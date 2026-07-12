@@ -27,8 +27,8 @@ Approval envelope = authority boundary
 - Canonical coding governance policy.
 - E2E Draft PR delivery workflow.
 - Local-agent and copyable-command rules.
-- Project packages for DS MCP, Rental Home, and PM Skills.
-- InstructionOps Agent and coding-agent bootstrap contracts.
+- Project packages for GWC, DS MCP, Rental Home, and PM Skills.
+- DWC runtime, InstructionOps Agent, and coding-agent bootstrap contracts.
 - JSON Schemas.
 - Validation, package-build, semantic-diff, and rollout-verification tools.
 - GitHub Actions for validation, package builds, and manual release publication.
@@ -45,6 +45,12 @@ Approval envelope = authority boundary
 
 - Repository writes require an active verified Project Profile with
   `write_enabled: true`.
+- On this repository, DWC read-only inspection is automatic; bounded non-risk
+  branch writes and Draft PR delivery are automatic under the active `gwc`
+  profile and one DS Admin task.
+- Financial, architecture, security-boundary, production configuration,
+  credential, production-data, destructive, irreversible, and broad-blast-
+  radius changes require explicit human direction.
 - `rental-home` and `pm-skills` are intentionally fail-closed until their
   repository identity and protected-base governance are verified.
 - Instruction deletion uses lifecycle transitions:
@@ -134,6 +140,27 @@ INSTRUCTION DRIFT <project-id>
 All modifying commands produce a proposal, scoped approval envelope, dedicated
 branch, validation evidence, and Draft PR. They never imply merge or deployment.
 
+## DWC repository operations
+
+For `nhatnguyenquang1838-coder/gwc`, DWC is not restricted to a fixed file
+allowlist. It may read the complete verified repository and modify any file
+required by the active DS Admin task on a dedicated guarded branch.
+
+The automatic path is:
+
+```text
+G0 intake
+→ automatic G1 inspection
+→ automatic G2 bounded non-risk execution
+→ validation and diff review
+→ automatic G3 Draft PR
+→ user review
+```
+
+Direct pushes to `main`, merge, auto-merge, deployment, release, production
+configuration, credential operations, production data, force-push, branch
+deletion, and shared-history rewrite remain prohibited or separately gated.
+
 ## Project activation
 
 A project becomes write-capable only after:
@@ -184,6 +211,7 @@ APPROVE CP-20260712-001 0123456789abcdef
 
 | Project | Status | Write enabled |
 |---|---:|---:|
+| `gwc` | active | yes |
 | `ds-mcp` | active | yes |
 | `rental-home` | pending verification | no |
 | `pm-skills` | pending repository assignment | no |
