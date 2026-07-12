@@ -1,4 +1,3 @@
-
 # Instruction Governance
 
 Central Git-based control plane for project instructions, governance policies,
@@ -97,7 +96,23 @@ dist/ds-mcp/<version>/
 └── package-manifest.yaml
 ```
 
-### 5. Compare package revisions
+### 5. Build the aggregate bundle
+
+```bash
+python tools/build_all_packages.py --output dist/bundles
+```
+
+Output:
+
+```text
+dist/bundles/gwc-all-projects-v<version>-<YYYYMMDD-HHMMSSZ>.zip
+```
+
+The aggregate archive contains every configured project package and a
+`bundle-manifest.yaml` with package versions, source commit, generation time,
+and SHA-256 evidence.
+
+### 6. Compare package revisions
 
 ```bash
 python tools/diff_instruction_package.py \
@@ -105,7 +120,7 @@ python tools/diff_instruction_package.py \
   dist/ds-mcp/1.1.0
 ```
 
-### 6. Verify a rollout checkout
+### 7. Verify a rollout checkout
 
 ```bash
 python tools/verify_rollout.py \
