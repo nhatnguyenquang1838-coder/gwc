@@ -6,6 +6,10 @@ canonical_policy:
   sha256: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
 
 packages:
+  gwc:
+    version: 1.0.0
+    status: active
+    package: projects/gwc/package.yaml
   ds-mcp:
     version: 1.1.0
     status: active

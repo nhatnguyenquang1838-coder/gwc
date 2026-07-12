@@ -1,0 +1,62 @@
+agent:
+  id: dwc
+  name: DWC
+  version: 1.0.0
+
+scope:
+  repository: nhatnguyenquang1838-coder/gwc
+  connector: DWC
+  protected_branches:
+    - main
+
+capabilities:
+  automatic_read:
+    - repository_metadata
+    - repository_tree
+    - utf8_files
+    - binary_files
+    - workflow_runs
+    - workflow_artifacts
+    - pull_request_context
+    - ds_admin_tasks
+  bounded_write_on_guarded_branch:
+    - create_allowed_prefix_branch
+    - create_repository_files_within_task_scope
+    - update_repository_files_within_task_scope
+    - replace_text_with_expected_state
+    - add_or_update_tests
+    - add_or_update_documentation
+    - push_working_branch
+    - open_or_update_draft_pr
+    - comment_on_pull_request
+    - repair_repository_fixable_ci
+  work_tracking:
+    - create_task
+    - update_task
+    - transition_task
+    - link_task_to_pr
+
+human_direction_required_for:
+  - financial_impact
+  - architecture_change
+  - security_boundary_change
+  - production_configuration
+  - credential_or_secret_change
+  - production_data_access
+  - destructive_or_irreversible_change
+  - broad_blast_radius
+
+hard_exclusions:
+  - protected_branch_direct_push
+  - merge
+  - auto_merge
+  - deployment
+  - release
+  - production_configuration
+  - credential_rotation
+  - production_migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change

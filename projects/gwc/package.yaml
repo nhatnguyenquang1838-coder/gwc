@@ -1,0 +1,60 @@
+schema_version: "1.0"
+project_id: gwc
+package_version: 1.0.0
+status: active
+
+profile: projects/gwc/project-profile.yaml
+
+instructions:
+  - id: coding-project-governance
+    path: core/Coding_Project_Governance_v1.0.md
+    target: .governance/Coding_Project_Governance_v1.0.md
+    required: true
+  - id: e2e-draft-pr-delivery
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+  - id: project-profile
+    path: projects/gwc/project-profile.yaml
+    target: .governance/project-profile.yaml
+    required: true
+  - id: project-extension
+    path: projects/gwc/project-extension.md
+    target: .governance/project-extension.md
+    required: true
+  - id: project-instructions
+    path: projects/gwc/project-instructions.md
+    target: .governance/project-instructions.md
+    required: true
+  - id: dwc-agent-instructions
+    path: agents/dwc/agent-instructions.md
+    target: .governance/agents/dwc/agent-instructions.md
+    required: true
+  - id: dwc-capabilities
+    path: agents/dwc/capabilities.yaml
+    target: .governance/agents/dwc/capabilities.yaml
+    required: true
+
+delivery:
+  mode: git-pr
+  target_repository: nhatnguyenquang1838-coder/gwc
+  target_path: .governance
+  default_branch: main
+  protected_branches:
+    - main
+  connector: DWC
+  identity_status: verified
+  write_enabled: true
+
+work_tracking:
+  provider: ds-admin
+  claim_required_for_e2e: true
+  ownership_verification_required: true
+  lease_renewal_required: false
+  status_transitions_from_state_engine: true
+
+notes:
+  - DWC repository reads are automatic for this verified repository.
+  - Bounded non-risk branch writes and Draft PR delivery are automatic.
+  - Security-boundary and other listed high-risk changes require explicit human direction.
+  - Merge, deployment, production configuration, credentials, and production data remain separately gated.
