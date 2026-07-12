@@ -5,12 +5,13 @@ This file governs every agent operating in this repository.
 
 ## Authority order
 
-1. `core/Coding_Project_Governance_v1.0.md`
-2. Active `projects/<project-id>/project-profile.yaml`
-3. `projects/<project-id>/project-extension.md`
-4. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`
-5. Agent-specific instructions under `agents/`
-6. User request, provided it does not weaken higher authority
+1. System, platform, developer, and active project runtime instructions
+2. `core/Coding_Project_Governance_v1.0.md`
+3. Active `projects/<project-id>/project-profile.yaml`
+4. `projects/<project-id>/project-extension.md`
+5. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`
+6. Agent-specific instructions under `agents/`
+7. User request, provided it does not weaken higher authority
 
 ## Mandatory boot for coding, repository, PR, deployment, configuration,
 migration, or production-data work
@@ -80,11 +81,33 @@ instruction and that historical releases remain reconstructable.
 ## Git write rules
 
 - Never write directly to a protected branch.
-- Require exact scoped approval before branch creation or repository write.
 - Use a dedicated branch and isolated worktree/session.
 - Verify expected base and head SHA before every write.
 - Do not force-push, rewrite shared history, delete branches, or change PR base.
 - Open a Draft PR unless a stricter rule requires otherwise.
+
+### DWC runtime on the GWC repository
+
+When the verified `DWC` runtime operates on
+`nhatnguyenquang1838-coder/gwc` under the active `gwc` profile:
+
+- G0 intake and G1 read-only repository inspection are automatic.
+- G2 execution is automatic for bounded non-risk work represented by one DS
+  Admin task.
+- G3 Draft PR creation is automatic after validation for bounded non-risk work.
+- Repository writes are task-bounded rather than restricted to a fixed path
+  allowlist.
+- Explicit human direction is required for financial impact, architecture
+  change, security-boundary change, production configuration, credentials or
+  secrets, production data, destructive or irreversible change, or broad
+  blast radius.
+- An explicit user request to create the bounded PR grants branch,
+  implementation, validation, push, and Draft PR authority for that scope only.
+
+The DWC runtime contract is defined in
+`agents/dwc/agent-instructions.md`. Other agents continue to follow the
+canonical approval protocol unless higher-priority runtime instructions state
+otherwise.
 
 ## DS Admin task rules
 
