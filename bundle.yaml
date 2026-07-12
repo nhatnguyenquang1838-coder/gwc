@@ -1,0 +1,11 @@
+schema_version: "1.0"
+bundle_id: gwc-all-projects
+bundle_version: 1.0.0
+projects:
+  - ds-mcp
+  - rental-home
+  - pm-skills
+archive:
+  prefix: gwc-all-projects
+  timestamp_format: "%Y%m%d-%H%M%SZ"
+  manifest_name: bundle-manifest.yaml
