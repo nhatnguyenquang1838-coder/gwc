@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/project-package.schema.json",
+  "title": "Instruction Governance Project Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_id",
+    "package_version",
+    "status",
+    "profile",
+    "instructions",
+    "delivery"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,63}$"
+    },
+    "package_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "active",
+        "deprecated",
+        "disabled",
+        "archived"
+      ]
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$"
+    },
+    "instructions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "target"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{2,80}$"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$"
+          },
+          "target": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$"
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "target_repository",
+        "target_path",
+        "default_branch",
+        "write_enabled"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "git-pr",
+            "local-copy",
+            "disabled"
+          ]
+        },
+        "target_repository": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "target_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).*$"
+        },
+        "default_branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "protected_branches": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "connector": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "identity_status": {
+          "enum": [
+            "verified",
+            "assumption",
+            "unconfirmed"
+          ]
+        },
+        "write_enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "work_tracking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "claim_required_for_e2e",
+        "ownership_verification_required"
+      ],
+      "properties": {
+        "provider": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "claim_required_for_e2e": {
+          "type": "boolean"
+        },
+        "ownership_verification_required": {
+          "type": "boolean"
+        },
+        "lease_renewal_required": {
+          "type": "boolean"
+        },
+        "status_transitions_from_state_engine": {
+          "type": "boolean"
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

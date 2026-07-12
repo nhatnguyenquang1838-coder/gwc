@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/approval-envelope.schema.json",
+  "title": "Scoped Approval Envelope for Instruction Governance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "approval_id",
+    "authority_gate",
+    "task_id",
+    "issued_at",
+    "expires_at",
+    "scope_version",
+    "risk_class",
+    "project_profile",
+    "repository",
+    "base_ref",
+    "base_sha",
+    "working_branch",
+    "modules_or_files",
+    "authorized_actions",
+    "excluded_actions",
+    "artifact_hashes",
+    "scope_hash"
+  ],
+  "properties": {
+    "approval_id": {
+      "type": "string",
+      "pattern": "^CP-[0-9]{8}-[0-9]{3,}$"
+    },
+    "authority_gate": {
+      "enum": [
+        "G2_EXECUTION",
+        "G3_PR",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION_DATA"
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scope_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "risk_class": {
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3"
+      ]
+    },
+    "project_profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "base_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "working_branch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "modules_or_files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "authorized_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "claim_work_item",
+          "renew_work_item_lease",
+          "update_work_item_status",
+          "release_work_item",
+          "modify_approved_files",
+          "run_sandboxed_validation",
+          "push_working_branch",
+          "open_or_update_draft_pr",
+          "merge_approved_pr",
+          "deploy_approved_release",
+          "production_data_read",
+          "production_data_write",
+          "production_config_change",
+          "credential_rotation"
+        ]
+      }
+    },
+    "excluded_actions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "work_item": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "id",
+        "claim_required",
+        "expected_repository"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claim_required": {
+          "type": "boolean"
+        },
+        "expected_repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "expected_owner": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "initial_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "review_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "artifact_hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "change_plan",
+        "mermaid",
+        "png",
+        "svg"
+      ],
+      "properties": {
+        "change_plan": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "mermaid": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "png": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "svg": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    }
+  }
+}

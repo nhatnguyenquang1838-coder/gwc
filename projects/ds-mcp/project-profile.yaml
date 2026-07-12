@@ -1,0 +1,65 @@
+version: '1.0'
+profile_id: ds-mcp
+project:
+  name: DS MCP
+  timezone: Asia/Ho_Chi_Minh
+  default_language: en
+  description: Node.js MCP and REST gateway with Supabase persistence, GitHub operations
+    through the DW connector, workflow state controls, and Vercel deployment.
+repository:
+  owner: dw18031988
+  name: ds_mcp_server
+  url: https://github.com/dw18031988/ds_mcp_server
+  default_branch: main
+  protected_branches:
+  - main
+  write_enabled: true
+  identity_status: verified
+  identity_note: Canonical project repository from DS MCP policy v2.1.
+connectors:
+  git_provider: DW
+  api_connector: DS MCP REST/MCP
+  account_or_tenant: null
+context:
+  read_first:
+  - README.md
+  - AGENTS.md
+  - CONTRIBUTING.md
+  - package.json
+  - pnpm-lock.yaml
+  - package-lock.json
+  - .github/workflows/
+  governance_from_protected_base: true
+  session_root: /mnt/data/ds_mcp_sessions/<YYYYMMDD-HHMM>-<TASK-ID>/
+  additional_notes:
+  - 'REST base: https://ds-mcp-server-one.vercel.app/'
+  - Inspect route policy, schemas, repositories, state engine, database RPCs, and
+    Admin UI contracts relevant to the task.
+commands:
+  discovery_required: true
+  package_manager: npm-or-pnpm-from-lockfile
+  validation_candidates:
+  - npm test
+  - npm run typecheck
+  - npm run build
+  - pnpm test
+  - pnpm typecheck
+  - pnpm build
+  execution_note: Select the package manager from the protected-base lockfile; never
+    invent or run absent scripts.
+ci:
+  provider: github-actions
+  recheck_delay: PT2M
+  required_workflows_discovery: true
+  known_required_workflows: []
+deployment:
+  provider: vercel
+  authority_gate: G5_DEPLOY
+  project_name: ds-mcp-server
+production_data:
+  provider: supabase
+  authority_gate: G6_PRODUCTION_DATA
+  notes: Transactions/RPCs, auth, rate limits, audit events, and State Engine invariants
+    are mandatory.
+extensions:
+- projects/ds-mcp/project-extension.md

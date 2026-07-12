@@ -1,0 +1,13 @@
+{
+  "bundle": "instruction-governance",
+  "canonical_policy_sha256": "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1",
+  "requested_files": 43,
+  "requested_files_missing": [],
+  "total_files": 49,
+  "validation": "VALIDATION PASSED\nRoot: /mnt/data/instruction-governance\nCanonical policy SHA-256: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1\nProjects validated: ds-mcp, rental-home, pm-skills",
+  "package_builds": [
+    "PACKAGE BUILD COMPLETE\nProject: ds-mcp\nVersion: 1.1.0\nOutput: /mnt/data/instruction-governance-build-check/ds-mcp/1.1.0\nFiles: 8\nManifest SHA-256: 2c6d3d57dbda9415c4bc725d99732034624c4eef196f6c8138bd4dcd36fef76c",
+    "PACKAGE BUILD COMPLETE\nProject: rental-home\nVersion: 1.0.0\nOutput: /mnt/data/instruction-governance-build-check/rental-home/1.0.0\nFiles: 8\nManifest SHA-256: a3c20d759b30eaf85b3d002529b397f83aa3ecbca68af13a302fd3d7e1abc4b1",
+    "PACKAGE BUILD COMPLETE\nProject: pm-skills\nVersion: 1.0.0\nOutput: /mnt/data/instruction-governance-build-check/pm-skills/1.0.0\nFiles: 6\nManifest SHA-256: a13a2a78b41683c2d54b8b8e7c72a318912820a3f2b13a8263af9c422b244f4a"
+  ]
+}

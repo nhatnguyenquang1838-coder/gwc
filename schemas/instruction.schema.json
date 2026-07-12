@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/instruction.schema.json",
+  "title": "Managed Instruction Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "instruction_id",
+    "version",
+    "title",
+    "lifecycle",
+    "scope",
+    "content_path",
+    "owner",
+    "change_policy"
+  ],
+  "properties": {
+    "instruction_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,80}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lifecycle": {
+      "enum": [
+        "draft",
+        "active",
+        "deprecated",
+        "disabled",
+        "archived"
+      ]
+    },
+    "scope": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "content_path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "consumers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "checksum_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "change_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_gate",
+        "requires_pr"
+      ],
+      "properties": {
+        "minimum_gate": {
+          "enum": [
+            "G1_INSPECT",
+            "G2_EXECUTION",
+            "G3_PR",
+            "G4_MERGE",
+            "G5_DEPLOY",
+            "G6_PRODUCTION_DATA"
+          ]
+        },
+        "requires_pr": {
+          "type": "boolean"
+        },
+        "requires_visuals": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

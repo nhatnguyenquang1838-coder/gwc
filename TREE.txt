@@ -1,0 +1,61 @@
+instruction-governance/
+├── .github/
+│   ├── workflows/
+│   │   ├── build-packages.yml
+│   │   ├── publish-release.yml
+│   │   └── validate-instructions.yml
+│   └── CODEOWNERS
+├── agents/
+│   ├── coding-agent/
+│   │   └── bootstrap.md
+│   └── instructionops-agent/
+│       ├── agent-instructions.md
+│       ├── capabilities.yaml
+│       └── command-contract.md
+├── core/
+│   ├── Coding_Project_Governance_v1.0.md
+│   ├── E2E_DRAFT_PR_DELIVERY_RULE.md
+│   ├── LOCAL_AGENT_RULE.md
+│   └── USER_COMMAND_FORMAT_RULE.md
+├── projects/
+│   ├── ds-mcp/
+│   │   ├── admin-task-claim-rule.md
+│   │   ├── package.yaml
+│   │   ├── project-extension.md
+│   │   ├── project-instructions.md
+│   │   └── project-profile.yaml
+│   ├── pm-skills/
+│   │   ├── package.yaml
+│   │   ├── project-extension.md
+│   │   ├── project-instructions.md
+│   │   └── project-profile.yaml
+│   └── rental-home/
+│       ├── package.yaml
+│       ├── project-extension.md
+│       ├── project-instructions.md
+│       ├── project-profile.yaml
+│       └── spec-driven-format.md
+├── releases/
+│   ├── changelog.md
+│   └── manifest.yaml
+├── schemas/
+│   ├── approval-envelope.schema.json
+│   ├── instruction.schema.json
+│   ├── project-package.schema.json
+│   └── rollout.schema.json
+├── templates/
+│   ├── e2e-rule.template.md
+│   ├── project-extension.template.md
+│   ├── project-instructions.template.md
+│   └── project-profile.template.yaml
+├── tools/
+│   ├── build_project_package.py
+│   ├── diff_instruction_package.py
+│   ├── validate_instructions.py
+│   └── verify_rollout.py
+├── AGENTS.md
+├── BUNDLE-REPORT.json
+├── catalog.yaml
+├── README.md
+├── requirements.txt
+└── SHA256SUMS.txt

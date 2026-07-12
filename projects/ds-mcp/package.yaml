@@ -1,0 +1,63 @@
+
+schema_version: "1.0"
+project_id: ds-mcp
+package_version: 1.1.0
+status: active
+
+profile: projects/ds-mcp/project-profile.yaml
+
+instructions:
+  - id: coding-project-governance
+    path: core/Coding_Project_Governance_v1.0.md
+    target: .governance/Coding_Project_Governance_v1.0.md
+    required: true
+  - id: e2e-draft-pr-delivery
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+  - id: local-agent-rule
+    path: core/LOCAL_AGENT_RULE.md
+    target: .governance/LOCAL_AGENT_RULE.md
+    required: true
+  - id: user-command-format
+    path: core/USER_COMMAND_FORMAT_RULE.md
+    target: .governance/USER_COMMAND_FORMAT_RULE.md
+    required: true
+  - id: project-profile
+    path: projects/ds-mcp/project-profile.yaml
+    target: .governance/project-profile.yaml
+    required: true
+  - id: project-extension
+    path: projects/ds-mcp/project-extension.md
+    target: .governance/project-extension.md
+    required: true
+  - id: project-instructions
+    path: projects/ds-mcp/project-instructions.md
+    target: .governance/project-instructions.md
+    required: true
+  - id: admin-task-claim
+    path: projects/ds-mcp/admin-task-claim-rule.md
+    target: .governance/admin-task-claim-rule.md
+    required: true
+
+delivery:
+  mode: git-pr
+  target_repository: dw18031988/ds_mcp_server
+  target_path: .governance
+  default_branch: main
+  protected_branches:
+    - main
+  connector: DW
+  identity_status: verified
+  write_enabled: true
+
+work_tracking:
+  provider: ds-admin
+  claim_required_for_e2e: true
+  ownership_verification_required: true
+  lease_renewal_required: true
+  status_transitions_from_state_engine: true
+
+notes:
+  - Merge, deployment, production configuration, and production data remain separately gated.
+  - Package version 1.1.0 adds mandatory Admin task claim governance.

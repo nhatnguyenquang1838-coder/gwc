@@ -1,0 +1,24 @@
+
+schema_version: "1.0"
+generated_from: local-ready-to-copy-bundle
+canonical_policy:
+  version: "1.0"
+  sha256: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+
+packages:
+  ds-mcp:
+    version: 1.1.0
+    status: active
+    package: projects/ds-mcp/package.yaml
+  rental-home:
+    version: 1.0.0
+    status: pending-verification
+    package: projects/rental-home/package.yaml
+  pm-skills:
+    version: 1.0.0
+    status: pending-repository
+    package: projects/pm-skills/package.yaml
+
+notes:
+  - This manifest describes source package versions, not completed target-repository rollouts.
+  - Project repositories must pin a generated package manifest and source commit.

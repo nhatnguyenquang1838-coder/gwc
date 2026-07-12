@@ -1,0 +1,44 @@
+
+name: Build instruction packages
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - ds-mcp
+          - rental-home
+          - pm-skills
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Validate
+        run: python tools/validate_instructions.py --project "${{ matrix.project }}"
+
+      - name: Build package
+        run: python tools/build_project_package.py "${{ matrix.project }}" --output dist --clean
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: instruction-package-${{ matrix.project }}
+          path: dist/${{ matrix.project }}/
+          if-no-files-found: error

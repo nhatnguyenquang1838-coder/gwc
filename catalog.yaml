@@ -1,0 +1,25 @@
+
+version: "1.0"
+repository:
+  name: instruction-governance
+  intended_remote: https://github.com/nhatnguyenquang1838-coder/gwc
+  default_branch: main
+
+canonical_policy:
+  path: core/Coding_Project_Governance_v1.0.md
+  version: "1.0"
+  sha256: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+
+projects:
+  ds-mcp:
+    package: projects/ds-mcp/package.yaml
+    status: active
+    enabled: true
+  rental-home:
+    package: projects/rental-home/package.yaml
+    status: pending-verification
+    enabled: true
+  pm-skills:
+    package: projects/pm-skills/package.yaml
+    status: pending-repository
+    enabled: true

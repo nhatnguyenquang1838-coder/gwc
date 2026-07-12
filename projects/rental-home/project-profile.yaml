@@ -1,0 +1,73 @@
+
+version: "1.0"
+profile_id: rental-home
+
+project:
+  name: Rental Home
+  timezone: Asia/Ho_Chi_Minh
+  default_language: en
+  description: Small rental-management application using Supabase, Vercel, and project-specific AGENTS.md governance.
+
+repository:
+  owner: nhatnguyenquang1838-coder
+  name: rental_home
+  url: https://github.com/nhatnguyenquang1838-coder/rental_home
+  default_branch: main
+  protected_branches:
+    - main
+  write_enabled: false
+  identity_status: unconfirmed
+  identity_note: Known repository candidate; protected-base identity and connector write authority must be reverified before activation.
+
+connectors:
+  git_provider: DW
+  api_connector: null
+  account_or_tenant: null
+
+context:
+  read_first:
+    - AGENTS.md
+    - README.md
+    - CONTRIBUTING.md
+    - package.json
+    - pnpm-lock.yaml
+    - package-lock.json
+    - supabase/
+    - .github/workflows/
+  governance_from_protected_base: true
+  session_root: /mnt/data/rental_home_sessions/<YYYYMMDD-HHMM>-<TASK-ID>/
+  additional_notes:
+    - AGENTS.md is the project-specific source of truth when present.
+    - Use one unique folder and worktree per branch.
+    - Preserve RLS, privacy, and Supabase migration discipline.
+
+commands:
+  discovery_required: true
+  package_manager: from-protected-base-lockfile
+  validation_candidates:
+    - npm test
+    - npm run typecheck
+    - npm run build
+    - pnpm test
+    - pnpm typecheck
+    - pnpm build
+  execution_note: Inspect scripts and lockfiles before selecting commands.
+
+ci:
+  provider: github-actions
+  recheck_delay: PT2M
+  required_workflows_discovery: true
+  known_required_workflows: []
+
+deployment:
+  provider: vercel
+  authority_gate: G5_DEPLOY
+  project_name: null
+
+production_data:
+  provider: supabase
+  authority_gate: G6_PRODUCTION_DATA
+  notes: RLS, auth, tenant/home ownership, migrations, and production data are separately gated.
+
+extensions:
+  - projects/rental-home/project-extension.md

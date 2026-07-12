@@ -1,0 +1,54 @@
+
+schema_version: "1.0"
+project_id: pm-skills
+package_version: 1.0.0
+status: active
+
+profile: projects/pm-skills/project-profile.yaml
+
+instructions:
+  - id: coding-project-governance
+    path: core/Coding_Project_Governance_v1.0.md
+    target: .governance/Coding_Project_Governance_v1.0.md
+    required: true
+  - id: local-agent-rule
+    path: core/LOCAL_AGENT_RULE.md
+    target: .governance/LOCAL_AGENT_RULE.md
+    required: true
+  - id: user-command-format
+    path: core/USER_COMMAND_FORMAT_RULE.md
+    target: .governance/USER_COMMAND_FORMAT_RULE.md
+    required: true
+  - id: project-profile
+    path: projects/pm-skills/project-profile.yaml
+    target: .governance/project-profile.yaml
+    required: true
+  - id: project-extension
+    path: projects/pm-skills/project-extension.md
+    target: .governance/project-extension.md
+    required: true
+  - id: project-instructions
+    path: projects/pm-skills/project-instructions.md
+    target: .governance/project-instructions.md
+    required: true
+
+delivery:
+  mode: disabled
+  target_repository: null
+  target_path: .governance
+  default_branch: main
+  protected_branches:
+    - main
+  connector: DW
+  identity_status: unconfirmed
+  write_enabled: false
+
+work_tracking:
+  provider: null
+  claim_required_for_e2e: false
+  ownership_verification_required: false
+  lease_renewal_required: false
+  status_transitions_from_state_engine: false
+
+notes:
+  - Assign and verify a repository before enabling Git delivery.

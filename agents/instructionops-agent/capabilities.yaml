@@ -1,0 +1,52 @@
+
+agent:
+  id: instructionops-agent
+  name: InstructionOps Agent
+  version: 1.0.0
+
+capabilities:
+  read:
+    - list_projects
+    - get_project_package
+    - get_instruction
+    - inspect_consumers
+    - inspect_release
+    - detect_drift
+  plan:
+    - propose_instruction_create
+    - propose_instruction_update
+    - propose_instruction_deprecation
+    - propose_rollout
+    - propose_rollback
+  validate:
+    - validate_catalog
+    - validate_schema
+    - validate_hashes
+    - validate_package
+    - validate_rollout
+    - semantic_diff
+  write_after_approval:
+    - modify_approved_instruction_files
+    - update_approved_package_manifest
+    - update_changelog
+    - build_package
+    - push_working_branch
+    - open_or_update_draft_pr
+  work_tracking_after_approval:
+    - claim_work_item
+    - renew_work_item_lease
+    - update_work_item_status
+
+hard_exclusions:
+  - merge
+  - auto_merge
+  - deployment
+  - production_configuration
+  - credential_rotation
+  - production_migration
+  - production_data
+  - protected_branch_direct_push
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
