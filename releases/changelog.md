@@ -1,6 +1,31 @@
 
 # Changelog
 
+## 2026-07-13
+
+### Added
+
+- Active `gwc` self-governance project profile and package.
+- DWC repository operation contract and machine-readable capabilities.
+- DS Admin traceability for GWC modifying tasks.
+
+### Changed
+
+- DWC read-only inspection is automatic for the verified GWC repository.
+- DWC may perform bounded non-risk writes on a dedicated branch and deliver a
+  Draft PR without repeated per-operation approval prompts.
+- DWC repository writes are task-bounded instead of restricted to a fixed file
+  allowlist.
+
+### Safety
+
+- Explicit human direction remains required for financial, architecture,
+  security-boundary, production configuration, credential, production-data,
+  destructive, irreversible, and broad-blast-radius changes.
+- Direct protected-branch pushes, merge, deployment, production operations,
+  force-push, branch deletion, and shared-history rewrite remain prohibited or
+  separately gated.
+
 ## 2026-07-12
 
 ### Added
