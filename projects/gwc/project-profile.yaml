@@ -1,0 +1,55 @@
+version: "1.0"
+profile_id: gwc
+project:
+  name: Instruction Governance Control Plane
+  timezone: Asia/Ho_Chi_Minh
+  default_language: en
+  description: Central governance repository and aggregate project package builder.
+repository:
+  owner: nhatnguyenquang1838-coder
+  name: gwc
+  url: https://github.com/nhatnguyenquang1838-coder/gwc
+  default_branch: main
+  protected_branches:
+    - main
+  write_enabled: true
+  identity_status: verified
+  identity_note: Verified through GitHub connector on 2026-07-12; authenticated account has admin and push permissions.
+connectors:
+  git_provider: GitHub
+  api_connector: GitHub
+  account_or_tenant: nhatnguyenquang1838-coder
+context:
+  read_first:
+    - README.md
+    - catalog.yaml
+    - tools/build_project_package.py
+    - .github/workflows/build-packages.yml
+    - projects/*/package.yaml
+  governance_from_protected_base: true
+  session_root: /mnt/data/gwc_sessions
+  additional_notes:
+    - Never push directly to main.
+    - Aggregate bundle must preserve per-project manifests and hashes.
+commands:
+  discovery_required: true
+  package_manager: python
+  validation_candidates:
+    - python tools/validate_instructions.py
+    - python -m pytest
+  execution_note: Inspect requirements and workflow actions before running repository code.
+ci:
+  provider: GitHub Actions
+  recheck_delay: PT2M
+  required_workflows_discovery: true
+  known_required_workflows:
+    - Build instruction packages
+deployment:
+  provider: GitHub Releases
+  authority_gate: G5_DEPLOY
+  project_name: gwc
+production_data:
+  provider: null
+  authority_gate: G6_PRODUCTION_DATA
+  notes: No production data operations are part of package building.
+extensions: []
