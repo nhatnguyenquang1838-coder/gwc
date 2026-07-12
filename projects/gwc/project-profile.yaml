@@ -1,0 +1,66 @@
+version: '1.0'
+profile_id: gwc
+project:
+  name: GWC
+  timezone: Asia/Ho_Chi_Minh
+  default_language: vi
+  description: Central governance runtime and source of truth for project instructions,
+    agent contracts, project profiles, package validation, and guarded PR delivery.
+repository:
+  owner: nhatnguyenquang1838-coder
+  name: gwc
+  url: https://github.com/nhatnguyenquang1838-coder/gwc
+  default_branch: main
+  protected_branches:
+    - main
+  write_enabled: true
+  identity_status: verified
+  identity_note: Verified through the DWC connector with admin, maintain, push, triage,
+    and pull permissions on 2026-07-13.
+connectors:
+  git_provider: DWC
+  api_connector: DS Admin
+  account_or_tenant: null
+context:
+  read_first:
+    - AGENTS.md
+    - core/Coding_Project_Governance_v1.0.md
+    - projects/gwc/project-profile.yaml
+    - projects/gwc/project-instructions.md
+    - projects/gwc/project-extension.md
+    - agents/dwc/agent-instructions.md
+    - agents/dwc/capabilities.yaml
+    - README.md
+    - catalog.yaml
+    - .github/workflows/
+  governance_from_protected_base: true
+  session_root: /mnt/data/gwc_sessions/<YYYYMMDD-HHMM>-<TASK-ID>/
+  additional_notes:
+    - DS Admin is the work-tracking source of truth.
+    - DWC G0/G1 inspection is automatic.
+    - DWC G2 and G3 are automatic only for bounded non-risk repository changes.
+commands:
+  discovery_required: true
+  package_manager: python
+  validation_candidates:
+    - python tools/validate_instructions.py
+    - python tools/build_project_package.py gwc --output dist
+  execution_note: Inspect scripts and workflow definitions before execution; do not
+    invent or run absent commands.
+ci:
+  provider: github-actions
+  recheck_delay: PT2M
+  required_workflows_discovery: true
+  known_required_workflows:
+    - validate-instructions
+deployment:
+  provider: none
+  authority_gate: G5_DEPLOY
+  project_name: null
+production_data:
+  provider: none
+  authority_gate: G6_PRODUCTION_DATA
+  notes: This repository contains governance source and must not contain production
+    credentials or production data.
+extensions:
+  - projects/gwc/project-extension.md
