@@ -1,0 +1,49 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-13T11:31:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
+  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  g0_snapshot: ../g0/context-snapshot.yaml
+problem:
+  statement: GWC lacks canonical machine-readable G0/G1 lifecycle artifacts.
+  why_now: The delivery lifecycle must prevent wrong-solution execution before G2.
+desired_outcome: Define deterministic G0/G1 contracts and fail-closed validation.
+stakeholders:
+  requester: DW
+  affected:
+  - DWC
+  - GWC maintainers
+scope:
+  in_scope:
+  - G0/G1 schemas
+  - templates
+  - validator
+  - tests
+  - documentation
+  non_goals:
+  - Merge automation
+  - deployment
+  - production operations
+  - external skill ingestion
+constraints:
+- Use existing dependencies
+- Use a guarded branch
+assumptions:
+- The active GWC project profile remains authoritative for repository identity.
+risks:
+- id: RISK-1
+  description: A permissive contract could allow incomplete G1 evidence.
+  impact: medium
+  mitigation: Use strict schemas and cross-artifact checks.
+acceptance_criteria:
+- id: AC-1
+  statement: Valid fixtures pass schema and cross-artifact validation.
+  verifiable: true
+- id: AC-2
+  statement: A selected option missing from the options artifact fails validation.
+  verifiable: true
+unresolved_questions: []
+status: READY
