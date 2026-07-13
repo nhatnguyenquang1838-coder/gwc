@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GWC Skill Registry",
+  "type": "object",
+  "required": [
+    "version",
+    "resolution_policy",
+    "skills"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "resolution_policy": {
+      "type": "object"
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source_type",
+          "sha256",
+          "status",
+          "authority"
+        ]
+      }
+    }
+  },
+  "additionalProperties": true
+}
