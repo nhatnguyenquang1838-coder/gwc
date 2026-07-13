@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.2.0
+package_version: 1.3.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -33,6 +33,18 @@ instructions:
   - id: g01-runtime-input-template
     path: templates/g01/g01-runtime-input.template.yaml
     target: .governance/templates/g01-runtime-input.template.yaml
+    required: true
+  - id: g01-decision-input-schema
+    path: schemas/g01-decision-input.schema.json
+    target: .governance/schemas/g01-decision-input.schema.json
+    required: true
+  - id: g01-decision-capture
+    path: tools/capture_g01_decision.py
+    target: .governance/tools/capture_g01_decision.py
+    required: true
+  - id: g01-decision-input-template
+    path: templates/g01/g01-decision-input.template.yaml
+    target: .governance/templates/g01-decision-input.template.yaml
     required: true
   - id: project-profile
     path: projects/gwc/project-profile.yaml
