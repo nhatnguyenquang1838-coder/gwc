@@ -1,0 +1,32 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-13T11:34:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
+  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  g0_snapshot: ../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-99
+user_decision:
+  actor: DW
+  decided_at: '2026-07-13T11:15:00Z'
+  source: 'chat: continue Enhance G01'
+  explicit: true
+rationale: Proceed with a bounded repository-native G0/G1 enhancement.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
