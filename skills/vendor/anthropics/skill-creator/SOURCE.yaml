@@ -1,0 +1,13 @@
+version: '1.0'
+skill_id: anthropics.skill-creator
+source_repo: anthropics/skills
+upstream_path: skills/skill-creator/SKILL.md
+source_url: https://raw.githubusercontent.com/anthropics/skills/main/skills/skill-creator/SKILL.md
+pinned_ref: main
+local_fallback: skills/vendor/anthropics/skill-creator/SKILL.md
+local_sha256: a688024c48c3b3772a9be5a53c513849222f1243d83eea92596e6fad031186a4
+license: license-not-verified
+import_mode: adapted_not_verbatim
+upstream_scripts_allowed: false
+authority: reference_only
+notes: Adapted local fallback; not a verbatim import.
