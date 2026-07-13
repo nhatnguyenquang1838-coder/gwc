@@ -1,0 +1,10 @@
+version: "1.0"
+task_id: ""
+decision: ""
+selected_option: ""
+assumptions: []
+risks: []
+approved_scope: []
+excluded_actions: []
+validation_plan: []
+next_gate: ""
