@@ -1,9 +1,9 @@
-040000 tree 1527a371bdc55538c39d9444b4283c41a33c0152	.github
+040000 tree acc5114927f28737c6ce5d9a16226ae3ca0d7447	.github
 100644 blob 0ccccad23f1b5a0184baedfd4bbe2f07dc7974ef 258	.github/CODEOWNERS
-040000 tree 8f078bacda4319e2dde114c68637d41c24b434c7	.github/workflows
+040000 tree 02fbb5908d528a9422a6b7e87a7910387501fb39	.github/workflows
 100644 blob d60dac96863ee59cb2e5060900a3aad077ccfd19 1036	.github/workflows/build-packages.yml
 100644 blob e9c60b8ffc91e7bf29c6c8ac642a4c3609424bd6 2175	.github/workflows/publish-release.yml
-100644 blob eb8beaad14901495bb1fb8aa5e624853fdf6040c 739	.github/workflows/validate-instructions.yml
+100644 blob 8009576e0adfe649a43e305c5d4b7fcaf6772453 1303	.github/workflows/validate-instructions.yml
 040000 tree 3bf4a12b8f987fc9919f2bcd2ccf9e1d8ce0dbad	agents
 100644 blob 4758f9c5de05381b8edc83d031fe811cdcd710b8 4852	AGENTS.md
 040000 tree 14476ad1fdf8457f8323b2469e06a73da5f01f6e	agents/coding-agent
@@ -68,7 +68,7 @@
 100644 blob d01a6240d1c9cabfeee4076021e528133da04494 2191	schemas/instruction.schema.json
 100644 blob 91fc4a4659ddbdf9519f133aeeca82649391ecdb 3709	schemas/project-package.schema.json
 100644 blob 82e7b532334905f3e8f043e63e51bdad4eae515e 2698	schemas/rollout.schema.json
-100644 blob 3c71bfe086a8f93030f10ff054e31e63cbbf0546 7836	SHA256SUMS.txt
+100644 blob 1711239a92244e24878dfafadfd9fd901a554a11 8344	SHA256SUMS.txt
 040000 tree ed0c04c718c5ccda94e1dd08201ae9a82fceb2d6	templates
 100644 blob 7faeadc937f7e7306f15eb4d5ada842905d60a8c 468	templates/e2e-rule.template.md
 040000 tree 9b4340c5fe6f72d61d5854426bf3f210e1f7e06d	templates/g01
@@ -100,13 +100,12 @@
 100644 blob 7b07d18b12acb9c1dd90b8c2e151e6dc811f38d3 2166	tests/test_base_drift_policy.py
 100644 blob 479621e6dd682ae8ad5d916e1a7cc0528b51a403 2579	tests/test_g01_lifecycle.py
 100644 blob a8d73eb5465a3e1d01f224cd82e7114f8d004ecb 5430	tests/test_g01_runtime.py
-040000 tree cd95ce89252be69b34745557c27d9fb67b622848	tools
+040000 tree 1dc680ba4e218d60539ced2a46e2ddd88c186941	tools
 100644 blob 7efb03b8708d13824618b38dbaa0fc3957a2e0b5 3767	tools/build_project_package.py
 100644 blob f83870d30b20ea67e4eaa67104a64b41ac2b9128 2772	tools/diff_instruction_package.py
 100644 blob bd8fee45c59fd2a9bb33e63793f3c304d810fc96 4999	tools/evaluate_base_drift.py
-100644 blob 452fd945d5a6a8bdbb132af801a49496b2ef14a1 13034	tools/generate_g01_runtime.py
+100644 blob abd062a3a795a8acd089ff86423f69fe585599dc 13032	tools/generate_g01_runtime.py
 100644 blob 4c037a0c2a22bf7732f8d0c73c2676916f33ee2b 3725	tools/hash_integrity_artifacts.py
 100644 blob 154b20f62d94204ecd94ecbc8b71979d6817cf7b 12506	tools/validate_g01.py
 100644 blob f4848eb7cfd0405f8d277a71b8309e0c84854234 10286	tools/validate_instructions.py
 100644 blob ba5efe6e05ba1536f5834b47ded50875abcabe0c 2331	tools/verify_rollout.py
-100644 blob a127a491f03721a5961ef0e39c2f8e44237f0869 9326	TREE.txt
