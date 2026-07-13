@@ -72,6 +72,38 @@ class G01RuntimeGenerationTests(unittest.TestCase):
             {item["code"] for item in artifacts["preflight"]["blockers"]},
         )
 
+    def test_cli_generates_schema_valid_artifact_set(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            workspace = Path(temp_dir) / "workspace"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(GENERATOR),
+                    "--root",
+                    str(ROOT),
+                    "--input",
+                    str(FIXTURE),
+                    "--workspace",
+                    str(workspace),
+                    "--json",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            summary = json.loads(result.stdout)
+            self.assertEqual("PASS", summary["outcome"])
+            self.assertTrue(summary["written"])
+            for relative_path in summary["artifacts"]:
+                self.assertTrue((workspace / relative_path).is_file(), relative_path)
+
+            preflight = yaml.safe_load(
+                (workspace / "g1/preflight/g1-preflight-report.yaml").read_text(encoding="utf-8")
+            )
+            self.assertEqual("PASS", preflight["outcome"])
+            self.assertEqual("G2_AUTOMATIC_BOUNDED", preflight["required_gate"])
+
     def test_invalid_input_exits_two_without_partial_artifacts(self) -> None:
         payload = copy.deepcopy(self.valid_input)
         payload["repository"]["base_sha"] = "not-a-sha"
