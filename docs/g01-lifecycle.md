@@ -79,12 +79,40 @@ R0/R1 work selects `G2_AUTOMATIC_BOUNDED`. R2/R3 work selects
 The generator never grants merge, deployment, release, secret, or production
 authority.
 
+## Options and decision capture
+
+`tools/capture_g01_decision.py` reads a completed intake and passing preflight,
+then generates the options and explicit decision artifacts from a versioned
+`g01-decision-input` document.
+
+```bash
+python tools/capture_g01_decision.py \
+  --input templates/g01/g01-decision-input.template.yaml \
+  --workspace .gwc \
+  --json
+```
+
+The capture flow validates option IDs, selected and recommended references,
+acceptance-criteria references, preflight status, and explicit human choice. It
+computes a deterministic `scope_hash` from the intake scope, constraints, and
+acceptance criteria, then runs the complete G0/G1 validator before returning
+`PASS`.
+
+A generated decision always records an empty authority grant list and excludes
+`G4_MERGE`, `G5_DEPLOY`, and `G6_PRODUCTION`.
+
+Decision capture exit codes are:
+
+- `0`: explicit accepted decision and complete G1 workspace `PASS`.
+- `1`: schema-valid `PENDING`, `REJECTED`, `NEEDS_INPUT`, or `BLOCKED` outcome.
+- `2`: input/schema/I/O failure.
+
 ## Validation
 
 ```bash
 python tools/validate_g01.py --workspace .gwc
 python tools/validate_g01.py --workspace tests/fixtures/g01-valid --json
-python -m unittest tests.test_g01_lifecycle tests.test_g01_runtime
+python -m unittest tests.test_g01_lifecycle tests.test_g01_runtime tests.test_g01_decision_capture
 ```
 
 The generic repository validator checks that the G0/G1 schemas and validator
