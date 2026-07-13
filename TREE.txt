@@ -1,61 +1,14 @@
-instruction-governance/
-├── .github/
-│   ├── workflows/
-│   │   ├── build-packages.yml
-│   │   ├── publish-release.yml
-│   │   └── validate-instructions.yml
-│   └── CODEOWNERS
-├── agents/
-│   ├── coding-agent/
-│   │   └── bootstrap.md
-│   └── instructionops-agent/
-│       ├── agent-instructions.md
-│       ├── capabilities.yaml
-│       └── command-contract.md
-├── core/
-│   ├── Coding_Project_Governance_v1.0.md
-│   ├── E2E_DRAFT_PR_DELIVERY_RULE.md
-│   ├── LOCAL_AGENT_RULE.md
-│   └── USER_COMMAND_FORMAT_RULE.md
-├── projects/
-│   ├── ds-mcp/
-│   │   ├── admin-task-claim-rule.md
-│   │   ├── package.yaml
-│   │   ├── project-extension.md
-│   │   ├── project-instructions.md
-│   │   └── project-profile.yaml
-│   ├── pm-skills/
-│   │   ├── package.yaml
-│   │   ├── project-extension.md
-│   │   ├── project-instructions.md
-│   │   └── project-profile.yaml
-│   └── rental-home/
-│       ├── package.yaml
-│       ├── project-extension.md
-│       ├── project-instructions.md
-│       ├── project-profile.yaml
-│       └── spec-driven-format.md
-├── releases/
-│   ├── changelog.md
-│   └── manifest.yaml
-├── schemas/
-│   ├── approval-envelope.schema.json
-│   ├── instruction.schema.json
-│   ├── project-package.schema.json
-│   └── rollout.schema.json
-├── templates/
-│   ├── e2e-rule.template.md
-│   ├── project-extension.template.md
-│   ├── project-instructions.template.md
-│   └── project-profile.template.yaml
-├── tools/
-│   ├── build_project_package.py
-│   ├── diff_instruction_package.py
-│   ├── validate_instructions.py
-│   └── verify_rollout.py
-├── AGENTS.md
-├── BUNDLE-REPORT.json
-├── catalog.yaml
-├── README.md
-├── requirements.txt
-└── SHA256SUMS.txt
+040000 tree 6b39cddb0e698eb479866e93014ca006d5b65465	.github
+100644 blob 0ccccad23f1b5a0184baedfd4bbe2f07dc7974ef 258	.github/CODEOWNERS
+100644 blob d60dac96863ee59cb2e5060900a3aad077ccfd19 1036	.github/workflows/build-packages.yml
+100644 blob 6aea0d9625c5596550d521bc9b902080d4ad695d 2159	.github/workflows/publish-release.yml
+100644 blob 732fb13fa49fc1a8a12e35715df24025ebd134c9 633	.github/workflows/validate-instructions.yml
+040000 tree 3b51ecf3d03dfb8e0d71479c2a1972dbb2a9507c	agents
+100644 blob 4758f9c5de05381b8edc83d031fe811cdcd710b8 4852	AGENTS.md
+040000 tree 14476ad1fdf8457f8323b2469e06a73da5f01f6e	agents/coding-agent
+100644 blob b6b02570fc1de49fc1124303431f21c873c8dce4 1154	agents/coding-agent/bootstrap.md
+040000 tree 63ef58a17693a9d00445e640ec71df8f2d858538	agents/dwc
+100644 blob eaecaab10c79201542cf34f67e3c2014e03d11fe 3593	agents/dwc/agent-instructions.md
+100644 blob f5455f90953bcebfad85b5a14dd8c9d42a3ad7ac 1378	agents/dwc/capabilities.yaml
+040000 tree e172baa933ff6c3cb5ffac0f0f92f35c499312d8	agents/instructionops-agent
+100644 blob 9e29997e3d6df91fbdc0c1bb4f146307ffa6b5ba3 2974	agents/instructionops-agent/agent-instructions.md
