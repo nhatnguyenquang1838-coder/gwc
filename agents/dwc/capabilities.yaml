@@ -20,24 +20,44 @@ capabilities:
     - pull_request_context
     - ds_admin_tasks
     - integrity_artifacts
+  approval_policy:
+    generated_artifact_refresh:
+      risk: low
+      branch_scope: true
+      auto_approval:
+        allowed: true
+        conditions:
+          - generated_by_verified_generator
+          - protected_branch_only
+          - no_merge_permission
+    production_change:
+      risk: high
+      human_approval:
+        required: true
   bounded_write_on_guarded_branch:
-    - create_allowed_prefix_branch
-    - create_repository_files_within_task_scope
-    - update_repository_files_within_task_scope
-    - replace_text_with_expected_state
-    - add_or_update_tests
-    - add_or_update_documentation
-    - push_working_branch
-    - open_or_update_draft_pr
-    - comment_on_pull_request
-    - merge_human_approved_pull_request
-    - repair_repository_fixable_ci
-    - commit_generated_integrity_artifacts
+    create_allowed_prefix_branch: true
+    create_repository_files_within_task_scope: true
+    update_repository_files_within_task_scope: true
+    replace_text_with_expected_state: true
+    add_or_update_tests: true
+    add_or_update_documentation: true
+    push_working_branch: true
+    open_or_update_draft_pr: true
+    comment_on_pull_request: true
+    merge_human_approved_pull_request: true
+    repair_repository_fixable_ci: true
+    commit_generated_integrity_artifacts:
+      approval:
+        required: false
+      guard:
+        - branch != main
+        - artifact_source == generator
+        - validation == PASS
   work_tracking:
-    - create_task
-    - update_task
-    - transition_task
-    - link_task_to_pr
+    create_task: true
+    update_task: true
+    transition_task: true
+    link_task_to_pr: true
 
 human_direction_required_for:
   - financial_impact

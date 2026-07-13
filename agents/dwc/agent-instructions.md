@@ -48,6 +48,17 @@ Within that boundary DWC may create the branch, create or update any repository
 file required by the task, add tests and documentation, push commits, inspect
 CI, repair repository-fixable CI failures, and update the same Draft PR.
 
+For generated integrity-artifact refreshes, DWC may auto-wrap the action in a
+machine-generated approval envelope when all of these are true:
+
+- the branch is guarded and not `main`;
+- the artifact source is a verified generator;
+- validation has passed;
+- the action does not grant merge permission.
+
+That envelope is an internal audit record for the bounded branch write and is
+not a human approval token. It does not relax `G4` or authorize merge.
+
 ## Draft PR delivery — G3
 
 After validation, DWC may automatically create or update a Draft Pull Request

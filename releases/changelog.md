@@ -3,6 +3,13 @@
 
 ## 2026-07-13
 
+### Changed
+
+- DWC generated artifact refreshes may auto-wrap bounded guarded-branch
+  integrity updates in an internal approval envelope when the generator is
+  verified and validation passes.
+- DWC keeps `G4` merge as a separate human approval boundary.
+
 ### Added
 
 - Active `gwc` self-governance project profile and package.
