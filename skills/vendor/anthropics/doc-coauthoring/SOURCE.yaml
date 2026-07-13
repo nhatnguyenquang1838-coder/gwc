@@ -1,0 +1,13 @@
+version: '1.0'
+skill_id: anthropics.doc-coauthoring
+source_repo: anthropics/skills
+upstream_path: skills/doc-coauthoring/SKILL.md
+source_url: https://raw.githubusercontent.com/anthropics/skills/main/skills/doc-coauthoring/SKILL.md
+pinned_ref: main
+local_fallback: skills/vendor/anthropics/doc-coauthoring/SKILL.md
+local_sha256: 6890fb0772be45d0090945f2756040c91114ad93101af35e711afe1a4d565a23
+license: license-not-verified
+import_mode: adapted_not_verbatim
+upstream_scripts_allowed: false
+authority: reference_only
+notes: Adapted local fallback; not a verbatim import.
