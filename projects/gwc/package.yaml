@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.0.0
+package_version: 1.0.1
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -13,6 +13,10 @@ instructions:
   - id: e2e-draft-pr-delivery
     path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
     target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+  - id: base-drift-policy
+    path: governance/base-drift-policy.yaml
+    target: .governance/base-drift-policy.yaml
     required: true
   - id: project-profile
     path: projects/gwc/project-profile.yaml
