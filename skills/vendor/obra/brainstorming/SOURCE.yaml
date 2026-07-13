@@ -1,0 +1,13 @@
+version: '1.0'
+skill_id: obra.brainstorming
+source_repo: obra/superpowers
+upstream_path: skills/brainstorming/SKILL.md
+source_url: https://raw.githubusercontent.com/obra/superpowers/main/skills/brainstorming/SKILL.md
+pinned_ref: main
+local_fallback: skills/vendor/obra/brainstorming/SKILL.md
+local_sha256: 546ff2cd2be6950ed4425ea022d21f7db820027b68570b1d9c39fbb3fb098fe2
+license: MIT
+import_mode: adapted_not_verbatim
+upstream_scripts_allowed: false
+authority: reference_only
+notes: Adapted local fallback; upstream license fetched as MIT.
