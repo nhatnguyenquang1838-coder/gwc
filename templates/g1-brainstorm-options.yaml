@@ -1,0 +1,11 @@
+version: "1.0"
+task_id: ""
+problem_statement: ""
+options:
+  - id: A
+    summary: ""
+    tradeoffs: []
+    risks: []
+recommendation:
+  option_id: ""
+  rationale: ""
