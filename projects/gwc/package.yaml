@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.1.0
+package_version: 1.2.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -21,6 +21,18 @@ instructions:
   - id: g01-lifecycle
     path: docs/g01-lifecycle.md
     target: .governance/g01-lifecycle.md
+    required: true
+  - id: g01-runtime-input-schema
+    path: schemas/g01-runtime-input.schema.json
+    target: .governance/schemas/g01-runtime-input.schema.json
+    required: true
+  - id: g01-runtime-generator
+    path: tools/generate_g01_runtime.py
+    target: .governance/tools/generate_g01_runtime.py
+    required: true
+  - id: g01-runtime-input-template
+    path: templates/g01/g01-runtime-input.template.yaml
+    target: .governance/templates/g01-runtime-input.template.yaml
     required: true
   - id: project-profile
     path: projects/gwc/project-profile.yaml
