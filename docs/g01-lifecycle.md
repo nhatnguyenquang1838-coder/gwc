@@ -54,12 +54,37 @@ A G1 `PASS` requires:
 6. The decision grants no authority and explicitly excludes `G4_MERGE`,
    `G5_DEPLOY`, and `G6_PRODUCTION`.
 
+## Runtime generation
+
+`tools/generate_g01_runtime.py` converts observed repository, task, request, and
+risk facts into schema-valid G0 context, G1 intake, and G1 preflight artifacts.
+It performs no connector or production calls; callers must supply the observed
+facts through a `g01-runtime-input` YAML document.
+
+```bash
+python tools/generate_g01_runtime.py \
+  --input templates/g01/g01-runtime-input.template.yaml \
+  --workspace .gwc \
+  --json
+```
+
+Runtime exit codes are:
+
+- `0`: generated artifacts are valid and preflight is `PASS`.
+- `1`: artifacts are valid but preflight is `NEEDS_INPUT` or `BLOCKED`.
+- `2`: input/schema/I/O error; no partial artifact set is reported as written.
+
+R0/R1 work selects `G2_AUTOMATIC_BOUNDED`. R2/R3 work selects
+`G2_HUMAN_DIRECTION` and fails closed until explicit human direction is recorded.
+The generator never grants merge, deployment, release, secret, or production
+authority.
+
 ## Validation
 
 ```bash
 python tools/validate_g01.py --workspace .gwc
 python tools/validate_g01.py --workspace tests/fixtures/g01-valid --json
-python -m unittest tests.test_g01_lifecycle
+python -m unittest tests.test_g01_lifecycle tests.test_g01_runtime
 ```
 
 The generic repository validator checks that the G0/G1 schemas and validator
