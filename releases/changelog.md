@@ -5,6 +5,10 @@
 
 ### Added
 
+- Versioned G01 decision input schema and deterministic options/decision capture
+  tool with explicit-choice enforcement, scope hashing, and full workspace validation.
+- Decision capture fixture and six focused tests covering PASS, blocked,
+  non-explicit, rejected, duplicate-option, and CLI end-to-end behavior.
 - Versioned G01 runtime input schema and deterministic generator for G0 context,
   G1 intake, and G1 preflight artifacts.
 - Fail-closed runtime checks for repository identity, required sources, DS Admin
@@ -18,8 +22,8 @@
 
 ### Changed
 
-- GWC project package version `1.2.0` includes G0/G1 lifecycle documentation,
-  runtime input schema, generator, and reusable template.
+- GWC project package version `1.3.0` includes G0/G1 lifecycle documentation,
+  runtime and decision input schemas, generators, and reusable templates.
 - GWC project package includes the base drift policy as a governed source
   instruction artifact.
 - Repository CI runs governance unit tests in addition to instruction validation.
