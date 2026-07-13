@@ -19,6 +19,7 @@ capabilities:
     - workflow_artifacts
     - pull_request_context
     - ds_admin_tasks
+    - integrity_artifacts
   bounded_write_on_guarded_branch:
     - create_allowed_prefix_branch
     - create_repository_files_within_task_scope
@@ -31,6 +32,7 @@ capabilities:
     - comment_on_pull_request
     - merge_human_approved_pull_request
     - repair_repository_fixable_ci
+    - commit_generated_integrity_artifacts
   work_tracking:
     - create_task
     - update_task
