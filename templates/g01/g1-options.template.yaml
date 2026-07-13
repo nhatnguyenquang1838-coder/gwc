@@ -6,7 +6,7 @@ trace:
   repository: nhatnguyenquang1838-coder/gwc
   task_id: task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
   base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
-  g0_snapshot: ../g0/context-snapshot.yaml
+  g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
   title: Repository-native contracts
