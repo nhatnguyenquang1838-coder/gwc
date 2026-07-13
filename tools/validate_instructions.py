@@ -80,6 +80,12 @@ def main() -> int:
         "schemas/g1-decision-record.schema.json",
         "tools/validate_g01.py",
         "docs/g01-lifecycle.md",
+        "templates/g01/g0-context-snapshot.template.yaml",
+        "templates/g01/g1-intake-brief.template.yaml",
+        "templates/g01/g1-preflight-report.template.yaml",
+        "templates/g01/g1-options.template.yaml",
+        "templates/g01/g1-decision-record.template.yaml",
+        "tests/test_g01_lifecycle.py",
     ]
     for rel in required:
         if not (root / rel).is_file():
