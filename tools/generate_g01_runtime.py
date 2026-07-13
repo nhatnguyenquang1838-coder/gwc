@@ -323,7 +323,7 @@ def main() -> int:
             generated_errors.extend(
                 f"{name}: {message}"
                 for message in _validation_messages(
-                    artifacts["name"],
+                    artifacts[name],
                     repo_root / "schemas" / schema_name,
                 )
             )
