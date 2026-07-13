@@ -8,6 +8,10 @@
 - Active `gwc` self-governance project profile and package.
 - DWC repository operation contract and machine-readable capabilities.
 - DS Admin traceability for GWC modifying tasks.
+- Candidate G1 Discovery and Alignment standard.
+- Local SKILL registry with hash-verified fallback resolution.
+- Vendored local fallback skills for G1 discovery, brainstorming, document coauthoring, underspecification checks, and context building.
+- Skill registry schema, validator, templates, and tests.
 
 ### Changed
 
@@ -19,6 +23,9 @@
 
 ### Safety
 
+- External SKILL content is reference-only and cannot override governance.
+- Upstream skill scripts remain blocked.
+- SKILL resolution fails closed on missing source, missing fallback, hash mismatch, unpinned source, or authority drift.
 - Explicit human direction remains required for financial, architecture,
   security-boundary, production configuration, credential, production-data,
   destructive, irreversible, and broad-blast-radius changes.
