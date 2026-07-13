@@ -1,0 +1,13 @@
+version: "1.0"
+task_id: ""
+repository: ""
+base_ref: ""
+base_sha: ""
+governance_files_read: []
+skill_resolution:
+  status: pending
+  selected_skills: []
+  fallback_used: false
+  failure_code: null
+blockers: []
+ready_for_g2: false
