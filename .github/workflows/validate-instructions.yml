@@ -29,5 +29,8 @@ jobs:
       - name: Validate instruction repository
         run: python tools/validate_instructions.py
 
+      - name: Run governance unit tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
       - name: Compile Python tools
         run: python -m compileall -q tools
