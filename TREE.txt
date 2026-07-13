@@ -51,6 +51,7 @@ instruction-governance/
 ├── tools/
 │   ├── build_project_package.py
 │   ├── diff_instruction_package.py
+│   ├── hash_integrity_artifacts.py
 │   ├── validate_instructions.py
 │   └── verify_rollout.py
 ├── AGENTS.md
