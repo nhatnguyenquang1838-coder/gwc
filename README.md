@@ -29,8 +29,8 @@ Approval envelope = authority boundary
 - Local-agent and copyable-command rules.
 - Project packages for GWC, DS MCP, Rental Home, and PM Skills.
 - DWC runtime, InstructionOps Agent, and coding-agent bootstrap contracts.
-- JSON Schemas.
-- Validation, package-build, semantic-diff, and rollout-verification tools.
+- JSON Schemas, including versioned G0/G1 lifecycle artifact contracts.
+- Deterministic G0/G1 gate validation, package-build, semantic-diff, and rollout-verification tools.
 - GitHub Actions for validation, package builds, and manual release publication.
 - Release manifest and changelog.
 
@@ -89,7 +89,19 @@ python -m pip install -r requirements.txt
 python tools/validate_instructions.py
 ```
 
-### 4. Build a project package
+### 4. Validate G0/G1 lifecycle artifacts
+
+```bash
+python tools/validate_g01.py --workspace .gwc
+python -m unittest tests.test_g01_lifecycle
+```
+
+The validator returns `PASS` only when G0 context and all G1 intake, preflight,
+options, and decision artifacts are schema-valid and mutually consistent. A G1
+`PASS` is evidence for G2 planning only; it never grants merge, deployment, or
+production authority. See `docs/g01-lifecycle.md`.
+
+### 5. Build a project package
 
 ```bash
 python tools/build_project_package.py ds-mcp --output dist
@@ -103,7 +115,7 @@ dist/ds-mcp/<version>/
 └── package-manifest.yaml
 ```
 
-### 5. Compare package revisions
+### 6. Compare package revisions
 
 ```bash
 python tools/diff_instruction_package.py \
@@ -111,7 +123,7 @@ python tools/diff_instruction_package.py \
   dist/ds-mcp/1.1.0
 ```
 
-### 6. Verify a rollout checkout
+### 7. Verify a rollout checkout
 
 ```bash
 python tools/verify_rollout.py \

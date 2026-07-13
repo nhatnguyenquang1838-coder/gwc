@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-13T11:33:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
+  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Repository-native contracts
+  description: Add strict JSON Schemas, YAML templates, and a deterministic Python
+    validator.
+  benefits:
+  - No new dependency
+  - Machine-readable evidence
+  - CI-compatible
+  tradeoffs:
+  - Requires explicit artifact maintenance
+  risks:
+  - Schema evolution must remain backward compatible
+  constraint_fit: FIT
+- id: OPT-2
+  title: Documentation-only lifecycle
+  description: Document G0/G1 without machine-readable enforcement.
+  benefits:
+  - Small initial diff
+  tradeoffs:
+  - Cannot reliably block incomplete G1 handoffs
+  risks:
+  - Agents may interpret lifecycle inconsistently
+  constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: It provides deterministic enforcement with existing dependencies.
+decision_required: true
+status: READY

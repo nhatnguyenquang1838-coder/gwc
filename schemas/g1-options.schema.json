@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g1-options.schema.json",
+  "title": "G1 Options",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at",
+    "trace",
+    "options",
+    "recommended_option_id",
+    "recommendation_rationale",
+    "decision_required",
+    "status"
+  ],
+  "$defs": {
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "repository",
+        "task_id",
+        "base_sha",
+        "g0_snapshot"
+      ],
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "g0_snapshot": {
+          "type": "string",
+          "const": "../../g0/context-snapshot.yaml"
+        }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "benefits",
+        "tradeoffs",
+        "risks",
+        "constraint_fit"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^OPT-[0-9]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "benefits": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "tradeoffs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "risks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "constraint_fit": {
+          "enum": [
+            "FIT",
+            "PARTIAL",
+            "NOT_FIT"
+          ]
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "const": "g1-options"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace": {
+      "$ref": "#/$defs/trace"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/option"
+      }
+    },
+    "recommended_option_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^OPT-[0-9]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "recommendation_rationale": {
+      "type": "string"
+    },
+    "decision_required": {
+      "const": true
+    },
+    "status": {
+      "enum": [
+        "DRAFT",
+        "READY"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "READY"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "options": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

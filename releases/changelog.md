@@ -5,13 +5,18 @@
 
 ### Added
 
+- Versioned G0 context and G1 intake, preflight, options, and decision schemas.
+- Deterministic fail-closed G0/G1 validator, reusable YAML templates, fixtures,
+  unit tests, and lifecycle documentation.
 - Base drift evaluation policy, schema, evaluator, tests, and documentation for
   evaluating protected-base SHA changes after approval.
 
 ### Changed
 
-- GWC project package now includes the base drift policy as a governed source
+- GWC project package version `1.1.0` includes G0/G1 lifecycle documentation.
+- GWC project package includes the base drift policy as a governed source
   instruction artifact.
+- Repository CI runs governance unit tests in addition to instruction validation.
 
 ## 2026-07-13
 

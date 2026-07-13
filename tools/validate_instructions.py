@@ -73,6 +73,19 @@ def main() -> int:
         "schemas/project-package.schema.json",
         "schemas/rollout.schema.json",
         "schemas/approval-envelope.schema.json",
+        "schemas/g0-context-snapshot.schema.json",
+        "schemas/g1-intake-brief.schema.json",
+        "schemas/g1-preflight-report.schema.json",
+        "schemas/g1-options.schema.json",
+        "schemas/g1-decision-record.schema.json",
+        "tools/validate_g01.py",
+        "docs/g01-lifecycle.md",
+        "templates/g01/g0-context-snapshot.template.yaml",
+        "templates/g01/g1-intake-brief.template.yaml",
+        "templates/g01/g1-preflight-report.template.yaml",
+        "templates/g01/g1-options.template.yaml",
+        "templates/g01/g1-decision-record.template.yaml",
+        "tests/test_g01_lifecycle.py",
     ]
     for rel in required:
         if not (root / rel).is_file():

@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.0.1
+package_version: 1.1.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -17,6 +17,10 @@ instructions:
   - id: base-drift-policy
     path: governance/base-drift-policy.yaml
     target: .governance/base-drift-policy.yaml
+    required: true
+  - id: g01-lifecycle
+    path: docs/g01-lifecycle.md
+    target: .governance/g01-lifecycle.md
     required: true
   - id: project-profile
     path: projects/gwc/project-profile.yaml

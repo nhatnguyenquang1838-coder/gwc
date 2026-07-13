@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g1-decision-record.schema.json",
+  "title": "G1 Decision Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at",
+    "trace",
+    "options_ref",
+    "preflight_ref",
+    "status",
+    "selected_option_id",
+    "user_decision",
+    "rationale",
+    "rejected_option_ids",
+    "acceptance_criteria_refs",
+    "scope_hash",
+    "g1_gate_outcome",
+    "authority_boundaries"
+  ],
+  "$defs": {
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "repository",
+        "task_id",
+        "base_sha",
+        "g0_snapshot"
+      ],
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "g0_snapshot": {
+          "type": "string",
+          "const": "../../g0/context-snapshot.yaml"
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "const": "g1-decision-record"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace": {
+      "$ref": "#/$defs/trace"
+    },
+    "options_ref": {
+      "const": "../brainstorming/g1-options.yaml"
+    },
+    "preflight_ref": {
+      "const": "../preflight/g1-preflight-report.yaml"
+    },
+    "status": {
+      "enum": [
+        "PENDING",
+        "ACCEPTED",
+        "REJECTED",
+        "SUPERSEDED"
+      ]
+    },
+    "selected_option_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^OPT-[0-9]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "user_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actor",
+        "decided_at",
+        "source",
+        "explicit"
+      ],
+      "properties": {
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explicit": {
+          "type": "boolean"
+        }
+      }
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "rejected_option_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^OPT-[0-9]+$"
+      }
+    },
+    "acceptance_criteria_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^AC-[0-9]+$"
+      }
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "g1_gate_outcome": {
+      "enum": [
+        "PASS",
+        "NEEDS_INPUT",
+        "BLOCKED",
+        "REJECTED"
+      ]
+    },
+    "authority_boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grants",
+        "excluded"
+      ],
+      "properties": {
+        "grants": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "excluded": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "G4_MERGE",
+              "G5_DEPLOY",
+              "G6_PRODUCTION"
+            ]
+          },
+          "allOf": [
+            {
+              "contains": {
+                "const": "G4_MERGE"
+              }
+            },
+            {
+              "contains": {
+                "const": "G5_DEPLOY"
+              }
+            },
+            {
+              "contains": {
+                "const": "G6_PRODUCTION"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "ACCEPTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "selected_option_id": {
+            "type": "string"
+          },
+          "user_decision": {
+            "properties": {
+              "explicit": {
+                "const": true
+              }
+            }
+          },
+          "acceptance_criteria_refs": {
+            "minItems": 1
+          },
+          "g1_gate_outcome": {
+            "const": "PASS"
+          }
+        }
+      }
+    }
+  ]
+}

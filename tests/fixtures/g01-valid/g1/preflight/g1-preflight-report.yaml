@@ -1,0 +1,32 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-13T11:32:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
+  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity and protected base are verified.
+  evidence:
+  - projects/gwc/project-profile.yaml@main
+  - main@ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+- id: TASK_TRACEABILITY
+  status: PASS
+  code: DS_ADMIN_TASK_PRESENT
+  message: Exactly one DS Admin task represents the bounded change.
+  evidence:
+  - task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
+risk_class: R1
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS
