@@ -45,7 +45,7 @@
         },
         "g0_snapshot": {
           "type": "string",
-          "const": "../g0/context-snapshot.yaml"
+          "const": "../../g0/context-snapshot.yaml"
         }
       }
     },
