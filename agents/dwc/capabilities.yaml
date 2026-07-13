@@ -29,6 +29,7 @@ capabilities:
     - push_working_branch
     - open_or_update_draft_pr
     - comment_on_pull_request
+    - merge_human_approved_pull_request
     - repair_repository_fixable_ci
   work_tracking:
     - create_task
