@@ -1,0 +1,13 @@
+version: '1.0'
+skill_id: trailofbits.audit-context-building
+source_repo: trailofbits/skills
+upstream_path: plugins/audit-context-building/skills/audit-context-building/SKILL.md
+source_url: https://raw.githubusercontent.com/trailofbits/skills/main/plugins/audit-context-building/skills/audit-context-building/SKILL.md
+pinned_ref: main
+local_fallback: skills/vendor/trailofbits/audit-context-building/SKILL.md
+local_sha256: e8816bb92f64d83ad2424937d945a3286fe13980acd88048a3c223431fab1dd7
+license: CC-BY-SA-4.0
+import_mode: adapted_not_verbatim
+upstream_scripts_allowed: false
+authority: reference_only
+notes: Adapted local fallback; upstream repo states CC-BY-SA-4.0.
