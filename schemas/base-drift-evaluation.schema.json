@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/base-drift-evaluation.schema.json",
+  "title": "Base Drift Evaluation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "old_base_sha",
+    "new_base_sha",
+    "changed_files",
+    "scope_overlap",
+    "risk_assessment",
+    "evaluator_decision"
+  ],
+  "properties": {
+    "old_base_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "new_base_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "changed_files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "scope_overlap": {
+      "type": "string",
+      "enum": [
+        "none",
+        "documented",
+        "partial",
+        "substantial",
+        "full"
+      ]
+    },
+    "risk_assessment": {
+      "type": "string",
+      "enum": [
+        "STOP",
+        "REAPPROVE",
+        "REVALIDATE",
+        "SAFE_CONTINUE"
+      ]
+    },
+    "evaluator_decision": {
+      "type": "string",
+      "enum": [
+        "STOP",
+        "REAPPROVE",
+        "REVALIDATE",
+        "SAFE_CONTINUE"
+      ]
+    },
+    "base_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approved_base_sha",
+        "execution_base_sha",
+        "drift_status",
+        "drift_evaluation_id",
+        "evaluator",
+        "evaluated_at"
+      ],
+      "properties": {
+        "approved_base_sha": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "execution_base_sha": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "drift_status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "unchanged",
+            "changed",
+            "safe_continue",
+            "revalidate",
+            "reapprove",
+            "stop",
+            null
+          ]
+        },
+        "drift_evaluation_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "evaluator": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

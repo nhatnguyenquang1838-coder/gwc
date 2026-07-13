@@ -3,6 +3,18 @@
 
 ## 2026-07-13
 
+### Added
+
+- Base drift evaluation policy, schema, evaluator, tests, and documentation for
+  evaluating protected-base SHA changes after approval.
+
+### Changed
+
+- GWC project package now includes the base drift policy as a governed source
+  instruction artifact.
+
+## 2026-07-13
+
 ### Changed
 
 - DWC generated artifact refreshes may auto-wrap bounded guarded-branch
