@@ -119,6 +119,30 @@ python tools/verify_rollout.py \
   /path/to/ds_mcp_server
 ```
 
+## G1 Discovery skills and local fallback
+
+GWC supports a repository-backed G1 Discovery candidate package under `skills/`.
+
+The resolution rule is:
+
+```text
+Referenced SKILL
+→ synced main / pinned source when readable and hash-valid
+→ local vendored fallback in the working repo when source access fails
+→ fail closed when neither path validates
+```
+
+External skills are reference-only. They do not override `AGENTS.md`, canonical
+governance, project profiles, DS Admin state, or user approval envelopes.
+Upstream scripts are blocked unless a separate approval explicitly authorizes
+them.
+
+Validate the skill registry with:
+
+```bash
+python tools/validate_skill_registry.py
+```
+
 ## Instruction CRUD commands
 
 The InstructionOps Agent accepts these normalized commands:
