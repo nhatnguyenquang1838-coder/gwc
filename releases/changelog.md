@@ -21,6 +21,12 @@
 - G1 skill expanded to version `0.3.0` with phase boundaries, artifact contract
   summaries, intake matrix, option selection rules, preflight outcomes, decision
   status rules, G2 handoff shape, and completion markers.
+- G1 now requires run identity metadata for each session: `run_id`,
+  `workspace_mode`, `workspace_root`, repository artifact write state,
+  conflict policy, and verification mode.
+- G1 chat-only mode is explicitly conversation-local and must not write
+  `.gwc/g1/...`; concurrent artifact runs must use isolated workspaces or fail
+  closed on unknown workspace ownership.
 - The skills document that task and risk facts are runtime/preflight inputs but
   are not fields in the canonical G0 context snapshot schema version `1.0`.
 
