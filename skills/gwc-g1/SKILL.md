@@ -1,8 +1,8 @@
 ---
 name: gwc-g1
-description: Use when a GWC task needs discovery, brainstorming, preflight, or an explicit decision before G2 planning or execution.
-when_to_use: Trigger for requests such as start G1, experience G1, brainstorm G2 options, preflight a change, make a G1 decision, prepare G2 handoff, or enhance G2 in nhatnguyenquang1838-coder/gwc.
-version: 0.1.0
+description: Use after G0 context is READY when a GWC task needs discovery, brainstorming, preflight, or an explicit decision before G2 planning or execution.
+when_to_use: Trigger for requests such as start G1, experience G1, brainstorm G2 options, preflight a change, make a G1 decision, prepare G2 handoff, or enhance G2 after project and repository context has been verified by G0.
+version: 0.2.0
 project: gwc
 owner: GWC
 ---
@@ -11,9 +11,9 @@ owner: GWC
 
 ## Purpose
 
-Use this skill to guide an agent through GWC G1 before any G2 work.
+Use this skill to guide an agent through GWC G1 after G0 has established a verified context boundary and before any G2 work.
 
-This is an agent-readable, offline-compatible instruction skill. It does not add executable validators or tools. Tool-level verification is a later enhancement.
+This is an agent-readable, offline-compatible instruction skill. It does not add executable validators or tools. It consumes the existing G0 contract rather than reconstructing a parallel context process. Tool-level verification remains in the repository-native G0/G1 mechanisms.
 
 ## Pattern sources
 
@@ -57,7 +57,7 @@ authority_boundaries:
 
 ## Required repository evidence
 
-Before producing G1 output, read protected-base evidence when available:
+Before producing G1 output, consume a `G0_CONTEXT_READY` handoff and confirm that protected-base evidence remains current. The G0 skill owns initial context reconstruction. G1 reads the sources below when the handoff is missing, stale, or requires verification:
 
 - `AGENTS.md`
 - `core/Coding_Project_Governance_v1.0.md`
@@ -74,6 +74,8 @@ Repository evidence wins over conversation memory and third-party skill examples
 
 Do not create a parallel G1 process. Reuse these repository mechanisms:
 
+- `skills/gwc-g0/SKILL.md`
+- `schemas/g0-context-snapshot.schema.json`
 - `schemas/g01-runtime-input.schema.json`
 - `tools/generate_g01_runtime.py`
 - `templates/g01/g01-runtime-input.template.yaml`
@@ -99,26 +101,42 @@ When tools are unavailable, follow the same artifact semantics manually and mark
 
 For chat-only runs, present equivalent sections in Markdown and state that repository artifacts were not written.
 
-## Action 1 — Reconstruct G0 context
+## Action 1 — Consume and verify G0 context
 
-Capture:
+Load `skills/gwc-g0/SKILL.md` or an equivalent repository-distributed copy before starting G1.
 
-- repository owner/name;
-- base branch and SHA;
-- active profile;
+Require one of:
+
+- a schema-valid `.gwc/g0/context-snapshot.yaml` with `status: READY`; or
+- a chat-only G0 handoff that states its verification mode and has no unresolved required-source blocker.
+
+Verify that the handoff still matches:
+
+- active project and profile;
+- repository full name;
+- protected governance base ref and current base SHA;
 - connector;
-- DS Admin task id and state;
-- available governance files;
-- user request;
-- risk class candidate;
-- exclusions.
+- applicable policy and required-source refs/hashes;
+- constraints and exclusions.
 
-Stop if repository identity or profile is missing or contradictory.
+Treat DS Admin task and risk facts as supplemental runtime/preflight inputs. The current G0 schema version `1.0` does not persist task ID, task state, or risk class, so do not invent those fields in the G0 artifact.
 
-Output marker:
+Refresh G0 when the project, repository, base SHA, profile, connector, task, required source, or authority-relevant user direction changes.
+
+Stop when G0 is missing, `BLOCKED`, stale, contradictory, or unverified for a required source. Do not reconstruct a second G0 process inside G1.
+
+Output markers:
 
 ```text
-G0_CONTEXT_READY | G0_CONTEXT_BLOCKED
+G0_CONTEXT_READY
+G1_ELIGIBLE_TO_START
+```
+
+or:
+
+```text
+G0_CONTEXT_BLOCKED
+G1_NOT_ELIGIBLE_TO_START
 ```
 
 ## Action 2 — Build G1 intake
@@ -276,6 +294,7 @@ Do not call implementation complete. It is only a G1-to-G2 readiness output.
 
 Stop and report `G1_BLOCKED` if:
 
+- G0 context is missing, `BLOCKED`, stale, contradictory, or unverified for a required source;
 - repository identity is ambiguous;
 - protected-base governance cannot be read;
 - the request conflicts with governance;
