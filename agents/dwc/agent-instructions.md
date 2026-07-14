@@ -30,13 +30,52 @@ Before any repository-changing action, DWC must read and follow:
 9. the task, target repository governance, package, spec, and workflow evidence
    relevant to the requested outcome.
 
-DWC must visibly report `GWC BOOT`, G0, G1, G2, and G3 status for
-repository-changing work. A gate may be reported as complete only when its
-canonical repository artifact exists and validation has passed.
+DWC must resolve one execution mode before gate reporting:
+
+- `chat_connector_only` — repository connectors are available, but no trusted
+  local checkout/shell validator is available;
+- `local_agent` — trusted local checkout, filesystem, shell, Git, and isolated
+  worktree/session are available;
+- `repo_ci` — running inside CI against committed artifacts.
+
+DWC must visibly report `GWC BOOT`, execution mode, G0, G1, G2, and G3 status
+for repository-changing work. A gate may be reported as complete only when its
+canonical repository artifact exists and validation has passed or trusted
+validator evidence is cited.
 
 DWC must not create a branch, update a file, create a commit, push a ref, or open
-a Pull Request while G0/G1 evidence is missing or invalid. It must not invoke a
-connector action first and backfill the artifacts later.
+a Pull Request while required G0/G1 evidence is missing or invalid for the
+current execution mode. It must not invoke a connector action first and backfill
+the artifacts later.
+
+## Execution mode rules
+
+### chat_connector_only
+
+DWC may inspect repository, task, PR, CI, and governance context. It may produce
+a conversation-local gate packet and identify blockers.
+
+DWC must not claim `G1_ALIGNMENT: PASS` or perform write-capable connector
+actions in chat connector mode unless trusted external validator evidence and a
+valid envelope already exist.
+
+When validator evidence is unavailable, DWC must stop before writes with:
+
+```text
+G1_ALIGNMENT: BLOCKED — validator unavailable in chat_connector_only mode
+```
+
+### local_agent
+
+DWC must materialize task-scoped G0/G1 artifacts, run
+`tools/validate_g01.py`, retain validator evidence, and only then enter G2 or
+create a guarded branch/worktree.
+
+### repo_ci
+
+DWC treats CI as a second boundary. CI may validate committed artifacts and
+policy after a branch or PR exists, but CI success does not retroactively
+authorize pre-write actions and never grants G4, G5, or G6 authority.
 
 ## Automatic inspection — G0
 
@@ -48,8 +87,8 @@ DWC may automatically perform read-only operations needed to understand a task:
 - compare refs, hashes, package versions, consumers, and CI evidence;
 - inspect the matching DS Admin task record.
 
-Automatic inspection does not itself complete G0. DWC must create or update the
-task-scoped G0 context artifact and validate that it is `READY` with no
+Automatic inspection does not itself complete G0. DWC must create, obtain, or
+cite the task-scoped G0 context artifact and validate that it is `READY` with no
 blockers. Until then, only read-only actions are allowed.
 
 ## Automatic alignment — G1
@@ -57,8 +96,9 @@ blockers. Until then, only read-only actions are allowed.
 DWC may automatically reconstruct the problem, scope, non-goals, constraints,
 risks, acceptance criteria, options, and recommended decision.
 
-Automatic analysis does not itself complete G1. DWC must create or update the
-canonical G1 intake, preflight, options, and decision artifacts and run:
+Automatic analysis does not itself complete G1. DWC must create, obtain, or cite
+the canonical G1 intake, preflight, options, and decision artifacts and run or
+cite validator evidence for:
 
 ```text
 python tools/validate_g01.py --workspace <task-workspace>
@@ -89,8 +129,8 @@ following are true:
 - validation and complete diff review are performed before G3.
 
 Before every write-capable connector call, DWC must verify that the exact action
-is listed in the active envelope. If not, DWC must stop with
-`GATE_ACTION_NOT_AUTHORIZED`.
+is listed in the active envelope and valid for the current execution mode. If
+not, DWC must stop with `GATE_ACTION_NOT_AUTHORIZED`.
 
 Within a valid G2 boundary DWC may create the guarded branch, create or update
 repository files required by the task, add tests and documentation, push
