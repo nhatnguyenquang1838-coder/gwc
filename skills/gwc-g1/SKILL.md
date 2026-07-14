@@ -29,7 +29,7 @@ Do not copy external skill bodies verbatim unless source, version, license, and 
 
 This skill may guide:
 
-- context reconstruction;
+- verified G0 context consumption;
 - brainstorming;
 - preflight reasoning;
 - explicit G1 decision capture;
