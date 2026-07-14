@@ -20,13 +20,26 @@ A GWC-governed project agent must read, in order:
 3. GWC core rules:
    - `core/Coding_Project_Governance_v1.0.md`;
    - `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`;
+   - `core/Agent_Operating_Runtime_Contract_v1.0.md`;
    - `core/E2E_DRAFT_PR_DELIVERY_RULE.md`.
-4. Active GWC project profile for this repository.
-5. Project instructions, extension, spec format, package manifests, workflows,
+4. `governance/instruction-source-registry.yaml` when present.
+5. Active GWC project profile for this repository.
+6. Project instructions, extension, spec format, package manifests, workflows,
    and task/spec files relevant to the request.
 
 If `.gwc/gwc` or `.governance` is expected but missing, the agent must fail
 closed for repository-changing work and report the setup gap.
+
+## Required operating preamble
+
+For non-trivial work, the project agent must print:
+
+```text
+SOURCE INSTRUCTION: <GDRIVE|GIT|GPT_PROJECT|REPO|PACKAGE|MIXED>
+EXECUTION MODE: <chat_connector_only|local_agent|repo_ci>
+```
+
+Then produce an Intake Card containing request type, source instruction, execution mode, risk flags, required reads, Files READ, Files WRITE, required gate, and next action.
 
 ## Required execution mode
 
@@ -41,6 +54,27 @@ execution_mode=chat_connector_only | local_agent | repo_ci
 - `local_agent`: local artifacts and local validator evidence are required before
   branch/worktree/write.
 - `repo_ci`: validates committed artifacts; CI does not grant pre-write authority.
+
+## Files READ / Files WRITE
+
+Project agents must declare file scope before mutation:
+
+```text
+Files READ:
+- <path>@<ref-or-sha>
+
+Files WRITE:
+- <path>
+```
+
+Rules:
+
+```text
+No Files READ evidence -> no content-dependent recommendation.
+No Files WRITE declaration -> no repository mutation.
+New write path -> stop, update scope, regenerate approval request.
+Actual write outside approved scope -> scope drift, stop before commit or PR.
+```
 
 ## Required gate behavior
 
@@ -87,6 +121,16 @@ G2 may only allow task-bounded guarded-branch work:
 G2 never grants merge, deployment, production configuration, credential changes,
 production migration, or production-data access.
 
+### Agent-generated approval commands
+
+Humans do not create approval tokens or scope hashes. The agent must generate an approval request from current evidence and show the exact command for the human to copy-paste:
+
+```text
+APPROVE <GATE> <approval_request_id> <scope_hash_16> <expires_at_utc>
+```
+
+Plain phrases such as `ok`, `approve`, `continue`, `go`, or `yes` are acknowledgement-only and never grant gate authority unless they exactly match an active generated approval command.
+
 ### G3 and later
 
 G3 may create or update a Draft PR only. G4, G5, and G6 require separate human
@@ -105,19 +149,26 @@ Before repository-changing work, read:
 2. `.gwc/gwc/AGENTS.md` or `.governance/AGENTS.md`
 3. `.gwc/gwc/core/Coding_Project_Governance_v1.0.md`
 4. `.gwc/gwc/core/GATE_LIFECYCLE_CONTRACT_v1.0.md`
-5. `.gwc/gwc/core/E2E_DRAFT_PR_DELIVERY_RULE.md`
-6. `.gwc/gwc/projects/<project-id>/project-profile.yaml`
-7. `.gwc/gwc/projects/<project-id>/project-instructions.md`
-8. `.gwc/gwc/projects/<project-id>/project-extension.md`
-9. task/spec/workflow files relevant to the request
+5. `.gwc/gwc/core/Agent_Operating_Runtime_Contract_v1.0.md`
+6. `.gwc/gwc/core/E2E_DRAFT_PR_DELIVERY_RULE.md`
+7. `.gwc/gwc/governance/instruction-source-registry.yaml` when present
+8. `.gwc/gwc/projects/<project-id>/project-profile.yaml`
+9. `.gwc/gwc/projects/<project-id>/project-instructions.md`
+10. `.gwc/gwc/projects/<project-id>/project-extension.md`
+11. task/spec/workflow files relevant to the request
 
-Declare `execution_mode` before gate reporting.
+Print SOURCE INSTRUCTION and declare `execution_mode` before gate reporting.
+
+Produce an Intake Card with Files READ and Files WRITE before mutation.
 
 Do not create a branch, modify files, push, or open a PR unless G0/G1 validator
 evidence and a valid G2 envelope exist for the current execution mode.
 
 In chat-only mode, stop before write-capable connector actions when validator
 evidence is unavailable.
+
+Never treat plain `ok`, `approve`, or `continue` as gate authority. The agent
+must generate the exact approval command and the human must copy-paste it.
 
 Never write directly to protected branches. Open Draft PR only. Merge, deploy,
 production config, credentials, migration, and production data require separate
