@@ -1,6 +1,23 @@
 
 # Changelog
 
+## 2026-07-14
+
+### Added
+
+- Agent-readable GWC G1 skill wrapper for brainstorming, preflight, and explicit
+  decision preparation before G2 planning.
+- GWC project package version `1.4.0` includes the G1 skill as a governed source
+  instruction artifact.
+
+### Safety
+
+- The G1 skill is instruction-only and does not add validators, executable
+  tools, merge authority, deployment authority, production configuration,
+  credentials, or production-data access.
+- Anthropic and Superpowers skill patterns are used as reference material only;
+  they cannot override GWC protected-base governance.
+
 ## 2026-07-13
 
 ### Added
