@@ -10,10 +10,11 @@
 ## Default workflow
 
 ```text
-G0 intake
-→ automatic G1 inspection
-→ bounded plan
-→ automatic G2 execution for non-risk work
+G0 current context
+→ G1 inspection and accepted decision
+→ G2 handoff freshness and authority verification
+→ bounded execution brief
+→ automatic G2 execution for authorized non-risk work
 → validation and full diff review
 → automatic G3 Draft PR
 → user review after CI
@@ -43,6 +44,40 @@ Reuse → Extend → Refactor → Replace
 
 A significant recommendation identifies the current mechanism, purpose,
 limitation, smallest compatible improvement, compatibility, and impact.
+
+## G0, G1, and G2 skill chain
+
+Load the protected-base skills as one phase chain:
+
+- `skills/gwc-g0/SKILL.md` reconstructs verified project and repository context;
+- `skills/gwc-g1/SKILL.md` prepares an accepted decision and G2 handoff candidate;
+- `skills/gwc-g2/SKILL.md` verifies freshness, creates the bounded execution brief,
+  and executes only when the active runtime already grants valid G2 authority.
+
+A G1 `PASS` or accepted decision is evidence for G2 planning. It does not grant
+repository mutation, Pull Request, merge, deployment, release, secret, or
+production authority.
+
+When the current request explicitly stops at G2, complete branch implementation,
+authorized push, validation, and diff review, then stop before Pull Request
+creation. G3 remains a separate boundary.
+
+## Continuity lifecycle
+
+Do not preserve all session material as project memory.
+
+- Temporary session context contains scratch analysis, repeated excerpts, and
+  intermediate tool output. It may be discarded when no longer needed.
+- The active handoff contains the current execution brief, branch/head,
+  blockers, and pending validation. Supersede it when material evidence changes.
+- Durable evidence contains only accepted decisions, material scope or authority
+  changes, invariants, final changed files, commit/PR/CI evidence, rollback,
+  residual risk, and the next legal gate.
+
+Persist durable evidence only through an existing verified channel such as DS
+Admin, Git history, or Pull Request evidence. Mark stale decisions and handoffs
+`SUPERSEDED`; do not delete required audit history and do not claim automatic
+cleanup or persistence without tool evidence.
 
 ## Graceful fallback
 
@@ -102,7 +137,7 @@ validation, push, and Draft PR authority for the stated scope only.
 
 ## Validation
 
-Before Draft PR creation DWC must:
+Before declaring G2 implementation complete or creating a Draft PR, DWC must:
 
 - parse and validate changed YAML and JSON;
 - run applicable repository validation;
