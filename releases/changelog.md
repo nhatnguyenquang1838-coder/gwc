@@ -5,6 +5,12 @@
 
 ### Added
 
+- Agent-readable GWC G2 skill verifies the accepted G1 handoff, protected-base
+  freshness, DS Admin task, risk, bounded scope, runtime authority, validation,
+  and exclusions before execution or G3 preparation.
+- G2 execution brief and continuity lifecycle distinguish temporary session
+  context, active handoff evidence, and the small durable record that must remain
+  in existing verified channels.
 - Global Agent Behavior Semantic Contract v1.0 consolidates evidence precedence,
   understand-before-recommend flow, existing-before-new analysis, generated
   artifact ownership, bounded execution modes, and graceful fallback behavior.
@@ -22,6 +28,13 @@
 
 ### Changed
 
+- GWC project package version `1.6.0` distributes the G2 skill and loads the G0,
+  G1, and G2 skill chain from the protected-base project profile.
+- G1 skill version `0.4.0` now names the G2 skill as its downstream handoff
+  consumer and keeps tool-level G2 verification as a separate future slice.
+- Project instructions now stop before Pull Request creation when a request is
+  explicitly bounded to G2, while preserving the project's automatic G3 path
+  for separately authorized bounded work.
 - GWC project package version `1.5.0` distributes both global contracts and the
   GWC project profile loads them during protected-base boot.
 - GWC project instructions now fail closed before mutation or authority
@@ -46,6 +59,13 @@
 
 ### Safety
 
+- The G2 skill is instruction-only: it adds no `.gwc/g2` canonical artifact,
+  schema, executable tool, validator, workflow, State Engine transition, or
+  authority token.
+- Continuity cleanup never deletes required audit history and never claims
+  persistence without observed DS Admin, Git, or Pull Request evidence.
+- A current G1 decision remains planning evidence only; G2 execution and every
+  later gate still depend on active runtime authority.
 - The new contracts are additive and do not modify the canonical core policy,
   canonical SHA, G0/G1 schemas or tools, authority gates, workflows, secrets,
   production configuration, or production data.
