@@ -12,10 +12,33 @@ core policy for other agents or repositories.
 ## Mission
 
 Allow DWC to inspect, maintain, validate, and deliver bounded changes to this
-repository through a guarded branch and Draft Pull Request without repeated
-approval prompts for routine repository operations.
+repository through a guarded branch and Draft Pull Request while enforcing the
+canonical GWC gate lifecycle.
 
-## Automatic inspection — G0/G1
+## Mandatory boot and gate enforcement
+
+Before any repository-changing action, DWC must read and follow:
+
+1. `AGENTS.md`;
+2. `core/Coding_Project_Governance_v1.0.md`;
+3. `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`;
+4. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`;
+5. `projects/gwc/project-profile.yaml`;
+6. `projects/gwc/project-instructions.md`;
+7. `projects/gwc/project-extension.md`;
+8. `agents/dwc/capabilities.yaml`;
+9. the task, target repository governance, package, spec, and workflow evidence
+   relevant to the requested outcome.
+
+DWC must visibly report `GWC BOOT`, G0, G1, G2, and G3 status for
+repository-changing work. A gate may be reported as complete only when its
+canonical repository artifact exists and validation has passed.
+
+DWC must not create a branch, update a file, create a commit, push a ref, or open
+a Pull Request while G0/G1 evidence is missing or invalid. It must not invoke a
+connector action first and backfill the artifacts later.
+
+## Automatic inspection — G0
 
 DWC may automatically perform read-only operations needed to understand a task:
 
@@ -23,33 +46,58 @@ DWC may automatically perform read-only operations needed to understand a task:
   workflow runs, and workflow artifacts;
 - read governance and project context from the protected base;
 - compare refs, hashes, package versions, consumers, and CI evidence;
-- create or update the matching DS Admin task record.
+- inspect the matching DS Admin task record.
 
-Read-only inspection does not authorize writes, merge, deployment, or
-production access.
+Automatic inspection does not itself complete G0. DWC must create or update the
+task-scoped G0 context artifact and validate that it is `READY` with no
+blockers. Until then, only read-only actions are allowed.
+
+## Automatic alignment — G1
+
+DWC may automatically reconstruct the problem, scope, non-goals, constraints,
+risks, acceptance criteria, options, and recommended decision.
+
+Automatic analysis does not itself complete G1. DWC must create or update the
+canonical G1 intake, preflight, options, and decision artifacts and run:
+
+```text
+python tools/validate_g01.py --workspace <task-workspace>
+```
+
+G1 is complete only when the result is `PASS`. A user instruction such as
+“apply fix” may select the bounded outcome but does not replace the required G1
+artifacts or validator.
 
 ## Automatic bounded execution — G2
 
-DWC may automatically execute a bounded, non-risk repository change when all
-of the following are true:
+DWC may execute a bounded, non-risk repository change only when all of the
+following are true:
 
-- the user has requested the outcome;
+- G0 is `READY`;
+- G1 is `PASS`;
+- the user requested the outcome;
 - repository identity and protected base are verified;
-- exactly one DS Admin task represents the work;
+- exactly one valid DS Admin task represents the work when required by profile;
+- a valid execution or approval envelope matches the task, repository, base SHA,
+  guarded branch, scope hash, file/module scope, risk, and intended actions;
 - the scope is explicit and limited to the requested result;
-- a dedicated allowed-prefix branch is used;
+- a dedicated allowed-prefix branch and isolated worktree/session are used;
 - no protected branch is written directly;
 - no secret, production configuration, production data, destructive action,
   financial impact, architecture change, security-boundary change, or broad
-  blast radius is introduced;
-- validation and complete diff review are performed before Draft PR creation.
+  blast radius is introduced unless explicit human direction is recorded;
+- validation and complete diff review are performed before G3.
 
-Within that boundary DWC may create the branch, create or update any repository
-file required by the task, add tests and documentation, push commits, inspect
-CI, repair repository-fixable CI failures, and update the same Draft PR.
+Before every write-capable connector call, DWC must verify that the exact action
+is listed in the active envelope. If not, DWC must stop with
+`GATE_ACTION_NOT_AUTHORIZED`.
+
+Within a valid G2 boundary DWC may create the guarded branch, create or update
+repository files required by the task, add tests and documentation, push
+commits, inspect CI, and repair repository-fixable CI failures.
 
 For generated integrity-artifact refreshes, DWC may auto-wrap the action in a
-machine-generated approval envelope when all of these are true:
+machine-generated approval envelope only when:
 
 - the branch is guarded and not `main`;
 - the artifact source is a verified generator;
@@ -57,12 +105,24 @@ machine-generated approval envelope when all of these are true:
 - the action does not grant merge permission.
 
 That envelope is an internal audit record for the bounded branch write and is
-not a human approval token. It does not relax `G4` or authorize merge.
+not a human approval token. It does not relax G4 or authorize merge.
 
 ## Draft PR delivery — G3
 
-After validation, DWC may automatically create or update a Draft Pull Request
-for bounded non-risk work. The PR is the user review boundary.
+After G2 validation and complete diff review, DWC may create or update a Draft
+Pull Request only when a task-scoped G3 delivery record identifies:
+
+- repository and task;
+- base and head SHA;
+- Draft PR identity;
+- validation and CI evidence;
+- changed scope;
+- exclusions and residual risks.
+
+The Draft PR is the user review boundary. G3 never grants merge, deployment,
+release, or production authority.
+
+## Human-direction categories
 
 Explicit human direction is required before G2/G3 execution when the task has
 any of these characteristics:
@@ -77,11 +137,19 @@ any of these characteristics:
 - broad blast radius.
 
 A user request that explicitly asks DWC to create the bounded PR for one of
-these categories satisfies the human-direction requirement only for branch,
-implementation, validation, push, and Draft PR creation. It does not grant
-merge, deploy, release, or production authority.
+these categories satisfies the human-direction requirement only for the exact
+G2/G3 scope recorded in the artifacts. It does not grant merge, deploy, release,
+or production authority.
 
-## Permanent exclusions
+## G4, G5, and G6
+
+G4 merge, G5 deploy, and G6 production operations always require a separate
+human decision recorded for the exact repository, task, PR or release, head SHA,
+scope hash, action, environment, and expiry where applicable.
+
+Approval for one gate never grants another gate.
+
+## Permanent exclusions without the matching gate
 
 DWC must not automatically:
 
@@ -93,11 +161,9 @@ DWC must not automatically:
 - read or write production data;
 - perform destructive migrations or irreversible operations.
 
-G4 merge, G5 deploy, and G6 production operations always require a separate
-human decision.
-
 ## Completion evidence
 
-A DWC repository task is complete only when the Draft PR exists, the latest
-head SHA is known, applicable validation is recorded, CI state is reported,
-and exclusions and residual risks are stated accurately.
+A DWC repository task is complete only when the required gate records exist,
+the Draft PR exists, the latest head SHA is known, applicable validation is
+recorded, CI state is reported, and exclusions and residual risks are stated
+accurately.
