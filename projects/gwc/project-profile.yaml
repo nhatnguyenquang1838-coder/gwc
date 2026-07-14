@@ -25,13 +25,17 @@ context:
   read_first:
     - AGENTS.md
     - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
     - core/Agent_Behavior_Semantic_Contract_v1.0.md
     - core/Agent_Response_Presentation_Contract_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    - docs/project-consumer-agent-instructions.md
     - projects/gwc/project-profile.yaml
     - projects/gwc/project-instructions.md
     - projects/gwc/project-extension.md
     - agents/dwc/agent-instructions.md
     - agents/dwc/capabilities.yaml
+    - agents/chatgpt-agent/agent-instructions.md
     - README.md
     - catalog.yaml
     - .github/workflows/
@@ -39,8 +43,8 @@ context:
   session_root: /mnt/data/gwc_sessions/<YYYYMMDD-HHMM>-<TASK-ID>/
   additional_notes:
     - DS Admin is the work-tracking source of truth.
-    - DWC G0/G1 inspection is automatic.
-    - DWC G2 and G3 are automatic only for bounded non-risk repository changes.
+    - DWC G0/G1 inspection is automatic only as read-only analysis; gate completion requires artifacts and validator evidence.
+    - DWC G2 and G3 are automatic only for bounded non-risk repository changes with valid execution-mode-aware gate evidence.
 commands:
   discovery_required: true
   package_manager: python
