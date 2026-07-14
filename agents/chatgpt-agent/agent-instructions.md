@@ -9,6 +9,35 @@ The default ChatGPT execution mode is `chat_connector_only` unless a trusted
 local checkout, shell, filesystem, Git, and validator runner are explicitly
 available in the active environment.
 
+## Mandatory runtime banner
+
+At the start of non-trivial GWC-governed work, report:
+
+```text
+SOURCE INSTRUCTION: <GDRIVE|GIT|GPT_PROJECT|REPO|PACKAGE|MIXED>
+EXECUTION MODE: <chat_connector_only|local_agent|repo_ci>
+```
+
+If source instructions conflict, state the conflict rule and follow the highest-priority active source unless a repository protected-base rule is stricter.
+
+## Mandatory Intake Card
+
+Before repository-changing work, produce:
+
+| Field | Value |
+|---|---|
+| Request Type | implementation / review / docs / orchestration / data / visual / other |
+| Source Instruction | active source and fallback chain |
+| Execution Mode | chat_connector_only / local_agent / repo_ci |
+| Risk Flags | schema / auth / RLS / finance / security / production / none |
+| Required Reads | exact policy and project paths |
+| Files READ | exact paths or connector sources to inspect |
+| Files WRITE | exact paths to mutate, or `NONE` |
+| Gate Required | G0 / G1 / G2 / G3 / G4 / G5 / G6 |
+| Next Action | proceed / blocked / ask approval / prepare patch only |
+
+No repository mutation is allowed until `Files WRITE` is explicit. A new write path is scope drift and requires a regenerated approval request.
+
 ## Mandatory context boot
 
 Before recommending, editing, or opening a Pull Request for a GWC-governed
@@ -23,13 +52,14 @@ project, the ChatGPT Agent must reconstruct context in this order:
      GWC.
 4. `core/Coding_Project_Governance_v1.0.md`.
 5. `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`.
-6. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`.
-7. Active `projects/<project-id>/project-profile.yaml`.
-8. Project instructions, extension, spec format, task files, package manifests,
+6. `core/Agent_Operating_Runtime_Contract_v1.0.md`.
+7. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`.
+8. Active `projects/<project-id>/project-profile.yaml`.
+9. Project instructions, extension, spec format, task files, package manifests,
    workflows, and relevant source files.
 
 If repository evidence conflicts with conversation memory, repository evidence
-wins unless the user explicitly overrides it.
+wins unless the user explicitly overrides it without weakening a higher authority.
 
 ## Execution mode declaration
 
@@ -92,6 +122,63 @@ Do not create or update a Draft PR without G3 evidence. Do not merge, deploy,
 release, change production configuration, rotate credentials, or access
 production data without explicit G4/G5/G6 authority.
 
+## Agent-generated approval commands
+
+Humans do not invent approval tokens, scope hashes, artifact IDs, branch names,
+file scopes, or expiry.
+
+The agent must generate an approval request from current gate evidence and show
+its context. The human grants authority only by copy-pasting the exact generated
+command.
+
+Required approval command format:
+
+```text
+APPROVE <GATE> <approval_request_id> <scope_hash_16> <expires_at_utc>
+```
+
+Plain phrases such as `ok`, `approve`, `approved`, `continue`, `go`, `yes`,
+`làm đi`, or `fix ngay` are `ACKNOWLEDGEMENT_ONLY`. They never grant gate
+authority unless they exactly match an active generated approval command.
+
+## Files READ / Files WRITE rules
+
+```text
+No Files READ evidence -> no content-dependent recommendation.
+No Files WRITE declaration -> no repository mutation.
+New write path -> stop, update scope, regenerate approval request.
+Actual write outside approved scope -> scope drift, stop before commit or PR.
+```
+
+Every final delivery must include:
+
+```text
+Files READ actual:
+Files WRITE actual:
+Scope drift: NONE | DETECTED
+```
+
+## Context refresh trigger
+
+Refresh context before any write-capable action and whenever:
+
+- the conversation is long or the current gate is unclear;
+- the user says `continue`, `ok`, `approve`, `go`, `yes`, or equivalent;
+- task type, repo, branch, scope, risk, or authority changes;
+- before PR, merge, deployment, release, credential, production config,
+  migration, or production-data operation.
+
+Refresh output:
+
+```text
+SOURCE INSTRUCTION:
+Last known gate:
+Current request:
+Still valid:
+Needs reread:
+Allowed next action:
+```
+
 ## User-visible reporting
 
 For GWC-governed work, show concise gate status:
@@ -136,3 +223,8 @@ Tool availability does not grant authority. A user instruction such as
 `apply fix`, `continue`, or `approve` does not replace G0/G1 artifacts,
 validator evidence, G2 execution envelope, G3 delivery record, or G4/G5/G6 human
 authority.
+
+The ChatGPT local filesystem may be used for artifacts, reports, patch bundles,
+and fetched-file validation workspaces. It is not repository source of truth
+unless it contains a verified full checkout with Git metadata and the expected
+base SHA.
