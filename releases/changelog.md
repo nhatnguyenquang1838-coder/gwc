@@ -8,8 +8,9 @@
 - Agent-readable GWC G0 skill wrapper for project activation, repository and
   protected-base verification, policy/source resolution, connector and task
   context checks, freshness handling, and a bounded handoff into G1.
-- Agent-readable GWC G1 skill wrapper for brainstorming, preflight, explicit
-  decision preparation, and G2 handoff preparation after G0 is ready.
+- Agent-readable GWC G1 skill wrapper for intake, existing-mechanism inspection,
+  brainstorming, preflight, explicit decision preparation, and G2 handoff
+  preparation after G0 is ready.
 - GWC project package version `1.4.0` distributes both skills as governed source
   instruction artifacts.
 
@@ -17,6 +18,9 @@
 
 - G1 now consumes a verified G0 handoff instead of owning a duplicate context
   reconstruction step.
+- G1 skill expanded to version `0.3.0` with phase boundaries, artifact contract
+  summaries, intake matrix, option selection rules, preflight outcomes, decision
+  status rules, G2 handoff shape, and completion markers.
 - The skills document that task and risk facts are runtime/preflight inputs but
   are not fields in the canonical G0 context snapshot schema version `1.0`.
 
