@@ -26,6 +26,7 @@ Approval envelope = authority boundary
 
 - Canonical coding governance policy.
 - Global agent behavior and adaptive response presentation contracts.
+- Agent-readable G0, G1, and G2 phase skills with a bounded G1-to-G2 handoff.
 - E2E Draft PR delivery workflow.
 - Local-agent and copyable-command rules.
 - Project packages for GWC, DS MCP, Rental Home, and PM Skills.
@@ -37,11 +38,15 @@ Approval envelope = authority boundary
 
 ## Agent operating model
 
-GWC package `1.5.0` adds two modular operational contracts without changing the
-canonical core hash or replacing G0/G1:
+GWC package `1.6.0` retains the two modular operational contracts and adds an
+agent-readable G2 handoff skill without changing the canonical core hash or
+replacing the existing G0/G1 lifecycle:
 
 - `core/Agent_Behavior_Semantic_Contract_v1.0.md`;
-- `core/Agent_Response_Presentation_Contract_v1.0.md`.
+- `core/Agent_Response_Presentation_Contract_v1.0.md`;
+- `skills/gwc-g0/SKILL.md`;
+- `skills/gwc-g1/SKILL.md`;
+- `skills/gwc-g2/SKILL.md`.
 
 The default reasoning flow is:
 
@@ -50,6 +55,8 @@ Understand
 → Inspect
 → Reconstruct current context
 → Identify existing mechanisms
+→ Accept a G1 decision
+→ Verify the G1-to-G2 handoff
 → Integrate the smallest compatible improvement
 → Execute only when authorized
 → Validate and report evidence
@@ -59,6 +66,13 @@ Agents prefer `Reuse → Extend → Refactor → Replace`. Missing task, connect
 or persistence evidence degrades the workflow to verified read-only or
 planning-only mode instead of blocking all useful analysis. Repository mutation
 and authority escalation still fail closed.
+
+G2 uses a concise execution brief rather than inventing a parallel canonical
+artifact. Temporary session context may be discarded, the active handoff is
+superseded when evidence changes, and only material decisions, scope/authority
+changes, final repository evidence, validation, rollback, residual risks, and
+the next gate are promoted to existing durable channels such as DS Admin, Git,
+or Pull Request history.
 
 Responses use direct Markdown by default, tables for comparison, Mermaid for
 workflow or architecture relationships, and SVG/PNG only when requested,
@@ -120,7 +134,7 @@ python -m pip install -r requirements.txt
 python tools/validate_instructions.py
 ```
 
-### 4. Validate G0/G1 lifecycle artifacts
+### 4. Validate G0/G1 lifecycle artifacts and prepare G2
 
 ```bash
 python tools/validate_g01.py --workspace .gwc
@@ -129,7 +143,9 @@ python -m unittest tests.test_g01_lifecycle
 
 The validator returns `PASS` only when G0 context and all G1 intake, preflight,
 options, and decision artifacts are schema-valid and mutually consistent. A G1
-`PASS` is evidence for G2 planning only; it never grants merge, deployment, or
+`PASS` is evidence for G2 planning only. `skills/gwc-g2/SKILL.md` then re-checks
+freshness, task traceability, scope, risk, runtime authority, and exclusions
+before bounded execution. Neither phase grants merge, deployment, release, or
 production authority. See `docs/g01-lifecycle.md`.
 
 ### 5. Build a project package
@@ -192,8 +208,9 @@ required by the active DS Admin task on a dedicated guarded branch.
 The automatic path is:
 
 ```text
-G0 intake
-→ automatic G1 inspection
+G0 current context
+→ automatic G1 inspection and accepted decision
+→ G2 handoff freshness and authority verification
 → automatic G2 bounded non-risk execution
 → validation and diff review
 → automatic G3 Draft PR
