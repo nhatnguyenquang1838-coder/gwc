@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.3.0
+package_version: 1.4.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -21,6 +21,14 @@ instructions:
   - id: g01-lifecycle
     path: docs/g01-lifecycle.md
     target: .governance/g01-lifecycle.md
+    required: true
+  - id: gwc-g0-agent-skill
+    path: skills/gwc-g0/SKILL.md
+    target: .governance/skills/gwc-g0/SKILL.md
+    required: true
+  - id: gwc-g1-agent-skill
+    path: skills/gwc-g1/SKILL.md
+    target: .governance/skills/gwc-g1/SKILL.md
     required: true
   - id: g01-runtime-input-schema
     path: schemas/g01-runtime-input.schema.json
