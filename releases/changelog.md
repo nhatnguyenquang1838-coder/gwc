@@ -5,16 +5,26 @@
 
 ### Added
 
-- Agent-readable GWC G1 skill wrapper for brainstorming, preflight, and explicit
-  decision preparation before G2 planning.
-- GWC project package version `1.4.0` includes the G1 skill as a governed source
-  instruction artifact.
+- Agent-readable GWC G0 skill wrapper for project activation, repository and
+  protected-base verification, policy/source resolution, connector and task
+  context checks, freshness handling, and a bounded handoff into G1.
+- Agent-readable GWC G1 skill wrapper for brainstorming, preflight, explicit
+  decision preparation, and G2 handoff preparation after G0 is ready.
+- GWC project package version `1.4.0` distributes both skills as governed source
+  instruction artifacts.
+
+### Changed
+
+- G1 now consumes a verified G0 handoff instead of owning a duplicate context
+  reconstruction step.
+- The skills document that task and risk facts are runtime/preflight inputs but
+  are not fields in the canonical G0 context snapshot schema version `1.0`.
 
 ### Safety
 
-- The G1 skill is instruction-only and does not add validators, executable
-  tools, merge authority, deployment authority, production configuration,
-  credentials, or production-data access.
+- The G0 and G1 skills are instruction-only and do not add validators,
+  executable tools, repository write authority, merge authority, deployment
+  authority, production configuration, credentials, or production-data access.
 - Anthropic and Superpowers skill patterns are used as reference material only;
   they cannot override GWC protected-base governance.
 
