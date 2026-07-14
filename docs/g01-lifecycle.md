@@ -54,12 +54,65 @@ A G1 `PASS` requires:
 6. The decision grants no authority and explicitly excludes `G4_MERGE`,
    `G5_DEPLOY`, and `G6_PRODUCTION`.
 
+## Runtime generation
+
+`tools/generate_g01_runtime.py` converts observed repository, task, request, and
+risk facts into schema-valid G0 context, G1 intake, and G1 preflight artifacts.
+It performs no connector or production calls; callers must supply the observed
+facts through a `g01-runtime-input` YAML document.
+
+```bash
+python tools/generate_g01_runtime.py \
+  --input templates/g01/g01-runtime-input.template.yaml \
+  --workspace .gwc \
+  --json
+```
+
+Runtime exit codes are:
+
+- `0`: generated artifacts are valid and preflight is `PASS`.
+- `1`: artifacts are valid but preflight is `NEEDS_INPUT` or `BLOCKED`.
+- `2`: input/schema/I/O error; no partial artifact set is reported as written.
+
+R0/R1 work selects `G2_AUTOMATIC_BOUNDED`. R2/R3 work selects
+`G2_HUMAN_DIRECTION` and fails closed until explicit human direction is recorded.
+The generator never grants merge, deployment, release, secret, or production
+authority.
+
+## Options and decision capture
+
+`tools/capture_g01_decision.py` reads a completed intake and passing preflight,
+then generates the options and explicit decision artifacts from a versioned
+`g01-decision-input` document.
+
+```bash
+python tools/capture_g01_decision.py \
+  --input templates/g01/g01-decision-input.template.yaml \
+  --workspace .gwc \
+  --json
+```
+
+The capture flow validates option IDs, selected and recommended references,
+acceptance-criteria references, preflight status, and explicit human choice. It
+computes a deterministic `scope_hash` from the intake scope, constraints, and
+acceptance criteria, then runs the complete G0/G1 validator before returning
+`PASS`.
+
+A generated decision always records an empty authority grant list and excludes
+`G4_MERGE`, `G5_DEPLOY`, and `G6_PRODUCTION`.
+
+Decision capture exit codes are:
+
+- `0`: explicit accepted decision and complete G1 workspace `PASS`.
+- `1`: schema-valid `PENDING`, `REJECTED`, `NEEDS_INPUT`, or `BLOCKED` outcome.
+- `2`: input/schema/I/O failure.
+
 ## Validation
 
 ```bash
 python tools/validate_g01.py --workspace .gwc
 python tools/validate_g01.py --workspace tests/fixtures/g01-valid --json
-python -m unittest tests.test_g01_lifecycle
+python -m unittest tests.test_g01_lifecycle tests.test_g01_runtime tests.test_g01_decision_capture
 ```
 
 The generic repository validator checks that the G0/G1 schemas and validator

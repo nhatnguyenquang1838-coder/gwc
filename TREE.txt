@@ -1,9 +1,9 @@
-040000 tree 1527a371bdc55538c39d9444b4283c41a33c0152	.github
+040000 tree acc5114927f28737c6ce5d9a16226ae3ca0d7447	.github
 100644 blob 0ccccad23f1b5a0184baedfd4bbe2f07dc7974ef 258	.github/CODEOWNERS
-040000 tree 8f078bacda4319e2dde114c68637d41c24b434c7	.github/workflows
+040000 tree 02fbb5908d528a9422a6b7e87a7910387501fb39	.github/workflows
 100644 blob d60dac96863ee59cb2e5060900a3aad077ccfd19 1036	.github/workflows/build-packages.yml
 100644 blob e9c60b8ffc91e7bf29c6c8ac642a4c3609424bd6 2175	.github/workflows/publish-release.yml
-100644 blob eb8beaad14901495bb1fb8aa5e624853fdf6040c 739	.github/workflows/validate-instructions.yml
+100644 blob 8009576e0adfe649a43e305c5d4b7fcaf6772453 1303	.github/workflows/validate-instructions.yml
 040000 tree 3bf4a12b8f987fc9919f2bcd2ccf9e1d8ce0dbad	agents
 100644 blob 4758f9c5de05381b8edc83d031fe811cdcd710b8 4852	AGENTS.md
 040000 tree 14476ad1fdf8457f8323b2469e06a73da5f01f6e	agents/coding-agent
@@ -22,20 +22,20 @@
 100644 blob 377c2d6e995a1c1aaecf43bf85eb383f1ccba3c2 7961	core/E2E_DRAFT_PR_DELIVERY_RULE.md
 100644 blob 1f139e126f1e94761046e770bca9b875fa2f00ae 2711	core/LOCAL_AGENT_RULE.md
 100644 blob 8aa1db77d1e39e1e2f34354bf6970c780e8616ef 1403	core/USER_COMMAND_FORMAT_RULE.md
-040000 tree 1d957690124de6068021618fff5e35c0180c715d	docs
+040000 tree 08ba34e69ba13204b3aace664d3943e5f28c93bd	docs
 100644 blob eb96f58dc6ff84672120a09b10a12b275704863c 1312	docs/base-drift-policy.md
-100644 blob bcd5fc7214a20d9d269c1c4a7b6649f322b612fc 2398	docs/g01-lifecycle.md
+100644 blob fea551486d2d2cbca7106f77f845b231d9e3c375 4404	docs/g01-lifecycle.md
 040000 tree 85d5ac40a71bc75f4886c4d626b7a2a4ef7b8fd1	governance
 100644 blob 6eb8b4a34247afee238a75475c03ede3f9824d00 1648	governance/base-drift-policy.yaml
-040000 tree 874f6b738f3374d6081e2511881730aaabe1f0db	projects
+040000 tree 5d93261fd2b70f96620ce09b724f3045585ffd9b	projects
 040000 tree 43085fcec0e2937a6ef957fb409a8e83d45e685d	projects/ds-mcp
 100644 blob 1679057df8dd8dcfdaac1c9669738d30fa66b0f1 2236	projects/ds-mcp/admin-task-claim-rule.md
 100644 blob 0bbca1c6437e421e5127d760cd8a7de04aac1f54 1854	projects/ds-mcp/package.yaml
 100644 blob 23a7fb725d368b3ebec4cef7fb7b0b8c4c5a8ded 2486	projects/ds-mcp/project-extension.md
 100644 blob afeb90928612cd9cac917a4455ff1ecc7513f85e 24433	projects/ds-mcp/project-instructions.md
 100644 blob 2841239ec42b5955018f1817c9c82ddba596aea0 1880	projects/ds-mcp/project-profile.yaml
-040000 tree cf5a9de380a613387fc50270ec8737e9c36ec5b4	projects/gwc
-100644 blob a2a0fa61a7c17307abe46dd23ea9c1a2c5231132 2147	projects/gwc/package.yaml
+040000 tree 73d1706d2ece53add28844ceec4f301068fff897	projects/gwc
+100644 blob f9a2b8485f488d9ff3c9676bcaef7168b8a16c94 3114	projects/gwc/package.yaml
 100644 blob 5bcbb7e9bccbb1cd70573627defea0ac6bee43b1 1451	projects/gwc/project-extension.md
 100644 blob 18d0100f8024f5f9b7861c0de2e02da7eb93a4ff 1928	projects/gwc/project-instructions.md
 100644 blob eec5b6a8b552c4a992e226239bcb502dd2d0c0c3 2127	projects/gwc/project-profile.yaml
@@ -51,15 +51,17 @@
 100644 blob d0d1001c15ffdb5cc932408b2c73428d36235d2b 1936	projects/rental-home/project-profile.yaml
 100644 blob 1a4197fb3649b4631ea3c5f50f84e0ba672899cf 10689	projects/rental-home/spec-driven-format.md
 100644 blob 9f20c0fcba4677b0cc1bc93b7ac544ad2de6510d 6508	README.md
-040000 tree 271be8c0d2425bfe5ae293340c1ba5f769e4ceff	releases
-100644 blob 024d68c49019c8e99c8f83e895cb560216f88b5e 2710	releases/changelog.md
+040000 tree 7e20ca484057568a2e2377404f0e6932811f5b0c	releases
+100644 blob 8ceb7cd937e9edff56c0c0742230978b15263ee7 3448	releases/changelog.md
 100644 blob 0b221e450e8485728d1f17085ecd4aec317b6557 592	releases/integrity-refresh-report.md
 100644 blob 75198e25b30eccef6bcde2e7c957f780216ff771 768	releases/manifest.yaml
 100644 blob 177df263d334e91d7e1a1acf7dce35b2409ad1b7 33	requirements.txt
-040000 tree 4e17ffb6bb453f839f3e551eb15202c928fd7ae0	schemas
+040000 tree 1516195ba45896f27a5e978ce9554e8c163e56b6	schemas
 100644 blob b9e037439d4863a869e125f57a9bbba99538b16e 4395	schemas/approval-envelope.schema.json
 100644 blob 5ba1fa1ff1e0d5ee269ec377bdf3370ddba37554 2617	schemas/base-drift-evaluation.schema.json
 100644 blob f86ff0d09031207357ab594c983f4d527607b29c 4573	schemas/g0-context-snapshot.schema.json
+100644 blob 224be0551e91f14c83f4962b8f2728d4db388a22 2560	schemas/g01-decision-input.schema.json
+100644 blob 9026e6afd716ff812c8020df7ec9647c537cc019 5500	schemas/g01-runtime-input.schema.json
 100644 blob 8f3beedd6a044924129a69d57ab5ff4d75adc1b6 4743	schemas/g1-decision-record.schema.json
 100644 blob 8d3da1bc5a7d8cb6f666630e02096d65d03592af 5399	schemas/g1-intake-brief.schema.json
 100644 blob 2ec0852592b5e0e45c3328277e6d78edd7a1ab40 3469	schemas/g1-options.schema.json
@@ -67,11 +69,13 @@
 100644 blob d01a6240d1c9cabfeee4076021e528133da04494 2191	schemas/instruction.schema.json
 100644 blob 91fc4a4659ddbdf9519f133aeeca82649391ecdb 3709	schemas/project-package.schema.json
 100644 blob 82e7b532334905f3e8f043e63e51bdad4eae515e 2698	schemas/rollout.schema.json
-100644 blob 7ceae2128572f24f988ce609ad5e1e59e9fa6a96 5351	SHA256SUMS.txt
-040000 tree 52bc10e70c12c3d76dde3ac633140d7f766000c2	templates
+100644 blob 1de4f011e53f51ab800c391c72eda6a3ba0dc31d 8344	SHA256SUMS.txt
+040000 tree 45bc209c0843b07f84b84fb32dc4df9e7a633468	templates
 100644 blob 7faeadc937f7e7306f15eb4d5ada842905d60a8c 468	templates/e2e-rule.template.md
-040000 tree 8d9bd38d394d9e3e3f4e04d47a93e588fa6577b3	templates/g01
+040000 tree 96c8e263a8f516dcdc335ae01749718ab418f77d	templates/g01
 100644 blob 17f669f1ffcdd113fca0ee992d9d0e10a18eb315 1073	templates/g01/g0-context-snapshot.template.yaml
+100644 blob 37ec05e4e9d3c1f557a3623e69f169a82c09ab95 1017	templates/g01/g01-decision-input.template.yaml
+100644 blob 326167bf9232a6c65a950716e12d72f80c64a554 2346	templates/g01/g01-runtime-input.template.yaml
 100644 blob ee4ec2c38d4cd64d48c9cfa63d753c622065bb62 914	templates/g01/g1-decision-record.template.yaml
 100644 blob 93aa567135b4fa40ab985ab52f947b699166a8ef 1430	templates/g01/g1-intake-brief.template.yaml
 100644 blob 9d744a84fc5a8922c14d5e0d334ebe998851f6ae 1143	templates/g01/g1-options.template.yaml
@@ -79,9 +83,11 @@
 100644 blob df7ddba6e0355b60e61385e9a73b8491583f48b1 704	templates/project-extension.template.md
 100644 blob 83350e56c7ef0164d27281ba5e560bb3b26809d5 364	templates/project-instructions.template.md
 100644 blob fa2fdb9fdccbb09d3b12f8d5cd3fbf0b93819aa4 1322	templates/project-profile.template.yaml
-040000 tree b18ccab73a19834904dd4cd5be9e7abbd7efdb7a	tests
-040000 tree 1a2777894ae9558cd827618cc4011bfb29583e19	tests/fixtures
+040000 tree e18ec967d22f9d7b1c68187fb400e1fed17fd942	tests
+040000 tree 2c11f864de9e4f7ed40b034002fb792eed093487	tests/fixtures
+100644 blob 37ec05e4e9d3c1f557a3623e69f169a82c09ab95 1017	tests/fixtures/g01-decision-valid.yaml
 100644 blob bf31eb8ab50c1b8efaf46bbd8321c2e07f23a89f 915	tests/fixtures/g01-invalid-decision.yaml
+100644 blob 326167bf9232a6c65a950716e12d72f80c64a554 2346	tests/fixtures/g01-runtime-valid.yaml
 040000 tree 12a8b6a9f25c9ce2f22d0b0003499dc48715250b	tests/fixtures/g01-valid
 040000 tree df32ade56b3136099730e6912b5b510a03e0e218	tests/fixtures/g01-valid/g0
 100644 blob 17f669f1ffcdd113fca0ee992d9d0e10a18eb315 1073	tests/fixtures/g01-valid/g0/context-snapshot.yaml
@@ -95,13 +101,16 @@
 040000 tree feb10ccea92a62e79b040a36ac333a4c5472eb8d	tests/fixtures/g01-valid/g1/preflight
 100644 blob b9fd1414e10d4422a4de503d09bbc1d96b7c011c 983	tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml
 100644 blob 7b07d18b12acb9c1dd90b8c2e151e6dc811f38d3 2166	tests/test_base_drift_policy.py
+100644 blob a5b20eadfafa9875d63f9c82ee324e9a36af9de3 4656	tests/test_g01_decision_capture.py
 100644 blob 479621e6dd682ae8ad5d916e1a7cc0528b51a403 2579	tests/test_g01_lifecycle.py
-040000 tree ba2f0551f12090d67d3f92f516a78eb06d9a3c7b	tools
+100644 blob a8d73eb5465a3e1d01f224cd82e7114f8d004ecb 5430	tests/test_g01_runtime.py
+040000 tree fb7f58653bd1a482d152ab7f1aebed801aa2129d	tools
 100644 blob 7efb03b8708d13824618b38dbaa0fc3957a2e0b5 3767	tools/build_project_package.py
+100644 blob 1e3ab8bc05d17b0bc8443999174ce0d8091c5fdd 9361	tools/capture_g01_decision.py
 100644 blob f83870d30b20ea67e4eaa67104a64b41ac2b9128 2772	tools/diff_instruction_package.py
 100644 blob bd8fee45c59fd2a9bb33e63793f3c304d810fc96 4999	tools/evaluate_base_drift.py
+100644 blob abd062a3a795a8acd089ff86423f69fe585599dc 13032	tools/generate_g01_runtime.py
 100644 blob 4c037a0c2a22bf7732f8d0c73c2676916f33ee2b 3725	tools/hash_integrity_artifacts.py
 100644 blob 154b20f62d94204ecd94ecbc8b71979d6817cf7b 12506	tools/validate_g01.py
-100644 blob e78d0f22add43b22e79ad8038aeb641aeae7eed8 10102	tools/validate_instructions.py
+100644 blob 96417185545447679be5bc701c3fc4c49707183b 10481	tools/validate_instructions.py
 100644 blob ba5efe6e05ba1536f5834b47ded50875abcabe0c 2331	tools/verify_rollout.py
-100644 blob 9842388190051e28b4f79717ffd86473d1b26b57 2171	TREE.txt

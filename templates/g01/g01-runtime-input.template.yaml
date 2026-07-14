@@ -1,0 +1,70 @@
+schema_version: '1.0'
+artifact_type: g01-runtime-input
+generated_at: '2026-07-13T15:45:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: feature/gwc-g01-artifact-contracts
+  base_sha: feae1d43a4880dcddea6c1844b3fb2ba388d9ab9
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+  verified: true
+task:
+  id: task_d77076f7-98e3-4e0f-a467-789d42c28cb6
+  claimed: true
+request:
+  requester: DW
+  problem:
+    statement: G1 contracts exist but runtime intake and preflight generation is manual.
+    why_now: The governed lifecycle needs repeatable machine-generated evidence before G2.
+  desired_outcome: Generate schema-valid G0, G1 intake, and G1 preflight artifacts from observed runtime facts.
+  affected: [DWC, GWC maintainers]
+  in_scope:
+    - Runtime input schema
+    - Deterministic artifact generator
+    - Fail-closed preflight checks
+    - Unit tests and documentation
+  non_goals:
+    - Merge automation
+    - Deployment
+    - Production operations
+    - Decision capture
+  constraints:
+    - Use existing PyYAML and jsonschema dependencies
+    - Write only to a caller-selected workspace
+  assumptions:
+    - Connector and task facts are observed before invoking the generator
+  risks:
+    - id: RISK-1
+      description: Caller-provided evidence could be incomplete.
+      impact: medium
+      mitigation: Validate input and generated artifacts and fail closed.
+  acceptance_criteria:
+    - id: AC-1
+      statement: Valid runtime input generates three schema-valid artifacts and PASS.
+      verifiable: true
+    - id: AC-2
+      statement: An unclaimed task generates BLOCKED with a stable code.
+      verifiable: true
+  unresolved_questions: []
+policies:
+  - id: GWC_CORE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: feature/gwc-g01-artifact-contracts
+    source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: a6de44653d23eb9e1ca5e3f6bd072d53f2eb28e7531b916982839b9a8d3670a9
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 0bc56158912f40c03330ba06481de11e6ebcc7355520413b7ca07c7d4416a249
+risk:
+  class: R1
+  human_direction_confirmed: false
