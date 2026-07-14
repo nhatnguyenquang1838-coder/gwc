@@ -30,6 +30,9 @@ context:
     - projects/gwc/project-profile.yaml
     - projects/gwc/project-instructions.md
     - projects/gwc/project-extension.md
+    - skills/gwc-g0/SKILL.md
+    - skills/gwc-g1/SKILL.md
+    - skills/gwc-g2/SKILL.md
     - agents/dwc/agent-instructions.md
     - agents/dwc/capabilities.yaml
     - README.md
@@ -40,6 +43,7 @@ context:
   additional_notes:
     - DS Admin is the work-tracking source of truth.
     - DWC G0/G1 inspection is automatic.
+    - G1 prepares an accepted decision handoff; G2 must re-check freshness, task traceability, risk, scope, and runtime authority before execution.
     - DWC G2 and G3 are automatic only for bounded non-risk repository changes.
 commands:
   discovery_required: true
