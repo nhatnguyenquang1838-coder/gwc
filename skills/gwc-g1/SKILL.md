@@ -124,6 +124,75 @@ python tools/validate_g01.py --workspace .gwc
 
 The templates are examples, not current evidence. Replace every project, repository, SHA, source, task, request, risk, option, and decision value with observed facts before execution.
 
+## Run identity and workspace mode
+
+Every G1 session must declare a `run_id` and `workspace_mode` before producing intake, options, preflight, decision, or handoff output.
+
+Allowed workspace modes:
+
+| Mode | Repository writes | Required use |
+|---|---:|---|
+| `chat-only` | No | Use for exploratory, conversational, or mobile sessions where no repository artifact should be written. |
+| `canonical` | Yes | Use only when one active G1 run owns `.gwc/g1/...` in the current branch/worktree. |
+| `session-scoped` | Yes | Use for concurrent or repeatable runs that need artifacts without sharing `.gwc/g1/...`. |
+
+The default mode is `chat-only` unless the user or task explicitly asks to write repository artifacts.
+
+`run_id` rules:
+
+- Generate one stable `run_id` per G1 session.
+- Prefer `g1-<YYYYMMDD-HHMM>-<short-task-or-topic>` for chat-only runs.
+- Prefer `g1-<task-id-short>-<YYYYMMDD-HHMM>` when DS Admin task identity is available.
+- Keep the same `run_id` for all G1 outputs in the same session.
+- Start a new `run_id` when the task, repository, base SHA, selected option, or user decision changes materially.
+- Do not reuse a `run_id` across independent sessions.
+
+For `chat-only`, no repository artifact may be written. The response itself is the G1 note.
+
+For `canonical`, use this workspace only when no other active G1 session is writing the same paths:
+
+```text
+.gwc/
+├── g0/context-snapshot.yaml
+└── g1/
+    ├── intake/g1-intake-brief.yaml
+    ├── preflight/g1-preflight-report.yaml
+    ├── brainstorming/g1-options.yaml
+    └── decision/g1-decision-record.yaml
+```
+
+For `session-scoped`, preserve the same internal G0/G1 structure under a session-owned workspace root:
+
+```text
+.gwc/runs/<run_id>/
+├── g0/context-snapshot.yaml
+└── g1/
+    ├── intake/g1-intake-brief.yaml
+    ├── preflight/g1-preflight-report.yaml
+    ├── brainstorming/g1-options.yaml
+    └── decision/g1-decision-record.yaml
+```
+
+Conflict policy:
+
+- Do not allow two active G1 sessions to write the same `workspace_root`.
+- If an active canonical run already owns `.gwc/g1/...`, choose `session-scoped` or stop with `G1_BLOCKED`.
+- If the agent cannot determine whether the workspace is already owned, default to `chat-only` or stop before writing.
+- Never overwrite an existing G1 artifact unless the same `run_id` owns it or the user explicitly asks to supersede it.
+
+Required run header:
+
+```text
+run_id: <stable-g1-run-id>
+workspace_mode: chat-only | canonical | session-scoped
+workspace_root: <none | .gwc | .gwc/runs/<run_id>>
+repository_artifact_written: YES | NO
+conflict_policy: no-shared-active-writes | fail-closed-on-unknown-ownership
+verification_mode: TOOL_VERIFIED | LOCAL_VERIFIED | UNVERIFIED_BY_TOOL
+```
+
+The current schemas do not persist `run_id` or `workspace_mode` as first-class fields. Treat these as G1 session metadata unless a later schema/tool task adds formal fields.
+
 When repository tools are unavailable, follow the same artifact semantics manually and mark the output:
 
 ```text
@@ -407,7 +476,18 @@ Do not call implementation complete. A G2 handoff candidate is not G2 execution 
 
 ## Chat-only response shape
 
+For `chat-only`, the response is the G1 note. It must be self-contained, must not claim repository artifact persistence, and must include the required run header.
+
 ```markdown
+## Run Header
+
+run_id: <stable-g1-run-id>
+workspace_mode: chat-only
+workspace_root: none
+repository_artifact_written: NO
+conflict_policy: no-repository-write
+verification_mode: TOOL_VERIFIED | LOCAL_VERIFIED | UNVERIFIED_BY_TOOL
+
 ## G0 Context
 
 ## G1 Intake
@@ -425,12 +505,13 @@ Do not call implementation complete. A G2 handoff candidate is not G2 execution 
 ## Boundaries
 ```
 
-For chat-only runs, explicitly state:
+Chat-only run rules:
 
-```text
-Repository artifact written: NO
-Verification mode: TOOL_VERIFIED | LOCAL_VERIFIED | UNVERIFIED_BY_TOOL
-```
+- Do not write `.gwc/g1/...`.
+- Do not imply that the G1 note is available to other sessions unless it is copied into a repository artifact, PR comment, DS Admin task, or another explicit persistent system.
+- State when the output is only conversation-local.
+- Use `G1_DECISION_PENDING` unless the user gives an explicit decision in the same run or a cited persistent source.
+- When later converting chat-only G1 into artifact mode, preserve the original `run_id` in the handoff text and create a new artifact-owning `run_id` if the artifact materially changes scope.
 
 ## Stop conditions
 
