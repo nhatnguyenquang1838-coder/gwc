@@ -68,7 +68,13 @@ def main() -> int:
     required = [
         "README.md", "AGENTS.md", "catalog.yaml",
         "core/Coding_Project_Governance_v1.0.md",
+        "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
         "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+        "agents/chatgpt-agent/agent-instructions.md",
+        "agents/coding-agent/bootstrap.md",
+        "agents/dwc/agent-instructions.md",
+        "agents/dwc/capabilities.yaml",
+        "docs/project-consumer-agent-instructions.md",
         "schemas/instruction.schema.json",
         "schemas/project-package.schema.json",
         "schemas/rollout.schema.json",
@@ -259,16 +265,10 @@ def main() -> int:
 
     if warnings:
         print("\n".join(f"WARNING: {item}" for item in warnings))
-
     if errors:
         print("\n".join(f"ERROR: {item}" for item in errors))
-        print(f"\nVALIDATION FAILED: {len(errors)} error(s)")
         return 1
-
-    print("VALIDATION PASSED")
-    print(f"Root: {root}")
-    print(f"Canonical policy SHA-256: {actual_core_sha}")
-    print(f"Projects validated: {', '.join(projects.keys())}")
+    print("Instruction repository validation passed")
     return 0
 
 

@@ -1,5 +1,44 @@
-
 # Changelog
+
+## 2026-07-15
+
+### Added
+
+- Gate Lifecycle Contract v1.0 defines G0 through G6 entry evidence, permitted
+  actions, exit evidence, authority boundaries, action-to-gate mapping, and
+  fail-closed behavior.
+- ChatGPT Agent Instructions define `chat_connector_only` defaults, mandatory
+  context boot, repository-evidence precedence, G0/G1 reporting, and write-stop
+  behavior when validator evidence is unavailable.
+- Project Consumer Agent Instructions define the minimum project-level
+  `AGENTS.md` pattern for repositories that consume GWC through a pinned
+  submodule or generated governance package.
+- GWC project package version `1.6.0` distributes the gate lifecycle contract,
+  ChatGPT agent instructions, and project consumer instructions.
+
+### Changed
+
+- `AGENTS.md`, coding-agent bootstrap, and DWC instructions now require explicit
+  execution mode selection: `chat_connector_only`, `local_agent`, or `repo_ci`.
+- G0/G1 completion can no longer be claimed from conversation reasoning alone;
+  G1 `PASS` requires `tools/validate_g01.py` evidence or trusted external
+  validator evidence.
+- Chat connector agents remain read-only for repository-changing work when local
+  validator evidence is unavailable, avoiding the branch-before-artifact
+  deadlock.
+- GWC validation now requires the new gate contract and ChatGPT/project-consumer
+  instruction sources.
+- Rental Home profile identity evidence was corrected to reference the actual
+  `nhatnguyenquang1838-coder/rental_home` repository rather than the GWC source
+  remote.
+
+### Safety
+
+- The update does not grant merge, deployment, production configuration,
+  credential, migration, or production-data authority.
+- CI success remains evidence only and does not grant authority.
+- The previous Rental Home rollout hardening remains deferred until GWC gate
+  enforcement is reviewed and merged.
 
 ## 2026-07-14
 
@@ -117,25 +156,3 @@
   separately gated.
 
 ## 2026-07-12
-
-### Added
-
-- Initial `instruction-governance` control-plane repository.
-- Canonical Coding Project Governance v1.0.
-- E2E Draft PR delivery rule.
-- Local Agent Rule.
-- Copyable User Command Format Rule.
-- DS MCP, Rental Home, and PM Skills project packages.
-- Mandatory DS Admin task claim rule for DS MCP.
-- InstructionOps Agent contract and capabilities.
-- Coding-agent bootstrap.
-- JSON schemas for instructions, packages, rollouts, and approval envelopes.
-- Validation, package build, diff, and rollout verification tools.
-- GitHub Actions validation, package build, and manual release workflows.
-
-### Safety
-
-- Rental Home writes are disabled pending repository verification.
-- PM Skills writes are disabled pending canonical repository assignment.
-- No deployment, production configuration, credential, migration, or
-  production-data authority is included.

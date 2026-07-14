@@ -1,4 +1,3 @@
-
 version: "1.0"
 profile_id: rental-home
 
@@ -17,7 +16,7 @@ repository:
     - main
   write_enabled: true
   identity_status: confirmed
-  identity_note: Repository identity verified against local Git remote origin git@github.com:nhatnguyenquang1838-coder/gwc.git on 2026-07-13; connector access verified via DW connector declaration in the active profile; write enablement updated after identity confirmation.
+  identity_note: Repository identity verified against GitHub repository nhatnguyenquang1838-coder/rental_home, default branch main, and available GitHub/DW connector access on 2026-07-13; write enablement was activated only for bounded branch and Draft PR delivery under the project governance gates.
 
 connectors:
   git_provider:

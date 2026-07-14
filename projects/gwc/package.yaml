@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.5.0
+package_version: 1.6.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -9,6 +9,10 @@ instructions:
   - id: coding-project-governance
     path: core/Coding_Project_Governance_v1.0.md
     target: .governance/Coding_Project_Governance_v1.0.md
+    required: true
+  - id: gate-lifecycle-contract
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    target: .governance/GATE_LIFECYCLE_CONTRACT_v1.0.md
     required: true
   - id: agent-behavior-semantic-contract
     path: core/Agent_Behavior_Semantic_Contract_v1.0.md
@@ -29,6 +33,10 @@ instructions:
   - id: g01-lifecycle
     path: docs/g01-lifecycle.md
     target: .governance/g01-lifecycle.md
+    required: true
+  - id: project-consumer-agent-instructions
+    path: docs/project-consumer-agent-instructions.md
+    target: .governance/project-consumer-agent-instructions.md
     required: true
   - id: gwc-g0-agent-skill
     path: skills/gwc-g0/SKILL.md
@@ -82,6 +90,10 @@ instructions:
     path: agents/dwc/capabilities.yaml
     target: .governance/agents/dwc/capabilities.yaml
     required: true
+  - id: chatgpt-agent-instructions
+    path: agents/chatgpt-agent/agent-instructions.md
+    target: .governance/agents/chatgpt-agent/agent-instructions.md
+    required: true
 
 delivery:
   mode: git-pr
@@ -103,6 +115,7 @@ work_tracking:
 
 notes:
   - DWC repository reads are automatic for this verified repository.
-  - Bounded non-risk branch writes and Draft PR delivery are automatic.
+  - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
+  - Chat connector agents remain read-only when validator evidence is unavailable.
   - Security-boundary and other listed high-risk changes require explicit human direction.
   - Merge, deployment, production configuration, credentials, and production data remain separately gated.
