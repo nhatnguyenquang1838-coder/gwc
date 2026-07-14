@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/approval-request.schema.json",
+  "title": "GWC Agent-Generated Approval Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "approval_request_id",
+    "gate",
+    "repository",
+    "base_branch",
+    "base_sha",
+    "scope_hash",
+    "scope_hash_short",
+    "files_read",
+    "files_write",
+    "authorized_actions",
+    "excluded_actions",
+    "expires_at",
+    "generated_command"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "approval-request" },
+    "approval_request_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$"
+    },
+    "gate": {
+      "enum": ["G2", "G3", "G4", "G5", "G6"]
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "base_branch": { "type": "string", "minLength": 1 },
+    "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "working_branch": { "type": ["string", "null"] },
+    "scope_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "scope_hash_short": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+    "files_read": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "files_write": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "authorized_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "excluded_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "generated_command": {
+      "type": "string",
+      "pattern": "^APPROVE G[2-6] [a-z0-9][a-z0-9._-]{2,120} [0-9a-f]{16} .+Z$"
+    }
+  }
+}
