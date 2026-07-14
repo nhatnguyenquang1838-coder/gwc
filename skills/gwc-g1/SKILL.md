@@ -2,7 +2,7 @@
 name: gwc-g1
 description: Use after G0 context is READY when a GWC task needs discovery, intake, brainstorming options, preflight, explicit decision capture, or a bounded G2 handoff candidate.
 when_to_use: Trigger for requests such as start G1, experience G1, discover scope, clarify a change, brainstorm G2 options, preflight a change, make a G1 decision, prepare G2 handoff, or enhance G2 after project and repository context has been verified by G0.
-version: 0.3.0
+version: 0.4.0
 project: gwc
 owner: GWC
 ---
@@ -77,6 +77,7 @@ Repository governance remains authoritative. G1 must reuse the repository-native
 Required references:
 
 - `skills/gwc-g0/SKILL.md`;
+- `skills/gwc-g2/SKILL.md` as the downstream handoff consumer;
 - `docs/g01-lifecycle.md`;
 - `schemas/g1-intake-brief.schema.json`;
 - `schemas/g1-preflight-report.schema.json`;
@@ -474,6 +475,8 @@ A G2 handoff candidate must include:
 
 Do not call implementation complete. A G2 handoff candidate is not G2 execution authority.
 
+The downstream consumer is `skills/gwc-g2/SKILL.md`. It must re-check freshness, task traceability, scope, risk, runtime authority, and exclusions before planning or execution.
+
 ## Chat-only response shape
 
 For `chat-only`, the response is the G1 note. It must be self-contained, must not claim repository artifact persistence, and must include the required run header.
@@ -560,12 +563,14 @@ G2_EXECUTION_NOT_GRANTED
 NO_LATER_PHASE_AUTHORITY_GRANTED
 ```
 
-## Default candidate for the current G2 stream
+## Implemented downstream G2 contract
 
-When the user asks to enhance G2, default to this candidate unless repository evidence changes:
+The instruction-level G1-to-G2 handoff is implemented by:
 
 ```text
-Add a G1-to-G2 handoff contract that consumes accepted G1 decision evidence and prepares, but does not grant, G2 execution authority.
+skills/gwc-g2/SKILL.md
 ```
 
-Prefer an agent-readable handoff first. Add tool-level verification later as a separate task when instruction-only handoff cannot provide enough validation confidence.
+G1 prepares the candidate. G2 verifies freshness, constructs the bounded execution brief, and executes only when the active runtime already grants valid authority.
+
+Schema, generator, validator, or canonical `.gwc/g2` artifact support remains a separate later enhancement when instruction-level evidence is no longer sufficient.
