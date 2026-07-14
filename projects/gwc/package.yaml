@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.5.0
+package_version: 1.6.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -37,6 +37,10 @@ instructions:
   - id: gwc-g1-agent-skill
     path: skills/gwc-g1/SKILL.md
     target: .governance/skills/gwc-g1/SKILL.md
+    required: true
+  - id: gwc-g2-agent-skill
+    path: skills/gwc-g2/SKILL.md
+    target: .governance/skills/gwc-g2/SKILL.md
     required: true
   - id: g01-runtime-input-schema
     path: schemas/g01-runtime-input.schema.json
@@ -103,6 +107,7 @@ work_tracking:
 
 notes:
   - DWC repository reads are automatic for this verified repository.
+  - G1 accepted decisions are re-verified through the agent-readable G2 handoff before bounded execution.
   - Bounded non-risk branch writes and Draft PR delivery are automatic.
   - Security-boundary and other listed high-risk changes require explicit human direction.
   - Merge, deployment, production configuration, credentials, and production data remain separately gated.
