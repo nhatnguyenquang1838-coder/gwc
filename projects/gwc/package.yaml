@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.4.0
+package_version: 1.5.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -9,6 +9,14 @@ instructions:
   - id: coding-project-governance
     path: core/Coding_Project_Governance_v1.0.md
     target: .governance/Coding_Project_Governance_v1.0.md
+    required: true
+  - id: agent-behavior-semantic-contract
+    path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+    target: .governance/Agent_Behavior_Semantic_Contract_v1.0.md
+    required: true
+  - id: agent-response-presentation-contract
+    path: core/Agent_Response_Presentation_Contract_v1.0.md
+    target: .governance/Agent_Response_Presentation_Contract_v1.0.md
     required: true
   - id: e2e-draft-pr-delivery
     path: core/E2E_DRAFT_PR_DELIVERY_RULE.md

@@ -25,6 +25,8 @@ context:
   read_first:
     - AGENTS.md
     - core/Coding_Project_Governance_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
     - projects/gwc/project-profile.yaml
     - projects/gwc/project-instructions.md
     - projects/gwc/project-extension.md

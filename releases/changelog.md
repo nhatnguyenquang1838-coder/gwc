@@ -5,6 +5,12 @@
 
 ### Added
 
+- Global Agent Behavior Semantic Contract v1.0 consolidates evidence precedence,
+  understand-before-recommend flow, existing-before-new analysis, generated
+  artifact ownership, bounded execution modes, and graceful fallback behavior.
+- Global Agent Response Presentation Contract v1.0 selects direct Markdown,
+  tables, Mermaid, SVG/PNG, YAML/JSON, or command blocks according to task
+  complexity and consumer needs.
 - Agent-readable GWC G0 skill wrapper for project activation, repository and
   protected-base verification, policy/source resolution, connector and task
   context checks, freshness handling, and a bounded handoff into G1.
@@ -16,6 +22,14 @@
 
 ### Changed
 
+- GWC project package version `1.5.0` distributes both global contracts and the
+  GWC project profile loads them during protected-base boot.
+- GWC project instructions now fail closed before mutation or authority
+  escalation while allowing qualified read-only and planning fallbacks when
+  task, connector, persistence, validation, or rendering evidence is missing.
+- Presentation defaults are adaptive: simple responses are not forced to use
+  Mermaid or SVG, while stricter project and approval artifact requirements
+  remain in force.
 - G1 now consumes a verified G0 handoff instead of owning a duplicate context
   reconstruction step.
 - G1 skill expanded to version `0.3.0` with phase boundaries, artifact contract
@@ -32,6 +46,11 @@
 
 ### Safety
 
+- The new contracts are additive and do not modify the canonical core policy,
+  canonical SHA, G0/G1 schemas or tools, authority gates, workflows, secrets,
+  production configuration, or production data.
+- Planning and read-only fallbacks never grant branch, commit, push, PR, merge,
+  deployment, release, or production authority.
 - The G0 and G1 skills are instruction-only and do not add validators,
   executable tools, repository write authority, merge authority, deployment
   authority, production configuration, credentials, or production-data access.

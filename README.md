@@ -25,6 +25,7 @@ Approval envelope = authority boundary
 ## What is included
 
 - Canonical coding governance policy.
+- Global agent behavior and adaptive response presentation contracts.
 - E2E Draft PR delivery workflow.
 - Local-agent and copyable-command rules.
 - Project packages for GWC, DS MCP, Rental Home, and PM Skills.
@@ -33,6 +34,36 @@ Approval envelope = authority boundary
 - Deterministic G0/G1 gate validation, package-build, semantic-diff, and rollout-verification tools.
 - GitHub Actions for validation, package builds, and manual release publication.
 - Release manifest and changelog.
+
+## Agent operating model
+
+GWC package `1.5.0` adds two modular operational contracts without changing the
+canonical core hash or replacing G0/G1:
+
+- `core/Agent_Behavior_Semantic_Contract_v1.0.md`;
+- `core/Agent_Response_Presentation_Contract_v1.0.md`.
+
+The default reasoning flow is:
+
+```text
+Understand
+→ Inspect
+→ Reconstruct current context
+→ Identify existing mechanisms
+→ Integrate the smallest compatible improvement
+→ Execute only when authorized
+→ Validate and report evidence
+```
+
+Agents prefer `Reuse → Extend → Refactor → Replace`. Missing task, connector,
+or persistence evidence degrades the workflow to verified read-only or
+planning-only mode instead of blocking all useful analysis. Repository mutation
+and authority escalation still fail closed.
+
+Responses use direct Markdown by default, tables for comparison, Mermaid for
+workflow or architecture relationships, and SVG/PNG only when requested,
+required, or materially useful. Stricter project and approval artifact rules
+continue to apply.
 
 ## Safety defaults
 
