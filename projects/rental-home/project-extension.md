@@ -63,6 +63,6 @@ Applicable work must include:
 
 ## Activation condition
 
-This profile remains `write_enabled: false` until repository identity,
-connector access, protected branches, and protected-base governance are
-verified through a reviewed profile update.
+This extension does not control repository write enablement. Follow the
+active project profile and protected-base governance for `write_enabled` and
+identity status.

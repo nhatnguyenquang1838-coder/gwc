@@ -15,15 +15,15 @@ repository:
   protected_branches:
     - main
   write_enabled: true
-  identity_status: confirmed
+  identity_status: verified
   identity_note: Repository identity verified against GitHub repository nhatnguyenquang1838-coder/rental_home, default branch main, and available GitHub/DW connector access on 2026-07-13; write enablement was activated only for bounded branch and Draft PR delivery under the project governance gates.
 
 connectors:
   git_provider:
-    - DW
     - GitHub
-  api_connector: null
-  account_or_tenant: null
+    - DW
+  api_connector: GitHub
+  account_or_tenant: nhatnguyenquang1838-coder
 
 context:
   read_first:
@@ -41,6 +41,7 @@ context:
     - AGENTS.md is the project-specific source of truth when present.
     - Use one unique folder and worktree per branch.
     - Preserve RLS, privacy, and Supabase migration discipline.
+    - GitHub is the primary repository connector; DW may be used only as a verified fallback under project instructions.
 
 commands:
   discovery_required: true
