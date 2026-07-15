@@ -26,12 +26,14 @@ Approval envelope = authority boundary
 
 - Canonical coding governance policy.
 - Global agent behavior and adaptive response presentation contracts.
-- E2E Draft PR delivery workflow.
+- E2E Draft PR delivery workflow and hotfix validation rules.
 - Local-agent and copyable-command rules.
 - Project packages for GWC, DS MCP, Rental Home, and PM Skills.
 - DWC runtime, InstructionOps Agent, and coding-agent bootstrap contracts.
-- JSON Schemas, including versioned G0/G1 lifecycle and G3 delivery-record contracts.
-- Deterministic G0/G1 and G3 gate validation, package-build, semantic-diff, and rollout-verification tools.
+- JSON Schemas, including versioned G0/G1 lifecycle, G3 delivery-record, and
+  G0 hotfix-intake contracts.
+- Deterministic G0/G1 and G3 gate validation, package-build, semantic-diff,
+  rollout-verification, integrity-hash, and hotfix-validation tools.
 - GitHub Actions for validation, package builds, and manual release publication.
 - Release manifest and changelog.
 
@@ -125,6 +127,8 @@ python tools/validate_instructions.py
 ```bash
 python tools/validate_g01.py --workspace .gwc
 python -m unittest tests.test_g01_lifecycle
+python -m unittest tests.test_g01_runtime
+python -m unittest tests.test_g01_decision_capture
 ```
 
 The validator returns `PASS` only when G0 context and all G1 intake, preflight,
@@ -132,7 +136,13 @@ options, and decision artifacts are schema-valid and mutually consistent. A G1
 `PASS` is evidence for G2 planning only; it never grants merge, deployment, or
 production authority. See `docs/g01-lifecycle.md`.
 
-### 5. Validate a G3 delivery record
+### 5. Validate base drift policy
+
+```bash
+python tools/evaluate_base_drift.py --test
+```
+
+### 6. Validate a G3 delivery record
 
 ```bash
 python tools/validate_g3_delivery.py \
@@ -147,7 +157,7 @@ exclusions. A new head SHA makes earlier review evidence stale and requires a
 new read-only review. Reviewer PASS is evidence only and does not grant G4 merge
 authority.
 
-### 6. Build a project package
+### 7. Build a project package
 
 ```bash
 python tools/build_project_package.py ds-mcp --output dist
@@ -161,7 +171,7 @@ dist/ds-mcp/<version>/
 └── package-manifest.yaml
 ```
 
-### 7. Compare package revisions
+### 8. Compare package revisions
 
 ```bash
 python tools/diff_instruction_package.py \
@@ -169,12 +179,18 @@ python tools/diff_instruction_package.py \
   dist/ds-mcp/1.1.0
 ```
 
-### 8. Verify a rollout checkout
+### 9. Verify a rollout checkout
 
 ```bash
 python tools/verify_rollout.py \
   dist/ds-mcp/1.1.0 \
   /path/to/ds_mcp_server
+```
+
+### 10. Validate integrity hashes
+
+```bash
+python tools/hash_integrity_artifacts.py --test
 ```
 
 ## Instruction CRUD commands
