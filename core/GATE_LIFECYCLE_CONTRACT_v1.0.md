@@ -84,9 +84,44 @@ The existing single-task `.gwc/g0` and `.gwc/g1` layout remains supported for ba
 
 **Entry:** G2 `PASS`, validation evidence exists, and complete diff review found no scope drift or prohibited changes.
 
-**Permitted actions:** create or update a Draft Pull Request only.
+**Permitted actions:** create or update a Draft Pull Request, assemble the canonical `g3/delivery-record.yaml`, and invoke or record an independent read-only review. G3 does not authorize the reviewer to modify the delivery.
 
-**Exit:** `delivery-record.yaml` identifies the PR, head SHA, validation evidence, residual risks, and exclusions.
+G3 uses three internal stages without creating another gate:
+
+```text
+G3.1 PR Assembly
+→ G3.2 Independent Review
+→ G3.3 Review Closure
+```
+
+The review must:
+
+- identify the implementer and reviewer;
+- record `independent` only when the reviewer is separate from the implementer;
+- record `fresh-context` when independence is approximated by a new context rather than a separate reviewer;
+- evaluate the applicable requirement, design, code, test, governance, delivery, and CI lanes;
+- bind evidence to the exact PR head SHA and scope hash;
+- classify findings as `BLOCKER`, `MAJOR`, `MINOR`, or `NIT`;
+- route blocking changes back to G2 for separately authorized revision;
+- become stale after any PR head change and require re-review.
+
+A reviewer that modifies the delivery loses reviewer independence. Another read-only review is then required for the new head SHA.
+
+**Exit:** `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and exact head SHA, records validation and CI evidence, contains a non-stale review decision, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions.
+
+G3 may report `PASS` only when:
+
+- the Draft PR and latest head SHA match the delivery record;
+- the review covers the same head SHA and scope hash;
+- every applicable review lane passes;
+- no unresolved `BLOCKER` exists;
+- every `MAJOR` is resolved or has explicit human risk acceptance for the exact head SHA;
+- every acceptance criterion is passed or explicitly not applicable;
+- required validation and CI checks pass for the exact head SHA;
+- no material scope drift or prohibited change exists;
+- residual risks and exclusions are recorded.
+
+Review `PASS` is G3 evidence only. It never grants merge authority; G4 still requires explicit human approval for the exact PR head SHA.
 
 ### G4_MERGE
 
