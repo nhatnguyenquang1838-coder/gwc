@@ -107,6 +107,15 @@ class G3DeliveryRecordTests(unittest.TestCase):
         record["review"]["acceptance_criteria"][0]["result"] = "not_verified"
         self.assertTrue(any("AC-1" in issue for issue in self.issues(record)))
 
+    def test_multiple_schema_errors_with_mixed_paths_are_reported(self) -> None:
+        record = copy.deepcopy(self.valid)
+        record["review"]["lanes"][0]["applicable"] = "yes"
+        record["task_id"] = 7
+        issues = self.issues(record)
+        self.assertGreaterEqual(len(issues), 2)
+        self.assertTrue(any("review.lanes.0.applicable" in issue for issue in issues))
+        self.assertTrue(any("task_id" in issue for issue in issues))
+
 
 if __name__ == "__main__":
     unittest.main()
