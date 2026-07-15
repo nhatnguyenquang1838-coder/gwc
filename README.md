@@ -30,8 +30,8 @@ Approval envelope = authority boundary
 - Local-agent and copyable-command rules.
 - Project packages for GWC, DS MCP, Rental Home, and PM Skills.
 - DWC runtime, InstructionOps Agent, and coding-agent bootstrap contracts.
-- JSON Schemas, including versioned G0/G1 lifecycle artifact contracts.
-- Deterministic G0/G1 gate validation, package-build, semantic-diff, and rollout-verification tools.
+- JSON Schemas, including versioned G0/G1 lifecycle and G3 delivery-record contracts.
+- Deterministic G0/G1 and G3 gate validation, package-build, semantic-diff, and rollout-verification tools.
 - GitHub Actions for validation, package builds, and manual release publication.
 - Release manifest and changelog.
 
@@ -132,7 +132,22 @@ options, and decision artifacts are schema-valid and mutually consistent. A G1
 `PASS` is evidence for G2 planning only; it never grants merge, deployment, or
 production authority. See `docs/g01-lifecycle.md`.
 
-### 5. Build a project package
+### 5. Validate a G3 delivery record
+
+```bash
+python tools/validate_g3_delivery.py \
+  --record templates/gates/g3-delivery-record.template.yaml \
+  --json
+python -m unittest tests.test_g3_delivery
+```
+
+The G3 record binds the Draft PR, exact head SHA, scope hash, validation, CI,
+acceptance criteria, review lanes, findings, residual risks, and later-gate
+exclusions. A new head SHA makes earlier review evidence stale and requires a
+new read-only review. Reviewer PASS is evidence only and does not grant G4 merge
+authority.
+
+### 6. Build a project package
 
 ```bash
 python tools/build_project_package.py ds-mcp --output dist
@@ -146,7 +161,7 @@ dist/ds-mcp/<version>/
 └── package-manifest.yaml
 ```
 
-### 6. Compare package revisions
+### 7. Compare package revisions
 
 ```bash
 python tools/diff_instruction_package.py \
@@ -154,7 +169,7 @@ python tools/diff_instruction_package.py \
   dist/ds-mcp/1.1.0
 ```
 
-### 7. Verify a rollout checkout
+### 8. Verify a rollout checkout
 
 ```bash
 python tools/verify_rollout.py \
@@ -196,7 +211,9 @@ G0 intake
 → automatic G1 inspection
 → automatic G2 bounded non-risk execution
 → validation and diff review
-→ automatic G3 Draft PR
+→ automatic G3 Draft PR assembly
+→ independent read-only review of the exact head SHA
+→ G3 review closure after CI
 → user review
 ```
 
