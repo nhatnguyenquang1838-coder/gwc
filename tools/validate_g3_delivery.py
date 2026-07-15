@@ -44,7 +44,10 @@ def _load_json(path: Path) -> Any:
 def _schema_issues(record: Any, schema: dict[str, Any]) -> list[str]:
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     issues: list[str] = []
-    for error in sorted(validator.iter_errors(record), key=lambda item: list(item.absolute_path)):
+    for error in sorted(
+        validator.iter_errors(record),
+        key=lambda item: tuple(str(part) for part in item.absolute_path),
+    ):
         location = ".".join(str(part) for part in error.absolute_path) or "<root>"
         issues.append(f"schema:{location}: {error.message}")
     return issues
