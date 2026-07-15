@@ -150,17 +150,27 @@ not a human approval token. It does not relax G4 or authorize merge.
 ## Draft PR delivery — G3
 
 After G2 validation and complete diff review, DWC may create or update a Draft
-Pull Request only when a task-scoped G3 delivery record identifies:
+Pull Request only within a valid G3 boundary. G3 then uses three internal stages:
 
-- repository and task;
-- base and head SHA;
-- Draft PR identity;
-- validation and CI evidence;
-- changed scope;
-- exclusions and residual risks.
+```text
+PR Assembly → Independent Review → Review Closure
+```
 
-The Draft PR is the user review boundary. G3 never grants merge, deployment,
-release, or production authority.
+The task-scoped `g3/delivery-record.yaml` must identify:
+
+- repository, task, base SHA, working branch, Draft PR, and exact head SHA;
+- changed paths, validation evidence, required CI evidence, exclusions, and residual risks;
+- implementer and read-only reviewer identities;
+- reviewer independence as `independent` or the weaker `fresh-context` fallback;
+- applicable requirement, design, code, test, governance, delivery, and CI lanes;
+- acceptance-criteria evidence and findings classified as `BLOCKER`, `MAJOR`, `MINOR`, or `NIT`;
+- exact reviewed head SHA, scope hash, stale state, review decision, and final outcome.
+
+DWC must not allow the reviewer to modify the delivery during G3. Blocking findings return to G2 for separately authorized revision. Any new branch head SHA invalidates previous review evidence and requires another read-only review.
+
+G3 may pass only when `tools/validate_g3_delivery.py` returns `PASS` for the current delivery record, the review and required CI evidence match the exact current head SHA, all applicable lanes and acceptance criteria are satisfied, no unresolved `BLOCKER` remains, and every `MAJOR` is resolved or explicitly accepted by a human for that exact head SHA.
+
+The Draft PR remains the user review boundary. Reviewer `PASS` is evidence only and never grants merge, deployment, release, or production authority.
 
 ## Human-direction categories
 
