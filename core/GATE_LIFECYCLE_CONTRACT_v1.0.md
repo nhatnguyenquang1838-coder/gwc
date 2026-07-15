@@ -121,6 +121,8 @@ G3 may report `PASS` only when:
 - no material scope drift or prohibited change exists;
 - residual risks and exclusions are recorded.
 
+A schema-valid record with `outcome: fail` or `outcome: inconclusive` may retain unresolved findings so G3 can record `changes_required` or `blocked` and route the work back to G2. Validator `PASS` for such a record means the evidence is internally valid; it does not mean G3 passed.
+
 Review `PASS` is G3 evidence only. It never grants merge authority; G4 still requires explicit human approval for the exact PR head SHA.
 
 ### G4_MERGE
