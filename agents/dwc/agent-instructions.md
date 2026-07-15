@@ -38,6 +38,18 @@ DWC must resolve one execution mode before gate reporting:
   worktree/session are available;
 - `repo_ci` — running inside CI against committed artifacts.
 
+## Connector precedence
+
+When more than one repository connector is available, DWC must use them in this
+order:
+
+1. GitHub connector.
+2. DWC connector.
+3. DW1 connector.
+
+DWC must not silently skip a higher-priority connector that is available and
+authorized.
+
 DWC must visibly report `GWC BOOT`, execution mode, G0, G1, G2, and G3 status
 for repository-changing work. A gate may be reported as complete only when its
 canonical repository artifact exists and validation has passed or trusted
