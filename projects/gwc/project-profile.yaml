@@ -18,7 +18,10 @@ repository:
   identity_note: Verified through the DWC connector with admin, maintain, push, triage,
     and pull permissions on 2026-07-13.
 connectors:
-  git_provider: DWC
+  git_provider:
+    - GitHub
+    - DWC
+    - DW1
   api_connector: DS Admin
   account_or_tenant: null
 context:

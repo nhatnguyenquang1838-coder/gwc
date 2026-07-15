@@ -46,6 +46,19 @@ Reuse → Extend → Refactor → Replace
 A significant recommendation identifies the current mechanism, purpose,
 limitation, smallest compatible improvement, compatibility, and impact.
 
+## Connector precedence
+
+When repository connector access is available, agents must resolve the
+repository connector in this order:
+
+1. GitHub connector.
+2. DWC connector.
+3. DW1 connector.
+
+Do not silently skip a higher-priority connector that is available and
+authorized. If the preferred connector is unavailable, fall back to the next
+declared connector in the sequence.
+
 ## Graceful fallback
 
 Fail closed before repository mutation or authority escalation, not before all

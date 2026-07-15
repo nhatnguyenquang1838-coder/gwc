@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-07-15 — Connector precedence update
+
+### Changed
+
+- GWC project profile now declares repository connector precedence as GitHub,
+  then DWC, then DW1.
+- GWC project instructions and DWC agent instructions now require the same
+  connector order and forbid silently skipping a higher-priority connector.
+- GWC project package version `1.9.0` records the connector precedence update.
+
+### Safety
+
+- This update changes connector-selection policy only.
+- It does not grant merge, deployment, production configuration, credential,
+  migration, or production-data authority.
+
 ## 2026-07-15 — G3 independent reviewer delivery contract
 
 ### Added
