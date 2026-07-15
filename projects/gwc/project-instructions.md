@@ -49,6 +49,7 @@ limitation, smallest compatible improvement, compatibility, and impact.
 Fail closed before repository mutation or authority escalation, not before all
 useful analysis.
 
+- In `chat_connector_only` mode, exact-ref GitHub/Git/DWC content may populate `/mnt/data` validation workspaces and run validators; connectors remain the repository source of truth and local Git operations grant no authority.
 - If DS Admin task traceability is unavailable, continue in read-only or
   planning-only mode but do not create a branch, commit, push, or PR.
 - If the repository or connector cannot be verified, provide qualified planning
