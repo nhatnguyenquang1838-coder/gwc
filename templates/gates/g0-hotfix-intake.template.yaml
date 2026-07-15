@@ -1,0 +1,23 @@
+# Hotfix/Rescue Intake Card Template
+schema_version: '1.0'
+artifact_type: g0-hotfix-intake
+generated_at: <ISO-8601-timestamp>
+mode: hotfix|rescue
+task_description: <brief-description-of-problem>
+activation_phrase: <exact-user-command-that-activated-mode>
+risk_assessment: low|medium|high
+affected_files:
+  - <file-path-1>
+  - <file-path-2>
+scope_hash_prefix: <16-character-prefix-from-activation>
+human_author: <user-identifier>
+approval_recorded: true
+prohibited_actions_verified:
+  - no_production_data_access
+  - no_credential_rotation
+  - no_main_branch_write
+  - no_merge_or_deploy
+validation_skipped:
+  - <reason-for-skipping-test-1>
+notes: <additional-context-or-risks>
+status: READY
