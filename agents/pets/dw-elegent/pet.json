@@ -1,0 +1,9 @@
+{
+  "id": "dw-elegent",
+  "displayName": "DW elegent",
+  "description": "A calm Vietnamese technical project manager and coding assistant in a refined scarf-and-coat pixel-art style.",
+  "spriteVersionNumber": 2,
+  "spritesheetPath": "spritesheet.webp",
+  "statusMessagesPath": "status-messages.vi.json",
+  "locale": "vi-VN"
+}

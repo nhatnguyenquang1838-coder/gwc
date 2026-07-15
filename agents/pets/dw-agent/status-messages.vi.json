@@ -1,0 +1,59 @@
+{
+  "locale": "vi-VN",
+  "address": "DW",
+  "idle": [
+    "DW, tôi đang chờ task.",
+    "Sẵn sàng khi anh bắt đầu.",
+    "Không có blocker mới."
+  ],
+  "working": [
+    "Đang xử lý task.",
+    "Tôi đang kiểm tra code.",
+    "Đang chạy test.",
+    "Đang rà soát spec.",
+    "Đang kiểm tra dependency."
+  ],
+  "needs_input": [
+    "DW, cần anh xác nhận.",
+    "Chưa rõ acceptance criteria.",
+    "Chọn branch nào?",
+    "Cần thêm thông tin.",
+    "Tôi cần quyền truy cập."
+  ],
+  "blocked": [
+    "Task đang bị block.",
+    "Build đang lỗi.",
+    "Thiếu biến môi trường.",
+    "API chưa phản hồi.",
+    "Có conflict cần xử lý.",
+    "Test chưa pass."
+  ],
+  "ready": [
+    "Xong rồi, DW.",
+    "Task đã hoàn tất.",
+    "Build đã pass.",
+    "PR đã sẵn sàng.",
+    "Không còn blocker.",
+    "Có thể review."
+  ],
+  "warning": [
+    "Phát hiện rủi ro.",
+    "Có thay đổi ngoài scope.",
+    "Đang có request trùng.",
+    "Không nên deploy lúc này.",
+    "Cần kiểm tra production."
+  ],
+  "celebration": [
+    "Xong, DW.",
+    "Ổn rồi.",
+    "Mọi thứ khớp."
+  ],
+  "sleep": [
+    "Tạm nghỉ.",
+    "Tôi chờ task tiếp theo."
+  ],
+  "wake": [
+    "Tôi quay lại rồi.",
+    "Sẵn sàng xử lý tiếp."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "dw-agent",
+  "displayName": "DW Agent",
+  "description": "A calm Vietnamese technical project manager and coding assistant.",
+  "spriteVersionNumber": 2,
+  "spritesheetPath": "spritesheet.webp",
+  "statusMessagesPath": "status-messages.vi.json",
+  "locale": "vi-VN"
+}
