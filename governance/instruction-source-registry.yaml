@@ -1,0 +1,50 @@
+schema_version: "1.0"
+registry_id: gwc-instruction-source-registry
+updated_at: "2026-07-15T00:00:00Z"
+conflict_rule: Higher-priority active instruction sources win unless a repository protected-base contract is stricter.
+sources:
+  - id: gwc-protected-base-agents
+    type: git-source
+    priority: 10
+    status: active
+    path: AGENTS.md
+    url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/AGENTS.md
+    owner: gwc
+    package_target: .governance/AGENTS.md
+    description: Protected-base authority file for agents operating in the GWC repository.
+  - id: gwc-operating-runtime-contract
+    type: git-source
+    priority: 20
+    status: active
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/Agent_Operating_Runtime_Contract_v1.0.md
+    owner: gwc
+    package_target: .governance/Agent_Operating_Runtime_Contract_v1.0.md
+    description: Central runtime behavior for SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, context refresh, and approval commands.
+  - id: project-google-drive-native-doc
+    type: google-drive-doc
+    priority: 30
+    status: active
+    path: null
+    url: null
+    owner: project
+    package_target: null
+    description: Project-specific native Google Drive instruction document when declared by the active project profile or project instruction.
+  - id: generated-governance-package
+    type: generated-package
+    priority: 40
+    status: fallback
+    path: .governance
+    url: null
+    owner: project
+    package_target: .governance
+    description: Generated GWC package consumed by downstream repositories when no higher-priority native source is available.
+  - id: gpt-project-instructions
+    type: gpt-project
+    priority: 50
+    status: fallback
+    path: null
+    url: null
+    owner: project
+    package_target: null
+    description: ChatGPT Project Instructions are fallback runtime context and must not weaken GWC repository contracts.

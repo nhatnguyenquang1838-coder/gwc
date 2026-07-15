@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/instruction-source-registry.schema.json",
+  "title": "GWC Instruction Source Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "updated_at",
+    "conflict_rule",
+    "sources"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "registry_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$"
+    },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "conflict_rule": { "type": "string", "minLength": 1 },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "priority", "status", "description"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$"
+          },
+          "type": {
+            "enum": ["google-drive-doc", "git-source", "generated-package", "gpt-project", "runtime"]
+          },
+          "priority": { "type": "integer", "minimum": 1 },
+          "status": { "enum": ["active", "fallback", "deprecated", "disabled", "archived"] },
+          "path": { "type": ["string", "null"] },
+          "url": { "type": ["string", "null"] },
+          "owner": { "type": ["string", "null"] },
+          "package_target": { "type": ["string", "null"] },
+          "description": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

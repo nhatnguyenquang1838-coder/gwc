@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.6.0
+package_version: 1.7.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -13,6 +13,10 @@ instructions:
   - id: gate-lifecycle-contract
     path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
     target: .governance/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+  - id: agent-operating-runtime-contract
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    target: .governance/Agent_Operating_Runtime_Contract_v1.0.md
     required: true
   - id: agent-behavior-semantic-contract
     path: core/Agent_Behavior_Semantic_Contract_v1.0.md
@@ -29,6 +33,10 @@ instructions:
   - id: base-drift-policy
     path: governance/base-drift-policy.yaml
     target: .governance/base-drift-policy.yaml
+    required: true
+  - id: instruction-source-registry
+    path: governance/instruction-source-registry.yaml
+    target: .governance/instruction-source-registry.yaml
     required: true
   - id: g01-lifecycle
     path: docs/g01-lifecycle.md
@@ -49,6 +57,14 @@ instructions:
   - id: g01-runtime-input-schema
     path: schemas/g01-runtime-input.schema.json
     target: .governance/schemas/g01-runtime-input.schema.json
+    required: true
+  - id: approval-request-schema
+    path: schemas/approval-request.schema.json
+    target: .governance/schemas/approval-request.schema.json
+    required: true
+  - id: instruction-source-registry-schema
+    path: schemas/instruction-source-registry.schema.json
+    target: .governance/schemas/instruction-source-registry.schema.json
     required: true
   - id: g01-runtime-generator
     path: tools/generate_g01_runtime.py
@@ -117,5 +133,6 @@ notes:
   - DWC repository reads are automatic for this verified repository.
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents remain read-only when validator evidence is unavailable.
+  - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, and agent-generated approval commands.
   - Security-boundary and other listed high-risk changes require explicit human direction.
   - Merge, deployment, production configuration, credentials, and production data remain separately gated.

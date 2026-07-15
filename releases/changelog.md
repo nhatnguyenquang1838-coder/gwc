@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-07-15 — Operating runtime hardening
+
+### Added
+
+- Agent Operating Runtime Contract v1.0 centralizes SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, context refresh, ChatGPT connector-only Git behavior, validation honesty, and agent-generated approval commands.
+- Instruction Source Registry defines centrally managed source priority across protected-base GWC files, Google Drive native project docs, generated packages, and GPT Project instructions.
+- Approval Request schema defines the agent-generated approval context and exact copy-paste command shape.
+- Instruction Source Registry schema validates registry shape and source entries.
+- Approval command tests ensure `ok`, `approve`, `continue`, and similar phrases remain acknowledgement-only, while exact generated approval commands are recognized.
+- Registry tests validate source registry schema conformance, source ID uniqueness, and priority uniqueness.
+- GWC project package version `1.7.0` distributes the operating runtime contract, approval schema, source registry, and registry schema.
+
+### Changed
+
+- ChatGPT Agent Instructions now require SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, context refresh, and agent-generated approval commands before write-capable work.
+- GWC project profile now reads the operating runtime contract and instruction source registry during protected-base boot.
+- Plain acknowledgements such as `ok`, `approve`, `approved`, `continue`, `go`, `yes`, `làm đi`, and `fix ngay` are explicitly not gate authority.
+- Humans do not invent approval tokens or scope hashes; agents generate the exact approval command and humans copy-paste it.
+
+### Safety
+
+- This update does not grant merge, deployment, production configuration, credential, migration, or production-data authority.
+- Draft PR delivery remains separate from G4 merge authority.
+- CI success remains evidence only and does not grant authority.
+
 ## 2026-07-15
 
 ### Added
@@ -118,41 +143,5 @@
 ### Changed
 
 - GWC project package version `1.3.0` includes G0/G1 lifecycle documentation,
-  runtime and decision input schemas, generators, and reusable templates.
-- GWC project package includes the base drift policy as a governed source
-  instruction artifact.
-- Repository CI runs governance unit tests in addition to instruction validation.
-
-## 2026-07-13
-
-### Changed
-
-- DWC generated artifact refreshes may auto-wrap bounded guarded-branch
-  integrity updates in an internal approval envelope when the generator is
-  verified and validation passes.
-- DWC keeps `G4` merge as a separate human approval boundary.
-
-### Added
-
-- Active `gwc` self-governance project profile and package.
-- DWC repository operation contract and machine-readable capabilities.
-- DS Admin traceability for GWC modifying tasks.
-
-### Changed
-
-- DWC read-only inspection is automatic for the verified GWC repository.
-- DWC may perform bounded non-risk writes on a dedicated branch and deliver a
-  Draft PR without repeated per-operation approval prompts.
-- DWC repository writes are task-bounded instead of restricted to a fixed file
-  allowlist.
-
-### Safety
-
-- Explicit human direction remains required for financial, architecture,
-  security-boundary, production configuration, credential, production-data,
-  destructive, irreversible, and broad-blast-radius changes.
-- Direct protected-branch pushes, merge, deployment, production operations,
-  force-push, branch deletion, and shared-history rewrite remain prohibited or
-  separately gated.
-
-## 2026-07-12
+  runtime and decision schemas, generator/capture tools, templates, fixtures,
+  and validation tests.

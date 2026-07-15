@@ -69,7 +69,9 @@ def main() -> int:
         "README.md", "AGENTS.md", "catalog.yaml",
         "core/Coding_Project_Governance_v1.0.md",
         "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+        "core/Agent_Operating_Runtime_Contract_v1.0.md",
         "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+        "governance/instruction-source-registry.yaml",
         "agents/chatgpt-agent/agent-instructions.md",
         "agents/coding-agent/bootstrap.md",
         "agents/dwc/agent-instructions.md",
@@ -79,6 +81,8 @@ def main() -> int:
         "schemas/project-package.schema.json",
         "schemas/rollout.schema.json",
         "schemas/approval-envelope.schema.json",
+        "schemas/approval-request.schema.json",
+        "schemas/instruction-source-registry.schema.json",
         "schemas/g0-context-snapshot.schema.json",
         "schemas/g01-runtime-input.schema.json",
         "schemas/g01-decision-input.schema.json",
@@ -100,6 +104,8 @@ def main() -> int:
         "tests/test_g01_lifecycle.py",
         "tests/test_g01_runtime.py",
         "tests/test_g01_decision_capture.py",
+        "tests/test_approval_request.py",
+        "tests/test_instruction_source_registry.py",
     ]
     for rel in required:
         if not (root / rel).is_file():
@@ -124,6 +130,25 @@ def main() -> int:
             Draft202012Validator.check_schema(schema)
         except Exception as exc:
             errors.append(f"invalid schema {schema_path.relative_to(root)}: {exc}")
+
+    # Validate the instruction source registry when present.
+    registry_path = root / "governance/instruction-source-registry.yaml"
+    registry_schema = root / "schemas/instruction-source-registry.schema.json"
+    if registry_path.is_file() and registry_schema.is_file():
+        try:
+            registry = load_yaml(registry_path)
+            errors.extend(validate_json_schema(
+                registry, registry_schema, "instruction-source-registry"
+            ))
+            sources = registry.get("sources", []) if isinstance(registry, dict) else []
+            ids = [source.get("id") for source in sources if isinstance(source, dict)]
+            priorities = [source.get("priority") for source in sources if isinstance(source, dict)]
+            if len(ids) != len(set(ids)):
+                errors.append("instruction-source-registry: duplicate source id")
+            if len(priorities) != len(set(priorities)):
+                errors.append("instruction-source-registry: duplicate priority")
+        except Exception as exc:
+            errors.append(f"instruction-source-registry cannot be validated: {exc}")
 
     try:
         catalog = load_yaml(root / "catalog.yaml")
