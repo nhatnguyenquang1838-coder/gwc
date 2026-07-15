@@ -103,14 +103,17 @@ def _semantic_issues(record: dict[str, Any]) -> list[str]:
     for finding in review["findings"]:
         severity = finding["severity"]
         status = finding["status"]
-        if severity == "BLOCKER" and status != "resolved":
-            issues.append(f"{finding['id']}: BLOCKER must be resolved before G3 pass")
-        if severity == "MAJOR" and status not in {"resolved", "accepted_risk"}:
-            issues.append(
-                f"{finding['id']}: MAJOR must be resolved or explicitly accepted"
-            )
-        if severity == "MINOR" and status == "open":
-            issues.append(f"{finding['id']}: MINOR must be resolved or deferred")
+        if outcome == "pass":
+            if severity == "BLOCKER" and status != "resolved":
+                issues.append(
+                    f"{finding['id']}: BLOCKER must be resolved before G3 pass"
+                )
+            if severity == "MAJOR" and status not in {"resolved", "accepted_risk"}:
+                issues.append(
+                    f"{finding['id']}: MAJOR must be resolved or explicitly accepted"
+                )
+            if severity == "MINOR" and status == "open":
+                issues.append(f"{finding['id']}: MINOR must be resolved or deferred")
         if status == "accepted_risk":
             acceptance = finding.get("risk_acceptance")
             if not acceptance:
