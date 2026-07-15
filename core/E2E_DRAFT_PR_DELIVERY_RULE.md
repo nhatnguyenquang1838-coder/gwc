@@ -33,8 +33,11 @@ Policy boot
 → Full diff review
 → Push approved branch
 → Create or update Draft PR
+→ Run independent read-only review
 → Monitor CI
 → Repair repository-fixable CI failures
+→ Re-review the exact repaired head SHA
+→ Close review evidence
 → Deliver final PR report
 → STOP
 ```
@@ -186,6 +189,31 @@ The agent must create a Draft PR containing:
 - Explicit exclusions.
 - Statement that merge, deployment, and production operations are not authorized.
 
+## Independent review
+
+After the Draft PR exists, G3 must invoke or record one read-only reviewer by default. The reviewer evaluates only the lanes applicable to the delivery: requirement, design, code, test, governance, delivery, and CI.
+
+Review evidence must be stored in the canonical task-scoped `g3/delivery-record.yaml` and must identify:
+
+- implementer and reviewer identity;
+- reviewer independence as `independent` or the weaker `fresh-context` fallback;
+- exact reviewed PR head SHA and scope hash;
+- lane applicability, status, and evidence;
+- acceptance-criteria results;
+- findings with `BLOCKER`, `MAJOR`, `MINOR`, or `NIT` severity;
+- final review decision and stale state.
+
+The reviewer must not modify code, design, tests, documentation, or delivery evidence during G3. A required change returns to G2 for a separately authorized revision. Every new head SHA invalidates the previous review and requires another read-only review.
+
+Finding policy:
+
+- unresolved `BLOCKER` findings return the task to G2 and prevent G3 completion;
+- `MAJOR` findings must be resolved or explicitly accepted by a human for the exact head SHA;
+- `MINOR` findings must be resolved or deferred to a traceable follow-up;
+- `NIT` findings are non-blocking but remain recorded.
+
+A G3 review decision does not authorize merge. G4 remains a separate human decision for the exact PR head SHA.
+
 ## CI monitoring
 
 After every push to the PR branch:
@@ -226,6 +254,9 @@ The task is complete only when:
 - Required CI is green for that SHA.
 - Required validation evidence is recorded.
 - Full diff review is complete.
+- Independent read-only review is complete for the exact current head SHA and scope hash.
+- No unresolved blocking finding remains, and accepted risks identify the exact head SHA.
+- Applicable review lanes and acceptance criteria have evidence.
 - Documentation is current.
 - No material scope drift occurred.
 - No excluded authority was exercised.
