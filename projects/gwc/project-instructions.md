@@ -15,8 +15,10 @@ G0 intake
 → bounded plan
 → automatic G2 execution for non-risk work
 → validation and full diff review
-→ automatic G3 Draft PR
-→ user review after CI
+→ automatic G3 Draft PR assembly
+→ independent read-only review of the exact PR head
+→ G3 review closure after CI
+→ user review
 → separate G4 merge decision
 → separate G5 deploy decision
 → separate G6 production decision
@@ -113,6 +115,14 @@ Explicit user direction is required before DWC executes a change involving:
 An explicit user request to create the PR grants branch, implementation,
 validation, push, and Draft PR authority for the stated scope only.
 
+## G3 independent review
+
+G3 extends the existing Draft PR delivery record; it does not create another gate. One read-only reviewer evaluates the applicable requirement, design, code, test, governance, delivery, and CI lanes and binds evidence to the exact PR head SHA and scope hash.
+
+`BLOCKER` findings return to G2. `MAJOR` findings require resolution or explicit human risk acceptance for the exact head SHA. Every new head SHA makes the prior review stale and requires re-review. A `fresh-context` fallback must be labelled as such and must not be represented as fully independent.
+
+Reviewer PASS is evidence only. It does not grant G4 merge authority.
+
 ## Validation
 
 Before Draft PR creation DWC must:
@@ -123,6 +133,8 @@ Before Draft PR creation DWC must:
 - check for secrets, accidental deletion, generated noise, weakened tests, and
   scope drift;
 - record limitations honestly when a validation cannot be executed locally.
+
+Before G3 closure DWC must validate the canonical task-scoped `g3/delivery-record.yaml` with `tools/validate_g3_delivery.py` and verify that review, validation, and required CI evidence all match the exact current PR head SHA.
 
 ## Permanent exclusions
 

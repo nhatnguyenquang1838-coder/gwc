@@ -1,0 +1,89 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: task-example-g3-review
+repository: example-org/example-repo
+base_ref: main
+base_sha: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+working_branch: feature/example-change
+pull_request:
+  number: 123
+  url: https://github.com/example-org/example-repo/pull/123
+  draft: true
+head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+scope_hash: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+changed_paths:
+  - src/example.py
+validation:
+  head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  status: pass
+  commands:
+    - command: python -m pytest
+      result: pass
+      evidence: local validation log for the exact PR head SHA
+review:
+  implementer_id: agent-implementer
+  reviewer_id: agent-reviewer
+  independence: independent
+  mode: read-only
+  reviewed_head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  reviewed_scope_hash: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  reviewed_at: "2026-07-15T04:30:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - AC-1 mapped to the approved G1 decision
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - design remains within the approved scope
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - full diff reviewed at the exact head SHA
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - tests cover the changed behavior
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G0 through G3 boundaries remain intact
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR and delivery evidence are complete
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - required CI passed for the exact head SHA
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - behavior verified by tests and review
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  checks:
+    - name: validate-instructions
+      required: true
+      status: pass
+      evidence: https://github.com/example-org/example-repo/actions/runs/123
+residual_risks: []
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass

@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.8.0
+package_version: 1.9.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -61,6 +61,18 @@ instructions:
   - id: approval-request-schema
     path: schemas/approval-request.schema.json
     target: .governance/schemas/approval-request.schema.json
+    required: true
+  - id: g3-delivery-record-schema
+    path: schemas/g3-delivery-record.schema.json
+    target: .governance/schemas/g3-delivery-record.schema.json
+    required: true
+  - id: g3-delivery-record-template
+    path: templates/gates/g3-delivery-record.template.yaml
+    target: .governance/templates/gates/g3-delivery-record.template.yaml
+    required: true
+  - id: g3-delivery-validator
+    path: tools/validate_g3_delivery.py
+    target: .governance/tools/validate_g3_delivery.py
     required: true
   - id: instruction-source-registry-schema
     path: schemas/instruction-source-registry.schema.json
