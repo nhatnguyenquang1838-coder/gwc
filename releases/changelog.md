@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-07-15 — G3 independent reviewer delivery contract
+
+### Added
+
+- G3 delivery-record schema and template formalize Draft PR identity, exact head SHA, scope hash, validation, CI, review lanes, acceptance criteria, findings, residual risks, exclusions, and final outcome.
+- Deterministic `validate_g3_delivery.py` enforces reviewer separation, read-only review, exact-head freshness, severity policy, acceptance-criteria evidence, required CI, and G4/G5/G6 boundaries.
+- Twelve focused tests cover valid delivery evidence, stale or mismatched heads, reviewer conflict, blocker and major findings, explicit risk acceptance, lane coverage, CI binding, unverified acceptance criteria, and valid `changes_required` evidence that routes open blockers back to G2.
+- GWC project package version `1.8.0` distributes the G3 schema, template, and validator.
+
+### Changed
+
+- G3 now uses internal PR Assembly, Independent Review, and Review Closure stages without introducing another lifecycle gate.
+- Blocking review findings return to G2 for separately authorized revision; every new PR head SHA invalidates earlier review evidence and requires re-review.
+- Project and DWC instructions now require a read-only reviewer and exact-head delivery evidence before G3 can pass.
+
+### Safety
+
+- Reviewer PASS is evidence only and never grants G4 merge authority.
+- This update does not authorize merge, deployment, release, production configuration, credentials, secrets, migrations, or production-data operations.
+
 ## 2026-07-15 — Operating runtime hardening
 
 ### Added
