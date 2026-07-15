@@ -6,7 +6,7 @@
 
 - G3 delivery-record schema and template formalize Draft PR identity, exact head SHA, scope hash, validation, CI, review lanes, acceptance criteria, findings, residual risks, exclusions, and final outcome.
 - Deterministic `validate_g3_delivery.py` enforces reviewer separation, read-only review, exact-head freshness, severity policy, acceptance-criteria evidence, required CI, and G4/G5/G6 boundaries.
-- Ten focused tests cover valid delivery evidence, stale or mismatched heads, reviewer conflict, blocker and major findings, explicit risk acceptance, lane coverage, CI binding, and unverified acceptance criteria.
+- Twelve focused tests cover valid delivery evidence, stale or mismatched heads, reviewer conflict, blocker and major findings, explicit risk acceptance, lane coverage, CI binding, unverified acceptance criteria, and valid `changes_required` evidence that routes open blockers back to G2.
 - GWC project package version `1.8.0` distributes the G3 schema, template, and validator.
 
 ### Changed
