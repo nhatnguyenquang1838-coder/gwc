@@ -1,4 +1,3 @@
-
 # Instruction Governance
 
 Central Git-based control plane for project instructions, governance policies,
@@ -285,12 +284,12 @@ APPROVE CP-20260712-001 0123456789abcdef
 
 ## Current project status
 
-| Project | Status | Write enabled |
-|---|---:|---:|
-| `gwc` | active | yes |
-| `ds-mcp` | active | yes |
-| `rental-home` | pending verification | no |
-| `pm-skills` | pending repository assignment | no |
+| Project       |                        Status | Write enabled |
+| ------------- | ----------------------------: | ------------: |
+| `gwc`         |                        active |           yes |
+| `ds-mcp`      |                        active |           yes |
+| `rental-home` |          pending verification |            no |
+| `pm-skills`   | pending repository assignment |            no |
 
 ## No implicit production action
 
