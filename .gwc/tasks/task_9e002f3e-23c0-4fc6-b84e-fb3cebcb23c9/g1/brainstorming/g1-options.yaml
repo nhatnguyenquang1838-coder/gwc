@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-15T13:44:06Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9
+  base_sha: 303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Bounded connector precedence hotfix
+  description: Update the scoped governance sources and add LF integrity attributes.
+  benefits:
+  - Deterministic routing
+  - Windows-safe validation
+  tradeoffs:
+  - Adds one repository attributes file
+  risks:
+  - Consumers must accept an ordered connector list
+  constraint_fit: FIT
+- id: OPT-2
+  title: Instruction-only update
+  description: Document precedence without changing the profile or line-ending behavior.
+  benefits:
+  - Smaller diff
+  tradeoffs:
+  - Leaves machine routing and Windows validation inconsistent
+  risks:
+  - Policy remains ambiguous
+  constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: The bounded hotfix fixes both machine-readable routing and
+  the integrity blocker with one validated change.
+decision_required: true
+status: READY

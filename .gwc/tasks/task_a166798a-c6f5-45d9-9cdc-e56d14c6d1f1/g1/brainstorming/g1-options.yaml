@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-15T13:53:06Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1
+  base_sha: b94f782519efbabd705062e41a23768745c28f2f
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Merge current main
+  description: Create a normal merge commit and manually preserve both changelog entries.
+  benefits:
+  - No history rewrite
+  - Auditable conflict resolution
+  tradeoffs:
+  - Adds a merge commit
+  risks:
+  - Manual changelog reconciliation
+  constraint_fit: FIT
+- id: OPT-2
+  title: Rebase hotfix
+  description: Replay the hotfix onto current main.
+  benefits:
+  - Linear history
+  tradeoffs:
+  - Requires rewriting the published branch
+  risks:
+  - Force-push
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: A merge commit resolves the conflict without rewriting shared
+  history.
+decision_required: true
+status: READY

@@ -1,0 +1,17 @@
+schema_version: '1.0'
+artifact_type: g01-decision-input
+generated_at: '2026-07-15T13:53:06Z'
+options:
+  - {id: OPT-1, title: Merge current main, description: Create a normal merge commit and manually preserve both changelog entries., benefits: [No history rewrite, Auditable conflict resolution], tradeoffs: [Adds a merge commit], risks: [Manual changelog reconciliation], constraint_fit: FIT}
+  - {id: OPT-2, title: Rebase hotfix, description: Replay the hotfix onto current main., benefits: [Linear history], tradeoffs: [Requires rewriting the published branch], risks: [Force-push], constraint_fit: NOT_FIT}
+recommended_option_id: OPT-1
+recommendation_rationale: A merge commit resolves the conflict without rewriting shared history.
+decision:
+  status: ACCEPTED
+  selected_option_id: OPT-1
+  actor: user
+  decided_at: '2026-07-15T13:53:06Z'
+  source: chat-fix-conflict
+  explicit: true
+  rationale: The user explicitly requested conflict resolution.
+  acceptance_criteria_refs: [AC-1, AC-2, AC-3]

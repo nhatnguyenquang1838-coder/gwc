@@ -1,0 +1,60 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-15T13:44:06Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9
+  base_sha: 303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC does not declare or enforce GitHub, DWC, then DW1 repository connector
+    precedence.
+  why_now: Agents need deterministic connector routing and Windows checkout normalization
+    currently breaks canonical policy validation.
+desired_outcome: Enforce connector precedence and preserve canonical LF integrity
+  on Windows.
+stakeholders:
+  requester: user
+  affected:
+  - GWC agents
+  - DWC runtime
+scope:
+  in_scope:
+  - Declare GitHub, DWC, then DW1 connector precedence
+  - Align project and DWC agent instructions
+  - Bump the GWC package version and changelog
+  - Add durable LF attributes for governance integrity files
+  - Validate, commit, and push the guarded hotfix branch
+  non_goals:
+  - Create or update a pull request
+  - Merge or enable auto-merge
+  - Deploy or publish a release
+  - Access production configuration, credentials, or data
+constraints:
+- Work only on hotfix/connector-precedence
+- Preserve protected main without direct writes
+- Limit the commit to the six approved paths
+assumptions:
+- The write_running DS Admin task is the valid work-item claim
+- GitHub CLI authentication represents the preferred connector for push
+risks:
+- id: RISK-1
+  description: Connector precedence may diverge across profile and agent instructions.
+  impact: medium
+  mitigation: Update all scoped sources together and run repository validation.
+acceptance_criteria:
+- id: AC-1
+  statement: The GWC profile declares GitHub, DWC, then DW1 in that order.
+  verifiable: true
+- id: AC-2
+  statement: Project and DWC agent instructions enforce the same precedence.
+  verifiable: true
+- id: AC-3
+  statement: Canonical policy validation passes from the Windows checkout.
+  verifiable: true
+- id: AC-4
+  statement: The guarded branch is committed and pushed without creating a PR.
+  verifiable: true
+unresolved_questions: []
+status: READY
