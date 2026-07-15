@@ -59,6 +59,20 @@ class G3DeliveryRecordTests(unittest.TestCase):
         }]
         self.assertTrue(any("BLOCKER" in issue for issue in self.issues(record)))
 
+    def test_open_blocker_is_valid_for_changes_required(self) -> None:
+        record = copy.deepcopy(self.valid)
+        record["outcome"] = "fail"
+        record["review"]["decision"] = "changes_required"
+        record["review"]["findings"] = [{
+            "id": "REV-1",
+            "severity": "BLOCKER",
+            "category": "code",
+            "status": "open",
+            "evidence": "broken invariant",
+            "recommendation": "return to G2",
+        }]
+        self.assertEqual([], self.issues(record))
+
     def test_major_without_acceptance_fails(self) -> None:
         record = copy.deepcopy(self.valid)
         record["review"]["findings"] = [{
