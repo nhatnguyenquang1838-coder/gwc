@@ -1,0 +1,35 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-15T13:53:06Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: b94f782519efbabd705062e41a23768745c28f2f
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- Do not rebase or force-push
+- Preserve both release entries
+- Keep the effective PR diff bounded
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5dea0ac9c9a953ec3fa16e591a804d9240a7499a3100fdbef633680c1291f464
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: a195957a5da4c856af50710d0928c807da6f258a69e700e3b587d82c6084faea
+status: READY
+blockers: []

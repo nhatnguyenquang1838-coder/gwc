@@ -1,0 +1,79 @@
+schema_version: '1.0'
+artifact_type: g01-runtime-input
+generated_at: '2026-07-15T13:44:06Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  protected_branches: [main]
+  connector: GitHub
+  write_enabled: true
+  verified: true
+task:
+  id: task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9
+  claimed: true
+request:
+  requester: user
+  problem:
+    statement: GWC does not declare or enforce GitHub, DWC, then DW1 repository connector precedence.
+    why_now: Agents need deterministic connector routing and Windows checkout normalization currently breaks canonical policy validation.
+  desired_outcome: Enforce connector precedence and preserve canonical LF integrity on Windows.
+  affected: [GWC agents, DWC runtime]
+  in_scope:
+    - Declare GitHub, DWC, then DW1 connector precedence
+    - Align project and DWC agent instructions
+    - Bump the GWC package version and changelog
+    - Add durable LF attributes for governance integrity files
+    - Validate, commit, and push the guarded hotfix branch
+  non_goals:
+    - Create or update a pull request
+    - Merge or enable auto-merge
+    - Deploy or publish a release
+    - Access production configuration, credentials, or data
+  constraints:
+    - Work only on hotfix/connector-precedence
+    - Preserve protected main without direct writes
+    - Limit the commit to the six approved paths
+  assumptions:
+    - The write_running DS Admin task is the valid work-item claim
+    - GitHub CLI authentication represents the preferred connector for push
+  risks:
+    - id: RISK-1
+      description: Connector precedence may diverge across profile and agent instructions.
+      impact: medium
+      mitigation: Update all scoped sources together and run repository validation.
+  acceptance_criteria:
+    - id: AC-1
+      statement: The GWC profile declares GitHub, DWC, then DW1 in that order.
+      verifiable: true
+    - id: AC-2
+      statement: Project and DWC agent instructions enforce the same precedence.
+      verifiable: true
+    - id: AC-3
+      statement: Canonical policy validation passes from the Windows checkout.
+      verifiable: true
+    - id: AC-4
+      statement: The guarded branch is committed and pushed without creating a PR.
+      verifiable: true
+  unresolved_questions: []
+policies:
+  - id: GWC_CORE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5456b7279d94a5b6287fab4ac719207e2a84dc0313d52d1c34ea9ed62b914dfa
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: f018922ecc9a7e2d595ec1bd3683ded6948ab7eb688277c16b8fa9da160201a4
+risk:
+  class: R1
+  human_direction_confirmed: true

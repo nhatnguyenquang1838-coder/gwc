@@ -1,0 +1,35 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-15T13:44:06Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9
+  base_sha: 303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-15T13:44:06Z'
+  source: chat-rescue-mode
+  explicit: true
+rationale: The user explicitly requested rescue mode and execution of the bounded
+  hotfix.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+scope_hash: sha256:8fccf7843485e6a9b00f96b89c90269b283d3c4491dff54bfab2152c02fb0765
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION

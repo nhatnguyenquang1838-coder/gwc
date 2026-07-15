@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-15T13:44:06Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9
+  base_sha: 303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity and base evidence are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@303229b2dc0cca5846e9bf58750b65bafc6a4c0a
+  - projects/gwc/project-profile.yaml
+- id: REQUIRED_SOURCES
+  status: PASS
+  code: REQUIRED_SOURCES_AVAILABLE
+  message: All required sources are available.
+  evidence:
+  - AGENTS.md
+  - projects/gwc/project-profile.yaml
+- id: TASK_TRACEABILITY
+  status: PASS
+  code: DS_ADMIN_TASK_CLAIMED
+  message: The bounded change has a claimed DS Admin task.
+  evidence:
+  - task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9
+- id: INTAKE_COMPLETENESS
+  status: PASS
+  code: G1_INTAKE_READY
+  message: Problem, scope, non-goals, and verifiable acceptance criteria are complete.
+  evidence:
+  - g1/intake/g1-intake-brief.yaml
+- id: RISK_GATE
+  status: PASS
+  code: AUTOMATIC_BOUNDED_ALLOWED
+  message: R0/R1 work may proceed through automatic bounded G2.
+  evidence:
+  - risk_class=R1
+risk_class: R1
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS
