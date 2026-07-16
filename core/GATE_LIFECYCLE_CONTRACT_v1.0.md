@@ -68,7 +68,7 @@ The existing single-task `.gwc/g0` and `.gwc/g1` layout remains supported for ba
 
 **Permitted actions:** read-only analysis and decision capture.
 
-**Exit:** `tools/validate_g01.py` returns `PASS`.
+**Exit:** `tools/validate_g01.py` returns `PASS`. Upon exit, the agent must proactively generate the G2 execution envelope and present the approval command to the user.
 
 ### G2_EXECUTION
 
@@ -78,7 +78,7 @@ The existing single-task `.gwc/g0` and `.gwc/g1` layout remains supported for ba
 
 **Prohibited actions:** protected-branch write, merge, deploy, release, production configuration, credentials, and production-data access.
 
-**Exit:** implementation exists on the guarded branch; validation evidence and complete diff evidence are available.
+**Exit:** implementation exists on the guarded branch; validation evidence and complete diff evidence are available. Upon exit, the agent must proactively generate the G3 delivery record and present the approval command to the user.
 
 ### G3_PR
 
@@ -107,7 +107,7 @@ The review must:
 
 A reviewer that modifies the delivery loses reviewer independence. Another read-only review is then required for the new head SHA.
 
-**Exit:** `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and exact head SHA, records validation and CI evidence, contains a non-stale review decision, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions.
+**Exit:** `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and exact head SHA, records validation and CI evidence, contains a non-stale review decision, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions. Upon exit, the agent must proactively generate the G4 merge approval request and present the approval command to the user.
 
 G3 may report `PASS` only when:
 
@@ -131,7 +131,7 @@ Review `PASS` is G3 evidence only. It never grants merge authority; G4 still req
 
 **Permitted actions:** merge the approved PR using the authorized method.
 
-**Exit:** merge commit or merged head evidence is recorded.
+**Exit:** merge commit or merged head evidence is recorded. Upon exit, the agent must proactively generate the G5 deployment approval request and present the approval command to the user.
 
 ### G5_DEPLOY
 
@@ -139,7 +139,7 @@ Review `PASS` is G3 evidence only. It never grants merge authority; G4 still req
 
 **Permitted actions:** deploy only the approved release to the approved environment.
 
-**Exit:** deployment result, environment, release SHA, and rollback evidence are recorded.
+**Exit:** deployment result, environment, release SHA, and rollback evidence are recorded. Upon exit, the agent must proactively generate the G6 production-data approval request and present the approval command to the user.
 
 ### G6_PRODUCTION_DATA
 
@@ -148,6 +148,19 @@ Review `PASS` is G3 evidence only. It never grants merge authority; G4 still req
 **Permitted actions:** only the approved production operation.
 
 **Exit:** operation result and audit evidence are recorded. Approval expires after the operation or its stated expiry time.
+
+## Proactive Gate Transition
+
+Every gate exit requires the agent to proactively generate the entry artifact for the next gate and present the corresponding approval command to the user. This ensures no gate ends in a silent state and the user always has a clear, actionable next step.
+
+The agent must:
+
+1. Confirm the current gate's exit criteria are fully satisfied.
+2. Generate the next gate's entry artifact (execution envelope, delivery record, or approval record) using the current gate's evidence.
+3. Present the generated approval command in a standalone fenced text block.
+4. Wait for the user to execute the command before proceeding to the next gate.
+
+The user retains sole authority to grant or deny the next gate. The agent's proactive generation is a convenience mechanism, not a delegation of authority.
 
 ## Action-to-gate mapping
 

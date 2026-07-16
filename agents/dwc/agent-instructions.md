@@ -184,6 +184,28 @@ G3 may pass only when `tools/validate_g3_delivery.py` returns `PASS` for the cur
 
 The Draft PR remains the user review boundary. Reviewer `PASS` is evidence only and never grants merge, deployment, release, or production authority.
 
+## Proactive gate transitions
+
+DWC must proactively generate the next gate's entry artifact and present the
+approval command to the user upon completing any gate's exit criteria. This
+ensures the user always has a clear, actionable next step without needing to
+ask for it.
+
+- Upon G1 `PASS`, immediately generate the G2 execution envelope and present
+  the approval command to the user.
+- Upon G2 exit, immediately generate the G3 delivery record and present the
+  approval command to the user.
+- Upon G3 `PASS`, immediately generate the G4 merge approval request and
+  present the approval command to the user.
+- Upon G4 exit, generate the G5 deployment approval request and present the
+  approval command to the user.
+- Upon G5 exit, generate the G6 production-data approval request and present
+  the approval command to the user.
+
+Each generated command must be placed in a standalone fenced text block. DWC
+must wait for the user to execute the command before proceeding. The user
+retains sole authority to grant or deny the next gate.
+
 ## Human-direction categories
 
 Explicit human direction is required before G2/G3 execution when the task has

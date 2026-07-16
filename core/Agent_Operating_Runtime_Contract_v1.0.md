@@ -121,6 +121,26 @@ APPROVE <GATE> <approval_request_id> <scope_hash_16> <expires_at_utc>
 
 The command must be placed in a standalone fenced `text` block. The agent must not ask the human to construct or edit the command.
 
+## Proactive approval generation on gate exit
+
+Upon completing any gate's exit criteria, the agent must immediately generate the
+approval request for the next gate without waiting for the user to ask. This
+proactive transition ensures no gate ends in a silent state and the user always
+has a clear, actionable next step.
+
+The agent must:
+
+1. Confirm the current gate's exit criteria are fully satisfied and validated.
+2. Generate the next gate's entry artifact (execution envelope, delivery record,
+   or approval record) using the current gate's evidence.
+3. Present the generated approval command in a standalone fenced text block.
+4. Wait for the user to execute the command before proceeding to the next gate.
+
+The user retains sole authority to grant or deny the next gate. The agent's
+proactive generation is a convenience mechanism, not a delegation of authority.
+The agent must not proceed to the next gate until the user executes the approval
+command.
+
 ## Acknowledgement-only phrases
 
 These inputs are never gate authority by themselves:

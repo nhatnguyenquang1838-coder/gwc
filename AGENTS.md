@@ -154,6 +154,10 @@ workspace. G1 is complete only when the validator returns `PASS`.
 A conversational agreement, a user request such as “apply fix”, or an agent's
 own recommendation does not replace a G1 `PASS`.
 
+**Proactive transition:** Upon G1 `PASS`, the agent must immediately generate
+the G2 execution envelope and present the approval command to the user. The
+agent must not wait for the user to ask for the next step.
+
 ### G2_EXECUTION — guarded branch only
 
 G2 requires:
@@ -169,17 +173,28 @@ Only actions explicitly listed in the active envelope are allowed. G2 never
 allows protected-branch writes, merge, deployment, release, credential changes,
 production configuration, or production-data operations.
 
+**Proactive transition:** Upon G2 exit, the agent must immediately generate the
+G3 delivery record and present the approval command to the user.
+
 ### G3_PR — Draft PR only
 
 G3 requires completed G2 evidence, applicable validation, complete diff review,
 no scope drift, and a delivery record for the exact head SHA. G3 may create or
 update a Draft Pull Request only.
 
+**Proactive transition:** Upon G3 `PASS`, the agent must immediately generate
+the G4 merge approval request and present the approval command to the user.
+
 ### G4_MERGE, G5_DEPLOY, G6_PRODUCTION_DATA
 
 These are separate human-authority gates. Approval for one gate never grants
 another gate. Approval must match the exact repository, task, PR or release,
 head SHA, scope hash, action, environment, and expiry where applicable.
+
+**Proactive transition:** Upon G4 exit, the agent must generate the G5
+deployment approval request. Upon G5 exit, the agent must generate the G6
+production-data approval request. Each must be presented to the user as a
+standalone approval command.
 
 ## Connector-call enforcement
 
