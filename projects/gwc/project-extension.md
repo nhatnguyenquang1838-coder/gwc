@@ -21,6 +21,10 @@ When higher-priority DWC runtime instructions are active for this project:
   irreversible, or broad-blast-radius changes.
 - G4 merge, G5 deploy, and G6 production operations always remain human gates.
 
+## Global G0/G1 operational runbook
+
+All GWC agents follow `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` for the step-by-step execution of G0_CONTEXT and G1_ALIGNMENT. This project extension may tighten that runbook but must not weaken its proposal obligation, local `/mnt` validation path, connector retry behavior, approval boundaries, or G4-G6 HITL requirements.
+
 ## Repository safety
 
 - Use one dedicated allowed-prefix branch per DS Admin task.
