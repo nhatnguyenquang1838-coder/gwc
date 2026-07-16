@@ -1,3 +1,4 @@
+
 # Instruction Governance
 
 Central Git-based control plane for project instructions, governance policies,
@@ -282,13 +283,45 @@ APPROVE CP-20260712-001 0123456789abcdef
 
 `APPROVE G2_EXECUTION` is not a valid execution token.
 
+## Gate Lifecycle Summary
+
+The repository enforces a strict sequential gate system. Each gate requires specific artifacts and validation before the next can be entered. Approval for one gate never grants authority for any other gate (fail-closed).
+
+| Gate | Purpose | Requirement |
+| :--- | :--- | :--- |
+| **G0_CONTEXT** | Contextual Awareness | `context-snapshot.yaml` (Status: READY) |
+| **G1_ALIGNMENT** | Alignment & Planning | `tools/validate_g01.py` (Result: PASS) |
+| **G2_EXECUTION** | Guarded Execution | Valid `execution-envelope.yaml` & authorized actions |
+| **G3_PR** | Draft PR Assembly | Valid `delivery-record.yaml` & Independent Review |
+| **G4_MERGE** | Merge Authorization | Explicit human approval for the exact head SHA |
+| **G5_DEPLOY** | Deployment Approval | Explicit human deployment authorization |
+| **G6_PRODUCTION_DATA** | Production Operations | Specific authorized operation (Data/Config/Migration) |
+
+## Current project status
+
+## Current project status
+
+## Gate Lifecycle Summary
+
+The repository enforces a strict sequential gate system. Each gate requires specific artifacts and validation before the next can be entered. Approval for one gate never grants authority for any other gate (fail-closed).
+
+| Gate | Purpose | Requirement |
+| :--- | :--- | :--- |
+| **G0_CONTEXT** | Contextual Awareness | `context-snapshot.yaml` (Status: READY) |
+| **G1_ALIGNMENT** | Alignment & Planning | `tools/validate_g01.py` (Result: PASS) |
+| **G2_EXECUTION** | Guarded Execution | Valid `execution-envelope.yaml` & authorized actions |
+| **G3_PR** | Draft PR Assembly | Valid `delivery-record.yaml` & Independent Review |
+| **G4_MERGE** | Merge Authorization | Explicit human approval for the exact head SHA |
+| **G5_DEPLOY** | Deployment Authorization | Explicit human deployment authorization |
+| **G6_PRODUCTION_DATA** | Production Operations | Specific authorized operation (Data/Config/Migration) |
+
 ## Current project status
 
 | Project       |                        Status | Write enabled |
 | ------------- | ----------------------------: | ------------: |
 | `gwc`         |                        active |           yes |
 | `ds-mcp`      |                        active |           yes |
-| `rental-home` |          pending verification |            no |
+| `rental-home` |                        active |           yes |
 | `pm-skills`   | pending repository assignment |            no |
 
 ## No implicit production action

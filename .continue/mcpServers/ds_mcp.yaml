@@ -1,0 +1,14 @@
+name: DS MCP
+version: 0.0.1
+schema: v1
+
+mcpServers:
+  - name: ds-mcp
+    type: stdio
+    command: npx
+    args:
+      - -y
+      - mcp-remote@latest
+      - https://ds-mcp-server-one.vercel.app/mcp
+      - --header
+      - "Authorization: Bearer ${{ secrets.MCP_BEARER_TOKEN }}"

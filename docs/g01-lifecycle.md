@@ -15,6 +15,20 @@ A passing G1 record is evidence that the problem, scope, non-goals, options,
 decision, constraints, and acceptance criteria are aligned. It is not execution,
 merge, deployment, release, configuration, secret, or production-data authority.
 
+## Invariants
+
+The following constraints are enforced across all G0 and G1 artifacts to ensure correctness:
+
+1.  **Trace Identity**: Every artifact in a specific cycle (Intake, Preflight, Options, Decision) must reference the same unique `trace_id`. Cross-referencing different traces is a violation of context consistency.
+2.  **Scope Hash**: The system generates a deterministic hash from the identified scope, constraints, and acceptance criteria. This hash is used to verify that the execution plan (G1) matches the actual scope agreed upon in G0/G1. Any drift in scope requires an immediate re-validation of all downstream records.
+
+## Invariants
+
+The following constraints are enforced across all G0 and G1 artifacts to ensure correctness:
+
+1.  **Trace Identity**: Every artifact in a specific cycle (Intake, Preflight, Options, Decision) must reference the same unique `trace_id`. Cross-referencing different traces is a violation of context consistency.
+22. **Scope Hash**: The system generates a deterministic hash from the identified scope, constraints, and acceptance criteria. This hash is used to verify that the execution plan (G1) matches the actual scope agreed upon in G0/G1. Any drift in scope requires an immediate re-validation of all downstream records.
+
 ## Canonical workspace
 
 ```text
