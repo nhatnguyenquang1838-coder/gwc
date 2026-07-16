@@ -27,7 +27,10 @@ Policy boot
 -> reverify claim before remote write
 -> push
 -> open Draft PR
--> update task through legal State Engine transition
+-> resolve the required transition from `core/task-lifecycle/gate-transition-map.yaml`
+-> verify that transition against DS MCP `task_state_contract_get`
+-> execute the legal State Engine transition
+-> verify observed state equals expected state
 -> final evidence
 ```
 
@@ -82,6 +85,10 @@ authorized_actions:
 - Ownership and lease remain valid before push and PR mutation.
 - Final PR number and final head SHA are linked to the task.
 - Status transitions use State Engine operations only.
+- Every completed gate resolves one deterministic transition from `core/task-lifecycle/gate-transition-map.yaml`.
+- The requested transition exists in the live DS MCP `task_state_contract_get` contract.
+- The observed destination state equals the mapped expected state.
+- Missing, illegal, or unverifiable transition evidence fails the gate; repository work is not considered complete.
 
 ## Failure codes
 
