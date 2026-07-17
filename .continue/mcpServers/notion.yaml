@@ -1,0 +1,12 @@
+name: Notion MCP
+version: 0.0.1
+schema: v1
+
+mcpServers:
+  - name: Notion
+    type: stdio
+    command: npx
+    args:
+      - "-y"
+      - "mcp-remote"
+      - "https://mcp.notion.com/mcp"
