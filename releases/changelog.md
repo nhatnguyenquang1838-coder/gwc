@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-07-19 — G3 Context7-first offline skill fallback
+
+### Added
+
+- GWC-native `gwc-g3` skill for Draft PR assembly, exact-head read-only review, finding routing, review closure, and G4 approval preparation.
+- Context7-first skill resolution for `/obra/superpowers` with deterministic offline fallback under `libs/g3-skill-library/`.
+- Pinned offline manifest, SHA-256 verification, provenance notice, and G3-compatible normalized review cards.
+- Contract tests for Context7-first ordering, bundle-atomic fallback, offline file hashes, exact-head evidence, and later-gate exclusions.
+
+### Changed
+
+- GWC package version `1.13.0` distributes the G3 skill and offline fallback library.
+- G3 uses exactly one source mode per run: `CONTEXT7_LIVE` or `OFFLINE_PINNED`; live and offline cards cannot be mixed.
+
+### Safety
+
+- Live and offline skill content is non-authoritative relative to protected-base GWC governance.
+- Offline cards do not grant merge, ready-for-review, branch cleanup, deployment, production configuration, credentials, migrations, or production-data authority.
+- G3 remains Draft-PR-only; G4 merge still requires a separate exact human approval for the current PR head SHA.
+
 ## 2026-07-18 - Capability-aware ChatGPT agent harmonization
 
 ### Changed
