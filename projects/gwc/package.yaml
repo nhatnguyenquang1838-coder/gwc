@@ -38,7 +38,6 @@ instructions:
      path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md
      target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md
      required: false
-     description: "Emergency bypass policy for time-critical fixes"
    - id: base-drift-policy
      path: governance/base-drift-policy.yaml
      target: .governance/base-drift-policy.yaml
