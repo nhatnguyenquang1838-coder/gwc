@@ -77,7 +77,7 @@ class ChatGPTArtifactContinuationTests(unittest.TestCase):
                 self.assertIn(phrase, self.text)
 
     def test_package_distributes_runbook(self) -> None:
-        self.assertEqual(self.package["package_version"], "1.12.0")
+        self.assertEqual(self.package["package_version"], "1.13.0")
         entries = {item["id"]: item for item in self.package["instructions"]}
         self.assertIn("g0-g1-operational-runbook", entries)
         self.assertEqual(
