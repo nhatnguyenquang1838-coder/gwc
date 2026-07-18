@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-07-18 - Capability-aware ChatGPT agent harmonization
+
+### Changed
+
+- Root agent routing now applies the shared GWC boot to every agent and selects
+  `local_agent` or `chat_connector_only` from verified capabilities rather than
+  an agent-name or conversation-surface branch.
+- ChatGPT instructions are now an additive overlay on `AGENTS.md`: they retain
+  runtime banner, intake and file tracking, exact-SHA artifact recovery,
+  proactive gate continuation, and exact approval commands without repeating
+  the shared gate contract.
+- Repository connectors now use the active profile's ordered fallback. Agents
+  do not need to onboard every connector when a trusted local checkout or an
+  earlier verified connector supplies the required evidence.
+- GWC project package version `1.12.0` distributes the harmonized ChatGPT
+  overlay. The `gwc` project is the only package consumer of this source.
+
+### Rollout and rollback
+
+- Roll out by building package `1.12.0`, reviewing the semantic package diff,
+  and updating consumers only through their pinned-package workflow.
+- Roll back by keeping consumers pinned to package `1.11.0`; do not hand-edit a
+  generated rollout package.
+
+### Safety
+
+- This change does not alter core policy, gate schemas, lifecycle order, merge,
+  deployment, production configuration, credentials, migrations, or production
+  data authority.
+- Connector fallback never substitutes for repository identity, task claim,
+  gate artifacts, validator evidence, or an exact approval boundary.
+
 ## 2026-07-18 — ChatGPT artifact-driven gate continuation
 
 ### Added
