@@ -1,0 +1,70 @@
+contract_version: 1.0.0
+authority:
+  state_machine: ds-mcp-state-engine
+  discovery_tool: task_state_contract_get
+rules:
+  - outcome: G0_READY
+    from_state: draft
+    transition: SUBMIT
+    expected_state: ready
+  - outcome: EXECUTION_STARTED
+    from_state: ready
+    transition: RUN_AGENT
+    expected_state: agent_running
+  - outcome: AGENT_WORK_SUCCEEDED
+    from_state: agent_running
+    transition: CALLBACK_SUCCESS
+    expected_state: pending_review
+  - outcome: AGENT_WORK_FAILED
+    from_state: agent_running
+    transition: CALLBACK_FAILED
+    expected_state: failed
+  - outcome: PLAN_APPROVED
+    from_state: pending_review
+    transition: APPROVE_PLAN
+    expected_state: pending_approval
+  - outcome: REVISION_REQUIRED
+    from_state: pending_review
+    transition: REVISE
+    expected_state: ready
+  - outcome: WRITE_APPROVED
+    from_state: pending_approval
+    transition: APPROVE_WRITE
+    expected_state: write_running
+  - outcome: WRITE_REJECTED
+    from_state: pending_approval
+    transition: REJECT_WRITE
+    expected_state: pending_review
+  - outcome: DRAFT_PR_CREATED
+    from_state: write_running
+    transition: PR_CREATED
+    expected_state: validation_running
+  - outcome: VALIDATION_PASSED
+    from_state: validation_running
+    transition: VALIDATION_PASSED
+    expected_state: completed
+  - outcome: VALIDATION_FAILED
+    from_state: validation_running
+    transition: VALIDATION_FAILED
+    expected_state: pending_review
+  - outcome: BLOCKED
+    from_state: ready
+    transition: BLOCK
+    expected_state: blocked
+  - outcome: UNBLOCKED
+    from_state: blocked
+    transition: UNBLOCK
+    expected_state: ready
+terminal_states:
+  - completed
+  - cancelled
+verification:
+  required: true
+  failure_behavior: fail_gate
+  evidence:
+    - task_id
+    - from_state
+    - transition
+    - expected_state
+    - observed_state
+    - event_id_or_idempotency_key

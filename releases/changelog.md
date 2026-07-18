@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-18 — ChatGPT artifact-driven gate continuation
+
+### Added
+
+- ChatGPT agents now read the protected-main G0/G1 operational runbook during mandatory context boot.
+- A deterministic recovery sequence requires exact-SHA fetch of gate artifacts, schemas, templates, validators, and source evidence into an isolated task workspace before reporting a remediable validator gap as blocked.
+- Gate exits now require proactive generation of the next canonical artifact and exact approval request through G2, G3, G4, G5, and G6.
+- Focused tests enforce the runbook boot dependency, isolated artifact recovery, hard-stop boundaries, and package distribution entry.
+
+### Changed
+
+- GWC project package version `1.11.0` distributes the operational runbook and updated ChatGPT agent instructions.
+- Missing local files, raw-download transport failures, stale generated artifacts, and remediable schema errors are recovery conditions rather than automatic workflow termination.
+
+### Safety
+
+- Artifact recovery does not grant authority. Protected-branch writes, merge, deployment, release, production configuration, credentials, migrations, production data, scope drift, expired approval, and connector hard denial remain stop conditions.
+- Draft PR delivery remains separate from G4 merge authority.
+
 ## 2026-07-15 — Connector precedence update
 
 ### Changed

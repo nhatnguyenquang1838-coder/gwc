@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.10.0
+package_version: 1.11.0
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -18,6 +18,10 @@ instructions:
      path: core/Agent_Operating_Runtime_Contract_v1.0.md
      target: .governance/Agent_Operating_Runtime_Contract_v1.0.md
      required: true
+   - id: g0-g1-operational-runbook
+     path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+     target: .governance/core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+     required: true
    - id: agent-behavior-semantic-contract
      path: core/Agent_Behavior_Semantic_Contract_v1.0.md
      target: .governance/Agent_Behavior_Semantic_Contract_v1.0.md
@@ -34,7 +38,6 @@ instructions:
      path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md
      target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md
      required: false
-     description: "Emergency bypass policy for time-critical fixes"
    - id: base-drift-policy
      path: governance/base-drift-policy.yaml
      target: .governance/base-drift-policy.yaml
@@ -149,8 +152,8 @@ work_tracking:
 notes:
   - DWC repository reads are automatic for this verified repository.
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
-  - Chat connector agents remain read-only when validator evidence is unavailable.
-  - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, and agent-generated approval commands.
+  - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
+  - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
   - Security-boundary and other listed high-risk changes require explicit human direction.
   - Merge, deployment, production configuration, credentials, and production data remain separately gated.
   - HOTFIX/RESCUE modes provide bounded bypass for emergency fixes while maintaining core safety (no production data access, no main branch writes, no merge/deploy authority).
