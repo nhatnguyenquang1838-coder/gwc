@@ -9,6 +9,10 @@ The default ChatGPT execution mode is `chat_connector_only` unless a trusted
 local checkout, shell, filesystem, Git, and validator runner are explicitly
 available in the active environment.
 
+For standard GWC governance rules, execution modes, gate sequence, connector-call
+enforcement, CRUD rules, Git write rules, DS Admin task rules, validation
+requirements, hard exclusions, and failure codes, see the parent `AGENTS.md`.
+
 ## Mandatory runtime banner
 
 At the start of non-trivial GWC-governed work, report:
@@ -38,28 +42,42 @@ Before repository-changing work, produce:
 
 No repository mutation is allowed until `Files WRITE` is explicit. A new write path is scope drift and requires a regenerated approval request.
 
-## Mandatory context boot
+## Mandatory connector boot
 
-Before recommending, editing, or opening a Pull Request for a GWC-governed
-project, the ChatGPT Agent must reconstruct context in this order:
+This boot is mandatory for every coding, repository, Pull Request, deployment,
+release, configuration, migration, credential, or production-data task.
 
-1. System, platform, developer, and active project runtime instructions.
-2. Target repository protected-base `AGENTS.md`.
-3. Pinned GWC source or package:
-   - `.gwc/gwc/AGENTS.md` when a GWC submodule exists;
-   - `.governance/*` package files when the project consumes a generated package;
-   - central `nhatnguyenquang1838-coder/gwc` source when directly operating on
-     GWC.
-4. `core/Coding_Project_Governance_v1.0.md`.
-5. `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`.
-6. `core/Agent_Operating_Runtime_Contract_v1.0.md`.
-7. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`.
-8. Active `projects/<project-id>/project-profile.yaml`.
-9. Project instructions, extension, spec format, task files, package manifests,
-   workflows, and relevant source files.
+Before any write-capable connector action, the agent must:
 
-If repository evidence conflicts with conversation memory, repository evidence
-wins unless the user explicitly overrides it without weakening a higher authority.
+1. Onboard Github Connector
+2. Onboard DWC Connector
+3. Onboard DW1 Connector
+
+If connector boot fails, report back to USER: FAILED LOADING
+
+## Connector-based context boot
+
+When operating via connectors, create a local mount for each request session for
+the working folder. Using connectors (in fallback order) from the main branch of
+the project to get and read:
+
+- `core/Coding_Project_Governance_v1.0.md`;
+- `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`;
+- `core/E2E_DRAFT_PR_DELIVERY_RULE.md`;
+- the active `projects/<project-id>/project-profile.yaml`;
+- the active project instructions and extension;
+- the applicable agent instructions and capability declaration;
+- the target repository's protected-base `AGENTS.md`, package files, task,
+  spec, and workflow files relevant to the request.
+
+Then:
+
+1. Verify core version and SHA-256.
+2. Resolve exactly one active project profile.
+3. Verify repository owner, repository name, default branch, protected branches,
+   connector identity, `identity_status`, and `write_enabled`.
+4. Resolve and report the execution mode, task ID, risk class, current gate,
+   required next gate, authorized actions, and excluded actions.
 
 ## Execution mode declaration
 
@@ -73,7 +91,35 @@ In `chat_connector_only` mode, do not claim local validation was run. Do not
 invent file-system paths, task artifacts, validator outputs, CI states, or DS
 Admin task transitions.
 
-## Gate behavior
+## ChatGPT-specific execution mode rules
+
+### `chat_connector_only` — ChatGPT variant
+
+Use this mode when the agent can read repositories and call connectors but has
+no trusted local repository checkout, no local shell, or no ability to run GWC
+validators against task-scoped artifacts.
+
+Allowed (per `AGENTS.md`):
+- read repository, task, PR, CI, and governance context;
+- produce a conversation-local G0/G1 gate packet;
+- identify missing artifacts, validators, and blockers;
+- draft a proposed patch plan or PR body;
+- create repository changes only when a valid artifact bundle and validator
+  evidence already exist from a trusted local or CI source.
+
+Not allowed (ChatGPT-specific additions to `AGENTS.md`):
+- claim `G1_ALIGNMENT: PASS` without validator evidence;
+- create a branch or mutate repository files merely from chat reasoning;
+- backfill G0/G1 artifacts after connector writes;
+- **Stop the G0/G1 without proceed brainstorming with user.**
+
+If validator evidence is unavailable, report:
+
+```text
+G1_ALIGNMENT: BLOCKED — validator unavailable in chat_connector_only mode
+```
+
+## ChatGPT-specific gate behavior
 
 ### G0_CONTEXT
 
@@ -122,7 +168,9 @@ Do not create or update a Draft PR without G3 evidence. Do not merge, deploy,
 release, change production configuration, rotate credentials, or access
 production data without explicit G4/G5/G6 authority.
 
-## Agent-generated approval commands
+## ChatGPT-specific approval command rules
+
+See `AGENTS.md` for standard approval command format. ChatGPT-specific additions:
 
 Humans do not invent approval tokens, scope hashes, artifact IDs, branch names,
 file scopes, or expiry.
@@ -141,7 +189,7 @@ Plain phrases such as `ok`, `approve`, `approved`, `continue`, `go`, `yes`,
 `làm đi`, or `fix ngay` are `ACKNOWLEDGEMENT_ONLY`. They never grant gate
 authority unless they exactly match an active generated approval command.
 
-## Files READ / Files WRITE rules
+## ChatGPT-specific file tracking rules
 
 ```text
 No Files READ evidence -> no content-dependent recommendation.
@@ -158,7 +206,7 @@ Files WRITE actual:
 Scope drift: NONE | DETECTED
 ```
 
-## Context refresh trigger
+## ChatGPT-specific context refresh rules
 
 Refresh context before any write-capable action and whenever:
 
@@ -179,7 +227,7 @@ Needs reread:
 Allowed next action:
 ```
 
-## User-visible reporting
+## ChatGPT-specific user-visible reporting
 
 For GWC-governed work, show concise gate status:
 
@@ -193,7 +241,7 @@ Next allowed action: prepare patch/PR plan only
 Do not expose hidden reasoning. Report evidence, blockers, decisions, and next
 allowed action.
 
-## Project context discipline
+## ChatGPT-specific project context discipline
 
 The ChatGPT Agent must not rely only on conversation memory. It must inspect the
 repository or supplied artifacts for:
@@ -217,7 +265,7 @@ For every significant recommendation, identify:
 - compatibility;
 - impact.
 
-## Safety boundary
+## ChatGPT-specific safety boundary
 
 Tool availability does not grant authority. A user instruction such as
 `apply fix`, `continue`, or `approve` does not replace G0/G1 artifacts,
