@@ -1,13 +1,31 @@
 # ChatGPT Agent Instructions for GWC-Governed Work
 
-## Scope
+## Purpose and authority
 
 These instructions apply to ChatGPT-style agents operating through conversation,
-connectors, or project context where GWC governance is present or requested.
+connectors, project context, or a trusted local checkout. They are an additive
+runtime overlay on the parent `AGENTS.md`.
 
-The default ChatGPT execution mode is `chat_connector_only` unless a trusted
-local checkout, shell, filesystem, Git, and validator runner are explicitly
-available in the active environment.
+The parent file remains canonical for authority order, shared boot, execution
+modes, gate sequence, connector-call enforcement, CRUD and Git rules, DS Admin
+task rules, validation, exclusions, and failure codes. If this overlay conflicts
+with the parent, follow the parent or any higher-priority instruction.
+
+## Capability-based execution mode
+
+Choose exactly one execution mode from verified capabilities, not from the
+ChatGPT product name or conversation surface:
+
+- Use `local_agent` when the active environment has a trusted full checkout,
+  shell, filesystem, Git, isolated worktree or session support, and can run the
+  protected-base GWC validators.
+- Use `chat_connector_only` when repository connectors are the source of truth
+  and no trusted full checkout is available, even if an isolated filesystem and
+  command runner can validate fetched artifacts.
+- Use `repo_ci` only inside the repository's CI runner.
+
+Do not downgrade a capable ChatGPT agent to `chat_connector_only`. Do not claim
+`local_agent` merely because a temporary filesystem or command runner exists.
 
 ## Mandatory runtime banner
 
@@ -18,9 +36,9 @@ SOURCE INSTRUCTION: <GDRIVE|GIT|GPT_PROJECT|REPO|PACKAGE|MIXED>
 EXECUTION MODE: <chat_connector_only|local_agent|repo_ci>
 ```
 
-If source instructions conflict, state the conflict rule and follow the
-highest-priority active source unless a repository protected-base rule is
-stricter.
+If sources conflict, state the applicable authority rule. Repository evidence
+from the pinned protected base overrides conversation memory unless an explicit
+user instruction validly changes scope without weakening higher authority.
 
 ## Mandatory Intake Card
 
@@ -39,138 +57,103 @@ Before repository-changing work, produce:
 | Next Action | proceed / blocked / ask approval / prepare patch only |
 
 No repository mutation is allowed until `Files WRITE` is explicit. A new write
-path is scope drift and requires a regenerated approval request.
+path is scope drift and requires refreshed artifacts and approval.
 
-## Mandatory context boot
+## Context boot and connector fallback
 
-Before recommending, editing, or opening a Pull Request for a GWC-governed
-project, the ChatGPT Agent must reconstruct context in this order:
+Run the shared boot from `AGENTS.md`, including the protected-base project
+profile, project instructions, extension, task/spec/workflow context, and:
 
-1. System, platform, developer, and active project runtime instructions.
-2. Target repository protected-base `AGENTS.md`.
-3. Pinned GWC source or package:
-   - `.gwc/gwc/AGENTS.md` when a GWC submodule exists;
-   - `.governance/*` package files when the project consumes a generated package;
-   - central `nhatnguyenquang1838-coder/gwc` source when directly operating on
-     GWC.
-4. `core/Coding_Project_Governance_v1.0.md`.
-5. `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`.
-6. `core/Agent_Operating_Runtime_Contract_v1.0.md`.
-7. `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md`.
-8. `core/E2E_DRAFT_PR_DELIVERY_RULE.md`.
-9. Active `projects/<project-id>/project-profile.yaml`.
-10. Project instructions, extension, spec format, task files, package manifests,
-    workflows, and relevant source files.
+- `core/Agent_Operating_Runtime_Contract_v1.0.md`;
+- `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md`;
+- this ChatGPT overlay.
 
-All repository files used for a gate decision must be fetched from one pinned
-protected-base SHA. Do not combine policy, schema, template, validator, or task
-artifacts from different revisions.
+Bind policy, schemas, templates, validators, task evidence, and decisions to one
+exact protected-base SHA. Do not combine gate evidence from different revisions.
 
-If repository evidence conflicts with conversation memory, repository evidence
-wins unless the user explicitly overrides it without weakening a higher
-authority.
+Use repository access in the active profile's declared precedence order. For the
+`gwc` profile that is GitHub, then DWC, then DW1. Use the first available,
+authorized route; record fallback and continue when an earlier connector is
+unavailable. Do not require onboarding every declared connector, and do not
+report a generic loading failure when another verified route or the trusted
+local checkout can supply the required evidence.
 
-## Execution mode declaration
+In `local_agent`, the verified checkout is repository source of truth for the
+pinned base and active guarded branch. Connector calls are needed only for facts
+or actions that the local checkout cannot prove or perform, such as DS Admin
+state, remote PR state, or CI evidence.
 
-At the start of repository-changing work, report:
+In `chat_connector_only`, the repository connector remains source of truth. A
+local isolated filesystem may hold fetched validation inputs, but it is not a
+trusted checkout unless Git metadata and the expected base SHA are verified.
 
-```text
-GWC BOOT: <PASS|BLOCKED> — execution_mode=<chat_connector_only|local_agent|repo_ci>
-```
-
-In `chat_connector_only` mode, do not invent file-system paths, task artifacts,
-validator outputs, CI states, or DS Admin task transitions.
-
-A connector-only agent may use an isolated writable filesystem and command
-runner for fetched-file validation without claiming it has a trusted Git
-checkout. The repository connector remains the source of truth. Every fetched
-validator, schema, template, runbook, and source file must be bound to the exact
-protected-base SHA and recorded in the gate evidence.
-
-## Gate behavior
+## ChatGPT gate behavior
 
 ### G0_CONTEXT
 
-The ChatGPT Agent may inspect repositories, files, pull requests, workflows,
-issues, and connector metadata. This is read-only.
-
-In chat-only mode, G0 may be reported as a **conversation-local gate packet**
-when it cites the repository evidence used. When an isolated filesystem and
-command runner are available, the agent must materialize the canonical G0
-artifact under a unique task workspace and validate it instead of remaining at
-a conversation-only packet.
+Repository, PR, workflow, task, and connector inspection is read-only. When an
+isolated filesystem and command runner are available, materialize and validate
+the canonical G0 artifact instead of stopping at a conversation-local packet.
 
 ### G1_ALIGNMENT
 
-The ChatGPT Agent may reconstruct problem, scope, non-goals, options, risks,
-acceptance criteria, and a recommended decision.
+Reconstruct problem, scope, non-goals, options, risks, acceptance criteria, and
+the explicit decision. Never report `G1_ALIGNMENT: PASS` unless:
 
-Do not report `G1_ALIGNMENT: PASS` unless one of these is true:
+- the exact protected-base `tools/validate_g01.py` passed against the matching
+  task workspace and schemas; or
+- trusted local or CI evidence proves that PASS for the same task, repository,
+  base SHA, branch, and scope hash.
 
-- the agent ran the exact protected-base `tools/validate_g01.py` against the
-  exact task workspace with the matching protected-base schemas; or
-- trusted CI/local evidence shows `validate_g01.py` returned `PASS` for the
-  exact task workspace, repository, base SHA, branch, and scope hash.
-
-Before reporting that a validator is unavailable, the agent must perform this
-recovery sequence when connector reads, an isolated filesystem, and a command
-runner are available:
+Before reporting validator evidence unavailable in `chat_connector_only` when
+connector reads, an isolated filesystem, and a command runner exist:
 
 1. Pin and re-verify the protected-base SHA.
-2. Read the operational runbook from that SHA.
+2. Read the protected-base operational runbook.
 3. Fetch the required gate artifacts, schemas, templates, validators, and
    referenced sources from the same SHA.
 4. Materialize them under a unique `/mnt/data/gwc_sessions/<session-id>/`
-   workspace and preserve their repository paths.
+   workspace while preserving repository paths and source hashes.
 5. Run the repository validator against the task workspace.
-6. Repair and retry remediable artifact, transport, path, or schema errors while
-   staying inside the current read/write scope.
-7. Preserve the command, exit code, stdout/stderr, hashes, and limitations as
-   validation evidence.
+6. Repair and retry remediable artifact, transport, path, or schema errors within
+   the declared scope.
+7. Preserve command, exit code, output, hashes, and limitations as evidence.
 
-Only after the recovery sequence is technically impossible, a connector returns
-a hard denial, or a real authority boundary is reached may the agent report:
+Only after that recovery is technically impossible, a connector returns a hard
+denial, or an authority boundary is reached may the agent report:
 
 ```text
-G1_ALIGNMENT: BLOCKED — exact validator evidence unavailable after artifact recovery
+G1_ALIGNMENT: BLOCKED - exact validator evidence unavailable after artifact recovery
 ```
 
 ### G2_EXECUTION
 
-In chat-only mode, do not create branches, update files, push commits, or open
-Pull Requests unless trusted G0/G1 validator evidence, a valid execution
-envelope, and the exact active approval command already exist.
-
-When the user asks to apply a fix but gate evidence is missing, build the missing
-read-only artifacts and validator evidence first. Do not stop merely because the
-artifacts were not already present locally.
+Do not create a branch, worktree, update, commit, push, or PR without matching
+G0/G1 evidence, a valid execution envelope, and the exact active approval when
+the runtime contract requires it. Missing gate files are preparation work: build
+and validate them before treating the request as blocked.
 
 ### G3_PR and later
 
-Do not create or update a Draft PR without G3 evidence. Do not merge, deploy,
-release, change production configuration, rotate credentials, or access
-production data without explicit G4/G5/G6 authority.
+Follow the parent gate contract. G3 permits a Draft PR only. G4 merge, G5 deploy,
+and G6 production authority remain separate exact human approvals.
 
 ## Artifact-driven gate continuation
 
-The agent owns gate preparation. The human owns only the explicit authority
-boundary.
-
-For every gate transition, the agent must:
+The agent owns gate preparation; the human owns explicit authority boundaries.
+For each transition:
 
 ```text
-Read protected-main runbook
-→ resolve current gate and exact action
-→ fetch current gate evidence from the pinned SHA
-→ fetch matching schemas/templates/validators
-→ materialize and validate in an isolated workspace
-→ repair remediable evidence gaps
-→ generate the next gate artifact and approval request
-→ present the exact APPROVE command
-→ stop only at the actual human-authority boundary or a hard denial
+Read protected-base runbook
+-> resolve current gate and exact action
+-> obtain current evidence from the pinned SHA
+-> obtain matching schemas, templates, and validators
+-> materialize and validate in an isolated workspace
+-> repair remediable evidence gaps
+-> generate the next gate artifact and approval request
+-> present the exact APPROVE command
+-> stop only at a real human-authority boundary or hard denial
 ```
-
-The minimum continuation artifacts are:
 
 | Gate exit | Agent-generated next artifact |
 |---|---|
@@ -181,48 +164,45 @@ The minimum continuation artifacts are:
 | G4 PASS | G5 deployment approval request bound to exact release/environment |
 | G5 PASS | G6 production approval request bound to exact operation/environment |
 
-For each transition, the agent must use the existing canonical mechanism before
-creating a new one:
+Use the existing canonical mechanism first:
 
 ```text
-Find existing → Reuse → Extend → Refactor → Replace only if required
+Find existing -> Reuse -> Extend -> Refactor -> Replace only if required
 ```
 
-Missing local files, unavailable raw-download transport, stale generated
-artifacts, or a remediable schema error are recovery conditions, not automatic
-workflow termination. A protected-branch write, merge, deployment, production
-configuration, credential, migration, production-data operation, scope drift,
-expired approval, or connector hard denial remains a real stop condition.
+Missing local files, transport failures, stale generated artifacts, and
+remediable schema errors are recovery conditions. A protected-branch write,
+merge, deployment, production configuration, credential, migration,
+production-data operation, scope drift, expired approval, or
+`connector hard denial` is a real stop condition.
 
 ## Agent-generated approval commands
 
-Humans do not invent approval tokens, scope hashes, artifact IDs, branch names,
-file scopes, or expiry.
-
-The agent must generate an approval request from current gate evidence and show
-its context. The human grants authority only by copy-pasting the exact generated
-command.
-
-Required approval command format:
+The agent generates approval identifiers, scope hashes, branch names, file
+scope, expiry, and the exact command. The human grants authority only by sending
+the active command exactly:
 
 ```text
 APPROVE <GATE> <approval_request_id> <scope_hash_16> <expires_at_utc>
 ```
 
-Plain phrases such as `ok`, `approve`, `approved`, `continue`, `go`, `yes`,
-`làm đi`, or `fix ngay` are `ACKNOWLEDGEMENT_ONLY`. They never grant gate
-authority unless they exactly match an active generated approval command.
+Plain acknowledgements such as `ok`, `approve`, `continue`, `go`, `yes`, or
+equivalents are `ACKNOWLEDGEMENT_ONLY` and do not grant gate authority.
 
-## Files READ / Files WRITE rules
+## File tracking and context refresh
 
 ```text
 No Files READ evidence -> no content-dependent recommendation.
 No Files WRITE declaration -> no repository mutation.
-New write path -> stop, update scope, regenerate approval request.
-Actual write outside approved scope -> scope drift, stop before commit or PR.
+New write path -> refresh scope and approval before writing.
+Actual write outside approved scope -> stop before commit or PR.
 ```
 
-Every final delivery must include:
+Refresh the active source, gate, task, repository, branch, scope, risk, and
+authority before every write-capable action and whenever the user says to
+continue or the context changes materially.
+
+Every delivery reports:
 
 ```text
 Files READ actual:
@@ -230,80 +210,23 @@ Files WRITE actual:
 Scope drift: NONE | DETECTED
 ```
 
-## Context refresh trigger
-
-Refresh context before any write-capable action and whenever:
-
-- the conversation is long or the current gate is unclear;
-- the user says `continue`, `ok`, `approve`, `go`, `yes`, or equivalent;
-- task type, repo, branch, scope, risk, or authority changes;
-- before PR, merge, deployment, release, credential, production config,
-  migration, or production-data operation.
-
-Refresh output:
-
-```text
-SOURCE INSTRUCTION:
-Last known gate:
-Current request:
-Still valid:
-Needs reread:
-Allowed next action:
-```
-
 ## User-visible reporting
 
-For GWC-governed work, show concise gate status and the recovery action actually
-performed:
+Show concise status with evidence and the actual recovery or approval boundary:
 
 ```text
-GWC BOOT: PASS — execution_mode=chat_connector_only
-G0_CONTEXT: READY — evidence: <repo/profile/task refs>
-G1_ALIGNMENT: PASS — validator: <path, command, exit code, artifact hashes>
-G2_EXECUTION: AWAITING_APPROVAL — <approval_request_id, scope_hash_16, expiry>
+GWC BOOT: PASS - execution_mode=<mode>
+G0_CONTEXT: READY - evidence: <repo/profile/task refs>
+G1_ALIGNMENT: PASS - validator: <path, command, exit code, hashes>
+G2_EXECUTION: AWAITING_APPROVAL - <request id, scope hash, expiry>
 ```
 
-When blocked, report the exact failed recovery step, hard denial, or authority
-boundary. Do not use `validator unavailable` as a generic reason when connector
-fetch plus isolated local validation was possible.
-
-Do not expose hidden reasoning. Report evidence, blockers, decisions, and next
-allowed action.
-
-## Project context discipline
-
-The ChatGPT Agent must not rely only on conversation memory. It must inspect the
-repository or supplied artifacts for:
-
-- project identity;
-- active GWC profile;
-- source of truth for instructions;
-- existing workflow before proposing a new workflow;
-- generated vs source artifacts;
-- validation and CI mechanisms;
-- consumers and rollout impact.
-
-Prefer `Reuse → Extend → Refactor → Replace`.
-
-For every significant recommendation, identify:
-
-- current mechanism;
-- purpose;
-- limitation;
-- improvement;
-- compatibility;
-- impact.
+Do not expose hidden reasoning. Report evidence, decisions, blockers, and the
+next allowed action. Never use `validator unavailable` generically when exact-SHA
+fetch and isolated validation are possible.
 
 ## Safety boundary
 
-Tool availability does not grant authority. A user instruction such as
-`apply fix`, `continue`, or `approve` does not replace G0/G1 artifacts,
-validator evidence, G2 execution envelope, G3 delivery record, or G4/G5/G6 human
-authority.
-
-The ChatGPT local filesystem may be used for artifacts, reports, patch bundles,
-and fetched-file validation workspaces. It is not repository source of truth
-unless it contains a verified full checkout with Git metadata and the expected
-base SHA. Connector-fetched files may still be used for task-scoped validation
-when their exact repository path, protected-base SHA, blob SHA, and content hash
-are preserved in evidence.
+Tool availability, a user request, or CI success does not replace gate artifacts
+or grant unrelated authority. Never invent repository paths, task artifacts,
+validator output, CI state, connector identity, or DS Admin transitions.
