@@ -93,9 +93,15 @@ When required by the active profile:
 2. Reuse exactly one matching task; do not create duplicates.
 3. If none exists and task creation is authorized, create one with repository, base branch, objective, risk, scope, exclusions, and idempotency key.
 4. Record the task ID in G0/G1 trace fields.
-5. Use legal State Engine transitions only.
-6. Record branch, PR, validation outcome, and final state as they become available.
-7. Never treat task creation, assignment, or state as approval for repository writes, merge, deployment, credentials, or production data.
+5. Fetch the authoritative DS MCP state contract through `task_state_contract_get`.
+6. Resolve the gate outcome in `core/task-lifecycle/gate-transition-map.yaml`.
+7. Verify the current state, transition, and expected destination are legal in the live contract.
+8. Execute the transition with an idempotency key.
+9. Read back the task and verify the observed state equals the expected state.
+10. Record task ID, prior state, transition, expected state, observed state, and event/idempotency evidence.
+11. Treat a missing, illegal, failed, or unverifiable transition as a failed gate DoD; do not report the gate complete.
+12. Record branch, PR, validation outcome, and final state as they become available.
+13. Never treat task creation, assignment, or state as approval for repository writes, merge, deployment, credentials, or production data.
 
 ## Connector failure and retry rules
 
@@ -111,6 +117,19 @@ For transport errors, unsupported parameter forms, timeouts, and capability mism
 Examples include verifying `main` still equals the locked SHA before retrying branch creation from `main`, or using an approved API connector after the preferred GitHub connector is unavailable or lacks the capability.
 
 Do not use fallback after governance denial, missing approval, protected-branch denial, scope mismatch, stale base SHA, or credential failure. API fallback is a transport fallback, never a governance fallback.
+
+## Mandatory post-gate transition DoD
+
+A gate that produces a lifecycle outcome is complete only when all of the following are true:
+
+- gate artifacts and validation evidence are complete;
+- the mapped transition exists in `core/task-lifecycle/gate-transition-map.yaml`;
+- the live DS MCP contract permits the transition from the observed current state;
+- the transition call succeeds idempotently;
+- task read-back equals the mapped expected state;
+- transition evidence is included in the gate report.
+
+Failure to transition is not a reporting-only warning. It fails the gate and requires repair or an explicit blocked state.
 
 ## Transition to later gates
 
