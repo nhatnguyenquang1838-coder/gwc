@@ -13,6 +13,23 @@ This file governs every agent operating in this repository.
 7. Agent-specific instructions under `agents/`
 8. User request, provided it does not weaken higher authority
 
+## Agent-specific routing
+
+The shared boot, execution modes, gate lifecycle, connector-call enforcement,
+and authority boundaries in this file apply to every agent. Agent-specific
+instructions add runtime behavior; they do not replace or duplicate this file.
+
+- ChatGPT-style agents must also read
+  `agents/chatgpt-agent/agent-instructions.md`.
+- Other agents must read their applicable instructions and capability
+  declaration under `agents/`.
+- Select execution mode from verified capabilities, not agent product, name, or
+  conversation surface. A ChatGPT-style agent with a trusted checkout, shell,
+  filesystem, Git, isolated worktree support, and validator runner uses
+  `local_agent`; without those capabilities it uses `chat_connector_only`.
+- Connector availability determines the verified connector route. It does not
+  change execution mode when a trusted local checkout is already available.
+
 ## Mandatory GWC boot
 
 This boot is mandatory for every coding, repository, Pull Request, deployment,
