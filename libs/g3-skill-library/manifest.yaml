@@ -1,0 +1,54 @@
+schema_version: '1.0'
+library_id: gwc-g3-offline-skills
+library_version: 0.1.0
+compatible_gate: G3_PR
+source_mode: OFFLINE_PINNED
+context7:
+  library_id: /obra/superpowers
+  query_first: true
+  required_skill_ids:
+  - requesting-code-review
+  - verification-before-completion
+  - receiving-code-review
+  - finishing-development-branch-pr-only
+fallback_policy:
+  mode: bundle-atomic
+  prohibit_mixed_sources: true
+  verify_sha256: true
+  fail_closed_code: G3_SKILL_SOURCE_BLOCKED
+authority:
+  prohibited_actions:
+  - merge
+  - auto_merge
+  - ready_for_review
+  - deploy
+  - release
+  - production_configuration
+  - credential_operation
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+skills:
+- id: dispatching-parallel-review
+  path: libs/g3-skill-library/skills/dispatching-parallel-review.md
+  required: false
+  sha256: sha256:0aeed86990be0ec88b50cbb1b358fe1abf8e7b9d0d6159bd7c0db282df977121
+- id: finishing-development-branch-pr-only
+  path: libs/g3-skill-library/skills/finishing-development-branch-pr-only.md
+  required: true
+  sha256: sha256:13319927800bfe418d4a439d596f80586cd777d7f81e7f3d4e863c092dc18cc1
+- id: receiving-code-review
+  path: libs/g3-skill-library/skills/receiving-code-review.md
+  required: true
+  sha256: sha256:b942aad1e0167af8f29aacd1442efec01a185e2aadfb653dbcac6d6d952a34ee
+- id: requesting-code-review
+  path: libs/g3-skill-library/skills/requesting-code-review.md
+  required: true
+  sha256: sha256:38079a9a2343bdba4395a98af628c30fe3f9cd98949dfa238d32a4db35bc6dd7
+- id: verification-before-completion
+  path: libs/g3-skill-library/skills/verification-before-completion.md
+  required: true
+  sha256: sha256:c0324c31dc8c7fd1bd6eedab7415d2aaa5ce521f4499dec9c9254e36cca1ad4f

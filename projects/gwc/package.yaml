@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: 1.12.0
+package_version: "1.13.0"
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -62,6 +62,42 @@ instructions:
      path: skills/gwc-g1/SKILL.md
      target: .governance/skills/gwc-g1/SKILL.md
      required: true
+   - id: gwc-g3-agent-skill
+     path: skills/gwc-g3/SKILL.md
+     target: .governance/skills/gwc-g3/SKILL.md
+     required: true
+   - id: g3-offline-skill-library-readme
+     path: libs/g3-skill-library/README.md
+     target: .governance/libs/g3-skill-library/README.md
+     required: true
+   - id: g3-offline-skill-library-notice
+     path: libs/g3-skill-library/NOTICE.md
+     target: .governance/libs/g3-skill-library/NOTICE.md
+     required: true
+   - id: g3-offline-skill-library-manifest
+     path: libs/g3-skill-library/manifest.yaml
+     target: .governance/libs/g3-skill-library/manifest.yaml
+     required: true
+   - id: g3-offline-requesting-code-review
+     path: libs/g3-skill-library/skills/requesting-code-review.md
+     target: .governance/libs/g3-skill-library/skills/requesting-code-review.md
+     required: true
+   - id: g3-offline-verification-before-completion
+     path: libs/g3-skill-library/skills/verification-before-completion.md
+     target: .governance/libs/g3-skill-library/skills/verification-before-completion.md
+     required: true
+   - id: g3-offline-receiving-code-review
+     path: libs/g3-skill-library/skills/receiving-code-review.md
+     target: .governance/libs/g3-skill-library/skills/receiving-code-review.md
+     required: true
+   - id: g3-offline-finishing-development-branch-pr-only
+     path: libs/g3-skill-library/skills/finishing-development-branch-pr-only.md
+     target: .governance/libs/g3-skill-library/skills/finishing-development-branch-pr-only.md
+     required: true
+   - id: g3-offline-dispatching-parallel-review
+     path: libs/g3-skill-library/skills/dispatching-parallel-review.md
+     target: .governance/libs/g3-skill-library/skills/dispatching-parallel-review.md
+     required: false
    - id: g01-runtime-input-schema
      path: schemas/g01-runtime-input.schema.json
      target: .governance/schemas/g01-runtime-input.schema.json
