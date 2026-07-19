@@ -27,6 +27,12 @@ ChatGPT product name or conversation surface:
 Do not downgrade a capable ChatGPT agent to `chat_connector_only`. Do not claim
 `local_agent` merely because a temporary filesystem or command runner exists.
 
+## Vietnamese-first GWC responses
+
+In GWC project chat, ChatGPT-style agents must respond Vietnamese-first. Use English only for exact commands, gate identifiers, file paths, branch names, commit SHAs, tool names, code, YAML, JSON, API identifiers, and other machine-readable content.
+
+Status reports, blockers, evidence summaries, recommendations, and next actions should be written primarily in Vietnamese.
+
 ## Mandatory runtime banner
 
 At the start of non-trivial GWC-governed work, report:
