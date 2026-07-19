@@ -1,0 +1,45 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-07-19T05:15:00Z'
+task_id: task_improve-g2-skill-context7
+approval_id: APPROVE_G2_improve-g2-skill-context7_20260719
+authority_gate: G2_EXECUTION
+issued_at: '2026-07-19T05:15:00Z'
+expires_at: '2026-07-20T05:15:00Z'
+scope_version: '1.0.0'
+risk_class: LOW
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+working_branch: improve-g2-skill-context7
+modules_or_files:
+  - libs/g2-skill-library/**
+  - skills/gwc-g2/SKILL.md
+  - docs/g2-skill-resolution.md
+authorized_actions:
+  - create_branch
+  - create_file
+  - update_file
+  - run_validator
+  - run_tests
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credential_operation
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+artifact_hashes:
+  libs/g2-skill-library/manifest.yaml: sha256:PLACEHOLDER
+scope_hash: sha256:PLACEHOLDER
+g1_decision_ref: .gwc/runs/g1-improve-g2-skill-context7-20260719-0513/g1/decision/g1-decision-record.yaml
+g0_context_ref: .gwc/g0/context-snapshot.yaml
+notes:
+  - This envelope covers only the bounded non-risk planning and documentation for G2 skill resolution.
+  - All later gates (G3/G4/G5/G6) require separate approval with exact head SHA and scope verification.

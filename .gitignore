@@ -22,3 +22,4 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+agents/coding-agent/.bbai_test

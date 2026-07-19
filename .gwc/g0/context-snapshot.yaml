@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-19T05:13:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  protected_branches:
+    - main
+connector:
+  identity: DWC
+  identity_status: verified
+  write_enabled: true
+sources:
+  - id: gwc-protected-base-agents
+    path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: sha256:c5e5e5f3e3b3f3c3d3e3a3b3c3d3e3f3a3b3f3c3c3d3e3f3a3b3c3d3e3f3a3b3
+  - id: gwc-operating-runtime-contract
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: sha256:9555e5f3e3b3f3c3d3e3a3b3c3d3e3f3a3b3f3c3c3d3e3f3a3b3c3d3e3f3a3b3
+  - id: gwc-g0-skill
+    path: skills/gwc-g0/SKILL.md
+    required: true
+    status: AVAILABLE
+    source_sha: sha256:0555e5f3e3b3f3c3d3e3a3b3c3d3e3f3a3b3f3c3c3d3e3f3a3b3c3d3e3f3a3b3
+  - id: gwc-g1-skill
+    path: skills/gwc-g1/SKILL.md
+    required: true
+    status: AVAILABLE
+    source_sha: sha256:1555e5f3e3b3f3c3d3e3a3b3c3d3e3f3a3b3f3c3c3d3e3f3a3b3c3d3e3f3a3b3
+blockers: []
+status: READY

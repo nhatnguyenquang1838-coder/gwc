@@ -1,0 +1,57 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-19T04:50:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_implement-g0-g1-skill-library
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Extend existing G0/G1 skills with Context7-first block
+    description: Add a Context7-first resolution block to `skills/gwc-g0/SKILL.md` and `skills/gwc-g1/SKILL.md`, and create a new offline skill library under `libs/g0-g1-skill-library/` with manifest, notice, readme, and four skill markdown files.
+    benefits:
+      - Reuses existing G0/G1 skill infrastructure
+      - Minimal schema/tool changes
+      - Lower blast radius
+      - Aligns with G3 pattern
+    tradeoffs:
+      - Requires maintenance of offline skill library
+      - Adds package distribution entries
+    risks:
+      - Offline skill library could diverge from Context7 live source
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: g0-context-loading
+        description: Context loading and source resolution for G0
+        is_required: true
+      - skill_id: g1-intake-options-preflight
+        description: Intake, options, and preflight for G1
+        is_required: true
+      - skill_id: g1-decision-record
+        description: Decision capture for G1
+        is_required: true
+      - skill_id: g0-g1-approval-envelope
+        description: Approval envelope preparation
+        is_required: true
+    acceptance_criteria_coverage:
+      - AC-1
+      - AC-2
+      - AC-3
+  - id: OPT-2
+    title: Documentation-only guidance
+    description: Document Context7-first intent in G0/G1 skills without creating offline skill files or package entries.
+    benefits:
+      - Minimal diff
+    tradeoffs:
+      - No deterministic offline fallback
+      - Inconsistent with G3 pattern
+    risks:
+      - Agents may ignore guidance
+      - No enforceable offline path
+    constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: Reuses existing mechanisms, maintains bundle-atomic fallback discipline, and matches the proven G3 pattern.
+decision_required: true
+status: READY

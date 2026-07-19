@@ -1,0 +1,59 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-19T05:14:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_improve-g2-skill-context7
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: DW
+  decided_at: '2026-07-19T05:14:00Z'
+  source: 'chat: use Context7 first for React Vite, Supabase, Vercel skills in G2'
+  explicit: true
+rationale: Extending G2 with Context7-first skill resolution maintains consistency with G0/G1/G3, provides deterministic offline fallback, and enables modern stack skill discovery.
+rejected_option_ids:
+  - OPT-2
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+scope_hash: sha256:PLACEHOLDER
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Design G2 skill resolution mechanism and offline fallback structure
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Query Context7 for React Vite, Supabase, Vercel skill patterns
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: Document findings and produce G2 execution envelope
+      dependencies: [SUB-TASK-1, SUB-TASK-2]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: codebase-documentation
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: context7-query
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-3
+      skill_id: validation
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+  summary: Design G2 skill resolution, query Context7 for modern stack skills, and produce validated G2 handoff artifacts.

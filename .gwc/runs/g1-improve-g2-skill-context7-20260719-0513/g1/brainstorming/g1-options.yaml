@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-19T05:14:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_improve-g2-skill-context7
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Extend G2 with Context7-first skill resolution
+    description: Add Context7-first skill resolution mechanism to G2 similar to G0/G1/G3, with offline fallback to a new G2 skill library.
+    benefits:
+      - Consistent with existing G0/G1/G3 pattern
+      - Deterministic offline fallback
+      - Modern stack skill access (React Vite, Supabase, Vercel)
+    tradeoffs:
+      - Requires new skill library maintenance
+      - Adds package distribution entries
+    risks:
+      - Offline library could diverge from Context7 live source
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: g2-context-loading
+        description: Context loading and source resolution for G2
+        is_required: true
+      - skill_id: g2-skill-query
+        description: Query Context7 for React Vite, Supabase, Vercel patterns
+        is_required: true
+    acceptance_criteria_coverage:
+      - AC-1
+      - AC-2
+      - AC-3
+  - id: OPT-2
+    title: Documentation-only guidance for G2
+    description: Document Context7-first intent for G2 without creating offline skill files or package entries.
+    benefits:
+      - Minimal diff
+    tradeoffs:
+      - No deterministic offline fallback
+      - Inconsistent with G0/G1/G3 pattern
+    risks:
+      - Agents may ignore guidance
+      - No enforceable offline path
+    constraint_fit: PARTIAL
+    skills_distribution:
+      - skill_id: technical_writing
+        description: Document the G2 skill resolution approach
+        is_required: true
+recommended_option_id: OPT-1
+recommendation_rationale: Reuses existing mechanisms, maintains bundle-atomic fallback discipline, and aligns with the proven G0/G1/G3 pattern.
+decision_required: true
+status: READY

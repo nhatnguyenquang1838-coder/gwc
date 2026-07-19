@@ -1,0 +1,59 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-19T04:51:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_implement-g0-g1-skill-library
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: DW
+  decided_at: '2026-07-19T04:51:00Z'
+  source: 'chat: implement automated G0/G1 skill library'
+  explicit: true
+rationale: Extending existing G0/G1 skills with the G3-equivalent Context7-first mechanism and a pinned offline fallback provides deterministic behavior, aligns with established patterns, and keeps gate semantics unchanged.
+rejected_option_ids:
+  - OPT-2
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+scope_hash: sha256:d96a4a9e1e85a4d44c8e5373c5df3a8f3b3a3b3f3c3d3e3f3a3b3c3d3e3f3a3b3
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Create offline skill library files and manifest
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Update G0/G1 skills with Context7-first resolution block
+      dependencies: []
+    - sub_task_id: SUB-TASK-3
+      description: Add contract tests and validate G0/G1 lifecycle
+      dependencies: [SUB-TASK-1, SUB-TASK-2]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: codebase-documentation
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: codebase-documentation
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: validation
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+  summary: Draft new offline skill library files, update G0/G1 skill sources, and validate through existing test suites.

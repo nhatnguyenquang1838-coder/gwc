@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-19T04:48:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_implement-g0-g1-skill-library
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Add a deterministic skill-library compatibility mechanism for G0 and G1 gates.
+  why_now: G3 already has Context7-first skill resolution with offline fallback; G0/G1 need the same capability.
+desired_outcome: G0 and G1 use Context7 first, fall back to `libs/g0-g1-skill-library/`, and maintain bundle-atomic source discipline without changing gate semantics.
+stakeholders:
+  - GWC repository maintainers
+  - Chat connector agents
+  - Local DWC agents
+scope:
+  in_scope:
+    - New `libs/g0-g1-skill-library/` with manifest, notice, readme, and four skill markdown files
+    - Updated `skills/gwc-g0/SKILL.md` and `skills/gwc-g1/SKILL.md` with Context7-first resolution block
+    - Tests for offline skill library hashes and skill contract markers
+    - GWC project package entries distributing the new library
+    - Changelog entry
+  non_goals:
+    - Modify G0/G1 schemas
+    - Change G0/G1 validators
+    - Add later-gate authority to G0/G1
+constraints:
+  - G0/G1 remain read-only and planning-only
+  - Offline cards do not grant execution, merge, deployment, release, production configuration, credential, migration, or production-data authority
+  - One run must use either CONTEXT7_LIVE or OFFLINE_PINNED; never mixed
+assumptions:
+  - Context7 MCP server is reachable when live mode is selected
+  - Offline manifest SHA-256 hashes are computed from committed files
+risks:
+  - Context7 unavailability would block skill discovery without offline fallback
+acceptance_criteria:
+  - AC-1: `libs/g0-g1-skill-library/manifest.yaml` exists with real SHA-256 hashes and bundle-atomic fallback policy.
+  - AC-2: `skills/gwc-g0/SKILL.md` and `skills/gwc-g1/SKILL.md` contain explicit Context7-first ordering, retry policy, and OFFLINE_PINNED fallback.
+  - AC-3: All G0/G1 skill library tests pass.
+unresolved_questions: []
+status: READY

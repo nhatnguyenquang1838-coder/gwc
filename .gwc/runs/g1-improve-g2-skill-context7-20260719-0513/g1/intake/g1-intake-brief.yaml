@@ -1,0 +1,41 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-19T05:13:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_improve-g2-skill-context7
+  base_sha: 6423b9bc0b0a4997a16dedbc7785e4ffc976fd1b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Improve G2 execution by integrating Context7 skill resolution for React Vite, Supabase, and Vercel patterns.
+  why_now: G2 needs modern stack best practices and deterministic skill access for implementation quality.
+desired_outcome: G2 agents can query Context7 for React Vite, Supabase, and Vercel skill patterns, with offline fallback if needed.
+stakeholders:
+  - G2 implementation agents
+  - project maintainers
+scope:
+  in_scope:
+    - Extend G2 workflow to use Context7-first skill resolution
+    - Identify skill patterns for React Vite, Supabase, Vercel
+    - Maintain bundle-atomic fallback discipline
+    - Produce intake, options, preflight, decision, and G2 handoff
+  non_goals:
+    - Production deployment
+    - Merge authority
+    - Schema changes
+constraints:
+  - G0/G1/G2 gate semantics remain unchanged
+  - Offline cards do not grant execution, merge, deployment, release, production configuration, credential, migration, or production-data authority
+  - One run must use either CONTEXT7_LIVE or OFFLINE_PINNED; never mixed
+assumptions:
+  - Context7 MCP server is reachable when live mode is selected
+  - Offline fallback library entries exist or can be created for G2 skills
+risks:
+  - Context7 unavailability could block skill discovery without offline fallback
+acceptance_criteria:
+  - AC-1: G2 skill resolution mechanism documented with Context7-first ordering and offline fallback.
+  - AC-2: React Vite, Supabase, and Vercel skill pattern queries identified or documented.
+  - AC-3: G0/G1 artifacts and G2 execution envelope produced and validated.
+unresolved_questions: []
+status: READY
