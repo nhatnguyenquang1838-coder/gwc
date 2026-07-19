@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/connector-trace.schema.json",
+  "title": "Connector Trace Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ok", "trace", "error", "data"],
+  "properties": {
+    "ok": {"type": "boolean"},
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trace_id", "operation", "failure_stage", "connector_received", "policy_checked", "upstream_attempted", "upstream_provider", "provider_request_id", "github_request_id", "http_status", "started_at", "completed_at", "duration_ms"],
+      "properties": {
+        "trace_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+        "operation": {"type": "string", "minLength": 1},
+        "failure_stage": {"type": ["string", "null"], "enum": [null, "platform_schema_validation", "platform_runtime", "connector_transport", "dw1_input_validation", "dw1_policy", "github_api", "response_serialization", "unknown"]},
+        "connector_received": {"type": "boolean"},
+        "policy_checked": {"type": "boolean"},
+        "upstream_attempted": {"type": "boolean"},
+        "upstream_provider": {"type": ["string", "null"], "enum": [null, "github"]},
+        "provider_request_id": {"type": ["string", "null"]},
+        "github_request_id": {"type": ["string", "null"]},
+        "http_status": {"type": ["integer", "null"], "minimum": 100, "maximum": 599},
+        "started_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "duration_ms": {"type": "integer", "minimum": 0}
+      }
+    },
+    "error": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "message", "retryable", "details"],
+          "properties": {
+            "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+            "message": {"type": "string", "minLength": 1},
+            "retryable": {"type": "boolean"},
+            "details": {"type": ["object", "null"]}
+          }
+        }
+      ]
+    },
+    "data": {"type": ["object", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"ok": {"const": true}}},
+      "then": {"properties": {"error": {"type": "null"}, "trace": {"properties": {"failure_stage": {"type": "null"}}}}}
+    },
+    {
+      "if": {"properties": {"trace": {"properties": {"failure_stage": {"const": "dw1_policy"}}}}},
+      "then": {"properties": {"trace": {"properties": {"connector_received": {"const": true}, "policy_checked": {"const": true}, "upstream_attempted": {"const": false}, "upstream_provider": {"type": "null"}, "http_status": {"type": "null"}}}}}
+    },
+    {
+      "if": {"properties": {"trace": {"properties": {"failure_stage": {"const": "github_api"}}}}},
+      "then": {"properties": {"trace": {"properties": {"upstream_attempted": {"const": true}, "upstream_provider": {"const": "github"}, "http_status": {"type": "integer"}}}}}
+    }
+  ]
+}
