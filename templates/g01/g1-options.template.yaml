@@ -21,6 +21,13 @@ options:
   risks:
   - Schema evolution must remain backward compatible
   constraint_fit: FIT
+  skills_distribution:
+  - skill_id: schema_design
+    description: Design machine-readable JSON schemas and YAML templates.
+    is_required: true
+  - skill_id: python_dev
+    description: Implement the deterministic validator in Python.
+    is_required: true
 - id: OPT-2
   title: Documentation-only lifecycle
   description: Document G0/G1 without machine-readable enforcement.
@@ -31,7 +38,12 @@ options:
   risks:
   - Agents may interpret lifecycle inconsistently
   constraint_fit: PARTIAL
+  skills_distribution:
+  - skill_id: technical_writing
+    description: Document the lifecycle and requirements in Markdown.
+    is_required: true
 recommended_option_id: OPT-1
 recommendation_rationale: It provides deterministic enforcement with existing dependencies.
 decision_required: true
 status: READY
+<EOF>

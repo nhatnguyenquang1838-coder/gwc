@@ -2,7 +2,7 @@
 name: gwc-g0
 description: Use when an agent must activate or reconstruct GWC project context, verify repository and policy evidence, resolve connector and DS Admin task facts, or refresh stale context before G1, G2, or repository work.
 when_to_use: Trigger for requests such as activate project, load project context, start G0, refresh context, verify repository, inspect governance before work, continue an existing PR, or prepare a G1 run in a GWC-governed project.
-version: 0.1.0
+version: 0.2.0
 project: gwc
 owner: GWC
 ---
@@ -15,10 +15,11 @@ Use this skill to establish a verified, current context boundary before G1 disco
 
 This is an agent-readable, offline-compatible instruction wrapper around the existing repository-native G0 contract. It does not replace the schema, runtime input, generator, validator, project profile, or protected-base governance.
 
-G0 answers one question:
+G0 answers two questions:
 
 ```text
-Do we know exactly which project, repository, policy set, source evidence, connector, task context, constraints, and authority boundary apply to this request right now?
+1. Do we know exactly which project, repository, policy set, source evidence, connector, task context, constraints, and authority boundary apply to this request right now?
+2. What is the contextual history, downstream impact, and stakeholder reach of this request?
 ```
 
 ## Authority boundary
@@ -273,6 +274,20 @@ The handoff includes:
 
 G1 must not reinterpret `BLOCKED`, stale, or unverified G0 evidence as `READY`.
 
+## Action 7.5 — Contextual Discovery
+
+Perform a systematic discovery of the following and include in the G0 handoff summary:
+
+- Historical Context: Search for related PRs, previous tasks, or legacy documentation that may influence the current request.
+- Downstream Impact: Identify repositories, services, or data schemas that may be impacted by the proposed changes.
+- Stakeholder Reach: Identify the personas and teams affected by the changes (e.g., end-users, internal support, infrastructure teams).
+
+Output markers:
+
+```text
+G0_CONTEXTUAL_DISCOVERY_COMPLETE | G0_CONTEXTUAL_DISCOVERY_BLOCKED
+```
+
 ## Offline command path
 
 After observed facts are assembled in a schema-valid runtime input:
@@ -343,3 +358,4 @@ G0_CONTEXT_BLOCKED
 G1_NOT_ELIGIBLE_TO_START
 NO_EXECUTION_AUTHORITY_GRANTED
 ```
+<EOF>

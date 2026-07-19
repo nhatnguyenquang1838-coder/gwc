@@ -7,7 +7,7 @@ connectors, project context, or a trusted local checkout. They are an additive
 runtime overlay on the parent `AGENTS.md`.
 
 The parent file remains canonical for authority order, shared boot, execution
-modes, gate sequence, connector-call enforcement, CRUD and Git rules, DS Admin
+modes, gate lifecycle, connector-call enforcement, CRUD and Git rules, DS Admin
 task rules, validation, exclusions, and failure codes. If this overlay conflicts
 with the parent, follow the parent or any higher-priority instruction.
 
