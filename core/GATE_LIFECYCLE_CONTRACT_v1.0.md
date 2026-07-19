@@ -118,7 +118,7 @@ The review must:
 
 A reviewer that modifies the delivery loses reviewer independence. Another read-only review is then required for the new head SHA.
 
-**Exit:** `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and exact head SHA, records validation and CI evidence, contains a non-stale review decision, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions. Upon exit, the agent must proactively generate the G4 merge approval request and present the approval command to the user.
+**Exit:** `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and exact head SHA, records validation and CI evidence, contains a non-stale review decision, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions. Upon exit, the agent may mark the Draft PR ready for review when a supported connector action exists, the latest head SHA is still current, required CI is green, no unresolved blocker exists, and no scope drift is detected. The agent must then proactively generate the G4 merge approval request and present the approval command to the user.
 
 G3 may report `PASS` only when:
 
@@ -159,15 +159,15 @@ If CI fails, the agent may diagnose and repair only repository-fixable failures 
 
 **Permitted actions:** merge the approved PR using the authorized method.
 
-**Draft PR precheck:** a Draft Pull Request is not eligible for G4 merge execution. If the PR is still draft, the agent must stop before issuing a merge-ready G4 approval request or before invoking a merge connector. If no ready-for-review connector action exists, the agent must report a manual ready-for-review blocker.
+**Draft PR precheck:** a Draft Pull Request is not eligible for G4 merge execution. Draft PR to ready-for-review transition belongs to G3 completion, not G4 authority. If the PR is still draft after G3 `PASS` and a ready-for-review connector is available, the agent may mark it ready before generating the G4 request. If no ready-for-review connector action exists, the agent must report a manual ready-for-review blocker.
 
-**Exit:** merge commit or merged head evidence is recorded. Upon exit, the agent must proactively generate the G5 status/deployment verification request and present the approval command to the user.
+**Exit:** merge commit or merged head evidence is recorded. Upon exit, the agent must automatically perform read-only `G5_STATUS_VERIFY` for the merge commit. A G5 approval command is required only for manual deploy, redeploy, release, publish, or runtime reload.
 
 ### G5_DEPLOY
 
-**Entry:** G4 `PASS` and explicit human G5 approval for the exact release, merge commit, or runtime status scope.
+**Entry:** G4 `PASS`. Read-only `G5_STATUS_VERIFY` starts automatically for the exact merge commit. Explicit human G5 approval is required only when the requested G5 action changes an environment or runtime.
 
-**Default permitted actions:** verify post-merge GitHub Actions, deployment checks such as Vercel checks integrated into GitHub Actions, deployment status, and runtime/tool-surface status for the approved commit.
+**Default permitted actions:** verify post-merge GitHub Actions, deployment checks such as Vercel checks integrated into GitHub Actions, deployment status, and runtime/tool-surface status for the approved commit. These read-only checks do not require human approval.
 
 **Manual deploy actions:** manually deploying, redeploying, publishing, releasing, or reloading runtime is permitted only when that action is explicitly listed in the G5 approval scope and the active project profile requires or allows manual deployment. When deployment is already automated by CI/CD, G5 is status verification only.
 
@@ -183,7 +183,7 @@ If CI fails, the agent may diagnose and repair only repository-fixable failures 
 
 ## Proactive Gate Transition
 
-Every gate exit requires the agent to proactively generate the entry artifact for the next gate and present the corresponding approval command to the user, except that G6 is generated only when production data, production configuration, migration, credentials, or secrets are actually in scope. This ensures no gate ends in a silent state and the user always has a clear, actionable next step.
+Every gate exit requires the agent to proactively generate the next needed artifact or action. Approval commands are required only at human-authority boundaries. Read-only `G5_STATUS_VERIFY` after G4 merge is automatic, and G6 is generated only when production data, production configuration, migration, credentials, or secrets are actually in scope. This ensures no gate ends in a silent state and the user always has a clear, actionable next step.
 
 The agent must:
 
@@ -203,8 +203,9 @@ The user retains sole authority to grant or deny the next gate. The agent's proa
 | Create/update files on guarded branch | G2_EXECUTION |
 | Push guarded branch | G2_EXECUTION |
 | Create/update Draft PR | G3_PR |
+| Mark Draft PR ready for review after G3 `PASS` | G3_PR |
 | Merge PR | G4_MERGE |
-| Verify post-merge CI, deployment checks, Vercel status, or runtime/tool surface | G5_DEPLOY |
+| Verify post-merge CI, deployment checks, Vercel status, or runtime/tool surface | G5_DEPLOY, automatic when read-only |
 | Manually deploy, redeploy, publish, release, or reload runtime | G5_DEPLOY with explicit manual action scope |
 | Read/write production data, production config, migration, credential rotation, or secret operation | G6_PRODUCTION_DATA |
 
