@@ -145,6 +145,12 @@ def generate_artifacts(
             "grants": [],
             "excluded": AUTHORITY_EXCLUSIONS,
         },
+        "subagent_distribution_plan": {
+            "task_decomposition": [],
+            "agent_allocation": [],
+            "execution_order": [],
+            "summary": "No subagent distribution required for this G1 decision capture.",
+        },
     }
     outcome = "PASS" if status == "ACCEPTED" and gate_outcome == "PASS" else gate_outcome
     return options, decision, outcome, semantic_issues
