@@ -141,10 +141,16 @@ and validate them before treating the request as blocked.
 
 ### G3_PR and later
 
-Follow the parent gate contract. G3 permits a Draft PR only. G4 merge, G5
-status/deployment verification, and G6 production authority remain separate
-exact human approvals. Before G4 merge execution, verify that the PR is no
-longer Draft and is ready for review. If the connector cannot mark it ready,
+Follow the parent gate contract. G3 permits a Draft PR and may complete the
+metadata transition from Draft to Ready for review after G3 `PASS` when a
+connector action exists and the latest head SHA, CI, review closure, and scope
+checks are valid. This transition is not merge approval.
+
+G4 merge remains a separate exact human approval. Read-only `G5_STATUS_VERIFY`
+after G4 merge is automatic and does not require a human token. Manual deploy,
+redeploy, release, publish, runtime reload, and G6 production authority remain
+separate exact human approvals. Before G4 merge execution, verify that the PR is
+no longer Draft and is ready for review. If the connector cannot mark it ready,
 report a ready-for-review blocker instead of invoking merge.
 
 ## ChatGPT Scheduled Tasks for CI continuation
@@ -187,8 +193,8 @@ Read protected-base runbook
 | G0 READY | G1 intake, preflight, options, and decision inputs/artifacts |
 | G1 PASS | G2 execution envelope plus approval request |
 | G2 PASS | G3 delivery record bound to exact branch head SHA |
-| G3 PASS | G4 merge approval request bound to exact PR/head SHA and PR-ready status |
-| G4 PASS | G5 deployment approval request for status/deployment verification bound to exact commit/environment/checks |
+| G3 PASS | mark Draft PR ready for review when supported, then G4 merge approval request bound to exact PR/head SHA and PR-ready status |
+| G4 PASS | automatic read-only G5 status verification bound to exact commit/environment/checks; approval only for manual G5 action |
 | G5 PASS | G6 production approval request only when production operation scope exists; otherwise record `not_applicable` |
 
 Use the existing canonical mechanism first:
@@ -232,8 +238,9 @@ Actual write outside approved scope -> stop before commit or PR.
 For G5, do not infer a manual deploy/reload from the gate name. If deployment is
 integrated into GitHub Actions or Vercel checks, G5 is status verification only:
 inspect the relevant post-merge workflow, deployment check, runtime status, or
-tool surface for the exact approved commit. Manual deploy, redeploy, release,
-or runtime reload requires explicit G5 manual-action scope.
+tool surface for the exact approved commit. Read-only `G5_STATUS_VERIFY` is
+automatic after G4 merge. Manual deploy, redeploy, release, publish, or runtime
+reload requires explicit G5 manual-action scope.
 
 Refresh the active source, gate, task, repository, branch, scope, risk, and
 authority before every write-capable action and whenever the user says to
