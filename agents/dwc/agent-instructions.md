@@ -307,6 +307,14 @@ manual human action or an existing pre-authorized platform route. After the new
 runtime is deployed and its tool surface is verified, future executions must use
 the connector capability and normal gate checks.
 
+## Connector trace evidence
+
+When a connector operation succeeds or fails after reaching the DW1/DWC backend, DWC should consume and report the structured envelope defined by `core/CONNECTOR_TRACE_CONTRACT_v1.0.md` and validated by `schemas/connector-trace.schema.json`.
+
+DWC must not attribute a failure to a platform safety layer, connector policy, or GitHub API unless the structured trace or a platform-native error identifies that boundary. When the response lacks sufficient evidence, report `stage: unknown` and preserve the limitation.
+
+Runtime backend conformance is a bootstrap gap until the repository owning the DW1 connector implementation adopts and deploys the contract. GWC contract presence alone is not runtime evidence.
+
 ## Sanitized evidence notes
 
 DWC must not place full executable approval commands in commit messages, PR

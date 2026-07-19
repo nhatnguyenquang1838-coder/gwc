@@ -1,0 +1,29 @@
+schema_version: '1.0'
+artifact_type: g0-hotfix-intake
+generated_at: '2026-07-19T11:20:00Z'
+mode: rescue
+task_description: Implement additive structured tracing for DW1 GitHub connector operations, including failure-stage attribution, request correlation IDs, normalized errors, and GWC contract tests.
+activation_phrase: ACTIVATE RESCUE 9ac9921974c56eee
+risk_assessment: medium
+affected_files:
+  - core/CONNECTOR_TRACE_CONTRACT_v1.0.md
+  - schemas/connector-trace.schema.json
+  - tests/test_connector_trace_contract.py
+  - agents/dwc/capabilities.yaml
+  - agents/dwc/agent-instructions.md
+scope_hash_prefix: 9ac9921974c56eee
+approval_recorded: true
+human_author: DW
+assumptions:
+  - Actual DW1 backend source is not present in the GWC repository tree.
+  - This rescue delivery defines and validates the governance contract; backend adoption requires its owning repository.
+shortcuts:
+  - Standard G1 is bypassed under RESCUE mode.
+  - Full repository validation is deferred to CI because the connector-only runtime has no verified checkout.
+prohibited_actions_confirmed_absent:
+  - merge
+  - deploy
+  - production_data
+  - production_configuration
+  - credentials
+  - secrets
