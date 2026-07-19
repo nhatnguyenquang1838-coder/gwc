@@ -420,6 +420,23 @@ Recommended mapping:
 | Blocker found | `blocked` |
 | Irrecoverable failure | `failed` |
 
+## G3 async CI continuation
+
+After creating or updating a Draft PR, the agent must not stop silently when CI is still running. It must keep the DS Admin task in `validation_running` and choose the strongest available continuation mechanism for the next CI check:
+
+1. webhook or event callback when available;
+2. local sleep or poll loop when running as a capable local agent;
+3. ChatGPT Scheduled Tasks when running in ChatGPT and the platform scheduler is available;
+4. manual checkpoint only when no async mechanism is available.
+
+The default next-check interval is 3 minutes when the selected environment supports that cadence. If the platform supports only a slower cadence, use the supported cadence and report the limitation.
+
+For ChatGPT Scheduled Tasks, the agent must verify that the task has an actual next run. If the task UI or scheduler state shows no next run, including `Chưa lên lịch`, the agent must treat async continuation as not scheduled and fall back to another legal mechanism or a manual checkpoint.
+
+A CI wait task may check and report CI state only. It must not modify repository content, merge, deploy, reload runtime, release, touch production configuration, handle credentials, run migrations, or access production data unless a separate active approval covers that exact action.
+
+When CI fails, the agent may repair only repository-fixable failures inside the approved G2 scope. Any repair commit invalidates prior CI, review, and G4-readiness evidence; the next G4 approval request must bind to the latest head SHA after required CI is green.
+
 ## Approval command generation
 
 The agent must generate the exact approval command from current gate evidence.
