@@ -20,6 +20,23 @@ capabilities:
     - pull_request_context
     - ds_admin_tasks
     - integrity_artifacts
+  observability:
+    structured_connector_trace:
+      contract: core/CONNECTOR_TRACE_CONTRACT_v1.0.md
+      schema: schemas/connector-trace.schema.json
+      response_mode: additive
+      required_fields:
+        - trace_id
+        - operation
+        - failure_stage
+        - connector_received
+        - policy_checked
+        - upstream_attempted
+        - provider_request_id
+        - github_request_id
+        - http_status
+      secret_redaction_required: true
+      backend_implementation_required: true
   approval_policy:
     generated_artifact_refresh:
       risk: low
