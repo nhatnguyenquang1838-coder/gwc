@@ -164,7 +164,7 @@ Read protected-base runbook
 | G1 PASS | G2 execution envelope plus approval request |
 | G2 PASS | G3 delivery record bound to exact branch head SHA |
 | G3 PASS | G4 merge approval request bound to exact PR/head SHA and PR-ready status |
-| G4 PASS | G5 status/deployment verification request bound to exact commit/environment/checks |
+| G4 PASS | G5 deployment approval request for status/deployment verification bound to exact commit/environment/checks |
 | G5 PASS | G6 production approval request only when production operation scope exists; otherwise record `not_applicable` |
 
 Use the existing canonical mechanism first:
