@@ -26,6 +26,28 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("G5 is status/deployment verification.", dwc)
         self.assertIn("For G5, do not infer a manual deploy/reload from the gate name.", chatgpt)
         self.assertIn("G5 checks those workflow/deployment statuses", e2e)
+        self.assertIn("Read-only `G5_STATUS_VERIFY` starts automatically", gate_contract)
+        self.assertIn("Read-only `G5_STATUS_VERIFY` runs automatically after G4 merge", e2e)
+
+    def test_ready_for_review_is_g3_metadata_completion(self) -> None:
+        gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
+        agents = self.normalized_text("AGENTS.md")
+        dwc = self.normalized_text("agents/dwc/agent-instructions.md")
+        chatgpt = self.normalized_text("agents/chatgpt-agent/agent-instructions.md")
+        e2e = self.normalized_text("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
+
+        self.assertIn("Mark Draft PR ready for review after G3 `PASS`", gate_contract)
+        self.assertIn("github_mark_pr_ready_for_review", dwc)
+        self.assertIn("This transition is not merge approval", chatgpt)
+        self.assertIn("G3 review decision does not authorize merge", e2e)
+        self.assertIn("This ready-for-review transition is G3 metadata completion", agents)
+
+    def test_chatgpt_gwc_responses_are_vietnamese_first(self) -> None:
+        agents = self.normalized_text("AGENTS.md")
+        chatgpt = self.normalized_text("agents/chatgpt-agent/agent-instructions.md")
+
+        self.assertIn("ChatGPT-style agents operating in GWC project chat must respond Vietnamese-first", agents)
+        self.assertIn("Status reports, blockers, evidence summaries, recommendations, and next actions should be written primarily in Vietnamese", chatgpt)
 
     def test_g6_is_not_generated_without_production_operation_scope(self) -> None:
         gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
