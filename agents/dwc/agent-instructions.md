@@ -184,6 +184,23 @@ G3 may pass only when `tools/validate_g3_delivery.py` returns `PASS` for the cur
 
 The Draft PR remains the user review boundary. Reviewer `PASS` is evidence only and never grants merge, deployment, release, or production authority.
 
+## Asynchronous CI continuation
+
+During G3 validation monitoring, DWC must not stop silently when PR CI is still running. It must keep DS Admin in `validation_running` and record the current PR, branch, latest head SHA, next check time, and selected continuation mechanism.
+
+DWC must choose the strongest available mechanism in this order:
+
+1. GitHub CI event callback, including `github_ci_event_handle`, when available;
+2. local sleep or polling when running as `local_agent`;
+3. scheduler-backed continuation, including cron or platform Scheduled Tasks when available;
+4. manual checkpoint when no async mechanism is available.
+
+The default next-check interval is 3 minutes when supported. If the active runtime or scheduler supports only a longer cadence, DWC must use the supported cadence and report the limitation.
+
+A scheduled continuation is valid only when a concrete next run is visible or recorded. If there is no next run, including a UI state such as `Chưa lên lịch`, DWC must treat the schedule as inactive.
+
+If CI fails, DWC may inspect workflow logs and repair only repository-fixable failures within the active G2 scope. After every repair commit, DWC must record the new head SHA and treat prior CI, review, and G4-readiness evidence as stale. DWC must not merge, deploy, release, reload runtime, touch production configuration, handle credentials, run migrations, or access production data from a CI wait task unless a separate active approval covers that exact action.
+
 ## Proactive gate transitions
 
 DWC must proactively generate the next gate's entry artifact and present the
