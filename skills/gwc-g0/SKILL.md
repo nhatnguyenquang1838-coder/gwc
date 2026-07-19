@@ -102,6 +102,51 @@ Keep evidence provenance explicit:
 
 Never convert an inference, remembered value, screenshot, or template example into verified repository evidence.
 
+## Skill source resolution
+
+Use Context7 first with exact library ID:
+
+```text
+/obra/superpowers
+```
+
+Resolution order:
+
+```text
+1. Query Context7 for latest compatible context-loading patterns.
+2. Confirm the complete G0-compatible bundle is present.
+3. If Context7 is forbidden, unavailable, timeout, empty, incomplete, or incompatible, load libs/g0-g1-skill-library/.
+4. Verify every offline file against libs/g0-g1-skill-library/manifest.yaml.
+5. If neither source is valid, stop with G0_G1_SKILL_SOURCE_BLOCKED.
+```
+
+Context7 is attempted before reading offline skill contents. When the exact library ID is known, direct `query-docs` is acceptable.
+
+### Retry policy
+
+- forbidden or unavailable: fallback immediately.
+- timeout: retry once, then fallback.
+- empty_result, incomplete_bundle, or incompatible_bundle: retry once with deeper research when available, then fallback.
+- never exceed two live queries for one G0 run.
+
+### bundle-atomic rule
+
+A G0 run uses exactly one source mode:
+
+```text
+CONTEXT7_LIVE
+or
+OFFLINE_PINNED
+```
+
+Do not mix live and offline skill cards. Record `source_mix: NONE`.
+
+### Required compatible skills
+
+The bundle is complete only when it covers:
+
+- `g0-context-loading` (required)
+
 ## Action 1 — Resolve exactly one active project
 
 Resolve the project in this order:
