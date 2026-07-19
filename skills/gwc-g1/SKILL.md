@@ -21,6 +21,12 @@ Do we have a clear, evidence-backed, explicitly accepted problem, scope, option,
 
 This is an agent-readable, offline-compatible instruction wrapper around the existing repository-native G1 contract. It does not replace schemas, templates, lifecycle documentation, validators, generators, or protected-base governance.
 
+In `chat-only` mode, G1 is an interactive brainstorming and alignment
+conversation. It may ask focused questions and refine options without writing
+artifacts, creating a task, or requesting an approval token. Label the result
+`CHAT_ONLY_PREPARATION`; formal G1 artifacts, task trace, validation, and the
+G2 approval command begin only after an explicit user request to enter G2.
+
 ## Phase boundary
 
 ```mermaid

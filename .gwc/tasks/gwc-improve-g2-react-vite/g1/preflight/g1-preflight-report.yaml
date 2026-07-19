@@ -1,0 +1,55 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+generated_at: "2026-07-19T00:05:00Z"
+trace:
+  project_id: gwc-core
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: gwc-improve-g2-react-vite
+  base_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  g0_snapshot: .gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml
+problem: "Enhance the libs/g2-skill-library by adding specific engineering skills for React and Vite."
+desired_outcome: "New skill files created and manifest.yaml updated with correct references."
+stakeholders:
+  - Engineering Team
+  - GWC Governance
+assumptions:
+  - "The project profile is correct."
+  - "Local agent has sufficient permissions."
+risks:
+  - "Scope drift if additional skills are added without approval."
+acceptance_criteria:
+  - "Verify all 4 new .md files are schema-valid and contain correct content."
+  - "Verify manifest.yaml correctly references the new files."
+  - "Run tools/validate_g01.py (once artifacts are complete)."
+unresolved_questions: []
+task_id: gwc-improve-g2-react-vite
+status: READY
+repository_analysis:
+  base_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  protected_branches: main
+  connector_identity: verified-connector
+dependency_check:
+  g01-lifecycle: Version 1.0+ (Verified)
+  g0-context-snapshot: Version 1.0+ (Verified)
+impact_assessment:
+  codebase: Low impact; adding new documentation/skill files to a library.
+  dependencies: No new external dependencies added; uses existing React/Vite standards.
+  security: No secrets or production credentials involved.
+blockers: []
+validation_plan:
+  - Verify all 4 new .md files are schema-valid and contain correct content.
+  - Verify manifest.yaml correctly references the new files.
+  - Run tools/validate_g01.py (once artifacts are complete).
+required_gate: G2_EXECUTION
+outcome: READY
+checks:
+  - id: check-01
+    description: "G0 Context Verified"
+    status: PASS
+  - id: check-02
+    description: "Project Profile Validated"
+    status: PASS
+  - id: check-03
+    description: "Governance Sources Checked"
+    status: PASS
+risk_class: R2

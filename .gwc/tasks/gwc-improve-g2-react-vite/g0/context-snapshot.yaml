@@ -1,0 +1,56 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-07-19T00:05:00Z"
+project:
+  name: gwc-core
+  id: gwc-core
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  protected_branches:
+    - main
+  connector: "verified-connector"
+  write_enabled: true
+constraints:
+  - "No production data or configuration changes allowed."
+  - "Must use local_agent for file creation and validation."
+applicable_policies:
+  - id: policy-01
+    ref: core/Coding_Project_Governance_v1.0.md
+    source_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  - id: policy-02
+    ref: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    source_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  - id: policy-03
+    ref: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    source_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+sources:
+  - id: src-01
+    ref: AGENTS.md
+    source_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+    required: true
+    status: AVAILABLE
+  - id: src-02
+    ref: projects/gwc/project-profile.yaml
+    source_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+    required: true
+    status: AVAILABLE
+blockers: []
+task_id: gwc-improve-g2-react-vite
+status: READY
+repository_identity:
+  owner_repo: nhatnguyenquang1838-coder/gwc
+  protected_base: main
+governance_sources:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+task_context:
+  objective: Enhance libs/g2-skill-library with React Vite engineering skills.
+  risk_class: R2
+  authorized_actions:
+    - Modify files in libs/g2-skill-library
+    - Update manifest.yaml

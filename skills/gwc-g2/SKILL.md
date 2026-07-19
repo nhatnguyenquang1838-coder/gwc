@@ -12,6 +12,7 @@ G2 is the phase where `libs/gwc-g2-execution-library` artifacts are used to mana
 - Commit a single, logical change representing the G1 fix.
 - Create/Bind an isolated working branch from a known, valid base SHA.
 - Push the finalized, guarded branch reference.
+- Apply React/Vite engineering standards (Component structure, State management, Performance optimization, and Testing) as defined in the G2 skill library.
 
 **Hard Exclusions (Failure Conditions):**
 Any attempt to execute actions outside the bounds of `G1_APPROVAL_HASH` or attempting unauthorized commits (e.g., squashing, rewriting shared history) must be blocked by `g2-repository-interaction.md` and result in a failure code before touching the remote repository.
@@ -36,6 +37,10 @@ The G2 execution is supported by the following artifacts in `libs/g2-skill-libra
 - `g2-execution-plan.md` (The sequence blueprint)
 - `g2-repository-interaction.md` (The action constraint layer)
 - `g2-approval-envelope.md` (The transition artifact)
+- `g2-react-vite-component-structure.md` (React/Vite component standards)
+- `g2-react-vite-state-management.md` (React/Vite state patterns)
+- `g2-react-vite-performance.md` (React/Vite performance & compiler rules)
+- `g2-react-vite-testing.md` (React/Vite testing & act() standards)
 
 ## Run Identity and Workspace Mode
 Every G2 session must declare a stable `run_id` before executing transactional steps:

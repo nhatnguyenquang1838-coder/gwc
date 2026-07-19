@@ -87,6 +87,11 @@ G0_INTAKE → H2_EXECUTION → G3_DRAFT_PR → STOP
 
 ### G0_INTAKE (Both Modes)
 
+For chat-only brainstorming before an explicit G2 transition request, use the
+conversation-local `CHAT_ONLY_PREPARATION` state. Do not create a physical
+intake artifact, task, or approval token in that state. Once the user requests
+G2, the formal rescue intake below becomes mandatory before execution.
+
 The agent MUST create a minimal context snapshot:
 
 ```yaml

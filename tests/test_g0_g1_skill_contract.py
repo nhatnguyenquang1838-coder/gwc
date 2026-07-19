@@ -36,6 +36,14 @@ class G0G1SkillContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.g0_text)
 
+    def test_g0_allows_chat_only_preparation_before_g2(self) -> None:
+        for marker in (
+            "CHAT_ONLY_PREPARATION",
+            "Physical artifacts, task creation, and approval tokens",
+            "explicitly requests transition to G2",
+        ):
+            self.assertIn(marker, self.g0_text)
+
     def test_g1_context7_first_offline_fallback_is_explicit(self) -> None:
         for marker in (
             "/obra/superpowers",
@@ -62,6 +70,14 @@ class G0G1SkillContractTests(unittest.TestCase):
             "G4_MERGE",
             "G5_DEPLOY",
             "G6_PRODUCTION",
+        ):
+            self.assertIn(marker, self.g1_text)
+
+    def test_g1_allows_interactive_chat_only_brainstorming(self) -> None:
+        for marker in (
+            "interactive brainstorming and alignment",
+            "without writing\nartifacts",
+            "G2 approval command begin only after an explicit user request",
         ):
             self.assertIn(marker, self.g1_text)
 

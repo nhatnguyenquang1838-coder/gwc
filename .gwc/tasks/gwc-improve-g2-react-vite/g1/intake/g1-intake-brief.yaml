@@ -1,0 +1,56 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-07-19T00:05:00Z"
+trace:
+  project_id: gwc-core
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: gwc-improve-g2-react-vite
+  base_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  g0_snapshot: .gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml
+problem: "Enhance the libs/g2-skill-library by adding specific engineering skills for React and Vite."
+desired_outcome: "New skill files created and manifest.yaml updated with correct references."
+stakeholders:
+  - Engineering Team
+  - GWC Governance
+assumptions:
+  - "The project profile is correct."
+  - "Local agent has sufficient permissions."
+risks:
+  - "Scope drift if additional skills are added without approval."
+acceptance_criteria:
+  - id: AC-01
+    statement: "g2-react-vite-component-structure.md is created."
+    verifiable: true
+  - id: AC-02
+    statement: "g2-react-vite-state-management.md is created."
+    verifiable: true
+  - id: AC-03
+    statement: "g2-react-vite-performance.md is created."
+    verifiable: true
+  - id: AC-04
+    statement: "g2-react-vite-testing.md is created."
+    verifiable: true
+  - id: AC-05
+    statement: "manifest.yaml is updated to include all 4 new skills."
+    verifiable: true
+unresolved_questions: []
+task_id: gwc-improve-g2-react-vite
+status: READY
+objective: Enhance the libs/g2-skill-library by adding specific engineering skills for React and Vite. This ensures that G2 execution follows modern best practices, including component structure, state management, performance (React Compiler), and testing standards.
+scope:
+  repository: nhatnguyenquang1838-coder/gwc
+  files_to_modify:
+    - libs/g2-skill-library/manifest.yaml
+    - libs/g2-skill-library/skills/*.md
+    - skills/gwc-g2/SKILL.md
+risk_class: R2
+requirements:
+  - Add g2-react-vite-component-structure.md
+  - Add g2-react-vite-state-management.md
+  - Add g2-react-vite-performance.md
+  - Add g2-react-vite-testing.md
+  - Update manifest.yaml to include all 4 new skills.
+constraints:
+  - Must follow core/Coding_Project_Governance_v1.0.md.
+  - No production data or configuration changes allowed.
+  - Must use local_agent for file creation and validation.

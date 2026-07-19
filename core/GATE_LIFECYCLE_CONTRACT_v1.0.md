@@ -48,6 +48,17 @@ Each task uses an isolated workspace:
 
 The existing single-task `.gwc/g0` and `.gwc/g1` layout remains supported for backward compatibility. New concurrent work should use the task-scoped layout.
 
+## Chat-only preparation
+
+Exploratory G0/G1 conversation is not a formal gate exit. It may collect
+context, brainstorm options, and refine a decision without physical artifacts,
+task creation, or approval tokens. Label this state
+`CHAT_ONLY_PREPARATION`; do not claim formal `READY` or `PASS`.
+
+Formal G0/G1 evidence begins when the user requests transition to G2. At that
+point the normal artifact, task-trace, validator, and G2 approval requirements
+apply before any write-capable action.
+
 ## Gate definitions
 
 ### G0_CONTEXT

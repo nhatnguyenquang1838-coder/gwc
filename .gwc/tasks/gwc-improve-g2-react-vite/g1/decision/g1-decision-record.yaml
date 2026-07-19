@@ -1,0 +1,38 @@
+schema_version: "1.0"
+artifact_type: g1-decision
+generated_at: "2026-07-19T00:05:00Z"
+trace:
+  project_id: gwc-core
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: gwc-improve-g2-react-vite
+  base_sha: "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+  g0_snapshot: .gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml
+problem: "Enhance the libs/g2-skill-library by adding specific engineering skills for React and Vite."
+desired_outcome: "New skill files created and manifest.yaml updated with correct references."
+stakeholders:
+  - Engineering Team
+  - GWC Governance
+assumptions:
+  - "The project profile is correct."
+  - "Local agent has sufficient permissions."
+risks:
+  - "Scope drift if additional skills are added without approval."
+acceptance_criteria:
+  - id: ac-01
+    description: "libs/g2-skill-library/skills/g2-react-vite-component-structure.md is created."
+  - id: ac-02
+    description: "libs/g2-skill-library/skills/g2-react-vite-state-management.md is created."
+  - id: ac-03
+    description: "libs/g2-skill-library/skills/g2-react-vite-performance.md is created."
+  - id: ac-04
+    description: "libs/g2-skill-library/skills/g2-react-vite-testing.md is created."
+  - id: ac-05
+    description: "manifest.yaml is updated to include all 4 new skills."
+unresolved_questions: []
+task_id: gwc-improve-g2-react-vite
+status: READY
+decision: Option 1: Standard Skill Addition (Recommended) was selected.
+rationale: This option provides the most direct and efficient path to fulfilling the requirement while maintaining strict adherence to the GWC workflow. It ensures that the new skills are integrated into the canonical library structure without unnecessary scope creep.
+risks:
+  risk_class: R2
+  mitigation: All changes are limited to the libs/g2-skill-library directory and do not affect production code or configuration.

@@ -76,6 +76,19 @@ GATE_ACTION_NOT_AUTHORIZED
 GATE_HUMAN_APPROVAL_REQUIRED
 ```
 
+## Conversational G0/G1 mode
+
+When the user is exploring or brainstorming in chat-only mode, G0/G1 may be
+performed as a conversation-local interaction. Do not require physical G0/G1
+artifacts, DS Admin task creation, or an approval token merely to discuss,
+compare, or refine options. Label this state `CHAT_ONLY_PREPARATION`; it is not
+formal G0/G1 completion.
+
+When the user explicitly requests transition to G2, switch to formal mode:
+create the task-scoped G0/G1 artifacts, create or claim the required DS Admin
+task, validate them, and generate the exact G2 approval command before any
+write-capable action.
+
 ## Run ID convention
 
 Every G0/G1 session must declare a `run_id` before producing artifacts.
@@ -171,7 +184,7 @@ G0_CONTEXT
 
 ### G0_CONTEXT — read only
 
-Before G2, the agent must create, obtain, or cite the task-scoped G0 context
+Before entering G2, the agent must create, obtain, or cite the task-scoped G0 context
 artifact and verify that it records:
 
 - active project profile;
@@ -181,12 +194,12 @@ artifact and verify that it records:
 - task or work-item identity;
 - blockers and risk signals.
 
-G0 is complete only when the artifact is schema-valid, has `status: READY`, and
+Formal G0 is complete only when the artifact is schema-valid, has `status: READY`, and
 contains no blockers. During G0 only read-only inspection is allowed.
 
 ### G1_ALIGNMENT — read only
 
-Before G2, the agent must create, obtain, or cite the task-scoped G1 artifacts:
+Before entering G2, the agent must create, obtain, or cite the task-scoped G1 artifacts:
 
 ```text
 g1-intake-brief.yaml

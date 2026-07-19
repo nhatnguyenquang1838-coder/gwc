@@ -15,6 +15,11 @@ Use this skill to establish a verified, current context boundary before G1 disco
 
 This is an agent-readable, offline-compatible instruction wrapper around the existing repository-native G0 contract. It does not replace the schema, runtime input, generator, validator, project profile, or protected-base governance.
 
+For chat-only exploration, run G0 conversationally and label the result
+`CHAT_ONLY_PREPARATION`. Physical artifacts, task creation, and approval tokens
+begin only when the user explicitly requests transition to G2. Do not represent
+chat-only preparation as formal G0 `READY`.
+
 G0 answers two questions:
 
 ```text

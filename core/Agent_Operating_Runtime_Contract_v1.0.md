@@ -23,6 +23,17 @@ EXECUTION MODE: <chat_connector_only|local_agent|repo_ci>
 
 When sources conflict, the agent must report the conflict rule and follow the highest-priority active source.
 
+## Chat-only exploration
+
+G0/G1 brainstorming is conversation-local by default. It may produce an
+informal intake, options, preflight discussion, and decision candidate without
+persisting artifacts, creating a task, or generating an approval token. Label
+this state `CHAT_ONLY_PREPARATION` and grant no execution authority.
+
+Formal G0/G1 artifacts, DS Admin task creation or claim, and the exact G2
+approval command are required only when the user explicitly requests transition
+to G2 or asks for a write-capable action.
+
 ## Intake Card
 
 Before repository-changing work, the agent must produce an Intake Card:
