@@ -76,6 +76,36 @@ GATE_ACTION_NOT_AUTHORIZED
 GATE_HUMAN_APPROVAL_REQUIRED
 ```
 
+## Run ID convention
+
+Every G0/G1 session must declare a `run_id` before producing artifacts.
+
+Formats:
+- When DS Admin task ID is available: `g1-<task-id-short>-<YYYYMMDD-HHMM>`
+- When no task ID: `g1-<YYYYMMDD-HHMM>-<short-kebab-topic>`
+
+Rules:
+- Maximum 64 characters. Alphanumeric and hyphens only.
+- Same `run_id` for all G1 outputs in the same session.
+- New `run_id` when task, repository, base SHA, selected option, or user decision changes materially.
+- Do not reuse a `run_id` across independent sessions.
+
+## Workspace location convention
+
+Before producing G0 or G1 artifacts, the agent must select a workspace root according to this decision matrix:
+
+| Mode | G0 location | G1 location | Validator command |
+|---|---|---|---|
+| `chat_connector_only` with `/mnt` | `/mnt/<session>/.gwc/tasks/<task-id>/g0/` | `/mnt/<session>/.gwc/tasks/<task-id>/g1/` | `--workspace /mnt/<session>/.gwc/tasks/<task-id>` |
+| `chat_connector_only` without `/mnt` | `.gwc/tasks/<task-id>/g0/` | `.gwc/tasks/<task-id>/g1/` | `--workspace .gwc/tasks/<task-id>` |
+| `local_agent` canonical | `.gwc/g0/` | `.gwc/g1/` | `--workspace .gwc` |
+| `local_agent` session-scoped | `.gwc/runs/<run_id>/g0/` | `.gwc/runs/<run_id>/g1/` | `--workspace .gwc/runs/<run_id>` |
+
+Conflict policy:
+- Do not allow two active sessions to write the same workspace root.
+- If canonical `.gwc/g1/` is already owned, choose session-scoped or stop with `G1_BLOCKED`.
+- Never overwrite existing G1 artifacts unless the same `run_id` owns them or the user explicitly supersedes.
+
 ## Execution modes
 
 The agent must declare exactly one execution mode before gate reporting.
@@ -353,6 +383,19 @@ No valid task claim
 
 Use State Engine operations only. Never invent task status or bypass claims,
 leases, ownership, or legal transitions.
+
+## Approval command generation
+
+The agent must generate the exact approval command from current gate evidence.
+
+Format: `APPROVE <GATE> <approval_id> <scope_hash_16> <expires_at_utc>`
+
+Rules:
+- `approval_id`: `APPROVE_<GATE>_<task-id-short>_<YYYYMMDD>`
+- `scope_hash`: Normalize envelope JSON (remove scope_hash, serialize UTF-8 JSON with sorted keys, arrays preserved, no insignificant whitespace), SHA-256, first 16 hex characters.
+- `expires_at`: ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`), no more than 24 hours after `issued_at`.
+- Placement: Standalone fenced text block, one command per block.
+- Humans do not invent gate tokens, artifact IDs, scope hashes, branches, file scope, or expiry.
 
 ## Exact user command presentation
 
