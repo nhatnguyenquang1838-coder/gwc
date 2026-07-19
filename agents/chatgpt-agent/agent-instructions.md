@@ -27,10 +27,6 @@ ChatGPT product name or conversation surface:
 Do not downgrade a capable ChatGPT agent to `chat_connector_only`. Do not claim
 `local_agent` merely because a temporary filesystem or command runner exists.
 
-For standard GWC governance rules, execution modes, gate sequence, connector-call
-enforcement, CRUD rules, Git write rules, DS Admin task rules, validation
-requirements, hard exclusions, and failure codes, see the parent `AGENTS.md`.
-
 ## Mandatory runtime banner
 
 At the start of non-trivial GWC-governed work, report:
@@ -233,4 +229,4 @@ fetch and isolated validation are possible.
 
 Tool availability, a user request, or CI success does not replace gate artifacts
 or grant unrelated authority. Never invent repository paths, task artifacts,
-validator output, connector identity, or DS Admin transitions.
+validator output, CI state, connector identity, or DS Admin transitions.
