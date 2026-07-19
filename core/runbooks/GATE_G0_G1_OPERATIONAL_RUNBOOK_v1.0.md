@@ -33,20 +33,24 @@ Validate committed artifacts and policy in CI. CI is additional evidence and nev
 3. Verify repository owner/name, default branch, protected branches, connector identity, and write-enabled status.
 4. Read the canonical policy, active profile, active extension, root `AGENTS.md`, and applicable protected-base governance.
 5. Resolve the exact protected-base commit SHA. When direct ref lookup fails, use an equivalent read-only method and verify equivalence before continuing.
-6. Identify or create exactly one work item when the active profile requires DS Admin traceability. DS Admin records traceability only; it does not grant execution authority.
-7. Classify risk and identify security, architecture, data, deployment, credential, destructive, and blast-radius signals.
-8. Define initial scope, non-goals, expected files/modules, authorized actions, and excluded actions.
-9. Classify blockers as:
+6. Select the workspace root according to the AGENTS.md workspace location convention decision matrix.
+7. Identify or create exactly one work item when the active profile requires DS Admin traceability. DS Admin records traceability only; it does not grant execution authority.
+   - Resolve or create a DS Admin task before G0 completion.
+   - Record the task ID in G0/G1 trace fields.
+   - Verify task state allows the intended transition before G2 entry.
+8. Classify risk and identify security, architecture, data, deployment, credential, destructive, and blast-radius signals.
+9. Define initial scope, non-goals, expected files/modules, authorized actions, and excluded actions.
+10. Classify blockers as:
    - self-remediable;
    - user-decision required;
    - external-write required;
    - missing capability;
    - hard denial.
-10. Automatically resolve self-remediable blockers and retry equivalent connector paths that remain within the approved repository, base, branch, action, and scope.
-11. Produce a structured G0 proposal for the user when trusted completion is not yet possible. Do not merely report `BLOCKED` and stop.
-12. Create `g0/context-snapshot.yaml` in the task workspace.
-13. Validate its schema and consistency.
-14. Exit with exactly one truthful status:
+11. Automatically resolve self-remediable blockers and retry equivalent connector paths that remain within the approved repository, base, branch, action, and scope.
+12. Produce a structured G0 proposal for the user when trusted completion is not yet possible. Do not merely report `BLOCKED` and stop.
+13. Create `g0/context-snapshot.yaml` in the task workspace.
+14. Validate its schema and consistency.
+15. Exit with exactly one truthful status:
    - `READY`: artifact valid, base resolved, no blockers;
    - `PROPOSED`: bounded proposal prepared for user decision;
    - `NOT_READY`: trusted persistence or validation still missing;
