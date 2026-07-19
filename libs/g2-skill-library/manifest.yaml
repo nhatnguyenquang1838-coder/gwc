@@ -1,0 +1,39 @@
+version: "1.0"
+# Canonical manifest for G2 Execution Skill Library
+
+# This library provides the canonical contract and artifacts for all G2 execution steps.
+# It is designed to be referenced by projects/gwc/package.yaml and consumers.
+
+# Core G2 Skills:
+skills:
+  - id: g2-approval-envelope
+    path: skills/g2-approval-envelope.md
+    version_ref: libs/g2-skill-library/manifest.yaml
+  - id: g2-execution-plan
+    path: skills/g2-execution-plan.md
+    version_ref: libs/g2-skill-library/manifest.yaml
+  - id: g2-repository-interaction
+    path: skills/g2-repository-interaction.md
+    version_ref: libs/g2-skill-library/manifest.yaml
+
+# Context7 Resolution & Fallback:
+resolution_strategy:
+  - try_context7()
+  - fallback_to(libs/g2-skill-library/)
+
+# Authority and Boundaries:
+authority:
+  grants: [] # No execution authority is granted by the skill itself; it enables actions authorized in G1.
+  excludes:
+    - G3_PR_AUTHORITY
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+
+# Dependency:
+dependencies:
+  g01-lifecycle: { required: true, version: ">= 1.0" }
+  g0-context-snapshot: { required: true, version: ">= 1.0" }
+
+# File/Directory structure mirrors the library root for consumers:
+# libs/g2-skill-library/
