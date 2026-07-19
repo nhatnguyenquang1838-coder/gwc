@@ -36,3 +36,8 @@ sources:
   source_sha: eec5b6a8b552c4a992e226239bcb502dd2d0c0c3
 status: READY
 blockers: []
+contextual_discovery:
+  historical_context: []
+  downstream_impact: []
+  stakeholder_reach: []
+<EOF>

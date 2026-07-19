@@ -30,3 +30,27 @@ authority_boundaries:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Design and export the new JSON schemas.
+  - sub_task_id: SUB-TASK-2
+    description: Implement the validation script in Python.
+  - sub_task_id: SUB-TASK-3
+    description: Update documentation and templates.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: schema_design
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-2
+    skill_id: python_dev
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: technical_writing
+    agent_type: specialist
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  summary: Multi-agent execution for schema design, Python validation, and documentation update.
+<EOF>

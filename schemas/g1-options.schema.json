@@ -106,6 +106,30 @@
             "PARTIAL",
             "NOT_FIT"
           ]
+        },
+        "skills_distribution": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "skill_id",
+              "description"
+            ],
+            "properties": {
+              "skill_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "is_required": {
+                "type": "boolean"
+              }
+            }
+          }
         }
       }
     }
