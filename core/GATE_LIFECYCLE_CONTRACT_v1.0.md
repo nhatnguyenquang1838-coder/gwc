@@ -12,8 +12,8 @@ G0_CONTEXT
 → G2_EXECUTION
 → G3_PR
 → G4_MERGE
-→ G5_DEPLOY
-→ G6_PRODUCTION_DATA
+→ G5_DEPLOY (status check unless manual deploy is explicitly in scope)
+→ G6_PRODUCTION_DATA (only when applicable)
 ```
 
 A later gate never implies authority for another gate. Every gate fails closed when required evidence is missing, invalid, expired, contradictory, or scoped to a different repository, task, base SHA, branch, or scope hash.
@@ -125,25 +125,46 @@ A schema-valid record with `outcome: fail` or `outcome: inconclusive` may retain
 
 Review `PASS` is G3 evidence only. It never grants merge authority; G4 still requires explicit human approval for the exact PR head SHA.
 
+#### G3 asynchronous CI continuation
+
+When CI is still running after Draft PR creation or after a repair push, G3 remains in validation monitoring rather than ending silently. The agent must record the current PR number, branch, latest head SHA, DS Admin state, next check time, and continuation mechanism.
+
+Continuation mechanisms are selected in this order:
+
+1. webhook or CI event callback;
+2. local sleep or poll loop for `local_agent` execution;
+3. platform scheduler, including ChatGPT Scheduled Tasks when available;
+4. manual checkpoint when no async mechanism is available.
+
+The default next-check interval is 3 minutes when supported by the active environment. Hosted schedulers that require a slower cadence must use the supported cadence and report that limitation.
+
+A scheduled CI continuation must be treated as inactive unless a concrete next run is visible or recorded. If no next run exists, the agent must not claim async continuation is active.
+
+If CI fails, the agent may diagnose and repair only repository-fixable failures within the active G2 scope. Any repair commit changes the latest head SHA and invalidates prior CI, review, and G4-readiness evidence. G4 approval may be generated only after required checks pass for the latest head SHA.
+
 ### G4_MERGE
 
-**Entry:** G3 `PASS`, required CI checks pass, review requirements are satisfied, and explicit human approval is recorded for the exact PR head SHA.
+**Entry:** G3 `PASS`, required CI checks pass, review requirements are satisfied, the Pull Request is ready for review, and explicit human approval is recorded for the exact PR head SHA.
 
 **Permitted actions:** merge the approved PR using the authorized method.
 
-**Exit:** merge commit or merged head evidence is recorded. Upon exit, the agent must proactively generate the G5 deployment approval request and present the approval command to the user.
+**Draft PR precheck:** a Draft Pull Request is not eligible for G4 merge execution. If the PR is still draft, the agent must stop before issuing a merge-ready G4 approval request or before invoking a merge connector. If no ready-for-review connector action exists, the agent must report a manual ready-for-review blocker.
+
+**Exit:** merge commit or merged head evidence is recorded. Upon exit, the agent must proactively generate the G5 status/deployment verification request and present the approval command to the user.
 
 ### G5_DEPLOY
 
-**Entry:** G4 `PASS` and explicit human deployment approval for the exact release or commit.
+**Entry:** G4 `PASS` and explicit human G5 approval for the exact release, merge commit, or runtime status scope.
 
-**Permitted actions:** deploy only the approved release to the approved environment.
+**Default permitted actions:** verify post-merge GitHub Actions, deployment checks such as Vercel checks integrated into GitHub Actions, deployment status, and runtime/tool-surface status for the approved commit.
 
-**Exit:** deployment result, environment, release SHA, and rollback evidence are recorded. Upon exit, the agent must proactively generate the G6 production-data approval request and present the approval command to the user.
+**Manual deploy actions:** manually deploying, redeploying, publishing, releasing, or reloading runtime is permitted only when that action is explicitly listed in the G5 approval scope and the active project profile requires or allows manual deployment. When deployment is already automated by CI/CD, G5 is status verification only.
+
+**Exit:** status evidence is recorded, including checked workflow or deployment names, conclusions, environment when known, release or commit SHA, and rollback evidence when applicable. Upon exit, the agent must generate a G6 approval request only when a production-data, production-configuration, migration, credential, or secret operation is actually in scope. Otherwise G6 is recorded as `not_applicable` and no G6 command is generated.
 
 ### G6_PRODUCTION_DATA
 
-**Entry:** explicit human approval for the precise production-data, configuration, migration, or credential operation, including expiry and scope.
+**Entry:** explicit human approval for the precise production-data, production configuration, migration, credential, or secret operation, including expiry and scope.
 
 **Permitted actions:** only the approved production operation.
 
@@ -151,7 +172,7 @@ Review `PASS` is G3 evidence only. It never grants merge authority; G4 still req
 
 ## Proactive Gate Transition
 
-Every gate exit requires the agent to proactively generate the entry artifact for the next gate and present the corresponding approval command to the user. This ensures no gate ends in a silent state and the user always has a clear, actionable next step.
+Every gate exit requires the agent to proactively generate the entry artifact for the next gate and present the corresponding approval command to the user, except that G6 is generated only when production data, production configuration, migration, credentials, or secrets are actually in scope. This ensures no gate ends in a silent state and the user always has a clear, actionable next step.
 
 The agent must:
 
@@ -159,6 +180,7 @@ The agent must:
 2. Generate the next gate's entry artifact (execution envelope, delivery record, or approval record) using the current gate's evidence.
 3. Present the generated approval command in a standalone fenced text block.
 4. Wait for the user to execute the command before proceeding to the next gate.
+5. Update the DS Admin task state through the legal State Engine transition that corresponds to the gate transition before continuing. If DS Admin update fails, report the blocker or record a clearly labeled late reconciliation note; never backdate or invent task state evidence.
 
 The user retains sole authority to grant or deny the next gate. The agent's proactive generation is a convenience mechanism, not a delegation of authority.
 
@@ -171,8 +193,9 @@ The user retains sole authority to grant or deny the next gate. The agent's proa
 | Push guarded branch | G2_EXECUTION |
 | Create/update Draft PR | G3_PR |
 | Merge PR | G4_MERGE |
-| Deploy or publish release | G5_DEPLOY |
-| Read/write production data, production config, migration, credential rotation | G6_PRODUCTION_DATA |
+| Verify post-merge CI, deployment checks, Vercel status, or runtime/tool surface | G5_DEPLOY |
+| Manually deploy, redeploy, publish, release, or reload runtime | G5_DEPLOY with explicit manual action scope |
+| Read/write production data, production config, migration, credential rotation, or secret operation | G6_PRODUCTION_DATA |
 
 ## Failure codes
 

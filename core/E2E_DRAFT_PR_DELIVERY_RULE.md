@@ -212,13 +212,13 @@ Finding policy:
 - `MINOR` findings must be resolved or deferred to a traceable follow-up;
 - `NIT` findings are non-blocking but remain recorded.
 
-A G3 review decision does not authorize merge. G4 remains a separate human decision for the exact PR head SHA.
+A G3 review decision does not authorize merge. G4 remains a separate human decision for the exact PR head SHA. If the PR later enters G4, it must be ready for review before a merge-ready G4 approval request is issued or a merge connector is invoked; Draft PR state is a G4 blocker.
 
 ## CI monitoring
 
 After every push to the PR branch:
 
-1. Schedule or perform a CI check after `+2 minutes`.
+1. Schedule or perform a CI check after `+3 minutes` when the environment supports that cadence.
 2. Verify the workflow belongs to the current PR head SHA.
 3. Verify all required checks exist.
 4. Verify all required checks complete successfully.
@@ -227,7 +227,20 @@ After every push to the PR branch:
 For pending states:
 
 - Make no code change.
-- Continue monitoring the same SHA.
+- Keep DS Admin in `validation_running`.
+- Record the PR number, branch, current head SHA, next check time, and continuation mechanism.
+- Continue monitoring the same SHA through the strongest available mechanism:
+  1. webhook or CI event callback;
+  2. local sleep or poll loop;
+  3. ChatGPT Scheduled Tasks or another platform scheduler;
+  4. manual checkpoint when no async mechanism is available.
+
+For ChatGPT Scheduled Tasks or other schedulers:
+
+- The task prompt must include repository, PR number, expected head SHA when available, allowed actions, excluded actions, and the next check time.
+- The task is not active unless a concrete next run is visible or recorded.
+- If the UI or scheduler reports no next run, including `Chưa lên lịch`, treat the task as not scheduled and use another legal mechanism or a manual checkpoint.
+- A scheduled CI task may check and report status only unless a separate active approval covers repository mutation.
 
 For repository-fixable failures:
 
@@ -236,7 +249,8 @@ For repository-fixable failures:
 3. Run applicable local validation.
 4. Push using expected-SHA guards.
 5. Record the new head SHA.
-6. Restart CI monitoring.
+6. Invalidate prior CI, review, and G4-readiness evidence for the old head SHA.
+7. Restart CI monitoring.
 
 Repair limits:
 
@@ -260,6 +274,17 @@ The task is complete only when:
 - Documentation is current.
 - No material scope drift occurred.
 - No excluded authority was exercised.
+
+## Post-E2E G4/G5/G6 scoping
+
+This E2E rule stops at a validated Draft PR. If the user later approves G4 and
+the PR is merged, G5 is interpreted as status/deployment verification unless a
+manual deploy, redeploy, release, or runtime reload is explicitly in scope.
+When Vercel or another deployment provider is integrated into GitHub Actions,
+G5 checks those workflow/deployment statuses for the exact approved commit and
+does not perform a separate deploy action. G6 is generated only when production
+data, production configuration, migrations, credentials, or secrets are actually
+in scope.
 
 ## Final response
 
@@ -299,7 +324,7 @@ After delivering the final report, stop and wait for the user to review the Pull
 Even in E2E mode, the agent must never:
 
 - Merge or enable auto-merge.
-- Deploy or publish a release.
+- Manually deploy, redeploy, publish a release, or reload runtime without explicit G5 manual-action scope.
 - Modify production configuration.
 - Rotate credentials.
 - Run production migrations.

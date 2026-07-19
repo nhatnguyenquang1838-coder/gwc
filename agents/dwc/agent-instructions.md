@@ -184,6 +184,23 @@ G3 may pass only when `tools/validate_g3_delivery.py` returns `PASS` for the cur
 
 The Draft PR remains the user review boundary. Reviewer `PASS` is evidence only and never grants merge, deployment, release, or production authority.
 
+## Asynchronous CI continuation
+
+During G3 validation monitoring, DWC must not stop silently when PR CI is still running. It must keep DS Admin in `validation_running` and record the current PR, branch, latest head SHA, next check time, and selected continuation mechanism.
+
+DWC must choose the strongest available mechanism in this order:
+
+1. GitHub CI event callback, including `github_ci_event_handle`, when available;
+2. local sleep or polling when running as `local_agent`;
+3. scheduler-backed continuation, including cron or platform Scheduled Tasks when available;
+4. manual checkpoint when no async mechanism is available.
+
+The default next-check interval is 3 minutes when supported. If the active runtime or scheduler supports only a longer cadence, DWC must use the supported cadence and report the limitation.
+
+A scheduled continuation is valid only when a concrete next run is visible or recorded. If there is no next run, including a UI state such as `Chưa lên lịch`, DWC must treat the schedule as inactive.
+
+If CI fails, DWC may inspect workflow logs and repair only repository-fixable failures within the active G2 scope. After every repair commit, DWC must record the new head SHA and treat prior CI, review, and G4-readiness evidence as stale. DWC must not merge, deploy, release, reload runtime, touch production configuration, handle credentials, run migrations, or access production data from a CI wait task unless a separate active approval covers that exact action.
+
 ## Proactive gate transitions
 
 DWC must proactively generate the next gate's entry artifact and present the
@@ -197,10 +214,12 @@ ask for it.
   approval command to the user.
 - Upon G3 `PASS`, immediately generate the G4 merge approval request and
   present the approval command to the user.
-- Upon G4 exit, generate the G5 deployment approval request and present the
-  approval command to the user.
-- Upon G5 exit, generate the G6 production-data approval request and present
-  the approval command to the user.
+- Upon G4 exit, generate the G5 status/deployment verification request and
+  present the approval command to the user.
+- Upon G5 exit, generate the G6 production-operation approval request only when
+  production data, production configuration, migrations, credentials, or secrets
+  are actually in scope. Otherwise record G6 as `not_applicable` and do not
+  generate a G6 command.
 
 Each generated command must be placed in a standalone fenced text block. DWC
 must wait for the user to execute the command before proceeding. The user
@@ -233,9 +252,17 @@ scope hash, action, environment, and expiry where applicable.
 
 When an exact G4 approval command is active and the connector exposes
 `github_merge_pr`, DWC must refresh PR state, verify the approved PR head SHA,
-confirm required CI checks passed for that same head, and then invoke
-`github_merge_pr` for that PR only. If the connector does not expose the tool,
-DWC must record a manual-merge blocker instead of claiming merge execution.
+confirm required CI checks passed for that same head, verify that the PR is not
+Draft and is ready for review, and then invoke `github_merge_pr` for that PR
+only. If the connector does not expose the tool, DWC must record a manual-merge blocker instead of claiming merge execution. If the PR is still Draft and no
+ready-for-review connector is available, DWC must record a ready-for-review
+blocker and must not invoke merge.
+
+G5 is status/deployment verification. When the project integrates Vercel or
+other deployment status into GitHub Actions, G5 requires checking the relevant
+post-merge workflow or deployment checks for the approved commit. DWC must not
+perform a manual deploy, redeploy, release, or runtime reload unless that exact
+manual action is explicitly included in the G5 scope.
 
 Approval for one gate never grants another gate.
 
@@ -251,9 +278,44 @@ DWC must not automatically:
 - read or write production data;
 - perform destructive migrations or irreversible operations.
 
+## DS Admin state synchronization
+
+DWC must keep DS Admin aligned with gate progress before continuing to the next
+major action. Use legal State Engine transitions only:
+
+| Gate moment | DS Admin target |
+|---|---|
+| G0/G1 work starts | `agent_running` |
+| Proposal ready | `pending_review` |
+| Plan selected | `pending_approval` |
+| G2 write starts | `write_running` |
+| PR created | `validation_running` |
+| Validation complete | `completed` |
+| Blocker | `blocked` |
+| Irrecoverable failure | `failed` |
+
+If DS Admin was not updated at the correct time, DWC may perform a late
+reconciliation only when it labels it as late reconciliation and cites current
+repository/task evidence. It must not backfill evidence or claim the task was in
+that state earlier.
+
+## Bootstrap capability rollout
+
+When a new connector capability is required to complete its own first rollout,
+DWC must declare a bootstrap gap. The first merge or deployment may require a
+manual human action or an existing pre-authorized platform route. After the new
+runtime is deployed and its tool surface is verified, future executions must use
+the connector capability and normal gate checks.
+
+## Sanitized evidence notes
+
+DWC must not place full executable approval commands in commit messages, PR
+titles, connector payloads, or long-lived comments. Use sanitized evidence
+metadata such as gate, approval ID, scope-hash prefix, expected SHA, and expiry.
+
 ## Completion evidence
 
 A DWC repository task is complete only when the required gate records exist,
 the Draft PR exists, the latest head SHA is known, applicable validation is
-recorded, CI state is reported, and exclusions and residual risks are stated
-accurately.
+recorded, CI state is reported, DS Admin state is synchronized or late
+reconciled, and exclusions and residual risks are stated accurately.

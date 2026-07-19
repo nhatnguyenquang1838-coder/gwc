@@ -165,8 +165,8 @@ G0_CONTEXT
 → G2_EXECUTION
 → G3_PR
 → G4_MERGE
-→ G5_DEPLOY
-→ G6_PRODUCTION_DATA
+→ G5_DEPLOY (status check unless manual deploy is explicitly in scope)
+→ G6_PRODUCTION_DATA (only when applicable)
 ```
 
 ### G0_CONTEXT — read only
@@ -238,10 +238,26 @@ These are separate human-authority gates. Approval for one gate never grants
 another gate. Approval must match the exact repository, task, PR or release,
 head SHA, scope hash, action, environment, and expiry where applicable.
 
+G4 requires the Pull Request to be ready for review before the agent issues a
+merge-ready G4 approval request or invokes a merge connector. A Draft PR is a
+G4 blocker unless a separately authorized ready-for-review action is available.
+
+G5 is a status/deployment verification gate. When deployment is already
+integrated into GitHub Actions or another CI/CD system, G5 means checking the
+post-merge workflow, deployment check, Vercel status, runtime status, or tool
+surface for the approved commit. It does not authorize a manual deploy,
+redeploy, release, or runtime reload unless that manual action is explicitly in
+scope.
+
+G6 is generated only when production data, production configuration, migration,
+credential, or secret operations are actually in scope. Otherwise the agent
+records `G6_PRODUCTION_DATA: not_applicable` and does not create a G6 approval
+command.
+
 **Proactive transition:** Upon G4 exit, the agent must generate the G5
-deployment approval request. Upon G5 exit, the agent must generate the G6
-production-data approval request. Each must be presented to the user as a
-standalone approval command.
+status/deployment verification request. Upon G5 exit, the agent must generate a
+G6 production-operation request only when G6 scope exists. Each required command
+must be presented to the user as a standalone approval command.
 
 ## Connector-call enforcement
 
@@ -257,8 +273,9 @@ execution mode.
 | Create commit, push branch, or update ref | G2_EXECUTION |
 | Create or update Draft Pull Request | G3_PR |
 | Merge or enable auto-merge | G4_MERGE |
-| Deploy or publish release | G5_DEPLOY |
-| Production data/config/migration/credential operation | G6_PRODUCTION_DATA |
+| Verify post-merge CI, deployment checks, Vercel status, or runtime/tool surface | G5_DEPLOY |
+| Manually deploy, redeploy, publish, release, or reload runtime | G5_DEPLOY with explicit manual action scope |
+| Production data/config/migration/credential/secret operation | G6_PRODUCTION_DATA |
 
 When required evidence is missing or invalid, the agent must stop before the
 connector call and report the exact failure code. It must not proceed and later
@@ -384,6 +401,42 @@ No valid task claim
 Use State Engine operations only. Never invent task status or bypass claims,
 leases, ownership, or legal transitions.
 
+The agent must synchronize DS Admin state before continuing across gate
+boundaries. Use only legal State Engine transitions. If the task state falls
+behind the repository work, the agent must perform a clearly labeled late
+reconciliation and disclose the limitation; it must not backdate, fabricate, or
+claim that DS Admin was current at the earlier gate.
+
+Recommended mapping:
+
+| Gate moment | DS Admin transition target |
+|---|---|
+| G0/G1 analysis starts | `agent_running` |
+| G0/G1 proposal is ready | `pending_review` |
+| User selects the plan | `pending_approval` |
+| G2 write starts | `write_running` |
+| PR is created | `validation_running` |
+| CI and validation pass | `completed` |
+| Blocker found | `blocked` |
+| Irrecoverable failure | `failed` |
+
+## G3 async CI continuation
+
+After creating or updating a Draft PR, the agent must not stop silently when CI is still running. It must keep the DS Admin task in `validation_running` and choose the strongest available continuation mechanism for the next CI check:
+
+1. webhook or event callback when available;
+2. local sleep or poll loop when running as a capable local agent;
+3. ChatGPT Scheduled Tasks when running in ChatGPT and the platform scheduler is available;
+4. manual checkpoint only when no async mechanism is available.
+
+The default next-check interval is 3 minutes when the selected environment supports that cadence. If the platform supports only a slower cadence, use the supported cadence and report the limitation.
+
+For ChatGPT Scheduled Tasks, the agent must verify that the task has an actual next run. If the task UI or scheduler state shows no next run, including `Chưa lên lịch`, the agent must treat async continuation as not scheduled and fall back to another legal mechanism or a manual checkpoint.
+
+A CI wait task may check and report CI state only. It must not modify repository content, merge, deploy, reload runtime, release, touch production configuration, handle credentials, run migrations, or access production data unless a separate active approval covers that exact action.
+
+When CI fails, the agent may repair only repository-fixable failures inside the approved G2 scope. Any repair commit invalidates prior CI, review, and G4-readiness evidence; the next G4 approval request must bind to the latest head SHA after required CI is green.
+
 ## Approval command generation
 
 The agent must generate the exact approval command from current gate evidence.
@@ -393,6 +446,7 @@ Format: `APPROVE <GATE> <approval_id> <scope_hash_16> <expires_at_utc>`
 Rules:
 - `approval_id`: `APPROVE_<GATE>_<task-id-short>_<YYYYMMDD>`
 - `scope_hash`: Normalize envelope JSON (remove scope_hash, serialize UTF-8 JSON with sorted keys, arrays preserved, no insignificant whitespace), SHA-256, first 16 hex characters.
+- The normalized envelope must include the gate, task ID when available, repository, branch or PR number when applicable, expected base SHA, expected head or release SHA when applicable, approved files or modules, authorized actions, excluded actions, required CI/deployment checks, and expiry.
 - `expires_at`: ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`), no more than 24 hours after `issued_at`.
 - Placement: Standalone fenced text block, one command per block.
 - Humans do not invent gate tokens, artifact IDs, scope hashes, branches, file scope, or expiry.
@@ -402,6 +456,11 @@ Rules:
 Every approval, activation, retry, or exact command requested from the user
 must be placed in a standalone fenced text block. Put one command in each
 block. Do not place placeholders in a command represented as executable.
+
+Do not copy full approval commands into commit messages, PR titles, connector
+payloads, or long-lived comments. Evidence notes should use sanitized approval
+metadata such as gate, approval ID, scope-hash prefix, and expiry, not the full
+executable command.
 
 ## Validation
 
@@ -419,7 +478,7 @@ Before a Draft PR:
 ## Hard exclusions without separate authority
 
 - merge or auto-merge;
-- deployment or release;
+- manual deployment, redeploy, runtime reload, or release without G5 manual-action scope;
 - production configuration;
 - credential rotation;
 - production migration;
