@@ -38,6 +38,7 @@ Policy boot
 → Repair repository-fixable CI failures
 → Re-review the exact repaired head SHA
 → Close review evidence
+→ Mark Draft PR ready for review when supported and G3 evidence passes
 → Deliver final PR report
 → STOP
 ```
@@ -107,6 +108,7 @@ Allowed autonomous actions:
 - Push the approved working branch.
 - Create or update a Draft PR.
 - Update the Draft PR description.
+- Mark the Draft PR ready for review after G3 `PASS` when a supported connector action exists.
 - Monitor CI for the current PR head SHA.
 - Diagnose repository-fixable CI failures.
 - Apply fixes within the approved scope.
@@ -212,7 +214,7 @@ Finding policy:
 - `MINOR` findings must be resolved or deferred to a traceable follow-up;
 - `NIT` findings are non-blocking but remain recorded.
 
-A G3 review decision does not authorize merge. G4 remains a separate human decision for the exact PR head SHA. If the PR later enters G4, it must be ready for review before a merge-ready G4 approval request is issued or a merge connector is invoked; Draft PR state is a G4 blocker.
+A G3 review decision does not authorize merge. After G3 `PASS`, the agent may mark the Draft PR ready for review when a supported connector action exists and the latest head SHA, CI, review closure, G3 evidence, and scope checks are valid. G4 remains a separate human decision for the exact PR head SHA. If the PR later enters G4, it must be ready for review before a merge-ready G4 approval request is issued or a merge connector is invoked; Draft PR state is a G4 blocker.
 
 ## CI monitoring
 
@@ -281,10 +283,12 @@ This E2E rule stops at a validated Draft PR. If the user later approves G4 and
 the PR is merged, G5 is interpreted as status/deployment verification unless a
 manual deploy, redeploy, release, or runtime reload is explicitly in scope.
 When Vercel or another deployment provider is integrated into GitHub Actions,
-G5 checks those workflow/deployment statuses for the exact approved commit and
-does not perform a separate deploy action. G6 is generated only when production
-data, production configuration, migrations, credentials, or secrets are actually
-in scope.
+read-only `G5_STATUS_VERIFY` runs automatically after G4 merge and checks those
+workflow/deployment statuses for the exact approved commit. It does not perform a
+separate deploy action. G5 approval is required only for manual deploy, redeploy,
+release, publish, or runtime reload. G6 is generated only when production data,
+production configuration, migrations, credentials, or secrets are actually in
+scope.
 
 ## Final response
 
