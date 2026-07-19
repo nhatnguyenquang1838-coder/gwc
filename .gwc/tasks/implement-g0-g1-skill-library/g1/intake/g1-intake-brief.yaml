@@ -36,8 +36,8 @@ assumptions:
 risks:
   - Context7 unavailability would block skill discovery without offline fallback
 acceptance_criteria:
-  - AC-1: `libs/g0-g1-skill-library/manifest.yaml` exists with real SHA-256 hashes and bundle-atomic fallback policy.
-  - AC-2: `skills/gwc-g0/SKILL.md` and `skills/gwc-g1/SKILL.md` contain explicit Context7-first ordering, retry policy, and OFFLINE_PINNED fallback.
-  - AC-3: All G0/G1 skill library tests pass.
+  - "AC-1: `libs/g0-g1-skill-library/manifest.yaml` exists with real SHA-256 hashes and bundle-atomic fallback policy."
+  - "AC-2: `skills/gwc-g0/SKILL.md` and `skills/gwc-g1/SKILL.md` contain explicit Context7-first ordering, retry policy, and OFFLINE_PINNED fallback."
+  - "AC-3: All G0/G1 skill library tests pass."
 unresolved_questions: []
 status: READY

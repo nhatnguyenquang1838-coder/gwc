@@ -1,4 +1,4 @@
-version: "1.0"
+schema_version: "1.0"
 project_id: gwc
 package_version: "1.13.0"
 status: active
@@ -20,23 +20,23 @@ instructions:
      required: true
    - id: g0-g1-operational-runbook
      path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
-     target: .governance/core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0md
+     target: .governance/core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
      required: true
    - id: agent-behavior-semantic-contract
      path: core/Agent_Behavior_Semantic_Contract_v1.0.md
      target: .governance/Agent_Behavior_Semantic_Contract_v1.0md
      required: true
    - id: agent-response-presentation-contract
-     path: core/Agent_Response_Presentation_Contract_v1.0md
-     target: .governance/Agent_Response_Presentation_Contract_v1.0md
+     path: core/Agent_Response_Presentation_Contract_v1.0.md
+     target: .governance/Agent_Response_Presentation_Contract_v1.0.md
      required: true
    - id: e2e-draft-pr-delivery
      path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
      target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md
      required: true
    - id: hotfix-and-rescue-mode
-     path: core/HOTFIX_AND_RESCUE_MODE_v1.0md
-     target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0md
+     path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md
+     target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md
      required: false
    - id: base-drift-policy
      path: governance/base-drift-policy.yaml
@@ -55,27 +55,27 @@ instructions:
      target: .governance/project-consumer-agent-instructions.md
      required: true
    # --- Canonical G2 Migration ---
-   - id: g2-skill-library
+   - id: g2-skill-library-readme
      path: libs/g2-skill-library/README.md
      target: .governance/libs/g2-skill-library/README.md
      required: true
-   - id: g2-skill-library
+   - id: g2-skill-library-manifest
      path: libs/g2-skill-library/manifest.yaml
      target: .governance/libs/g2-skill-library/manifest.yaml
      required: true
-   - id: g2-skill-library
+   - id: g2-skill-library-notice
      path: libs/g2-skill-library/NOTICE.md
      target: .governance/libs/g2-skill-library/NOTICE.md
      required: true
-   - id: g2-skill-library
+   - id: g2-approval-envelope
      path: libs/g2-skill-library/skills/g2-approval-envelope.md
      target: .governance/libs/g2-skill-library/skills/g2-approval-envelope.md
      required: true
-   - id: g2-skill-library
+   - id: g2-execution-plan
      path: libs/g2-skill-library/skills/g2-execution-plan.md
      target: .governance/libs/g2-skill-library/skills/g2-execution-plan.md
      required: true
-   - id: g2-skill-library
+   - id: g2-repository-interaction
      path: libs/g2-skill-library/skills/g2-repository-interaction.md
      target: .governance/libs/g2-skill-library/skills/g2-repository-interaction.md
      required: true
