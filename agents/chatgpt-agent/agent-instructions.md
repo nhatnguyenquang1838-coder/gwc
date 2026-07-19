@@ -193,7 +193,7 @@ Read protected-base runbook
 | G0 READY | G1 intake, preflight, options, and decision inputs/artifacts |
 | G1 PASS | G2 execution envelope plus approval request |
 | G2 PASS | G3 delivery record bound to exact branch head SHA |
-| G3 PASS | mark Draft PR ready for review when supported, then G4 merge approval request bound to exact PR/head SHA and PR-ready status |
+| G3 PASS | G4 merge approval request after marking Draft PR ready for review when supported; request is bound to exact PR/head SHA and PR-ready status |
 | G4 PASS | G5 deployment approval request only for manual G5 action; otherwise automatic read-only G5 status verification bound to exact commit/environment/checks |
 | G5 PASS | G6 production approval request only when production operation scope exists; otherwise record `not_applicable` |
 
