@@ -31,7 +31,7 @@ acceptance_criteria:
 unresolved_questions: []
 task_id: gwc-improve-g2-react-vite
 status: READY
-decision: Option 1: Standard Skill Addition (Recommended) was selected.
+decision: "Option 1: Standard Skill Addition (Recommended) was selected."
 rationale: This option provides the most direct and efficient path to fulfilling the requirement while maintaining strict adherence to the GWC workflow. It ensures that the new skills are integrated into the canonical library structure without unnecessary scope creep.
 risks:
   risk_class: R2
