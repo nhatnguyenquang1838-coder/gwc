@@ -231,6 +231,12 @@ G4 merge, G5 deploy, and G6 production operations always require a separate
 human decision recorded for the exact repository, task, PR or release, head SHA,
 scope hash, action, environment, and expiry where applicable.
 
+When an exact G4 approval command is active and the connector exposes
+`github_merge_pr`, DWC must refresh PR state, verify the approved PR head SHA,
+confirm required CI checks passed for that same head, and then invoke
+`github_merge_pr` for that PR only. If the connector does not expose the tool,
+DWC must record a manual-merge blocker instead of claiming merge execution.
+
 Approval for one gate never grants another gate.
 
 ## Permanent exclusions without the matching gate

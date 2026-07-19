@@ -71,7 +71,7 @@ human_direction_required_for:
 
 hard_exclusions:
   - protected_branch_direct_push
-  - merge
+  - merge_without_exact_g4_human_approval
   - auto_merge
   - deployment
   - release
