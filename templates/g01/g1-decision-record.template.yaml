@@ -18,39 +18,38 @@ user_decision:
   explicit: true
 rationale: Proceed with a bounded repository-native G0/G1 enhancement.
 rejected_option_ids:
-- OPT-2
+  - OPT-2
 acceptance_criteria_refs:
-- AC-1
-- AC-2
+  - AC-1
+  - AC-2
 scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
   excluded:
-  - G4_MERGE
-  - G5_DEPLOY
-  - G6_PRODUCTION
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
 subagent_distribution_plan:
   task_decomposition:
-  - sub_task_id: SUB-TASK-1
-    description: Design and export the new JSON schemas.
-  - sub_task_id: SUB-TASK-2
-    description: Implement the validation script in Python.
-  - sub_task_id: SUB-TASK-3
-    description: Update documentation and templates.
+    - sub_task_id: SUB-TASK-1
+      description: Design and export the new JSON schemas.
+    - sub_task_id: SUB-TASK-2
+      description: Implement the validation script in Python.
+    - sub_task_id: SUB-TASK-3
+      description: Update documentation and templates.
   agent_allocation:
-  - sub_task_id: SUB-TASK-1
-    skill_id: schema_design
-    agent_type: specialist
-  - sub_task_id: SUB-TASK-2
-    skill_id: python_dev
-    agent_type: primary
-  - sub_task_id: SUB-TASK-3
-    skill_id: technical_writing
-    agent_type: specialist
+    - sub_task_id: SUB-TASK-1
+      skill_id: schema_design
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-2
+      skill_id: python_dev
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: technical_writing
+      agent_type: specialist
   execution_order:
-  - SUB-TASK-1
-  - SUB-TASK-2
-  - SUB-TASK-3
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
   summary: Multi-agent execution for schema design, Python validation, and documentation update.
-<EOF>

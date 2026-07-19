@@ -11,6 +11,11 @@ options_ref: ../brainstorming/g1-options.yaml
 preflight_ref: ../preflight/g1-preflight-report.yaml
 status: ACCEPTED
 selected_option_id: OPT-99
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No distributed subagent execution required for this task.
 user_decision:
   actor: DW
   decided_at: '2026-07-13T11:15:00Z'

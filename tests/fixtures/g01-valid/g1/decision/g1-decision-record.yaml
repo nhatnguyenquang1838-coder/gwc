@@ -30,3 +30,8 @@ authority_boundaries:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No distributed subagent execution required for this task.

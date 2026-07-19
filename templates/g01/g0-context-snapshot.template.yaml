@@ -10,34 +10,33 @@ repository:
   base_ref: main
   base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
   protected_branches:
-  - main
+    - main
   connector: DWC
   write_enabled: true
 constraints:
-- Never write directly to main
-- G4 merge, G5 deploy, and G6 production remain separate human gates
+  - Never write directly to main
+  - G4 merge, G5 deploy, and G6 production remain separate human gates
 applicable_policies:
-- id: CODING-PROJECT-GOVERNANCE
-  path: core/Coding_Project_Governance_v1.0.md
-  ref: main
-  source_sha: ce6afe8a12740a22478c2eae6410e7784d795118
-- id: GWC-PROJECT-INSTRUCTIONS
-  path: projects/gwc/project-instructions.md
-  ref: main
-  source_sha: 18d0100f8024f5f9b7861c0de2e02da7eb93a4ff
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ce6afe8a12740a22478c2eae6410e7784d795118
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: main
+    source_sha: 18d0100f8024f5f9b7861c0de2e02da7eb93a4ff
 sources:
-- path: AGENTS.md
-  required: true
-  status: AVAILABLE
-  source_sha: 4758f9c5de05381b8edc83d031fe811cdcd710b8
-- path: projects/gwc/project-profile.yaml
-  required: true
-  status: AVAILABLE
-  source_sha: eec5b6a8b552c4a992e226239bcb502dd2d0c0c3
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 4758f9c5de05381b8edc83d031fe811cdcd710b8
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: eec5b6a8b552c4a992e226239bcb502dd2d0c0c3
 status: READY
 blockers: []
 contextual_discovery:
   historical_context: []
   downstream_impact: []
   stakeholder_reach: []
-<EOF>

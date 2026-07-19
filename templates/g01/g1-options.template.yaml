@@ -8,42 +8,41 @@ trace:
   base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
-- id: OPT-1
-  title: Repository-native contracts
-  description: Add strict JSON Schemas, YAML templates, and a deterministic Python
-    validator.
-  benefits:
-  - No new dependency
-  - Machine-readable evidence
-  - CI-compatible
-  tradeoffs:
-  - Requires explicit artifact maintenance
-  risks:
-  - Schema evolution must remain backward compatible
-  constraint_fit: FIT
-  skills_distribution:
-  - skill_id: schema_design
-    description: Design machine-readable JSON schemas and YAML templates.
-    is_required: true
-  - skill_id: python_dev
-    description: Implement the deterministic validator in Python.
-    is_required: true
-- id: OPT-2
-  title: Documentation-only lifecycle
-  description: Document G0/G1 without machine-readable enforcement.
-  benefits:
-  - Small initial diff
-  tradeoffs:
-  - Cannot reliably block incomplete G1 handoffs
-  risks:
-  - Agents may interpret lifecycle inconsistently
-  constraint_fit: PARTIAL
-  skills_distribution:
-  - skill_id: technical_writing
-    description: Document the lifecycle and requirements in Markdown.
-    is_required: true
+  - id: OPT-1
+    title: Repository-native contracts
+    description: Add strict JSON Schemas, YAML templates, and a deterministic Python
+      validator.
+    benefits:
+      - No new dependency
+      - Machine-readable evidence
+      - CI-compatible
+    tradeoffs:
+      - Requires explicit artifact maintenance
+    risks:
+      - Schema evolution must remain backward compatible
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: schema_design
+        description: Design machine-readable JSON schemas and YAML templates.
+        is_required: true
+      - skill_id: python_dev
+        description: Implement the deterministic validator in Python.
+        is_required: true
+  - id: OPT-2
+    title: Documentation-only lifecycle
+    description: Document G0/G1 without machine-readable enforcement.
+    benefits:
+      - Small initial diff
+    tradeoffs:
+      - Cannot reliably block incomplete G1 handoffs
+    risks:
+      - Agents may interpret lifecycle inconsistently
+    constraint_fit: PARTIAL
+    skills_distribution:
+      - skill_id: technical_writing
+        description: Document the lifecycle and requirements in Markdown.
+        is_required: true
 recommended_option_id: OPT-1
 recommendation_rationale: It provides deterministic enforcement with existing dependencies.
 decision_required: true
 status: READY
-<EOF>
