@@ -94,11 +94,39 @@ instructions:
      path: libs/g3-skill-library/skills/finishing-development-branch-pr-only.md
      target: .governance/libs/g3-skill-library/skills/finishing-development-branch-pr-only.md
      required: true
-   - id: g3-offline-dispatching-parallel-review
-     path: libs/g3-skill-library/skills/dispatching-parallel-review.md
-     target: .governance/libs/g3-skill-library/skills/dispatching-parallel-review.md
-     required: false
-   - id: g01-runtime-input-schema
+    - id: g3-offline-dispatching-parallel-review
+      path: libs/g3-skill-library/skills/dispatching-parallel-review.md
+      target: .governance/libs/g3-skill-library/skills/dispatching-parallel-review.md
+      required: false
+    - id: g0-g1-offline-skill-library-readme
+      path: libs/g0-g1-skill-library/README.md
+      target: .governance/libs/g0-g1-skill-library/README.md
+      required: true
+    - id: g0-g1-offline-skill-library-notice
+      path: libs/g0-g1-skill-library/NOTICE.md
+      target: .governance/libs/g0-g1-skill-library/NOTICE.md
+      required: true
+    - id: g0-g1-offline-skill-library-manifest
+      path: libs/g0-g1-skill-library/manifest.yaml
+      target: .governance/libs/g0-g1-skill-library/manifest.yaml
+      required: true
+    - id: g0-g1-offline-context-loading
+      path: libs/g0-g1-skill-library/skills/g0-context-loading.md
+      target: .governance/libs/g0-g1-skill-library/skills/g0-context-loading.md
+      required: true
+    - id: g0-g1-offline-intake-options-preflight
+      path: libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md
+      target: .governance/libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md
+      required: true
+    - id: g0-g1-offline-decision-record
+      path: libs/g0-g1-skill-library/skills/g1-decision-record.md
+      target: .governance/libs/g0-g1-skill-library/skills/g1-decision-record.md
+      required: true
+    - id: g0-g1-offline-approval-envelope
+      path: libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md
+      target: .governance/libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md
+      required: true
+    - id: g01-runtime-input-schema
      path: schemas/g01-runtime-input.schema.json
      target: .governance/schemas/g01-runtime-input.schema.json
      required: true

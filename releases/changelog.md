@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-07-19 — G0/G1 Context7-first offline skill fallback
+
+### Added
+
+- Deterministic offline skill library for G0 and G1 under `libs/g0-g1-skill-library/`.
+- Context7-first skill resolution for G0 (`skills/gwc-g0/SKILL.md`) and G1 (`skills/gwc-g1/SKILL.md`) with bundle-atomic fallback policy.
+- Pinned offline manifest, SHA-256 verification, provenance notice, and G0/G1-compatible normalized skill cards:
+  - `g0-context-loading`
+  - `g1-intake-options-preflight`
+  - `g1-decision-record`
+  - `g0-g1-approval-envelope`
+- Contract tests for Context7-first ordering, bundle-atomic fallback, offline file hashes, required skill composition, and exact evidence boundaries.
+- GWC project package entries distributing the new G0/G1 skill library.
+
+### Changed
+
+- G0 and G1 skills now use exactly one source mode per run: `CONTEXT7_LIVE` or `OFFLINE_PINNED`; live and offline cards cannot be mixed.
+- GWC project package version `1.14.0` distributes the G0/G1 skill library and updated skills.
+
+### Safety
+
+- Live and offline skill content is non-authoritative relative to protected-base GWC governance.
+- Offline cards do not grant execution, merge, deployment, release, production configuration, credential, migration, or production-data authority.
+- G0/G1 remain read-only and planning-only gates; G2 execution still requires a valid envelope and explicit approval.
+
 ## 2026-07-19 — G3 Context7-first offline skill fallback
 
 ### Added
