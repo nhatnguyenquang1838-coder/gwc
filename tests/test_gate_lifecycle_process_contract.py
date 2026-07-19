@@ -70,6 +70,41 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("## Sanitized evidence notes", dwc)
         self.assertIn("Do not copy full executable approval commands into connector payloads", chatgpt)
 
+    def test_g3_async_ci_continuation_uses_environment_aware_mechanism(self) -> None:
+        gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
+        agents = self.normalized_text("AGENTS.md")
+        dwc = self.normalized_text("agents/dwc/agent-instructions.md")
+        e2e = self.normalized_text("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
+
+        self.assertIn("G3 asynchronous CI continuation", gate_contract)
+        self.assertIn("webhook or CI event callback", gate_contract)
+        self.assertIn("local sleep or poll loop", agents)
+        self.assertIn("The default next-check interval is 3 minutes", dwc)
+        self.assertIn("manual checkpoint when no async mechanism is available", e2e)
+
+    def test_chatgpt_scheduled_tasks_require_actual_next_run(self) -> None:
+        agents = self.normalized_text("AGENTS.md")
+        chatgpt = self.normalized_text("agents/chatgpt-agent/agent-instructions.md")
+        e2e = self.normalized_text("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
+
+        self.assertIn("ChatGPT Scheduled Tasks", chatgpt)
+        self.assertIn("This is a scheduled continuation, not raw process sleep.", chatgpt)
+        self.assertIn("If the UI shows no next run or a state such as `Chưa lên lịch`", chatgpt)
+        self.assertIn("including `Chưa lên lịch`", agents)
+        self.assertIn("The task is not active unless a concrete next run is visible or recorded.", e2e)
+
+    def test_ci_failure_repair_invalidates_stale_g4_evidence(self) -> None:
+        gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
+        agents = self.normalized_text("AGENTS.md")
+        dwc = self.normalized_text("agents/dwc/agent-instructions.md")
+        e2e = self.normalized_text("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
+
+        self.assertIn("repository-fixable failures within the active G2 scope", gate_contract)
+        self.assertIn("Any repair commit invalidates prior CI", agents)
+        self.assertIn("prior CI, review, and G4-readiness evidence as stale", dwc)
+        self.assertIn("G4 approval may be generated only after required checks pass for the latest head SHA", gate_contract)
+        self.assertIn("Invalidate prior CI, review, and G4-readiness evidence", e2e)
+
 
 if __name__ == "__main__":
     unittest.main()
