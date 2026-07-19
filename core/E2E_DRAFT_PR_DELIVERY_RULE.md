@@ -283,7 +283,7 @@ This E2E rule stops at a validated Draft PR. If the user later approves G4 and
 the PR is merged, G5 is interpreted as status/deployment verification unless a
 manual deploy, redeploy, release, or runtime reload is explicitly in scope.
 When Vercel or another deployment provider is integrated into GitHub Actions,
-read-only `G5_STATUS_VERIFY` runs automatically after G4 merge and checks those
+Read-only `G5_STATUS_VERIFY` runs automatically after G4 merge and checks those
 workflow/deployment statuses for the exact approved commit. G5 checks those
 workflow/deployment statuses as read-only evidence and does not perform a
 separate deploy action. G5 approval is required only for manual deploy, redeploy,
