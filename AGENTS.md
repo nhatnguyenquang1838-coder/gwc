@@ -19,6 +19,13 @@ The shared boot, execution modes, gate lifecycle, connector-call enforcement,
 and authority boundaries in this file apply to every agent. Agent-specific
 instructions add runtime behavior; they do not replace or duplicate this file.
 
+## GWC ChatGPT response language
+
+ChatGPT-style agents operating in GWC project chat must respond Vietnamese-first.
+Keep English only where it preserves executable or technical precision, including gate names, exact approval commands, file paths, branch names, commit SHAs, tool names, code, YAML, JSON, and API identifiers.
+
+A response that primarily explains governance, status, next action, blockers, or evidence should use Vietnamese as the main language.
+
 - ChatGPT-style agents must also read
   `agents/chatgpt-agent/agent-instructions.md`.
 - Other agents must read their applicable instructions and capability
@@ -253,23 +260,28 @@ head SHA, scope hash, action, environment, and expiry where applicable.
 
 G4 requires the Pull Request to be ready for review before the agent issues a
 merge-ready G4 approval request or invokes a merge connector. A Draft PR is a
-G4 blocker unless a separately authorized ready-for-review action is available.
+G4 blocker at merge time. After G3 `PASS`, the agent may automatically mark the
+Draft PR ready for review when a connector action exists and the latest head SHA,
+required CI, review closure, G3 evidence, and scope-drift checks are satisfied.
+This ready-for-review transition is G3 metadata completion; it is not G4 approval
+and never authorizes merge.
 
-G5 is a status/deployment verification gate. When deployment is already
-integrated into GitHub Actions or another CI/CD system, G5 means checking the
-post-merge workflow, deployment check, Vercel status, runtime status, or tool
-surface for the approved commit. It does not authorize a manual deploy,
-redeploy, release, or runtime reload unless that manual action is explicitly in
-scope.
+G5 is a status/deployment verification gate. Read-only `G5_STATUS_VERIFY` runs
+automatically after G4 merge for the approved commit. It may check post-merge
+workflow status, deployment check status, Vercel status, runtime status, or tool
+surface. It does not authorize a manual deploy, redeploy, release, publish, or
+runtime reload unless that manual action is explicitly in G5 manual-action scope.
 
 G6 is generated only when production data, production configuration, migration,
 credential, or secret operations are actually in scope. Otherwise the agent
 records `G6_PRODUCTION_DATA: not_applicable` and does not create a G6 approval
 command.
 
-**Proactive transition:** Upon G4 exit, the agent must generate the G5
-status/deployment verification request. Upon G5 exit, the agent must generate a
-G6 production-operation request only when G6 scope exists. Each required command
+**Proactive transition:** Upon G4 exit, the agent must automatically run
+read-only `G5_STATUS_VERIFY` for the merge commit. The agent must request a G5
+approval command only when a manual deploy, redeploy, release, publish, or
+runtime reload is required. Upon G5 exit, the agent must generate a G6
+production-operation request only when G6 scope exists. Each required command
 must be presented to the user as a standalone approval command.
 
 ## Connector-call enforcement
@@ -285,8 +297,9 @@ execution mode.
 | Create, update, or delete repository files | G2_EXECUTION |
 | Create commit, push branch, or update ref | G2_EXECUTION |
 | Create or update Draft Pull Request | G3_PR |
+| Mark Draft PR ready for review after G3 `PASS` | G3_PR |
 | Merge or enable auto-merge | G4_MERGE |
-| Verify post-merge CI, deployment checks, Vercel status, or runtime/tool surface | G5_DEPLOY |
+| Verify post-merge CI, deployment checks, Vercel status, or runtime/tool surface | G5_DEPLOY, automatic when read-only |
 | Manually deploy, redeploy, publish, release, or reload runtime | G5_DEPLOY with explicit manual action scope |
 | Production data/config/migration/credential/secret operation | G6_PRODUCTION_DATA |
 
