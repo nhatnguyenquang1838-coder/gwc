@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-07-19 — DW1 connector structured trace contract
+
+### Added
+
+- Additive connector trace contract defining deterministic failure-stage attribution across platform runtime, connector transport, connector validation/policy, and GitHub API boundaries.
+- JSON Schema for trace IDs, operation names, stage values, upstream-attempt evidence, provider request IDs, HTTP status, and normalized retry metadata.
+- Contract tests for successful GitHub calls, connector-policy rejection, required error envelopes, and non-speculative safety-layer attribution.
+
+### Changed
+
+- DWC instructions now require structured trace evidence before naming the blocking layer.
+- DWC capabilities declare structured connector tracing as `contract_defined_runtime_bootstrap_gap`.
+
+### Limitations
+
+- The DW1 backend source is not present in this repository. Runtime instrumentation and deployment must occur in the connector implementation repository before these fields can be treated as live runtime evidence.
+
+### Safety
+
+- This additive contract grants no merge, deployment, release, production configuration, credential, secret, migration, or production-data authority.
+
 ## 2026-07-19 — G0/G1 Context7-first offline skill fallback
 
 ### Added
