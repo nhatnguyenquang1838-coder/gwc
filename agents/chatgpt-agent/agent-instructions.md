@@ -135,8 +135,11 @@ and validate them before treating the request as blocked.
 
 ### G3_PR and later
 
-Follow the parent gate contract. G3 permits a Draft PR only. G4 merge, G5 deploy,
-and G6 production authority remain separate exact human approvals.
+Follow the parent gate contract. G3 permits a Draft PR only. G4 merge, G5
+status/deployment verification, and G6 production authority remain separate
+exact human approvals. Before G4 merge execution, verify that the PR is no
+longer Draft and is ready for review. If the connector cannot mark it ready,
+report a ready-for-review blocker instead of invoking merge.
 
 ## Artifact-driven gate continuation
 
@@ -160,9 +163,9 @@ Read protected-base runbook
 | G0 READY | G1 intake, preflight, options, and decision inputs/artifacts |
 | G1 PASS | G2 execution envelope plus approval request |
 | G2 PASS | G3 delivery record bound to exact branch head SHA |
-| G3 PASS | G4 merge approval request bound to exact PR/head SHA |
-| G4 PASS | G5 deployment approval request bound to exact release/environment |
-| G5 PASS | G6 production approval request bound to exact operation/environment |
+| G3 PASS | G4 merge approval request bound to exact PR/head SHA and PR-ready status |
+| G4 PASS | G5 status/deployment verification request bound to exact commit/environment/checks |
+| G5 PASS | G6 production approval request only when production operation scope exists; otherwise record `not_applicable` |
 
 Use the existing canonical mechanism first:
 
@@ -189,6 +192,10 @@ APPROVE <GATE> <approval_request_id> <scope_hash_16> <expires_at_utc>
 Plain acknowledgements such as `ok`, `approve`, `continue`, `go`, `yes`, or
 equivalents are `ACKNOWLEDGEMENT_ONLY` and do not grant gate authority.
 
+Do not copy full executable approval commands into connector payloads, commit
+messages, PR titles, or long-lived comments. Use sanitized metadata: gate,
+approval ID, scope-hash prefix, expected SHA, and expiry.
+
 ## File tracking and context refresh
 
 ```text
@@ -197,6 +204,12 @@ No Files WRITE declaration -> no repository mutation.
 New write path -> refresh scope and approval before writing.
 Actual write outside approved scope -> stop before commit or PR.
 ```
+
+For G5, do not infer a manual deploy/reload from the gate name. If deployment is
+integrated into GitHub Actions or Vercel checks, G5 is status verification only:
+inspect the relevant post-merge workflow, deployment check, runtime status, or
+tool surface for the exact approved commit. Manual deploy, redeploy, release,
+or runtime reload requires explicit G5 manual-action scope.
 
 Refresh the active source, gate, task, repository, branch, scope, risk, and
 authority before every write-capable action and whenever the user says to
@@ -229,4 +242,6 @@ fetch and isolated validation are possible.
 
 Tool availability, a user request, or CI success does not replace gate artifacts
 or grant unrelated authority. Never invent repository paths, task artifacts,
-validator output, CI state, connector identity, or DS Admin transitions.
+validator output, CI state, connector identity, or DS Admin transitions. DS
+Admin transitions must be legal State Engine transitions and should be updated
+at each gate boundary; late reconciliation must be disclosed as late.
