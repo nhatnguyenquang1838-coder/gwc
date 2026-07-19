@@ -58,6 +58,20 @@ capabilities:
     update_task: true
     transition_task: true
     link_task_to_pr: true
+  observability:
+    structured_connector_trace:
+      contract: core/CONNECTOR_TRACE_CONTRACT_v1.0.md
+      schema: schemas/connector-trace.schema.json
+      status: contract_defined_runtime_bootstrap_gap
+      required_fields:
+        - trace_id
+        - operation
+        - stage
+        - connector_received
+        - policy_checked
+        - upstream_attempted
+        - provider_request_id
+        - http_status
 
 human_direction_required_for:
   - financial_impact
