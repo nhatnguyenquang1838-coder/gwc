@@ -125,6 +125,23 @@ A schema-valid record with `outcome: fail` or `outcome: inconclusive` may retain
 
 Review `PASS` is G3 evidence only. It never grants merge authority; G4 still requires explicit human approval for the exact PR head SHA.
 
+#### G3 asynchronous CI continuation
+
+When CI is still running after Draft PR creation or after a repair push, G3 remains in validation monitoring rather than ending silently. The agent must record the current PR number, branch, latest head SHA, DS Admin state, next check time, and continuation mechanism.
+
+Continuation mechanisms are selected in this order:
+
+1. webhook or CI event callback;
+2. local sleep or poll loop for `local_agent` execution;
+3. platform scheduler, including ChatGPT Scheduled Tasks when available;
+4. manual checkpoint when no async mechanism is available.
+
+The default next-check interval is 3 minutes when supported by the active environment. Hosted schedulers that require a slower cadence must use the supported cadence and report that limitation.
+
+A scheduled CI continuation must be treated as inactive unless a concrete next run is visible or recorded. If no next run exists, the agent must not claim async continuation is active.
+
+If CI fails, the agent may diagnose and repair only repository-fixable failures within the active G2 scope. Any repair commit changes the latest head SHA and invalidates prior CI, review, and G4-readiness evidence. G4 approval may be generated only after required checks pass for the latest head SHA.
+
 ### G4_MERGE
 
 **Entry:** G3 `PASS`, required CI checks pass, review requirements are satisfied, the Pull Request is ready for review, and explicit human approval is recorded for the exact PR head SHA.
