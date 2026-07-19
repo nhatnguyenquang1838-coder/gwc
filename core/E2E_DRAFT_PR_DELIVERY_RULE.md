@@ -212,7 +212,7 @@ Finding policy:
 - `MINOR` findings must be resolved or deferred to a traceable follow-up;
 - `NIT` findings are non-blocking but remain recorded.
 
-A G3 review decision does not authorize merge. G4 remains a separate human decision for the exact PR head SHA.
+A G3 review decision does not authorize merge. G4 remains a separate human decision for the exact PR head SHA. If the PR later enters G4, it must be ready for review before a merge-ready G4 approval request is issued or a merge connector is invoked; Draft PR state is a G4 blocker.
 
 ## CI monitoring
 
@@ -261,6 +261,17 @@ The task is complete only when:
 - No material scope drift occurred.
 - No excluded authority was exercised.
 
+## Post-E2E G4/G5/G6 scoping
+
+This E2E rule stops at a validated Draft PR. If the user later approves G4 and
+the PR is merged, G5 is interpreted as status/deployment verification unless a
+manual deploy, redeploy, release, or runtime reload is explicitly in scope.
+When Vercel or another deployment provider is integrated into GitHub Actions,
+G5 checks those workflow/deployment statuses for the exact approved commit and
+does not perform a separate deploy action. G6 is generated only when production
+data, production configuration, migrations, credentials, or secrets are actually
+in scope.
+
 ## Final response
 
 The final response must lead with:
@@ -299,7 +310,7 @@ After delivering the final report, stop and wait for the user to review the Pull
 Even in E2E mode, the agent must never:
 
 - Merge or enable auto-merge.
-- Deploy or publish a release.
+- Manually deploy, redeploy, publish a release, or reload runtime without explicit G5 manual-action scope.
 - Modify production configuration.
 - Rotate credentials.
 - Run production migrations.
