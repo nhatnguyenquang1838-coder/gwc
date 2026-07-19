@@ -218,7 +218,7 @@ A G3 review decision does not authorize merge. G4 remains a separate human decis
 
 After every push to the PR branch:
 
-1. Schedule or perform a CI check after `+2 minutes`.
+1. Schedule or perform a CI check after `+3 minutes` when the environment supports that cadence.
 2. Verify the workflow belongs to the current PR head SHA.
 3. Verify all required checks exist.
 4. Verify all required checks complete successfully.
@@ -227,7 +227,20 @@ After every push to the PR branch:
 For pending states:
 
 - Make no code change.
-- Continue monitoring the same SHA.
+- Keep DS Admin in `validation_running`.
+- Record the PR number, branch, current head SHA, next check time, and continuation mechanism.
+- Continue monitoring the same SHA through the strongest available mechanism:
+  1. webhook or CI event callback;
+  2. local sleep or poll loop;
+  3. ChatGPT Scheduled Tasks or another platform scheduler;
+  4. manual checkpoint when no async mechanism is available.
+
+For ChatGPT Scheduled Tasks or other schedulers:
+
+- The task prompt must include repository, PR number, expected head SHA when available, allowed actions, excluded actions, and the next check time.
+- The task is not active unless a concrete next run is visible or recorded.
+- If the UI or scheduler reports no next run, including `Chưa lên lịch`, treat the task as not scheduled and use another legal mechanism or a manual checkpoint.
+- A scheduled CI task may check and report status only unless a separate active approval covers repository mutation.
 
 For repository-fixable failures:
 
@@ -236,7 +249,8 @@ For repository-fixable failures:
 3. Run applicable local validation.
 4. Push using expected-SHA guards.
 5. Record the new head SHA.
-6. Restart CI monitoring.
+6. Invalidate prior CI, review, and G4-readiness evidence for the old head SHA.
+7. Restart CI monitoring.
 
 Repair limits:
 
