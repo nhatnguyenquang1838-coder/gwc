@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/connector-trace.schema.json",
+  "title": "Connector Trace Envelope",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["ok", "trace"],
+  "properties": {
+    "ok": {"type": "boolean"},
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trace_id",
+        "operation",
+        "stage",
+        "connector_received",
+        "policy_checked",
+        "upstream_provider",
+        "upstream_attempted",
+        "provider_request_id",
+        "http_status"
+      ],
+      "properties": {
+        "trace_id": {"type": "string", "minLength": 8, "maxLength": 128},
+        "operation": {"type": "string", "minLength": 1},
+        "stage": {
+          "enum": [
+            "completed",
+            "schema_validation",
+            "platform_runtime",
+            "connector_transport",
+            "connector_input_validation",
+            "connector_policy",
+            "upstream_api",
+            "response_serialization",
+            "unknown"
+          ]
+        },
+        "connector_received": {"type": "boolean"},
+        "policy_checked": {"type": "boolean"},
+        "upstream_provider": {"type": ["string", "null"]},
+        "upstream_attempted": {"type": "boolean"},
+        "provider_request_id": {"type": ["string", "null"]},
+        "http_status": {"type": ["integer", "null"], "minimum": 100, "maximum": 599}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"upstream_attempted": {"const": true}}, "required": ["upstream_attempted"]},
+          "then": {"properties": {"upstream_provider": {"type": "string", "minLength": 1}}}
+        }
+      ]
+    },
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {"type": ["string", "null"]},
+        "message": {"type": ["string", "null"]},
+        "retryable": {"type": ["boolean", "null"]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"ok": {"const": false}}, "required": ["ok"]},
+      "then": {"required": ["error"]}
+    }
+  ]
+}
