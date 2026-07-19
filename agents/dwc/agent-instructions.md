@@ -212,10 +212,8 @@ ask for it.
   the approval command to the user.
 - Upon G2 exit, immediately generate the G3 delivery record and present the
   approval command to the user.
-- Upon G3 `PASS`, immediately generate the G4 merge approval request and
-  present the approval command to the user.
-- Upon G4 exit, generate the G5 status/deployment verification request and
-  present the approval command to the user.
+- Upon G3 `PASS`, mark the Draft PR ready for review when `github_mark_pr_ready_for_review` is available and current evidence is valid, then immediately generate the G4 merge approval request and present the approval command to the user.
+- Upon G4 exit, automatically run read-only `G5_STATUS_VERIFY` for the merge commit. Generate a G5 approval command only for manual deploy, redeploy, release, publish, or runtime reload.
 - Upon G5 exit, generate the G6 production-operation approval request only when
   production data, production configuration, migrations, credentials, or secrets
   are actually in scope. Otherwise record G6 as `not_applicable` and do not
@@ -250,6 +248,8 @@ G4 merge, G5 deploy, and G6 production operations always require a separate
 human decision recorded for the exact repository, task, PR or release, head SHA,
 scope hash, action, environment, and expiry where applicable.
 
+When G3 has passed and the connector exposes `github_mark_pr_ready_for_review`, DWC may mark the Draft PR ready for review after verifying the latest PR head SHA, required CI success, review closure, G3 evidence, and no scope drift. This action is G3 metadata completion only; it does not grant merge authority.
+
 When an exact G4 approval command is active and the connector exposes
 `github_merge_pr`, DWC must refresh PR state, verify the approved PR head SHA,
 confirm required CI checks passed for that same head, verify that the PR is not
@@ -258,10 +258,10 @@ only. If the connector does not expose the tool, DWC must record a manual-merge 
 ready-for-review connector is available, DWC must record a ready-for-review
 blocker and must not invoke merge.
 
-G5 is status/deployment verification. When the project integrates Vercel or
-other deployment status into GitHub Actions, G5 requires checking the relevant
-post-merge workflow or deployment checks for the approved commit. DWC must not
-perform a manual deploy, redeploy, release, or runtime reload unless that exact
+G5 is status/deployment verification. Read-only `G5_STATUS_VERIFY` after G4 merge is automatic for the approved commit. When the project integrates Vercel or
+other deployment status into GitHub Actions, G5 checks the relevant post-merge
+workflow or deployment checks for the approved commit. DWC must not perform a
+manual deploy, redeploy, release, publish, or runtime reload unless that exact
 manual action is explicitly included in the G5 scope.
 
 Approval for one gate never grants another gate.
