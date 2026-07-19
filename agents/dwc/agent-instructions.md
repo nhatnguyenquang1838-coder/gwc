@@ -237,8 +237,7 @@ When an exact G4 approval command is active and the connector exposes
 `github_merge_pr`, DWC must refresh PR state, verify the approved PR head SHA,
 confirm required CI checks passed for that same head, verify that the PR is not
 Draft and is ready for review, and then invoke `github_merge_pr` for that PR
-only. If the connector does not expose the tool, DWC must record a manual-merge
-blocker instead of claiming merge execution. If the PR is still Draft and no
+only. If the connector does not expose the tool, DWC must record a manual-merge blocker instead of claiming merge execution. If the PR is still Draft and no
 ready-for-review connector is available, DWC must record a ready-for-review
 blocker and must not invoke merge.
 
