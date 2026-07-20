@@ -1,0 +1,22 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+preflight_status: PASS
+checks:
+  protected_branch_direct_push: false
+  production_configuration: false
+  credentials_or_secrets: false
+  production_data: false
+  migrations: false
+  deployment_or_release: false
+  branch_deletion_or_force_push: false
+  pr_base_change: false
+  governance_boundary_change: true
+mitigations:
+  - "Scope limited to capability declaration, governance instructions, schema enum, package version, changelog, and tests."
+  - "Ready-for-review action remains G3 metadata completion and explicitly grants no merge authority."
+  - "G4 merge remains separately gated by exact approval."
+blockers: []
