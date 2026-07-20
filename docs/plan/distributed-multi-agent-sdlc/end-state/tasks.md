@@ -1,10 +1,23 @@
-# Implementation Plan
+# End-State Implementation Plan
+
+**Status:** Deferred until Pilot v1 closure  
+**Status reviewed:** 2026-07-20
+
+## Evidence gate
+
+No task in this plan is complete. End-state execution may start only after the
+Pilot success and controlled failure-recovery runs produce a recorded
+`GO` or `GO_WITH_CONDITIONS` decision. Merge of prerequisite code alone is not
+operational acceptance.
 
 ## Overview
 
-Deliver the end-state in incremental releases after Pilot v1. Each release must reuse existing DS MCP/GWC mechanisms, preserve compatibility, and have an explicit go/no-go. Do not start a later wave merely because the previous code was merged; require operational evidence.
+Deliver the end-state in incremental releases after Pilot v1. Each release must
+reuse existing DS MCP/GWC mechanisms, preserve compatibility, and have an
+explicit go/no-go. Do not start a later wave merely because the previous code was
+merged; require operational evidence.
 
-## Task Dependency Graph
+## Task dependency graph
 
 ```mermaid
 graph TD
@@ -13,9 +26,10 @@ graph TD
   T3 --> T4[4. Role and evidence]
   T4 --> T5[5. Git and quality]
   T5 --> T6[6. Operations]
-  T6 --> T7[7. Multi-project rollout]
+  T6 --> T7[7. Runtime SSOT migration]
   T7 --> T8[8. Authority executors]
-  T8 --> T9[9. Platform hardening]
+  T8 --> T9[9. Multi-project rollout]
+  T9 --> T10[10. Platform hardening]
 ```
 
 ## Tasks
@@ -101,11 +115,12 @@ graph TD
   - _Requirements: 2, 6, 12_
 
 - [ ] 11. Add separately authorized G4/G5/G6 executors
-  - Implement merge executor only with exact, unexpired G4 authority.
-  - Implement deployment executor only with exact G5 authority.
-  - Implement production-operation executor only with exact G6 authority.
+  - Execute merge only with exact, unexpired G4 authority for the reviewed head.
+  - Keep automatic post-merge G5 limited to read-only status verification.
+  - Execute manual deploy/redeploy/release/publish/runtime reload only with exact G5 authority.
+  - Execute production operations only with exact G6 authority.
   - Add immutable target, scope, expiry, actor, result, and rollback evidence.
-  - Keep these executors disabled until platform controls and human procedures are reviewed.
+  - Keep executors disabled until platform controls and human procedures are reviewed.
   - _Requirements: 10, 11_
 
 - [ ] 12. Execute multi-project rollout
@@ -128,8 +143,8 @@ graph TD
 ## Notes
 
 - End-state work is a program, not one PR.
-- Use multiple atomic specs/PRs after Pilot closure.
-- Prefer Reuse → Extend → Refactor → Replace.
+- Use multiple atomic specs and PRs after Pilot closure.
+- Prefer `Reuse → Extend → Refactor → Replace`.
 - Do not replace the State Engine or adapter model without evidence that extension cannot satisfy the requirement.
 - Every repository-changing slice requires separate task-scoped gates and claims.
-- G4, G5, and G6 remain separate exact human authority.
+- G4, manual G5 actions, and G6 remain separate exact human authority.

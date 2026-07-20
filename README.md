@@ -1,336 +1,202 @@
-
-# Instruction Governance
+# GWC — Governed Workflow Control
 
 Central Git-based control plane for project instructions, governance policies,
-agent contracts, project profiles, release packages, rollout verification, and
-rollback evidence.
+agent contracts, project profiles, gate evidence, release packages, rollout
+verification, and rollback evidence.
 
-This repository is designed to be copied into:
+## Current status
 
-```text
-https://github.com/nhatnguyenquang1838-coder/gwc
-```
+| Item | Current repository state |
+|---|---|
+| Repository | `nhatnguyenquang1838-coder/gwc` |
+| GWC package | `1.13.0` |
+| Canonical core policy | Version `1.0` |
+| Canonical core SHA-256 | `04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1` |
+| Protected branch | `main` |
+| Delivery model | Guarded branch → validation → Draft PR → exact-head CI/QA when required → independent review |
+
+Projects pin a package version and source commit. They must not consume an
+unqualified `latest` package automatically.
 
 ## Core model
 
 ```text
-Central repository = source of truth
+GWC repository = governance source of truth
 Project repository = pinned consumer
-InstructionOps Agent = Git orchestrator
+DS Admin task = runtime traceability
+Guarded branch = execution boundary
 Pull Request = review boundary
 Manifest and SHA-256 = integrity boundary
 Approval envelope = authority boundary
 ```
 
-## What is included
+## Gate lifecycle
 
-- Canonical coding governance policy.
-- Global agent behavior and adaptive response presentation contracts.
-- E2E Draft PR delivery workflow and hotfix validation rules.
-- Local-agent and copyable-command rules.
-- Project packages for GWC, DS MCP, Rental Home, and PM Skills.
-- DWC runtime, InstructionOps Agent, and coding-agent bootstrap contracts.
-- JSON Schemas, including versioned G0/G1 lifecycle, G3 delivery-record, and
-  G0 hotfix-intake contracts.
-- Deterministic G0/G1 and G3 gate validation, package-build, semantic-diff,
-  rollout-verification, integrity-hash, and hotfix-validation tools.
-- GitHub Actions for validation, package builds, and manual release publication.
-- Release manifest and changelog.
-
-## Agent operating model
-
-GWC package `1.5.0` adds two modular operational contracts without changing the
-canonical core hash or replacing G0/G1:
-
-- `core/Agent_Behavior_Semantic_Contract_v1.0.md`;
-- `core/Agent_Response_Presentation_Contract_v1.0.md`.
-
-The default reasoning flow is:
-
-```text
-Understand
-→ Inspect
-→ Reconstruct current context
-→ Identify existing mechanisms
-→ Integrate the smallest compatible improvement
-→ Execute only when authorized
-→ Validate and report evidence
+```mermaid
+flowchart LR
+  G0[G0 Context] --> G1[G1 Alignment]
+  G1 --> G2[G2 Execution]
+  G2 --> P[Draft PR under G3]
+  P --> CI[Exact-head CI]
+  CI --> Q{QA policy applies?}
+  Q -- Yes --> QA[QA_VALIDATE exact-head evidence]
+  Q -- No --> G3[G3 review closure]
+  QA --> G3
+  G3 --> G4[G4 Merge]
+  G4 --> G5[G5 Status verify or manual deploy]
+  G5 --> G6[G6 Production operation when applicable]
 ```
 
-Agents prefer `Reuse → Extend → Refactor → Replace`. Missing task, connector,
-or persistence evidence degrades the workflow to verified read-only or
-planning-only mode instead of blocking all useful analysis. Repository mutation
-and authority escalation still fail closed.
+`QA_VALIDATE` is a project or workflow stage inside the G3 evidence path. It is
+not a new canonical GWC gate and does not change the sequence
+`G0 → G1 → G2 → G3 → G4 → G5 → G6`.
 
-Responses use direct Markdown by default, tables for comparison, Mermaid for
-workflow or architecture relationships, and SVG/PNG only when requested,
-required, or materially useful. Stricter project and approval artifact rules
-continue to apply.
+| Gate | Purpose | Required evidence or authority |
+|---|---|---|
+| `G0_CONTEXT` | Reconstruct verified context | READY context snapshot, exact repository and base SHA |
+| `G1_ALIGNMENT` | Select bounded outcome | Intake, preflight, options, explicit decision, validator `PASS` |
+| `G2_EXECUTION` | Perform scoped repository work | Valid execution envelope, exact Files WRITE and allowed actions |
+| `G3_PR` | Deliver and review exact branch head | Draft PR, validation, CI, delivery record, independent read-only review; exact-head QA evidence when the active workflow requires QA |
+| `G4_MERGE` | Merge reviewed head | Separate exact human approval bound to PR and head SHA |
+| `G5_STATUS_VERIFY` | Verify post-merge automation | Automatic read-only verification for the approved merge commit |
+| `G5` manual action | Deploy, redeploy, release, publish, or reload runtime | Separate exact human approval for that action |
+| `G6_PRODUCTION` | Production data/config/migration/credential operation | Separate exact human approval; otherwise `not_applicable` |
 
-## Safety defaults
+Approval for one gate never grants another gate. CI success, QA `PASS`, and
+reviewer `PASS` are evidence only.
 
-- The canonical core policy is pinned to version `1.0`.
-- Canonical SHA-256:
+### Evidence freshness
 
-```text
-04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
-```
+For workflows that require QA, a QA `PASS` is invalid unless the evidence is:
 
-- Repository writes require an active verified Project Profile with
-  `write_enabled: true`.
-- On this repository, DWC read-only inspection is automatic; bounded non-risk
-  branch writes and Draft PR delivery are automatic under the active `gwc`
-  profile and one DS Admin task.
-- Financial, architecture, security-boundary, production configuration,
-  credential, production-data, destructive, irreversible, and broad-blast-
-  radius changes require explicit human direction.
-- `rental-home` and `pm-skills` are intentionally fail-closed until their
-  repository identity and protected-base governance are verified.
-- Instruction deletion uses lifecycle transitions:
-  `active -> deprecated -> disabled -> archived`.
-- Production changes, deployment, merge, credential operations, and
-  production-data access require separate authority gates.
-- The repository contains no credentials.
+- schema-valid and accepted by the active QA evidence validator;
+- bound to the current repository, PR, scope, lease owner, and exact head SHA;
+- produced after the required CI result for the same head;
+- free of unresolved scope, secret, or authority violations.
 
-## Quick start
+Any head change invalidates prior head-bound CI, QA, and G3 review evidence.
+`REVIEW_READY` or `ACCEPTED_PENDING_G4` means the evidence package is ready for a
+separate G4 decision; it does not authorize merge, deployment, or production
+operations.
 
-### 1. Copy to the `gwc` repository
+## Execution modes
 
-Copy the contents of this directory to the root of a local checkout of `gwc`.
+| Mode | Source of truth | Repository mutation |
+|---|---|---|
+| `chat_connector_only` | Verified repository connector | Only through verified gate artifacts, envelope, and connector capability |
+| `local_agent` | Trusted checkout and isolated worktree | Scoped local Git execution after gate validation |
+| `repo_ci` | CI checkout for the exact commit | Validation only; CI does not grant later authority |
 
-PowerShell:
+Execution mode is selected from verified capabilities, not from the agent product
+name.
 
-```powershell
-Copy-Item -Recurse -Force .\instruction-governance\* C:\path\to\gwc\
-```
+## Start here
 
-Bash:
+| Need | Document |
+|---|---|
+| Repository authority and boot sequence | [`AGENTS.md`](AGENTS.md) |
+| Runtime behavior | [`core/Agent_Operating_Runtime_Contract_v1.0.md`](core/Agent_Operating_Runtime_Contract_v1.0.md) |
+| Coding governance | [`core/Coding_Project_Governance_v1.0.md`](core/Coding_Project_Governance_v1.0.md) |
+| Gate lifecycle | [`core/GATE_LIFECYCLE_CONTRACT_v1.0.md`](core/GATE_LIFECYCLE_CONTRACT_v1.0.md) |
+| Draft PR delivery | [`core/E2E_DRAFT_PR_DELIVERY_RULE.md`](core/E2E_DRAFT_PR_DELIVERY_RULE.md) |
+| G0/G1 operations | [`core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md`](core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md) |
+| G0/G1 artifact guide | [`docs/g01-lifecycle.md`](docs/g01-lifecycle.md) |
+| Base drift decisions | [`docs/base-drift-policy.md`](docs/base-drift-policy.md) |
+| Observed G0/G1 failure patterns | [`docs/gaps/g0-g1-naming-location-convention-gaps.md`](docs/gaps/g0-g1-naming-location-convention-gaps.md) |
+| GWC project profile | [`projects/gwc/project-profile.yaml`](projects/gwc/project-profile.yaml) |
+| GWC package | [`projects/gwc/package.yaml`](projects/gwc/package.yaml) |
+| Project overview | [`GWC_Project_Overview.md`](GWC_Project_Overview.md) |
+| Distributed multi-agent plan | [`docs/plan/distributed-multi-agent-sdlc/README.md`](docs/plan/distributed-multi-agent-sdlc/README.md) |
+| Release history | [`releases/changelog.md`](releases/changelog.md) |
 
-```bash
-cp -a instruction-governance/. /path/to/gwc/
-```
+## Quick validation
 
-### 2. Install validation dependencies
+Install dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 3. Validate everything
+Validate repository instructions and packages:
 
 ```bash
 python tools/validate_instructions.py
 ```
 
-### 4. Validate G0/G1 lifecycle artifacts
+Validate a task-scoped G0/G1 workspace:
 
 ```bash
-python tools/validate_g01.py --workspace .gwc
-python -m unittest tests.test_g01_lifecycle
-python -m unittest tests.test_g01_runtime
-python -m unittest tests.test_g01_decision_capture
+python tools/validate_g01.py --workspace .gwc/tasks/<task-id>
 ```
 
-The validator returns `PASS` only when G0 context and all G1 intake, preflight,
-options, and decision artifacts are schema-valid and mutually consistent. A G1
-`PASS` is evidence for G2 planning only; it never grants merge, deployment, or
-production authority. See `docs/g01-lifecycle.md`.
-
-### 5. Validate base drift policy
-
-```bash
-python tools/evaluate_base_drift.py --test
-```
-
-### 6. Validate a G3 delivery record
+Validate a G3 delivery record:
 
 ```bash
 python tools/validate_g3_delivery.py \
-  --record templates/gates/g3-delivery-record.template.yaml \
+  --record .gwc/tasks/<task-id>/g3/delivery-record.yaml \
   --json
-python -m unittest tests.test_g3_delivery
 ```
 
-The G3 record binds the Draft PR, exact head SHA, scope hash, validation, CI,
-acceptance criteria, review lanes, findings, residual risks, and later-gate
-exclusions. A new head SHA makes earlier review evidence stale and requires a
-new read-only review. Reviewer PASS is evidence only and does not grant G4 merge
-authority.
-
-### 7. Build a project package
+Run unit tests:
 
 ```bash
-python tools/build_project_package.py ds-mcp --output dist
+python -m unittest discover -s tests -p "test_*.py"
 ```
 
-Output:
-
-```text
-dist/ds-mcp/<version>/
-├── .governance/
-└── package-manifest.yaml
-```
-
-### 8. Compare package revisions
+Build a project package:
 
 ```bash
-python tools/diff_instruction_package.py \
-  dist-old/ds-mcp/1.0.0 \
-  dist/ds-mcp/1.1.0
+python tools/build_project_package.py <project-id> --output dist
 ```
 
-### 9. Verify a rollout checkout
+## Repository write model
 
-```bash
-python tools/verify_rollout.py \
-  dist/ds-mcp/1.1.0 \
-  /path/to/ds_mcp_server
-```
-
-### 10. Validate integrity hashes
-
-```bash
-python tools/hash_integrity_artifacts.py --test
-```
-
-## Instruction CRUD commands
-
-The InstructionOps Agent accepts these normalized commands:
+For this repository, verified read-only inspection is automatic. Bounded writes
+require one active DS Admin task, task-scoped G0/G1 evidence, an explicit file
+scope, a valid execution envelope, a guarded branch, validation, and a Draft PR.
 
 ```text
-INSTRUCTION LIST [project-id]
-INSTRUCTION GET <project-id> [instruction-id]
-INSTRUCTION CREATE <project-id> <instruction-id>
-INSTRUCTION UPDATE <project-id> <instruction-id>
-INSTRUCTION DEPRECATE <project-id> <instruction-id>
-INSTRUCTION VALIDATE [project-id]
-INSTRUCTION BUILD <project-id>
-INSTRUCTION DIFF <project-id> <from-version> <to-version>
-INSTRUCTION PUBLISH <project-id> <version>
-INSTRUCTION ROLLBACK <project-id> <version>
-INSTRUCTION DRIFT <project-id>
+Inspect
+→ G0 READY
+→ G1 PASS
+→ exact G2 authority when required
+→ guarded branch execution
+→ Draft PR and exact-head CI
+→ QA_VALIDATE when the active workflow requires it
+→ G3 delivery record and independent review
+→ exact G4 approval before merge
 ```
 
-All modifying commands produce a proposal, scoped approval envelope, dedicated
-branch, validation evidence, and Draft PR. They never imply merge or deployment.
+Do not infer readiness or completion from conversation memory, a similarly named
+task, or a previously passing head. Task state and evidence must be resolved from
+the protected base, DS Admin, the current branch head, and repository-native
+validation.
 
-## DWC repository operations
+Direct pushes to protected branches, auto-merge, unapproved merge, deployment,
+release, production configuration/data, credentials, migrations, force-push,
+branch deletion, and shared-history rewrite remain prohibited or separately
+gated.
 
-For `nhatnguyenquang1838-coder/gwc`, DWC is not restricted to a fixed file
-allowlist. It may read the complete verified repository and modify any file
-required by the active DS Admin task on a dedicated guarded branch.
+## Project packages
 
-The automatic path is:
+| Project | Package state | Write enabled |
+|---|---|---|
+| `gwc` | active | yes |
+| `ds-mcp` | active | yes |
+| `rental-home` | active | yes |
+| `pm-skills` | pending repository assignment | no |
 
-```text
-G0 intake
-→ automatic G1 inspection
-→ automatic G2 bounded non-risk execution
-→ validation and diff review
-→ automatic G3 Draft PR assembly
-→ independent read-only review of the exact head SHA
-→ G3 review closure after CI
-→ user review
-```
-
-Direct pushes to `main`, merge, auto-merge, deployment, release, production
-configuration, credential operations, production data, force-push, branch
-deletion, and shared-history rewrite remain prohibited or separately gated.
-
-## Project activation
-
-A project becomes write-capable only after:
-
-1. Repository owner and name are verified.
-2. Default and protected branches are verified.
-3. Connector identity is verified.
-4. Protected-base governance is read.
-5. `write_enabled` is deliberately changed to `true`.
-6. The profile change is reviewed through a Pull Request.
-
-## Git workflow
-
-Recommended branch prefixes:
-
-```text
-docs/
-chore/
-feature/
-fix/
-ai/
-```
-
-Never push instruction changes directly to a protected branch.
+The active project profile and package are authoritative when this summary drifts.
 
 ## Release model
 
-Project packages use Semantic Versioning:
-
 - `PATCH`: wording or typo changes that do not alter behavior.
-- `MINOR`: additive rule, check, command, or gate.
+- `MINOR`: additive rule, check, command, capability, or gate behavior.
 - `MAJOR`: breaking workflow, authority, schema, or compatibility change.
-
-Projects pin a package version and source commit. They must not consume
-`latest` automatically.
-
-## Approval command format
-
-Any exact user command must be displayed as a standalone copyable block:
-
-```text
-APPROVE CP-20260712-001 0123456789abcdef
-```
-
-`APPROVE G2_EXECUTION` is not a valid execution token.
-
-## Gate Lifecycle Summary
-
-The repository enforces a strict sequential gate system. Each gate requires specific artifacts and validation before the next can be entered. Approval for one gate never grants authority for any other gate (fail-closed).
-
-| Gate | Purpose | Requirement |
-| :--- | :--- | :--- |
-| **G0_CONTEXT** | Contextual Awareness | `context-snapshot.yaml` (Status: READY) |
-| **G1_ALIGNMENT** | Alignment & Planning | `tools/validate_g01.py` (Result: PASS) |
-| **G2_EXECUTION** | Guarded Execution | Valid `execution-envelope.yaml` & authorized actions |
-| **G3_PR** | Draft PR Assembly | Valid `delivery-record.yaml` & Independent Review |
-| **G4_MERGE** | Merge Authorization | Explicit human approval for the exact head SHA |
-| **G5_DEPLOY** | Deployment Approval | Explicit human deployment authorization |
-| **G6_PRODUCTION_DATA** | Production Operations | Specific authorized operation (Data/Config/Migration) |
-
-## Current project status
-
-## Current project status
-
-## Gate Lifecycle Summary
-
-The repository enforces a strict sequential gate system. Each gate requires specific artifacts and validation before the next can be entered. Approval for one gate never grants authority for any other gate (fail-closed).
-
-| Gate | Purpose | Requirement |
-| :--- | :--- | :--- |
-| **G0_CONTEXT** | Contextual Awareness | `context-snapshot.yaml` (Status: READY) |
-| **G1_ALIGNMENT** | Alignment & Planning | `tools/validate_g01.py` (Result: PASS) |
-| **G2_EXECUTION** | Guarded Execution | Valid `execution-envelope.yaml` & authorized actions |
-| **G3_PR** | Draft PR Assembly | Valid `delivery-record.yaml` & Independent Review |
-| **G4_MERGE** | Merge Authorization | Explicit human approval for the exact head SHA |
-| **G5_DEPLOY** | Deployment Authorization | Explicit human deployment authorization |
-| **G6_PRODUCTION_DATA** | Production Operations | Specific authorized operation (Data/Config/Migration) |
-
-## Current project status
-
-| Project       |                        Status | Write enabled |
-| ------------- | ----------------------------: | ------------: |
-| `gwc`         |                        active |           yes |
-| `ds-mcp`      |                        active |           yes |
-| `rental-home` |                        active |           yes |
-| `pm-skills`   | pending repository assignment |            no |
 
 ## No implicit production action
 
-Building or publishing an instruction package does not:
-
-- merge a Pull Request;
-- deploy an application;
-- change Vercel configuration;
-- rotate credentials;
-- run migrations;
-- read or write production data.
+Building or publishing a package, passing CI or QA, completing review, or
+creating a Draft PR does not merge a Pull Request, deploy an application, modify
+production configuration, rotate credentials, run migrations, or read/write
+production data.

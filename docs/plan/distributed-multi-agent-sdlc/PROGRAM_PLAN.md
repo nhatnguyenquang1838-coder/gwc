@@ -1,188 +1,248 @@
 # Distributed Multi-Agent SDLC Program Plan
 
+**Plan status:** Approved direction; Pilot completion not verified  
+**Status reviewed:** 2026-07-20  
+**Current GWC evidence baseline:** `main@16f64a88e0a5a7fc811e32e3acd06cda1301c50c`
+
 ## 1. Decision
 
-Use **DS MCP as the single execution control plane**. Do not introduce a second orchestrator or a new generic file-writing MCP.
+Use **DS MCP as the single execution control plane**. Do not introduce a second
+orchestrator or a generic file-writing MCP.
 
-Repository specs remain the source of truth for requirements and design. DS Admin/AgentOps becomes the source of truth for runtime execution state, role ownership, leases, PR/head-SHA binding, CI state, QA evidence, and stage transitions.
+Repository specs remain the source of truth for requirements and design. DS
+Admin/AgentOps becomes the source of truth for runtime execution state, role
+ownership, claims, leases, PR/head-SHA binding, CI state, QA evidence, and stage
+transitions.
 
-## 2. Current-to-Target Assessment
-
-### 2.1 Runtime Source of Truth
-
-**Current mechanism:** DS Admin/AgentOps tracks durable workflows, while Rental Home also treats `TASK.md` and Kiro task files as workflow state.
-
-**Purpose:** Coordinate tasks and retain project-local traceability.
-
-**Limitation:** Runtime state can drift between Task Server and repository Markdown.
-
-**Improvement:** Introduce `tracking_mode: ds_admin_runtime` for Pilot v1. DS Admin is canonical for runtime state; repository task files are projections/evidence for Pilot tasks.
-
-**Compatibility:** Existing non-pilot tasks continue their current repository-driven workflow until migrated.
-
-**Impact:** Removes split-brain execution without a big-bang migration.
-
-### 2.2 Workflow Engine
-
-**Current mechanism:** A linear State Engine creates `analyze_repo → plan_changes → modify_code → create_pr → wait_github_ci → final_report`, with CI failure routed through `fix_ci`.
-
-**Purpose:** Durable asynchronous execution.
-
-**Limitation:** No distinct QA stage or role-bound handoff.
-
-**Improvement:** Pilot adds `qa_validate` and role capability enforcement. End-state moves to versioned declarative workflow templates.
-
-**Compatibility:** Preserve current task types and transition semantics; add one bounded stage first.
-
-**Impact:** Enables a real Dev-to-QA handoff without replacing the State Engine.
-
-### 2.3 File and Action Boundaries
-
-**Current mechanism:** Repository allowlist, protected-branch blocks, branch prefix rules, exact task scope, GWC envelopes, and isolated worktrees.
-
-**Purpose:** Prevent unsafe writes.
-
-**Limitation:** Boundaries are not yet tied consistently to agent role and claimed stage.
-
-**Improvement:** Bind role, stage, repository, branch, exact file set, and authorized action set to the task claim and G2 envelope.
-
-**Compatibility:** Reuses existing GitHub gateway and GWC action-to-gate validation.
-
-**Impact:** Stronger than regex-only directory guards.
-
-### 2.4 QA Evidence
-
-**Current mechanism:** Local test commands, CI status, reviewer gate, and free-form task result artifacts.
-
-**Purpose:** Demonstrate correctness.
-
-**Limitation:** No canonical QA evidence schema tied to exact PR head SHA.
-
-**Improvement:** Add `QaEvidence` with exact repo, PR, head SHA, agent, commands, test/coverage results, diff-scope result, findings, and disposition.
-
-**Compatibility:** Store under existing task result artifacts and event log in Pilot v1.
-
-**Impact:** Makes QA auditable and prevents stale-head approval.
-
-### 2.5 Merge and Deployment
-
-**Current mechanism:** GWC separates G4 merge, G5 deployment, and G6 production authority.
-
-**Purpose:** Preserve human authority for high-impact operations.
-
-**Limitation:** The original guide collapses QA pass, Done, and merge.
-
-**Improvement:** End Pilot at `REVIEW_READY` or `ACCEPTED_PENDING_G4`. Merge remains a separate exact human decision.
-
-**Compatibility:** Fully aligned with existing GWC.
-
-**Impact:** Prevents CI or QA from implicitly granting merge/deploy authority.
-
-## 3. Pilot v1 Outcome
-
-Pilot v1 is complete only when both runs succeed:
-
-1. **Success run**
-   - Lead creates the root work item and workflow.
-   - Dev claims the exact `modify_code` task.
-   - Dev implements the Rental Home validation adapter in an isolated worktree.
-   - A Draft PR is created and CI passes for the exact head SHA.
-   - QA claims the exact `qa_validate` task.
-   - QA validates the same head SHA and submits structured QA evidence.
-   - Reviewer/human receives the final report.
-   - No merge or deployment is performed without separate authority.
-
-2. **Controlled failure-recovery run**
-   - A deterministic test failure is introduced in a pilot-only branch or fixture.
-   - QA reports `failed` with structured findings.
-   - State Engine returns work to Dev within a bounded repair loop.
-   - Dev fixes the exact finding.
-   - CI and QA pass on the new exact head SHA.
-   - The audit trail shows both attempts and no stale evidence reuse.
-
-## 4. Pilot Scope
-
-### In Scope
-
-- `qa_validate` async stage.
-- Role-to-capability policy.
-- Targeted task claim and lease checks.
-- Exact repository/branch/PR/head-SHA binding.
-- Structured `QaEvidence`.
-- Machine-readable Rental Home workflow validation output.
-- Heartbeat and scheduler operational checks.
-- Success and failure-recovery pilot runs.
-- Dashboard visibility for stage, owner, stale status, CI, and QA result.
-- Tests, OpenAPI/MCP capability documentation, and handoff documentation.
-
-### Out of Scope
-
-- Merge automation.
-- Deployment automation.
-- Production data or configuration.
-- Supabase schema changes unless later proven necessary and separately scoped.
-- Rental Home business behavior changes.
-- Generic DAG engine replacement in Pilot v1.
-- Jira/Linear integration.
-- Multi-repository parallel fan-out.
-- Cost-based model routing.
-- Autonomous security, architecture, or migration approval.
-
-## 5. Program Workstreams
+## 2. Current status
 
 ```mermaid
 flowchart LR
-    P0[Contract and gates] --> P1[DS MCP control plane]
-    P1 --> P2[Rental adapter]
-    P2 --> P3[Success pilot]
-    P3 --> P4[Failure recovery]
-    P4 --> P5[End-state rollout]
+  P[Planning package persisted] --> C[Contract and repository reconciliation]
+  C --> D[DS MCP Pilot capability]
+  D --> R[Rental Home adapter]
+  R --> S[Success run]
+  S --> F[Failure-recovery run]
+  F --> G[GO / GO_WITH_CONDITIONS / NO_GO]
+  G --> E[End-state rollout]
 ```
 
-### Workstream A — Governance and Contract
+| Phase | Status | Evidence rule |
+|---|---|---|
+| Planning package | Complete | GWC plan files exist on protected `main` |
+| Contract and baseline reconciliation | Pending per implementation task | Must be proven against each repository's current protected base |
+| DS MCP Pilot capability | Not verified complete | Requires exact PR/head, CI, runtime activation, and capability evidence |
+| Rental Home adapter | Not verified complete | Requires separate exact PR/head and validation evidence |
+| Success Pilot run | Not started/verified | Requires end-to-end task, claim, CI, QA, and transition audit trail |
+| Failure-recovery Pilot run | Not started/verified | Requires stale-evidence rejection and bounded repair evidence |
+| End-state rollout | Deferred | Starts only after recorded Pilot go/no-go |
 
-- Reconcile profile/package/extension contradictions before G2.
-- Materialize G0/G1 task workspaces.
-- Define role, stage, evidence, and authority boundaries.
-- Generate separate G2/G3 packages per repository.
-- Keep G4/G5/G6 excluded.
+No unchecked task in this package may be marked complete from conversation memory,
+a similarly named task, or evidence bound to another base, branch, PR, or head.
 
-### Workstream B — DS MCP Pilot Capability
+## 3. Current-to-target assessment
 
-- Extend async stage schema with `qa_validate`.
-- Add role/capability policy.
-- Bind claims to task/repository/branch/PR/head SHA.
-- Add QA evidence validation and storage.
-- Add deterministic transitions for QA pass/fail.
-- Add dashboard and API/MCP projections.
-- Add tests.
+### 3.1 Runtime source of truth
 
-### Workstream C — Rental Home Adapter
+**Current mechanism:** DS Admin/AgentOps tracks durable workflow state while some
+project repositories also maintain Markdown task projections.
 
-- Add deterministic JSON output to the existing repository workflow validator.
-- Preserve human-readable output.
-- Add tests for pass/fail and malformed state.
-- Add adapter documentation.
-- Do not change app runtime, Supabase, RLS, auth, or production data.
+**Purpose:** Coordinate execution and retain project-local traceability.
 
-### Workstream D — Pilot Execution
+**Limitation:** Runtime state and repository projection can drift.
 
-- Create DS Admin root task and child tasks.
-- Register/heartbeat Lead, Dev, and QA identities.
-- Execute success path.
-- Execute controlled failure-recovery path.
-- Produce evidence report.
+**Improvement:** Use `tracking_mode: ds_admin_runtime` for Pilot tasks. DS Admin
+is canonical for runtime state; repository task files are requirements,
+projections, and evidence.
 
-### Workstream E — End-State
+**Compatibility:** Non-pilot tasks retain their current mode until explicitly
+migrated.
 
-- Versioned workflow templates.
-- Multi-project adapters.
-- Policy packs and QA profiles.
-- Artifact registry.
-- Operations, scheduler, SLOs, and recovery.
-- Gradual runtime-SSOT migration.
+**Impact:** Removes split-brain execution without a big-bang migration.
 
-## 6. Proposed Task Tree
+### 3.2 Workflow engine
+
+**Current mechanism:** DS MCP provides durable tasks, legal State Engine
+transitions, async workflows, claims/leases, callbacks, CI continuation, and
+operational projections.
+
+**Purpose:** Provide durable asynchronous execution.
+
+**Limitation:** The Pilot still needs exact evidence that role-separated QA and
+head-bound evidence work together end to end.
+
+**Improvement:** Add or verify a bounded `qa_validate` stage and role-capability
+enforcement before considering generic workflow-template expansion.
+
+**Compatibility:** Preserve existing task types and transition semantics.
+`qa_validate` remains a Pilot workflow stage inside the G3 evidence path and does
+not become a canonical GWC gate.
+
+**Impact:** Enables auditable Dev-to-QA handoff without replacing the State
+Engine or changing `G0 → G1 → G2 → G3 → G4 → G5 → G6`.
+
+### 3.3 File and action boundaries
+
+**Current mechanism:** Protected-branch blocks, branch-prefix rules, task scope,
+GWC envelopes, exact Files WRITE, and isolated worktrees/sessions.
+
+**Purpose:** Prevent unsafe or unrelated writes.
+
+**Limitation:** Role, claimed stage, branch, file set, and action set must be
+verified consistently at each write boundary.
+
+**Improvement:** Bind those dimensions to the task claim and execution envelope.
+
+**Compatibility:** Reuse the GitHub gateway and GWC action-to-gate checks.
+
+**Impact:** Stronger than directory or regex guards alone.
+
+### 3.4 QA evidence
+
+**Current mechanism:** Pilot requirements and design already specify
+`qa_validate`, role-capability enforcement, exact PR/head binding, structured
+`QaEvidence`, stale-head rejection, and explicit non-grant of G4/G5/G6
+authority.
+
+**Purpose:** Demonstrate quality for the exact current revision.
+
+**Limitation:** The planning narrative must state the same fail-closed evidence
+strictness as G0/G1: no QA `PASS` without accepted, current validator evidence.
+
+**Improvement:** A Pilot QA `PASS` requires:
+
+1. exact repository, PR, scope, and current head binding;
+2. active lease ownership and the required QA role/capability;
+3. required CI success for the same head;
+4. schema-valid, bounded, secret-safe evidence;
+5. rejection of stale, malformed, mismatched, or scope-violating evidence;
+6. preserved validator result and accepted evidence in task artifacts/events.
+
+Any new head invalidates prior CI, QA, and G3 review evidence.
+
+**Compatibility:** Store normalized evidence through existing task artifacts and
+events. Do not add another evidence store.
+
+**Impact:** Prevents stale-head acceptance without overstating a missing
+`QaEvidence` architecture gap.
+
+### 3.5 Merge and deployment
+
+**Current mechanism:** GWC separates G4 merge, G5 status/deployment, and G6
+production authority.
+
+**Purpose:** Preserve explicit authority for high-impact operations.
+
+**Improvement:** End the Pilot at `REVIEW_READY` or `ACCEPTED_PENDING_G4` only
+after exact-head CI, required QA, and G3 review evidence are complete. Merge
+remains an exact human decision. After merge, read-only G5 status verification is
+automatic; manual deploy/redeploy/release/publish/runtime reload still requires
+separate G5 authority.
+
+**Compatibility:** No new authority state is introduced. These labels describe
+review readiness only.
+
+**Impact:** CI, QA, G3 `PASS`, `REVIEW_READY`, and `ACCEPTED_PENDING_G4` can never
+implicitly grant merge, deployment, or production authority.
+
+## 4. Pilot evidence and drift controls
+
+### 4.1 Protected-base drift
+
+Apply [`../../base-drift-policy.md`](../../base-drift-policy.md) after the
+approved protected base changes:
+
+| Decision | Pilot action | Required evidence response |
+|---|---|---|
+| `SAFE_CONTINUE` | Continue only when changed files do not overlap scope or authority boundaries | Record the drift evaluation; preserve G0/G1 and G2; retain head-bound evidence only when the execution head remains valid |
+| `REVALIDATE` | Reconstruct/rebase the execution head when needed and rerun affected checks | Regenerate validation, CI, QA, and G3 review evidence for the new head |
+| `REAPPROVE` | Refresh alignment and authority before further writes | Regenerate G0/G1, scope hash, work binding, G2 envelope, and approval; invalidate downstream evidence |
+| `STOP` | Stop the Pilot slice | Require a new bounded scope/authority package; reuse no prior approval or production-sensitive evidence |
+
+A drift decision records old/new base SHAs, changed files, scope overlap, risk,
+and evaluator decision. QA evidence is never “reapproved”; it is either still
+valid for the unchanged head or regenerated for the new exact head.
+
+### 4.2 Pilot preflight checklist
+
+The implementation checklist in
+[`pilot-v1/ds-mcp/tasks.md`](pilot-v1/ds-mcp/tasks.md) addresses the observed
+failure patterns in
+[`../../gaps/g0-g1-naming-location-convention-gaps.md`](../../gaps/g0-g1-naming-location-convention-gaps.md).
+Before Pilot execution, verify:
+
+- deterministic run/task identity and collision-free task-scoped workspace;
+- a real DS Admin task in a legal state;
+- current protected-base SHA and complete G0/G1 evidence;
+- `tools/validate_g01.py --workspace <workspace>` with preserved stdout, exit code,
+  and workspace path;
+- non-placeholder scope hash, approval ID, and UTC expiry;
+- visible gate-transition reporting;
+- no use of conversation memory as completion or authority evidence.
+
+## 5. Pilot completion outcome
+
+Pilot v1 is complete only when both runs succeed.
+
+### Success run
+
+- Lead creates the root work item and workflow.
+- Dev claims the exact scoped modification task.
+- Dev implements the Rental Home validation adapter in an isolated worktree.
+- A Draft PR is created and CI passes for the exact head SHA.
+- QA claims the exact QA task and validates the same head SHA.
+- Structured QA evidence is accepted for that head.
+- G3 delivery/review evidence reaches review-ready state.
+- Reviewer/human receives the final report.
+- No merge or manual deployment occurs without separate authority.
+
+### Controlled failure-recovery run
+
+- A deterministic failure is introduced in a Pilot-only branch or fixture.
+- QA returns structured failed evidence.
+- State Engine creates or routes a bounded Dev repair task.
+- Dev fixes the exact finding.
+- Prior CI/QA/G3 review evidence is rejected after the head changes.
+- CI and QA pass for the new exact head SHA.
+- The audit trail preserves both attempts and all legal transitions.
+
+## 6. Pilot scope
+
+### In scope
+
+- Role-to-capability policy and targeted task claims.
+- Lease and heartbeat enforcement.
+- Exact repository/branch/PR/head-SHA binding.
+- Structured QA evidence and freshness validation.
+- Protected-base drift classification and evidence response.
+- Machine-readable Rental Home workflow validation output.
+- Bounded repair and stale-evidence rejection.
+- Dashboard visibility for stage, owner, stale status, CI, QA, retries, blockers,
+  and next action.
+- Success and controlled failure-recovery runs.
+
+### Out of scope
+
+- A new canonical `QA_VALIDATE` gate.
+- Automatic merge without exact G4 approval.
+- Manual deployment without exact G5 approval.
+- Production data/configuration, credentials, secrets, or migrations.
+- Rental Home business behavior changes.
+- Generic DAG replacement during Pilot v1.
+- Multi-repository parallel fan-out.
+- Autonomous security, architecture, migration, or production approval.
+
+## 7. Program workstreams
+
+| Workstream | Scope | Exit evidence |
+|---|---|---|
+| A — Governance and contract | Reconcile profiles, packages, gates, roles, evidence, drift, exclusions | Valid task-scoped G0/G1, preflight checklist, and repository-specific delivery scope |
+| B — DS MCP capability | QA stage, role policy, evidence binding, API/MCP/dashboard, tests | Draft PR, exact head CI/QA/review, separate runtime activation evidence |
+| C — Rental Home adapter | JSON validation output and focused tests | Separate Draft PR, exact head CI, no app/DB/auth/RLS scope drift |
+| D — Pilot execution | Success and failure-recovery runs | Complete transition, claim, CI, QA, stale-evidence, and drift audit trail |
+| E — End-state | Templates, adapters, policies, registry, SLOs, rollout | Starts only after Pilot go/no-go |
+
+## 8. Proposed task tree
 
 ```text
 MAS-PILOT-00  Epic: Distributed Multi-Agent SDLC Pilot v1
@@ -194,44 +254,49 @@ MAS-PILOT-00  Epic: Distributed Multi-Agent SDLC Pilot v1
 ├── MAS-PILOT-06  DS MCP focused tests and Draft PR
 ├── MAS-PILOT-07  Rental Home JSON validation adapter
 ├── MAS-PILOT-08  Rental Home tests and Draft PR
-├── MAS-PILOT-09  Operational activation under separate G5 if required
+├── MAS-PILOT-09  Runtime activation when required
 ├── MAS-PILOT-10  Execute success run
 ├── MAS-PILOT-11  Execute failure-recovery run
 └── MAS-PILOT-12  Pilot report and end-state go/no-go
 ```
 
-Each repository-changing task requires its own task-scoped G0/G1 evidence, valid claim, G2 envelope, isolated branch/worktree, validation, and G3 delivery record.
+Each repository-changing task requires its own DS Admin traceability, current
+protected-base G0/G1 evidence, execution envelope, isolated branch/worktree,
+validation, applicable QA evidence, and G3 delivery record.
 
-## 7. Release Strategy
+## 9. Release strategy
 
 | Release | Scope | Exit |
 |---|---|---|
-| R0 | Specs and contracts | Approved spec package |
-| R1 | DS MCP Pilot capability | Draft PR, local tests, CI green |
-| R2 | Rental Home adapter | Draft PR, local tests, CI green |
-| R3 | Runtime activation | Separate G4/G5 authority where applicable |
-| R4 | Success pilot | Complete exact-SHA audit trail |
-| R5 | Failure-recovery pilot | Bounded recovery proven |
-| R6 | End-state decision | Scale, revise, or stop |
+| R0 | Specs and contracts | Planning package reviewed and persisted |
+| R1 | DS MCP Pilot capability | Draft PR, validation, exact-head CI/QA and review |
+| R2 | Runtime activation | Separate G4 and manual G5 authority where applicable |
+| R3 | Rental Home adapter | Separate Draft PR, validation, exact-head CI and review |
+| R4 | Success Pilot | Complete exact-SHA audit trail |
+| R5 | Failure-recovery Pilot | Bounded recovery and stale-evidence rejection proven |
+| R6 | End-state decision | `GO`, `GO_WITH_CONDITIONS`, or `NO_GO` |
 
-## 8. Go/No-Go Criteria
+## 10. Go/no-go criteria
 
 ### Go
 
-- No illegal transition.
-- No unclaimed write.
-- No protected-branch write.
-- No stale PR/CI/QA evidence accepted.
-- All stage changes recorded by State Engine.
-- Success and failure-recovery runs complete.
+- Pilot preflight checklist is complete with repository evidence.
+- No illegal transition or unclaimed write.
+- No protected-branch direct write.
+- No stale PR, CI, QA, review, or head-SHA evidence accepted.
+- Base drift is classified and handled according to policy.
+- All stage changes are recorded by the State Engine.
+- Success and failure-recovery runs are complete.
 - No G4/G5/G6 authority leakage.
-- Operators can identify current owner, stage, blocker, and next action.
+- Operators can identify current owner, stage, blocker, evidence, and next action.
 
-### No-Go
+### No-go
 
-- Runtime state diverges between DS Admin and repository projection.
-- QA validates a different head SHA.
-- Agent can claim a task outside its role.
-- Lease expiry is silently ignored.
-- Repair loop exceeds three attempts.
-- Pilot requires production data, secret changes, or unplanned architecture changes.
+- Runtime state diverges from its declared source of truth.
+- QA validates a different head SHA or reports `PASS` without accepted fresh evidence.
+- An agent can claim work outside its role or scope.
+- Lease expiry or callback failure is silently ignored.
+- Base drift is unclassified or required revalidation/reapproval is skipped.
+- Repair exceeds its bounded attempt budget.
+- Pilot requires unplanned production, credential, secret, migration, or broad
+  architecture scope.
