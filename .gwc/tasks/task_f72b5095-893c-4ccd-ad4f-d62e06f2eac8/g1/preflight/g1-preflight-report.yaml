@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-20T08:24:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity and base evidence are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@52fe9dac663df68be904a74d9fca6e4797d49944
+  - projects/gwc/project-profile.yaml
+- id: REQUIRED_SOURCES
+  status: PASS
+  code: REQUIRED_SOURCES_AVAILABLE
+  message: All required sources are available.
+  evidence:
+  - AGENTS.md
+  - projects/gwc/project-profile.yaml
+- id: TASK_TRACEABILITY
+  status: PASS
+  code: DS_ADMIN_TASK_CLAIMED
+  message: The bounded change has a claimed DS Admin task.
+  evidence:
+  - task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+- id: INTAKE_COMPLETENESS
+  status: PASS
+  code: G1_INTAKE_READY
+  message: Problem, scope, non-goals, and verifiable acceptance criteria are complete.
+  evidence:
+  - g1/intake/g1-intake-brief.yaml
+- id: RISK_GATE
+  status: PASS
+  code: HUMAN_DIRECTION_CONFIRMED
+  message: Required human direction is recorded for the high-risk class.
+  evidence:
+  - risk_class=R3
+risk_class: R3
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

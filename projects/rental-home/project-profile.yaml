@@ -59,7 +59,8 @@ ci:
   provider: github-actions
   recheck_delay: PT2M
   required_workflows_discovery: true
-  known_required_workflows: []
+  known_required_workflows:
+    - validate-instructions
 
 deployment:
   provider: vercel

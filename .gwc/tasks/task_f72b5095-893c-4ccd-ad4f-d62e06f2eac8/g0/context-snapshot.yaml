@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-20T08:24:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  protected_branches:
+  - main
+  connector: DWC
+  write_enabled: true
+constraints:
+- Use guarded branch only
+- Verify worktree registration before removal
+- Keep asset files recoverable locally
+- Do not include unrelated files
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 1c6fd4d45b97d010b0a8f42308ff1076c62a002ec79378623845cf36e4a171a2
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: dec885c9125d6c4bf2fad5007cc233c45e61bc9341f1e55137d071a341c23c09
+status: READY
+blockers: []

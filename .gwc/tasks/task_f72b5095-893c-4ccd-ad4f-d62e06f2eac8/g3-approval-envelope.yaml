@@ -1,0 +1,10 @@
+approval_id: APPROVE_G3_f72b5095_20260720
+authority_gate: G3_PR
+task_id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+repository: nhatnguyenquang1838-coder/gwc
+branch: codex/asset-tracking-cleanup-20260720
+head_sha: e7c415ffc6dcd1fbcbbff6c683d2a148ef14af3f
+authorized_actions: [open_or_update_draft_pr]
+excluded_actions: [merge, auto_merge, deploy, production_data, protected_main_write]
+expires_at: '2026-07-21T08:45:00Z'
+scope_hash: sha256:1123e2d5c7df2036340b8eacb05837450433db18105165c9f331a099f8f3e2eb

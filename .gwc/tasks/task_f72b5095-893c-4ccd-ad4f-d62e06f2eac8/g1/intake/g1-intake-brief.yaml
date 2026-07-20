@@ -1,0 +1,65 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-20T08:24:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The repository contains a redundant registered worktree and tracked pet
+    sprite assets that should be separated from the main delivery.
+  why_now: The user requested cleanup based only on Git-tracked files and explicitly
+    excluded asset changes from main.
+desired_outcome: Remove the redundant worktree and prepare a dedicated asset branch
+  that untracks agents/pets without changing main.
+stakeholders:
+  requester: user
+  affected:
+  - GWC maintainers
+scope:
+  in_scope:
+  - Remove registered worktree .gwc/worktrees/blackboxai-review-doc-updates
+  - Create dedicated asset branch from protected main
+  - Remove agents/pets/* from Git tracking on asset branch
+  - Preserve asset files locally
+  - Add or verify ignore coverage for untracked assets
+  non_goals:
+  - Modify main
+  - Push any branch
+  - Open or merge a PR
+  - Delete pet files from disk
+  - Remove .git history
+  - Deploy or access production data
+constraints:
+- Use guarded branch only
+- Verify worktree registration before removal
+- Keep asset files recoverable locally
+- Do not include unrelated files
+assumptions:
+- The DS Admin task is assigned to codex-local-agent and is in agent_running state
+risks:
+- id: RISK-1
+  description: Removing a worktree can discard uncommitted work if it exists.
+  impact: high
+  mitigation: Inspect worktree status and refuse removal if dirty.
+- id: RISK-2
+  description: Untracking assets can affect consumers that expect them in Git.
+  impact: medium
+  mitigation: Keep files on disk, document the separate asset branch, and verify only
+    tracking state changes.
+acceptance_criteria:
+- id: AC-1
+  statement: The redundant worktree is clean, registered, and safely removed without
+    changing main history.
+  verifiable: true
+- id: AC-2
+  statement: A dedicated non-main asset branch contains the intended pet asset tracking
+    change only.
+  verifiable: true
+- id: AC-3
+  statement: Main remains at the locked base SHA and has no branch or content mutation.
+  verifiable: true
+unresolved_questions: []
+status: READY

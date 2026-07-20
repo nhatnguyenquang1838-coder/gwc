@@ -1,0 +1,31 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-20T08:25:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision: {actor: user, decided_at: '2026-07-20T08:20:00+07:00', source: 'Current chat request: sử dụng ds admin mcp đã được cài đặt trong Codex', explicit: true}
+rationale: User explicitly selected the governed workflow and required the asset tracking change to remain off main.
+rejected_option_ids: [OPT-2]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3]
+scope_hash: sha256:6b4d4b04f87f02dcb8d06f2c71e0fb0a8d3ea4be8482fd3c37d67ebc4caa8a9d
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - {sub_task_id: SUB-TASK-1, description: Inspect worktree cleanliness and remove only the redundant clean worktree., dependencies: []}
+    - {sub_task_id: SUB-TASK-2, description: Create asset branch and untrack pet assets without deleting local files., dependencies: [SUB-TASK-1]}
+  agent_allocation:
+    - {sub_task_id: SUB-TASK-1, skill_id: git-worktree-safety, agent_type: primary}
+    - {sub_task_id: SUB-TASK-2, skill_id: git-asset-tracking, agent_type: primary}
+  execution_order: [SUB-TASK-1, SUB-TASK-2]
+  summary: Single local agent execution; no subagent required.

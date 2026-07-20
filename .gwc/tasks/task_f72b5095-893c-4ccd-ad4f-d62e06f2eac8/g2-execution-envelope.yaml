@@ -1,0 +1,33 @@
+approval_id: CP-20260720-002
+authority_gate: G2_EXECUTION
+task_id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+issued_at: '2026-07-20T08:27:00Z'
+expires_at: '2026-07-21T08:35:00Z'
+scope_version: 2
+risk_class: R3
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+working_branch: codex/asset-tracking-cleanup-20260720
+modules_or_files:
+  - .gwc/worktrees/blackboxai-review-doc-updates
+  - agents/pets/dw-agent/spritesheet.webp
+  - agents/pets/dw-elegent/spritesheet.webp
+  - .gitignore
+authorized_actions: [claim_work_item, update_work_item_status, modify_approved_files, run_sandboxed_validation, push_working_branch]
+excluded_actions: [push_working_branch, open_or_update_draft_pr, merge, deploy, production_data_read, production_data_write, production_config_change, credential_rotation, protected_main_write, branch_delete, force_push]
+work_item:
+  provider: DS Admin State Engine
+  id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  expected_owner: codex-local-agent
+  initial_state: agent_running
+  review_state: pending_approval
+artifact_hashes:
+  change_plan: sha256:76336b53ca65cf01b7d7e0d17b9d96009ce282663cfb77891afdc2cea07fecc8
+  mermaid: sha256:b174843d913bea46da8d939ab5a229a0b263b22dec6515953395e4d2b42f93b9
+  png: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  svg: sha256:0000000000000000000000000000000000000000000000000000000000000000
+scope_hash: sha256:325bcf487dfac656cd822b36a3d5a1e154eba7d889c3ab889dd5f700e822bc49

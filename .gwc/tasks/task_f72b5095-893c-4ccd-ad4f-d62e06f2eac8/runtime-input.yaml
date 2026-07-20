@@ -1,0 +1,38 @@
+schema_version: '1.0'
+artifact_type: g01-runtime-input
+generated_at: '2026-07-20T08:24:00Z'
+project: {id: gwc, name: GWC, profile_path: projects/gwc/project-profile.yaml}
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+  verified: true
+task: {id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8, claimed: true}
+request:
+  requester: user
+  problem:
+    statement: The repository contains a redundant registered worktree and tracked pet sprite assets that should be separated from the main delivery.
+    why_now: The user requested cleanup based only on Git-tracked files and explicitly excluded asset changes from main.
+  desired_outcome: Remove the redundant worktree and prepare a dedicated asset branch that untracks agents/pets without changing main.
+  affected: [GWC maintainers]
+  in_scope: [Remove registered worktree .gwc/worktrees/blackboxai-review-doc-updates, Create dedicated asset branch from protected main, Remove agents/pets/* from Git tracking on asset branch, Preserve asset files locally, Add or verify ignore coverage for untracked assets]
+  non_goals: [Modify main, Push any branch, Open or merge a PR, Delete pet files from disk, Remove .git history, Deploy or access production data]
+  constraints: [Use guarded branch only, Verify worktree registration before removal, Keep asset files recoverable locally, Do not include unrelated files]
+  assumptions: [The DS Admin task is assigned to codex-local-agent and is in agent_running state]
+  risks:
+    - {id: RISK-1, description: 'Removing a worktree can discard uncommitted work if it exists.', impact: high, mitigation: 'Inspect worktree status and refuse removal if dirty.'}
+    - {id: RISK-2, description: 'Untracking assets can affect consumers that expect them in Git.', impact: medium, mitigation: 'Keep files on disk, document the separate asset branch, and verify only tracking state changes.'}
+  acceptance_criteria:
+    - {id: AC-1, statement: 'The redundant worktree is clean, registered, and safely removed without changing main history.', verifiable: true}
+    - {id: AC-2, statement: 'A dedicated non-main asset branch contains the intended pet asset tracking change only.', verifiable: true}
+    - {id: AC-3, statement: 'Main remains at the locked base SHA and has no branch or content mutation.', verifiable: true}
+  unresolved_questions: []
+policies:
+  - {id: GWC_CORE, path: core/Coding_Project_Governance_v1.0.md, ref: main, source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1}
+sources:
+  - {path: AGENTS.md, required: true, status: AVAILABLE, source_sha: 1c6fd4d45b97d010b0a8f42308ff1076c62a002ec79378623845cf36e4a171a2}
+  - {path: projects/gwc/project-profile.yaml, required: true, status: AVAILABLE, source_sha: dec885c9125d6c4bf2fad5007cc233c45e61bc9341f1e55137d071a341c23c09}
+risk: {class: R3, human_direction_confirmed: true}

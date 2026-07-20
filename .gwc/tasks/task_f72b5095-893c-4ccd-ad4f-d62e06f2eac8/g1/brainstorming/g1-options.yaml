@@ -1,0 +1,28 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-20T08:25:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8
+  base_sha: 52fe9dac663df68be904a74d9fca6e4797d49944
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Asset branch plus worktree cleanup
+    description: Create a guarded asset branch, untrack pet sprites there while keeping files locally, and remove the clean redundant worktree.
+    benefits: [Keeps main unchanged, Separates asset decision, Reclaims redundant worktree space]
+    tradeoffs: [Requires a separate follow-up review or PR for asset removal]
+    risks: [Asset consumers may still expect the files in Git]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Remove assets from main immediately
+    description: Untrack pet sprites directly from main and remove the redundant worktree.
+    benefits: [Immediate cleanup]
+    tradeoffs: [Violates the requested main-branch boundary, Higher blast radius]
+    risks: [Protected branch mutation, Asset availability regression]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: The first option satisfies the explicit requirement that pet tracking changes stay off main and keeps the local files recoverable.
+decision_required: true
+status: READY
