@@ -9,7 +9,7 @@ verification, and rollback evidence.
 | Item | Current repository state |
 |---|---|
 | Repository | `nhatnguyenquang1838-coder/gwc` |
-| GWC package | `1.13.0` |
+| GWC package | `1.14.0` |
 | Canonical core policy | Version `1.0` |
 | Canonical core SHA-256 | `04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1` |
 | Protected branch | `main` |
@@ -90,12 +90,28 @@ operations.
 Execution mode is selected from verified capabilities, not from the agent product
 name.
 
+## Kiro spec-driven delivery
+
+Material feature work uses the canonical Kiro structure:
+
+```text
+.kiro/specs/<SPEC-ID>/
+  requirements.md
+  design.md
+  tasks.md
+```
+
+Before G2, ChatGPT-style agents use the same runtime trace as local agents: one AgentOps/DS Admin task, legal state transitions, and a task-scoped `.gwc/tasks/<task-id>/g0`, `g1`, and `g2` workspace bound to the exact repository, base SHA, branch, and scope hash.
+
+Kiro specs, task state, and `.gwc` artifacts provide traceability only. They do not grant repository write, Draft PR, merge, deploy, release, migration, credential, production configuration, or production-data authority.
+
 ## Start here
 
 | Need | Document |
 |---|---|
 | Repository authority and boot sequence | [`AGENTS.md`](AGENTS.md) |
 | Runtime behavior | [`core/Agent_Operating_Runtime_Contract_v1.0.md`](core/Agent_Operating_Runtime_Contract_v1.0.md) |
+| Kiro spec-driven delivery | [`core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`](core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md) |
 | Coding governance | [`core/Coding_Project_Governance_v1.0.md`](core/Coding_Project_Governance_v1.0.md) |
 | Gate lifecycle | [`core/GATE_LIFECYCLE_CONTRACT_v1.0.md`](core/GATE_LIFECYCLE_CONTRACT_v1.0.md) |
 | Draft PR delivery | [`core/E2E_DRAFT_PR_DELIVERY_RULE.md`](core/E2E_DRAFT_PR_DELIVERY_RULE.md) |
