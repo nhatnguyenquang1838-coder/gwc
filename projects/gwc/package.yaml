@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: "1.13.0"
+package_version: "1.14.0"
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -17,6 +17,10 @@ instructions:
    - id: agent-operating-runtime-contract
      path: core/Agent_Operating_Runtime_Contract_v1.0.md
      target: .governance/Agent_Operating_Runtime_Contract_v1.0.md
+     required: true
+   - id: kiro-spec-driven-delivery-rule
+     path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+     target: .governance/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
      required: true
    - id: g0-g1-operational-runbook
      path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
@@ -103,6 +107,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - Package version 1.14.0 adds the canonical Kiro spec-driven delivery rule and ChatGPT/local-agent task-runtime parity.
   - Security-boundary and other listed high-risk changes require explicit human direction.
   - Merge, deployment, production configuration, credentials, and production data remain separately gated.
   - HOTFIX/RESCUE modes provide bounded bypass for emergency fixes while maintaining core safety (no production data access, no main branch writes, no merge/deploy authority).
