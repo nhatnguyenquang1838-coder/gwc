@@ -184,6 +184,21 @@ G3 may pass only when `tools/validate_g3_delivery.py` returns `PASS` for the cur
 
 The Draft PR remains the user review boundary. Reviewer `PASS` is evidence only and never grants merge, deployment, release, or production authority.
 
+### Ready-for-review connector action contract
+
+When `github_mark_pr_ready_for_review` is available, DWC may invoke it only as G3 metadata completion after G3 `PASS`. The action must accept at minimum:
+
+```text
+owner
+repo
+pr_number
+expected_head_sha
+```
+
+Before invoking it, DWC must verify the latest PR head SHA equals `expected_head_sha`, required CI is `success` for that exact SHA, review closure and the G3 delivery record are non-stale, the PR is still Draft, and there is no scope drift. The connector must fail closed if any of those checks cannot be verified.
+
+This action grants no merge permission. It must not mark another PR ready, change the PR base, enable auto-merge, merge, deploy, release, modify production configuration, access credentials, or access production data. If the tool is unavailable, DWC must record a `ready-for-review blocker` and wait for manual UI promotion before G4.
+
 ## Asynchronous CI continuation
 
 During G3 validation monitoring, DWC must not stop silently when PR CI is still running. It must keep DS Admin in `validation_running` and record the current PR, branch, latest head SHA, next check time, and selected continuation mechanism.
