@@ -1,0 +1,34 @@
+schema_version: "1.0"
+artifact_type: g2-ci-repair-envelope
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+authority_gate: G2_EXECUTION
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+working_branch: feature/dwc-ready-for-review-capability
+repair_number: 1
+trigger:
+  ci_run_id: 29749679426
+  workflow: Validate instructions
+  conclusion: failure
+root_cause: "Existing regression test hard-coded GWC package_version 1.14.0 after the package was bumped to 1.14.1 for this change."
+authorized_actions:
+  - add_or_update_tests
+  - push_working_branch
+files_write:
+  - tests/test_chatgpt_agent_runbook_continuation.py
+excluded_actions:
+  - protected_branch_direct_push
+  - merge_without_exact_g4_human_approval
+  - auto_merge
+  - deployment
+  - release
+  - production_configuration
+  - credential_rotation
+  - production_migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+scope_hash: sha256:3dc1d5d577991c1bf501a598515344857d9d2410f1447a65898e16508971dc21
