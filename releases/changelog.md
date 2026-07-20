@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-07-20 — DWC ready-for-review capability contract
+
+### Added
+
+- DWC capability declaration for `github_mark_pr_ready_for_review` as G3 metadata completion after exact-head G3 `PASS`.
+- Approval envelope action enum entry for `mark_pr_ready_for_review` so G3/G4 preparation can represent the metadata transition explicitly.
+- Regression tests for the capability guard, instruction contract, no-merge boundary, and schema action entry.
+
+### Changed
+
+- GWC package version `1.14.1` records the ready-for-review connector contract while keeping G4 merge authority separate.
+
+### Safety
+
+- The ready-for-review action grants no merge, auto-merge, deploy, release, production configuration, credential, migration, production-data, force-push, branch-deletion, or PR-base-change authority.
+- If the connector tool is unavailable, DWC must report a ready-for-review blocker and wait for manual UI promotion before G4.
+
 ## 2026-07-20 — Canonical Kiro spec-driven delivery and ChatGPT task parity
 
 ### Added
