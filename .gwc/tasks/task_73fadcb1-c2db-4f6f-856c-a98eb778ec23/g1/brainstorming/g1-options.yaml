@@ -1,0 +1,53 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-20T09:49:48Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+  base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Canonical core rule plus local adapter and ChatGPT runtime parity
+  description: Extract reusable Kiro format into core, inherit via packages, retain Rental Home-specific constraints, and extend ChatGPT instructions to reuse DS task plus .gwc task workspace.
+  benefits:
+  - One reusable rule
+  - No Rental Home breaking removal
+  - Chat and local execution preparation become traceable and consistent
+  tradeoffs:
+  - Touches central rule, agent overlay, three packages, docs, and task evidence
+  risks:
+  - Broad governance blast radius requires careful validation
+  constraint_fit: FIT
+  skills_distribution:
+  - skill_id: governance-authoring
+    description: Draft canonical rule and adapter boundaries
+    is_required: true
+  - skill_id: validation
+    description: Validate G0/G1, packages, and instruction references
+    is_required: true
+- id: OPT-2
+  title: Update Rental Home and ChatGPT instructions only
+  description: Keep the format project-local and add only ChatGPT task behavior.
+  benefits:
+  - Smaller diff
+  tradeoffs:
+  - Does not satisfy reusable governance across gwc and ds-mcp
+  risks:
+  - Continued duplication and inconsistent consumers
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Create a new .gwc task artifact contract
+  description: Add new task JSON/README/report artifacts instead of reusing current gate layout.
+  benefits:
+  - Could provide richer metadata
+  tradeoffs:
+  - Introduces an unrequested parallel mechanism
+  risks:
+  - Conflicts with existing .gwc task workspace and increases migration cost
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: It meets all requested consumers, preserves compatibility, and reuses the exact task-scoped .gwc mechanism visible on main.
+decision_required: true
+status: READY
