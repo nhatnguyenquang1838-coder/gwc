@@ -13,9 +13,9 @@ verifiable sequence. It binds intent, evidence, repository state, execution
 scope, validation, review, and high-authority actions to explicit artifacts and
 gates.
 
-GWC is not a replacement for project requirements, tests, CI, code review, or
-human authority. It coordinates those mechanisms and prevents evidence from one
-stage being reused as permission for another.
+GWC is not a replacement for project requirements, tests, CI, QA, code review,
+or human authority. It coordinates those mechanisms and prevents evidence from
+one stage being reused as permission for another.
 
 ## Operating model
 
@@ -24,9 +24,14 @@ flowchart LR
   I[User intent] --> C[G0 verified context]
   C --> A[G1 aligned decision]
   A --> E[G2 scoped execution]
-  E --> P[G3 Draft PR and review]
-  P --> M{Exact G4 approval?}
-  M -- No --> R[Remain reviewable]
+  E --> P[Draft PR under G3]
+  P --> CI[Exact-head CI]
+  CI --> Q{Workflow requires QA?}
+  Q -- Yes --> QA[QA_VALIDATE exact-head evidence]
+  Q -- No --> R[G3 review closure]
+  QA --> R
+  R --> M{Exact G4 approval?}
+  M -- No --> W[REVIEW_READY or ACCEPTED_PENDING_G4]
   M -- Yes --> G[Merge reviewed head]
   G --> S[G5 read-only status verification]
   S --> X{Manual deploy or production operation?}
@@ -34,17 +39,40 @@ flowchart LR
   X -- Yes --> H[Separate G5 or G6 authority]
 ```
 
+`QA_VALIDATE` is a Pilot or project workflow stage inside the G3 evidence path,
+not a new canonical GWC gate. The canonical lifecycle remains
+`G0 → G1 → G2 → G3 → G4 → G5 → G6`.
+
 ### Authority boundaries
 
 - G0 and G1 establish evidence; they do not grant repository mutation.
 - G2 grants only the actions and files listed in the active envelope.
-- G3 produces review evidence for one exact branch head SHA.
+- G3 produces delivery and review evidence for one exact branch head SHA.
+- Project QA may be required before G3 can reach review-ready or `PASS`.
+- QA `PASS`, CI `PASS`, `REVIEW_READY`, and `ACCEPTED_PENDING_G4` do not grant
+  merge, auto-merge, deployment, release, or production authority.
 - G4 is a separate exact human merge decision.
 - Read-only post-merge G5 status verification is automatic.
 - Manual deploy, redeploy, release, publish, or runtime reload requires separate
   G5 authority.
 - G6 is generated only when production data, configuration, migrations,
   credentials, or secrets are actually in scope.
+
+### QA evidence freshness invariant
+
+A QA `PASS` without validated, current, exact-head evidence is invalid.
+
+For a workflow that requires QA, G3 cannot reach review-ready or `PASS` unless:
+
+1. the QA payload is schema-valid;
+2. the QA agent is the active lease owner and has the required role/capability;
+3. repository, PR, scope, and head SHA match the active work binding;
+4. required CI has passed for the same head;
+5. stale, malformed, secret-bearing, or scope-violating evidence is rejected;
+6. the accepted evidence and validation result are preserved in the audit trail.
+
+Any new head SHA invalidates earlier head-bound CI, QA, and reviewer evidence and
+requires fresh validation for that head.
 
 ## Current capabilities
 
@@ -74,8 +102,22 @@ capability must still be verified before claiming an operation was performed.
 | Connector-fetched validation can be blocked by transport or local DNS | Materialize exact-ref artifacts when possible; preserve limitation; require repository-native CI before completion |
 | DS Admin task state can become stale if callbacks are missed | Use legal State Engine transitions and disclose late reconciliation |
 | Generated artifacts can drift from sources | Update source first and regenerate through the verified generator |
-| Review evidence becomes stale after any new head SHA | Re-run validation and independent review for the new head |
+| Review evidence becomes stale after any new head SHA | Re-run validation, required QA, and independent review for the new head |
 | Planning documents can look like completed implementation | Separate `proposal`, `in progress`, and `evidence verified` status explicitly |
+
+## Protected-base drift
+
+Pilot work applies [`docs/base-drift-policy.md`](docs/base-drift-policy.md):
+
+| Drift decision | Required response |
+|---|---|
+| `SAFE_CONTINUE` | Record old/new base, changed files, overlap, and decision; continue only when scope and authority remain unchanged |
+| `REVALIDATE` | Recreate the execution head from the new base when required and rerun affected validation, CI, QA, and G3 review |
+| `REAPPROVE` | Refresh G0/G1, scope hash, work binding, and G2 authority; invalidate downstream head-bound evidence |
+| `STOP` | Stop execution and obtain a new scope/authority package; do not reuse prior approval or production-sensitive evidence |
+
+Conversation memory, a similarly named task, or a previously completed component
+is not protected-base evidence and cannot change Pilot status.
 
 ## Current priorities
 
@@ -115,12 +157,14 @@ Later, only after Pilot evidence
 
 - No protected-branch direct write.
 - No repository mutation outside the active task and file scope.
-- No stale base, CI, review, or head-SHA evidence accepted.
-- No CI/reviewer result interpreted as merge or deployment authority.
+- No stale base, CI, QA, review, or head-SHA evidence accepted.
+- No CI/QA/reviewer result interpreted as merge or deployment authority.
 - Every high-authority action is bound to an exact target, scope, actor, and
   expiry.
 - Operators can identify the current task, gate, owner, blocker, evidence, and
   next legal action.
+- Pilot preflight addresses the observed naming, workspace, validation,
+  traceability, approval, and gate-reporting failure patterns.
 
 ## Related documents
 
@@ -128,4 +172,6 @@ Later, only after Pilot evidence
 - [`AGENTS.md`](AGENTS.md)
 - [`core/GATE_LIFECYCLE_CONTRACT_v1.0.md`](core/GATE_LIFECYCLE_CONTRACT_v1.0.md)
 - [`core/E2E_DRAFT_PR_DELIVERY_RULE.md`](core/E2E_DRAFT_PR_DELIVERY_RULE.md)
+- [`docs/base-drift-policy.md`](docs/base-drift-policy.md)
+- [`docs/gaps/g0-g1-naming-location-convention-gaps.md`](docs/gaps/g0-g1-naming-location-convention-gaps.md)
 - [`docs/plan/distributed-multi-agent-sdlc/README.md`](docs/plan/distributed-multi-agent-sdlc/README.md)
