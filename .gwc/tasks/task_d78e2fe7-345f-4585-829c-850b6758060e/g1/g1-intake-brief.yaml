@@ -1,0 +1,19 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+problem_statement: "G3 can pass, but DWC cannot promote a Draft PR to Ready for review because no connector capability/action is declared. This leaves G4 blocked or forces manual UI action."
+goals:
+  - "Declare a bounded DWC capability for Draft PR to Ready for review metadata transition."
+  - "Document exact preconditions and fail-closed behavior for github_mark_pr_ready_for_review."
+  - "Add regression tests so future governance changes preserve this boundary."
+non_goals:
+  - "Do not implement backend connector runtime code."
+  - "Do not merge, deploy, release, change production configuration, or access production data."
+risk_flags:
+  - governance_authority_boundary
+  - connector_capability_declaration
+human_direction:
+  recorded: true
+  source: "User said: Nhận handoff, tiến hành gwc changes."

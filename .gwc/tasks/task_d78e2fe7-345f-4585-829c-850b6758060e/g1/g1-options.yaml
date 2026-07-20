@@ -1,0 +1,21 @@
+schema_version: "1.0"
+artifact_type: g1-options
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+repository: nhatnguyenquang1838-coder/gwc
+options:
+  - id: A
+    name: "Document-only note"
+    summary: "Add docs saying manual Ready-for-review is needed."
+    decision: rejected
+    reason: "Leaves connector capability gap unresolved."
+  - id: B
+    name: "Capability contract + tests"
+    summary: "Declare bounded capability, document action contract, add schema enum and tests."
+    decision: selected
+    reason: "Fixes governance gap without claiming backend implementation or changing G4 authority."
+  - id: C
+    name: "Runtime connector implementation"
+    summary: "Change backend tool surface now."
+    decision: rejected
+    reason: "Backend connector runtime is outside this repo scope."
+selected_option: B

@@ -1,0 +1,39 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+decision: "Proceed with Option B: capability contract + tests."
+selected_scope:
+  files_write:
+    - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml
+    - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml
+    - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml
+    - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml
+    - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml
+    - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml
+    - agents/dwc/capabilities.yaml
+    - agents/dwc/agent-instructions.md
+    - schemas/approval-envelope.schema.json
+    - tests/test_dwc_connector_capability_contract.py
+    - projects/gwc/package.yaml
+    - releases/changelog.md
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials_or_secrets
+  - production_data
+  - migrations
+  - force_push
+  - branch_deletion
+  - pr_base_change
+acceptance_criteria:
+  - "DWC capabilities declare mark_pr_ready_for_review as bounded branch/PR metadata action."
+  - "DWC instructions define github_mark_pr_ready_for_review arguments, preconditions, and no-merge boundary."
+  - "Approval envelope schema can represent mark_pr_ready_for_review as an authorized action."
+  - "Regression tests fail if capability or instruction contract is removed."
+  - "Package version and changelog record the governance update."

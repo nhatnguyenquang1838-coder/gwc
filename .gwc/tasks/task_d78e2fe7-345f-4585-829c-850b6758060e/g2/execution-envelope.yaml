@@ -1,0 +1,47 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+authority_gate: G2_EXECUTION
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+working_branch: feature/dwc-ready-for-review-capability
+risk_class: R1
+authorized_actions:
+  - create_allowed_prefix_branch
+  - create_repository_files_within_task_scope
+  - update_repository_files_within_task_scope
+  - replace_text_with_expected_state
+  - add_or_update_tests
+  - add_or_update_documentation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - comment_on_pull_request
+files_write:
+  - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml
+  - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml
+  - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml
+  - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml
+  - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml
+  - .gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml
+  - agents/dwc/capabilities.yaml
+  - agents/dwc/agent-instructions.md
+  - schemas/approval-envelope.schema.json
+  - tests/test_dwc_connector_capability_contract.py
+  - projects/gwc/package.yaml
+  - releases/changelog.md
+excluded_actions:
+  - protected_branch_direct_push
+  - merge_without_exact_g4_human_approval
+  - auto_merge
+  - deployment
+  - release
+  - production_configuration
+  - credential_rotation
+  - production_migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+scope_hash: sha256:ad89eae942cce13fd8e2dab109f5009532e8f8eb15aa570dc9c5e00ea5fed894
