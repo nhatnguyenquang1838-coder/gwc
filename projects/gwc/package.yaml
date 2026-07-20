@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: "1.14.0"
+package_version: "1.14.1"
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -107,6 +107,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
   - Package version 1.14.0 adds the canonical Kiro spec-driven delivery rule and ChatGPT/local-agent task-runtime parity.
   - Security-boundary and other listed high-risk changes require explicit human direction.
   - Merge, deployment, production configuration, credentials, and production data remain separately gated.
