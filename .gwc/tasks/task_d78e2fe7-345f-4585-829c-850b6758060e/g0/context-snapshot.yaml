@@ -1,0 +1,41 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+task_id: task_d78e2fe7-345f-4585-829c-850b6758060e
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+source_instruction: REPO
+execution_mode: chat_connector_only
+created_at_utc: "2026-07-20T13:58:39Z"
+status: READY
+request:
+  summary: "Implement GWC handoff change to declare and test DWC Draft PR to Ready for review capability after G3 PASS."
+  source_ref: chat-20260720-ready-for-review-capability-handoff
+required_reads:
+  - AGENTS.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - governance/instruction-source-registry.yaml
+  - docs/project-consumer-agent-instructions.md
+  - projects/gwc/project-profile.yaml
+  - projects/gwc/package.yaml
+  - agents/chatgpt-agent/agent-instructions.md
+  - agents/dwc/agent-instructions.md
+  - agents/dwc/capabilities.yaml
+  - tools/validate_instructions.py
+  - tools/validate_g01.py
+task_specific_reads:
+  - tests/test_dwc_connector_capability_contract.py
+  - tests/test_gate_lifecycle_process_contract.py
+  - schemas/approval-envelope.schema.json
+  - releases/changelog.md
+facts:
+  current_main_sha: 9272fc278c173d1bc08e8a58edd4a970239a1df0
+  current_main_tree: 96e6761c994da46edf36c586c0c4b92cebdad01b
+  handoff_source_pr: 42
+  prior_gap: "DWC connector lacks github_mark_pr_ready_for_review capability/action."
+blockers: []
+limitations:
+  - "Container could not resolve GitHub directly; repository evidence was fetched through DWC connector."
