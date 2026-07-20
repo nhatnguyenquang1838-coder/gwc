@@ -1,0 +1,63 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-20T09:49:48Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+  base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository and protected base are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@04c314a26e2986f2bb46b61bae32cca6613670d1
+  - projects/gwc/project-profile.yaml
+- id: TASK_TRACEABILITY
+  status: PASS
+  code: DS_TASK_AGENT_RUNNING
+  message: One DS task represents the work and entered agent_running during G0/G1 preparation.
+  evidence:
+  - task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+  - transition REVISE -> ready -> RUN_AGENT -> agent_running
+- id: EXISTING_MECHANISM
+  status: PASS
+  code: GWC_TASK_WORKSPACE_REUSED
+  message: Main contains task-scoped .gwc gate artifacts; no new parallel task contract is introduced.
+  evidence:
+  - .gwc/tasks/<task-id>/g0
+  - .gwc/tasks/<task-id>/g1
+  - .gwc/tasks/<task-id>/g2
+  - core/LOCAL_AGENT_RULE.md
+- id: CONSUMER_SCOPE
+  status: PASS
+  code: THREE_CONSUMERS_IDENTIFIED
+  message: All requested package consumers are present.
+  evidence:
+  - projects/gwc/package.yaml
+  - projects/ds-mcp/package.yaml
+  - projects/rental-home/package.yaml
+- id: CONTEXT7
+  status: WARN
+  code: CONTEXT7_AUTH_FAILED
+  message: Context7 API rejected the configured key; repository evidence remains sufficient and authoritative.
+  evidence:
+  - 'Context7.resolve-library-id: Forbidden invalid API key'
+- id: RISK_GATE
+  status: PASS
+  code: HUMAN_DIRECTION_RECORDED
+  message: R2 broad governance scope has explicit user direction but still requires exact G2 approval.
+  evidence:
+  - user requested execution and ChatGPT .gwc parity
+  - required_gate=G2_HUMAN_DIRECTION
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
