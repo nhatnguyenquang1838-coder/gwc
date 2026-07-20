@@ -60,6 +60,20 @@ capabilities:
     add_or_update_documentation: true
     push_working_branch: true
     open_or_update_draft_pr: true
+    mark_pr_ready_for_review:
+      tool: github_mark_pr_ready_for_review
+      approval:
+        required: false
+      guard:
+        - pr_state == draft
+        - g3_delivery_record == PASS
+        - expected_head_sha == current_head_sha
+        - required_ci == success
+        - scope_drift == false
+        - no_merge_permission
+      notes:
+        - G3 metadata completion only.
+        - Does not grant G4 merge authority.
     comment_on_pull_request: true
     merge_human_approved_pull_request: true
     repair_repository_fixable_ci: true
