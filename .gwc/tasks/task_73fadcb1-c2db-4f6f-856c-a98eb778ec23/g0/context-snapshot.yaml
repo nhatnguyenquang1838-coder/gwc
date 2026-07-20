@@ -1,0 +1,92 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-20T09:49:48Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  protected_branches:
+  - main
+  connector: DWC
+  write_enabled: true
+constraints:
+- Use guarded branch feature/kiro-spec-driven-delivery-rule
+- Draft PR only; no merge, deploy, release, production configuration/data, credentials,
+  or migrations
+- Preserve Rental Home local constraints as an additive adapter
+- ChatGPT task-runtime parity must reuse the existing .gwc/tasks/<task-id>/ gate artifact
+  layout
+- Context7 lookup failed with invalid API key; repository evidence is authoritative
+applicable_policies:
+- id: GWC_AGENTS
+  path: AGENTS.md
+  ref: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  source_sha: 8f998d43cea98df0c7eddcc90465fcf88ec2474c
+- id: GWC_RUNTIME
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  source_sha: 7d701cb2000a4f187fc84a6ca6dbe283b0c56677
+- id: GWC_CODING
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  source_sha: ce6afe8a12740a22478c2eae6410e7784d795118
+- id: GWC_GATES
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  source_sha: 6063feaef3306f63727faa73caad4d97344f40c7
+- id: GWC_E2E
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  source_sha: 7890cf3a0184718d5268730d6eda1f619ada76cf
+- id: GWC_LOCAL_AGENT
+  path: core/LOCAL_AGENT_RULE.md
+  ref: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  source_sha: 1f139e126f1e94761046e770bca9b875fa2f00ae
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 8f998d43cea98df0c7eddcc90465fcf88ec2474c
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 337ff66874cb249e1acd5f7ce42766c2475fbd98
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 24e63cb745af2a906287a3db9270985fcfd7c2d4
+- path: core/LOCAL_AGENT_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 1f139e126f1e94761046e770bca9b875fa2f00ae
+- path: projects/rental-home/spec-driven-format.md
+  required: true
+  status: AVAILABLE
+  source_sha: 1a4197fb3649b4631ea3c5f50f84e0ba672899cf
+- path: .gwc/tasks/
+  required: true
+  status: AVAILABLE
+  source_sha: 3bd38117fdb48d9389e7c0689ec1c25b431df519
+status: READY
+blockers: []
+contextual_discovery:
+  downstream_impact:
+  - target: projects/gwc
+    impact_type: NON_BREAKING
+    description: Adds canonical Kiro rule and ChatGPT runtime parity.
+  - target: projects/ds-mcp
+    impact_type: NON_BREAKING
+    description: Inherits reusable spec-driven rule.
+  - target: projects/rental-home
+    impact_type: NON_BREAKING
+    description: Keeps local adapter while inheriting canonical rule.
+  stakeholder_reach:
+  - persona: ChatGPT agent
+    impact: Must create or claim DS task, reach agent_running, and materialize .gwc
+      task evidence before repository execution.
+  - persona: Local coding agent
+    impact: Existing behavior remains canonical and is reused.

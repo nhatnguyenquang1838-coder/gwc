@@ -1,0 +1,67 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-20T10:04:59Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+  base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: DW
+  decided_at: '2026-07-20T09:49:48Z'
+  source: chat-20260720-explicit-execution-request
+  explicit: true
+rationale: The user explicitly rejected a planning-only result and requested execution, plus ChatGPT parity with the existing local-agent .gwc task mechanism.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+scope_hash: sha256:7a0f7489eb2f6bd6a50d3b646b662776a6391d469b90b92684175819eff89ad4
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Author canonical Kiro rule and ChatGPT .gwc runtime parity clause
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Update registry, packages, Rental Home adapter, README, and changelog
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Run validators, tests, diff review, and Draft PR delivery
+    dependencies:
+    - SUB-TASK-1
+    - SUB-TASK-2
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: governance-authoring
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: package-integration
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: governance-validation
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  summary: Single ChatGPT/DWC implementation context with a separate read-only review at G3.

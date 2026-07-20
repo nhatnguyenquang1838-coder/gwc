@@ -1,7 +1,7 @@
 
 schema_version: "1.0"
 project_id: rental-home
-package_version: 1.0.0
+package_version: 1.1.0
 status: active
 
 profile: projects/rental-home/project-profile.yaml
@@ -10,6 +10,10 @@ instructions:
   - id: coding-project-governance
     path: core/Coding_Project_Governance_v1.0.md
     target: .governance/Coding_Project_Governance_v1.0.md
+    required: true
+  - id: kiro-spec-driven-delivery-rule
+    path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+    target: .governance/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
     required: true
   - id: e2e-draft-pr-delivery
     path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
@@ -60,3 +64,4 @@ work_tracking:
 
 notes:
   - Fail closed until repository identity and protected-base governance are verified.
+  - Package version 1.1.0 inherits the canonical Kiro rule and retains Rental Home constraints through spec-driven-format.md.

@@ -1,0 +1,67 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-07-20T10:04:59Z'
+task_id: task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+approval_request_id: g2-kiro-spec-chatgpt-parity-20260720-02
+authority_gate: G2_EXECUTION
+issued_at: '2026-07-20T10:04:59Z'
+expires_at: '2026-07-21T10:04:59Z'
+scope_version: 1.0.0
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+working_branch: feature/kiro-spec-driven-delivery-rule
+modules_or_files:
+- .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml
+- .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/execution-envelope.yaml
+- core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+- governance/instruction-source-registry.yaml
+- agents/chatgpt-agent/agent-instructions.md
+- docs/project-consumer-agent-instructions.md
+- projects/gwc/package.yaml
+- projects/ds-mcp/package.yaml
+- projects/rental-home/package.yaml
+- projects/rental-home/spec-driven-format.md
+- README.md
+- releases/changelog.md
+authorized_actions:
+- create_guarded_branch
+- create_or_update_scoped_files
+- run_sandboxed_validation
+- push_guarded_branch
+- create_draft_pr
+excluded_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- production_configuration
+- credentials
+- migration
+- production_data
+- force_push
+- branch_deletion
+- shared_history_rewrite
+- pr_base_change
+artifact_hashes:
+  proposal/change-flow.mmd: sha256:15ba8dbed07b1edbb04ff6d11f41275ef5b641efe204c575970954676309877e
+  proposal/change-flow.png: sha256:8f4900ecacad7da805d527c17cfbb14420fb0c8b8a08cef7a2fc4012d043f95d
+  proposal/change-flow.svg: sha256:d353f937caa160e928f9e68252a099b8d4fb87560d15d1c64671e339e7849f81
+  proposal/change-plan.md: sha256:54d463f27bc1bd999a74da9895722aff0d18734e570312df5e7d6069705a9b1e
+  proposal/core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md: sha256:8f3a4b8d2c008ca8bfc544bf571c57da4cf1a266a8dfe0ab6ec793dc5633f915
+  proposal/intake-card.md: sha256:1ac0b2d22437eaa9ee4563bd63c4f7fca181c4bf571340d190b49ce0cfa8ff76
+  proposal/scope.json: sha256:12c14bff4028eaa54f99934f9d23cabd8b8385f4989257bf279d24a6c26d205b
+scope_hash: sha256:7a0f7489eb2f6bd6a50d3b646b662776a6391d469b90b92684175819eff89ad4
+g1_decision_ref: .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml
+g0_context_ref: .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml
+notes:
+- ChatGPT task entered agent_running during G0/G1 preparation and is synchronized through DS Admin.
+- Local .gwc artifacts may be prepared before approval; repository persistence and branch writes require exact G2 approval.
+- Draft PR only. G4/G5/G6 are excluded.
+- Branch changed from gwc/ to feature/ because connector policy only permits approved branch prefixes; prior G2 request was invalidated before any repository write.

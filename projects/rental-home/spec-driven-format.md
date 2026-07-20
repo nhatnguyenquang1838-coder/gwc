@@ -1,553 +1,136 @@
-# Rental Home Spec-Driven Format Rule
+# Rental Home Spec-Driven Format Adapter
 
-## Purpose
+## Authority and inheritance
 
-Use this rule whenever the user asks to create a task, create a spec, plan work, or says:
+This project-local adapter extends [`core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`](../../core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md).
 
-```txt
-I want to do <something> in rental home
-```
+The canonical rule defines the shared `.kiro/specs/<SPEC-ID>/` structure, required `requirements.md`, `design.md`, and `tasks.md` sections, phase discipline, ChatGPT/local-agent task-runtime parity, and GWC authority boundaries.
 
-The output must follow the Rental Home Kiro spec-driven format exactly.
+This file adds only Rental Home-specific triggers, naming, design constraints, and validation requirements. It must not weaken the canonical rule or any protected-base GWC contract.
 
-## Trigger Conditions
+## Rental Home triggers
 
-Apply this rule when the user says or implies any of the following:
+Apply spec-driven delivery when a Rental Home request includes or implies:
 
-- `create task`
-- `create tasks`
-- `create spec`
-- `create specs`
-- `make spec`
-- `write requirements`
-- `write design`
-- `write tasks`
-- `I want to do ... in rental home`
-- `implement ... in rental_home`
-- `add feature ... in rental home`
-- `fix ... in rental home`
-- `plan ... for rental home`
+- create task, tasks, spec, or specs;
+- write requirements, design, or implementation tasks;
+- implement, add, fix, redesign, or plan a non-trivial Rental Home feature;
+- change UI behavior, public interfaces, data flow, RLS, Supabase access, architecture, or migrations.
 
-If the request is about the Rental Home repo and requires planned implementation, default to spec-driven output.
+Read-only analysis and isolated non-behavioral wording fixes may omit a spec when higher-priority instructions permit it.
 
-## Required Folder Structure
+## Folder and naming
 
-Create one spec folder under:
+Use exactly:
 
-```txt
-.kiro/specs/<SPEC-ID-kebab-case>/
-```
-
-Each spec folder must contain exactly these files:
-
-```txt
-requirements.md
-design.md
-tasks.md
-```
-
-Example:
-
-```txt
-.kiro/specs/RD-INV-01-debt-report-range-ui/
+```text
+.kiro/specs/<DOMAIN>-<AREA>-<NN>-<short-kebab-title>/
   requirements.md
   design.md
   tasks.md
 ```
 
-If there are multiple independent workstreams, create multiple spec folders.
-
-Do not put spec-driven feature specs under `docs/tasks/` unless the user explicitly asks for a non-Kiro archive.
-
-## Naming Rule
-
-Use this format:
-
-```txt
-<DOMAIN>-<AREA>-<NN>-<short-kebab-title>
-```
-
 Examples:
 
-```txt
+```text
 RD-INV-01-debt-report-range-ui
-RD-INV-02-invoice-table-crud-actions
-RD-INV-03-invoice-generation-logic
 OPS-ALERT-01-notification-read-state
 TENANT-DETAIL-01-logic-cleanup
 ```
 
-Use uppercase prefix if the current repo/spec convention uses uppercase. Do not silently change existing folder casing.
+Rules:
 
-## `requirements.md` Required Format
+1. Preserve existing folder casing and project conventions.
+2. Split independent workstreams into separate spec folders.
+3. Do not use `docs/tasks/<task>/spec.md` for a Kiro feature spec unless the user explicitly requests a non-Kiro archive.
+4. Do not relocate historical specs solely to adopt this adapter.
 
-The file must start with:
+## Requirements additions
 
-```md
-# Requirements Document
-```
+In addition to the canonical requirements format:
 
-Required sections, in order:
+- use headings exactly as `### Requirement N: <Title>`;
+- include numbered, observable EARS-style acceptance criteria;
+- state explicit non-goals for schema, RLS, migration, billing, invoice, tenant, and notification behavior when relevant;
+- identify affected roles and homes when privacy or authorization is involved.
 
-```md
-# Requirements Document
+## Design additions
 
-## Introduction
+`design.md` must identify existing mechanisms before proposing new ones and include, where applicable:
 
-## Glossary
+- component or module name, suggested path, responsibility, and interface;
+- domain types, derived UI models, state models, and mapping rules;
+- RLS, role, home, tenant, room, invoice, and service-cycle boundaries;
+- correctness and non-regression properties;
+- error, empty, loading, and authorization-denied behavior;
+- validation commands and migration implications.
 
-## Requirements
-```
+### Mandatory implementation constraints
 
-Each requirement heading must use this exact format:
+- UI code must not call Supabase directly.
+- Use repositories and dependencies exposed through `src/app/dependencies.ts`.
+- Reuse existing shared UI components before creating project-local duplicates.
+- Do not change database schema, RLS, migrations, production configuration, credentials, or production data unless separately scoped and authorized.
+- Do not touch unrelated files or perform opportunistic refactoring.
 
-```md
-### Requirement N: Title
-```
+## Tasks additions
 
-Valid:
+`tasks.md` must:
 
-```md
-### Requirement 1: Overview Debt Report
-```
+- include a Mermaid dependency graph;
+- use checkbox task states;
+- map every implementation and validation task to requirement IDs;
+- include inspection, implementation, relevant tests, validation, and final reporting;
+- mark blocked, skipped, and optional work explicitly;
+- keep database or RLS work in separately visible tasks when applicable.
 
-Invalid:
+Allowed task markers:
 
-```md
-### Requirement 1 — Overview Debt Report
-### Requirement 1 - Overview Debt Report
-### Requirement: Overview Debt Report
-### Overview Debt Report
-```
-
-Each requirement must include:
-
-```md
-**User Story:** As a <role>, I want <capability>, so that <benefit>.
-
-#### Acceptance Criteria
-```
-
-Acceptance criteria must be numbered and use EARS-style language when practical:
-
-```md
-1. WHEN <condition> THEN the system SHALL <behavior>.
-2. IF <condition> THEN the system SHALL <behavior>.
-3. WHEN <condition> THEN the system SHOULD <behavior>.
-```
-
-Use `SHALL` for mandatory behavior.
-Use `SHOULD` for preferred behavior.
-Use `MUST NOT` / `SHALL NOT` for constraints.
-
-### `requirements.md` Template
-
-```md
-# Requirements Document
-
-## Introduction
-
-<Explain current problem, target outcome, and explicit non-goals.>
-
-## Glossary
-
-| Term | Definition |
-|---|---|
-| <Term> | <Definition> |
-
-## Requirements
-
-### Requirement 1: <Title>
-
-**User Story:** As a <role>, I want <capability>, so that <benefit>.
-
-#### Acceptance Criteria
-
-1. WHEN <condition> THEN the system SHALL <behavior>.
-2. IF <condition> THEN the system SHALL <behavior>.
-3. WHEN <condition> THEN the system SHOULD <behavior>.
-
-### Requirement 2: <Title>
-
-**User Story:** As a <role>, I want <capability>, so that <benefit>.
-
-#### Acceptance Criteria
-
-1. WHEN <condition> THEN the system SHALL <behavior>.
-```
-
-## `design.md` Required Format
-
-The file must start with:
-
-```md
-# Design Document
-```
-
-Required sections, in order:
-
-```md
-# Design Document
-
-## Overview
-
-## Architecture
-
-## Components and Interfaces
-
-## Data Models
-
-## Correctness Properties
-
-## Error Handling
-
-## Testing Strategy
-
-## Implementation Constraints
-```
-
-### Components and Interfaces
-
-This section must define:
-
-- Component/module name.
-- Suggested path.
-- Responsibility.
-- Interface/type signature where practical.
-- Existing shared components to reuse.
-
-### Data Models
-
-This section must define:
-
-- Domain types.
-- Derived UI row models.
-- State models.
-- Mapping rules.
-
-### Correctness Properties
-
-This section must define invariants and non-regression rules.
-
-Examples:
-
-```txt
-A missing period must not increase total debt.
-A paid invoice must never be marked overdue.
-Danger tone has priority over warning tone.
-```
-
-### `design.md` Template
-
-```md
-# Design Document
-
-## Overview
-
-<Explain design purpose and non-goals.>
-
-## Architecture
-
-```txt
-<High-level structure>
-```
-
-## Components and Interfaces
-
-### <ComponentOrModuleName>
-
-Suggested path:
-
-```txt
-<path>
-```
-
-Responsibility:
-
-- <Responsibility>
-
-Interface:
-
-```ts
-type <PropsOrInput> = {
-  ...
-}
-```
-
-## Data Models
-
-### <ModelName>
-
-```ts
-type <ModelName> = {
-  ...
-}
-```
-
-## Correctness Properties
-
-### <Property group>
-
-<Invariant or rule.>
-
-## Error Handling
-
-<Expected error behavior.>
-
-## Testing Strategy
-
-<Required tests and validation commands.>
-
-## Implementation Constraints
-
-- Do not touch unrelated files.
-- Do not call Supabase directly from UI.
-- Use repositories from `src/app/dependencies.ts`.
-- Run validation honestly.
-```
-
-## `tasks.md` Required Format
-
-The file must start with:
-
-```md
-# Implementation Plan
-```
-
-Required sections, in order:
-
-```md
-# Implementation Plan
-
-## Overview
-
-## Task Dependency Graph
-
-## Tasks
-
-## Notes
-```
-
-The Task Dependency Graph section must contain a Mermaid graph.
-
-Recommended:
-
-```md
-## Task Dependency Graph
-
-```mermaid
-graph TD
-  T1[1. Inspect current implementation] --> T2[2. Add utilities]
-  T2 --> T3[3. Add tests]
-  T2 --> T4[4. Create UI component]
-  T3 --> T5[5. Validate]
-  T4 --> T5
-```
-```
-
-Tasks must be checkboxes and use requirement mapping:
-
-```md
-- [ ] 1. Inspect current implementation
-  - Read current files.
-  - Identify current behavior.
-  - Confirm scope boundaries.
-  - _Requirements: 1, 2, 3_
-```
-
-Allowed task statuses:
-
-```txt
+```text
 [ ] not started
-[x] done
-[-] blocked/skipped
 [~] in progress
+[x] done
+[-] blocked or skipped
 ```
 
-### `tasks.md` Template
+## Validation
 
-```md
-# Implementation Plan
+Before calling a Rental Home spec Kiro-ready, verify:
 
-## Overview
+```text
+requirements.md
+- starts with # Requirements Document
+- contains Introduction, Glossary, and Requirements
+- every requirement has User Story and Acceptance Criteria
 
-<Explain implementation slice and strict scope.>
+design.md
+- starts with # Design Document
+- contains all canonical design sections
+- documents Rental Home architecture and data-access constraints
 
-## Task Dependency Graph
-
-```mermaid
-graph TD
-  T1[1. Inspect current implementation] --> T2[2. Add foundation]
-  T2 --> T3[3. Add tests]
-  T2 --> T4[4. Implement UI/logic]
-  T3 --> T5[5. Validate]
-  T4 --> T5
-  T5 --> T6[6. Final report]
+tasks.md
+- starts with # Implementation Plan
+- contains Overview, Task Dependency Graph, Tasks, and Notes
+- contains Mermaid, checkboxes, and requirement mappings
 ```
 
-```json
-{
-  "waves": [
-    {
-      "id": "wave-1",
-      "description": "Inspection and planning",
-      "tasks": ["1"]
-    },
-    {
-      "id": "wave-2",
-      "description": "Overview compaction",
-      "tasks": ["2"]
-    },
-    {
-      "id": "wave-3",
-      "description": "Invoice tab compaction",
-      "tasks": ["3"]
-    },
-    {
-      "id": "wave-4",
-      "description": "Scoped CSS styling",
-      "tasks": ["4"]
-    },
-    {
-      "id": "wave-5",
-      "description": "Validation and smoke testing",
-      "tasks": ["5"]
-    },
-    {
-      "id": "wave-6",
-      "description": "Final reporting",
-      "tasks": ["6"]
-    }
-  ]
-}
+Implementation tasks must include the relevant repository commands, normally:
+
+```bash
+npm run typecheck
+npm run build
 ```
 
-## Tasks
+Run relevant tests defined by the active repository. Report unavailable checks honestly; do not claim `PASS` without evidence.
 
-- [ ] 1. Inspect current implementation
-  - Read relevant files.
-  - Identify current behavior.
-  - Identify existing conventions.
-  - Confirm scope boundaries.
-  - _Requirements: 1, 2, 3_
+## Agent behavior
 
-- [ ] 2. Add foundation
-  - Add helpers/types/components required by this spec.
-  - Keep logic pure where practical.
-  - _Requirements: 1, 2_
+When implementation is requested:
 
-- [ ] 3. Add tests
-  - Add unit tests for pure logic.
-  - Add UI tests only if current project convention supports them.
-  - _Requirements: 1, 2, 3_
+1. read the canonical rule and this adapter;
+2. create or claim the AgentOps/DS Admin task required by the canonical rule;
+3. materialize `.gwc/tasks/<task-id>/g0`, `g1`, and `g2` evidence before G2;
+4. review the Kiro spec in phase order;
+5. execute only the approved task and Files WRITE scope.
 
-- [ ] 4. Implement scoped behavior
-  - Wire the new behavior into the smallest safe surface.
-  - Do not touch unrelated features.
-  - _Requirements: 1, 2, 3_
-
-- [ ] 5. Validate
-  - Run `npm run typecheck`.
-  - Run `npm run build`.
-  - Run relevant tests.
-  - Report honestly if validation cannot run.
-  - _Requirements: 1, 2, 3_
-
-- [ ] 6. Final report
-  - Report files changed.
-  - Report behavior changed.
-  - Report validation result.
-  - Report risks/blockers.
-  - _Requirements: 1, 2, 3_
-
-## Notes
-
-- Do not combine unrelated workstreams.
-- Do not change database schema unless the spec explicitly requires it.
-- Do not call Supabase directly from UI.
-- Use repositories from `src/app/dependencies.ts`.
-- Reuse existing shared UI components first.
-- Keep generated files in `.kiro/specs/<SPEC-ID>/`.
-```
-
-## Agent Process Rule
-
-When generating a new spec:
-
-1. Restate the requested outcome.
-2. Choose one spec folder name.
-3. Create:
-   - `requirements.md`
-   - `design.md`
-   - `tasks.md`
-4. Validate the headings before final output.
-5. If multiple workstreams exist, split them into multiple spec folders.
-6. Do not produce only one file.
-7. Do not use old `docs/tasks/<task>/spec.md` format unless explicitly requested.
-8. Do not claim the spec is Kiro-ready unless all required sections exist.
-
-## Heading Validation Checklist
-
-Before final output, verify:
-
-### requirements.md
-
-- [ ] Starts with `# Requirements Document`
-- [ ] Has `## Introduction`
-- [ ] Has `## Glossary`
-- [ ] Has `## Requirements`
-- [ ] Every requirement heading is `### Requirement N: Title`
-- [ ] Every requirement has `**User Story:**`
-- [ ] Every requirement has `#### Acceptance Criteria`
-
-### design.md
-
-- [ ] Starts with `# Design Document`
-- [ ] Has `## Overview`
-- [ ] Has `## Architecture`
-- [ ] Has `## Components and Interfaces`
-- [ ] Has `## Data Models`
-- [ ] Has `## Correctness Properties`
-- [ ] Has `## Error Handling`
-- [ ] Has `## Testing Strategy`
-- [ ] Has `## Implementation Constraints`
-
-### tasks.md
-
-- [ ] Starts with `# Implementation Plan`
-- [ ] Has `## Overview`
-- [ ] Has `## Task Dependency Graph`
-- [ ] Has `## Tasks`
-- [ ] Has `## Notes`
-- [ ] Task Dependency Graph contains Mermaid graph
-- [ ] Tasks are checkbox items
-- [ ] Tasks include `_Requirements: ..._`
-
-## Response Rule for ChatGPT
-
-When the user asks ChatGPT to create Rental Home tasks/specs:
-
-- Provide spec-driven files in this exact format.
-- Prefer creating a zip artifact if the user asks for files.
-- If only text is requested, provide file-by-file content.
-- If the user says “create task/spec” but does not provide enough detail, ask only for missing critical info.
-- If enough context exists, make reasonable PM assumptions and proceed.
-- Include the exact destination path:
-
-```txt
-.kiro/specs/<SPEC-ID>/
-  requirements.md
-  design.md
-  tasks.md
-```
-
-## Response Rule for Kiro/Codex Agent
-
-When Kiro/Codex receives a Rental Home task/spec request:
-
-- Read this rule first.
-- Generate specs only under `.kiro/specs/<SPEC-ID>/`.
-- Use exactly `requirements.md`, `design.md`, and `tasks.md`.
-- Follow the heading validation checklist.
-- Do not implement code unless the user explicitly asks.
-- If implementation is requested, first read the spec and follow `tasks.md`.
+Spec approval, DS task state, and `.gwc` artifacts are traceability only. They do not grant repository write, Draft PR, merge, deploy, migration, credential, production configuration, or production-data authority.

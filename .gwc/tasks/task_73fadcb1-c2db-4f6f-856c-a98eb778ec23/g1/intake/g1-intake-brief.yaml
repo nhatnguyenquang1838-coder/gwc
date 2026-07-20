@@ -1,0 +1,100 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-20T09:49:48Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+  base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC lacks a reusable Kiro spec-driven rule and does not explicitly require
+    ChatGPT agents to use the same running-task and .gwc task workspace mechanism
+    as local agents.
+  why_now: The existing Rental Home format is project-coupled, and chat connector
+    agents can otherwise stop at planning documents instead of entering traceable execution
+    preparation.
+desired_outcome: Add a canonical Kiro requirements/design/tasks rule inherited by
+  gwc, ds-mcp, and rental-home, with explicit ChatGPT AgentOps task-running and .gwc
+  task-workspace parity.
+stakeholders:
+  requester: DW
+  affected:
+  - GWC consumers
+  - ChatGPT agents
+  - local coding agents
+  - DWC runtime
+scope:
+  in_scope:
+  - Create core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - Require .kiro/specs/<SPEC-ID-kebab-case>/{requirements.md,design.md,tasks.md}
+  - Require ChatGPT agents to create or claim one DS task, transition it to agent_running,
+    and materialize .gwc/tasks/<task-id>/ gate artifacts before G2
+  - Register and package the rule for gwc, ds-mcp, and rental-home
+  - Retain Rental Home rule as an additive adapter
+  - Document the canonical workflow and release entry
+  - Deliver a validated Draft PR only
+  non_goals:
+  - Merge or auto-merge the PR
+  - Deploy or publish a release
+  - Change production configuration, credentials, migrations, or production data
+  - Delete existing Rental Home specs or force migration of historical specs
+  - Create a parallel task artifact contract not present on main
+constraints:
+- Use guarded branch feature/kiro-spec-driven-delivery-rule
+- Draft PR only; no merge, deploy, release, production configuration/data, credentials,
+  or migrations
+- Preserve Rental Home local constraints as an additive adapter
+- ChatGPT task-runtime parity must reuse the existing .gwc/tasks/<task-id>/ gate artifact
+  layout
+assumptions:
+- The DS Admin task state engine is the runtime source of truth for task state
+- The existing .gwc/tasks/<task-id>/g0,g1,g2 layout is the mechanism to reuse
+- Package version increments are minor because behavior is additive but consumer-visible
+risks:
+- id: RISK-1
+  description: Central governance change affects three consumers and may create duplicate
+    rules.
+  impact: high
+  mitigation: Extract only reusable content and retain Rental Home as a stricter adapter.
+- id: RISK-2
+  description: Agents may treat Kiro specs or task state as execution authority.
+  impact: high
+  mitigation: State explicitly that specs, task creation, and agent_running do not
+    grant G2/G3/G4.
+- id: RISK-3
+  description: Package or registry references may drift.
+  impact: medium
+  mitigation: Update all package manifests together and run repository validation/CI.
+acceptance_criteria:
+- id: AC-1
+  statement: The canonical rule defines the required .kiro/specs folder and required
+    sections for requirements.md, design.md, and tasks.md.
+  verifiable: true
+- id: AC-2
+  statement: The rule requires ChatGPT agents to create or claim exactly one DS task,
+    verify agent_running, and materialize task-scoped .gwc gate artifacts before G2
+    execution.
+  verifiable: true
+- id: AC-3
+  statement: The rule states that Kiro specs, DS task state, and .gwc artifacts do
+    not grant repository write, PR, merge, deploy, or production authority.
+  verifiable: true
+- id: AC-4
+  statement: gwc, ds-mcp, and rental-home package manifests inherit the canonical
+    rule.
+  verifiable: true
+- id: AC-5
+  statement: Rental Home retains only additive project-local constraints and references
+    the canonical rule.
+  verifiable: true
+- id: AC-6
+  statement: Repository validation and tests pass, or any unavailable checks are reported
+    without a false PASS claim.
+  verifiable: true
+- id: AC-7
+  statement: Delivery stops at a Draft PR and does not merge, deploy, or touch production
+    scope.
+  verifiable: true
+unresolved_questions: []
+status: READY

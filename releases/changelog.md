@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-07-20 — Canonical Kiro spec-driven delivery and ChatGPT task parity
+
+### Added
+
+- Canonical `core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md` for reusable requirements, design, and implementation-task planning under `.kiro/specs/<SPEC-ID>/`.
+- Explicit ChatGPT/local-agent runtime parity: one AgentOps/DS Admin task, legal transitions through `agent_running`, and task-scoped `.gwc/tasks/<task-id>/g0`, `g1`, and `g2` evidence before G2.
+- Canonical rule registration and distribution through the `gwc`, `ds-mcp`, and `rental-home` packages.
+
+### Changed
+
+- GWC package version `1.14.0`, DS MCP package version `1.2.0`, and Rental Home package version `1.1.0` include the canonical rule.
+- Rental Home spec guidance is now an additive adapter that retains project naming, Mermaid dependency graphs, `src/app/dependencies.ts`, Supabase access, RLS/schema, and validation constraints without duplicating the shared template.
+- ChatGPT and project-consumer instructions now require the existing `.gwc/tasks/<task-id>` mechanism instead of a parallel or conversation-only task artifact format.
+
+### Compatibility
+
+- Existing specs are not moved or rewritten automatically.
+- Project-local rules may add stricter naming, architecture, security, data, and validation constraints but may not weaken canonical GWC gates.
+
+### Safety
+
+- Kiro specs, task creation, `agent_running`, and valid `.gwc` artifacts are traceability only.
+- This change grants no protected-branch write, merge, auto-merge, deployment, release, production configuration, credential, migration, or production-data authority.
+
 ## 2026-07-19 — DW1 connector structured trace contract
 
 ### Added

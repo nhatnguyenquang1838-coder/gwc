@@ -8,6 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]
 ROOT_INSTRUCTIONS = ROOT / "AGENTS.md"
 INSTRUCTIONS = ROOT / "agents/chatgpt-agent/agent-instructions.md"
 PACKAGE = ROOT / "projects/gwc/package.yaml"
+KIRO_RULE = ROOT / "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md"
+TASK_WORKSPACE = ROOT / ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23"
 
 
 class ChatGPTArtifactContinuationTests(unittest.TestCase):
@@ -16,6 +18,7 @@ class ChatGPTArtifactContinuationTests(unittest.TestCase):
         cls.root_text = ROOT_INSTRUCTIONS.read_text(encoding="utf-8")
         cls.text = INSTRUCTIONS.read_text(encoding="utf-8")
         cls.package = yaml.safe_load(PACKAGE.read_text(encoding="utf-8"))
+        cls.kiro_text = KIRO_RULE.read_text(encoding="utf-8")
 
     def test_root_routes_by_capability_without_identity_else_branch(self) -> None:
         self.assertIn("## Agent-specific routing", self.root_text)
@@ -76,8 +79,8 @@ class ChatGPTArtifactContinuationTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, self.text)
 
-    def test_package_distributes_runbook(self) -> None:
-        self.assertEqual(self.package["package_version"], "1.13.0")
+    def test_package_distributes_runbook_and_kiro_rule(self) -> None:
+        self.assertEqual(self.package["package_version"], "1.14.0")
         entries = {item["id"]: item for item in self.package["instructions"]}
         self.assertIn("g0-g1-operational-runbook", entries)
         self.assertEqual(
@@ -85,6 +88,36 @@ class ChatGPTArtifactContinuationTests(unittest.TestCase):
             "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
         )
         self.assertTrue(entries["g0-g1-operational-runbook"]["required"])
+        self.assertIn("kiro-spec-driven-delivery-rule", entries)
+        self.assertEqual(
+            entries["kiro-spec-driven-delivery-rule"]["path"],
+            "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+        )
+        self.assertTrue(entries["kiro-spec-driven-delivery-rule"]["required"])
+
+    def test_kiro_rule_requires_chatgpt_task_runtime_parity(self) -> None:
+        required_phrases = [
+            "resolve or create exactly one AgentOps/DS Admin task",
+            ".gwc/tasks/<task-id>/",
+            "Repository persistence of `.gwc` artifacts is itself a G2 write",
+            "do not grant repository write",
+        ]
+        for phrase in required_phrases:
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, self.kiro_text)
+
+        required_artifacts = [
+            "g0/context-snapshot.yaml",
+            "g1/intake/g1-intake-brief.yaml",
+            "g1/preflight/g1-preflight-report.yaml",
+            "g1/brainstorming/g1-options.yaml",
+            "g1/decision/g1-decision-record.yaml",
+            "g2/execution-envelope.yaml",
+            "g2/ci-repair-envelope-01.yaml",
+        ]
+        for relative_path in required_artifacts:
+            with self.subTest(relative_path=relative_path):
+                self.assertTrue((TASK_WORKSPACE / relative_path).is_file())
 
 
 if __name__ == "__main__":
