@@ -1,140 +1,131 @@
-# GWC Project Overview: Establishing a Robust Governance Workflow
+# GWC Project Overview
 
-**Target Audience:** Stakeholders, Technical Leaders, Compliance/Security Teams
-**Document Status:** Finalized Draft – Ready for Advisor Review
+**Audience:** Technical leaders, delivery teams, platform engineers, reviewers,
+and governance stakeholders  
+**Status:** Active repository overview  
+**Evidence baseline:** `main@16f64a88e0a5a7fc811e32e3acd06cda1301c50c`  
+**Last reviewed:** 2026-07-20
 
----
+## Purpose
 
-## Section I: Introduction and Conceptual Overview
-### The Governance Workflow (GWC): Ensuring High-Assurance Contributions
+GWC turns repository change from an unstructured activity into a governed,
+verifiable sequence. It binds intent, evidence, repository state, execution
+scope, validation, review, and high-authority actions to explicit artifacts and
+gates.
 
-**1.1 The Challenge: Uncontrolled Velocity $\rightarrow$ Enterprise Risk**
+GWC is not a replacement for project requirements, tests, CI, code review, or
+human authority. It coordinates those mechanisms and prevents evidence from one
+stage being reused as permission for another.
 
-In modern, high-velocity development environments, the ability to integrate external contributions rapidly introduces critical points of friction and risk. Without stringent control, code contribution becomes an unstructured exchange susceptible to accidental breaches, security vulnerabilities, and compliance gaps.
-
-**The Goal of GWC is to transform contribution from an *unstructured activity* into a *governed, verifiable process*.**
-
-**1.2 What is GWC? (The Core Concept)**
-
-GWC provides a formalized, mandatory lifecycle management system that treats code contribution not as a single event, but as a series of checkpoints. It is the automated compliance layer that guides a feature from an initial idea through rigorous vetting into a deployable, auditable artifact.
-
-### **1.3 The GWC Flow Diagram (Conceptual Model)**
-
-GWC establishes a **State Machine** where the contributor artifact exists in defined states until it achieves validation at each gate. The flow is a structured progression of maturity and authority, enforced by mandatory artifacts.
+## Operating model
 
 ```mermaid
-graph TD
-    A[Contributor Idea] --> B{G0: Contextualize Change?};
-    B -- Yes, Task Defined --> C(G0_CONTEXT: Artifact Created);
-    C --> D{G1: Validate Technical Fitness?};
-    D -- Yes, Validator PASS --> E(G1_ALIGNMENT: Artifact Created);
-    E --> F{G2: Execute Against Codebase?};
-    F -- Yes, Guarded Branch/Commit --> G(G2_EXECUTION: Artifact Created);
-    G --> H{G3: Deliver for Review?};
-    H -- Yes, Draft PR Ready --> I(G3_PR: Artifact Created);
-    I --> J{G4+?: High-Authority Action?};
-    J -- Yes, Pass Authority Check --> K[Deployment/Merge Approved];
+flowchart LR
+  I[User intent] --> C[G0 verified context]
+  C --> A[G1 aligned decision]
+  A --> E[G2 scoped execution]
+  E --> P[G3 Draft PR and review]
+  P --> M{Exact G4 approval?}
+  M -- No --> R[Remain reviewable]
+  M -- Yes --> G[Merge reviewed head]
+  G --> S[G5 read-only status verification]
+  S --> X{Manual deploy or production operation?}
+  X -- No --> D[Close with evidence]
+  X -- Yes --> H[Separate G5 or G6 authority]
 ```
 
----
+### Authority boundaries
 
-## Section II: Architecture and Operational Mechanics
-### The GWC Engine: Translating Intent into Actionable Compliance
+- G0 and G1 establish evidence; they do not grant repository mutation.
+- G2 grants only the actions and files listed in the active envelope.
+- G3 produces review evidence for one exact branch head SHA.
+- G4 is a separate exact human merge decision.
+- Read-only post-merge G5 status verification is automatic.
+- Manual deploy, redeploy, release, publish, or runtime reload requires separate
+  G5 authority.
+- G6 is generated only when production data, configuration, migrations,
+  credentials, or secrets are actually in scope.
 
-The GWC architecture is not a single piece of software; it is an enforced *contract* between the contributor's intent and the repository's compliance requirements. This contract is governed by three primary elements: **Execution Modes, Gate Artifacts, and the Sequence Contract.**
+## Current capabilities
 
-**2.1 The Three Operating Contexts (Execution Modes)**
+| Capability | Current state |
+|---|---|
+| Protected-base boot and instruction precedence | Active |
+| Task-scoped G0 context artifacts | Active |
+| G1 intake, preflight, options, explicit decision, deterministic validator | Active |
+| Capability-aware `chat_connector_only`, `local_agent`, and `repo_ci` modes | Active |
+| Guarded branch execution with explicit Files WRITE | Active |
+| Draft PR delivery with exact-head evidence | Active |
+| Independent read-only G3 review and review closure | Active |
+| Automatic Draft → Ready metadata transition after valid G3, when supported | Active contract behavior |
+| Exact G4 human-approved merge execution, when connector capability is available | Active contract behavior |
+| Automatic read-only G5 status verification after merge | Active contract behavior |
+| Structured connector trace contract | Contract defined; backend adoption must be verified separately |
+| Context7-first skill resolution with pinned offline fallback | Available in scoped skill-library workflows |
 
-The system adapts its level of authority based on where the contributor is operating. This prevents unauthorized actions by restricting capabilities until the correct operational context is established.
+The repository contract describes permitted behavior. Live connector/runtime
+capability must still be verified before claiming an operation was performed.
 
-```mermaid
-flowchart TD
-    A[Contributor Action/Intent] --> B{Where is the work happening?};
-    B -- External Tooling/Idea Stage --> C[chat_connector_only: READ & Draft];
-    B -- Trusted Workstation/Local Machine --> D[local_agent: MUTATE & Prove];
-    B -- Repository Server/Pipeline --> E[repo_ci: Validate & Checkpoint];
+## Current limitations
+
+| Limitation | Operational response |
+|---|---|
+| Connector or runtime may not expose every declared capability | Use the next verified connector route or stop at the actual authority/capability boundary |
+| Connector-fetched validation can be blocked by transport or local DNS | Materialize exact-ref artifacts when possible; preserve limitation; require repository-native CI before completion |
+| DS Admin task state can become stale if callbacks are missed | Use legal State Engine transitions and disclose late reconciliation |
+| Generated artifacts can drift from sources | Update source first and regenerate through the verified generator |
+| Review evidence becomes stale after any new head SHA | Re-run validation and independent review for the new head |
+| Planning documents can look like completed implementation | Separate `proposal`, `in progress`, and `evidence verified` status explicitly |
+
+## Current priorities
+
+1. **Documentation integrity** — keep README, overview, plans, package, and current
+   gate behavior synchronized with protected `main`.
+2. **Runtime observability** — verify connector trace adoption and avoid
+   speculative failure attribution.
+3. **Operational lifecycle quality** — reduce stale task state, improve callback
+   reliability, and preserve auditable transitions.
+4. **Pilot evidence before scale** — execute the distributed multi-agent Pilot
+   success and failure-recovery runs before starting end-state rollout.
+5. **Existing before new** — reuse, extend, or refactor current GWC/DS MCP
+   mechanisms before introducing another orchestrator, state engine, or generic
+   write service.
+
+## Roadmap principles
+
+The roadmap does **not** include automatic merge without human G4 authority.
+Automation should prepare evidence, remove mechanical friction, and execute only
+within an exact active authority boundary.
+
+```text
+Near term
+→ improve documentation, traceability, validation recovery, and connector evidence
+→ execute bounded multi-agent Pilot with exact-SHA QA evidence
+→ close Pilot with GO / GO_WITH_CONDITIONS / NO_GO
+
+Later, only after Pilot evidence
+→ versioned workflow templates
+→ validated project adapters
+→ stronger role and evidence registries
+→ operational SLOs and recovery
+→ separately authorized G4/G5/G6 executors
 ```
 
-**2.2 The Gate Artifacts (The Proof)**
+## Success measures
 
-A "Gate" is not just a step; it is a requirement for producing and proving specific, schema-validated artifacts.
+- No protected-branch direct write.
+- No repository mutation outside the active task and file scope.
+- No stale base, CI, review, or head-SHA evidence accepted.
+- No CI/reviewer result interpreted as merge or deployment authority.
+- Every high-authority action is bound to an exact target, scope, actor, and
+  expiry.
+- Operators can identify the current task, gate, owner, blocker, evidence, and
+  next legal action.
 
-*   **G0 Context:** Proves *why* we are touching the code (Task ID, Risk Profile, Base SHA).
-    *   *(Analogous to: Filling out the "Project Charter".)*
-*   **G1 Alignment:** Proves *that* the proposed change is technically sound and compliant (Validator `PASS`, detailed Preflight Report).
-    *   *(Analogous to: The Technical Review and Security Vetting.)*
-*   **G2 Execution:** Proves *the action itself* (Scoped commits, Guarded Branch/Worktree). This is the first boundary crossing into executable code.
-    *   *(Analogous to: The "Engineering Build" phase.)*
+## Related documents
 
-**2.3 The Sequence Contract (The Guardrails)**
-
-The GWC mandates a strict, one-way flow. This is the system's fundamental security guarantee against shortcuts.
-
-**Flow:** $\text{G0\_CONTEXT} \rightarrow \text{G1\_ALIGNMENT} \rightarrow \text{G2\_EXECUTION} \rightarrow \text{G3\_PR} \rightarrow \text{[G4/G5/G6...] }$
-
-*   **Implication:** No gate may be skipped. The system does not accept *reasoning* of success; it requires the objective, artifact-backed output (like `tools/validate_g01.py` returning `PASS`) to prove successful transition.
-*   **The Role of Gates:** Each gate acts as a mandatory "handshake" between the contributor's intent and the repository's acceptance.
-
----
-
-## Section III: Current State – Where We Are Today
-### Achievements and Proven Capabilities
-
-The current iteration of GWC has successfully moved beyond conceptual design into operational reality. We have proven the core mechanism—the gating process—works as designed, even if we are still optimizing workflows.
-
-**3.1 Core Achieved Milestones (The Wins)**
-
-*   **Artifact Traceability:** We have successfully mandated and enforced the production of auditable artifacts for G0 through G3. The system definitively tracks *why* a change was made and *how* it progressed through the lifecycle.
-*   **Risk Isolation:** The mandatory segregation into `chat_connector_only` and `local_agent` modes has proven highly effective in preventing low-authority interactions from translating into high-risk repository mutations.
-*   **Strict Sequencing:** The enforcement of the linear $\text{G0} \rightarrow \text{G1} \rightarrow \text{G2}$ sequence has successfully prevented contributor bypass of necessary compliance checks, forcing a high bar for contribution acceptance.
-*   **Drafting Pipeline:** The system reliably supports the journey from initial concept to a runnable Draft Pull Request (G3), minimizing wasted effort on unvetted ideas.
-
-**3.2 Limitations & Known Constraints (The Reality Check)**
-
-Transparency on limitations is key to effective advice. These are the friction points we are actively seeking input on:
-
-*   **Human Velocity Bottleneck:** The transition into the G4/G5/G6 stages relies heavily on sequential human approvals, which is a necessary safety control but creates velocity slowdowns.
-*   **Contextual Drag:** The required artifact generation process for G1 and G2 can introduce significant cognitive load on contributors if not perfectly aligned with the workflow.
-*   **Optimal Tooling Dependency:** The reliability and speed of GWC are tied to the effectiveness of underlying tools. We are seeking advice on enhancing these low-level tools to minimize contributor friction without compromising security.
-
----
-
-## Section IV: Future Vision and Roadmap
-### Scaling Velocity Without Compromising Integrity through Intelligent Augmentation
-
-Our vision for GWC is not merely to enforce boundaries; it is to **automate the friction points** of quality control, leveraging advanced intelligence to bind high-velocity development with maximum safety.
-
-### **4.1 Short-Term Goals (Phase 2: Friction Reduction)**
-
-*   **Goal:** Automating G4 Merge Approval Velocity.
-    *   **Action:** Developing mechanisms to allow trusted merges *without* requiring manual sign-off for low-risk, compliant changes.
-    *   **Impact:** Translates G3 success into faster integration timelines.
-*   **Goal:** Enhancing `chat_connector_only` intelligence.
-    *   **Action:** Deepening the context awareness in read-mode to provide more actionable, higher-fidelity feedback loops.
-    *   **Impact:** Maximizes the utility of the most restricted mode, turning suggestion into execution plan efficiently.
-
-### **4.2 Long-Term Goals (Phase 3: Predictive Assurance & Acceleration)**
-
-This phase introduces the concept of **AI-Augmented Review**, transforming GWC from a compliance checkpoint into an intelligent pipeline accelerator.
-
-*   **Goal: Implement the Scoring & Review Engine.**
-    *   **Action:** Introduce an AI Agent trained on past successful contributions. This engine independently reviews deliverables and assigns a **Risk/Complexity Score**.
-    *   **Impact:** This triage mechanism filters the noise, elevating genuinely complex or high-risk items to the decision-maker while automatically signing off on low-risk, simple tasks.
-*   **Goal: Smarter Gate Transitions.**
-    *   **Action:** The GWC system uses the Scoring Engine's output to guide the human reviewer. Instead of a binary PASS/FAIL, the system presents actionable data: "Low Risk: Auto-Sign-Off Recommended" vs. "High Risk: Manual Deep Dive Required."
-    *   **Impact:** The human decision-maker shifts from being a mechanical approver to a strategic oversight body, dramatically accelerating throughput.
-
-### **4.3 The Ideal State (The Vision)**
-GWC becomes an invisible, hyper-efficient layer between human intent and machine execution. The combination of the strict GWC contract and the AI Scoring Engine creates a virtuous cycle: rigorous safety for compliance, intelligent augmentation for speed.
-
----
-## Section V: Seeking Guidance and Contributors (Call to Action)
-### Our Ask
-
-We are entering a critical phase where the next leap forward requires external expertise. We invite advisors in specific domains to join us:
-
-*   **Compliance & Policy Experts:** To help define the optimal G4/G5/G6 workflows in high-speed scenarios.
-*   **ML/AI Specialists:** To accelerate the development of the Scoring and Review Engine (Phase 3).
-*   **DevX Engineers:** To ensure that GWC remains a facilitator of flow, not merely a barrier.
-
-**Contact us to explore how your unique expertise can define the next generation of high-assurance development.**
+- [`README.md`](README.md)
+- [`AGENTS.md`](AGENTS.md)
+- [`core/GATE_LIFECYCLE_CONTRACT_v1.0.md`](core/GATE_LIFECYCLE_CONTRACT_v1.0.md)
+- [`core/E2E_DRAFT_PR_DELIVERY_RULE.md`](core/E2E_DRAFT_PR_DELIVERY_RULE.md)
+- [`docs/plan/distributed-multi-agent-sdlc/README.md`](docs/plan/distributed-multi-agent-sdlc/README.md)
