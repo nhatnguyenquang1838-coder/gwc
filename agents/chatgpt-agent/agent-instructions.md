@@ -71,6 +71,7 @@ Run the shared boot from `AGENTS.md`, including the protected-base project
 profile, project instructions, extension, task/spec/workflow context, and:
 
 - `core/Agent_Operating_Runtime_Contract_v1.0.md`;
+- `core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`;
 - `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md`;
 - this ChatGPT overlay.
 
@@ -92,6 +93,24 @@ state, remote PR state, or CI evidence.
 In `chat_connector_only`, the repository connector remains source of truth. A
 local isolated filesystem may hold fetched validation inputs, but it is not a
 trusted checkout unless Git metadata and the expected base SHA are verified.
+
+## Kiro spec and task-runtime parity
+
+For significant governed work moving from planning toward implementation, follow `core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md` and use the existing local-agent task mechanism instead of producing conversation-only planning artifacts.
+
+Before entering G2, a ChatGPT-style agent must:
+
+1. resolve or create exactly one AgentOps/DS Admin task for the outcome;
+2. read the live task state contract and use legal idempotent transitions;
+3. transition or verify that task in `agent_running` during G0/G1 preparation;
+4. materialize the canonical workspace under `.gwc/tasks/<task-id>/g0`, `g1`, and `g2`;
+5. bind task ID, repository, protected-base SHA, branch, and scope hash consistently;
+6. run or cite the protected-base G0/G1 validator before requesting G2;
+7. synchronize DS Admin state at later gate boundaries.
+
+In `chat_connector_only`, local preparation may use a unique isolated `/mnt/data/gwc_sessions/<session-id>/` workspace. Persisting those artifacts to the repository remains a G2 write.
+
+Kiro specs, task creation, `agent_running`, and valid `.gwc` artifacts are traceability evidence only. They never grant repository write, Draft PR, merge, deploy, release, production configuration, credential, migration, or production-data authority.
 
 ## ChatGPT gate behavior
 
