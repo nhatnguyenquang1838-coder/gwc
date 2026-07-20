@@ -21,6 +21,7 @@ A GWC-governed project agent must read, in order:
    - `core/Coding_Project_Governance_v1.0.md`;
    - `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`;
    - `core/Agent_Operating_Runtime_Contract_v1.0.md`;
+   - `core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`;
    - `core/E2E_DRAFT_PR_DELIVERY_RULE.md`.
 4. `governance/instruction-source-registry.yaml` when present.
 5. Active GWC project profile for this repository.
@@ -75,6 +76,14 @@ No Files WRITE declaration -> no repository mutation.
 New write path -> stop, update scope, regenerate approval request.
 Actual write outside approved scope -> scope drift, stop before commit or PR.
 ```
+
+## Kiro specs and task-runtime parity
+
+For significant governed work moving toward implementation, project agents must follow `core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`.
+
+Before G2, a ChatGPT-style agent must create or claim exactly one AgentOps/DS Admin task, use legal task transitions, reach or verify `agent_running` during G0/G1 preparation, and materialize the canonical `.gwc/tasks/<task-id>/g0`, `g1`, and `g2` workspace used by local agents.
+
+The task ID, repository, protected-base SHA, branch, and scope hash must remain consistent across DS Admin and gate artifacts. Kiro specs, task state, and `.gwc` artifacts are traceability only and never grant repository write, PR, merge, deploy, or production authority.
 
 ## Required gate behavior
 
@@ -150,12 +159,13 @@ Before repository-changing work, read:
 3. `.gwc/gwc/core/Coding_Project_Governance_v1.0.md`
 4. `.gwc/gwc/core/GATE_LIFECYCLE_CONTRACT_v1.0.md`
 5. `.gwc/gwc/core/Agent_Operating_Runtime_Contract_v1.0.md`
-6. `.gwc/gwc/core/E2E_DRAFT_PR_DELIVERY_RULE.md`
-7. `.gwc/gwc/governance/instruction-source-registry.yaml` when present
-8. `.gwc/gwc/projects/<project-id>/project-profile.yaml`
-9. `.gwc/gwc/projects/<project-id>/project-instructions.md`
-10. `.gwc/gwc/projects/<project-id>/project-extension.md`
-11. task/spec/workflow files relevant to the request
+6. `.gwc/gwc/core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`
+7. `.gwc/gwc/core/E2E_DRAFT_PR_DELIVERY_RULE.md`
+8. `.gwc/gwc/governance/instruction-source-registry.yaml` when present
+9. `.gwc/gwc/projects/<project-id>/project-profile.yaml`
+10. `.gwc/gwc/projects/<project-id>/project-instructions.md`
+11. `.gwc/gwc/projects/<project-id>/project-extension.md`
+12. task/spec/workflow files relevant to the request
 
 Print SOURCE INSTRUCTION and declare `execution_mode` before gate reporting.
 
