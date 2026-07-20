@@ -105,6 +105,7 @@
           "run_sandboxed_validation",
           "push_working_branch",
           "open_or_update_draft_pr",
+          "mark_pr_ready_for_review",
           "merge_approved_pr",
           "deploy_approved_release",
           "production_data_read",
