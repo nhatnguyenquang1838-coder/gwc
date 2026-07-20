@@ -1,0 +1,55 @@
+schema_version: "1.0"
+envelope_id: g2-ci-repair-kiro-spec-chatgpt-parity-01
+task_id: task_73fadcb1-c2db-4f6f-856c-a98eb778ec23
+gate: G2_EXECUTION
+status: approved
+created_at: "2026-07-20T10:39:51Z"
+repository:
+  owner: nhatnguyenquang1838-coder
+  name: gwc
+  protected_base: main
+  protected_base_sha: 04c314a26e2986f2bb46b61bae32cca6613670d1
+  branch: feature/kiro-spec-driven-delivery-rule
+  repair_from_head: 76e22195e5a4490095ad46ffe48ce132b4f77663
+pull_request:
+  number: 42
+  draft_required: true
+approval:
+  approval_request_id: g2-kiro-spec-chatgpt-parity-20260720-03
+  scope_hash: sha256:a8bf7422f8e3153fd2fab4f5ebc8b8a54e2a6e89bf46e024beb8f11d60a27e70
+  scope_hash_16: a8bf7422f8e3153f
+  expires_at_utc: "2026-07-21T10:20:00Z"
+ci_failure:
+  workflow_run_id: 29734506450
+  artifact_id: 8457688556
+  failed_test: test_package_distributes_runbook
+  reason: Approved package version is 1.14.0 while the existing test still asserts 1.13.0.
+files_write:
+  - .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/ci-repair-envelope-01.yaml
+  - tests/test_chatgpt_agent_runbook_continuation.py
+authorized_actions:
+  - create_or_update_scoped_files
+  - run_sandboxed_validation
+  - push_guarded_branch
+  - update_existing_draft_pr_validation_evidence
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  - mark_pr_ready
+validation:
+  required:
+    - python tools/validate_instructions.py
+    - python tools/validate_g01.py --workspace .gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23 --json
+    - python -m unittest discover -s tests -p "test_*.py"
+  exact_head_ci_required: true
