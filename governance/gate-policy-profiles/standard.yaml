@@ -1,0 +1,44 @@
+schema_version: "1.0"
+profile_type: gate_policy
+profile_id: standard
+status: active
+description: Standard GWC gate lifecycle and authority policy.
+gate_sequence:
+  - G0_CONTEXT
+  - G1_ALIGNMENT
+  - G2_EXECUTION
+  - G3_PR
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+gates:
+  G0_CONTEXT:
+    authority: automatic_read_only
+    write_allowed: false
+  G1_ALIGNMENT:
+    authority: automatic_read_only
+    write_allowed: false
+  G2_EXECUTION:
+    authority: exact_human_approval
+    write_allowed: true
+  G3_PR:
+    authority: evidence_driven
+    write_allowed: true
+    draft_pr_only: true
+    ready_for_review_after_pass: true
+  G4_MERGE:
+    authority: exact_human_approval
+    write_allowed: true
+  G5_DEPLOY:
+    authority: status_verify_or_exact_human_manual_action
+    write_allowed: conditional
+  G6_PRODUCTION_DATA:
+    authority: exact_human_approval_when_applicable
+    write_allowed: conditional
+invariants:
+  - no_gate_skip
+  - no_retroactive_evidence
+  - exact_scope_binding
+  - exact_head_ci_for_g3
+  - g4_required_for_merge
+  - later_gate_authority_not_implied
