@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-07-21 — REVAMP-GWC-008 package export smoke verification
+
+### Added
+
+- Package export smoke runbook for post-merge generated `.governance/` verification.
+- Deterministic `tools/verify_package_export_smoke.py` verifier for exporting the real `projects/gwc/package.yaml` package into an isolated generated tree.
+- Regression test that runs the smoke verifier against the live GWC package manifest.
+
+### Changed
+
+- `projects/gwc/package.yaml` now distributes the smoke runbook and verifier through the generated `.governance/` package.
+- `package_version` remains `1.16.0`; this is a smoke-verification rollout, not a package-version bump.
+
+### Safety
+
+- Generated `.governance/` output and `.package-export-manifest.json` are evidence only; they do not grant protected-branch write, merge, deploy, release, production configuration, credential, migration, or production-data authority.
+
 ## 2026-07-21 — REVAMP-GWC-006 consumer package export
 
 ### Added
