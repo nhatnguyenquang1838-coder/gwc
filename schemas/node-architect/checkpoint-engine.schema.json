@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/checkpoint-engine.schema.json",
+  "title": "Checkpoint Runtime Engine Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "engine_id",
+    "required_phases",
+    "invariants",
+    "state_fields",
+    "failure_routes",
+    "authority_boundaries"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "engine_id": {"type": "string", "minLength": 1},
+    "required_phases": {
+      "type": "array",
+      "minItems": 6,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cas_required",
+        "lease_required",
+        "reconcile_before_retry",
+        "checkpoint_before_suspend",
+        "no_false_pass"
+      ],
+      "properties": {
+        "cas_required": {"const": true},
+        "lease_required": {"const": true},
+        "reconcile_before_retry": {"const": true},
+        "checkpoint_before_suspend": {"const": true},
+        "no_false_pass": {"const": true}
+      }
+    },
+    "state_fields": {
+      "type": "array",
+      "minItems": 10,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "failure_routes": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["failure", "route"],
+        "properties": {
+          "failure": {"type": "string", "minLength": 1},
+          "route": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "authority_boundaries": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
