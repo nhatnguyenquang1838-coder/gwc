@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.1",
+  "node_id": "reference.read_context",
+  "node_version": "0.1.0",
+  "node_class": "read_only",
+  "purpose": "Load protected-base context and live state evidence without causing side effects.",
+  "entry": {
+    "requires": [
+      "repository_identity_verified",
+      "protected_base_sha_known",
+      "execution_mode_resolved"
+    ]
+  },
+  "do": {
+    "actions": [
+      "fetch_required_sources",
+      "summarize_context_evidence",
+      "emit_read_only_handoff"
+    ],
+    "side_effect": false
+  },
+  "branches": [
+    {
+      "when": "required_source_missing",
+      "route": "self_repair_or_block"
+    },
+    {
+      "when": "context_ready",
+      "route": "reference.scoped_write"
+    }
+  ],
+  "exit": {
+    "evidence": [
+      "files_read_list",
+      "protected_base_sha",
+      "context_summary"
+    ]
+  },
+  "next": ["reference.scoped_write"]
+}
