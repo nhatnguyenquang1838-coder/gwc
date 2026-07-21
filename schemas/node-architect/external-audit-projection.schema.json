@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/external-audit-projection.schema.json",
+  "title": "External Audit Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "projection_type",
+    "task_id",
+    "canonical_gate",
+    "canonical_status",
+    "blocking",
+    "targets"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "projection_type": { "const": "external_audit" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "canonical_gate": { "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"] },
+    "canonical_status": { "enum": ["READY", "RUNNING", "PASS", "BLOCKED", "FAILED", "NOT_APPLICABLE"] },
+    "blocking": { "const": false },
+    "targets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jira", "tc_ds_mcp", "git"],
+      "properties": {
+        "jira": { "$ref": "#/$defs/target" },
+        "tc_ds_mcp": { "$ref": "#/$defs/target" },
+        "git": { "$ref": "#/$defs/target" }
+      }
+    }
+  },
+  "$defs": {
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "status", "blocking"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "status": { "enum": ["AUDIT_NOT_REQUIRED", "AUDIT_PENDING", "AUDIT_SUBMITTED", "AUDIT_VERIFIED", "AUDIT_STALE", "AUDIT_FAILED", "AUDIT_SKIPPED"] },
+        "blocking": { "const": false },
+        "desired_action": { "type": "string" },
+        "readback_actor": { "type": "string" },
+        "readback_timestamp": { "type": "string" }
+      }
+    }
+  }
+}
