@@ -1,0 +1,57 @@
+{
+  "$id": "https://gwc.local/schemas/node-architect/node-pack.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_transitions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "authority_required": {
+            "enum": ["none", "read_only", "g2_required", "g3_required", "g4_required", "g5_required", "g6_required"]
+          },
+          "from": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+          "to": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"}
+        },
+        "required": ["from", "to", "authority_required"],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "catalog_expansion_status": {"enum": ["blocked_until_kernel_pass", "prototype_only", "catalog_ready"]},
+    "kernel_ref": {"const": "RUNTIME_KERNEL@0.1"},
+    "node_pack_id": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+    "nodes": {
+      "items": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_refs": {
+      "items": {"type": "string"},
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {"const": "0.1"},
+    "side_effect_nodes": {
+      "items": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+      "type": "array",
+      "uniqueItems": true
+    },
+    "version": {"pattern": "^0\\.[0-9]+$", "type": "string"}
+  },
+  "required": [
+    "schema_version",
+    "node_pack_id",
+    "version",
+    "kernel_ref",
+    "nodes",
+    "schema_refs",
+    "allowed_transitions",
+    "side_effect_nodes",
+    "catalog_expansion_status"
+  ],
+  "title": "GWC Node Pack",
+  "type": "object"
+}

@@ -1,0 +1,80 @@
+{
+  "$id": "https://gwc.local/schemas/node-architect/runtime-kernel.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_boundaries": {
+          "items": {
+            "enum": ["G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "external_projection_authority": {"const": false},
+        "merge_requires_exact_g4": {"const": true},
+        "write_requires_exact_g2": {"const": true}
+      },
+      "required": ["write_requires_exact_g2", "merge_requires_exact_g4", "external_projection_authority", "approval_boundaries"],
+      "type": "object"
+    },
+    "durability": {
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_before_suspend": {"const": true},
+        "event_history_required": {"const": true},
+        "version_pin_required": {"const": true}
+      },
+      "required": ["event_history_required", "checkpoint_before_suspend", "version_pin_required"],
+      "type": "object"
+    },
+    "invariants": {
+      "items": {
+        "enum": [
+          "authority_boundary",
+          "event_history",
+          "idempotency_key",
+          "checkpoint_before_suspend",
+          "readback_after_side_effect",
+          "exact_evidence_binding",
+          "version_pin",
+          "projection_is_not_authority",
+          "no_blind_retry",
+          "catalog_expansion_gate"
+        ]
+      },
+      "minItems": 10,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "kernel_id": {"const": "RUNTIME_KERNEL"},
+    "node_catalog_guard": {
+      "additionalProperties": false,
+      "properties": {
+        "expansion_allowed_before_kernel_pass": {"const": false},
+        "requires_failure_simulation": {"const": true},
+        "requires_reference_node_pack": {"const": true}
+      },
+      "required": ["expansion_allowed_before_kernel_pass", "requires_reference_node_pack", "requires_failure_simulation"],
+      "type": "object"
+    },
+    "schema_version": {"const": "0.1"},
+    "side_effects": {
+      "additionalProperties": false,
+      "properties": {
+        "idempotency_key_required": {"const": true},
+        "readback_required": {"const": true},
+        "retry_requires_reconciliation": {"const": true}
+      },
+      "required": ["idempotency_key_required", "readback_required", "retry_requires_reconciliation"],
+      "type": "object"
+    },
+    "version": {"const": "0.1"}
+  },
+  "required": ["schema_version", "kernel_id", "version", "invariants", "authority", "durability", "side_effects", "node_catalog_guard"],
+  "title": "GWC Runtime Kernel",
+  "type": "object"
+}
