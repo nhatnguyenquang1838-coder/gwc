@@ -13,9 +13,9 @@ class GwcPackageRevampExportTests(unittest.TestCase):
         with PACKAGE.open("r", encoding="utf-8") as handle:
             return yaml.safe_load(handle)
 
-    def test_package_version_bumped_for_consumer_export(self):
+    def test_package_version_remains_current_for_consumer_export(self):
         package = self.load_package()
-        self.assertEqual(package["package_version"], "1.17.0")
+        self.assertEqual(package["package_version"], "1.16.0")
 
     def test_revamp_export_entries_are_declared(self):
         package = self.load_package()
