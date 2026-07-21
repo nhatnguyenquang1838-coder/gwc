@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import copy
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 import yaml
+from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -83,6 +85,70 @@ class ProfileResolverTests(unittest.TestCase):
             RESOLVER.resolve_profile_set(
                 root, root / "governance/profile-sets/gwc-standard.yaml"
             )
+
+    def test_gate_policy_schema_rejects_authority_and_write_drift(self) -> None:
+        schema = json.loads(
+            (ROOT / "schemas/gate-policy-profile.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        profile = yaml.safe_load(
+            (ROOT / "governance/gate-policy-profiles/standard.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        validator = Draft202012Validator(schema)
+        cases = [
+            ("G0_CONTEXT", "authority", "exact_human_approval"),
+            ("G0_CONTEXT", "write_allowed", True),
+            ("G1_ALIGNMENT", "authority", "exact_human_approval"),
+            ("G1_ALIGNMENT", "write_allowed", True),
+            ("G2_EXECUTION", "authority", "automatic_read_only"),
+            ("G2_EXECUTION", "write_allowed", False),
+            ("G3_PR", "authority", "exact_human_approval"),
+            ("G3_PR", "write_allowed", False),
+            ("G3_PR", "draft_pr_only", False),
+            ("G3_PR", "ready_for_review_after_pass", False),
+            ("G4_MERGE", "authority", "evidence_driven"),
+            ("G4_MERGE", "write_allowed", False),
+            ("G5_DEPLOY", "authority", "automatic_read_only"),
+            ("G5_DEPLOY", "write_allowed", False),
+            ("G6_PRODUCTION_DATA", "authority", "automatic_read_only"),
+            ("G6_PRODUCTION_DATA", "write_allowed", False),
+        ]
+        for gate, field, unsafe_value in cases:
+            with self.subTest(gate=gate, field=field, unsafe_value=unsafe_value):
+                mutated = copy.deepcopy(profile)
+                mutated["gates"][gate][field] = unsafe_value
+                self.assertTrue(
+                    list(validator.iter_errors(mutated)),
+                    f"unsafe gate-policy drift was accepted: {gate}.{field}={unsafe_value!r}",
+                )
+
+    def test_gate_policy_schema_rejects_pr_flags_outside_g3(self) -> None:
+        schema = json.loads(
+            (ROOT / "schemas/gate-policy-profile.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        profile = yaml.safe_load(
+            (ROOT / "governance/gate-policy-profiles/standard.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        validator = Draft202012Validator(schema)
+        for gate in (
+            "G0_CONTEXT",
+            "G1_ALIGNMENT",
+            "G2_EXECUTION",
+            "G4_MERGE",
+            "G5_DEPLOY",
+            "G6_PRODUCTION_DATA",
+        ):
+            with self.subTest(gate=gate):
+                mutated = copy.deepcopy(profile)
+                mutated["gates"][gate]["draft_pr_only"] = True
+                self.assertTrue(list(validator.iter_errors(mutated)))
 
 
 if __name__ == "__main__":
