@@ -118,13 +118,13 @@ Before producing G0 or G1 artifacts, the agent must select a workspace root acco
 |---|---|---|---|
 | `chat_connector_only` with `/mnt` | `/mnt/<session>/.gwc/tasks/<task-id>/g0/` | `/mnt/<session>/.gwc/tasks/<task-id>/g1/` | `--workspace /mnt/<session>/.gwc/tasks/<task-id>` |
 | `chat_connector_only` without `/mnt` | `.gwc/tasks/<task-id>/g0/` | `.gwc/tasks/<task-id>/g1/` | `--workspace .gwc/tasks/<task-id>` |
-| `local_agent` canonical | `.gwc/g0/` | `.gwc/g1/` | `--workspace .gwc` |
-| `local_agent` session-scoped | `.gwc/runs/<run_id>/g0/` | `.gwc/runs/<run_id>/g1/` | `--workspace .gwc/runs/<run_id>` |
+| `local_agent` | `.gwc/tasks/<task-id>/g0/` | `.gwc/tasks/<task-id>/g1/` | `--workspace .gwc/tasks/<task-id>` |
 
 Conflict policy:
 - Do not allow two active sessions to write the same workspace root.
-- If canonical `.gwc/g1/` is already owned, choose session-scoped or stop with `G1_BLOCKED`.
-- Never overwrite existing G1 artifacts unless the same `run_id` owns them or the user explicitly supersedes.
+- Every new formal task MUST use `.gwc/tasks/<task-id>/` as its only artifact root; `run_id` is session metadata, not a root selector.
+- `.gwc/g0`, `.gwc/g1`, and `.gwc/runs/<run_id>` are read-only compatibility layouts and MUST NOT be selected for new tasks.
+- Never overwrite task-scoped artifacts unless the same task ID owns them or the user explicitly supersedes.
 
 ### Task-scoped gate artifacts
 
