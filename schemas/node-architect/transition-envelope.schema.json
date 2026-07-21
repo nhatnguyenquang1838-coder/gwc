@@ -1,0 +1,55 @@
+{
+  "$id": "https://gwc.local/schemas/node-architect/transition-envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_required": {
+      "enum": ["none", "read_only", "g2_required", "g3_required", "g4_required", "g5_required", "g6_required"]
+    },
+    "checkpoint_id": {"minLength": 1, "type": "string"},
+    "current_gate": {
+      "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]
+    },
+    "event_history_ref": {"minLength": 1, "type": "string"},
+    "evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_ids": {"items": {"type": "string"}, "type": "array", "uniqueItems": true},
+        "ci_status": {"enum": ["not_applicable", "pending", "success", "failure"]},
+        "head_sha": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+        "readback_performed": {"type": "boolean"}
+      },
+      "required": ["readback_performed"],
+      "type": "object"
+    },
+    "from_node": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+    "human_approval_required": {"type": "boolean"},
+    "invalidates_prior_evidence": {"type": "boolean"},
+    "next_gate": {
+      "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]
+    },
+    "reason": {"minLength": 1, "type": "string"},
+    "schema_version": {"const": "0.1"},
+    "task_id": {"minLength": 1, "type": "string"},
+    "to_node": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+    "transition_id": {"pattern": "^trn_[a-z0-9._-]+$", "type": "string"}
+  },
+  "required": [
+    "schema_version",
+    "transition_id",
+    "task_id",
+    "from_node",
+    "to_node",
+    "current_gate",
+    "next_gate",
+    "checkpoint_id",
+    "event_history_ref",
+    "authority_required",
+    "human_approval_required",
+    "invalidates_prior_evidence",
+    "reason",
+    "evidence"
+  ],
+  "title": "GWC Transition Envelope",
+  "type": "object"
+}
