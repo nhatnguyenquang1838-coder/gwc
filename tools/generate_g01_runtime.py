@@ -244,7 +244,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         ))
     else:
         checks.append(_check(
-            "REPO_IDENTITY", "FAIL", "REPOSITORY_NOT_VERIFIUD",
+            "REPO_IDENTITY", "FAIL", "REPOSITORY_NOT_VERIFIED",
             "Repository identity is not verified.",
             [project["profile_path"]],
         ))
