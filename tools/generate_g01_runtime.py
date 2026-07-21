@@ -28,6 +28,33 @@ GENERATED_ARTIFACTS: dict[str, tuple[str, str]] = {
     "preflight": ("g1/preflight/g1-preflight-report.yaml", "g1-preflight-report.schema.json"),
 }
 HIGH_RISK_CLASSES = {"R2", "R3"}
+DELIVERY_LIFECYCLE_ACTIONS = [
+    "create_guarded_branch",
+    "modify_scoped_files",
+    "run_sandboxed_validation",
+    "push_working_branch",
+    "open_or_update_draft_pr",
+    "monitor_ci",
+    "repair_repository_fixable_ci",
+    "independent_g3_review",
+    "mark_pr_ready_for_review_after_g3_pass",
+]
+DELIVERY_NON_GOALS = [
+    "merge",
+    "auto_merge",
+    "deploy",
+    "release",
+    "production_config_change",
+    "credential_rotation",
+    "production_data_access",
+]
+G3_READY_FOR_REVIEW_EVIDENCE = [
+    "g3_delivery_record_pass",
+    "current_pr_head_sha_match",
+    "required_ci_success",
+    "review_closure_non_stale",
+    "scope_drift_false",
+]
 
 
 def _load_yaml(path: Path) -> Any:
@@ -83,6 +110,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
     generated_at = runtime_input["generated_at"]
     project = runtime_input["project"]
     repository = runtime_input["repository"]
+    runtime = runtime_input["runtime"]
     task = runtime_input["task"]
     request = runtime_input["request"]
     risk = runtime_input["risk"]
@@ -94,6 +122,27 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         "task_id": task["id"],
         "base_sha": repository["base_sha"],
         "g0_snapshot": "../../g0/context-snapshot.yaml",
+    }
+    runtime_context = {
+        "agent_runtime_id": runtime["agent_runtime_id"],
+        "execution_mode": runtime["execution_mode"],
+        "selected_profile": {
+            "id": runtime["selected_profile"]["id"],
+            "path": runtime["selected_profile"]["path"],
+        },
+        "selected_connector": runtime["selected_connector"],
+        "connector_priority": runtime["connector_priority"],
+        "required_behavior_contracts": [
+            item["path"] for item in runtime["required_behavior_contracts"]
+        ],
+    }
+    delivery_lifecycle = {
+        "authorized_actions": DELIVERY_LIFECYCLE_ACTIONS,
+        "downstream_non_goals": DELIVERY_NON_GOALS,
+        "g3_metadata_completion": {
+            "ready_for_review_after_g3_pass": True,
+            "required_evidence": G3_READY_FOR_REVIEW_EVIDENCE,
+        },
     }
 
     g0_blockers: list[dict[str, str]] = []
@@ -111,6 +160,27 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         g0_blockers.append(_blocker(
             "REQUIRED_SOURCE_UNAVAILABLE",
             "Required sources are unavailable: " + ", ".join(sorted(unavailable_required)),
+        ))
+    if runtime["execution_mode"] not in runtime["selected_profile"]["supported_execution_modes"]:
+        g0_blockers.append(_blocker(
+            "EXECUTION_MODE_UNSUPPORTED",
+            "The selected runtime profile does not support the current execution mode.",
+        ))
+    if runtime["selected_connector"] not in runtime["connector_priority"]:
+        g0_blockers.append(_blocker(
+            "CONNECTOR_NOT_DECLARED",
+            "The selected connector must be present in connector_priority.",
+        ))
+    unavailable_contracts = [
+        contract["path"]
+        for contract in runtime["required_behavior_contracts"]
+        if contract["required"] and contract["status"] != "AVAILABLE"
+    ]
+    if unavailable_contracts:
+        g0_blockers.append(_blocker(
+            "BEHAVIOR_CONTRACT_UNAVAILABLE",
+            "Required behavior contracts are unavailable: "
+            + ", ".join(sorted(unavailable_contracts)),
         ))
 
     g0 = {
@@ -130,6 +200,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
             "connector": repository["connector"],
             "write_enabled": repository["write_enabled"],
         },
+        "runtime_context": runtime_context,
         "constraints": request["constraints"],
         "applicable_policies": runtime_input["policies"],
         "sources": sources,
@@ -157,6 +228,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         "assumptions": request["assumptions"],
         "risks": request["risks"],
         "acceptance_criteria": request["acceptance_criteria"],
+        "delivery_lifecycle": delivery_lifecycle,
         "unresolved_questions": request["unresolved_questions"],
         "status": "READY" if intake_complete else "NEEDS_INPUT",
     }
@@ -189,6 +261,49 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
             "All required sources are available.",
             [source["path"] for source in sources if source["required"]],
         ))
+
+    if runtime["execution_mode"] in runtime["selected_profile"]["supported_execution_modes"]:
+        checks.append(_check(
+            "EXECUTION_MODE_COMPATIBILITY", "PASS", "EXECUTION_MODE_SUPPORTED",
+            "The selected runtime profile supports the current execution mode.",
+            [
+                runtime["selected_profile"]["path"],
+                f'execution_mode={runtime["execution_mode"]}',
+            ],
+        ))
+    else:
+        checks.append(_check(
+            "EXECUTION_MODE_COMPATIBILITY", "FAIL", "EXECUTION_MODE_UNSUPPORTED",
+            "The selected runtime profile does not support the current execution mode.",
+            [runtime["selected_profile"]["path"]],
+        ))
+        blockers.append(_blocker(
+            "EXECUTION_MODE_UNSUPPORTED",
+            "Select a runtime profile that supports the current execution mode.",
+        ))
+
+    if unavailable_contracts:
+        checks.append(_check(
+            "BOOTSTRAP_BEHAVIOR_CONTRACTS", "FAIL", "BEHAVIOR_CONTRACT_UNAVAILABLE",
+            "One or more required behavior contracts are unavailable.",
+            sorted(unavailable_contracts),
+        ))
+        blockers.append(_blocker(
+            "BEHAVIOR_CONTRACT_UNAVAILABLE",
+            "Required behavior contracts must be loaded before G0/G1 can pass.",
+        ))
+    else:
+        checks.append(_check(
+            "BOOTSTRAP_BEHAVIOR_CONTRACTS", "PASS", "BEHAVIOR_CONTRACTS_AVAILABLE",
+            "Required behavior and presentation contracts are available.",
+            runtime_context["required_behavior_contracts"],
+        ))
+
+    checks.append(_check(
+        "DELIVERY_LIFECYCLE_SCOPE", "PASS", "NON_MERGE_DELIVERY_SCOPE_EXPLICIT",
+        "G1 intake anticipates branch, scoped write, validation, Draft PR, CI, G3 review, and ready-for-review metadata completion without G4 authority.",
+        DELIVERY_LIFECYCLE_ACTIONS,
+    ))
 
     if task["claimed"]:
         checks.append(_check(
@@ -274,6 +389,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
             "connector": repository["connector"],
         },
         "checks": checks,
+        "runtime_context": runtime_context,
         "risk_class": risk_class,
         "required_gate": required_gate,
         "blockers": blockers,
