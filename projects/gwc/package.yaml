@@ -72,6 +72,8 @@ instructions:
   - {id: kiro-local-agent-package-validator, path: tools/node_architect/validate_kiro_local_agent_package.py, target: .governance/tools/node_architect/validate_kiro_local_agent_package.py, required: true}
   - {id: kiro-local-agent-package-renderer, path: tools/node_architect/render_kiro_local_agent_package.py, target: .governance/tools/node_architect/render_kiro_local_agent_package.py, required: true}
   - {id: consumer-package-export-tool, path: tools/export_project_package.py, target: .governance/tools/export_project_package.py, required: true}
+  - {id: package-export-smoke-runbook, path: docs/runbooks/PACKAGE_EXPORT_SMOKE_TEST.md, target: .governance/docs/runbooks/PACKAGE_EXPORT_SMOKE_TEST.md, required: true}
+  - {id: package-export-smoke-verifier, path: tools/verify_package_export_smoke.py, target: .governance/tools/verify_package_export_smoke.py, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -93,6 +95,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-008 adds post-merge package export smoke verification and generated .governance artifact checks without changing package_version.
   - REVAMP-GWC-006 adds consumer package export rules, schemas, tools, and package entries without changing package_version.
   - Package version 1.16.0 adds runtime bootstrap evidence to G0/G1 and fail-closed selected runtime profile resolution for the current agent execution mode.
   - Package version 1.15.0 adds typed multi-profile resolution and mandatory gate response traceability.
