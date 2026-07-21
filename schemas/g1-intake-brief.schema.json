@@ -220,6 +220,57 @@
         "$ref": "#/$defs/acceptance"
       }
     },
+    "delivery_lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorized_actions",
+        "downstream_non_goals",
+        "g3_metadata_completion"
+      ],
+      "properties": {
+        "authorized_actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "downstream_non_goals": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "g3_metadata_completion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "ready_for_review_after_g3_pass",
+            "required_evidence"
+          ],
+          "properties": {
+            "ready_for_review_after_g3_pass": {
+              "type": "boolean"
+            },
+            "required_evidence": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
     "unresolved_questions": {
       "type": "array",
       "uniqueItems": true,
