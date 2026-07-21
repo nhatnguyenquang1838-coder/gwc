@@ -1,0 +1,68 @@
+approval_id: CP-20260721-001
+authority_gate: G2_EXECUTION
+task_id: task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+issued_at: "2026-07-21T03:18:00Z"
+expires_at: "2026-07-21T15:18:00Z"
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+working_branch: codex/gwc-g2-g6-artifacts-task-50c03a0f
+modules_or_files:
+  - AGENTS.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - schemas/approval-envelope.schema.json
+  - tools/validate_g01.py
+  - tests/test_chatgpt_agent_runbook_continuation.py
+  - tests/test_gate_lifecycle_process_contract.py
+  - tests/test_g01_lifecycle.py
+  - docs/g01-lifecycle.md
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g0/context-snapshot.yaml
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.svg
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.png
+  - .gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml
+authorized_actions:
+  - claim_work_item
+  - update_work_item_status
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+excluded_actions:
+  - protected_branch_direct_push
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+work_item:
+  provider: DS Admin State Engine
+  id: task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  expected_owner: dwc
+  initial_state: agent_running
+  review_state: pending_approval
+artifact_hashes:
+  change_plan: sha256:d21dcabca22fd0b68f5a6810087c9d8b3bea7475cadc8cc8875ee121f3a891eb
+  mermaid: sha256:e3591258006bb7be365744f5a03e99026d3ac25a2722cad9ce8e330f49f644ab
+  png: sha256:eb10f7326ae50bd0609f066f3825afb6843540f14ff3832171bc7415ccb28c1d
+  svg: sha256:2f40a02f87dba21c6596d7f63c4479b4e2998811add37161703f80ccc563c3aa
+scope_hash: sha256:27706c80d6205b3254f31d41cecbfd073e3144a064587b3b559b677ed351c61e

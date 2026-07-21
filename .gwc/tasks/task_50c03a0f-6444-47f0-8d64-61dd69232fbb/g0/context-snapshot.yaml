@@ -1,0 +1,175 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-07-21T03:07:45Z"
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+  protected_branches:
+    - main
+  connector: DWC
+  write_enabled: true
+constraints:
+  - "Task objective: define rules that force G2-G6 write-applicable artifacts into .gwc/tasks with G0 and G1 evidence."
+  - "Execution mode: local_agent."
+  - "DS Admin task ID: task_50c03a0f-6444-47f0-8d64-61dd69232fbb; State Engine state: agent_running."
+  - "Risk class: R2, because the requested governance behavior changes the workflow/state enforcement boundary."
+  - "The profile requires exactly one DS Admin task and a valid State Engine trace before G0 completion."
+  - "G0 is read-only; no branch, worktree, repository file mutation, commit, push, PR, merge, deploy, or production operation is authorized."
+  - "The checkout has a pre-existing unrelated modification in .blackboxrules; it is excluded from this task."
+applicable_policies:
+  - id: coding-project-governance
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474c6e8e664ed8d0ed41c1
+  - id: gate-lifecycle-contract
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 5b03ff313f01ee5f8ef802ae7b3d7b02c65516e70483bc4365e8e957d50c65e7
+  - id: e2e-draft-pr-delivery
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: 98920b03a2876161654f6487eb836c219a185970ff06b0b6643b1b5594392317
+  - id: g0-g1-operational-runbook
+    path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    ref: main
+    source_sha: 5437c4a8080c30ef0aa681f973289f04ce08b00d70fb80abecaf878e75a6c2cf
+  - id: gwc-project-profile
+    path: projects/gwc/project-profile.yaml
+    ref: main
+    source_sha: dec885c9125d6c4bf2fad5007cc233c45e61bc9341f1e55137d071a341c23c09
+  - id: gwc-project-instructions
+    path: projects/gwc/project-instructions.md
+    ref: main
+    source_sha: e29c33ccae5118112d7fc677c8cc79c7d949e4c61ceb2534efaae598759e1afb
+  - id: gwc-project-extension
+    path: projects/gwc/project-extension.md
+    ref: main
+    source_sha: 517888b11bb555370e40f1833652c47c01fbbb3514359f607d5c902852548dfc
+  - id: chatgpt-agent-instructions
+    path: agents/chatgpt-agent/agent-instructions.md
+    ref: main
+    source_sha: 286881813d88755bbdd63c5b3d02500d552f0437d3365d54d766922ed669c4d0
+  - id: dwc-agent-instructions
+    path: agents/dwc/agent-instructions.md
+    ref: main
+    source_sha: 7ab9d5edbddb9cca7b86b3fca4b46a098aff020b08c645ccdbd393c94819543a
+  - id: dwc-capabilities
+    path: agents/dwc/capabilities.yaml
+    ref: main
+    source_sha: c69388fec10525dd051288dec3bc639e8e6668fae9c42f4048b445c78128a3b2
+  - id: g0-context-schema
+    path: schemas/g0-context-snapshot.schema.json
+    ref: main
+    source_sha: 9967c4c9878ff0592866583835b0536353282c4eae892d952a930af8d291f659
+  - id: g0-context-template
+    path: templates/g01/g0-context-snapshot.template.yaml
+    ref: main
+    source_sha: c2a4860576f9af4a0d7baa5ea57c263a3a01c2b32fd85032fc52c89d7eb19a77
+  - id: g01-validator
+    path: tools/validate_g01.py
+    ref: main
+    source_sha: 8f7d2864843ba235fd7882fdcfb7efa084e699383de3776f42c4d60b995bb855
+  - id: task-lifecycle-map
+    path: core/task-lifecycle/gate-transition-map.yaml
+    ref: main
+    source_sha: 5e70d55906883a1919891191f79e11d7fef385105bd4799b766f10819407389c
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 1c6fd4d45b97d010b0a8f42308ff1076c62a002ec79378623845cf36e4a171a2
+  - path: core/Coding_Project_Governance_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474c6e8e664ed8d0ed41c1
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5b03ff313f01ee5f8ef802ae7b3d7b02c65516e70483bc4365e8e957d50c65e7
+  - path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+    status: AVAILABLE
+    source_sha: 98920b03a2876161654f6487eb836c219a185970ff06b0b6643b1b5594392317
+  - path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5f23c4b96b983b1fbca1f91a8e22faab8fcb2fc96a8c456db85bcb7240eebb83
+  - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 1bfb72e73553a3b63728d902837b674fd4687407fa4422034e28a4bde28c8eb1
+  - path: core/Agent_Response_Presentation_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: e95c7529c4bbee6bfbe18028eb780832803759d29e63a5e11fa2ab39de024f2a
+  - path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 8f3a4b8d2c008ca8bfc544bf571c57da4cf1a266a8dfe0ab6ec793dc5633f915
+  - path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5437c4a8080c30ef0aa681f973289f04ce08b00d70fb80abecaf878e75a6c2cf
+  - path: governance/instruction-source-registry.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: b84baf226ae4d4983281d281c6ecec6e9f5f3a5a6285019504bfe69d72cd9246
+  - path: docs/project-consumer-agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 4c44990376821ca7d883add174fc5910b884863a1b286a49652cd01170b2c25f
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: dec885c9125d6c4bf2fad5007cc233c45e61bc9341f1e55137d071a341c23c09
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: e29c33ccae5118112d7fc677c8cc79c7d949e4c61ceb2534efaae598759e1afb
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: 517888b11bb555370e40f1833652c47c01fbbb3514359f607d5c902852548dfc
+  - path: projects/gwc/package.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 6c1f960a3af36c7802f045e543cfa85e1f5676b4ce775a1371ba858d2e16b289
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 286881813d88755bbdd63c5b3d02500d552f0437d3365d54d766922ed669c4d0
+  - path: agents/dwc/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 7ab9d5edbddb9cca7b86b3fca4b46a098aff020b08c645ccdbd393c94819543a
+  - path: agents/dwc/capabilities.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: c69388fec10525dd051288dec3bc639e8e6668fae9c42f4048b445c78128a3b2
+  - path: tools/validate_g01.py
+    required: true
+    status: AVAILABLE
+    source_sha: 8f7d2864843ba235fd7882fdcfb7efa084e699383de3776f42c4d60b995bb855
+  - path: schemas/g0-context-snapshot.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 9967c4c9878ff0592866583835b0536353282c4eae892d952a930af8d291f659
+  - path: templates/g01/g0-context-snapshot.template.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: c2a4860576f9af4a0d7baa5ea57c263a3a01c2b32fd85032fc52c89d7eb19a77
+  - path: core/task-lifecycle/gate-transition-map.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 5e70d55906883a1919891191f79e11d7fef385105bd4799b766f10819407389c
+status: READY
+blockers: []
+contextual_discovery:
+  historical_context: []
+  downstream_impact: []
+  stakeholder_reach: []

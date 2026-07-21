@@ -63,6 +63,25 @@ class G01LifecycleValidationTests(unittest.TestCase):
         self.assertEqual("BLOCKED", report.outcome)
         self.assertIn("MISSING_ARTIFACT", codes)
 
+    def test_downstream_gate_artifact_is_required_when_applicable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp) / "workspace"
+            shutil.copytree(ROOT / "tests" / "fixtures" / "g01-valid", workspace)
+            report = validate_g01.validate_workspace(ROOT, workspace, gate="G2_EXECUTION")
+        codes = {issue.code for issue in report.issues}
+        self.assertIn("GATE_ARTIFACT_MISSING", codes)
+
+    def test_downstream_gate_artifact_must_be_non_empty_yaml(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp) / "workspace"
+            shutil.copytree(ROOT / "tests" / "fixtures" / "g01-valid", workspace)
+            envelope = workspace / "g2" / "execution-envelope.yaml"
+            envelope.parent.mkdir(parents=True)
+            envelope.write_text("[]\n", encoding="utf-8")
+            report = validate_g01.validate_workspace(ROOT, workspace, gate="G2_EXECUTION")
+        codes = {issue.code for issue in report.issues}
+        self.assertIn("GATE_ARTIFACT_INVALID", codes)
+
 
 if __name__ == "__main__":
     unittest.main()

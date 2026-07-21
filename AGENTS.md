@@ -126,6 +126,29 @@ Conflict policy:
 - If canonical `.gwc/g1/` is already owned, choose session-scoped or stop with `G1_BLOCKED`.
 - Never overwrite existing G1 artifacts unless the same `run_id` owns them or the user explicitly supersedes.
 
+### Task-scoped gate artifacts
+
+For formal work, every write-applicable gate artifact belongs under the same
+task workspace. A gate action is blocked with GATE_ARTIFACT_MISSING,
+GATE_ARTIFACT_INVALID, or GATE_SCOPE_MISMATCH when its artifact is absent,
+invalid, stale, or bound to another task, repository, base SHA, working branch,
+or scope hash.
+
+| Gate | Required artifact | Applicability |
+|---|---|---|
+| G0_CONTEXT | .gwc/tasks/<task-id>/g0/context-snapshot.yaml | Always |
+| G1_ALIGNMENT | .gwc/tasks/<task-id>/g1/{intake,preflight,brainstorming,decision}/*.yaml | Always |
+| G2_EXECUTION | .gwc/tasks/<task-id>/g2/execution-envelope.yaml | Before any G2 write |
+| G3_PR | .gwc/tasks/<task-id>/g3/delivery-record.yaml | Before Draft PR action |
+| G4_MERGE | .gwc/tasks/<task-id>/g4/merge-approval.yaml | Only when merge is in scope |
+| G5_DEPLOY | .gwc/tasks/<task-id>/g5/deployment-approval.yaml | Only for manual deploy/release/reload |
+| G6_PRODUCTION_DATA | .gwc/tasks/<task-id>/g6/production-approval.yaml | Only for production data/config/credential/migration work |
+
+When G4, G5, or G6 is not applicable, record not_applicable in the current
+gate outcome and do not create a misleading approval artifact. The artifact
+path, task ID, and gate applicability must be checked before the connector
+action; a later gate never inherits an earlier gate's artifact.
+
 ## Execution modes
 
 The agent must declare exactly one execution mode before gate reporting.

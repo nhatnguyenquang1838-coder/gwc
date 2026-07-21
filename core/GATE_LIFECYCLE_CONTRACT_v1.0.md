@@ -48,6 +48,27 @@ Each task uses an isolated workspace:
 
 The existing single-task `.gwc/g0` and `.gwc/g1` layout remains supported for backward compatibility. New concurrent work should use the task-scoped layout.
 
+### Required artifact matrix
+
+The task workspace is the source of truth for gate applicability and evidence:
+
+| Gate | Artifact path | Required before |
+|---|---|---|
+| G0_CONTEXT | .gwc/tasks/<task-id>/g0/context-snapshot.yaml | Formal G0 exit |
+| G1_ALIGNMENT | .gwc/tasks/<task-id>/g1/intake/g1-intake-brief.yaml, g1/preflight/g1-preflight-report.yaml, g1/brainstorming/g1-options.yaml, g1/decision/g1-decision-record.yaml | G1 exit |
+| G2_EXECUTION | .gwc/tasks/<task-id>/g2/execution-envelope.yaml | Any guarded branch, worktree, or repository write |
+| G3_PR | .gwc/tasks/<task-id>/g3/delivery-record.yaml | Draft PR creation or update |
+| G4_MERGE | .gwc/tasks/<task-id>/g4/merge-approval.yaml | Merge or auto-merge action |
+| G5_DEPLOY | .gwc/tasks/<task-id>/g5/deployment-approval.yaml | Manual deploy, release, publish, or runtime reload |
+| G6_PRODUCTION_DATA | .gwc/tasks/<task-id>/g6/production-approval.yaml | Production data/configuration/credential/migration/secret action |
+
+The G4, G5, and G6 rows are conditional. If a row is not applicable, the
+current gate record must state not_applicable; absence is not permission.
+Before invoking an action, the runtime must verify the applicable artifact's
+presence, schema, freshness, and binding to the same task ID, repository, base
+SHA, working branch, risk class, and scope hash. Failure is fail-closed with
+GATE_ARTIFACT_MISSING, GATE_ARTIFACT_INVALID, or GATE_SCOPE_MISMATCH.
+
 ## Chat-only preparation
 
 Exploratory G0/G1 conversation is not a formal gate exit. It may collect
