@@ -29,6 +29,13 @@ ARTIFACTS: dict[str, tuple[str, str]] = {
 }
 
 REQUIRED_EXCLUDED_AUTHORITIES = {"G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION"}
+GATE_ARTIFACTS: dict[str, str] = {
+    "G2_EXECUTION": "g2/execution-envelope.yaml",
+    "G3_PR": "g3/delivery-record.yaml",
+    "G4_MERGE": "g4/merge-approval.yaml",
+    "G5_DEPLOY": "g5/deployment-approval.yaml",
+    "G6_PRODUCTION_DATA": "g6/production-approval.yaml",
+}
 
 
 @dataclass(frozen=True)
@@ -86,6 +93,55 @@ def _schema_issues(
             )
         )
     return issues
+
+
+def validate_gate_artifact(workspace: Path, gate: str) -> list[ValidationIssue]:
+    """Fail closed when an applicable downstream gate artifact is absent or malformed."""
+    relative_path = GATE_ARTIFACTS.get(gate)
+    if relative_path is None:
+        return [
+            ValidationIssue(
+                code="GATE_SEQUENCE_INVALID",
+                artifact=gate,
+                location="gate",
+                message=f"Unsupported downstream gate: {gate}",
+            )
+        ]
+
+    artifact_path = workspace / relative_path
+    if not artifact_path.is_file():
+        return [
+            ValidationIssue(
+                code="GATE_ARTIFACT_MISSING",
+                artifact=gate,
+                location=relative_path,
+                message=f"Required gate artifact is missing: {artifact_path}",
+            )
+        ]
+
+    try:
+        artifact = _load_yaml(artifact_path)
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        return [
+            ValidationIssue(
+                code="GATE_ARTIFACT_INVALID",
+                artifact=gate,
+                location=relative_path,
+                message=f"Gate artifact could not be loaded: {exc}",
+            )
+        ]
+
+    if not isinstance(artifact, dict) or not artifact:
+        return [
+            ValidationIssue(
+                code="GATE_ARTIFACT_INVALID",
+                artifact=gate,
+                location=relative_path,
+                message="Gate artifact must be a non-empty YAML object.",
+            )
+        ]
+
+    return []
 
 
 def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
@@ -276,7 +332,11 @@ def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
     return issues
 
 
-def validate_workspace(repo_root: Path, workspace: Path) -> ValidationReport:
+def validate_workspace(
+    repo_root: Path,
+    workspace: Path,
+    gate: str | None = None,
+) -> ValidationReport:
     issues: list[ValidationIssue] = []
     artifacts: dict[str, Any] = {}
 
@@ -321,6 +381,8 @@ def validate_workspace(repo_root: Path, workspace: Path) -> ValidationReport:
         issue.code == "SCHEMA_VALIDATION_ERROR" for issue in issues
     ):
         issues.extend(_cross_artifact_issues(artifacts))
+    if gate is not None:
+        issues.extend(validate_gate_artifact(workspace, gate))
 
     return ValidationReport(outcome="PASS" if not issues else "BLOCKED", issues=issues)
 
@@ -337,6 +399,12 @@ def main() -> int:
         default=".gwc",
         help="G0/G1 workspace path, relative to the repository root unless absolute.",
     )
+    parser.add_argument(
+        "--gate",
+        choices=sorted(GATE_ARTIFACTS),
+        default=None,
+        help="Require the applicable downstream gate artifact in this task workspace.",
+    )
     parser.add_argument("--json", action="store_true", help="Emit a JSON report.")
     args = parser.parse_args()
 
@@ -346,7 +414,7 @@ def main() -> int:
         workspace = repo_root / workspace
 
     try:
-        report = validate_workspace(repo_root, workspace.resolve())
+        report = validate_workspace(repo_root, workspace.resolve(), gate=args.gate)
     except Exception as exc:  # configuration-level failure
         if args.json:
             print(json.dumps({"outcome": "ERROR", "valid": False, "error": str(exc)}))

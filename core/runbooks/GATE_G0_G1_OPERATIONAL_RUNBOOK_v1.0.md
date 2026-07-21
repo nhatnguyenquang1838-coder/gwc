@@ -89,6 +89,23 @@ Use validator-specific root arguments when required by the checked-in tool.
 13. Preserve validator stdout, exit code, artifact hashes, and workspace path as evidence.
 14. Enter G2 only after G0 `READY`, G1 `PASS`, a valid task-scoped execution envelope, and all mandatory checks pass.
 
+## Downstream artifact continuation
+
+On every gate transition, materialize and validate the next applicable artifact
+under the same .gwc/tasks/<task-id>/ workspace before invoking its action:
+
+| Transition | Artifact |
+|---|---|
+| G1 PASS -> G2 | g2/execution-envelope.yaml |
+| G2 PASS -> G3 | g3/delivery-record.yaml |
+| G3 PASS -> G4 | g4/merge-approval.yaml |
+| G4 PASS -> G5 | g5/deployment-approval.yaml for manual action; otherwise a read-only status record |
+| G5 PASS -> G6 | g6/production-approval.yaml only when production scope exists |
+
+The runtime must fail closed when an applicable artifact is missing, invalid,
+expired, or mismatched. A conditional gate is recorded as not_applicable; it is
+never silently skipped and never inherits authority from another gate.
+
 ## DS Admin traceability
 
 When required by the active profile:

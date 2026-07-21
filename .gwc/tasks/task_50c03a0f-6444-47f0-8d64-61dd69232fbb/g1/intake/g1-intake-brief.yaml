@@ -1,0 +1,68 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-07-21T03:14:15Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+  base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC does not yet enforce one canonical task-scoped artifact layout for every write-applicable gate from G2 through G6.
+  why_now: The requested governance change must make G2-G6 execution evidence discoverable, validator-bound, and fail-closed before write-capable actions.
+desired_outcome: Define and implement repository-native rules that require applicable G2-G6 artifacts under .gwc/tasks/<task-id>/ while preserving separate human authority for G4, G5, and G6.
+stakeholders:
+  requester: user
+  affected:
+    - GWC maintainers
+    - local_agent and DWC runtimes
+    - DS Admin State Engine
+    - repository reviewers
+scope:
+  in_scope:
+    - AGENTS.md gate and workspace requirements
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md and core/E2E_DRAFT_PR_DELIVERY_RULE.md consistency
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md artifact continuation rules
+    - schemas and templates for task-scoped gate artifacts
+    - tools/validate_g01.py and applicable gate validators
+    - focused tests and documentation for G2-G6 artifact enforcement
+  non_goals:
+    - Direct writes to protected main
+    - Merge or auto-merge
+    - Manual deploy, release, runtime reload, or production configuration
+    - Credential, secret, migration, or production-data operations
+    - Cleanup of unrelated pre-existing .blackboxrules changes
+constraints:
+  - Use the existing .gwc/tasks/<task-id>/g0 and g1 layout as the canonical trace root.
+  - Bind all artifacts to task ID, repository, protected-base SHA, risk class, and scope hash.
+  - G2 requires a valid execution envelope and exact approval before repository writes.
+  - G3 is Draft PR only; G4 merge, G5 deploy, and G6 production remain separate gates.
+  - Preserve existing unrelated checkout changes.
+assumptions:
+  - The active gwc profile and protected base remain authoritative.
+  - DS Admin task_50c03a0f-6444-47f0-8d64-61dd69232fbb remains the sole task for this bounded outcome.
+  - The current local_agent checkout can run Python 3 and the repository validators.
+risks:
+  - id: RISK-1
+    description: A partial enforcement rule could permit a write-capable gate to proceed without its required artifact.
+    impact: high
+    mitigation: Add schema-backed per-gate requirements, fail-closed validator checks, and focused negative tests.
+  - id: RISK-2
+    description: Overlapping lifecycle contracts could create contradictory artifact or approval requirements.
+    impact: medium
+    mitigation: Compare and update the canonical core contract, runbook, profile, and consumer instructions together.
+acceptance_criteria:
+  - id: AC-1
+    statement: The repository has one documented canonical .gwc/tasks/<task-id>/ layout for G0, G1, and every applicable G2-G6 write artifact.
+    verifiable: true
+  - id: AC-2
+    statement: Validators fail closed when an applicable G2-G6 artifact is missing, stale, mismatched, or outside the task workspace.
+    verifiable: true
+  - id: AC-3
+    statement: Valid artifacts bind task ID, repository, protected-base SHA, risk class, scope hash, authorized actions, and excluded authorities consistently.
+    verifiable: true
+  - id: AC-4
+    statement: Focused tests pass for valid artifacts and missing/stale/scope-drift negative cases without granting merge, deploy, or production authority.
+    verifiable: true
+unresolved_questions: []
+status: READY

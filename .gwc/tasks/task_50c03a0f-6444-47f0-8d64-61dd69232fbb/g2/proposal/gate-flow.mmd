@@ -1,0 +1,12 @@
+flowchart LR
+  G0["G0_CONTEXT\nREADY\n.gwc/tasks/<task-id>/g0"] --> G1["G1_ALIGNMENT\nPASS\n4 validated artifacts"]
+  G1 --> G2["G2_EXECUTION\nexact approval\nexecution envelope"]
+  G2 --> G3["G3_PR\nvalidation\nDraft PR"]
+  G3 --> G4["G4_MERGE\nhuman approval"]
+  G4 --> G5["G5_DEPLOY\nstatus or approval"]
+  G5 --> G6["G6_PRODUCTION\nonly if applicable"]
+  G2 -.-> X["Every applicable gate artifact\nunder .gwc/tasks/<task-id>/"]
+  G3 -.-> X
+  G4 -.-> X
+  G5 -.-> X
+  G6 -.-> X

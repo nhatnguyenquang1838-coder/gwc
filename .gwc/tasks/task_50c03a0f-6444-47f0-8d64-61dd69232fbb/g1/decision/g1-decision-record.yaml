@@ -1,0 +1,58 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+generated_at: "2026-07-21T03:14:15Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+  base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: "2026-07-21T03:14:15Z"
+  source: "chat: please create, dont stop"
+  explicit: true
+rationale: Proceed with canonical task-scoped enforcement so every write-applicable G2-G6 gate has discoverable, schema-backed, validator-bound evidence while G4/G5/G6 remain separate authority gates.
+rejected_option_ids:
+  - OPT-2
+  - OPT-3
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+scope_hash: sha256:aaf45d5d7b548d5adb2960fbcb19fb9b731300644bc11d16bb1576a2c315185f
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Map current lifecycle contracts and define the canonical G2-G6 artifact matrix.
+    - sub_task_id: SUB-TASK-2
+      description: Implement schema, template, and validator enforcement for the agreed artifact matrix.
+    - sub_task_id: SUB-TASK-3
+      description: Add focused negative tests and update operator documentation.
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: governance_contract_design
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: schema_validator_engineering
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: test_documentation
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+  summary: Bounded G2 implementation will proceed only on a guarded branch with a task-scoped execution envelope and exact G2 approval; G3 remains Draft PR only.

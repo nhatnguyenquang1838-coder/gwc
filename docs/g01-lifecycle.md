@@ -68,6 +68,19 @@ A G1 `PASS` requires:
 6. The decision grants no authority and explicitly excludes `G4_MERGE`,
    `G5_DEPLOY`, and `G6_PRODUCTION`.
 
+## Downstream task workspace
+
+G1 PASS is the handoff point for the next task-scoped artifact. For the same
+task ID, .gwc/tasks/<task-id>/g2/execution-envelope.yaml is mandatory before
+G2 creates a branch, worktree, or repository write. G2 then produces
+g3/delivery-record.yaml before a Draft PR; G3 produces conditional G4 and G5
+approval records; G5 produces conditional G6 production approval evidence.
+
+Every applicable downstream artifact must bind task ID, repository, protected
+base SHA, working branch, risk class, and scope hash. Missing, invalid, stale,
+or cross-task artifacts are fail-closed. Non-applicable G4/G5/G6 operations
+must be recorded as not_applicable, not treated as implicitly authorized.
+
 ## Runtime generation
 
 `tools/generate_g01_runtime.py` converts observed repository, task, request, and

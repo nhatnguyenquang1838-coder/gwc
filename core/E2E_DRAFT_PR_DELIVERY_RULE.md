@@ -94,6 +94,23 @@ The approval envelope must bind the work to:
 
 The agent must not begin implementation until the exact token is received.
 
+## Task-scoped gate artifact enforcement
+
+Formal evidence is persisted in .gwc/tasks/<task-id>/; it is not inferred from
+chat, an untracked side directory, or a prior gate. The runtime must check the
+applicable artifact before each write-capable action:
+
+- G2: g2/execution-envelope.yaml
+- G3: g3/delivery-record.yaml
+- G4: g4/merge-approval.yaml
+- G5: g5/deployment-approval.yaml for manual deployment scope
+- G6: g6/production-approval.yaml for production-operation scope
+
+Each artifact must bind to the task ID, repository, protected-base SHA, working
+branch, risk class, and scope hash. Missing, invalid, stale, or cross-task
+evidence fails closed. Conditional G4/G5/G6 artifacts are omitted only when the
+gate is explicitly recorded as not_applicable.
+
 ## Autonomous execution boundary
 
 After valid approval, the agent may proceed without requesting confirmation for every normal implementation step, provided all actions remain within the approved envelope.

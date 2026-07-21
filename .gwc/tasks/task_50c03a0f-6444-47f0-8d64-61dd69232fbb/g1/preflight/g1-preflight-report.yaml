@@ -1,0 +1,65 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+generated_at: "2026-07-21T03:14:15Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+  base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity, protected branch, and base SHA are verified.
+    evidence:
+      - nhatnguyenquang1838-coder/gwc@04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+      - projects/gwc/project-profile.yaml
+  - id: GOVERNANCE_SOURCES
+    status: PASS
+    code: REQUIRED_SOURCES_AVAILABLE
+    message: Required governance, profile, agent, schema, template, and validator sources are available at the pinned base.
+    evidence:
+      - AGENTS.md
+      - core/Coding_Project_Governance_v1.0.md
+      - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+      - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+      - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+      - projects/gwc/project-profile.yaml
+      - tools/validate_g01.py
+  - id: TASK_TRACEABILITY
+    status: PASS
+    code: DS_ADMIN_TASK_CLAIMED
+    message: The sole DS Admin task is assigned to DWC and is in agent_running for G0/G1 preparation.
+    evidence:
+      - task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+      - state=agent_running
+      - transition=RUN_AGENT
+  - id: RISK_CLASSIFICATION
+    status: PASS
+    code: R2_WORKFLOW_STATE_CHANGE
+    message: R2 applies because the requested change modifies workflow/state enforcement behavior.
+    evidence:
+      - "core/Coding_Project_Governance_v1.0.md:risk-classes"
+      - "user request: please create"
+  - id: HUMAN_DIRECTION
+    status: PASS
+    code: HUMAN_DIRECTION_CONFIRMED
+    message: The user explicitly directed creation and continuation of the bounded governance artifact work.
+    evidence:
+      - "user request: please create, dont stop"
+  - id: PREEXISTING_CHANGE_ISOLATION
+    status: PASS
+    code: UNRELATED_CHANGE_EXCLUDED
+    message: The pre-existing .blackboxrules modification is excluded from the task scope.
+    evidence:
+      - "git status: M .blackboxrules"
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

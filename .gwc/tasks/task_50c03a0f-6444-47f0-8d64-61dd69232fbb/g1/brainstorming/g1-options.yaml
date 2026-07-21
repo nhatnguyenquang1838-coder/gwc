@@ -1,0 +1,56 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-07-21T03:14:15Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_50c03a0f-6444-47f0-8d64-61dd69232fbb
+  base_sha: 04c99cb5c555bd59eb6c034256ab0d7caaf9afe9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Canonical task-scoped enforcement
+    description: Extend the existing G0/G1 artifact lifecycle into a documented, schema-backed .gwc/tasks contract covering applicable G2-G6 artifacts and fail-closed gate validators.
+    benefits:
+      - One discoverable evidence root per task
+      - Consistent task/base/scope binding
+      - Reusable validator and CI enforcement
+    tradeoffs:
+      - Requires coordinated updates across contracts, schemas, validators, tests, and docs
+    risks:
+      - Incorrect required-artifact mapping could block valid work
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: governance_contract_design
+        description: Align core lifecycle, runbook, project, and agent requirements.
+        is_required: true
+      - skill_id: schema_validator_engineering
+        description: Add schema and fail-closed validator coverage for each applicable gate artifact.
+        is_required: true
+      - skill_id: test_documentation
+        description: Add focused tests and explain the canonical task workspace layout.
+        is_required: true
+  - id: OPT-2
+    title: Documentation-only rule
+    description: Document the required .gwc/tasks layout without expanding schema or validator enforcement.
+    benefits:
+      - Smaller initial diff
+    tradeoffs:
+      - Agents and CI can still proceed despite missing or stale artifacts
+    risks:
+      - Human interpretation remains the enforcement point
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Validator-only enforcement
+    description: Add checks in the validator while leaving lifecycle contracts and task workspace documentation unchanged.
+    benefits:
+      - Stronger machine enforcement than documentation alone
+    tradeoffs:
+      - Contract drift and unclear artifact ownership remain possible
+    risks:
+      - Consumers may not know which artifact is required at each gate
+    constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 reuses the existing G0/G1 lifecycle and provides the smallest complete change that aligns policy, artifact location, schema, validation, and operator guidance.
+decision_required: true
+status: READY
