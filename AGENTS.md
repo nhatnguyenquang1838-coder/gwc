@@ -55,7 +55,7 @@ Before any write-capable connector action, the agent must:
    - the target repository's protected-base `AGENTS.md`, package files, task,
      spec, and workflow files relevant to the request.
 3. Verify core version `1.0` and SHA-256
-   `04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1`.
+   `ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48`.
 4. Resolve exactly one active project profile.
 5. Verify repository owner, repository name, default branch, protected branches,
    connector identity, `identity_status`, and `write_enabled`.
