@@ -57,6 +57,21 @@ class BaseDriftPolicyTests(unittest.TestCase):
         self.assertEqual(payload["evaluator_decision"], "REAPPROVE")
         self.assertEqual(payload["risk_assessment"], "REAPPROVE")
 
+    def test_unrelated_drift_is_safe_to_continue(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools/evaluate_base_drift.py"),
+                "--old-base-sha", "132304c74873d7f64651ebd3aa9ad639cd2aff92",
+                "--new-base-sha", "132304c74873d7f64651ebd3aa9ad639cd2aff93",
+                "--changed-file", "README.md",
+            ], cwd=ROOT, check=False, capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["evaluator_decision"], "SAFE_CONTINUE")
+        self.assertEqual(payload["risk_assessment"], "SAFE_CONTINUE")
+
 
 if __name__ == "__main__":
     unittest.main()

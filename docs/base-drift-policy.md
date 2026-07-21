@@ -25,6 +25,11 @@ Every evaluation must record:
 - `risk_assessment`
 - `evaluator_decision`
 
+Continuation rule: `SAFE_CONTINUE` preserves the active G2 envelope when the
+changed files are unrelated to approved scope and authority/risk/actions remain
+unchanged. `REVALIDATE` preserves approval but blocks continuation until the
+affected checks pass. Only `REAPPROVE` or `STOP` invalidates the envelope.
+
 ## Approval envelope extension
 
 The approval envelope may carry this base-context block:
