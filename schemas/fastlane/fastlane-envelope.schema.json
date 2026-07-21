@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/fastlane/fastlane-envelope.schema.json",
+  "title": "GWC FastLane Bootstrap Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow",
+    "temporary",
+    "sunset_condition",
+    "task",
+    "repository",
+    "connector_route",
+    "scope",
+    "authority",
+    "audit_projection"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "workflow": {
+      "const": "GWC_FASTLANE_BOOTSTRAP"
+    },
+    "temporary": {
+      "const": true
+    },
+    "sunset_condition": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "risk_class"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_class": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3"
+          ]
+        }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_name",
+        "base_branch",
+        "base_sha",
+        "working_branch"
+      ],
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "base_branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "working_branch": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "connector_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary",
+        "fallback",
+        "selected"
+      ],
+      "properties": {
+        "primary": {
+          "const": "GitHub"
+        },
+        "fallback": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "DWC",
+              "DW1"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "selected": {
+          "enum": [
+            "GitHub",
+            "DWC",
+            "DW1"
+          ]
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files_read",
+        "files_write",
+        "authorized_actions",
+        "excluded_actions"
+      ],
+      "properties": {
+        "files_read": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "files_write": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "authorized_actions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "create_guarded_branch",
+              "modify_scoped_files",
+              "open_or_update_draft_pr",
+              "readback_branch_pr_diff_ci"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "excluded_actions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "direct_push_main",
+              "force_push",
+              "delete_branch",
+              "change_pr_base",
+              "merge",
+              "auto_merge",
+              "deploy",
+              "release",
+              "production_config",
+              "credentials",
+              "secrets",
+              "migration",
+              "production_data"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "g2_approval_required",
+        "g4_merge_approval_required",
+        "g5_deploy_approval_required",
+        "g6_production_approval_required"
+      ],
+      "properties": {
+        "g2_approval_required": {
+          "const": true
+        },
+        "g4_merge_approval_required": {
+          "const": true
+        },
+        "g5_deploy_approval_required": {
+          "type": "boolean"
+        },
+        "g6_production_approval_required": {
+          "const": false
+        }
+      }
+    },
+    "audit_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jira",
+        "tc_ds_mcp",
+        "blocking"
+      ],
+      "properties": {
+        "jira": {
+          "enum": [
+            "optional",
+            "disabled"
+          ]
+        },
+        "tc_ds_mcp": {
+          "enum": [
+            "optional",
+            "disabled"
+          ]
+        },
+        "blocking": {
+          "const": false
+        }
+      }
+    }
+  }
+}
