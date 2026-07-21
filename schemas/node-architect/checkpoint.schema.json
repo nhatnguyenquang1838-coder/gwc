@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/checkpoint.schema.json",
+  "title": "GWC Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "checkpoint_id",
+    "task",
+    "repository",
+    "gate",
+    "execution_mode",
+    "scope",
+    "git_delivery",
+    "validation",
+    "next_action",
+    "audit_projection",
+    "created_at_utc"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "risk_class"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk_class": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3"
+          ]
+        }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_name",
+        "base_branch",
+        "base_sha"
+      ],
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "base_branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "working_branch": {
+          "type": "string"
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current",
+        "status",
+        "source"
+      ],
+      "properties": {
+        "current": {
+          "enum": [
+            "G0_CONTEXT",
+            "G1_ALIGNMENT",
+            "G2_EXECUTION",
+            "G3_PR",
+            "G4_MERGE",
+            "G5_DEPLOY",
+            "G6_PRODUCTION_DATA"
+          ]
+        },
+        "status": {
+          "enum": [
+            "READY",
+            "RUNNING",
+            "PASS",
+            "BLOCKED",
+            "FAILED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "source": {
+          "enum": [
+            "gwc_gate_evidence",
+            "kiro_checkpoint",
+            "git_delivery_evidence"
+          ]
+        }
+      }
+    },
+    "execution_mode": {
+      "enum": [
+        "chat_connector_only",
+        "local_agent",
+        "repo_ci"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files_read",
+        "files_write",
+        "authorized_actions",
+        "excluded_actions"
+      ],
+      "properties": {
+        "files_read": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "files_write": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "authorized_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "excluded_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "git_delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "branch",
+        "pr_number",
+        "head_sha",
+        "ci_status"
+      ],
+      "properties": {
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pr_number": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "head_sha": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "ci_status": {
+          "enum": [
+            "not_started",
+            "in_progress",
+            "success",
+            "failure",
+            "skipped",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "performed",
+        "skipped",
+        "evidence"
+      ],
+      "properties": {
+        "performed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "skipped": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gate",
+        "action",
+        "requires_human_approval"
+      ],
+      "properties": {
+        "gate": {
+          "enum": [
+            "G0_CONTEXT",
+            "G1_ALIGNMENT",
+            "G2_EXECUTION",
+            "G3_PR",
+            "G4_MERGE",
+            "G5_DEPLOY",
+            "G6_PRODUCTION_DATA"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requires_human_approval": {
+          "type": "boolean"
+        },
+        "approval_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "audit_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_of_truth",
+        "links"
+      ],
+      "properties": {
+        "source_of_truth": {
+          "const": false
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
