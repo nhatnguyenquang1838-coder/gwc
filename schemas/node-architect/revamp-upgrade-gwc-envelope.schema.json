@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json",
+  "title": "REVAMP_UPGRADE_GWC Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow",
+    "task",
+    "repository",
+    "canonical_state",
+    "scope",
+    "authority",
+    "audit_projection"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "workflow": { "const": "REVAMP_UPGRADE_GWC" },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "risk_class"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "risk_class": { "enum": ["R0", "R1", "R2", "R3"] }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_name", "base_branch", "base_sha", "working_branch"],
+      "properties": {
+        "full_name": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
+        "base_branch": { "type": "string", "minLength": 1 },
+        "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "working_branch": { "type": "string", "minLength": 1 }
+      }
+    },
+    "canonical_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate", "status", "source"],
+      "properties": {
+        "gate": { "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"] },
+        "status": { "enum": ["READY", "RUNNING", "PASS", "BLOCKED", "FAILED", "NOT_APPLICABLE"] },
+        "source": { "enum": ["gwc_gate_evidence", "kiro_checkpoint", "git_delivery_evidence"] }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files_read", "files_write", "authorized_actions", "excluded_actions"],
+      "properties": {
+        "files_read": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "files_write": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+        "authorized_actions": { "type": "array", "items": { "enum": ["create_guarded_branch", "modify_scoped_files", "run_validation", "open_or_update_draft_pr", "readback_branch_pr_diff_ci"] }, "minItems": 1, "uniqueItems": true },
+        "excluded_actions": { "type": "array", "items": { "enum": ["direct_push_main", "force_push", "delete_branch", "change_pr_base", "merge", "auto_merge", "deploy", "release", "production_config", "credentials", "secrets", "migration", "production_data"] }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["g2_approval_required", "g4_merge_approval_required", "g5_manual_deploy_required", "g6_production_approval_required"],
+      "properties": {
+        "g2_approval_required": { "const": true },
+        "g4_merge_approval_required": { "const": true },
+        "g5_manual_deploy_required": { "type": "boolean" },
+        "g6_production_approval_required": { "const": false }
+      }
+    },
+    "audit_projection": { "$ref": "external-audit-projection.schema.json" }
+  }
+}
