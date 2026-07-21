@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/stale-session-cleanup.schema.json",
+  "title": "GWC Stale Session Cleanup Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dry_run",
+    "stale_after_hours",
+    "root",
+    "preserve_patterns",
+    "delete_candidates"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "stale_after_hours": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "preserve_patterns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "delete_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}
