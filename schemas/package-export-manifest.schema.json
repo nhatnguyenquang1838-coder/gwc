@@ -1,0 +1,35 @@
+{
+  "$id": "https://instruction-governance.local/schemas/package-export-manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "entries": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {"minimum": 0, "type": ["integer", "null"]},
+          "id": {"pattern": "^[a-z][a-z0-9-]{2,100}$", "type": "string"},
+          "required": {"type": "boolean"},
+          "sha256": {"pattern": "^[0-9a-f]{64}$", "type": ["string", "null"]},
+          "source_path": {"pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$", "type": "string"},
+          "status": {"enum": ["copied", "skipped_optional"]},
+          "target_path": {"pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+$", "type": "string"}
+        },
+        "required": ["id", "source_path", "target_path", "required", "status", "sha256", "bytes"],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "generated_at_utc": {"pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$", "type": "string"},
+    "package_version": {"pattern": "^\\d+\\.\\d+\\.\\d+$", "type": "string"},
+    "project_id": {"pattern": "^[a-z][a-z0-9-]{2,63}$", "type": "string"},
+    "schema_version": {"const": "1.0"},
+    "source_base_sha": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+    "source_ref": {"minLength": 1, "type": "string"},
+    "source_repository": {"pattern": "^[^/\\s]+/[^/\\s]+$", "type": "string"},
+    "target_root": {"minLength": 1, "type": "string"}
+  },
+  "required": ["schema_version", "project_id", "package_version", "source_repository", "source_ref", "source_base_sha", "target_root", "generated_at_utc", "entries"],
+  "title": "GWC Package Export Manifest",
+  "type": "object"
+}
