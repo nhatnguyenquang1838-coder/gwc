@@ -1,0 +1,10 @@
+# Approval request for G2 execution of Agent-to-Agent Task Handover design
+schema_version: "1.0"
+approval_request_id: AR-20260721-001
+gate: G2_EXECUTION
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: ac1ba0afc1d082cd42c9e448dd2e67d6d14fcc92
+working_branch: feature/agent-handover-opt2-20260721
+approved_by: GitHub Copilot
+command: "APPROVE G2 CP-20260721-001 4c381db0add2888a1f8d1b884dd9161301bcf525d97325f710e76b3a9f091713 2026-07-22T05:00:00Z"
