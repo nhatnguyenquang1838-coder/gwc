@@ -1,0 +1,20 @@
+schema_version: "1.0"
+profile_type: risk
+profile_id: default
+status: active
+default_risk_class: R2
+classes:
+  R0: read_only_investigation
+  R1: low_risk_isolated_write
+  R2: behavior_or_interface_change
+  R3: high_risk_change
+escalation_triggers:
+  - authentication_or_authorization
+  - credentials_or_secrets
+  - destructive_data_or_migration
+  - production_configuration
+  - deployment_or_release
+  - broad_blast_radius
+policy:
+  escalate_to_highest_applicable: true
+  downgrade_to_reduce_approval: false

@@ -1,6 +1,6 @@
 schema_version: "1.0"
 project_id: gwc
-package_version: "1.14.1"
+package_version: "1.15.0"
 status: active
 
 profile: projects/gwc/project-profile.yaml
@@ -45,6 +45,58 @@ instructions:
    - id: base-drift-policy
      path: governance/base-drift-policy.yaml
      target: .governance/base-drift-policy.yaml
+     required: true
+   - id: gwc-standard-profile-set
+     path: governance/profile-sets/gwc-standard.yaml
+     target: .governance/profile-sets/gwc-standard.yaml
+     required: true
+   - id: standard-gate-policy-profile
+     path: governance/gate-policy-profiles/standard.yaml
+     target: .governance/gate-policy-profiles/standard.yaml
+     required: true
+   - id: chatgpt-agent-runtime-profile
+     path: governance/agent-runtime-profiles/chatgpt.yaml
+     target: .governance/agent-runtime-profiles/chatgpt.yaml
+     required: true
+   - id: dwc-agent-runtime-profile
+     path: governance/agent-runtime-profiles/dwc.yaml
+     target: .governance/agent-runtime-profiles/dwc.yaml
+     required: true
+   - id: repo-governance-environment-profile
+     path: governance/environment-profiles/repo-governance.yaml
+     target: .governance/environment-profiles/repo-governance.yaml
+     required: true
+   - id: default-risk-profile
+     path: governance/risk-profiles/default.yaml
+     target: .governance/risk-profiles/default.yaml
+     required: true
+   - id: profile-set-schema
+     path: schemas/profile-set.schema.json
+     target: .governance/schemas/profile-set.schema.json
+     required: true
+   - id: gate-policy-profile-schema
+     path: schemas/gate-policy-profile.schema.json
+     target: .governance/schemas/gate-policy-profile.schema.json
+     required: true
+   - id: gate-response-trace-schema
+     path: schemas/gate-response-trace.schema.json
+     target: .governance/schemas/gate-response-trace.schema.json
+     required: true
+   - id: gate-response-template
+     path: templates/gates/gate-response.template.md
+     target: .governance/templates/gates/gate-response.template.md
+     required: true
+   - id: profile-resolver
+     path: tools/resolve_profiles.py
+     target: .governance/tools/resolve_profiles.py
+     required: true
+   - id: profile-set-validator
+     path: tools/validate_profile_set.py
+     target: .governance/tools/validate_profile_set.py
+     required: true
+   - id: gate-response-trace-validator
+     path: tools/validate_gate_response_trace.py
+     target: .governance/tools/validate_gate_response_trace.py
      required: true
    - id: instruction-source-registry
      path: governance/instruction-source-registry.yaml
@@ -107,6 +159,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - Package version 1.15.0 adds typed multi-profile resolution and mandatory gate response traceability.
   - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
   - Package version 1.14.0 adds the canonical Kiro spec-driven delivery rule and ChatGPT/local-agent task-runtime parity.
   - Security-boundary and other listed high-risk changes require explicit human direction.

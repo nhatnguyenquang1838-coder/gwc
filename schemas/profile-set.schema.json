@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/profile-set.schema.json",
+  "title": "GWC Profile Set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_type", "profile_id", "status", "project_id", "profiles", "resolution"],
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\).+\\.ya?ml$"}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "profile_type": {"const": "profile_set"},
+    "profile_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$"},
+    "status": {"enum": ["draft", "active", "deprecated", "disabled", "archived"]},
+    "project_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$"},
+    "description": {"type": "string", "minLength": 1},
+    "profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_policy", "agent_runtimes", "environment", "risk"],
+      "properties": {
+        "gate_policy": {"$ref": "#/$defs/reference"},
+        "agent_runtimes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/reference"}},
+        "environment": {"$ref": "#/$defs/reference"},
+        "risk": {"$ref": "#/$defs/reference"}
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "fail_closed"],
+      "properties": {
+        "order": {"const": ["gate_policy", "agent_runtime", "environment", "risk"]},
+        "fail_closed": {"const": true}
+      }
+    }
+  }
+}

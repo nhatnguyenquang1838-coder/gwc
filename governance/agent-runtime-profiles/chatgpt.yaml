@@ -1,0 +1,23 @@
+schema_version: "1.0"
+profile_type: agent_runtime
+profile_id: chatgpt
+status: active
+agent_id: chatgpt-agent
+execution_modes:
+  - chat_connector_only
+  - local_agent
+  - repo_ci
+connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+capabilities:
+  - protected_base_read
+  - isolated_artifact_validation
+  - guarded_branch_write_with_g2
+  - draft_pr_delivery_with_g3
+constraints:
+  - vietnamese_first_for_gwc
+  - exact_approval_command_required
+  - connector_is_source_of_truth_in_chat_connector_only
+  - no_merge_without_g4

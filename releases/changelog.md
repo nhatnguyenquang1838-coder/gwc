@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-07-21 — Multi-profile resolver and gate response traceability
+
+### Added
+
+- Typed profile set composition for gate policy, agent runtime, environment, and risk profiles.
+- Standard GWC profile set with ChatGPT and DWC runtime profiles, repository-governance environment, and default risk classification.
+- Deterministic fail-closed profile resolver and validator with safe-path, type, ID, active-state, duplicate, and schema checks.
+- Mandatory gate response trace schema, template, and validator for `Skills called`, `Started at UTC`, and `Ended at UTC`.
+- Kiro requirements, design, implementation plan, and focused regression tests.
+
+### Changed
+
+- GWC package version `1.15.0` distributes the profile assets, schemas, response template, resolver, and validators.
+
+### Compatibility
+
+- `projects/gwc/project-profile.yaml` remains the active repository identity; profile sets extend rather than replace the existing mechanism.
+- Resolver output is deterministic and no new runtime dependency is introduced.
+
+### Safety
+
+- The standard gate profile preserves G2 exact approval, G3 Draft PR and exact-head evidence, Ready-for-review metadata completion after G3 `PASS`, and separate G4 merge authority.
+- This change grants no protected-branch write, merge, deploy, release, production configuration, credential, migration, or production-data authority.
+
 ## 2026-07-20 — DWC ready-for-review capability contract
 
 ### Added

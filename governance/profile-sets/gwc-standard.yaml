@@ -1,0 +1,28 @@
+schema_version: "1.0"
+profile_type: profile_set
+profile_id: gwc-standard
+status: active
+project_id: gwc
+description: Standard composed runtime profile set for the GWC governance repository.
+profiles:
+  gate_policy:
+    id: standard
+    path: governance/gate-policy-profiles/standard.yaml
+  agent_runtimes:
+    - id: chatgpt
+      path: governance/agent-runtime-profiles/chatgpt.yaml
+    - id: dwc
+      path: governance/agent-runtime-profiles/dwc.yaml
+  environment:
+    id: repo-governance
+    path: governance/environment-profiles/repo-governance.yaml
+  risk:
+    id: default
+    path: governance/risk-profiles/default.yaml
+resolution:
+  order:
+    - gate_policy
+    - agent_runtime
+    - environment
+    - risk
+  fail_closed: true

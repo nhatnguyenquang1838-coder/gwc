@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-response-trace.schema.json",
+  "title": "GWC Gate Response Trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "gate", "Skills called", "Started at UTC", "Ended at UTC"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-response-trace"},
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "Skills called": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "Started at UTC": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "Ended at UTC": {"type": "string", "format": "date-time", "pattern": "Z$"}
+  }
+}
