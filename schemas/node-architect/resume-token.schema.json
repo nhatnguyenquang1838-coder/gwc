@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/resume-token.schema.json",
+  "title": "GWC Resume Token",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "resume_token_id",
+    "checkpoint_id",
+    "issued_at_utc",
+    "expires_at_utc",
+    "next_gate",
+    "next_action",
+    "requires_human_approval",
+    "audit_projection"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "resume_token_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issued_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_gate": {
+      "enum": [
+        "G0_CONTEXT",
+        "G1_ALIGNMENT",
+        "G2_EXECUTION",
+        "G3_PR",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION_DATA"
+      ]
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requires_human_approval": {
+      "type": "boolean"
+    },
+    "approval_command": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^APPROVE (G2|G3|G4|G5|G6) [A-Za-z0-9._:-]+ [0-9a-f]{16} [0-9T:\\-]+Z$"
+    },
+    "audit_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_of_truth",
+        "links"
+      ],
+      "properties": {
+        "source_of_truth": {
+          "const": false
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
