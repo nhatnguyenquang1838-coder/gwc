@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-07-21 — REVAMP-GWC-006 consumer package export
+
+### Added
+
+- Consumer package export rule for generated `.governance/` package boundaries.
+- Package export manifest schema and deterministic `tools/export_project_package.py` exporter.
+- GWC package entries for REVAMP node-architect rules, schemas, tools, and exporter distribution.
+
+### Changed
+
+- `projects/gwc/package.yaml` keeps `package_version: "1.16.0"` for compatibility with the existing runtime-bootstrap package assertion.
+- Package notes now record REVAMP-GWC-006 as a package-entry/export rollout without presenting it as a second `Package version 1.16.0` release line.
+
+### Hygiene
+
+- PR #58 metadata was corrected so the body no longer claims a package-version bump to `1.17.0`.
+- Release notes now document the consumer export scope that was intentionally skipped during PR #58 because the connector had no safe append primitive in that execution turn.
+
+### Safety
+
+- This change grants no protected-branch write outside G2, merge, deploy, release, production configuration, credential, migration, or production-data authority.
+
 ## 2026-07-21 — G0/G1 runtime bootstrap and lifecycle scope
 
 ### Added

@@ -93,7 +93,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
-  - Package version 1.16.0 distributes REVAMP_UPGRADE_GWC node-architect consumer export rules, schemas, tools, and package entries.
+  - REVAMP-GWC-006 adds consumer package export rules, schemas, tools, and package entries without changing package_version.
   - Package version 1.16.0 adds runtime bootstrap evidence to G0/G1 and fail-closed selected runtime profile resolution for the current agent execution mode.
   - Package version 1.15.0 adds typed multi-profile resolution and mandatory gate response traceability.
   - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
