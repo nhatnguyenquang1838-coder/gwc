@@ -2,140 +2,76 @@ schema_version: "1.0"
 project_id: gwc
 package_version: "1.16.0"
 status: active
-
 profile: projects/gwc/project-profile.yaml
-
 instructions:
-   - id: coding-project-governance
-     path: core/Coding_Project_Governance_v1.0.md
-     target: .governance/Coding_Project_Governance_v1.0.md
-     required: true
-   - id: gate-lifecycle-contract
-     path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
-     target: .governance/GATE_LIFECYCLE_CONTRACT_v1.0.md
-     required: true
-   - id: agent-operating-runtime-contract
-     path: core/Agent_Operating_Runtime_Contract_v1.0.md
-     target: .governance/Agent_Operating_Runtime_Contract_v1.0.md
-     required: true
-   - id: kiro-spec-driven-delivery-rule
-     path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
-     target: .governance/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
-     required: true
-   - id: g0-g1-operational-runbook
-     path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
-     target: .governance/core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
-     required: true
-   - id: agent-behavior-semantic-contract
-     path: core/Agent_Behavior_Semantic_Contract_v1.0.md
-     target: .governance/Agent_Behavior_Semantic_Contract_v1.0md
-     required: true
-   - id: agent-response-presentation-contract
-     path: core/Agent_Response_Presentation_Contract_v1.0.md
-     target: .governance/Agent_Response_Presentation_Contract_v1.0.md
-     required: true
-   - id: e2e-draft-pr-delivery
-     path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
-     target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md
-     required: true
-   - id: hotfix-and-rescue-mode
-     path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md
-     target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md
-     required: false
-   - id: base-drift-policy
-     path: governance/base-drift-policy.yaml
-     target: .governance/base-drift-policy.yaml
-     required: true
-   - id: gwc-standard-profile-set
-     path: governance/profile-sets/gwc-standard.yaml
-     target: .governance/profile-sets/gwc-standard.yaml
-     required: true
-   - id: standard-gate-policy-profile
-     path: governance/gate-policy-profiles/standard.yaml
-     target: .governance/gate-policy-profiles/standard.yaml
-     required: true
-   - id: chatgpt-agent-runtime-profile
-     path: governance/agent-runtime-profiles/chatgpt.yaml
-     target: .governance/agent-runtime-profiles/chatgpt.yaml
-     required: true
-   - id: dwc-agent-runtime-profile
-     path: governance/agent-runtime-profiles/dwc.yaml
-     target: .governance/agent-runtime-profiles/dwc.yaml
-     required: true
-   - id: repo-governance-environment-profile
-     path: governance/environment-profiles/repo-governance.yaml
-     target: .governance/environment-profiles/repo-governance.yaml
-     required: true
-   - id: default-risk-profile
-     path: governance/risk-profiles/default.yaml
-     target: .governance/risk-profiles/default.yaml
-     required: true
-   - id: profile-set-schema
-     path: schemas/profile-set.schema.json
-     target: .governance/schemas/profile-set.schema.json
-     required: true
-   - id: gate-policy-profile-schema
-     path: schemas/gate-policy-profile.schema.json
-     target: .governance/schemas/gate-policy-profile.schema.json
-     required: true
-   - id: gate-response-trace-schema
-     path: schemas/gate-response-trace.schema.json
-     target: .governance/schemas/gate-response-trace.schema.json
-     required: true
-   - id: gate-response-template
-     path: templates/gates/gate-response.template.md
-     target: .governance/templates/gates/gate-response.template.md
-     required: true
-   - id: profile-resolver
-     path: tools/resolve_profiles.py
-     target: .governance/tools/resolve_profiles.py
-     required: true
-   - id: profile-set-validator
-     path: tools/validate_profile_set.py
-     target: .governance/tools/validate_profile_set.py
-     required: true
-   - id: gate-response-trace-validator
-     path: tools/validate_gate_response_trace.py
-     target: .governance/tools/validate_gate_response_trace.py
-     required: true
-   - id: instruction-source-registry
-     path: governance/instruction-source-registry.yaml
-     target: .governance/instruction-source-registry.yaml
-     required: true
-   - id: g01-lifecycle
-     path: docs/g01-lifecycle.md
-     target: .governance/g01-lifecycle.md
-     required: true
-   - id: project-consumer-agent-instructions
-     path: docs/project-consumer-agent-instructions.md
-     target: .governance/project-consumer-agent-instructions.md
-     required: true
-   # --- Canonical G2 Migration ---
-   - id: g2-skill-library-readme
-     path: libs/g2-skill-library/README.md
-     target: .governance/libs/g2-skill-library/README.md
-     required: true
-   - id: g2-skill-library-manifest
-     path: libs/g2-skill-library/manifest.yaml
-     target: .governance/libs/g2-skill-library/manifest.yaml
-     required: true
-   - id: g2-skill-library-notice
-     path: libs/g2-skill-library/NOTICE.md
-     target: .governance/libs/g2-skill-library/NOTICE.md
-     required: true
-   - id: g2-approval-envelope
-     path: libs/g2-skill-library/skills/g2-approval-envelope.md
-     target: .governance/libs/g2-skill-library/skills/g2-approval-envelope.md
-     required: true
-   - id: g2-execution-plan
-     path: libs/g2-skill-library/skills/g2-execution-plan.md
-     target: .governance/libs/g2-skill-library/skills/g2-execution-plan.md
-     required: true
-   - id: g2-repository-interaction
-     path: libs/g2-skill-library/skills/g2-repository-interaction.md
-     target: .governance/libs/g2-skill-library/skills/g2-repository-interaction.md
-     required: true
-
+  - {id: coding-project-governance, path: core/Coding_Project_Governance_v1.0.md, target: .governance/Coding_Project_Governance_v1.0.md, required: true}
+  - {id: gate-lifecycle-contract, path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md, target: .governance/GATE_LIFECYCLE_CONTRACT_v1.0.md, required: true}
+  - {id: agent-operating-runtime-contract, path: core/Agent_Operating_Runtime_Contract_v1.0.md, target: .governance/Agent_Operating_Runtime_Contract_v1.0.md, required: true}
+  - {id: kiro-spec-driven-delivery-rule, path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md, target: .governance/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md, required: true}
+  - {id: g0-g1-operational-runbook, path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, target: .governance/core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, required: true}
+  - {id: agent-behavior-semantic-contract, path: core/Agent_Behavior_Semantic_Contract_v1.0.md, target: .governance/Agent_Behavior_Semantic_Contract_v1.0.md, required: true}
+  - {id: agent-response-presentation-contract, path: core/Agent_Response_Presentation_Contract_v1.0.md, target: .governance/Agent_Response_Presentation_Contract_v1.0.md, required: true}
+  - {id: e2e-draft-pr-delivery, path: core/E2E_DRAFT_PR_DELIVERY_RULE.md, target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md, required: true}
+  - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
+  - {id: base-drift-policy, path: governance/base-drift-policy.yaml, target: .governance/base-drift-policy.yaml, required: true}
+  - {id: gwc-standard-profile-set, path: governance/profile-sets/gwc-standard.yaml, target: .governance/profile-sets/gwc-standard.yaml, required: true}
+  - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/gate-policy-profiles/standard.yaml, required: true}
+  - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/agent-runtime-profiles/chatgpt.yaml, required: true}
+  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/agent-runtime-profiles/dwc.yaml, required: true}
+  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/environment-profiles/repo-governance.yaml, required: true}
+  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/risk-profiles/default.yaml, required: true}
+  - {id: profile-set-schema, path: schemas/profile-set.schema.json, target: .governance/schemas/profile-set.schema.json, required: true}
+  - {id: gate-policy-profile-schema, path: schemas/gate-policy-profile.schema.json, target: .governance/schemas/gate-policy-profile.schema.json, required: true}
+  - {id: gate-response-trace-schema, path: schemas/gate-response-trace.schema.json, target: .governance/schemas/gate-response-trace.schema.json, required: true}
+  - {id: gate-response-template, path: templates/gates/gate-response.template.md, target: .governance/templates/gates/gate-response.template.md, required: true}
+  - {id: profile-resolver, path: tools/resolve_profiles.py, target: .governance/tools/resolve_profiles.py, required: true}
+  - {id: profile-set-validator, path: tools/validate_profile_set.py, target: .governance/tools/validate_profile_set.py, required: true}
+  - {id: gate-response-trace-validator, path: tools/validate_gate_response_trace.py, target: .governance/tools/validate_gate_response_trace.py, required: true}
+  - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/instruction-source-registry.yaml, required: true}
+  - {id: g01-lifecycle, path: docs/g01-lifecycle.md, target: .governance/g01-lifecycle.md, required: true}
+  - {id: project-consumer-agent-instructions, path: docs/project-consumer-agent-instructions.md, target: .governance/project-consumer-agent-instructions.md, required: true}
+  - {id: g2-skill-library-readme, path: libs/g2-skill-library/README.md, target: .governance/libs/g2-skill-library/README.md, required: true}
+  - {id: g2-skill-library-manifest, path: libs/g2-skill-library/manifest.yaml, target: .governance/libs/g2-skill-library/manifest.yaml, required: true}
+  - {id: g2-skill-library-notice, path: libs/g2-skill-library/NOTICE.md, target: .governance/libs/g2-skill-library/NOTICE.md, required: true}
+  - {id: g2-approval-envelope, path: libs/g2-skill-library/skills/g2-approval-envelope.md, target: .governance/libs/g2-skill-library/skills/g2-approval-envelope.md, required: true}
+  - {id: g2-execution-plan, path: libs/g2-skill-library/skills/g2-execution-plan.md, target: .governance/libs/g2-skill-library/skills/g2-execution-plan.md, required: true}
+  - {id: g2-repository-interaction, path: libs/g2-skill-library/skills/g2-repository-interaction.md, target: .governance/libs/g2-skill-library/skills/g2-repository-interaction.md, required: true}
+  - {id: gwc-fastlane-bootstrap-workflow, path: core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md, target: .governance/core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md, required: true}
+  - {id: revamp-upgrade-gwc-workflow, path: core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md, target: .governance/core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md, required: true}
+  - {id: revamp-upgrade-gwc-runbook, path: docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md, target: .governance/docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md, required: true}
+  - {id: external-audit-projection-rule, path: core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md, target: .governance/core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md, required: true}
+  - {id: kiro-strict-coding-state-rule, path: core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md, target: .governance/core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md, required: true}
+  - {id: checkpoint-resume-rule, path: core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md, target: .governance/core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md, required: true}
+  - {id: stale-session-cleanup-rule, path: core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md, target: .governance/core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md, required: true}
+  - {id: ds-admin-tc-sync-protocol, path: core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md, target: .governance/core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md, required: true}
+  - {id: kiro-local-agent-execution-package, path: core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md, target: .governance/core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md, required: true}
+  - {id: consumer-package-export-rule, path: core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md, target: .governance/core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md, required: true}
+  - {id: revamp-upgrade-gwc-envelope-schema, path: schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json, target: .governance/schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json, required: true}
+  - {id: external-audit-projection-schema, path: schemas/node-architect/external-audit-projection.schema.json, target: .governance/schemas/node-architect/external-audit-projection.schema.json, required: true}
+  - {id: kiro-coding-state-schema, path: schemas/node-architect/kiro-coding-state.schema.json, target: .governance/schemas/node-architect/kiro-coding-state.schema.json, required: true}
+  - {id: node-registry-schema, path: schemas/node-architect/node-registry.schema.json, target: .governance/schemas/node-architect/node-registry.schema.json, required: true}
+  - {id: runtime-node-schema, path: schemas/node-architect/runtime-node.schema.json, target: .governance/schemas/node-architect/runtime-node.schema.json, required: true}
+  - {id: simulation-result-schema, path: schemas/node-architect/simulation-result.schema.json, target: .governance/schemas/node-architect/simulation-result.schema.json, required: true}
+  - {id: checkpoint-schema, path: schemas/node-architect/checkpoint.schema.json, target: .governance/schemas/node-architect/checkpoint.schema.json, required: true}
+  - {id: resume-token-schema, path: schemas/node-architect/resume-token.schema.json, target: .governance/schemas/node-architect/resume-token.schema.json, required: true}
+  - {id: stale-session-cleanup-schema, path: schemas/node-architect/stale-session-cleanup.schema.json, target: .governance/schemas/node-architect/stale-session-cleanup.schema.json, required: true}
+  - {id: ds-admin-tc-sync-schema, path: schemas/node-architect/ds-admin-tc-sync.schema.json, target: .governance/schemas/node-architect/ds-admin-tc-sync.schema.json, required: true}
+  - {id: sync-target-schema, path: schemas/node-architect/sync-target.schema.json, target: .governance/schemas/node-architect/sync-target.schema.json, required: true}
+  - {id: sync-projection-result-schema, path: schemas/node-architect/sync-projection-result.schema.json, target: .governance/schemas/node-architect/sync-projection-result.schema.json, required: true}
+  - {id: kiro-local-agent-package-schema, path: schemas/node-architect/kiro-local-agent-package.schema.json, target: .governance/schemas/node-architect/kiro-local-agent-package.schema.json, required: true}
+  - {id: local-agent-command-schema, path: schemas/node-architect/local-agent-command.schema.json, target: .governance/schemas/node-architect/local-agent-command.schema.json, required: true}
+  - {id: local-agent-validation-report-schema, path: schemas/node-architect/local-agent-validation-report.schema.json, target: .governance/schemas/node-architect/local-agent-validation-report.schema.json, required: true}
+  - {id: package-export-manifest-schema, path: schemas/package-export-manifest.schema.json, target: .governance/schemas/package-export-manifest.schema.json, required: true}
+  - {id: node-registry-compiler, path: tools/node_architect/compile_node_registry.py, target: .governance/tools/node_architect/compile_node_registry.py, required: true}
+  - {id: node-registry-validator, path: tools/node_architect/validate_node_registry.py, target: .governance/tools/node_architect/validate_node_registry.py, required: true}
+  - {id: gate-runtime-simulator, path: tools/node_architect/simulate_gate_runtime.py, target: .governance/tools/node_architect/simulate_gate_runtime.py, required: true}
+  - {id: checkpoint-resume-validator, path: tools/node_architect/validate_checkpoint_resume.py, target: .governance/tools/node_architect/validate_checkpoint_resume.py, required: true}
+  - {id: stale-session-cleaner, path: tools/node_architect/cleanup_stale_sessions.py, target: .governance/tools/node_architect/cleanup_stale_sessions.py, required: true}
+  - {id: ds-admin-tc-sync-validator, path: tools/node_architect/validate_ds_admin_tc_sync.py, target: .governance/tools/node_architect/validate_ds_admin_tc_sync.py, required: true}
+  - {id: ds-admin-tc-projection-renderer, path: tools/node_architect/render_ds_admin_tc_projection.py, target: .governance/tools/node_architect/render_ds_admin_tc_projection.py, required: true}
+  - {id: kiro-local-agent-package-validator, path: tools/node_architect/validate_kiro_local_agent_package.py, target: .governance/tools/node_architect/validate_kiro_local_agent_package.py, required: true}
+  - {id: kiro-local-agent-package-renderer, path: tools/node_architect/render_kiro_local_agent_package.py, target: .governance/tools/node_architect/render_kiro_local_agent_package.py, required: true}
+  - {id: consumer-package-export-tool, path: tools/export_project_package.py, target: .governance/tools/export_project_package.py, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -146,19 +82,18 @@ delivery:
   connector: DWC
   identity_status: verified
   write_enabled: true
-
 work_tracking:
   provider: ds-admin
   claim_required_for_e2e: true
   ownership_verification_required: true
   lease_renewal_required: false
   status_transitions_from_state_engine: true
-
 notes:
   - DWC repository reads are automatic for this verified repository.
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - Package version 1.16.0 distributes REVAMP_UPGRADE_GWC node-architect consumer export rules, schemas, tools, and package entries.
   - Package version 1.16.0 adds runtime bootstrap evidence to G0/G1 and fail-closed selected runtime profile resolution for the current agent execution mode.
   - Package version 1.15.0 adds typed multi-profile resolution and mandatory gate response traceability.
   - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
