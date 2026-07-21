@@ -6,12 +6,26 @@ and governance stakeholders
 **Evidence baseline:** `main@16f64a88e0a5a7fc811e32e3acd06cda1301c50c`  
 **Last reviewed:** 2026-07-20
 
+gates.
 ## Purpose
 
 GWC turns repository change from an unstructured activity into a governed,
 verifiable sequence. It binds intent, evidence, repository state, execution
 scope, validation, review, and high-authority actions to explicit artifacts and
 gates.
+
+## Agent‑to‑Agent Task Handover
+
+### Overview
+The GWC project now supports a formal, documented task handover capability that allows an authorized agent to transfer the ownership of an active task to another authorized agent.
+
+### How It Works
+1. **Ownership Transfer** – The source agent records the handover event, capturing both source and target agent identifiers.
+2. **Context Preservation** – The handover event includes the repository, task ID, base SHA, and any other execution context required for the receiving agent to resume work.
+3. **State‑Engine Enforcement** – The DS Admin State Engine validates that the source agent holds a valid claim and that the target agent is eligible to receive the task.
+4. **Audit Trail** – Immutable log entries are created for each handover event, ensuring traceability.
+
+This design respects GWC governance policies and does not grant merge, deploy, or production authority.
 
 GWC is not a replacement for project requirements, tests, CI, QA, code review,
 or human authority. It coordinates those mechanisms and prevents evidence from

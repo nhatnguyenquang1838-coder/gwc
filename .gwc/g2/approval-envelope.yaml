@@ -1,0 +1,31 @@
+# Approval envelope for G2 execution of Agent-to-Agent Task Handover design
+schema_version: "1.0"
+approval_id: CP-20260721-001
+authority_gate: G2_EXECUTION
+task_id: task_886edc95-8f8b-4ff6-aff8-c6252f39bb86
+issued_at: 2026-07-21T05:00:00Z
+expires_at: 2026-07-22T05:00:00Z
+scope_version: 1
+risk_class: R2
+project_profile: gwc
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: ac1ba0afc1d082cd42c9e448dd2e67d6d14fcc92
+working_branch: feature/agent-handover-opt2-20260721
+modules_or_files:
+  - GWC_Project_Overview.md
+  - docs/plan/distributed-multi-agent-sdlc/README.md
+  - docs/plan/distributed-multi-agent-sdlc/end-state/requirements.md
+  - docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/requirements.md
+  - docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md
+authorized_actions:
+  - modify_approved_files
+excluded_actions: []
+authored_by: GitHub Copilot
+artifact_hashes:
+  change_plan: sha256:224d33f5554c61f5629ea95abf37bd013f8ce2ad3e979d8aed9c5c0a82227533
+  mermaid: sha256:bc50e5cbecbd7ad6053e6f9514fbdbd246e09c55b0a890d2e2611d9ffb8f5c78
+  png: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  svg: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+# scope_hash computed from normalized envelope JSON (excluding this field)
+scope_hash: sha256:4c381db0add2888a1f8d1b884dd9161301bcf525d97325f710e76b3a9f091713
