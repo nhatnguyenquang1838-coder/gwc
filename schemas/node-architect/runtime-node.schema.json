@@ -1,0 +1,17 @@
+{
+  "$id": "https://gwc.local/schemas/node-architect/runtime-node.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_boundary": {"enum": ["none", "read_only", "g2_required", "g4_required", "g5_required", "g6_required"]},
+    "canonical": {"enum": ["canonical", "delivery_evidence", "audit_projection", "resume_hint"]},
+    "description": {"type": "string"},
+    "gates": {"items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]}, "type": "array", "uniqueItems": true},
+    "node_id": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
+    "node_type": {"enum": ["actor", "workflow", "gate", "tool", "schema", "state", "projection", "connector"]},
+    "title": {"minLength": 1, "type": "string"}
+  },
+  "required": ["node_id", "node_type", "title", "canonical", "authority_boundary", "gates"],
+  "title": "GWC Runtime Node",
+  "type": "object"
+}
