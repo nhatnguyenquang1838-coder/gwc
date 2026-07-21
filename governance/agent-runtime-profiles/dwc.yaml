@@ -1,0 +1,24 @@
+schema_version: "1.0"
+profile_type: agent_runtime
+profile_id: dwc
+status: active
+agent_id: dwc
+execution_modes:
+  - chat_connector_only
+  - local_agent
+  - repo_ci
+connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+capabilities:
+  - protected_base_read
+  - ds_admin_state_sync
+  - guarded_branch_write_with_g2
+  - draft_pr_delivery_with_g3
+  - mark_pr_ready_after_g3_pass
+constraints:
+  - exact_task_trace_required
+  - exact_scope_and_head_binding
+  - no_merge_without_g4
+  - no_production_operation_without_applicable_gate
