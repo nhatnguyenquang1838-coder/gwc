@@ -29,28 +29,29 @@ FORBIDDEN_AUTHORITY = (
 )
 
 
-def validate_fragment(path: Path) -> list[str]:
+def validate_fragment(path: Path, root: Path) -> list[str]:
     errors: list[str] = []
+    relative_path = path.relative_to(root)
     if path.suffix != ".md":
-        errors.append(f"{path}: fragment must be a Markdown file")
+        errors.append(f"{relative_path}: fragment must be a Markdown file")
         return errors
-    if path.parent != FRAGMENT_DIR:
-        errors.append(f"{path}: fragment must live directly under {FRAGMENT_DIR}")
+    if relative_path.parent != FRAGMENT_DIR:
+        errors.append(f"{relative_path}: fragment must live directly under {FRAGMENT_DIR}")
 
     text = path.read_text(encoding="utf-8")
     headings = DATE_HEADING_RE.findall(text)
     if len(headings) != 1:
-        errors.append(f"{path}: expected exactly one dated '## YYYY-MM-DD — title' heading")
+        errors.append(f"{relative_path}: expected exactly one dated '## YYYY-MM-DD — title' heading")
     if not SECTION_RE.search(text):
-        errors.append(f"{path}: expected at least one '###' section heading")
+        errors.append(f"{relative_path}: expected at least one '###' section heading")
     if not TASK_RE.search(text):
-        errors.append(f"{path}: expected a REVAMP-GWC task id")
+        errors.append(f"{relative_path}: expected a REVAMP-GWC task id")
     lowered = text.lower()
     for phrase in FORBIDDEN_AUTHORITY:
-        if phrase in lowered and "no " not in lowered:
-            errors.append(f"{path}: forbidden authority claim: {phrase}")
+        if phrase in lowered and f"no {phrase.removeprefix('grants ')}" not in lowered:
+            errors.append(f"{relative_path}: forbidden authority claim: {phrase}")
     if not text.endswith("\n"):
-        errors.append(f"{path}: must end with a newline")
+        errors.append(f"{relative_path}: must end with a newline")
     return errors
 
 
@@ -72,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
     if not fragments:
         errors.append(f"{FRAGMENT_DIR}: expected at least one changelog fragment")
     for fragment in fragments:
-        errors.extend(validate_fragment(fragment.relative_to(root)))
+        errors.extend(validate_fragment(fragment, root))
 
     if errors:
         for error in errors:
