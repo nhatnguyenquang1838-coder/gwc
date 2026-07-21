@@ -14,7 +14,7 @@ import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
 
-CANONICAL_SHA = "04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1"
+CANONICAL_SHA = "ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48"
 
 
 def sha256(path: Path) -> str:

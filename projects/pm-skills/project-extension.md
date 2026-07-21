@@ -5,7 +5,7 @@ version: "1.0"
 authoritative: false
 extends_profile: pm-skills
 core_policy: CODING-PROJECT-GOVERNANCE@1.0
-core_sha256: 04cd33bbaff66f44917199e6bbb8355a1e956edb9c474e6c8e664ed8d0ed41c1
+core_sha256: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
 mode: tighten_only
 ---
 

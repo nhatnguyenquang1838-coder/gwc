@@ -150,7 +150,12 @@ An execution approval is valid only when all are true:
 Approval expires when:
 
 - `expires_at` is reached.
-- `PROTECTED_BASE` SHA changes for any reason.
+- `PROTECTED_BASE` SHA changes and the drift evaluator classifies the change as
+  `REAPPROVE` or `STOP`. `SAFE_CONTINUE` preserves the active approval when
+  changed files are outside the approved scope and repository, risk,
+  authority, and working-branch conditions remain unchanged. `REVALIDATE`
+  preserves approval but requires the affected validation to pass before
+  continuing.
 - Target files or governance rules materially change.
 - Another actor pushes an unreviewed commit to the working branch.
 - Scope, architecture, data behavior, security impact, migration, external interface, deployment, or authorized actions change.
