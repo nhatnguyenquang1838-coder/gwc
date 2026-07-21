@@ -1,0 +1,14 @@
+{
+  "$id": "https://gwc.local/schemas/node-architect/node-registry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "edges": {"items": {"additionalProperties": false, "properties": {"relation": {"enum": ["requires", "produces", "observes", "projects_to", "validates", "blocks"]}, "source": {"minLength": 1, "type": "string"}, "target": {"minLength": 1, "type": "string"}}, "required": ["source", "target", "relation"], "type": "object"}, "type": "array"},
+    "nodes": {"items": {"$ref": "runtime-node.schema.json"}, "minItems": 1, "type": "array"},
+    "registry_id": {"minLength": 1, "type": "string"},
+    "schema_version": {"const": "0.1"}
+  },
+  "required": ["schema_version", "registry_id", "nodes", "edges"],
+  "title": "GWC Node Registry",
+  "type": "object"
+}

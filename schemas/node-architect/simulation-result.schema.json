@@ -1,0 +1,16 @@
+{
+  "$id": "https://gwc.local/schemas/node-architect/simulation-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "findings": {"items": {"additionalProperties": false, "properties": {"code": {"minLength": 1, "type": "string"}, "message": {"minLength": 1, "type": "string"}, "severity": {"enum": ["INFO", "MINOR", "MAJOR", "BLOCKER"]}}, "required": ["severity", "code", "message"], "type": "object"}, "type": "array"},
+    "outcome": {"enum": ["PASS", "FAIL"]},
+    "registry_id": {"minLength": 1, "type": "string"},
+    "requested_action": {"minLength": 1, "type": "string"},
+    "required_gate": {"type": ["string", "null"]},
+    "schema_version": {"const": "0.1"}
+  },
+  "required": ["schema_version", "registry_id", "requested_action", "outcome", "required_gate", "findings"],
+  "title": "GWC Node Runtime Simulation Result",
+  "type": "object"
+}
