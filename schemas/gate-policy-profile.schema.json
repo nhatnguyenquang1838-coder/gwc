@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-policy-profile.schema.json",
+  "title": "GWC Gate Policy Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_type", "profile_id", "status", "gate_sequence", "gates", "invariants"],
+  "$defs": {
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority", "write_allowed"],
+      "properties": {
+        "authority": {"enum": ["automatic_read_only", "exact_human_approval", "evidence_driven", "status_verify_or_exact_human_manual_action", "exact_human_approval_when_applicable"]},
+        "write_allowed": {"enum": [true, false, "conditional"]},
+        "draft_pr_only": {"type": "boolean"},
+        "ready_for_review_after_pass": {"type": "boolean"}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "profile_type": {"const": "gate_policy"},
+    "profile_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+    "status": {"enum": ["draft", "active", "deprecated", "disabled", "archived"]},
+    "description": {"type": "string", "minLength": 1},
+    "gate_sequence": {"const": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"],
+      "properties": {
+        "G0_CONTEXT": {"$ref": "#/$defs/gate"},
+        "G1_ALIGNMENT": {"$ref": "#/$defs/gate"},
+        "G2_EXECUTION": {"$ref": "#/$defs/gate"},
+        "G3_PR": {"$ref": "#/$defs/gate"},
+        "G4_MERGE": {"$ref": "#/$defs/gate"},
+        "G5_DEPLOY": {"$ref": "#/$defs/gate"},
+        "G6_PRODUCTION_DATA": {"$ref": "#/$defs/gate"}
+      }
+    },
+    "invariants": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [{
+    "properties": {"gates": {"properties": {
+      "G0_CONTEXT": {"properties": {"write_allowed": {"const": false}}},
+      "G1_ALIGNMENT": {"properties": {"write_allowed": {"const": false}}},
+      "G3_PR": {"required": ["draft_pr_only", "ready_for_review_after_pass"], "properties": {"draft_pr_only": {"const": true}, "ready_for_review_after_pass": {"const": true}}},
+      "G4_MERGE": {"properties": {"authority": {"const": "exact_human_approval"}}}
+    }}}
+  }]
+}
