@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/kiro-coding-state.schema.json",
+  "title": "Kiro Strict Coding State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "state",
+    "repository",
+    "scope",
+    "readback"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "state": {
+      "enum": [
+        "PREPARED_BY_CHATGPT",
+        "CODING_READY",
+        "CODING_RUNNING",
+        "VALIDATION_RUNNING",
+        "DIFF_READBACK_REQUIRED",
+        "DRAFT_PR_READY",
+        "REPAIR_REQUIRED",
+        "BLOCKED_SCOPE_DRIFT",
+        "BLOCKED_APPROVAL_EXPIRED",
+        "BLOCKED_PROHIBITED_ACTION"
+      ]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_name", "base_sha", "working_branch"],
+      "properties": {
+        "full_name": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
+        "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "working_branch": { "type": "string", "minLength": 1 }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files_read", "files_write", "authorized_actions", "excluded_actions"],
+      "properties": {
+        "files_read": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "files_write": { "type": "array", "items": { "type": "string" }, "minItems": 1, "uniqueItems": true },
+        "authorized_actions": { "type": "array", "items": { "enum": ["modify_scoped_files", "run_validation", "report_diff", "open_or_update_draft_pr"] }, "minItems": 1, "uniqueItems": true },
+        "excluded_actions": { "type": "array", "items": { "enum": ["direct_push_main", "force_push", "merge", "auto_merge", "deploy", "release", "production_config", "credentials", "secrets", "migration", "production_data"] }, "minItems": 1, "uniqueItems": true }
+      }
+    },
+    "readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files_read_actual", "files_write_actual", "changed_files", "validation_status", "scope_drift"],
+      "properties": {
+        "files_read_actual": { "type": "array", "items": { "type": "string" } },
+        "files_write_actual": { "type": "array", "items": { "type": "string" } },
+        "changed_files": { "type": "array", "items": { "type": "string" } },
+        "validation_status": { "enum": ["passed", "failed", "skipped", "not_available"] },
+        "scope_drift": { "enum": ["NONE", "DETECTED"] },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
