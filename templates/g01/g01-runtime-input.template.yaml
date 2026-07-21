@@ -13,6 +13,35 @@ repository:
   connector: DWC
   write_enabled: true
   verified: true
+runtime:
+  agent_runtime_id: dwc
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+    status: active
+    source_sha: d06ab5631a7888fd09ee44839de48840c8131eb5
+    supported_execution_modes: [chat_connector_only, local_agent, repo_ci]
+  connector_priority: [GitHub, DWC, DW1]
+  selected_connector: DWC
+  connector_fallback_evidence:
+    - connector: GitHub
+      role: primary
+      status: UNAVAILABLE
+      evidence: GitHub connector unavailable in this template; DWC selected as declared fallback.
+    - connector: DWC
+      role: fallback
+      status: AVAILABLE
+      evidence: DWC connector verified for repository reads and guarded writes.
+  required_behavior_contracts:
+    - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: 1234567890abcdef1234567890abcdef12345678
+    - path: core/Agent_Response_Presentation_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: abcdef1234567890abcdef1234567890abcdef12
 task:
   id: task_d77076f7-98e3-4e0f-a467-789d42c28cb6
   claimed: true

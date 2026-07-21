@@ -34,6 +34,48 @@ class ProfileResolverTests(unittest.TestCase):
             ["standard", "chatgpt", "dwc", "repo-governance", "default"],
         )
 
+    def test_selects_one_runtime_for_execution_mode(self) -> None:
+        result = RESOLVER.resolve_profile_set(
+            ROOT,
+            ROOT / "governance/profile-sets/gwc-standard.yaml",
+            agent_runtime_id="dwc",
+            execution_mode="chat_connector_only",
+        )
+        self.assertEqual(
+            [item["profile_type"] for item in result["resolved_profiles"]],
+            ["gate_policy", "agent_runtime", "environment", "risk"],
+        )
+        self.assertEqual(
+            [item["profile_id"] for item in result["resolved_profiles"]],
+            ["standard", "dwc", "repo-governance", "default"],
+        )
+        self.assertEqual(
+            {
+                "agent_runtime_id": "dwc",
+                "execution_mode": "chat_connector_only",
+                "profile_path": "governance/agent-runtime-profiles/dwc.yaml",
+            },
+            result["selected_runtime"],
+        )
+
+    def test_unknown_runtime_selection_fails_closed(self) -> None:
+        with self.assertRaisesRegex(RESOLVER.ProfileResolutionError, "exactly one"):
+            RESOLVER.resolve_profile_set(
+                ROOT,
+                ROOT / "governance/profile-sets/gwc-standard.yaml",
+                agent_runtime_id="missing-runtime",
+                execution_mode="chat_connector_only",
+            )
+
+    def test_unsupported_execution_mode_fails_closed(self) -> None:
+        with self.assertRaisesRegex(RESOLVER.ProfileResolutionError, "not supported"):
+            RESOLVER.resolve_profile_set(
+                ROOT,
+                ROOT / "governance/profile-sets/gwc-standard.yaml",
+                agent_runtime_id="dwc",
+                execution_mode="unsupported_mode",
+            )
+
     def copy_fixture(self) -> Path:
         root = Path(tempfile.mkdtemp())
         paths = [

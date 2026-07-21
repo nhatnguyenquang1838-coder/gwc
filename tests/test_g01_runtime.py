@@ -38,6 +38,22 @@ class G01RuntimeGenerationTests(unittest.TestCase):
         self.assertEqual("PASS", artifacts["preflight"]["outcome"])
         self.assertEqual("G2_AUTOMATIC_BOUNDED", artifacts["preflight"]["required_gate"])
         self.assertEqual([], artifacts["preflight"]["blockers"])
+        check_ids = {item["id"] for item in artifacts["preflight"]["checks"]}
+        self.assertIn("EXECUTION_MODE_COMPATIBILITY", check_ids)
+        self.assertIn("BOOTSTRAP_BEHAVIOR_CONTRACTS", check_ids)
+        self.assertIn("DELIVERY_LIFECYCLE_SCOPE", check_ids)
+        self.assertEqual(
+            "chat_connector_only",
+            artifacts["preflight"]["runtime_context"]["execution_mode"],
+        )
+        self.assertIn(
+            "mark_pr_ready_for_review_after_g3_pass",
+            artifacts["intake"]["delivery_lifecycle"]["authorized_actions"],
+        )
+        self.assertIn(
+            "merge",
+            artifacts["intake"]["delivery_lifecycle"]["downstream_non_goals"],
+        )
 
     def test_unclaimed_task_fails_closed(self) -> None:
         payload = copy.deepcopy(self.valid_input)
@@ -69,6 +85,27 @@ class G01RuntimeGenerationTests(unittest.TestCase):
         self.assertEqual("G2_HUMAN_DIRECTION", artifacts["preflight"]["required_gate"])
         self.assertIn(
             "HUMAN_DIRECTION_REQUIRED",
+            {item["code"] for item in artifacts["preflight"]["blockers"]},
+        )
+
+    def test_unsupported_execution_mode_fails_closed(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["selected_profile"]["supported_execution_modes"] = ["local_agent"]
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("BLOCKED", outcome)
+        self.assertIn(
+            "EXECUTION_MODE_UNSUPPORTED",
+            {item["code"] for item in artifacts["preflight"]["blockers"]},
+        )
+
+    def test_missing_behavior_contract_fails_closed(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["required_behavior_contracts"][0]["status"] = "MISSING"
+        payload["runtime"]["required_behavior_contracts"][0]["source_sha"] = None
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("BLOCKED", outcome)
+        self.assertIn(
+            "BEHAVIOR_CONTRACT_UNAVAILABLE",
             {item["code"] for item in artifacts["preflight"]["blockers"]},
         )
 

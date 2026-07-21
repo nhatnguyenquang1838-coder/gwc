@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-21 — G0/G1 runtime bootstrap and lifecycle scope
+
+### Added
+
+- Runtime bootstrap evidence in G01 runtime input for selected agent runtime, execution mode, runtime profile source, connector priority, selected connector, fallback evidence, and required behavior contracts.
+- G0 and G1 preflight runtime context so agents must bind G0/G1 evidence to the current runtime profile and execution mode.
+- G1 intake delivery lifecycle coverage for guarded branch creation, scoped writes, validation, push, Draft PR creation/update, CI monitoring or repair, independent G3 review, and Draft-to-Ready-for-review metadata completion after G3 `PASS`.
+- Profile resolver and validator flags to select exactly one active runtime profile for the current agent and fail closed when execution mode compatibility is missing.
+
+### Changed
+
+- GWC package version `1.16.0` distributes the runtime bootstrap evidence, lifecycle scope fields, resolver selection behavior, template updates, and regression tests.
+- The G0/G1 operational runbook now requires selected runtime profile resolution and connector-role evidence before G2 handoff.
+
+### Safety
+
+- Ready-for-review remains G3 metadata completion only after exact-head G3 `PASS`; it grants no merge authority.
+- This change grants no protected-branch write outside G2, merge, deploy, release, production configuration, credential, migration, or production-data authority.
+
 ## 2026-07-21 — Multi-profile resolver and gate response traceability
 
 ### Added

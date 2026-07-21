@@ -67,9 +67,53 @@ def profile_references(profile_set: dict[str, Any]) -> list[tuple[str, dict[str,
     return references
 
 
-def resolve_profile_set(root: Path, profile_set_path: Path) -> dict[str, Any]:
+def _select_agent_runtime(
+    resolved_profiles: list[dict[str, Any]],
+    agent_runtime_id: str,
+    execution_mode: str,
+) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    matches = [
+        item
+        for item in resolved_profiles
+        if item["profile_type"] == "agent_runtime"
+        and item["profile_id"] == agent_runtime_id
+    ]
+    if len(matches) != 1:
+        raise ProfileResolutionError(
+            f"exactly one active agent runtime required for {agent_runtime_id!r}; "
+            f"found {len(matches)}"
+        )
+    selected = matches[0]
+    supported_modes = selected["content"].get("execution_modes", [])
+    if execution_mode not in supported_modes:
+        raise ProfileResolutionError(
+            f"execution mode {execution_mode!r} is not supported by "
+            f"agent runtime {agent_runtime_id!r}"
+        )
+    filtered_profiles = [
+        item
+        for item in resolved_profiles
+        if item["profile_type"] != "agent_runtime" or item is selected
+    ]
+    return filtered_profiles, {
+        "agent_runtime_id": agent_runtime_id,
+        "execution_mode": execution_mode,
+        "profile_path": selected["path"],
+    }
+
+
+def resolve_profile_set(
+    root: Path,
+    profile_set_path: Path,
+    agent_runtime_id: str | None = None,
+    execution_mode: str | None = None,
+) -> dict[str, Any]:
     root = root.resolve()
     profile_set_path = profile_set_path.resolve()
+    if (agent_runtime_id is None) != (execution_mode is None):
+        raise ProfileResolutionError(
+            "agent_runtime_id and execution_mode must be provided together"
+        )
     profile_set = load_yaml(profile_set_path)
     if not isinstance(profile_set, dict):
         raise ProfileResolutionError("profile set must be an object")
@@ -143,7 +187,13 @@ def resolve_profile_set(root: Path, profile_set_path: Path) -> dict[str, Any]:
             item["path"],
         )
     )
-    return {
+    selected_runtime: dict[str, str] | None = None
+    if agent_runtime_id is not None and execution_mode is not None:
+        resolved_profiles, selected_runtime = _select_agent_runtime(
+            resolved_profiles, agent_runtime_id, execution_mode
+        )
+
+    result = {
         "schema_version": "1.0",
         "artifact_type": "resolved-profile-set",
         "profile_set": {
@@ -152,6 +202,9 @@ def resolve_profile_set(root: Path, profile_set_path: Path) -> dict[str, Any]:
         },
         "resolved_profiles": resolved_profiles,
     }
+    if selected_runtime is not None:
+        result["selected_runtime"] = selected_runtime
+    return result
 
 
 def main() -> int:
@@ -160,11 +213,26 @@ def main() -> int:
     parser.add_argument(
         "--profile-set", default="governance/profile-sets/gwc-standard.yaml"
     )
+    parser.add_argument(
+        "--agent-runtime",
+        default=None,
+        help="Select exactly one active agent runtime by id, e.g. chatgpt or dwc.",
+    )
+    parser.add_argument(
+        "--execution-mode",
+        default=None,
+        help="Validate the selected runtime supports this execution mode.",
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1]
     try:
-        result = resolve_profile_set(root, safe_repo_path(root, args.profile_set))
+        result = resolve_profile_set(
+            root,
+            safe_repo_path(root, args.profile_set),
+            agent_runtime_id=args.agent_runtime,
+            execution_mode=args.execution_mode,
+        )
     except (OSError, ValueError, yaml.YAMLError, json.JSONDecodeError) as exc:
         print(
             json.dumps({"outcome": "FAIL", "error": str(exc)})

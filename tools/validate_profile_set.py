@@ -18,17 +18,34 @@ def main() -> int:
     parser.add_argument(
         "--profile-set", default="governance/profile-sets/gwc-standard.yaml"
     )
+    parser.add_argument(
+        "--agent-runtime",
+        default=None,
+        help="Select exactly one active agent runtime by id, e.g. chatgpt or dwc.",
+    )
+    parser.add_argument(
+        "--execution-mode",
+        default=None,
+        help="Validate the selected runtime supports this execution mode.",
+    )
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1]
     try:
-        result = resolve_profile_set(root, safe_repo_path(root, args.profile_set))
+        result = resolve_profile_set(
+            root,
+            safe_repo_path(root, args.profile_set),
+            agent_runtime_id=args.agent_runtime,
+            execution_mode=args.execution_mode,
+        )
         report = {
             "outcome": "PASS",
             "valid": True,
             "profile_set": result["profile_set"],
             "resolved_count": len(result["resolved_profiles"]),
         }
+        if "selected_runtime" in result:
+            report["selected_runtime"] = result["selected_runtime"]
     except (OSError, ValueError, yaml.YAMLError, json.JSONDecodeError) as exc:
         report = {"outcome": "FAIL", "valid": False, "error": str(exc)}
     print(

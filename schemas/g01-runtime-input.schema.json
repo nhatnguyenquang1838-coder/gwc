@@ -4,7 +4,7 @@
   "title": "G01 Runtime Input",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "artifact_type", "generated_at", "project", "repository", "task", "request", "policies", "sources", "risk"],
+  "required": ["schema_version", "artifact_type", "generated_at", "project", "repository", "runtime", "task", "request", "policies", "sources", "risk"],
   "$defs": {
     "riskItem": {
       "type": "object",
@@ -81,6 +81,49 @@
         "connector": {"type": "string", "minLength": 1},
         "write_enabled": {"type": "boolean"},
         "verified": {"type": "boolean"}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_runtime_id", "execution_mode", "selected_profile", "connector_priority", "selected_connector", "connector_fallback_evidence", "required_behavior_contracts"],
+      "properties": {
+        "agent_runtime_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+        "execution_mode": {"enum": ["chat_connector_only", "local_agent", "repo_ci"]},
+        "selected_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "path", "status", "source_sha", "supported_execution_modes"],
+          "properties": {
+            "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$"},
+            "path": {"type": "string", "pattern": "^governance/agent-runtime-profiles/[^/]+\\.ya?ml$"},
+            "status": {"const": "active"},
+            "source_sha": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+            "supported_execution_modes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"enum": ["chat_connector_only", "local_agent", "repo_ci"]}
+            }
+          }
+        },
+        "connector_priority": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "selected_connector": {"type": "string", "minLength": 1},
+        "connector_fallback_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["connector", "role", "status", "evidence"],
+            "properties": {
+              "connector": {"type": "string", "minLength": 1},
+              "role": {"enum": ["primary", "fallback"]},
+              "status": {"enum": ["AVAILABLE", "UNAVAILABLE", "SKIPPED"]},
+              "evidence": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "required_behavior_contracts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}}
       }
     },
     "task": {
