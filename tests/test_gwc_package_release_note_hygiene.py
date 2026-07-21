@@ -37,7 +37,7 @@ class GwcPackageReleaseNoteHygieneTests(unittest.TestCase):
     def test_changelog_backfills_consumer_export_scope(self) -> None:
         self.assertIn("REVAMP-GWC-006 consumer package export", self.changelog)
         self.assertIn("Package export manifest schema", self.changelog)
-        self.assertIn("does not bump package_version", self.changelog)
+        self.assertIn('keeps `package_version: "1.16.0"`', self.changelog)
         self.assertIn("PR #58 metadata was corrected", self.changelog)
 
 
