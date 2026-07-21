@@ -121,7 +121,12 @@ The agent must provide concise progress updates but does not need additional app
 
 The agent must stop and request a new approval envelope when any of the following occurs:
 
-- Base SHA changes.
+- Protected-base drift is evaluated before continuation. `SAFE_CONTINUE` does
+  not require a new envelope when changed files are unrelated to the approved
+  scope and authority/risk remain unchanged. `REVALIDATE` keeps the envelope
+  but requires affected checks to pass. `REAPPROVE` or `STOP` requires a new
+  envelope (or a hard stop) for governance, security, runtime-boundary,
+  in-scope, secret, production, destructive, or otherwise material changes.
 - Another actor changes the working branch.
 - Target files or modules change materially.
 - A new dependency is required but was not approved.
