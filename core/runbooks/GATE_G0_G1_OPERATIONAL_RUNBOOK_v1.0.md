@@ -31,16 +31,18 @@ Validate committed artifacts and policy in CI. CI is additional evidence and nev
 1. Receive the request and identify the expected result.
 2. Resolve exactly one active project profile.
 3. Verify repository owner/name, default branch, protected branches, connector identity, and write-enabled status.
-4. Read the canonical policy, active profile, active extension, root `AGENTS.md`, and applicable protected-base governance.
+4. Read the canonical policy, active profile, active extension, root `AGENTS.md`, applicable protected-base governance, global behavior contracts, and response-presentation contracts.
 5. Resolve the exact protected-base commit SHA. When direct ref lookup fails, use an equivalent read-only method and verify equivalence before continuing.
-6. Select the workspace root according to the AGENTS.md workspace location convention decision matrix.
-7. Identify or create exactly one work item when the active profile requires DS Admin traceability. DS Admin records traceability only; it does not grant execution authority.
+6. Resolve exactly one active agent runtime profile for the current agent and execution mode. Fail closed when the profile is missing, duplicated, inactive, or does not support the selected execution mode.
+7. Select the workspace root according to the AGENTS.md workspace location convention decision matrix.
+8. Identify or create exactly one work item when the active profile requires DS Admin traceability. DS Admin records traceability only; it does not grant execution authority.
    - Resolve or create a DS Admin task before G0 completion.
    - Record the task ID in G0/G1 trace fields.
    - Verify task state allows the intended transition before G2 entry.
-8. Classify risk and identify security, architecture, data, deployment, credential, destructive, and blast-radius signals.
-9. Define initial scope, non-goals, expected files/modules, authorized actions, and excluded actions.
-10. Classify blockers as:
+9. Classify risk and identify security, architecture, data, deployment, credential, destructive, and blast-radius signals.
+10. Define initial scope, non-goals, expected files/modules, authorized actions, excluded actions, and the full non-merge delivery lifecycle through G3: guarded branch creation, scoped writes, validation, push, Draft PR creation/update, CI monitoring or repair, independent G3 review, and Draft-to-Ready-for-review metadata completion when supported.
+11. Record connector-role evidence, including preferred connector availability, selected connector, fallback route, and why any higher-priority connector was not used.
+12. Classify blockers as:
    - self-remediable;
    - user-decision required;
    - external-write required;
@@ -65,8 +67,8 @@ Missing write authority blocks only the external write. It does not block propos
 ## G1_ALIGNMENT procedure
 
 1. Confirm G0 is `READY`, or explicitly label G1 work as conversation-local preparation when G0 trusted evidence is incomplete.
-2. Create `g1/intake/g1-intake-brief.yaml` with problem statement, scope, non-goals, stakeholders, constraints, and verifiable acceptance criteria.
-3. Create `g1/preflight/g1-preflight-report.yaml` with repository/profile consistency, risk analysis, dependency checks, capability checks, and blockers.
+2. Create `g1/intake/g1-intake-brief.yaml` with problem statement, scope, non-goals, stakeholders, constraints, verifiable acceptance criteria, and the full non-merge delivery lifecycle needed to reach a reviewed Draft PR without G4 authority.
+3. Create `g1/preflight/g1-preflight-report.yaml` with repository/profile consistency, selected runtime profile, execution-mode compatibility, behavior-contract availability, connector fallback evidence, risk analysis, dependency checks, capability checks, and blockers.
 4. Create `g1/brainstorming/g1-options.yaml` with considered options, trade-offs, rejected alternatives, and selected direction.
 5. Create `g1/decision/g1-decision-record.yaml` with the accepted decision, rationale, final scope, validation plan, rollback considerations, and explicit user decision.
 6. Verify all four artifacts use the same project, repository, task trace, protected base, and scope.
