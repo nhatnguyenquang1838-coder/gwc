@@ -16,6 +16,19 @@
         "draft_pr_only": {"type": "boolean"},
         "ready_for_review_after_pass": {"type": "boolean"}
       }
+    },
+    "non_pr_gate": {
+      "allOf": [
+        {"$ref": "#/$defs/gate"},
+        {
+          "not": {
+            "anyOf": [
+              {"required": ["draft_pr_only"]},
+              {"required": ["ready_for_review_after_pass"]}
+            ]
+          }
+        }
+      ]
     }
   },
   "properties": {
@@ -30,23 +43,58 @@
       "additionalProperties": false,
       "required": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"],
       "properties": {
-        "G0_CONTEXT": {"$ref": "#/$defs/gate"},
-        "G1_ALIGNMENT": {"$ref": "#/$defs/gate"},
-        "G2_EXECUTION": {"$ref": "#/$defs/gate"},
-        "G3_PR": {"$ref": "#/$defs/gate"},
-        "G4_MERGE": {"$ref": "#/$defs/gate"},
-        "G5_DEPLOY": {"$ref": "#/$defs/gate"},
-        "G6_PRODUCTION_DATA": {"$ref": "#/$defs/gate"}
+        "G0_CONTEXT": {
+          "allOf": [
+            {"$ref": "#/$defs/non_pr_gate"},
+            {"properties": {"authority": {"const": "automatic_read_only"}, "write_allowed": {"const": false}}}
+          ]
+        },
+        "G1_ALIGNMENT": {
+          "allOf": [
+            {"$ref": "#/$defs/non_pr_gate"},
+            {"properties": {"authority": {"const": "automatic_read_only"}, "write_allowed": {"const": false}}}
+          ]
+        },
+        "G2_EXECUTION": {
+          "allOf": [
+            {"$ref": "#/$defs/non_pr_gate"},
+            {"properties": {"authority": {"const": "exact_human_approval"}, "write_allowed": {"const": true}}}
+          ]
+        },
+        "G3_PR": {
+          "allOf": [
+            {"$ref": "#/$defs/gate"},
+            {
+              "required": ["draft_pr_only", "ready_for_review_after_pass"],
+              "properties": {
+                "authority": {"const": "evidence_driven"},
+                "write_allowed": {"const": true},
+                "draft_pr_only": {"const": true},
+                "ready_for_review_after_pass": {"const": true}
+              }
+            }
+          ]
+        },
+        "G4_MERGE": {
+          "allOf": [
+            {"$ref": "#/$defs/non_pr_gate"},
+            {"properties": {"authority": {"const": "exact_human_approval"}, "write_allowed": {"const": true}}}
+          ]
+        },
+        "G5_DEPLOY": {
+          "allOf": [
+            {"$ref": "#/$defs/non_pr_gate"},
+            {"properties": {"authority": {"const": "status_verify_or_exact_human_manual_action"}, "write_allowed": {"const": "conditional"}}}
+          ]
+        },
+        "G6_PRODUCTION_DATA": {
+          "allOf": [
+            {"$ref": "#/$defs/non_pr_gate"},
+            {"properties": {"authority": {"const": "exact_human_approval_when_applicable"}, "write_allowed": {"const": "conditional"}}}
+          ]
+        }
       }
     },
     "invariants": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
-  },
-  "allOf": [{
-    "properties": {"gates": {"properties": {
-      "G0_CONTEXT": {"properties": {"write_allowed": {"const": false}}},
-      "G1_ALIGNMENT": {"properties": {"write_allowed": {"const": false}}},
-      "G3_PR": {"required": ["draft_pr_only", "ready_for_review_after_pass"], "properties": {"draft_pr_only": {"const": true}, "ready_for_review_after_pass": {"const": true}}},
-      "G4_MERGE": {"properties": {"authority": {"const": "exact_human_approval"}}}
-    }}}
-  }]
+  }
 }
