@@ -87,6 +87,9 @@ The agent must refresh context before any write-capable action and whenever one 
 - long conversation or unclear current gate;
 - user says `continue`, `ok`, `approve`, `go`, `yes`, or equivalent;
 - task type, repo, branch, scope, risk, or authority changes;
+- protected-base drift is detected; classify the changed files and refresh only
+  the evidence required by `SAFE_CONTINUE`, `REVALIDATE`, `REAPPROVE`, or
+  `STOP`.
 - before PR, merge, deployment, release, credential, production config, migration, or production-data operation.
 
 Refresh output:
