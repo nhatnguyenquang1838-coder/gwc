@@ -1,0 +1,58 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-22T18:58:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-68
+  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Reuse existing export stack and add nine catalog nodes
+  description: Add a descriptor-only package_export family mapped to the current export rule, tool, manifest, smoke verifier, runbook, and tests.
+  benefits:
+  - Small reviewable batch
+  - No parallel export runtime
+  - Complies with nine-node cap
+  - Preserves package compatibility
+  tradeoffs:
+  - Catalog remains descriptive rather than a new runtime implementation
+  risks:
+  - Existing mechanism gaps must be surfaced rather than silently rewritten
+  constraint_fit: FIT
+  skills_distribution:
+  - skill_id: node_catalog_design
+    description: Design nine package-export descriptors.
+    is_required: true
+  - skill_id: package_export_validation
+    description: Validate descriptors and existing mechanism references.
+    is_required: true
+- id: OPT-2
+  title: Rewrite package exporter while adding nodes
+  description: Refactor exporter, schema, smoke runtime, and descriptors in one batch.
+  benefits:
+  - Potentially modernizes implementation
+  tradeoffs:
+  - Broad behavior change
+  - Larger regression surface
+  - Not required for catalog completion
+  risks:
+  - Scope drift
+  - Consumer incompatibility
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Add nodes and publish/update consumers
+  description: Add descriptors then automatically distribute generated packages to consumers.
+  benefits:
+  - Immediate downstream propagation
+  tradeoffs:
+  - Cross-repository mutation and deployment-like behavior
+  risks:
+  - Unauthorized consumer writes
+  - Production boundary ambiguity
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: It extends the current canonical mechanism with the smallest compatible nine-node batch and preserves all authority boundaries.
+decision_required: true
+status: READY
