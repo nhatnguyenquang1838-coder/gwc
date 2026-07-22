@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.resume-token-validation",
+  "node_type": "gate",
+  "title": "Resume Token Validation",
+  "description": "Validate resume tokens before continuing interrupted G2 execution.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}

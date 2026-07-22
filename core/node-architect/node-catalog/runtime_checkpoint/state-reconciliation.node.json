@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.state-reconciliation",
+  "node_type": "workflow",
+  "title": "State Reconciliation",
+  "description": "Reconcile local, connector, task, and PR state after interruptions.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.cas-write-guard",
+  "node_type": "gate",
+  "title": "Cas Write Guard",
+  "description": "Guard branch and artifact writes with compare-and-swap expectations.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
