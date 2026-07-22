@@ -1,0 +1,27 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Alibaba Qwen
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Qwen 3 Coder Plus
+    provider: openai
+    model: qwen3-coder-plus
+    apiBase: https://ws-469sglirlqeu0n8r.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+    apiKey: sk-ws-H.XLIIIR.Qu2n.MEUCIQDFsrJ9L6ACr9q_41059q96LOkVuVnLtUSn0xJYYBeIrwIgUbZIwqO_pWDJ4DLSGCwZt2FU7sQXISfUrNAGShHHKxI
+    roles:
+      - chat
+      - edit
+      - apply
+models:
+  - name: Qwen 3.7 Max
+    provider: openai
+    model: qwen3.7-max
+    apiBase: https://ws-469sglirlqeu0n8r.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+    apiKey: sk-ws-H.XLIIIR.Qu2n.MEUCIQDFsrJ9L6ACr9q_41059q96LOkVuVnLtUSn0xJYYBeIrwIgUbZIwqO_pWDJ4DLSGCwZt2FU7sQXISfUrNAGShHHKxI
+    roles:
+      - chat
+      - edit
+      - apply

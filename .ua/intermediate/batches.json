@@ -1,0 +1,2995 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "louvain",
+  "totalFiles": 332,
+  "totalBatches": 38,
+  "exportsByPath": {
+    ".blackboxrules": [],
+    ".gitattributes": [],
+    ".github/CODEOWNERS": [],
+    ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd": [],
+    "assets/CodeViewer-OPyd4etH.js": [
+      "default"
+    ],
+    "assets/KeyboardShortcutsHelp-BUsSghl_.js": [
+      "default"
+    ],
+    "assets/LearnPanel-DPcu2QbB.js": [
+      "default"
+    ],
+    "assets/OnboardingOverlay-D1fHuJ3E.js": [
+      "default"
+    ],
+    "assets/PathFinderModal-Bt3-QpGJ.js": [
+      "default"
+    ],
+    "assets/elk-CXeXGyKz.js": [
+      "E"
+    ],
+    "assets/force-layout.worker-o9G88Lbd.js": [],
+    "assets/graph-layout-DJJECaXo.js": [],
+    "assets/graphology-BgTy_cc3.js": [
+      "G",
+      "l"
+    ],
+    "assets/index-BSUMpTki.js": [
+      "a",
+      "f",
+      "u"
+    ],
+    "assets/markdown-DtJ_FMNT.js": [
+      "M",
+      "r"
+    ],
+    "assets/react-vendor-BVoutfaX.js": [
+      "R",
+      "a",
+      "b",
+      "c",
+      "g",
+      "j",
+      "r"
+    ],
+    "assets/xyflow-BLuFBhnn.js": [
+      "B",
+      "C",
+      "H",
+      "M",
+      "P",
+      "R",
+      "a",
+      "b",
+      "c",
+      "d",
+      "i",
+      "u"
+    ],
+    "projects/gwc/project-profile.sha256": [],
+    "tests/test_approval_request.py": [
+      "ApprovalRequestTests"
+    ],
+    "tests/test_base_drift_policy.py": [
+      "BaseDriftPolicyTests"
+    ],
+    "tests/test_chatgpt_agent_runbook_continuation.py": [
+      "ChatGPTArtifactContinuationTests"
+    ],
+    "tests/test_checkpoint_resume_cleanup.py": [
+      "load_module",
+      "utc",
+      "valid_checkpoint",
+      "valid_resume_token",
+      "CheckpointResumeTests",
+      "StaleSessionCleanupTests"
+    ],
+    "tests/test_connector_trace_contract.py": [
+      "ConnectorTraceContractTests"
+    ],
+    "tests/test_consumer_package_export.py": [
+      "load_tool",
+      "ConsumerPackageExportTests"
+    ],
+    "tests/test_ds_admin_tc_sync_protocol.py": [
+      "base_packet",
+      "run_validator",
+      "DsAdminTcSyncProtocolTest"
+    ],
+    "tests/test_dwc_connector_capability_contract.py": [
+      "DwcConnectorCapabilityContractTests"
+    ],
+    "tests/test_fastlane_bootstrap_workflow.py": [
+      "FastLaneBootstrapWorkflowTests"
+    ],
+    "tests/test_g01_decision_capture.py": [
+      "DecisionCaptureTests"
+    ],
+    "tests/test_g01_lifecycle.py": [
+      "G01LifecycleValidationTests"
+    ],
+    "tests/test_g01_runtime.py": [
+      "load_generator",
+      "G01RuntimeGenerationTests"
+    ],
+    "tests/test_g0_g1_offline_skill_library.py": [
+      "G0G1OfflineSkillLibraryTests"
+    ],
+    "tests/test_g0_g1_skill_contract.py": [
+      "G0G1SkillContractTests"
+    ],
+    "tests/test_g2-execution-library.py": [],
+    "tests/test_g3_delivery.py": [
+      "G3DeliveryRecordTests"
+    ],
+    "tests/test_g3_offline_skill_library.py": [
+      "G3OfflineSkillLibraryTests"
+    ],
+    "tests/test_g3_skill_contract.py": [
+      "G3SkillContractTests"
+    ],
+    "tests/test_gate_lifecycle_process_contract.py": [
+      "GateLifecycleProcessContractTests"
+    ],
+    "tests/test_gate_response_trace.py": [
+      "valid_trace",
+      "GateResponseTraceTests"
+    ],
+    "tests/test_gwc_package_release_note_hygiene.py": [
+      "GwcPackageReleaseNoteHygieneTests"
+    ],
+    "tests/test_gwc_package_revamp_exports.py": [
+      "GwcPackageRevampExportTests"
+    ],
+    "tests/test_gwc_workflow_simulator.py": [
+      "GwcWorkflowSimulatorTests"
+    ],
+    "tests/test_instruction_source_registry.py": [
+      "InstructionSourceRegistryTests"
+    ],
+    "tests/test_kiro_local_agent_package.py": [
+      "load_module",
+      "KiroLocalAgentPackageTests"
+    ],
+    "tests/test_node_architect_runtime_validation.py": [
+      "write_json",
+      "run_tool",
+      "NodeArchitectRuntimeValidationTests"
+    ],
+    "tests/test_profile_resolver.py": [
+      "ProfileResolverTests"
+    ],
+    "tests/test_revamp_upgrade_gwc_workflow.py": [
+      "RevampUpgradeGwcWorkflowTests"
+    ],
+    "tools/build_project_package.py": [
+      "sha256",
+      "load_yaml",
+      "git_value",
+      "main"
+    ],
+    "tools/capture_g01_decision.py": [
+      "_load_yaml",
+      "_load_json",
+      "_validation_messages",
+      "_scope_hash",
+      "_load_validator",
+      "generate_artifacts",
+      "_write_yaml_atomic",
+      "main"
+    ],
+    "tools/diff_instruction_package.py": [
+      "sha256",
+      "files",
+      "main"
+    ],
+    "tools/evaluate_base_drift.py": [
+      "load_yaml",
+      "load_json",
+      "classify_changed_file",
+      "choose_decision",
+      "validate_payload",
+      "build_result",
+      "main"
+    ],
+    "tools/export_project_package.py": [
+      "load_yaml",
+      "is_safe_relative",
+      "require_safe_relative",
+      "utc_now_seconds",
+      "resolve_inside",
+      "export_package",
+      "main"
+    ],
+    "tools/generate_g01_runtime.py": [
+      "_load_yaml",
+      "_load_json",
+      "_validation_messages",
+      "_blocker",
+      "_check",
+      "_intake_is_complete",
+      "generate_artifacts",
+      "_write_yaml_atomic",
+      "main"
+    ],
+    "tools/gwc_workflow_simulator.py": [
+      "Gate",
+      "GateError",
+      "ContextSource",
+      "G1Validator",
+      "ApprovalSource",
+      "MockContextSource",
+      "MockG1Validator",
+      "MockApprovalSource",
+      "WorkflowResult",
+      "GwcWorkflowSimulator"
+    ],
+    "tools/hash_integrity_artifacts.py": [
+      "sha256",
+      "load_manifest",
+      "main"
+    ],
+    "tools/node_architect/cleanup_stale_sessions.py": [
+      "parse_utc",
+      "load_manifest",
+      "is_protected",
+      "classify_session",
+      "scan",
+      "remove_candidates",
+      "build_plan",
+      "main"
+    ],
+    "tools/node_architect/compile_node_registry.py": [
+      "_load_json",
+      "_iter_node_files",
+      "_normalize_node",
+      "compile_registry",
+      "_write_json",
+      "build_parser",
+      "main"
+    ],
+    "tools/node_architect/render_ds_admin_tc_projection.py": [
+      "load_json",
+      "pick",
+      "render_packet",
+      "emit",
+      "main"
+    ],
+    "tools/node_architect/render_kiro_local_agent_package.py": [
+      "load_json",
+      "stable_hash",
+      "render_package",
+      "main"
+    ],
+    "tools/node_architect/simulate_gate_runtime.py": [
+      "_finding",
+      "_load_registry",
+      "simulate",
+      "build_parser",
+      "main"
+    ],
+    "tools/node_architect/validate_checkpoint_resume.py": [
+      "ValidationError",
+      "load_json",
+      "parse_utc",
+      "require_mapping",
+      "require_string",
+      "require_list",
+      "validate_checkpoint",
+      "validate_resume_token",
+      "build_result",
+      "main"
+    ],
+    "tools/node_architect/validate_ds_admin_tc_sync.py": [
+      "load_json",
+      "validate_packet",
+      "emit",
+      "main"
+    ],
+    "tools/node_architect/validate_kiro_local_agent_package.py": [
+      "ValidationError",
+      "load_json",
+      "ensure",
+      "as_set",
+      "validate_package",
+      "validate_report",
+      "result",
+      "main"
+    ],
+    "tools/node_architect/validate_node_registry.py": [
+      "_finding",
+      "_load_registry",
+      "validate_registry",
+      "validation_result",
+      "build_parser",
+      "main"
+    ],
+    "tools/resolve_profiles.py": [
+      "ProfileResolutionError",
+      "load_yaml",
+      "load_json",
+      "safe_repo_path",
+      "validate_schema",
+      "profile_references",
+      "_select_agent_runtime",
+      "resolve_profile_set",
+      "main"
+    ],
+    "tools/validate_g01.py": [
+      "ValidationIssue",
+      "ValidationReport",
+      "_load_yaml",
+      "_load_json",
+      "_schema_issues",
+      "validate_gate_artifact",
+      "_cross_artifact_issues",
+      "validate_workspace",
+      "main"
+    ],
+    "tools/validate_g3_delivery.py": [
+      "_load_yaml",
+      "_load_json",
+      "_schema_issues",
+      "_semantic_issues",
+      "validate_record",
+      "_parser",
+      "main"
+    ],
+    "tools/validate_gate_response_trace.py": [
+      "load",
+      "parse_utc",
+      "validate_trace",
+      "main"
+    ],
+    "tools/validate_hotfix.py": [
+      "ValidationIssue",
+      "ValidationReport",
+      "validate_intake",
+      "main"
+    ],
+    "tools/validate_instructions.py": [
+      "sha256",
+      "load_yaml",
+      "load_json",
+      "validate_json_schema",
+      "ensure_relative_safe",
+      "main"
+    ],
+    "tools/validate_profile_set.py": [
+      "main"
+    ],
+    "tools/verify_rollout.py": [
+      "sha256",
+      "load_yaml",
+      "main"
+    ]
+  },
+  "batches": [
+    {
+      "batchIndex": 1,
+      "files": [
+        {
+          "path": ".github/workflows/build-packages.yml",
+          "language": "yaml",
+          "sizeLines": 45,
+          "fileCategory": "infra"
+        },
+        {
+          "path": ".github/workflows/publish-release.yml",
+          "language": "yaml",
+          "sizeLines": 71,
+          "fileCategory": "infra"
+        },
+        {
+          "path": ".github/workflows/validate-instructions.yml",
+          "language": "yaml",
+          "sizeLines": 53,
+          "fileCategory": "infra"
+        }
+      ],
+      "batchImportData": {
+        ".github/workflows/build-packages.yml": [],
+        ".github/workflows/publish-release.yml": [],
+        ".github/workflows/validate-instructions.yml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 2,
+      "files": [
+        {
+          "path": ".gwc/g2/approval-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 31,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/g2/approval-request.yaml",
+          "language": "yaml",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/g2/change-plan.md",
+          "language": "markdown",
+          "sizeLines": 25,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".gwc/g2/mermaid.md",
+          "language": "markdown",
+          "sizeLines": 1,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        ".gwc/g2/approval-envelope.yaml": [],
+        ".gwc/g2/approval-request.yaml": [],
+        ".gwc/g2/change-plan.md": [],
+        ".gwc/g2/mermaid.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 3,
+      "files": [
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 39,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 19,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 21,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 22,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml": [],
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 4,
+      "files": [
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g2-execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 33,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g3-approval-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 10,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/runtime-input.yaml",
+          "language": "yaml",
+          "sizeLines": 38,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g2-execution-envelope.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g3-approval-envelope.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/runtime-input.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 5,
+      "files": [
+        {
+          "path": ".kiro/specs/gwc-multi-profile-resolver-gate-trace/design.md",
+          "language": "markdown",
+          "sizeLines": 57,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".kiro/specs/gwc-multi-profile-resolver-gate-trace/requirements.md",
+          "language": "markdown",
+          "sizeLines": 59,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".kiro/specs/gwc-multi-profile-resolver-gate-trace/tasks.md",
+          "language": "markdown",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        ".kiro/specs/gwc-multi-profile-resolver-gate-trace/design.md": [],
+        ".kiro/specs/gwc-multi-profile-resolver-gate-trace/requirements.md": [],
+        ".kiro/specs/gwc-multi-profile-resolver-gate-trace/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 6,
+      "files": [
+        {
+          "path": "AGENTS.md",
+          "language": "markdown",
+          "sizeLines": 541,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "BUNDLE-REPORT.json",
+          "language": "json",
+          "sizeLines": 13,
+          "fileCategory": "config"
+        },
+        {
+          "path": "GWC_Project_Overview.md",
+          "language": "markdown",
+          "sizeLines": 336,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "HEARTBEAT.md",
+          "language": "markdown",
+          "sizeLines": 5,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "IDENTITY.md",
+          "language": "markdown",
+          "sizeLines": 29,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "README.md",
+          "language": "markdown",
+          "sizeLines": 218,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "SHA256SUMS.txt",
+          "language": "txt",
+          "sizeLines": 87,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "SOUL.md",
+          "language": "markdown",
+          "sizeLines": 42,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "TODO.md",
+          "language": "markdown",
+          "sizeLines": 7,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "TOOLS.md",
+          "language": "markdown",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "TREE.txt",
+          "language": "txt",
+          "sizeLines": 116,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "USER.md",
+          "language": "markdown",
+          "sizeLines": 21,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "catalog.yaml",
+          "language": "yaml",
+          "sizeLines": 29,
+          "fileCategory": "config"
+        },
+        {
+          "path": "gwc-knowledge-graph.html",
+          "language": "html",
+          "sizeLines": 280,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "index.html",
+          "language": "html",
+          "sizeLines": 26,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "knowledge-graph.html",
+          "language": "html",
+          "sizeLines": 747,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "knowledge-graph.json",
+          "language": "json",
+          "sizeLines": 3087,
+          "fileCategory": "config"
+        },
+        {
+          "path": "openclaw-workspace-state.json",
+          "language": "json",
+          "sizeLines": 4,
+          "fileCategory": "config"
+        },
+        {
+          "path": "requirements.txt",
+          "language": "txt",
+          "sizeLines": 2,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "AGENTS.md": [],
+        "BUNDLE-REPORT.json": [],
+        "GWC_Project_Overview.md": [],
+        "HEARTBEAT.md": [],
+        "IDENTITY.md": [],
+        "README.md": [],
+        "SHA256SUMS.txt": [],
+        "SOUL.md": [],
+        "TODO.md": [],
+        "TOOLS.md": [],
+        "TREE.txt": [],
+        "USER.md": [],
+        "catalog.yaml": [],
+        "gwc-knowledge-graph.html": [],
+        "index.html": [],
+        "knowledge-graph.html": [],
+        "knowledge-graph.json": [],
+        "openclaw-workspace-state.json": [],
+        "requirements.txt": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 7,
+      "files": [
+        {
+          "path": "agents/instructionops-agent/agent-instructions.md",
+          "language": "markdown",
+          "sizeLines": 122,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "agents/instructionops-agent/capabilities.yaml",
+          "language": "yaml",
+          "sizeLines": 52,
+          "fileCategory": "config"
+        },
+        {
+          "path": "agents/instructionops-agent/command-contract.md",
+          "language": "markdown",
+          "sizeLines": 73,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "agents/instructionops-agent/agent-instructions.md": [],
+        "agents/instructionops-agent/capabilities.yaml": [],
+        "agents/instructionops-agent/command-contract.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 8,
+      "files": [
+        {
+          "path": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 194,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 199,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/Agent_Response_Presentation_Contract_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 220,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/CONNECTOR_TRACE_CONTRACT_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 112,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/Coding_Project_Governance_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 670,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+          "language": "markdown",
+          "sizeLines": 361,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 188,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 250,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/HOTFIX_AND_RESCUE_MODE_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 312,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 219,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/LOCAL_AGENT_RULE.md",
+          "language": "markdown",
+          "sizeLines": 104,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/USER_COMMAND_FORMAT_RULE.md",
+          "language": "markdown",
+          "sizeLines": 66,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "core/Agent_Behavior_Semantic_Contract_v1.0.md": [],
+        "core/Agent_Operating_Runtime_Contract_v1.0.md": [],
+        "core/Agent_Response_Presentation_Contract_v1.0.md": [],
+        "core/CONNECTOR_TRACE_CONTRACT_v1.0.md": [],
+        "core/Coding_Project_Governance_v1.0.md": [],
+        "core/E2E_DRAFT_PR_DELIVERY_RULE.md": [],
+        "core/GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md": [],
+        "core/GATE_LIFECYCLE_CONTRACT_v1.0.md": [],
+        "core/HOTFIX_AND_RESCUE_MODE_v1.0.md": [],
+        "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md": [],
+        "core/LOCAL_AGENT_RULE.md": [],
+        "core/USER_COMMAND_FORMAT_RULE.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 9,
+      "files": [
+        {
+          "path": "core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 85,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 128,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 137,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 112,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 155,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 99,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 83,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md": [],
+        "core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md": [],
+        "core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md": [],
+        "core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md": [],
+        "core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md": [],
+        "core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md": [],
+        "core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 10,
+      "files": [
+        {
+          "path": "docs/base-drift-policy.md",
+          "language": "markdown",
+          "sizeLines": 62,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/g01-lifecycle.md",
+          "language": "markdown",
+          "sizeLines": 152,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/project-consumer-agent-instructions.md",
+          "language": "markdown",
+          "sizeLines": 199,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "docs/base-drift-policy.md": [],
+        "docs/g01-lifecycle.md": [],
+        "docs/project-consumer-agent-instructions.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 11,
+      "files": [
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/end-state/design.md",
+          "language": "markdown",
+          "sizeLines": 454,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/end-state/requirements.md",
+          "language": "markdown",
+          "sizeLines": 186,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/end-state/tasks.md",
+          "language": "markdown",
+          "sizeLines": 150,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "docs/plan/distributed-multi-agent-sdlc/end-state/design.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/end-state/requirements.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/end-state/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 12,
+      "files": [
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md",
+          "language": "markdown",
+          "sizeLines": 466,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/migration-reconciliation-doctor-spec.md",
+          "language": "markdown",
+          "sizeLines": 338,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/notion-importer-spec.md",
+          "language": "markdown",
+          "sizeLines": 306,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/requirements.md",
+          "language": "markdown",
+          "sizeLines": 154,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/supabase-snapshot-exporter-spec.md",
+          "language": "markdown",
+          "sizeLines": 281,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/tasks.md",
+          "language": "markdown",
+          "sizeLines": 198,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/migration-reconciliation-doctor-spec.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/notion-importer-spec.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/requirements.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/supabase-snapshot-exporter-spec.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 13,
+      "files": [
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/design.md",
+          "language": "markdown",
+          "sizeLines": 276,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/requirements.md",
+          "language": "markdown",
+          "sizeLines": 105,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/tasks.md",
+          "language": "markdown",
+          "sizeLines": 97,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/design.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/requirements.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/tasks.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 14,
+      "files": [
+        {
+          "path": "libs/g0-g1-skill-library/NOTICE.md",
+          "language": "markdown",
+          "sizeLines": 6,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g0-g1-skill-library/README.md",
+          "language": "markdown",
+          "sizeLines": 14,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g0-g1-skill-library/manifest.yaml",
+          "language": "yaml",
+          "sizeLines": 51,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "libs/g0-g1-skill-library/NOTICE.md": [],
+        "libs/g0-g1-skill-library/README.md": [],
+        "libs/g0-g1-skill-library/manifest.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 15,
+      "files": [
+        {
+          "path": "libs/g0-g1-skill-library/skills/g0-context-loading.md",
+          "language": "markdown",
+          "sizeLines": 72,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md",
+          "language": "markdown",
+          "sizeLines": 72,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g0-g1-skill-library/skills/g1-decision-record.md",
+          "language": "markdown",
+          "sizeLines": 85,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md",
+          "language": "markdown",
+          "sizeLines": 85,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "libs/g0-g1-skill-library/skills/g0-context-loading.md": [],
+        "libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md": [],
+        "libs/g0-g1-skill-library/skills/g1-decision-record.md": [],
+        "libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 16,
+      "files": [
+        {
+          "path": "libs/g2-skill-library/NOTICE.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/README.md",
+          "language": "markdown",
+          "sizeLines": 22,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/manifest.yaml",
+          "language": "yaml",
+          "sizeLines": 51,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "libs/g2-skill-library/NOTICE.md": [],
+        "libs/g2-skill-library/README.md": [],
+        "libs/g2-skill-library/manifest.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 17,
+      "files": [
+        {
+          "path": "libs/g2-skill-library/skills/g2-approval-envelope.md",
+          "language": "markdown",
+          "sizeLines": 16,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/skills/g2-execution-plan.md",
+          "language": "markdown",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/skills/g2-react-vite-component-structure.md",
+          "language": "markdown",
+          "sizeLines": 16,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/skills/g2-react-vite-performance.md",
+          "language": "markdown",
+          "sizeLines": 15,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/skills/g2-react-vite-state-management.md",
+          "language": "markdown",
+          "sizeLines": 15,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/skills/g2-react-vite-testing.md",
+          "language": "markdown",
+          "sizeLines": 16,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g2-skill-library/skills/g2-repository-interaction.md",
+          "language": "markdown",
+          "sizeLines": 21,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "libs/g2-skill-library/skills/g2-approval-envelope.md": [],
+        "libs/g2-skill-library/skills/g2-execution-plan.md": [],
+        "libs/g2-skill-library/skills/g2-react-vite-component-structure.md": [],
+        "libs/g2-skill-library/skills/g2-react-vite-performance.md": [],
+        "libs/g2-skill-library/skills/g2-react-vite-state-management.md": [],
+        "libs/g2-skill-library/skills/g2-react-vite-testing.md": [],
+        "libs/g2-skill-library/skills/g2-repository-interaction.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 18,
+      "files": [
+        {
+          "path": "libs/g3-skill-library/NOTICE.md",
+          "language": "markdown",
+          "sizeLines": 5,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g3-skill-library/README.md",
+          "language": "markdown",
+          "sizeLines": 15,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g3-skill-library/manifest.yaml",
+          "language": "yaml",
+          "sizeLines": 54,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "libs/g3-skill-library/NOTICE.md": [],
+        "libs/g3-skill-library/README.md": [],
+        "libs/g3-skill-library/manifest.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 19,
+      "files": [
+        {
+          "path": "libs/g3-skill-library/skills/dispatching-parallel-review.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g3-skill-library/skills/finishing-development-branch-pr-only.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g3-skill-library/skills/receiving-code-review.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g3-skill-library/skills/requesting-code-review.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "libs/g3-skill-library/skills/verification-before-completion.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "libs/g3-skill-library/skills/dispatching-parallel-review.md": [],
+        "libs/g3-skill-library/skills/finishing-development-branch-pr-only.md": [],
+        "libs/g3-skill-library/skills/receiving-code-review.md": [],
+        "libs/g3-skill-library/skills/requesting-code-review.md": [],
+        "libs/g3-skill-library/skills/verification-before-completion.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 20,
+      "files": [
+        {
+          "path": "memory/2026-07-22-0254.md",
+          "language": "markdown",
+          "sizeLines": 5,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "memory/2026-07-22-0258.md",
+          "language": "markdown",
+          "sizeLines": 5,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "memory/2026-07-22-0302.md",
+          "language": "markdown",
+          "sizeLines": 9,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "memory/2026-07-22-0254.md": [],
+        "memory/2026-07-22-0258.md": [],
+        "memory/2026-07-22-0302.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 21,
+      "files": [
+        {
+          "path": "projects/ds-mcp/admin-task-claim-rule.md",
+          "language": "markdown",
+          "sizeLines": 108,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/ds-mcp/package.yaml",
+          "language": "yaml",
+          "sizeLines": 68,
+          "fileCategory": "config"
+        },
+        {
+          "path": "projects/ds-mcp/project-extension.md",
+          "language": "markdown",
+          "sizeLines": 47,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/ds-mcp/project-instructions.md",
+          "language": "markdown",
+          "sizeLines": 600,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/ds-mcp/project-profile.yaml",
+          "language": "yaml",
+          "sizeLines": 65,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "projects/ds-mcp/admin-task-claim-rule.md": [],
+        "projects/ds-mcp/package.yaml": [],
+        "projects/ds-mcp/project-extension.md": [],
+        "projects/ds-mcp/project-instructions.md": [],
+        "projects/ds-mcp/project-profile.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 22,
+      "files": [
+        {
+          "path": "projects/gwc/package.yaml",
+          "language": "yaml",
+          "sizeLines": 103,
+          "fileCategory": "config"
+        },
+        {
+          "path": "projects/gwc/project-extension.md",
+          "language": "markdown",
+          "sizeLines": 78,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/gwc/project-instructions.md",
+          "language": "markdown",
+          "sizeLines": 143,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/gwc/project-profile.yaml",
+          "language": "yaml",
+          "sizeLines": 78,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "projects/gwc/package.yaml": [],
+        "projects/gwc/project-extension.md": [],
+        "projects/gwc/project-instructions.md": [],
+        "projects/gwc/project-profile.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 23,
+      "files": [
+        {
+          "path": "projects/pm-skills/package.yaml",
+          "language": "yaml",
+          "sizeLines": 54,
+          "fileCategory": "config"
+        },
+        {
+          "path": "projects/pm-skills/project-extension.md",
+          "language": "markdown",
+          "sizeLines": 60,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/pm-skills/project-instructions.md",
+          "language": "markdown",
+          "sizeLines": 37,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/pm-skills/project-profile.yaml",
+          "language": "yaml",
+          "sizeLines": 61,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "projects/pm-skills/package.yaml": [],
+        "projects/pm-skills/project-extension.md": [],
+        "projects/pm-skills/project-instructions.md": [],
+        "projects/pm-skills/project-profile.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 24,
+      "files": [
+        {
+          "path": "projects/rental-home/package.yaml",
+          "language": "yaml",
+          "sizeLines": 67,
+          "fileCategory": "config"
+        },
+        {
+          "path": "projects/rental-home/project-extension.md",
+          "language": "markdown",
+          "sizeLines": 68,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/rental-home/project-instructions.md",
+          "language": "markdown",
+          "sizeLines": 48,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "projects/rental-home/project-profile.yaml",
+          "language": "yaml",
+          "sizeLines": 76,
+          "fileCategory": "config"
+        },
+        {
+          "path": "projects/rental-home/spec-driven-format.md",
+          "language": "markdown",
+          "sizeLines": 136,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "projects/rental-home/package.yaml": [],
+        "projects/rental-home/project-extension.md": [],
+        "projects/rental-home/project-instructions.md": [],
+        "projects/rental-home/project-profile.yaml": [],
+        "projects/rental-home/spec-driven-format.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 25,
+      "files": [
+        {
+          "path": "releases/changelog.md",
+          "language": "markdown",
+          "sizeLines": 406,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/integrity-refresh-report.md",
+          "language": "markdown",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/manifest.yaml",
+          "language": "yaml",
+          "sizeLines": 28,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "releases/changelog.md": [],
+        "releases/integrity-refresh-report.md": [],
+        "releases/manifest.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 26,
+      "files": [
+        {
+          "path": "schemas/approval-envelope.schema.json",
+          "language": "json",
+          "sizeLines": 207,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/approval-request.schema.json",
+          "language": "json",
+          "sizeLines": 72,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/base-drift-evaluation.schema.json",
+          "language": "json",
+          "sizeLines": 126,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/connector-trace.schema.json",
+          "language": "json",
+          "sizeLines": 62,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g0-context-snapshot.schema.json",
+          "language": "json",
+          "sizeLines": 367,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g01-decision-input.schema.json",
+          "language": "json",
+          "sizeLines": 61,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g01-runtime-input.schema.json",
+          "language": "json",
+          "sizeLines": 176,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g1-decision-record.schema.json",
+          "language": "json",
+          "sizeLines": 311,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g1-intake-brief.schema.json",
+          "language": "json",
+          "sizeLines": 322,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g1-options.schema.json",
+          "language": "json",
+          "sizeLines": 199,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g1-preflight-report.schema.json",
+          "language": "json",
+          "sizeLines": 294,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/g3-delivery-record.schema.json",
+          "language": "json",
+          "sizeLines": 461,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/gate-policy-profile.schema.json",
+          "language": "json",
+          "sizeLines": 100,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/gate-response-trace.schema.json",
+          "language": "json",
+          "sizeLines": 16,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/instruction-source-registry.schema.json",
+          "language": "json",
+          "sizeLines": 48,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/instruction.schema.json",
+          "language": "json",
+          "sizeLines": 109,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/package-export-manifest.schema.json",
+          "language": "json",
+          "sizeLines": 35,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/profile-set.schema.json",
+          "language": "json",
+          "sizeLines": 47,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/project-package.schema.json",
+          "language": "json",
+          "sizeLines": 168,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/rollout.schema.json",
+          "language": "json",
+          "sizeLines": 130,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "schemas/approval-envelope.schema.json": [],
+        "schemas/approval-request.schema.json": [],
+        "schemas/base-drift-evaluation.schema.json": [],
+        "schemas/connector-trace.schema.json": [],
+        "schemas/g0-context-snapshot.schema.json": [],
+        "schemas/g01-decision-input.schema.json": [],
+        "schemas/g01-runtime-input.schema.json": [],
+        "schemas/g1-decision-record.schema.json": [],
+        "schemas/g1-intake-brief.schema.json": [],
+        "schemas/g1-options.schema.json": [],
+        "schemas/g1-preflight-report.schema.json": [],
+        "schemas/g3-delivery-record.schema.json": [],
+        "schemas/gate-policy-profile.schema.json": [],
+        "schemas/gate-response-trace.schema.json": [],
+        "schemas/instruction-source-registry.schema.json": [],
+        "schemas/instruction.schema.json": [],
+        "schemas/package-export-manifest.schema.json": [],
+        "schemas/profile-set.schema.json": [],
+        "schemas/project-package.schema.json": [],
+        "schemas/rollout.schema.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 27,
+      "files": [
+        {
+          "path": "schemas/node-architect/checkpoint.schema.json",
+          "language": "json",
+          "sizeLines": 305,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/ds-admin-tc-sync.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/external-audit-projection.schema.json",
+          "language": "json",
+          "sizeLines": 49,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/kiro-coding-state.schema.json",
+          "language": "json",
+          "sizeLines": 67,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/kiro-local-agent-package.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/local-agent-command.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/local-agent-validation-report.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/node-registry.schema.json",
+          "language": "json",
+          "sizeLines": 14,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/resume-token.schema.json",
+          "language": "json",
+          "sizeLines": 84,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json",
+          "language": "json",
+          "sizeLines": 75,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/runtime-node.schema.json",
+          "language": "json",
+          "sizeLines": 17,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/simulation-result.schema.json",
+          "language": "json",
+          "sizeLines": 16,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/stale-session-cleanup.schema.json",
+          "language": "json",
+          "sizeLines": 59,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/sync-projection-result.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/sync-target.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "schemas/node-architect/checkpoint.schema.json": [],
+        "schemas/node-architect/ds-admin-tc-sync.schema.json": [],
+        "schemas/node-architect/external-audit-projection.schema.json": [],
+        "schemas/node-architect/kiro-coding-state.schema.json": [],
+        "schemas/node-architect/kiro-local-agent-package.schema.json": [],
+        "schemas/node-architect/local-agent-command.schema.json": [],
+        "schemas/node-architect/local-agent-validation-report.schema.json": [],
+        "schemas/node-architect/node-registry.schema.json": [],
+        "schemas/node-architect/resume-token.schema.json": [],
+        "schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json": [],
+        "schemas/node-architect/runtime-node.schema.json": [],
+        "schemas/node-architect/simulation-result.schema.json": [],
+        "schemas/node-architect/stale-session-cleanup.schema.json": [],
+        "schemas/node-architect/sync-projection-result.schema.json": [],
+        "schemas/node-architect/sync-target.schema.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 28,
+      "files": [
+        {
+          "path": "templates/e2e-rule.template.md",
+          "language": "markdown",
+          "sizeLines": 21,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "templates/project-extension.template.md",
+          "language": "markdown",
+          "sizeLines": 33,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "templates/project-instructions.template.md",
+          "language": "markdown",
+          "sizeLines": 19,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "templates/project-profile.template.yaml",
+          "language": "yaml",
+          "sizeLines": 59,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "templates/e2e-rule.template.md": [],
+        "templates/project-extension.template.md": [],
+        "templates/project-instructions.template.md": [],
+        "templates/project-profile.template.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 29,
+      "files": [
+        {
+          "path": "templates/g01/g0-context-snapshot.template.yaml",
+          "language": "yaml",
+          "sizeLines": 41,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/g01/g01-decision-input.template.yaml",
+          "language": "yaml",
+          "sizeLines": 29,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/g01/g01-runtime-input.template.yaml",
+          "language": "yaml",
+          "sizeLines": 99,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/g01/g1-decision-record.template.yaml",
+          "language": "yaml",
+          "sizeLines": 54,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/g01/g1-intake-brief.template.yaml",
+          "language": "yaml",
+          "sizeLines": 49,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/g01/g1-options.template.yaml",
+          "language": "yaml",
+          "sizeLines": 47,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/g01/g1-preflight-report.template.yaml",
+          "language": "yaml",
+          "sizeLines": 32,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "templates/g01/g0-context-snapshot.template.yaml": [],
+        "templates/g01/g01-decision-input.template.yaml": [],
+        "templates/g01/g01-runtime-input.template.yaml": [],
+        "templates/g01/g1-decision-record.template.yaml": [],
+        "templates/g01/g1-intake-brief.template.yaml": [],
+        "templates/g01/g1-options.template.yaml": [],
+        "templates/g01/g1-preflight-report.template.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 30,
+      "files": [
+        {
+          "path": "templates/gates/g0-hotfix-intake.template.yaml",
+          "language": "yaml",
+          "sizeLines": 23,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/gates/g3-delivery-record.template.yaml",
+          "language": "yaml",
+          "sizeLines": 89,
+          "fileCategory": "config"
+        },
+        {
+          "path": "templates/gates/gate-response.template.md",
+          "language": "markdown",
+          "sizeLines": 35,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "templates/gates/g0-hotfix-intake.template.yaml": [],
+        "templates/gates/g3-delivery-record.template.yaml": [],
+        "templates/gates/gate-response.template.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 31,
+      "files": [
+        {
+          "path": "tests/fixtures/g01-decision-valid.yaml",
+          "language": "yaml",
+          "sizeLines": 29,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/fixtures/g01-invalid-decision.yaml",
+          "language": "yaml",
+          "sizeLines": 36,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/fixtures/g01-runtime-valid.yaml",
+          "language": "yaml",
+          "sizeLines": 99,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "tests/fixtures/g01-decision-valid.yaml": [],
+        "tests/fixtures/g01-invalid-decision.yaml": [],
+        "tests/fixtures/g01-runtime-valid.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 32,
+      "files": [
+        {
+          "path": ".blackboxrules",
+          "language": "unknown",
+          "sizeLines": 0,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".codex_plugins/understand-anything/plugin.json",
+          "language": "json",
+          "sizeLines": 18,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".continue/mcpServers/ds_mcp.yaml",
+          "language": "yaml",
+          "sizeLines": 13,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".continue/mcpServers/notion.yaml",
+          "language": "yaml",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gitattributes",
+          "language": "unknown",
+          "sizeLines": 10,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".github/CODEOWNERS",
+          "language": "unknown",
+          "sizeLines": 9,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 56,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/gwc-improve-g2-react-vite/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 60,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/gwc-improve-g2-react-vite/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 38,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/gwc-improve-g2-react-vite/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 56,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/gwc-improve-g2-react-vite/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 55,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/implement-g0-g1-skill-library/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 39,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/implement-g0-g1-skill-library/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 56,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/implement-g0-g1-skill-library/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 58,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/implement-g0-g1-skill-library/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 42,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/implement-g0-g1-skill-library/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 58,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/implement-g0-g1-skill-library/g2/execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 53,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/rescue-dw1-trace/g0/intake.yaml",
+          "language": "yaml",
+          "sizeLines": 29,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 175,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 56,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 58,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 68,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 65,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md",
+          "language": "markdown",
+          "sizeLines": 40,
+          "fileCategory": "docs"
+        },
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 68,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".blackboxrules": [],
+        ".codex_plugins/understand-anything/plugin.json": [],
+        ".continue/mcpServers/ds_mcp.yaml": [],
+        ".continue/mcpServers/notion.yaml": [],
+        ".gitattributes": [],
+        ".github/CODEOWNERS": [],
+        ".gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/gwc-improve-g2-react-vite/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/gwc-improve-g2-react-vite/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/gwc-improve-g2-react-vite/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/gwc-improve-g2-react-vite/g1/preflight/g1-preflight-report.yaml": [],
+        ".gwc/tasks/implement-g0-g1-skill-library/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/implement-g0-g1-skill-library/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/implement-g0-g1-skill-library/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/implement-g0-g1-skill-library/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/implement-g0-g1-skill-library/g1/preflight/g1-preflight-report.yaml": [],
+        ".gwc/tasks/implement-g0-g1-skill-library/g2/execution-envelope.yaml": [],
+        ".gwc/tasks/rescue-dw1-trace/g0/intake.yaml": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md": [],
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 33,
+      "files": [
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd",
+          "language": "mmd",
+          "sizeLines": 12,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 92,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 53,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 67,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 100,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 63,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/ci-repair-envelope-01.yaml",
+          "language": "yaml",
+          "sizeLines": 55,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 67,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/decision-input.yaml",
+          "language": "yaml",
+          "sizeLines": 29,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 35,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 36,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 35,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 60,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 51,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/runtime-input.yaml",
+          "language": "yaml",
+          "sizeLines": 79,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/decision-input.yaml",
+          "language": "yaml",
+          "sizeLines": 17,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 35,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 36,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 33,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 54,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 51,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/runtime-input.yaml",
+          "language": "yaml",
+          "sizeLines": 37,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 41,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml",
+          "language": "yaml",
+          "sizeLines": 34,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 47,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/preflight/g1-preflight-report.yaml": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/ci-repair-envelope-01.yaml": [],
+        ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/execution-envelope.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/decision-input.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/preflight/g1-preflight-report.yaml": [],
+        ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/runtime-input.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/decision-input.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/preflight/g1-preflight-report.yaml": [],
+        ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/runtime-input.yaml": [],
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml": [],
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 34,
+      "files": [
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 36,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 28,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 31,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 65,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 51,
+          "fileCategory": "config"
+        },
+        {
+          "path": "agents/chatgpt-agent/agent-instructions.md",
+          "language": "markdown",
+          "sizeLines": 297,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "agents/coding-agent/bootstrap.md",
+          "language": "markdown",
+          "sizeLines": 100,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "agents/coding-agent/g2-implementation-skills.md",
+          "language": "markdown",
+          "sizeLines": 0,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "agents/dwc/agent-instructions.md",
+          "language": "markdown",
+          "sizeLines": 344,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "agents/dwc/capabilities.yaml",
+          "language": "yaml",
+          "sizeLines": 116,
+          "fileCategory": "config"
+        },
+        {
+          "path": "assets/CodeViewer-OPyd4etH.js",
+          "language": "javascript",
+          "sizeLines": 15,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/KeyboardShortcutsHelp-BUsSghl_.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/LearnPanel-DPcu2QbB.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/OnboardingOverlay-D1fHuJ3E.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/PathFinderModal-Bt3-QpGJ.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/elk-CXeXGyKz.js",
+          "language": "javascript",
+          "sizeLines": 26,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/force-layout.worker-o9G88Lbd.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/graph-layout-DJJECaXo.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/graphology-BgTy_cc3.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/index-BSUMpTki.js",
+          "language": "javascript",
+          "sizeLines": 42,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/index-FnUqz1wa.css",
+          "language": "css",
+          "sizeLines": 1,
+          "fileCategory": "markup"
+        },
+        {
+          "path": "assets/markdown-DtJ_FMNT.js",
+          "language": "javascript",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/react-vendor-BVoutfaX.js",
+          "language": "javascript",
+          "sizeLines": 49,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/xyflow-BLuFBhnn.js",
+          "language": "javascript",
+          "sizeLines": 23,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/xyflow-BZV40eAE.css",
+          "language": "css",
+          "sizeLines": 1,
+          "fileCategory": "markup"
+        }
+      ],
+      "batchImportData": {
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml": [],
+        "agents/chatgpt-agent/agent-instructions.md": [],
+        "agents/coding-agent/bootstrap.md": [],
+        "agents/coding-agent/g2-implementation-skills.md": [],
+        "agents/dwc/agent-instructions.md": [],
+        "agents/dwc/capabilities.yaml": [],
+        "assets/CodeViewer-OPyd4etH.js": [],
+        "assets/KeyboardShortcutsHelp-BUsSghl_.js": [],
+        "assets/LearnPanel-DPcu2QbB.js": [],
+        "assets/OnboardingOverlay-D1fHuJ3E.js": [],
+        "assets/PathFinderModal-Bt3-QpGJ.js": [],
+        "assets/elk-CXeXGyKz.js": [],
+        "assets/force-layout.worker-o9G88Lbd.js": [],
+        "assets/graph-layout-DJJECaXo.js": [],
+        "assets/graphology-BgTy_cc3.js": [],
+        "assets/index-BSUMpTki.js": [],
+        "assets/index-FnUqz1wa.css": [],
+        "assets/markdown-DtJ_FMNT.js": [],
+        "assets/react-vendor-BVoutfaX.js": [],
+        "assets/xyflow-BLuFBhnn.js": [],
+        "assets/xyflow-BZV40eAE.css": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 35,
+      "files": [
+        {
+          "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+          "language": "markdown",
+          "sizeLines": 193,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/runbooks/README.md",
+          "language": "markdown",
+          "sizeLines": 9,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/task-lifecycle/gate-transition-map.yaml",
+          "language": "yaml",
+          "sizeLines": 70,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 210,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 102,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/gaps/g0-g1-naming-location-convention-gaps.md",
+          "language": "markdown",
+          "sizeLines": 190,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+          "language": "markdown",
+          "sizeLines": 302,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/plan/distributed-multi-agent-sdlc/README.md",
+          "language": "markdown",
+          "sizeLines": 147,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
+          "language": "markdown",
+          "sizeLines": 136,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md",
+          "language": "markdown",
+          "sizeLines": 118,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/skills/requirements-tracer.md",
+          "language": "markdown",
+          "sizeLines": 21,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "governance/agent-runtime-profiles/chatgpt.yaml",
+          "language": "yaml",
+          "sizeLines": 23,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/agent-runtime-profiles/dwc.yaml",
+          "language": "yaml",
+          "sizeLines": 24,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/base-drift-policy.yaml",
+          "language": "yaml",
+          "sizeLines": 62,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/environment-profiles/repo-governance.yaml",
+          "language": "yaml",
+          "sizeLines": 19,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/gate-policy-profiles/standard.yaml",
+          "language": "yaml",
+          "sizeLines": 44,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/instruction-source-registry.yaml",
+          "language": "yaml",
+          "sizeLines": 76,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/profile-sets/gwc-standard.yaml",
+          "language": "yaml",
+          "sizeLines": 28,
+          "fileCategory": "config"
+        },
+        {
+          "path": "governance/risk-profiles/default.yaml",
+          "language": "yaml",
+          "sizeLines": 20,
+          "fileCategory": "config"
+        },
+        {
+          "path": "projects/gwc/project-profile.sha256",
+          "language": "sha256",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "schemas/fastlane/fastlane-envelope.schema.json",
+          "language": "json",
+          "sizeLines": 236,
+          "fileCategory": "config"
+        },
+        {
+          "path": "skills/gwc-g0/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 411,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "skills/gwc-g1/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 594,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "skills/gwc-g2/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 51,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "skills/gwc-g3/SKILL.md",
+          "language": "markdown",
+          "sizeLines": 102,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md": [],
+        "core/runbooks/README.md": [],
+        "core/task-lifecycle/gate-transition-map.yaml": [],
+        "core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md": [],
+        "core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md": [],
+        "docs/gaps/g0-g1-naming-location-convention-gaps.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/README.md": [],
+        "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md": [],
+        "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md": [],
+        "docs/skills/requirements-tracer.md": [],
+        "governance/agent-runtime-profiles/chatgpt.yaml": [],
+        "governance/agent-runtime-profiles/dwc.yaml": [],
+        "governance/base-drift-policy.yaml": [],
+        "governance/environment-profiles/repo-governance.yaml": [],
+        "governance/gate-policy-profiles/standard.yaml": [],
+        "governance/instruction-source-registry.yaml": [],
+        "governance/profile-sets/gwc-standard.yaml": [],
+        "governance/risk-profiles/default.yaml": [],
+        "projects/gwc/project-profile.sha256": [],
+        "schemas/fastlane/fastlane-envelope.schema.json": [],
+        "skills/gwc-g0/SKILL.md": [],
+        "skills/gwc-g1/SKILL.md": [],
+        "skills/gwc-g2/SKILL.md": [],
+        "skills/gwc-g3/SKILL.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 36,
+      "files": [
+        {
+          "path": "tests/fixtures/g01-valid/g0/context-snapshot.yaml",
+          "language": "yaml",
+          "sizeLines": 38,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml",
+          "language": "yaml",
+          "sizeLines": 37,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml",
+          "language": "yaml",
+          "sizeLines": 37,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml",
+          "language": "yaml",
+          "sizeLines": 49,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml",
+          "language": "yaml",
+          "sizeLines": 32,
+          "fileCategory": "config"
+        },
+        {
+          "path": "tests/test_approval_request.py",
+          "language": "python",
+          "sizeLines": 37,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_base_drift_policy.py",
+          "language": "python",
+          "sizeLines": 77,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_chatgpt_agent_runbook_continuation.py",
+          "language": "python",
+          "sizeLines": 124,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_checkpoint_resume_cleanup.py",
+          "language": "python",
+          "sizeLines": 161,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_connector_trace_contract.py",
+          "language": "python",
+          "sizeLines": 64,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_consumer_package_export.py",
+          "language": "python",
+          "sizeLines": 109,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_ds_admin_tc_sync_protocol.py",
+          "language": "python",
+          "sizeLines": 161,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_dwc_connector_capability_contract.py",
+          "language": "python",
+          "sizeLines": 60,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_fastlane_bootstrap_workflow.py",
+          "language": "python",
+          "sizeLines": 59,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g01_decision_capture.py",
+          "language": "python",
+          "sizeLines": 118,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g01_lifecycle.py",
+          "language": "python",
+          "sizeLines": 87,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g01_runtime.py",
+          "language": "python",
+          "sizeLines": 176,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g0_g1_offline_skill_library.py",
+          "language": "python",
+          "sizeLines": 54,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g0_g1_skill_contract.py",
+          "language": "python",
+          "sizeLines": 86,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g2-execution-library.py",
+          "language": "python",
+          "sizeLines": 18,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g3_delivery.py",
+          "language": "python",
+          "sizeLines": 135,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g3_offline_skill_library.py",
+          "language": "python",
+          "sizeLines": 45,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_g3_skill_contract.py",
+          "language": "python",
+          "sizeLines": 33,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_gate_lifecycle_process_contract.py",
+          "language": "python",
+          "sizeLines": 132,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_gate_response_trace.py",
+          "language": "python",
+          "sizeLines": 58,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "tests/fixtures/g01-valid/g0/context-snapshot.yaml": [],
+        "tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml": [],
+        "tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml": [],
+        "tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml": [],
+        "tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml": [],
+        "tests/test_approval_request.py": [],
+        "tests/test_base_drift_policy.py": [],
+        "tests/test_chatgpt_agent_runbook_continuation.py": [],
+        "tests/test_checkpoint_resume_cleanup.py": [],
+        "tests/test_connector_trace_contract.py": [],
+        "tests/test_consumer_package_export.py": [],
+        "tests/test_ds_admin_tc_sync_protocol.py": [],
+        "tests/test_dwc_connector_capability_contract.py": [],
+        "tests/test_fastlane_bootstrap_workflow.py": [],
+        "tests/test_g01_decision_capture.py": [],
+        "tests/test_g01_lifecycle.py": [],
+        "tests/test_g01_runtime.py": [],
+        "tests/test_g0_g1_offline_skill_library.py": [],
+        "tests/test_g0_g1_skill_contract.py": [],
+        "tests/test_g2-execution-library.py": [],
+        "tests/test_g3_delivery.py": [],
+        "tests/test_g3_offline_skill_library.py": [],
+        "tests/test_g3_skill_contract.py": [],
+        "tests/test_gate_lifecycle_process_contract.py": [],
+        "tests/test_gate_response_trace.py": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 37,
+      "files": [
+        {
+          "path": "tests/test_gwc_package_release_note_hygiene.py",
+          "language": "python",
+          "sizeLines": 45,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_gwc_package_revamp_exports.py",
+          "language": "python",
+          "sizeLines": 41,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_gwc_workflow_simulator.py",
+          "language": "python",
+          "sizeLines": 55,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_instruction_source_registry.py",
+          "language": "python",
+          "sizeLines": 32,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_kiro_local_agent_package.py",
+          "language": "python",
+          "sizeLines": 147,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_node_architect_runtime_validation.py",
+          "language": "python",
+          "sizeLines": 176,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_profile_resolver.py",
+          "language": "python",
+          "sizeLines": 197,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_revamp_upgrade_gwc_workflow.py",
+          "language": "python",
+          "sizeLines": 85,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/build_project_package.py",
+          "language": "python",
+          "sizeLines": 118,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/capture_g01_decision.py",
+          "language": "python",
+          "sizeLines": 242,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/diff_instruction_package.py",
+          "language": "python",
+          "sizeLines": 99,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/evaluate_base_drift.py",
+          "language": "python",
+          "sizeLines": 149,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/export_project_package.py",
+          "language": "python",
+          "sizeLines": 163,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/generate_g01_runtime.py",
+          "language": "python",
+          "sizeLines": 475,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/gwc_workflow_simulator.py",
+          "language": "python",
+          "sizeLines": 100,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/hash_integrity_artifacts.py",
+          "language": "python",
+          "sizeLines": 125,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/cleanup_stale_sessions.py",
+          "language": "python",
+          "sizeLines": 149,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/compile_node_registry.py",
+          "language": "python",
+          "sizeLines": 111,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/render_ds_admin_tc_projection.py",
+          "language": "python",
+          "sizeLines": 127,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/render_kiro_local_agent_package.py",
+          "language": "python",
+          "sizeLines": 166,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/simulate_gate_runtime.py",
+          "language": "python",
+          "sizeLines": 89,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_checkpoint_resume.py",
+          "language": "python",
+          "sizeLines": 201,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_ds_admin_tc_sync.py",
+          "language": "python",
+          "sizeLines": 147,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_kiro_local_agent_package.py",
+          "language": "python",
+          "sizeLines": 233,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_registry.py",
+          "language": "python",
+          "sizeLines": 123,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "tests/test_gwc_package_release_note_hygiene.py": [],
+        "tests/test_gwc_package_revamp_exports.py": [],
+        "tests/test_gwc_workflow_simulator.py": [],
+        "tests/test_instruction_source_registry.py": [],
+        "tests/test_kiro_local_agent_package.py": [],
+        "tests/test_node_architect_runtime_validation.py": [],
+        "tests/test_profile_resolver.py": [],
+        "tests/test_revamp_upgrade_gwc_workflow.py": [],
+        "tools/build_project_package.py": [],
+        "tools/capture_g01_decision.py": [],
+        "tools/diff_instruction_package.py": [],
+        "tools/evaluate_base_drift.py": [],
+        "tools/export_project_package.py": [],
+        "tools/generate_g01_runtime.py": [],
+        "tools/gwc_workflow_simulator.py": [],
+        "tools/hash_integrity_artifacts.py": [],
+        "tools/node_architect/cleanup_stale_sessions.py": [],
+        "tools/node_architect/compile_node_registry.py": [],
+        "tools/node_architect/render_ds_admin_tc_projection.py": [],
+        "tools/node_architect/render_kiro_local_agent_package.py": [],
+        "tools/node_architect/simulate_gate_runtime.py": [],
+        "tools/node_architect/validate_checkpoint_resume.py": [],
+        "tools/node_architect/validate_ds_admin_tc_sync.py": [],
+        "tools/node_architect/validate_kiro_local_agent_package.py": [],
+        "tools/node_architect/validate_node_registry.py": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 38,
+      "files": [
+        {
+          "path": "tools/resolve_profiles.py",
+          "language": "python",
+          "sizeLines": 253,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_g01.py",
+          "language": "python",
+          "sizeLines": 436,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_g3_delivery.py",
+          "language": "python",
+          "sizeLines": 224,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_gate_response_trace.py",
+          "language": "python",
+          "sizeLines": 81,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_hotfix.py",
+          "language": "python",
+          "sizeLines": 185,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_instructions.py",
+          "language": "python",
+          "sizeLines": 301,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_profile_set.py",
+          "language": "python",
+          "sizeLines": 61,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/verify_rollout.py",
+          "language": "python",
+          "sizeLines": 83,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "tools/resolve_profiles.py": [],
+        "tools/validate_g01.py": [],
+        "tools/validate_g3_delivery.py": [],
+        "tools/validate_gate_response_trace.py": [],
+        "tools/validate_hotfix.py": [],
+        "tools/validate_instructions.py": [],
+        "tools/validate_profile_set.py": [],
+        "tools/verify_rollout.py": []
+      },
+      "neighborMap": {}
+    }
+  ]
+}

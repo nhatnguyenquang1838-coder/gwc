@@ -1,0 +1,18 @@
+{
+  "name": "understand-anything",
+  "description": "AI-powered codebase understanding — analyze, visualize, and explain any project",
+  "version": "2.9.4",
+  "author": {"name": "Egonex"},
+  "source": "/Users/mac/prj/Understand-Anything/understand-anything-plugin",
+  "skills": [
+    "understand",
+    "understand-chat",
+    "understand-dashboard",
+    "understand-diff",
+    "understand-domain",
+    "understand-explain",
+    "understand-figma",
+    "understand-knowledge",
+    "understand-onboard"
+  ]
+}

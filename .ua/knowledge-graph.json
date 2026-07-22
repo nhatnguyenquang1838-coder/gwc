@@ -1,0 +1,5303 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "gwc",
+    "description": "Governance and workflow management codebase — an internal multi-agent SDLC platform with Jira/Confluence sync, DS MCP integration, Supabase persistence, and Vercel deployment.",
+    "languages": [
+      "python",
+      "yaml",
+      "markdown",
+      "json"
+    ],
+    "frameworks": [
+      "git",
+      "npm/pnpm"
+    ],
+    "analyzedAt": "2026-07-21T20:41:48.436Z",
+    "gitCommitHash": "HEAD"
+  },
+  "nodes": [
+    {
+      "id": "file:.claude/settings.local.json",
+      "type": "file",
+      "name": "settings.local.json",
+      "filePath": ".claude/settings.local.json",
+      "summary": "A json file in the other layer under .claude/settings.local.json. Size: 0.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/plugin.json",
+      "type": "file",
+      "name": "plugin.json",
+      "filePath": ".codex_plugins/understand-anything/plugin.json",
+      "summary": "A json file in the other layer under .codex_plugins/understand-anything. Size: 0.5KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand",
+      "type": "file",
+      "name": "understand",
+      "filePath": ".codex_plugins/understand-anything/skills/understand",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.5KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-chat",
+      "type": "file",
+      "name": "understand-chat",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-chat",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.1KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-dashboard",
+      "type": "file",
+      "name": "understand-dashboard",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-dashboard",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.1KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-diff",
+      "type": "file",
+      "name": "understand-diff",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-diff",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.1KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-domain",
+      "type": "file",
+      "name": "understand-domain",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-domain",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.1KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-explain",
+      "type": "file",
+      "name": "understand-explain",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-explain",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.1KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-figma",
+      "type": "file",
+      "name": "understand-figma",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-figma",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.2KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-knowledge",
+      "type": "file",
+      "name": "understand-knowledge",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-knowledge",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.2KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/skills/understand-onboard",
+      "type": "file",
+      "name": "understand-onboard",
+      "filePath": ".codex_plugins/understand-anything/skills/understand-onboard",
+      "summary": "A unknown file in the tools layer under .codex_plugins/understand-anything. Size: 0.1KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:.codex_plugins/understand-anything/understand-anything-plugin",
+      "type": "file",
+      "name": "understand-anything-plugin",
+      "filePath": ".codex_plugins/understand-anything/understand-anything-plugin",
+      "summary": "A unknown file in the other layer under .codex_plugins/understand-anything. Size: 0.4KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.continue/mcpServers/ds_mcp.yaml",
+      "type": "file",
+      "name": "ds_mcp.yaml",
+      "filePath": ".continue/mcpServers/ds_mcp.yaml",
+      "summary": "A yaml file in the other layer under .continue/mcpServers. Size: 0.3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.continue/mcpServers/notion.yaml",
+      "type": "file",
+      "name": "notion.yaml",
+      "filePath": ".continue/mcpServers/notion.yaml",
+      "summary": "A yaml file in the other layer under .continue/mcpServers. Size: 0.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gitattributes",
+      "type": "file",
+      "name": ".gitattributes",
+      "filePath": ".gitattributes",
+      "summary": "A unknown file in the other layer. Size: 0.3KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.github/CODEOWNERS",
+      "type": "file",
+      "name": "CODEOWNERS",
+      "filePath": ".github/CODEOWNERS",
+      "summary": "A unknown file in the other layer under .github/CODEOWNERS. Size: 0.3KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.github/workflows/build-packages.yml",
+      "type": "file",
+      "name": "build-packages.yml",
+      "filePath": ".github/workflows/build-packages.yml",
+      "summary": "A yml file in the other layer under .github/workflows. Size: 1KB. Purposes: config.",
+      "tags": [
+        "config"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.github/workflows/publish-release.yml",
+      "type": "file",
+      "name": "publish-release.yml",
+      "filePath": ".github/workflows/publish-release.yml",
+      "summary": "A yml file in the other layer under .github/workflows. Size: 2.2KB. Purposes: config.",
+      "tags": [
+        "config"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.github/workflows/validate-instructions.yml",
+      "type": "file",
+      "name": "validate-instructions.yml",
+      "filePath": ".github/workflows/validate-instructions.yml",
+      "summary": "A yml file in the other layer under .github/workflows. Size: 1.3KB. Purposes: config.",
+      "tags": [
+        "config"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gitignore",
+      "type": "file",
+      "name": ".gitignore",
+      "filePath": ".gitignore",
+      "summary": "A unknown file in the other layer. Size: 0.2KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/g2/approval-envelope.yaml",
+      "type": "file",
+      "name": "approval-envelope.yaml",
+      "filePath": ".gwc/g2/approval-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/g2. Size: 1.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/g2/approval-request.yaml",
+      "type": "file",
+      "name": "approval-request.yaml",
+      "filePath": ".gwc/g2/approval-request.yaml",
+      "summary": "A yaml file in the other layer under .gwc/g2. Size: 0.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/g2/change-plan.md",
+      "type": "file",
+      "name": "change-plan.md",
+      "filePath": ".gwc/g2/change-plan.md",
+      "summary": "A md file in the other layer under .gwc/g2. Size: 1.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/gwc-improve-g2-react-vite/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/gwc-improve-g2-react-vite/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/gwc-improve-g2-react-vite/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/gwc-improve-g2-react-vite/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/implement-g0-g1-skill-library/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/implement-g0-g1-skill-library/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/implement-g0-g1-skill-library/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/implement-g0-g1-skill-library/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/implement-g0-g1-skill-library/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/implement-g0-g1-skill-library/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/implement-g0-g1-skill-library/g2/execution-envelope.yaml",
+      "type": "file",
+      "name": "execution-envelope.yaml",
+      "filePath": ".gwc/tasks/implement-g0-g1-skill-library/g2/execution-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/rescue-dw1-trace/g0/intake.yaml",
+      "type": "file",
+      "name": "intake.yaml",
+      "filePath": ".gwc/tasks/rescue-dw1-trace/g0/intake.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 7.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 3.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md",
+      "type": "file",
+      "name": "change-plan.md",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md",
+      "summary": "A md file in the other layer under .gwc/tasks. Size: 1.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml",
+      "type": "file",
+      "name": "execution-envelope.yaml",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd",
+      "type": "file",
+      "name": "gate-flow.mmd",
+      "filePath": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd",
+      "summary": "A mmd file in the other layer under .gwc/tasks. Size: 0.5KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 3.3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 4.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/ci-repair-envelope-01.yaml",
+      "type": "file",
+      "name": "ci-repair-envelope-01.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/ci-repair-envelope-01.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/execution-envelope.yaml",
+      "type": "file",
+      "name": "execution-envelope.yaml",
+      "filePath": ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/execution-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 3.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/decision-input.yaml",
+      "type": "file",
+      "name": "decision-input.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/decision-input.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/runtime-input.yaml",
+      "type": "file",
+      "name": "runtime-input.yaml",
+      "filePath": ".gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/runtime-input.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/decision-input.yaml",
+      "type": "file",
+      "name": "decision-input.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/decision-input.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 0.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/runtime-input.yaml",
+      "type": "file",
+      "name": "runtime-input.yaml",
+      "filePath": ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/runtime-input.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 0.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 0.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml",
+      "type": "file",
+      "name": "ci-repair-envelope-01.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml",
+      "type": "file",
+      "name": "execution-envelope.yaml",
+      "filePath": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 2.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g2-execution-envelope.yaml",
+      "type": "file",
+      "name": "g2-execution-envelope.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g2-execution-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g3-approval-envelope.yaml",
+      "type": "file",
+      "name": "g3-approval-envelope.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g3-approval-envelope.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 0.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/runtime-input.yaml",
+      "type": "file",
+      "name": "runtime-input.yaml",
+      "filePath": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/runtime-input.yaml",
+      "summary": "A yaml file in the other layer under .gwc/tasks. Size: 3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:AGENTS.md",
+      "type": "file",
+      "name": "AGENTS.md",
+      "filePath": "AGENTS.md",
+      "summary": "A md file in the other layer. Size: 23.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:BUNDLE-REPORT.json",
+      "type": "file",
+      "name": "BUNDLE-REPORT.json",
+      "filePath": "BUNDLE-REPORT.json",
+      "summary": "A json file in the other layer. Size: 1.2KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:GWC_Project_Overview.md",
+      "type": "file",
+      "name": "GWC_Project_Overview.md",
+      "filePath": "GWC_Project_Overview.md",
+      "summary": "A md file in the other layer. Size: 21.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:HEARTBEAT.md",
+      "type": "file",
+      "name": "HEARTBEAT.md",
+      "filePath": "HEARTBEAT.md",
+      "summary": "A md file in the other layer. Size: 0.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:IDENTITY.md",
+      "type": "file",
+      "name": "IDENTITY.md",
+      "filePath": "IDENTITY.md",
+      "summary": "A md file in the other layer. Size: 1.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "A md file in the other layer. Size: 8.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:SHA256SUMS.txt",
+      "type": "file",
+      "name": "SHA256SUMS.txt",
+      "filePath": "SHA256SUMS.txt",
+      "summary": "A txt file in the other layer. Size: 8.9KB. Purposes: reference.",
+      "tags": [
+        "reference"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:SOUL.md",
+      "type": "file",
+      "name": "SOUL.md",
+      "filePath": "SOUL.md",
+      "summary": "A md file in the other layer. Size: 1.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:TODO.md",
+      "type": "file",
+      "name": "TODO.md",
+      "filePath": "TODO.md",
+      "summary": "A md file in the other layer. Size: 0.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:TOOLS.md",
+      "type": "file",
+      "name": "TOOLS.md",
+      "filePath": "TOOLS.md",
+      "summary": "A md file in the other layer. Size: 0.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:TREE.txt",
+      "type": "file",
+      "name": "TREE.txt",
+      "filePath": "TREE.txt",
+      "summary": "A txt file in the other layer. Size: 10.2KB. Purposes: reference.",
+      "tags": [
+        "reference"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:USER.md",
+      "type": "file",
+      "name": "USER.md",
+      "filePath": "USER.md",
+      "summary": "A md file in the other layer. Size: 0.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:agents/.DS_Store",
+      "type": "file",
+      "name": ".DS_Store",
+      "filePath": "agents/.DS_Store",
+      "summary": "A unknown file in the agents layer under agents/.DS_Store. Size: 8.2KB. Purposes: general.",
+      "tags": [
+        "general"
+      ],
+      "complexity": "complex",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/chatgpt-agent/agent-instructions.md",
+      "type": "file",
+      "name": "agent-instructions.md",
+      "filePath": "agents/chatgpt-agent/agent-instructions.md",
+      "summary": "A md file in the agents layer under agents/chatgpt-agent. Size: 14.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/coding-agent/bootstrap.md",
+      "type": "file",
+      "name": "bootstrap.md",
+      "filePath": "agents/coding-agent/bootstrap.md",
+      "summary": "A md file in the agents layer under agents/coding-agent. Size: 4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/dwc/agent-instructions.md",
+      "type": "file",
+      "name": "agent-instructions.md",
+      "filePath": "agents/dwc/agent-instructions.md",
+      "summary": "A md file in the agents layer under agents/dwc. Size: 16.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/dwc/capabilities.yaml",
+      "type": "file",
+      "name": "capabilities.yaml",
+      "filePath": "agents/dwc/capabilities.yaml",
+      "summary": "A yaml file in the agents layer under agents/dwc. Size: 3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/instructionops-agent/agent-instructions.md",
+      "type": "file",
+      "name": "agent-instructions.md",
+      "filePath": "agents/instructionops-agent/agent-instructions.md",
+      "summary": "A md file in the agents layer under agents/instructionops-agent. Size: 3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/instructionops-agent/capabilities.yaml",
+      "type": "file",
+      "name": "capabilities.yaml",
+      "filePath": "agents/instructionops-agent/capabilities.yaml",
+      "summary": "A yaml file in the agents layer under agents/instructionops-agent. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "agents"
+    },
+    {
+      "id": "file:agents/instructionops-agent/command-contract.md",
+      "type": "file",
+      "name": "command-contract.md",
+      "filePath": "agents/instructionops-agent/command-contract.md",
+      "summary": "A md file in the agents layer under agents/instructionops-agent. Size: 1.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "agents"
+    },
+    {
+      "id": "file:catalog.yaml",
+      "type": "file",
+      "name": "catalog.yaml",
+      "filePath": "catalog.yaml",
+      "summary": "A yaml file in the other layer. Size: 0.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:core/Agent_Behavior_Semantic_Contract_v1.0.md",
+      "type": "file",
+      "name": "Agent_Behavior_Semantic_Contract_v1.0.md",
+      "filePath": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+      "summary": "A md file in the core layer under core/Agent_Behavior_Semantic_Contract_v1.0.md. Size: 7.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/Agent_Operating_Runtime_Contract_v1.0.md",
+      "type": "file",
+      "name": "Agent_Operating_Runtime_Contract_v1.0.md",
+      "filePath": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+      "summary": "A md file in the core layer under core/Agent_Operating_Runtime_Contract_v1.0.md. Size: 6.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/Agent_Response_Presentation_Contract_v1.0.md",
+      "type": "file",
+      "name": "Agent_Response_Presentation_Contract_v1.0.md",
+      "filePath": "core/Agent_Response_Presentation_Contract_v1.0.md",
+      "summary": "A md file in the core layer under core/Agent_Response_Presentation_Contract_v1.0.md. Size: 7.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/CONNECTOR_TRACE_CONTRACT_v1.0.md",
+      "type": "file",
+      "name": "CONNECTOR_TRACE_CONTRACT_v1.0.md",
+      "filePath": "core/CONNECTOR_TRACE_CONTRACT_v1.0.md",
+      "summary": "A md file in the core layer under core/CONNECTOR_TRACE_CONTRACT_v1.0.md. Size: 4.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/Coding_Project_Governance_v1.0.md",
+      "type": "file",
+      "name": "Coding_Project_Governance_v1.0.md",
+      "filePath": "core/Coding_Project_Governance_v1.0.md",
+      "summary": "A md file in the core layer under core/Coding_Project_Governance_v1.0.md. Size: 28.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "type": "file",
+      "name": "E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "filePath": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "summary": "A md file in the core layer under core/E2E_DRAFT_PR_DELIVERY_RULE.md. Size: 13.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md",
+      "type": "file",
+      "name": "GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md",
+      "filePath": "core/GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md",
+      "summary": "A md file in the core layer under core/GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md. Size: 6.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "type": "file",
+      "name": "GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "filePath": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "summary": "A md file in the core layer under core/GATE_LIFECYCLE_CONTRACT_v1.0.md. Size: 14.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/HOTFIX_AND_RESCUE_MODE_v1.0.md",
+      "type": "file",
+      "name": "HOTFIX_AND_RESCUE_MODE_v1.0.md",
+      "filePath": "core/HOTFIX_AND_RESCUE_MODE_v1.0.md",
+      "summary": "A md file in the core layer under core/HOTFIX_AND_RESCUE_MODE_v1.0.md. Size: 11.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "type": "file",
+      "name": "KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "filePath": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "summary": "A md file in the core layer under core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md. Size: 7.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/LOCAL_AGENT_RULE.md",
+      "type": "file",
+      "name": "LOCAL_AGENT_RULE.md",
+      "filePath": "core/LOCAL_AGENT_RULE.md",
+      "summary": "A md file in the core layer under core/LOCAL_AGENT_RULE.md. Size: 2.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/USER_COMMAND_FORMAT_RULE.md",
+      "type": "file",
+      "name": "USER_COMMAND_FORMAT_RULE.md",
+      "filePath": "core/USER_COMMAND_FORMAT_RULE.md",
+      "summary": "A md file in the core layer under core/USER_COMMAND_FORMAT_RULE.md. Size: 1.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "type": "file",
+      "name": "CHECKPOINT_RESUME_RULE_v0.1.md",
+      "filePath": "core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 3.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md",
+      "type": "file",
+      "name": "CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md",
+      "filePath": "core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 3.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md",
+      "type": "file",
+      "name": "DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md",
+      "filePath": "core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 4.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md",
+      "type": "file",
+      "name": "EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md",
+      "filePath": "core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 3.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md",
+      "type": "file",
+      "name": "KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md",
+      "filePath": "core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 4.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md",
+      "type": "file",
+      "name": "KIRO_STRICT_CODING_STATE_RULE_v0.1.md",
+      "filePath": "core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 2.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md",
+      "type": "file",
+      "name": "STALE_SESSION_CLEANUP_RULE_v0.1.md",
+      "filePath": "core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md",
+      "summary": "A md file in the core layer under core/node-architect. Size: 2.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "type": "file",
+      "name": "GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "filePath": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "summary": "A md file in the core layer under core/runbooks. Size: 12.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/runbooks/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "core/runbooks/README.md",
+      "summary": "A md file in the core layer under core/runbooks. Size: 0.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/task-lifecycle/gate-transition-map.yaml",
+      "type": "file",
+      "name": "gate-transition-map.yaml",
+      "filePath": "core/task-lifecycle/gate-transition-map.yaml",
+      "summary": "A yaml file in the core layer under core/task-lifecycle. Size: 1.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md",
+      "type": "file",
+      "name": "GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md",
+      "filePath": "core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md",
+      "summary": "A md file in the core layer under core/workflows. Size: 6.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "core"
+    },
+    {
+      "id": "file:core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md",
+      "type": "file",
+      "name": "REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md",
+      "filePath": "core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md",
+      "summary": "A md file in the core layer under core/workflows. Size: 3.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "core"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "type": "file",
+      "name": "Coding_Project_Governance_v1.0.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 28.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "type": "file",
+      "name": "E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 9.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/LOCAL_AGENT_RULE.md",
+      "type": "file",
+      "name": "LOCAL_AGENT_RULE.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/LOCAL_AGENT_RULE.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 2.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/USER_COMMAND_FORMAT_RULE.md",
+      "type": "file",
+      "name": "USER_COMMAND_FORMAT_RULE.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/USER_COMMAND_FORMAT_RULE.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 1.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/project-extension.md",
+      "type": "file",
+      "name": "project-extension.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/project-extension.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/project-instructions.md",
+      "type": "file",
+      "name": "project-instructions.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/project-instructions.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 1.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/project-profile.yaml",
+      "type": "file",
+      "name": "project-profile.yaml",
+      "filePath": "dist/rental-home/1.0.0/.governance/project-profile.yaml",
+      "summary": "A yaml file in the other layer under dist/rental-home. Size: 2.3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/.governance/spec-driven-format.md",
+      "type": "file",
+      "name": "spec-driven-format.md",
+      "filePath": "dist/rental-home/1.0.0/.governance/spec-driven-format.md",
+      "summary": "A md file in the other layer under dist/rental-home. Size: 10.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "other"
+    },
+    {
+      "id": "file:dist/rental-home/1.0.0/package-manifest.yaml",
+      "type": "file",
+      "name": "package-manifest.yaml",
+      "filePath": "dist/rental-home/1.0.0/package-manifest.yaml",
+      "summary": "A yaml file in the other layer under dist/rental-home. Size: 2.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "other"
+    },
+    {
+      "id": "file:docs/base-drift-policy.md",
+      "type": "file",
+      "name": "base-drift-policy.md",
+      "filePath": "docs/base-drift-policy.md",
+      "summary": "A md file in the docs layer under docs/base-drift-policy.md. Size: 1.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/g01-lifecycle.md",
+      "type": "file",
+      "name": "g01-lifecycle.md",
+      "filePath": "docs/g01-lifecycle.md",
+      "summary": "A md file in the docs layer under docs/g01-lifecycle.md. Size: 6.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/gaps/g0-g1-naming-location-convention-gaps.md",
+      "type": "file",
+      "name": "g0-g1-naming-location-convention-gaps.md",
+      "filePath": "docs/gaps/g0-g1-naming-location-convention-gaps.md",
+      "summary": "A md file in the docs layer under docs/gaps. Size: 8.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "type": "file",
+      "name": "PROGRAM_PLAN.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 13.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/README.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 7.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/end-state/design.md",
+      "type": "file",
+      "name": "design.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/end-state/design.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 9.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/end-state/requirements.md",
+      "type": "file",
+      "name": "requirements.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/end-state/requirements.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 9.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/end-state/tasks.md",
+      "type": "file",
+      "name": "tasks.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/end-state/tasks.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 6.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md",
+      "type": "file",
+      "name": "design.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 10.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/migration-reconciliation-doctor-spec.md",
+      "type": "file",
+      "name": "migration-reconciliation-doctor-spec.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/migration-reconciliation-doctor-spec.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 10.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/notion-importer-spec.md",
+      "type": "file",
+      "name": "notion-importer-spec.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/notion-importer-spec.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 10.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/requirements.md",
+      "type": "file",
+      "name": "requirements.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/requirements.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 8.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/supabase-snapshot-exporter-spec.md",
+      "type": "file",
+      "name": "supabase-snapshot-exporter-spec.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/supabase-snapshot-exporter-spec.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 7.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/tasks.md",
+      "type": "file",
+      "name": "tasks.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/tasks.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 11.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/design.md",
+      "type": "file",
+      "name": "design.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/design.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/requirements.md",
+      "type": "file",
+      "name": "requirements.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/requirements.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 5.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/tasks.md",
+      "type": "file",
+      "name": "tasks.md",
+      "filePath": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/tasks.md",
+      "summary": "A md file in the docs layer under docs/plan. Size: 4.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/project-consumer-agent-instructions.md",
+      "type": "file",
+      "name": "project-consumer-agent-instructions.md",
+      "filePath": "docs/project-consumer-agent-instructions.md",
+      "summary": "A md file in the docs layer under docs/project-consumer-agent-instructions.md. Size: 6.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
+      "type": "file",
+      "name": "GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
+      "filePath": "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
+      "summary": "A md file in the docs layer under docs/runbooks. Size: 3.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md",
+      "type": "file",
+      "name": "REVAMP_UPGRADE_GWC_RUNBOOK.md",
+      "filePath": "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md",
+      "summary": "A md file in the docs layer under docs/runbooks. Size: 3.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "docs"
+    },
+    {
+      "id": "file:docs/skills/requirements-tracer.md",
+      "type": "file",
+      "name": "requirements-tracer.md",
+      "filePath": "docs/skills/requirements-tracer.md",
+      "summary": "A md file in the tools layer under docs/skills. Size: 1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:governance/agent-runtime-profiles/chatgpt.yaml",
+      "type": "file",
+      "name": "chatgpt.yaml",
+      "filePath": "governance/agent-runtime-profiles/chatgpt.yaml",
+      "summary": "A yaml file in the docs layer under governance/agent-runtime-profiles. Size: 0.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/agent-runtime-profiles/dwc.yaml",
+      "type": "file",
+      "name": "dwc.yaml",
+      "filePath": "governance/agent-runtime-profiles/dwc.yaml",
+      "summary": "A yaml file in the docs layer under governance/agent-runtime-profiles. Size: 0.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/base-drift-policy.yaml",
+      "type": "file",
+      "name": "base-drift-policy.yaml",
+      "filePath": "governance/base-drift-policy.yaml",
+      "summary": "A yaml file in the docs layer under governance/base-drift-policy.yaml. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/environment-profiles/repo-governance.yaml",
+      "type": "file",
+      "name": "repo-governance.yaml",
+      "filePath": "governance/environment-profiles/repo-governance.yaml",
+      "summary": "A yaml file in the docs layer under governance/environment-profiles. Size: 0.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/gate-policy-profiles/standard.yaml",
+      "type": "file",
+      "name": "standard.yaml",
+      "filePath": "governance/gate-policy-profiles/standard.yaml",
+      "summary": "A yaml file in the docs layer under governance/gate-policy-profiles. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/instruction-source-registry.yaml",
+      "type": "file",
+      "name": "instruction-source-registry.yaml",
+      "filePath": "governance/instruction-source-registry.yaml",
+      "summary": "A yaml file in the docs layer under governance/instruction-source-registry.yaml. Size: 2.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/profile-sets/gwc-standard.yaml",
+      "type": "file",
+      "name": "gwc-standard.yaml",
+      "filePath": "governance/profile-sets/gwc-standard.yaml",
+      "summary": "A yaml file in the docs layer under governance/profile-sets. Size: 0.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:governance/risk-profiles/default.yaml",
+      "type": "file",
+      "name": "default.yaml",
+      "filePath": "governance/risk-profiles/default.yaml",
+      "summary": "A yaml file in the docs layer under governance/risk-profiles. Size: 0.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "type": "file",
+      "name": "NOTICE.md",
+      "filePath": "libs/g0-g1-skill-library/NOTICE.md",
+      "summary": "A md file in the other layer under libs/g0-g1-skill-library. Size: 0.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "libs/g0-g1-skill-library/README.md",
+      "summary": "A md file in the other layer under libs/g0-g1-skill-library. Size: 0.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/manifest.yaml",
+      "type": "file",
+      "name": "manifest.yaml",
+      "filePath": "libs/g0-g1-skill-library/manifest.yaml",
+      "summary": "A yaml file in the other layer under libs/g0-g1-skill-library. Size: 1.6KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/skills/g0-context-loading.md",
+      "type": "file",
+      "name": "g0-context-loading.md",
+      "filePath": "libs/g0-g1-skill-library/skills/g0-context-loading.md",
+      "summary": "A md file in the tools layer under libs/g0-g1-skill-library. Size: 2.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md",
+      "type": "file",
+      "name": "g0-g1-approval-envelope.md",
+      "filePath": "libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md",
+      "summary": "A md file in the tools layer under libs/g0-g1-skill-library. Size: 3.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/skills/g1-decision-record.md",
+      "type": "file",
+      "name": "g1-decision-record.md",
+      "filePath": "libs/g0-g1-skill-library/skills/g1-decision-record.md",
+      "summary": "A md file in the tools layer under libs/g0-g1-skill-library. Size: 3.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md",
+      "type": "file",
+      "name": "g1-intake-options-preflight.md",
+      "filePath": "libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md",
+      "summary": "A md file in the tools layer under libs/g0-g1-skill-library. Size: 3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/NOTICE.md",
+      "type": "file",
+      "name": "NOTICE.md",
+      "filePath": "libs/g2-skill-library/NOTICE.md",
+      "summary": "A md file in the other layer under libs/g2-skill-library. Size: 0.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g2-skill-library/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "libs/g2-skill-library/README.md",
+      "summary": "A md file in the other layer under libs/g2-skill-library. Size: 0.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g2-skill-library/manifest.yaml",
+      "type": "file",
+      "name": "manifest.yaml",
+      "filePath": "libs/g2-skill-library/manifest.yaml",
+      "summary": "A yaml file in the other layer under libs/g2-skill-library. Size: 1.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-approval-envelope.md",
+      "type": "file",
+      "name": "g2-approval-envelope.md",
+      "filePath": "libs/g2-skill-library/skills/g2-approval-envelope.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 1.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-execution-plan.md",
+      "type": "file",
+      "name": "g2-execution-plan.md",
+      "filePath": "libs/g2-skill-library/skills/g2-execution-plan.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-react-vite-component-structure.md",
+      "type": "file",
+      "name": "g2-react-vite-component-structure.md",
+      "filePath": "libs/g2-skill-library/skills/g2-react-vite-component-structure.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 0.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-react-vite-performance.md",
+      "type": "file",
+      "name": "g2-react-vite-performance.md",
+      "filePath": "libs/g2-skill-library/skills/g2-react-vite-performance.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-react-vite-state-management.md",
+      "type": "file",
+      "name": "g2-react-vite-state-management.md",
+      "filePath": "libs/g2-skill-library/skills/g2-react-vite-state-management.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-react-vite-testing.md",
+      "type": "file",
+      "name": "g2-react-vite-testing.md",
+      "filePath": "libs/g2-skill-library/skills/g2-react-vite-testing.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g2-skill-library/skills/g2-repository-interaction.md",
+      "type": "file",
+      "name": "g2-repository-interaction.md",
+      "filePath": "libs/g2-skill-library/skills/g2-repository-interaction.md",
+      "summary": "A md file in the tools layer under libs/g2-skill-library. Size: 1.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g3-skill-library/NOTICE.md",
+      "type": "file",
+      "name": "NOTICE.md",
+      "filePath": "libs/g3-skill-library/NOTICE.md",
+      "summary": "A md file in the other layer under libs/g3-skill-library. Size: 0.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g3-skill-library/README.md",
+      "type": "file",
+      "name": "README.md",
+      "filePath": "libs/g3-skill-library/README.md",
+      "summary": "A md file in the other layer under libs/g3-skill-library. Size: 0.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g3-skill-library/manifest.yaml",
+      "type": "file",
+      "name": "manifest.yaml",
+      "filePath": "libs/g3-skill-library/manifest.yaml",
+      "summary": "A yaml file in the other layer under libs/g3-skill-library. Size: 1.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:libs/g3-skill-library/skills/dispatching-parallel-review.md",
+      "type": "file",
+      "name": "dispatching-parallel-review.md",
+      "filePath": "libs/g3-skill-library/skills/dispatching-parallel-review.md",
+      "summary": "A md file in the tools layer under libs/g3-skill-library. Size: 0.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g3-skill-library/skills/finishing-development-branch-pr-only.md",
+      "type": "file",
+      "name": "finishing-development-branch-pr-only.md",
+      "filePath": "libs/g3-skill-library/skills/finishing-development-branch-pr-only.md",
+      "summary": "A md file in the tools layer under libs/g3-skill-library. Size: 0.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g3-skill-library/skills/receiving-code-review.md",
+      "type": "file",
+      "name": "receiving-code-review.md",
+      "filePath": "libs/g3-skill-library/skills/receiving-code-review.md",
+      "summary": "A md file in the tools layer under libs/g3-skill-library. Size: 0.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g3-skill-library/skills/requesting-code-review.md",
+      "type": "file",
+      "name": "requesting-code-review.md",
+      "filePath": "libs/g3-skill-library/skills/requesting-code-review.md",
+      "summary": "A md file in the tools layer under libs/g3-skill-library. Size: 0.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:libs/g3-skill-library/skills/verification-before-completion.md",
+      "type": "file",
+      "name": "verification-before-completion.md",
+      "filePath": "libs/g3-skill-library/skills/verification-before-completion.md",
+      "summary": "A md file in the tools layer under libs/g3-skill-library. Size: 0.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:memory/2026-07-22-0254.md",
+      "type": "file",
+      "name": "2026-07-22-0254.md",
+      "filePath": "memory/2026-07-22-0254.md",
+      "summary": "A md file in the data layer under memory/2026-07-22-0254.md. Size: 0.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:memory/2026-07-22-0258.md",
+      "type": "file",
+      "name": "2026-07-22-0258.md",
+      "filePath": "memory/2026-07-22-0258.md",
+      "summary": "A md file in the data layer under memory/2026-07-22-0258.md. Size: 0.2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:memory/2026-07-22-0302.md",
+      "type": "file",
+      "name": "2026-07-22-0302.md",
+      "filePath": "memory/2026-07-22-0302.md",
+      "summary": "A md file in the data layer under memory/2026-07-22-0302.md. Size: 0.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:openclaw-workspace-state.json",
+      "type": "file",
+      "name": "openclaw-workspace-state.json",
+      "filePath": "openclaw-workspace-state.json",
+      "summary": "A json file in the other layer. Size: 0.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "other"
+    },
+    {
+      "id": "file:projects/ds-mcp/admin-task-claim-rule.md",
+      "type": "file",
+      "name": "admin-task-claim-rule.md",
+      "filePath": "projects/ds-mcp/admin-task-claim-rule.md",
+      "summary": "A md file in the projects layer under projects/ds-mcp. Size: 2.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/ds-mcp/package.yaml",
+      "type": "file",
+      "name": "package.yaml",
+      "filePath": "projects/ds-mcp/package.yaml",
+      "summary": "A yaml file in the projects layer under projects/ds-mcp. Size: 2.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/ds-mcp/project-extension.md",
+      "type": "file",
+      "name": "project-extension.md",
+      "filePath": "projects/ds-mcp/project-extension.md",
+      "summary": "A md file in the projects layer under projects/ds-mcp. Size: 2.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/ds-mcp/project-instructions.md",
+      "type": "file",
+      "name": "project-instructions.md",
+      "filePath": "projects/ds-mcp/project-instructions.md",
+      "summary": "A md file in the projects layer under projects/ds-mcp. Size: 24.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/ds-mcp/project-profile.yaml",
+      "type": "file",
+      "name": "project-profile.yaml",
+      "filePath": "projects/ds-mcp/project-profile.yaml",
+      "summary": "A yaml file in the projects layer under projects/ds-mcp. Size: 1.9KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/gwc/package.yaml",
+      "type": "file",
+      "name": "package.yaml",
+      "filePath": "projects/gwc/package.yaml",
+      "summary": "A yaml file in the projects layer under projects/gwc. Size: 13.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "complex",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/gwc/project-extension.md",
+      "type": "file",
+      "name": "project-extension.md",
+      "filePath": "projects/gwc/project-extension.md",
+      "summary": "A md file in the projects layer under projects/gwc. Size: 3.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/gwc/project-instructions.md",
+      "type": "file",
+      "name": "project-instructions.md",
+      "filePath": "projects/gwc/project-instructions.md",
+      "summary": "A md file in the projects layer under projects/gwc. Size: 5.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/gwc/project-profile.yaml",
+      "type": "file",
+      "name": "project-profile.yaml",
+      "filePath": "projects/gwc/project-profile.yaml",
+      "summary": "A yaml file in the projects layer under projects/gwc. Size: 2.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/pm-skills/package.yaml",
+      "type": "file",
+      "name": "package.yaml",
+      "filePath": "projects/pm-skills/package.yaml",
+      "summary": "A yaml file in the projects layer under projects/pm-skills. Size: 1.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/pm-skills/project-extension.md",
+      "type": "file",
+      "name": "project-extension.md",
+      "filePath": "projects/pm-skills/project-extension.md",
+      "summary": "A md file in the projects layer under projects/pm-skills. Size: 1.3KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/pm-skills/project-instructions.md",
+      "type": "file",
+      "name": "project-instructions.md",
+      "filePath": "projects/pm-skills/project-instructions.md",
+      "summary": "A md file in the projects layer under projects/pm-skills. Size: 1.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/pm-skills/project-profile.yaml",
+      "type": "file",
+      "name": "project-profile.yaml",
+      "filePath": "projects/pm-skills/project-profile.yaml",
+      "summary": "A yaml file in the projects layer under projects/pm-skills. Size: 1.5KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/rental-home/package.yaml",
+      "type": "file",
+      "name": "package.yaml",
+      "filePath": "projects/rental-home/package.yaml",
+      "summary": "A yaml file in the projects layer under projects/rental-home. Size: 2.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/rental-home/project-extension.md",
+      "type": "file",
+      "name": "project-extension.md",
+      "filePath": "projects/rental-home/project-extension.md",
+      "summary": "A md file in the projects layer under projects/rental-home. Size: 2KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/rental-home/project-instructions.md",
+      "type": "file",
+      "name": "project-instructions.md",
+      "filePath": "projects/rental-home/project-instructions.md",
+      "summary": "A md file in the projects layer under projects/rental-home. Size: 1.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/rental-home/project-profile.yaml",
+      "type": "file",
+      "name": "project-profile.yaml",
+      "filePath": "projects/rental-home/project-profile.yaml",
+      "summary": "A yaml file in the projects layer under projects/rental-home. Size: 2.3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:projects/rental-home/spec-driven-format.md",
+      "type": "file",
+      "name": "spec-driven-format.md",
+      "filePath": "projects/rental-home/spec-driven-format.md",
+      "summary": "A md file in the projects layer under projects/rental-home. Size: 4.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "projects"
+    },
+    {
+      "id": "file:releases/changelog.md",
+      "type": "file",
+      "name": "changelog.md",
+      "filePath": "releases/changelog.md",
+      "summary": "A md file in the releases layer under releases/changelog.md. Size: 23.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "releases"
+    },
+    {
+      "id": "file:releases/integrity-refresh-report.md",
+      "type": "file",
+      "name": "integrity-refresh-report.md",
+      "filePath": "releases/integrity-refresh-report.md",
+      "summary": "A md file in the releases layer under releases/integrity-refresh-report.md. Size: 0.6KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "releases"
+    },
+    {
+      "id": "file:releases/manifest.yaml",
+      "type": "file",
+      "name": "manifest.yaml",
+      "filePath": "releases/manifest.yaml",
+      "summary": "A yaml file in the releases layer under releases/manifest.yaml. Size: 0.8KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "releases"
+    },
+    {
+      "id": "file:schemas/approval-envelope.schema.json",
+      "type": "file",
+      "name": "approval-envelope.schema.json",
+      "filePath": "schemas/approval-envelope.schema.json",
+      "summary": "A json file in the data layer under schemas/approval-envelope.schema.json. Size: 4.4KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/approval-request.schema.json",
+      "type": "file",
+      "name": "approval-request.schema.json",
+      "filePath": "schemas/approval-request.schema.json",
+      "summary": "A json file in the data layer under schemas/approval-request.schema.json. Size: 2.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/base-drift-evaluation.schema.json",
+      "type": "file",
+      "name": "base-drift-evaluation.schema.json",
+      "filePath": "schemas/base-drift-evaluation.schema.json",
+      "summary": "A json file in the data layer under schemas/base-drift-evaluation.schema.json. Size: 2.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/connector-trace.schema.json",
+      "type": "file",
+      "name": "connector-trace.schema.json",
+      "filePath": "schemas/connector-trace.schema.json",
+      "summary": "A json file in the data layer under schemas/connector-trace.schema.json. Size: 3.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/fastlane/fastlane-envelope.schema.json",
+      "type": "file",
+      "name": "fastlane-envelope.schema.json",
+      "filePath": "schemas/fastlane/fastlane-envelope.schema.json",
+      "summary": "A json file in the data layer under schemas/fastlane. Size: 5.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g0-context-snapshot.schema.json",
+      "type": "file",
+      "name": "g0-context-snapshot.schema.json",
+      "filePath": "schemas/g0-context-snapshot.schema.json",
+      "summary": "A json file in the data layer under schemas/g0-context-snapshot.schema.json. Size: 8.5KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g01-decision-input.schema.json",
+      "type": "file",
+      "name": "g01-decision-input.schema.json",
+      "filePath": "schemas/g01-decision-input.schema.json",
+      "summary": "A json file in the data layer under schemas/g01-decision-input.schema.json. Size: 2.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g01-runtime-input.schema.json",
+      "type": "file",
+      "name": "g01-runtime-input.schema.json",
+      "filePath": "schemas/g01-runtime-input.schema.json",
+      "summary": "A json file in the data layer under schemas/g01-runtime-input.schema.json. Size: 7.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g1-decision-record.schema.json",
+      "type": "file",
+      "name": "g1-decision-record.schema.json",
+      "filePath": "schemas/g1-decision-record.schema.json",
+      "summary": "A json file in the data layer under schemas/g1-decision-record.schema.json. Size: 7.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g1-intake-brief.schema.json",
+      "type": "file",
+      "name": "g1-intake-brief.schema.json",
+      "filePath": "schemas/g1-intake-brief.schema.json",
+      "summary": "A json file in the data layer under schemas/g1-intake-brief.schema.json. Size: 6.7KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g1-options.schema.json",
+      "type": "file",
+      "name": "g1-options.schema.json",
+      "filePath": "schemas/g1-options.schema.json",
+      "summary": "A json file in the data layer under schemas/g1-options.schema.json. Size: 4.3KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g1-preflight-report.schema.json",
+      "type": "file",
+      "name": "g1-preflight-report.schema.json",
+      "filePath": "schemas/g1-preflight-report.schema.json",
+      "summary": "A json file in the data layer under schemas/g1-preflight-report.schema.json. Size: 6.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/g3-delivery-record.schema.json",
+      "type": "file",
+      "name": "g3-delivery-record.schema.json",
+      "filePath": "schemas/g3-delivery-record.schema.json",
+      "summary": "A json file in the data layer under schemas/g3-delivery-record.schema.json. Size: 10.5KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/gate-policy-profile.schema.json",
+      "type": "file",
+      "name": "gate-policy-profile.schema.json",
+      "filePath": "schemas/gate-policy-profile.schema.json",
+      "summary": "A json file in the data layer under schemas/gate-policy-profile.schema.json. Size: 3.8KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/gate-response-trace.schema.json",
+      "type": "file",
+      "name": "gate-response-trace.schema.json",
+      "filePath": "schemas/gate-response-trace.schema.json",
+      "summary": "A json file in the data layer under schemas/gate-response-trace.schema.json. Size: 0.9KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/instruction-source-registry.schema.json",
+      "type": "file",
+      "name": "instruction-source-registry.schema.json",
+      "filePath": "schemas/instruction-source-registry.schema.json",
+      "summary": "A json file in the data layer under schemas/instruction-source-registry.schema.json. Size: 1.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/instruction.schema.json",
+      "type": "file",
+      "name": "instruction.schema.json",
+      "filePath": "schemas/instruction.schema.json",
+      "summary": "A json file in the data layer under schemas/instruction.schema.json. Size: 2.2KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/checkpoint.schema.json",
+      "type": "file",
+      "name": "checkpoint.schema.json",
+      "filePath": "schemas/node-architect/checkpoint.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 6.3KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "complex",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/ds-admin-tc-sync.schema.json",
+      "type": "file",
+      "name": "ds-admin-tc-sync.schema.json",
+      "filePath": "schemas/node-architect/ds-admin-tc-sync.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1.9KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/external-audit-projection.schema.json",
+      "type": "file",
+      "name": "external-audit-projection.schema.json",
+      "filePath": "schemas/node-architect/external-audit-projection.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1.7KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/kiro-coding-state.schema.json",
+      "type": "file",
+      "name": "kiro-coding-state.schema.json",
+      "filePath": "schemas/node-architect/kiro-coding-state.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 2.8KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/kiro-local-agent-package.schema.json",
+      "type": "file",
+      "name": "kiro-local-agent-package.schema.json",
+      "filePath": "schemas/node-architect/kiro-local-agent-package.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 2.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/local-agent-command.schema.json",
+      "type": "file",
+      "name": "local-agent-command.schema.json",
+      "filePath": "schemas/node-architect/local-agent-command.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 0.6KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/local-agent-validation-report.schema.json",
+      "type": "file",
+      "name": "local-agent-validation-report.schema.json",
+      "filePath": "schemas/node-architect/local-agent-validation-report.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1.5KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/node-registry.schema.json",
+      "type": "file",
+      "name": "node-registry.schema.json",
+      "filePath": "schemas/node-architect/node-registry.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 0.9KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/resume-token.schema.json",
+      "type": "file",
+      "name": "resume-token.schema.json",
+      "filePath": "schemas/node-architect/resume-token.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1.8KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json",
+      "type": "file",
+      "name": "revamp-upgrade-gwc-envelope.schema.json",
+      "filePath": "schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 3.4KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/runtime-node.schema.json",
+      "type": "file",
+      "name": "runtime-node.schema.json",
+      "filePath": "schemas/node-architect/runtime-node.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/simulation-result.schema.json",
+      "type": "file",
+      "name": "simulation-result.schema.json",
+      "filePath": "schemas/node-architect/simulation-result.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 0.9KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/stale-session-cleanup.schema.json",
+      "type": "file",
+      "name": "stale-session-cleanup.schema.json",
+      "filePath": "schemas/node-architect/stale-session-cleanup.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1.2KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/sync-projection-result.schema.json",
+      "type": "file",
+      "name": "sync-projection-result.schema.json",
+      "filePath": "schemas/node-architect/sync-projection-result.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 0.8KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/node-architect/sync-target.schema.json",
+      "type": "file",
+      "name": "sync-target.schema.json",
+      "filePath": "schemas/node-architect/sync-target.schema.json",
+      "summary": "A json file in the data layer under schemas/node-architect. Size: 1.1KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/package-export-manifest.schema.json",
+      "type": "file",
+      "name": "package-export-manifest.schema.json",
+      "filePath": "schemas/package-export-manifest.schema.json",
+      "summary": "A json file in the data layer under schemas/package-export-manifest.schema.json. Size: 1.8KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/profile-set.schema.json",
+      "type": "file",
+      "name": "profile-set.schema.json",
+      "filePath": "schemas/profile-set.schema.json",
+      "summary": "A json file in the data layer under schemas/profile-set.schema.json. Size: 1.8KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "simple",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/project-package.schema.json",
+      "type": "file",
+      "name": "project-package.schema.json",
+      "filePath": "schemas/project-package.schema.json",
+      "summary": "A json file in the data layer under schemas/project-package.schema.json. Size: 3.7KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:schemas/rollout.schema.json",
+      "type": "file",
+      "name": "rollout.schema.json",
+      "filePath": "schemas/rollout.schema.json",
+      "summary": "A json file in the data layer under schemas/rollout.schema.json. Size: 2.7KB. Purposes: config, schema, manifest.",
+      "tags": [
+        "config",
+        "schema",
+        "manifest"
+      ],
+      "complexity": "moderate",
+      "layer": "data"
+    },
+    {
+      "id": "file:skills/gwc-g0/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "skills/gwc-g0/SKILL.md",
+      "summary": "A md file in the tools layer under skills/gwc-g0. Size: 13.1KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:skills/gwc-g1/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "skills/gwc-g1/SKILL.md",
+      "summary": "A md file in the tools layer under skills/gwc-g1. Size: 18.8KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:skills/gwc-g2/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "skills/gwc-g2/SKILL.md",
+      "summary": "A md file in the tools layer under skills/gwc-g2. Size: 2.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:skills/gwc-g3/SKILL.md",
+      "type": "file",
+      "name": "SKILL.md",
+      "filePath": "skills/gwc-g3/SKILL.md",
+      "summary": "A md file in the tools layer under skills/gwc-g3. Size: 4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:templates/e2e-rule.template.md",
+      "type": "file",
+      "name": "e2e-rule.template.md",
+      "filePath": "templates/e2e-rule.template.md",
+      "summary": "A md file in the docs layer under templates/e2e-rule.template.md. Size: 0.5KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "type": "file",
+      "name": "g0-context-snapshot.template.yaml",
+      "filePath": "templates/g01/g0-context-snapshot.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 1.2KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g01-decision-input.template.yaml",
+      "type": "file",
+      "name": "g01-decision-input.template.yaml",
+      "filePath": "templates/g01/g01-decision-input.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g01-runtime-input.template.yaml",
+      "type": "file",
+      "name": "g01-runtime-input.template.yaml",
+      "filePath": "templates/g01/g01-runtime-input.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 3.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g1-decision-record.template.yaml",
+      "type": "file",
+      "name": "g1-decision-record.template.yaml",
+      "filePath": "templates/g01/g1-decision-record.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 1.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g1-intake-brief.template.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.template.yaml",
+      "filePath": "templates/g01/g1-intake-brief.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 1.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g1-options.template.yaml",
+      "type": "file",
+      "name": "g1-options.template.yaml",
+      "filePath": "templates/g01/g1-options.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 1.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/g01/g1-preflight-report.template.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.template.yaml",
+      "filePath": "templates/g01/g1-preflight-report.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/g01. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/gates/g0-hotfix-intake.template.yaml",
+      "type": "file",
+      "name": "g0-hotfix-intake.template.yaml",
+      "filePath": "templates/gates/g0-hotfix-intake.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/gates. Size: 0.7KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/gates/g3-delivery-record.template.yaml",
+      "type": "file",
+      "name": "g3-delivery-record.template.yaml",
+      "filePath": "templates/gates/g3-delivery-record.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/gates. Size: 2.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/gates/gate-response.template.md",
+      "type": "file",
+      "name": "gate-response.template.md",
+      "filePath": "templates/gates/gate-response.template.md",
+      "summary": "A md file in the docs layer under templates/gates. Size: 0.9KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/project-extension.template.md",
+      "type": "file",
+      "name": "project-extension.template.md",
+      "filePath": "templates/project-extension.template.md",
+      "summary": "A md file in the docs layer under templates/project-extension.template.md. Size: 0.7KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/project-instructions.template.md",
+      "type": "file",
+      "name": "project-instructions.template.md",
+      "filePath": "templates/project-instructions.template.md",
+      "summary": "A md file in the docs layer under templates/project-instructions.template.md. Size: 0.4KB. Purposes: documentation, guide.",
+      "tags": [
+        "documentation",
+        "guide"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:templates/project-profile.template.yaml",
+      "type": "file",
+      "name": "project-profile.template.yaml",
+      "filePath": "templates/project-profile.template.yaml",
+      "summary": "A yaml file in the docs layer under templates/project-profile.template.yaml. Size: 1.3KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "docs"
+    },
+    {
+      "id": "file:tests/fixtures/g01-decision-valid.yaml",
+      "type": "file",
+      "name": "g01-decision-valid.yaml",
+      "filePath": "tests/fixtures/g01-decision-valid.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-invalid-decision.yaml",
+      "type": "file",
+      "name": "g01-invalid-decision.yaml",
+      "filePath": "tests/fixtures/g01-invalid-decision.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-runtime-valid.yaml",
+      "type": "file",
+      "name": "g01-runtime-valid.yaml",
+      "filePath": "tests/fixtures/g01-runtime-valid.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 3.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-valid/g0/context-snapshot.yaml",
+      "type": "file",
+      "name": "context-snapshot.yaml",
+      "filePath": "tests/fixtures/g01-valid/g0/context-snapshot.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml",
+      "type": "file",
+      "name": "g1-options.yaml",
+      "filePath": "tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml",
+      "type": "file",
+      "name": "g1-decision-record.yaml",
+      "filePath": "tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1.1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml",
+      "type": "file",
+      "name": "g1-intake-brief.yaml",
+      "filePath": "tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1.4KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml",
+      "type": "file",
+      "name": "g1-preflight-report.yaml",
+      "filePath": "tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml",
+      "summary": "A yaml file in the tests layer under tests/fixtures. Size: 1KB. Purposes: config, specification.",
+      "tags": [
+        "config",
+        "specification"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_approval_request.py",
+      "type": "file",
+      "name": "test_approval_request.py",
+      "filePath": "tests/test_approval_request.py",
+      "summary": "A py file in the tests layer under tests/test_approval_request.py. Size: 1KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_base_drift_policy.py",
+      "type": "file",
+      "name": "test_base_drift_policy.py",
+      "filePath": "tests/test_base_drift_policy.py",
+      "summary": "A py file in the tests layer under tests/test_base_drift_policy.py. Size: 2.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+      "type": "file",
+      "name": "test_chatgpt_agent_runbook_continuation.py",
+      "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+      "summary": "A py file in the tests layer under tests/test_chatgpt_agent_runbook_continuation.py. Size: 5.4KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_checkpoint_resume_cleanup.py",
+      "type": "file",
+      "name": "test_checkpoint_resume_cleanup.py",
+      "filePath": "tests/test_checkpoint_resume_cleanup.py",
+      "summary": "A py file in the tests layer under tests/test_checkpoint_resume_cleanup.py. Size: 6.6KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_connector_trace_contract.py",
+      "type": "file",
+      "name": "test_connector_trace_contract.py",
+      "filePath": "tests/test_connector_trace_contract.py",
+      "summary": "A py file in the tests layer under tests/test_connector_trace_contract.py. Size: 3.2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_consumer_package_export.py",
+      "type": "file",
+      "name": "test_consumer_package_export.py",
+      "filePath": "tests/test_consumer_package_export.py",
+      "summary": "A py file in the tests layer under tests/test_consumer_package_export.py. Size: 3.5KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_ds_admin_tc_sync_protocol.py",
+      "type": "file",
+      "name": "test_ds_admin_tc_sync_protocol.py",
+      "filePath": "tests/test_ds_admin_tc_sync_protocol.py",
+      "summary": "A py file in the tests layer under tests/test_ds_admin_tc_sync_protocol.py. Size: 6.5KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_dwc_connector_capability_contract.py",
+      "type": "file",
+      "name": "test_dwc_connector_capability_contract.py",
+      "filePath": "tests/test_dwc_connector_capability_contract.py",
+      "summary": "A py file in the tests layer under tests/test_dwc_connector_capability_contract.py. Size: 2.8KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_fastlane_bootstrap_workflow.py",
+      "type": "file",
+      "name": "test_fastlane_bootstrap_workflow.py",
+      "filePath": "tests/test_fastlane_bootstrap_workflow.py",
+      "summary": "A py file in the tests layer under tests/test_fastlane_bootstrap_workflow.py. Size: 2.1KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g01_decision_capture.py",
+      "type": "file",
+      "name": "test_g01_decision_capture.py",
+      "filePath": "tests/test_g01_decision_capture.py",
+      "summary": "A py file in the tests layer under tests/test_g01_decision_capture.py. Size: 4.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g01_lifecycle.py",
+      "type": "file",
+      "name": "test_g01_lifecycle.py",
+      "filePath": "tests/test_g01_lifecycle.py",
+      "summary": "A py file in the tests layer under tests/test_g01_lifecycle.py. Size: 3.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g01_runtime.py",
+      "type": "file",
+      "name": "test_g01_runtime.py",
+      "filePath": "tests/test_g01_runtime.py",
+      "summary": "A py file in the tests layer under tests/test_g01_runtime.py. Size: 7.2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g0_g1_offline_skill_library.py",
+      "type": "file",
+      "name": "test_g0_g1_offline_skill_library.py",
+      "filePath": "tests/test_g0_g1_offline_skill_library.py",
+      "summary": "A py file in the tests layer under tests/test_g0_g1_offline_skill_library.py. Size: 2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g0_g1_skill_contract.py",
+      "type": "file",
+      "name": "test_g0_g1_skill_contract.py",
+      "filePath": "tests/test_g0_g1_skill_contract.py",
+      "summary": "A py file in the tests layer under tests/test_g0_g1_skill_contract.py. Size: 2.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g2-execution-library.py",
+      "type": "file",
+      "name": "test_g2-execution-library.py",
+      "filePath": "tests/test_g2-execution-library.py",
+      "summary": "A py file in the tests layer under tests/test_g2-execution-library.py. Size: 1.2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g3_delivery.py",
+      "type": "file",
+      "name": "test_g3_delivery.py",
+      "filePath": "tests/test_g3_delivery.py",
+      "summary": "A py file in the tests layer under tests/test_g3_delivery.py. Size: 5.3KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g3_offline_skill_library.py",
+      "type": "file",
+      "name": "test_g3_offline_skill_library.py",
+      "filePath": "tests/test_g3_offline_skill_library.py",
+      "summary": "A py file in the tests layer under tests/test_g3_offline_skill_library.py. Size: 1.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_g3_skill_contract.py",
+      "type": "file",
+      "name": "test_g3_skill_contract.py",
+      "filePath": "tests/test_g3_skill_contract.py",
+      "summary": "A py file in the tests layer under tests/test_g3_skill_contract.py. Size: 1.4KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_gate_lifecycle_process_contract.py",
+      "type": "file",
+      "name": "test_gate_lifecycle_process_contract.py",
+      "filePath": "tests/test_gate_lifecycle_process_contract.py",
+      "summary": "A py file in the tests layer under tests/test_gate_lifecycle_process_contract.py. Size: 7.8KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_gate_response_trace.py",
+      "type": "file",
+      "name": "test_gate_response_trace.py",
+      "filePath": "tests/test_gate_response_trace.py",
+      "summary": "A py file in the tests layer under tests/test_gate_response_trace.py. Size: 1.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_gwc_package_release_note_hygiene.py",
+      "type": "file",
+      "name": "test_gwc_package_release_note_hygiene.py",
+      "filePath": "tests/test_gwc_package_release_note_hygiene.py",
+      "summary": "A py file in the tests layer under tests/test_gwc_package_release_note_hygiene.py. Size: 1.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_gwc_package_revamp_exports.py",
+      "type": "file",
+      "name": "test_gwc_package_revamp_exports.py",
+      "filePath": "tests/test_gwc_package_revamp_exports.py",
+      "summary": "A py file in the tests layer under tests/test_gwc_package_revamp_exports.py. Size: 1.4KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_gwc_workflow_simulator.py",
+      "type": "file",
+      "name": "test_gwc_workflow_simulator.py",
+      "filePath": "tests/test_gwc_workflow_simulator.py",
+      "summary": "A py file in the tests layer under tests/test_gwc_workflow_simulator.py. Size: 1.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_instruction_source_registry.py",
+      "type": "file",
+      "name": "test_instruction_source_registry.py",
+      "filePath": "tests/test_instruction_source_registry.py",
+      "summary": "A py file in the tests layer under tests/test_instruction_source_registry.py. Size: 1.3KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_kiro_local_agent_package.py",
+      "type": "file",
+      "name": "test_kiro_local_agent_package.py",
+      "filePath": "tests/test_kiro_local_agent_package.py",
+      "summary": "A py file in the tests layer under tests/test_kiro_local_agent_package.py. Size: 6.1KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_node_architect_runtime_validation.py",
+      "type": "file",
+      "name": "test_node_architect_runtime_validation.py",
+      "filePath": "tests/test_node_architect_runtime_validation.py",
+      "summary": "A py file in the tests layer under tests/test_node_architect_runtime_validation.py. Size: 6.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_profile_resolver.py",
+      "type": "file",
+      "name": "test_profile_resolver.py",
+      "filePath": "tests/test_profile_resolver.py",
+      "summary": "A py file in the tests layer under tests/test_profile_resolver.py. Size: 8KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tests/test_revamp_upgrade_gwc_workflow.py",
+      "type": "file",
+      "name": "test_revamp_upgrade_gwc_workflow.py",
+      "filePath": "tests/test_revamp_upgrade_gwc_workflow.py",
+      "summary": "A py file in the tests layer under tests/test_revamp_upgrade_gwc_workflow.py. Size: 3.8KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tests"
+    },
+    {
+      "id": "file:tools/build_project_package.py",
+      "type": "file",
+      "name": "build_project_package.py",
+      "filePath": "tools/build_project_package.py",
+      "summary": "A py file in the tools layer under tools/build_project_package.py. Size: 3.8KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/capture_g01_decision.py",
+      "type": "file",
+      "name": "capture_g01_decision.py",
+      "filePath": "tools/capture_g01_decision.py",
+      "summary": "A py file in the tools layer under tools/capture_g01_decision.py. Size: 9.6KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/diff_instruction_package.py",
+      "type": "file",
+      "name": "diff_instruction_package.py",
+      "filePath": "tools/diff_instruction_package.py",
+      "summary": "A py file in the tools layer under tools/diff_instruction_package.py. Size: 2.8KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/evaluate_base_drift.py",
+      "type": "file",
+      "name": "evaluate_base_drift.py",
+      "filePath": "tools/evaluate_base_drift.py",
+      "summary": "A py file in the tools layer under tools/evaluate_base_drift.py. Size: 5KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/export_project_package.py",
+      "type": "file",
+      "name": "export_project_package.py",
+      "filePath": "tools/export_project_package.py",
+      "summary": "A py file in the tools layer under tools/export_project_package.py. Size: 6.4KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/generate_g01_runtime.py",
+      "type": "file",
+      "name": "generate_g01_runtime.py",
+      "filePath": "tools/generate_g01_runtime.py",
+      "summary": "A py file in the tools layer under tools/generate_g01_runtime.py. Size: 17.6KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/gwc_workflow_simulator.py",
+      "type": "file",
+      "name": "gwc_workflow_simulator.py",
+      "filePath": "tools/gwc_workflow_simulator.py",
+      "summary": "A py file in the tools layer under tools/gwc_workflow_simulator.py. Size: 2.6KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/hash_integrity_artifacts.py",
+      "type": "file",
+      "name": "hash_integrity_artifacts.py",
+      "filePath": "tools/hash_integrity_artifacts.py",
+      "summary": "A py file in the tools layer under tools/hash_integrity_artifacts.py. Size: 3.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "type": "file",
+      "name": "cleanup_stale_sessions.py",
+      "filePath": "tools/node_architect/cleanup_stale_sessions.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 4.6KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/compile_node_registry.py",
+      "type": "file",
+      "name": "compile_node_registry.py",
+      "filePath": "tools/node_architect/compile_node_registry.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 3.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/render_ds_admin_tc_projection.py",
+      "type": "file",
+      "name": "render_ds_admin_tc_projection.py",
+      "filePath": "tools/node_architect/render_ds_admin_tc_projection.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 4.3KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/render_kiro_local_agent_package.py",
+      "type": "file",
+      "name": "render_kiro_local_agent_package.py",
+      "filePath": "tools/node_architect/render_kiro_local_agent_package.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 5.5KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/simulate_gate_runtime.py",
+      "type": "file",
+      "name": "simulate_gate_runtime.py",
+      "filePath": "tools/node_architect/simulate_gate_runtime.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 3.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/validate_checkpoint_resume.py",
+      "type": "file",
+      "name": "validate_checkpoint_resume.py",
+      "filePath": "tools/node_architect/validate_checkpoint_resume.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 7.6KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/validate_ds_admin_tc_sync.py",
+      "type": "file",
+      "name": "validate_ds_admin_tc_sync.py",
+      "filePath": "tools/node_architect/validate_ds_admin_tc_sync.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 5.3KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/validate_kiro_local_agent_package.py",
+      "type": "file",
+      "name": "validate_kiro_local_agent_package.py",
+      "filePath": "tools/node_architect/validate_kiro_local_agent_package.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 9.2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/node_architect/validate_node_registry.py",
+      "type": "file",
+      "name": "validate_node_registry.py",
+      "filePath": "tools/node_architect/validate_node_registry.py",
+      "summary": "A py file in the tools layer under tools/node_architect. Size: 5.1KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/resolve_profiles.py",
+      "type": "file",
+      "name": "resolve_profiles.py",
+      "filePath": "tools/resolve_profiles.py",
+      "summary": "A py file in the tools layer under tools/resolve_profiles.py. Size: 9.2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/validate_g01.py",
+      "type": "file",
+      "name": "validate_g01.py",
+      "filePath": "tools/validate_g01.py",
+      "summary": "A py file in the tools layer under tools/validate_g01.py. Size: 14.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/validate_g3_delivery.py",
+      "type": "file",
+      "name": "validate_g3_delivery.py",
+      "filePath": "tools/validate_g3_delivery.py",
+      "summary": "A py file in the tools layer under tools/validate_g3_delivery.py. Size: 8.1KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/validate_gate_response_trace.py",
+      "type": "file",
+      "name": "validate_gate_response_trace.py",
+      "filePath": "tools/validate_gate_response_trace.py",
+      "summary": "A py file in the tools layer under tools/validate_gate_response_trace.py. Size: 2.7KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/validate_hotfix.py",
+      "type": "file",
+      "name": "validate_hotfix.py",
+      "filePath": "tools/validate_hotfix.py",
+      "summary": "A py file in the tools layer under tools/validate_hotfix.py. Size: 5.9KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/validate_instructions.py",
+      "type": "file",
+      "name": "validate_instructions.py",
+      "filePath": "tools/validate_instructions.py",
+      "summary": "A py file in the tools layer under tools/validate_instructions.py. Size: 12KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "complex",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/validate_profile_set.py",
+      "type": "file",
+      "name": "validate_profile_set.py",
+      "filePath": "tools/validate_profile_set.py",
+      "summary": "A py file in the tools layer under tools/validate_profile_set.py. Size: 2KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "simple",
+      "layer": "tools"
+    },
+    {
+      "id": "file:tools/verify_rollout.py",
+      "type": "file",
+      "name": "verify_rollout.py",
+      "filePath": "tools/verify_rollout.py",
+      "summary": "A py file in the tools layer under tools/verify_rollout.py. Size: 2.3KB. Purposes: script.",
+      "tags": [
+        "script"
+      ],
+      "complexity": "moderate",
+      "layer": "tools"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-chat",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-dashboard",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-diff",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-domain",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-explain",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-figma",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-knowledge",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/skills/understand-onboard",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.codex_plugins/understand-anything/plugin.json",
+      "target": "file:.codex_plugins/understand-anything/understand-anything-plugin",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.continue/mcpServers/ds_mcp.yaml",
+      "target": "file:.continue/mcpServers/notion.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.github/workflows/build-packages.yml",
+      "target": "file:.github/workflows/publish-release.yml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.github/workflows/build-packages.yml",
+      "target": "file:.github/workflows/validate-instructions.yml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/g2/approval-envelope.yaml",
+      "target": "file:.gwc/g2/approval-request.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/g2/approval-envelope.yaml",
+      "target": "file:.gwc/g2/change-plan.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/gwc-improve-g2-react-vite/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/implement-g0-g1-skill-library/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/implement-g0-g1-skill-library/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/implement-g0-g1-skill-library/g2/execution-envelope.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/rescue-dw1-trace/g0/intake.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/ci-repair-envelope-01.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g2/execution-envelope.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/decision-input.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_9e002f3e-23c0-4fc6-b84e-fb3cebcb23c9/runtime-input.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/decision-input.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/runtime-input.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g2-execution-envelope.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g3-approval-envelope.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:.gwc/tasks/gwc-improve-g2-react-vite/g0/context-snapshot.yaml",
+      "target": "file:.gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/runtime-input.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:agents/dwc/agent-instructions.md",
+      "target": "file:agents/dwc/capabilities.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:agents/instructionops-agent/agent-instructions.md",
+      "target": "file:agents/instructionops-agent/capabilities.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:agents/instructionops-agent/agent-instructions.md",
+      "target": "file:agents/instructionops-agent/command-contract.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "target": "file:core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "target": "file:core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "target": "file:core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "target": "file:core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "target": "file:core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
+      "target": "file:core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "target": "file:core/runbooks/README.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md",
+      "target": "file:core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/LOCAL_AGENT_RULE.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/USER_COMMAND_FORMAT_RULE.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/project-extension.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/project-instructions.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/project-profile.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/.governance/spec-driven-format.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:dist/rental-home/1.0.0/.governance/Coding_Project_Governance_v1.0.md",
+      "target": "file:dist/rental-home/1.0.0/package-manifest.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/README.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/end-state/design.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/end-state/requirements.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/end-state/tasks.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/migration-reconciliation-doctor-spec.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/notion-importer-spec.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/requirements.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/supabase-snapshot-exporter-spec.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/tasks.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/design.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/requirements.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
+      "target": "file:docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/tasks.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
+      "target": "file:docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:governance/agent-runtime-profiles/chatgpt.yaml",
+      "target": "file:governance/agent-runtime-profiles/dwc.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "target": "file:libs/g0-g1-skill-library/README.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "target": "file:libs/g0-g1-skill-library/manifest.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "target": "file:libs/g0-g1-skill-library/skills/g0-context-loading.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "target": "file:libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "target": "file:libs/g0-g1-skill-library/skills/g1-decision-record.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g0-g1-skill-library/NOTICE.md",
+      "target": "file:libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/README.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/manifest.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-approval-envelope.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-execution-plan.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-react-vite-component-structure.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-react-vite-performance.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-react-vite-state-management.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-react-vite-testing.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g2-skill-library/NOTICE.md",
+      "target": "file:libs/g2-skill-library/skills/g2-repository-interaction.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/README.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/manifest.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/skills/dispatching-parallel-review.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/skills/finishing-development-branch-pr-only.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/skills/receiving-code-review.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/skills/requesting-code-review.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:libs/g3-skill-library/NOTICE.md",
+      "target": "file:libs/g3-skill-library/skills/verification-before-completion.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/ds-mcp/admin-task-claim-rule.md",
+      "target": "file:projects/ds-mcp/package.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/ds-mcp/admin-task-claim-rule.md",
+      "target": "file:projects/ds-mcp/project-extension.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/ds-mcp/admin-task-claim-rule.md",
+      "target": "file:projects/ds-mcp/project-instructions.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/ds-mcp/admin-task-claim-rule.md",
+      "target": "file:projects/ds-mcp/project-profile.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/gwc/package.yaml",
+      "target": "file:projects/gwc/project-extension.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/gwc/package.yaml",
+      "target": "file:projects/gwc/project-instructions.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/gwc/package.yaml",
+      "target": "file:projects/gwc/project-profile.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/pm-skills/package.yaml",
+      "target": "file:projects/pm-skills/project-extension.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/pm-skills/package.yaml",
+      "target": "file:projects/pm-skills/project-instructions.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/pm-skills/package.yaml",
+      "target": "file:projects/pm-skills/project-profile.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/rental-home/package.yaml",
+      "target": "file:projects/rental-home/project-extension.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/rental-home/package.yaml",
+      "target": "file:projects/rental-home/project-instructions.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/rental-home/package.yaml",
+      "target": "file:projects/rental-home/project-profile.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:projects/rental-home/package.yaml",
+      "target": "file:projects/rental-home/spec-driven-format.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/ds-admin-tc-sync.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/external-audit-projection.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/kiro-coding-state.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/kiro-local-agent-package.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/local-agent-command.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/local-agent-validation-report.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/node-registry.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/resume-token.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/runtime-node.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/simulation-result.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/stale-session-cleanup.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/sync-projection-result.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:schemas/node-architect/checkpoint.schema.json",
+      "target": "file:schemas/node-architect/sync-target.schema.json",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "target": "file:templates/g01/g01-decision-input.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "target": "file:templates/g01/g01-runtime-input.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "target": "file:templates/g01/g1-decision-record.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "target": "file:templates/g01/g1-intake-brief.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "target": "file:templates/g01/g1-options.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/g01/g0-context-snapshot.template.yaml",
+      "target": "file:templates/g01/g1-preflight-report.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/gates/g0-hotfix-intake.template.yaml",
+      "target": "file:templates/gates/g3-delivery-record.template.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:templates/gates/g0-hotfix-intake.template.yaml",
+      "target": "file:templates/gates/gate-response.template.md",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-invalid-decision.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-runtime-valid.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-valid/g0/context-snapshot.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tests/fixtures/g01-decision-valid.yaml",
+      "target": "file:tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/compile_node_registry.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/render_ds_admin_tc_projection.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/render_kiro_local_agent_package.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/simulate_gate_runtime.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/validate_checkpoint_resume.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/validate_ds_admin_tc_sync.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/validate_kiro_local_agent_package.py",
+      "type": "contains",
+      "direction": "forward"
+    },
+    {
+      "source": "file:tools/node_architect/cleanup_stale_sessions.py",
+      "target": "file:tools/node_architect/validate_node_registry.py",
+      "type": "contains",
+      "direction": "forward"
+    }
+  ]
+}
