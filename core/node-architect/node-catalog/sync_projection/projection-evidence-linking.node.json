@@ -1,0 +1,12 @@
+{
+  "node_id": "sync-projection-projection-evidence-linking",
+  "node_type": "projection",
+  "title": "Projection Evidence Linking",
+  "canonical": "audit_projection",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION",
+    "G3_PR"
+  ],
+  "description": "Link external records to sanitized task, PR, commit, workflow, and gate evidence identifiers."
+}

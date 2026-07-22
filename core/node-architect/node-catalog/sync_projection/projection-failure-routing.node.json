@@ -1,0 +1,12 @@
+{
+  "node_id": "sync-projection-projection-failure-routing",
+  "node_type": "workflow",
+  "title": "Projection Failure Routing",
+  "canonical": "audit_projection",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION",
+    "G3_PR"
+  ],
+  "description": "Route retryable projection failures, hard denials, stale evidence, and authority conflicts without blocking canonical delivery unnecessarily."
+}

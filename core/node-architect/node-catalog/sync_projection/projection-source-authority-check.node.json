@@ -1,0 +1,11 @@
+{
+  "node_id": "sync-projection-projection-source-authority-check",
+  "node_type": "gate",
+  "title": "Projection Source Authority Check",
+  "canonical": "audit_projection",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ],
+  "description": "Verify every projected field is derived from an allowed canonical source and cannot become gate authority."
+}
