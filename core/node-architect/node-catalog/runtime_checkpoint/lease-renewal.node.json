@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.lease-renewal",
+  "node_type": "workflow",
+  "title": "Lease Renewal",
+  "description": "Renew active leases only when work remains inside the approved scope.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
