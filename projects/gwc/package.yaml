@@ -15,11 +15,11 @@ instructions:
   - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
   - {id: base-drift-policy, path: governance/base-drift-policy.yaml, target: .governance/base-drift-policy.yaml, required: true}
   - {id: gwc-standard-profile-set, path: governance/profile-sets/gwc-standard.yaml, target: .governance/profile-sets/gwc-standard.yaml, required: true}
-  - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/governance/gate-policy-profiles/standard.yaml, required: true}
-  - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/governance/agent-runtime-profiles/chatgpt.yaml, required: true}
-  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/governance/agent-runtime-profiles/dwc.yaml, required: true}
-  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/governance/environment-profiles/repo-governance.yaml, required: true}
-  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/governance/risk-profiles/default.yaml, required: true}
+  - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/gate-policy-profiles/standard.yaml, required: true}
+  - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/agent-runtime-profiles/chatgpt.yaml, required: true}
+  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/agent-runtime-profiles/dwc.yaml, required: true}
+  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/environment-profiles/repo-governance.yaml, required: true}
+  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/risk-profiles/default.yaml, required: true}
   - {id: profile-set-schema, path: schemas/profile-set.schema.json, target: .governance/schemas/profile-set.schema.json, required: true}
   - {id: gate-policy-profile-schema, path: schemas/gate-policy-profile.schema.json, target: .governance/schemas/gate-policy-profile.schema.json, required: true}
   - {id: gate-response-trace-schema, path: schemas/gate-response-trace.schema.json, target: .governance/schemas/gate-response-trace.schema.json, required: true}
@@ -27,7 +27,7 @@ instructions:
   - {id: profile-resolver, path: tools/resolve_profiles.py, target: .governance/tools/resolve_profiles.py, required: true}
   - {id: profile-set-validator, path: tools/validate_profile_set.py, target: .governance/tools/validate_profile_set.py, required: true}
   - {id: gate-response-trace-validator, path: tools/validate_gate_response_trace.py, target: .governance/tools/validate_gate_response_trace.py, required: true}
-  - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/governance/instruction-source-registry.yaml, required: true}
+  - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/instruction-source-registry.yaml, required: true}
   - {id: g01-lifecycle, path: docs/g01-lifecycle.md, target: .governance/g01-lifecycle.md, required: true}
   - {id: project-consumer-agent-instructions, path: docs/project-consumer-agent-instructions.md, target: .governance/project-consumer-agent-instructions.md, required: true}
   - {id: g2-skill-library-readme, path: libs/g2-skill-library/README.md, target: .governance/libs/g2-skill-library/README.md, required: true}
