@@ -1,0 +1,56 @@
+---
+const githubUrl = 'https://github.com/YOUR_USERNAME/YOUR_REPO';
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="brand-footer">
+       <div class="brand-footer-inner">
+             <div class="brand-footer-row">
+                    <div class="brand-footer-logo">
+                          <span>Your Project</span>
+                     </div>
+
+                      <div class="brand-footer-links">
+                           <nav class="brand-footer-link-group" aria-label="Navigation">
+                                <a href="#top">Home</a>
+                                <a href="#features">Features</a>
+                                <a href="#live-demo">Live Demo</a>
+                                <a href="#install">Get Started</a>
+                           </nav>
+                      </div>
+
+                       <div class="brand-footer-social-links" aria-label="Social links">
+                            <a href={githubUrl} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                                  <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor">
+                                    <path d="M12 .587l3.668 7.568L24 9.306l-6 5.986 1.416 8.421L12 19.897l-7.416 3.816L6 15.292 0 9.306l8.332-1.151z"/>
+                                  </svg>
+                            </a>
+                       </div>
+                 </div>
+
+                   <div class="brand-footer-bottom">
+                        <span>&copy; {currentYear} Your Name. All rights reserved.</span>
+                  </div>
+            </div>
+</footer>
+
+<style>
+.brand-footer {
+    position: relative; z-index: 3; overflow: hidden;
+    padding: 30px 32px 22px; color: #1a0b54;
+    background: radial-gradient(circle at 78% 0%, rgba(88,43,232,.08), transparent 38%), linear-gradient(180deg, #fff 0%, #f7f5ff 100%);
+    font-family: var(--font-brand);
+}
+.brand-footer-inner { width: min(100%, 1152px); margin: 0 auto; }
+.brand-footer-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px; min-height: 40px; }
+.brand-footer-logo { display: inline-flex; align-items: center; gap: 8px; color: #1a0b54; font-size: 22px; font-weight: 500; }
+.brand-footer-links { justify-content: center; min-width: 0; gap: 26px; }
+.brand-footer-link-group { gap: 18px; flex-wrap: wrap; justify-content: center; }
+.brand-footer-link-group a { color: #746c91; font-size: 13px; line-height: 1.25; text-decoration: none; white-space: nowrap; transition: color 180ms ease; }
+.brand-footer-link-group a:hover { color: var(--accent); }
+.brand-footer-social-links { display: flex; flex: 0 0 auto; gap: 6px; }
+.brand-footer-social-links a { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; color: #582be8; background: #f4f2fb; text-decoration: none; transition: all 180ms ease; }
+.brand-footer-social-links a:hover { color: #fff; background: #582be8; transform: translateY(-1px); }
+.brand-footer-bottom { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 0.35rem 1.5rem; margin-top: 18px; color: #817a96; font-size: 11px; line-height: 1.45; }
+@media (max-width: 680px) { .brand-footer { padding: 26px 20px 22px; } .brand-footer-links { flex-direction: column; align-items: flex-start; gap: 12px; } .brand-footer-bottom { justify-content: flex-start; margin-top: 20px; } }
+</style>

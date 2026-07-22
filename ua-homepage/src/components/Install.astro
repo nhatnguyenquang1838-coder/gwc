@@ -1,0 +1,41 @@
+---
+<section class="install" id="install">
+      <div class="install-inner reveal">
+          <h2 class="install-title">Get started in <span class="grad">minutes</span>.</h2>
+           <div class="install-code">
+                <div class="install-code-header">
+                     <span class="install-code-dot"></span>
+                     <span class="install-code-label">Terminal</span>
+                </div>
+                 <pre><code><span class="cmd">npm install your-package</span></code></pre>
+           </div>
+            <p class="install-note">Works with any project setup.</p>
+      </div>
+</section>
+
+<style>
+.install { padding: 8rem 2rem; text-align: center; }
+.install-inner { max-width: 600px; margin: 0 auto; }
+.install-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    color: var(--text); font-weight: 780; margin-bottom: 2.5rem;
+}
+.install-code {
+    background: #1e1e2e; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px; overflow: hidden; text-align: left; margin-bottom: 1.5rem;
+}
+.install-code-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.install-code-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent-3);
+}
+.install-code-label { font-size: 0.8rem; color: #8d95aa; font-family: var(--font-code); }
+pre { padding: 1.25rem 1.5rem; margin: 0; overflow-x: auto; }
+code { font-family: var(--font-code); font-size: 0.95rem; line-height: 1.8; color: #eef0fb; }
+.cmd { color: var(--accent); }
+.install-note { font-size: 0.9rem; color: var(--text-muted); }
+@media (max-width: 480px) { .install { padding: 4.5rem 1.25rem; } }
+</style>

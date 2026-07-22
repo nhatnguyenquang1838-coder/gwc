@@ -15,7 +15,6 @@ models:
       - chat
       - edit
       - apply
-models:
   - name: Qwen 3.7 Max
     provider: openai
     model: qwen3.7-max

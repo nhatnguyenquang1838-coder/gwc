@@ -1,0 +1,213 @@
+/* Font declarations — self-hosted, no external CDN dependency */
+@font-face {
+  font-family: 'Mazzard H';
+  src: url('/fonts/MazzardH-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mazzard H';
+  src: url('/fonts/MazzardH-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Variable';
+  src: url('/fonts/GeistVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono Variable';
+  src: url('/fonts/GeistMonoVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Serif Display';
+  src: url('/fonts/DMSerifDisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Design tokens */
+:root {
+  --bg: #f8f8fd;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: #ffffff;
+  --surface-dark: #10131d;
+  --border: #e8e1ff;
+  --border-soft: #eceef4;
+  --violet-deep: #35138f;
+  --brand-violet: #582be8;
+  --violet-bright: #744bef;
+  --violet-light: #a996ff;
+  --violet-mist: #c2b6ff;
+  --gradient-primary: linear-gradient(90deg, #35138f 0%, #582be8 52%, #744bef 100%);
+  --gradient-on-dark: linear-gradient(90deg, #a996ff 0%, #8064f4 45%, #c2b6ff 100%);
+  --button-glow: 0 12px 28px rgba(88, 43, 232, 0.24);
+  --button-glow-hover: 0 16px 36px rgba(88, 43, 232, 0.34);
+  --accent: #582be8;
+  --accent-2: #582be8;
+  --accent-3: #744bef;
+  --accent-deep: #35138f;
+  --accent-soft: #f1ecff;
+  --accent-glow: rgba(88, 43, 232, 0.18);
+  --text: #0f1020;
+  --text-soft: #1f2236;
+  --text-muted: #7e7893;
+  --text-on-dark: #eef0fb;
+  --text-muted-on-dark: #8d95aa;
+  --shadow-soft: 0 30px 80px rgba(88, 43, 232, 0.12), 0 10px 30px rgba(15, 16, 32, 0.08);
+  --shadow-card: 0 18px 42px rgba(80, 70, 120, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.86);
+
+  /* Brand sweep: deep violet -> brand violet -> bright violet */
+  --grad-cool: #35138f;
+  --grad-mid: #582be8;
+  --grad-warm: #744bef;
+  --gradient: var(--gradient);
+
+  --font-heading: 'Mazzard H', sans-serif;
+  --font-body: 'Mazzard H', sans-serif;
+  --font-code: 'Mazzard H', sans-serif;
+  --font-brand: 'Mazzard H', sans-serif;
+}
+
+/* Reset & base */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family: 'Mazzard H', sans-serif;
+}
+
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
+body {
+  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(147, 197, 253, 0.3), transparent 34rem),
+    radial-gradient(circle at 86% 10%, rgba(139, 92, 246, 0.24), transparent 36rem),
+    radial-gradient(circle at 50% 88%, rgba(244, 114, 182, 0.16), transparent 34rem),
+    linear-gradient(180deg, #fbfdff 0%, var(--bg) 42%, #fbf8ff 100%);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Scroll-reveal animation */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+
+.reveal.visible {
+  animation: fadeSlideUp 0.7s ease-out forwards;
+}
+
+/* Stagger delays for feature cards */
+.reveal-delay-1 { animation-delay: 0.1s; }
+.reveal-delay-2 { animation-delay: 0.25s; }
+.reveal-delay-3 { animation-delay: 0.4s; }
+
+/* Gradient text utility */
+.grad {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,11 @@
+# astro build output
+/dist/
+
+# node_modules
+/node_modules/
+
+# macOS
+.DS_Store
+
+# env
+.env*.local
