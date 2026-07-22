@@ -1,0 +1,11 @@
+{
+  "node_id": "package-export-package-manifest-load",
+  "node_type": "tool",
+  "title": "Package Manifest Load",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ],
+  "description": "Load the approved project package manifest and preserve its stable entry order before export."
+}
