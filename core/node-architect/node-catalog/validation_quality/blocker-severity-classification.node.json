@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-blocker-severity-classification",
+  "node_type": "gate",
+  "title": "Blocker Severity Classification",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Classify unresolved blockers before Ready or G4 request."
+}
