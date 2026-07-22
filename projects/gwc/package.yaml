@@ -124,6 +124,18 @@ instructions:
   - {id: repo-delivery-pr-blocker-check-node, path: core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json, required: true}
   - {id: repo-delivery-node-validator, path: tools/node_architect/validate_node_catalog_repo_delivery.py, target: .governance/tools/node_architect/validate_node_catalog_repo_delivery.py, required: true}
   - {id: revamp-gwc-018-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-018-repo-delivery.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-018-repo-delivery.md, required: true}
+  - {id: runtime-checkpoint-node-family-readme, path: core/node-architect/node-catalog/runtime_checkpoint/README.md, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/README.md, required: true}
+  - {id: runtime-checkpoint-checkpoint-capture-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json, required: true}
+  - {id: runtime-checkpoint-checkpoint-persist-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json, required: true}
+  - {id: runtime-checkpoint-resume-token-generation-node, path: core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json, required: true}
+  - {id: runtime-checkpoint-resume-token-validation-node, path: core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json, required: true}
+  - {id: runtime-checkpoint-lease-acquisition-node, path: core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json, required: true}
+  - {id: runtime-checkpoint-lease-renewal-node, path: core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json, required: true}
+  - {id: runtime-checkpoint-cas-write-guard-node, path: core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json, required: true}
+  - {id: runtime-checkpoint-state-reconciliation-node, path: core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json, required: true}
+  - {id: runtime-checkpoint-checkpoint-expiry-cleanup-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json, required: true}
+  - {id: runtime-checkpoint-node-validator, path: tools/node_architect/validate_node_catalog_runtime_checkpoint.py, target: .governance/tools/node_architect/validate_node_catalog_runtime_checkpoint.py, required: true}
+  - {id: revamp-gwc-019-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -145,6 +157,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-019 adds the runtime_checkpoint controlled node catalog batch without runtime engine, scheduler/worker, production data, merge/deploy authority, or changing package_version.
   - REVAMP-GWC-018 adds the repo_delivery controlled node catalog batch without merge/deploy/production authority or changing package_version.
   - REVAMP-GWC-017 adds the gate_authority controlled node catalog batch without merge/deploy/production authority or changing package_version.
   - REVAMP-GWC-016 adds the first controlled node catalog batch for intake_context without implementing all 81 nodes or changing package_version.
@@ -158,5 +171,5 @@ notes:
   - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
   - Package version 1.14.0 adds the canonical Kiro spec-driven delivery rule and ChatGPT/local-agent task-runtime parity.
   - Security-boundary and other listed high-risk changes require explicit human direction.
-  - Merge, deployment, production configuration, credentials, and production data remain separately gated.
+  - Merge, deployment, production configuration, and production data remain separately gated.
   - HOTFIX/RESCUE modes provide bounded bypass for emergency fixes while maintaining core safety (no production data access, no main branch writes, no merge/deploy authority).
