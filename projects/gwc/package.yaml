@@ -83,6 +83,11 @@ instructions:
   - {id: package-export-smoke-verifier, path: tools/verify_package_export_smoke.py, target: .governance/tools/verify_package_export_smoke.py, required: true}
   - {id: runtime-kernel-validator, path: tools/node_architect/validate_runtime_kernel_contract.py, target: .governance/tools/node_architect/validate_runtime_kernel_contract.py, required: true}
   - {id: changelog-fragment-validator, path: tools/validate_changelog_fragments.py, target: .governance/tools/validate_changelog_fragments.py, required: true}
+  - {id: controlled-node-catalog-expansion-plan, path: core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md, target: .governance/core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md, required: true}
+  - {id: node-catalog-expansion-plan, path: core/node-architect/node-catalog-expansion-plan.json, target: .governance/core/node-architect/node-catalog-expansion-plan.json, required: true}
+  - {id: node-catalog-expansion-plan-schema, path: schemas/node-architect/node-catalog-expansion-plan.schema.json, target: .governance/schemas/node-architect/node-catalog-expansion-plan.schema.json, required: true}
+  - {id: node-catalog-expansion-plan-validator, path: tools/node_architect/validate_node_catalog_expansion_plan.py, target: .governance/tools/node_architect/validate_node_catalog_expansion_plan.py, required: true}
+  - {id: revamp-gwc-015-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -104,6 +109,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-015 adds controlled 81-node catalog expansion planning without implementing the 81-node catalog or changing package_version.
   - REVAMP-GWC-010 adds safe changelog fragment hygiene for connector-safe release notes without changing package_version.
   - REVAMP-GWC-009 adds runtime kernel and schema contracts before node catalog expansion without changing package_version.
   - REVAMP-GWC-008 adds post-merge package export smoke verification and generated .governance artifact checks without changing package_version.
