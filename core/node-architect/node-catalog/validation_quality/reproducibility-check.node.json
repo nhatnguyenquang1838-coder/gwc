@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-reproducibility-check",
+  "node_type": "tool",
+  "title": "Reproducibility Check",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Verify validation commands can be reproduced from repository artifacts."
+}
