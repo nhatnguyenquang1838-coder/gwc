@@ -1,0 +1,73 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-22T18:58:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-68
+  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-07-22T18:58:00Z'
+  source: 'chat: If post-merge CI passed, prepare G0/G1 and a G2 envelope for SCRUM-68 Batch 07 package_export with exactly 9 nodes; user supplied workflow run 29946832280.'
+  explicit: true
+rationale: Proceed with the next controlled family by reusing the existing export stack and adding exactly nine package_export descriptors plus bounded validation and package entries.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+scope_hash: sha256:844ab3a1e45b78a91a0d5217b8aecdbc0dd86706fb8bfe3c9f4bdd9ddb9853aa
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Design nine package_export descriptors mapped to existing mechanisms.
+  - sub_task_id: SUB-TASK-2
+    description: Implement family validator and focused tests.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Update package exports and changelog.
+    dependencies:
+    - SUB-TASK-2
+  - sub_task_id: SUB-TASK-4
+    description: Run validation, create Draft PR, and monitor exact-head CI.
+    dependencies:
+    - SUB-TASK-3
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: node_catalog_design
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: python_validation
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: package_export
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-4
+    skill_id: governance_validation
+    agent_type: reviewer
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: One bounded nine-node family; no later family or runtime rewrite.
