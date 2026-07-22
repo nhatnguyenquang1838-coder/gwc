@@ -1,0 +1,11 @@
+{
+  "node_id": "intake_context.request-intake",
+  "node_type": "workflow",
+  "title": "Request Intake",
+  "canonical": "canonical",
+  "authority_boundary": "read_only",
+  "gates": [
+    "G0_CONTEXT"
+  ],
+  "description": "Normalizes the user request into a bounded intake fact set before any gate decision."
+}
