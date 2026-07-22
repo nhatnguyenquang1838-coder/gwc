@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.gate-transition-decision",
+  "node_type": "state",
+  "title": "Gate Transition Decision",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Determines whether a gate should pass, block, request approval, continue validation, or fail closed."
+}
