@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-side-effect-check",
+  "node_type": "workflow",
+  "title": "Side Effect Check",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Confirm catalog-only batches do not add runtime, deploy, or production side effects."
+}

@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-g3-pass-decision",
+  "node_type": "gate",
+  "title": "G3 Pass Decision",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Decide whether exact-head CI, tests, and blocker checks satisfy G3."
+}

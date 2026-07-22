@@ -136,6 +136,18 @@ instructions:
   - {id: runtime-checkpoint-checkpoint-expiry-cleanup-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json, required: true}
   - {id: runtime-checkpoint-node-validator, path: tools/node_architect/validate_node_catalog_runtime_checkpoint.py, target: .governance/tools/node_architect/validate_node_catalog_runtime_checkpoint.py, required: true}
   - {id: revamp-gwc-019-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md, required: true}
+  - {id: validation-quality-node-family-readme, path: core/node-architect/node-catalog/validation_quality/README.md, target: .governance/core/node-architect/node-catalog/validation_quality/README.md, required: true}
+  - {id: validation-quality-schema-validation-node, path: core/node-architect/node-catalog/validation_quality/schema-validation.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/schema-validation.node.json, required: true}
+  - {id: validation-quality-validator-execution-node, path: core/node-architect/node-catalog/validation_quality/validator-execution.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/validator-execution.node.json, required: true}
+  - {id: validation-quality-unit-test-mapping-node, path: core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json, required: true}
+  - {id: validation-quality-ci-evidence-capture-node, path: core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json, required: true}
+  - {id: validation-quality-evidence-quality-check-node, path: core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json, required: true}
+  - {id: validation-quality-reproducibility-check-node, path: core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json, required: true}
+  - {id: validation-quality-blocker-severity-classification-node, path: core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json, required: true}
+  - {id: validation-quality-side-effect-check-node, path: core/node-architect/node-catalog/validation_quality/side-effect-check.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/side-effect-check.node.json, required: true}
+  - {id: validation-quality-g3-pass-decision-node, path: core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json, required: true}
+  - {id: validation-quality-node-validator, path: tools/node_architect/validate_node_catalog_validation_quality.py, target: .governance/tools/node_architect/validate_node_catalog_validation_quality.py, required: true}
+  - {id: revamp-gwc-020-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -157,6 +169,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-020 adds the validation_quality controlled node catalog batch without merge/deploy/production authority, runtime engine, or changing package_version.
   - REVAMP-GWC-019 adds the runtime_checkpoint controlled node catalog batch without runtime engine, scheduler/worker, production data, merge/deploy authority, or changing package_version.
   - REVAMP-GWC-018 adds the repo_delivery controlled node catalog batch without merge/deploy/production authority or changing package_version.
   - REVAMP-GWC-017 adds the gate_authority controlled node catalog batch without merge/deploy/production authority or changing package_version.

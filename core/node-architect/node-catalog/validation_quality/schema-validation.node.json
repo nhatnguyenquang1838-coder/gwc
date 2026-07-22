@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-schema-validation",
+  "node_type": "tool",
+  "title": "Schema Validation",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Validate runtime node payloads against the canonical runtime-node schema."
+}

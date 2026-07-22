@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-unit-test-mapping",
+  "node_type": "workflow",
+  "title": "Unit Test Mapping",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Map changed runtime catalog artifacts to focused unit tests."
+}
