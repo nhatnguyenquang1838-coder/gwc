@@ -1,0 +1,12 @@
+{
+  "node_id": "sync-projection-ds-admin-state-projection",
+  "node_type": "projection",
+  "title": "DS Admin State Projection",
+  "canonical": "audit_projection",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION",
+    "G3_PR"
+  ],
+  "description": "Project canonical task and gate state into DS Admin as audit-only state without granting authority."
+}
