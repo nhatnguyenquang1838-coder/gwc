@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.checkpoint-persist",
+  "node_type": "tool",
+  "title": "Checkpoint Persist",
+  "description": "Persist checkpoint artifacts to the approved workspace without production data access.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
