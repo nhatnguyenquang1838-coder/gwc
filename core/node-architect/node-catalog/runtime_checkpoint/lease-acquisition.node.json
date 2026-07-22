@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.lease-acquisition",
+  "node_type": "connector",
+  "title": "Lease Acquisition",
+  "description": "Acquire bounded work leases before mutating guarded branch state.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
