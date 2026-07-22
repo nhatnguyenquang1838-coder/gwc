@@ -1,0 +1,11 @@
+{
+  "node_id": "intake_context.files-write-scope",
+  "node_type": "workflow",
+  "title": "Files Write Scope",
+  "canonical": "canonical",
+  "authority_boundary": "read_only",
+  "gates": [
+    "G0_CONTEXT"
+  ],
+  "description": "Renders bounded write paths and exclusions for a later G2 execution envelope."
+}

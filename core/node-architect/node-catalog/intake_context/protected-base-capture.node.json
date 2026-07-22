@@ -1,0 +1,11 @@
+{
+  "node_id": "intake_context.protected-base-capture",
+  "node_type": "workflow",
+  "title": "Protected Base Capture",
+  "canonical": "canonical",
+  "authority_boundary": "read_only",
+  "gates": [
+    "G0_CONTEXT"
+  ],
+  "description": "Captures the exact protected base commit SHA used for later gate and PR evidence."
+}

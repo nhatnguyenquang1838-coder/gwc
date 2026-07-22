@@ -1,0 +1,11 @@
+{
+  "node_id": "intake_context.context-gap-escalation",
+  "node_type": "workflow",
+  "title": "Context Gap Escalation",
+  "canonical": "canonical",
+  "authority_boundary": "read_only",
+  "gates": [
+    "G0_CONTEXT"
+  ],
+  "description": "Fails closed when required context, repo evidence, or source instruction evidence is missing."
+}
