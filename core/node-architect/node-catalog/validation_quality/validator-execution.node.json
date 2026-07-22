@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-validator-execution",
+  "node_type": "tool",
+  "title": "Validator Execution",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Run stdlib validators and capture deterministic return codes."
+}
