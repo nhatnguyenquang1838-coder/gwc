@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.approval-command-validation",
+  "node_type": "gate",
+  "title": "Approval Command Validation",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Validates that a human response matches the exact approval command before any G2, G4, G5, or G6 action proceeds."
+}
