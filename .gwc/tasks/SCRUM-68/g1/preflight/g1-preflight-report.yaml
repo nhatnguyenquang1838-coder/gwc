@@ -1,0 +1,73 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-22T18:58:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-68
+  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity and main merge commit are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  - 'PR #75 merged'
+- id: BATCH_06_MERGED
+  status: PASS
+  code: PREVIOUS_BATCH_MERGED
+  message: Batch 06 sync_projection is merged to main.
+  evidence:
+  - 'PR #75'
+  - merge commit 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+- id: POST_MERGE_CI
+  status: PASS
+  code: EXACT_POST_MERGE_CI_SUCCESS
+  message: Validate instructions completed successfully after the merge and checked out the exact merge commit on main.
+  evidence:
+  - workflow run 29946832280
+  - job 89014233368 conclusion=success
+  - checkout SHA 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+- id: BATCH_ADMISSION
+  status: PASS
+  code: BATCH_07_ADMITTED
+  message: The controlled plan admits Batch 07 after Batch 06 merge and exact post-merge CI.
+  evidence:
+  - batch-07-package-export
+  - planned_nodes=9
+  - max_nodes_per_batch=9
+- id: EXISTING_MECHANISM
+  status: PASS
+  code: REUSE_EXISTING_EXPORT_STACK
+  message: Existing export rule, exporter, manifest schema, smoke verifier, runbook, and test are present and will be reused.
+  evidence:
+  - core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md
+  - tools/export_project_package.py
+  - tools/verify_package_export_smoke.py
+  - tests/test_package_export_smoke.py
+- id: SCOPE_ISOLATION
+  status: PASS
+  code: PACKAGE_EXPORT_ONLY
+  message: Scope is limited to one nine-node family and support artifacts.
+  evidence:
+  - no failure_recovery
+  - no scale_control
+  - no runtime publish or consumer update
+- id: RISK_CLASS
+  status: PASS
+  code: R2_GOVERNANCE_PACKAGE_SURFACE
+  message: Package governance and consumer export surface changes are treated as R2.
+  evidence:
+  - package export descriptors
+  - consumer package manifest surface
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
