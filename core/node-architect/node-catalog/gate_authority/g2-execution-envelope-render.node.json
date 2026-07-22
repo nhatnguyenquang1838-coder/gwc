@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.g2-execution-envelope-render",
+  "node_type": "workflow",
+  "title": "G2 Execution Envelope Render",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Renders a bounded G2 execution envelope from G1 decision records, Files READ/WRITE, authorized actions, and exclusions."
+}
