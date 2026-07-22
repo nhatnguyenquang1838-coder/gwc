@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-ci-evidence-capture",
+  "node_type": "workflow",
+  "title": "CI Evidence Capture",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Capture exact-head workflow runs and status evidence for G3."
+}
