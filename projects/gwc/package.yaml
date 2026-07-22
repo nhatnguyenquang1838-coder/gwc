@@ -171,5 +171,5 @@ notes:
   - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
   - Package version 1.14.0 adds the canonical Kiro spec-driven delivery rule and ChatGPT/local-agent task-runtime parity.
   - Security-boundary and other listed high-risk changes require explicit human direction.
-  - Merge, deployment, production configuration, and production data remain separately gated.
+  - Merge, deployment, production configuration, credentials, and production data remain separately gated.
   - HOTFIX/RESCUE modes provide bounded bypass for emergency fixes while maintaining core safety (no production data access, no main branch writes, no merge/deploy authority).
