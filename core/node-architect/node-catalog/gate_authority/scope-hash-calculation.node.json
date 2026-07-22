@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.scope-hash-calculation",
+  "node_type": "tool",
+  "title": "Scope Hash Calculation",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Calculates deterministic scope hashes from approved files, actions, exclusions, base SHA, and expiry inputs."
+}

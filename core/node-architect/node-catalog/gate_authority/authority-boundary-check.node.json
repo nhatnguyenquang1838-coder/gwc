@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.authority-boundary-check",
+  "node_type": "gate",
+  "title": "Authority Boundary Check",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Blocks actions that cross gate authority boundaries, including merge, deploy, production data, secrets, and branch-history operations."
+}

@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.gate-state-resolution",
+  "node_type": "gate",
+  "title": "Gate State Resolution",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Resolves the active GWC gate from intake facts, task artifacts, and prior gate evidence before any transition is considered."
+}

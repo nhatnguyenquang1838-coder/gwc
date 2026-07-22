@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.approval-token-generation",
+  "node_type": "workflow",
+  "title": "Approval Token Generation",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Produces exact human approval commands with gate, approval request ID, scope hash, and UTC expiry for gated actions."
+}
