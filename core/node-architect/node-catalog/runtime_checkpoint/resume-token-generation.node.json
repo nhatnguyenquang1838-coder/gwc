@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.resume-token-generation",
+  "node_type": "workflow",
+  "title": "Resume Token Generation",
+  "description": "Generate resume tokens that bind task, gate, base, head, and evidence context.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
