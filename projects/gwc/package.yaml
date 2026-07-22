@@ -148,6 +148,18 @@ instructions:
   - {id: validation-quality-g3-pass-decision-node, path: core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json, required: true}
   - {id: validation-quality-node-validator, path: tools/node_architect/validate_node_catalog_validation_quality.py, target: .governance/tools/node_architect/validate_node_catalog_validation_quality.py, required: true}
   - {id: revamp-gwc-020-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md, required: true}
+  - {id: sync-projection-node-family-readme, path: core/node-architect/node-catalog/sync_projection/README.md, target: .governance/core/node-architect/node-catalog/sync_projection/README.md, required: true}
+  - {id: sync-projection-ds-admin-state-projection-node, path: core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json, required: true}
+  - {id: sync-projection-task-center-sync-node, path: core/node-architect/node-catalog/sync_projection/task-center-sync.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/task-center-sync.node.json, required: true}
+  - {id: sync-projection-external-audit-event-projection-node, path: core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json, required: true}
+  - {id: sync-projection-source-authority-check-node, path: core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json, required: true}
+  - {id: sync-projection-drift-detection-node, path: core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json, required: true}
+  - {id: sync-projection-reconcile-readback-node, path: core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json, required: true}
+  - {id: sync-projection-failure-routing-node, path: core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json, required: true}
+  - {id: sync-projection-evidence-linking-node, path: core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json, required: true}
+  - {id: sync-projection-privacy-boundary-check-node, path: core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json, required: true}
+  - {id: sync-projection-node-validator, path: tools/node_architect/validate_node_catalog_sync_projection.py, target: .governance/tools/node_architect/validate_node_catalog_sync_projection.py, required: true}
+  - {id: revamp-gwc-022-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -169,6 +181,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-022 adds the sync_projection controlled node catalog batch as audit-only projection evidence without DS Admin/Task Center implementation, merge/deploy/production authority, runtime engine, or changing package_version.
   - REVAMP-GWC-020 adds the validation_quality controlled node catalog batch without merge/deploy/production authority, runtime engine, or changing package_version.
   - REVAMP-GWC-019 adds the runtime_checkpoint controlled node catalog batch without runtime engine, scheduler/worker, production data, merge/deploy authority, or changing package_version.
   - REVAMP-GWC-018 adds the repo_delivery controlled node catalog batch without merge/deploy/production authority or changing package_version.
