@@ -1,0 +1,11 @@
+{
+  "node_id": "intake_context.files-read-scope",
+  "node_type": "workflow",
+  "title": "Files Read Scope",
+  "canonical": "canonical",
+  "authority_boundary": "read_only",
+  "gates": [
+    "G0_CONTEXT"
+  ],
+  "description": "Renders the required read set for the current task from governance and task-specific inputs."
+}
