@@ -1,0 +1,185 @@
+{
+  "$schema": "https://schemas.gwc.dev/node-architect/node-catalog-expansion-plan.schema.json",
+  "plan_id": "revamp-gwc-015-controlled-81-node-catalog-expansion",
+  "plan_version": "0.1",
+  "task_id": "REVAMP-GWC-015",
+  "status": "plan_only",
+  "base_commit": "815a8e9e460bdacc9939e68885fc6bcc09b18e21",
+  "target_total_nodes": 81,
+  "scale_81_nodes_allowed": false,
+  "implementation_allowed": false,
+  "max_nodes_per_batch": 9,
+  "prerequisites": [
+    {
+      "id": "runtime_kernel",
+      "status": "landed",
+      "evidence": "PR #61 + PR #66 main consolidation"
+    },
+    {
+      "id": "reference_nodes",
+      "status": "landed",
+      "evidence": "PR #66"
+    },
+    {
+      "id": "checkpoint_engine_contract",
+      "status": "landed",
+      "evidence": "PR #66"
+    },
+    {
+      "id": "failure_simulation_matrix",
+      "status": "landed",
+      "evidence": "PR #66"
+    }
+  ],
+  "node_families": [
+    {
+      "family_id": "intake_context",
+      "planned_nodes": 9,
+      "authority_boundary": "G0_CONTEXT",
+      "purpose": "Request intake, context capture, and source resolution."
+    },
+    {
+      "family_id": "gate_authority",
+      "planned_nodes": 9,
+      "authority_boundary": "G1_ALIGNMENT_G2_EXECUTION",
+      "purpose": "Gate state, approval, evidence, and scope enforcement."
+    },
+    {
+      "family_id": "repo_delivery",
+      "planned_nodes": 9,
+      "authority_boundary": "G2_EXECUTION_G3_PR",
+      "purpose": "Branch, diff, PR, CI, and review workflow."
+    },
+    {
+      "family_id": "runtime_checkpoint",
+      "planned_nodes": 9,
+      "authority_boundary": "G2_EXECUTION",
+      "purpose": "Checkpoint, resume, lease, CAS, and reconciliation."
+    },
+    {
+      "family_id": "validation_quality",
+      "planned_nodes": 9,
+      "authority_boundary": "G3_PR",
+      "purpose": "Validators, test mapping, and evidence quality."
+    },
+    {
+      "family_id": "sync_projection",
+      "planned_nodes": 9,
+      "authority_boundary": "G2_EXECUTION_G3_PR",
+      "purpose": "DS Admin, task center, and external audit projections."
+    },
+    {
+      "family_id": "package_export",
+      "planned_nodes": 9,
+      "authority_boundary": "G2_EXECUTION_G3_PR",
+      "purpose": "Package build, export, and smoke verification."
+    },
+    {
+      "family_id": "failure_recovery",
+      "planned_nodes": 9,
+      "authority_boundary": "G2_EXECUTION_G5_DEPLOY",
+      "purpose": "Timeout, crash, stale session, retry, and rollback handling."
+    },
+    {
+      "family_id": "scale_control",
+      "planned_nodes": 9,
+      "authority_boundary": "G3_PR_G5_DEPLOY",
+      "purpose": "Batch control, readiness, throttle, and observability."
+    }
+  ],
+  "batch_sequence": [
+    {
+      "batch_id": "batch-01-intake-context",
+      "family_id": "intake_context",
+      "planned_nodes": 9,
+      "base_requirement": "main contains REVAMP-GWC-015"
+    },
+    {
+      "batch_id": "batch-02-gate-authority",
+      "family_id": "gate_authority",
+      "planned_nodes": 9,
+      "base_requirement": "batch-01 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-03-repo-delivery",
+      "family_id": "repo_delivery",
+      "planned_nodes": 9,
+      "base_requirement": "batch-02 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-04-runtime-checkpoint",
+      "family_id": "runtime_checkpoint",
+      "planned_nodes": 9,
+      "base_requirement": "batch-03 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-05-validation-quality",
+      "family_id": "validation_quality",
+      "planned_nodes": 9,
+      "base_requirement": "batch-04 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-06-sync-projection",
+      "family_id": "sync_projection",
+      "planned_nodes": 9,
+      "base_requirement": "batch-05 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-07-package-export",
+      "family_id": "package_export",
+      "planned_nodes": 9,
+      "base_requirement": "batch-06 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-08-failure-recovery",
+      "family_id": "failure_recovery",
+      "planned_nodes": 9,
+      "base_requirement": "batch-07 merged and post-merge CI verified"
+    },
+    {
+      "batch_id": "batch-09-scale-control",
+      "family_id": "scale_control",
+      "planned_nodes": 9,
+      "base_requirement": "batch-08 merged and post-merge CI verified"
+    }
+  ],
+  "admission_criteria": [
+    "previous_batch_merged_to_main",
+    "exact_post_merge_ci_available",
+    "node_schema_validation_passes",
+    "node_registry_compile_passes",
+    "failure_simulation_matrix_current",
+    "no_unresolved_blocker_or_major",
+    "no_merge_deploy_or_production_authority_in_batch_scope"
+  ],
+  "validation_lanes": [
+    "schema",
+    "registry",
+    "gate_authority",
+    "side_effects",
+    "suspend_resume",
+    "failure_mapping",
+    "package_export"
+  ],
+  "stop_conditions": [
+    "target_total_nodes_changed_without_new_g1_decision",
+    "batch_exceeds_max_nodes_per_batch",
+    "production_engine_implementation_requested",
+    "node_crosses_authority_boundary_without_gate",
+    "package_export_cannot_include_new_artifacts_safely",
+    "validation_cannot_be_reproduced"
+  ],
+  "explicit_exclusions": [
+    "implement_81_node_catalog",
+    "production_runtime_engine",
+    "scheduler_worker",
+    "merge",
+    "auto_merge",
+    "deploy_release",
+    "production_config_data",
+    "secrets_credentials",
+    "migration",
+    "direct_main_push",
+    "force_push_branch_delete_pr_base_change"
+  ]
+}

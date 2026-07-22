@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.gwc.dev/node-architect/node-catalog-expansion-plan.schema.json",
+  "title": "GWC Node Catalog Expansion Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "plan_id",
+    "plan_version",
+    "task_id",
+    "status",
+    "base_commit",
+    "target_total_nodes",
+    "scale_81_nodes_allowed",
+    "implementation_allowed",
+    "max_nodes_per_batch",
+    "prerequisites",
+    "node_families",
+    "batch_sequence",
+    "admission_criteria",
+    "validation_lanes",
+    "stop_conditions",
+    "explicit_exclusions"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]+$"
+    },
+    "plan_version": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string",
+      "const": "REVAMP-GWC-015"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "plan_only"
+      ]
+    },
+    "base_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "target_total_nodes": {
+      "type": "integer",
+      "const": 81
+    },
+    "scale_81_nodes_allowed": {
+      "type": "boolean",
+      "const": false
+    },
+    "implementation_allowed": {
+      "type": "boolean",
+      "const": false
+    },
+    "max_nodes_per_batch": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9
+    },
+    "prerequisites": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "landed"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "node_families": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "family_id",
+          "planned_nodes",
+          "authority_boundary",
+          "purpose"
+        ],
+        "properties": {
+          "family_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]+$"
+          },
+          "planned_nodes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9
+          },
+          "authority_boundary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "batch_sequence": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "batch_id",
+          "family_id",
+          "planned_nodes",
+          "base_requirement"
+        ],
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "pattern": "^batch-[0-9]{2}-[a-z0-9-]+$"
+          },
+          "family_id": {
+            "type": "string"
+          },
+          "planned_nodes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9
+          },
+          "base_requirement": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "admission_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation_lanes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "explicit_exclusions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
