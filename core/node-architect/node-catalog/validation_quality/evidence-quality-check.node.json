@@ -1,0 +1,11 @@
+{
+  "node_id": "validation-quality-evidence-quality-check",
+  "node_type": "gate",
+  "title": "Evidence Quality Check",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ],
+  "description": "Check evidence completeness before declaring G3 PASS."
+}
