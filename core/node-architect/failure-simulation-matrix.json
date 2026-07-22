@@ -1,0 +1,49 @@
+{
+  "schema_version": "0.1",
+  "matrix_id": "revamp-gwc-013-failure-simulation-scale-readiness",
+  "scale_81_nodes_allowed": false,
+  "required_cases": [
+    {
+      "case_id": "unknown_write_result_reconciles_before_retry",
+      "trigger": "provider returns ambiguous result after a side effect attempt",
+      "expected_response": "reconcile live state before retry",
+      "forbidden_behaviors": ["blind retry", "false pass"],
+      "evidence_required": ["provider_result", "live_state_readback", "checkpoint_revision"]
+    },
+    {
+      "case_id": "cas_mismatch_reloads_checkpoint",
+      "trigger": "checkpoint revision changed before persist",
+      "expected_response": "reload checkpoint and reconcile",
+      "forbidden_behaviors": ["overwrite newer checkpoint", "continue stale state"],
+      "evidence_required": ["expected_revision", "actual_revision", "reload_evidence"]
+    },
+    {
+      "case_id": "lease_expired_stops_or_reacquires",
+      "trigger": "lease expires before node advance",
+      "expected_response": "stop or safely reacquire lease after readback",
+      "forbidden_behaviors": ["advance without lease", "assume ownership"],
+      "evidence_required": ["lease_owner", "lease_expires_at_utc", "readback_evidence"]
+    },
+    {
+      "case_id": "approval_expired_regenerates_request",
+      "trigger": "approval command is expired or scope mismatched",
+      "expected_response": "regenerate approval request without side effect",
+      "forbidden_behaviors": ["execute with stale approval", "reuse scope hash blindly"],
+      "evidence_required": ["approval_request_id", "expires_at_utc", "scope_hash"]
+    },
+    {
+      "case_id": "duplicate_agent_blocked_by_lease",
+      "trigger": "two agents try to resume the same run",
+      "expected_response": "only lease holder advances node",
+      "forbidden_behaviors": ["double write", "parallel checkpoint advance"],
+      "evidence_required": ["lease_owner", "agent_id", "checkpoint_revision"]
+    },
+    {
+      "case_id": "node_version_drift_pins_or_restarts",
+      "trigger": "node content changes while run is active",
+      "expected_response": "pin old version or restart with explicit new run",
+      "forbidden_behaviors": ["mix node versions", "silently continue with drift"],
+      "evidence_required": ["node_id", "node_version", "run_id"]
+    }
+  ]
+}
