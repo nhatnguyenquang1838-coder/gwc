@@ -1,0 +1,11 @@
+{
+  "node_id": "intake_context.risk-classification",
+  "node_type": "workflow",
+  "title": "Risk Classification",
+  "canonical": "canonical",
+  "authority_boundary": "read_only",
+  "gates": [
+    "G0_CONTEXT"
+  ],
+  "description": "Classifies request risk flags before deciding which gate path is required."
+}
