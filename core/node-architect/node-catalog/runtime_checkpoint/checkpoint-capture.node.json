@@ -1,0 +1,11 @@
+{
+  "node_id": "runtime_checkpoint.checkpoint-capture",
+  "node_type": "state",
+  "title": "Checkpoint Capture",
+  "description": "Capture a deterministic checkpoint before bounded execution state changes.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
