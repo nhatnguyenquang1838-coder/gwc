@@ -1,6 +1,6 @@
-schema_version: "1.0"
+schema_version: '1.0'
 project_id: gwc
-package_version: "1.16.0"
+package_version: '1.16.0'
 status: active
 profile: projects/gwc/project-profile.yaml
 instructions:
@@ -88,6 +88,18 @@ instructions:
   - {id: node-catalog-expansion-plan-schema, path: schemas/node-architect/node-catalog-expansion-plan.schema.json, target: .governance/schemas/node-architect/node-catalog-expansion-plan.schema.json, required: true}
   - {id: node-catalog-expansion-plan-validator, path: tools/node_architect/validate_node_catalog_expansion_plan.py, target: .governance/tools/node_architect/validate_node_catalog_expansion_plan.py, required: true}
   - {id: revamp-gwc-015-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md, required: true}
+  - {id: intake-context-node-family-readme, path: core/node-architect/node-catalog/intake_context/README.md, target: .governance/core/node-architect/node-catalog/intake_context/README.md, required: true}
+  - {id: intake-context-request-intake-node, path: core/node-architect/node-catalog/intake_context/request-intake.node.json, target: .governance/core/node-architect/node-catalog/intake_context/request-intake.node.json, required: true}
+  - {id: intake-context-source-resolution-node, path: core/node-architect/node-catalog/intake_context/source-resolution.node.json, target: .governance/core/node-architect/node-catalog/intake_context/source-resolution.node.json, required: true}
+  - {id: intake-context-repo-identity-check-node, path: core/node-architect/node-catalog/intake_context/repo-identity-check.node.json, target: .governance/core/node-architect/node-catalog/intake_context/repo-identity-check.node.json, required: true}
+  - {id: intake-context-protected-base-capture-node, path: core/node-architect/node-catalog/intake_context/protected-base-capture.node.json, target: .governance/core/node-architect/node-catalog/intake_context/protected-base-capture.node.json, required: true}
+  - {id: intake-context-risk-classification-node, path: core/node-architect/node-catalog/intake_context/risk-classification.node.json, target: .governance/core/node-architect/node-catalog/intake_context/risk-classification.node.json, required: true}
+  - {id: intake-context-files-read-scope-node, path: core/node-architect/node-catalog/intake_context/files-read-scope.node.json, target: .governance/core/node-architect/node-catalog/intake_context/files-read-scope.node.json, required: true}
+  - {id: intake-context-files-write-scope-node, path: core/node-architect/node-catalog/intake_context/files-write-scope.node.json, target: .governance/core/node-architect/node-catalog/intake_context/files-write-scope.node.json, required: true}
+  - {id: intake-context-intake-card-render-node, path: core/node-architect/node-catalog/intake_context/intake-card-render.node.json, target: .governance/core/node-architect/node-catalog/intake_context/intake-card-render.node.json, required: true}
+  - {id: intake-context-context-gap-escalation-node, path: core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json, target: .governance/core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json, required: true}
+  - {id: intake-context-node-validator, path: tools/node_architect/validate_node_catalog_intake_context.py, target: .governance/tools/node_architect/validate_node_catalog_intake_context.py, required: true}
+  - {id: revamp-gwc-016-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-016-intake-context.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-016-intake-context.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -109,6 +121,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-016 adds the first controlled node catalog batch for intake_context without implementing all 81 nodes or changing package_version.
   - REVAMP-GWC-015 adds controlled 81-node catalog expansion planning without implementing the 81-node catalog or changing package_version.
   - REVAMP-GWC-010 adds safe changelog fragment hygiene for connector-safe release notes without changing package_version.
   - REVAMP-GWC-009 adds runtime kernel and schema contracts before node catalog expansion without changing package_version.
