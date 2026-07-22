@@ -15,11 +15,11 @@ instructions:
   - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
   - {id: base-drift-policy, path: governance/base-drift-policy.yaml, target: .governance/base-drift-policy.yaml, required: true}
   - {id: gwc-standard-profile-set, path: governance/profile-sets/gwc-standard.yaml, target: .governance/profile-sets/gwc-standard.yaml, required: true}
-  - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/gate-policy-profiles/standard.yaml, required: true}
-  - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/agent-runtime-profiles/chatgpt.yaml, required: true}
-  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/agent-runtime-profiles/dwc.yaml, required: true}
-  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/environment-profiles/repo-governance.yaml, required: true}
-  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/risk-profiles/default.yaml, required: true}
+  - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/governance/gate-policy-profiles/standard.yaml, required: true}
+  - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/governance/agent-runtime-profiles/chatgpt.yaml, required: true}
+  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/governance/agent-runtime-profiles/dwc.yaml, required: true}
+  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/governance/environment-profiles/repo-governance.yaml, required: true}
+  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/governance/risk-profiles/default.yaml, required: true}
   - {id: profile-set-schema, path: schemas/profile-set.schema.json, target: .governance/schemas/profile-set.schema.json, required: true}
   - {id: gate-policy-profile-schema, path: schemas/gate-policy-profile.schema.json, target: .governance/schemas/gate-policy-profile.schema.json, required: true}
   - {id: gate-response-trace-schema, path: schemas/gate-response-trace.schema.json, target: .governance/schemas/gate-response-trace.schema.json, required: true}
@@ -27,7 +27,7 @@ instructions:
   - {id: profile-resolver, path: tools/resolve_profiles.py, target: .governance/tools/resolve_profiles.py, required: true}
   - {id: profile-set-validator, path: tools/validate_profile_set.py, target: .governance/tools/validate_profile_set.py, required: true}
   - {id: gate-response-trace-validator, path: tools/validate_gate_response_trace.py, target: .governance/tools/validate_gate_response_trace.py, required: true}
-  - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/instruction-source-registry.yaml, required: true}
+  - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/governance/instruction-source-registry.yaml, required: true}
   - {id: g01-lifecycle, path: docs/g01-lifecycle.md, target: .governance/g01-lifecycle.md, required: true}
   - {id: project-consumer-agent-instructions, path: docs/project-consumer-agent-instructions.md, target: .governance/project-consumer-agent-instructions.md, required: true}
   - {id: g2-skill-library-readme, path: libs/g2-skill-library/README.md, target: .governance/libs/g2-skill-library/README.md, required: true}
@@ -160,6 +160,18 @@ instructions:
   - {id: sync-projection-privacy-boundary-check-node, path: core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json, required: true}
   - {id: sync-projection-node-validator, path: tools/node_architect/validate_node_catalog_sync_projection.py, target: .governance/tools/node_architect/validate_node_catalog_sync_projection.py, required: true}
   - {id: revamp-gwc-022-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md, required: true}
+  - {id: package-export-node-family-readme, path: core/node-architect/node-catalog/package_export/README.md, target: .governance/core/node-architect/node-catalog/package_export/README.md, required: true}
+  - {id: package-export-package-manifest-load-node, path: core/node-architect/node-catalog/package_export/package-manifest-load.node.json, target: .governance/core/node-architect/node-catalog/package_export/package-manifest-load.node.json, required: true}
+  - {id: package-export-entry-schema-validation-node, path: core/node-architect/node-catalog/package_export/entry-schema-validation.node.json, target: .governance/core/node-architect/node-catalog/package_export/entry-schema-validation.node.json, required: true}
+  - {id: package-export-source-path-safety-check-node, path: core/node-architect/node-catalog/package_export/source-path-safety-check.node.json, target: .governance/core/node-architect/node-catalog/package_export/source-path-safety-check.node.json, required: true}
+  - {id: package-export-target-path-safety-check-node, path: core/node-architect/node-catalog/package_export/target-path-safety-check.node.json, target: .governance/core/node-architect/node-catalog/package_export/target-path-safety-check.node.json, required: true}
+  - {id: package-export-governance-tree-build-node, path: core/node-architect/node-catalog/package_export/governance-tree-build.node.json, target: .governance/core/node-architect/node-catalog/package_export/governance-tree-build.node.json, required: true}
+  - {id: package-export-export-manifest-generation-node, path: core/node-architect/node-catalog/package_export/export-manifest-generation.node.json, target: .governance/core/node-architect/node-catalog/package_export/export-manifest-generation.node.json, required: true}
+  - {id: package-export-deterministic-hash-verification-node, path: core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json, target: .governance/core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json, required: true}
+  - {id: package-export-smoke-verification-node, path: core/node-architect/node-catalog/package_export/smoke-verification.node.json, target: .governance/core/node-architect/node-catalog/package_export/smoke-verification.node.json, required: true}
+  - {id: package-export-export-failure-routing-node, path: core/node-architect/node-catalog/package_export/export-failure-routing.node.json, target: .governance/core/node-architect/node-catalog/package_export/export-failure-routing.node.json, required: true}
+  - {id: package-export-node-validator, path: tools/node_architect/validate_node_catalog_package_export.py, target: .governance/tools/node_architect/validate_node_catalog_package_export.py, required: true}
+  - {id: revamp-gwc-023-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -181,6 +193,7 @@ notes:
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
   - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-023 adds the package_export controlled node catalog batch by extending deterministic package build, manifest, hash readback, and smoke verification without publishing, consumer mutation, merge/deploy/production authority, or changing package_version.
   - REVAMP-GWC-022 adds the sync_projection controlled node catalog batch as audit-only projection evidence without DS Admin/Task Center implementation, merge/deploy/production authority, runtime engine, or changing package_version.
   - REVAMP-GWC-020 adds the validation_quality controlled node catalog batch without merge/deploy/production authority, runtime engine, or changing package_version.
   - REVAMP-GWC-019 adds the runtime_checkpoint controlled node catalog batch without runtime engine, scheduler/worker, production data, merge/deploy authority, or changing package_version.
