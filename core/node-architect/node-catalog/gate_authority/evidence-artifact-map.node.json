@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.evidence-artifact-map",
+  "node_type": "schema",
+  "title": "Evidence Artifact Map",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Maps required gate evidence to canonical artifact locations so agents do not claim pass without traceable proof."
+}
