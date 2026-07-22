@@ -1,0 +1,12 @@
+{
+  "node_id": "repo_delivery.ready-for-review-promotion",
+  "node_type": "connector",
+  "title": "Ready For Review Promotion",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION",
+    "G3_PR"
+  ],
+  "description": "Promote Draft PR to Ready for Review only after G3 criteria pass."
+}

@@ -1,0 +1,12 @@
+{
+  "node_id": "repo_delivery.ci-failure-repair",
+  "node_type": "workflow",
+  "title": "Ci Failure Repair",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION",
+    "G3_PR"
+  ],
+  "description": "Repair CI failures within the same bounded PR scope."
+}
