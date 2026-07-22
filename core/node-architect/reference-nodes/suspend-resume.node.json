@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1",
+  "node_id": "reference.await_approval",
+  "node_version": "0.1.0",
+  "node_class": "suspend_resume",
+  "purpose": "Stop at a human approval boundary, persist checkpoint evidence, and resume only after an exact valid command or explicit rejection.",
+  "entry": {
+    "requires": [
+      "readback_evidence_current",
+      "next_gate_requires_human_decision",
+      "checkpoint_writer_available"
+    ]
+  },
+  "do": {
+    "actions": [
+      "prepare_approval_request",
+      "persist_checkpoint_before_suspend",
+      "emit_exact_approval_command"
+    ],
+    "side_effect": false,
+    "checkpoint_before_suspend": true,
+    "resume_signal": "exact_approval_command_or_rejection"
+  },
+  "branches": [
+    {
+      "when": "exact_approval_received_and_current",
+      "route": "next_authorized_node"
+    },
+    {
+      "when": "approval_expired_or_scope_mismatch",
+      "route": "regenerate_approval_request"
+    },
+    {
+      "when": "rejected",
+      "route": "stop_without_side_effect"
+    }
+  ],
+  "exit": {
+    "evidence": [
+      "approval_request_id",
+      "scope_hash",
+      "expires_at_utc",
+      "resume_signal_status"
+    ]
+  },
+  "next": ["next_authorized_node"]
+}
