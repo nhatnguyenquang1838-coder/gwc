@@ -1,0 +1,54 @@
+{
+  "schema_version": "0.1",
+  "node_id": "reference.scoped_write",
+  "node_version": "0.1.0",
+  "node_class": "side_effect_write",
+  "purpose": "Perform one bounded repository side effect only after valid G2 authority and read it back before routing forward.",
+  "entry": {
+    "requires": [
+      "valid_g2_approval",
+      "files_write_declared",
+      "scope_hash_current",
+      "parent_checkpoint_clean"
+    ]
+  },
+  "do": {
+    "actions": [
+      "prepare_single_write",
+      "execute_bounded_write",
+      "read_back_written_resource"
+    ],
+    "side_effect": true,
+    "idempotency_key_required": true,
+    "idempotency_key_fields": [
+      "task_id",
+      "gate",
+      "target_path",
+      "approved_scope_hash"
+    ],
+    "readback_node": "reference.read_context"
+  },
+  "branches": [
+    {
+      "when": "write_denied_or_scope_mismatch",
+      "route": "fail_closed"
+    },
+    {
+      "when": "write_succeeded_and_readback_matches",
+      "route": "reference.await_approval"
+    },
+    {
+      "when": "write_result_unknown",
+      "route": "reconcile_before_retry"
+    }
+  ],
+  "exit": {
+    "evidence": [
+      "write_target",
+      "idempotency_key",
+      "provider_result",
+      "readback_evidence"
+    ]
+  },
+  "next": ["reference.await_approval"]
+}
