@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.blocked-action-escalation",
+  "node_type": "workflow",
+  "title": "Blocked Action Escalation",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Explains blocked actions and generates the next exact approval or remediation command instead of stopping vaguely."
+}
