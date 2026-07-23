@@ -12,14 +12,14 @@ instructions:
   - {id: agent-behavior-semantic-contract, path: core/Agent_Behavior_Semantic_Contract_v1.0.md, target: .governance/Agent_Behavior_Semantic_Contract_v1.0.md, required: true}
   - {id: agent-response-presentation-contract, path: core/Agent_Response_Presentation_Contract_v1.0.md, target: .governance/Agent_Response_Presentation_Contract_v1.0.md, required: true}
   - {id: e2e-draft-pr-delivery, path: core/E2E_DRAFT_PR_DELIVERY_RULE.md, target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md, required: true}
-  - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
+  - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/core/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
   - {id: base-drift-policy, path: governance/base-drift-policy.yaml, target: .governance/base-drift-policy.yaml, required: true}
   - {id: gwc-standard-profile-set, path: governance/profile-sets/gwc-standard.yaml, target: .governance/profile-sets/gwc-standard.yaml, required: true}
   - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/gate-policy-profiles/standard.yaml, required: true}
   - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/agent-runtime-profiles/chatgpt.yaml, required: true}
-  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/agent-runtime-profiles/dwc.yaml, required: true}
-  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/environment-profiles/repo-governance.yaml, required: true}
-  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/risk-profiles/default.yaml, required: true}
+  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/governance/agent-runtime-profiles/dwc.yaml, required: true}
+  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/governance/environment-profiles/repo-governance.yaml, required: true}
+  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/governance/risk-profiles/default.yaml, required: true}
   - {id: profile-set-schema, path: schemas/profile-set.schema.json, target: .governance/schemas/profile-set.schema.json, required: true}
   - {id: gate-policy-profile-schema, path: schemas/gate-policy-profile.schema.json, target: .governance/schemas/gate-policy-profile.schema.json, required: true}
   - {id: gate-response-trace-schema, path: schemas/gate-response-trace.schema.json, target: .governance/schemas/gate-response-trace.schema.json, required: true}
@@ -184,6 +184,18 @@ instructions:
   - {id: failure-recovery-version-drift-rollback-routing-node, path: core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, required: true}
   - {id: failure-recovery-node-validator, path: tools/node_architect/validate_node_catalog_failure_recovery.py, target: .governance/tools/node_architect/validate_node_catalog_failure_recovery.py, required: true}
   - {id: revamp-gwc-024-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, required: true}
+  - {id: scale-control-node-family-readme, path: core/node-architect/node-catalog/scale_control/README.md, target: .governance/core/node-architect/node-catalog/scale_control/README.md, required: true}
+  - {id: scale-control-batch-admission-check-node, path: core/node-architect/node-catalog/scale_control/batch-admission-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/batch-admission-check.node.json, required: true}
+  - {id: scale-control-batch-size-limit-check-node, path: core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json, required: true}
+  - {id: scale-control-previous-batch-g5-verification-node, path: core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json, target: .governance/core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json, required: true}
+  - {id: scale-control-catalog-cardinality-readiness-node, path: core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json, target: .governance/core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json, required: true}
+  - {id: scale-control-execution-throttle-control-node, path: core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json, target: .governance/core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json, required: true}
+  - {id: scale-control-workflow-run-observability-node, path: core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json, target: .governance/core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json, required: true}
+  - {id: scale-control-exact-head-readiness-check-node, path: core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json, required: true}
+  - {id: scale-control-rollout-progress-projection-node, path: core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json, target: .governance/core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json, required: true}
+  - {id: scale-control-independent-audit-handoff-node, path: core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, target: .governance/core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, required: true}
+  - {id: scale-control-node-validator, path: tools/node_architect/validate_node_catalog_scale_control.py, target: .governance/tools/node_architect/validate_node_catalog_scale_control.py, required: true}
+  - {id: revamp-gwc-025-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -201,6 +213,7 @@ work_tracking:
   lease_renewal_required: false
   status_transitions_from_state_engine: true
 notes:
+  - REVAMP-GWC-025 adds the final scale_control catalog batch, completing 81 descriptors for independent audit while keeping scale permission false and package_version unchanged.
   - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.
   - DWC repository reads are automatic for this verified repository.
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
