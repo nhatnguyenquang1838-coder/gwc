@@ -12,7 +12,13 @@ from typing import Any
 
 REQUIRED_NODE_FIELDS = {"node_id", "node_type", "title", "canonical", "authority_boundary", "gates"}
 VALID_GATES = {"G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"}
-AUTHORITY_TO_GATE = {"g2_required": "G2_EXECUTION", "g4_required": "G4_MERGE", "g5_required": "G5_DEPLOY", "g6_required": "G6_PRODUCTION_DATA"}
+AUTHORITY_TO_GATE = {
+    "g2_required": "G2_EXECUTION",
+    "g3_required": "G3_PR",
+    "g4_required": "G4_MERGE",
+    "g5_required": "G5_DEPLOY",
+    "g6_required": "G6_PRODUCTION_DATA",
+}
 
 
 def _finding(severity: str, code: str, message: str) -> dict[str, str]:
