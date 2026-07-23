@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.duplicate-agent-fencing",
+  "node_type": "gate",
+  "title": "Duplicate Agent Fencing",
+  "description": "Fence duplicate agents so only the valid lease holder may advance or perform a side effect.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
