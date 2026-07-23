@@ -1,0 +1,65 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-23T07:15:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-73
+  base_sha: fec372605988caa783603fc6574f4c1209c1d9fa
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Validate GWC gate lifecycle and end-to-end workflow by creating a minimal test task
+  why_now: User requested testing GWC with a new Jira task
+desired_outcome: Complete G0/G1 package and present G2 execution envelope approval command
+stakeholders:
+  requester: operator
+  affected:
+    - gwc_operator
+scope:
+  in_scope:
+    - Create Jira task tracking GWC test
+    - Create G0 context snapshot
+    - Create G1 artifacts
+    - Validate available tools and schemas
+    - Propose bounded next steps
+  non_goals:
+    - Repository mutation
+    - Branch creation
+    - Commit or push
+    - Merge, deploy, or production operations
+constraints:
+  - Must follow gwc runbook and canonical policy
+  - Must keep artifacts under .gwc/tasks/SCRUM-73/
+  - Must report validators honestly when unavailable
+assumptions:
+  - Jira connector is available and authenticated
+  - GitHub connector can inspect protected base
+  - Local filesystem supports artifact creation
+risks:
+  - id: RISK-1
+    description: Canonical Python validator cannot run without pip
+    impact: low
+    mitigation: Use available Bun-based validation as fallback
+acceptance_criteria:
+  - id: AC-1
+    statement: G0 and G1 artifacts are schema-valid and traceable
+    verifiable: true
+  - id: AC-2
+    statement: Validator evidence is recorded honestly
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - read_repository
+    - create_task_artifacts
+    - validate_schemas
+  downstream_non_goals:
+    - merge
+    - deploy
+    - production_data
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+      - delivery-record.yaml
+      - validation results
+unresolved_questions: []
+status: READY

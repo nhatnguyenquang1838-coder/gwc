@@ -1,0 +1,44 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-23T07:15:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-73
+  base_sha: fec372605988caa783603fc6574f4c1209c1d9fa
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: operator
+  decided_at: '2026-07-23T07:15:00Z'
+  source: user request and bounded test scope
+  explicit: true
+rationale: OPT-1 produces bounded trusted artifacts and exposes the next approval boundary without repository writes
+rejected_option_ids:
+  - OPT-2
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+scope_hash: sha256:377072f47559e4b006a194a49353eb63682ccc071fee3e14a15cc7d6dde878e4
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Create G2 execution envelope
+      dependencies: []
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: coding-agent
+      agent_type: primary
+  execution_order:
+    - SUB-TASK-1
+  summary: Single bounded task producing G2 envelope and approval command

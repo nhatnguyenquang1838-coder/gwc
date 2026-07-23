@@ -1,0 +1,59 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-23T07:15:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-73
+  base_sha: fec372605988caa783603fc6574f4c1209c1d9fa
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: fec372605988caa783603fc6574f4c1209c1d9fa
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPO_IDENTITY_OK
+    message: Repository owner, name, default branch, and protected branches verified
+    evidence:
+      - project-profile.yaml
+      - git remote resolution
+  - id: BASE_SHA
+    status: PASS
+    code: BASE_SHA_OK
+    message: Protected base SHA resolved from main ref
+    evidence:
+      - git rev-parse main
+  - id: JIRA_CONNECTOR
+    status: PASS
+    code: JIRA_CONNECTOR_OK
+    message: Jira connector authenticated and task SCRUM-73 created
+    evidence:
+      - acli jira workitem create
+      - acli jira workitem view
+  - id: POLICY_SOURCES
+    status: PASS
+    code: POLICY_SOURCES_OK
+    message: Required governance sources resolved and available
+    evidence:
+      - AGENTS.md
+      - core/Coding_Project_Governance_v1.0.md
+      - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - id: PYTHON_VALIDATOR
+    status: WARN
+    code: VALIDATOR_INCOMPLETE
+    message: python tools/validate_g01.py cannot run without pip
+    evidence:
+      - 'python3: No module named pip'
+  - id: G0_ARTIFACT
+    status: PASS
+    code: G0_ARTIFACT_OK
+    message: G0 context snapshot validates with Bun/ajv 2020-12
+    evidence:
+      - bun validate-g0.js
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

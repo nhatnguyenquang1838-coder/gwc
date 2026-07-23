@@ -1,0 +1,38 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-23T07:15:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-73
+  base_sha: fec372605988caa783603fc6574f4c1209c1d9fa
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Minimal G0/G1 testing only
+    description: Complete G0 and G1 artifacts for SCRUM-73, validate schema integrity with available tools, and produce G2 envelope approval command
+    benefits:
+      - Validates end-to-end GWC workflow
+      - Produces trusted artifacts without external dependencies
+      - Keeps scope bounded and reviewable
+    tradeoffs:
+      - Cannot run canonical Python validator
+      - Stops at G1 until user approves
+    risks:
+      - VALIDATOR_GAP remains unresolved
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Stop at G1 conversation-local preparation
+    description: Do not formalize artifacts beyond chat-only G0/G1 discussion
+    benefits:
+      - Zero setup cost
+    tradeoffs:
+      - No trusted persisted evidence
+      - No approval command generated
+    risks:
+      - Cannot transition to G2
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest bounded path that produces schema-valid G0/G1 artifacts and an approval-ready G2 envelope
+decision_required: true
+status: READY

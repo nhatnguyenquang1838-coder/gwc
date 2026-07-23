@@ -1,0 +1,127 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-23T06:51:20Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: fec372605988caa783603fc6574f4c1209c1d9fa
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- Never write directly to main
+- Use one dedicated guarded branch/worktree for this test task
+- Keep commits bounded to approved test scope
+- Exclude unrelated cleanup, dependency upgrades, and refactors
+- Do not merge, deploy, or mutate production data without separate authority
+applicable_policies:
+- id: GWC-PROTECTED-BASE-AGENTS
+  path: AGENTS.md
+  ref: main
+  source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+- id: AGENT-OPERATING-RUNTIME
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: main
+  source_sha: 5551a474b060e89560ada2bb3614417425069fde
+- id: CODING-PROJECT-GOVERNANCE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: GATE-LIFECYCLE
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main
+  source_sha: 63953fc2420958814fb2d567d4d4106ba58db9f4
+- id: E2E-DRAFT-PR
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: main
+  source_sha: a88f94204ee27cb237af546d84db97a52cfd943d
+- id: AGENT-BEHAVIOR-SEMANTIC
+  path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+  ref: main
+  source_sha: 956e557fedee58bc7d6eb2d53c2615524db8b16f
+- id: AGENT-RESPONSE-PRESENTATION
+  path: core/Agent_Response_Presentation_Contract_v1.0.md
+  ref: main
+  source_sha: 244ba257d995971f5026a86e5668bc8ede8767e2
+- id: LOCAL-AGENT-RULE
+  path: core/LOCAL_AGENT_RULE.md
+  ref: main
+  source_sha: 1f139e126f1e94761046e770bca9b875fa2f00ae
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 63953fc2420958814fb2d567d4d4106ba58db9f4
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5551a474b060e89560ada2bb3614417425069fde
+- path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 956e557fedee58bc7d6eb2d53c2615524db8b16f
+- path: core/Agent_Response_Presentation_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 244ba257d995971f5026a86e5668bc8ede8767e2
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: a88f94204ee27cb237af546d84db97a52cfd943d
+- path: core/LOCAL_AGENT_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 1f139e126f1e94761046e770bca9b875fa2f00ae
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 7be8aa1f85f414db975c65cc6035494d61d65162
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: 0a7e4d9c7e5b9a6c8d2f3e4a5b6c7d8e9f0a1b2c
+- path: agents/dwc/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: c6296f58e524f7cabe3a35bcbe72d253db54a8c7
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 8d6fe5ee1c62ad1c5df1caabe519bbfc59a31d10
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 882ce0f4190ddcdae6cda7b1627984c3401b502d
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: kilo
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
