@@ -22,6 +22,8 @@ GENERATED_ARTIFACTS: dict[str, tuple[str, str]] = {
     "preflight": ("g1/preflight/g1-preflight-report.yaml", "g1-preflight-report.schema.json"),
 }
 HIGH_RISK_CLASSES = {"R2", "R3"}
+NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
+BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
 DELIVERY_LIFECYCLE_ACTIONS = [
     "create_guarded_branch", "modify_scoped_files", "run_sandboxed_validation",
     "push_working_branch", "open_or_update_draft_pr", "monitor_ci",
@@ -86,11 +88,21 @@ def _intake_is_complete(request: dict[str, Any]) -> bool:
     )
 
 
+def _selected_connector_available(runtime: dict[str, Any]) -> bool:
+    selected = runtime["selected_connector"]
+    matching = [
+        item for item in runtime.get("connector_fallback_evidence", [])
+        if item.get("connector") == selected
+    ]
+    return any(item.get("status") == "AVAILABLE" for item in matching)
+
+
 def _route_steps(repository: dict[str, Any], runtime: dict[str, Any], sources_ready: bool) -> list[dict[str, Any]]:
     connector = runtime["selected_connector"]
     connector_declared = connector in runtime["connector_priority"]
-    read_status = "VERIFIED" if repository["verified"] and sources_ready else "HARD_BLOCKED"
-    write_status = "VERIFIED" if repository["verified"] and repository["write_enabled"] and connector_declared else "HARD_BLOCKED"
+    connector_available = _selected_connector_available(runtime)
+    read_status = "VERIFIED" if repository["verified"] and sources_ready and connector_available else "HARD_BLOCKED"
+    write_status = "VERIFIED" if repository["verified"] and repository["write_enabled"] and connector_declared and connector_available else "HARD_BLOCKED"
     fallbacks = [item for item in runtime["connector_priority"] if item != connector]
     return [
         {"id": "STEP-01", "name": "protected-base-and-process-readback", "gate": "G1_ALIGNMENT", "actor": "agent", "action_class": "read", "capability_required": "repository_read", "capability_status": read_status, "primary_route": connector, "fallback_routes": fallbacks, "continuation": "immediate", "expected_evidence": "protected base SHA and required process sources", "bypass_eligibility": "FORBIDDEN"},
@@ -99,8 +111,41 @@ def _route_steps(repository: dict[str, Any], runtime: dict[str, Any], sources_re
         {"id": "STEP-04", "name": "scoped-file-write-and-validation", "gate": "G2_EXECUTION", "actor": "agent", "action_class": "repository_write", "capability_required": "guarded_file_write_and_validation", "capability_status": write_status, "primary_route": connector, "fallback_routes": ["trusted local agent"], "continuation": "checkpoint, exact diff readback, and validator run", "expected_evidence": "approved changed paths and validation results", "bypass_eligibility": "FORBIDDEN"},
         {"id": "STEP-05", "name": "draft-pr-delivery", "gate": "G3_PR", "actor": "agent_or_human", "action_class": "repository_metadata_write", "capability_required": "draft_pr_create_or_update", "capability_status": write_status, "primary_route": connector, "fallback_routes": ["human manual UI action"], "continuation": "checkpoint before human wait and readback after", "expected_evidence": "PR number URL and exact head SHA", "bypass_eligibility": "OPERATIONAL_ONLY"},
         {"id": "STEP-06", "name": "exact-head-ci-continuation", "gate": "G3_PR", "actor": "agent_or_human", "action_class": "async_read_and_bounded_repair", "capability_required": "ci_status_and_continuation", "capability_status": "VERIFIED", "primary_route": "CI callback or scheduled continuation", "fallback_routes": ["local poll", "manual checkpoint"], "continuation": "required until terminal exact-head CI state", "expected_evidence": "required checks for current head and next continuation", "bypass_eligibility": "MANUAL_CHECKPOINT_ONLY"},
-        {"id": "STEP-07", "name": "merge", "gate": "G4_MERGE", "actor": "human_authorized_agent", "action_class": "protected_action", "capability_required": "exact_g4_authority", "capability_status": "SEPARATE_GATE", "primary_route": "exact G4 approval then guarded merge", "fallback_routes": [], "continuation": "stop at human authority boundary", "expected_evidence": "exact PR head and merge commit", "bypass_eligibility": "FORBIDDEN"},
+        {"id": "STEP-07", "name": "independent-g3-review", "gate": "G3_PR", "actor": "agent", "action_class": "read_only_review", "capability_required": "independent_review_bundle", "capability_status": "VERIFIED", "primary_route": "Context7-compatible review bundle", "fallback_routes": ["offline pinned G3 skill library"], "continuation": "review exact current head and return required changes to G2", "expected_evidence": "seven review lanes and acceptance-criteria closure for exact head", "bypass_eligibility": "FORBIDDEN"},
+        {"id": "STEP-08", "name": "ready-for-review-promotion", "gate": "G3_PR", "actor": "agent_or_human", "action_class": "repository_metadata_write", "capability_required": "mark_pr_ready_for_review", "capability_status": write_status, "primary_route": connector, "fallback_routes": ["human manual UI action"], "continuation": "checkpoint before action and exact PR-state readback after", "expected_evidence": "PR is ready, head SHA unchanged, G3 PASS remains current", "bypass_eligibility": "OPERATIONAL_ONLY"},
+        {"id": "STEP-09", "name": "merge", "gate": "G4_MERGE", "actor": "human_authorized_agent", "action_class": "protected_action", "capability_required": "exact_g4_authority", "capability_status": "SEPARATE_GATE", "primary_route": "exact G4 approval then guarded merge", "fallback_routes": [], "continuation": "stop at human authority boundary", "expected_evidence": "exact PR head and merge commit", "bypass_eligibility": "FORBIDDEN"},
     ]
+
+
+def _classify_execution_feasibility(route_steps: list[dict[str, Any]]) -> dict[str, Any]:
+    unresolved = [
+        step for step in route_steps
+        if step.get("capability_status") in NON_EXECUTABLE_CAPABILITY_STATES
+    ]
+    bypass_steps = [
+        step for step in unresolved
+        if step.get("bypass_eligibility") in BYPASS_ELIGIBLE
+        and bool(step.get("fallback_routes"))
+    ]
+    bypass_ids = {step.get("id") for step in bypass_steps}
+    fatal_steps = [step for step in unresolved if step.get("id") not in bypass_ids]
+
+    if fatal_steps:
+        outcome = "NOT_EXECUTABLE"
+        human_bypass_required = False
+    elif bypass_steps:
+        outcome = "EXECUTABLE_WITH_HUMAN_BYPASS"
+        human_bypass_required = True
+    else:
+        outcome = "EXECUTABLE"
+        human_bypass_required = False
+
+    return {
+        "outcome": outcome,
+        "route_steps": route_steps,
+        "continuation_coverage": "COMPLETE",
+        "human_bypass_required": human_bypass_required,
+    }
 
 
 def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], str]:
@@ -128,6 +173,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
     unavailable_contracts = [item["path"] for item in runtime["required_behavior_contracts"] if item["required"] and item["status"] != "AVAILABLE"]
     execution_supported = runtime["execution_mode"] in runtime["selected_profile"]["supported_execution_modes"]
     connector_declared = runtime["selected_connector"] in runtime["connector_priority"]
+    connector_available = _selected_connector_available(runtime)
 
     g0_blockers: list[dict[str, str]] = []
     if repository["verified"] is not True:
@@ -138,6 +184,8 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         g0_blockers.append(_blocker("EXECUTION_MODE_UNSUPPORTED", "The selected runtime profile does not support the current execution mode."))
     if not connector_declared:
         g0_blockers.append(_blocker("CONNECTOR_NOT_DECLARED", "The selected connector must be present in connector_priority."))
+    if not connector_available:
+        g0_blockers.append(_blocker("SELECTED_CONNECTOR_UNAVAILABLE", "The selected connector requires AVAILABLE evidence before G1 can pass."))
     if unavailable_contracts:
         g0_blockers.append(_blocker("BEHAVIOR_CONTRACT_UNAVAILABLE", "Required behavior contracts are unavailable: " + ", ".join(sorted(unavailable_contracts))))
 
@@ -165,6 +213,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         _check("REPO_IDENTITY", "PASS" if repository["verified"] else "FAIL", "REPOSITORY_VERIFIED" if repository["verified"] else "REPOSITORY_NOT_VERIFIED", "Repository identity and base evidence are verified." if repository["verified"] else "Repository identity is not verified.", [f'{repository["full_name"]}@{repository["base_sha"]}', project["profile_path"]]),
         _check("REQUIRED_SOURCES", "FAIL" if unavailable_required else "PASS", "REQUIRED_SOURCE_UNAVAILABLE" if unavailable_required else "REQUIRED_SOURCES_AVAILABLE", "One or more required sources are unavailable." if unavailable_required else "All required sources are available.", sorted(unavailable_required) if unavailable_required else [item["path"] for item in sources if item["required"]]),
         _check("EXECUTION_MODE_COMPATIBILITY", "PASS" if execution_supported else "FAIL", "EXECUTION_MODE_SUPPORTED" if execution_supported else "EXECUTION_MODE_UNSUPPORTED", "The selected runtime profile supports the current execution mode." if execution_supported else "The selected runtime profile does not support the current execution mode.", [runtime["selected_profile"]["path"], f'execution_mode={runtime["execution_mode"]}']),
+        _check("SELECTED_CONNECTOR", "PASS" if connector_available else "FAIL", "SELECTED_CONNECTOR_AVAILABLE" if connector_available else "SELECTED_CONNECTOR_UNAVAILABLE", "The selected connector has AVAILABLE evidence." if connector_available else "The selected connector has no AVAILABLE evidence.", [runtime["selected_connector"]]),
         _check("BOOTSTRAP_BEHAVIOR_CONTRACTS", "FAIL" if unavailable_contracts else "PASS", "BEHAVIOR_CONTRACT_UNAVAILABLE" if unavailable_contracts else "BEHAVIOR_CONTRACTS_AVAILABLE", "One or more required behavior contracts are unavailable." if unavailable_contracts else "Required behavior and presentation contracts are available.", sorted(unavailable_contracts) if unavailable_contracts else runtime_context["required_behavior_contracts"]),
         _check("DELIVERY_LIFECYCLE_SCOPE", "PASS", "NON_MERGE_DELIVERY_SCOPE_EXPLICIT", "G1 anticipates guarded delivery through G3 without granting G4 authority.", DELIVERY_LIFECYCLE_ACTIONS),
     ]
@@ -194,12 +243,19 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
 
     sources_ready = not unavailable_required
     route_steps = _route_steps(repository, runtime, sources_ready)
-    hard_blocked = any(step["capability_status"] in {"UNKNOWN", "HARD_BLOCKED"} for step in route_steps)
     process_readback = {"process_id": "governed-repository-delivery", "terminal_outcome": request["desired_outcome"], "required_sources": PROCESS_SOURCES, "status": "VERIFIED" if sources_ready and repository["verified"] else "INCOMPLETE"}
-    execution_feasibility = {"outcome": "NOT_EXECUTABLE" if hard_blocked else "EXECUTABLE", "route_steps": route_steps, "continuation_coverage": "COMPLETE", "human_bypass_required": False}
+    execution_feasibility = _classify_execution_feasibility(route_steps)
+    feasibility_outcome = execution_feasibility["outcome"]
+    route_executable = feasibility_outcome != "NOT_EXECUTABLE"
     checks.append(_check("PROCESS_READBACK", "PASS" if process_readback["status"] == "VERIFIED" else "FAIL", "PROCESS_READBACK_COMPLETE" if process_readback["status"] == "VERIFIED" else "PROCESS_READBACK_INCOMPLETE", "The governing process and requested terminal outcome were read back." if process_readback["status"] == "VERIFIED" else "Required process evidence is incomplete.", PROCESS_SOURCES))
-    checks.append(_check("EXECUTION_FEASIBILITY", "PASS" if not hard_blocked else "FAIL", "END_TO_END_ROUTE_EXECUTABLE" if not hard_blocked else "END_TO_END_ROUTE_NOT_EXECUTABLE", "Every mandatory route step has a verified capability or a separate downstream authority gate." if not hard_blocked else "At least one mandatory route step is hard blocked.", [step["id"] for step in route_steps]))
-    if hard_blocked:
+    checks.append(_check(
+        "EXECUTION_FEASIBILITY",
+        "PASS" if route_executable else "FAIL",
+        "END_TO_END_ROUTE_EXECUTABLE_WITH_HUMAN_BYPASS" if feasibility_outcome == "EXECUTABLE_WITH_HUMAN_BYPASS" else ("END_TO_END_ROUTE_EXECUTABLE" if route_executable else "END_TO_END_ROUTE_NOT_EXECUTABLE"),
+        "Every mandatory route step is executable." if feasibility_outcome == "EXECUTABLE" else ("Blocked operational steps have bounded HUMAN BYPASS fallbacks." if route_executable else "At least one mandatory route step is hard blocked without a legal fallback."),
+        [step["id"] for step in route_steps],
+    ))
+    if not route_executable:
         blockers.append(_blocker("EXECUTION_ROUTE_NOT_FEASIBLE", "The requested terminal outcome cannot be executed with the verified capabilities."))
 
     if blockers:
