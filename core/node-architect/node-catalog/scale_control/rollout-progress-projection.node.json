@@ -4,7 +4,7 @@
   "title": "Rollout Progress Projection",
   "description": "Expose batch, family, node-count, gate, and audit readiness as a non-authoritative progress projection.",
   "canonical": "audit_projection",
-  "authority_boundary": "g2_required",
+  "authority_boundary": "read_only",
   "gates": [
     "G3_PR"
   ]
