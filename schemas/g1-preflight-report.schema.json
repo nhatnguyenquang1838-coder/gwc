@@ -5,288 +5,133 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version",
-    "artifact_type",
-    "generated_at",
-    "trace",
-    "repository_state",
-    "checks",
-    "risk_class",
-    "required_gate",
-    "blockers",
-    "outcome"
+    "schema_version", "artifact_type", "generated_at", "trace", "repository_state",
+    "checks", "process_readback", "execution_feasibility", "risk_class", "required_gate",
+    "blockers", "outcome"
   ],
   "$defs": {
     "trace": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "project_id",
-        "repository",
-        "task_id",
-        "base_sha",
-        "g0_snapshot"
-      ],
+      "type": "object", "additionalProperties": false,
+      "required": ["project_id", "repository", "task_id", "base_sha", "g0_snapshot"],
       "properties": {
-        "project_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "repository": {
-          "type": "string",
-          "pattern": "^[^/\\s]+/[^/\\s]+$"
-        },
-        "task_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "base_sha": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
-        },
-        "g0_snapshot": {
-          "type": "string",
-          "const": "../../g0/context-snapshot.yaml"
-        }
+        "project_id": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "task_id": {"type": "string", "minLength": 1},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "g0_snapshot": {"type": "string", "const": "../../g0/context-snapshot.yaml"}
       }
     },
     "check": {
-      "type": "object",
-      "additionalProperties": false,
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "status", "code", "message", "evidence"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Z0-9_-]+$"},
+        "status": {"enum": ["PASS", "WARN", "FAIL"]},
+        "code": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "message": {"type": "string", "minLength": 1},
+        "evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "route_step": {
+      "type": "object", "additionalProperties": false,
       "required": [
-        "id",
-        "status",
-        "code",
-        "message",
-        "evidence"
+        "id", "name", "gate", "actor", "action_class", "capability_required",
+        "capability_status", "primary_route", "fallback_routes", "continuation",
+        "expected_evidence", "bypass_eligibility"
       ],
       "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[A-Z0-9_-]+$"
-        },
-        "status": {
-          "enum": [
-            "PASS",
-            "WARN",
-            "FAIL"
-          ]
-        },
-        "code": {
-          "type": "string",
-          "pattern": "^[A-Z0-9_]+$"
-        },
-        "message": {
-          "type": "string",
-          "minLength": 1
-        },
-        "evidence": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
+        "id": {"type": "string", "pattern": "^STEP-[0-9]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+        "actor": {"enum": ["agent", "human", "agent_or_human", "human_authorized_agent"]},
+        "action_class": {"type": "string", "minLength": 1},
+        "capability_required": {"type": "string", "minLength": 1},
+        "capability_status": {"enum": ["VERIFIED", "SEPARATE_GATE", "UNKNOWN", "HARD_BLOCKED"]},
+        "primary_route": {"type": "string", "minLength": 1},
+        "fallback_routes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "continuation": {"type": "string", "minLength": 1},
+        "expected_evidence": {"type": "string", "minLength": 1},
+        "bypass_eligibility": {"enum": ["FORBIDDEN", "OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"]}
       }
     }
   },
   "properties": {
-    "schema_version": {
-      "const": "1.0"
-    },
-    "artifact_type": {
-      "const": "g1-preflight-report"
-    },
-    "generated_at": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "trace": {
-      "$ref": "#/$defs/trace"
-    },
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g1-preflight-report"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "trace": {"$ref": "#/$defs/trace"},
     "repository_state": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "base_ref",
-        "base_sha",
-        "profile_path",
-        "connector"
-      ],
+      "type": "object", "additionalProperties": false,
+      "required": ["base_ref", "base_sha", "profile_path", "connector"],
       "properties": {
-        "base_ref": {
-          "type": "string",
-          "minLength": 1
-        },
-        "base_sha": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
-        },
-        "profile_path": {
-          "type": "string",
-          "minLength": 1
-        },
-        "connector": {
-          "type": "string",
-          "minLength": 1
-        }
+        "base_ref": {"type": "string", "minLength": 1},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "profile_path": {"type": "string", "minLength": 1},
+        "connector": {"type": "string", "minLength": 1}
       }
     },
-    "checks": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/check"
+    "checks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/check"}},
+    "process_readback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["process_id", "terminal_outcome", "required_sources", "status"],
+      "properties": {
+        "process_id": {"type": "string", "minLength": 1},
+        "terminal_outcome": {"type": "string", "minLength": 1},
+        "required_sources": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "status": {"enum": ["VERIFIED", "INCOMPLETE"]}
       }
     },
-    "risk_class": {
-      "enum": [
-        "R0",
-        "R1",
-        "R2",
-        "R3"
-      ]
+    "execution_feasibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["outcome", "route_steps", "continuation_coverage", "human_bypass_required"],
+      "properties": {
+        "outcome": {"enum": ["EXECUTABLE", "EXECUTABLE_WITH_HUMAN_BYPASS", "NOT_EXECUTABLE"]},
+        "route_steps": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/route_step"}},
+        "continuation_coverage": {"enum": ["COMPLETE", "INCOMPLETE"]},
+        "human_bypass_required": {"type": "boolean"}
+      }
     },
-    "required_gate": {
-      "enum": [
-        "G2_AUTOMATIC_BOUNDED",
-        "G2_HUMAN_DIRECTION",
-        "STOP"
-      ]
-    },
+    "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+    "required_gate": {"enum": ["G2_AUTOMATIC_BOUNDED", "G2_HUMAN_DIRECTION", "STOP"]},
     "runtime_context": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "agent_runtime_id",
-        "execution_mode",
-        "selected_profile",
-        "selected_connector",
-        "connector_priority",
-        "required_behavior_contracts"
-      ],
+      "type": "object", "additionalProperties": false,
+      "required": ["agent_runtime_id", "execution_mode", "selected_profile", "selected_connector", "connector_priority", "required_behavior_contracts"],
       "properties": {
-        "agent_runtime_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "execution_mode": {
-          "enum": [
-            "chat_connector_only",
-            "local_agent",
-            "repo_ci"
-          ]
-        },
+        "agent_runtime_id": {"type": "string", "minLength": 1},
+        "execution_mode": {"enum": ["chat_connector_only", "local_agent", "repo_ci"]},
         "selected_profile": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "id",
-            "path"
-          ],
-          "properties": {
-            "id": {
-              "type": "string",
-              "minLength": 1
-            },
-            "path": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
+          "type": "object", "additionalProperties": false, "required": ["id", "path"],
+          "properties": {"id": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}}
         },
-        "selected_connector": {
-          "type": "string",
-          "minLength": 1
-        },
-        "connector_priority": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required_behavior_contracts": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
+        "selected_connector": {"type": "string", "minLength": 1},
+        "connector_priority": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "required_behavior_contracts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
       }
     },
     "blockers": {
       "type": "array",
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "code",
-          "message"
-        ],
-        "properties": {
-          "code": {
-            "type": "string",
-            "pattern": "^[A-Z0-9_]+$"
-          },
-          "message": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
+        "type": "object", "additionalProperties": false, "required": ["code", "message"],
+        "properties": {"code": {"type": "string", "pattern": "^[A-Z0-9_]+$"}, "message": {"type": "string", "minLength": 1}}
       }
     },
-    "outcome": {
-      "enum": [
-        "PASS",
-        "NEEDS_INPUT",
-        "BLOCKED"
-      ]
-    }
+    "outcome": {"enum": ["PASS", "NEEDS_INPUT", "BLOCKED"]}
   },
   "allOf": [
     {
-      "if": {
-        "properties": {
-          "outcome": {
-            "const": "PASS"
-          }
-        }
-      },
+      "if": {"properties": {"outcome": {"const": "PASS"}}},
       "then": {
         "properties": {
-          "blockers": {
-            "maxItems": 0
-          },
-          "checks": {
-            "items": {
-              "allOf": [
-                {
-                  "$ref": "#/$defs/check"
-                },
-                {
-                  "properties": {
-                    "status": {
-                      "enum": [
-                        "PASS",
-                        "WARN"
-                      ]
-                    }
-                  }
-                }
-              ]
+          "blockers": {"maxItems": 0},
+          "checks": {"items": {"allOf": [{"$ref": "#/$defs/check"}, {"properties": {"status": {"enum": ["PASS", "WARN"]}}}]}},
+          "process_readback": {"properties": {"status": {"const": "VERIFIED"}}},
+          "execution_feasibility": {
+            "properties": {
+              "outcome": {"enum": ["EXECUTABLE", "EXECUTABLE_WITH_HUMAN_BYPASS"]},
+              "continuation_coverage": {"const": "COMPLETE"}
             }
           },
-          "required_gate": {
-            "enum": [
-              "G2_AUTOMATIC_BOUNDED",
-              "G2_HUMAN_DIRECTION"
-            ]
-          }
+          "required_gate": {"enum": ["G2_AUTOMATIC_BOUNDED", "G2_HUMAN_DIRECTION"]}
         }
       }
     }
