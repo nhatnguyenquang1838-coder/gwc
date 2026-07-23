@@ -4,7 +4,7 @@ Task: `REVAMP-GWC-022`
 Batch: `batch-06-sync-projection`  
 Family: `sync_projection`  
 Planned nodes: 9  
-Authority boundary: `G2_EXECUTION_G3_PR`
+Authority boundary: `read_only`; applicability gates: `G2_EXECUTION_G3_PR`
 
 This family defines controlled audit-projection nodes for DS Admin, Task Center, and external audit surfaces. Canonical repository, gate, PR, CI, and task evidence remains authoritative; projected state is never approval or execution authority.
 
@@ -30,7 +30,7 @@ Forbidden:
 
 ## Nodes
 
-| Node | Type | Gates |
+| Node | Type | Applicability gates |
 |---|---|---|
 | `sync-projection-ds-admin-state-projection` | projection | G2, G3 |
 | `sync-projection-task-center-sync` | connector | G2, G3 |
@@ -47,11 +47,11 @@ Forbidden:
 ```text
 ✅ exactly 9 nodes
 ✅ canonical=audit_projection
-✅ authority_boundary=g2_required
-✅ gates limited to G2_EXECUTION and G3_PR
+✅ authority_boundary=read_only
+✅ gates are applicability metadata limited to G2_EXECUTION and G3_PR
 ✅ source authority, drift detection, readback, failure routing, evidence linking, and privacy boundary are explicit
 ✅ external projection is audit evidence only
-❌ no G4/G5/G6 authority
+❌ no G2/G3/G4/G5/G6 authority grant from projection state
 ❌ no runtime or connector implementation
 ❌ no package version change
 ```
