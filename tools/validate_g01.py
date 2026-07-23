@@ -158,17 +158,26 @@ def _execution_feasibility_issues(preflight: dict[str, Any]) -> list[ValidationI
             "Execution route step IDs must be unique.",
         ))
 
-    blocked = [
-        step.get("id")
-        for step in route_steps
+    unresolved_steps = [
+        step for step in route_steps
         if step.get("capability_status") in NON_EXECUTABLE_CAPABILITY_STATES
     ]
-    if blocked:
+    bypass_steps = [
+        step for step in unresolved_steps
+        if step.get("bypass_eligibility") in BYPASS_ELIGIBLE
+        and bool(step.get("fallback_routes"))
+    ]
+    bypass_step_ids = {step.get("id") for step in bypass_steps}
+    fatal_steps = [step for step in unresolved_steps if step.get("id") not in bypass_step_ids]
+
+    if fatal_steps:
         issues.append(_issue(
             "G1_EXECUTION_CAPABILITY_UNVERIFIED",
             "preflight",
             "execution_feasibility.route_steps",
-            f"Mandatory route steps are not executable: {', '.join(str(item) for item in blocked)}.",
+            "Mandatory route steps are not executable and have no legal HUMAN BYPASS: "
+            + ", ".join(str(step.get("id")) for step in fatal_steps)
+            + ".",
         ))
 
     missing_continuation = [
@@ -184,9 +193,6 @@ def _execution_feasibility_issues(preflight: dict[str, Any]) -> list[ValidationI
 
     outcome = feasibility.get("outcome")
     human_bypass_required = feasibility.get("human_bypass_required") is True
-    bypass_steps = [
-        step for step in route_steps if step.get("bypass_eligibility") in BYPASS_ELIGIBLE
-    ]
 
     if outcome == "NOT_EXECUTABLE":
         issues.append(_issue(
@@ -202,12 +208,26 @@ def _execution_feasibility_issues(preflight: dict[str, Any]) -> list[ValidationI
             "execution_feasibility",
             "human_bypass_required=true requires EXECUTABLE_WITH_HUMAN_BYPASS.",
         ))
+    if outcome == "EXECUTABLE_WITH_HUMAN_BYPASS" and not human_bypass_required:
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_OUTCOME_MISMATCH",
+            "preflight",
+            "execution_feasibility",
+            "EXECUTABLE_WITH_HUMAN_BYPASS requires human_bypass_required=true.",
+        ))
     if outcome == "EXECUTABLE_WITH_HUMAN_BYPASS" and not bypass_steps:
         issues.append(_issue(
             "G1_HUMAN_BYPASS_STEP_MISSING",
             "preflight",
             "execution_feasibility.route_steps",
-            "A human-bypass outcome requires at least one explicitly eligible operational step.",
+            "A human-bypass outcome requires at least one blocked operational step with a legal fallback.",
+        ))
+    if outcome == "EXECUTABLE" and bypass_steps:
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_REQUIRED",
+            "preflight",
+            "execution_feasibility.outcome",
+            "A blocked bypass-eligible step requires EXECUTABLE_WITH_HUMAN_BYPASS.",
         ))
     if outcome == "EXECUTABLE" and human_bypass_required:
         issues.append(_issue(
