@@ -32,6 +32,17 @@ sources:
   status: active
   type: git-source
   url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+- description: Shared runtime interrupt contract for base drift, authority expiry,
+    working-head drift, capability loss, external wait, checkpoint, resume, reroute,
+    and stop semantics.
+  id: interrupt-flow-contract
+  owner: gwc
+  package_target: .governance/INTERRUPT_FLOW_CONTRACT_v1.0.md
+  path: core/INTERRUPT_FLOW_CONTRACT_v1.0.md
+  priority: 23
+  status: active
+  type: git-source
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/INTERRUPT_FLOW_CONTRACT_v1.0.md
 - description: Hotfix and Rescue mode policy for bounded bypass of standard GWC gates
     when user explicitly activates with activation phrases. Provides HOTFIX (light
     validation) and RESCUE (minimal validation) execution paths.
@@ -73,4 +84,4 @@ sources:
   status: fallback
   type: gpt-project
   url: null
-updated_at: '2026-07-20T00:00:00Z'
+updated_at: '2026-07-23T10:05:00Z'

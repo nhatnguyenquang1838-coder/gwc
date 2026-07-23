@@ -1,7 +1,7 @@
 # Runtime Checkpoint Node Family
 
 ```text
-Task: REVAMP-GWC-019
+Task: REVAMP-GWC-019 / SCRUM-74 extension
 Batch: batch-04-runtime-checkpoint
 Family: runtime_checkpoint
 Planned nodes: 9
@@ -12,29 +12,43 @@ Authority boundary: G2_EXECUTION
 
 This family models the checkpoint/resume layer used by GWC agents during scoped G2 execution.
 
-It keeps checkpoint capture, checkpoint persistence, resume token handling, lease behavior, CAS write guards, state reconciliation, and expiry cleanup explicit without granting merge, deploy, production, or runtime-engine authority.
+It keeps checkpoint capture, checkpoint persistence, resume token handling, lease behavior, CAS write guards, state reconciliation, expiry cleanup, and interrupt-flow handling explicit without granting merge, deploy, production, or runtime-engine authority.
 
 ## Nodes
 
 | Node | Type | Purpose |
 |---|---|---|
-| `runtime_checkpoint.checkpoint-capture` | state | Capture a deterministic checkpoint before bounded execution state changes. |
-| `runtime_checkpoint.checkpoint-persist` | tool | Persist checkpoint artifacts to the approved workspace without production data access. |
-| `runtime_checkpoint.resume-token-generation` | workflow | Generate resume tokens that bind task, gate, base, head, and evidence context. |
-| `runtime_checkpoint.resume-token-validation` | gate | Validate resume tokens before continuing interrupted G2 execution. |
+| `runtime_checkpoint.checkpoint-capture` | state | Capture a deterministic checkpoint before bounded execution state changes or interrupt suspension. |
+| `runtime_checkpoint.checkpoint-persist` | tool | Persist checkpoint and interrupt-frame artifacts to the approved workspace without production data access. |
+| `runtime_checkpoint.resume-token-generation` | workflow | Generate resume tokens that bind task, gate, base, head, evidence, and interrupt context. |
+| `runtime_checkpoint.resume-token-validation` | gate | Validate resume tokens and resume conditions before continuing interrupted G2 execution. |
 | `runtime_checkpoint.lease-acquisition` | connector | Acquire bounded work leases before mutating guarded branch state. |
 | `runtime_checkpoint.lease-renewal` | workflow | Renew active leases only when work remains inside the approved scope. |
 | `runtime_checkpoint.cas-write-guard` | gate | Guard branch and artifact writes with compare-and-swap expectations. |
-| `runtime_checkpoint.state-reconciliation` | workflow | Reconcile local, connector, task, and PR state after interruptions. |
-| `runtime_checkpoint.checkpoint-expiry-cleanup` | tool | Clean expired checkpoint hints without deleting governance evidence. |
+| `runtime_checkpoint.state-reconciliation` | workflow | Assess drift, refresh evidence, and select resume, repair, reapproval, or stop routing after interruptions. |
+| `runtime_checkpoint.checkpoint-expiry-cleanup` | tool | Clean expired checkpoint hints and interrupt frames without deleting governance evidence. |
+
+## Base-drift interrupt mapping
+
+The logical BASE_DRIFT stages reuse the existing nine-node family instead of increasing the controlled 81-node catalog:
+
+| Logical stage | Existing node mapping |
+|---|---|
+| detect | `cas-write-guard` and repository base-drift check |
+| checkpoint/suspend | `checkpoint-capture` + `checkpoint-persist` |
+| assess/revalidate | `state-reconciliation` |
+| resume | `resume-token-generation` + `resume-token-validation` |
+| reapprove/stop | gate-authority or failure-recovery routing outside this family |
 
 ## Guardrails
 
 ```text
 ✅ exactly 9 nodes
+✅ controlled 81-node catalog cardinality remains unchanged
 ✅ all nodes use authority_boundary=g2_required
 ✅ all nodes are limited to G2_EXECUTION
 ✅ checkpoint/resume metadata only
+✅ base-drift interrupt flow reuses existing nodes
 ✅ G4 merge remains separate
 ✅ no deploy/production authority
 ✅ no runtime engine implementation

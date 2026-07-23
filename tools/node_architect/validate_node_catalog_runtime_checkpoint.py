@@ -106,6 +106,8 @@ def validate_family(family_dir: Path) -> None:
         "batch-04-runtime-checkpoint",
         "runtime_checkpoint",
         "G2_EXECUTION",
+        "exactly 9 nodes",
+        "controlled 81-node catalog cardinality remains unchanged",
         "no runtime engine implementation",
         "no production data access",
     ]:
