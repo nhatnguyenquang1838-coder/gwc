@@ -1,72 +1,72 @@
 schema_version: '1.0'
 artifact_type: g1-preflight-report
-generated_at: '2026-07-22T18:58:00Z'
+generated_at: '2026-07-23T02:00:03Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-68
-  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
   profile_path: projects/gwc/project-profile.yaml
   connector: GitHub
 checks:
 - id: REPO_IDENTITY
   status: PASS
   code: REPOSITORY_VERIFIED
-  message: Repository identity and main merge commit are verified.
+  message: Repository identity and protected main merge commit are verified.
   evidence:
-  - nhatnguyenquang1838-coder/gwc@215cbfcfeab4a53b3cd785a1f2178e2405c420b8
-  - 'PR #75 merged'
-- id: BATCH_06_MERGED
+  - nhatnguyenquang1838-coder/gwc@ab378f97417814f04a1a14acdf572e34490c5e3d
+  - 'PR #76 merged'
+- id: TASK_TRACEABILITY
   status: PASS
-  code: PREVIOUS_BATCH_MERGED
-  message: Batch 06 sync_projection is merged to main.
+  code: JIRA_TASK_IN_PROGRESS
+  message: SCRUM-68 remains the canonical workflow task.
   evidence:
-  - 'PR #75'
-  - merge commit 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
-- id: POST_MERGE_CI
+  - SCRUM-68
+  - status=In Progress
+- id: BATCH_PLAN
   status: PASS
-  code: EXACT_POST_MERGE_CI_SUCCESS
-  message: Validate instructions completed successfully after the merge and checked out the exact merge commit on main.
+  code: SEQUENTIAL_BATCHES_REQUIRED
+  message: The controlled plan requires Batch 08 then Batch 09, with at most nine nodes each.
   evidence:
-  - workflow run 29946832280
-  - job 89014233368 conclusion=success
-  - checkout SHA 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
-- id: BATCH_ADMISSION
-  status: PASS
-  code: BATCH_07_ADMITTED
-  message: The controlled plan admits Batch 07 after Batch 06 merge and exact post-merge CI.
-  evidence:
-  - batch-07-package-export
-  - planned_nodes=9
+  - batch-08 base requires batch-07 merge + post-merge CI
+  - batch-09 base requires batch-08 merge + post-merge CI
   - max_nodes_per_batch=9
-- id: EXISTING_MECHANISM
+- id: SINGLE_APPROVAL_MODEL
   status: PASS
-  code: REUSE_EXISTING_EXPORT_STACK
-  message: Existing export rule, exporter, manifest schema, smoke verifier, runbook, and test are present and will be reused.
+  code: STAGED_ONE_BRANCH_SELECTED
+  message: One envelope can remain branch-bounded by reusing the same guarded branch and appending Stage 09 only after Stage
+    08 merge readback.
   evidence:
-  - core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md
-  - tools/export_project_package.py
-  - tools/verify_package_export_smoke.py
-  - tests/test_package_export_smoke.py
-- id: SCOPE_ISOLATION
+  - working_branch=feature/scrum-68-final-node-catalog
+  - two PRs, one active stage at a time
+  - separate G4 per PR
+- id: BATCH_07_POST_MERGE_CI
   status: PASS
-  code: PACKAGE_EXPORT_ONLY
-  message: Scope is limited to one nine-node family and support artifacts.
+  code: G5_EXACT_POST_MERGE_CI_PASS
+  message: Validate instructions passed on the exact Batch 07 merge commit and main branch.
   evidence:
-  - no failure_recovery
-  - no scale_control
-  - no runtime publish or consumer update
+  - workflow_run=29972360095
+  - job=89096886651 conclusion=success
+  - head_branch=main
+  - head_sha=ab378f97417814f04a1a14acdf572e34490c5e3d
+- id: FAILURE_FOUNDATION
+  status: PASS
+  code: FAILURE_MATRIX_PRESENT
+  message: Failure simulation matrix and validator exist and remain the starting mechanism.
+  evidence:
+  - core/node-architect/failure-simulation-matrix.json
+  - tools/node_architect/validate_failure_simulation_matrix.py
 - id: RISK_CLASS
   status: PASS
-  code: R2_GOVERNANCE_PACKAGE_SURFACE
-  message: Package governance and consumer export surface changes are treated as R2.
+  code: R2_STAGED_GOVERNANCE_CHANGE
+  message: The scope changes final catalog governance families but does not implement production runtime or deploy actions.
   evidence:
-  - package export descriptors
-  - consumer package manifest surface
+  - 18 descriptors in two isolated PRs
+  - no G4/G5 manual/G6 authority in G2
 risk_class: R2
 required_gate: G2_HUMAN_DIRECTION
 blockers: []

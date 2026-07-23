@@ -172,6 +172,18 @@ instructions:
   - {id: package-export-export-failure-routing-node, path: core/node-architect/node-catalog/package_export/export-failure-routing.node.json, target: .governance/core/node-architect/node-catalog/package_export/export-failure-routing.node.json, required: true}
   - {id: package-export-node-validator, path: tools/node_architect/validate_node_catalog_package_export.py, target: .governance/tools/node_architect/validate_node_catalog_package_export.py, required: true}
   - {id: revamp-gwc-023-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md, required: true}
+  - {id: failure-recovery-node-family-readme, path: core/node-architect/node-catalog/failure_recovery/README.md, target: .governance/core/node-architect/node-catalog/failure_recovery/README.md, required: true}
+  - {id: failure-recovery-timeout-recovery-node, path: core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json, required: true}
+  - {id: failure-recovery-crash-checkpoint-recovery-node, path: core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json, required: true}
+  - {id: failure-recovery-stale-session-reconciliation-node, path: core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json, required: true}
+  - {id: failure-recovery-unknown-write-reconciliation-node, path: core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json, required: true}
+  - {id: failure-recovery-cas-mismatch-recovery-node, path: core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json, required: true}
+  - {id: failure-recovery-lease-expiry-recovery-node, path: core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json, required: true}
+  - {id: failure-recovery-approval-expiry-recovery-node, path: core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json, required: true}
+  - {id: failure-recovery-duplicate-agent-fencing-node, path: core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json, required: true}
+  - {id: failure-recovery-version-drift-rollback-routing-node, path: core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, required: true}
+  - {id: failure-recovery-node-validator, path: tools/node_architect/validate_node_catalog_failure_recovery.py, target: .governance/tools/node_architect/validate_node_catalog_failure_recovery.py, required: true}
+  - {id: revamp-gwc-024-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -189,6 +201,7 @@ work_tracking:
   lease_renewal_required: false
   status_transitions_from_state_engine: true
 notes:
+  - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.
   - DWC repository reads are automatic for this verified repository.
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
   - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.

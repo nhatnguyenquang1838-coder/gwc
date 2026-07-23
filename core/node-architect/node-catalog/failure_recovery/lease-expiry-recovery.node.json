@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.lease-expiry-recovery",
+  "node_type": "gate",
+  "title": "Lease Expiry Recovery",
+  "description": "Stop advancement after lease expiry and allow continuation only after safe readback and reacquisition.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}

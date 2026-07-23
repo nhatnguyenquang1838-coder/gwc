@@ -1,24 +1,25 @@
 schema_version: '1.0'
 artifact_type: g1-decision-record
-generated_at: '2026-07-22T18:58:00Z'
+generated_at: '2026-07-23T02:00:03Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-68
-  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
   g0_snapshot: ../../g0/context-snapshot.yaml
 options_ref: ../brainstorming/g1-options.yaml
 preflight_ref: ../preflight/g1-preflight-report.yaml
 status: ACCEPTED
-selected_option_id: OPT-1
+selected_option_id: OPT-2
 user_decision:
   actor: Nhat Nguyen Quang
-  decided_at: '2026-07-22T18:58:00Z'
-  source: 'chat: If post-merge CI passed, prepare G0/G1 and a G2 envelope for SCRUM-68 Batch 07 package_export with exactly 9 nodes; user supplied workflow run 29946832280.'
+  decided_at: '2026-07-23T02:00:03Z'
+  source: 'chat: Implement tuần tự, envelope là scope của cả 2, tôi duyệt 1 lần. Sẽ có 2 PR merge tuần tự.'
   explicit: true
-rationale: Proceed with the next controlled family by reusing the existing export stack and adding exactly nine package_export descriptors plus bounded validation and package entries.
+rationale: Use one staged G2 envelope and one reusable branch for both final families. Stage 08 and Stage 09 remain separate
+  PRs with exact admission, G3, and G4 boundaries.
 rejected_option_ids:
-- OPT-2
+- OPT-1
 - OPT-3
 acceptance_criteria_refs:
 - AC-1
@@ -28,7 +29,8 @@ acceptance_criteria_refs:
 - AC-5
 - AC-6
 - AC-7
-scope_hash: sha256:844ab3a1e45b78a91a0d5217b8aecdbc0dd86706fb8bfe3c9f4bdd9ddb9853aa
+- AC-8
+scope_hash: sha256:30ad8a649cafe7eb2f3a9828869bd85740a1b6a9571c63c1e42d72b7c8ab01a2
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -39,35 +41,60 @@ authority_boundaries:
 subagent_distribution_plan:
   task_decomposition:
   - sub_task_id: SUB-TASK-1
-    description: Design nine package_export descriptors mapped to existing mechanisms.
+    description: Verify Batch 07 post-merge CI and unlock Stage 08.
   - sub_task_id: SUB-TASK-2
-    description: Implement family validator and focused tests.
+    description: Implement and validate nine failure_recovery nodes.
     dependencies:
     - SUB-TASK-1
   - sub_task_id: SUB-TASK-3
-    description: Update package exports and changelog.
+    description: Create, validate, review, and merge Stage 08 PR under separate G4.
     dependencies:
     - SUB-TASK-2
   - sub_task_id: SUB-TASK-4
-    description: Run validation, create Draft PR, and monitor exact-head CI.
+    description: Verify Stage 08 post-merge CI and unlock Stage 09.
     dependencies:
     - SUB-TASK-3
+  - sub_task_id: SUB-TASK-5
+    description: Append and validate nine scale_control nodes on the same branch.
+    dependencies:
+    - SUB-TASK-4
+  - sub_task_id: SUB-TASK-6
+    description: Create, validate, review, and merge Stage 09 PR under separate G4.
+    dependencies:
+    - SUB-TASK-5
+  - sub_task_id: SUB-TASK-7
+    description: Run exact 81-node registry and package audit.
+    dependencies:
+    - SUB-TASK-6
   agent_allocation:
   - sub_task_id: SUB-TASK-1
-    skill_id: node_catalog_design
-    agent_type: primary
+    skill_id: governance_validation
+    agent_type: reviewer
   - sub_task_id: SUB-TASK-2
-    skill_id: python_validation
+    skill_id: failure_recovery
     agent_type: specialist
   - sub_task_id: SUB-TASK-3
-    skill_id: package_export
-    agent_type: specialist
+    skill_id: repo_delivery
+    agent_type: primary
   - sub_task_id: SUB-TASK-4
     skill_id: governance_validation
     agent_type: reviewer
+  - sub_task_id: SUB-TASK-5
+    skill_id: scale_observability
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-6
+    skill_id: repo_delivery
+    agent_type: primary
+  - sub_task_id: SUB-TASK-7
+    skill_id: catalog_audit
+    agent_type: validator
   execution_order:
   - SUB-TASK-1
   - SUB-TASK-2
   - SUB-TASK-3
   - SUB-TASK-4
-  summary: One bounded nine-node family; no later family or runtime rewrite.
+  - SUB-TASK-5
+  - SUB-TASK-6
+  - SUB-TASK-7
+  summary: One approval, one branch, two sequential PRs; no stage may start before the preceding merge and exact post-merge
+    CI.

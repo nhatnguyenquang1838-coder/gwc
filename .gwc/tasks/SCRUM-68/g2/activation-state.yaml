@@ -1,0 +1,22 @@
+schema_version: '1.0'
+task_id: SCRUM-68
+approval_id: CP-20260723-071
+initial_base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
+working_branch: feature/scrum-68-final-node-catalog
+stage_08:
+  family: failure_recovery
+  planned_nodes: 9
+  status: ACTIVE
+  unlocked_by:
+    workflow_run_id: 29972360095
+    job_id: 89096886651
+    conclusion: success
+    head_branch: main
+    head_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
+stage_09:
+  family: scale_control
+  planned_nodes: 9
+  status: LOCKED
+  unlock_condition: Stage 08 PR merged and exact post-merge CI PASS
+g4_policy: separate exact approval per PR
+updated_at: '2026-07-23T02:39:00Z'

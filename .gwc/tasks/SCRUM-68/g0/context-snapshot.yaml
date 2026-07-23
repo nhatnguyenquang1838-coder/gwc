@@ -1,6 +1,6 @@
 schema_version: '1.0'
 artifact_type: g0-context-snapshot
-generated_at: '2026-07-22T18:58:00Z'
+generated_at: '2026-07-23T02:00:03Z'
 project:
   id: gwc
   name: GWC
@@ -8,17 +8,20 @@ project:
 repository:
   full_name: nhatnguyenquang1838-coder/gwc
   base_ref: main
-  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
   protected_branches:
   - main
   connector: GitHub
   write_enabled: true
 constraints:
 - Never write directly to main
-- Batch 07 may add exactly nine package_export nodes and no later family
-- Previous Batch 06 must be merged and exact post-merge CI verified
-- Reuse the existing package exporter, export rule, manifest schema, smoke verifier, and tests before extending
-- G4 merge, manual G5 actions, and G6 production operations remain excluded
+- Use one staged G2 envelope and one reusable working branch for Batch 08 and Batch 09
+- Each PR may add exactly nine nodes and must remain independently reviewable
+- Batch 08 may activate only after Batch 07 merge commit post-merge CI is verified
+- Batch 09 may activate only after Batch 08 is merged and exact post-merge CI is verified
+- Use separate exact G4 approval for each PR
+- No force-push, branch deletion, shared-history rewrite, or PR base change
+- G2 excludes merge, deploy, release, production, secrets, credentials, and migrations
 applicable_policies:
 - id: GWC-PROTECTED-BASE-AGENTS
   path: AGENTS.md
@@ -44,10 +47,14 @@ applicable_policies:
   path: core/node-architect/node-catalog-expansion-plan.json
   ref: main
   source_sha: 4ec834a59ec602b5a2473f50af0ee0ff2e70b949
-- id: CONSUMER-PACKAGE-EXPORT
-  path: core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md
+- id: RUNTIME-KERNEL
+  path: core/node-architect/RUNTIME_KERNEL_v0.1.md
   ref: main
-  source_sha: d33b86fb7d96d8b4b575d7b15452421c3f556099
+  source_sha: 60a6b2488a3d712fe22b74592585db478c744969
+- id: FAILURE-SIMULATION-MATRIX
+  path: core/node-architect/failure-simulation-matrix.json
+  ref: main
+  source_sha: 821801b6c702462b26721ed88c84879b4a787603
 sources:
 - path: AGENTS.md
   required: true
@@ -84,7 +91,7 @@ sources:
 - path: projects/gwc/package.yaml
   required: true
   status: AVAILABLE
-  source_sha: 7587016ff4f08ac613c41d7d1573c23cf5c9db33
+  source_sha: 3414decd872b0f56c63c606f965632ee05820bd5
 - path: agents/chatgpt-agent/agent-instructions.md
   required: true
   status: AVAILABLE
@@ -101,30 +108,42 @@ sources:
   required: true
   status: AVAILABLE
   source_sha: 882ce0f4190ddcdae6cda7b1627984c3401b502d
+- path: core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md
+  required: true
+  status: AVAILABLE
+  source_sha: 503c4b0e8db1800c55be3f4a2b5f0d4ed9daef54
 - path: core/node-architect/node-catalog-expansion-plan.json
   required: true
   status: AVAILABLE
   source_sha: 4ec834a59ec602b5a2473f50af0ee0ff2e70b949
+- path: core/node-architect/RUNTIME_KERNEL_v0.1.md
+  required: true
+  status: AVAILABLE
+  source_sha: 60a6b2488a3d712fe22b74592585db478c744969
+- path: core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md
+  required: true
+  status: AVAILABLE
+  source_sha: 2f61da46ff34c28331b8ec199e6fcbe184cc82c2
+- path: core/node-architect/failure-simulation-matrix.json
+  required: true
+  status: AVAILABLE
+  source_sha: 821801b6c702462b26721ed88c84879b4a787603
+- path: schemas/node-architect/failure-simulation-matrix.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 1dccc0e29a053d0c0da51b64068af3d613880b5b
 - path: schemas/node-architect/runtime-node.schema.json
   required: true
   status: AVAILABLE
   source_sha: e8208410cde0175b2cefa9bb7929455890715166
-- path: core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md
+- path: tools/node_architect/validate_failure_simulation_matrix.py
   required: true
   status: AVAILABLE
-  source_sha: d33b86fb7d96d8b4b575d7b15452421c3f556099
-- path: tools/export_project_package.py
+  source_sha: 1363fddd29b9fb86db8b437042706c77474a003c
+- path: tests/test_failure_simulation_scale_readiness.py
   required: true
   status: AVAILABLE
-  source_sha: 8c77a4bd05e94a6f6ff0a09a5a43efa47cd143db
-- path: tools/verify_package_export_smoke.py
-  required: true
-  status: AVAILABLE
-  source_sha: e5bc5520cf70e2cb3092f8c45235a8ad9a7a20ba
-- path: tests/test_package_export_smoke.py
-  required: true
-  status: AVAILABLE
-  source_sha: b0ce26f76bb844a3d8af43197aa3d2c1363e7f94
+  source_sha: e37f5b095987454fcf77717b729f82aecbe5798d
 - path: schemas/g0-context-snapshot.schema.json
   required: true
   status: AVAILABLE

@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.version-drift-rollback-routing",
+  "node_type": "workflow",
+  "title": "Version Drift Rollback Routing",
+  "description": "Pin or restart on node-version drift and route rollback evidence without granting deployment authority.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g5_required",
+  "gates": [
+    "G5_DEPLOY"
+  ]
+}
