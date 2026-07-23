@@ -54,7 +54,7 @@ class ScaleControlTests(unittest.TestCase):
         for node in nodes:
             if node["canonical"] == "audit_projection":
                 continue
-            expected = "g5_required" if node["gates"] == ["G5_DEPLOY"] else "g2_required"
+            expected = "g5_required" if node["gates"] == ["G5_DEPLOY"] else "g3_required"
             self.assertEqual(node["authority_boundary"], expected)
 
     def test_catalog_exports_eighty_one_nodes(self):
