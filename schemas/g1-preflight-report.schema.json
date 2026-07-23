@@ -6,8 +6,7 @@
   "additionalProperties": false,
   "required": [
     "schema_version", "artifact_type", "generated_at", "trace", "repository_state",
-    "checks", "process_readback", "execution_feasibility", "risk_class", "required_gate",
-    "blockers", "outcome"
+    "checks", "risk_class", "required_gate", "blockers", "outcome"
   ],
   "$defs": {
     "trace": {
@@ -118,6 +117,14 @@
     "outcome": {"enum": ["PASS", "NEEDS_INPUT", "BLOCKED"]}
   },
   "allOf": [
+    {
+      "if": {"required": ["process_readback"]},
+      "then": {"required": ["execution_feasibility"]}
+    },
+    {
+      "if": {"required": ["execution_feasibility"]},
+      "then": {"required": ["process_readback"]}
+    },
     {
       "if": {"properties": {"outcome": {"const": "PASS"}}},
       "then": {
