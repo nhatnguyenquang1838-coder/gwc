@@ -1,0 +1,65 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: task_b5042e55-efea-4c51-91e3-0278afffb197
+approval_request_id: APPROVE_G2_b5042e55_20260723
+authority_gate: G2_EXECUTION
+issued_at: "2026-07-23T02:57:00Z"
+expires_at: "2026-07-24T02:57:00Z"
+scope_version: "1.0"
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: Egonex-AI/Understand-Anything
+base_ref: main
+base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+working_branch: feature/remove-dashboard-token-gate-20260723
+modules_or_files:
+  - packages/dashboard/src/App.tsx
+  - packages/dashboard/vite.config.ts
+  - packages/core/src/schema.ts
+  - packages/core/src/__tests__/schema.test.ts
+authorized_actions:
+  - claim_work_item
+  - renew_work_item_lease
+  - update_work_item_status
+  - create_isolated_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  - commit
+  - push
+  - pr_creation
+  - source-edits-outside-scope
+required_checks:
+  - dashboard builds with typecheck
+  - legacy flat graphs without layers and with missing edge weights validate successfully and default weights to 0.5 without warning flood
+  - knowledge-graph.json and staleness endpoints return 200 without token
+  - dashboard loads without token prompt and without missing-weight warning banner
+work_item:
+  provider: DS Admin
+  id: task_b5042e55-efea-4c51-91e3-0278afffb197
+  claim_required: true
+  expected_repository: Egonex-AI/Understand-Anything
+  initial_state: draft
+  review_state: pending_approval
+artifact_hashes:
+  g0: sha256:task-scoped
+  g1: sha256:scope-revised
+g0_context_ref: .gwc/tasks/task_b5042e55-efea-4c51-91e3-0278afffb197/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/task_b5042e55-efea-4c51-91e3-0278afffb197/g1/decision/g1-decision-record.yaml
+scope_hash: sha256:f932a85b4d019e6f25c47a253918c865828c7c9cdc10cdb9c393db93582d9619
+notes:
+  - One bounded local dashboard repair; no commit, push, PR, merge, deploy, or production operation.
+  - Schema migration handles legacy flat graphs missing layers and edge weights without warning flooding the dashboard.

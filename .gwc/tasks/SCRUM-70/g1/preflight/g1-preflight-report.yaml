@@ -1,0 +1,30 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-23T06:32:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-70
+  base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+  - {id: REPO_IDENTITY, status: PASS, code: REPOSITORY_VERIFIED, message: Repository identity and protected base are verified., evidence: [projects/gwc/project-profile.yaml@origin/main, origin/main@6ccc057fe8b43d181b86d0411e60123a79b88]}
+  - {id: JIRA_TASK, status: PASS, code: JIRA_TASK_PRESENT, message: Jira task SCRUM-70 is the single task identity for this bounded change., evidence: [https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-70]}
+  - {id: SCOPE_BOUNDARY, status: PASS, code: EXCLUSIONS_RECORDED, message: 'No adapter, historical migration, Story 7, merge, deploy, or production operation is in scope.', evidence: [SCRUM-70 description, g1/intake/g1-intake-brief.yaml]}
+  - {id: LOCAL_VALIDATOR, status: PASS, code: INSTRUCTION_VALIDATION_PASSED, message: Protected-base instruction validation passed during read-only inspection., evidence: [tools/validate_instructions.py exit 0]}
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: codex-local-agent
+  execution_mode: local_agent
+  selected_profile: {id: gwc, path: projects/gwc/project-profile.yaml}
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts: [core/Agent_Behavior_Semantic_Contract_v1.0.md, core/Agent_Response_Presentation_Contract_v1.0.md]
+blockers: []
+outcome: PASS

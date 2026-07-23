@@ -1,0 +1,50 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+generated_at: "2026-07-23T02:57:00Z"
+trace:
+  project_id: gwc
+  repository: Egonex-AI/Understand-Anything
+  task_id: task_b5042e55-efea-4c51-91e3-0278afffb197
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity and protected base are verified.
+    evidence: [projects/gwc/project-profile.yaml, main@6ae71878beb50226a1e4b7e2f52ac6468c86f74b]
+  - id: TASK_TRACEABILITY
+    status: PASS
+    code: DS_ADMIN_TASK_PRESENT
+    message: One DS Admin task represents this bounded repair.
+    evidence: [task_b5042e55-efea-4c51-91e3-0278afffb197]
+  - id: SOURCE_FILES
+    status: PASS
+    code: REQUIRED_FILES_AVAILABLE
+    message: Dashboard and core schema/test files are available in the guarded worktree.
+    evidence: [packages/dashboard/src/App.tsx, packages/dashboard/vite.config.ts, packages/core/src/schema.ts, packages/core/src/__tests__/schema.test.ts]
+  - id: DIRTY_STATE_CONTAINED
+    status: PASS
+    code: PREEXISTING_CHANGES_RECORDED
+    message: Unrelated changes remain outside the guarded worktree scope.
+    evidence: [git-status-guarded-worktree]
+risk_class: R2
+required_gate: G2_AUTOMATIC_BOUNDED
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+blockers: []
+outcome: PASS

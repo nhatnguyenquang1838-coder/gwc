@@ -1,0 +1,50 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-23T06:30:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+constraints:
+  - Never write directly to main
+  - Jira MCP is the task workflow source for new tasks only
+  - Existing DS Admin and Rental Home tasks are excluded from migration
+  - GWC task-scoped artifacts remain authoritative for G0-G6 evidence and approvals
+  - G4 merge, G5 deploy, and G6 production remain separate human gates
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: origin/main
+    source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  - id: GATE-LIFECYCLE-CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: origin/main
+    source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: origin/main
+    source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+sources:
+  - {path: AGENTS.md, required: true, status: AVAILABLE, source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88}
+  - {path: projects/gwc/project-profile.yaml, required: true, status: AVAILABLE, source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88}
+  - {path: projects/gwc/project-instructions.md, required: true, status: AVAILABLE, source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88}
+  - {path: projects/gwc/project-extension.md, required: true, status: AVAILABLE, source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88}
+  - {path: agents/chatgpt-agent/agent-instructions.md, required: true, status: AVAILABLE, source_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88}
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: codex-local-agent
+  execution_mode: local_agent
+  selected_profile: {id: gwc, path: projects/gwc/project-profile.yaml}
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md

@@ -1,0 +1,28 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-07-23T02:57:00Z"
+trace:
+  project_id: gwc
+  repository: Egonex-AI/Understand-Anything
+  task_id: task_b5042e55-efea-4c51-91e3-0278afffb197
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Fix schema migration and dashboard together
+    description: Keep the token removal and teach the schema to recognize flat legacy graphs without layers, defaulting missing weights silently.
+    benefits: [Fixes root cause, Preserves graph data, One bounded validation surface]
+    tradeoffs: [Requires core package build and regression test]
+    risks: [Schema migration must remain limited to legacy flat graphs]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Hide the warning in the dashboard
+    description: Suppress missing-weight warnings in UI without fixing schema classification.
+    benefits: [Small UI change]
+    tradeoffs: [Masks schema behavior, leaves root cause]
+    risks: [Future consumers still see warnings]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Fix the migration boundary in core and retain a regression test rather than hiding validation evidence in the dashboard.
+decision_required: true
+status: READY

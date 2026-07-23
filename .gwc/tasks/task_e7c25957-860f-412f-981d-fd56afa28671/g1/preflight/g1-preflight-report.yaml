@@ -1,0 +1,61 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+generated_at: "2026-07-22T18:50:12Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_e7c25957-860f-412f-981d-fd56afa28671
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity, protected base, and write-enabled profile are verified.
+    evidence: [projects/gwc/project-profile.yaml, main@34c080a3fa82a19182b04a8be2a784a8e2ab5acd]
+  - id: TASK_TRACEABILITY
+    status: PASS
+    code: DS_ADMIN_TASK_PRESENT
+    message: Exactly one DWC/DS Admin task represents this bounded rebuild.
+    evidence: [task_e7c25957-860f-412f-981d-fd56afa28671]
+  - id: OFFICIAL_SKILL_SOURCE
+    status: PASS
+    code: UNDERSTAND_SKILLS_READ
+    message: Official understand, dashboard, and relevant analyzer instructions are available locally and were inspected.
+    evidence: [/Users/mac/prj/Understand-Anything/understand-anything-plugin/skills/understand/SKILL.md, /Users/mac/prj/Understand-Anything/understand-anything-plugin/skills/understand-dashboard/SKILL.md]
+  - id: LLM_EXECUTION_SURFACE
+    status: PASS
+    code: CLAUDE_CLI_AVAILABLE
+    message: Claude CLI is installed and can invoke the official slash-command pipeline after G2 authorization.
+    evidence: [/Users/mac/.local/bin/claude]
+  - id: IGNORE_CONFIGURATION
+    status: PASS
+    code: UNDERSTANDIGNORE_PRESENT
+    message: Existing .ua/.understandignore is present for reuse.
+    evidence: [.ua/.understandignore]
+  - id: DIRTY_STATE_CONTAINED
+    status: PASS
+    code: PREEXISTING_CHANGES_RECORDED
+    message: Existing .ua and unrelated tts-training changes are recorded and will be isolated from the rebuild.
+    evidence: [git status --short]
+risk_class: R1
+required_gate: G2_AUTOMATIC_BOUNDED
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+blockers: []
+outcome: PASS

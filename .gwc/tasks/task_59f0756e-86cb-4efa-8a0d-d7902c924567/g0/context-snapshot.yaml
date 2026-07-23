@@ -1,0 +1,60 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-07-23T03:33:00Z"
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+constraints:
+  - Never write directly to main
+  - Commit only the approved graph artifacts
+  - Exclude tts-training, .ua/tmp, and unrelated task workspaces
+  - Preserve existing local commit 34c080a in branch ancestry
+  - G4 merge, G5 deploy, and G6 production remain separate human gates
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - id: GATE-LIFECYCLE
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 130fc457745a7c3bca05bfd67714fd24a541e31a50a46080d0c89475ac5d1a43
+  - id: E2E-DRAFT-PR
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: a8d1ca868fc5a740f2dda9d53cb502186ab94d89011555c770a43c6993523402
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: fd89901e22859ad118557996dfedc1c68ddbd30cf349b9054f6a9a922016b574
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: dec885c9125d6c4bf2fad5007cc233c45e61bc9341f1e55137d071a341c23c09
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: e29c33ccae5118112d7fc677c8cc79c7d949e4c61ceb2534efaae598759e1afb
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md

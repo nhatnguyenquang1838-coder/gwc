@@ -1,0 +1,61 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-07-23T02:57:00Z"
+project:
+  id: gwc
+  name: GWC dashboard integration
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: Egonex-AI/Understand-Anything
+  base_ref: main
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+constraints:
+  - Never write directly to main
+  - Limit changes to the four approved dashboard/core files
+  - No commit, push, PR, merge, deploy, or production operation
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE-LIFECYCLE
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 54fce3665a885667bb17174d520486cf1207d427
+  - id: E2E-DRAFT-PR
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: e2ae72322f3248182cce5150201377b6f7edac89
+sources:
+  - path: /Users/mac/prj/Understand-Anything/understand-anything-plugin/packages/dashboard/src/App.tsx
+    required: true
+    status: AVAILABLE
+    source_sha: c7db460fc3e4525abf93ba73a6d3339a0ef49cb4ccc62261c3611118d066b747
+  - path: /Users/mac/prj/Understand-Anything/understand-anything-plugin/packages/dashboard/vite.config.ts
+    required: true
+    status: AVAILABLE
+    source_sha: c3f574f4bd2ff9ffa3f31d844c9ceae10cdcc3e4e090fb2e55864a8084482da7
+  - path: /Users/mac/prj/Understand-Anything/understand-anything-plugin/packages/core/src/schema.ts
+    required: true
+    status: AVAILABLE
+    source_sha: e043d70c2d4485fe717ccee9eb54ad4e36256fdafc0713999e7b9b345bbc7c97
+  - path: /Users/mac/prj/Understand-Anything/understand-anything-plugin/packages/core/src/__tests__/schema.test.ts
+    required: true
+    status: AVAILABLE
+    source_sha: cf2e99aad42949a7ee15a6a1ab0e3c461fce4680b3ce1d6d8d69023dc3dd1423
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md

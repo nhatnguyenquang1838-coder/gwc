@@ -1,0 +1,64 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: task_6e8c52f6-25e2-465f-8590-5b6642cf69a1
+approval_request_id: APPROVE_G2_6e8c52f6_20260723_02
+authority_gate: G2_EXECUTION
+issued_at: "2026-07-23T02:42:00Z"
+expires_at: "2026-07-24T02:42:00Z"
+scope_version: 1.0.1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: Egonex-AI/Understand-Anything
+base_ref: main
+base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+working_branch: feature/remove-dashboard-token-gate-20260723
+modules_or_files:
+  - packages/dashboard/src/App.tsx
+  - packages/dashboard/vite.config.ts
+authorized_actions:
+  - claim_work_item
+  - renew_work_item_lease
+  - update_work_item_status
+  - create_guarded_branch
+  - create_isolated_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  - commit
+  - push
+  - pr_creation
+  - source-edits-outside-scope
+required_checks:
+  - dashboard builds with typecheck
+  - dashboard loads without token prompt
+  - knowledge-graph.json and staleness endpoints return 200 without token
+  - no token gate or token query requirement remains in scoped dashboard code
+work_item:
+  provider: DS Admin
+  id: task_6e8c52f6-25e2-465f-8590-5b6642cf69a1
+  claim_required: true
+  expected_repository: Egonex-AI/Understand-Anything
+  initial_state: ready
+  review_state: write_running
+artifact_hashes:
+  g0: sha256:task-scoped
+  g1: sha256:preflight-pass
+g0_context_ref: .gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/decision/g1-decision-record.yaml
+scope_hash: sha256:6c3c450fc6ce5341e6fef8c7bdedfc84affe3cb6f5e518aa70c08304a3b5a522
+notes:
+  - This is a local upstream Understand Anything clone used by the GWC dashboard demo.
+  - Removing the token gate intentionally exposes local dashboard data endpoints; no production deployment or remote write is authorized.

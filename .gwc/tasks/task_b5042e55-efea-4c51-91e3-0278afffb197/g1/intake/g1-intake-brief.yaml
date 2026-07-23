@@ -1,0 +1,47 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-07-23T02:57:00Z"
+trace:
+  project_id: gwc
+  repository: Egonex-AI/Understand-Anything
+  task_id: task_b5042e55-efea-4c51-91e3-0278afffb197
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The local dashboard no longer needs a token gate, and legacy flat graphs still surface one missing-weight warning per edge.
+  why_now: The user reported the missing-weight error again and authorized one bounded envelope to complete the graph HTML fix.
+desired_outcome: The local dashboard loads directly and legacy flat graph edges receive a silent default weight of 0.5.
+stakeholders:
+  requester: User
+  affected: [GWC dashboard users]
+scope:
+  in_scope:
+    - packages/dashboard/src/App.tsx
+    - packages/dashboard/vite.config.ts
+    - packages/core/src/schema.ts
+    - packages/core/src/__tests__/schema.test.ts
+  non_goals: [Graph artifact rewrite, commit, push, PR, merge, deploy, production operations]
+constraints:
+  - Preserve unrelated dirty files
+  - Use the existing guarded branch/worktree
+  - Validate dashboard build, schema behavior, and HTTP loading
+assumptions:
+  - The existing guarded branch contains the previously approved token-gate change.
+  - The reported missing-weight message is the schema migration warning observed in the dashboard.
+risks:
+  - id: RISK-1
+    description: Broad graph rewrites could alter user data.
+    impact: medium
+    mitigation: Do not rewrite generated graph artifacts; change only migration behavior and its test.
+acceptance_criteria:
+  - id: AC-1
+    statement: Dashboard opens without token prompt or tokenized URL.
+    verifiable: true
+  - id: AC-2
+    statement: Legacy flat graphs without layers and missing edge weights validate successfully, default weights to 0.5, and emit no per-edge missing-weight warnings.
+    verifiable: true
+  - id: AC-3
+    statement: Dashboard build succeeds and graph/staleness endpoints return 200 without token.
+    verifiable: true
+status: READY
+unresolved_questions: []

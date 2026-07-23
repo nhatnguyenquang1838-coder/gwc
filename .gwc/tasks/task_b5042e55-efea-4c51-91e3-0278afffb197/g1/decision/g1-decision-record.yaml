@@ -1,0 +1,35 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+generated_at: "2026-07-23T02:57:00Z"
+trace:
+  project_id: gwc
+  repository: Egonex-AI/Understand-Anything
+  task_id: task_b5042e55-efea-4c51-91e3-0278afffb197
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: User
+  decided_at: "2026-07-23T02:56:41Z"
+  source: chat-authorized-one-envelope-graph-html-fix
+  explicit: true
+rationale: Fix both the local dashboard token gate and the root schema migration that produces repeated missing-weight warnings.
+rejected_option_ids: [OPT-2]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3]
+scope_hash: sha256:f932a85b4d019e6f25c47a253918c865828c7c9cdc10cdb9c393db93582d9619
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Implement and test the bounded dashboard and schema migration fix.
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: local-agent
+      agent_type: primary
+  execution_order: [SUB-TASK-1]

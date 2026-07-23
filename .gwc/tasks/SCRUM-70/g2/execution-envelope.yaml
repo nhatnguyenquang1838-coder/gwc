@@ -1,0 +1,80 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+task_id: SCRUM-70
+approval_request_id: APPROVE_G2_SCRUM70_20260723
+authority_gate: G2_EXECUTION
+issued_at: '2026-07-23T06:40:00Z'
+expires_at: '2026-07-24T06:40:00Z'
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+working_branch: codex/scrum-70-jira-mcp-governance
+target_pr_base: main
+draft_pr: true
+modules_or_files:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - docs/project-consumer-agent-instructions.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - agents/dwc/agent-instructions.md
+  - projects/gwc/project-profile.yaml
+  - projects/gwc/project-instructions.md
+  - projects/gwc/project-extension.md
+  - projects/gwc/package.yaml
+  - tests
+  - releases/changelog.md
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage_approved_files
+  - create_commit
+  - push_branch
+  - create_draft_pr
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - production_data
+  - existing_ds_admin_task_migration
+  - existing_rental_home_task_migration
+  - jira_adapter
+  - story_7
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+required_checks:
+  - validate_g01
+  - validate_instructions
+  - YAML and JSON validation
+  - repository tests
+  - package export validation
+  - git diff --check
+  - complete diff and scope review
+work_item:
+  provider: jira-mcp
+  id: SCRUM-70
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: To Do
+artifact_hashes:
+  g0: task-scoped
+  g1: validator-pass
+scope_hash: sha256:5abebda204da86080becd131e0ba0dd27e746d6faa02b6477b49aaa77fb898e5
+g0_context_ref: .gwc/tasks/SCRUM-70/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/SCRUM-70/g1/decision/g1-decision-record.yaml
+notes:
+  - Direct Atlassian MCP is used; no Jira adapter is in scope.
+  - Existing DS Admin and Rental Home tasks remain untouched.
+  - GWC gate evidence remains authoritative; Jira status does not grant G0-G6 approval.
+  - Draft PR only. G4, G5 and G6 are excluded.

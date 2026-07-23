@@ -1,0 +1,48 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-23T06:31:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-70
+  base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC currently requires DS Admin as canonical work tracking, while the approved target is direct Jira MCP task workflow for new tasks.
+  why_now: Jira task SCRUM-70 was created and the user selected the direct MCP path with no historical migration.
+desired_outcome: New GWC task governance uses Jira MCP task identity and status while preserving GWC gate evidence and GitHub authority boundaries.
+stakeholders:
+  requester: user
+  affected: [GWC maintainers, DWC runtime, ChatGPT-style agents, new GWC task consumers]
+scope:
+  in_scope:
+    - Update GWC profile and package work_tracking configuration for Jira MCP.
+    - Update GWC runtime instructions and consumer guidance for new Jira tasks.
+    - Preserve GWC G0-G6 gate evidence as authority.
+    - Define DS Admin as read-only compatibility projection for the transition period.
+    - Add validation and regression tests for Jira task identity and lifecycle references.
+    - Update package exports and changelog.
+  non_goals:
+    - Build a Jira adapter.
+    - Migrate existing DS Admin tasks.
+    - Migrate existing Rental Home tasks.
+    - Modify existing DS Admin or Rental Home task records.
+    - Implement Story 7 or a separate DS Admin authority shutdown.
+    - Merge, deploy, production configuration, credentials, or production data.
+constraints: [Use direct Atlassian Jira MCP calls, Use a guarded branch, Do not modify protected main, Preserve unrelated working-tree changes]
+assumptions: [Jira project SCRUM remains available, SCRUM-70 remains the task identity, GWC gate artifacts remain gate authority]
+risks:
+  - {id: RISK-1, description: Existing consumers may still assume DS Admin is canonical., impact: high, mitigation: Update the GWC package and preserve legacy compatibility without migrating legacy records.}
+  - {id: RISK-2, description: Jira status could be mistaken for GWC gate approval., impact: high, mitigation: Keep gate authority and approval exclusions explicit in contracts and tests.}
+acceptance_criteria:
+  - {id: AC-1, statement: The GWC profile declares Jira MCP as provider for new task workflow and binds task identity to Jira issue keys., verifiable: true}
+  - {id: AC-2, statement: GWC instructions state Jira status does not grant G0-G6 authority and existing tasks are not migrated., verifiable: true}
+  - {id: AC-3, statement: 'Package export, YAML/JSON validation and regression tests pass without modifying existing task records.', verifiable: true}
+delivery_lifecycle:
+  authorized_actions: [Create guarded branch after G2 approval, Modify approved GWC governance/profile/package/schema/test/changelog files, Run local validation, Assemble Draft PR after G3]
+  downstream_non_goals: [Merge or auto-merge, Deploy or release, Production data/configuration/credentials/secrets]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence: [Exact branch head SHA, Full diff review, Validation and test results, Independent read-only G3 review]
+unresolved_questions: []
+status: READY

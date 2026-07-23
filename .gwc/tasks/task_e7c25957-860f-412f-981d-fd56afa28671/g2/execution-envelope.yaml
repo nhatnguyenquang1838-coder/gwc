@@ -1,0 +1,67 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: task_e7c25957-860f-412f-981d-fd56afa28671
+approval_request_id: APPROVE_G2_e7c25957_20260723_02
+authority_gate: G2_EXECUTION
+issued_at: "2026-07-22T19:08:00Z"
+expires_at: "2026-07-23T19:08:00Z"
+scope_version: 1.0.1
+risk_class: R1
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+working_branch: feature/understand-graph-rebuild-20260723
+modules_or_files:
+  - .ua/config.json
+  - .ua/knowledge-graph.json
+  - .ua/meta.json
+  - .ua/fingerprints.json
+  - .ua/intermediate/scan-result.json
+  - .ua/intermediate/batches.json
+  - .ua/intermediate/tour.json
+  - .ua/intermediate/
+authorized_actions:
+  - claim_work_item
+  - renew_work_item_lease
+  - update_work_item_status
+  - modify_approved_files
+  - run_sandboxed_validation
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  - source-code-edits
+  - manual-graph-edge-injection
+required_checks:
+  - official Understand Anything full pipeline completes
+  - graph schema/integrity validation PASS
+  - gate/runbook content-grounded path check
+  - dashboard HTTP smoke test
+work_item:
+  provider: DS Admin
+  id: task_e7c25957-860f-412f-981d-fd56afa28671
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: ready
+  review_state: write_running
+artifact_hashes:
+  g0: sha256:task-scoped
+  g1: sha256:validator-pass
+g0_context_ref: .gwc/tasks/task_e7c25957-860f-412f-981d-fd56afa28671/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/task_e7c25957-860f-412f-981d-fd56afa28671/g1/decision/g1-decision-record.yaml
+scope_hash: sha256:8fbccba6eadaf335934481a0e4bdde3b0e37b0425a483244e6b267924ef5e583
+notes:
+  - Existing dirty .ua and unrelated tts-training changes must remain untouched in the current checkout.
+  - Execute in an isolated guarded worktree created from main@34c080a3fa82a19182b04a8be2a784a8e2ab5acd.
+  - No Draft PR is requested by this task; G3 is not authorized by this envelope.

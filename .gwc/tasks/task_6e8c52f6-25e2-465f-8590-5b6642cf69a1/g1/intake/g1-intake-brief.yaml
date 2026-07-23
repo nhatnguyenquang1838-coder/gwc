@@ -1,0 +1,62 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-07-23T02:38:00Z"
+trace:
+  project_id: gwc
+  repository: Egonex-AI/Understand-Anything
+  task_id: task_6e8c52f6-25e2-465f-8590-5b6642cf69a1
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The local dashboard blocks graph loading behind an unnecessary access-token page and tokenized data requests.
+  why_now: The user explicitly requested removal of the token check from the local dashboard page.
+desired_outcome: Local dashboard opens and loads its graph without a token prompt or token query parameter.
+stakeholders:
+  requester: User
+  affected: [GWC maintainers, Understand Anything dashboard users]
+scope:
+  in_scope:
+    - packages/dashboard/src/App.tsx
+    - packages/dashboard/vite.config.ts
+  non_goals:
+    - Graph rebuild
+    - Changes outside dashboard package
+    - Commit, push, PR, merge, deploy, or production operations
+constraints:
+  - Preserve unrelated dirty files and inspect generated diff for scope drift
+  - Use Claude/official Understand Anything subagent execution if available; report semantic capability gaps honestly
+  - Do not write directly to protected main; execute on a dedicated guarded branch/worktree
+assumptions:
+  - .ua/.understandignore is the reviewed ignore configuration for this run
+  - The current graph's base commit is 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  - The local Understand Anything clone is the available upstream skill source
+risks:
+  - id: RISK-1
+    description: LLM semantic analysis may add unsupported relationships if prompts or evidence handling drift from the official agent contract.
+    impact: medium
+    mitigation: Use official file-analyzer/merge/reviewer prompts, require content-grounded edges, and run deterministic graph validation.
+  - id: RISK-2
+    description: Existing dirty generated artifacts and unrelated files could be overwritten or mixed into the rebuild.
+    impact: medium
+    mitigation: Isolate execution in a dedicated worktree and compare only scoped .ua outputs against the protected base.
+acceptance_criteria:
+  - id: AC-1
+    statement: The official full pipeline completes without an unreported phase failure and produces schema-valid knowledge-graph.json, meta.json, and fingerprints.json.
+    verifiable: true
+  - id: AC-2
+    statement: Every emitted semantic edge is grounded in analyzed file content and no orphan or dangling graph references remain.
+    verifiable: true
+  - id: AC-3
+    statement: A content-grounded path query for GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md and GATE_LIFECYCLE_CONTRACT_v1.0.md returns the expected relationship when one exists, and the dashboard loads the rebuilt graph over HTTP.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - Run official Understand Anything analysis in the dedicated guarded worktree
+    - Write only task-scoped generated .ua outputs and validation evidence
+    - Run local validation and inspect the complete scoped diff
+  downstream_non_goals: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [scoped diff review, graph validation, dashboard HTTP smoke test]
+unresolved_questions: []
+status: READY

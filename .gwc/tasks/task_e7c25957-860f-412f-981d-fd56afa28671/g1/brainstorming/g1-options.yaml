@@ -1,0 +1,28 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-07-22T18:50:12Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_e7c25957-860f-412f-981d-fd56afa28671
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Official full rebuild with semantic analysis
+    description: Invoke the official Understand Anything full pipeline with deterministic extraction plus content-grounded LLM file analysis, architecture, tour, validation, and fingerprints.
+    benefits: [Correct semantic relationships, Officially reproducible pipeline, Better traversal evidence]
+    tradeoffs: [Requires Claude CLI/API availability, Longer runtime]
+    risks: [LLM output quality must be reviewed]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Deterministic-only rebuild
+    description: Re-run scanner and static structure extraction without semantic file-analyzer agents.
+    benefits: [Deterministic, No LLM dependency]
+    tradeoffs: [Cannot reliably infer gate-to-runbook content relationships]
+    risks: [Graph remains structurally disconnected for documentation semantics]
+    constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: The reported defect is semantic traversal, so the official file-analyzer stage is necessary; deterministic-only output would repeat the known limitation.
+decision_required: true
+status: READY

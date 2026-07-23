@@ -1,0 +1,96 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: task_59f0756e-86cb-4efa-8a0d-d7902c924567
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+working_branch: codex/gwc-graph-pr-no-tts-20260723
+pull_request:
+  number: 78
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/78
+  draft: true
+head_sha: fdfb9bd60d82d840a9c22c9add88e45438dfabf6
+scope_hash: sha256:9637ac2e423ba6866bd65523a0783482a8bf9d830e53f911176ffc6a0889ad94
+changed_paths:
+  - .ua/fingerprints.json
+  - .ua/intermediate/batches.json
+  - .ua/intermediate/scan-result.json
+  - .ua/knowledge-graph.json
+  - .ua/meta.json
+validation:
+  head_sha: fdfb9bd60d82d840a9c22c9add88e45438dfabf6
+  status: pass
+  commands:
+    - command: python3 JSON parse and graph integrity check
+      result: pass
+      evidence: 5 JSON files parsed; 2162 nodes; 3264 edges; 3 layers; 0 dangling edges
+    - command: git diff HEAD^ HEAD --check
+      result: pass
+      evidence: clean
+review:
+  implementer_id: dwc
+  reviewer_id: fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: fdfb9bd60d82d840a9c22c9add88e45438dfabf6
+  reviewed_scope_hash: sha256:9637ac2e423ba6866bd65523a0783482a8bf9d830e53f911176ffc6a0889ad94
+  reviewed_at: "2026-07-23T03:43:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence: [User-approved graph delivery excluding TTS]
+    - name: design
+      applicable: true
+      status: pass
+      evidence: [Generated artifact-only change; no source-code redesign]
+    - name: code
+      applicable: true
+      status: pass
+      evidence: [Exact five-path staged allowlist reviewed]
+    - name: test
+      applicable: true
+      status: pass
+      evidence: [JSON and graph integrity validation passed]
+    - name: governance
+      applicable: true
+      status: pass
+      evidence: [G0/G1 validator PASS and G2 approval matched]
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence: ["Branch pushed and Draft PR #78 created"]
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/29977693232
+        - https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/29977693249
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence: [Only five approved .ua files committed; TTS excluded]
+    - id: AC-2
+      result: pass
+      evidence: [Graph metadata and integrity checks passed]
+    - id: AC-3
+      result: pass
+      evidence: ["Draft PR #78 targets main at exact head SHA"]
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: fdfb9bd60d82d840a9c22c9add88e45438dfabf6
+  checks:
+    - name: validate-instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/29977693232
+residual_risks: []
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass

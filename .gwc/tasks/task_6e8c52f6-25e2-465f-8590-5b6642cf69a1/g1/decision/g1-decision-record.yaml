@@ -1,0 +1,50 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+generated_at: "2026-07-23T02:38:00Z"
+trace:
+  project_id: gwc
+  repository: Egonex-AI/Understand-Anything
+  task_id: task_6e8c52f6-25e2-465f-8590-5b6642cf69a1
+  base_sha: 6ae71878beb50226a1e4b7e2f52ac6468c86f74b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: User
+  decided_at: "2026-07-22T18:50:12Z"
+  source: chat-requested-official-rebuild
+  explicit: true
+rationale: Re-run the official semantic pipeline because the existing graph does not represent the reported gate-to-runbook relationship correctly.
+rejected_option_ids: [OPT-2]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3]
+scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Run official project scanner, batching, and deterministic structure extraction.
+    - sub_task_id: SUB-TASK-2
+      description: Run official file-analyzer agents for content-grounded semantic nodes and edges.
+    - sub_task_id: SUB-TASK-3
+      description: Merge/review graph, assign architecture layers, build tour, validate, and fingerprint.
+    - sub_task_id: SUB-TASK-4
+      description: Validate gate/runbook path evidence and dashboard HTTP loading/traversal.
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: understand-project-scanner
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: understand-file-analyzer
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-3
+      skill_id: understand-architecture-and-tour
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-4
+      skill_id: graph-reviewer
+      agent_type: reviewer
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3, SUB-TASK-4]

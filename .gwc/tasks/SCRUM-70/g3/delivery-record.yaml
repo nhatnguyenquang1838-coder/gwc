@@ -1,0 +1,78 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-70
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+working_branch: codex/scrum-70-jira-mcp-governance
+pull_request:
+  number: 80
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/80
+  draft: true
+head_sha: d7496e04947f74fdd8a7473e735ee10df9f8d2e6
+scope_hash: sha256:50ad48db5c37499a2de8abdf422f43567753abbaf6f3073dfc66ac8bfd9c8411
+changed_paths:
+  - AGENTS.md
+  - agents/dwc/agent-instructions.md
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - docs/project-consumer-agent-instructions.md
+  - projects/gwc/package.yaml
+  - projects/gwc/project-extension.md
+  - projects/gwc/project-instructions.md
+  - projects/gwc/project-profile.yaml
+  - releases/changelog.md
+  - tests/test_chatgpt_agent_runbook_continuation.py
+  - tests/test_gate_lifecycle_process_contract.py
+validation:
+  head_sha: d7496e04947f74fdd8a7473e735ee10df9f8d2e6
+  status: pass
+  commands:
+    - command: /Users/mac/prj/gwc/.venv/bin/python tools/validate_instructions.py
+      result: pass
+      evidence: Instruction repository validation passed.
+    - command: /Users/mac/prj/gwc/.venv/bin/python -m unittest discover -s tests -p 'test_*.py'
+      result: pass
+      evidence: 222 tests passed for the exact head SHA.
+    - command: /Users/mac/prj/gwc/.venv/bin/python tools/build_project_package.py gwc --output /tmp/gwc-scrum70-dist --clean
+      result: pass
+      evidence: Package export completed with 180 files.
+    - command: git diff --check
+      result: pass
+      evidence: No whitespace errors.
+review:
+  implementer_id: codex-local-agent
+  reviewer_id: codex-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: d7496e04947f74fdd8a7473e735ee10df9f8d2e6
+  reviewed_scope_hash: sha256:50ad48db5c37499a2de8abdf422f43567753abbaf6f3073dfc66ac8bfd9c8411
+  reviewed_at: '2026-07-23T07:05:00Z'
+  lanes:
+    - {name: requirement, applicable: true, status: pass, evidence: ['Scope matches SCRUM-70 and user exclusions.']}
+    - {name: design, applicable: true, status: pass, evidence: ['Direct Jira MCP path preserves GWC gate authority.']}
+    - {name: code, applicable: true, status: pass, evidence: ['Full diff reviewed at exact head SHA.']}
+    - {name: test, applicable: true, status: pass, evidence: ['Full test suite passed.']}
+    - {name: governance, applicable: true, status: pass, evidence: ['G0-G6 exclusions and provider boundary preserved.']}
+    - {name: delivery, applicable: true, status: pass, evidence: ['Draft PR #80 matches branch and head SHA.']}
+    - {name: ci, applicable: true, status: pass, evidence: ['GitHub CI passed for exact head SHA.']}
+  findings: []
+  acceptance_criteria:
+    - {id: AC-1, result: pass, evidence: ['GWC profile and package declare Jira MCP provider for new tasks.']}
+    - {id: AC-2, result: pass, evidence: ['Contracts separate Jira task status from G0-G6 authority and exclude legacy migration.']}
+    - {id: AC-3, result: pass, evidence: ['Validation, tests, package export and diff checks passed.']}
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: d7496e04947f74fdd8a7473e735ee10df9f8d2e6
+  checks:
+    - {name: validate-instructions, required: true, status: pass, evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/29979459103}
+residual_risks: []
+exclusions: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION_DATA]
+outcome: pass

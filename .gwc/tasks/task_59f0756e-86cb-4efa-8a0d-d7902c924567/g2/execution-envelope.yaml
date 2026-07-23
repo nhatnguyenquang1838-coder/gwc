@@ -1,0 +1,68 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: task_59f0756e-86cb-4efa-8a0d-d7902c924567
+approval_request_id: APPROVE_G2_59f0756e_20260723
+authority_gate: G2_EXECUTION
+issued_at: "2026-07-23T03:35:00Z"
+expires_at: "2026-07-23T15:35:00Z"
+scope_version: 1.0.0
+risk_class: R1
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+working_branch: codex/gwc-graph-pr-no-tts-20260723
+target_pr_base: main
+draft_pr: true
+modules_or_files:
+  - .ua/fingerprints.json
+  - .ua/intermediate/batches.json
+  - .ua/intermediate/scan-result.json
+  - .ua/knowledge-graph.json
+  - .ua/meta.json
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage_approved_files
+  - create_commit
+  - push_branch
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  - tts-training
+  - .ua/tmp
+  - unrelated_task_workspaces
+required_checks:
+  - parse approved JSON artifacts
+  - graph metadata and integrity validation PASS
+  - git diff --check
+  - explicit staged-file allowlist review
+  - required GitHub Actions validation workflow
+work_item:
+  provider: DS Admin
+  id: task_59f0756e-86cb-4efa-8a0d-d7902c924567
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: agent_running
+artifact_hashes:
+  g0: task-scoped
+  g1: validator-pass
+g0_context_ref: .gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/decision/g1-decision-record.yaml
+scope_hash: sha256:9637ac2e423ba6866bd65523a0783482a8bf9d830e53f911176ffc6a0889ad94
+notes:
+  - Existing local commit 34c080a is preserved in branch ancestry because the graph was generated from that checkout.
+  - Do not stage tts-training, .ua/tmp, or any existing unrelated .gwc/tasks workspace.
+  - G3 Draft PR creation follows after G2 validation; G4 merge and later gates are excluded.

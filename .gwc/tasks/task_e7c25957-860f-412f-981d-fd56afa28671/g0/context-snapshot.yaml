@@ -1,0 +1,67 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-07-22T18:50:12Z"
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+constraints:
+  - Never write directly to main
+  - Use the official Understand Anything pipeline; do not hand-edit generated graph output
+  - Preserve unrelated working-tree changes
+  - G4 merge, G5 deploy, and G6 production remain separate human gates
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE-LIFECYCLE
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 54fce3665a885667bb17174d520486cf1207d427
+  - id: E2E-DRAFT-PR
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: e2ae72322f3248182cce5150201377b6f7edac89
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: main
+    source_sha: ea3ebbf80f5870793def2bc909bd0a6f56252c41
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5cbfe73c4dcd3480fee36cc4ad6a789461fbd56a
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 337ff66874cb249e1acd5f7ce42766c2475fbd98
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: ea3ebbf80f5870793def2bc909bd0a6f56252c41
+  - path: /Users/mac/prj/Understand-Anything/understand-anything-plugin/skills/understand/SKILL.md
+    required: true
+    status: AVAILABLE
+    source_sha: null
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md

@@ -1,0 +1,35 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-23T06:34:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-70
+  base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-23T06:29:00Z'
+  source: 'chat confirmation: ok'
+  explicit: true
+rationale: Implement the fast direct-MCP path for new GWC tasks, without building an adapter or migrating existing DS Admin and Rental Home tasks.
+rejected_option_ids: [OPT-2]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3]
+scope_hash: sha256:96348fec5a6958d8dcbc35d9cbef08ee0b101a90a33f08fbef0361e6118a98e1
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - {sub_task_id: SUB-TASK-1, description: Update GWC task provider and runtime contracts for direct Jira MCP.}
+    - {sub_task_id: SUB-TASK-2, description: 'Update validators, tests, package export and changelog.', dependencies: [SUB-TASK-1]}
+  agent_allocation:
+    - {sub_task_id: SUB-TASK-1, skill_id: primary-governance-implementation, agent_type: primary}
+    - {sub_task_id: SUB-TASK-2, skill_id: validation-and-package-export, agent_type: validator}
+  execution_order: [SUB-TASK-1, SUB-TASK-2]
+  summary: Single bounded implementation lane followed by validation.

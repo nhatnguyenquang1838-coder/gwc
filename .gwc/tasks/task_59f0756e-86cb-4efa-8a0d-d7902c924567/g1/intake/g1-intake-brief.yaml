@@ -1,0 +1,62 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-07-23T03:33:00Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_59f0756e-86cb-4efa-8a0d-d7902c924567
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Latest GWC graph outputs are uncommitted while unrelated TTS and temporary files must not enter delivery.
+  why_now: User explicitly requested committing graph changes and opening a PR to main while excluding TTS.
+desired_outcome: Deliver the five latest .ua graph artifacts in a guarded branch and Draft PR targeting main.
+stakeholders:
+  requester: User
+  affected: [GWC maintainers, dashboard users]
+scope:
+  in_scope:
+    - .ua/intermediate/batches.json
+    - .ua/intermediate/scan-result.json
+    - .ua/knowledge-graph.json
+    - .ua/fingerprints.json
+    - .ua/meta.json
+    - Commit, push guarded branch, and create Draft PR targeting main
+  non_goals:
+    - tts-training/
+    - .ua/tmp/
+    - Unrelated existing .gwc/tasks/* workspaces
+    - Direct main write, merge, deploy, release, production data/config, credentials, force-push, or history rewrite
+constraints:
+  - Preserve existing local commit 34c080a in branch ancestry because the graph was generated from that checkout.
+  - Review the complete diff and verify no excluded path is staged.
+assumptions:
+  - The five .ua files are the intended latest graph delivery artifacts.
+  - Current local main HEAD 34c080a is the protected-base snapshot used for this task.
+risks:
+  - id: RISK-1
+    description: Generated graph output is large and may contain accidental unrelated files.
+    impact: medium
+    mitigation: Stage an explicit five-file allowlist and inspect staged names/diff check.
+acceptance_criteria:
+  - id: AC-1
+    statement: Only the five approved .ua files are staged and committed; TTS and temporary/task files remain uncommitted.
+    verifiable: true
+  - id: AC-2
+    statement: JSON graph artifacts parse successfully and graph metadata remains internally consistent.
+    verifiable: true
+  - id: AC-3
+    statement: A guarded branch is pushed and a Draft PR targeting main is created for the exact head SHA.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - Create guarded branch/worktree from main@34c080a
+    - Modify/stage/commit only the five approved .ua files
+    - Run scoped validation and full diff review
+    - Push branch and create Draft PR targeting main
+  downstream_non_goals: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [explicit staged-file review, JSON validation, git diff --check]
+unresolved_questions: []
+status: READY

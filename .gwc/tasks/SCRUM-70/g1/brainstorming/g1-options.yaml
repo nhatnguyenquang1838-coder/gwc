@@ -1,0 +1,28 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-23T06:33:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-70
+  base_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Direct Jira MCP for new tasks
+    description: Use Atlassian MCP directly and keep GWC gate artifacts separate from Jira task status.
+    benefits: [Matches the selected architecture, Avoids an adapter layer, Enables fast incremental rollout]
+    tradeoffs: [Runtime instructions and consumers require coordinated updates]
+    risks: [Jira outage and status/authority confusion require explicit handling]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Build a Jira adapter first
+    description: Add an internal abstraction before switching the provider.
+    benefits: [Centralizes provider-specific behavior]
+    tradeoffs: [Slower delivery and explicitly excluded]
+    risks: [Adds unneeded architecture and migration surface]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Direct Jira MCP is the smallest implementation matching the requested scope while preserving GWC gate authority and excluding historical migration.
+decision_required: true
+status: READY

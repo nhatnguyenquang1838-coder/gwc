@@ -1,0 +1,28 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-07-23T03:33:00Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: task_59f0756e-86cb-4efa-8a0d-d7902c924567
+  base_sha: 34c080a3fa82a19182b04a8be2a784a8e2ab5acd
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Deliver explicit graph artifact allowlist
+    description: Stage and deliver only the five latest .ua graph artifacts, excluding TTS, temp files, and unrelated task workspaces.
+    benefits: [Small auditable PR, Preserves requested graph, Prevents TTS noise]
+    tradeoffs: [Does not deliver unrelated local changes]
+    risks: [Generated graph diff is large]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Commit all current working-tree changes
+    description: Include graph, TTS, task evidence, and temporary outputs in one PR.
+    benefits: [Single broad commit]
+    tradeoffs: [High noise and scope drift]
+    risks: [Accidental temporary or unrelated delivery]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: The user explicitly excluded TTS; an explicit graph allowlist is the smallest auditable delivery.
+decision_required: true
+status: READY
