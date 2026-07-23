@@ -60,7 +60,7 @@ sources:
   owner: gwc
   package_target: .governance/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
   path: core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
-  priority: 24
+  priority: 26
   status: active
   type: git-source
   url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
@@ -105,4 +105,4 @@ sources:
   status: fallback
   type: gpt-project
   url: null
-updated_at: '2026-07-23T12:20:00Z'
+updated_at: '2026-07-23T12:35:00Z'
