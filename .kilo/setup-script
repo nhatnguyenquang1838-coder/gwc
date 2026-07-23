@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ -z "${JIRA_SITE:-}" ] || [ -z "${JIRA_EMAIL:-}" ] || [ -z "${JIRA_API_TOKEN:-}" ]; then
+  echo "Missing JIRA_SITE, JIRA_EMAIL, or JIRA_API_TOKEN" >&2
+  exit 1
+fi
+
+ACLI_BIN="$HOME/.local/bin/acli"
+
+if [ ! -x "$ACLI_BIN" ]; then
+  curl -fsSL -o /tmp/acli "https://acli.atlassian.com/linux/latest/acli_linux_amd64/acli"
+  mkdir -p "$HOME/.local/bin"
+  mv /tmp/acli "$ACLI_BIN"
+  chmod +x "$ACLI_BIN"
+fi
+
+"$ACLI_BIN" jira auth login --site "$JIRA_SITE" --email "$JIRA_EMAIL" --token <<< "$JIRA_API_TOKEN"
