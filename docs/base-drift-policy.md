@@ -62,17 +62,17 @@ base_context:
   evaluated_at: null
 ```
 
-## Node integration
+## Existing-node integration
 
-The runtime checkpoint catalog exposes five BASE_DRIFT interrupt nodes:
+The interrupt mechanism does not increase the controlled 81-node catalog. It reuses existing runtime nodes:
 
-- `runtime_checkpoint.base-drift-detect`
-- `runtime_checkpoint.base-drift-assess`
-- `runtime_checkpoint.base-drift-revalidate`
-- `runtime_checkpoint.base-drift-reapprove`
-- `runtime_checkpoint.base-drift-stop`
+- repository base-drift/CAS checks detect the interrupt;
+- checkpoint capture and persistence suspend the parent safely;
+- state reconciliation performs assessment and affected-evidence refresh;
+- resume-token generation and validation restore the parent or continue the next node;
+- gate-authority and failure-recovery routes handle reapproval and stop outcomes.
 
-These nodes model routing and evidence lifecycle only. They do not implement a runtime engine, scheduler, merge, deploy, production, credential, secret, migration, or destructive operation capability.
+These mappings model routing and evidence lifecycle only. They do not implement a runtime engine, scheduler, merge, deploy, production, credential, secret, migration, or destructive operation capability.
 
 ## Validation
 
