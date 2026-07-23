@@ -1,0 +1,156 @@
+---
+const githubUrl = 'https://github.com/YOUR_USERNAME/YOUR_REPO';
+
+const navigation = {
+    home: '#top',
+    features: '#features',
+    liveDemo: '#live-demo',
+    getStarted: '#install',
+};
+---
+
+<header class="brand-header" id="brand-header">
+      <nav class="brand-nav" aria-label="Primary navigation">
+          <div class="brand-desktop-nav" aria-label="Navigation">
+              <a href={navigation.home}>Home</a>
+              <a href={navigation.features}>Features</a>
+              <a href={navigation.liveDemo}>Live Demo</a>
+              <a href={navigation.getStarted}>Get Started</a>
+          </div>
+
+          <a class="brand-cta" href={githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
+
+          <button
+             class="brand-menu-toggle"
+             id="brand-menu-toggle"
+             type="button"
+             aria-expanded="false"
+             aria-label="Open navigation menu"
+          >
+              <svg class="brand-menu-open-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                  <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="brand-menu-close-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" hidden>
+                  <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+          </button>
+
+          <div class="brand-mobile-panel" id="brand-mobile-menu" hidden>
+              <a href={navigation.home}>Home</a>
+              <a href={navigation.features}>Features</a>
+              <a href={navigation.liveDemo}>Live Demo</a>
+              <a href={navigation.getStarted}>Get Started</a>
+          </div>
+      </nav>
+</header>
+
+<style>
+.brand-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brand-header.scrolled {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px) saturate(1.2);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.brand-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brand-desktop-nav {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.brand-desktop-nav a {
+    color: var(--text-soft);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.brand-desktop-nav a:hover {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.brand-cta {
+    background: var(--gradient);
+    color: #ffffff !important;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(88,43,232,.24);
+}
+
+@media (max-width: 768px) {
+      .brand-menu-toggle { display: block; }
+      .brand-desktop-nav { display: none; }
+}
+
+/* Mobile panel */
+.brand-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: var(--text);
+}
+
+@media (max-width: 768px) {
+      .brand-header.scrolled {
+          background: rgba(255, 255, 255, 0.98);
+      }
+}
+</style>
+
+<script>
+    const header = document.getElementById('brand-header');
+    const toggle = document.getElementById('brand-menu-toggle');
+    const panel = document.getElementById('brand-mobile-menu');
+
+     // Scroll effect
+    function handleScroll() {
+        if (window.scrollY > 100) {
+            header.classList.add('scrolled');
+         } else {
+            header.classList.remove('scrolled');
+         }
+     }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+     // Mobile menu toggle
+    if (toggle && panel) {
+        toggle.addEventListener('click', () => {
+            const isOpen = panel.classList.contains('open');
+            if (isOpen) {
+                panel.classList.remove('open');
+                panel.setAttribute('hidden', '');
+             } else {
+                panel.classList.add('open');
+                panel.removeAttribute('hidden');
+             }
+         });
+     }
+</script>
