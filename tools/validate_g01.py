@@ -36,6 +36,8 @@ GATE_ARTIFACTS: dict[str, str] = {
     "G5_DEPLOY": "g5/deployment-approval.yaml",
     "G6_PRODUCTION_DATA": "g6/production-approval.yaml",
 }
+NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
+BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
 
 
 @dataclass(frozen=True)
@@ -73,25 +75,18 @@ def _load_json(path: Path) -> Any:
         return json.load(handle)
 
 
-def _schema_issues(
-    artifact_name: str,
-    instance: Any,
-    schema_path: Path,
-) -> list[ValidationIssue]:
+def _issue(code: str, artifact: str, location: str, message: str) -> ValidationIssue:
+    return ValidationIssue(code=code, artifact=artifact, location=location, message=message)
+
+
+def _schema_issues(artifact_name: str, instance: Any, schema_path: Path) -> list[ValidationIssue]:
     schema = _load_json(schema_path)
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema, format_checker=FormatChecker())
     issues: list[ValidationIssue] = []
     for error in sorted(validator.iter_errors(instance), key=lambda item: list(item.path)):
         location = ".".join(str(part) for part in error.path) or "<root>"
-        issues.append(
-            ValidationIssue(
-                code="SCHEMA_VALIDATION_ERROR",
-                artifact=artifact_name,
-                location=location,
-                message=error.message,
-            )
-        )
+        issues.append(_issue("SCHEMA_VALIDATION_ERROR", artifact_name, location, error.message))
     return issues
 
 
@@ -99,49 +94,150 @@ def validate_gate_artifact(workspace: Path, gate: str) -> list[ValidationIssue]:
     """Fail closed when an applicable downstream gate artifact is absent or malformed."""
     relative_path = GATE_ARTIFACTS.get(gate)
     if relative_path is None:
-        return [
-            ValidationIssue(
-                code="GATE_SEQUENCE_INVALID",
-                artifact=gate,
-                location="gate",
-                message=f"Unsupported downstream gate: {gate}",
-            )
-        ]
+        return [_issue("GATE_SEQUENCE_INVALID", gate, "gate", f"Unsupported downstream gate: {gate}")]
 
     artifact_path = workspace / relative_path
     if not artifact_path.is_file():
-        return [
-            ValidationIssue(
-                code="GATE_ARTIFACT_MISSING",
-                artifact=gate,
-                location=relative_path,
-                message=f"Required gate artifact is missing: {artifact_path}",
-            )
-        ]
+        return [_issue("GATE_ARTIFACT_MISSING", gate, relative_path, f"Required gate artifact is missing: {artifact_path}")]
 
     try:
         artifact = _load_yaml(artifact_path)
     except (OSError, ValueError, yaml.YAMLError) as exc:
-        return [
-            ValidationIssue(
-                code="GATE_ARTIFACT_INVALID",
-                artifact=gate,
-                location=relative_path,
-                message=f"Gate artifact could not be loaded: {exc}",
-            )
-        ]
+        return [_issue("GATE_ARTIFACT_INVALID", gate, relative_path, f"Gate artifact could not be loaded: {exc}")]
 
     if not isinstance(artifact, dict) or not artifact:
-        return [
-            ValidationIssue(
-                code="GATE_ARTIFACT_INVALID",
-                artifact=gate,
-                location=relative_path,
-                message="Gate artifact must be a non-empty YAML object.",
-            )
-        ]
-
+        return [_issue("GATE_ARTIFACT_INVALID", gate, relative_path, "Gate artifact must be a non-empty YAML object.")]
     return []
+
+
+def _execution_feasibility_issues(preflight: dict[str, Any]) -> list[ValidationIssue]:
+    has_readback = "process_readback" in preflight
+    has_feasibility = "execution_feasibility" in preflight
+
+    # Legacy preflight artifacts created before the feasibility extension remain
+    # valid when both new fields are absent. New or migrated artifacts must carry
+    # the pair together so partial enforcement cannot silently pass.
+    if not has_readback and not has_feasibility:
+        return []
+    if has_readback != has_feasibility:
+        return [_issue(
+            "G1_EXECUTION_FEASIBILITY_INCOMPLETE",
+            "preflight",
+            "<root>",
+            "process_readback and execution_feasibility must be provided together.",
+        )]
+
+    issues: list[ValidationIssue] = []
+    readback = preflight.get("process_readback", {})
+    feasibility = preflight.get("execution_feasibility", {})
+    route_steps = feasibility.get("route_steps", [])
+
+    if readback.get("status") != "VERIFIED":
+        issues.append(_issue(
+            "G1_PROCESS_READBACK_INCOMPLETE",
+            "preflight",
+            "process_readback.status",
+            "G1 PASS requires verified readback of the governing process and terminal outcome.",
+        ))
+
+    if not route_steps:
+        issues.append(_issue(
+            "G1_EXECUTION_ROUTE_MISSING",
+            "preflight",
+            "execution_feasibility.route_steps",
+            "G1 requires an end-to-end route matrix through the declared terminal outcome.",
+        ))
+        return issues
+
+    step_ids = [step.get("id") for step in route_steps]
+    if len(step_ids) != len(set(step_ids)):
+        issues.append(_issue(
+            "G1_EXECUTION_ROUTE_DUPLICATE_STEP",
+            "preflight",
+            "execution_feasibility.route_steps",
+            "Execution route step IDs must be unique.",
+        ))
+
+    unresolved_steps = [
+        step for step in route_steps
+        if step.get("capability_status") in NON_EXECUTABLE_CAPABILITY_STATES
+    ]
+    bypass_steps = [
+        step for step in unresolved_steps
+        if step.get("bypass_eligibility") in BYPASS_ELIGIBLE
+        and bool(step.get("fallback_routes"))
+    ]
+    bypass_step_ids = {step.get("id") for step in bypass_steps}
+    fatal_steps = [step for step in unresolved_steps if step.get("id") not in bypass_step_ids]
+
+    if fatal_steps:
+        issues.append(_issue(
+            "G1_EXECUTION_CAPABILITY_UNVERIFIED",
+            "preflight",
+            "execution_feasibility.route_steps",
+            "Mandatory route steps are not executable and have no legal HUMAN BYPASS: "
+            + ", ".join(str(step.get("id")) for step in fatal_steps)
+            + ".",
+        ))
+
+    missing_continuation = [
+        step.get("id") for step in route_steps if not str(step.get("continuation", "")).strip()
+    ]
+    if missing_continuation or feasibility.get("continuation_coverage") != "COMPLETE":
+        issues.append(_issue(
+            "G1_CONTINUATION_COVERAGE_INCOMPLETE",
+            "preflight",
+            "execution_feasibility.continuation_coverage",
+            "Every route step, including async and human-wait steps, requires a continuation rule.",
+        ))
+
+    outcome = feasibility.get("outcome")
+    human_bypass_required = feasibility.get("human_bypass_required") is True
+
+    if outcome == "NOT_EXECUTABLE":
+        issues.append(_issue(
+            "G1_EXECUTION_NOT_FEASIBLE",
+            "preflight",
+            "execution_feasibility.outcome",
+            "G1 cannot PASS when the requested terminal outcome is not executable.",
+        ))
+    if human_bypass_required and outcome != "EXECUTABLE_WITH_HUMAN_BYPASS":
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_OUTCOME_MISMATCH",
+            "preflight",
+            "execution_feasibility",
+            "human_bypass_required=true requires EXECUTABLE_WITH_HUMAN_BYPASS.",
+        ))
+    if outcome == "EXECUTABLE_WITH_HUMAN_BYPASS" and not human_bypass_required:
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_OUTCOME_MISMATCH",
+            "preflight",
+            "execution_feasibility",
+            "EXECUTABLE_WITH_HUMAN_BYPASS requires human_bypass_required=true.",
+        ))
+    if outcome == "EXECUTABLE_WITH_HUMAN_BYPASS" and not bypass_steps:
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_STEP_MISSING",
+            "preflight",
+            "execution_feasibility.route_steps",
+            "A human-bypass outcome requires at least one blocked operational step with a legal fallback.",
+        ))
+    if outcome == "EXECUTABLE" and bypass_steps:
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_REQUIRED",
+            "preflight",
+            "execution_feasibility.outcome",
+            "A blocked bypass-eligible step requires EXECUTABLE_WITH_HUMAN_BYPASS.",
+        ))
+    if outcome == "EXECUTABLE" and human_bypass_required:
+        issues.append(_issue(
+            "G1_HUMAN_BYPASS_UNEXPECTED",
+            "preflight",
+            "execution_feasibility.human_bypass_required",
+            "EXECUTABLE cannot require HUMAN BYPASS.",
+        ))
+
+    return issues
 
 
 def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
@@ -152,22 +248,11 @@ def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
     options = artifacts["options"]
     decision = artifacts["decision"]
 
-    traces = {
-        name: artifact.get("trace")
-        for name, artifact in artifacts.items()
-        if name != "g0"
-    }
+    traces = {name: artifact.get("trace") for name, artifact in artifacts.items() if name != "g0"}
     reference_trace = traces["intake"]
     for name, trace in traces.items():
         if trace != reference_trace:
-            issues.append(
-                ValidationIssue(
-                    code="TRACE_MISMATCH",
-                    artifact=name,
-                    location="trace",
-                    message="All G1 artifacts must use the same trace object.",
-                )
-            )
+            issues.append(_issue("TRACE_MISMATCH", name, "trace", "All G1 artifacts must use the same trace object."))
 
     repo = g0.get("repository", {})
     project = g0.get("project", {})
@@ -179,29 +264,17 @@ def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
         }
         for key, value in expected.items():
             if reference_trace.get(key) != value:
-                issues.append(
-                    ValidationIssue(
-                        code="G0_G1_CONTEXT_MISMATCH",
-                        artifact="intake",
-                        location=f"trace.{key}",
-                        message=f"G1 trace {key} does not match the G0 snapshot.",
-                    )
-                )
+                issues.append(_issue(
+                    "G0_G1_CONTEXT_MISMATCH", "intake", f"trace.{key}",
+                    f"G1 trace {key} does not match the G0 snapshot.",
+                ))
 
     required_sources_missing = [
-        item.get("path")
-        for item in g0.get("sources", [])
+        item.get("path") for item in g0.get("sources", [])
         if item.get("required") and item.get("status") != "AVAILABLE"
     ]
     if g0.get("status") != "READY" or g0.get("blockers") or required_sources_missing:
-        issues.append(
-            ValidationIssue(
-                code="G0_NOT_READY",
-                artifact="g0",
-                location="status",
-                message="G0 must be READY with no blockers and all required sources available.",
-            )
-        )
+        issues.append(_issue("G0_NOT_READY", "g0", "status", "G0 must be READY with no blockers and all required sources available."))
 
     scope = intake.get("scope", {})
     criteria = intake.get("acceptance_criteria", [])
@@ -212,92 +285,51 @@ def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
         or not criteria
         or intake.get("unresolved_questions")
     ):
-        issues.append(
-            ValidationIssue(
-                code="G1_INTAKE_NOT_READY",
-                artifact="intake",
-                location="status",
-                message="READY intake requires scope, non-goals, acceptance criteria, and no unresolved questions.",
-            )
-        )
+        issues.append(_issue(
+            "G1_INTAKE_NOT_READY", "intake", "status",
+            "READY intake requires scope, non-goals, acceptance criteria, and no unresolved questions.",
+        ))
     if any(not item.get("verifiable") for item in criteria):
-        issues.append(
-            ValidationIssue(
-                code="G1_ACCEPTANCE_CRITERIA_NOT_VERIFIABLE",
-                artifact="intake",
-                location="acceptance_criteria",
-                message="Every acceptance criterion must be verifiable.",
-            )
-        )
+        issues.append(_issue(
+            "G1_ACCEPTANCE_CRITERIA_NOT_VERIFIABLE", "intake", "acceptance_criteria",
+            "Every acceptance criterion must be verifiable.",
+        ))
 
-    failed_checks = [
-        item.get("id")
-        for item in preflight.get("checks", [])
-        if item.get("status") == "FAIL"
-    ]
+    failed_checks = [item.get("id") for item in preflight.get("checks", []) if item.get("status") == "FAIL"]
     if preflight.get("outcome") != "PASS" or preflight.get("blockers") or failed_checks:
-        issues.append(
-            ValidationIssue(
-                code="G1_PREFLIGHT_NOT_PASS",
-                artifact="preflight",
-                location="outcome",
-                message="Preflight must PASS with no blockers or failed checks.",
-            )
-        )
+        issues.append(_issue(
+            "G1_PREFLIGHT_NOT_PASS", "preflight", "outcome",
+            "Preflight must PASS with no blockers or failed checks.",
+        ))
+    issues.extend(_execution_feasibility_issues(preflight))
 
     option_items = options.get("options", [])
     option_ids = [item.get("id") for item in option_items]
     if len(option_ids) != len(set(option_ids)):
-        issues.append(
-            ValidationIssue(
-                code="G1_DUPLICATE_OPTION_ID",
-                artifact="options",
-                location="options",
-                message="Option IDs must be unique.",
-            )
-        )
+        issues.append(_issue("G1_DUPLICATE_OPTION_ID", "options", "options", "Option IDs must be unique."))
     if options.get("status") != "READY" or not option_items:
-        issues.append(
-            ValidationIssue(
-                code="G1_OPTIONS_NOT_READY",
-                artifact="options",
-                location="status",
-                message="Options must be READY and contain at least one option.",
-            )
-        )
+        issues.append(_issue("G1_OPTIONS_NOT_READY", "options", "status", "Options must be READY and contain at least one option."))
     recommended = options.get("recommended_option_id")
     if recommended is not None and recommended not in option_ids:
-        issues.append(
-            ValidationIssue(
-                code="G1_RECOMMENDED_OPTION_NOT_FOUND",
-                artifact="options",
-                location="recommended_option_id",
-                message="The recommended option must exist in options.",
-            )
-        )
+        issues.append(_issue(
+            "G1_RECOMMENDED_OPTION_NOT_FOUND", "options", "recommended_option_id",
+            "The recommended option must exist in options.",
+        ))
 
     selected = decision.get("selected_option_id")
     if selected not in option_ids:
-        issues.append(
-            ValidationIssue(
-                code="G1_SELECTED_OPTION_NOT_FOUND",
-                artifact="decision",
-                location="selected_option_id",
-                message="The selected option must exist in the options artifact.",
-            )
-        )
+        issues.append(_issue(
+            "G1_SELECTED_OPTION_NOT_FOUND", "decision", "selected_option_id",
+            "The selected option must exist in the options artifact.",
+        ))
 
     criterion_ids = {item.get("id") for item in criteria}
     referenced_criteria = set(decision.get("acceptance_criteria_refs", []))
     if not referenced_criteria or not referenced_criteria.issubset(criterion_ids):
-        issues.append(
-            ValidationIssue(
-                code="G1_ACCEPTANCE_REFERENCE_INVALID",
-                artifact="decision",
-                location="acceptance_criteria_refs",
-                message="Decision acceptance criteria must reference intake criteria.",
-            )
-        )
+        issues.append(_issue(
+            "G1_ACCEPTANCE_REFERENCE_INVALID", "decision", "acceptance_criteria_refs",
+            "Decision acceptance criteria must reference intake criteria.",
+        ))
 
     excluded = set(decision.get("authority_boundaries", {}).get("excluded", []))
     explicit_decision = decision.get("user_decision", {}).get("explicit") is True
@@ -307,36 +339,20 @@ def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
         or not explicit_decision
         or not REQUIRED_EXCLUDED_AUTHORITIES.issubset(excluded)
     ):
-        issues.append(
-            ValidationIssue(
-                code="G1_DECISION_NOT_ACCEPTED",
-                artifact="decision",
-                location="status",
-                message=(
-                    "A PASS decision must be ACCEPTED, explicit, and exclude "
-                    "G4 merge, G5 deploy, and G6 production authority."
-                ),
-            )
-        )
+        issues.append(_issue(
+            "G1_DECISION_NOT_ACCEPTED", "decision", "status",
+            "A PASS decision must be ACCEPTED, explicit, and exclude G4 merge, G5 deploy, and G6 production authority.",
+        ))
 
     if decision.get("authority_boundaries", {}).get("grants"):
-        issues.append(
-            ValidationIssue(
-                code="G1_AUTHORITY_GRANT_FORBIDDEN",
-                artifact="decision",
-                location="authority_boundaries.grants",
-                message="A G1 decision cannot grant execution, merge, deploy, or production authority.",
-            )
-        )
-
+        issues.append(_issue(
+            "G1_AUTHORITY_GRANT_FORBIDDEN", "decision", "authority_boundaries.grants",
+            "A G1 decision cannot grant execution, merge, deploy, or production authority.",
+        ))
     return issues
 
 
-def validate_workspace(
-    repo_root: Path,
-    workspace: Path,
-    gate: str | None = None,
-) -> ValidationReport:
+def validate_workspace(repo_root: Path, workspace: Path, gate: str | None = None) -> ValidationReport:
     issues: list[ValidationIssue] = []
     artifacts: dict[str, Any] = {}
 
@@ -344,42 +360,19 @@ def validate_workspace(
         artifact_path = workspace / relative_path
         schema_path = repo_root / "schemas" / schema_name
         if not artifact_path.is_file():
-            issues.append(
-                ValidationIssue(
-                    code="MISSING_ARTIFACT",
-                    artifact=name,
-                    location=relative_path,
-                    message=f"Required artifact is missing: {artifact_path}",
-                )
-            )
+            issues.append(_issue("MISSING_ARTIFACT", name, relative_path, f"Required artifact is missing: {artifact_path}"))
             continue
         if not schema_path.is_file():
-            issues.append(
-                ValidationIssue(
-                    code="MISSING_SCHEMA",
-                    artifact=name,
-                    location=str(schema_path),
-                    message=f"Required schema is missing: {schema_path}",
-                )
-            )
+            issues.append(_issue("MISSING_SCHEMA", name, str(schema_path), f"Required schema is missing: {schema_path}"))
             continue
         try:
             artifact = _load_yaml(artifact_path)
             artifacts[name] = artifact
             issues.extend(_schema_issues(name, artifact, schema_path))
         except (OSError, ValueError, yaml.YAMLError, json.JSONDecodeError) as exc:
-            issues.append(
-                ValidationIssue(
-                    code="ARTIFACT_LOAD_ERROR",
-                    artifact=name,
-                    location=relative_path,
-                    message=str(exc),
-                )
-            )
+            issues.append(_issue("ARTIFACT_LOAD_ERROR", name, relative_path, str(exc)))
 
-    if len(artifacts) == len(ARTIFACTS) and not any(
-        issue.code == "SCHEMA_VALIDATION_ERROR" for issue in issues
-    ):
+    if len(artifacts) == len(ARTIFACTS) and not any(issue.code == "SCHEMA_VALIDATION_ERROR" for issue in issues):
         issues.extend(_cross_artifact_issues(artifacts))
     if gate is not None:
         issues.extend(validate_gate_artifact(workspace, gate))
@@ -389,22 +382,9 @@ def validate_workspace(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--root",
-        default=None,
-        help="Repository root; defaults to the parent of tools/.",
-    )
-    parser.add_argument(
-        "--workspace",
-        default=".gwc",
-        help="G0/G1 workspace path, relative to the repository root unless absolute.",
-    )
-    parser.add_argument(
-        "--gate",
-        choices=sorted(GATE_ARTIFACTS),
-        default=None,
-        help="Require the applicable downstream gate artifact in this task workspace.",
-    )
+    parser.add_argument("--root", default=None, help="Repository root; defaults to the parent of tools/.")
+    parser.add_argument("--workspace", default=".gwc", help="G0/G1 workspace path, relative to the repository root unless absolute.")
+    parser.add_argument("--gate", choices=sorted(GATE_ARTIFACTS), default=None, help="Require the applicable downstream gate artifact in this task workspace.")
     parser.add_argument("--json", action="store_true", help="Emit a JSON report.")
     args = parser.parse_args()
 
@@ -428,7 +408,6 @@ def main() -> int:
         print(f"G0/G1 validation outcome: {report.outcome}")
         for issue in report.issues:
             print(f"{issue.code}: {issue.artifact}:{issue.location}: {issue.message}")
-
     return 0 if report.valid else 1
 
 

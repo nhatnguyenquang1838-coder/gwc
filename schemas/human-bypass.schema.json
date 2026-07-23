@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/human-bypass.schema.json",
+  "title": "GWC Human Bypass Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "bypass_request_id", "task_id", "gate",
+    "node_id", "blocked_step_id", "blocker_code", "rationale", "human_actor",
+    "exact_scope", "authorized_manual_action", "excluded_actions", "repository",
+    "scope_hash", "issued_at_utc", "accepted_at_utc", "expires_at_utc",
+    "checkpoint_before", "expected_readback", "observed_readback", "checkpoint_after",
+    "residual_risk", "audit_event_id", "state", "outcome"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "human-bypass-record"},
+    "bypass_request_id": {"type": "string", "pattern": "^HB-[A-Z0-9][A-Z0-9_-]+$"},
+    "task_id": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "node_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "blocked_step_id": {"type": "string", "minLength": 1},
+    "blocker_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+    "rationale": {"type": "string", "minLength": 1},
+    "human_actor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id"],
+      "properties": {"id": {"type": "string", "minLength": 1}, "display_name": {"type": "string", "minLength": 1}}
+    },
+    "exact_scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "authorized_manual_action": {"type": "string", "minLength": 1},
+    "excluded_actions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "repository": {
+      "type": "object", "additionalProperties": false,
+      "required": ["full_name", "base_sha"],
+      "properties": {
+        "full_name": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "branch": {"type": ["string", "null"]},
+        "head_sha": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"type": "null"}]}
+      }
+    },
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "issued_at_utc": {"type": "string", "format": "date-time"},
+    "accepted_at_utc": {"type": ["string", "null"], "format": "date-time"},
+    "expires_at_utc": {"type": "string", "format": "date-time"},
+    "checkpoint_before": {"type": "string", "minLength": 1},
+    "expected_readback": {"type": "string", "minLength": 1},
+    "observed_readback": {"type": ["string", "null"]},
+    "checkpoint_after": {"type": ["string", "null"]},
+    "residual_risk": {"type": "string"},
+    "audit_event_id": {"type": ["string", "null"], "pattern": "^evt_[a-z0-9._-]+$"},
+    "state": {"enum": ["HUMAN_BYPASS_PENDING", "HUMAN_BYPASS_ACCEPTED", "HUMAN_BYPASS_EVIDENCE_VERIFIED", "RESUME", "HUMAN_BYPASS_EXPIRED", "HUMAN_BYPASS_REJECTED"]},
+    "outcome": {"enum": ["PENDING", "SUCCESS", "EXPIRED", "REJECTED", "BLOCKED"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"enum": ["HUMAN_BYPASS_ACCEPTED", "HUMAN_BYPASS_EVIDENCE_VERIFIED", "RESUME"]}}},
+      "then": {"properties": {"accepted_at_utc": {"type": "string", "format": "date-time"}}}
+    },
+    {
+      "if": {"properties": {"state": {"enum": ["HUMAN_BYPASS_EVIDENCE_VERIFIED", "RESUME"]}}},
+      "then": {
+        "properties": {
+          "observed_readback": {"type": "string", "minLength": 1},
+          "checkpoint_after": {"type": "string", "minLength": 1},
+          "audit_event_id": {"type": "string", "pattern": "^evt_[a-z0-9._-]+$"},
+          "outcome": {"const": "SUCCESS"}
+        }
+      }
+    }
+  ]
+}

@@ -1,32 +1,50 @@
 schema_version: '1.0'
 artifact_type: g1-preflight-report
-generated_at: '2026-07-13T11:32:00Z'
+generated_at: '2026-07-23T00:00:00Z'
 trace:
   project_id: gwc
-  repository: nhatnguyenquang1838-coder/gwc
-  task_id: task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
-  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  repository: owner/repository
+  task_id: TASK-1
+  base_sha: 0000000000000000000000000000000000000000
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
+  base_sha: 0000000000000000000000000000000000000000
   profile_path: projects/gwc/project-profile.yaml
-  connector: DWC
+  connector: GitHub
 checks:
-- id: REPO_IDENTITY
-  status: PASS
-  code: REPOSITORY_VERIFIED
-  message: Repository identity and protected base are verified.
-  evidence:
-  - projects/gwc/project-profile.yaml@main
-  - main@ea9860e38ac124f24fe35704a24bdf6ea40cfd0c
-- id: TASK_TRACEABILITY
-  status: PASS
-  code: DS_ADMIN_TASK_PRESENT
-  message: Exactly one DS Admin task represents the bounded change.
-  evidence:
-  - task_c6dbe6d8-3e13-4c20-91bf-eb5158f05869
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity and protected base are verified.
+    evidence:
+      - projects/gwc/project-profile.yaml@main
+process_readback:
+  process_id: governed-repository-delivery
+  terminal_outcome: guarded branch with validated scoped commit; Draft PR requires G3
+  required_sources:
+    - AGENTS.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+  route_steps:
+    - id: STEP-01
+      name: protected-base-readback
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: read
+      capability_required: repository_read
+      capability_status: VERIFIED
+      primary_route: GitHub connector
+      fallback_routes: [DWC, DW1]
+      continuation: immediate
+      expected_evidence: protected base SHA and required process paths
+      bypass_eligibility: FORBIDDEN
 risk_class: R1
-required_gate: G2_AUTOMATIC_BOUNDED
+required_gate: G2_HUMAN_DIRECTION
 blockers: []
 outcome: PASS

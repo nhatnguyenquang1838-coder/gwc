@@ -13,6 +13,7 @@ instructions:
   - {id: agent-response-presentation-contract, path: core/Agent_Response_Presentation_Contract_v1.0.md, target: .governance/Agent_Response_Presentation_Contract_v1.0.md, required: true}
   - {id: e2e-draft-pr-delivery, path: core/E2E_DRAFT_PR_DELIVERY_RULE.md, target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md, required: true}
   - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
+  - {id: human-bypass-contract, path: core/HUMAN_BYPASS_CONTRACT_v1.0.md, target: .governance/HUMAN_BYPASS_CONTRACT_v1.0.md, required: true}
   - {id: base-drift-policy, path: governance/base-drift-policy.yaml, target: .governance/base-drift-policy.yaml, required: true}
   - {id: gwc-standard-profile-set, path: governance/profile-sets/gwc-standard.yaml, target: .governance/profile-sets/gwc-standard.yaml, required: true}
   - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/gate-policy-profiles/standard.yaml, required: true}
@@ -29,6 +30,10 @@ instructions:
   - {id: gate-response-trace-validator, path: tools/validate_gate_response_trace.py, target: .governance/tools/validate_gate_response_trace.py, required: true}
   - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/instruction-source-registry.yaml, required: true}
   - {id: g01-lifecycle, path: docs/g01-lifecycle.md, target: .governance/g01-lifecycle.md, required: true}
+  - {id: g1-preflight-report-schema, path: schemas/g1-preflight-report.schema.json, target: .governance/schemas/g1-preflight-report.schema.json, required: true}
+  - {id: g01-runtime-generator, path: tools/generate_g01_runtime.py, target: .governance/tools/generate_g01_runtime.py, required: true}
+  - {id: g01-validator, path: tools/validate_g01.py, target: .governance/tools/validate_g01.py, required: true}
+  - {id: human-bypass-schema, path: schemas/human-bypass.schema.json, target: .governance/schemas/human-bypass.schema.json, required: true}
   - {id: project-consumer-agent-instructions, path: docs/project-consumer-agent-instructions.md, target: .governance/project-consumer-agent-instructions.md, required: true}
   - {id: g2-skill-library-readme, path: libs/g2-skill-library/README.md, target: .governance/libs/g2-skill-library/README.md, required: true}
   - {id: g2-skill-library-manifest, path: libs/g2-skill-library/manifest.yaml, target: .governance/libs/g2-skill-library/manifest.yaml, required: true}
@@ -196,6 +201,7 @@ instructions:
   - {id: scale-control-independent-audit-handoff-node, path: core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, target: .governance/core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, required: true}
   - {id: scale-control-node-validator, path: tools/node_architect/validate_node_catalog_scale_control.py, target: .governance/tools/node_architect/validate_node_catalog_scale_control.py, required: true}
   - {id: revamp-gwc-025-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, required: true}
+  - {id: g1-human-bypass-changelog-fragment, path: releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md, target: .governance/releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -213,6 +219,7 @@ work_tracking:
   lease_renewal_required: false
   status_transitions_from_state_engine: false
 notes:
+  - G1 feasibility now requires process readback and an executable route matrix; HUMAN BYPASS is exported as a step-bound operational handoff with audit and deterministic readback.
   - REVAMP-GWC-025 adds the final scale_control catalog batch, completing 81 descriptors for independent audit while keeping scale permission false and package_version unchanged.
   - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.
   - DWC repository reads are automatic for this verified repository.
