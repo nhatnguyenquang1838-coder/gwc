@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.batch-admission-check",
+  "node_type": "gate",
+  "title": "Batch Admission Check",
+  "description": "Evaluate previous-batch merge, exact post-merge CI, blocker status, and bounded scope before admitting a catalog batch.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ]
+}
