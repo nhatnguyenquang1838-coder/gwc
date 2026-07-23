@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.rollout-progress-projection",
+  "node_type": "projection",
+  "title": "Rollout Progress Projection",
+  "description": "Expose batch, family, node-count, gate, and audit readiness as a non-authoritative progress projection.",
+  "canonical": "audit_projection",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ]
+}
