@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.timeout-recovery",
+  "node_type": "workflow",
+  "title": "Timeout Recovery",
+  "description": "Classify a bounded timeout, preserve current checkpoint evidence, and stop or resume without assuming the side effect failed.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
