@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-knowledge-graph.schema.json",
+  "title": "Runtime Knowledge Graph Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "nodes", "edges"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "runtime-knowledge-graph"},
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "label"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "type": {"enum": ["gate", "capability_family", "runtime_node", "edge_scenario", "artifact"]},
+          "label": {"type": "string", "minLength": 1},
+          "source_path": {"type": "string"},
+          "source_sha": {"type": "string"},
+          "aliases": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "relationship"],
+        "properties": {
+          "source": {"type": "string", "minLength": 1},
+          "target": {"type": "string", "minLength": 1},
+          "relationship": {
+            "enum": [
+              "BELONGS_TO_FAMILY",
+              "GOVERNED_BY_GATE",
+              "IMPLEMENTED_BY",
+              "VALIDATED_BY",
+              "HANDLES_SCENARIO",
+              "DEPENDS_ON_NODE",
+              "EXPORTED_BY_PACKAGE",
+              "ALIASED_BY"
+            ]
+          },
+          "evidence": {"type": "string"}
+        }
+      }
+    }
+  }
+}
