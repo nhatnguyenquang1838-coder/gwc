@@ -28,3 +28,14 @@ fi
 echo "[acli-setup] Logging into Jira..."
 "$ACLI_BIN" jira auth login --site "$JIRA_SITE" --email "$JIRA_EMAIL" --token <<< "$JIRA_API_TOKEN"
 echo "[acli-setup] Login complete"
+
+echo "[gwc-setup] Ensuring python3 + pip + validator deps..."
+if ! command -v python3 >/dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y python3
+fi
+if ! command -v pip3 >/dev/null 2>&1 && ! python3 -m pip --version >/dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y python3-pip
+fi
+python3 -m pip install --user --quiet pyyaml jsonschema
