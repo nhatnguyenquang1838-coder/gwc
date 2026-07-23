@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.approval-expiry-recovery",
+  "node_type": "gate",
+  "title": "Approval Expiry Recovery",
+  "description": "Block stale approval execution and regenerate a request bound to the current scope and evidence.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
