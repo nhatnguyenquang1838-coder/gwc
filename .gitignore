@@ -24,3 +24,7 @@ wheels/
 .installed.cfg
 *.egg
 agents/coding-agent/.bbai_test
+
+# Understand Anything temp/runtime artifacts
+.ua/tmp/
+.ua/intermediate/
