@@ -1,0 +1,9 @@
+{
+  "node_id": "runtime_checkpoint.base-drift-stop",
+  "node_type": "gate",
+  "title": "Base Drift Stop",
+  "description": "Fail closed for unsafe, production, secret, destructive, history-rewrite, or unassessable base drift and preserve blocker evidence for human investigation.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": ["G2_EXECUTION"]
+}
