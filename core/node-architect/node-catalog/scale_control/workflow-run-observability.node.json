@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.workflow-run-observability",
+  "node_type": "projection",
+  "title": "Workflow Run Observability",
+  "description": "Project exact-head CI evidence across pull-request and post-merge push events while distinguishing missing runs from connector visibility gaps.",
+  "canonical": "audit_projection",
+  "authority_boundary": "g5_required",
+  "gates": [
+    "G5_DEPLOY"
+  ]
+}
