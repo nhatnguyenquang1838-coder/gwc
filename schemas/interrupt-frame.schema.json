@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/interrupt-frame.schema.json",
+  "title": "GWC Interrupt Frame",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "interrupt_id",
+    "interrupt_type",
+    "state",
+    "task_id",
+    "gate",
+    "repository",
+    "branch",
+    "approved_base_sha",
+    "observed_base_sha",
+    "working_head_sha",
+    "scope_hash",
+    "parent",
+    "assessment",
+    "continuation",
+    "audit_events"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "interrupt_id": {"type": "string", "pattern": "^INT-[A-Z0-9-]+$"},
+    "interrupt_type": {"enum": ["BASE_DRIFT", "AUTHORITY_EXPIRY", "WORKING_HEAD_DRIFT", "CAPABILITY_LOSS", "EXTERNAL_WAIT"]},
+    "state": {"enum": ["DETECTED", "CHECKPOINTED", "PARENT_SUSPENDED", "ASSESSING", "HANDLING", "RESUME_VERIFY", "RESUMED", "REROUTED", "REAPPROVAL_REQUIRED", "STOPPED", "EXPIRED"]},
+    "task_id": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "approved_base_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "observed_base_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "working_head_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "parent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "node_version", "phase", "checkpoint_id", "side_effect_state"],
+      "properties": {
+        "node_id": {"type": "string", "minLength": 1},
+        "node_version": {"type": "string", "minLength": 1},
+        "phase": {"enum": ["PRE_ACTION", "SIDE_EFFECT_IN_FLIGHT", "POST_ACTION_READBACK", "WAITING", "COMPLETED"]},
+        "checkpoint_id": {"type": "string", "minLength": 1},
+        "side_effect_state": {"enum": ["NOT_STARTED", "IN_FLIGHT", "COMPLETED_READBACK_VERIFIED", "UNKNOWN"]}
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "reason_codes", "affected_gates", "affected_evidence"],
+      "properties": {
+        "decision": {"enum": ["SAFE_CONTINUE", "REVALIDATE", "REAPPROVE", "STOP"]},
+        "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}},
+        "affected_gates": {"type": "array", "uniqueItems": true, "items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]}},
+        "affected_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["on_pass", "on_fail", "resume_verification_required"],
+      "properties": {
+        "on_pass": {"enum": ["RESUME_PARENT", "CONTINUE_NEXT", "REROUTE_REPAIR", "REROUTE_REAPPROVE", "STOP"]},
+        "on_fail": {"enum": ["REROUTE_REPAIR", "REROUTE_REAPPROVE", "STOP"]},
+        "resume_verification_required": {"type": "boolean"},
+        "target_node": {"type": ["string", "null"]}
+      }
+    },
+    "audit_events": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}
