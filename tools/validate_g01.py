@@ -111,6 +111,22 @@ def validate_gate_artifact(workspace: Path, gate: str) -> list[ValidationIssue]:
 
 
 def _execution_feasibility_issues(preflight: dict[str, Any]) -> list[ValidationIssue]:
+    has_readback = "process_readback" in preflight
+    has_feasibility = "execution_feasibility" in preflight
+
+    # Legacy preflight artifacts created before the feasibility extension remain
+    # valid when both new fields are absent. New or migrated artifacts must carry
+    # the pair together so partial enforcement cannot silently pass.
+    if not has_readback and not has_feasibility:
+        return []
+    if has_readback != has_feasibility:
+        return [_issue(
+            "G1_EXECUTION_FEASIBILITY_INCOMPLETE",
+            "preflight",
+            "<root>",
+            "process_readback and execution_feasibility must be provided together.",
+        )]
+
     issues: list[ValidationIssue] = []
     readback = preflight.get("process_readback", {})
     feasibility = preflight.get("execution_feasibility", {})
