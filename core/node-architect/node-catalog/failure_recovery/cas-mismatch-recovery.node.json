@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.cas-mismatch-recovery",
+  "node_type": "workflow",
+  "title": "CAS Mismatch Recovery",
+  "description": "Reload the latest checkpoint revision after a compare-and-swap mismatch and reconcile instead of overwriting newer state.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
