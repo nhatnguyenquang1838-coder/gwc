@@ -37,6 +37,36 @@ capabilities:
         - http_status
       secret_redaction_required: true
       backend_implementation_required: true
+    g5_ci_status_verify:
+      contract: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+      evidence_schema: schemas/g5-ci-verification-evidence.schema.json
+      checkpoint_schema: schemas/node-architect/g5-ci-checkpoint.schema.json
+      approval:
+        required: false
+      action_class: read_only
+      minimum_gate: G5_DEPLOY
+      trigger: after_g4_merge
+      connector_methods:
+        - fetch_commit_workflow_runs
+        - get_commit_combined_status
+        - fetch_workflow_run_jobs
+        - fetch_workflow_run_artifacts
+        - fetch_workflow_job_steps
+      guard:
+        - merge_commit_sha_is_known
+        - selected_run_head_sha_equals_merge_commit_sha
+        - empty_pr_filtered_results_are_not_ci_pending
+        - pending_state_has_checkpoint
+        - manual_action_authorized == false
+      classifications:
+        - success
+        - failure
+        - CI_PENDING
+        - CONNECTOR_OBSERVABILITY_INCOMPLETE
+        - SHA_MISMATCH
+      notes:
+        - Read-only G5 status verification only.
+        - Does not authorize deploy, release, publish, runtime reload, merge, production data, production configuration, credentials, secrets, or migration.
   approval_policy:
     generated_artifact_refresh:
       risk: low
