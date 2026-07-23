@@ -1,4 +1,4 @@
-# GWC Gate Lifecycle Contract v1.0
+# GWC Gate Lifecycle Contract v1.1
 
 ## Purpose
 
@@ -189,6 +189,8 @@ If CI fails, the agent may diagnose and repair only repository-fixable failures 
 **Entry:** G4 `PASS`. Read-only `G5_STATUS_VERIFY` starts automatically for the exact merge commit. Explicit human G5 approval is required only when the requested G5 action changes an environment or runtime.
 
 **Default permitted actions:** verify post-merge GitHub Actions, deployment checks such as Vercel checks integrated into GitHub Actions, deployment status, and runtime/tool-surface status for the approved commit. These read-only checks do not require human approval.
+
+**Post-merge verification procedure:** read-only `G5_STATUS_VERIFY` must bind evidence to the exact merge commit. The agent must first attempt exact post-merge lookup using `event=push`, `branch=main`, and `head_sha=<merge_sha>` or equivalent connector parameters. If the available connector surface does not support those filters, or returns empty results, the agent must fall back to a known `run_id` and direct jobs/artifacts lookup. Empty PR-filtered results without run-id/artifact fallback evidence must be classified `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
 
 **Manual deploy actions:** manually deploying, redeploying, publishing, releasing, or reloading runtime is permitted only when that action is explicitly listed in the G5 approval scope and the active project profile requires or allows manual deployment. When deployment is already automated by CI/CD, G5 is status verification only.
 

@@ -141,6 +141,33 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("G4 approval may be generated only after required checks pass for the latest head SHA", gate_contract)
         self.assertIn("Invalidate prior CI, review, and G4-readiness evidence", e2e)
 
+    def test_g5_post_merge_verification_requires_exact_sha_lookup(self) -> None:
+        gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
+        agents = self.normalized_text("AGENTS.md")
+        dwc = self.normalized_text("agents/dwc/agent-instructions.md")
+        chatgpt = self.normalized_text("agents/chatgpt-agent/agent-instructions.md")
+        e2e = self.normalized_text("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
+
+        expected = "event=push"
+        self.assertIn(expected, gate_contract)
+        self.assertIn("head_sha=<merge_sha>", gate_contract)
+        self.assertIn("CONNECTOR_OBSERVABILITY_INCOMPLETE", gate_contract)
+
+        self.assertIn("exact post-merge lookup", agents)
+        self.assertIn("CONNECTOR_OBSERVABILITY_INCOMPLETE", agents)
+        self.assertIn("`CI_PENDING` is reserved only when", agents)
+
+        self.assertIn("event=push", dwc)
+        self.assertIn("head_sha=<merge_sha>", dwc)
+        self.assertIn("CONNECTOR_OBSERVABILITY_INCOMPLETE", dwc)
+
+        self.assertIn("event=push", chatgpt)
+        self.assertIn("head_sha=<merge_sha>", chatgpt)
+        self.assertIn("CONNECTOR_OBSERVABILITY_INCOMPLETE", chatgpt)
+
+        self.assertIn("event=push", e2e)
+        self.assertIn("CONNECTOR_OBSERVABILITY_INCOMPLETE", e2e)
+
 
 if __name__ == "__main__":
     unittest.main()

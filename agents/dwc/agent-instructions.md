@@ -279,6 +279,15 @@ workflow or deployment checks for the approved commit. DWC must not perform a
 manual deploy, redeploy, release, publish, or runtime reload unless that exact
 manual action is explicitly included in the G5 scope.
 
+For post-merge verification, DWC must first attempt exact lookup using
+`event=push`, `branch=main`, and `head_sha=<merge_sha>` or equivalent connector
+parameters, and must fall back to a known `run_id` and direct jobs/artifacts
+lookup when the connector surface does not support those filters or returns empty
+results. Empty PR-filtered results without run-id/artifact fallback evidence must
+be classified `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
+`CI_PENDING` is reserved only when a post-merge run is found but has not yet
+completed.
+
 Approval for one gate never grants another gate.
 
 ## Permanent exclusions without the matching gate
