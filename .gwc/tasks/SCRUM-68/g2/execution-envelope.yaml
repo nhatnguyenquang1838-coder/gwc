@@ -1,38 +1,49 @@
-approval_id: CP-20260723-076
+approval_id: CP-20260723-077
 authority_gate: G2_EXECUTION
 task_id: SCRUM-68
-issued_at: '2026-07-23T05:55:31Z'
-expires_at: '2026-07-24T05:30:00Z'
-scope_version: 4
+issued_at: '2026-07-23T08:13:29Z'
+expires_at: '2026-07-24T07:45:00Z'
+scope_version: 5
 risk_class: R2
 project_profile: projects/gwc/project-profile.yaml
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
-base_sha: a20f34dd7cb530417878f9ef44b2aef329e9c36c
+base_sha: 14545de1f96ad7cab8c675cdf8aebfe5f80caa4b
 working_branch: fix/scrum-68-node-registry-authority-consistency
+existing_pr:
+  number: 84
+  state: draft
+  expected_current_head: 58ef692736a894c12aeedce3c625edaa4bdce6c7
+supersedes_approval_id: CP-20260723-076
+supersession_reason: CI exposed 14 authority/gate mismatches requiring schema, global
+  validator, and validation_quality scope not covered by the prior envelope.
 modules_or_files:
 - .gwc/tasks/SCRUM-68/**
-- core/node-architect/node-catalog/sync_projection/**
+- schemas/node-architect/runtime-node.schema.json
+- tools/node_architect/validate_node_registry.py
+- core/node-architect/node-catalog/validation_quality/**
+- tools/node_architect/validate_node_catalog_validation_quality.py
+- tests/test_node_catalog_validation_quality.py
+- core/node-architect/node-catalog/scale_control/{batch-admission-check,batch-size-limit-check,catalog-cardinality-readiness,execution-throttle-control,independent-audit-handoff}.node.json
 - core/node-architect/node-catalog/scale_control/README.md
-- core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json
-- core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json
-- tools/node_architect/validate_node_catalog_sync_projection.py
 - tools/node_architect/validate_node_catalog_scale_control.py
-- tests/test_node_catalog_sync_projection.py
 - tests/test_node_catalog_scale_control.py
 - tests/test_node_architect_runtime_validation.py
-- projects/gwc/package.yaml
 - releases/changelog.d/2026-07-23-scrum-68-node-registry-authority-consistency.md
 authorized_actions:
+- integrate_current_main_into_working_branch_without_rewrite
 - modify_approved_files
 - run_sandboxed_validation
 - push_working_branch
 - open_or_update_draft_pr
+- monitor_exact_head_ci
+- repair_repository_fixable_ci_within_scope
+- generate_g3_delivery_record_after_g2_exit
 excluded_actions:
 - protected_branch_direct_push
 - merge
 - auto_merge
-- mark_pr_ready_for_review_before_g3_pass
+- mark_pr_ready_before_g3_pass
 - deploy
 - release
 - publish
@@ -47,12 +58,10 @@ excluded_actions:
 - branch_deletion
 - shared_history_rewrite
 - pr_base_change
-- change_node_count
-- change_scale_81_nodes_allowed
+- weaken_global_validator
+- add_g2_execution_to_g3_only_nodes
 - change_package_version
-- implement_runtime_engine
-- implement_executable_failure_proof
-- unrelated_cleanup
+- enable_scale_81_nodes
 work_item:
   provider: jira
   id: SCRUM-68
@@ -62,8 +71,8 @@ work_item:
   initial_state: In Progress
   review_state: In Review
 artifact_hashes:
-  change_plan: sha256:3211f23324e0755b2ecb0b51baa6c304a5391b7d057a443f2f92e70294e3ae24
-  mermaid: sha256:0d71f1d0a13ece3dffc801e09099f9ddf17fa6c4bfac9d56c47048e4226d9381
-  png: sha256:d574d197b33e4ec1cc5ca6fd7d7044e0b3ffe60d94ada957c87de5bd329fa951
-  svg: sha256:67835e979dde044e3ffc36d241f48a99365b489591a1c87f28456dbb9cf27ce7
-scope_hash: sha256:7012a575544ebeb9aa7c6b58df5ab4b6ddf045432be99376ea53904dc082afb2
+  change_plan: sha256:c54692ab2e43d6e3073cc0bf9b1ff5e1ca93e0607d576c6a6b0fb323da59b049
+  mermaid: sha256:c2bcc11fc5cbc7cf065d2bd0e47af3615ebaf3891572cde2992e43c42153554c
+  svg: sha256:43c15a8a4565af6f853df5b40c49ead764997afe095ebadbfe8db7175aace079
+  png: sha256:e42201a21273ac693be43297e80a5cd34330e3c02f138229942b0e9eeb933dc7
+scope_hash: sha256:c438bc7eb9d4c42d97db1d2d86676c9916db8ba355b26816c030d19cc80cebb2
