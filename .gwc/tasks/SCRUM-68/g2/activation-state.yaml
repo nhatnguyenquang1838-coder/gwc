@@ -6,17 +6,26 @@ working_branch: feature/scrum-68-final-node-catalog
 stage_08:
   family: failure_recovery
   planned_nodes: 9
-  status: ACTIVE
-  unlocked_by:
-    workflow_run_id: 29972360095
-    job_id: 89096886651
+  status: COMPLETE
+  merged_pr: 77
+  merge_commit: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  post_merge_validation:
+    workflow_run_id: 29977733907
+    job_id: 89112982225
     conclusion: success
     head_branch: main
-    head_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
+    head_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
 stage_09:
   family: scale_control
   planned_nodes: 9
-  status: LOCKED
-  unlock_condition: Stage 08 PR merged and exact post-merge CI PASS
+  status: ACTIVE
+  unlocked_by:
+    workflow_run_id: 29977733907
+    job_id: 89112982225
+    conclusion: success
+    head_branch: main
+    head_sha: 6ccc057fe8b43d181b86d0411e60180223a79b88
+  observability_backlog: SCRUM-69
+  exit_condition: Draft PR validated for exact head; merge requires separate G4 approval
 g4_policy: separate exact approval per PR
-updated_at: '2026-07-23T02:39:00Z'
+updated_at: '2026-07-23T04:00:00Z'
