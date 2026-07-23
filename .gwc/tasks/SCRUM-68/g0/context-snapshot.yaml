@@ -1,0 +1,149 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-22T18:58:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- Never write directly to main
+- Batch 07 may add exactly nine package_export nodes and no later family
+- Previous Batch 06 must be merged and exact post-merge CI verified
+- Reuse the existing package exporter, export rule, manifest schema, smoke verifier, and tests before extending
+- G4 merge, manual G5 actions, and G6 production operations remain excluded
+applicable_policies:
+- id: GWC-PROTECTED-BASE-AGENTS
+  path: AGENTS.md
+  ref: main
+  source_sha: 5cbfe73c4dcd3480fee36cc4ad6a789461fbd56a
+- id: AGENT-OPERATING-RUNTIME
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: main
+  source_sha: 7c803600ab683940cb0624fb3fe44fbffca681ef
+- id: CODING-PROJECT-GOVERNANCE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: GATE-LIFECYCLE
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main
+  source_sha: 54fce3665a885667bb17174d520486cf1207d427
+- id: E2E-DRAFT-PR
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: main
+  source_sha: e2ae72322f3248182cce5150201377b6f7edac89
+- id: CONTROLLED-81-NODE-PLAN
+  path: core/node-architect/node-catalog-expansion-plan.json
+  ref: main
+  source_sha: 4ec834a59ec602b5a2473f50af0ee0ff2e70b949
+- id: CONSUMER-PACKAGE-EXPORT
+  path: core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md
+  ref: main
+  source_sha: d33b86fb7d96d8b4b575d7b15452421c3f556099
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5cbfe73c4dcd3480fee36cc4ad6a789461fbd56a
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 7c803600ab683940cb0624fb3fe44fbffca681ef
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 54fce3665a885667bb17174d520486cf1207d427
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: e2ae72322f3248182cce5150201377b6f7edac89
+- path: governance/instruction-source-registry.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 327cf8a2929d05e6ede3f844af7128f5e027f08f
+- path: docs/project-consumer-agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: a63c1dd25d3ba43cda95e1389525b8a2a9cc4d1c
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 337ff66874cb249e1acd5f7ce42766c2475fbd98
+- path: projects/gwc/package.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 7587016ff4f08ac613c41d7d1573c23cf5c9db33
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 86d93d9107230b1e19ee3f94409bfd8c3626bee8
+- path: agents/dwc/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: bf4c97cda326d9352e588f4e752bc7c744935460
+- path: tools/validate_instructions.py
+  required: true
+  status: AVAILABLE
+  source_sha: 3f5066b517e51258afb852b0c36666574bd0edb2
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 882ce0f4190ddcdae6cda7b1627984c3401b502d
+- path: core/node-architect/node-catalog-expansion-plan.json
+  required: true
+  status: AVAILABLE
+  source_sha: 4ec834a59ec602b5a2473f50af0ee0ff2e70b949
+- path: schemas/node-architect/runtime-node.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: e8208410cde0175b2cefa9bb7929455890715166
+- path: core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md
+  required: true
+  status: AVAILABLE
+  source_sha: d33b86fb7d96d8b4b575d7b15452421c3f556099
+- path: tools/export_project_package.py
+  required: true
+  status: AVAILABLE
+  source_sha: 8c77a4bd05e94a6f6ff0a09a5a43efa47cd143db
+- path: tools/verify_package_export_smoke.py
+  required: true
+  status: AVAILABLE
+  source_sha: e5bc5520cf70e2cb3092f8c45235a8ad9a7a20ba
+- path: tests/test_package_export_smoke.py
+  required: true
+  status: AVAILABLE
+  source_sha: b0ce26f76bb844a3d8af43197aa3d2c1363e7f94
+- path: schemas/g0-context-snapshot.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: bef0d03797f31693c43ca2b87ee6722c2b441422
+- path: schemas/g1-intake-brief.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 7a746e8b555fbe531819f70ea33f0b9803681c74
+- path: schemas/g1-preflight-report.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 321084dd4e0a820a1a1aa13e1c2cba8e5af050e7
+- path: schemas/g1-options.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 2ceecc0be2242e7aaa0013e60c64024e0db261ff
+- path: schemas/g1-decision-record.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 4061c198e9783df555e2cbbe59fcbe7d36089ca6
+status: READY
+blockers: []

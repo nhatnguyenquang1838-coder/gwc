@@ -1,0 +1,60 @@
+approval_id: CP-20260723-069
+authority_gate: G2_EXECUTION
+task_id: SCRUM-68
+issued_at: '2026-07-22T18:58:00Z'
+expires_at: '2026-07-23T18:58:00Z'
+scope_version: 2
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+working_branch: feature/scrum-68-package-export-nodes
+modules_or_files:
+- .gwc/tasks/SCRUM-68/**
+- core/node-architect/node-catalog/package_export/**
+- tools/node_architect/validate_node_catalog_package_export.py
+- tests/test_node_catalog_package_export.py
+- projects/gwc/package.yaml
+- releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md
+authorized_actions:
+- modify_approved_files
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+excluded_actions:
+- protected_branch_direct_push
+- merge
+- auto_merge
+- mark_pr_ready_for_review
+- deploy
+- release
+- production_data_read
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- branch_deletion
+- shared_history_rewrite
+- pr_base_change
+- rewrite_export_project_package
+- change_package_version
+- publish_package
+- update_consumer_repositories
+- implement_failure_recovery_batch
+- implement_scale_control_batch
+work_item:
+  provider: jira
+  id: SCRUM-68
+  claim_required: false
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  expected_owner: null
+  initial_state: In Progress
+  review_state: In Review
+artifact_hashes:
+  change_plan: sha256:b2e39352128f3efb9f395bae32dcab804a38b926be9f1a2cb12e4f16f3635f24
+  mermaid: sha256:348225549f373c444942c064a3cb1e7098c6d3f2cd624e5642831d0888123ece
+  png: sha256:f593a2079a8f8f1c767b1a96fef239432b3cf12242e80825d35093177e8eb63a
+  svg: sha256:9d10600a5d00ee8ab4867727eaeddc2808ca5bab7c103e0198e3e5f0cf4ba812
+scope_hash: sha256:6675b82f6359f1d1aa694f790ce0ffad6204745cd5ca6753e50d7e3e69c659dd

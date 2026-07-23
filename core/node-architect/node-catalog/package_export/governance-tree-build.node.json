@@ -1,0 +1,9 @@
+{
+  "node_id": "package-export-governance-tree-build",
+  "node_type": "workflow",
+  "title": "Governance Tree Build",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": ["G2_EXECUTION", "G3_PR"],
+  "description": "Copy approved source bytes into the generated governance tree without changing canonical authority."
+}

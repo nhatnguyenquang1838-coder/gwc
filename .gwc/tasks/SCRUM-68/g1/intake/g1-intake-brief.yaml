@@ -1,0 +1,84 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-22T18:58:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-68
+  base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The controlled 81-node catalog has completed Batch 06 and needs the seventh package_export family without duplicating or replacing the existing package export runtime mechanisms.
+  why_now: 'PR #75 is merged and post-merge Validate instructions run 29946832280 succeeded on the exact merge commit, satisfying Batch 07 admission.'
+desired_outcome: Add exactly nine package_export catalog descriptors that model the existing package build, export, manifest, determinism, smoke verification, and failure behavior while preserving current authority boundaries.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - GWC consumer repositories
+  - ChatGPT and DWC agents
+  - Package export operators
+scope:
+  in_scope:
+  - Exactly nine package_export runtime node descriptors
+  - One package_export family README
+  - One deterministic family validator
+  - Focused unit tests for count, schema, authority, gates, filenames, and existing-mechanism references
+  - Package export entries for the new family artifacts
+  - One changelog fragment
+  - Draft PR delivery with exact-head validation and CI
+  non_goals:
+  - Rewrite tools/export_project_package.py
+  - Replace the existing consumer package export rule
+  - Change package_version
+  - Publish packages or update consumer repositories automatically
+  - Implement failure_recovery or scale_control families
+  - Merge, deploy, release, production config/data, credentials, secrets, migration, direct main push, force push, branch deletion, history rewrite, or PR base change
+constraints:
+- Exactly nine nodes
+- Gates limited to G2_EXECUTION and G3_PR
+- authority_boundary must be g2_required
+- Reuse existing exporter, manifest schema, smoke verifier, runbook, and test
+- No package version change
+- Fresh exact-head CI before G3 completion
+assumptions:
+- Jira SCRUM-68 remains the program task
+- GitHub connector is repository source of truth
+- Existing package export mechanisms remain compatible and are extended by catalog descriptors only
+risks:
+- id: RISK-1
+  description: A parallel exporter design could create conflicting package semantics.
+  impact: high
+  mitigation: Reference and reuse the existing exporter, rule, schema, smoke verifier, and tests.
+- id: RISK-2
+  description: Package descriptor nodes could accidentally imply publish, merge, or deployment authority.
+  impact: high
+  mitigation: Limit gates to G2/G3 and enforce g2_required with explicit exclusions.
+- id: RISK-3
+  description: Package manifest or target-path semantics could drift from current implementation.
+  impact: medium
+  mitigation: Add node and validator assertions tied to existing mechanism paths and determinism rules.
+acceptance_criteria:
+- id: AC-1
+  statement: The package_export family contains exactly nine uniquely named node descriptor files plus one README.
+  verifiable: true
+- id: AC-2
+  statement: Every descriptor validates against runtime-node.schema.json, uses authority_boundary=g2_required, and only G2_EXECUTION/G3_PR gates.
+  verifiable: true
+- id: AC-3
+  statement: The nine nodes explicitly cover manifest loading, entry validation, source safety, target safety, governance tree build, manifest generation, deterministic hash verification, smoke verification, and failure routing.
+  verifiable: true
+- id: AC-4
+  statement: The family reuses and references the existing package export rule, exporter, manifest schema, smoke verifier, runbook, and smoke test rather than creating a parallel mechanism.
+  verifiable: true
+- id: AC-5
+  statement: projects/gwc/package.yaml adds exactly twelve unique export entries for README, nine nodes, validator, and changelog without changing package_version.
+  verifiable: true
+- id: AC-6
+  statement: Focused family tests, package export smoke tests, validate_instructions, full unit tests, Python compilation, and exact-head CI pass before G3 completion.
+  verifiable: true
+- id: AC-7
+  statement: No later family, merge, deployment, release, production operation, secret, migration, or protected-branch write is included.
+  verifiable: true
+unresolved_questions: []
+status: READY
