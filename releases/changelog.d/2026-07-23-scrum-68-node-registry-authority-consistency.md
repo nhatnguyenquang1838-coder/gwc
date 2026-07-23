@@ -4,8 +4,10 @@
 
 - Align all `sync_projection` descriptors with the global runtime registry invariant by setting `authority_boundary: read_only` while retaining G2/G3 applicability metadata.
 - Align the `scale_control.workflow-run-observability` and `scale_control.rollout-progress-projection` audit projections with the same read-only authority rule.
-- Update family validators and focused tests so audit projections cannot grant G2, G3, G5, or other gate authority.
-- Add an executable regression test that compiles and validates the complete 81-node catalog.
+- Add the explicit `g3_required` runtime-node authority value and map it to `G3_PR` in the global registry validator.
+- Migrate all nine `validation_quality` descriptors and five non-projection `scale_control` G3 descriptors from the contradictory `g2_required + G3_PR` mapping to `g3_required + G3_PR`.
+- Update family validators and focused tests so G3-only nodes cannot imply G2 execution authority and audit projections cannot grant gate authority.
+- Keep the executable regression test that compiles and validates the complete 81-node catalog.
 
 ### Preserved
 
