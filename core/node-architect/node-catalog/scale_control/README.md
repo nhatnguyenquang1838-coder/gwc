@@ -5,7 +5,7 @@ Batch 09 is the final controlled catalog family. It defines batch admission, seq
 ## Boundaries
 
 - Exactly nine descriptors.
-- Canonical G3 control nodes use `g2_required` because the runtime-node schema has no separate `g3_required` authority value; their gate binding remains exactly `G3_PR`.
+- Canonical G3 control nodes use `g3_required` and remain bound exactly to `G3_PR`.
 - Canonical G5 evidence/control nodes use `g5_required` and remain bound to `G5_DEPLOY`.
 - `workflow-run-observability` and `rollout-progress-projection` are `audit_projection` nodes with `authority_boundary: read_only`; their gates are applicability metadata only.
 - No scheduler, worker, connector implementation, deploy, release, production configuration/data, secret, credential, migration, or merge authority is introduced.
