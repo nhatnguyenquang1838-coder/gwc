@@ -1,0 +1,9 @@
+{
+  "node_id": "runtime_checkpoint.base-drift-revalidate",
+  "node_type": "workflow",
+  "title": "Base Drift Revalidate",
+  "description": "Refresh only affected validation and candidate-integration evidence for REVALIDATE drift while preserving G2 authority until checks pass or reroute is required.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": ["G2_EXECUTION"]
+}
