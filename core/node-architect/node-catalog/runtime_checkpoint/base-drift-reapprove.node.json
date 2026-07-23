@@ -1,0 +1,9 @@
+{
+  "node_id": "runtime_checkpoint.base-drift-reapprove",
+  "node_type": "gate",
+  "title": "Base Drift Reapprove",
+  "description": "Invalidate stale authority for material base drift and route to a refreshed approval envelope without performing repository writes beyond the approved scope.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": ["G2_EXECUTION"]
+}
