@@ -4,9 +4,11 @@ Task: `REVAMP-GWC-020`
 Batch: `batch-05-validation-quality`  
 Family: `validation_quality`  
 Planned nodes: 9  
-Authority boundary: `G3_PR`
+Authority boundary: `g3_required` / `G3_PR`
 
 This family defines the controlled runtime node catalog entries for validation quality work: schema validation, validator execution, unit-test mapping, exact-head CI evidence, reproducibility, side-effect checks, blocker classification, and G3 pass decisions.
+
+`g3_required` is the explicit authority label for nodes whose applicability and decision boundary are exactly `G3_PR`. It does not grant G2 execution, G4 merge, G5 deploy, or G6 production authority.
 
 ## Scope
 
