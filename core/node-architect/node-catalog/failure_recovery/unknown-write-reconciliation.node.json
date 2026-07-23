@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.unknown-write-reconciliation",
+  "node_type": "gate",
+  "title": "Unknown Write Reconciliation",
+  "description": "Require provider readback after an ambiguous write result before any retry or PASS decision.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
