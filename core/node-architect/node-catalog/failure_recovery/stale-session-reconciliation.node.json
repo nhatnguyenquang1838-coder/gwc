@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.stale-session-reconciliation",
+  "node_type": "workflow",
+  "title": "Stale Session Reconciliation",
+  "description": "Detect stale session ownership and reconcile live task, repository, lease, and checkpoint state before continuing.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
