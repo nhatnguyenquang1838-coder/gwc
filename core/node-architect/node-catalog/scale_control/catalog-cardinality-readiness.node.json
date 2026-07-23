@@ -4,7 +4,7 @@
   "title": "Catalog Cardinality Readiness",
   "description": "Verify that the controlled catalog contains exactly nine families of nine unique runtime nodes before independent audit.",
   "canonical": "canonical",
-  "authority_boundary": "g2_required",
+  "authority_boundary": "g3_required",
   "gates": [
     "G3_PR"
   ]

@@ -39,8 +39,8 @@ def validate_family(family_dir: Path) -> None:
             raise AssertionError(f"{path}: duplicate node_id")
         seen.add(payload["node_id"])
 
-        if payload["authority_boundary"] != "g2_required":
-            raise AssertionError(f"{path}: authority_boundary must be g2_required")
+        if payload["authority_boundary"] != "g3_required":
+            raise AssertionError(f"{path}: authority_boundary must be g3_required")
         if set(payload["gates"]) != {"G3_PR"}:
             raise AssertionError(f"{path}: gates must be exactly G3_PR")
 

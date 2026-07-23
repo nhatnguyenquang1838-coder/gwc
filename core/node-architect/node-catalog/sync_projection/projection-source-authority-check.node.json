@@ -3,7 +3,7 @@
   "node_type": "gate",
   "title": "Projection Source Authority Check",
   "canonical": "audit_projection",
-  "authority_boundary": "g2_required",
+  "authority_boundary": "read_only",
   "gates": [
     "G2_EXECUTION"
   ],

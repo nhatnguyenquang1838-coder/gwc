@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COMPILE = ROOT / "tools/node_architect/compile_node_registry.py"
 VALIDATE = ROOT / "tools/node_architect/validate_node_registry.py"
 SIMULATE = ROOT / "tools/node_architect/simulate_gate_runtime.py"
+CATALOG = ROOT / "core/node-architect/node-catalog"
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -84,6 +85,29 @@ class NodeArchitectRuntimeValidationTests(unittest.TestCase):
             simulated = run_tool(str(SIMULATE), "--registry", str(registry), "--requested-action", "merge")
             self.assertEqual(simulated.returncode, 0, simulated.stdout)
             self.assertEqual(json.loads(simulated.stdout)["required_gate"], "G4_MERGE")
+
+    def test_full_repository_catalog_compiles_and_validates(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            registry = Path(temp) / "registry.json"
+
+            compiled = run_tool(
+                str(COMPILE),
+                "--input-dir",
+                str(CATALOG),
+                "--output",
+                str(registry),
+                "--registry-id",
+                "gwc-81-node-catalog",
+            )
+            self.assertEqual(compiled.returncode, 0, compiled.stderr)
+
+            payload = json.loads(registry.read_text(encoding="utf-8"))
+            self.assertEqual(len(payload["nodes"]), 81)
+            self.assertEqual(len({node["node_id"] for node in payload["nodes"]}), 81)
+
+            validated = run_tool(str(VALIDATE), "--registry", str(registry))
+            self.assertEqual(validated.returncode, 0, validated.stdout)
+            self.assertEqual(json.loads(validated.stdout)["outcome"], "PASS")
 
     def test_validate_fails_duplicate_nodes(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

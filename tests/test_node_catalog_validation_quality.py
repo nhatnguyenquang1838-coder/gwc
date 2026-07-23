@@ -16,7 +16,7 @@ class ValidationQualityNodeCatalogTest(unittest.TestCase):
         for path in FAMILY_DIR.glob("*.node.json"):
             payload = json.loads(path.read_text(encoding="utf-8"))
             self.assertTrue(payload["node_id"].startswith("validation-quality-"))
-            self.assertEqual(payload["authority_boundary"], "g2_required")
+            self.assertEqual(payload["authority_boundary"], "g3_required")
             self.assertEqual(set(payload["gates"]), {"G3_PR"})
 
     def test_node_id_matches_file_name(self):

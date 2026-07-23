@@ -54,15 +54,15 @@ def validate_family(family_dir: Path) -> None:
 
         if payload["canonical"] != "audit_projection":
             raise AssertionError(f"{path}: canonical must be audit_projection")
-        if payload["authority_boundary"] != "g2_required":
-            raise AssertionError(f"{path}: authority_boundary must be g2_required")
+        if payload["authority_boundary"] != "read_only":
+            raise AssertionError(f"{path}: audit projection authority must be read_only")
         gates = set(payload["gates"])
         if not gates or not gates.issubset(ALLOWED_GATES):
             raise AssertionError(f"{path}: gates must be a non-empty subset of {sorted(ALLOWED_GATES)}")
         covered_gates.update(gates)
 
     if covered_gates != ALLOWED_GATES:
-        raise AssertionError(f"family must cover both gates, got {sorted(covered_gates)}")
+        raise AssertionError(f"family must cover both applicability gates, got {sorted(covered_gates)}")
     missing_semantics = REQUIRED_SEMANTICS - stems
     if missing_semantics:
         raise AssertionError(f"missing required projection semantics: {sorted(missing_semantics)}")
