@@ -18,6 +18,15 @@ def load_schema(relative: str) -> dict:
     return json.loads((ROOT / relative).read_text(encoding="utf-8"))
 
 
+def load_module(name: str, relative: str):
+    spec = importlib.util.spec_from_file_location(name, ROOT / relative)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def valid_record() -> dict:
     return {
         "schema_version": "1.0",
@@ -26,11 +35,11 @@ def valid_record() -> dict:
         "task_id": "SCRUM-72",
         "gate": "G3_PR",
         "node_id": "ready-for-review-promotion",
-        "blocked_step_id": "STEP-07",
+        "blocked_step_id": "STEP-08",
         "blocker_code": "CONNECTOR_ACTION_UNAVAILABLE",
         "rationale": "The agent cannot invoke the metadata action but the same bounded UI action exists.",
         "human_actor": {"id": "human-owner", "display_name": "Owner"},
-        "exact_scope": ["PR #81: mark ready for review"],
+        "exact_scope": ["PR #83: mark ready for review"],
         "authorized_manual_action": "Mark the exact Draft PR ready for review.",
         "excluded_actions": ["merge", "base change", "scope change"],
         "repository": {
@@ -133,7 +142,7 @@ class HumanBypassSchemaTests(unittest.TestCase):
             "idempotency_key": "HB-SCRUM72-001",
             "bypass": {
                 "bypass_request_id": "HB-SCRUM72-001",
-                "blocked_step_id": "STEP-07",
+                "blocked_step_id": "STEP-08",
                 "scope_hash": "sha256:" + "a" * 64,
             },
         }
@@ -145,11 +154,8 @@ class HumanBypassSchemaTests(unittest.TestCase):
 class G1FeasibilityValidatorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        spec = importlib.util.spec_from_file_location("validate_g01", ROOT / "tools/validate_g01.py")
-        assert spec and spec.loader
-        cls.module = importlib.util.module_from_spec(spec)
-        sys.modules[spec.name] = cls.module
-        spec.loader.exec_module(cls.module)
+        cls.validator_module = load_module("validate_g01", "tools/validate_g01.py")
+        cls.generator_module = load_module("generate_g01_runtime", "tools/generate_g01_runtime.py")
 
     def valid_preflight(self) -> dict:
         return {
@@ -160,8 +166,9 @@ class G1FeasibilityValidatorTests(unittest.TestCase):
                 "human_bypass_required": True,
                 "route_steps": [
                     {
-                        "id": "STEP-01",
+                        "id": "STEP-08",
                         "capability_status": "VERIFIED",
+                        "fallback_routes": ["human manual UI action"],
                         "continuation": "checkpoint and readback",
                         "bypass_eligibility": "OPERATIONAL_ONLY",
                     }
@@ -169,23 +176,59 @@ class G1FeasibilityValidatorTests(unittest.TestCase):
             },
         }
 
-    def test_unknown_capability_blocks_g1(self) -> None:
+    def test_unknown_capability_without_fallback_blocks_g1(self) -> None:
         preflight = self.valid_preflight()
-        preflight["execution_feasibility"]["route_steps"][0]["capability_status"] = "UNKNOWN"
-        codes = {issue.code for issue in self.module._execution_feasibility_issues(preflight)}
+        step = preflight["execution_feasibility"]["route_steps"][0]
+        step["capability_status"] = "UNKNOWN"
+        step["fallback_routes"] = []
+        codes = {issue.code for issue in self.validator_module._execution_feasibility_issues(preflight)}
         self.assertIn("G1_EXECUTION_CAPABILITY_UNVERIFIED", codes)
 
     def test_missing_continuation_blocks_g1(self) -> None:
         preflight = self.valid_preflight()
         preflight["execution_feasibility"]["route_steps"][0]["continuation"] = ""
-        codes = {issue.code for issue in self.module._execution_feasibility_issues(preflight)}
+        codes = {issue.code for issue in self.validator_module._execution_feasibility_issues(preflight)}
         self.assertIn("G1_CONTINUATION_COVERAGE_INCOMPLETE", codes)
 
-    def test_human_bypass_outcome_requires_eligible_step(self) -> None:
+    def test_human_bypass_outcome_requires_blocked_eligible_step(self) -> None:
         preflight = self.valid_preflight()
-        preflight["execution_feasibility"]["route_steps"][0]["bypass_eligibility"] = "FORBIDDEN"
-        codes = {issue.code for issue in self.module._execution_feasibility_issues(preflight)}
+        codes = {issue.code for issue in self.validator_module._execution_feasibility_issues(preflight)}
         self.assertIn("G1_HUMAN_BYPASS_STEP_MISSING", codes)
+
+    def test_eligible_blocked_step_with_fallback_uses_human_bypass(self) -> None:
+        preflight = self.valid_preflight()
+        preflight["execution_feasibility"]["route_steps"][0]["capability_status"] = "HARD_BLOCKED"
+        self.assertEqual([], self.validator_module._execution_feasibility_issues(preflight))
+
+    def test_legacy_pair_absent_is_compatible_but_partial_is_blocked(self) -> None:
+        self.assertEqual([], self.validator_module._execution_feasibility_issues({}))
+        partial = {"process_readback": {"status": "VERIFIED"}}
+        codes = {issue.code for issue in self.validator_module._execution_feasibility_issues(partial)}
+        self.assertIn("G1_EXECUTION_FEASIBILITY_INCOMPLETE", codes)
+
+    def test_generator_classifies_bypass_resolvable_route(self) -> None:
+        route = [{
+            "id": "STEP-08",
+            "capability_status": "HARD_BLOCKED",
+            "fallback_routes": ["human manual UI action"],
+            "bypass_eligibility": "OPERATIONAL_ONLY",
+        }]
+        result = self.generator_module._classify_execution_feasibility(route)
+        self.assertEqual("EXECUTABLE_WITH_HUMAN_BYPASS", result["outcome"])
+        self.assertTrue(result["human_bypass_required"])
+
+    def test_generated_route_covers_g3_review_and_ready_promotion(self) -> None:
+        repository = {"verified": True, "write_enabled": True}
+        runtime = {
+            "selected_connector": "DWC",
+            "connector_priority": ["GitHub", "DWC", "DW1"],
+            "connector_fallback_evidence": [
+                {"connector": "DWC", "role": "fallback", "status": "AVAILABLE", "evidence": "verified"}
+            ],
+        }
+        names = {step["name"] for step in self.generator_module._route_steps(repository, runtime, True)}
+        self.assertIn("independent-g3-review", names)
+        self.assertIn("ready-for-review-promotion", names)
 
 
 if __name__ == "__main__":
