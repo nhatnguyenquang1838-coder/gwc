@@ -10,116 +10,89 @@
     "changed_files",
     "scope_overlap",
     "risk_assessment",
-    "evaluator_decision"
+    "evaluator_decision",
+    "reason_codes",
+    "authority_effect",
+    "evidence_effect",
+    "continuation"
   ],
   "properties": {
-    "old_base_sha": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{40}$"
-    },
-    "new_base_sha": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{40}$"
-    },
+    "old_base_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "new_base_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
     "changed_files": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
+      "items": {"type": "string", "minLength": 1}
+    },
+    "scope_overlap": {"enum": ["none", "documented", "partial", "substantial", "full"]},
+    "risk_assessment": {"enum": ["STOP", "REAPPROVE", "REVALIDATE", "SAFE_CONTINUE"]},
+    "evaluator_decision": {"enum": ["STOP", "REAPPROVE", "REVALIDATE", "SAFE_CONTINUE"]},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": [
+        "UNRELATED_PATH_CHANGE",
+        "APPROVED_SCOPE_OVERLAP",
+        "TRANSITIVE_DEPENDENCY_CHANGE",
+        "GOVERNANCE_SOURCE_CHANGE",
+        "VALIDATOR_OR_SCHEMA_CHANGE",
+        "REQUIRED_WORKFLOW_CHANGE",
+        "SECURITY_BOUNDARY_CHANGE",
+        "RISK_CLASS_INCREASE",
+        "AUTHORIZED_ACTION_EXPANSION",
+        "ACCEPTANCE_CRITERIA_CHANGE",
+        "CANDIDATE_INTEGRATION_CONFLICT",
+        "VALIDATION_REGRESSION",
+        "HISTORY_REWRITE",
+        "DRIFT_UNASSESSABLE",
+        "SECRET_OR_PRODUCTION_BOUNDARY"
+      ]}
+    },
+    "authority_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["g2", "g3", "g4", "g5", "g6"],
+      "properties": {
+        "g2": {"enum": ["PRESERVED", "PRESERVED_PENDING_REVALIDATION", "INVALIDATED", "NOT_APPLICABLE"]},
+        "g3": {"enum": ["PRESERVED", "REFRESH_REQUIRED", "INVALIDATED", "NOT_APPLICABLE"]},
+        "g4": {"enum": ["PRESERVED", "REFRESH_REQUIRED", "INVALIDATED", "NOT_APPLICABLE"]},
+        "g5": {"enum": ["PRESERVED", "REFRESH_REQUIRED", "INVALIDATED", "NOT_APPLICABLE"]},
+        "g6": {"enum": ["PRESERVED", "REFRESH_REQUIRED", "INVALIDATED", "NOT_APPLICABLE"]}
       }
     },
-    "scope_overlap": {
-      "type": "string",
-      "enum": [
-        "none",
-        "documented",
-        "partial",
-        "substantial",
-        "full"
-      ]
+    "evidence_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invalidated", "preserved"],
+      "properties": {
+        "invalidated": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "preserved": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
     },
-    "risk_assessment": {
-      "type": "string",
-      "enum": [
-        "STOP",
-        "REAPPROVE",
-        "REVALIDATE",
-        "SAFE_CONTINUE"
-      ]
-    },
-    "evaluator_decision": {
-      "type": "string",
-      "enum": [
-        "STOP",
-        "REAPPROVE",
-        "REVALIDATE",
-        "SAFE_CONTINUE"
-      ]
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interrupt_required", "next_mode", "requires_human_approval"],
+      "properties": {
+        "interrupt_required": {"type": "boolean"},
+        "next_mode": {"enum": ["RESUME_PARENT", "CONTINUE_NEXT", "REROUTE_REPAIR", "REROUTE_REAPPROVE", "STOP"]},
+        "requires_human_approval": {"type": "boolean"},
+        "required_checks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
     },
     "base_context": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "approved_base_sha",
-        "execution_base_sha",
-        "drift_status",
-        "drift_evaluation_id",
-        "evaluator",
-        "evaluated_at"
-      ],
+      "required": ["approved_base_sha", "execution_base_sha", "drift_status", "drift_evaluation_id", "evaluator", "evaluated_at"],
       "properties": {
-        "approved_base_sha": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "pattern": "^[a-f0-9]{40}$"
-        },
-        "execution_base_sha": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "pattern": "^[a-f0-9]{40}$"
-        },
-        "drift_status": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "unchanged",
-            "changed",
-            "safe_continue",
-            "revalidate",
-            "reapprove",
-            "stop",
-            null
-          ]
-        },
-        "drift_evaluation_id": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "minLength": 1
-        },
-        "evaluator": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "minLength": 1
-        },
-        "evaluated_at": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "date-time"
-        }
+        "approved_base_sha": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}$"},
+        "execution_base_sha": {"type": ["string", "null"], "pattern": "^[a-f0-9]{40}$"},
+        "drift_status": {"type": ["string", "null"], "enum": ["unchanged", "changed", "safe_continue", "revalidate", "reapprove", "stop", null]},
+        "drift_evaluation_id": {"type": ["string", "null"], "minLength": 1},
+        "evaluator": {"type": ["string", "null"], "minLength": 1},
+        "evaluated_at": {"type": ["string", "null"], "format": "date-time"}
       }
     }
   }
