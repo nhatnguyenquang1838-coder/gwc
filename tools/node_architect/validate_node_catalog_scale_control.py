@@ -52,7 +52,7 @@ def validate_family(family_dir: Path, package_path: Path, matrix_path: Path) -> 
             if gates not in ({"G3_PR"}, {"G5_DEPLOY"}):
                 raise AssertionError(f"{path.name}: projection applicability gate mismatch")
         elif gates == {"G3_PR"}:
-            if authority != "g2_required":
+            if authority != "g3_required":
                 raise AssertionError(f"{path.name}: G3 control mapping mismatch")
         elif gates == {"G5_DEPLOY"}:
             if authority != "g5_required":
