@@ -1,12 +1,25 @@
-schema_version: "1.0"
+schema_version: "1.1"
 policy_id: base-drift-evaluation
 status: active
 repository: nhatnguyenquang1838-coder/gwc
 base_reference: main
 description: >
-  Evaluate protected-base SHA drift after approval so bounded changes can
-  continue, revalidate, reapprove, or stop based on the scope overlap and
-  risk class of the changed files.
+  Evaluate protected-base SHA drift after approval as a runtime interrupt so
+  bounded changes can continue, revalidate, reapprove, or stop based on ancestry,
+  approved-scope overlap, authority impact, evidence impact, and risk class.
+
+interrupt:
+  type: BASE_DRIFT
+  contract: core/INTERRUPT_FLOW_CONTRACT_v1.0.md
+  frame_schema: schemas/interrupt-frame.schema.json
+  node_interruptibility_schema: schemas/node-interruptibility.schema.json
+  resume_without_human_command:
+    - SAFE_CONTINUE
+    - REVALIDATE_PASS
+  human_authority_required:
+    - REAPPROVE
+  terminal_stop:
+    - STOP
 
 approval_envelope_extension:
   base_context:
@@ -19,14 +32,16 @@ approval_envelope_extension:
 
 decision_rules:
   SAFE_CONTINUE:
-    - Documentation
-    - Tests
-    - Changelog
-    - Unrelated source changes
+    - Documentation outside approved scope
+    - Tests outside approved scope
+    - Changelog outside approved scope
+    - Unrelated source changes with no dependency or governance impact
   REVALIDATE:
     - Application code
     - Dependencies
     - Schema changes
+    - Validator or tool changes
+    - Approved-scope overlap that does not require broader authority
   REAPPROVE:
     - Governance
     - Security
@@ -34,12 +49,17 @@ decision_rules:
     - Registry
     - Workflow engine
     - Runtime boundary
+    - Risk class increase
+    - Acceptance criteria change
+    - Authorized action expansion
   STOP:
     - Secrets
     - Credentials
     - Production config
     - Production data
     - Destructive operations
+    - History rewrite
+    - Unassessable repository state
 
 evidence_required:
   - old_base_sha
@@ -48,6 +68,10 @@ evidence_required:
   - scope_overlap
   - risk_assessment
   - evaluator_decision
+  - reason_codes
+  - authority_effect
+  - evidence_effect
+  - continuation
 
 evaluation_order:
   - STOP
@@ -55,8 +79,15 @@ evaluation_order:
   - REVALIDATE
   - SAFE_CONTINUE
 
+continuation_modes:
+  SAFE_CONTINUE: RESUME_PARENT
+  REVALIDATE: RESUME_PARENT_AFTER_CHECKS
+  REAPPROVE: REROUTE_REAPPROVE
+  STOP: STOP
+
 notes:
-  - STOP always wins when a change touches secrets, credentials, production config, production data, or destructive operations.
+  - STOP always wins when a change touches secrets, credentials, production config, production data, destructive operations, history rewrite, or unassessable state.
   - REAPPROVE wins for governance and boundary changes even if the file list also includes lower-risk documentation.
-  - REVALIDATE wins for application code, dependency, or schema changes unless a higher decision applies.
-  - SAFE_CONTINUE applies only when the diff is limited to documentation, tests, changelog, or unrelated source changes.
+  - REVALIDATE wins for application code, dependency, schema, validator, tool, or approved-scope-overlap changes unless a higher decision applies.
+  - SAFE_CONTINUE applies only when the diff is unrelated to approved scope and no authority, risk, task, repository, branch, or action boundary changed.
+  - Base-drift interrupt flow refreshes evidence; it must not weaken G2-G6 authority boundaries.
