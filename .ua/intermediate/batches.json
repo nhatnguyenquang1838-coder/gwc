@@ -1,13 +1,15 @@
 {
   "schemaVersion": 1,
   "algorithm": "louvain",
-  "totalFiles": 332,
-  "totalBatches": 38,
+  "totalFiles": 453,
+  "totalBatches": 49,
   "exportsByPath": {
     ".blackboxrules": [],
     ".gitattributes": [],
     ".github/CODEOWNERS": [],
     ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd": [],
+    ".ua/.understandignore": [],
+    ".ua/tmp/ua-scan.stderr": [],
     "assets/CodeViewer-OPyd4etH.js": [
       "default"
     ],
@@ -71,8 +73,14 @@
     "tests/test_base_drift_policy.py": [
       "BaseDriftPolicyTests"
     ],
+    "tests/test_changelog_fragment_hygiene.py": [
+      "ChangelogFragmentHygieneTests"
+    ],
     "tests/test_chatgpt_agent_runbook_continuation.py": [
       "ChatGPTArtifactContinuationTests"
+    ],
+    "tests/test_checkpoint_engine_contract.py": [
+      "CheckpointEngineContractTests"
     ],
     "tests/test_checkpoint_resume_cleanup.py": [
       "load_module",
@@ -97,8 +105,19 @@
     "tests/test_dwc_connector_capability_contract.py": [
       "DwcConnectorCapabilityContractTests"
     ],
+    "tests/test_failure_simulation_scale_readiness.py": [
+      "valid_matrix",
+      "FailureSimulationScaleReadinessTests"
+    ],
     "tests/test_fastlane_bootstrap_workflow.py": [
       "FastLaneBootstrapWorkflowTests"
+    ],
+    "tests/test_fastlane_process_optimization.py": [
+      "read",
+      "test_e2e_allows_autonomous_steps_after_g2_but_blocks_merge",
+      "test_fastlane_limits_g2_to_branch_files_pr_and_blocks_higher_gates",
+      "test_chatgpt_overlay_requires_auto_ready_when_supported_then_g4_token",
+      "test_dwc_contract_keeps_ready_for_review_as_g3_metadata_only"
     ],
     "tests/test_g01_decision_capture.py": [
       "DecisionCaptureTests"
@@ -154,11 +173,44 @@
       "run_tool",
       "NodeArchitectRuntimeValidationTests"
     ],
+    "tests/test_node_catalog_expansion_plan.py": [
+      "load_validator",
+      "NodeCatalogExpansionPlanTests"
+    ],
+    "tests/test_node_catalog_gate_authority.py": [
+      "GateAuthorityNodeCatalogTests"
+    ],
+    "tests/test_node_catalog_intake_context.py": [
+      "load_validator",
+      "valid_node",
+      "IntakeContextNodeCatalogTests"
+    ],
+    "tests/test_node_catalog_repo_delivery.py": [
+      "RepoDeliveryNodeCatalogTests"
+    ],
+    "tests/test_node_catalog_runtime_checkpoint.py": [
+      "RuntimeCheckpointNodeCatalogTests"
+    ],
+    "tests/test_node_catalog_validation_quality.py": [
+      "ValidationQualityNodeCatalogTest"
+    ],
+    "tests/test_package_export_smoke.py": [
+      "load_tool",
+      "PackageExportSmokeTests"
+    ],
     "tests/test_profile_resolver.py": [
       "ProfileResolverTests"
     ],
+    "tests/test_reference_nodes.py": [
+      "ReferenceNodeTests"
+    ],
     "tests/test_revamp_upgrade_gwc_workflow.py": [
       "RevampUpgradeGwcWorkflowTests"
+    ],
+    "tests/test_runtime_kernel_contract.py": [
+      "run_validator",
+      "load_validator_module",
+      "RuntimeKernelContractTests"
     ],
     "tools/build_project_package.py": [
       "sha256",
@@ -266,6 +318,12 @@
       "build_parser",
       "main"
     ],
+    "tools/node_architect/validate_checkpoint_engine_contract.py": [
+      "load_schema",
+      "validate_schema",
+      "validate_doc",
+      "main"
+    ],
     "tools/node_architect/validate_checkpoint_resume.py": [
       "ValidationError",
       "load_json",
@@ -284,6 +342,12 @@
       "emit",
       "main"
     ],
+    "tools/node_architect/validate_failure_simulation_matrix.py": [
+      "load_json",
+      "validate_schema",
+      "validate_matrix",
+      "main"
+    ],
     "tools/node_architect/validate_kiro_local_agent_package.py": [
       "ValidationError",
       "load_json",
@@ -294,10 +358,61 @@
       "result",
       "main"
     ],
+    "tools/node_architect/validate_node_catalog_expansion_plan.py": [
+      "ValidationError",
+      "_load_json",
+      "_expect",
+      "validate_plan",
+      "main"
+    ],
+    "tools/node_architect/validate_node_catalog_gate_authority.py": [
+      "load_node",
+      "validate_node",
+      "validate_family",
+      "main"
+    ],
+    "tools/node_architect/validate_node_catalog_intake_context.py": [
+      "_repo_root",
+      "_default_family_dir",
+      "_load_node",
+      "_validate_node",
+      "validate_family",
+      "main"
+    ],
+    "tools/node_architect/validate_node_catalog_repo_delivery.py": [
+      "validate_family",
+      "main"
+    ],
+    "tools/node_architect/validate_node_catalog_runtime_checkpoint.py": [
+      "load_json",
+      "iter_node_files",
+      "validate_family",
+      "main"
+    ],
+    "tools/node_architect/validate_node_catalog_validation_quality.py": [
+      "validate_family",
+      "main"
+    ],
     "tools/node_architect/validate_node_registry.py": [
       "_finding",
       "_load_registry",
       "validate_registry",
+      "validation_result",
+      "build_parser",
+      "main"
+    ],
+    "tools/node_architect/validate_reference_nodes.py": [
+      "load_nodes",
+      "require_key",
+      "validate_node",
+      "validate_nodes",
+      "main"
+    ],
+    "tools/node_architect/validate_runtime_kernel_contract.py": [
+      "_finding",
+      "_load_json",
+      "validate_kernel",
+      "validate_workspace",
       "validation_result",
       "build_parser",
       "main"
@@ -311,6 +426,11 @@
       "profile_references",
       "_select_agent_runtime",
       "resolve_profile_set",
+      "main"
+    ],
+    "tools/validate_changelog_fragments.py": [
+      "validate_fragment",
+      "iter_fragments",
       "main"
     ],
     "tools/validate_g01.py": [
@@ -356,15 +476,176 @@
     "tools/validate_profile_set.py": [
       "main"
     ],
+    "tools/verify_package_export_smoke.py": [
+      "load_exporter",
+      "sha256_file",
+      "validate_export",
+      "main"
+    ],
     "tools/verify_rollout.py": [
       "sha256",
       "load_yaml",
       "main"
-    ]
+    ],
+    "ua-homepage/astro.config.mjs": [],
+    "ua-homepage/src/components/CommunityVideo.astro": [],
+    "ua-homepage/src/components/Features.astro": [],
+    "ua-homepage/src/components/Footer.astro": [],
+    "ua-homepage/src/components/Hero.astro": [],
+    "ua-homepage/src/components/Install.astro": [],
+    "ua-homepage/src/components/Nav.astro": [],
+    "ua-homepage/src/components/Problem.astro": [],
+    "ua-homepage/src/components/Showcase.astro": [],
+    "ua-homepage/src/layouts/Layout.astro": [],
+    "ua-homepage/src/pages/.gitkeep": [],
+    "ua-homepage/src/pages/index.astro": []
   },
   "batches": [
     {
       "batchIndex": 1,
+      "files": [
+        {
+          "path": "assets/CodeViewer-OPyd4etH.js",
+          "language": "javascript",
+          "sizeLines": 15,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/KeyboardShortcutsHelp-BUsSghl_.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/LearnPanel-DPcu2QbB.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/OnboardingOverlay-D1fHuJ3E.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/PathFinderModal-Bt3-QpGJ.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/elk-CXeXGyKz.js",
+          "language": "javascript",
+          "sizeLines": 26,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/graph-layout-DJJECaXo.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/graphology-BgTy_cc3.js",
+          "language": "javascript",
+          "sizeLines": 1,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/index-BSUMpTki.js",
+          "language": "javascript",
+          "sizeLines": 42,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/markdown-DtJ_FMNT.js",
+          "language": "javascript",
+          "sizeLines": 29,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/react-vendor-BVoutfaX.js",
+          "language": "javascript",
+          "sizeLines": 49,
+          "fileCategory": "code"
+        },
+        {
+          "path": "assets/xyflow-BLuFBhnn.js",
+          "language": "javascript",
+          "sizeLines": 23,
+          "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "assets/CodeViewer-OPyd4etH.js": [
+          "assets/elk-CXeXGyKz.js",
+          "assets/graph-layout-DJJECaXo.js",
+          "assets/graphology-BgTy_cc3.js",
+          "assets/index-BSUMpTki.js",
+          "assets/markdown-DtJ_FMNT.js",
+          "assets/react-vendor-BVoutfaX.js",
+          "assets/xyflow-BLuFBhnn.js"
+        ],
+        "assets/KeyboardShortcutsHelp-BUsSghl_.js": [
+          "assets/elk-CXeXGyKz.js",
+          "assets/graph-layout-DJJECaXo.js",
+          "assets/graphology-BgTy_cc3.js",
+          "assets/index-BSUMpTki.js",
+          "assets/react-vendor-BVoutfaX.js",
+          "assets/xyflow-BLuFBhnn.js"
+        ],
+        "assets/LearnPanel-DPcu2QbB.js": [
+          "assets/elk-CXeXGyKz.js",
+          "assets/graph-layout-DJJECaXo.js",
+          "assets/graphology-BgTy_cc3.js",
+          "assets/index-BSUMpTki.js",
+          "assets/markdown-DtJ_FMNT.js",
+          "assets/react-vendor-BVoutfaX.js",
+          "assets/xyflow-BLuFBhnn.js"
+        ],
+        "assets/OnboardingOverlay-D1fHuJ3E.js": [
+          "assets/elk-CXeXGyKz.js",
+          "assets/graph-layout-DJJECaXo.js",
+          "assets/graphology-BgTy_cc3.js",
+          "assets/index-BSUMpTki.js",
+          "assets/react-vendor-BVoutfaX.js",
+          "assets/xyflow-BLuFBhnn.js"
+        ],
+        "assets/PathFinderModal-Bt3-QpGJ.js": [
+          "assets/elk-CXeXGyKz.js",
+          "assets/graph-layout-DJJECaXo.js",
+          "assets/graphology-BgTy_cc3.js",
+          "assets/index-BSUMpTki.js",
+          "assets/react-vendor-BVoutfaX.js",
+          "assets/xyflow-BLuFBhnn.js"
+        ],
+        "assets/elk-CXeXGyKz.js": [
+          "assets/react-vendor-BVoutfaX.js"
+        ],
+        "assets/graph-layout-DJJECaXo.js": [],
+        "assets/graphology-BgTy_cc3.js": [
+          "assets/react-vendor-BVoutfaX.js"
+        ],
+        "assets/index-BSUMpTki.js": [
+          "assets/elk-CXeXGyKz.js",
+          "assets/graph-layout-DJJECaXo.js",
+          "assets/graphology-BgTy_cc3.js",
+          "assets/react-vendor-BVoutfaX.js",
+          "assets/xyflow-BLuFBhnn.js"
+        ],
+        "assets/markdown-DtJ_FMNT.js": [
+          "assets/react-vendor-BVoutfaX.js"
+        ],
+        "assets/react-vendor-BVoutfaX.js": [],
+        "assets/xyflow-BLuFBhnn.js": [
+          "assets/react-vendor-BVoutfaX.js"
+        ]
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 2,
       "files": [
         {
           "path": ".github/workflows/build-packages.yml",
@@ -393,7 +674,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 2,
+      "batchIndex": 3,
       "files": [
         {
           "path": ".gwc/g2/approval-envelope.yaml",
@@ -429,7 +710,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 3,
+      "batchIndex": 4,
       "files": [
         {
           "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g1/g1-decision-record.yaml",
@@ -465,7 +746,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 4,
+      "batchIndex": 5,
       "files": [
         {
           "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g2-execution-envelope.yaml",
@@ -494,7 +775,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 5,
+      "batchIndex": 6,
       "files": [
         {
           "path": ".kiro/specs/gwc-multi-profile-resolver-gate-trace/design.md",
@@ -523,7 +804,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 6,
+      "batchIndex": 7,
       "files": [
         {
           "path": "AGENTS.md",
@@ -604,28 +885,10 @@
           "fileCategory": "config"
         },
         {
-          "path": "gwc-knowledge-graph.html",
-          "language": "html",
-          "sizeLines": 280,
-          "fileCategory": "markup"
-        },
-        {
           "path": "index.html",
           "language": "html",
           "sizeLines": 26,
           "fileCategory": "markup"
-        },
-        {
-          "path": "knowledge-graph.html",
-          "language": "html",
-          "sizeLines": 747,
-          "fileCategory": "markup"
-        },
-        {
-          "path": "knowledge-graph.json",
-          "language": "json",
-          "sizeLines": 3087,
-          "fileCategory": "config"
         },
         {
           "path": "openclaw-workspace-state.json",
@@ -654,17 +917,14 @@
         "TREE.txt": [],
         "USER.md": [],
         "catalog.yaml": [],
-        "gwc-knowledge-graph.html": [],
         "index.html": [],
-        "knowledge-graph.html": [],
-        "knowledge-graph.json": [],
         "openclaw-workspace-state.json": [],
         "requirements.txt": []
       },
       "neighborMap": {}
     },
     {
-      "batchIndex": 7,
+      "batchIndex": 8,
       "files": [
         {
           "path": "agents/instructionops-agent/agent-instructions.md",
@@ -693,7 +953,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 8,
+      "batchIndex": 9,
       "files": [
         {
           "path": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
@@ -785,7 +1045,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 9,
+      "batchIndex": 10,
       "files": [
         {
           "path": "core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md",
@@ -794,9 +1054,21 @@
           "fileCategory": "docs"
         },
         {
+          "path": "core/node-architect/CHECKPOINT_RUNTIME_ENGINE_CONTRACT_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 64,
+          "fileCategory": "docs"
+        },
+        {
           "path": "core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md",
           "language": "markdown",
           "sizeLines": 128,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 149,
           "fileCategory": "docs"
         },
         {
@@ -812,6 +1084,12 @@
           "fileCategory": "docs"
         },
         {
+          "path": "core/node-architect/FAILURE_SIMULATION_SCALE_READINESS_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 53,
+          "fileCategory": "docs"
+        },
+        {
           "path": "core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md",
           "language": "markdown",
           "sizeLines": 155,
@@ -824,25 +1102,475 @@
           "fileCategory": "docs"
         },
         {
+          "path": "core/node-architect/REFERENCE_NODES_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 40,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/RUNTIME_KERNEL_v0.1.md",
+          "language": "markdown",
+          "sizeLines": 95,
+          "fileCategory": "docs"
+        },
+        {
           "path": "core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md",
           "language": "markdown",
           "sizeLines": 83,
           "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/failure-simulation-matrix.json",
+          "language": "json",
+          "sizeLines": 49,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog-expansion-plan.json",
+          "language": "json",
+          "sizeLines": 185,
+          "fileCategory": "config"
         }
       ],
       "batchImportData": {
         "core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md": [],
+        "core/node-architect/CHECKPOINT_RUNTIME_ENGINE_CONTRACT_v0.1.md": [],
         "core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md": [],
+        "core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md": [],
         "core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md": [],
         "core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md": [],
+        "core/node-architect/FAILURE_SIMULATION_SCALE_READINESS_v0.1.md": [],
         "core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md": [],
         "core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md": [],
-        "core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md": []
+        "core/node-architect/REFERENCE_NODES_v0.1.md": [],
+        "core/node-architect/RUNTIME_KERNEL_v0.1.md": [],
+        "core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md": [],
+        "core/node-architect/failure-simulation-matrix.json": [],
+        "core/node-architect/node-catalog-expansion-plan.json": []
       },
       "neighborMap": {}
     },
     {
-      "batchIndex": 10,
+      "batchIndex": 11,
+      "files": [
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/README.md",
+          "language": "markdown",
+          "sizeLines": 66,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/node-catalog/gate_authority/README.md": [],
+        "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json": [],
+        "core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 12,
+      "files": [
+        {
+          "path": "core/node-architect/node-catalog/intake_context/README.md",
+          "language": "markdown",
+          "sizeLines": 65,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/files-read-scope.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/files-write-scope.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/intake-card-render.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/risk-classification.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/intake_context/source-resolution.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/node-catalog/intake_context/README.md": [],
+        "core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json": [],
+        "core/node-architect/node-catalog/intake_context/files-read-scope.node.json": [],
+        "core/node-architect/node-catalog/intake_context/files-write-scope.node.json": [],
+        "core/node-architect/node-catalog/intake_context/intake-card-render.node.json": [],
+        "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json": [],
+        "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json": [],
+        "core/node-architect/node-catalog/intake_context/request-intake.node.json": [],
+        "core/node-architect/node-catalog/intake_context/risk-classification.node.json": [],
+        "core/node-architect/node-catalog/intake_context/source-resolution.node.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 13,
+      "files": [
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/README.md",
+          "language": "markdown",
+          "sizeLines": 68,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/branch-creation.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/diff-readback.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json",
+          "language": "json",
+          "sizeLines": 12,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/node-catalog/repo_delivery/README.md": [],
+        "core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/branch-creation.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/diff-readback.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json": [],
+        "core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 14,
+      "files": [
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/README.md",
+          "language": "markdown",
+          "sizeLines": 71,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/node-catalog/runtime_checkpoint/README.md": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json": [],
+        "core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 15,
+      "files": [
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/README.md",
+          "language": "markdown",
+          "sizeLines": 43,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/schema-validation.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/side-effect-check.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/node-catalog/validation_quality/validator-execution.node.json",
+          "language": "json",
+          "sizeLines": 11,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/node-catalog/validation_quality/README.md": [],
+        "core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/schema-validation.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/side-effect-check.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json": [],
+        "core/node-architect/node-catalog/validation_quality/validator-execution.node.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 16,
+      "files": [
+        {
+          "path": "core/node-architect/reference-nodes/read-only-context.node.json",
+          "language": "json",
+          "sizeLines": 40,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/reference-nodes/scoped-write.node.json",
+          "language": "json",
+          "sizeLines": 54,
+          "fileCategory": "config"
+        },
+        {
+          "path": "core/node-architect/reference-nodes/suspend-resume.node.json",
+          "language": "json",
+          "sizeLines": 47,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "core/node-architect/reference-nodes/read-only-context.node.json": [],
+        "core/node-architect/reference-nodes/scoped-write.node.json": [],
+        "core/node-architect/reference-nodes/suspend-resume.node.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 17,
       "files": [
         {
           "path": "docs/base-drift-policy.md",
@@ -871,7 +1599,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 11,
+      "batchIndex": 18,
       "files": [
         {
           "path": "docs/plan/distributed-multi-agent-sdlc/end-state/design.md",
@@ -900,7 +1628,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 12,
+      "batchIndex": 19,
       "files": [
         {
           "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/ds-mcp/design.md",
@@ -950,7 +1678,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 13,
+      "batchIndex": 20,
       "files": [
         {
           "path": "docs/plan/distributed-multi-agent-sdlc/pilot-v1/rental-home/design.md",
@@ -979,7 +1707,43 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 14,
+      "batchIndex": 21,
+      "files": [
+        {
+          "path": "docs/runbooks/CHANGELOG_APPEND_HYGIENE.md",
+          "language": "markdown",
+          "sizeLines": 59,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
+          "language": "markdown",
+          "sizeLines": 136,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/runbooks/PACKAGE_EXPORT_SMOKE_TEST.md",
+          "language": "markdown",
+          "sizeLines": 80,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md",
+          "language": "markdown",
+          "sizeLines": 118,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "docs/runbooks/CHANGELOG_APPEND_HYGIENE.md": [],
+        "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md": [],
+        "docs/runbooks/PACKAGE_EXPORT_SMOKE_TEST.md": [],
+        "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 22,
       "files": [
         {
           "path": "libs/g0-g1-skill-library/NOTICE.md",
@@ -1008,7 +1772,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 15,
+      "batchIndex": 23,
       "files": [
         {
           "path": "libs/g0-g1-skill-library/skills/g0-context-loading.md",
@@ -1044,7 +1808,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 16,
+      "batchIndex": 24,
       "files": [
         {
           "path": "libs/g2-skill-library/NOTICE.md",
@@ -1073,7 +1837,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 17,
+      "batchIndex": 25,
       "files": [
         {
           "path": "libs/g2-skill-library/skills/g2-approval-envelope.md",
@@ -1130,7 +1894,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 18,
+      "batchIndex": 26,
       "files": [
         {
           "path": "libs/g3-skill-library/NOTICE.md",
@@ -1159,7 +1923,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 19,
+      "batchIndex": 27,
       "files": [
         {
           "path": "libs/g3-skill-library/skills/dispatching-parallel-review.md",
@@ -1202,7 +1966,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 20,
+      "batchIndex": 28,
       "files": [
         {
           "path": "memory/2026-07-22-0254.md",
@@ -1231,7 +1995,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 21,
+      "batchIndex": 29,
       "files": [
         {
           "path": "projects/ds-mcp/admin-task-claim-rule.md",
@@ -1274,12 +2038,12 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 22,
+      "batchIndex": 30,
       "files": [
         {
           "path": "projects/gwc/package.yaml",
           "language": "yaml",
-          "sizeLines": 103,
+          "sizeLines": 188,
           "fileCategory": "config"
         },
         {
@@ -1310,7 +2074,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 23,
+      "batchIndex": 31,
       "files": [
         {
           "path": "projects/pm-skills/package.yaml",
@@ -1346,7 +2110,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 24,
+      "batchIndex": 32,
       "files": [
         {
           "path": "projects/rental-home/package.yaml",
@@ -1389,12 +2153,76 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 25,
+      "batchIndex": 33,
+      "files": [
+        {
+          "path": "releases/changelog.d/2026-07-21-revamp-gwc-009-runtime-kernel.md",
+          "language": "markdown",
+          "sizeLines": 13,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md",
+          "language": "markdown",
+          "sizeLines": 16,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-016-intake-context.md",
+          "language": "markdown",
+          "sizeLines": 21,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-017-gate-authority.md",
+          "language": "markdown",
+          "sizeLines": 37,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-018-repo-delivery.md",
+          "language": "markdown",
+          "sizeLines": 34,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md",
+          "language": "markdown",
+          "sizeLines": 36,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md",
+          "language": "markdown",
+          "sizeLines": 38,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "releases/changelog.d/2026-07-22-revamp-gwc-021-process-fastlane.md",
+          "language": "markdown",
+          "sizeLines": 23,
+          "fileCategory": "docs"
+        }
+      ],
+      "batchImportData": {
+        "releases/changelog.d/2026-07-21-revamp-gwc-009-runtime-kernel.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-016-intake-context.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-017-gate-authority.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-018-repo-delivery.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md": [],
+        "releases/changelog.d/2026-07-22-revamp-gwc-021-process-fastlane.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 34,
       "files": [
         {
           "path": "releases/changelog.md",
           "language": "markdown",
-          "sizeLines": 406,
+          "sizeLines": 423,
           "fileCategory": "docs"
         },
         {
@@ -1418,7 +2246,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 26,
+      "batchIndex": 35,
       "files": [
         {
           "path": "schemas/approval-envelope.schema.json",
@@ -1566,8 +2394,14 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 27,
+      "batchIndex": 36,
       "files": [
+        {
+          "path": "schemas/node-architect/checkpoint-engine.schema.json",
+          "language": "json",
+          "sizeLines": 65,
+          "fileCategory": "config"
+        },
         {
           "path": "schemas/node-architect/checkpoint.schema.json",
           "language": "json",
@@ -1584,6 +2418,12 @@
           "path": "schemas/node-architect/external-audit-projection.schema.json",
           "language": "json",
           "sizeLines": 49,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/failure-simulation-matrix.schema.json",
+          "language": "json",
+          "sizeLines": 37,
           "fileCategory": "config"
         },
         {
@@ -1611,6 +2451,18 @@
           "fileCategory": "config"
         },
         {
+          "path": "schemas/node-architect/node-catalog-expansion-plan.schema.json",
+          "language": "json",
+          "sizeLines": 191,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/node-pack.schema.json",
+          "language": "json",
+          "sizeLines": 57,
+          "fileCategory": "config"
+        },
+        {
           "path": "schemas/node-architect/node-registry.schema.json",
           "language": "json",
           "sizeLines": 14,
@@ -1626,6 +2478,18 @@
           "path": "schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json",
           "language": "json",
           "sizeLines": 75,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/runtime-event.schema.json",
+          "language": "json",
+          "sizeLines": 56,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/runtime-kernel.schema.json",
+          "language": "json",
+          "sizeLines": 80,
           "fileCategory": "config"
         },
         {
@@ -1651,35 +2515,34 @@
           "language": "json",
           "sizeLines": 1,
           "fileCategory": "config"
-        },
-        {
-          "path": "schemas/node-architect/sync-target.schema.json",
-          "language": "json",
-          "sizeLines": 1,
-          "fileCategory": "config"
         }
       ],
       "batchImportData": {
+        "schemas/node-architect/checkpoint-engine.schema.json": [],
         "schemas/node-architect/checkpoint.schema.json": [],
         "schemas/node-architect/ds-admin-tc-sync.schema.json": [],
         "schemas/node-architect/external-audit-projection.schema.json": [],
+        "schemas/node-architect/failure-simulation-matrix.schema.json": [],
         "schemas/node-architect/kiro-coding-state.schema.json": [],
         "schemas/node-architect/kiro-local-agent-package.schema.json": [],
         "schemas/node-architect/local-agent-command.schema.json": [],
         "schemas/node-architect/local-agent-validation-report.schema.json": [],
+        "schemas/node-architect/node-catalog-expansion-plan.schema.json": [],
+        "schemas/node-architect/node-pack.schema.json": [],
         "schemas/node-architect/node-registry.schema.json": [],
         "schemas/node-architect/resume-token.schema.json": [],
         "schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json": [],
+        "schemas/node-architect/runtime-event.schema.json": [],
+        "schemas/node-architect/runtime-kernel.schema.json": [],
         "schemas/node-architect/runtime-node.schema.json": [],
         "schemas/node-architect/simulation-result.schema.json": [],
         "schemas/node-architect/stale-session-cleanup.schema.json": [],
-        "schemas/node-architect/sync-projection-result.schema.json": [],
-        "schemas/node-architect/sync-target.schema.json": []
+        "schemas/node-architect/sync-projection-result.schema.json": []
       },
       "neighborMap": {}
     },
     {
-      "batchIndex": 28,
+      "batchIndex": 37,
       "files": [
         {
           "path": "templates/e2e-rule.template.md",
@@ -1715,7 +2578,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 29,
+      "batchIndex": 38,
       "files": [
         {
           "path": "templates/g01/g0-context-snapshot.template.yaml",
@@ -1772,7 +2635,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 30,
+      "batchIndex": 39,
       "files": [
         {
           "path": "templates/gates/g0-hotfix-intake.template.yaml",
@@ -1801,7 +2664,7 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 31,
+      "batchIndex": 40,
       "files": [
         {
           "path": "tests/fixtures/g01-decision-valid.yaml",
@@ -1830,7 +2693,36 @@
       "neighborMap": {}
     },
     {
-      "batchIndex": 32,
+      "batchIndex": 41,
+      "files": [
+        {
+          "path": "ua-homepage/README.md",
+          "language": "markdown",
+          "sizeLines": 35,
+          "fileCategory": "docs"
+        },
+        {
+          "path": "ua-homepage/package.json",
+          "language": "json",
+          "sizeLines": 17,
+          "fileCategory": "config"
+        },
+        {
+          "path": "ua-homepage/tsconfig.json",
+          "language": "json",
+          "sizeLines": 9,
+          "fileCategory": "config"
+        }
+      ],
+      "batchImportData": {
+        "ua-homepage/README.md": [],
+        "ua-homepage/package.json": [],
+        "ua-homepage/tsconfig.json": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 42,
       "files": [
         {
           "path": ".blackboxrules",
@@ -1842,6 +2734,12 @@
           "path": ".codex_plugins/understand-anything/plugin.json",
           "language": "json",
           "sizeLines": 18,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".continue/agents/new-config.yaml",
+          "language": "yaml",
+          "sizeLines": 26,
           "fileCategory": "config"
         },
         {
@@ -1975,17 +2873,12 @@
           "language": "markdown",
           "sizeLines": 40,
           "fileCategory": "docs"
-        },
-        {
-          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml",
-          "language": "yaml",
-          "sizeLines": 68,
-          "fileCategory": "config"
         }
       ],
       "batchImportData": {
         ".blackboxrules": [],
         ".codex_plugins/understand-anything/plugin.json": [],
+        ".continue/agents/new-config.yaml": [],
         ".continue/mcpServers/ds_mcp.yaml": [],
         ".continue/mcpServers/notion.yaml": [],
         ".gitattributes": [],
@@ -2007,14 +2900,19 @@
         ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/decision/g1-decision-record.yaml": [],
         ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/intake/g1-intake-brief.yaml": [],
         ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g1/preflight/g1-preflight-report.yaml": [],
-        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md": [],
-        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml": []
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/change-plan.md": []
       },
       "neighborMap": {}
     },
     {
-      "batchIndex": 33,
+      "batchIndex": 43,
       "files": [
+        {
+          "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 68,
+          "fileCategory": "config"
+        },
         {
           "path": ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd",
           "language": "mmd",
@@ -2158,15 +3056,10 @@
           "language": "yaml",
           "sizeLines": 34,
           "fileCategory": "config"
-        },
-        {
-          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml",
-          "language": "yaml",
-          "sizeLines": 47,
-          "fileCategory": "config"
         }
       ],
       "batchImportData": {
+        ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/execution-envelope.yaml": [],
         ".gwc/tasks/task_50c03a0f-6444-47f0-8d64-61dd69232fbb/g2/proposal/gate-flow.mmd": [],
         ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g0/context-snapshot.yaml": [],
         ".gwc/tasks/task_73fadcb1-c2db-4f6f-856c-a98eb778ec23/g1/brainstorming/g1-options.yaml": [],
@@ -2190,14 +3083,19 @@
         ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/g1/preflight/g1-preflight-report.yaml": [],
         ".gwc/tasks/task_a166798a-c6f5-45d9-9cdc-e56d14c6d1f1/runtime-input.yaml": [],
         ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g0/context-snapshot.yaml": [],
-        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml": [],
-        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml": []
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/ci-repair-envelope-01.yaml": []
       },
       "neighborMap": {}
     },
     {
-      "batchIndex": 34,
+      "batchIndex": 44,
       "files": [
+        {
+          "path": ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml",
+          "language": "yaml",
+          "sizeLines": 47,
+          "fileCategory": "config"
+        },
         {
           "path": ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml",
           "language": "yaml",
@@ -2227,6 +3125,36 @@
           "language": "yaml",
           "sizeLines": 51,
           "fileCategory": "config"
+        },
+        {
+          "path": ".ua/.understandignore",
+          "language": "unknown",
+          "sizeLines": 84,
+          "fileCategory": "code"
+        },
+        {
+          "path": ".ua/intermediate/batches.json",
+          "language": "json",
+          "sizeLines": 2994,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".ua/intermediate/scan-result.json",
+          "language": "json",
+          "sizeLines": 2023,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".ua/knowledge-graph.json",
+          "language": "json",
+          "sizeLines": 5302,
+          "fileCategory": "config"
+        },
+        {
+          "path": ".ua/tmp/ua-scan.stderr",
+          "language": "stderr",
+          "sizeLines": 10,
+          "fileCategory": "code"
         },
         {
           "path": "agents/chatgpt-agent/agent-instructions.md",
@@ -2259,63 +3187,9 @@
           "fileCategory": "config"
         },
         {
-          "path": "assets/CodeViewer-OPyd4etH.js",
-          "language": "javascript",
-          "sizeLines": 15,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/KeyboardShortcutsHelp-BUsSghl_.js",
-          "language": "javascript",
-          "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/LearnPanel-DPcu2QbB.js",
-          "language": "javascript",
-          "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/OnboardingOverlay-D1fHuJ3E.js",
-          "language": "javascript",
-          "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/PathFinderModal-Bt3-QpGJ.js",
-          "language": "javascript",
-          "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/elk-CXeXGyKz.js",
-          "language": "javascript",
-          "sizeLines": 26,
-          "fileCategory": "code"
-        },
-        {
           "path": "assets/force-layout.worker-o9G88Lbd.js",
           "language": "javascript",
           "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/graph-layout-DJJECaXo.js",
-          "language": "javascript",
-          "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/graphology-BgTy_cc3.js",
-          "language": "javascript",
-          "sizeLines": 1,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/index-BSUMpTki.js",
-          "language": "javascript",
-          "sizeLines": 42,
           "fileCategory": "code"
         },
         {
@@ -2325,62 +3199,11 @@
           "fileCategory": "markup"
         },
         {
-          "path": "assets/markdown-DtJ_FMNT.js",
-          "language": "javascript",
-          "sizeLines": 29,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/react-vendor-BVoutfaX.js",
-          "language": "javascript",
-          "sizeLines": 49,
-          "fileCategory": "code"
-        },
-        {
-          "path": "assets/xyflow-BLuFBhnn.js",
-          "language": "javascript",
-          "sizeLines": 23,
-          "fileCategory": "code"
-        },
-        {
           "path": "assets/xyflow-BZV40eAE.css",
           "language": "css",
           "sizeLines": 1,
           "fileCategory": "markup"
-        }
-      ],
-      "batchImportData": {
-        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml": [],
-        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml": [],
-        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml": [],
-        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml": [],
-        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml": [],
-        "agents/chatgpt-agent/agent-instructions.md": [],
-        "agents/coding-agent/bootstrap.md": [],
-        "agents/coding-agent/g2-implementation-skills.md": [],
-        "agents/dwc/agent-instructions.md": [],
-        "agents/dwc/capabilities.yaml": [],
-        "assets/CodeViewer-OPyd4etH.js": [],
-        "assets/KeyboardShortcutsHelp-BUsSghl_.js": [],
-        "assets/LearnPanel-DPcu2QbB.js": [],
-        "assets/OnboardingOverlay-D1fHuJ3E.js": [],
-        "assets/PathFinderModal-Bt3-QpGJ.js": [],
-        "assets/elk-CXeXGyKz.js": [],
-        "assets/force-layout.worker-o9G88Lbd.js": [],
-        "assets/graph-layout-DJJECaXo.js": [],
-        "assets/graphology-BgTy_cc3.js": [],
-        "assets/index-BSUMpTki.js": [],
-        "assets/index-FnUqz1wa.css": [],
-        "assets/markdown-DtJ_FMNT.js": [],
-        "assets/react-vendor-BVoutfaX.js": [],
-        "assets/xyflow-BLuFBhnn.js": [],
-        "assets/xyflow-BZV40eAE.css": []
-      },
-      "neighborMap": {}
-    },
-    {
-      "batchIndex": 35,
-      "files": [
+        },
         {
           "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
           "language": "markdown",
@@ -2416,7 +3239,40 @@
           "language": "markdown",
           "sizeLines": 190,
           "fileCategory": "docs"
-        },
+        }
+      ],
+      "batchImportData": {
+        ".gwc/tasks/task_d78e2fe7-345f-4585-829c-850b6758060e/g2/execution-envelope.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g0/context-snapshot.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/brainstorming/g1-options.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/decision/g1-decision-record.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/intake/g1-intake-brief.yaml": [],
+        ".gwc/tasks/task_f72b5095-893c-4ccd-ad4f-d62e06f2eac8/g1/preflight/g1-preflight-report.yaml": [],
+        ".ua/.understandignore": [],
+        ".ua/intermediate/batches.json": [],
+        ".ua/intermediate/scan-result.json": [],
+        ".ua/knowledge-graph.json": [],
+        ".ua/tmp/ua-scan.stderr": [],
+        "agents/chatgpt-agent/agent-instructions.md": [],
+        "agents/coding-agent/bootstrap.md": [],
+        "agents/coding-agent/g2-implementation-skills.md": [],
+        "agents/dwc/agent-instructions.md": [],
+        "agents/dwc/capabilities.yaml": [],
+        "assets/force-layout.worker-o9G88Lbd.js": [],
+        "assets/index-FnUqz1wa.css": [],
+        "assets/xyflow-BZV40eAE.css": [],
+        "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md": [],
+        "core/runbooks/README.md": [],
+        "core/task-lifecycle/gate-transition-map.yaml": [],
+        "core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md": [],
+        "core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md": [],
+        "docs/gaps/g0-g1-naming-location-convention-gaps.md": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 45,
+      "files": [
         {
           "path": "docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md",
           "language": "markdown",
@@ -2427,18 +3283,6 @@
           "path": "docs/plan/distributed-multi-agent-sdlc/README.md",
           "language": "markdown",
           "sizeLines": 147,
-          "fileCategory": "docs"
-        },
-        {
-          "path": "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md",
-          "language": "markdown",
-          "sizeLines": 136,
-          "fileCategory": "docs"
-        },
-        {
-          "path": "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md",
-          "language": "markdown",
-          "sizeLines": 118,
           "fileCategory": "docs"
         },
         {
@@ -2508,6 +3352,18 @@
           "fileCategory": "config"
         },
         {
+          "path": "schemas/node-architect/sync-target.schema.json",
+          "language": "json",
+          "sizeLines": 1,
+          "fileCategory": "config"
+        },
+        {
+          "path": "schemas/node-architect/transition-envelope.schema.json",
+          "language": "json",
+          "sizeLines": 55,
+          "fileCategory": "config"
+        },
+        {
           "path": "skills/gwc-g0/SKILL.md",
           "language": "markdown",
           "sizeLines": 411,
@@ -2530,40 +3386,7 @@
           "language": "markdown",
           "sizeLines": 102,
           "fileCategory": "docs"
-        }
-      ],
-      "batchImportData": {
-        "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md": [],
-        "core/runbooks/README.md": [],
-        "core/task-lifecycle/gate-transition-map.yaml": [],
-        "core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md": [],
-        "core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md": [],
-        "docs/gaps/g0-g1-naming-location-convention-gaps.md": [],
-        "docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md": [],
-        "docs/plan/distributed-multi-agent-sdlc/README.md": [],
-        "docs/runbooks/GWC_FASTLANE_BOOTSTRAP_RUNBOOK.md": [],
-        "docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md": [],
-        "docs/skills/requirements-tracer.md": [],
-        "governance/agent-runtime-profiles/chatgpt.yaml": [],
-        "governance/agent-runtime-profiles/dwc.yaml": [],
-        "governance/base-drift-policy.yaml": [],
-        "governance/environment-profiles/repo-governance.yaml": [],
-        "governance/gate-policy-profiles/standard.yaml": [],
-        "governance/instruction-source-registry.yaml": [],
-        "governance/profile-sets/gwc-standard.yaml": [],
-        "governance/risk-profiles/default.yaml": [],
-        "projects/gwc/project-profile.sha256": [],
-        "schemas/fastlane/fastlane-envelope.schema.json": [],
-        "skills/gwc-g0/SKILL.md": [],
-        "skills/gwc-g1/SKILL.md": [],
-        "skills/gwc-g2/SKILL.md": [],
-        "skills/gwc-g3/SKILL.md": []
-      },
-      "neighborMap": {}
-    },
-    {
-      "batchIndex": 36,
-      "files": [
+        },
         {
           "path": "tests/fixtures/g01-valid/g0/context-snapshot.yaml",
           "language": "yaml",
@@ -2599,7 +3422,40 @@
           "language": "python",
           "sizeLines": 37,
           "fileCategory": "code"
-        },
+        }
+      ],
+      "batchImportData": {
+        "docs/plan/distributed-multi-agent-sdlc/PROGRAM_PLAN.md": [],
+        "docs/plan/distributed-multi-agent-sdlc/README.md": [],
+        "docs/skills/requirements-tracer.md": [],
+        "governance/agent-runtime-profiles/chatgpt.yaml": [],
+        "governance/agent-runtime-profiles/dwc.yaml": [],
+        "governance/base-drift-policy.yaml": [],
+        "governance/environment-profiles/repo-governance.yaml": [],
+        "governance/gate-policy-profiles/standard.yaml": [],
+        "governance/instruction-source-registry.yaml": [],
+        "governance/profile-sets/gwc-standard.yaml": [],
+        "governance/risk-profiles/default.yaml": [],
+        "projects/gwc/project-profile.sha256": [],
+        "schemas/fastlane/fastlane-envelope.schema.json": [],
+        "schemas/node-architect/sync-target.schema.json": [],
+        "schemas/node-architect/transition-envelope.schema.json": [],
+        "skills/gwc-g0/SKILL.md": [],
+        "skills/gwc-g1/SKILL.md": [],
+        "skills/gwc-g2/SKILL.md": [],
+        "skills/gwc-g3/SKILL.md": [],
+        "tests/fixtures/g01-valid/g0/context-snapshot.yaml": [],
+        "tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml": [],
+        "tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml": [],
+        "tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml": [],
+        "tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml": [],
+        "tests/test_approval_request.py": []
+      },
+      "neighborMap": {}
+    },
+    {
+      "batchIndex": 46,
+      "files": [
         {
           "path": "tests/test_base_drift_policy.py",
           "language": "python",
@@ -2607,9 +3463,21 @@
           "fileCategory": "code"
         },
         {
+          "path": "tests/test_changelog_fragment_hygiene.py",
+          "language": "python",
+          "sizeLines": 52,
+          "fileCategory": "code"
+        },
+        {
           "path": "tests/test_chatgpt_agent_runbook_continuation.py",
           "language": "python",
           "sizeLines": 124,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_checkpoint_engine_contract.py",
+          "language": "python",
+          "sizeLines": 115,
           "fileCategory": "code"
         },
         {
@@ -2643,9 +3511,21 @@
           "fileCategory": "code"
         },
         {
+          "path": "tests/test_failure_simulation_scale_readiness.py",
+          "language": "python",
+          "sizeLines": 86,
+          "fileCategory": "code"
+        },
+        {
           "path": "tests/test_fastlane_bootstrap_workflow.py",
           "language": "python",
           "sizeLines": 59,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_fastlane_process_optimization.py",
+          "language": "python",
+          "sizeLines": 42,
           "fileCategory": "code"
         },
         {
@@ -2713,40 +3593,7 @@
           "language": "python",
           "sizeLines": 58,
           "fileCategory": "code"
-        }
-      ],
-      "batchImportData": {
-        "tests/fixtures/g01-valid/g0/context-snapshot.yaml": [],
-        "tests/fixtures/g01-valid/g1/brainstorming/g1-options.yaml": [],
-        "tests/fixtures/g01-valid/g1/decision/g1-decision-record.yaml": [],
-        "tests/fixtures/g01-valid/g1/intake/g1-intake-brief.yaml": [],
-        "tests/fixtures/g01-valid/g1/preflight/g1-preflight-report.yaml": [],
-        "tests/test_approval_request.py": [],
-        "tests/test_base_drift_policy.py": [],
-        "tests/test_chatgpt_agent_runbook_continuation.py": [],
-        "tests/test_checkpoint_resume_cleanup.py": [],
-        "tests/test_connector_trace_contract.py": [],
-        "tests/test_consumer_package_export.py": [],
-        "tests/test_ds_admin_tc_sync_protocol.py": [],
-        "tests/test_dwc_connector_capability_contract.py": [],
-        "tests/test_fastlane_bootstrap_workflow.py": [],
-        "tests/test_g01_decision_capture.py": [],
-        "tests/test_g01_lifecycle.py": [],
-        "tests/test_g01_runtime.py": [],
-        "tests/test_g0_g1_offline_skill_library.py": [],
-        "tests/test_g0_g1_skill_contract.py": [],
-        "tests/test_g2-execution-library.py": [],
-        "tests/test_g3_delivery.py": [],
-        "tests/test_g3_offline_skill_library.py": [],
-        "tests/test_g3_skill_contract.py": [],
-        "tests/test_gate_lifecycle_process_contract.py": [],
-        "tests/test_gate_response_trace.py": []
-      },
-      "neighborMap": {}
-    },
-    {
-      "batchIndex": 37,
-      "files": [
+        },
         {
           "path": "tests/test_gwc_package_release_note_hygiene.py",
           "language": "python",
@@ -2758,7 +3605,82 @@
           "language": "python",
           "sizeLines": 41,
           "fileCategory": "code"
-        },
+        }
+      ],
+      "batchImportData": {
+        "tests/test_base_drift_policy.py": [],
+        "tests/test_changelog_fragment_hygiene.py": [
+          "tools/validate_changelog_fragments.py"
+        ],
+        "tests/test_chatgpt_agent_runbook_continuation.py": [],
+        "tests/test_checkpoint_engine_contract.py": [
+          "tools/node_architect/validate_checkpoint_engine_contract.py"
+        ],
+        "tests/test_checkpoint_resume_cleanup.py": [],
+        "tests/test_connector_trace_contract.py": [],
+        "tests/test_consumer_package_export.py": [],
+        "tests/test_ds_admin_tc_sync_protocol.py": [],
+        "tests/test_dwc_connector_capability_contract.py": [],
+        "tests/test_failure_simulation_scale_readiness.py": [
+          "tools/node_architect/validate_failure_simulation_matrix.py"
+        ],
+        "tests/test_fastlane_bootstrap_workflow.py": [],
+        "tests/test_fastlane_process_optimization.py": [],
+        "tests/test_g01_decision_capture.py": [],
+        "tests/test_g01_lifecycle.py": [],
+        "tests/test_g01_runtime.py": [],
+        "tests/test_g0_g1_offline_skill_library.py": [],
+        "tests/test_g0_g1_skill_contract.py": [],
+        "tests/test_g2-execution-library.py": [],
+        "tests/test_g3_delivery.py": [],
+        "tests/test_g3_offline_skill_library.py": [],
+        "tests/test_g3_skill_contract.py": [],
+        "tests/test_gate_lifecycle_process_contract.py": [],
+        "tests/test_gate_response_trace.py": [],
+        "tests/test_gwc_package_release_note_hygiene.py": [],
+        "tests/test_gwc_package_revamp_exports.py": []
+      },
+      "neighborMap": {
+        "tests/test_changelog_fragment_hygiene.py": [
+          {
+            "path": "tools/validate_changelog_fragments.py",
+            "batchIndex": 48,
+            "symbols": [
+              "validate_fragment",
+              "iter_fragments",
+              "main"
+            ]
+          }
+        ],
+        "tests/test_checkpoint_engine_contract.py": [
+          {
+            "path": "tools/node_architect/validate_checkpoint_engine_contract.py",
+            "batchIndex": 48,
+            "symbols": [
+              "load_schema",
+              "validate_schema",
+              "validate_doc",
+              "main"
+            ]
+          }
+        ],
+        "tests/test_failure_simulation_scale_readiness.py": [
+          {
+            "path": "tools/node_architect/validate_failure_simulation_matrix.py",
+            "batchIndex": 48,
+            "symbols": [
+              "load_json",
+              "validate_schema",
+              "validate_matrix",
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 47,
+      "files": [
         {
           "path": "tests/test_gwc_workflow_simulator.py",
           "language": "python",
@@ -2784,15 +3706,69 @@
           "fileCategory": "code"
         },
         {
+          "path": "tests/test_node_catalog_expansion_plan.py",
+          "language": "python",
+          "sizeLines": 63,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_node_catalog_gate_authority.py",
+          "language": "python",
+          "sizeLines": 53,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_node_catalog_intake_context.py",
+          "language": "python",
+          "sizeLines": 94,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_node_catalog_repo_delivery.py",
+          "language": "python",
+          "sizeLines": 52,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_node_catalog_runtime_checkpoint.py",
+          "language": "python",
+          "sizeLines": 65,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_node_catalog_validation_quality.py",
+          "language": "python",
+          "sizeLines": 44,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_package_export_smoke.py",
+          "language": "python",
+          "sizeLines": 48,
+          "fileCategory": "code"
+        },
+        {
           "path": "tests/test_profile_resolver.py",
           "language": "python",
           "sizeLines": 197,
           "fileCategory": "code"
         },
         {
+          "path": "tests/test_reference_nodes.py",
+          "language": "python",
+          "sizeLines": 92,
+          "fileCategory": "code"
+        },
+        {
           "path": "tests/test_revamp_upgrade_gwc_workflow.py",
           "language": "python",
           "sizeLines": 85,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tests/test_runtime_kernel_contract.py",
+          "language": "python",
+          "sizeLines": 124,
           "fileCategory": "code"
         },
         {
@@ -2854,7 +3830,110 @@
           "language": "python",
           "sizeLines": 111,
           "fileCategory": "code"
-        },
+        }
+      ],
+      "batchImportData": {
+        "tests/test_gwc_workflow_simulator.py": [
+          "tools/gwc_workflow_simulator.py"
+        ],
+        "tests/test_instruction_source_registry.py": [],
+        "tests/test_kiro_local_agent_package.py": [],
+        "tests/test_node_architect_runtime_validation.py": [],
+        "tests/test_node_catalog_expansion_plan.py": [],
+        "tests/test_node_catalog_gate_authority.py": [
+          "tools/node_architect/validate_node_catalog_gate_authority.py"
+        ],
+        "tests/test_node_catalog_intake_context.py": [],
+        "tests/test_node_catalog_repo_delivery.py": [
+          "tools/node_architect/validate_node_catalog_repo_delivery.py"
+        ],
+        "tests/test_node_catalog_runtime_checkpoint.py": [
+          "tools/node_architect/validate_node_catalog_runtime_checkpoint.py"
+        ],
+        "tests/test_node_catalog_validation_quality.py": [
+          "tools/node_architect/validate_node_catalog_validation_quality.py"
+        ],
+        "tests/test_package_export_smoke.py": [],
+        "tests/test_profile_resolver.py": [],
+        "tests/test_reference_nodes.py": [
+          "tools/node_architect/validate_reference_nodes.py"
+        ],
+        "tests/test_revamp_upgrade_gwc_workflow.py": [],
+        "tests/test_runtime_kernel_contract.py": [],
+        "tools/build_project_package.py": [],
+        "tools/capture_g01_decision.py": [],
+        "tools/diff_instruction_package.py": [],
+        "tools/evaluate_base_drift.py": [],
+        "tools/export_project_package.py": [],
+        "tools/generate_g01_runtime.py": [],
+        "tools/gwc_workflow_simulator.py": [],
+        "tools/hash_integrity_artifacts.py": [],
+        "tools/node_architect/cleanup_stale_sessions.py": [],
+        "tools/node_architect/compile_node_registry.py": []
+      },
+      "neighborMap": {
+        "tests/test_node_catalog_gate_authority.py": [
+          {
+            "path": "tools/node_architect/validate_node_catalog_gate_authority.py",
+            "batchIndex": 48,
+            "symbols": [
+              "load_node",
+              "validate_node",
+              "validate_family",
+              "main"
+            ]
+          }
+        ],
+        "tests/test_node_catalog_repo_delivery.py": [
+          {
+            "path": "tools/node_architect/validate_node_catalog_repo_delivery.py",
+            "batchIndex": 48,
+            "symbols": [
+              "validate_family",
+              "main"
+            ]
+          }
+        ],
+        "tests/test_node_catalog_runtime_checkpoint.py": [
+          {
+            "path": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+            "batchIndex": 48,
+            "symbols": [
+              "load_json",
+              "iter_node_files",
+              "validate_family",
+              "main"
+            ]
+          }
+        ],
+        "tests/test_node_catalog_validation_quality.py": [
+          {
+            "path": "tools/node_architect/validate_node_catalog_validation_quality.py",
+            "batchIndex": 48,
+            "symbols": [
+              "validate_family",
+              "main"
+            ]
+          }
+        ],
+        "tests/test_reference_nodes.py": [
+          {
+            "path": "tools/node_architect/validate_reference_nodes.py",
+            "batchIndex": 48,
+            "symbols": [
+              "load_nodes",
+              "require_key",
+              "validate_node",
+              "validate_nodes",
+              "main"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 48,
+      "files": [
         {
           "path": "tools/node_architect/render_ds_admin_tc_projection.py",
           "language": "python",
@@ -2874,6 +3953,12 @@
           "fileCategory": "code"
         },
         {
+          "path": "tools/node_architect/validate_checkpoint_engine_contract.py",
+          "language": "python",
+          "sizeLines": 117,
+          "fileCategory": "code"
+        },
+        {
           "path": "tools/node_architect/validate_checkpoint_resume.py",
           "language": "python",
           "sizeLines": 201,
@@ -2886,9 +3971,51 @@
           "fileCategory": "code"
         },
         {
+          "path": "tools/node_architect/validate_failure_simulation_matrix.py",
+          "language": "python",
+          "sizeLines": 97,
+          "fileCategory": "code"
+        },
+        {
           "path": "tools/node_architect/validate_kiro_local_agent_package.py",
           "language": "python",
           "sizeLines": 233,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_catalog_expansion_plan.py",
+          "language": "python",
+          "sizeLines": 164,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_catalog_gate_authority.py",
+          "language": "python",
+          "sizeLines": 137,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_catalog_intake_context.py",
+          "language": "python",
+          "sizeLines": 149,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_catalog_repo_delivery.py",
+          "language": "python",
+          "sizeLines": 100,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+          "language": "python",
+          "sizeLines": 130,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_node_catalog_validation_quality.py",
+          "language": "python",
+          "sizeLines": 62,
           "fileCategory": "code"
         },
         {
@@ -2896,44 +4023,29 @@
           "language": "python",
           "sizeLines": 123,
           "fileCategory": "code"
-        }
-      ],
-      "batchImportData": {
-        "tests/test_gwc_package_release_note_hygiene.py": [],
-        "tests/test_gwc_package_revamp_exports.py": [],
-        "tests/test_gwc_workflow_simulator.py": [],
-        "tests/test_instruction_source_registry.py": [],
-        "tests/test_kiro_local_agent_package.py": [],
-        "tests/test_node_architect_runtime_validation.py": [],
-        "tests/test_profile_resolver.py": [],
-        "tests/test_revamp_upgrade_gwc_workflow.py": [],
-        "tools/build_project_package.py": [],
-        "tools/capture_g01_decision.py": [],
-        "tools/diff_instruction_package.py": [],
-        "tools/evaluate_base_drift.py": [],
-        "tools/export_project_package.py": [],
-        "tools/generate_g01_runtime.py": [],
-        "tools/gwc_workflow_simulator.py": [],
-        "tools/hash_integrity_artifacts.py": [],
-        "tools/node_architect/cleanup_stale_sessions.py": [],
-        "tools/node_architect/compile_node_registry.py": [],
-        "tools/node_architect/render_ds_admin_tc_projection.py": [],
-        "tools/node_architect/render_kiro_local_agent_package.py": [],
-        "tools/node_architect/simulate_gate_runtime.py": [],
-        "tools/node_architect/validate_checkpoint_resume.py": [],
-        "tools/node_architect/validate_ds_admin_tc_sync.py": [],
-        "tools/node_architect/validate_kiro_local_agent_package.py": [],
-        "tools/node_architect/validate_node_registry.py": []
-      },
-      "neighborMap": {}
-    },
-    {
-      "batchIndex": 38,
-      "files": [
+        },
+        {
+          "path": "tools/node_architect/validate_reference_nodes.py",
+          "language": "python",
+          "sizeLines": 97,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/node_architect/validate_runtime_kernel_contract.py",
+          "language": "python",
+          "sizeLines": 211,
+          "fileCategory": "code"
+        },
         {
           "path": "tools/resolve_profiles.py",
           "language": "python",
           "sizeLines": 253,
+          "fileCategory": "code"
+        },
+        {
+          "path": "tools/validate_changelog_fragments.py",
+          "language": "python",
+          "sizeLines": 87,
           "fileCategory": "code"
         },
         {
@@ -2971,23 +4083,223 @@
           "language": "python",
           "sizeLines": 61,
           "fileCategory": "code"
+        }
+      ],
+      "batchImportData": {
+        "tools/node_architect/render_ds_admin_tc_projection.py": [],
+        "tools/node_architect/render_kiro_local_agent_package.py": [],
+        "tools/node_architect/simulate_gate_runtime.py": [],
+        "tools/node_architect/validate_checkpoint_engine_contract.py": [],
+        "tools/node_architect/validate_checkpoint_resume.py": [],
+        "tools/node_architect/validate_ds_admin_tc_sync.py": [],
+        "tools/node_architect/validate_failure_simulation_matrix.py": [],
+        "tools/node_architect/validate_kiro_local_agent_package.py": [],
+        "tools/node_architect/validate_node_catalog_expansion_plan.py": [],
+        "tools/node_architect/validate_node_catalog_gate_authority.py": [],
+        "tools/node_architect/validate_node_catalog_intake_context.py": [],
+        "tools/node_architect/validate_node_catalog_repo_delivery.py": [],
+        "tools/node_architect/validate_node_catalog_runtime_checkpoint.py": [],
+        "tools/node_architect/validate_node_catalog_validation_quality.py": [],
+        "tools/node_architect/validate_node_registry.py": [],
+        "tools/node_architect/validate_reference_nodes.py": [],
+        "tools/node_architect/validate_runtime_kernel_contract.py": [],
+        "tools/resolve_profiles.py": [],
+        "tools/validate_changelog_fragments.py": [],
+        "tools/validate_g01.py": [],
+        "tools/validate_g3_delivery.py": [],
+        "tools/validate_gate_response_trace.py": [],
+        "tools/validate_hotfix.py": [],
+        "tools/validate_instructions.py": [],
+        "tools/validate_profile_set.py": [
+          "tools/resolve_profiles.py"
+        ]
+      },
+      "neighborMap": {
+        "tools/node_architect/validate_checkpoint_engine_contract.py": [
+          {
+            "path": "tests/test_checkpoint_engine_contract.py",
+            "batchIndex": 46,
+            "symbols": [
+              "CheckpointEngineContractTests"
+            ]
+          }
+        ],
+        "tools/node_architect/validate_failure_simulation_matrix.py": [
+          {
+            "path": "tests/test_failure_simulation_scale_readiness.py",
+            "batchIndex": 46,
+            "symbols": [
+              "valid_matrix",
+              "FailureSimulationScaleReadinessTests"
+            ]
+          }
+        ],
+        "tools/node_architect/validate_node_catalog_gate_authority.py": [
+          {
+            "path": "tests/test_node_catalog_gate_authority.py",
+            "batchIndex": 47,
+            "symbols": [
+              "GateAuthorityNodeCatalogTests"
+            ]
+          }
+        ],
+        "tools/node_architect/validate_node_catalog_repo_delivery.py": [
+          {
+            "path": "tests/test_node_catalog_repo_delivery.py",
+            "batchIndex": 47,
+            "symbols": [
+              "RepoDeliveryNodeCatalogTests"
+            ]
+          }
+        ],
+        "tools/node_architect/validate_node_catalog_runtime_checkpoint.py": [
+          {
+            "path": "tests/test_node_catalog_runtime_checkpoint.py",
+            "batchIndex": 47,
+            "symbols": [
+              "RuntimeCheckpointNodeCatalogTests"
+            ]
+          }
+        ],
+        "tools/node_architect/validate_node_catalog_validation_quality.py": [
+          {
+            "path": "tests/test_node_catalog_validation_quality.py",
+            "batchIndex": 47,
+            "symbols": [
+              "ValidationQualityNodeCatalogTest"
+            ]
+          }
+        ],
+        "tools/node_architect/validate_reference_nodes.py": [
+          {
+            "path": "tests/test_reference_nodes.py",
+            "batchIndex": 47,
+            "symbols": [
+              "ReferenceNodeTests"
+            ]
+          }
+        ],
+        "tools/validate_changelog_fragments.py": [
+          {
+            "path": "tests/test_changelog_fragment_hygiene.py",
+            "batchIndex": 46,
+            "symbols": [
+              "ChangelogFragmentHygieneTests"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "batchIndex": 49,
+      "files": [
+        {
+          "path": "tools/verify_package_export_smoke.py",
+          "language": "python",
+          "sizeLines": 183,
+          "fileCategory": "code"
         },
         {
           "path": "tools/verify_rollout.py",
           "language": "python",
           "sizeLines": 83,
           "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/astro.config.mjs",
+          "language": "javascript",
+          "sizeLines": 6,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/CommunityVideo.astro",
+          "language": "astro",
+          "sizeLines": 38,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Features.astro",
+          "language": "astro",
+          "sizeLines": 36,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Footer.astro",
+          "language": "astro",
+          "sizeLines": 56,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Hero.astro",
+          "language": "astro",
+          "sizeLines": 244,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Install.astro",
+          "language": "astro",
+          "sizeLines": 41,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Nav.astro",
+          "language": "astro",
+          "sizeLines": 156,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Problem.astro",
+          "language": "astro",
+          "sizeLines": 173,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/components/Showcase.astro",
+          "language": "astro",
+          "sizeLines": 55,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/layouts/Layout.astro",
+          "language": "astro",
+          "sizeLines": 27,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/pages/.gitkeep",
+          "language": "unknown",
+          "sizeLines": 0,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/pages/index.astro",
+          "language": "astro",
+          "sizeLines": 40,
+          "fileCategory": "code"
+        },
+        {
+          "path": "ua-homepage/src/styles/global.css",
+          "language": "css",
+          "sizeLines": 213,
+          "fileCategory": "markup"
         }
       ],
       "batchImportData": {
-        "tools/resolve_profiles.py": [],
-        "tools/validate_g01.py": [],
-        "tools/validate_g3_delivery.py": [],
-        "tools/validate_gate_response_trace.py": [],
-        "tools/validate_hotfix.py": [],
-        "tools/validate_instructions.py": [],
-        "tools/validate_profile_set.py": [],
-        "tools/verify_rollout.py": []
+        "tools/verify_package_export_smoke.py": [],
+        "tools/verify_rollout.py": [],
+        "ua-homepage/astro.config.mjs": [],
+        "ua-homepage/src/components/CommunityVideo.astro": [],
+        "ua-homepage/src/components/Features.astro": [],
+        "ua-homepage/src/components/Footer.astro": [],
+        "ua-homepage/src/components/Hero.astro": [],
+        "ua-homepage/src/components/Install.astro": [],
+        "ua-homepage/src/components/Nav.astro": [],
+        "ua-homepage/src/components/Problem.astro": [],
+        "ua-homepage/src/components/Showcase.astro": [],
+        "ua-homepage/src/layouts/Layout.astro": [],
+        "ua-homepage/src/pages/.gitkeep": [],
+        "ua-homepage/src/pages/index.astro": [],
+        "ua-homepage/src/styles/global.css": []
       },
       "neighborMap": {}
     }
