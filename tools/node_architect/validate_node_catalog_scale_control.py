@@ -19,6 +19,7 @@ ALLOWED_TYPES = {"actor", "workflow", "gate", "tool", "schema", "state", "projec
 ALLOWED_CANONICAL = {"canonical", "delivery_evidence", "audit_projection", "resume_hint"}
 MATRIX_PATH = Path("core/node-architect/failure-simulation-matrix.json")
 
+
 def validate_family(family_dir: Path, package_path: Path, matrix_path: Path) -> None:
     if not (family_dir / "README.md").exists():
         raise AssertionError("missing README.md")
@@ -39,13 +40,26 @@ def validate_family(family_dir: Path, package_path: Path, matrix_path: Path) -> 
         ids.add(node["node_id"])
         if node["node_type"] not in ALLOWED_TYPES or node["canonical"] not in ALLOWED_CANONICAL:
             raise AssertionError(f"{path.name}: invalid type/canonical")
-        gates = set(node["gates"]); covered |= gates
-        if node["authority_boundary"] == "g2_required" and gates != {"G3_PR"}:
-            raise AssertionError(f"{path.name}: G3 mapping mismatch")
-        if node["authority_boundary"] == "g5_required" and gates != {"G5_DEPLOY"}:
-            raise AssertionError(f"{path.name}: G5 mapping mismatch")
-        if node["authority_boundary"] not in {"g2_required", "g5_required"}:
-            raise AssertionError(f"{path.name}: invalid authority")
+
+        gates = set(node["gates"])
+        covered |= gates
+        authority = node["authority_boundary"]
+        canonical = node["canonical"]
+
+        if canonical == "audit_projection":
+            if authority != "read_only":
+                raise AssertionError(f"{path.name}: audit projection authority must be read_only")
+            if gates not in ({"G3_PR"}, {"G5_DEPLOY"}):
+                raise AssertionError(f"{path.name}: projection applicability gate mismatch")
+        elif gates == {"G3_PR"}:
+            if authority != "g2_required":
+                raise AssertionError(f"{path.name}: G3 control mapping mismatch")
+        elif gates == {"G5_DEPLOY"}:
+            if authority != "g5_required":
+                raise AssertionError(f"{path.name}: G5 evidence mapping mismatch")
+        else:
+            raise AssertionError(f"{path.name}: unsupported gate mapping")
+
     if stems != REQUIRED_SEMANTICS:
         raise AssertionError(f"semantics mismatch: {sorted(stems)}")
     if covered != {"G3_PR", "G5_DEPLOY"}:
@@ -74,6 +88,7 @@ def validate_family(family_dir: Path, package_path: Path, matrix_path: Path) -> 
     if matrix.get("scale_81_nodes_allowed") is not False:
         raise AssertionError("scale permission must remain false pending independent audit")
 
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--family-dir", type=Path, default=Path("core/node-architect/node-catalog/scale_control"))
@@ -83,9 +98,11 @@ def main(argv=None) -> int:
     try:
         validate_family(args.family_dir, args.package, args.matrix)
     except Exception as exc:
-        print(f"FAIL: {exc}", file=sys.stderr); return 1
+        print(f"FAIL: {exc}", file=sys.stderr)
+        return 1
     print("PASS: scale_control family and 81-node readiness are valid")
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
