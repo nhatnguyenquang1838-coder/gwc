@@ -2,6 +2,7 @@ name: Notion MCP
 version: 0.0.1
 schema: v1
 
+# Endpoint and auth policy are managed centrally in .continue/user-setup.yaml
 mcpServers:
   - name: Notion
     type: stdio

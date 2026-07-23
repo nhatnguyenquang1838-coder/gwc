@@ -1,0 +1,43 @@
+# .continue/user-setup.yaml
+# Single source of truth cho connector/endpoint/model configs.
+# MCP server configs trong .continue/mcpServers/ và agent models trong .continue/agents/
+# nên tham chiếu secret tại đây để tránh hardcode token/URL literal.
+version: 1
+schema: user-setup
+
+mcp_servers:
+  ds-mcp:
+    command: npx
+    args:
+      - -y
+      - mcp-remote@latest
+      - https://ds-mcp-server-one.vercel.app/mcp
+      - --header
+      - Authorization: Bearer ${{ secrets.MCP_BEARER_TOKEN }}
+
+  notion:
+    command: npx
+    args:
+      - -y
+      - mcp-remote
+      - https://mcp.notion.com/mcp
+
+agent_models:
+  - name: Alibaba Qwen
+    provider: openai
+    models:
+      - name: Qwen 3 Coder Plus
+        model: qwen3-coder-plus
+        apiBase: https://ws-469sglirlqeu0n8r.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+        apiKey: ${{ secrets.ALIBABA_API_KEY }}
+        roles: [chat, edit, apply]
+      - name: Qwen 3.7 Max
+        model: qwen3.7-max
+        apiBase: https://ws-469sglirlqeu0n8r.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+        apiKey: ${{ secrets.ALIBABA_API_KEY }}
+        roles: [chat, edit, apply]
+
+endpoints:
+  ds_mcp_rest: https://ds-mcp-server-one.vercel.app/
+  notion_mcp: https://mcp.notion.com/mcp
+  alibaba_api: https://ws-469sglirlqeu0n8r.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
