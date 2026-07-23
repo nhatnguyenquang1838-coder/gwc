@@ -1,29 +1,28 @@
-approval_id: CP-20260723-071
+approval_id: CP-20260723-076
 authority_gate: G2_EXECUTION
 task_id: SCRUM-68
-issued_at: '2026-07-23T02:00:03Z'
-expires_at: '2026-07-24T01:30:03Z'
-scope_version: 3
+issued_at: '2026-07-23T05:55:31Z'
+expires_at: '2026-07-24T05:30:00Z'
+scope_version: 4
 risk_class: R2
 project_profile: projects/gwc/project-profile.yaml
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
-base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
-working_branch: feature/scrum-68-final-node-catalog
+base_sha: a20f34dd7cb530417878f9ef44b2aef329e9c36c
+working_branch: fix/scrum-68-node-registry-authority-consistency
 modules_or_files:
 - .gwc/tasks/SCRUM-68/**
-- core/node-architect/node-catalog/failure_recovery/**
-- core/node-architect/node-catalog/scale_control/**
-- core/node-architect/failure-simulation-matrix.json
-- schemas/node-architect/failure-simulation-matrix.schema.json
-- tools/node_architect/validate_node_catalog_failure_recovery.py
+- core/node-architect/node-catalog/sync_projection/**
+- core/node-architect/node-catalog/scale_control/README.md
+- core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json
+- core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json
+- tools/node_architect/validate_node_catalog_sync_projection.py
 - tools/node_architect/validate_node_catalog_scale_control.py
-- tests/test_node_catalog_failure_recovery.py
+- tests/test_node_catalog_sync_projection.py
 - tests/test_node_catalog_scale_control.py
-- tests/test_failure_simulation_scale_readiness.py
+- tests/test_node_architect_runtime_validation.py
 - projects/gwc/package.yaml
-- releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md
-- releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md
+- releases/changelog.d/2026-07-23-scrum-68-node-registry-authority-consistency.md
 authorized_actions:
 - modify_approved_files
 - run_sandboxed_validation
@@ -33,7 +32,7 @@ excluded_actions:
 - protected_branch_direct_push
 - merge
 - auto_merge
-- mark_pr_ready_for_review
+- mark_pr_ready_for_review_before_g3_pass
 - deploy
 - release
 - publish
@@ -42,16 +41,18 @@ excluded_actions:
 - production_data_write
 - production_config_change
 - credential_rotation
+- secret_handling
 - migration
 - force_push
 - branch_deletion
 - shared_history_rewrite
 - pr_base_change
-- parallel_pr_execution
-- more_than_nine_nodes_per_pr
-- execute_stage08_before_batch07_g5_pass
-- execute_stage09_before_batch08_merge_and_g5_pass
-- continue_after_approval_expiry
+- change_node_count
+- change_scale_81_nodes_allowed
+- change_package_version
+- implement_runtime_engine
+- implement_executable_failure_proof
+- unrelated_cleanup
 work_item:
   provider: jira
   id: SCRUM-68
@@ -61,8 +62,8 @@ work_item:
   initial_state: In Progress
   review_state: In Review
 artifact_hashes:
-  change_plan: sha256:6761ac422ffe77c05588271c863c6f2a7d1738a212bcdc7b0fcdce51136acf24
-  mermaid: sha256:4d692074dc6145d8e6a29c5246ac8bbcc8e7e41ca7e0de95270de5119c7b2e7c
-  png: sha256:0f07b76c320ff8aac7a0b5951bb69dbfe7f6376eb60d0d0419aa1491bd313efc
-  svg: sha256:956c58ed119fc594ea6c97ed19545b346f7f1335dad3b24da34c7b3ee5ee4467
-scope_hash: sha256:a1ae5c60126fafd4796aa22586445a6b2ab0b88e91a85a5bb70dcccfbd43f9e1
+  change_plan: sha256:3211f23324e0755b2ecb0b51baa6c304a5391b7d057a443f2f92e70294e3ae24
+  mermaid: sha256:0d71f1d0a13ece3dffc801e09099f9ddf17fa6c4bfac9d56c47048e4226d9381
+  png: sha256:d574d197b33e4ec1cc5ca6fd7d7044e0b3ffe60d94ada957c87de5bd329fa951
+  svg: sha256:67835e979dde044e3ffc36d241f48a99365b489591a1c87f28456dbb9cf27ce7
+scope_hash: sha256:7012a575544ebeb9aa7c6b58df5ab4b6ddf045432be99376ea53904dc082afb2
