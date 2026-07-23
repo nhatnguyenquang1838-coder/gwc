@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g5-ci-verification-evidence.schema.json",
+  "title": "G5 CI Verification Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at",
+    "task_id",
+    "repository",
+    "gate",
+    "merge_commit_sha",
+    "classification",
+    "discovery",
+    "required_workflows",
+    "selected_runs",
+    "rejected_candidates",
+    "checkpoint_required",
+    "manual_action_authorized"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g5-ci-verification-evidence"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "gate": {"const": "G5_DEPLOY"},
+    "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "g4_approval_id": {"type": "string"},
+    "g4_scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "classification": {
+      "enum": [
+        "success",
+        "failure",
+        "CI_PENDING",
+        "CONNECTOR_OBSERVABILITY_INCOMPLETE",
+        "SHA_MISMATCH"
+      ]
+    },
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "exact_sha_lookup_attempted", "fallbacks_attempted"],
+      "properties": {
+        "method": {
+          "enum": [
+            "exact_push_lookup",
+            "known_run_id",
+            "combined_commit_status",
+            "connector_incomplete"
+          ]
+        },
+        "exact_sha_lookup_attempted": {"type": "boolean"},
+        "fallbacks_attempted": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "connector_limitations": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "required_workflows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "required"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "workflow_file": {"type": "string"},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "selected_runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["workflow", "run_id", "run_attempt", "head_sha", "status", "conclusion"],
+        "properties": {
+          "workflow": {"type": "string", "minLength": 1},
+          "run_id": {"type": "integer", "minimum": 1},
+          "run_attempt": {"type": "integer", "minimum": 1},
+          "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "status": {"type": "string", "minLength": 1},
+          "conclusion": {"type": ["string", "null"]},
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["job_id", "name", "status", "conclusion"],
+              "properties": {
+                "job_id": {"type": "integer", "minimum": 1},
+                "name": {"type": "string", "minLength": 1},
+                "status": {"type": "string", "minLength": 1},
+                "conclusion": {"type": ["string", "null"]}
+              }
+            }
+          }
+        }
+      }
+    },
+    "rejected_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason"],
+        "properties": {
+          "run_id": {"type": "integer", "minimum": 1},
+          "head_sha": {"type": "string"},
+          "reason": {
+            "enum": [
+              "sha_mismatch",
+              "wrong_event",
+              "wrong_branch",
+              "not_required_workflow",
+              "stale_attempt",
+              "skipped_or_neutral"
+            ]
+          }
+        }
+      }
+    },
+    "checkpoint_required": {"type": "boolean"},
+    "checkpoint_path": {"type": "string"},
+    "manual_action_authorized": {"const": false}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"classification": {"const": "CI_PENDING"}}},
+      "then": {"properties": {"checkpoint_required": {"const": true}}, "required": ["checkpoint_path"]}
+    },
+    {
+      "if": {"properties": {"classification": {"const": "success"}}},
+      "then": {"properties": {"checkpoint_required": {"const": false}}}
+    }
+  ]
+}
