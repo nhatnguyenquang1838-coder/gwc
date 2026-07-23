@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.batch-size-limit-check",
+  "node_type": "gate",
+  "title": "Batch Size Limit Check",
+  "description": "Reject a catalog delivery that exceeds the approved maximum of nine nodes or mixes multiple implementation batches.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.independent-audit-handoff",
+  "node_type": "workflow",
+  "title": "Independent Audit Handoff",
+  "description": "Package the completed eighty-one-node catalog for independent audit without enabling production scale or runtime execution.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ]
+}

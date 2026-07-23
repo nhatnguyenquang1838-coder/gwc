@@ -184,6 +184,18 @@ instructions:
   - {id: failure-recovery-version-drift-rollback-routing-node, path: core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, required: true}
   - {id: failure-recovery-node-validator, path: tools/node_architect/validate_node_catalog_failure_recovery.py, target: .governance/tools/node_architect/validate_node_catalog_failure_recovery.py, required: true}
   - {id: revamp-gwc-024-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, required: true}
+  - {id: scale-control-node-family-readme, path: core/node-architect/node-catalog/scale_control/README.md, target: .governance/core/node-architect/node-catalog/scale_control/README.md, required: true}
+  - {id: scale-control-batch-admission-check-node, path: core/node-architect/node-catalog/scale_control/batch-admission-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/batch-admission-check.node.json, required: true}
+  - {id: scale-control-batch-size-limit-check-node, path: core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json, required: true}
+  - {id: scale-control-previous-batch-g5-verification-node, path: core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json, target: .governance/core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json, required: true}
+  - {id: scale-control-catalog-cardinality-readiness-node, path: core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json, target: .governance/core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json, required: true}
+  - {id: scale-control-execution-throttle-control-node, path: core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json, target: .governance/core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json, required: true}
+  - {id: scale-control-workflow-run-observability-node, path: core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json, target: .governance/core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json, required: true}
+  - {id: scale-control-exact-head-readiness-check-node, path: core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json, required: true}
+  - {id: scale-control-rollout-progress-projection-node, path: core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json, target: .governance/core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json, required: true}
+  - {id: scale-control-independent-audit-handoff-node, path: core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, target: .governance/core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, required: true}
+  - {id: scale-control-node-validator, path: tools/node_architect/validate_node_catalog_scale_control.py, target: .governance/tools/node_architect/validate_node_catalog_scale_control.py, required: true}
+  - {id: revamp-gwc-025-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -201,6 +213,7 @@ work_tracking:
   lease_renewal_required: false
   status_transitions_from_state_engine: false
 notes:
+  - REVAMP-GWC-025 adds the final scale_control catalog batch, completing 81 descriptors for independent audit while keeping scale permission false and package_version unchanged.
   - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.
   - DWC repository reads are automatic for this verified repository.
   - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
