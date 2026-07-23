@@ -1,0 +1,9 @@
+{
+  "node_id": "runtime_checkpoint.base-drift-detect",
+  "node_type": "gate",
+  "title": "Base Drift Detect",
+  "description": "Detect protected-base SHA drift before write-capable continuation and open a base-drift interrupt candidate without deciding materiality.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": ["G2_EXECUTION"]
+}
