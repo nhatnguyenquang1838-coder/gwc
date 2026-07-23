@@ -47,6 +47,8 @@ External projection = audit or resume hint only.
 | `projection_is_not_authority` | Jira, TC, DS MCP, Notion, comments, labels, dashboards, and generated `.governance/` exports are not canonical authority. |
 | `no_blind_retry` | Retry is forbidden unless the prior event/checkpoint proves the previous side effect is safe to repeat or already reconciled. |
 | `catalog_expansion_gate` | New node catalog expansion must wait until kernel, schemas, validator, and representative node packs pass. |
+| `human_bypass_is_operational_only` | HUMAN BYPASS may hand one exact operational step to a human; it never weakens the minimum gate or protected-action boundary. |
+| `human_bypass_readback_before_resume` | A bypassed step remains suspended until append-only audit, deterministic readback, and checkpoint-after evidence are persisted. |
 
 ## Runtime state lanes
 
@@ -67,6 +69,21 @@ flowchart LR
 | `transition_envelope` | Yes | One bounded movement from a node to a next node. |
 | `node_pack` | Yes when validated | Versioned bundle of nodes, schemas, and allowed transitions. |
 | `external_projection` | No | Audit/dashboard/search/help surface only. |
+
+## HUMAN BYPASS lane
+
+```text
+blocked eligible operational step
+→ checkpoint_before
+→ HUMAN_BYPASS request
+→ human exact action
+→ human_bypass_* runtime events
+→ deterministic readback
+→ checkpoint_after
+→ resume
+```
+
+The canonical record is defined by `core/HUMAN_BYPASS_CONTRACT_v1.0.md` and `schemas/human-bypass.schema.json`. A bypass request is invalid after expiry or any task, gate, node, branch, base SHA, head SHA, action, or scope drift. Protected-branch write, validation/CI skipping, merge, deploy, production, secret, credential, migration, destructive action, force-push, branch deletion, history rewrite, and PR base change are never bypass-eligible.
 
 ## Gate mapping
 
