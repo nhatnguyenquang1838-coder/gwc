@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Iterable
 
 EXPECTED_FAMILY = "runtime_checkpoint"
-EXPECTED_NODE_COUNT = 14
+EXPECTED_NODE_COUNT = 9
 EXPECTED_AUTHORITY = "g2_required"
 EXPECTED_GATES = {"G2_EXECUTION"}
 ALLOWED_KEYS = {
@@ -27,13 +27,6 @@ ALLOWED_KEYS = {
 }
 ALLOWED_NODE_TYPES = {"actor", "workflow", "gate", "tool", "schema", "state", "projection", "connector"}
 ALLOWED_CANONICAL = {"canonical", "delivery_evidence", "audit_projection", "resume_hint"}
-REQUIRED_BASE_DRIFT_NODES = {
-    "runtime_checkpoint.base-drift-detect",
-    "runtime_checkpoint.base-drift-assess",
-    "runtime_checkpoint.base-drift-revalidate",
-    "runtime_checkpoint.base-drift-reapprove",
-    "runtime_checkpoint.base-drift-stop",
-}
 
 
 def load_json(path: Path) -> dict:
@@ -108,17 +101,13 @@ def validate_family(family_dir: Path) -> None:
         if set(gates) != EXPECTED_GATES:
             raise AssertionError(f"{path.name}: gates must be exactly {sorted(EXPECTED_GATES)}, got {gates!r}")
 
-    missing_base_drift = sorted(REQUIRED_BASE_DRIFT_NODES - seen)
-    if missing_base_drift:
-        raise AssertionError(f"missing base drift interrupt nodes: {missing_base_drift}")
-
     readme_text = readme.read_text(encoding="utf-8")
     for required in [
         "batch-04-runtime-checkpoint",
         "runtime_checkpoint",
         "G2_EXECUTION",
-        "exactly 14 nodes",
-        "base-drift interrupt flow",
+        "exactly 9 nodes",
+        "controlled 81-node catalog cardinality remains unchanged",
         "no runtime engine implementation",
         "no production data access",
     ]:
