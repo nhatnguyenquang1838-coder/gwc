@@ -30,12 +30,16 @@ echo "[acli-setup] Logging into Jira..."
 echo "[acli-setup] Login complete"
 
 echo "[gwc-setup] Ensuring python3 + pip + validator deps..."
+SUDO=""
+if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+  SUDO="sudo"
+fi
 if ! command -v python3 >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get install -y python3
+  $SUDO apt-get update
+  $SUDO apt-get install -y python3
 fi
 if ! command -v pip3 >/dev/null 2>&1 && ! python3 -m pip --version >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get install -y python3-pip
+  $SUDO apt-get update
+  $SUDO apt-get install -y python3-pip
 fi
 python3 -m pip install --user --quiet pyyaml jsonschema
