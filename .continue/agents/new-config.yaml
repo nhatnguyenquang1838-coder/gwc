@@ -1,6 +1,7 @@
 # This is an example configuration file
 # To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
 # Store the credential in Continue secrets as ALIBABA_API_KEY.
+# Model base URLs and keys are managed centrally in .continue/user-setup.yaml
 
 name: Alibaba Qwen
 version: 1.0.0

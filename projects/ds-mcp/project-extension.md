@@ -32,7 +32,7 @@ source_note: DS MCP API, workflow, connector, data, and Admin UI invariants.
 ## Repository and connector
 
 - GitHub operations use the `DW` connector declared by the profile.
-- REST base context is `https://ds-mcp-server-one.vercel.app/`; this is context only and does not authorize network calls or deployment.
+- REST base context is declared in project-instructions.md `rest_base_url`; this is context only and does not authorize network calls or deployment.
 - Never push directly to `main`; use a dedicated branch/worktree.
 - After every PR push, apply the core `+2 minute` CI monitoring and bounded repair loop.
 
@@ -45,3 +45,4 @@ Applicable tests must cover:
 - Forced and non-forced destructive behavior.
 - Auth, authorization denial, route policy, rate limiting, request IDs, and secret redaction.
 - Admin UI loading, disabled CTA, confirmation, filtering, hidden selection, and failure output.
+

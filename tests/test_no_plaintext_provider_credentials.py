@@ -5,11 +5,17 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONTINUE_CONFIG_ROOT = REPO_ROOT / ".continue"
+CLAUDE_CONFIG_ROOT = REPO_ROOT / ".claude"
 CREDENTIAL_LINE = re.compile(
     r"^\s*(apiKey|api_key|accessToken|access_token|token|secret)\s*:\s*(.+?)\s*$",
     re.IGNORECASE,
 )
 SECRET_REFERENCE = re.compile(r"^\$\{\{\s*secrets\.[A-Z][A-Z0-9_]*\s*\}\}$")
+BEARER_LINE = re.compile(
+    r"^\s*Authorization:\s*Bearer\s+(.+?)\s*$",
+    re.IGNORECASE,
+)
+NON_SECRET_BEARER = re.compile(r"^\$\{\{\s*secrets\.[A-Z][A-Z0-9_]*\s*\}\}$")
 
 
 class NoPlaintextProviderCredentialsTest(unittest.TestCase):
@@ -32,6 +38,31 @@ class NoPlaintextProviderCredentialsTest(unittest.TestCase):
                     )
 
         self.assertEqual(findings, [], "plaintext provider credential fields found:\n" + "\n".join(findings))
+
+    def test_claude_settings_use_secret_references(self):
+        json_files = sorted(CLAUDE_CONFIG_ROOT.rglob("*.json"))
+        json_files.extend(sorted(CLAUDE_CONFIG_ROOT.rglob("*.jsonc")))
+        findings: list[str] = []
+        for path in json_files:
+            for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+                match = CREDENTIAL_LINE.match(line)
+                if match:
+                    value = match.group(2).split(" #", 1)[0].strip().strip('"').strip("'")
+                    if not SECRET_REFERENCE.fullmatch(value):
+                        findings.append(
+                            f"{path.relative_to(REPO_ROOT)}:{line_number}: "
+                            f"{match.group(1)} must use a ${{{{ secrets.NAME }}}} reference"
+                        )
+                bearer_match = BEARER_LINE.match(line)
+                if bearer_match:
+                    token = bearer_match.group(1).strip().strip('"').strip("'")
+                    if not NON_SECRET_BEARER.fullmatch(token):
+                        findings.append(
+                            f"{path.relative_to(REPO_ROOT)}:{line_number}: "
+                            f"Authorization bearer token must use a ${{{{ secrets.NAME }}}} reference"
+                        )
+
+        self.assertEqual(findings, [], "plaintext credentials in .claude config found:\n" + "\n".join(findings))
 
     def test_alibaba_example_has_one_models_mapping(self):
         config = CONTINUE_CONFIG_ROOT / "agents" / "new-config.yaml"

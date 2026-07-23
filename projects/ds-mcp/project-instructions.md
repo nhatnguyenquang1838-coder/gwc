@@ -7,11 +7,11 @@ language: en
 timezone: Asia/Ho_Chi_Minh
 repository: dw18031988/ds_mcp_server
 repository_url: https://github.com/dw18031988/ds_mcp_server
-rest_base_url: https://ds-mcp-server-one.vercel.app/
 github_connector: DW
 approval_protocol: scoped-envelope
 ci_recheck_delay: PT2M
 policy_source: this_file
+rest_base_url: https://ds-mcp-server-one.vercel.app/
 ---
 
 # DS MCP LLM Operational Instructions v2.1
