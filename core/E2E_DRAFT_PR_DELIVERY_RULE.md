@@ -320,6 +320,36 @@ release, publish, or runtime reload. G6 is generated only when production data,
 production configuration, migrations, credentials, or secrets are actually in
 scope.
 
+### Work-tracking projection after G5 PASS
+
+After read-only `G5_STATUS_VERIFY` reaches `PASS`, the agent must project the
+final gate state to the active work-tracking provider before declaring the scope
+fully reconciled. For `projects/gwc`, the active provider is Jira through the
+Atlassian connector declared by the project profile.
+
+The projection is traceability only. Jira, DS Admin, task-center, Confluence, or
+any external tool state never grants repository write, PR, merge, deploy,
+release, production, credential, secret, migration, or production-data authority.
+GWC gate artifacts and exact approvals remain the authority source.
+
+The projection must attempt, in order:
+
+1. Add or update an audit comment on the active task containing the PR number,
+   merge SHA, G5 run or deployment evidence, gate outcomes, and explicit
+   exclusions.
+2. Apply the legal provider transition that matches the final state, such as
+   `Done` when the scope is complete, `In Review` when project review remains,
+   or `In Progress` when downstream authorized work remains.
+3. Read back the provider task status, latest comment/update evidence, and
+   updated timestamp.
+4. Record the readback in the G5 outcome or final delivery report.
+
+If provider access is unavailable, the provider rejects the transition, or the
+connector cannot read back the update, the agent must record
+`JIRA_UPDATE_BLOCKED` with the attempted provider, task key, intended transition,
+error summary, and a late-reconciliation note. The agent must not backdate,
+invent, or silently skip task-state evidence.
+
 ## Final response
 
 The final response must lead with:
