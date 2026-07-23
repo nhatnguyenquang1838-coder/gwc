@@ -43,6 +43,27 @@ sources:
   status: active
   type: git-source
   url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/INTERRUPT_FLOW_CONTRACT_v1.0.md
+- description: Executable read-only G5 CI verification contract for exact merge-SHA
+    GitHub Actions run resolution, fallback routing, checkpoint persistence, and
+    evidence classification.
+  id: g5-ci-verification-contract
+  owner: gwc
+  package_target: .governance/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+  path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+  priority: 24
+  status: active
+  type: git-source
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+- description: Canonical taxonomy and knowledge-graph relationship contract for
+    Gate, Capability Family, Runtime Node, Edge Scenario, and Artifact entities.
+  id: runtime-catalog-knowledge-graph-contract
+  owner: gwc
+  package_target: .governance/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
+  path: core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
+  priority: 26
+  status: active
+  type: git-source
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/blob/main/core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
 - description: Hotfix and Rescue mode policy for bounded bypass of standard GWC gates
     when user explicitly activates with activation phrases. Provides HOTFIX (light
     validation) and RESCUE (minimal validation) execution paths.
@@ -84,4 +105,4 @@ sources:
   status: fallback
   type: gpt-project
   url: null
-updated_at: '2026-07-23T10:05:00Z'
+updated_at: '2026-07-23T12:35:00Z'

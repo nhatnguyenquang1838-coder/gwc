@@ -202,6 +202,16 @@ instructions:
   - {id: scale-control-node-validator, path: tools/node_architect/validate_node_catalog_scale_control.py, target: .governance/tools/node_architect/validate_node_catalog_scale_control.py, required: true}
   - {id: revamp-gwc-025-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, required: true}
   - {id: g1-human-bypass-changelog-fragment, path: releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md, target: .governance/releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md, required: true}
+  - {id: g5-ci-verification-contract, path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md, target: .governance/G5_CI_VERIFICATION_CONTRACT_v1.0.md, required: true}
+  - {id: runtime-catalog-kg-contract, path: core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md, target: .governance/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md, required: true}
+  - {id: g5-ci-verification-evidence-schema, path: schemas/g5-ci-verification-evidence.schema.json, target: .governance/schemas/g5-ci-verification-evidence.schema.json, required: true}
+  - {id: g5-ci-checkpoint-schema, path: schemas/node-architect/g5-ci-checkpoint.schema.json, target: .governance/schemas/node-architect/g5-ci-checkpoint.schema.json, required: true}
+  - {id: runtime-catalog-taxonomy-schema, path: schemas/node-architect/runtime-catalog-taxonomy.schema.json, target: .governance/schemas/node-architect/runtime-catalog-taxonomy.schema.json, required: true}
+  - {id: runtime-knowledge-graph-schema, path: schemas/node-architect/runtime-knowledge-graph.schema.json, target: .governance/schemas/node-architect/runtime-knowledge-graph.schema.json, required: true}
+  - {id: g5-ci-verification-validator, path: tools/node_architect/validate_g5_ci_verification.py, target: .governance/tools/node_architect/validate_g5_ci_verification.py, required: true}
+  - {id: runtime-catalog-taxonomy-validator, path: tools/node_architect/validate_runtime_catalog_taxonomy.py, target: .governance/tools/node_architect/validate_runtime_catalog_taxonomy.py, required: true}
+  - {id: runtime-knowledge-graph-projector, path: tools/node_architect/project_runtime_knowledge_graph.py, target: .governance/tools/node_architect/project_runtime_knowledge_graph.py, required: true}
+  - {id: scrum-75-g5-ci-kg-changelog-fragment, path: releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md, target: .governance/releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc
@@ -219,6 +229,7 @@ work_tracking:
   lease_renewal_required: false
   status_transitions_from_state_engine: false
 notes:
+  - SCRUM-75 exports the G5 CI verification contract and runtime catalog KG normalization artifacts without changing package_version or adding merge/deploy/production authority.
   - G1 feasibility now requires process readback and an executable route matrix; HUMAN BYPASS is exported as a step-bound operational handoff with audit and deterministic readback.
   - REVAMP-GWC-025 adds the final scale_control catalog batch, completing 81 descriptors for independent audit while keeping scale permission false and package_version unchanged.
   - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.

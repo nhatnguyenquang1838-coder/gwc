@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+  "title": "Runtime Catalog Taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "families", "runtime_node_count", "edge_scenario_count"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "runtime-catalog-taxonomy"},
+    "runtime_node_count": {"const": 81},
+    "edge_scenario_count": {"type": "integer", "minimum": 0},
+    "families": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "canonical_name", "node_count", "governed_gates"],
+        "properties": {
+          "id": {"enum": ["intake_context", "gate_authority", "repo_delivery", "runtime_checkpoint", "validation_quality", "sync_projection", "package_export", "failure_recovery", "scale_control"]},
+          "canonical_name": {"type": "string", "minLength": 1},
+          "node_count": {"const": 9},
+          "governed_gates": {
+            "type": "array",
+            "items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]}
+          },
+          "aliases": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "canonical_terms": {
+      "type": "array",
+      "items": {"enum": ["Gate", "Capability Family", "Runtime Node", "Edge Scenario", "Artifact"]}
+    }
+  }
+}
