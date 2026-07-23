@@ -295,6 +295,15 @@ workflow status, deployment check status, Vercel status, runtime status, or tool
 surface. It does not authorize a manual deploy, redeploy, release, publish, or
 runtime reload unless that manual action is explicitly in G5 manual-action scope.
 
+For G5 evidence, the agent must first attempt exact post-merge lookup using
+`event=push`, `branch=main`, and `head_sha=<merge_sha>` or equivalent connector
+parameters. If the connector surface does not support those filters or returns
+empty results, the agent must fall back to a known `run_id` and direct
+jobs/artifacts lookup. Empty PR-filtered results without run-id/artifact fallback
+evidence must be classified `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
+`CI_PENDING` is reserved only when a post-merge run is found but has not yet
+completed.
+
 G6 is generated only when production data, production configuration, migration,
 credential, or secret operations are actually in scope. Otherwise the agent
 records `G6_PRODUCTION_DATA: not_applicable` and does not create a G6 approval
