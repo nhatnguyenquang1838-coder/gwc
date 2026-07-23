@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.catalog-cardinality-readiness",
+  "node_type": "state",
+  "title": "Catalog Cardinality Readiness",
+  "description": "Verify that the controlled catalog contains exactly nine families of nine unique runtime nodes before independent audit.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ]
+}

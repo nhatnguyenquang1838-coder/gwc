@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "[acli-setup] JIRA_SITE=${JIRA_SITE:-<missing>}"
+echo "[acli-setup] JIRA_EMAIL=${JIRA_EMAIL:-<missing>}"
+echo "[acli-setup] HOME=$HOME"
+echo "[acli-setup] PATH=$PATH"
+
+if [ -z "${JIRA_SITE:-}" ] || [ -z "${JIRA_EMAIL:-}" ] || [ -z "${JIRA_API_TOKEN:-}" ]; then
+  echo "[acli-setup] Missing JIRA_SITE, JIRA_EMAIL, or JIRA_API_TOKEN" >&2
+  exit 1
+fi
+
+ACLI_BIN="/usr/local/bin/acli"
+
+if [ ! -x "$ACLI_BIN" ]; then
+  echo "[acli-setup] Downloading acli..."
+  curl -fsSL -o /tmp/acli "https://acli.atlassian.com/linux/latest/acli_linux_amd64/acli"
+  echo "[acli-setup] Installing to $ACLI_BIN..."
+  mkdir -p /usr/local/bin
+  mv /tmp/acli "$ACLI_BIN"
+  chmod +x "$ACLI_BIN"
+  echo "[acli-setup] Installed: $($ACLI_BIN --version || true)"
+else
+  echo "[acli-setup] acli already installed at $ACLI_BIN"
+fi
+
+echo "[acli-setup] Logging into Jira..."
+"$ACLI_BIN" jira auth login --site "$JIRA_SITE" --email "$JIRA_EMAIL" --token <<< "$JIRA_API_TOKEN"
+echo "[acli-setup] Login complete"

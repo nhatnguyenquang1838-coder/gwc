@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.execution-throttle-control",
+  "node_type": "workflow",
+  "title": "Execution Throttle Control",
+  "description": "Limit catalog expansion to one sequential pull request and one bounded batch at a time without parallel execution.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G3_PR"
+  ]
+}

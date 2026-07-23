@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.previous-batch-g5-verification",
+  "node_type": "workflow",
+  "title": "Previous Batch G5 Verification",
+  "description": "Bind the next batch admission decision to successful post-merge validation evidence for the exact previous merge commit.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g5_required",
+  "gates": [
+    "G5_DEPLOY"
+  ]
+}

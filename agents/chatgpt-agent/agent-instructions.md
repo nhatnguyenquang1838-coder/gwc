@@ -261,6 +261,14 @@ tool surface for the exact approved commit. Read-only `G5_STATUS_VERIFY` is
 automatic after G4 merge. Manual deploy, redeploy, release, publish, or runtime
 reload requires explicit G5 manual-action scope.
 
+For post-merge verification, first attempt exact lookup using `event=push`,
+`branch=main`, and `head_sha=<merge_sha>` or equivalent connector parameters. If
+the connector surface does not support those filters or returns empty results,
+fall back to a known `run_id` and direct jobs/artifacts lookup. Empty PR-filtered
+results without run-id/artifact fallback evidence must be classified
+`CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
+`CI_PENDING` is reserved only when a run is found but has not yet completed.
+
 Refresh the active source, gate, task, repository, branch, scope, risk, and
 authority before every write-capable action and whenever the user says to
 continue or the context changes materially.

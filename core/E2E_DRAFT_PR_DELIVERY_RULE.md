@@ -247,6 +247,7 @@ After every push to the PR branch:
 3. Verify all required checks exist.
 4. Verify all required checks complete successfully.
 5. Reject stale, unrelated, skipped, neutral, cancelled, timed-out, or weakened evidence.
+6. Classify post-merge results using exact evidence only: `success` when required checks passed for the exact merge commit; `failure` when a check failed for the exact commit; `CI_PENDING` only when a run is found and still in progress for the exact commit; `CONNECTOR_OBSERVABILITY_INCOMPLETE` when post-merge lookup returns empty for the exact commit because the available connector surface only supports PR-filtered results or the requested parameters are unavailable. Before classifying empty results as incomplete, attempt the known `run_id` and jobs/artifacts fallback.
 
 For pending states:
 
@@ -306,7 +307,13 @@ the PR is merged, G5 is interpreted as status/deployment verification unless a
 manual deploy, redeploy, release, or runtime reload is explicitly in scope.
 When Vercel or another deployment provider is integrated into GitHub Actions,
 Read-only `G5_STATUS_VERIFY` runs automatically after G4 merge and checks those
-workflow/deployment statuses for the exact approved commit. G5 checks those
+workflow/deployment statuses for the exact approved commit. G5 must first attempt
+exact post-merge lookup using `event=push`, `branch=main`, and
+`head_sha=<merge_sha>` or equivalent connector parameters, and must fall back to
+known `run_id` and direct jobs/artifacts lookup when the connector surface does
+not support those filters or returns empty results. Empty PR-filtered results
+without run-id/artifact fallback evidence must be classified
+`CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`. G5 checks those
 workflow/deployment statuses as read-only evidence and does not perform a
 separate deploy action. G5 approval is required only for manual deploy, redeploy,
 release, publish, or runtime reload. G6 is generated only when production data,

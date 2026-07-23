@@ -40,3 +40,23 @@ def test_dwc_contract_keeps_ready_for_review_as_g3_metadata_only():
     assert "This action grants no merge permission" in text
     assert "Upon G3 `PASS`, mark the Draft PR ready for review" in text
     assert "G4 merge, G5 deploy, and G6 production operations always require a separate" in text
+
+
+def test_g5_exact_sha_fallback_blocks_pr_only_false_pending():
+    gate_contract = read("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
+    dwc = read("agents/dwc/agent-instructions.md")
+    chatgpt = read("agents/chatgpt-agent/agent-instructions.md")
+
+    assert "event=push" in gate_contract
+    assert "branch=main" in gate_contract
+    assert "head_sha=<merge_sha>" in gate_contract
+    assert "run_id" in gate_contract
+    assert "CONNECTOR_OBSERVABILITY_INCOMPLETE" in gate_contract
+
+    assert "event=push" in dwc
+    assert "fall back to a known `run_id`" in dwc
+    assert "CONNECTOR_OBSERVABILITY_INCOMPLETE" in dwc
+
+    assert "event=push" in chatgpt
+    assert "fall back to a known `run_id`" in chatgpt
+    assert "CONNECTOR_OBSERVABILITY_INCOMPLETE" in chatgpt
