@@ -1,9 +1,0 @@
-{
-  "node_id": "runtime_checkpoint.base-drift-assess",
-  "node_type": "workflow",
-  "title": "Base Drift Assess",
-  "description": "Classify protected-base drift by changed paths, approved scope overlap, governance impact, dependency impact, and authority/evidence invalidation effects.",
-  "canonical": "canonical",
-  "authority_boundary": "g2_required",
-  "gates": ["G2_EXECUTION"]
-}
