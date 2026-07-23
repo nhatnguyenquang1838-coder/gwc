@@ -27,7 +27,7 @@ All GWC agents follow `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` for
 
 ## Repository safety
 
-- Use one dedicated allowed-prefix branch per DS Admin task.
+- Use one dedicated allowed-prefix branch per Jira task.
 - Never write directly to `main`.
 - Verify repository identity and protected-base SHA before writes.
 - Re-read existing files before updating them.
@@ -35,11 +35,12 @@ All GWC agents follow `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` for
 - Open a Draft PR and report current head SHA and CI state.
 - Never treat CI success as merge or deployment authority.
 
-## DS Admin traceability
+## Jira task traceability
 
-Every modifying task must have exactly one DS Admin task record. DWC records the
-repository, base branch, working branch, PR, validation outcome, and final task
-state through legal State Engine transitions.
+Every new modifying task must have exactly one Jira issue in project `SCRUM`.
+Atlassian MCP records the repository, base branch, working branch, PR, validation
+outcome, and final task state. Jira task status does not grant G0-G6 authority.
+Existing DS Admin and Rental Home task records remain unchanged.
 
 ## Hotfix and Rescue Mode Support
 
@@ -69,7 +70,7 @@ TRULY EMERGENCY OVERRIDE [brief description]
 
 All activation commands must be in standalone fenced text blocks. The user 
 acknowledges that bypassing standard gates requires post-facto review and 
-retroactive task claiming through DS Admin when applicable.
+retroactive task claiming through the active Jira workflow when applicable.
 
 **No mode overrides:**
 - Production data reads/writes (G6)

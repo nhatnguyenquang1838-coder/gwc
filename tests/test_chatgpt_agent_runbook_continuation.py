@@ -97,7 +97,7 @@ class ChatGPTArtifactContinuationTests(unittest.TestCase):
 
     def test_kiro_rule_requires_chatgpt_task_runtime_parity(self) -> None:
         required_phrases = [
-            "resolve or create exactly one AgentOps/DS Admin task",
+            "resolve or create exactly one task through the active profile's work-tracking provider",
             ".gwc/tasks/<task-id>/",
             "Repository persistence of `.gwc` artifacts is itself a G2 write",
             "do not grant repository write",

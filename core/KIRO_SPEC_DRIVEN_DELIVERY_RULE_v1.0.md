@@ -139,7 +139,7 @@ For significant governed work that is moving from planning toward implementation
 
 Before entering G2, the agent MUST:
 
-1. resolve or create exactly one AgentOps/DS Admin task for the requested outcome;
+1. resolve or create exactly one task through the active profile's work-tracking provider (Jira via Atlassian MCP for `gwc`);
 2. read the live task state contract and use legal idempotent transitions only;
 3. transition or verify the task in `agent_running` while G0/G1 preparation is active;
 4. materialize the canonical task workspace under:
@@ -156,7 +156,7 @@ Before entering G2, the agent MUST:
 
 5. bind the task ID, repository, protected-base SHA, scope hash, and branch consistently across the task state and gate artifacts;
 6. run or cite the protected-base G0/G1 validator before requesting G2;
-7. synchronize DS Admin state at each later gate boundary.
+7. synchronize the active work-tracking provider state at each later gate boundary.
 
 In `chat_connector_only` mode, the workspace MAY be materialized in a unique isolated `/mnt` session before approval. Repository persistence of `.gwc` artifacts is itself a G2 write and MUST NOT occur before valid G2 authority.
 

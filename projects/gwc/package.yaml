@@ -195,11 +195,11 @@ delivery:
   identity_status: verified
   write_enabled: true
 work_tracking:
-  provider: ds-admin
+  provider: jira-mcp
   claim_required_for_e2e: true
   ownership_verification_required: true
   lease_renewal_required: false
-  status_transitions_from_state_engine: true
+  status_transitions_from_state_engine: false
 notes:
   - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.
   - DWC repository reads are automatic for this verified repository.

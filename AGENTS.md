@@ -87,13 +87,13 @@ GATE_HUMAN_APPROVAL_REQUIRED
 
 When the user is exploring or brainstorming in chat-only mode, G0/G1 may be
 performed as a conversation-local interaction. Do not require physical G0/G1
-artifacts, DS Admin task creation, or an approval token merely to discuss,
+artifacts, work-item creation, or an approval token merely to discuss,
 compare, or refine options. Label this state `CHAT_ONLY_PREPARATION`; it is not
 formal G0/G1 completion.
 
 When the user explicitly requests transition to G2, switch to formal mode:
-create the task-scoped G0/G1 artifacts, create or claim the required DS Admin
-task, validate them, and generate the exact G2 approval command before any
+create the task-scoped G0/G1 artifacts, create or claim the required task through
+the active profile provider, validate them, and generate the exact G2 approval command before any
 write-capable action.
 
 ## Run ID convention
@@ -101,7 +101,7 @@ write-capable action.
 Every G0/G1 session must declare a `run_id` before producing artifacts.
 
 Formats:
-- When DS Admin task ID is available: `g1-<task-id-short>-<YYYYMMDD-HHMM>`
+- When a task ID is available: `g1-<task-id-short>-<YYYYMMDD-HHMM>`
 - When no task ID: `g1-<YYYYMMDD-HHMM>-<short-kebab-topic>`
 
 Rules:
@@ -432,7 +432,7 @@ The DWC runtime contract is defined in
 canonical approval protocol unless higher-priority runtime instructions state
 otherwise.
 
-## DS Admin task rules
+## Work-tracking task rules
 
 For profiles where `work_tracking.claim_required_for_e2e` is true:
 
@@ -447,18 +447,17 @@ No valid task claim
 -> no Pull Request
 ```
 
-Use State Engine operations only. Never invent task status or bypass claims,
+Use active-provider operations only. Never invent task status or bypass claims,
 leases, ownership, or legal transitions.
 
-The agent must synchronize DS Admin state before continuing across gate
-boundaries. Use only legal State Engine transitions. If the task state falls
-behind the repository work, the agent must perform a clearly labeled late
-reconciliation and disclose the limitation; it must not backdate, fabricate, or
-claim that DS Admin was current at the earlier gate.
+The agent must synchronize the active work-tracking provider before continuing
+across gate boundaries. Use only legal provider transitions. If task state falls
+behind repository work, perform a clearly labeled late reconciliation and disclose
+the limitation; never backdate, fabricate, or claim earlier task state.
 
 Recommended mapping:
 
-| Gate moment | DS Admin transition target |
+| Gate moment | Work-tracking transition target |
 |---|---|
 | G0/G1 analysis starts | `agent_running` |
 | G0/G1 proposal is ready | `pending_review` |
@@ -471,7 +470,7 @@ Recommended mapping:
 
 ## G3 async CI continuation
 
-After creating or updating a Draft PR, the agent must not stop silently when CI is still running. It must keep the DS Admin task in `validation_running` and choose the strongest available continuation mechanism for the next CI check:
+After creating or updating a Draft PR, the agent must not stop silently when CI is still running. It must keep the active work-tracking task in `validation_running` and choose the strongest available continuation mechanism for the next CI check:
 
 1. webhook or event callback when available;
 2. local sleep or poll loop when running as a capable local agent;

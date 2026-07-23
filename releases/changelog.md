@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-07-23 — SCRUM-70 Jira MCP task governance
+
+### Changed
+
+- New GWC tasks use Jira project `SCRUM` and direct Atlassian MCP task operations.
+- Jira issue keys are task identity; GWC gate artifacts remain authoritative for G0-G6 evidence and approvals.
+- Existing DS Admin and Rental Home task records remain unchanged and are not migrated.
+- DS Admin references are retained only for compatibility/projection semantics; no Jira adapter or Story 7 shutdown is included.
+
 ## 2026-07-21 — REVAMP-GWC-008 package export smoke verification
 
 ### Added

@@ -97,7 +97,7 @@ DWC may automatically perform read-only operations needed to understand a task:
   workflow runs, and workflow artifacts;
 - read governance and project context from the protected base;
 - compare refs, hashes, package versions, consumers, and CI evidence;
-- inspect the matching DS Admin task record.
+- inspect the matching task record from the active work-tracking provider.
 
 Automatic inspection does not itself complete G0. DWC must create, obtain, or
 cite the task-scoped G0 context artifact and validate that it is `READY` with no
@@ -129,7 +129,7 @@ following are true:
 - G1 is `PASS`;
 - the user requested the outcome;
 - repository identity and protected base are verified;
-- exactly one valid DS Admin task represents the work when required by profile;
+- exactly one valid task from the active work-tracking provider represents the work when required by profile;
 - a valid execution or approval envelope matches the task, repository, base SHA,
   guarded branch, scope hash, file/module scope, risk, and intended actions;
 - the scope is explicit and limited to the requested result;
@@ -201,7 +201,7 @@ This action grants no merge permission. It must not mark another PR ready, chang
 
 ## Asynchronous CI continuation
 
-During G3 validation monitoring, DWC must not stop silently when PR CI is still running. It must keep DS Admin in `validation_running` and record the current PR, branch, latest head SHA, next check time, and selected continuation mechanism.
+During G3 validation monitoring, DWC must not stop silently when PR CI is still running. It must keep the active work-tracking task in its validation state and record the current PR, branch, latest head SHA, next check time, and selected continuation mechanism.
 
 DWC must choose the strongest available mechanism in this order:
 
@@ -293,12 +293,12 @@ DWC must not automatically:
 - read or write production data;
 - perform destructive migrations or irreversible operations.
 
-## DS Admin state synchronization
+## Work-tracking state synchronization
 
-DWC must keep DS Admin aligned with gate progress before continuing to the next
-major action. Use legal State Engine transitions only:
+DWC must keep the active work-tracking provider aligned with task progress before
+continuing to the next major action. Use legal provider transitions only:
 
-| Gate moment | DS Admin target |
+| Gate moment | Work-tracking target |
 |---|---|
 | G0/G1 work starts | `agent_running` |
 | Proposal ready | `pending_review` |
@@ -309,7 +309,7 @@ major action. Use legal State Engine transitions only:
 | Blocker | `blocked` |
 | Irrecoverable failure | `failed` |
 
-If DS Admin was not updated at the correct time, DWC may perform a late
+If the work-tracking provider was not updated at the correct time, DWC may perform a late
 reconciliation only when it labels it as late reconciliation and cites current
 repository/task evidence. It must not backfill evidence or claim the task was in
 that state earlier.
@@ -340,5 +340,5 @@ metadata such as gate, approval ID, scope-hash prefix, expected SHA, and expiry.
 
 A DWC repository task is complete only when the required gate records exist,
 the Draft PR exists, the latest head SHA is known, applicable validation is
-recorded, CI state is reported, DS Admin state is synchronized or late
+recorded, CI state is reported, active work-tracking state is synchronized or late
 reconciled, and exclusions and residual risks are stated accurately.

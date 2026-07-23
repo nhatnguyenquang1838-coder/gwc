@@ -61,16 +61,30 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("production data, production configuration, migrations, credentials, or secrets", dwc)
         self.assertIn("record `not_applicable`", chatgpt)
 
-    def test_ds_admin_sync_and_late_reconciliation_are_required(self) -> None:
+    def test_work_tracking_sync_and_late_reconciliation_are_required(self) -> None:
         gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
         agents = self.normalized_text("AGENTS.md")
         dwc = self.normalized_text("agents/dwc/agent-instructions.md")
         chatgpt = self.normalized_text("agents/chatgpt-agent/agent-instructions.md")
 
-        self.assertIn("Update the DS Admin task state through the legal State Engine transition", gate_contract)
-        self.assertIn("The agent must synchronize DS Admin state before continuing across gate", agents)
-        self.assertIn("## DS Admin state synchronization", dwc)
+        self.assertIn("Update the active work-tracking task through its legal provider transition", gate_contract)
+        self.assertIn("The agent must synchronize the active work-tracking provider before continuing", agents)
+        self.assertIn("## Work-tracking state synchronization", dwc)
         self.assertIn("late reconciliation must be disclosed as late", chatgpt)
+
+    def test_gwc_uses_direct_jira_mcp_for_new_tasks(self) -> None:
+        profile = self.normalized_text("projects/gwc/project-profile.yaml")
+        package = self.normalized_text("projects/gwc/package.yaml")
+        instructions = self.normalized_text("projects/gwc/project-instructions.md")
+        extension = self.normalized_text("projects/gwc/project-extension.md")
+
+        self.assertIn("api_connector: Atlassian Jira MCP", profile)
+        self.assertIn("provider: jira-mcp", package)
+        self.assertIn("status_transitions_from_state_engine: false", package)
+        self.assertIn("Jira MCP is the work-tracking source of truth for new GWC tasks", profile)
+        self.assertIn("Jira via Atlassian MCP", instructions)
+        self.assertIn("Every new modifying task must have exactly one Jira issue", extension)
+        self.assertIn("Existing DS Admin and Rental Home task records remain unchanged", extension)
 
     def test_g4_ready_for_review_precheck_blocks_draft_pr_merge(self) -> None:
         gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")

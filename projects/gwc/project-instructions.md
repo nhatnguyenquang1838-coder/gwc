@@ -5,7 +5,9 @@
 - Project ID: `gwc`
 - Repository: `nhatnguyenquang1838-coder/gwc`
 - Runtime agent: `DWC`
-- Work-tracking source of truth: DS Admin
+- Work-tracking source of truth for new tasks: Jira via Atlassian MCP
+- Existing DS Admin and Rental Home tasks are not migrated
+- GWC gate artifacts remain authoritative for G0-G6 evidence and approvals
 
 ## Default workflow
 
@@ -64,7 +66,7 @@ declared connector in the sequence.
 Fail closed before repository mutation or authority escalation, not before all
 useful analysis.
 
-- If DS Admin task traceability is unavailable, continue in read-only or
+- If the active Jira task is unavailable, continue in read-only or
   planning-only mode but do not create a branch, commit, push, or PR.
 - If the repository or connector cannot be verified, provide qualified planning
   only and do not claim repository inspection.
@@ -93,7 +95,7 @@ was generated or persisted when it was not.
 ## DWC repository access
 
 DWC may read the complete verified repository and may create or update any file
-required by the active DS Admin task on a dedicated guarded branch.
+required by the active Jira task on a dedicated guarded branch.
 
 Repository access is task-bounded rather than path-bounded. DWC must not use
 this permission for unrelated cleanup, broad refactoring, dependency changes,
