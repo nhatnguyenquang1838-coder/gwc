@@ -159,7 +159,7 @@ Review `PASS` is G3 evidence only. It never grants merge authority; G4 still req
 
 #### G3 asynchronous CI continuation
 
-When CI is still running after Draft PR creation or after a repair push, G3 remains in validation monitoring rather than ending silently. The agent must record the current PR number, branch, latest head SHA, DS Admin state, next check time, and continuation mechanism.
+When CI is still running after Draft PR creation or after a repair push, G3 remains in validation monitoring rather than ending silently. The agent must record the current PR number, branch, latest head SHA, active work-tracking state, next check time, and continuation mechanism.
 
 Continuation mechanisms are selected in this order:
 
@@ -214,7 +214,7 @@ The agent must:
 2. Generate the next gate's entry artifact (execution envelope, delivery record, or approval record) using the current gate's evidence.
 3. Present the generated approval command in a standalone fenced text block.
 4. Wait for the user to execute the command before proceeding to the next gate.
-5. Update the DS Admin task state through the legal State Engine transition that corresponds to the gate transition before continuing. If DS Admin update fails, report the blocker or record a clearly labeled late reconciliation note; never backdate or invent task state evidence.
+5. Update the active work-tracking task through its legal provider transition that corresponds to the gate transition before continuing. If the update fails, report the blocker or record a clearly labeled late reconciliation note; never backdate or invent task state evidence.
 
 The user retains sole authority to grant or deny the next gate. The agent's proactive generation is a convenience mechanism, not a delegation of authority.
 

@@ -251,7 +251,7 @@ After every push to the PR branch:
 For pending states:
 
 - Make no code change.
-- Keep DS Admin in `validation_running`.
+- Keep the active work-tracking task in its validation state.
 - Record the PR number, branch, current head SHA, next check time, and continuation mechanism.
 - Continue monitoring the same SHA through the strongest available mechanism:
   1. webhook or CI event callback;

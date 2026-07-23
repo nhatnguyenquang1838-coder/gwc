@@ -30,7 +30,7 @@ informal intake, options, preflight discussion, and decision candidate without
 persisting artifacts, creating a task, or generating an approval token. Label
 this state `CHAT_ONLY_PREPARATION` and grant no execution authority.
 
-Formal G0/G1 artifacts, DS Admin task creation or claim, and the exact G2
+Formal G0/G1 artifacts, active-provider task creation or claim, and the exact G2
 approval command are required only when the user explicitly requests transition
 to G2 or asks for a write-capable action.
 

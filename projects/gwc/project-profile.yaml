@@ -22,7 +22,7 @@ connectors:
     - GitHub
     - DWC
     - DW1
-  api_connector: DS Admin
+  api_connector: Atlassian Jira MCP
   account_or_tenant: null
 context:
   read_first:
@@ -47,7 +47,9 @@ context:
   governance_from_protected_base: true
   session_root: /mnt/data/gwc_sessions/<YYYYMMDD-HHMM>-<TASK-ID>/
   additional_notes:
-    - DS Admin is the work-tracking source of truth.
+    - Jira MCP is the work-tracking source of truth for new GWC tasks.
+    - Existing DS Admin and Rental Home tasks are not migrated.
+    - GWC gate artifacts remain authoritative for G0-G6 evidence and approvals.
     - DWC G0/G1 inspection is automatic only as read-only analysis; gate completion requires artifacts and validator evidence.
     - DWC G2 and G3 are automatic only for bounded non-risk repository changes with valid execution-mode-aware gate evidence.
     - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, context refresh, and agent-generated approval commands.

@@ -81,9 +81,9 @@ Actual write outside approved scope -> scope drift, stop before commit or PR.
 
 For significant governed work moving toward implementation, project agents must follow `core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md`.
 
-Before G2, a ChatGPT-style agent must create or claim exactly one AgentOps/DS Admin task, use legal task transitions, reach or verify `agent_running` during G0/G1 preparation, and materialize the canonical `.gwc/tasks/<task-id>/g0`, `g1`, and `g2` workspace used by local agents.
+Before G2, a ChatGPT-style agent must create or claim exactly one task through the active project work-tracking provider. For `gwc`, this means a Jira issue via Atlassian MCP. The agent must use legal provider transitions, reach or verify the provider's active-work state during G0/G1 preparation, and materialize the canonical `.gwc/tasks/<task-id>/g0`, `g1`, and `g2` workspace used by local agents.
 
-The task ID, repository, protected-base SHA, branch, and scope hash must remain consistent across DS Admin and gate artifacts. Kiro specs, task state, and `.gwc` artifacts are traceability only and never grant repository write, PR, merge, deploy, or production authority.
+The task ID, repository, protected-base SHA, branch, and scope hash must remain consistent across the active work-tracking provider and gate artifacts. Kiro specs, task state, and `.gwc` artifacts are traceability only and never grant repository write, PR, merge, deploy, or production authority. Existing legacy task records are not migrated by this rule.
 
 ## Required gate behavior
 

@@ -29,7 +29,7 @@ For GWC, this includes:
 - `skills/gwc-g0/SKILL.md` for verified context initialization;
 - `skills/gwc-g1/SKILL.md` for discovery, options, preflight, and decision;
 - repository-native schemas, generators, validators, tests, and package tools;
-- DS Admin for modifying-task traceability where required.
+- The active project work-tracking provider for modifying-task traceability where required.
 
 This contract must not duplicate or silently redefine those mechanisms.
 
@@ -130,7 +130,7 @@ stronger mode than is available.
 
 Fallback rules:
 
-- Missing DS Admin task traceability does not block read-only analysis; it
+- Missing active-provider task traceability does not block read-only analysis; it
   blocks repository mutation where the active package requires a task.
 - A connector failure does not block general planning; it blocks claims based
   on unobserved repository or task state.

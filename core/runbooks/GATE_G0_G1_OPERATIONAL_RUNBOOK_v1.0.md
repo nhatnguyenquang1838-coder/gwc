@@ -35,8 +35,8 @@ Validate committed artifacts and policy in CI. CI is additional evidence and nev
 5. Resolve the exact protected-base commit SHA. When direct ref lookup fails, use an equivalent read-only method and verify equivalence before continuing.
 6. Resolve exactly one active agent runtime profile for the current agent and execution mode. Fail closed when the profile is missing, duplicated, inactive, or does not support the selected execution mode.
 7. Select the workspace root according to the AGENTS.md workspace location convention decision matrix.
-8. Identify or create exactly one work item when the active profile requires DS Admin traceability. DS Admin records traceability only; it does not grant execution authority.
-   - Resolve or create a DS Admin task before G0 completion.
+8. Identify or create exactly one work item when the active profile requires work-tracking traceability. The active provider records traceability only; it does not grant execution authority.
+   - For `gwc`, resolve or create a Jira issue through Atlassian MCP before G0 completion.
    - Record the task ID in G0/G1 trace fields.
    - Verify task state allows the intended transition before G2 entry.
 9. Classify risk and identify security, architecture, data, deployment, credential, destructive, and blast-radius signals.
@@ -108,15 +108,15 @@ The runtime must fail closed when an applicable artifact is missing, invalid,
 expired, or mismatched. A conditional gate is recorded as not_applicable; it is
 never silently skipped and never inherits authority from another gate.
 
-## DS Admin traceability
+## Work-tracking traceability
 
-When required by the active profile:
+When required by the active profile, use the configured provider (Jira MCP for `gwc`):
 
 1. Search for a matching task using source reference or idempotency key.
 2. Reuse exactly one matching task; do not create duplicates.
 3. If none exists and task creation is authorized, create one with repository, base branch, objective, risk, scope, exclusions, and idempotency key.
 4. Record the task ID in G0/G1 trace fields.
-5. Fetch the authoritative DS MCP state contract through `task_state_contract_get`.
+5. Fetch the authoritative task state contract through the configured provider.
 6. Resolve the gate outcome in `core/task-lifecycle/gate-transition-map.yaml`.
 7. Verify the current state, transition, and expected destination are legal in the live contract.
 8. Execute the transition with an idempotency key.
@@ -187,7 +187,7 @@ Keep reports concise. Continue automatically across remediable blockers and conn
 3. A connector parameter error triggers an equivalent safe retry without a new approval when scope and authority are unchanged.
 4. User acknowledgement of G0 permits G1 planning but does not grant repository-write authority.
 5. `NOT_RUN` is never reported as `PASS`.
-6. DS Admin task creation never replaces approval.
+6. Work-item creation or status transition never replaces approval.
 7. Governance denial, stale SHA, scope mismatch, and protected-branch denial fail closed without API fallback.
 8. G3 creates Draft PR only and stops before G4.
 9. G4, G5, and G6 remain separate HITL/authority gates.
