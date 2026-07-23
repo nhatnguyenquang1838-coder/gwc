@@ -1,0 +1,11 @@
+{
+  "node_id": "scale_control.exact-head-readiness-check",
+  "node_type": "gate",
+  "title": "Exact Head Readiness Check",
+  "description": "Require validation, workflow, and artifact evidence to bind to the exact current branch or merge commit before readiness can pass.",
+  "canonical": "delivery_evidence",
+  "authority_boundary": "g5_required",
+  "gates": [
+    "G5_DEPLOY"
+  ]
+}
