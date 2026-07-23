@@ -1,22 +1,29 @@
-approval_id: CP-20260723-069
+approval_id: CP-20260723-071
 authority_gate: G2_EXECUTION
 task_id: SCRUM-68
-issued_at: '2026-07-22T18:58:00Z'
-expires_at: '2026-07-23T18:58:00Z'
-scope_version: 2
+issued_at: '2026-07-23T02:00:03Z'
+expires_at: '2026-07-24T01:30:03Z'
+scope_version: 3
 risk_class: R2
 project_profile: projects/gwc/project-profile.yaml
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
-base_sha: 215cbfcfeab4a53b3cd785a1f2178e2405c420b8
-working_branch: feature/scrum-68-package-export-nodes
+base_sha: ab378f97417814f04a1a14acdf572e34490c5e3d
+working_branch: feature/scrum-68-final-node-catalog
 modules_or_files:
 - .gwc/tasks/SCRUM-68/**
-- core/node-architect/node-catalog/package_export/**
-- tools/node_architect/validate_node_catalog_package_export.py
-- tests/test_node_catalog_package_export.py
+- core/node-architect/node-catalog/failure_recovery/**
+- core/node-architect/node-catalog/scale_control/**
+- core/node-architect/failure-simulation-matrix.json
+- schemas/node-architect/failure-simulation-matrix.schema.json
+- tools/node_architect/validate_node_catalog_failure_recovery.py
+- tools/node_architect/validate_node_catalog_scale_control.py
+- tests/test_node_catalog_failure_recovery.py
+- tests/test_node_catalog_scale_control.py
+- tests/test_failure_simulation_scale_readiness.py
 - projects/gwc/package.yaml
-- releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md
+- releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md
+- releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md
 authorized_actions:
 - modify_approved_files
 - run_sandboxed_validation
@@ -29,6 +36,8 @@ excluded_actions:
 - mark_pr_ready_for_review
 - deploy
 - release
+- publish
+- runtime_reload
 - production_data_read
 - production_data_write
 - production_config_change
@@ -38,12 +47,11 @@ excluded_actions:
 - branch_deletion
 - shared_history_rewrite
 - pr_base_change
-- rewrite_export_project_package
-- change_package_version
-- publish_package
-- update_consumer_repositories
-- implement_failure_recovery_batch
-- implement_scale_control_batch
+- parallel_pr_execution
+- more_than_nine_nodes_per_pr
+- execute_stage08_before_batch07_g5_pass
+- execute_stage09_before_batch08_merge_and_g5_pass
+- continue_after_approval_expiry
 work_item:
   provider: jira
   id: SCRUM-68
@@ -53,8 +61,8 @@ work_item:
   initial_state: In Progress
   review_state: In Review
 artifact_hashes:
-  change_plan: sha256:b2e39352128f3efb9f395bae32dcab804a38b926be9f1a2cb12e4f16f3635f24
-  mermaid: sha256:348225549f373c444942c064a3cb1e7098c6d3f2cd624e5642831d0888123ece
-  png: sha256:f593a2079a8f8f1c767b1a96fef239432b3cf12242e80825d35093177e8eb63a
-  svg: sha256:9d10600a5d00ee8ab4867727eaeddc2808ca5bab7c103e0198e3e5f0cf4ba812
-scope_hash: sha256:6675b82f6359f1d1aa694f790ce0ffad6204745cd5ca6753e50d7e3e69c659dd
+  change_plan: sha256:6761ac422ffe77c05588271c863c6f2a7d1738a212bcdc7b0fcdce51136acf24
+  mermaid: sha256:4d692074dc6145d8e6a29c5246ac8bbcc8e7e41ca7e0de95270de5119c7b2e7c
+  png: sha256:0f07b76c320ff8aac7a0b5951bb69dbfe7f6376eb60d0d0419aa1491bd313efc
+  svg: sha256:956c58ed119fc594ea6c97ed19545b346f7f1335dad3b24da34c7b3ee5ee4467
+scope_hash: sha256:a1ae5c60126fafd4796aa22586445a6b2ab0b88e91a85a5bb70dcccfbd43f9e1
