@@ -1,0 +1,11 @@
+{
+  "node_id": "failure_recovery.crash-checkpoint-recovery",
+  "node_type": "workflow",
+  "title": "Crash Checkpoint Recovery",
+  "description": "Recover from an agent or process crash using the latest canonical checkpoint and exact next action.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
+}
