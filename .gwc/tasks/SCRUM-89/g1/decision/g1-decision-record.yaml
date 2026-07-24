@@ -1,6 +1,6 @@
 schema_version: '1.0'
 artifact_type: g1-decision-record
-generated_at: '2026-07-24T07:50:00Z'
+generated_at: '2026-07-24T09:47:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -16,8 +16,9 @@ user_decision:
   decided_at: '2026-07-24T07:41:00Z'
   source: 'chat request: start SCRUM-89'
   explicit: true
-rationale: Implement OPT-1. Canonical Kiro fallback plan is .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff
-  at sha256:24d504c52afd3868e5dae60ca0fc38a63c28304c2449dd365ae7792e38100a3b.
+rationale: Implement OPT-1. Scope delta 02 adds the protected-base decision-capture
+  runtime and its focused test so plan-aware preflight evidence can produce a valid
+  accepted decision. Canonical plan revision is sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753.
 rejected_option_ids:
 - OPT-2
 - OPT-3
@@ -30,7 +31,7 @@ acceptance_criteria_refs:
 - AC-6
 - AC-7
 - AC-8
-scope_hash: sha256:b77a3c463adb3a3d2a95616c9eb24a61b1f1e11f385cf6d2b2e9d4e12ff3ab81
+scope_hash: sha256:2bf519dbfca54a6dd2b3c06f602db636a7fa1148a74fe3a031360a33f7de33f2
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
