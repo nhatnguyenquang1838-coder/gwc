@@ -1,0 +1,22 @@
+schema_version: '1.0'
+artifact_type: base-drift-reconciliation-record
+task_id: SCRUM-91
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+working_branch: feat/dw-power-distribution-v1
+starting_head_sha: 0c91a95c04af29d2f05181f951686c9ab495283b
+reconciled_head_sha: a94cb5cc232cb5851e1c2e07672ef7702ad6f317
+method: non-force history-preserving merge
+branch_state:
+  status: ahead
+  ahead_by: 17
+  behind_by: 0
+  merge_base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+scope_diff:
+  changed_files: 16
+  outside_approved_scope: []
+approval_id: G2-SCRUM91-BASEDRIFT-20260724-01
+scope_hash: sha256:d4e85bce1ff882bb9bd9c91bd868e345be32b001a9115116f37fe5c8d9e2cbf8
+result: RECONCILED
+recorded_at: '2026-07-24T15:05:00Z'
