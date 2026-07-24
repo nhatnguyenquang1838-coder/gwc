@@ -13,6 +13,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 import hashlib
 import importlib.util
 import json
@@ -24,6 +25,16 @@ import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
 AUTHORITY_EXCLUSIONS = ["G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION"]
+PLAN_REF_FIELDS = (
+    "applicability",
+    "source",
+    "canonical_task_uid",
+    "repository",
+    "protected_base_sha",
+    "plan_root",
+    "plan_revision",
+    "validation_evidence",
+)
 
 
 def _load_yaml(path: Path) -> Any:
@@ -68,6 +79,29 @@ def _load_validator(repo_root: Path):
     return module
 
 
+def _plan_reference(preflight: dict[str, Any]) -> tuple[dict[str, Any] | None, list[str]]:
+    """Return the immutable G1 plan reference or explicit fail-closed issues.
+
+    Legacy schema version 1.0 artifacts with no implementation plan remain valid.
+    A 1.1 preflight, or any preflight carrying plan evidence, is plan-aware and
+    must provide every field required by the decision-record reference schema.
+    """
+    plan = preflight.get("implementation_plan")
+    plan_aware = preflight.get("schema_version") == "1.1" or plan is not None
+    if not plan_aware:
+        return None, []
+    if not isinstance(plan, dict):
+        return None, ["G1_IMPLEMENTATION_PLAN_EVIDENCE_MISSING"]
+
+    missing = [field for field in PLAN_REF_FIELDS if field not in plan]
+    if missing:
+        return None, [
+            "G1_IMPLEMENTATION_PLAN_REFERENCE_INCOMPLETE:" + ",".join(sorted(missing))
+        ]
+
+    return {field: deepcopy(plan[field]) for field in PLAN_REF_FIELDS}, []
+
+
 def generate_artifacts(
     decision_input: dict[str, Any],
     intake: dict[str, Any],
@@ -97,6 +131,9 @@ def generate_artifacts(
     if requested_status == "ACCEPTED" and not explicit:
         semantic_issues.append("G1_EXPLICIT_DECISION_REQUIRED")
 
+    plan_ref, plan_issues = _plan_reference(preflight)
+    semantic_issues.extend(plan_issues)
+
     trace = intake["trace"]
     options = {
         "schema_version": "1.0",
@@ -122,7 +159,7 @@ def generate_artifacts(
 
     rejected = [option_id for option_id in option_ids if option_id != selected]
     decision = {
-        "schema_version": "1.0",
+        "schema_version": "1.1" if plan_ref is not None else "1.0",
         "artifact_type": "g1-decision-record",
         "generated_at": generated_at,
         "trace": trace,
@@ -152,6 +189,9 @@ def generate_artifacts(
             "summary": "No subagent distribution required for this G1 decision capture.",
         },
     }
+    if plan_ref is not None:
+        decision["implementation_plan_ref"] = plan_ref
+
     outcome = "PASS" if status == "ACCEPTED" and gate_outcome == "PASS" else gate_outcome
     return options, decision, outcome, semantic_issues
 
@@ -193,7 +233,7 @@ def main() -> int:
             decision_input, intake, preflight
         )
 
-        generated_errors: list[str, Any] = []
+        generated_errors: list[str] = []
         generated_errors.extend(
             f"options: {message}"
             for message in _validation_messages(

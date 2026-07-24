@@ -55,11 +55,139 @@
           "const": "../../g0/context-snapshot.yaml"
         }
       }
+    },
+    "implementationPlanRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applicability",
+        "source",
+        "canonical_task_uid",
+        "repository",
+        "protected_base_sha",
+        "plan_root",
+        "plan_revision",
+        "validation_evidence"
+      ],
+      "properties": {
+        "applicability": {
+          "enum": [
+            "required",
+            "not_applicable"
+          ]
+        },
+        "source": {
+          "enum": [
+            "existing_kiro",
+            "task_me",
+            "generated_kiro",
+            "plan_not_applicable"
+          ]
+        },
+        "canonical_task_uid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "protected_base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "plan_root": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plan_revision": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(sha256:)?[0-9a-f]{40,64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validation_evidence": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "required"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "existing_kiro",
+                  "task_me",
+                  "generated_kiro"
+                ]
+              },
+              "plan_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "plan_revision": {
+                "type": "string",
+                "pattern": "^(sha256:)?[0-9a-f]{40,64}$"
+              },
+              "validation_evidence": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "not_applicable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "const": "plan_not_applicable"
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "enum": [
+        "1.0",
+        "1.1"
+      ]
     },
     "artifact_type": {
       "const": "g1-decision-record"
@@ -275,6 +403,9 @@
           "type": "string"
         }
       }
+    },
+    "implementation_plan_ref": {
+      "$ref": "#/$defs/implementationPlanRef"
     }
   },
   "allOf": [
@@ -305,6 +436,20 @@
             "const": "PASS"
           }
         }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.1"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "implementation_plan_ref"
+        ]
       }
     }
   ]

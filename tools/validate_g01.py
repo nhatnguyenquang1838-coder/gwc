@@ -38,6 +38,15 @@ GATE_ARTIFACTS: dict[str, str] = {
 }
 NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
 BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
+IMPLEMENTATION_PLAN_REQUIRED_FIELDS = (
+    "canonical_task_uid", "repository", "protected_base_sha", "plan_root",
+    "requirements_path", "design_path", "tasks_path", "plan_revision",
+    "validation_evidence", "generated_by", "generated_at_utc",
+)
+PLAN_REF_FIELDS = (
+    "applicability", "source", "canonical_task_uid", "repository",
+    "protected_base_sha", "plan_root", "plan_revision", "validation_evidence",
+)
 
 
 @dataclass(frozen=True)
@@ -90,7 +99,202 @@ def _schema_issues(artifact_name: str, instance: Any, schema_path: Path) -> list
     return issues
 
 
-def validate_gate_artifact(workspace: Path, gate: str) -> list[ValidationIssue]:
+def _implementation_plan_issues(
+    preflight: dict[str, Any],
+    decision: dict[str, Any],
+) -> list[ValidationIssue]:
+    """Validate the G1 plan-evidence pair while preserving legacy pair absence."""
+    has_plan = "implementation_plan" in preflight
+    has_reference = "implementation_plan_ref" in decision
+    plan_aware = (
+        preflight.get("schema_version") == "1.1"
+        or decision.get("schema_version") == "1.1"
+    )
+
+    if not has_plan and not has_reference:
+        if plan_aware:
+            return [_issue(
+                "G1_IMPLEMENTATION_PLAN_EVIDENCE_MISSING",
+                "preflight",
+                "implementation_plan",
+                "Plan-aware G1 artifacts require preflight plan evidence and a decision plan reference.",
+            )]
+        return []
+    if has_plan != has_reference:
+        return [_issue(
+            "G1_IMPLEMENTATION_PLAN_EVIDENCE_INCOMPLETE",
+            "preflight",
+            "implementation_plan",
+            "Preflight implementation_plan and decision implementation_plan_ref must be provided together.",
+        )]
+
+    plan = preflight.get("implementation_plan", {})
+    reference = decision.get("implementation_plan_ref", {})
+    issues: list[ValidationIssue] = []
+    applicability = plan.get("applicability")
+
+    if applicability == "not_applicable":
+        if (
+            plan.get("source") != "plan_not_applicable"
+            or plan.get("validation_status") != "NOT_APPLICABLE"
+            or not str(plan.get("reason", "")).strip()
+        ):
+            issues.append(_issue(
+                "G1_PLAN_NOT_APPLICABLE_INVALID",
+                "preflight",
+                "implementation_plan",
+                "Not-applicable plan evidence requires an explicit reason, plan_not_applicable source, and NOT_APPLICABLE status.",
+            ))
+    elif applicability == "required":
+        missing = [field for field in IMPLEMENTATION_PLAN_REQUIRED_FIELDS if not plan.get(field)]
+        if missing:
+            issues.append(_issue(
+                "G1_IMPLEMENTATION_PLAN_MISSING",
+                "preflight",
+                "implementation_plan",
+                "Missing implementation-plan fields: " + ", ".join(missing),
+            ))
+        if plan.get("validation_status") != "PASS":
+            issues.append(_issue(
+                "G1_IMPLEMENTATION_PLAN_NOT_VALIDATED",
+                "preflight",
+                "implementation_plan.validation_status",
+                "A required implementation plan must have validation_status=PASS.",
+            ))
+        if plan.get("source") == "task_me" and plan.get("task_me_invoked") is not True:
+            issues.append(_issue(
+                "G1_TASK_ME_NOT_INVOKED",
+                "preflight",
+                "implementation_plan.task_me_invoked",
+                "Task Me plan source requires invocation evidence.",
+            ))
+        if (
+            plan.get("task_me_applicable") is True
+            and plan.get("task_me_available") is True
+            and plan.get("task_me_invoked") is not True
+        ):
+            issues.append(_issue(
+                "G1_TASK_ME_REQUIRED",
+                "preflight",
+                "implementation_plan",
+                "Task Me was applicable and available but was not invoked.",
+            ))
+        if (
+            plan.get("source") == "generated_kiro"
+            and plan.get("task_me_applicable") is True
+            and plan.get("task_me_invoked") is not True
+            and not plan.get("task_me_fallback_reason")
+        ):
+            issues.append(_issue(
+                "G1_TASK_ME_FALLBACK_REASON_MISSING",
+                "preflight",
+                "implementation_plan.task_me_fallback_reason",
+                "Kiro fallback requires an explicit Task Me fallback reason.",
+            ))
+    else:
+        issues.append(_issue(
+            "G1_PLAN_APPLICABILITY_INVALID",
+            "preflight",
+            "implementation_plan.applicability",
+            "Plan applicability must be required or not_applicable.",
+        ))
+
+    for field in PLAN_REF_FIELDS:
+        if reference.get(field) != plan.get(field):
+            issues.append(_issue(
+                "G1_IMPLEMENTATION_PLAN_REFERENCE_MISMATCH",
+                "decision",
+                f"implementation_plan_ref.{field}",
+                f"Decision plan reference does not match preflight field: {field}.",
+            ))
+
+    trace = preflight.get("trace", {})
+    if plan.get("repository") != trace.get("repository"):
+        issues.append(_issue(
+            "G1_IMPLEMENTATION_PLAN_REPOSITORY_MISMATCH",
+            "preflight",
+            "implementation_plan.repository",
+            "Implementation-plan repository does not match the G1 trace.",
+        ))
+    if plan.get("protected_base_sha") != trace.get("base_sha"):
+        issues.append(_issue(
+            "G1_IMPLEMENTATION_PLAN_BASE_MISMATCH",
+            "preflight",
+            "implementation_plan.protected_base_sha",
+            "Implementation-plan protected base SHA does not match the G1 trace.",
+        ))
+    return issues
+
+
+def _g2_plan_read_issues(
+    workspace: Path,
+    artifacts: dict[str, Any],
+    envelope: dict[str, Any],
+) -> list[ValidationIssue]:
+    """Require a verified exact-plan read receipt before G2 mutation."""
+    preflight_plan = artifacts.get("preflight", {}).get("implementation_plan")
+    plan = preflight_plan or envelope.get("implementation_plan")
+    if not plan or plan.get("applicability") == "not_applicable":
+        return []
+
+    receipt_path = workspace / "g2" / "plan-read-receipt.yaml"
+    if not receipt_path.is_file():
+        return [_issue(
+            "G2_PLAN_READ_RECEIPT_MISSING",
+            "G2_EXECUTION",
+            "g2/plan-read-receipt.yaml",
+            "G2 must read the approved implementation plan before the first repository write.",
+        )]
+    try:
+        receipt = _load_yaml(receipt_path)
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        return [_issue(
+            "G2_PLAN_READ_EVIDENCE_INVALID",
+            "G2_EXECUTION",
+            "g2/plan-read-receipt.yaml",
+            f"Plan-read receipt could not be loaded: {exc}",
+        )]
+    if not isinstance(receipt, dict):
+        return [_issue(
+            "G2_PLAN_READ_EVIDENCE_INVALID",
+            "G2_EXECUTION",
+            "g2/plan-read-receipt.yaml",
+            "Plan-read receipt must be a YAML object.",
+        )]
+
+    expected_paths = {
+        plan.get("requirements_path"),
+        plan.get("design_path"),
+        plan.get("tasks_path"),
+    } - {None}
+    observed_paths = set(receipt.get("paths_read", []))
+    checks = {
+        "canonical_task_uid": receipt.get("canonical_task_uid") == plan.get("canonical_task_uid"),
+        "repository": receipt.get("repository") == plan.get("repository"),
+        "base_sha": receipt.get("base_sha") == plan.get("protected_base_sha"),
+        "plan_revision": receipt.get("plan_revision") == plan.get("plan_revision"),
+        "paths_read": expected_paths.issubset(observed_paths),
+        "scope_consistency": receipt.get("scope_consistency") == "MATCH",
+        "repository_state": receipt.get("repository_state") == "MATCH",
+        "status": receipt.get("status") == "VERIFIED",
+    }
+    issues: list[ValidationIssue] = []
+    for field, matched in checks.items():
+        if not matched:
+            issues.append(_issue(
+                "G2_PLAN_READ_MISMATCH",
+                "G2_EXECUTION",
+                f"plan-read-receipt.{field}",
+                f"G2 plan-read check failed: {field}.",
+            ))
+    return issues
+
+
+def validate_gate_artifact(
+    workspace: Path,
+    gate: str,
+    artifacts: dict[str, Any] | None = None,
+) -> list[ValidationIssue]:
     """Fail closed when an applicable downstream gate artifact is absent or malformed."""
     relative_path = GATE_ARTIFACTS.get(gate)
     if relative_path is None:
@@ -107,6 +311,8 @@ def validate_gate_artifact(workspace: Path, gate: str) -> list[ValidationIssue]:
 
     if not isinstance(artifact, dict) or not artifact:
         return [_issue("GATE_ARTIFACT_INVALID", gate, relative_path, "Gate artifact must be a non-empty YAML object.")]
+    if gate == "G2_EXECUTION":
+        return _g2_plan_read_issues(workspace, artifacts or {}, artifact)
     return []
 
 
@@ -302,6 +508,7 @@ def _cross_artifact_issues(artifacts: dict[str, Any]) -> list[ValidationIssue]:
             "Preflight must PASS with no blockers or failed checks.",
         ))
     issues.extend(_execution_feasibility_issues(preflight))
+    issues.extend(_implementation_plan_issues(preflight, decision))
 
     option_items = options.get("options", [])
     option_ids = [item.get("id") for item in option_items]
@@ -375,7 +582,7 @@ def validate_workspace(repo_root: Path, workspace: Path, gate: str | None = None
     if len(artifacts) == len(ARTIFACTS) and not any(issue.code == "SCHEMA_VALIDATION_ERROR" for issue in issues):
         issues.extend(_cross_artifact_issues(artifacts))
     if gate is not None:
-        issues.extend(validate_gate_artifact(workspace, gate))
+        issues.extend(validate_gate_artifact(workspace, gate, artifacts))
 
     return ValidationReport(outcome="PASS" if not issues else "BLOCKED", issues=issues)
 

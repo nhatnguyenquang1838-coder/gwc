@@ -32,3 +32,19 @@ The plan must always be actionable and auditable, linking each command execution
 2. `apply_patch(path/to/file, patch_id)`
 3. `add_gwc_commit(message="G2fix: Implement approved changes")`
 4. `create_garded_branch()`
+
+## G1 implementation-plan handoff precondition
+
+Before the first G2 repository mutation, the executor MUST read the exact plan package referenced by the accepted G1 decision and G2 execution envelope.
+
+When `implementation_plan.applicability=required`, G2 MUST:
+
+1. read `requirements.md`, `design.md`, and `tasks.md`, or the approved equivalent package;
+2. verify `canonical_task_uid`, repository, protected-base SHA, plan root, and plan revision against G1;
+3. verify the current repository still matches the protected-base binding and that the approved scope remains consistent;
+4. write `g2/plan-read-receipt.yaml` with the exact paths read, revision, base SHA, reader, timestamp, and `VERIFIED` result;
+5. run `tools/validate_g01.py --gate G2_EXECUTION` before the first mutation.
+
+A missing plan, missing read receipt, stale revision, base drift, ownership conflict, unresolved dependency, or scope mismatch MUST stop execution and return the task to G1. G2 MUST NOT silently regenerate or broaden the implementation plan.
+
+`PLAN_NOT_APPLICABLE` is valid only when the accepted G1 evidence includes a reason and the G2 envelope carries the same not-applicable reference. This precondition grants no merge, deploy, release, credential, migration, production-configuration, or production-data authority.
