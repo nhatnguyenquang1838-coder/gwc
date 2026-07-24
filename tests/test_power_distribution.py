@@ -13,7 +13,7 @@ RECIPE_PATH = ROOT / "distribution" / "power-package.yaml"
 CONFIG_PATH = ROOT / "distribution" / "config" / "gwc.defaults.yaml"
 CONFIG_SCHEMA_PATH = ROOT / "distribution" / "contracts" / "gwc-config.schema.json"
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "publish-power.yml"
-FOUNDATION_SHA = "4e552ea3d915a4790814b08b3155c66e3c5736a1"
+FOUNDATION_SHA = "299cd605899467377cd31651b27d31c3f88db759"
 
 REQUIRED_SOURCE_PATHS = (
     "AGENTS.md",
