@@ -43,8 +43,9 @@ flowchart TD
   - Avoid duplicating full templates; link to canonical schema fields.
   - Requirements: 1, 2, 3, 4, 5.
 
-- [ ] 4. Extend deterministic G0/G1 runtime generation
+- [ ] 4. Extend deterministic G0/G1 runtime generation and decision capture
   - Update `tools/generate_g01_runtime.py` to consume observed planning evidence.
+  - Update `tools/capture_g01_decision.py` to emit schema version `1.1` and copy the exact `implementation_plan_ref` from plan-aware preflight evidence.
   - Generate plan applicability, discovery and selected-route evidence without performing external Task Me or repository writes.
   - Include route continuation and fallback evidence.
   - Requirements: 1, 2, 3, 4.
@@ -52,7 +53,7 @@ flowchart TD
 - [ ] 5. Add fail-closed G1 and G2 handoff validation
   - Update `tools/validate_g01.py` to enforce completeness, validation, identity/base binding and preflight/decision consistency.
   - For `--gate G2_EXECUTION`, require a non-empty implementation-plan reference and read receipt in the G2 envelope when applicability is required.
-  - Return explicit failure codes for missing, stale, invalid, or mismatched evidence.
+  - Return explicit failure codes for missing, stale, invalid or mismatched evidence.
   - Requirements: 4, 5, 6.
 
 - [ ] 6. Update agent and G2 execution guidance
@@ -63,6 +64,7 @@ flowchart TD
 
 - [ ] 7. Add comprehensive tests and fixtures
   - Add a focused test module for plan applicability and handoff.
+  - Update `tests/test_g01_decision_capture.py` to cover plan-aware decision capture, immutable revision propagation, and legacy `1.0` compatibility.
   - Cover existing-plan reuse, Task Me generation, Kiro fallback, not-applicable, missing plan, invalid plan, stale revision, duplicate/conflicting candidates, base drift and G2 read enforcement.
   - Update existing feasibility and continuation tests where required.
   - Requirements: 1–6.
