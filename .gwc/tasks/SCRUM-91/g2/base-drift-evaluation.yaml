@@ -1,0 +1,59 @@
+schema_version: '1.0'
+artifact_type: base-drift-evaluation
+evaluation_id: BD-SCRUM91-20260724-01
+task_id: SCRUM-91
+repository: nhatnguyenquang1838-coder/gwc
+working_branch: feat/dw-power-distribution-v1
+working_head_sha: 0c91a95c04af29d2f05181f951686c9ab495283b
+old_base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+new_base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+branch_state:
+  ahead_by: 16
+  behind_by: 14
+  status: diverged
+changed_files:
+- .gwc/tasks/SCRUM-89/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-89/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-89/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-89/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-89/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-89/g2/approval-request.yaml
+- .gwc/tasks/SCRUM-89/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-89/g2/plan-read-receipt.yaml
+- .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/design.md
+- .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md
+- .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/tasks.md
+- core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+- core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+- libs/g2-skill-library/skills/g2-execution-plan.md
+- projects/gwc/package.yaml
+- releases/changelog.md
+- schemas/g01-runtime-input.schema.json
+- schemas/g1-decision-record.schema.json
+- schemas/g1-preflight-report.schema.json
+- tests/test_g01_decision_capture.py
+- tests/test_g1_implementation_plan_handoff.py
+- tools/capture_g01_decision.py
+- tools/generate_g01_runtime.py
+- tools/validate_g01.py
+scope_overlap:
+  direct_write_path_overlap: false
+  semantic_or_packaged_dependency_overlap: true
+  affected_areas:
+  - G0/G1 schemas
+  - G0/G1 generators and validators
+  - GWC project package
+  - Kiro delivery governance
+  - G2 execution planning guidance
+risk_assessment: Governance, schema, validator, and packaged dependency behavior changed after G2 approval.
+evaluator_decision: REAPPROVE
+reason_codes:
+- GOVERNANCE_CHANGED
+- SCHEMA_CHANGED
+- VALIDATOR_CHANGED
+- PACKAGED_DEPENDENCY_CHANGED
+- BRANCH_DIVERGED
+authority_effect: Previous G2 authority cannot be reused for branch reconciliation or G3.
+evidence_effect: Refresh task artifacts and rerun exact-head validation against the new protected base.
+continuation: Issue a new bounded G2 envelope; after approval reconcile and revalidate, then prepare G3.
+evaluated_at: '2026-07-24T13:15:00Z'
