@@ -1,0 +1,46 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-24T07:50:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-89
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Extend current G0/G1/G2 contracts
+  description: Add enforceable plan evidence and read-before-write checks to existing
+    artifacts.
+  benefits:
+  - Reuses current governance
+  - Fail-closed enforcement
+  tradeoffs:
+  - Coordinated multi-file change
+  risks:
+  - Compatibility gaps without tests
+  constraint_fit: FIT
+- id: OPT-2
+  title: Documentation only
+  description: Tell agents to use plans without machine enforcement.
+  benefits:
+  - Small diff
+  tradeoffs:
+  - No enforcement
+  risks:
+  - Silent skips
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: New G1.5 gate
+  description: Create a separate planning gate.
+  benefits:
+  - Conceptual separation
+  tradeoffs:
+  - Duplicates lifecycle
+  risks:
+  - Gate proliferation
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Reuse and extend is the smallest enforceable path.
+decision_required: true
+status: READY

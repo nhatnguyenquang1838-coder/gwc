@@ -32,6 +32,30 @@ class DecisionCaptureTests(unittest.TestCase):
         cls.intake = yaml.safe_load(INTAKE.read_text(encoding="utf-8"))
         cls.preflight = yaml.safe_load(PREFLIGHT.read_text(encoding="utf-8"))
 
+    @staticmethod
+    def implementation_plan() -> dict:
+        return {
+            "applicability": "required",
+            "reason": "Non-trivial implementation requires a plan.",
+            "source": "generated_kiro",
+            "task_me_applicable": True,
+            "task_me_available": False,
+            "task_me_invoked": False,
+            "task_me_fallback_reason": "Task Me unavailable.",
+            "canonical_task_uid": "GWC-G1-PLAN-01",
+            "repository": "owner/repo",
+            "protected_base_sha": "a" * 40,
+            "plan_root": ".kiro/specs/gwc-g1-plan-01",
+            "requirements_path": ".kiro/specs/gwc-g1-plan-01/requirements.md",
+            "design_path": ".kiro/specs/gwc-g1-plan-01/design.md",
+            "tasks_path": ".kiro/specs/gwc-g1-plan-01/tasks.md",
+            "plan_revision": "sha256:" + "b" * 64,
+            "validation_status": "PASS",
+            "validation_evidence": "evidence/plan-validation.json",
+            "generated_by": "chatgpt-agent/kiro-fallback",
+            "generated_at_utc": "2026-07-24T08:00:00Z",
+        }
+
     def test_accepted_explicit_decision_passes(self) -> None:
         options, decision, outcome, issues = module.generate_artifacts(
             copy.deepcopy(self.input), self.intake, self.preflight
@@ -45,7 +69,50 @@ class DecisionCaptureTests(unittest.TestCase):
             set(decision["authority_boundaries"]["excluded"]),
         )
         self.assertTrue(decision["scope_hash"].startswith("sha256:"))
+        self.assertEqual("1.0", decision["schema_version"])
+        self.assertNotIn("implementation_plan_ref", decision)
         self.assertEqual([], issues)
+
+    def test_plan_aware_decision_copies_immutable_reference(self) -> None:
+        preflight = copy.deepcopy(self.preflight)
+        plan = self.implementation_plan()
+        preflight["schema_version"] = "1.1"
+        preflight["implementation_plan"] = plan
+        _, decision, outcome, issues = module.generate_artifacts(
+            copy.deepcopy(self.input), self.intake, preflight
+        )
+        expected = {field: plan[field] for field in module.PLAN_REF_FIELDS}
+        self.assertEqual("PASS", outcome)
+        self.assertEqual([], issues)
+        self.assertEqual("1.1", decision["schema_version"])
+        self.assertEqual(expected, decision["implementation_plan_ref"])
+        self.assertEqual(plan["plan_revision"], decision["implementation_plan_ref"]["plan_revision"])
+        plan["plan_revision"] = "sha256:" + "c" * 64
+        self.assertNotEqual(plan["plan_revision"], decision["implementation_plan_ref"]["plan_revision"])
+
+    def test_plan_aware_preflight_without_plan_blocks(self) -> None:
+        preflight = copy.deepcopy(self.preflight)
+        preflight["schema_version"] = "1.1"
+        _, decision, outcome, issues = module.generate_artifacts(
+            copy.deepcopy(self.input), self.intake, preflight
+        )
+        self.assertEqual("BLOCKED", outcome)
+        self.assertEqual("PENDING", decision["status"])
+        self.assertEqual("1.0", decision["schema_version"])
+        self.assertNotIn("implementation_plan_ref", decision)
+        self.assertIn("G1_IMPLEMENTATION_PLAN_EVIDENCE_MISSING", issues)
+
+    def test_incomplete_plan_reference_blocks(self) -> None:
+        preflight = copy.deepcopy(self.preflight)
+        preflight["schema_version"] = "1.1"
+        preflight["implementation_plan"] = self.implementation_plan()
+        del preflight["implementation_plan"]["plan_revision"]
+        _, decision, outcome, issues = module.generate_artifacts(
+            copy.deepcopy(self.input), self.intake, preflight
+        )
+        self.assertEqual("BLOCKED", outcome)
+        self.assertEqual("PENDING", decision["status"])
+        self.assertTrue(any(issue.startswith("G1_IMPLEMENTATION_PLAN_REFERENCE_INCOMPLETE") for issue in issues))
 
     def test_missing_selected_option_blocks(self) -> None:
         payload = copy.deepcopy(self.input)

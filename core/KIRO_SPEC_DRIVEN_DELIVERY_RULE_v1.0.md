@@ -217,3 +217,53 @@ A Kiro-ready spec passes when:
 - tasks are dependency-aware and map to requirements;
 - project-local constraints are preserved;
 - the spec does not claim or imply authority beyond the current GWC gate.
+
+## 13. Task Me / Kiro implementation-plan handoff
+
+For every task moving from G1 planning to implementation, G1 MUST deterministically classify implementation-plan applicability.
+
+### 13.1 Applicability
+
+Use `applicability: required` for material or multi-step implementation, schema/runtime changes, architecture changes, migrations, or work that benefits from codebase or knowledge-graph analysis, impact analysis, complexity analysis, dependency ordering, file/symbol targeting, or test design.
+
+Use `applicability: not_applicable` only for read-only discovery, status checks, approval recording, communication-only or projection-only work, or a clearly trivial bounded edit. The G1 evidence MUST include the reason; `PLAN_NOT_APPLICABLE` is not an implicit default.
+
+### 13.2 Resolution order
+
+When a plan is required, G1 MUST use this order:
+
+1. Search the target repository for a current task-compatible Kiro spec or other project-approved canonical plan.
+2. Reuse it only when task identity, repository, protected-base SHA, requirements, design, task decomposition, and current codebase state match.
+3. When no valid plan exists, call Task Me when it is applicable and available.
+4. When Task Me is unavailable, unsupported, or not applicable, generate the canonical Kiro three-file package directly and record the fallback reason.
+
+Duplicate or conflicting plan candidates MUST block G1 until one canonical plan is selected or the conflict is resolved.
+
+### 13.3 G1 evidence
+
+Plan-aware G1 artifacts MUST carry one structured `implementation_plan` object in preflight and one immutable `implementation_plan_ref` in the accepted decision. They MUST bind:
+
+- applicability and reason;
+- selected source: `existing_kiro`, `task_me`, `generated_kiro`, or `plan_not_applicable`;
+- Task Me applicability, availability, invocation, and fallback reason;
+- canonical task UID, repository, and protected-base SHA;
+- plan root plus requirements, design, and tasks paths;
+- exact plan revision;
+- validation status and durable validation evidence;
+- generator identity and UTC timestamp.
+
+Legacy artifacts that contain neither field remain compatible. A partial pair is invalid. When applicability is required, G1 `PASS` is forbidden if a path, revision, validation result, identity binding, or durable evidence is missing, stale, invalid, or inconsistent.
+
+### 13.4 G2 read-before-write
+
+The accepted G1 plan reference MUST be copied unchanged into the G2 execution envelope. Before the first G2 repository mutation, the executor MUST:
+
+1. read all three plan files or the approved equivalent package;
+2. verify canonical task UID, repository, protected-base SHA, and plan revision;
+3. verify repository state and approved scope remain consistent;
+4. record `.gwc/tasks/<task-id>/g2/plan-read-receipt.yaml` with the exact paths read and verification result;
+5. run `tools/validate_g01.py --gate G2_EXECUTION`.
+
+A missing plan, missing read receipt, stale revision, base drift, scope mismatch, ownership conflict, or unresolved dependency MUST stop G2 and return the task to G1. G2 MUST NOT silently regenerate, widen, or substitute the plan after approval.
+
+The read receipt and plan reference MUST remain visible in G2/G3 evidence and the Draft PR body. They grant no G4, G5, or G6 authority.

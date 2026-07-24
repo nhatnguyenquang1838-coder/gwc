@@ -24,6 +24,11 @@ GENERATED_ARTIFACTS: dict[str, tuple[str, str]] = {
 HIGH_RISK_CLASSES = {"R2", "R3"}
 NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
 BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
+IMPLEMENTATION_PLAN_REQUIRED_FIELDS = (
+    "canonical_task_uid", "repository", "protected_base_sha", "plan_root",
+    "requirements_path", "design_path", "tasks_path", "plan_revision",
+    "validation_evidence", "generated_by", "generated_at_utc",
+)
 DELIVERY_LIFECYCLE_ACTIONS = [
     "create_guarded_branch", "modify_scoped_files", "run_sandboxed_validation",
     "push_working_branch", "open_or_update_draft_pr", "monitor_ci",
@@ -42,6 +47,7 @@ PROCESS_SOURCES = [
     "AGENTS.md",
     "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
     "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+    "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
 ]
 
 
@@ -97,14 +103,94 @@ def _selected_connector_available(runtime: dict[str, Any]) -> bool:
     return any(item.get("status") == "AVAILABLE" for item in matching)
 
 
-def _route_steps(repository: dict[str, Any], runtime: dict[str, Any], sources_ready: bool) -> list[dict[str, Any]]:
+def _implementation_plan_blockers(
+    implementation_plan: dict[str, Any] | None,
+    repository: dict[str, Any],
+) -> list[dict[str, str]]:
+    """Validate observed plan-routing evidence without performing side effects."""
+    if implementation_plan is None:
+        return []
+
+    applicability = implementation_plan.get("applicability")
+    if applicability == "not_applicable":
+        if (
+            implementation_plan.get("source") == "plan_not_applicable"
+            and implementation_plan.get("validation_status") == "NOT_APPLICABLE"
+            and str(implementation_plan.get("reason", "")).strip()
+        ):
+            return []
+        return [_blocker(
+            "G1_PLAN_NOT_APPLICABLE_INVALID",
+            "Not-applicable plan evidence requires an explicit reason, plan_not_applicable source, and NOT_APPLICABLE status.",
+        )]
+    if applicability != "required":
+        return [_blocker(
+            "G1_PLAN_APPLICABILITY_INVALID",
+            "Plan applicability must be required or not_applicable.",
+        )]
+
+    blockers: list[dict[str, str]] = []
+    missing = [field for field in IMPLEMENTATION_PLAN_REQUIRED_FIELDS if not implementation_plan.get(field)]
+    if missing:
+        blockers.append(_blocker(
+            "G1_IMPLEMENTATION_PLAN_MISSING",
+            "Missing implementation-plan fields: " + ", ".join(missing),
+        ))
+    if implementation_plan.get("validation_status") != "PASS":
+        blockers.append(_blocker(
+            "G1_IMPLEMENTATION_PLAN_NOT_VALIDATED",
+            "A required implementation plan must have validation_status=PASS.",
+        ))
+    if implementation_plan.get("repository") != repository.get("full_name"):
+        blockers.append(_blocker(
+            "G1_IMPLEMENTATION_PLAN_REPOSITORY_MISMATCH",
+            "Implementation-plan repository does not match the G0 repository.",
+        ))
+    if implementation_plan.get("protected_base_sha") != repository.get("base_sha"):
+        blockers.append(_blocker(
+            "G1_IMPLEMENTATION_PLAN_BASE_MISMATCH",
+            "Implementation-plan protected base SHA does not match G0.",
+        ))
+    if implementation_plan.get("source") == "task_me" and implementation_plan.get("task_me_invoked") is not True:
+        blockers.append(_blocker(
+            "G1_TASK_ME_NOT_INVOKED",
+            "Task Me plan source requires invocation evidence.",
+        ))
+    if (
+        implementation_plan.get("task_me_applicable") is True
+        and implementation_plan.get("task_me_available") is True
+        and implementation_plan.get("task_me_invoked") is not True
+    ):
+        blockers.append(_blocker(
+            "G1_TASK_ME_REQUIRED",
+            "Task Me was applicable and available but was not invoked.",
+        ))
+    if (
+        implementation_plan.get("source") == "generated_kiro"
+        and implementation_plan.get("task_me_applicable") is True
+        and implementation_plan.get("task_me_invoked") is not True
+        and not implementation_plan.get("task_me_fallback_reason")
+    ):
+        blockers.append(_blocker(
+            "G1_TASK_ME_FALLBACK_REASON_MISSING",
+            "Kiro fallback requires an explicit Task Me fallback reason.",
+        ))
+    return blockers
+
+
+def _route_steps(
+    repository: dict[str, Any],
+    runtime: dict[str, Any],
+    sources_ready: bool,
+    implementation_plan: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     connector = runtime["selected_connector"]
     connector_declared = connector in runtime["connector_priority"]
     connector_available = _selected_connector_available(runtime)
     read_status = "VERIFIED" if repository["verified"] and sources_ready and connector_available else "HARD_BLOCKED"
     write_status = "VERIFIED" if repository["verified"] and repository["write_enabled"] and connector_declared and connector_available else "HARD_BLOCKED"
     fallbacks = [item for item in runtime["connector_priority"] if item != connector]
-    return [
+    route_steps = [
         {"id": "STEP-01", "name": "protected-base-and-process-readback", "gate": "G1_ALIGNMENT", "actor": "agent", "action_class": "read", "capability_required": "repository_read", "capability_status": read_status, "primary_route": connector, "fallback_routes": fallbacks, "continuation": "immediate", "expected_evidence": "protected base SHA and required process sources", "bypass_eligibility": "FORBIDDEN"},
         {"id": "STEP-02", "name": "formal-g01-artifact-generation-and-validation", "gate": "G1_ALIGNMENT", "actor": "agent", "action_class": "local_validation", "capability_required": "python_jsonschema_validator", "capability_status": "VERIFIED", "primary_route": "tools/generate_g01_runtime.py + tools/validate_g01.py", "fallback_routes": ["trusted local agent", "repo CI"], "continuation": "immediate", "expected_evidence": "schema validation and validate_g01 exit code", "bypass_eligibility": "FORBIDDEN"},
         {"id": "STEP-03", "name": "guarded-branch-creation", "gate": "G2_EXECUTION", "actor": "agent_or_human", "action_class": "repository_write", "capability_required": "guarded_branch_create", "capability_status": write_status, "primary_route": connector, "fallback_routes": ["human manual UI action"], "continuation": "checkpoint before side effect and readback after", "expected_evidence": "branch ref equals approved base SHA", "bypass_eligibility": "OPERATIONAL_ONLY"},
@@ -115,6 +201,23 @@ def _route_steps(repository: dict[str, Any], runtime: dict[str, Any], sources_re
         {"id": "STEP-08", "name": "ready-for-review-promotion", "gate": "G3_PR", "actor": "agent_or_human", "action_class": "repository_metadata_write", "capability_required": "mark_pr_ready_for_review", "capability_status": write_status, "primary_route": connector, "fallback_routes": ["human manual UI action"], "continuation": "checkpoint before action and exact PR-state readback after", "expected_evidence": "PR is ready, head SHA unchanged, G3 PASS remains current", "bypass_eligibility": "OPERATIONAL_ONLY"},
         {"id": "STEP-09", "name": "merge", "gate": "G4_MERGE", "actor": "human_authorized_agent", "action_class": "protected_action", "capability_required": "exact_g4_authority", "capability_status": "SEPARATE_GATE", "primary_route": "exact G4 approval then guarded merge", "fallback_routes": [], "continuation": "stop at human authority boundary", "expected_evidence": "exact PR head and merge commit", "bypass_eligibility": "FORBIDDEN"},
     ]
+    if implementation_plan is not None:
+        plan_status = "VERIFIED" if not _implementation_plan_blockers(implementation_plan, repository) else "HARD_BLOCKED"
+        route_steps.insert(2, {
+            "id": "STEP-10",
+            "name": "implementation-plan-discovery-validation-and-handoff",
+            "gate": "G1_ALIGNMENT",
+            "actor": "agent",
+            "action_class": "planning_and_validation",
+            "capability_required": "task_me_or_kiro_plan",
+            "capability_status": plan_status,
+            "primary_route": implementation_plan.get("source", "unknown"),
+            "fallback_routes": ["existing Kiro plan", "Task Me", "generated Kiro plan"],
+            "continuation": "bind the exact plan revision and return to G1 on drift",
+            "expected_evidence": str(implementation_plan.get("plan_revision") or implementation_plan.get("reason")),
+            "bypass_eligibility": "FORBIDDEN",
+        })
+    return route_steps
 
 
 def _classify_execution_feasibility(route_steps: list[dict[str, Any]]) -> dict[str, Any]:
@@ -157,6 +260,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
     request = runtime_input["request"]
     risk = runtime_input["risk"]
     sources = runtime_input["sources"]
+    implementation_plan = runtime_input.get("implementation_plan_observation")
 
     trace = {"project_id": project["id"], "repository": repository["full_name"], "task_id": task["id"], "base_sha": repository["base_sha"], "g0_snapshot": "../../g0/context-snapshot.yaml"}
     runtime_context = {
@@ -209,6 +313,8 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
     }
 
     blockers = list(g0_blockers)
+    implementation_plan_blockers = _implementation_plan_blockers(implementation_plan, repository)
+    blockers.extend(implementation_plan_blockers)
     checks: list[dict[str, Any]] = [
         _check("REPO_IDENTITY", "PASS" if repository["verified"] else "FAIL", "REPOSITORY_VERIFIED" if repository["verified"] else "REPOSITORY_NOT_VERIFIED", "Repository identity and base evidence are verified." if repository["verified"] else "Repository identity is not verified.", [f'{repository["full_name"]}@{repository["base_sha"]}', project["profile_path"]]),
         _check("REQUIRED_SOURCES", "FAIL" if unavailable_required else "PASS", "REQUIRED_SOURCE_UNAVAILABLE" if unavailable_required else "REQUIRED_SOURCES_AVAILABLE", "One or more required sources are unavailable." if unavailable_required else "All required sources are available.", sorted(unavailable_required) if unavailable_required else [item["path"] for item in sources if item["required"]]),
@@ -217,6 +323,22 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         _check("BOOTSTRAP_BEHAVIOR_CONTRACTS", "FAIL" if unavailable_contracts else "PASS", "BEHAVIOR_CONTRACT_UNAVAILABLE" if unavailable_contracts else "BEHAVIOR_CONTRACTS_AVAILABLE", "One or more required behavior contracts are unavailable." if unavailable_contracts else "Required behavior and presentation contracts are available.", sorted(unavailable_contracts) if unavailable_contracts else runtime_context["required_behavior_contracts"]),
         _check("DELIVERY_LIFECYCLE_SCOPE", "PASS", "NON_MERGE_DELIVERY_SCOPE_EXPLICIT", "G1 anticipates guarded delivery through G3 without granting G4 authority.", DELIVERY_LIFECYCLE_ACTIONS),
     ]
+
+    if implementation_plan is not None:
+        plan_status = "FAIL" if implementation_plan_blockers else "PASS"
+        if implementation_plan_blockers:
+            plan_code = implementation_plan_blockers[0]["code"]
+            plan_message = implementation_plan_blockers[0]["message"]
+        elif implementation_plan.get("applicability") == "not_applicable":
+            plan_code = "PLAN_NOT_APPLICABLE"
+            plan_message = "Implementation planning is explicitly not applicable."
+        else:
+            plan_code = "IMPLEMENTATION_PLAN_VALIDATED"
+            plan_message = "Implementation-plan routing and validation evidence are complete."
+        checks.append(_check(
+            "IMPLEMENTATION_PLAN_HANDOFF", plan_status, plan_code, plan_message,
+            [str(implementation_plan.get("plan_revision") or implementation_plan.get("reason"))],
+        ))
 
     if task["claimed"]:
         checks.append(_check("TASK_TRACEABILITY", "PASS", "DS_ADMIN_TASK_CLAIMED", "The bounded change has a claimed work-tracking task.", [task["id"]]))
@@ -242,7 +364,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         checks.append(_check("RISK_GATE", "PASS", "AUTOMATIC_BOUNDED_ALLOWED", "R0/R1 work may proceed through automatic bounded G2.", [f"risk_class={risk_class}"]))
 
     sources_ready = not unavailable_required
-    route_steps = _route_steps(repository, runtime, sources_ready)
+    route_steps = _route_steps(repository, runtime, sources_ready, implementation_plan)
     process_readback = {"process_id": "governed-repository-delivery", "terminal_outcome": request["desired_outcome"], "required_sources": PROCESS_SOURCES, "status": "VERIFIED" if sources_ready and repository["verified"] else "INCOMPLETE"}
     execution_feasibility = _classify_execution_feasibility(route_steps)
     feasibility_outcome = execution_feasibility["outcome"]
@@ -265,11 +387,13 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
         outcome = "PASS"
 
     preflight = {
-        "schema_version": "1.0", "artifact_type": "g1-preflight-report", "generated_at": generated_at, "trace": trace,
+        "schema_version": "1.1" if implementation_plan is not None else "1.0", "artifact_type": "g1-preflight-report", "generated_at": generated_at, "trace": trace,
         "repository_state": {"base_ref": repository["base_ref"], "base_sha": repository["base_sha"], "profile_path": project["profile_path"], "connector": repository["connector"]},
         "checks": checks, "process_readback": process_readback, "execution_feasibility": execution_feasibility,
         "runtime_context": runtime_context, "risk_class": risk_class, "required_gate": required_gate, "blockers": blockers, "outcome": outcome,
     }
+    if implementation_plan is not None:
+        preflight["implementation_plan"] = implementation_plan
     return {"g0": g0, "intake": intake, "preflight": preflight}, outcome
 
 

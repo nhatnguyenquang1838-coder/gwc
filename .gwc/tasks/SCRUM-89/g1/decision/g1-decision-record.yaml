@@ -1,0 +1,77 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-24T09:47:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-89
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-24T07:41:00Z'
+  source: 'chat request: start SCRUM-89'
+  explicit: true
+rationale: Implement OPT-1. Scope delta 02 adds the protected-base decision-capture
+  runtime and its focused test so plan-aware preflight evidence can produce a valid
+  accepted decision. Canonical plan revision is sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+- AC-8
+scope_hash: sha256:2bf519dbfca54a6dd2b3c06f602db636a7fa1148a74fe3a031360a33f7de33f2
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Schemas and templates
+  - sub_task_id: SUB-TASK-2
+    description: Generator and validator
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Policy and agent guidance
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-4
+    description: Tests and package
+    dependencies:
+    - SUB-TASK-2
+    - SUB-TASK-3
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: schema-design
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: python-runtime
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: governance-authoring
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-4
+    skill_id: validation
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Contract extension, runtime enforcement, guidance, then validation.
