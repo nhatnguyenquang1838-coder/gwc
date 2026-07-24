@@ -35,9 +35,9 @@ checks:
     evidence: [nhatnguyenquang1838-coder/DW-SuperApps@4e552ea3d915a4790814b08b3155c66e3c5736a1]
   - id: BRANCH_STATE
     status: PASS
-    code: GUARDED_BRANCH_AVAILABLE
-    message: The target feature branch does not yet exist in GWC and can be created from the exact protected base after approval.
-    evidence: [GitHub branch search returned no feat/dw-power-distribution-v1]
+    code: GUARDED_BRANCH_RECONCILED
+    message: The guarded branch was reconciled with the current protected base using non-force history-preserving Git.
+    evidence: [feat/dw-power-distribution-v1@a94cb5cc232cb5851e1c2e07672ef7702ad6f317, merge-base 16c72a1200cdeadc2c549f992966f731acab89bb, ahead 17, behind 0]
   - id: SCOPE_BOUNDARY
     status: PASS
     code: FILES_WRITE_BOUNDED
@@ -47,7 +47,7 @@ checks:
     status: PASS
     code: EXACT_VALIDATOR_MATERIALIZED
     message: Protected-base validate_g01.py and matching schemas were materialized in an isolated session and hash-verified.
-    evidence: [tools/validate_g01.py blob 24033e60e9f9b9b205e22e8308156d9ca6499fb7, schemas from main@16c72a1200cdeadc2c549f992966f731acab89bb]
+    evidence: [tools/validate_g01.py blob 4fbc4fc57657ce0df1fde308743646a996156721, schemas from main@16c72a1200cdeadc2c549f992966f731acab89bb]
 process_readback:
   process_id: GWC-G0-G1-G2-BRANCH-IMPLEMENTATION
   terminal_outcome: GWC skills-only provider implementation committed and pushed on feat/dw-power-distribution-v1, with no PR, merge, release, deployment, or publication.
@@ -98,16 +98,16 @@ execution_feasibility:
       expected_evidence: Exact active approval message
       bypass_eligibility: FORBIDDEN
     - id: STEP-4
-      name: Create guarded branch
+      name: Reconcile guarded branch with current base
       gate: G2_EXECUTION
       actor: human_authorized_agent
       action_class: repository_branch_write
-      capability_required: GitHub create_branch from exact base SHA
+      capability_required: Trusted non-force history-preserving Git merge
       capability_status: VERIFIED
-      primary_route: GitHub connector
-      fallback_routes: [DWC connector, DW1 connector]
-      continuation: Stop on branch collision or base drift; otherwise persist approved artifacts and implementation files.
-      expected_evidence: feat/dw-power-distribution-v1 ref at 16c72a1200cdeadc2c549f992966f731acab89bb
+      primary_route: Trusted checkout merges main@16c72a1200cdeadc2c549f992966f731acab89bb into feat/dw-power-distribution-v1 without force push
+      fallback_routes: [connector branch-merge action when available]
+      continuation: Verify merge-base, ahead/behind state, and exact reconciled head before artifact refresh.
+      expected_evidence: feat/dw-power-distribution-v1@a94cb5cc232cb5851e1c2e07672ef7702ad6f317 with merge-base 16c72a1200cdeadc2c549f992966f731acab89bb and behind_by 0
       bypass_eligibility: FORBIDDEN
     - id: STEP-5
       name: Implement bounded provider distribution
