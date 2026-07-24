@@ -1,0 +1,160 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-24T11:33:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity, protected base, write-enabled profile, and connector permissions are verified.
+    evidence: [projects/gwc/project-profile.yaml@b3edbb102fb5b0e7e1532e221d89c16896f17755, GitHub main@b3edbb102fb5b0e7e1532e221d89c16896f17755]
+  - id: JIRA_TASK
+    status: PASS
+    code: JIRA_TASK_IN_PROGRESS
+    message: Jira SCRUM-91 is the single active work-item identity and is In Progress during G0/G1 preparation.
+    evidence: [https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-91]
+  - id: TASK_SPEC
+    status: PASS
+    code: TASK_ME_SPEC_AVAILABLE
+    message: DW-PDIST-02 defines bounded provider scope, exclusions, dependencies, and Definition of Done.
+    evidence: [DW-SuperApps .ua/generated/task-plans/DW-POWER-DIST-20260724/tasks/DW-PDIST-02-gwc-skills-distribution/task.yaml@a2d917b9d9e94ae35e66edf6ac51b25e7d8cabcb]
+  - id: FOUNDATION
+    status: PASS
+    code: SHARED_FOUNDATION_PINNED
+    message: The shared deterministic builder, runtime templates, schemas, and reusable workflow are available at an immutable DW commit.
+    evidence: [nhatnguyenquang1838-coder/DW-SuperApps@4e552ea3d915a4790814b08b3155c66e3c5736a1]
+  - id: BRANCH_STATE
+    status: PASS
+    code: GUARDED_BRANCH_AVAILABLE
+    message: The target feature branch does not yet exist in GWC and can be created from the exact protected base after approval.
+    evidence: [GitHub branch search returned no feat/dw-power-distribution-v1]
+  - id: SCOPE_BOUNDARY
+    status: PASS
+    code: FILES_WRITE_BOUNDED
+    message: Files WRITE is limited to task artifacts, one Kiro spec, provider metadata/workflow/tests, and one changelog fragment.
+    evidence: [scope.json, g1/intake/g1-intake-brief.yaml]
+  - id: VALIDATOR_RECOVERY
+    status: PASS
+    code: EXACT_VALIDATOR_MATERIALIZED
+    message: Protected-base validate_g01.py and matching schemas were materialized in an isolated session and hash-verified.
+    evidence: [tools/validate_g01.py blob 24033e60e9f9b9b205e22e8308156d9ca6499fb7, schemas from main@b3edbb102fb5b0e7e1532e221d89c16896f17755]
+process_readback:
+  process_id: GWC-G0-G1-G2-BRANCH-IMPLEMENTATION
+  terminal_outcome: GWC skills-only provider implementation committed and pushed on feat/dw-power-distribution-v1, with no PR, merge, release, deployment, or publication.
+  required_sources:
+    - AGENTS.md and protected-base core/project/runtime contracts
+    - Jira SCRUM-91 live task state
+    - DW-PDIST-02 Task Me specification
+    - Shared DW Power Distribution foundation at 4e552ea3d915a4790814b08b3155c66e3c5736a1
+    - skills/gwc-g1/SKILL.md and its repository-native references
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+    - id: STEP-1
+      name: Recover and verify protected-base context
+      gate: G0_CONTEXT
+      actor: agent
+      action_class: read_only_repository_inspection
+      capability_required: GitHub connector reads and isolated filesystem
+      capability_status: VERIFIED
+      primary_route: GitHub connector pinned to main@b3edbb102fb5b0e7e1532e221d89c16896f17755
+      fallback_routes: [DWC connector, DW1 connector]
+      continuation: Materialize G0 and proceed only when all required sources are AVAILABLE and blockers are empty.
+      expected_evidence: READY context-snapshot bound to SCRUM-91 and b3edbb102fb5b0e7e1532e221d89c16896f17755
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-2
+      name: Materialize and validate G1
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: isolated_artifact_validation
+      capability_required: Exact protected-base validator, schemas, Python, PyYAML, and jsonschema
+      capability_status: VERIFIED
+      primary_route: /mnt/data/gwc_sessions/20260724-1828-SCRUM-91
+      fallback_routes: [trusted repo CI validation for the same exact task/base/scope]
+      continuation: Repair schema or trace errors in the isolated workspace and rerun until PASS or a hard authority blocker is found.
+      expected_evidence: validate_g01.py exit 0 with JSON outcome PASS
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-3
+      name: Obtain exact G2 authority
+      gate: G2_EXECUTION
+      actor: human
+      action_class: approval_boundary
+      capability_required: Exact APPROVE G2 command matching request ID, scope hash, and expiry
+      capability_status: SEPARATE_GATE
+      primary_route: User sends the generated approval command exactly
+      fallback_routes: []
+      continuation: Revalidate base, task, branch, scope, and expiry; execute only when all fields still match.
+      expected_evidence: Exact active approval message
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-4
+      name: Create guarded branch
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: repository_branch_write
+      capability_required: GitHub create_branch from exact base SHA
+      capability_status: VERIFIED
+      primary_route: GitHub connector
+      fallback_routes: [DWC connector, DW1 connector]
+      continuation: Stop on branch collision or base drift; otherwise persist approved artifacts and implementation files.
+      expected_evidence: feat/dw-power-distribution-v1 ref at b3edbb102fb5b0e7e1532e221d89c16896f17755
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-5
+      name: Implement bounded provider distribution
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: repository_file_write
+      capability_required: GitHub create/update file or tree/commit operations
+      capability_status: VERIFIED
+      primary_route: GitHub connector writes only declared Files WRITE
+      fallback_routes: [DWC connector, DW1 connector]
+      continuation: After each write batch, re-read branch head and stop on scope drift.
+      expected_evidence: Kiro spec, task artifacts, recipe, config/schema, workflow, tests, and changelog on the guarded branch
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-6
+      name: Validate exact branch head
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: static_validation
+      capability_required: Connector readback plus isolated Python/YAML/JSON/test execution
+      capability_status: VERIFIED
+      primary_route: Fetch exact branch files, materialize locally, parse schemas/workflow, run provider tests, and review complete diff
+      fallback_routes: [repository CI after a separately authorized G3 PR]
+      continuation: Repair only files inside the approved scope; any new path requires a new envelope.
+      expected_evidence: Validation report, exact head SHA, hashes, complete diff and scope review
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-7
+      name: Commit and push feature-branch result
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: repository_commit_push
+      capability_required: GitHub tree/commit/ref operations
+      capability_status: VERIFIED
+      primary_route: GitHub connector fast-forward updates to feat/dw-power-distribution-v1
+      fallback_routes: [DWC connector, DW1 connector]
+      continuation: Record final head in Jira and Task Me evidence, then stop before G3 because PR creation is excluded.
+      expected_evidence: Exact feature-branch head SHA and Jira implementation comment
+      bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: chatgpt-github-connector
+  execution_mode: chat_connector_only
+  selected_profile: {id: gwc, path: projects/gwc/project-profile.yaml}
+  selected_connector: GitHub
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts: [core/Agent_Behavior_Semantic_Contract_v1.0.md, core/Agent_Response_Presentation_Contract_v1.0.md]
+blockers: []
+outcome: PASS
