@@ -1,0 +1,83 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-24T11:31:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC has no governed provider recipe and publishing entrypoint for the shared DW Power Distribution v1 contract.
+  why_now: DW-PDIST-01, Task Me, and UA provider work are complete enough that SCRUM-91 is the sole blocker for final DW Power distribution integration.
+desired_outcome: Create a curated skills-only GWC provider package definition on a guarded feature branch, using the shared DW foundation and preserving all GWC authority boundaries.
+stakeholders:
+  requester: user
+  affected: [GWC maintainers, DW-SuperApps consumers, ChatGPT-style agents, local agent hosts]
+scope:
+  in_scope:
+    - Create the canonical Kiro spec for DW-PDIST-02 inside GWC.
+    - Add a strict allowlist distribution recipe for skills/gwc-g1 and verified internal dependencies.
+    - Add neutral configuration defaults and a JSON Schema contract.
+    - Add a provider workflow pinned to the shared DW distribution foundation commit.
+    - Add provider static tests and a changelog fragment.
+    - Persist SCRUM-91 G0/G1/G2 artifacts on the guarded branch after exact G2 approval.
+  non_goals:
+    - Modify existing GWC skill behavior or canonical core governance contracts.
+    - Package .gwc/tasks, historical evidence, generated plans/tasks, dashboards, frontends, secrets, or caches.
+    - Create a Pull Request or mark one ready for review.
+    - Merge, deploy, release, publish power-dist, alter production configuration, credentials, secrets, or production data.
+constraints:
+  - Base all authority and repository evidence on main@16c72a1200cdeadc2c549f992966f731acab89bb.
+  - Use branch feat/dw-power-distribution-v1.
+  - Pin the shared DW foundation to commit 4e552ea3d915a4790814b08b3155c66e3c5736a1.
+  - Use one staging tree for future ZIP and power-dist publication.
+  - Installation must create only an empty consumer-owned .gwc runtime root.
+assumptions:
+  - The shared DW Power Distribution v1 foundation remains compatible at the pinned commit.
+  - Existing GWC skill references listed in skills/gwc-g1/SKILL.md remain present at the protected base.
+  - GitHub connector permissions remain write-enabled for the guarded branch.
+risks:
+  - id: RISK-1
+    description: An overly broad recipe could package governance runtime evidence, generated files, UI assets, or secrets.
+    impact: high
+    mitigation: Use a strict allowlist, explicit forbidden patterns, and provider tests.
+  - id: RISK-2
+    description: Duplicating the DW builder or runtime inside GWC would create contract drift.
+    impact: high
+    mitigation: Pin and call the shared reusable workflow and builder instead of copying implementation.
+  - id: RISK-3
+    description: Publishing actions could be mistaken as authorized by G2 implementation approval.
+    impact: medium
+    mitigation: Exclude release and power-dist publication from this envelope and keep workflow publication inputs disabled by default during validation.
+acceptance_criteria:
+  - id: AC-1
+    statement: The allowlist recipe contains skills/gwc-g1 and every required reference while rejecting forbidden runtime, evidence, UI, generated, secret, and cache paths.
+    verifiable: true
+  - id: AC-2
+    statement: Provider configuration and consumer contract files validate and remain host-neutral.
+    verifiable: true
+  - id: AC-3
+    statement: The workflow pins the shared DW foundation and uses one validated staging tree for release and power-dist outputs.
+    verifiable: true
+  - id: AC-4
+    statement: Static provider tests verify reference resolution, exclusion boundaries, empty .gwc runtime ownership, and no installation side effects.
+    verifiable: true
+  - id: AC-5
+    statement: All changes remain on feat/dw-power-distribution-v1 with no PR, merge, release, deployment, or publication.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - Create guarded branch only after exact G2 approval.
+    - Persist task artifacts, Kiro spec, provider recipe, config contract, workflow, tests, and changelog within declared Files WRITE.
+    - Run local and connector-backed static validation.
+    - Commit and push the guarded feature branch.
+  downstream_non_goals:
+    - Create or update a Pull Request.
+    - Merge or auto-merge.
+    - Deploy, release, publish power-dist, or modify production state.
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [Exact branch head SHA, Full diff review, Static validation results, Scope-drift check]
+unresolved_questions: []
+status: READY

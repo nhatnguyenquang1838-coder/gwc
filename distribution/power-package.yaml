@@ -1,0 +1,106 @@
+apiVersion: dw.superapps/v1
+kind: PowerDistribution
+metadata:
+  id: gwc
+  name: GWC
+  description: Curated G0/G1 governance skills and their verified offline dependencies.
+spec:
+  source:
+    repository: nhatnguyenquang1838-coder/gwc
+    defaultRef: main
+  package:
+    entrypoints:
+      - skills/gwc-g0/SKILL.md
+      - skills/gwc-g1/SKILL.md
+    managedPaths:
+      - AGENTS.md
+      - core
+      - agents/chatgpt-agent
+      - agents/dwc
+      - skills/gwc-g0
+      - skills/gwc-g1
+      - libs/g0-g1-skill-library
+      - docs/g01-lifecycle.md
+      - projects/gwc
+      - schemas
+      - templates/g01
+      - tools
+      - distribution/config
+      - distribution/contracts
+    runtimeTemplates: true
+  include:
+    - AGENTS.md
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    - agents/chatgpt-agent/agent-instructions.md
+    - agents/dwc/agent-instructions.md
+    - agents/dwc/capabilities.yaml
+    - skills/gwc-g0/**
+    - skills/gwc-g1/**
+    - libs/g0-g1-skill-library/**
+    - docs/g01-lifecycle.md
+    - projects/gwc/project-profile.yaml
+    - projects/gwc/project-instructions.md
+    - projects/gwc/project-extension.md
+    - projects/gwc/package.yaml
+    - schemas/g0-context-snapshot.schema.json
+    - schemas/g01-runtime-input.schema.json
+    - schemas/g01-decision-input.schema.json
+    - schemas/g1-intake-brief.schema.json
+    - schemas/g1-preflight-report.schema.json
+    - schemas/g1-options.schema.json
+    - schemas/g1-decision-record.schema.json
+    - schemas/approval-envelope.schema.json
+    - templates/g01/**
+    - tools/generate_g01_runtime.py
+    - tools/capture_g01_decision.py
+    - tools/validate_g01.py
+    - distribution/config/**
+    - distribution/contracts/**
+    - requirements.txt
+  exclude:
+    - "**/__pycache__/**"
+    - "**/*.pyc"
+    - "**/*.pyo"
+    - "**/*.log"
+    - "**/.DS_Store"
+    - "**/.cache/**"
+    - "**/node_modules/**"
+    - "**/coverage/**"
+    - "**/dist/**"
+    - "**/build/**"
+  forbidden:
+    paths:
+      - ".gwc/**"
+      - ".ua/**"
+      - ".task-me/**"
+      - ".kiro/specs/**"
+      - ".github/**"
+      - "tests/**"
+      - "releases/**"
+      - "docs/superpowers/**"
+      - "docs/plans/**"
+      - "tasks/**"
+      - "plans/**"
+      - "apps/**"
+      - "dashboard/**"
+      - "frontend/**"
+      - "public/**"
+      - "artifacts/**"
+      - "reports/**"
+      - "**/screenshots/**"
+      - "**/generated/**"
+      - "**/.env*"
+      - "**/secrets/**"
+    contentPatterns:
+      - "(?i)BEGIN [A-Z ]*PRIVATE KEY"
+      - "(?i)(api[_-]?key|access[_-]?token|secret)\\s*[:=]\\s*['\"][^'\"]{12,}['\"]"
+  runtime:
+    dataRoot: .gwc
+    configRequired: false

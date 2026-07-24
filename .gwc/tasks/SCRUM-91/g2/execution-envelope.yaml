@@ -1,0 +1,71 @@
+schema_version: '1.0'
+artifact_type: execution-envelope
+approval_id: G2-SCRUM91-BASEDRIFT-20260724-01
+authority_gate: G2_EXECUTION
+task_id: SCRUM-91
+issued_at: '2026-07-24T13:15:00Z'
+expires_at: '2026-07-25T13:15:00Z'
+scope_version: 2
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+working_branch: feat/dw-power-distribution-v1
+starting_head_sha: 0c91a95c04af29d2f05181f951686c9ab495283b
+reason: BASE_DRIFT_REAPPROVE
+base_context:
+  approved_base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  execution_base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  drift_status: REAPPROVE
+  drift_evaluation_id: BD-SCRUM91-20260724-01
+  evaluator: chatgpt-github-connector
+  evaluated_at: '2026-07-24T13:15:00Z'
+files_read:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- docs/base-drift-policy.md
+- projects/gwc/project-profile.yaml
+- .gwc/tasks/SCRUM-91/**
+- current protected-base drift diff
+files_write:
+- .gwc/tasks/SCRUM-91/**
+- .kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md
+- .kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md
+- .kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md
+- distribution/power-package.yaml
+- distribution/README.md
+- distribution/config/gwc.defaults.yaml
+- distribution/contracts/gwc-config.schema.json
+- .github/workflows/publish-power.yml
+- tests/test_power_distribution.py
+- releases/changelog.d/2026-07-24-gwc-power-distribution.md
+authorized_actions:
+- record the base-drift evaluation in the SCRUM-91 task workspace
+- refresh SCRUM-91 G0/G1/G2 artifacts for current protected-base schemas and policy
+- reconcile main@16c72a1200cdeadc2c549f992966f731acab89bb into the guarded branch
+  using non-force history-preserving Git
+- make minimal compatibility changes only within files_write
+- run exact-head G0/G1/G2, instruction, provider, deterministic-build, and install/doctor
+  validation
+- commit and push the refreshed guarded branch
+- prepare a G3 approval request after all validation passes
+excluded_actions:
+- create or update a pull request
+- mark a pull request ready for review
+- merge or enable auto-merge
+- write to protected main
+- force push or rewrite shared history
+- delete branches
+- release or publish GitHub assets
+- publish or update power-dist
+- deploy or reload runtime
+- production configuration or production data
+- credential, secret, or migration operation
+acceptance:
+- branch is reconciled with current main without force push
+- task artifacts validate against current protected-base schemas
+- complete diff remains inside files_write
+- provider tests and shared deterministic package smoke pass
+- no PR action occurs until a separate valid G3 approval
+scope_hash: sha256:d4e85bce1ff882bb9bd9c91bd868e345be32b001a9115116f37fe5c8d9e2cbf8

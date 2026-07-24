@@ -1,0 +1,142 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-91
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+working_branch: feat/dw-power-distribution-v1
+pull_request:
+  number: 92
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/92
+  draft: true
+head_sha: d1a2038d1facbf07eda6fc08cd80b5c3580b506e
+scope_hash: sha256:5c8fdc4b8438d8a11ef8cc4d488a2b45c24fd236bb3ddd9f7c78dfff1da6b7d3
+changed_paths:
+  - .github/workflows/publish-power.yml
+  - .gwc/tasks/SCRUM-91/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-91/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-91/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-91/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-91/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-91/g2/base-drift-evaluation.yaml
+  - .gwc/tasks/SCRUM-91/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-91/g2/reconciliation-record.yaml
+  - .kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md
+  - .kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md
+  - .kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md
+  - distribution/README.md
+  - distribution/config/gwc.defaults.yaml
+  - distribution/contracts/gwc-config.schema.json
+  - distribution/power-package.yaml
+  - releases/changelog.d/2026-07-24-gwc-power-distribution.md
+  - tests/test_power_distribution.py
+validation:
+  head_sha: d1a2038d1facbf07eda6fc08cd80b5c3580b506e
+  status: pass
+  commands:
+    - command: GitHub Actions — Validate instructions run 30108513857
+      result: pass
+      evidence: Repository validation, governance unit tests, and Python compilation passed for exact implementation head d1a2038d1facbf07eda6fc08cd80b5c3580b506e.
+    - command: GitHub Actions — Build instruction packages run 30108513858
+      result: pass
+      evidence: gwc, ds-mcp, rental-home, and pm-skills package validation/build jobs passed for exact implementation head.
+    - command: G2 exact remote blob readback and provider validation
+      result: pass
+      evidence: 18/18 implementation blobs matched; no scope drift; deterministic provider archive SHA-256 32f137b93663f7addb16c0515b53f84b1b73b454446ad0932c2770b0ed360b2b.
+review:
+  implementer_id: chatgpt-agent-primary
+  reviewer_id: chatgpt-agent-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: d1a2038d1facbf07eda6fc08cd80b5c3580b506e
+  reviewed_scope_hash: sha256:5c8fdc4b8438d8a11ef8cc4d488a2b45c24fd236bb3ddd9f7c78dfff1da6b7d3
+  reviewed_at: '2026-07-24T16:29:00Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Requirements 1 through 6 are mapped to the curated recipe, neutral config, provider tests, deterministic workflow pin, runtime ownership, and governed delivery evidence.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - The design reuses the immutable shared foundation and does not modify existing GWC skill or governance behavior.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Full 18-file implementation diff reviewed; allowlist, forbidden paths, schema, workflow caller, and audit records remain within scope.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Provider tests cover entrypoints, dependency closure, forbidden content, neutral configuration, immutable workflow pinning, and task-evidence exclusion.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 reconciliation is history-preserving; branch is behind_by zero; no merge, release, publication, deployment, credential, secret, or production authority is granted.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR 92 is bound to the approved base and implementation head; canonical G3 delivery evidence is recorded by this evidence-only change.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30108513857 and Build instruction packages run 30108513858 both completed successfully on the exact implementation head.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - G0/G1 entrypoints and all declared required dependency files are selected by the strict provider recipe and verified by tests.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Fail-closed forbidden paths and secret-content patterns exclude task evidence, generated plans, UI assets, tests, releases, caches, and secret-bearing files.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Runtime defaults validate against a closed schema and hard-code externalWritesEnabled false plus repository-write approval required.
+    - id: AC-4
+      result: pass
+      evidence:
+        - Reusable publishing workflow is pinned to DW-SuperApps commit 4e552ea3d915a4790814b08b3155c66e3c5736a1 and both publication inputs default false.
+    - id: AC-5
+      result: pass
+      evidence:
+        - Deterministic install/doctor/uninstall evidence confirms consumer-owned empty .gwc runtime data is preserved.
+    - id: AC-6
+      result: pass
+      evidence:
+        - Protected-base reconciliation, exact scope review, CI, fresh-context review, and authority exclusions are all evidenced.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: d1a2038d1facbf07eda6fc08cd80b5c3580b506e
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30108513857
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30108513858
+residual_risks:
+  - The manual caller uses secrets: inherit, but the reusable workflow is pinned and declares or references no custom caller secrets; publication still requires separate workflow invocation authority.
+  - This G3 record is an evidence-only commit after the reviewed implementation head; PR-head CI must pass again before Ready for review and G4 preparation.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - RELEASE_PUBLICATION
+  - POWER_DIST_PUBLICATION
+  - PROTECTED_MAIN_WRITE
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass
