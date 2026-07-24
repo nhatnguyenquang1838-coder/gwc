@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-24T14:00:28Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: merge --no-ff
+  description: git merge --no-ff origin/main into feat/dw-power-distribution-v1
+  benefits:
+  - preserves branch history with explicit merge commit
+  - standard approach for integrating main into feature branch
+  - clear audit trail of the reconciliation
+  tradeoffs:
+  - creates a merge commit that is not a fast-forward
+  risks:
+  - potential merge conflicts
+  constraint_fit: FIT
+- id: OPT-2
+  title: merge --ff-only
+  description: git merge --ff-only origin/main into feat/dw-power-distribution-v1
+  benefits:
+  - cleaner linear history
+  - no merge commit created
+  tradeoffs:
+  - will fail if feat branch has diverged from main
+  - does not preserve explicit reconciliation intent
+  risks:
+  - merge will fail if branches have diverged
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: rebase
+  description: git rebase origin/main onto feat/dw-power-distribution-v1
+  benefits:
+  - linear history on feat branch
+  - incorporates latest main changes
+  tradeoffs:
+  - rewrites feat branch history
+  - requires force-push to update remote
+  - higher risk for shared branches
+  risks:
+  - history rewrite on shared branch
+  - requires force-push
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: The user explicitly requested --no-ff merge. OPT-1 is the
+  only option that preserves the explicit reconciliation intent and does not rewrite
+  history or require force-push.
+decision_required: true
+status: READY

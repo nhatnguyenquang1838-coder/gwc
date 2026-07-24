@@ -1,0 +1,82 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-24T14:00:28Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-24T14:00:28Z'
+  source: explicit git merge command in request
+  explicit: true
+rationale: Merge origin/main into feat/dw-power-distribution-v1 with --no-ff to reconcile
+  SCRUM-91 with current main. OPT-1 is selected because it matches the user explicit
+  --no-ff requirement, preserves branch history, and does not require force-push.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+scope_hash: sha256:3f31f8c764e1bcfb8acc760f88b17d9bdb90e81b89d8aa3f70fc6c31d0616047
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - description: Fetch origin branches
+    sub_task_id: SUB-TASK-1
+  - description: Switch to feature branch
+    sub_task_id: SUB-TASK-2
+    dependencies:
+    - SUB-TASK-1
+  - description: Merge main into feature branch
+    sub_task_id: SUB-TASK-3
+    dependencies:
+    - SUB-TASK-1
+    - SUB-TASK-2
+  - description: Push merged branch to origin
+    sub_task_id: SUB-TASK-4
+    dependencies:
+    - SUB-TASK-3
+  agent_allocation:
+  - agent_type: primary
+    skill_id: git-operations
+    sub_task_id: SUB-TASK-1
+  - agent_type: primary
+    skill_id: git-operations
+    sub_task_id: SUB-TASK-2
+  - agent_type: primary
+    skill_id: git-operations
+    sub_task_id: SUB-TASK-3
+  - agent_type: primary
+    skill_id: git-operations
+    sub_task_id: SUB-TASK-4
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Fetch, switch, merge --no-ff, push to origin for SCRUM-91.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-91
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  plan_root: .gwc/tasks/SCRUM-91
+  plan_revision: 16c72a1200cdeadc2c549f992966f731acab89bb
+  validation_evidence: tools/validate_g01.py

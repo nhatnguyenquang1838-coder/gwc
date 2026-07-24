@@ -1,0 +1,150 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-24T14:00:28Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: CK-01
+  status: PASS
+  code: REPO_IDENTITY
+  message: Repository identity verified
+  evidence:
+  - nhatnguyenquang1838-coder/gwc
+  - 16c72a1200cdeadc2c549f992966f731acab89bb
+- id: CK-02
+  status: PASS
+  code: WORKING_BRANCH_EXISTS
+  message: Feature branch feat/dw-power-distribution-v1 exists on origin
+  evidence:
+  - origin/feat/dw-power-distribution-v1
+  - 0c91a95c04af29d2f05181f951686c9ab495283b
+- id: CK-03
+  status: PASS
+  code: MERGE_BASE_EXISTS
+  message: Target merge base commit 16c72a1 exists and matches origin/main HEAD
+  evidence:
+  - 16c72a1200cdeadc2c549f992966f731acab89bb
+- id: CK-04
+  status: PASS
+  code: WRITE_ENABLED
+  message: Project profile write_enabled=true, identity_status=verified
+  evidence:
+  - write_enabled=true
+  - identity_status=verified
+- id: CK-05
+  status: PASS
+  code: CONNECTOR_CONNECTIVITY
+  message: Git fetch connectivity to origin confirmed
+  evidence:
+  - git fetch origin main feat/dw-power-distribution-v1 succeeds
+- id: CK-06
+  status: PASS
+  code: VALIDATOR_AVAILABLE
+  message: tools/validate_g01.py exists
+  evidence:
+  - tools/validate_g01.py
+- id: CK-07
+  status: PASS
+  code: CORE_VERSION_VERIFIED
+  message: Coding_Project_Governance_v1.0.md version=1.0 SHA-256 verified
+  evidence:
+  - ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+process_readback:
+  process_id: GWC-SCRUM-91-MERGE
+  terminal_outcome: Merge feat/dw-power-distribution-v1 with main and push
+  required_sources:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-01
+    name: git-fetch
+    gate: G0_CONTEXT
+    actor: agent
+    action_class: git_read
+    capability_required: git_fetch
+    capability_status: VERIFIED
+    primary_route: GitHub
+    fallback_routes:
+    - DWC
+    - DW1
+    continuation: fetch origin main and feat/dw-power-distribution-v1
+    expected_evidence: both branches fetched successfully
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-02
+    name: git-switch
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: git_switch
+    capability_required: git_checkout
+    capability_status: VERIFIED
+    primary_route: local_git
+    fallback_routes: []
+    continuation: switch to feat/dw-power-distribution-v1
+    expected_evidence: branch checked out
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-03
+    name: git-merge
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: git_merge
+    capability_required: git_merge
+    capability_status: VERIFIED
+    primary_route: local_git
+    fallback_routes:
+    - manual conflict resolution
+    continuation: merge --no-ff origin/main into feat branch
+    expected_evidence: merge commit created
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-04
+    name: git-push
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: git_push
+    capability_required: git_push
+    capability_status: VERIFIED
+    primary_route: GitHub
+    fallback_routes:
+    - DWC
+    - DW1
+    continuation: push merged branch to origin
+    expected_evidence: push succeeded
+    bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
+implementation_plan:
+  applicability: required
+  reason: Merge current main into feature branch to reconcile SCRUM-91
+  source: task_me
+  task_me_applicable: true
+  task_me_available: true
+  task_me_invoked: true
+  task_me_fallback_reason: No fallback needed
+  canonical_task_uid: SCRUM-91
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  plan_root: .gwc/tasks/SCRUM-91
+  requirements_path: .gwc/tasks/SCRUM-91/g1/intake/g1-intake-brief.yaml
+  design_path: .gwc/tasks/SCRUM-91/g1/brainstorming/g1-options.yaml
+  tasks_path: .gwc/tasks/SCRUM-91/g1/decision/g1-decision-record.yaml
+  plan_revision: 16c72a1200cdeadc2c549f992966f731acab89bb
+  validation_status: PASS
+  validation_evidence: tools/validate_g01.py
+  generated_by: local_agent
+  generated_at_utc: '2026-07-24T14:00:28Z'

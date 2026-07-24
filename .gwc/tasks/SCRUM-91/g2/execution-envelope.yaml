@@ -1,0 +1,28 @@
+approval_id: APPROVE-G2-SCRUM-91-20260724
+authority_gate: G2_EXECUTION
+task_id: SCRUM-91
+issued_at: '2026-07-24T14:09:57Z'
+expires_at: '2026-07-25T14:09:57Z'
+scope_version: 1
+risk_class: R1
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+working_branch: feat/dw-power-distribution-v1
+modules_or_files:
+- .git/refs/heads/feat/dw-power-distribution-v1
+authorized_actions:
+- git_fetch
+- git_checkout
+- git_merge
+- git_push
+excluded_actions:
+- merge_protected_branch
+- force_push
+- delete_branch
+- deploy
+- production_data_write
+- production_config_change
+artifact_hashes:
+  g0_snapshot: sha256:ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+scope_hash: sha256:d80bdbe6437db59c359372b734d19d5e95711df75740038241a14a9912eee26e

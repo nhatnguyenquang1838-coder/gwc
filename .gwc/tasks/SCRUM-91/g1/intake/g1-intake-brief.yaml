@@ -1,0 +1,62 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-24T14:00:28Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-91 requires merging origin/main into the feat/dw-power-distribution-v1
+    branch to reconcile the feature branch with the current main
+  why_now: The user explicitly requested git merge --no-ff to update the feature branch
+    with latest main changes
+desired_outcome: 'feat/dw-power-distribution-v1 contains a --no-ff merge commit from
+  main with message chore(gwc): reconcile SCRUM-91 with current main and the branch
+  is pushed to origin'
+stakeholders:
+  requester: user
+  affected:
+  - developer
+scope:
+  in_scope:
+  - git fetch origin main feat/dw-power-distribution-v1
+  - git switch feat/dw-power-distribution-v1
+  - git merge --no-ff 16c72a1200cdeadc2c549f992966f731acab89bb
+  - git push origin feat/dw-power-distribution-v1
+  non_goals:
+  - merge into main
+  - modify protected branches
+  - force-push
+  - delete branches
+constraints:
+- must use --no-ff flag
+- 'merge commit message must be chore(gwc): reconcile SCRUM-91 with current main'
+- must push to origin after merge
+- must not modify protected branches
+assumptions:
+- feat/dw-power-distribution-v1 has diverged from main and requires a merge commit
+- no merge conflicts are expected
+- the working directory is clean
+risks:
+- id: RISK-1
+  description: potential merge conflicts between main and feat branch
+  impact: medium
+  mitigation: check for conflicts locally before pushing
+acceptance_criteria:
+- id: AC-1
+  statement: feat/dw-power-distribution-v1 contains the merge commit
+  verifiable: true
+- id: AC-2
+  statement: 'merge commit message is chore(gwc): reconcile SCRUM-91 with current
+    main'
+  verifiable: true
+- id: AC-3
+  statement: branch is pushed to origin successfully
+  verifiable: true
+- id: AC-4
+  statement: no protected branches are modified
+  verifiable: true
+unresolved_questions: []
+status: READY
