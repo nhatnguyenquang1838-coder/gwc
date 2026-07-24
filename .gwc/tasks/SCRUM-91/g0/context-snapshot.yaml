@@ -8,7 +8,7 @@ project:
 repository:
   full_name: nhatnguyenquang1838-coder/gwc
   base_ref: main
-  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   protected_branches: [main]
   connector: GitHub
   write_enabled: true
@@ -23,37 +23,37 @@ applicable_policies:
   - id: CODING-PROJECT-GOVERNANCE
     path: core/Coding_Project_Governance_v1.0.md
     ref: main
-    source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+    source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   - id: GATE-LIFECYCLE-CONTRACT
     path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
     ref: main
-    source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+    source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   - id: KIRO-SPEC-DRIVEN-DELIVERY
     path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
     ref: main
-    source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+    source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   - id: G0-G1-OPERATIONAL-RUNBOOK
     path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
     ref: main
-    source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+    source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   - id: GWC-PROJECT-INSTRUCTIONS
     path: projects/gwc/project-instructions.md
     ref: main
-    source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+    source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
 sources:
-  - {path: AGENTS.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: core/Coding_Project_Governance_v1.0.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: core/Agent_Operating_Runtime_Contract_v1.0.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: core/E2E_DRAFT_PR_DELIVERY_RULE.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: projects/gwc/project-profile.yaml, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: projects/gwc/project-instructions.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: projects/gwc/project-extension.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: agents/chatgpt-agent/agent-instructions.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: skills/gwc-g1/SKILL.md, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
-  - {path: tools/validate_g01.py, required: true, status: AVAILABLE, source_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755}
+  - {path: AGENTS.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: core/Coding_Project_Governance_v1.0.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: core/Agent_Operating_Runtime_Contract_v1.0.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: core/E2E_DRAFT_PR_DELIVERY_RULE.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: projects/gwc/project-profile.yaml, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: projects/gwc/project-instructions.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: projects/gwc/project-extension.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: agents/chatgpt-agent/agent-instructions.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: skills/gwc-g1/SKILL.md, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
+  - {path: tools/validate_g01.py, required: true, status: AVAILABLE, source_sha: 16c72a1200cdeadc2c549f992966f731acab89bb}
   - {path: 'DW-SuperApps Task Me spec DW-PDIST-02', required: true, status: AVAILABLE, source_sha: a2d917b9d9e94ae35e66edf6ac51b25e7d8cabcb}
   - {path: 'Jira SCRUM-91', required: true, status: AVAILABLE, source_sha: null}
 status: READY
