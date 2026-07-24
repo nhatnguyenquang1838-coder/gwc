@@ -23,12 +23,12 @@ permissions:
 
 jobs:
   package:
-    uses: nhatnguyenquang1838-coder/DW-SuperApps/.github/workflows/reusable-publish-power.yml@4e552ea3d915a4790814b08b3155c66e3c5736a1
+    uses: nhatnguyenquang1838-coder/DW-SuperApps/.github/workflows/reusable-publish-power.yml@299cd605899467377cd31651b27d31c3f88db759
     with:
       power_id: gwc
       recipe_path: distribution/power-package.yaml
       package_version: ${{ inputs.package_version }}
-      foundation_ref: 4e552ea3d915a4790814b08b3155c66e3c5736a1
+      foundation_ref: 299cd605899467377cd31651b27d31c3f88db759
       source_date_epoch: 0
       distribution_branch: power-dist
       publish_release: ${{ inputs.publish_release }}
