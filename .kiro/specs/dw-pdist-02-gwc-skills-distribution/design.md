@@ -101,7 +101,7 @@ The default configuration uses:
 
 ## Implementation Constraints
 
-- Protected base is `main@b3edbb102fb5b0e7e1532e221d89c16896f17755`.
+- Protected base is `main@16c72a1200cdeadc2c549f992966f731acab89bb`.
 - Shared foundation is pinned to `4e552ea3d915a4790814b08b3155c66e3c5736a1`.
 - Existing GWC skill or core contract behavior is not modified.
 - No PR, merge, release, `power-dist` publication, deployment, credential, secret, production configuration, or production data action is authorized.
