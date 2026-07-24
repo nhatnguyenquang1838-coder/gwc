@@ -1,0 +1,38 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-24T11:32:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Curated allowlist provider using the shared DW foundation
+    description: Add only provider metadata, neutral contracts, workflow caller, Kiro spec, and tests while packaging existing verified GWC skill dependencies by allowlist.
+    benefits: [Smallest compatible change, Reuses the shared deterministic builder/runtime, Avoids source duplication, Preserves governance behavior]
+    tradeoffs: [Provider publishing depends on the pinned DW foundation commit, Reference inventory must be maintained]
+    risks: [A missing reference can break standalone installation, An overly broad pattern can leak forbidden content]
+    constraint_fit: FIT
+    skills_distribution:
+      - {skill_id: gwc-g1, description: Canonical GWC G1 alignment and G2 handoff skill., is_required: true}
+      - {skill_id: gwc-g0, description: Required G0 handoff dependency referenced by the G1 skill., is_required: true}
+  - id: OPT-2
+    title: Copy the DW builder and runtime into GWC
+    description: Duplicate the shared packaging implementation inside GWC and maintain it independently.
+    benefits: [Provider repository is self-contained]
+    tradeoffs: [Creates duplicated code and version drift, Expands validation and maintenance surface]
+    risks: [Divergent package semantics across GWC, Task Me, and UA]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Package the whole GWC repository
+    description: Publish a broad repository archive and rely on consumers to ignore unrelated content.
+    benefits: [Minimal reference inventory work]
+    tradeoffs: [Large package, Weak boundary control]
+    risks: [Could include task evidence, generated content, dashboards, caches, or sensitive files]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the only option that reuses the existing shared foundation, satisfies the skills-only boundary, and avoids changing canonical GWC behavior or publishing forbidden repository content.
+decision_required: true
+status: READY
