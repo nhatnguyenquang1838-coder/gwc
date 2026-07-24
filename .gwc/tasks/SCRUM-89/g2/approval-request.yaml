@@ -1,14 +1,24 @@
 schema_version: '1.0'
 artifact_type: g2-approval-request
 task_id: SCRUM-89
-approval_id: G2-SCRUM89-20260724-01
+approval_id: G2-SCRUM89-20260724-02
 authority_gate: G2
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
 working_branch: feat/scrum-89-g1-plan-handoff
+checkpoint_head_sha: 8497c4664e856f11bb75fb0bdd1b03ad189eae17
 risk_class: R2
-scope_hash: sha256:ce3a5ff6fc727d2aeeea6c342974313bc00cc60a13ff8dc3ce74594657586a86
-issued_at: '2026-07-24T07:50:00Z'
-expires_at: '2026-07-25T07:50:00Z'
-exact_approval_command: APPROVE G2 G2-SCRUM89-20260724-01 ce3a5ff6fc727d2a 2026-07-25T07:50:00Z
-status: AWAITING_HUMAN_APPROVAL
+scope_version: 2
+supersedes: G2-SCRUM89-20260724-01
+scope_hash: sha256:e6e804b202ab0408ab485b35c494b97faf85585476b4187a4e6f08dada0bc0aa
+issued_at: '2026-07-24T09:47:00Z'
+expires_at: '2026-07-25T09:47:00Z'
+added_files:
+- tools/capture_g01_decision.py
+- tests/test_g01_decision_capture.py
+exact_approval_command: APPROVE G2 G2-SCRUM89-20260724-02 e6e804b202ab0408 2026-07-25T09:47:00Z
+status: APPROVED
+approved_at: '2026-07-24T10:28:08Z'
+approved_by: user
+observed_approval_command: APPROVE G2 G2-SCRUM89-20260724-02 e6e804b202ab0408 2026-07-25T09:47:00Z
+scope_hash_prefix_verified: true
