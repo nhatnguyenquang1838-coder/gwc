@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-24 — SCRUM-89 G1 implementation-plan handoff
+
+### Added
+
+- Plan-aware G0/G1 runtime input, preflight, decision-capture, and validation evidence.
+- Exact implementation-plan reference propagation from G1 into the G2 execution envelope.
+- Verified G2 plan-read receipt enforcement before repository mutation.
+- Kiro fallback routing when Task Me is applicable but unavailable.
+
+### Changed
+
+- The GWC consumer package exports the runtime input schema, preflight schema, decision schema, generator, decision-capture tool, validator, runbook, Kiro rule, and G2 execution guidance.
+- Legacy schema version `1.0` artifacts remain valid when both plan-evidence fields are absent.
+
+### Safety
+
+- Missing, partial, invalid, stale, mismatched, or base-drifted plan evidence fails closed.
+- This change grants no protected-branch write, merge, deploy, release, production configuration, credential, migration, or production-data authority.
+
 ## 2026-07-23 — SCRUM-70 Jira MCP task governance
 
 ### Changed
