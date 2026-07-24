@@ -1,0 +1,395 @@
+{
+  "apiVersion": "dw.superapps/v1",
+  "files": [
+    {
+      "mode": "0644",
+      "path": "AGENTS.md",
+      "sha256": "599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d",
+      "size": 23840
+    },
+    {
+      "mode": "0600",
+      "path": "POWER.yaml",
+      "sha256": "0e4a014332084db4864d6918021e1e0d8119c14333f9f267ea7f12721a1a0792",
+      "size": 603
+    },
+    {
+      "mode": "0600",
+      "path": "SOURCE.json",
+      "sha256": "4659decbd80092e83d06766d1d92cc700be1c6230a8d023ed32727c2baaff36f",
+      "size": 187
+    },
+    {
+      "mode": "0600",
+      "path": "VERSION",
+      "sha256": "0a3d898a9d649378dd2098e9dee8a94d1a04d6c88d34603cc865b8c36dcde30e",
+      "size": 24
+    },
+    {
+      "mode": "0644",
+      "path": "agents/chatgpt-agent/agent-instructions.md",
+      "sha256": "37cb998a3025b862e1384a570ccecc740d5d9634250afea1926bae331ec8fc42",
+      "size": 14737
+    },
+    {
+      "mode": "0644",
+      "path": "agents/dwc/agent-instructions.md",
+      "sha256": "7060f8dee2af1d5ef4d954af479342b5a8cf203d1c07a43d02922509c656be42",
+      "size": 17598
+    },
+    {
+      "mode": "0644",
+      "path": "agents/dwc/capabilities.yaml",
+      "sha256": "dbacc281112e523b7398353c26549bac2f3df83a305a6c75387d8f42e270bff4",
+      "size": 4196
+    },
+    {
+      "mode": "0755",
+      "path": "bin/configure",
+      "sha256": "d6a3b625b1f547a59a72ff9d1a30a6db4db3b7aadba56fae26bf62005e447e40",
+      "size": 428
+    },
+    {
+      "mode": "0755",
+      "path": "bin/configure.ps1",
+      "sha256": "f8a37a0d550ac55e58b71c38918f0bdefec62025e239d2b71316775d242c172b",
+      "size": 274
+    },
+    {
+      "mode": "0755",
+      "path": "bin/doctor",
+      "sha256": "3d9e2a35c431bffa94f022e42fb54173842a1b26cf6e90e18710f36e887e0377",
+      "size": 425
+    },
+    {
+      "mode": "0755",
+      "path": "bin/doctor.ps1",
+      "sha256": "5b3c5f0157119c00949c07cf3e9724fcb033424fec4524f378accc4b00cd4ca3",
+      "size": 271
+    },
+    {
+      "mode": "0755",
+      "path": "bin/install",
+      "sha256": "b22793805c30387331c0001e394d4d044a3be009ecb6ad46319f0873110e1911",
+      "size": 426
+    },
+    {
+      "mode": "0755",
+      "path": "bin/install.ps1",
+      "sha256": "f9bf3f6959f82dfd13feeb584ffbcca2ad925612aa6d3dbcf1046d174ac1c7e8",
+      "size": 272
+    },
+    {
+      "mode": "0755",
+      "path": "bin/uninstall",
+      "sha256": "0bddd2eebd8b6c3644610cf03dc3ca2a49d7916f27433b22b0281920a60e892f",
+      "size": 428
+    },
+    {
+      "mode": "0755",
+      "path": "bin/uninstall.ps1",
+      "sha256": "4d68e727a10aa7ecda07a222da81bf44c67710a76abc65c06d4280f7d21f1619",
+      "size": 274
+    },
+    {
+      "mode": "0644",
+      "path": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+      "sha256": "10dd851a670bf54a952cb736d64d2b3d06e134baec46cc50e7fc9f8e670dd215",
+      "size": 7745
+    },
+    {
+      "mode": "0644",
+      "path": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+      "sha256": "0d0001e1575edeb8f99fd93882f62add90b2aea38178140301a7274174e52501",
+      "size": 6917
+    },
+    {
+      "mode": "0644",
+      "path": "core/Agent_Response_Presentation_Contract_v1.0.md",
+      "sha256": "e95c7529c4bbee6bfbe18028eb780832803759d29e63a5e11fa2ab39de024f2a",
+      "size": 7051
+    },
+    {
+      "mode": "0644",
+      "path": "core/Coding_Project_Governance_v1.0.md",
+      "sha256": "ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48",
+      "size": 28818
+    },
+    {
+      "mode": "0644",
+      "path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "sha256": "4c2587ce6aa5c74cf4ba33d92d3f0ecb34ff698380c056f0bba45886bbfdf37b",
+      "size": 15975
+    },
+    {
+      "mode": "0644",
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "sha256": "0ebb556371c4b88cef1487488b54d3c0eecf7be83456b53633803bd257e9e7ec",
+      "size": 15374
+    },
+    {
+      "mode": "0644",
+      "path": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "sha256": "aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e8",
+      "size": 10626
+    },
+    {
+      "mode": "0644",
+      "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "sha256": "1304b7d9923b9e5805a0f42cf159a87dab4c6d76086467fc6929396893635fbc",
+      "size": 15645
+    },
+    {
+      "mode": "0644",
+      "path": "distribution/config/gwc.defaults.yaml",
+      "sha256": "2a04e1488bbe469b0cebaa2c6426f065adddcadf5cdf22f34090ff6df2e38fcb",
+      "size": 547
+    },
+    {
+      "mode": "0644",
+      "path": "distribution/contracts/gwc-config.schema.json",
+      "sha256": "2b79799fe254920d85ae172230abe732d031591e64ae408a7d2a2c04e2d2cbee",
+      "size": 1666
+    },
+    {
+      "mode": "0644",
+      "path": "docs/g01-lifecycle.md",
+      "sha256": "02be50cd5e2583fb14d3e892ff5995f616aa9c01213595413ecb6f23cf518403",
+      "size": 6394
+    },
+    {
+      "mode": "0644",
+      "path": "lib/power_runtime.py",
+      "sha256": "28401ff39568ebfa801b74b98d1361ed27554ee94c6f98b4da750ec21c8fce94",
+      "size": 12638
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/NOTICE.md",
+      "sha256": "32b1b7c0405bffef43bf8f728f63e8755fc707b29807d34368b35ac7f49c2832",
+      "size": 496
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/README.md",
+      "sha256": "879c175fcc3b20cc341d8958e47af552c3d2f8f4625bbdc921f3013ebaa5ea70",
+      "size": 730
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/manifest.yaml",
+      "sha256": "7691360f8e1b0a5a527d6ec3f6ffeb817980b3ea5d1bf32be6b40a29d0b1212f",
+      "size": 1583
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/skills/g0-context-loading.md",
+      "sha256": "60de8b024031941d6ae377e9b738f1b67ffb9851f73130f0733af7f8d240feb6",
+      "size": 2643
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md",
+      "sha256": "69056d8a3b16a01596888b96ee308d0183e1c2cbac2b7872a4533efe3d5db761",
+      "size": 3412
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/skills/g1-decision-record.md",
+      "sha256": "cd2f4a1f6a144a6e31e2e07976357cb734c684334b5d929dacd74692d043934c",
+      "size": 3237
+    },
+    {
+      "mode": "0644",
+      "path": "libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md",
+      "sha256": "d81e8f35c431f82dd19acaae9327d48d306141654d29a58105d9cdbbdf190d53",
+      "size": 3006
+    },
+    {
+      "mode": "0644",
+      "path": "projects/gwc/package.yaml",
+      "sha256": "19c83b29bedb7070ecccc8adc689f81c3e9fbd92bb235ce3e3289dd3e197bc54",
+      "size": 49768
+    },
+    {
+      "mode": "0644",
+      "path": "projects/gwc/project-extension.md",
+      "sha256": "d23ba7148409e3d2a9b420790a1c7d11d2523c9fc472fbc0d62aa5b230ccde2e",
+      "size": 3194
+    },
+    {
+      "mode": "0644",
+      "path": "projects/gwc/project-instructions.md",
+      "sha256": "f3bdff255483aa1c03f2a2061346e91417083b667d54e69138c94b8d6cf9cf83",
+      "size": 5469
+    },
+    {
+      "mode": "0644",
+      "path": "projects/gwc/project-profile.yaml",
+      "sha256": "fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5",
+      "size": 3002
+    },
+    {
+      "mode": "0644",
+      "path": "requirements.txt",
+      "sha256": "c6510e2d2bfbd08ae31ee9d1042c91e2d748cca5b1c58a6fd879ae32f5fb073c",
+      "size": 33
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/approval-envelope.schema.json",
+      "sha256": "6ec12b05db5da6bf0bc4ce129b0599870e87d1167899f3da5d85518828c2525b",
+      "size": 4433
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g0-context-snapshot.schema.json",
+      "sha256": "4d2e306e503a50b0aa5600146d020d636ffb7c7cefe18a0c6a3e623ca6fb52c5",
+      "size": 8466
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g01-decision-input.schema.json",
+      "sha256": "e23e571495212198e56e6c154bd22d5a011fe8f7dcc4d9ca6c5f5ac090056956",
+      "size": 2560
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g01-runtime-input.schema.json",
+      "sha256": "e7fb3e1c682e61847a51adda6f90d2ae74cfbdc4332bb3b4b1113ba2cfc26193",
+      "size": 16254
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g1-decision-record.schema.json",
+      "sha256": "5551a9710efd15f0b16878f7cb207f3c495515a55d657c848989ad19f20e1a75",
+      "size": 10005
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g1-intake-brief.schema.json",
+      "sha256": "5d8684ebba0444ec15f87f532a8cc648a1f2d35bdc097fa360b9e8cb6e291384",
+      "size": 6696
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g1-options.schema.json",
+      "sha256": "89958f0bdcefb594fa41cd90dcc014c275b2103bba4f31eba2577fec0670cf11",
+      "size": 4286
+    },
+    {
+      "mode": "0644",
+      "path": "schemas/g1-preflight-report.schema.json",
+      "sha256": "2105b22bfcba2ff12f420d5ae772ad731fe295adda643a37c7d92f0863352389",
+      "size": 16080
+    },
+    {
+      "mode": "0644",
+      "path": "skills/gwc-g0/SKILL.md",
+      "sha256": "c01ccfa87a8eee1ecd949a5dc2fc0f0235811f6ebcf718cab2e08b159d5a9ca9",
+      "size": 13113
+    },
+    {
+      "mode": "0644",
+      "path": "skills/gwc-g1/SKILL.md",
+      "sha256": "0ebecdf16ea7c11c47735522eac376e3b769f58e989acb8345a890d82123f1f2",
+      "size": 18786
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g0-context-snapshot.template.yaml",
+      "sha256": "c2a4860576f9af4a0d7baa5ea57c263a3a01c2b32fd85032fc52c89d7eb19a77",
+      "size": 1205
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g01-decision-input.template.yaml",
+      "sha256": "9f25d7315b145d937ea212213a1159b6433c2567a849b8079854a7885ef213a1",
+      "size": 1017
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g01-runtime-input.template.yaml",
+      "sha256": "092de0214089225a0ee154d5d142d9858444ea49b1489b448ea78c1ede77efd5",
+      "size": 3424
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g1-decision-record.template.yaml",
+      "sha256": "a2a18da7946cf5494127220da9a0a40f9de8dfe15f518db400edd2c3c6a56ef4",
+      "size": 1693
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g1-intake-brief.template.yaml",
+      "sha256": "1a0b4618e98cef78a405c09628fab3719e1ee70bdc57942789b7e3d723ac3d62",
+      "size": 1430
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g1-options.template.yaml",
+      "sha256": "53e3b9d362be6667f44b056fd5728f4489f460fa91c51be85df8f81304cbcc21",
+      "size": 1651
+    },
+    {
+      "mode": "0644",
+      "path": "templates/g01/g1-preflight-report.template.yaml",
+      "sha256": "7173f90f3bff84c8f9fc80d8930150cccdea1cf7403ae2638314a811b626c2d5",
+      "size": 1543
+    },
+    {
+      "mode": "0644",
+      "path": "tools/capture_g01_decision.py",
+      "sha256": "c98dc9a2001faeb227e571cc15069216435311c7df0daa8b2acdf15995033d7c",
+      "size": 11019
+    },
+    {
+      "mode": "0755",
+      "path": "tools/generate_g01_runtime.py",
+      "sha256": "4bc46989c951d32cdcbeeeaeede2b149f436942c38fa95fbc5ae5421c6641004",
+      "size": 29539
+    },
+    {
+      "mode": "0755",
+      "path": "tools/validate_g01.py",
+      "sha256": "31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb",
+      "size": 25397
+    }
+  ],
+  "kind": "PowerPackageManifest",
+  "metadata": {
+    "powerId": "gwc",
+    "sourceRef": "main",
+    "sourceRepository": "nhatnguyenquang1838-coder/gwc",
+    "sourceSha": "62689ce35e279751a3bf17b5255ac258dafbe7d7",
+    "version": "main-20260725.1-62689ce"
+  },
+  "spec": {
+    "entrypoints": [
+      "skills/gwc-g0/SKILL.md",
+      "skills/gwc-g1/SKILL.md"
+    ],
+    "generatedFiles": [
+      "POWER.yaml",
+      "SOURCE.json",
+      "VERSION"
+    ],
+    "managedPaths": [
+      "AGENTS.md",
+      "core",
+      "agents/chatgpt-agent",
+      "agents/dwc",
+      "skills/gwc-g0",
+      "skills/gwc-g1",
+      "libs/g0-g1-skill-library",
+      "docs/g01-lifecycle.md",
+      "projects/gwc",
+      "schemas",
+      "templates/g01",
+      "tools",
+      "distribution/config",
+      "distribution/contracts"
+    ],
+    "runtimeDataRoot": ".gwc"
+  }
+}

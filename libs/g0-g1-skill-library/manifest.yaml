@@ -1,0 +1,51 @@
+schema_version: '1.0'
+library_id: gwc-g0-g1-offline-skills
+library_version: 0.1.0
+compatible_gates:
+  - G0_CONTEXT
+  - G1_ALIGNMENT
+source_mode: OFFLINE_PINNED
+context7:
+  library_id: /obra/superpowers
+  query_first: true
+  required_skill_ids:
+    - g0-context-loading
+    - g1-intake-options-preflight
+    - g1-decision-record
+    - g0-g1-approval-envelope
+fallback_policy:
+  mode: bundle-atomic
+  prohibit_mixed_sources: true
+  verify_sha256: true
+  fail_closed_code: G0_G1_SKILL_SOURCE_BLOCKED
+authority:
+  prohibited_actions:
+    - merge
+    - auto_merge
+    - deploy
+    - release
+    - production_configuration
+    - credential_operation
+    - migration
+    - production_data
+    - force_push
+    - branch_deletion
+    - shared_history_rewrite
+    - pr_base_change
+skills:
+  - id: g0-context-loading
+    path: libs/g0-g1-skill-library/skills/g0-context-loading.md
+    required: true
+    sha256: sha256:60de8b024031941d6ae377e9b738f1b67ffb9851f73130f0733af7f8d240feb6
+  - id: g1-intake-options-preflight
+    path: libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md
+    required: true
+    sha256: sha256:d81e8f35c431f82dd19acaae9327d48d306141654d29a58105d9cdbbdf190d53
+  - id: g1-decision-record
+    path: libs/g0-g1-skill-library/skills/g1-decision-record.md
+    required: true
+    sha256: sha256:cd2f4a1f6a144a6e31e2e07976357cb734c684334b5d929dacd74692d043934c
+  - id: g0-g1-approval-envelope
+    path: libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md
+    required: true
+    sha256: sha256:69056d8a3b16a01596888b96ee308d0183e1c2cbac2b7872a4533efe3d5db761

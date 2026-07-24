@@ -1,0 +1,28 @@
+apiVersion: dw.superapps/v1
+kind: PowerPackage
+metadata:
+  id: gwc
+  name: GWC
+  version: main-20260725.1-62689ce
+  description: Curated G0/G1 governance skills and their verified offline dependencies.
+spec:
+  entrypoints:
+  - skills/gwc-g0/SKILL.md
+  - skills/gwc-g1/SKILL.md
+  managedPaths:
+  - AGENTS.md
+  - core
+  - agents/chatgpt-agent
+  - agents/dwc
+  - skills/gwc-g0
+  - skills/gwc-g1
+  - libs/g0-g1-skill-library
+  - docs/g01-lifecycle.md
+  - projects/gwc
+  - schemas
+  - templates/g01
+  - tools
+  - distribution/config
+  - distribution/contracts
+  runtimeDataRoot: .gwc
+  configRequired: false

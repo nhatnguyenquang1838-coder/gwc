@@ -1,0 +1,146 @@
+agent:
+  id: dwc
+  name: DWC
+  version: 1.0.0
+
+scope:
+  repository: nhatnguyenquang1838-coder/gwc
+  connector: DWC
+  protected_branches:
+    - main
+
+capabilities:
+  automatic_read:
+    - repository_metadata
+    - repository_tree
+    - utf8_files
+    - binary_files
+    - workflow_runs
+    - workflow_artifacts
+    - pull_request_context
+    - ds_admin_tasks
+    - integrity_artifacts
+  observability:
+    structured_connector_trace:
+      contract: core/CONNECTOR_TRACE_CONTRACT_v1.0.md
+      schema: schemas/connector-trace.schema.json
+      response_mode: additive
+      required_fields:
+        - trace_id
+        - operation
+        - failure_stage
+        - connector_received
+        - policy_checked
+        - upstream_attempted
+        - provider_request_id
+        - github_request_id
+        - http_status
+      secret_redaction_required: true
+      backend_implementation_required: true
+    g5_ci_status_verify:
+      contract: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+      evidence_schema: schemas/g5-ci-verification-evidence.schema.json
+      checkpoint_schema: schemas/node-architect/g5-ci-checkpoint.schema.json
+      approval:
+        required: false
+      action_class: read_only
+      minimum_gate: G5_DEPLOY
+      trigger: after_g4_merge
+      connector_methods:
+        - fetch_commit_workflow_runs
+        - get_commit_combined_status
+        - fetch_workflow_run_jobs
+        - fetch_workflow_run_artifacts
+        - fetch_workflow_job_steps
+      guard:
+        - merge_commit_sha_is_known
+        - selected_run_head_sha_equals_merge_commit_sha
+        - empty_pr_filtered_results_are_not_ci_pending
+        - pending_state_has_checkpoint
+        - manual_action_authorized == false
+      classifications:
+        - success
+        - failure
+        - CI_PENDING
+        - CONNECTOR_OBSERVABILITY_INCOMPLETE
+        - SHA_MISMATCH
+      notes:
+        - Read-only G5 status verification only.
+        - Does not authorize deploy, release, publish, runtime reload, merge, production data, production configuration, credentials, secrets, or migration.
+  approval_policy:
+    generated_artifact_refresh:
+      risk: low
+      branch_scope: true
+      auto_approval:
+        allowed: true
+        conditions:
+          - generated_by_verified_generator
+          - protected_branch_only
+          - no_merge_permission
+    production_change:
+      risk: high
+      human_approval:
+        required: true
+  bounded_write_on_guarded_branch:
+    create_allowed_prefix_branch: true
+    create_repository_files_within_task_scope: true
+    update_repository_files_within_task_scope: true
+    replace_text_with_expected_state: true
+    add_or_update_tests: true
+    add_or_update_documentation: true
+    push_working_branch: true
+    open_or_update_draft_pr: true
+    mark_pr_ready_for_review:
+      tool: github_mark_pr_ready_for_review
+      approval:
+        required: false
+      guard:
+        - pr_state == draft
+        - g3_delivery_record == PASS
+        - expected_head_sha == current_head_sha
+        - required_ci == success
+        - scope_drift == false
+        - no_merge_permission
+      notes:
+        - G3 metadata completion only.
+        - Does not grant G4 merge authority.
+    comment_on_pull_request: true
+    merge_human_approved_pull_request: true
+    repair_repository_fixable_ci: true
+    commit_generated_integrity_artifacts:
+      approval:
+        required: false
+      guard:
+        - branch != main
+        - artifact_source == generator
+        - validation == PASS
+  work_tracking:
+    create_task: true
+    update_task: true
+    transition_task: true
+    link_task_to_pr: true
+
+human_direction_required_for:
+  - financial_impact
+  - architecture_change
+  - security_boundary_change
+  - production_configuration
+  - credential_or_secret_change
+  - production_data_access
+  - destructive_or_irreversible_change
+  - broad_blast_radius
+
+hard_exclusions:
+  - protected_branch_direct_push
+  - merge_without_exact_g4_human_approval
+  - auto_merge
+  - deployment
+  - release
+  - production_configuration
+  - credential_rotation
+  - production_migration
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change

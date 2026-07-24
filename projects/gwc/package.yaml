@@ -1,0 +1,262 @@
+schema_version: "1.0"
+project_id: gwc
+package_version: "1.16.0"
+status: active
+profile: projects/gwc/project-profile.yaml
+instructions:
+  - {id: coding-project-governance, path: core/Coding_Project_Governance_v1.0.md, target: .governance/Coding_Project_Governance_v1.0.md, required: true}
+  - {id: gate-lifecycle-contract, path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md, target: .governance/GATE_LIFECYCLE_CONTRACT_v1.0.md, required: true}
+  - {id: agent-operating-runtime-contract, path: core/Agent_Operating_Runtime_Contract_v1.0.md, target: .governance/Agent_Operating_Runtime_Contract_v1.0.md, required: true}
+  - {id: kiro-spec-driven-delivery-rule, path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md, target: .governance/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md, required: true}
+  - {id: g0-g1-operational-runbook, path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, target: .governance/core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, required: true}
+  - {id: agent-behavior-semantic-contract, path: core/Agent_Behavior_Semantic_Contract_v1.0.md, target: .governance/Agent_Behavior_Semantic_Contract_v1.0.md, required: true}
+  - {id: agent-response-presentation-contract, path: core/Agent_Response_Presentation_Contract_v1.0.md, target: .governance/Agent_Response_Presentation_Contract_v1.0.md, required: true}
+  - {id: e2e-draft-pr-delivery, path: core/E2E_DRAFT_PR_DELIVERY_RULE.md, target: .governance/E2E_DRAFT_PR_DELIVERY_RULE.md, required: true}
+  - {id: hotfix-and-rescue-mode, path: core/HOTFIX_AND_RESCUE_MODE_v1.0.md, target: .governance/HOTFIX_AND_RESCUE_MODE_v1.0.md, required: false}
+  - {id: human-bypass-contract, path: core/HUMAN_BYPASS_CONTRACT_v1.0.md, target: .governance/HUMAN_BYPASS_CONTRACT_v1.0.md, required: true}
+  - {id: base-drift-policy, path: governance/base-drift-policy.yaml, target: .governance/base-drift-policy.yaml, required: true}
+  - {id: gwc-standard-profile-set, path: governance/profile-sets/gwc-standard.yaml, target: .governance/profile-sets/gwc-standard.yaml, required: true}
+  - {id: standard-gate-policy-profile, path: governance/gate-policy-profiles/standard.yaml, target: .governance/gate-policy-profiles/standard.yaml, required: true}
+  - {id: chatgpt-agent-runtime-profile, path: governance/agent-runtime-profiles/chatgpt.yaml, target: .governance/agent-runtime-profiles/chatgpt.yaml, required: true}
+  - {id: dwc-agent-runtime-profile, path: governance/agent-runtime-profiles/dwc.yaml, target: .governance/agent-runtime-profiles/dwc.yaml, required: true}
+  - {id: repo-governance-environment-profile, path: governance/environment-profiles/repo-governance.yaml, target: .governance/environment-profiles/repo-governance.yaml, required: true}
+  - {id: default-risk-profile, path: governance/risk-profiles/default.yaml, target: .governance/risk-profiles/default.yaml, required: true}
+  - {id: profile-set-schema, path: schemas/profile-set.schema.json, target: .governance/schemas/profile-set.schema.json, required: true}
+  - {id: gate-policy-profile-schema, path: schemas/gate-policy-profile.schema.json, target: .governance/schemas/gate-policy-profile.schema.json, required: true}
+  - {id: gate-response-trace-schema, path: schemas/gate-response-trace.schema.json, target: .governance/schemas/gate-response-trace.schema.json, required: true}
+  - {id: gate-response-template, path: templates/gates/gate-response.template.md, target: .governance/templates/gates/gate-response.template.md, required: true}
+  - {id: profile-resolver, path: tools/resolve_profiles.py, target: .governance/tools/resolve_profiles.py, required: true}
+  - {id: profile-set-validator, path: tools/validate_profile_set.py, target: .governance/tools/validate_profile_set.py, required: true}
+  - {id: gate-response-trace-validator, path: tools/validate_gate_response_trace.py, target: .governance/tools/validate_gate_response_trace.py, required: true}
+  - {id: instruction-source-registry, path: governance/instruction-source-registry.yaml, target: .governance/instruction-source-registry.yaml, required: true}
+  - {id: g01-lifecycle, path: docs/g01-lifecycle.md, target: .governance/g01-lifecycle.md, required: true}
+  - {id: g1-preflight-report-schema, path: schemas/g1-preflight-report.schema.json, target: .governance/schemas/g1-preflight-report.schema.json, required: true}
+  - {id: g01-runtime-input-schema, path: schemas/g01-runtime-input.schema.json, target: .governance/schemas/g01-runtime-input.schema.json, required: true}
+  - {id: g1-decision-record-schema, path: schemas/g1-decision-record.schema.json, target: .governance/schemas/g1-decision-record.schema.json, required: true}
+  - {id: g01-runtime-generator, path: tools/generate_g01_runtime.py, target: .governance/tools/generate_g01_runtime.py, required: true}
+  - {id: g01-decision-capture, path: tools/capture_g01_decision.py, target: .governance/tools/capture_g01_decision.py, required: true}
+  - {id: g01-validator, path: tools/validate_g01.py, target: .governance/tools/validate_g01.py, required: true}
+  - {id: human-bypass-schema, path: schemas/human-bypass.schema.json, target: .governance/schemas/human-bypass.schema.json, required: true}
+  - {id: project-consumer-agent-instructions, path: docs/project-consumer-agent-instructions.md, target: .governance/project-consumer-agent-instructions.md, required: true}
+  - {id: g2-skill-library-readme, path: libs/g2-skill-library/README.md, target: .governance/libs/g2-skill-library/README.md, required: true}
+  - {id: g2-skill-library-manifest, path: libs/g2-skill-library/manifest.yaml, target: .governance/libs/g2-skill-library/manifest.yaml, required: true}
+  - {id: g2-skill-library-notice, path: libs/g2-skill-library/NOTICE.md, target: .governance/libs/g2-skill-library/NOTICE.md, required: true}
+  - {id: g2-approval-envelope, path: libs/g2-skill-library/skills/g2-approval-envelope.md, target: .governance/libs/g2-skill-library/skills/g2-approval-envelope.md, required: true}
+  - {id: g2-execution-plan, path: libs/g2-skill-library/skills/g2-execution-plan.md, target: .governance/libs/g2-skill-library/skills/g2-execution-plan.md, required: true}
+  - {id: g2-repository-interaction, path: libs/g2-skill-library/skills/g2-repository-interaction.md, target: .governance/libs/g2-skill-library/skills/g2-repository-interaction.md, required: true}
+  - {id: gwc-fastlane-bootstrap-workflow, path: core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md, target: .governance/core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md, required: true}
+  - {id: revamp-upgrade-gwc-workflow, path: core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md, target: .governance/core/workflows/REVAMP_UPGRADE_GWC_WORKFLOW_v0.1.md, required: true}
+  - {id: revamp-upgrade-gwc-runbook, path: docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md, target: .governance/docs/runbooks/REVAMP_UPGRADE_GWC_RUNBOOK.md, required: true}
+  - {id: external-audit-projection-rule, path: core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md, target: .governance/core/node-architect/EXTERNAL_AUDIT_PROJECTION_RULE_v0.1.md, required: true}
+  - {id: kiro-strict-coding-state-rule, path: core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md, target: .governance/core/node-architect/KIRO_STRICT_CODING_STATE_RULE_v0.1.md, required: true}
+  - {id: checkpoint-resume-rule, path: core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md, target: .governance/core/node-architect/CHECKPOINT_RESUME_RULE_v0.1.md, required: true}
+  - {id: stale-session-cleanup-rule, path: core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md, target: .governance/core/node-architect/STALE_SESSION_CLEANUP_RULE_v0.1.md, required: true}
+  - {id: ds-admin-tc-sync-protocol, path: core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md, target: .governance/core/node-architect/DS_ADMIN_TC_SYNC_PROTOCOL_v0.1.md, required: true}
+  - {id: kiro-local-agent-execution-package, path: core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md, target: .governance/core/node-architect/KIRO_LOCAL_AGENT_EXECUTION_PACKAGE_v0.1.md, required: true}
+  - {id: consumer-package-export-rule, path: core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md, target: .governance/core/node-architect/CONSUMER_PACKAGE_EXPORT_RULE_v0.1.md, required: true}
+  - {id: runtime-kernel-rule, path: core/node-architect/RUNTIME_KERNEL_v0.1.md, target: .governance/core/node-architect/RUNTIME_KERNEL_v0.1.md, required: true}
+  - {id: changelog-append-hygiene-runbook, path: docs/runbooks/CHANGELOG_APPEND_HYGIENE.md, target: .governance/docs/runbooks/CHANGELOG_APPEND_HYGIENE.md, required: true}
+  - {id: revamp-gwc-009-changelog-fragment, path: releases/changelog.d/2026-07-21-revamp-gwc-009-runtime-kernel.md, target: .governance/releases/changelog.d/2026-07-21-revamp-gwc-009-runtime-kernel.md, required: true}
+  - {id: revamp-upgrade-gwc-envelope-schema, path: schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json, target: .governance/schemas/node-architect/revamp-upgrade-gwc-envelope.schema.json, required: true}
+  - {id: external-audit-projection-schema, path: schemas/node-architect/external-audit-projection.schema.json, target: .governance/schemas/node-architect/external-audit-projection.schema.json, required: true}
+  - {id: kiro-coding-state-schema, path: schemas/node-architect/kiro-coding-state.schema.json, target: .governance/schemas/node-architect/kiro-coding-state.schema.json, required: true}
+  - {id: node-registry-schema, path: schemas/node-architect/node-registry.schema.json, target: .governance/schemas/node-architect/node-registry.schema.json, required: true}
+  - {id: runtime-node-schema, path: schemas/node-architect/runtime-node.schema.json, target: .governance/schemas/node-architect/runtime-node.schema.json, required: true}
+  - {id: simulation-result-schema, path: schemas/node-architect/simulation-result.schema.json, target: .governance/schemas/node-architect/simulation-result.schema.json, required: true}
+  - {id: checkpoint-schema, path: schemas/node-architect/checkpoint.schema.json, target: .governance/schemas/node-architect/checkpoint.schema.json, required: true}
+  - {id: resume-token-schema, path: schemas/node-architect/resume-token.schema.json, target: .governance/schemas/node-architect/resume-token.schema.json, required: true}
+  - {id: stale-session-cleanup-schema, path: schemas/node-architect/stale-session-cleanup.schema.json, target: .governance/schemas/node-architect/stale-session-cleanup.schema.json, required: true}
+  - {id: ds-admin-tc-sync-schema, path: schemas/node-architect/ds-admin-tc-sync.schema.json, target: .governance/schemas/node-architect/ds-admin-tc-sync.schema.json, required: true}
+  - {id: sync-target-schema, path: schemas/node-architect/sync-target.schema.json, target: .governance/schemas/node-architect/sync-target.schema.json, required: true}
+  - {id: sync-projection-result-schema, path: schemas/node-architect/sync-projection-result.schema.json, target: .governance/schemas/node-architect/sync-projection-result.schema.json, required: true}
+  - {id: kiro-local-agent-package-schema, path: schemas/node-architect/kiro-local-agent-package.schema.json, target: .governance/schemas/node-architect/kiro-local-agent-package.schema.json, required: true}
+  - {id: local-agent-command-schema, path: schemas/node-architect/local-agent-command.schema.json, target: .governance/schemas/node-architect/local-agent-command.schema.json, required: true}
+  - {id: local-agent-validation-report-schema, path: schemas/node-architect/local-agent-validation-report.schema.json, target: .governance/schemas/node-architect/local-agent-validation-report.schema.json, required: true}
+  - {id: runtime-kernel-schema, path: schemas/node-architect/runtime-kernel.schema.json, target: .governance/schemas/node-architect/runtime-kernel.schema.json, required: true}
+  - {id: runtime-event-schema, path: schemas/node-architect/runtime-event.schema.json, target: .governance/schemas/node-architect/runtime-event.schema.json, required: true}
+  - {id: transition-envelope-schema, path: schemas/node-architect/transition-envelope.schema.json, target: .governance/schemas/node-architect/transition-envelope.schema.json, required: true}
+  - {id: node-pack-schema, path: schemas/node-architect/node-pack.schema.json, target: .governance/schemas/node-architect/node-pack.schema.json, required: true}
+  - {id: package-export-manifest-schema, path: schemas/package-export-manifest.schema.json, target: .governance/schemas/package-export-manifest.schema.json, required: true}
+  - {id: node-registry-compiler, path: tools/node_architect/compile_node_registry.py, target: .governance/tools/node_architect/compile_node_registry.py, required: true}
+  - {id: node-registry-validator, path: tools/node_architect/validate_node_registry.py, target: .governance/tools/node_architect/validate_node_registry.py, required: true}
+  - {id: gate-runtime-simulator, path: tools/node_architect/simulate_gate_runtime.py, target: .governance/tools/node_architect/simulate_gate_runtime.py, required: true}
+  - {id: checkpoint-resume-validator, path: tools/node_architect/validate_checkpoint_resume.py, target: .governance/tools/node_architect/validate_checkpoint_resume.py, required: true}
+  - {id: stale-session-cleaner, path: tools/node_architect/cleanup_stale_sessions.py, target: .governance/tools/node_architect/cleanup_stale_sessions.py, required: true}
+  - {id: ds-admin-tc-sync-validator, path: tools/node_architect/validate_ds_admin_tc_sync.py, target: .governance/tools/node_architect/validate_ds_admin_tc_sync.py, required: true}
+  - {id: ds-admin-tc-projection-renderer, path: tools/node_architect/render_ds_admin_tc_projection.py, target: .governance/tools/node_architect/render_ds_admin_tc_projection.py, required: true}
+  - {id: kiro-local-agent-package-validator, path: tools/node_architect/validate_kiro_local_agent_package.py, target: .governance/tools/node_architect/validate_kiro_local_agent_package.py, required: true}
+  - {id: kiro-local-agent-package-renderer, path: tools/node_architect/render_kiro_local_agent_package.py, target: .governance/tools/node_architect/render_kiro_local_agent_package.py, required: true}
+  - {id: consumer-package-export-tool, path: tools/export_project_package.py, target: .governance/tools/export_project_package.py, required: true}
+  - {id: package-export-smoke-runbook, path: docs/runbooks/PACKAGE_EXPORT_SMOKE_TEST.md, target: .governance/docs/runbooks/PACKAGE_EXPORT_SMOKE_TEST.md, required: true}
+  - {id: package-export-smoke-verifier, path: tools/verify_package_export_smoke.py, target: .governance/tools/verify_package_export_smoke.py, required: true}
+  - {id: runtime-kernel-validator, path: tools/node_architect/validate_runtime_kernel_contract.py, target: .governance/tools/node_architect/validate_runtime_kernel_contract.py, required: true}
+  - {id: changelog-fragment-validator, path: tools/validate_changelog_fragments.py, target: .governance/tools/validate_changelog_fragments.py, required: true}
+  - {id: controlled-node-catalog-expansion-plan, path: core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md, target: .governance/core/node-architect/CONTROLLED_81_NODE_CATALOG_EXPANSION_PLAN_v0.1.md, required: true}
+  - {id: node-catalog-expansion-plan, path: core/node-architect/node-catalog-expansion-plan.json, target: .governance/core/node-architect/node-catalog-expansion-plan.json, required: true}
+  - {id: node-catalog-expansion-plan-schema, path: schemas/node-architect/node-catalog-expansion-plan.schema.json, target: .governance/schemas/node-architect/node-catalog-expansion-plan.schema.json, required: true}
+  - {id: node-catalog-expansion-plan-validator, path: tools/node_architect/validate_node_catalog_expansion_plan.py, target: .governance/tools/node_architect/validate_node_catalog_expansion_plan.py, required: true}
+  - {id: revamp-gwc-015-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-015-node-catalog-expansion-plan.md, required: true}
+  - {id: intake-context-node-family-readme, path: core/node-architect/node-catalog/intake_context/README.md, target: .governance/core/node-architect/node-catalog/intake_context/README.md, required: true}
+  - {id: intake-context-request-intake-node, path: core/node-architect/node-catalog/intake_context/request-intake.node.json, target: .governance/core/node-architect/node-catalog/intake_context/request-intake.node.json, required: true}
+  - {id: intake-context-source-resolution-node, path: core/node-architect/node-catalog/intake_context/source-resolution.node.json, target: .governance/core/node-architect/node-catalog/intake_context/source-resolution.node.json, required: true}
+  - {id: intake-context-repo-identity-check-node, path: core/node-architect/node-catalog/intake_context/repo-identity-check.node.json, target: .governance/core/node-architect/node-catalog/intake_context/repo-identity-check.node.json, required: true}
+  - {id: intake-context-protected-base-capture-node, path: core/node-architect/node-catalog/intake_context/protected-base-capture.node.json, target: .governance/core/node-architect/node-catalog/intake_context/protected-base-capture.node.json, required: true}
+  - {id: intake-context-risk-classification-node, path: core/node-architect/node-catalog/intake_context/risk-classification.node.json, target: .governance/core/node-architect/node-catalog/intake_context/risk-classification.node.json, required: true}
+  - {id: intake-context-files-read-scope-node, path: core/node-architect/node-catalog/intake_context/files-read-scope.node.json, target: .governance/core/node-architect/node-catalog/intake_context/files-read-scope.node.json, required: true}
+  - {id: intake-context-files-write-scope-node, path: core/node-architect/node-catalog/intake_context/files-write-scope.node.json, target: .governance/core/node-architect/node-catalog/intake_context/files-write-scope.node.json, required: true}
+  - {id: intake-context-intake-card-render-node, path: core/node-architect/node-catalog/intake_context/intake-card-render.node.json, target: .governance/core/node-architect/node-catalog/intake_context/intake-card-render.node.json, required: true}
+  - {id: intake-context-context-gap-escalation-node, path: core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json, target: .governance/core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json, required: true}
+  - {id: intake-context-node-validator, path: tools/node_architect/validate_node_catalog_intake_context.py, target: .governance/tools/node_architect/validate_node_catalog_intake_context.py, required: true}
+  - {id: revamp-gwc-016-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-016-intake-context.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-016-intake-context.md, required: true}
+  - {id: gate-authority-node-family-readme, path: core/node-architect/node-catalog/gate_authority/README.md, target: .governance/core/node-architect/node-catalog/gate_authority/README.md, required: true}
+  - {id: gate-authority-gate-state-resolution-node, path: core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json, required: true}
+  - {id: gate-authority-approval-token-generation-node, path: core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json, required: true}
+  - {id: gate-authority-approval-command-validation-node, path: core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json, required: true}
+  - {id: gate-authority-scope-hash-calculation-node, path: core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json, required: true}
+  - {id: gate-authority-authority-boundary-check-node, path: core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json, required: true}
+  - {id: gate-authority-evidence-artifact-map-node, path: core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json, required: true}
+  - {id: gate-authority-gate-transition-decision-node, path: core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json, required: true}
+  - {id: gate-authority-g2-execution-envelope-render-node, path: core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json, required: true}
+  - {id: gate-authority-blocked-action-escalation-node, path: core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json, target: .governance/core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json, required: true}
+  - {id: gate-authority-node-validator, path: tools/node_architect/validate_node_catalog_gate_authority.py, target: .governance/tools/node_architect/validate_node_catalog_gate_authority.py, required: true}
+  - {id: revamp-gwc-017-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-017-gate-authority.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-017-gate-authority.md, required: true}
+  - {id: repo-delivery-node-family-readme, path: core/node-architect/node-catalog/repo_delivery/README.md, target: .governance/core/node-architect/node-catalog/repo_delivery/README.md, required: true}
+  - {id: repo-delivery-branch-creation-node, path: core/node-architect/node-catalog/repo_delivery/branch-creation.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/branch-creation.node.json, required: true}
+  - {id: repo-delivery-base-drift-check-node, path: core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json, required: true}
+  - {id: repo-delivery-scoped-file-write-node, path: core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json, required: true}
+  - {id: repo-delivery-diff-readback-node, path: core/node-architect/node-catalog/repo_delivery/diff-readback.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/diff-readback.node.json, required: true}
+  - {id: repo-delivery-draft-pr-creation-node, path: core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json, required: true}
+  - {id: repo-delivery-ci-run-capture-node, path: core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json, required: true}
+  - {id: repo-delivery-ci-failure-repair-node, path: core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json, required: true}
+  - {id: repo-delivery-ready-for-review-promotion-node, path: core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json, required: true}
+  - {id: repo-delivery-pr-blocker-check-node, path: core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json, target: .governance/core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json, required: true}
+  - {id: repo-delivery-node-validator, path: tools/node_architect/validate_node_catalog_repo_delivery.py, target: .governance/tools/node_architect/validate_node_catalog_repo_delivery.py, required: true}
+  - {id: revamp-gwc-018-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-018-repo-delivery.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-018-repo-delivery.md, required: true}
+  - {id: runtime-checkpoint-node-family-readme, path: core/node-architect/node-catalog/runtime_checkpoint/README.md, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/README.md, required: true}
+  - {id: runtime-checkpoint-checkpoint-capture-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json, required: true}
+  - {id: runtime-checkpoint-checkpoint-persist-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json, required: true}
+  - {id: runtime-checkpoint-resume-token-generation-node, path: core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json, required: true}
+  - {id: runtime-checkpoint-resume-token-validation-node, path: core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json, required: true}
+  - {id: runtime-checkpoint-lease-acquisition-node, path: core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json, required: true}
+  - {id: runtime-checkpoint-lease-renewal-node, path: core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json, required: true}
+  - {id: runtime-checkpoint-cas-write-guard-node, path: core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json, required: true}
+  - {id: runtime-checkpoint-state-reconciliation-node, path: core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json, required: true}
+  - {id: runtime-checkpoint-checkpoint-expiry-cleanup-node, path: core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json, target: .governance/core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json, required: true}
+  - {id: runtime-checkpoint-node-validator, path: tools/node_architect/validate_node_catalog_runtime_checkpoint.py, target: .governance/tools/node_architect/validate_node_catalog_runtime_checkpoint.py, required: true}
+  - {id: revamp-gwc-019-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-019-runtime-checkpoint.md, required: true}
+  - {id: validation-quality-node-family-readme, path: core/node-architect/node-catalog/validation_quality/README.md, target: .governance/core/node-architect/node-catalog/validation_quality/README.md, required: true}
+  - {id: validation-quality-schema-validation-node, path: core/node-architect/node-catalog/validation_quality/schema-validation.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/schema-validation.node.json, required: true}
+  - {id: validation-quality-validator-execution-node, path: core/node-architect/node-catalog/validation_quality/validator-execution.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/validator-execution.node.json, required: true}
+  - {id: validation-quality-unit-test-mapping-node, path: core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json, required: true}
+  - {id: validation-quality-ci-evidence-capture-node, path: core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json, required: true}
+  - {id: validation-quality-evidence-quality-check-node, path: core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json, required: true}
+  - {id: validation-quality-reproducibility-check-node, path: core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json, required: true}
+  - {id: validation-quality-blocker-severity-classification-node, path: core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json, required: true}
+  - {id: validation-quality-side-effect-check-node, path: core/node-architect/node-catalog/validation_quality/side-effect-check.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/side-effect-check.node.json, required: true}
+  - {id: validation-quality-g3-pass-decision-node, path: core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json, target: .governance/core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json, required: true}
+  - {id: validation-quality-node-validator, path: tools/node_architect/validate_node_catalog_validation_quality.py, target: .governance/tools/node_architect/validate_node_catalog_validation_quality.py, required: true}
+  - {id: revamp-gwc-020-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-020-validation-quality.md, required: true}
+  - {id: sync-projection-node-family-readme, path: core/node-architect/node-catalog/sync_projection/README.md, target: .governance/core/node-architect/node-catalog/sync_projection/README.md, required: true}
+  - {id: sync-projection-ds-admin-state-projection-node, path: core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json, required: true}
+  - {id: sync-projection-task-center-sync-node, path: core/node-architect/node-catalog/sync_projection/task-center-sync.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/task-center-sync.node.json, required: true}
+  - {id: sync-projection-external-audit-event-projection-node, path: core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json, required: true}
+  - {id: sync-projection-source-authority-check-node, path: core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json, required: true}
+  - {id: sync-projection-drift-detection-node, path: core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json, required: true}
+  - {id: sync-projection-reconcile-readback-node, path: core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json, required: true}
+  - {id: sync-projection-failure-routing-node, path: core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json, required: true}
+  - {id: sync-projection-evidence-linking-node, path: core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json, required: true}
+  - {id: sync-projection-privacy-boundary-check-node, path: core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json, target: .governance/core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json, required: true}
+  - {id: sync-projection-node-validator, path: tools/node_architect/validate_node_catalog_sync_projection.py, target: .governance/tools/node_architect/validate_node_catalog_sync_projection.py, required: true}
+  - {id: revamp-gwc-022-changelog-fragment, path: releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md, target: .governance/releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md, required: true}
+  - {id: package-export-node-family-readme, path: core/node-architect/node-catalog/package_export/README.md, target: .governance/core/node-architect/node-catalog/package_export/README.md, required: true}
+  - {id: package-export-package-manifest-load-node, path: core/node-architect/node-catalog/package_export/package-manifest-load.node.json, target: .governance/core/node-architect/node-catalog/package_export/package-manifest-load.node.json, required: true}
+  - {id: package-export-entry-schema-validation-node, path: core/node-architect/node-catalog/package_export/entry-schema-validation.node.json, target: .governance/core/node-architect/node-catalog/package_export/entry-schema-validation.node.json, required: true}
+  - {id: package-export-source-path-safety-check-node, path: core/node-architect/node-catalog/package_export/source-path-safety-check.node.json, target: .governance/core/node-architect/node-catalog/package_export/source-path-safety-check.node.json, required: true}
+  - {id: package-export-target-path-safety-check-node, path: core/node-architect/node-catalog/package_export/target-path-safety-check.node.json, target: .governance/core/node-architect/node-catalog/package_export/target-path-safety-check.node.json, required: true}
+  - {id: package-export-governance-tree-build-node, path: core/node-architect/node-catalog/package_export/governance-tree-build.node.json, target: .governance/core/node-architect/node-catalog/package_export/governance-tree-build.node.json, required: true}
+  - {id: package-export-export-manifest-generation-node, path: core/node-architect/node-catalog/package_export/export-manifest-generation.node.json, target: .governance/core/node-architect/node-catalog/package_export/export-manifest-generation.node.json, required: true}
+  - {id: package-export-deterministic-hash-verification-node, path: core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json, target: .governance/core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json, required: true}
+  - {id: package-export-smoke-verification-node, path: core/node-architect/node-catalog/package_export/smoke-verification.node.json, target: .governance/core/node-architect/node-catalog/package_export/smoke-verification.node.json, required: true}
+  - {id: package-export-export-failure-routing-node, path: core/node-architect/node-catalog/package_export/export-failure-routing.node.json, target: .governance/core/node-architect/node-catalog/package_export/export-failure-routing.node.json, required: true}
+  - {id: package-export-node-validator, path: tools/node_architect/validate_node_catalog_package_export.py, target: .governance/tools/node_architect/validate_node_catalog_package_export.py, required: true}
+  - {id: revamp-gwc-023-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md, required: true}
+  - {id: failure-recovery-node-family-readme, path: core/node-architect/node-catalog/failure_recovery/README.md, target: .governance/core/node-architect/node-catalog/failure_recovery/README.md, required: true}
+  - {id: failure-recovery-timeout-recovery-node, path: core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json, required: true}
+  - {id: failure-recovery-crash-checkpoint-recovery-node, path: core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json, required: true}
+  - {id: failure-recovery-stale-session-reconciliation-node, path: core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json, required: true}
+  - {id: failure-recovery-unknown-write-reconciliation-node, path: core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json, required: true}
+  - {id: failure-recovery-cas-mismatch-recovery-node, path: core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json, required: true}
+  - {id: failure-recovery-lease-expiry-recovery-node, path: core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json, required: true}
+  - {id: failure-recovery-approval-expiry-recovery-node, path: core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json, required: true}
+  - {id: failure-recovery-duplicate-agent-fencing-node, path: core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json, required: true}
+  - {id: failure-recovery-version-drift-rollback-routing-node, path: core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, target: .governance/core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json, required: true}
+  - {id: failure-recovery-node-validator, path: tools/node_architect/validate_node_catalog_failure_recovery.py, target: .governance/tools/node_architect/validate_node_catalog_failure_recovery.py, required: true}
+  - {id: revamp-gwc-024-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md, required: true}
+  - {id: scale-control-node-family-readme, path: core/node-architect/node-catalog/scale_control/README.md, target: .governance/core/node-architect/node-catalog/scale_control/README.md, required: true}
+  - {id: scale-control-batch-admission-check-node, path: core/node-architect/node-catalog/scale_control/batch-admission-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/batch-admission-check.node.json, required: true}
+  - {id: scale-control-batch-size-limit-check-node, path: core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json, required: true}
+  - {id: scale-control-previous-batch-g5-verification-node, path: core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json, target: .governance/core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json, required: true}
+  - {id: scale-control-catalog-cardinality-readiness-node, path: core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json, target: .governance/core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json, required: true}
+  - {id: scale-control-execution-throttle-control-node, path: core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json, target: .governance/core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json, required: true}
+  - {id: scale-control-workflow-run-observability-node, path: core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json, target: .governance/core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json, required: true}
+  - {id: scale-control-exact-head-readiness-check-node, path: core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json, target: .governance/core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json, required: true}
+  - {id: scale-control-rollout-progress-projection-node, path: core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json, target: .governance/core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json, required: true}
+  - {id: scale-control-independent-audit-handoff-node, path: core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, target: .governance/core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json, required: true}
+  - {id: scale-control-node-validator, path: tools/node_architect/validate_node_catalog_scale_control.py, target: .governance/tools/node_architect/validate_node_catalog_scale_control.py, required: true}
+  - {id: revamp-gwc-025-changelog-fragment, path: releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, target: .governance/releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md, required: true}
+  - {id: g1-human-bypass-changelog-fragment, path: releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md, target: .governance/releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md, required: true}
+  - {id: g5-ci-verification-contract, path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md, target: .governance/G5_CI_VERIFICATION_CONTRACT_v1.0.md, required: true}
+  - {id: runtime-catalog-kg-contract, path: core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md, target: .governance/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md, required: true}
+  - {id: g5-ci-verification-evidence-schema, path: schemas/g5-ci-verification-evidence.schema.json, target: .governance/schemas/g5-ci-verification-evidence.schema.json, required: true}
+  - {id: g5-ci-checkpoint-schema, path: schemas/node-architect/g5-ci-checkpoint.schema.json, target: .governance/schemas/node-architect/g5-ci-checkpoint.schema.json, required: true}
+  - {id: runtime-catalog-taxonomy-schema, path: schemas/node-architect/runtime-catalog-taxonomy.schema.json, target: .governance/schemas/node-architect/runtime-catalog-taxonomy.schema.json, required: true}
+  - {id: runtime-knowledge-graph-schema, path: schemas/node-architect/runtime-knowledge-graph.schema.json, target: .governance/schemas/node-architect/runtime-knowledge-graph.schema.json, required: true}
+  - {id: g5-ci-verification-validator, path: tools/node_architect/validate_g5_ci_verification.py, target: .governance/tools/node_architect/validate_g5_ci_verification.py, required: true}
+  - {id: runtime-catalog-taxonomy-validator, path: tools/node_architect/validate_runtime_catalog_taxonomy.py, target: .governance/tools/node_architect/validate_runtime_catalog_taxonomy.py, required: true}
+  - {id: runtime-knowledge-graph-projector, path: tools/node_architect/project_runtime_knowledge_graph.py, target: .governance/tools/node_architect/project_runtime_knowledge_graph.py, required: true}
+  - {id: scrum-75-g5-ci-kg-changelog-fragment, path: releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md, target: .governance/releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md, required: true}
+delivery:
+  mode: git-pr
+  target_repository: nhatnguyenquang1838-coder/gwc
+  target_path: .governance
+  default_branch: main
+  protected_branches:
+    - main
+  connector: DWC
+  identity_status: verified
+  write_enabled: true
+work_tracking:
+  provider: jira-mcp
+  claim_required_for_e2e: true
+  ownership_verification_required: true
+  lease_renewal_required: false
+  status_transitions_from_state_engine: false
+notes:
+  - SCRUM-89 exports the plan-aware G0/G1 input, decision, capture, validation, and G2 handoff surfaces without changing package_version or granting G4-G6 authority.
+  - SCRUM-75 exports the G5 CI verification contract and runtime catalog KG normalization artifacts without changing package_version or adding merge/deploy/production authority.
+  - G1 feasibility now requires process readback and an executable route matrix; HUMAN BYPASS is exported as a step-bound operational handoff with audit and deterministic readback.
+  - REVAMP-GWC-025 adds the final scale_control catalog batch, completing 81 descriptors for independent audit while keeping scale permission false and package_version unchanged.
+  - REVAMP-GWC-024 adds the failure_recovery controlled node catalog batch without runtime engine, manual deploy/release/production authority, Batch 09 content, or changing package_version.
+  - DWC repository reads are automatic for this verified repository.
+  - Bounded non-risk branch writes and Draft PR delivery require execution-mode-aware G0/G1 evidence and a valid gate envelope.
+  - Chat connector agents must fetch the protected-main operational runbook and exact-ref gate dependencies before declaring a remediable artifact or validator gap blocked.
+  - ChatGPT operating behavior requires SOURCE INSTRUCTION, Intake Card, Files READ/WRITE, artifact-driven gate continuation, and agent-generated approval commands.
+  - REVAMP-GWC-023 adds the package_export controlled node catalog batch by extending deterministic package build, manifest, hash readback, and smoke verification without publishing, consumer mutation, merge/deploy/production authority, or changing package_version.
+  - REVAMP-GWC-022 adds the sync_projection controlled node catalog batch as audit-only projection evidence without DS Admin/Task Center implementation, merge/deploy/production authority, runtime engine, or changing package_version.
+  - REVAMP-GWC-020 adds the validation_quality controlled node catalog batch without merge/deploy/production authority, runtime engine, or changing package_version.
+  - REVAMP-GWC-019 adds the runtime_checkpoint controlled node catalog batch without runtime engine, scheduler/worker, production data, merge/deploy authority, or changing package_version.
+  - REVAMP-GWC-018 adds the repo_delivery controlled node catalog batch without merge/deploy/production authority or changing package_version.
+  - REVAMP-GWC-017 adds the gate_authority controlled node catalog batch without merge/deploy/production authority or changing package_version.
+  - REVAMP-GWC-016 adds the first controlled node catalog batch for intake_context without implementing all 81 nodes or changing package_version.
+  - REVAMP-GWC-015 adds controlled 81-node catalog expansion planning without implementing the 81-node catalog or changing package_version.
+  - REVAMP-GWC-010 adds safe changelog fragment hygiene for connector-safe release notes without changing package_version.
+  - REVAMP-GWC-009 adds runtime kernel and schema contracts before node catalog expansion without changing package_version.
+  - REVAMP-GWC-008 adds post-merge package export smoke verification and generated .governance artifact checks without changing package_version.
+  - REVAMP-GWC-006 adds consumer package export rules, schemas, tools, and package entries without changing package_version.
+  - Package version 1.16.0 adds runtime bootstrap evidence to G0/G1 and fail-closed selected runtime profile resolution for the current agent execution mode.
+  - Package version 1.15.0 adds typed multi-profile resolution and mandatory gate response traceability.
+  - Package version 1.14.1 adds the DWC ready-for-review capability contract while preserving G4 merge authority boundaries.
+  - Package version 1.14.0 adds the canonical Kiro spec-driven delivery rule and ChatGPT/local-agent task-runtime parity.
+  - Security-boundary and other listed high-risk changes require explicit human direction.
+  - Merge, deployment, production configuration, credentials, and production data remain separately gated.
+  - HOTFIX/RESCUE modes provide bounded bypass for emergency fixes while maintaining core safety (no production data access, no main branch writes, no merge/deploy authority).

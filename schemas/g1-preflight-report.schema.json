@@ -1,0 +1,744 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g1-preflight-report.schema.json",
+  "title": "G1 Preflight Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at",
+    "trace",
+    "repository_state",
+    "checks",
+    "risk_class",
+    "required_gate",
+    "blockers",
+    "outcome"
+  ],
+  "$defs": {
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "repository",
+        "task_id",
+        "base_sha",
+        "g0_snapshot"
+      ],
+      "properties": {
+        "project_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "g0_snapshot": {
+          "type": "string",
+          "const": "../../g0/context-snapshot.yaml"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "code",
+        "message",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_-]+$"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "WARN",
+            "FAIL"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "route_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "gate",
+        "actor",
+        "action_class",
+        "capability_required",
+        "capability_status",
+        "primary_route",
+        "fallback_routes",
+        "continuation",
+        "expected_evidence",
+        "bypass_eligibility"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^STEP-[0-9]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gate": {
+          "enum": [
+            "G0_CONTEXT",
+            "G1_ALIGNMENT",
+            "G2_EXECUTION",
+            "G3_PR",
+            "G4_MERGE",
+            "G5_DEPLOY",
+            "G6_PRODUCTION_DATA"
+          ]
+        },
+        "actor": {
+          "enum": [
+            "agent",
+            "human",
+            "agent_or_human",
+            "human_authorized_agent"
+          ]
+        },
+        "action_class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capability_required": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capability_status": {
+          "enum": [
+            "VERIFIED",
+            "SEPARATE_GATE",
+            "UNKNOWN",
+            "HARD_BLOCKED"
+          ]
+        },
+        "primary_route": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fallback_routes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "continuation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bypass_eligibility": {
+          "enum": [
+            "FORBIDDEN",
+            "OPERATIONAL_ONLY",
+            "MANUAL_CHECKPOINT_ONLY"
+          ]
+        }
+      }
+    },
+    "implementationPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applicability",
+        "reason",
+        "source",
+        "task_me_applicable",
+        "task_me_available",
+        "task_me_invoked",
+        "task_me_fallback_reason",
+        "canonical_task_uid",
+        "repository",
+        "protected_base_sha",
+        "plan_root",
+        "requirements_path",
+        "design_path",
+        "tasks_path",
+        "plan_revision",
+        "validation_status",
+        "validation_evidence",
+        "generated_by",
+        "generated_at_utc"
+      ],
+      "properties": {
+        "applicability": {
+          "enum": [
+            "required",
+            "not_applicable"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "existing_kiro",
+            "task_me",
+            "generated_kiro",
+            "plan_not_applicable"
+          ]
+        },
+        "task_me_applicable": {
+          "type": "boolean"
+        },
+        "task_me_available": {
+          "type": "boolean"
+        },
+        "task_me_invoked": {
+          "type": "boolean"
+        },
+        "task_me_fallback_reason": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "canonical_task_uid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "protected_base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "plan_root": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requirements_path": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "design_path": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tasks_path": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "plan_revision": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(sha256:)?[0-9a-f]{40,64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validation_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "validation_evidence": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "generated_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_at_utc": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "required"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "existing_kiro",
+                  "task_me",
+                  "generated_kiro"
+                ]
+              },
+              "plan_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requirements_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "design_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tasks_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "plan_revision": {
+                "type": "string",
+                "pattern": "^(sha256:)?[0-9a-f]{40,64}$"
+              },
+              "validation_status": {
+                "const": "PASS"
+              },
+              "validation_evidence": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "not_applicable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source": {
+                "const": "plan_not_applicable"
+              },
+              "validation_status": {
+                "const": "NOT_APPLICABLE"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0",
+        "1.1"
+      ]
+    },
+    "artifact_type": {
+      "const": "g1-preflight-report"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace": {
+      "$ref": "#/$defs/trace"
+    },
+    "repository_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base_ref",
+        "base_sha",
+        "profile_path",
+        "connector"
+      ],
+      "properties": {
+        "base_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "profile_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connector": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "process_readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_id",
+        "terminal_outcome",
+        "required_sources",
+        "status"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "terminal_outcome": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "status": {
+          "enum": [
+            "VERIFIED",
+            "INCOMPLETE"
+          ]
+        }
+      }
+    },
+    "execution_feasibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "route_steps",
+        "continuation_coverage",
+        "human_bypass_required"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "EXECUTABLE",
+            "EXECUTABLE_WITH_HUMAN_BYPASS",
+            "NOT_EXECUTABLE"
+          ]
+        },
+        "route_steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/route_step"
+          }
+        },
+        "continuation_coverage": {
+          "enum": [
+            "COMPLETE",
+            "INCOMPLETE"
+          ]
+        },
+        "human_bypass_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "implementation_plan": {
+      "$ref": "#/$defs/implementationPlan"
+    },
+    "risk_class": {
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3"
+      ]
+    },
+    "required_gate": {
+      "enum": [
+        "G2_AUTOMATIC_BOUNDED",
+        "G2_HUMAN_DIRECTION",
+        "STOP"
+      ]
+    },
+    "runtime_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_runtime_id",
+        "execution_mode",
+        "selected_profile",
+        "selected_connector",
+        "connector_priority",
+        "required_behavior_contracts"
+      ],
+      "properties": {
+        "agent_runtime_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "execution_mode": {
+          "enum": [
+            "chat_connector_only",
+            "local_agent",
+            "repo_ci"
+          ]
+        },
+        "selected_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "path"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "selected_connector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "connector_priority": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required_behavior_contracts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]+$"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "outcome": {
+      "enum": [
+        "PASS",
+        "NEEDS_INPUT",
+        "BLOCKED"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "process_readback"
+        ]
+      },
+      "then": {
+        "required": [
+          "execution_feasibility"
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "execution_feasibility"
+        ]
+      },
+      "then": {
+        "required": [
+          "process_readback"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "PASS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "maxItems": 0
+          },
+          "checks": {
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/check"
+                },
+                {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "PASS",
+                        "WARN"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "process_readback": {
+            "properties": {
+              "status": {
+                "const": "VERIFIED"
+              }
+            }
+          },
+          "execution_feasibility": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "EXECUTABLE",
+                  "EXECUTABLE_WITH_HUMAN_BYPASS"
+                ]
+              },
+              "continuation_coverage": {
+                "const": "COMPLETE"
+              }
+            }
+          },
+          "required_gate": {
+            "enum": [
+              "G2_AUTOMATIC_BOUNDED",
+              "G2_HUMAN_DIRECTION"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.1"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "implementation_plan"
+        ]
+      }
+    }
+  ]
+}

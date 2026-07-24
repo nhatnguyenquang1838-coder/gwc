@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw.superapps/schemas/gwc-runtime-config.schema.json",
+  "title": "GWC Runtime Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {"const": "dw.superapps/v1"},
+    "kind": {"const": "PowerRuntimeConfig"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["powerId"],
+      "properties": {
+        "powerId": {"const": "gwc"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projectId",
+        "projectProfile",
+        "defaultLanguage",
+        "runtimeRoot",
+        "taskProvider",
+        "connectorOrder",
+        "externalWritesEnabled",
+        "approvalRequiredForRepositoryWrites"
+      ],
+      "properties": {
+        "projectId": {"const": "gwc"},
+        "projectProfile": {"const": "projects/gwc/project-profile.yaml"},
+        "defaultLanguage": {"type": "string", "minLength": 2, "maxLength": 16},
+        "runtimeRoot": {"const": ".gwc"},
+        "taskProvider": {"const": "jira-mcp"},
+        "connectorOrder": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["GitHub", "DWC", "DW1"]}
+        },
+        "externalWritesEnabled": {"const": false},
+        "approvalRequiredForRepositoryWrites": {"const": true},
+        "notes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
