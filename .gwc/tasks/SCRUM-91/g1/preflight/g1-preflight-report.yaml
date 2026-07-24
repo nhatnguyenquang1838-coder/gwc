@@ -5,11 +5,11 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-91
-  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   profile_path: projects/gwc/project-profile.yaml
   connector: GitHub
 checks:
@@ -17,7 +17,7 @@ checks:
     status: PASS
     code: REPOSITORY_VERIFIED
     message: Repository identity, protected base, write-enabled profile, and connector permissions are verified.
-    evidence: [projects/gwc/project-profile.yaml@b3edbb102fb5b0e7e1532e221d89c16896f17755, GitHub main@b3edbb102fb5b0e7e1532e221d89c16896f17755]
+    evidence: [projects/gwc/project-profile.yaml@16c72a1200cdeadc2c549f992966f731acab89bb, GitHub main@16c72a1200cdeadc2c549f992966f731acab89bb]
   - id: JIRA_TASK
     status: PASS
     code: JIRA_TASK_IN_PROGRESS
@@ -47,7 +47,7 @@ checks:
     status: PASS
     code: EXACT_VALIDATOR_MATERIALIZED
     message: Protected-base validate_g01.py and matching schemas were materialized in an isolated session and hash-verified.
-    evidence: [tools/validate_g01.py blob 24033e60e9f9b9b205e22e8308156d9ca6499fb7, schemas from main@b3edbb102fb5b0e7e1532e221d89c16896f17755]
+    evidence: [tools/validate_g01.py blob 24033e60e9f9b9b205e22e8308156d9ca6499fb7, schemas from main@16c72a1200cdeadc2c549f992966f731acab89bb]
 process_readback:
   process_id: GWC-G0-G1-G2-BRANCH-IMPLEMENTATION
   terminal_outcome: GWC skills-only provider implementation committed and pushed on feat/dw-power-distribution-v1, with no PR, merge, release, deployment, or publication.
@@ -68,10 +68,10 @@ execution_feasibility:
       action_class: read_only_repository_inspection
       capability_required: GitHub connector reads and isolated filesystem
       capability_status: VERIFIED
-      primary_route: GitHub connector pinned to main@b3edbb102fb5b0e7e1532e221d89c16896f17755
+      primary_route: GitHub connector pinned to main@16c72a1200cdeadc2c549f992966f731acab89bb
       fallback_routes: [DWC connector, DW1 connector]
       continuation: Materialize G0 and proceed only when all required sources are AVAILABLE and blockers are empty.
-      expected_evidence: READY context-snapshot bound to SCRUM-91 and b3edbb102fb5b0e7e1532e221d89c16896f17755
+      expected_evidence: READY context-snapshot bound to SCRUM-91 and 16c72a1200cdeadc2c549f992966f731acab89bb
       bypass_eligibility: FORBIDDEN
     - id: STEP-2
       name: Materialize and validate G1
@@ -107,7 +107,7 @@ execution_feasibility:
       primary_route: GitHub connector
       fallback_routes: [DWC connector, DW1 connector]
       continuation: Stop on branch collision or base drift; otherwise persist approved artifacts and implementation files.
-      expected_evidence: feat/dw-power-distribution-v1 ref at b3edbb102fb5b0e7e1532e221d89c16896f17755
+      expected_evidence: feat/dw-power-distribution-v1 ref at 16c72a1200cdeadc2c549f992966f731acab89bb
       bypass_eligibility: FORBIDDEN
     - id: STEP-5
       name: Implement bounded provider distribution
