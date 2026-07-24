@@ -1,0 +1,19 @@
+apiVersion: dw.superapps/v1
+kind: PowerRuntimeConfig
+metadata:
+  powerId: gwc
+spec:
+  projectId: gwc
+  projectProfile: projects/gwc/project-profile.yaml
+  defaultLanguage: vi
+  runtimeRoot: .gwc
+  taskProvider: jira-mcp
+  connectorOrder:
+    - GitHub
+    - DWC
+    - DW1
+  externalWritesEnabled: false
+  approvalRequiredForRepositoryWrites: true
+  notes:
+    - Copy and adapt this file in consumer-owned configuration.
+    - Installation does not create tasks, gates, approvals, branches, pull requests, releases, deployments, or external writes.
