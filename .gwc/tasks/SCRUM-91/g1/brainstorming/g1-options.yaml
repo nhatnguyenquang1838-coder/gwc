@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-91
-  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
   - id: OPT-1
