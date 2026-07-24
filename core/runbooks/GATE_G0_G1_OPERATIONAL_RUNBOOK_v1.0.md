@@ -43,20 +43,20 @@ Validate committed artifacts and policy in CI. CI is additional evidence and nev
 10. Define initial scope, non-goals, expected files/modules, authorized actions, excluded actions, and the full non-merge delivery lifecycle through G3: guarded branch creation, scoped writes, validation, push, Draft PR creation/update, CI monitoring or repair, independent G3 review, and Draft-to-Ready-for-review metadata completion when supported.
 11. Record connector-role evidence, including preferred connector availability, selected connector, fallback route, and why any higher-priority connector was not used.
 12. Classify blockers as:
-   - self-remediable;
-   - user-decision required;
-   - external-write required;
-   - missing capability;
-   - hard denial.
-11. Automatically resolve self-remediable blockers and retry equivalent connector paths that remain within the approved repository, base, branch, action, and scope.
-12. Produce a structured G0 proposal for the user when trusted completion is not yet possible. Do not merely report `BLOCKED` and stop.
-13. Create `g0/context-snapshot.yaml` in the task workspace.
-14. Validate its schema and consistency.
-15. Exit with exactly one truthful status:
-   - `READY`: artifact valid, base resolved, no blockers;
-   - `PROPOSED`: bounded proposal prepared for user decision;
-   - `NOT_READY`: trusted persistence or validation still missing;
-   - `DENIED`: hard prohibition or irreconcilable mismatch.
+    - self-remediable;
+    - user-decision required;
+    - external-write required;
+    - missing capability;
+    - hard denial.
+13. Automatically resolve self-remediable blockers and retry equivalent connector paths that remain within the approved repository, base, branch, action, and scope.
+14. Produce a structured G0 proposal for the user when trusted completion is not yet possible. Do not merely report `BLOCKED` and stop.
+15. Create `g0/context-snapshot.yaml` in the task workspace.
+16. Validate its schema and consistency.
+17. Exit with exactly one truthful status:
+    - `READY`: artifact valid, base resolved, no blockers;
+    - `PROPOSED`: bounded proposal prepared for user decision;
+    - `NOT_READY`: trusted persistence or validation still missing;
+    - `DENIED`: hard prohibition or irreconcilable mismatch.
 
 ## Mandatory G0 proposal behavior
 
@@ -69,13 +69,22 @@ Missing write authority blocks only the external write. It does not block propos
 1. Confirm G0 is `READY`, or explicitly label G1 work as conversation-local preparation when G0 trusted evidence is incomplete.
 2. Create `g1/intake/g1-intake-brief.yaml` with problem statement, scope, non-goals, stakeholders, constraints, verifiable acceptance criteria, and the full non-merge delivery lifecycle needed to reach a reviewed Draft PR without G4 authority.
 3. Create `g1/preflight/g1-preflight-report.yaml` with repository/profile consistency, selected runtime profile, execution-mode compatibility, behavior-contract availability, connector fallback evidence, risk analysis, dependency checks, capability checks, and blockers.
-4. Create `g1/brainstorming/g1-options.yaml` with considered options, trade-offs, rejected alternatives, and selected direction.
-5. Create `g1/decision/g1-decision-record.yaml` with the accepted decision, rationale, final scope, validation plan, rollback considerations, and explicit user decision.
-6. Verify all four artifacts use the same project, repository, task trace, protected base, and scope.
-7. Detect scope drift. Any material change to repository, base SHA, files, behavior, architecture, data/security impact, risk, or authorized actions requires a scope delta and new approval envelope.
-8. Fetch `tools/validate_g01.py` and the referenced schemas from the protected base when no checkout exists.
-9. Materialize an isolated workspace, preferably `/mnt/<session>/.gwc/tasks/<task-id>/` for connector sessions.
-10. Run:
+4. Determine implementation-plan applicability and record the reason.
+5. When a plan is required:
+   - search the target repository for a current task-compatible canonical Kiro or project-approved plan;
+   - reject stale, mismatched, duplicate, or conflicting candidates;
+   - call Task Me when codebase/knowledge-graph impact analysis, complexity, dependency DAG, file/symbol targeting, test design, or multi-step implementation guidance is applicable and the capability is available;
+   - otherwise generate the canonical Kiro `requirements.md`, `design.md`, and `tasks.md` package and record the Task Me fallback reason;
+   - validate the plan and bind the exact plan revision and durable validation evidence.
+6. When a plan is not applicable, record `applicability: not_applicable`, `source: plan_not_applicable`, and a specific reason. Do not omit the decision.
+7. Add the structured `implementation_plan` evidence to preflight. The accepted decision must carry a matching immutable `implementation_plan_ref`.
+8. Create `g1/brainstorming/g1-options.yaml` with considered options, trade-offs, rejected alternatives, and selected direction.
+9. Create `g1/decision/g1-decision-record.yaml` with the accepted decision, rationale, final scope, validation plan, rollback considerations, explicit user decision, and the accepted plan reference.
+10. Verify all four artifacts use the same project, repository, task trace, protected base, scope, and implementation-plan binding.
+11. Detect scope or plan drift. Any material change to repository, base SHA, plan revision, files, behavior, architecture, data/security impact, risk, or authorized actions requires a scope delta and return to G1.
+12. Fetch `tools/validate_g01.py` and the referenced schemas from the protected base when no checkout exists.
+13. Materialize an isolated workspace, preferably `/mnt/<session>/.gwc/tasks/<task-id>/` for connector sessions.
+14. Run:
 
 ```bash
 python tools/validate_g01.py --workspace .gwc/tasks/<task-id> --json
@@ -83,30 +92,47 @@ python tools/validate_g01.py --workspace .gwc/tasks/<task-id> --json
 
 Use validator-specific root arguments when required by the checked-in tool.
 
-11. Interpret results truthfully:
-   - exit `0`: `PASS`;
-   - exit `1`: artifacts present but invalid, inconsistent, or blocked;
-   - exit `2`: configuration or I/O error.
-12. Resolve remediable validation issues and rerun. Do not stop after the first correctable failure.
-13. Preserve validator stdout, exit code, artifact hashes, and workspace path as evidence.
-14. Enter G2 only after G0 `READY`, G1 `PASS`, a valid task-scoped execution envelope, and all mandatory checks pass.
+15. Interpret results truthfully:
+    - exit `0`: `PASS`;
+    - exit `1`: artifacts present but invalid, inconsistent, or blocked;
+    - exit `2`: configuration or I/O error.
+16. Resolve remediable validation issues and rerun. Do not stop after the first correctable failure.
+17. Preserve validator stdout, exit code, artifact hashes, workspace path, plan revision, and plan-validation evidence.
+18. Enter G2 only after G0 `READY`, G1 `PASS`, a valid task-scoped execution envelope, and all mandatory checks pass.
+
+A required plan with a missing path, missing revision, failed validation, stale base binding, incomplete evidence pair, or Task Me routing contradiction MUST block G1. Legacy artifacts that contain neither plan field remain compatible; a partial new-format pair is invalid.
+
+## G1 to G2 implementation-plan handoff
+
+The G2 execution envelope MUST copy the accepted `implementation_plan_ref` without changing task UID, repository, protected-base SHA, plan root, plan revision, or validation evidence.
+
+After exact G2 approval and before the first repository mutation, the G2 executor must:
+
+1. re-read the protected base and confirm it still matches the approved SHA;
+2. read the referenced requirements, design, and tasks files or approved equivalent package;
+3. confirm current repository state and scope still match the plan;
+4. write `.gwc/tasks/<task-id>/g2/plan-read-receipt.yaml` recording the reader, timestamp, exact paths read, task UID, repository, base SHA, plan revision, scope consistency, repository state, and `VERIFIED` status;
+5. run:
+
+```bash
+python tools/validate_g01.py --workspace .gwc/tasks/<task-id> --gate G2_EXECUTION --json
+```
+
+A missing or invalid receipt, stale revision, base drift, missing plan file, unresolved dependency, ownership conflict, or scope mismatch returns execution to G1. The agent must not silently regenerate or widen the approved plan.
 
 ## Downstream artifact continuation
 
-On every gate transition, materialize and validate the next applicable artifact
-under the same .gwc/tasks/<task-id>/ workspace before invoking its action:
+On every gate transition, materialize and validate the next applicable artifact under the same `.gwc/tasks/<task-id>/` workspace before invoking its action:
 
 | Transition | Artifact |
 |---|---|
-| G1 PASS -> G2 | g2/execution-envelope.yaml |
+| G1 PASS -> G2 | g2/execution-envelope.yaml plus plan-read receipt before first write when required |
 | G2 PASS -> G3 | g3/delivery-record.yaml |
 | G3 PASS -> G4 | g4/merge-approval.yaml |
 | G4 PASS -> G5 | g5/deployment-approval.yaml for manual action; otherwise a read-only status record |
 | G5 PASS -> G6 | g6/production-approval.yaml only when production scope exists |
 
-The runtime must fail closed when an applicable artifact is missing, invalid,
-expired, or mismatched. A conditional gate is recorded as not_applicable; it is
-never silently skipped and never inherits authority from another gate.
+The runtime must fail closed when an applicable artifact is missing, invalid, expired, or mismatched. A conditional gate is recorded as not_applicable; it is never silently skipped and never inherits authority from another gate.
 
 ## Work-tracking traceability
 
@@ -123,7 +149,7 @@ When required by the active profile, use the configured provider (Jira MCP for `
 9. Read back the task and verify the observed state equals the expected state.
 10. Record task ID, prior state, transition, expected state, observed state, and event/idempotency evidence.
 11. Treat a missing, illegal, failed, or unverifiable transition as a failed gate DoD; do not report the gate complete.
-12. Record branch, PR, validation outcome, and final state as they become available.
+12. Record branch, PR, validation outcome, plan reference, and final state as they become available.
 13. Never treat task creation, assignment, or state as approval for repository writes, merge, deployment, credentials, or production data.
 
 ## Connector failure and retry rules
@@ -147,7 +173,7 @@ A gate that produces a lifecycle outcome is complete only when all of the follow
 
 - gate artifacts and validation evidence are complete;
 - the mapped transition exists in `core/task-lifecycle/gate-transition-map.yaml`;
-- the live DS MCP contract permits the transition from the observed current state;
+- the live task contract permits the transition from the observed current state;
 - the transition call succeeds idempotently;
 - task read-back equals the mapped expected state;
 - transition evidence is included in the gate report.
@@ -191,3 +217,8 @@ Keep reports concise. Continue automatically across remediable blockers and conn
 7. Governance denial, stale SHA, scope mismatch, and protected-branch denial fail closed without API fallback.
 8. G3 creates Draft PR only and stops before G4.
 9. G4, G5, and G6 remain separate HITL/authority gates.
+10. A required implementation plan cannot pass G1 when missing, stale, mismatched, or unvalidated.
+11. Existing valid Kiro plans are reused before Task Me or generated-Kiro fallback.
+12. Task Me is required when applicable and available; fallback reasons are explicit.
+13. G2 cannot pass its pre-write validation without a matching plan-read receipt.
+14. Base or plan drift returns the workflow to G1.

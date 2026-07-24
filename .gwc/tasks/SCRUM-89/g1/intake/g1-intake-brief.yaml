@@ -1,0 +1,102 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-24T07:50:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-89
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC G0/G1 does not structurally require a validated implementation-plan
+    handoff before G2 source mutation.
+  why_now: The user explicitly started SCRUM-89.
+desired_outcome: Every implementation-capable task reaches G2 with one validated plan
+  that G2 reads and verifies before writing.
+stakeholders:
+  requester: user
+  affected:
+  - GWC maintainers
+  - ChatGPT/DWC agents
+  - G2 executors
+  - GWC project consumers
+scope:
+  in_scope:
+  - Plan applicability and discovery
+  - Task Me when applicable and available
+  - Kiro fallback
+  - G1 structured plan evidence
+  - G2 read-before-write enforcement
+  - Schemas, generator, validator, policies, agents, tests, package and changelog
+  non_goals:
+  - Task Me engine changes
+  - New planning gate
+  - Direct main write
+  - Merge/deploy/production
+  - Unrelated refactoring
+constraints:
+- Protected base b3edbb102fb5b0e7e1532e221d89c16896f17755
+- Preserve legacy compatibility
+- Draft PR only
+assumptions:
+- SCRUM-89 is the single task identity
+- GitHub remains repository truth
+- User start command is explicit G1 direction
+risks:
+- id: RISK-1
+  description: Schema compatibility break
+  impact: high
+  mitigation: Pair-absence compatibility and tests
+- id: RISK-2
+  description: False Task Me invocation claim
+  impact: high
+  mitigation: Require availability and invocation evidence
+- id: RISK-3
+  description: Stale plan after base drift
+  impact: high
+  mitigation: Bind plan and base hashes
+acceptance_criteria:
+- id: AC-1
+  statement: Deterministic plan applicability
+  verifiable: true
+- id: AC-2
+  statement: Existing valid plan reuse
+  verifiable: true
+- id: AC-3
+  statement: Task Me or Kiro fallback evidence
+  verifiable: true
+- id: AC-4
+  statement: Complete durable G1 plan reference
+  verifiable: true
+- id: AC-5
+  statement: G1 blocks missing/stale/invalid plan
+  verifiable: true
+- id: AC-6
+  statement: G2 reads and verifies plan before write
+  verifiable: true
+- id: AC-7
+  statement: Required regression coverage
+  verifiable: true
+- id: AC-8
+  statement: No G4/G5/G6 authority
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - Guarded branch after G2
+  - Approved scoped writes
+  - Validation
+  - Push and Draft PR after G3
+  downstream_non_goals:
+  - Merge
+  - Deploy
+  - Production
+  - Protected branch write
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - Exact head SHA
+    - Validation and CI
+    - Independent review
+    - Unchanged plan reference
+unresolved_questions: []
+status: READY
