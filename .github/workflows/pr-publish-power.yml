@@ -1,0 +1,121 @@
+name: PR publish GWC Power
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/pr-publish-power.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out exact reviewed provider source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 62689ce35e279751a3bf17b5255ac258dafbe7d7
+          fetch-depth: 0
+
+      - name: Check out pinned DW distribution foundation
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: nhatnguyenquang1838-coder/DW-SuperApps
+          ref: 4e552ea3d915a4790814b08b3155c66e3c5736a1
+          path: .dw-power-dist
+          fetch-depth: 1
+
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install -r .dw-power-dist/requirements-dev.txt
+      - run: python .dw-power-dist/scripts/power_dist.py validate-recipe --recipe distribution/power-package.yaml
+
+      - name: Build deterministic distribution
+        run: |
+          set -euo pipefail
+          python .dw-power-dist/scripts/power_dist.py build \
+            --recipe distribution/power-package.yaml \
+            --source . \
+            --output "${RUNNER_TEMP}/power-dist-output" \
+            --version main-20260725.1-62689ce \
+            --source-repository "${GITHUB_REPOSITORY}" \
+            --source-ref main \
+            --source-sha 62689ce35e279751a3bf17b5255ac258dafbe7d7 \
+            --source-date-epoch 0 \
+            --templates-root .dw-power-dist/templates/power-runtime \
+            > "${RUNNER_TEMP}/power-dist-result.json"
+
+      - name: Export result
+        id: result
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r = json.loads((Path(os.environ['RUNNER_TEMP']) / 'power-dist-result.json').read_text())
+          with Path(os.environ['GITHUB_OUTPUT']).open('a', encoding='utf-8') as f:
+              f.write(f"archive={r['archive']}\nchecksum={r['checksum']}\nstaging_root={r['staging_root']}\nsha256={r['sha256']}\n")
+          PY
+
+      - run: python .dw-power-dist/scripts/power_dist.py verify --package-root "${{ steps.result.outputs.staging_root }}"
+
+      - name: Smoke install and doctor
+        run: |
+          set -euo pipefail
+          consumer="$(mktemp -d)"
+          runtime="${{ steps.result.outputs.staging_root }}/lib/power_runtime.py"
+          python "$runtime" install --target "$consumer"
+          python "$runtime" doctor --target "$consumer"
+          python "$runtime" uninstall --target "$consumer"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: gwc-main-20260725.1-62689ce
+          path: |
+            ${{ steps.result.outputs.archive }}
+            ${{ steps.result.outputs.checksum }}
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: main-20260725.1-62689ce
+          ARCHIVE: ${{ steps.result.outputs.archive }}
+          CHECKSUM: ${{ steps.result.outputs.checksum }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ARCHIVE" "$CHECKSUM" --clobber
+          else
+            gh release create "$TAG" "$ARCHIVE" "$CHECKSUM" --title "gwc $TAG" --notes "Source: ${GITHUB_REPOSITORY}@62689ce35e279751a3bf17b5255ac258dafbe7d7"
+          fi
+
+      - name: Synchronize power-dist
+        env:
+          STAGING_ROOT: ${{ steps.result.outputs.staging_root }}
+        run: |
+          set -euo pipefail
+          worktree="$(mktemp -d)"
+          if git ls-remote --exit-code --heads origin power-dist >/dev/null 2>&1; then
+            git fetch origin power-dist
+            git worktree add "$worktree" origin/power-dist
+            git -C "$worktree" switch -c power-dist
+          else
+            git worktree add --detach "$worktree"
+            git -C "$worktree" switch --orphan power-dist
+          fi
+          find "$worktree" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$STAGING_ROOT"/. "$worktree"/
+          git -C "$worktree" add -A
+          git -C "$worktree" config user.name "github-actions[bot]"
+          git -C "$worktree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git -C "$worktree" diff --cached --quiet; then
+            echo "power-dist already matches validated staging tree"
+          else
+            git -C "$worktree" commit -m "dist: publish main-20260725.1-62689ce"
+            git -C "$worktree" push origin HEAD:power-dist
+          fi
