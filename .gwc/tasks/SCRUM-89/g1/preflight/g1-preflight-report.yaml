@@ -1,6 +1,6 @@
 schema_version: '1.0'
 artifact_type: g1-preflight-report
-generated_at: '2026-07-24T07:50:00Z'
+generated_at: '2026-07-24T09:47:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -51,7 +51,16 @@ checks:
   message: Canonical Kiro plan generated
   evidence:
   - .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff
-  - sha256:24d504c52afd3868e5dae60ca0fc38a63c28304c2449dd365ae7792e38100a3b
+  - sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753
+- id: SCOPE_DELTA_02
+  status: PASS
+  code: DECISION_CAPTURE_DEPENDENCY_DISCOVERED
+  message: Protected-base compatibility review identified the standard decision-capture
+    runtime and its focused test as required implementation paths.
+  evidence:
+  - tools/capture_g01_decision.py
+  - tests/test_g01_decision_capture.py
+  - checkpoint 8497c4664e856f11bb75fb0bdd1b03ad189eae17
 process_readback:
   process_id: GWC-G0-G1-TO-G2-PLAN-HANDOFF
   terminal_outcome: Validated Draft PR then stop before G4
@@ -102,7 +111,7 @@ execution_feasibility:
     fallback_routes:
     - Task Me when available
     continuation: generate and validate all three plan files
-    expected_evidence: sha256:24d504c52afd3868e5dae60ca0fc38a63c28304c2449dd365ae7792e38100a3b
+    expected_evidence: sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753
     bypass_eligibility: FORBIDDEN
   - id: STEP-04
     name: g01-validation
