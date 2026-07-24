@@ -67,18 +67,22 @@ Suggested states:
 
 Extend `schemas/g1-decision-record.schema.json` with the immutable accepted plan reference. The decision contains only the selected canonical plan, not all discovery candidates. Cross-artifact validation ensures it matches preflight.
 
+### 3.1 Decision capture runtime
+
+Update `tools/capture_g01_decision.py` so a plan-aware preflight produces a plan-aware accepted decision. The tool must copy the exact immutable `implementation_plan_ref`, emit schema version `1.1`, and fail closed when the preflight plan evidence is incomplete. This preserves the existing human-decision capture boundary rather than requiring manual post-processing.
+
 ### 4. Validator
 
 Extend `tools/validate_g01.py` with:
 
 - plan pair/completeness rules analogous to the existing feasibility extension;
 - required-plan failure codes;
-- preflight-to-decision consistency checks;
+- preflight-to-decision consistency checks, including output from `tools/capture_g01_decision.py`;
 - path/revision/task/repository/base binding checks;
 - compatibility behavior for legacy artifacts with neither new field;
 - a G2 handoff check when `--gate G2_EXECUTION` is requested.
 
-Candidate failure codes the validator must emit:
+Candidate failure codes:
 
 - `G1_PLAN_APPLICABILITY_MISSING`
 - `G1_PLAN_REQUIRED_MISSING`
@@ -153,7 +157,7 @@ plan_read_receipt:
 3. **Single selection:** Exactly one selected plan source governs G2.
 4. **No silent drift:** Any material mismatch returns to G1.
 5. **Authority separation:** Plan evidence grants no write, merge, deploy or production authority.
-6. **Compatibility:** Legacy artifacts are accepted only under explicit pair-absence compatibility; partial new-format enforcement is blocked.
+6. **Compatibility:** Legacy artifacts are accepted only under explicit pair-absence compatibility; partial extension is blocked.
 7. **Trace continuity:** G1, G2, G3 and PR evidence preserve the same canonical plan revision.
 
 ## Error Handling
@@ -168,6 +172,7 @@ plan_read_receipt:
 ## Testing Strategy
 
 - Schema tests for complete/partial/not-applicable plan blocks.
+- Decision-capture tests proving plan-aware preflight evidence is copied unchanged into the accepted decision.
 - Validator unit tests for all failure codes and legacy compatibility.
 - Generator tests for existing-plan, Task Me and Kiro fallback routes.
 - G2 handoff tests for read receipt, revision mismatch, base drift and scope mismatch.
