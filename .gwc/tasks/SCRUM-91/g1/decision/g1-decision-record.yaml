@@ -1,0 +1,41 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-24T11:34:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-91
+  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-24T11:28:46Z'
+  source: 'chat: Ok. Tiến hành tạo envelop'
+  explicit: true
+rationale: The user explicitly requested formal envelope creation after Task Me and UA provider work were completed. The curated allowlist approach is the smallest compatible implementation and preserves existing governance behavior.
+rejected_option_ids: [OPT-2, OPT-3]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5]
+scope_hash: sha256:2e20431d74f45a3a6b4e8f9d0bcd5bb5ad520ee52dfb10438a924465b66e2da9
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - {sub_task_id: SUB-TASK-1, description: Create the local Kiro spec and persist SCRUM-91 gate artifacts on the approved branch.}
+    - sub_task_id: SUB-TASK-2
+      description: 'Implement the strict provider recipe, neutral config/schema, workflow caller, tests, and changelog.'
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: 'Validate exact branch content, review the full diff, record evidence, and stop before PR creation.'
+      dependencies: [SUB-TASK-2]
+  agent_allocation:
+    - {sub_task_id: SUB-TASK-1, skill_id: gwc-g1-and-kiro-spec, agent_type: primary}
+    - {sub_task_id: SUB-TASK-2, skill_id: power-distribution-provider-implementation, agent_type: primary}
+    - {sub_task_id: SUB-TASK-3, skill_id: provider-validation-and-scope-review, agent_type: validator}
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3]
+  summary: One bounded implementation lane followed by exact-head validation; no PR or later-gate action.
