@@ -1,4 +1,5 @@
 name: Publish GWC Power once
+# publication-trigger: 1
 
 on:
   push:
