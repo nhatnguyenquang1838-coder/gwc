@@ -135,10 +135,18 @@ def generate_artifacts(data: dict[str, Any]) -> tuple[dict[str, Any], str]:
     trace = {"project_id": project["id"], "repository": repo["full_name"], "task_id": task["id"], "base_sha": repo["base_sha"], "g0_snapshot": "../../g0/context-snapshot.yaml"}
     runtime_context = {"agent_runtime_id": runtime["agent_runtime_id"], "execution_mode": runtime["execution_mode"], "selected_profile": {"id": runtime["selected_profile"]["id"], "path": runtime["selected_profile"]["path"]}, "selected_connector": runtime["selected_connector"], "connector_priority": runtime["connector_priority"], "required_behavior_contracts": [x["path"] for x in runtime["required_behavior_contracts"]]}
     missing_sources = [x["path"] for x in sources if x["required"] and x["status"] != "AVAILABLE"]
+    unavailable_contracts = [x["path"] for x in runtime["required_behavior_contracts"] if x["required"] and x["status"] != "AVAILABLE"]
+    execution_supported = runtime["execution_mode"] in runtime["selected_profile"]["supported_execution_modes"]
+    connector_declared = runtime["selected_connector"] in runtime["connector_priority"]
+    connector_available = _selected_connector_available(runtime)
     blockers: list[dict[str, str]] = []
     if not repo["verified"]: blockers.append(_blocker("REPOSITORY_NOT_VERIFIED", "Repository identity is not verified."))
     if missing_sources: blockers.append(_blocker("REQUIRED_SOURCE_UNAVAILABLE", ", ".join(missing_sources)))
-    if not task["claimed"]: blockers.append(_blocker("TASK_NOT_CLAIMED", "The work-tracking task is not claimed."))
+    if not execution_supported: blockers.append(_blocker("EXECUTION_MODE_UNSUPPORTED", "Selected runtime profile does not support this execution mode."))
+    if unavailable_contracts: blockers.append(_blocker("BEHAVIOR_CONTRACT_UNAVAILABLE", ", ".join(unavailable_contracts)))
+    if not connector_declared: blockers.append(_blocker("CONNECTOR_NOT_DECLARED", "Selected connector is absent from connector_priority."))
+    if not connector_available: blockers.append(_blocker("SELECTED_CONNECTOR_UNAVAILABLE", "Selected connector lacks AVAILABLE evidence."))
+    if not task["claimed"]: blockers.append(_blocker("DS_ADMIN_TASK_NOT_CLAIMED", "The work-tracking task is not claimed."))
     plan_issues = _plan_blockers(plan, repo)
     blockers.extend(plan_issues)
     high = risk["class"] in HIGH_RISK
@@ -149,13 +157,16 @@ def generate_artifacts(data: dict[str, Any]) -> tuple[dict[str, Any], str]:
     if feasibility["outcome"] == "NOT_EXECUTABLE": blockers.append(_blocker("EXECUTION_ROUTE_NOT_FEASIBLE", "A mandatory route step is hard blocked."))
     intake_ready = bool(request.get("problem", {}).get("statement") and request.get("problem", {}).get("why_now") and request.get("desired_outcome") and request.get("in_scope") and request.get("non_goals") and request.get("acceptance_criteria") and not request.get("unresolved_questions") and all(x.get("verifiable") is True for x in request["acceptance_criteria"]))
     if not intake_ready: blockers.append(_blocker("G1_INTAKE_NEEDS_INPUT", "Intake is incomplete."))
-    g0_blockers = [b for b in blockers if b["code"] in {"REPOSITORY_NOT_VERIFIED", "REQUIRED_SOURCE_UNAVAILABLE"}]
+    g0_blockers = [b for b in blockers if b["code"] in {"REPOSITORY_NOT_VERIFIED", "REQUIRED_SOURCE_UNAVAILABLE", "EXECUTION_MODE_UNSUPPORTED", "BEHAVIOR_CONTRACT_UNAVAILABLE", "CONNECTOR_NOT_DECLARED", "SELECTED_CONNECTOR_UNAVAILABLE"}]
     g0 = {"schema_version": "1.0", "artifact_type": "g0-context-snapshot", "generated_at": now, "project": {"id": project["id"], "name": project["name"], "profile_path": project["profile_path"]}, "repository": {k: repo[k] for k in ("full_name", "base_ref", "base_sha", "protected_branches", "connector", "write_enabled")}, "runtime_context": runtime_context, "constraints": request["constraints"], "applicable_policies": data["policies"], "sources": sources, "status": "BLOCKED" if g0_blockers else "READY", "blockers": g0_blockers}
     delivery = {"authorized_actions": DELIVERY_ACTIONS, "downstream_non_goals": DELIVERY_NON_GOALS, "g3_metadata_completion": {"ready_for_review_after_g3_pass": True, "required_evidence": ["exact head SHA", "required CI", "review closure", "scope match"]}}
     intake = {"schema_version": "1.0", "artifact_type": "g1-intake-brief", "generated_at": now, "trace": trace, "problem": request["problem"], "desired_outcome": request["desired_outcome"], "stakeholders": {"requester": request["requester"], "affected": request["affected"]}, "scope": {"in_scope": request["in_scope"], "non_goals": request["non_goals"]}, "constraints": request["constraints"], "assumptions": request["assumptions"], "risks": request["risks"], "acceptance_criteria": request["acceptance_criteria"], "delivery_lifecycle": delivery, "unresolved_questions": request["unresolved_questions"], "status": "READY" if intake_ready else "NEEDS_INPUT"}
     checks = [
         _check("REPO_IDENTITY", "PASS" if repo["verified"] else "FAIL", "REPOSITORY_VERIFIED" if repo["verified"] else "REPOSITORY_NOT_VERIFIED", "Repository identity and base checked.", [repo["full_name"], repo["base_sha"]]),
-        _check("TASK_TRACEABILITY", "PASS" if task["claimed"] else "FAIL", "TASK_CLAIMED" if task["claimed"] else "TASK_NOT_CLAIMED", "Task claim checked.", [task["id"]]),
+        _check("TASK_TRACEABILITY", "PASS" if task["claimed"] else "FAIL", "TASK_CLAIMED" if task["claimed"] else "DS_ADMIN_TASK_NOT_CLAIMED", "Task claim checked.", [task["id"]]),
+        _check("EXECUTION_MODE_COMPATIBILITY", "PASS" if execution_supported else "FAIL", "EXECUTION_MODE_SUPPORTED" if execution_supported else "EXECUTION_MODE_UNSUPPORTED", "Execution mode compatibility checked.", [runtime["execution_mode"], runtime["selected_profile"]["id"]]),
+        _check("BOOTSTRAP_BEHAVIOR_CONTRACTS", "PASS" if not unavailable_contracts else "FAIL", "BEHAVIOR_CONTRACTS_AVAILABLE" if not unavailable_contracts else "BEHAVIOR_CONTRACT_UNAVAILABLE", "Required behavior contracts checked.", [x["path"] for x in runtime["required_behavior_contracts"]]),
+        _check("DELIVERY_LIFECYCLE_SCOPE", "PASS", "DELIVERY_LIFECYCLE_DECLARED", "Non-merge lifecycle actions and exclusions are explicit.", DELIVERY_ACTIONS + DELIVERY_NON_GOALS),
         _check("IMPLEMENTATION_PLAN_HANDOFF", "FAIL" if plan_issues else "PASS", plan_issues[0]["code"] if plan_issues else "PLAN_NOT_APPLICABLE" if plan and plan["applicability"] == "not_applicable" else "IMPLEMENTATION_PLAN_VALIDATED", plan_issues[0]["message"] if plan_issues else "Plan route and evidence are complete.", [str((plan or {}).get("plan_revision") or (plan or {}).get("reason") or "legacy")]),
         _check("EXECUTION_FEASIBILITY", "FAIL" if feasibility["outcome"] == "NOT_EXECUTABLE" else "PASS", "END_TO_END_ROUTE_NOT_EXECUTABLE" if feasibility["outcome"] == "NOT_EXECUTABLE" else "END_TO_END_ROUTE_EXECUTABLE", "Execution route classified.", [s["id"] for s in route]),
     ]

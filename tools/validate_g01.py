@@ -35,6 +35,8 @@ class ValidationReport:
 
 def _yaml(path: Path) -> Any: return yaml.safe_load(path.read_text(encoding="utf-8"))
 def _json(path: Path) -> Any: return json.loads(path.read_text(encoding="utf-8"))
+_load_yaml = _yaml
+_load_json = _json
 def _issue(code: str, artifact: str, location: str, message: str) -> ValidationIssue: return ValidationIssue(code, artifact, location, message)
 
 
