@@ -1,0 +1,84 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+task_id: SCRUM-91
+approval_request_id: G2-SCRUM91-20260724-01
+authority_gate: G2_EXECUTION
+issued_at: '2026-07-24T11:39:00Z'
+expires_at: '2026-07-25T11:39:00Z'
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+working_branch: feat/dw-power-distribution-v1
+target_pr_base: main
+draft_pr: false
+modules_or_files:
+  - .gwc/tasks/SCRUM-91/**
+  - .kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md
+  - .kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md
+  - .kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md
+  - distribution/power-package.yaml
+  - distribution/README.md
+  - distribution/config/gwc.defaults.yaml
+  - distribution/contracts/gwc-config.schema.json
+  - .github/workflows/publish-power.yml
+  - tests/test_power_distribution.py
+  - releases/changelog.d/2026-07-24-gwc-power-distribution.md
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - persist_task_gate_artifacts
+  - create_kiro_spec
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage_approved_files
+  - create_commit
+  - push_branch
+excluded_actions:
+  - protected_branch_write
+  - create_pull_request
+  - mark_pr_ready
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - publish_power_dist
+  - production_configuration
+  - credentials
+  - secrets
+  - production_data
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  - modify_existing_gwc_skill_or_core_contracts_outside_recipe_references
+  - historical_gate_evidence_migration
+required_checks:
+  - validate_g01
+  - validate_instructions
+  - YAML and JSON validation
+  - provider recipe reference and exclusion tests
+  - workflow YAML parse
+  - git diff --check
+  - complete diff and scope review
+work_item:
+  provider: jira-mcp
+  id: SCRUM-91
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: In Progress
+artifact_hashes:
+  g0: sha256:57ff9a4be9eabd4323842b5a7a606446496dc5e5e87a683a2518710ee301f651
+  intake: sha256:b95738958f5532fde2fb73c571a7b9da5fcd32b2755d0bd083e542e388a46223
+  preflight: sha256:0d2404586939cecbf2d9bbc95226a8713fca2665418b8e358b159fc6707a47f3
+  options: sha256:00b0ebfa3c344ccdf82d6020d7948905fd6d61471feb1edba8913f57ba79e9b5
+  decision: sha256:5cccb07de8ec74a59620a7dde6b1786be9a4cf1972160e8644f7362ac6419264
+scope_hash: sha256:2e20431d74f45a3a6b4e8f9d0bcd5bb5ad520ee52dfb10438a924465b66e2da9
+g0_context_ref: .gwc/tasks/SCRUM-91/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/SCRUM-91/g1/decision/g1-decision-record.yaml
+notes:
+  - The protected base is fixed at main@b3edbb102fb5b0e7e1532e221d89c16896f17755.
+  - The shared DW Power Distribution foundation is pinned at 4e552ea3d915a4790814b08b3155c66e3c5736a1.
+  - The package is skills-only and must exclude task evidence, generated plans/tasks, dashboards, frontends, secrets, caches, and populated runtime data.
+  - This envelope authorizes feature-branch implementation only. It does not authorize a Pull Request or any G3-G6 action.
