@@ -1,11 +1,11 @@
 schema_version: '1.0'
 artifact_type: g2-execution-envelope
 task_id: SCRUM-89
-approval_request_id: G2-SCRUM89-20260724-01
+approval_request_id: G2-SCRUM89-20260724-02
 authority_gate: G2_EXECUTION
-issued_at: '2026-07-24T07:50:00Z'
-expires_at: '2026-07-25T07:50:00Z'
-scope_version: 1
+issued_at: '2026-07-24T09:47:00Z'
+expires_at: '2026-07-25T09:47:00Z'
+scope_version: 2
 risk_class: R2
 project_profile: projects/gwc/project-profile.yaml
 repository: nhatnguyenquang1838-coder/gwc
@@ -21,7 +21,7 @@ modules_or_files:
 - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
 - agents/chatgpt-agent/agent-instructions.md
 - agents/dwc/agent-instructions.md
-- libs/g2-skill-library/skils/g2-execution-plan.md
+- libs/g2-skill-library/skills/g2-execution-plan.md
 - schemas/g01-runtime-input.schema.json
 - schemas/g1-preflight-report.schema.json
 - schemas/g1-decision-record.schema.json
@@ -33,6 +33,8 @@ modules_or_files:
 - tests/test_chatgpt_agent_runbook_continuation.py
 - projects/gwc/package.yaml
 - releases/changelog.md
+- tools/capture_g01_decision.py
+- tests/test_g01_decision_capture.py
 authorized_actions:
 - create_guarded_branch_or_worktree
 - persist_task_scoped_gate_artifacts
@@ -62,9 +64,9 @@ required_checks:
 - validate_instructions
 - YAML/JSON
 - tests
-- package_export
+- package export
 - git diff --check
-- scope_review
+- scope review
 work_item:
   provider: jira-mcp
   id: SCRUM-89
@@ -85,11 +87,11 @@ implementation_plan:
   requirements_path: .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md
   design_path: .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/design.md
   tasks_path: .kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/tasks.md
-  plan_revision: sha256:24d504c52afd3868e5dae60ca0fc38a63c28304c2449dd365ae7792e38100a3b
+  plan_revision: sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753
   validation_status: PASS
-  validation_evidence: evidence/kiro-plan-validation.json
+  validation_evidence: evidence/kiro-plan-validation-v2.json
   generated_by: chatgpt-agent/kiro-fallback
-  generated_at_utc: '2026-07-24T07:50:00Z'
+  generated_at_utc: '2026-07-24T09:47:00Z'
 plan_read_precondition:
   required_before_first_write: true
   required_paths:
@@ -99,15 +101,22 @@ plan_read_precondition:
   must_match_task_uid: GWC-G1-PLAN-01
   must_match_base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
   on_mismatch: STOP_AND_RETURN_TO_G1
+  must_match_plan_revision: sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753
 g0_context_ref: .gwc/tasks/SCRUM-89/g0/context-snapshot.yaml
 g1_decision_ref: .gwc/tasks/SCRUM-89/g1/decision/g1-decision-record.yaml
 notes:
-- Exact G2 approval required before repository write
-- Draft PR only
-approval_id: G2-SCRUM89-20260724-01
+- Scope version 2 retains all version 1 permissions and adds only the decision-capture
+  runtime and focused test.
+- Existing branch checkpoint is preserved; no force-push or history rewrite.
+- Draft PR only. G4, G5 and G6 remain excluded.
+approval_id: G2-SCRUM89-20260724-02
 artifact_hashes:
   g0: sha256:ae076a5b5a1a9c949a810127b9e5700b9bc593bb71485078ce6fd24b8239fcd4
   g1: sha256:31f59c5adcd5ac2f716cc56f549b066994f5fa20883b53464e1703364565cc4e
-  kiro_plan: sha256:24d504c52afd3868e5dae60ca0fc38a63c28304c2449dd365ae7792e38100a3b
-  kiro_validation: sha256:36caa91a1e222a610a0341f2063ac1410b86201f0dc796b8f4a63945646e8075
-scope_hash: sha256:ce3a5ff6fc727d2aeeea6c342974313bc00cc60a13ff8dc3ce74594657586a86
+  kiro_plan: sha256:87dedce0c7feb7b80f039a2f72a8d22d488b9d89282ff784b71fef9afaa79753
+  kiro_validation: sha256:cfb99822dec114bef16b16c34207df2133f93aa3521e018f222e9f4afef57a90
+supersedes_approval_id: G2-SCRUM89-20260724-01
+checkpoint_head_sha: 8497c4664e856f11bb75fb0bdd1b03ad189eae17
+scope_delta_reason: Protected-base decision capture must propagate implementation_plan_ref;
+  omitting it leaves the runtime unable to create valid plan-aware G1 decisions.
+scope_hash: sha256:e6e804b202ab0408ab485b35c494b97faf85585476b4187a4e6f08dada0bc0aa
