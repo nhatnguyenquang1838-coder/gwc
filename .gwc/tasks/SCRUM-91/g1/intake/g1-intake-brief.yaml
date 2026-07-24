@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-91
-  base_sha: b3edbb102fb5b0e7e1532e221d89c16896f17755
+  base_sha: 16c72a1200cdeadc2c549f992966f731acab89bb
   g0_snapshot: ../../g0/context-snapshot.yaml
 problem:
   statement: GWC has no governed provider recipe and publishing entrypoint for the shared DW Power Distribution v1 contract.
@@ -28,7 +28,7 @@ scope:
     - Create a Pull Request or mark one ready for review.
     - Merge, deploy, release, publish power-dist, alter production configuration, credentials, secrets, or production data.
 constraints:
-  - Base all authority and repository evidence on main@b3edbb102fb5b0e7e1532e221d89c16896f17755.
+  - Base all authority and repository evidence on main@16c72a1200cdeadc2c549f992966f731acab89bb.
   - Use branch feat/dw-power-distribution-v1.
   - Pin the shared DW foundation to commit 4e552ea3d915a4790814b08b3155c66e3c5736a1.
   - Use one staging tree for future ZIP and power-dist publication.
