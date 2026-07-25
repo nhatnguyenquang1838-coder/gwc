@@ -1,0 +1,62 @@
+﻿schema_version: '1.0'
+run_id: gwc-scrum-95-20260725-r2
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: d33ab8a52d341fa7f9ae65a1a88cb193ba61aded
+tasks:
+- task_id: SCRUM-100
+  slug: audit-current-gwc-contracts-blockers-surfaces
+  title: Audit current GWC contracts, blockers and executable surfaces
+  folder: tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces
+  wave: 1
+  requires: []
+  parallel_with:
+  - SCRUM-101
+  - SCRUM-102
+  risk: R1
+  likely_hours: 10
+- task_id: SCRUM-101
+  slug: define-dw-super-app-source-of-truth-authority
+  title: Define DW SUPER APP source-of-truth and authority matrix
+  folder: tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority
+  wave: 1
+  requires: []
+  parallel_with:
+  - SCRUM-100
+  - SCRUM-102
+  risk: R2
+  likely_hours: 8
+- task_id: SCRUM-102
+  slug: design-canonical-runtime-schemas
+  title: Design canonical node, scenario, profile and history schemas
+  folder: tasks/SCRUM-102-design-canonical-runtime-schemas
+  wave: 1
+  requires: []
+  parallel_with:
+  - SCRUM-100
+  - SCRUM-101
+  risk: R2
+  likely_hours: 14
+- task_id: SCRUM-103
+  slug: resolve-lifecycle-authority-workspace-package-blockers
+  title: Resolve lifecycle, authority-validator, workspace and package blockers
+  folder: tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers
+  wave: 2
+  requires:
+  - SCRUM-100
+  parallel_with: []
+  risk: R2
+  likely_hours: 20
+- task_id: SCRUM-104
+  slug: build-registries-validators-v3-binding
+  title: Build canonical registries, validators and v3 data binding
+  folder: tasks/SCRUM-104-build-registries-validators-v3-binding
+  wave: 3
+  requires:
+  - SCRUM-100
+  - SCRUM-101
+  - SCRUM-102
+  - SCRUM-103
+  parallel_with: []
+  risk: R2
+  likely_hours: 24
+
