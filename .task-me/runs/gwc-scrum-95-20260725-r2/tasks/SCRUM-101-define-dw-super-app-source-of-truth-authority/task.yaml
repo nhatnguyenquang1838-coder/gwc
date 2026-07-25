@@ -1,4 +1,4 @@
-﻿schema_version: '1.0'
+schema_version: '1.0'
 task_id: SCRUM-101
 title: Define DW SUPER APP source-of-truth and authority matrix
 slug: define-dw-super-app-source-of-truth-authority

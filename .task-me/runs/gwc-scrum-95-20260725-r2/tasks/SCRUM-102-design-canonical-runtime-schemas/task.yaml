@@ -1,4 +1,4 @@
-﻿schema_version: '1.0'
+schema_version: '1.0'
 task_id: SCRUM-102
 title: Design canonical node, scenario, profile and history schemas
 slug: design-canonical-runtime-schemas
