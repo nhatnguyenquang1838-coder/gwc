@@ -1,0 +1,73 @@
+﻿schema_version: '1.0'
+task_id: SCRUM-101
+title: Define DW SUPER APP source-of-truth and authority matrix
+slug: define-dw-super-app-source-of-truth-authority
+objective: Define the integration ownership and authority boundaries for GWC, UA,
+  Task-Me, BMAD, GitHub/CI, deployment systems and Jira.
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: d33ab8a52d341fa7f9ae65a1a88cb193ba61aded
+requirements:
+- REQ-P1-02
+scope:
+  included:
+  - Control-plane responsibilities
+  - Generated-output ownership
+  - Exact source-of-truth matrix
+  - Adapter read/write boundaries
+  - Authority and projection distinctions
+  excluded:
+  - Implementing UA/Task-Me/BMAD integrations
+  - Product source changes
+verified_paths:
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- docs/project-consumer-agent-instructions.md
+dependencies:
+  requires: []
+  parallel_with:
+  - SCRUM-100
+  - SCRUM-102
+  delivery_wave: 1
+complexity:
+  class: medium
+  risk: R2
+  effort:
+    optimistic_hours: 5
+    likely_hours: 8
+    pessimistic_hours: 12
+  drivers:
+  - governance contract coupling
+  - cross-schema compatibility
+  - test and consumer-package impact
+implementation_plan:
+- Define canonical owner for product source, requirements, knowledge, plans, gate
+  state, runtime history and external status.
+- Define GWC/UA/Task-Me/BMAD input/output contracts.
+- Define prohibited cross-component writes.
+- Define GitHub, deployment and Jira evidence/projection roles.
+- Record compatibility rules for consumer projects.
+test_plan:
+- Every state-changing operation resolves to exactly one authority owner.
+- Jira and external projections cannot grant G0-G6 authority.
+- Task-Me and BMAD outputs cannot mutate canonical GWC state.
+definition_of_done:
+- Source-of-truth matrix has no ownership collision.
+- Every adapter has allowed writes and explicit denied writes.
+- Human authority boundaries are explicit.
+evidence_refs:
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+decisions:
+- decision: Reuse and extend current GWC mechanisms before replacement.
+  rule: Reuse 鈫?Extend 鈫?Refactor 鈫?Replace
+  confidence: 0.95
+- decision: Do not treat the 81-slot scaffold as 81 completed executable adapters.
+  rule: Source-backed maturity/provenance boundary
+  confidence: 0.98
+unresolved:
+- Exact implementation symbols must be re-verified in an isolated checkout before
+  G2 edits.
+- Current main CI result must be captured before Draft PR readiness.
+
