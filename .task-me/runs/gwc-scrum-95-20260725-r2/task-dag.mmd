@@ -1,0 +1,16 @@
+﻿graph TD
+  T100[SCRUM-100 Audit contracts and blockers]
+  T101[SCRUM-101 Authority matrix]
+  T102[SCRUM-102 Canonical schemas]
+  T103[SCRUM-103 Resolve blockers]
+  T104[SCRUM-104 Registries + v3 binding]
+
+  T100 --> T103
+  T100 --> T104
+  T101 --> T104
+  T102 --> T104
+  T103 --> T104
+
+  T100 -. PARALLEL .- T101
+  T101 -. PARALLEL .- T102
+
