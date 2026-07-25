@@ -1,0 +1,56 @@
+﻿{
+  "task_id": "SCRUM-103",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "requirements": [
+    "REQ-P1-01",
+    "REQ-P1-04"
+  ],
+  "sources": [
+    {
+      "path": "projects/gwc/project-instructions.md",
+      "category": "design",
+      "blob_sha": "7be8aa1f85f414db975c65cc6035494d61d65162",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Default workflow, Jira truth, automatic bounded G2/G3 policy, validation."
+    },
+    {
+      "path": "core/task-lifecycle/gate-transition-map.yaml",
+      "category": "system_graph",
+      "blob_sha": "36acd06a411956f6292ed750470d61441fda91df",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Current state engine stops at completed after validation and does not model explicit G4/G5 states."
+    },
+    {
+      "path": "tools/validate_g01.py",
+      "category": "code",
+      "blob_sha": "4fbc4fc57657ce0df1fde308743646a996156721",
+      "coverage": "implementation-plan and route validation sections",
+      "status": "VERIFIED",
+      "notes": "Enforces plan handoff, exact base/repository binding and plan-read receipt."
+    },
+    {
+      "path": "distribution/power-package.yaml",
+      "category": "repository_context",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Skills-only GWC Power distribution surface."
+    },
+    {
+      "path": ".github/workflows/validate-instructions.yml",
+      "category": "repository_context",
+      "coverage": "path verified from tree",
+      "status": "PATH_VERIFIED",
+      "notes": "Required workflow named validate-instructions in project profile."
+    }
+  ],
+  "confidence": 0.82,
+  "limitations": [
+    "No materialized Git checkout; git status and untracked files cannot be verified.",
+    "No canonical UA base graph exists in the protected-base inventory.",
+    "Source inventory is bounded to verified architecture, governance, runtime-catalog and test surfaces.",
+    "The package is planning evidence, not repository execution evidence."
+  ]
+}
