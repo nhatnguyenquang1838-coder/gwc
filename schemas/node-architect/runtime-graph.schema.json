@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-graph.schema.json",
+  "title": "Canonical Runtime Graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "graph_id", "revision", "nodes", "edges"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-graph"},
+    "graph_id": {"type": "string", "minLength": 1},
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision_id", "parent_revision_id", "source_sha"],
+      "properties": {
+        "revision_id": {"type": "string"},
+        "parent_revision_id": {"type": ["string", "null"]},
+        "source_sha": {"type": "string"}
+      }
+    },
+    "nodes": {"type": "array", "items": {"type": "string"}},
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "edge_type", "runtime_executable", "provenance"],
+        "properties": {
+          "source": {"type": "string"},
+          "target": {"type": "string"},
+          "edge_type": {"enum": ["runtime", "visualization", "audit", "dependency"]},
+          "runtime_executable": {"type": "boolean"},
+          "provenance": {"type": "string"}
+        }
+      }
+    }
+  }
+}
