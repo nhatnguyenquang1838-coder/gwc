@@ -1,0 +1,93 @@
+﻿{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-95-20260725-r2",
+  "nodes": [
+    {
+      "id": "repo:gwc",
+      "type": "repository",
+      "label": "nhatnguyenquang1838-coder/gwc"
+    },
+    {
+      "id": "gate:G0-G6",
+      "type": "authority_lifecycle",
+      "label": "G0_CONTEXT through G6_PRODUCTION_DATA"
+    },
+    {
+      "id": "state:current-map",
+      "type": "state_machine",
+      "label": "Current task transition map"
+    },
+    {
+      "id": "catalog:81",
+      "type": "catalog_invariant",
+      "label": "9 families 脳 9 runtime nodes"
+    },
+    {
+      "id": "nodes:explicit4",
+      "type": "runtime_nodes",
+      "label": "Four explicit G5-focused runtime nodes"
+    },
+    {
+      "id": "scenario:116",
+      "type": "declared_scenario_space",
+      "label": "116 declared edge scenarios"
+    },
+    {
+      "id": "task:SCRUM-95",
+      "type": "jira_task",
+      "label": "Architecture Readiness & Canonical Registry Foundation"
+    },
+    {
+      "id": "visual:v3",
+      "type": "external_artifact",
+      "label": "Cytoscape full scenario graph baseline v3"
+    },
+    {
+      "id": "taskme:run",
+      "type": "planning_run",
+      "label": "gwc-scrum-95-20260725-r2"
+    }
+  ],
+  "edges": [
+    {
+      "source": "task:SCRUM-95",
+      "target": "repo:gwc",
+      "type": "ANALYZES"
+    },
+    {
+      "source": "repo:gwc",
+      "target": "gate:G0-G6",
+      "type": "IMPLEMENTS_PARTIALLY"
+    },
+    {
+      "source": "repo:gwc",
+      "target": "state:current-map",
+      "type": "CONTAINS"
+    },
+    {
+      "source": "repo:gwc",
+      "target": "catalog:81",
+      "type": "DECLARES"
+    },
+    {
+      "source": "catalog:81",
+      "target": "nodes:explicit4",
+      "type": "MATERIALIZES_PARTIALLY"
+    },
+    {
+      "source": "catalog:81",
+      "target": "scenario:116",
+      "type": "DECLARES_SCENARIO_SPACE"
+    },
+    {
+      "source": "visual:v3",
+      "target": "catalog:81",
+      "type": "VISUALIZES_PROPOSED_REGISTRY"
+    },
+    {
+      "source": "taskme:run",
+      "target": "task:SCRUM-95",
+      "type": "DECOMPOSES"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+﻿{
+  "schema_version": "1.0",
+  "artifact_type": "restart-validation",
+  "task_id": "SCRUM-95",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "target_run_id": "gwc-scrum-95-20260725-r2",
+  "current_base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "source_audit_commit": "98c010ccb9291c660280b2949a47165565f86090",
+  "expected_file_count": 57,
+  "allowed_scope": [
+    ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/**",
+    ".task-architect/config.json",
+    ".task-me/runs/gwc-scrum-95-20260725-r2/**",
+    ".ua/extensions/planning-graph.json",
+    ".ua/extensions/traceability-graph.json"
+  ],
+  "scope_result": "PASS",
+  "authority_result": "G2_REMEDIATION_RECONSTRUCTED_PENDING_READBACK",
+  "notes": "The reconstructed package is intended for stage-then-squash delivery. G3 PR and G4 merge remain separate gates."
+}

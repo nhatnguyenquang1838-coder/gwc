@@ -1,0 +1,73 @@
+﻿{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-25T01:40:52+07:00",
+  "source": {
+    "run_id": "gwc-scrum-95-20260725-r2",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded"
+  },
+  "nodes": [
+    {
+      "id": "SCRUM-100",
+      "type": "task",
+      "label": "Audit current GWC contracts, blockers and executable surfaces",
+      "wave": 1,
+      "risk": "R1"
+    },
+    {
+      "id": "SCRUM-101",
+      "type": "task",
+      "label": "Define DW SUPER APP source-of-truth and authority matrix",
+      "wave": 1,
+      "risk": "R2"
+    },
+    {
+      "id": "SCRUM-102",
+      "type": "task",
+      "label": "Design canonical node, scenario, profile and history schemas",
+      "wave": 1,
+      "risk": "R2"
+    },
+    {
+      "id": "SCRUM-103",
+      "type": "task",
+      "label": "Resolve lifecycle, authority-validator, workspace and package blockers",
+      "wave": 2,
+      "risk": "R2"
+    },
+    {
+      "id": "SCRUM-104",
+      "type": "task",
+      "label": "Build canonical registries, validators and v3 data binding",
+      "wave": 3,
+      "risk": "R2"
+    }
+  ],
+  "edges": [
+    {
+      "source": "SCRUM-100",
+      "target": "SCRUM-103",
+      "type": "BLOCKS"
+    },
+    {
+      "source": "SCRUM-100",
+      "target": "SCRUM-104",
+      "type": "BLOCKS"
+    },
+    {
+      "source": "SCRUM-101",
+      "target": "SCRUM-104",
+      "type": "BLOCKS"
+    },
+    {
+      "source": "SCRUM-102",
+      "target": "SCRUM-104",
+      "type": "BLOCKS"
+    },
+    {
+      "source": "SCRUM-103",
+      "target": "SCRUM-104",
+      "type": "BLOCKS"
+    }
+  ]
+}

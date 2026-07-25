@@ -1,0 +1,82 @@
+﻿schema_version: '1.0'
+task_id: SCRUM-104
+title: Build canonical registries, validators and v3 data binding
+slug: build-registries-validators-v3-binding
+objective: Materialize approved registry entries and connect the full-flow v3 visualization
+  to external registry/scenario data.
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: d33ab8a52d341fa7f9ae65a1a88cb193ba61aded
+requirements:
+- REQ-P1-02
+- REQ-P1-03
+- REQ-P1-05
+scope:
+  included:
+  - 81-slot node registry with maturity/provenance
+  - Initial canonical scenario registry
+  - Flow profile registry
+  - Registry validators
+  - External data contract for v3
+  - Visual versus runtime edge separation
+  excluded:
+  - Executing runtime nodes
+  - Self-improvement
+  - Automatic graph mutation
+verified_paths:
+- tools/node_architect/project_runtime_knowledge_graph.py
+- schemas/node-architect/runtime-catalog-taxonomy.schema.json
+- tests/test_runtime_catalog_taxonomy_kg.py
+- catalog.yaml
+dependencies:
+  requires:
+  - SCRUM-100
+  - SCRUM-101
+  - SCRUM-102
+  - SCRUM-103
+  parallel_with: []
+  delivery_wave: 3
+complexity:
+  class: medium
+  risk: R2
+  effort:
+    optimistic_hours: 14
+    likely_hours: 24
+    pessimistic_hours: 40
+  drivers:
+  - governance contract coupling
+  - cross-schema compatibility
+  - test and consumer-package impact
+implementation_plan:
+- 'Review 77 proposed slots: keep, rename, merge, split, reject or defer.'
+- Create canonical registry with explicit source_status and maturity.
+- Create initial source-backed scenario definitions.
+- Add schema and cross-registry validators.
+- Import v3 renderer as a data-driven view with thin edges and inactive dimming.
+- Add tests for registry loading, route classification and visual-only edges.
+test_plan:
+- 81-slot invariant and family distribution.
+- No proposed slot presented as stable without promotion evidence.
+- Scenario references resolve to existing node/flow/green anchors.
+- Visual-only edges cannot enter runtime graph.
+- V3 loads full graph and dims inactive nodes without deleting them.
+definition_of_done:
+- All 81 slots have explicit maturity and provenance.
+- Registry/schema validation runs in CI.
+- V3 uses external data rather than hard-coded scenario arrays.
+- Phase 2 can select three pilot nodes from the registry.
+evidence_refs:
+- tools/node_architect/project_runtime_knowledge_graph.py
+- schemas/node-architect/runtime-catalog-taxonomy.schema.json
+- tests/test_runtime_catalog_taxonomy_kg.py
+decisions:
+- decision: Reuse and extend current GWC mechanisms before replacement.
+  rule: Reuse 鈫?Extend 鈫?Refactor 鈫?Replace
+  confidence: 0.95
+- decision: Do not treat the 81-slot scaffold as 81 completed executable adapters.
+  rule: Source-backed maturity/provenance boundary
+  confidence: 0.98
+unresolved:
+- Exact implementation symbols must be re-verified in an isolated checkout before
+  G2 edits.
+- Current main CI result must be captured before Draft PR readiness.
+
