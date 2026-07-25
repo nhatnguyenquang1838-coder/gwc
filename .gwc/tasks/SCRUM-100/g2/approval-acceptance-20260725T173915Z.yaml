@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g2-approval-acceptance
+task_id: SCRUM-100
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+approval_id: APPROVE_G2_EXECUTION_SCRUM-100_20260725T172050Z
+scope_hash_prefix: 63100265af9f43fd
+expires_at_utc: '2026-07-26T17:20:50Z'
+received_at_utc: '2026-07-25T17:39:15Z'
+command_match: true
+base_match: true
+scope_match: true
+plan_revision_match: true
+not_expired: true
+outcome: ACCEPTED
+authorized_actions:
+  - create_guarded_branch_from_exact_base
+  - write_audit_only_artifacts
+  - run_validation
+  - push_branch
+  - create_or_update_draft_pr
+  - monitor_ci_read_only
+excluded_actions:
+  - modify_runtime
+  - modify_validators
+  - modify_workflows
+  - modify_package_files
+  - merge
+  - deploy
+  - release
+  - production_data
+  - production_configuration
+  - credentials_or_secrets
+  - force_push
+  - direct_main_write
