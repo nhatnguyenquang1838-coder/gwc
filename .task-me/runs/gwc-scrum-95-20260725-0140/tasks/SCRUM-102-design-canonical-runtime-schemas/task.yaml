@@ -1,0 +1,77 @@
+schema_version: '1.0'
+task_id: SCRUM-102
+title: Design canonical node, scenario, profile and history schemas
+slug: design-canonical-runtime-schemas
+objective: Define typed versioned contracts for runtime nodes, scenarios, profiles,
+  guard expressions, graphs, revisions and history.
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: 62689ce35e279751a3bf17b5255ac258dafbe7d7
+requirements:
+- REQ-P1-03
+scope:
+  included:
+  - Node contract metadata dimensions
+  - Scenario activation and route model
+  - Profile overlays
+  - Typed guards
+  - Runtime graph/revision/history
+  - Promotion lifecycle metadata
+  excluded:
+  - Graph compiler implementation
+  - Durable engine
+  - Automatic catalog promotion
+verified_paths:
+- schemas/node-architect/runtime-catalog-taxonomy.schema.json
+- core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
+- tools/node_architect/project_runtime_knowledge_graph.py
+- tests/test_runtime_catalog_taxonomy_kg.py
+dependencies:
+  requires: []
+  parallel_with:
+  - SCRUM-100
+  - SCRUM-101
+  delivery_wave: 1
+complexity:
+  class: medium
+  risk: R2
+  effort:
+    optimistic_hours: 8
+    likely_hours: 14
+    pessimistic_hours: 22
+  drivers:
+  - governance contract coupling
+  - cross-schema compatibility
+  - test and consumer-package impact
+implementation_plan:
+- Define stable ID and independent semantic version fields.
+- Separate effect, authority, reversibility, idempotency, suspension and determinism
+  dimensions.
+- Define runtime versus visualization edge categories.
+- Define scenario facts, typed guards, green anchors and human boundaries.
+- Define immutable graph revision and routing-history records.
+- Create schema validation fixtures.
+test_plan:
+- Schema meta-validation.
+- Positive and negative fixtures for every contract.
+- Reject free-form executable guards.
+- Reject promoted nodes without evidence contract and implementation owner.
+definition_of_done:
+- Schemas are versioned and additionalProperties policy is explicit.
+- No graph edge is executable without provenance/type/rule.
+- Node promotion checklist is machine-checkable.
+evidence_refs:
+- tools/node_architect/project_runtime_knowledge_graph.py
+- schemas/node-architect/runtime-catalog-taxonomy.schema.json
+- tests/test_runtime_catalog_taxonomy_kg.py
+- core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md
+decisions:
+- decision: Reuse and extend current GWC mechanisms before replacement.
+  rule: Reuse → Extend → Refactor → Replace
+  confidence: 0.95
+- decision: Do not treat the 81-slot scaffold as 81 completed executable adapters.
+  rule: Source-backed maturity/provenance boundary
+  confidence: 0.98
+unresolved:
+- Exact implementation symbols must be re-verified in an isolated checkout before
+  G2 edits.
+- Current main CI result must be captured before Draft PR readiness.

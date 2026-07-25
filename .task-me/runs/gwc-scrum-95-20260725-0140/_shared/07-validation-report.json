@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-95-20260725-0140",
+  "outcome": "PASS_WITH_LIMITATIONS",
+  "checks": {
+    "folder_mode_per_task": true,
+    "task_folder_count": 5,
+    "task_record_count": 5,
+    "unique_task_ids": true,
+    "unique_folders": true,
+    "dependencies_known": true,
+    "dag_acyclic": true,
+    "all_required_task_files_present": true,
+    "output_inside_root": true
+  },
+  "limitations": [
+    "No materialized Git checkout; git status and untracked files cannot be verified.",
+    "No canonical UA base graph exists in the protected-base inventory.",
+    "Source inventory is bounded to verified architecture, governance, runtime-catalog and test surfaces.",
+    "The package is planning evidence, not repository execution evidence."
+  ],
+  "blocking_for_repository_execution": [
+    "Formal G0/G1 validator evidence and task-scoped G2 execution envelope are not included in this Task-Me output.",
+    "Repository state/cleanliness and exact current CI state require a trusted checkout or CI evidence."
+  ]
+}

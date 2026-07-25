@@ -1,0 +1,88 @@
+{
+  "task_id": "SCRUM-100",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "62689ce35e279751a3bf17b5255ac258dafbe7d7",
+  "requirements": [
+    "REQ-P1-01",
+    "REQ-P1-04"
+  ],
+  "sources": [
+    {
+      "path": "AGENTS.md",
+      "category": "repository_context",
+      "blob_sha": "fafe4099ffc7c576ec05fa38be5dd1bb1670cddb",
+      "coverage": "full policy relevant ranges",
+      "status": "VERIFIED",
+      "notes": "Mandatory boot, execution modes, G0-G6 artifacts and chat_connector_only boundary."
+    },
+    {
+      "path": "projects/gwc/project-profile.yaml",
+      "category": "repository_context",
+      "blob_sha": "487bb5e227b20cd9cde85ad6a17305e8610177dc",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Repository identity, connectors, Jira provider, validation candidates."
+    },
+    {
+      "path": "projects/gwc/project-instructions.md",
+      "category": "design",
+      "blob_sha": "7be8aa1f85f414db975c65cc6035494d61d65162",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Default workflow, Jira truth, automatic bounded G2/G3 policy, validation."
+    },
+    {
+      "path": "projects/gwc/project-extension.md",
+      "category": "design",
+      "blob_sha": "af302cda2ef0327e295e01911c09cd683f951385",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Automatic gate policy, safety, Jira traceability, hotfix/rescue boundaries."
+    },
+    {
+      "path": "core/task-lifecycle/gate-transition-map.yaml",
+      "category": "system_graph",
+      "blob_sha": "36acd06a411956f6292ed750470d61441fda91df",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Current state engine stops at completed after validation and does not model explicit G4/G5 states."
+    },
+    {
+      "path": "tools/validate_g01.py",
+      "category": "code",
+      "blob_sha": "4fbc4fc57657ce0df1fde308743646a996156721",
+      "coverage": "implementation-plan and route validation sections",
+      "status": "VERIFIED",
+      "notes": "Enforces plan handoff, exact base/repository binding and plan-read receipt."
+    },
+    {
+      "path": "tests/test_g1_implementation_plan_handoff.py",
+      "category": "tests",
+      "blob_sha": "7b5e5b49100a2654d5cde66984246ff109e09863",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Tests Task-Me invocation, plan reference, base drift and G2 plan read."
+    },
+    {
+      "path": "tools/node_architect/project_runtime_knowledge_graph.py",
+      "category": "code",
+      "coverage": "focused projection",
+      "status": "VERIFIED",
+      "notes": "Materializes four explicit runtime node IDs and taxonomy projection."
+    },
+    {
+      "path": "tests/test_runtime_catalog_taxonomy_kg.py",
+      "category": "tests",
+      "coverage": "focused invariant tests",
+      "status": "VERIFIED",
+      "notes": "Validates taxonomy/knowledge graph projection."
+    }
+  ],
+  "confidence": 0.9,
+  "limitations": [
+    "No materialized Git checkout; git status and untracked files cannot be verified.",
+    "No canonical UA base graph exists in the protected-base inventory.",
+    "Source inventory is bounded to verified architecture, governance, runtime-catalog and test surfaces.",
+    "The package is planning evidence, not repository execution evidence."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "SCRUM-101",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "62689ce35e279751a3bf17b5255ac258dafbe7d7",
+  "requirements": [
+    "REQ-P1-02"
+  ],
+  "sources": [
+    {
+      "path": "projects/gwc/project-profile.yaml",
+      "category": "repository_context",
+      "blob_sha": "487bb5e227b20cd9cde85ad6a17305e8610177dc",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Repository identity, connectors, Jira provider, validation candidates."
+    },
+    {
+      "path": "projects/gwc/project-instructions.md",
+      "category": "design",
+      "blob_sha": "7be8aa1f85f414db975c65cc6035494d61d65162",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Default workflow, Jira truth, automatic bounded G2/G3 policy, validation."
+    },
+    {
+      "path": "projects/gwc/project-extension.md",
+      "category": "design",
+      "blob_sha": "af302cda2ef0327e295e01911c09cd683f951385",
+      "coverage": "full",
+      "status": "VERIFIED",
+      "notes": "Automatic gate policy, safety, Jira traceability, hotfix/rescue boundaries."
+    }
+  ],
+  "confidence": 0.9,
+  "limitations": [
+    "No materialized Git checkout; git status and untracked files cannot be verified.",
+    "No canonical UA base graph exists in the protected-base inventory.",
+    "Source inventory is bounded to verified architecture, governance, runtime-catalog and test surfaces.",
+    "The package is planning evidence, not repository execution evidence."
+  ]
+}

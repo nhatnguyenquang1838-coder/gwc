@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-25T01:40:52+07:00",
+  "source": {
+    "run_id": "gwc-scrum-95-20260725-0140",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "base_sha": "62689ce35e279751a3bf17b5255ac258dafbe7d7"
+  },
+  "nodes": [
+    {
+      "id": "REQ-P1-01",
+      "type": "requirement",
+      "label": "Current GWC blockers must be inventoried with source provenance and executable impact."
+    },
+    {
+      "id": "REQ-P1-02",
+      "type": "requirement",
+      "label": "DW SUPER APP source-of-truth and authority ownership must be explicit for GWC, UA, Task-Me, BMAD, GitHub and Jira."
+    },
+    {
+      "id": "REQ-P1-03",
+      "type": "requirement",
+      "label": "Node, scenario, profile, decision-rule, runtime graph and history contracts must be typed and versioned."
+    },
+    {
+      "id": "REQ-P1-04",
+      "type": "requirement",
+      "label": "Lifecycle, action authority, workspace, G3 readiness and package drift blockers must be resolved before runtime expansion."
+    },
+    {
+      "id": "REQ-P1-05",
+      "type": "requirement",
+      "label": "Canonical registries, validators and Cytoscape v3 data binding must be produced from external registry data."
+    },
+    {
+      "id": "SCRUM-100",
+      "type": "task",
+      "label": "Audit current GWC contracts, blockers and executable surfaces"
+    },
+    {
+      "id": "SCRUM-101",
+      "type": "task",
+      "label": "Define DW SUPER APP source-of-truth and authority matrix"
+    },
+    {
+      "id": "SCRUM-102",
+      "type": "task",
+      "label": "Design canonical node, scenario, profile and history schemas"
+    },
+    {
+      "id": "SCRUM-103",
+      "type": "task",
+      "label": "Resolve lifecycle, authority-validator, workspace and package blockers"
+    },
+    {
+      "id": "SCRUM-104",
+      "type": "task",
+      "label": "Build canonical registries, validators and v3 data binding"
+    }
+  ],
+  "edges": [
+    {
+      "source": "REQ-P1-01",
+      "target": "SCRUM-100",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-04",
+      "target": "SCRUM-100",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-02",
+      "target": "SCRUM-101",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-03",
+      "target": "SCRUM-102",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-01",
+      "target": "SCRUM-103",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-04",
+      "target": "SCRUM-103",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-02",
+      "target": "SCRUM-104",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-03",
+      "target": "SCRUM-104",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "REQ-P1-05",
+      "target": "SCRUM-104",
+      "type": "SATISFIED_BY"
+    }
+  ]
+}
