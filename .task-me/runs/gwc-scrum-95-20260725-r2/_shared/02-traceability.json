@@ -1,0 +1,114 @@
+﻿{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-95-20260725-r2",
+  "requirements": [
+    {
+      "id": "REQ-P1-01",
+      "statement": "Current GWC blockers must be inventoried with source provenance and executable impact.",
+      "jira": [
+        "SCRUM-95",
+        "SCRUM-100"
+      ]
+    },
+    {
+      "id": "REQ-P1-02",
+      "statement": "DW SUPER APP source-of-truth and authority ownership must be explicit for GWC, UA, Task-Me, BMAD, GitHub and Jira.",
+      "jira": [
+        "SCRUM-95",
+        "SCRUM-101"
+      ]
+    },
+    {
+      "id": "REQ-P1-03",
+      "statement": "Node, scenario, profile, decision-rule, runtime graph and history contracts must be typed and versioned.",
+      "jira": [
+        "SCRUM-95",
+        "SCRUM-102"
+      ]
+    },
+    {
+      "id": "REQ-P1-04",
+      "statement": "Lifecycle, action authority, workspace, G3 readiness and package drift blockers must be resolved before runtime expansion.",
+      "jira": [
+        "SCRUM-95",
+        "SCRUM-103"
+      ]
+    },
+    {
+      "id": "REQ-P1-05",
+      "statement": "Canonical registries, validators and Cytoscape v3 data binding must be produced from external registry data.",
+      "jira": [
+        "SCRUM-95",
+        "SCRUM-104"
+      ]
+    }
+  ],
+  "links": [
+    {
+      "from": "REQ-P1-01",
+      "to": "core/task-lifecycle/gate-transition-map.yaml",
+      "type": "IMPLEMENTATION_EVIDENCE",
+      "confidence": 0.95
+    },
+    {
+      "from": "REQ-P1-01",
+      "to": "tools/validate_g01.py",
+      "type": "ENFORCEMENT_EVIDENCE",
+      "confidence": 0.95
+    },
+    {
+      "from": "REQ-P1-02",
+      "to": "projects/gwc/project-profile.yaml",
+      "type": "AUTHORITY_EVIDENCE",
+      "confidence": 0.95
+    },
+    {
+      "from": "REQ-P1-02",
+      "to": "projects/gwc/project-instructions.md",
+      "type": "AUTHORITY_EVIDENCE",
+      "confidence": 0.95
+    },
+    {
+      "from": "REQ-P1-03",
+      "to": "schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+      "type": "SCHEMA_EVIDENCE",
+      "confidence": 0.9
+    },
+    {
+      "from": "REQ-P1-03",
+      "to": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+      "type": "DESIGN_EVIDENCE",
+      "confidence": 0.9
+    },
+    {
+      "from": "REQ-P1-04",
+      "to": "core/task-lifecycle/gate-transition-map.yaml",
+      "type": "GAP_EVIDENCE",
+      "confidence": 0.98
+    },
+    {
+      "from": "REQ-P1-04",
+      "to": "AGENTS.md",
+      "type": "POLICY_EVIDENCE",
+      "confidence": 0.98
+    },
+    {
+      "from": "REQ-P1-05",
+      "to": "tools/node_architect/project_runtime_knowledge_graph.py",
+      "type": "CURRENT_MECHANISM",
+      "confidence": 0.95
+    },
+    {
+      "from": "REQ-P1-05",
+      "to": "tests/test_runtime_catalog_taxonomy_kg.py",
+      "type": "TEST_EVIDENCE",
+      "confidence": 0.9
+    }
+  ],
+  "unresolved": [
+    "Exact current CI outcome for main was not obtained by the standalone scan.",
+    "The repository does not expose a canonical full 81-node definition registry.",
+    "The repository does not expose a canonical full 116-scenario registry.",
+    "The visual v3 template is currently stored outside the repository and must be onboarded under separately approved scope."
+  ]
+}
