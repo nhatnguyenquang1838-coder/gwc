@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "task-me-plan-binding-refresh",
+  "generated_at_utc": "2026-07-25T17:19:42Z",
+  "canonical_task_uid": "SCRUM-100",
+  "source_planning_task_uid": "SCRUM-95",
+  "source_run_id": "gwc-scrum-95-20260725-r2",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_ref": "main",
+  "protected_base_sha": "82755198c772cdba7b07ebaa5fc7e8c1801a6bb0",
+  "plan_root": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry",
+  "files": [
+    {
+      "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+      "git_blob_sha": "05192d267055d106dd20d6df517aca505a4c7aa2",
+      "content_sha256_from_source_validation": "91e98464ca41cf57f69e381267e6c6ddb4941e57903519e4bdab1dcd34b8954e",
+      "status": "UNCHANGED_AT_MERGE_BASE"
+    },
+    {
+      "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md",
+      "git_blob_sha": "3102379d5525ef822def867e621fe7a845a79fcf",
+      "content_sha256_from_source_validation": "7b1910c653f3403427aba6d5fc459b1974bf31c9b1bfb65e556bc97242740c20",
+      "status": "UNCHANGED_AT_MERGE_BASE"
+    },
+    {
+      "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md",
+      "git_blob_sha": "07f6332c70274d2eacb415521f1b4e9f093dc37d",
+      "content_sha256_from_source_validation": "e39fa4f6b89182ebef1668ff8e576f43267906d368876f1696dfa7c48779ef21",
+      "status": "UNCHANGED_AT_MERGE_BASE"
+    }
+  ],
+  "plan_revision": "sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a",
+  "source_validation": {
+    "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/08-plan-validation.json",
+    "git_blob_sha": "4b71b8aa8826e35fc446fdb4c6d9600322f938f3",
+    "original_protected_base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+    "original_plan_revision": "sha256:25cdc71ffdee27f684263db8e2d039e5d4d46aed4a5068be6d8d0e85826281d4",
+    "original_outcome": "PASS"
+  },
+  "merge_readback": {
+    "validated_head_sha": "f4abd966b05d8fea8b29f71a885606cf584b477e",
+    "current_merge_sha": "82755198c772cdba7b07ebaa5fc7e8c1801a6bb0",
+    "compare_status": "ahead",
+    "ahead_by": 1,
+    "changed_files": [],
+    "plan_content_changed": false
+  },
+  "ci_evidence": {
+    "validate_instructions_run_id": 30161225679,
+    "validate_instructions_conclusion": "success",
+    "build_instruction_packages_run_id": 30161225683,
+    "build_instruction_packages_conclusion": "success"
+  },
+  "checks": {
+    "current_base_verified": true,
+    "source_validation_passed": true,
+    "plan_files_present_on_current_base": true,
+    "plan_file_blob_shas_verified": true,
+    "validated_head_to_merge_has_no_file_changes": true,
+    "required_headings_verified": true,
+    "required_sections_verified": true,
+    "mermaid_present": true,
+    "task_me_per_task_layout_valid": true
+  },
+  "outcome": "PASS",
+  "note": "This is a governed exact-base binding refresh. It does not claim Task-Me was rerun; it rebinds unchanged validated plan content to the merge SHA using GitHub compare and blob evidence."
+}
