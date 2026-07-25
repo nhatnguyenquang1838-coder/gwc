@@ -1,0 +1,73 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-25T17:19:42Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-100
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-07-25T17:19:42Z'
+  source: 'User message: ok repair for me'
+  explicit: true
+rationale: The user explicitly authorized repair of the G1 evidence blockers. This acceptance authorizes G1 evidence correction only; G2 repository mutation still requires a new exact approval envelope.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+scope_hash: sha256:63100265af9f43fd9f64cac4f6a98e258e2948b1c93cdc7d18df2b6522824748
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Repository evidence audit
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Gate and blocker classification
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Report and approval candidate generation
+    dependencies:
+    - SUB-TASK-2
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: github-repository-audit
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: gwc-g1
+    agent_type: reviewer
+  - sub_task_id: SUB-TASK-3
+    skill_id: governance-evidence
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  summary: Single-agent connector execution with separated evidence, review and validation responsibilities.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-100
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  plan_root: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry
+  plan_revision: sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
+  validation_evidence: evidence/task-me-plan-binding-refresh-20260725T171942Z.json
