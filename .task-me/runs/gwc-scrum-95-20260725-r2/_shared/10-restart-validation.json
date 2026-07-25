@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "task-me-restart-validation",
+  "generated_at": "2026-07-25T06:16:53Z",
+  "task_id": "SCRUM-95",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "run_id": "gwc-scrum-95-20260725-r2",
+  "plan_revision": "sha256:70f9b16f4ab6209f840140cb6734a13d4901cd3cb66a1a026d0d7313f69fcad6",
+  "file_count": 10,
+  "task_folder_count": 0,
+  "historical_reference_policy": {
+    "allowed_files": [
+      ".task-me/runs/gwc-scrum-95-20260725-r2/RUN-SUMMARY.md",
+      ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json"
+    ],
+    "purpose": "Preserve immutable baseline-drift audit evidence only."
+  },
+  "checks": {
+    "json_valid": true,
+    "yaml_valid": true,
+    "kiro_structure_valid": true,
+    "task_me_per_task_layout_valid": false,
+    "executable_references_bound_to_current_base": true,
+    "baseline_drift_reviewed": true
+  },
+  "outcome": "DEGRADED_PASS",
+  "issues": [
+    "Connector execution committed the Kiro projection, Task-Me config, UA graphs, and shared validation evidence only. Full per-task folders remain in the local R2 package artifact and were not expanded into the branch in this G2 connector execution."
+  ]
+}
