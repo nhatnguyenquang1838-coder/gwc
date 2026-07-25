@@ -1,0 +1,45 @@
+{
+  "task_id": "SCRUM-102",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "requirements": [
+    "REQ-P1-03"
+  ],
+  "sources": [
+    {
+      "path": "tools/node_architect/project_runtime_knowledge_graph.py",
+      "category": "code",
+      "coverage": "focused projection",
+      "status": "VERIFIED",
+      "notes": "Materializes four explicit runtime node IDs and taxonomy projection."
+    },
+    {
+      "path": "schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+      "category": "system_graph",
+      "coverage": "full schema previously inspected",
+      "status": "VERIFIED",
+      "notes": "Defines 9 families, 81 runtime nodes invariant and scenario metadata shape."
+    },
+    {
+      "path": "tests/test_runtime_catalog_taxonomy_kg.py",
+      "category": "tests",
+      "coverage": "focused invariant tests",
+      "status": "VERIFIED",
+      "notes": "Validates taxonomy/knowledge graph projection."
+    },
+    {
+      "path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+      "category": "design",
+      "coverage": "contract relevant ranges",
+      "status": "VERIFIED",
+      "notes": "Defines runtime catalog graph terminology and relationship semantics."
+    }
+  ],
+  "confidence": 0.9,
+  "limitations": [
+    "No materialized Git checkout; git status and untracked files cannot be verified.",
+    "No canonical UA base graph exists in the protected-base inventory.",
+    "Source inventory is bounded to verified architecture, governance, runtime-catalog and test surfaces.",
+    "The package is planning evidence, not repository execution evidence."
+  ]
+}

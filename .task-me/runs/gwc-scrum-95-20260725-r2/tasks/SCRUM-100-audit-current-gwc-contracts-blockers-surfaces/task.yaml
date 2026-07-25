@@ -1,0 +1,85 @@
+schema_version: '1.0'
+task_id: SCRUM-100
+title: Audit current GWC contracts, blockers and executable surfaces
+slug: audit-current-gwc-contracts-blockers-surfaces
+objective: Produce a source-backed current-state audit that separates contracts, executable
+  enforcement, tests, generated package behavior and proposed architecture.
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: d33ab8a52d341fa7f9ae65a1a88cb193ba61aded
+requirements:
+- REQ-P1-01
+- REQ-P1-04
+scope:
+  included:
+  - AGENTS.md and active GWC project instructions
+  - G0-G6 contracts and task lifecycle map
+  - G0/G1/G2/G3 validators and tests
+  - runtime catalog/KG projection
+  - distribution and CI surfaces
+  excluded:
+  - Source code changes
+  - Registry promotion
+  - PR merge/deployment
+verified_paths:
+- AGENTS.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- core/task-lifecycle/gate-transition-map.yaml
+- tools/validate_g01.py
+- tests/test_g1_implementation_plan_handoff.py
+- tools/node_architect/project_runtime_knowledge_graph.py
+- tests/test_runtime_catalog_taxonomy_kg.py
+dependencies:
+  requires: []
+  parallel_with:
+  - SCRUM-101
+  - SCRUM-102
+  delivery_wave: 1
+complexity:
+  class: low
+  risk: R1
+  effort:
+    optimistic_hours: 6
+    likely_hours: 10
+    pessimistic_hours: 16
+  drivers:
+  - governance contract coupling
+  - cross-schema compatibility
+  - test and consumer-package impact
+implementation_plan:
+- Build a table of declared behavior versus executable enforcement.
+- Classify each finding as implemented, partial, contract-only, proposed or stale.
+- Verify every blocker against a protected-base path and test where available.
+- Separate edge-scenario count from graph-edge count.
+- Publish current-state audit and unresolved evidence gaps.
+test_plan:
+- Path existence checks for every cited file.
+- Cross-check audit statements against current tests and schemas.
+- No inferred implementation may be labelled canonical.
+definition_of_done:
+- Every blocker has severity, owner surface, evidence path and remediation dependency.
+- Four explicit runtime nodes and 77 proposed slots are clearly separated.
+- Audit identifies whether main CI evidence was observed or unavailable.
+evidence_refs:
+- AGENTS.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- core/task-lifecycle/gate-transition-map.yaml
+- tools/validate_g01.py
+- tests/test_g1_implementation_plan_handoff.py
+- tools/node_architect/project_runtime_knowledge_graph.py
+- tests/test_runtime_catalog_taxonomy_kg.py
+decisions:
+- decision: Reuse and extend current GWC mechanisms before replacement.
+  rule: Reuse 鈫?Extend 鈫?Refactor 鈫?Replace
+  confidence: 0.95
+- decision: Do not treat the 81-slot scaffold as 81 completed executable adapters.
+  rule: Source-backed maturity/provenance boundary
+  confidence: 0.98
+unresolved:
+- Exact implementation symbols must be re-verified in an isolated checkout before
+  G2 edits.
+- Current main CI result must be captured before Draft PR readiness.
+
