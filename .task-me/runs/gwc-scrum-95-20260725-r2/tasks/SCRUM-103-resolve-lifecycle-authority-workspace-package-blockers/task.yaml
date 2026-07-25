@@ -1,0 +1,82 @@
+﻿schema_version: '1.0'
+task_id: SCRUM-103
+title: Resolve lifecycle, authority-validator, workspace and package blockers
+slug: resolve-lifecycle-authority-workspace-package-blockers
+objective: Implement the smallest compatible corrections required before registry/runtime
+  expansion.
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: d33ab8a52d341fa7f9ae65a1a88cb193ba61aded
+requirements:
+- REQ-P1-01
+- REQ-P1-04
+scope:
+  included:
+  - G4/G5 lifecycle representation
+  - Executable action-authority validation path
+  - Canonical .gwc/tasks/<task-id> workspace
+  - G3 ready-for-review consistency
+  - Package/integrity drift
+  - G2 operational contract
+  excluded:
+  - Adaptive graph compiler
+  - Durable runtime
+  - Production actions
+verified_paths:
+- core/task-lifecycle/gate-transition-map.yaml
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- tools/validate_g01.py
+- projects/gwc/project-instructions.md
+- distribution/power-package.yaml
+- .github/workflows/validate-instructions.yml
+dependencies:
+  requires:
+  - SCRUM-100
+  parallel_with: []
+  delivery_wave: 2
+complexity:
+  class: medium
+  risk: R2
+  effort:
+    optimistic_hours: 12
+    likely_hours: 20
+    pessimistic_hours: 32
+  drivers:
+  - governance contract coupling
+  - cross-schema compatibility
+  - test and consumer-package impact
+implementation_plan:
+- Write failing tests for confirmed current blockers.
+- Extend the existing mechanism rather than replace it.
+- Implement action-to-gate validation with exact task/repo/SHA/scope binding.
+- Align task workspace and G3 state semantics.
+- Regenerate package/integrity outputs through one inspected command.
+- Run full repository validation and review complete diff.
+test_plan:
+- Lifecycle transition positive/negative tests.
+- Authority mismatch and expired approval tests.
+- Canonical/legacy workspace compatibility tests.
+- G3 stale-head and Draft/ready transition tests.
+- Package manifest/checksum drift tests.
+definition_of_done:
+- No blocker-severity finding remains open.
+- Current tests remain compatible or migrations are explicit.
+- No G4/G5/G6 authority is weakened.
+- Consumer package validation passes.
+evidence_refs:
+- projects/gwc/project-instructions.md
+- core/task-lifecycle/gate-transition-map.yaml
+- tools/validate_g01.py
+- distribution/power-package.yaml
+- .github/workflows/validate-instructions.yml
+decisions:
+- decision: Reuse and extend current GWC mechanisms before replacement.
+  rule: Reuse 鈫?Extend 鈫?Refactor 鈫?Replace
+  confidence: 0.95
+- decision: Do not treat the 81-slot scaffold as 81 completed executable adapters.
+  rule: Source-backed maturity/provenance boundary
+  confidence: 0.98
+unresolved:
+- Exact implementation symbols must be re-verified in an isolated checkout before
+  G2 edits.
+- Current main CI result must be captured before Draft PR readiness.
+
