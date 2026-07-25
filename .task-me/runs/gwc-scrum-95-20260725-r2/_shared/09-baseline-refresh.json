@@ -1,0 +1,23 @@
+﻿{
+  "schema_version": "1.0",
+  "artifact_type": "baseline-refresh",
+  "task_id": "SCRUM-95",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "previous_base_sha": "62689ce35e279751a3bf17b5255ac258dafbe7d7",
+  "current_base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "source_audit_commit": "98c010ccb9291c660280b2949a47165565f86090",
+  "drift_summary": [
+    {
+      "path": ".github/workflows/publish-power.yml",
+      "classification": "outside_phase_1_planning_scope",
+      "impact": "no conflict with SCRUM-95 planning package"
+    },
+    {
+      "path": "tests/test_power_distribution.py",
+      "classification": "outside_phase_1_planning_scope",
+      "impact": "no conflict with SCRUM-95 planning package"
+    }
+  ],
+  "result": "REFRESHED",
+  "notes": "Refreshes the Task-Me planning package from old protected base to current main without authorizing runtime, workflow, release, deployment, or production changes."
+}
