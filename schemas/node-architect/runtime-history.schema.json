@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-history.schema.json",
+  "title": "Canonical Runtime History",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "history_id", "node_id", "started_at", "decision_records", "routing_records", "checkpoint_refs"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-history"},
+    "history_id": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "minLength": 1},
+    "started_at": {"type": "string", "format": "date-time"},
+    "decision_records": {"type": "array", "items": {"type": "string"}},
+    "routing_records": {"type": "array", "items": {"type": "string"}},
+    "checkpoint_refs": {"type": "array", "items": {"type": "string"}}
+  }
+}
