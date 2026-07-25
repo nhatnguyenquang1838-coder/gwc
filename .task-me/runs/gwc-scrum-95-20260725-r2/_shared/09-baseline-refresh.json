@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "task-me-baseline-refresh",
+  "task_id": "SCRUM-95",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "previous_base_sha": "62689ce35e279751a3bf17b5255ac258dafbe7d7",
+  "current_base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "drift_classification": "NON_MATERIAL_TO_PHASE_1_PLAN",
+  "changed_paths_reviewed": [
+    ".github/workflows/publish-power.yml",
+    "tests/test_power_distribution.py"
+  ],
+  "impact_assessment": [
+    "Power Distribution foundation pinning changed after the original plan.",
+    "No Phase 1 architecture-readiness source, gate contract, schema, registry, or visual-binding source was changed by the drift.",
+    "Task decomposition remains valid, but all provenance and plan hashes must bind the new protected base."
+  ],
+  "stale_branch": {
+    "branch": "feat/SCRUM-95-task-me-gwc-scan",
+    "head_sha": "98c010ccb9291c660280b2949a47165565f86090",
+    "status": "AUDIT_ONLY_DO_NOT_PR"
+  },
+  "generated_at": "2026-07-25T06:13:58Z",
+  "outcome": "PASS"
+}

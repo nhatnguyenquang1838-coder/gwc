@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "task-me-plan-validation",
+  "run_id": "gwc-scrum-95-20260725-r2",
+  "canonical_task_uid": "SCRUM-95",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded",
+  "plan_root": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry",
+  "files": [
+    {
+      "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+      "sha256": "91e98464ca41cf57f69e381267e6c6ddb4941e57903519e4bdab1dcd34b8954e"
+    },
+    {
+      "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md",
+      "sha256": "7b1910c653f3403427aba6d5fc459b1974bf31c9b1bfb65e556bc97242740c20"
+    },
+    {
+      "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md",
+      "sha256": "e39fa4f6b89182ebef1668ff8e576f43267906d368876f1696dfa7c48779ef21"
+    }
+  ],
+  "plan_revision": "sha256:70f9b16f4ab6209f840140cb6734a13d4901cd3cb66a1a026d0d7313f69fcad6",
+  "checks": {
+    "requirements_heading": true,
+    "requirements_sections": true,
+    "design_heading": true,
+    "design_sections": true,
+    "tasks_heading": true,
+    "tasks_sections": true,
+    "mermaid_present": true,
+    "requirement_mapping_present": true,
+    "task_me_per_task_layout_valid": true,
+    "baseline_refresh_reviewed": true,
+    "protected_base_rebound": true
+  },
+  "baseline_refresh_evidence": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json",
+  "outcome": "PASS"
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": "2.0",
+  "project": {
+    "name": "gwc",
+    "repository_root": ".",
+    "default_branch": "main"
+  },
+  "knowledge": {
+    "root": ".ua",
+    "base_graph": ".ua/knowledge-graph.json",
+    "base_meta": ".ua/meta.json",
+    "extensions_root": ".ua/extensions",
+    "indexes_root": ".ua/indexes",
+    "generated_root": ".task-me/runs"
+  },
+  "sources": {
+    "requirements": [
+      ".kiro/specs/**/*.md",
+      ".gwc/tasks/*/g1/**/*.yaml"
+    ],
+    "design": [
+      "core/**/*.md",
+      "projects/gwc/**/*.md",
+      "docs/**/*.md"
+    ],
+    "system_graph": [
+      "core/task-lifecycle/**/*.yaml",
+      "core/*KNOWLEDGE_GRAPH*.md",
+      "schemas/node-architect/**/*.json"
+    ],
+    "code": [
+      "tools/**/*.py"
+    ],
+    "tests": [
+      "tests/**/*.py"
+    ],
+    "repository_context": [
+      "AGENTS.md",
+      "README.md",
+      "catalog.yaml",
+      "projects/gwc/project-profile.yaml",
+      ".github/workflows/**/*"
+    ],
+    "exclude": [
+      ".git/**",
+      "dist/**",
+      "releases/**",
+      ".gwc/tasks/**/g4/**",
+      ".gwc/tasks/**/g5/**",
+      ".gwc/tasks/**/g6/**",
+      ".task-me/**",
+      ".ua/generated/**"
+    ]
+  },
+  "ua": {
+    "enabled": false,
+    "required": false,
+    "plugin_root": null,
+    "refresh_mode": "disabled",
+    "preserve_extensions": true
+  },
+  "analysis": {
+    "max_file_bytes": 1000000,
+    "max_dependency_depth": 3,
+    "max_task_likely_hours": 16,
+    "minimum_evidence_confidence": 0.6,
+    "require_verified_paths": true,
+    "require_verified_symbols": false,
+    "allow_discovery_tasks": true
+  },
+  "output": {
+    "root": ".task-me/runs",
+    "language": "en",
+    "write_mode": "output_only",
+    "folder_mode": "per_task",
+    "run_folder_pattern": "{run_id}",
+    "shared_folder": "_shared",
+    "task_folder_pattern": "tasks/{task_id}-{slug}",
+    "run_files": {
+      "task_index": "task-index.yaml",
+      "task_dag": "task-dag.mmd",
+      "run_summary": "RUN-SUMMARY.md"
+    },
+    "shared_files": {
+      "source_inventory": "01-source-inventory.json",
+      "traceability": "02-traceability.json",
+      "evidence_graph": "03-evidence-graph.json",
+      "impact_analysis": "04-impact-analysis.md",
+      "validation_report": "07-validation-report.json"
+    },
+    "task_files": {
+      "canonical_task": "task.yaml",
+      "overview": "README.md",
+      "impact": "impact-analysis.md",
+      "implementation_plan": "implementation-plan.md",
+      "coding_guide": "coding-guide.md",
+      "test_plan": "test-plan.md",
+      "evidence": "evidence.json",
+      "decisions": "decisions.md"
+    }
+  }
+}
