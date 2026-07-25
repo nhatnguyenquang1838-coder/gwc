@@ -1,0 +1,42 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+authority_gate: G2_EXECUTION
+task_id: SCRUM-102
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 319e611d1a318df8ec5eccd3210078652e01369d
+working_branch: docs/SCRUM-102-canonical-schema-design
+scope_hash: sha256:1cb9b700bb45f60d25929a7916a28d5bd8e688f0083f10a1d270d5e6ecc23268
+approval_request_id: SCRUM-102-G2-CANONICAL-SCHEMAS-20260725T203000Z
+approved_at_utc: '2026-07-25T18:40:00Z'
+expires_at_utc: '2026-07-26T20:30:00Z'
+risk_class: R2
+authorized_actions:
+  - create_guarded_branch
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+authorized_paths:
+  - .gwc/tasks/SCRUM-102/**
+  - .kiro/specs/GWC-P1-scrum-102-canonical-runtime-schemas/**
+  - schemas/node-architect/runtime-node.schema.json
+  - schemas/node-architect/runtime-scenario.schema.json
+  - schemas/node-architect/runtime-profile.schema.json
+  - schemas/node-architect/runtime-history.schema.json
+  - schemas/node-architect/runtime-graph.schema.json
+  - schemas/node-architect/decision-rule.schema.json
+  - tests/test_canonical_runtime_schema_contracts.py
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - runtime_reload
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - protected_main_write
+approval_evidence: Exact user approval command received in current ChatGPT conversation.
