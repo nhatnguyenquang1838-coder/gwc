@@ -9,13 +9,43 @@ approval_id: APPROVE_G2_EXECUTION_SCRUM-100_20260725T172050Z
 scope_hash: sha256:63100265af9f43fd9f64cac4f6a98e258e2948b1c93cdc7d18df2b6522824748
 plan_revision: sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
 started_at_utc: '2026-07-25T17:39:15Z'
-status: IN_PROGRESS
+completed_at_utc: '2026-07-25T17:54:15Z'
+status: READY_FOR_G3
 authorized_scope:
   - .gwc/tasks/SCRUM-100/**
   - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/current-state-baseline.md
   - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/executable-surface-inventory.md
   - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/blocker-register.md
   - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence-provenance-map.md
+result:
+  draft_pr_number: 97
+  draft_pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/97
+  draft: true
+  changed_files: 19
+  additions_before_completion_journal: 1328
+  deletions: 0
+  scope_allowlist_check: PASS
+  g01_validator:
+    outcome: PASS
+    exit_code: 0
+    evidence: ../evidence/g01-validator-20260725T172000Z.meta.json
+  final_g2_validator:
+    outcome: PASS
+    exit_code: 0
+    evidence: ../evidence/g2-final-validator-20260725T174500Z.meta.json
+  next_gate: G3_PR
+excluded_actions_confirmed:
+  - runtime changes
+  - validator changes
+  - workflow changes
+  - package changes
+  - direct main write
+  - force push
+  - merge
+  - deploy
+  - release
+  - production mutation
 notes:
   - G0/G1 audit acceptance criterion AC-4 records that no repository write occurred during G0/G1; this G2 record publishes the already-produced audit artifacts under separately approved write authority.
-  - No runtime, validator, workflow or package source is modified.
+  - The final exact branch head is the GitHub PR head readback; this record intentionally avoids embedding a self-referential commit SHA.
+  - Draft PR creation does not grant G3 PASS or Ready-for-review authority.
