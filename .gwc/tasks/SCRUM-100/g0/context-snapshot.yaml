@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-25T16:16:10Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- 'SOURCE INSTRUCTION: REPO'
+- 'EXECUTION MODE: chat_connector_only'
+- Read-only G0/G1 audit
+- No runtime, validator, workflow or package mutation
+- No G2 repository write without exact valid approval
+applicable_policies:
+- id: canonical-governance
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: gate-lifecycle
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  source_sha: 63953fc2420958814fb2d567d4d4106ba58db9f4
+- id: g01-runbook
+  path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  ref: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  source_sha: 47b4b59e22e9cc868e20f17b61580b27726ba106
+- id: project-profile
+  path: projects/gwc/project-profile.yaml
+  ref: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 63953fc2420958814fb2d567d4d4106ba58db9f4
+- path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/
+  required: true
+  status: AVAILABLE
+  source_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+- path: .task-me/runs/gwc-scrum-95-20260725-r2/
+  required: true
+  status: AVAILABLE
+  source_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: chatgpt
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md

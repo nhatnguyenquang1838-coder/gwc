@@ -1,0 +1,145 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-100
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+working_branch: docs/SCRUM-100-current-state-audit
+pull_request:
+  number: 97
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/97
+  draft: true
+head_sha: 9c8ac622a07ce2f8e820ee464799dd2ecf90467a
+scope_hash: sha256:63100265af9f43fd9f64cac4f6a98e258e2948b1c93cdc7d18df2b6522824748
+changed_paths:
+  - .gwc/tasks/SCRUM-100/evidence/evidence-provenance-map.json
+  - .gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json
+  - .gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.stdout.json
+  - .gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json
+  - .gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.stdout.json
+  - .gwc/tasks/SCRUM-100/evidence/task-me-plan-binding-refresh-20260725T171942Z.json
+  - .gwc/tasks/SCRUM-100/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-100/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-100/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-100/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-100/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-100/g2/approval-acceptance-20260725T173915Z.yaml
+  - .gwc/tasks/SCRUM-100/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-100/g2/execution-record.yaml
+  - .gwc/tasks/SCRUM-100/g2/plan-read-receipt.yaml
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/blocker-register.md
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/current-state-baseline.md
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence-provenance-map.md
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/executable-surface-inventory.md
+validation:
+  head_sha: 9c8ac622a07ce2f8e820ee464799dd2ecf90467a
+  status: pass
+  commands:
+    - command: Exact checked-in validate_g01.py for G0/G1
+      result: pass
+      evidence: .gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json records exit code 0 and no issues with matching validator and schema Git blob hashes.
+    - command: Exact checked-in validate_g01.py --gate G2_EXECUTION
+      result: pass
+      evidence: .gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json records exit code 0 and no issues.
+    - command: G2 exact diff allowlist readback
+      result: pass
+      evidence: GitHub compare from base 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0 to reviewed head found 19 files, all inside the approved SCRUM-100 task and report paths.
+review:
+  implementer_id: chatgpt-agent-primary
+  reviewer_id: chatgpt-agent-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 9c8ac622a07ce2f8e820ee464799dd2ecf90467a
+  reviewed_scope_hash: sha256:63100265af9f43fd9f64cac4f6a98e258e2948b1c93cdc7d18df2b6522824748
+  reviewed_at: '2026-07-25T18:56:30Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - AC-1 through AC-5 are traceable to the baseline, inventory, blocker register, provenance map and canonical G0/G1/G2 records.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - The audit preserves the repository/Jira authority boundary and delegates remediation to SCRUM-103 without introducing runtime design changes.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - All YAML, JSON and Markdown changes were reviewed; no executable runtime, validator, workflow or package source was modified.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Exact G0/G1 and G2 validators returned exit code 0; repository validation and package-build workflows passed on the reviewed head.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 approval, scope hash, plan revision, authority exclusions and projection-only Jira status are explicitly recorded.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR 97 is open, mergeable and bound to the reviewed implementation head; the changed-path set matches the approved allowlist.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30168560108 and Build instruction packages run 30168560095 both completed successfully on the reviewed head.
+  findings:
+    - id: REV-1
+      severity: MINOR
+      category: governance
+      status: resolved
+      evidence: AC-4 states that the G0/G1 audit performs no repository write, while .gwc/tasks/SCRUM-100/g2/execution-record.yaml records the separately approved G2 publication.
+      recommendation: Keep the read-only audit claim scoped to G0/G1 and distinguish it from the later approved G2 evidence publication.
+      resolution: The G2 execution record and PR body explicitly document this distinction; no unapproved write occurred.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - executable-surface-inventory.md assigns the required maturity classification to each audited capability.
+    - id: AC-2
+      result: pass
+      evidence:
+        - The baseline and inventory compare G3, G4 and G5 contracts, validators and the incomplete transition map.
+    - id: AC-3
+      result: pass
+      evidence:
+        - The audit separately records 81 proposed slots, four explicit runtime nodes, 116 declared scenarios and 13 current graph edges.
+    - id: AC-4
+      result: pass
+      evidence:
+        - G0/G1 source recovery and audit production were read-only; the later repository publication occurred only after exact G2 approval and is separately audited.
+    - id: AC-5
+      result: pass
+      evidence:
+        - The G1 decision, active G2 envelope, approval acceptance, exact-head PR and CI evidence define the next gate and preconditions precisely.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 9c8ac622a07ce2f8e820ee464799dd2ecf90467a
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30168560108
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30168560095
+residual_risks:
+  - This G3 delivery record is an evidence-only commit after the reviewed implementation head; CI must pass again on the resulting PR head before Ready-for-review and G4 preparation.
+  - The review uses the repository-defined fresh-context lane rather than an external human reviewer; G4 remains human-authorized.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass

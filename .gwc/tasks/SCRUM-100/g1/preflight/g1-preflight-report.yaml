@@ -1,0 +1,156 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-25T17:20:50Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-100
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPO_VERIFIED
+  message: Repository and default branch verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc
+  - 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+- id: SOURCE_RECOVERY
+  status: PASS
+  code: SOURCES_AVAILABLE
+  message: Required contracts, plans, validators and package surfaces inspected.
+  evidence:
+  - evidence/evidence-provenance-map.json
+- id: PLAN_BINDING
+  status: PASS
+  code: PLAN_BASE_REFRESHED
+  message: Validated plan content was unchanged between the successful PR head and current merge SHA; exact current blob evidence is recorded.
+  evidence:
+  - evidence/task-me-plan-binding-refresh-20260725T171942Z.json
+  - sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
+  - 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+- id: FORMAL_VALIDATOR
+  status: PASS
+  code: EXACT_VALIDATOR_PASS
+  message: Exact checked-in validator returned exit code 0 and PASS with all source/schema Git blob hashes matching current main.
+  evidence:
+  - evidence/g01-validator-20260725T172000Z.meta.json
+  - evidence/g01-validator-20260725T172000Z.stdout.json
+  - exit_code=0
+- id: WORK_TRACKING
+  status: WARN
+  code: JIRA_PROJECTION_RECORDED
+  message: Jira projection/readback is recorded but does not grant repository or gate authority.
+  evidence:
+  - SCRUM-100:In Progress
+  - Jira comment 10121
+  - core/task-lifecycle/gate-transition-map.yaml
+process_readback:
+  process_id: SCRUM-100-read-only-current-state-audit
+  terminal_outcome: G1 PASS with exact validator evidence; bounded G2 remains a separate human approval.
+  required_sources:
+  - AGENTS.md
+  - core governance
+  - lifecycle
+  - SCRUM-95 Kiro package
+  - Task-Me run
+  - validators
+  - packages
+  - CI definitions
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-1
+    name: Recover protected-base evidence
+    gate: G0_CONTEXT
+    actor: agent
+    action_class: read_only
+    capability_required: GitHub repository read
+    capability_status: VERIFIED
+    primary_route: GitHub connector
+    fallback_routes: []
+    continuation: Proceed to local artifact materialization
+    expected_evidence: Exact main SHA and source map
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-2
+    name: Materialize audit artifacts
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_write
+    capability_required: Local workspace
+    capability_status: VERIFIED
+    primary_route: /mnt/data/gwc_sessions
+    fallback_routes: []
+    continuation: Run formal validator
+    expected_evidence: G0/G1 YAML and reports
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-3
+    name: Run protected-base G0/G1 validator
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_validation
+    capability_required: Exact connector-to-local source materialization
+    capability_status: VERIFIED
+    primary_route: Exact GitHub connector source materialized under validator-source with matching Git blob hashes
+    fallback_routes: []
+    continuation: Require exact validator exit code 0 before issuing ACTIVE G2 envelope
+    expected_evidence: Validator JSON, exit code, command, and exact source/schema Git blob hashes
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-4
+    name: Request G2
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: external_write
+    capability_required: Valid exact G2 approval
+    capability_status: SEPARATE_GATE
+    primary_route: Generated approval envelope
+    fallback_routes: []
+    continuation: Await a new non-expired exact human G2 approval before any repository mutation
+    expected_evidence: Active non-expired exact approval
+    bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+implementation_plan:
+  applicability: required
+  reason: The audit precedes R2 lifecycle, validator, workspace and package corrections.
+  source: task_me
+  task_me_applicable: true
+  task_me_available: true
+  task_me_invoked: true
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-100
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  plan_root: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry
+  requirements_path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md
+  design_path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+  tasks_path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md
+  plan_revision: sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
+  validation_status: PASS
+  validation_evidence: evidence/task-me-plan-binding-refresh-20260725T171942Z.json
+  generated_by: task-me:gwc-scrum-95-20260725-r2 + governed exact-base rebind
+  generated_at_utc: '2026-07-25T17:19:42Z'
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: chatgpt
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+blockers: []
+outcome: PASS

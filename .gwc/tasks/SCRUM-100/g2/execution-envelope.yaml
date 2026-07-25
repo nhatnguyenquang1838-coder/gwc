@@ -1,0 +1,84 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+status: ACTIVE
+activation_state: AWAITING_APPROVAL
+generated_at_utc: '2026-07-25T17:20:50Z'
+approval_id: APPROVE_G2_EXECUTION_SCRUM-100_20260725T172050Z
+supersedes_approval_id: APPROVE_G2_EXECUTION_SCRUM-100_20260725T162910Z
+task_id: SCRUM-100
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+scope:
+  task_id: SCRUM-100
+  repository: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  plan_revision: sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
+  files_write:
+  - .gwc/tasks/SCRUM-100/**
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/current-state-baseline.md
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/executable-surface-inventory.md
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/blocker-register.md
+  - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence-provenance-map.md
+  authorized_actions:
+  - create_guarded_branch_from_exact_base
+  - write_audit_only_artifacts
+  - run_validation
+  - push_branch
+  - create_or_update_draft_pr
+  - monitor_ci_read_only
+  excluded_actions:
+  - modify_runtime
+  - modify_validators
+  - modify_workflows
+  - modify_package_files
+  - merge
+  - deploy
+  - release
+  - production_data
+  - production_configuration
+  - credentials_or_secrets
+  - force_push
+  - direct_main_write
+scope_hash: sha256:63100265af9f43fd9f64cac4f6a98e258e2948b1c93cdc7d18df2b6522824748
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-100
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  plan_root: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry
+  plan_revision: sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
+  validation_evidence: evidence/task-me-plan-binding-refresh-20260725T171942Z.json
+plan_read_receipt: g2/plan-read-receipt.yaml
+g1_validation_evidence: evidence/g01-validator-20260725T172000Z.meta.json
+expires_at_utc: '2026-07-26T17:20:50Z'
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-100_20260725T172050Z 63100265af9f43fd 2026-07-26T17:20:50Z
+prerequisites:
+- id: G1_VALIDATOR
+  status: PASS
+  evidence: evidence/g01-validator-20260725T172000Z.meta.json
+- id: G1_DECISION
+  status: PASS
+  evidence: g1/decision/g1-decision-record.yaml
+- id: PLAN_BINDING
+  status: PASS
+  evidence: evidence/task-me-plan-binding-refresh-20260725T171942Z.json
+- id: BASE_READBACK
+  status: PASS
+  evidence: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+- id: PLAN_READ
+  status: PASS
+  evidence: g2/plan-read-receipt.yaml
+- id: WORK_TRACKING_PROJECTION
+  status: RECORDED_NON_AUTHORITATIVE
+  evidence: Jira SCRUM-100 In Progress; comment 10121
+activation_blockers: []
+invalidation_conditions:
+- current main SHA changes
+- scope hash changes
+- plan revision changes
+- approval expires
+- approval command mismatch
+warning: ACTIVE means structurally eligible for exact human approval. It does not authorize repository mutation until the exact approval command is received and revalidated.

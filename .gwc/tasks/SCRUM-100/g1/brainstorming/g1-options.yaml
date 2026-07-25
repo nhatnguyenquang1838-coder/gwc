@@ -1,0 +1,46 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-25T17:19:42Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-100
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Repair G1 and prepare bounded G2
+  description: Materialize the exact protected-base validator, refresh unchanged Task-Me plan evidence to current main, validate G1, and prepare a separate bounded G2 approval envelope.
+  benefits:
+  - Exact-base validation
+  - Preserves separate G2 approval
+  - Repairs stale evidence without runtime changes
+  tradeoffs:
+  - Creates local governance evidence before repository execution
+  risks:
+  - Any protected-base drift invalidates the prepared envelope
+  constraint_fit: FIT
+- id: OPT-2
+  title: Reuse stale SCRUM-95 binding
+  description: Treat the older plan validation as current.
+  benefits:
+  - Faster apparent progression
+  tradeoffs:
+  - Violates exact-base binding
+  risks:
+  - Invalid G2 authority
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Start SCRUM-103 implementation
+  description: Proceed directly to blocker repair.
+  benefits:
+  - Immediate code changes
+  tradeoffs:
+  - Skips formal G1 and explicit G2 approval
+  risks:
+  - Governance breach
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: The user explicitly authorized repair. This path resolves the G1 evidence defects while retaining fail-closed G2 authority boundaries.
+decision_required: true
+status: READY

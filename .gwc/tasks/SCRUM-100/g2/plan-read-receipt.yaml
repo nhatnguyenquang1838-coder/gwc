@@ -1,0 +1,24 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+generated_at_utc: '2026-07-25T17:20:50Z'
+canonical_task_uid: SCRUM-100
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+plan_revision: sha256:f72746ea784e9460b218e26b01c652240a458a41c3f85483dc614c1c3ac5eb6a
+paths_read:
+- .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md
+- .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+- .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md
+path_blob_shas:
+  .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md: 05192d267055d106dd20d6df517aca505a4c7aa2
+  .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md: 3102379d5525ef822def867e621fe7a845a79fcf
+  .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md: 07f6332c70274d2eacb415521f1b4e9f093dc37d
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+evidence:
+- evidence/task-me-plan-binding-refresh-20260725T171942Z.json
+- evidence/g01-validator-20260725T172000Z.meta.json
+- 'GitHub current-main readback: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0'
+note: Plan content was read through the GitHub connector. This receipt authorizes no write by itself.
