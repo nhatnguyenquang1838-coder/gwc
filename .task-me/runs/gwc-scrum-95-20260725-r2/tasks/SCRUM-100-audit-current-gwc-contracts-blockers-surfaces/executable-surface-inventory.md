@@ -133,7 +133,7 @@
 - **Classification:** `PARTIAL`
 - **Finding:** The KG projector explicitly emits four runtime-node identities and relationships. They are projection descriptors, not verified executable adapters.
 - **Evidence:**
-  - `tools/node_architect/project_runtime_knowledge_GRAPH.py`
+  - `tools/node_architect/project_runtime_knowledge_graph.py`
 
 ## 116 edge scenarios
 
