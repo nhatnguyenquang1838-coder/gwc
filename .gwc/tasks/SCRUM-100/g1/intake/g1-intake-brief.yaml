@@ -1,0 +1,88 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-25T16:16:10Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-100
+  base_sha: 82755198c772cdba7b07ebaa5fc7e8c1801a6bb0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC contracts, runtime descriptors, state maps, validators, packages and CI surfaces do not yet provide a verified current-state maturity baseline.
+  why_now: SCRUM-103 and SCRUM-104 depend on a source-backed audit that separates implemented enforcement from contracts and proposals.
+desired_outcome: Produce a verified read-only baseline, blocker register, provenance map, SCRUM-103 scope and truthful G1 gate result.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - DW SUPER APP
+  - SCRUM-103
+  - SCRUM-104
+scope:
+  in_scope:
+  - G0-G6 lifecycle and state maps
+  - Authority validators
+  - Checkpoint/resume and task evidence
+  - Package/export integrity
+  - CI and connector observability
+  - 81 slots, four explicit nodes, 116 scenarios and graph edges
+  - Consumer-package/runtime boundaries
+  non_goals:
+  - Repository mutation
+  - Runtime implementation
+  - Validator/workflow/package repair
+  - Merge, deploy, release or production operations
+constraints:
+- Use GitHub connector as repository source of truth
+- Bind evidence to exact main SHA
+- Do not enter G2 without exact approval
+assumptions:
+- Jira is projection only
+- Planning outputs do not grant execution authority
+risks:
+- id: RISK-1
+  description: Contracts may be mistaken for executable runtime.
+  impact: high
+  mitigation: Classify every surface and require source evidence.
+- id: RISK-2
+  description: Stale generated package evidence may appear current.
+  impact: high
+  mitigation: Compare source SHA/hash and generated metadata.
+acceptance_criteria:
+- id: AC-1
+  statement: Every relevant capability has one required maturity classification.
+  verifiable: true
+- id: AC-2
+  statement: G3, G4 and G5 separation is checked against contracts, validators and state map.
+  verifiable: true
+- id: AC-3
+  statement: Catalog slots, explicit nodes, scenarios and graph edges are not conflated.
+  verifiable: true
+- id: AC-4
+  statement: No repository write is performed.
+  verifiable: true
+- id: AC-5
+  statement: The next gate and approval preconditions are exact.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - read_repository
+  - read_jira_projection
+  - materialize_local_g0_g1_artifacts
+  - produce_local_reports
+  downstream_non_goals:
+  - G2_EXECUTION
+  - G3_PR
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - Draft PR
+    - exact head SHA
+    - validation
+    - independent review
+    - CI
+unresolved_questions: []
+status: READY
