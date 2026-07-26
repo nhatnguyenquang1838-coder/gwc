@@ -1,0 +1,72 @@
+approval_id: CP-20260726-142
+authority_gate: G2_EXECUTION
+task_id: SCRUM-142
+issued_at: '2026-07-26T13:50:33Z'
+expires_at: '2026-07-27T13:50:33Z'
+scope_version: 2
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c855336dc17f20115e640516107999b08e9d783e
+working_branch: repair/scrum-142-canonical-ua-refresh-r2-20260726
+modules_or_files:
+- .gwc/tasks/SCRUM-142/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-142/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-142/g2/approval-envelope.yaml
+- .gwc/tasks/SCRUM-142/evidence/revisit-review.md
+- .gwc/tasks/SCRUM-142/evidence/revisit-change-plan.md
+- .gwc/tasks/SCRUM-142/evidence/revisit-flow.mmd
+- .gwc/tasks/SCRUM-142/evidence/revisit-flow.svg
+- .gwc/tasks/SCRUM-142/evidence/revisit-flow.png
+- .gwc/tasks/SCRUM-142/evidence/g01-validator-r2.json
+- .gwc/tasks/SCRUM-142/evidence/envelope-validation-r2.json
+- .gwc/tasks/SCRUM-142/ua-refresh-report.md
+- .ua/.understandignore
+- .ua/config.json
+- .ua/knowledge-graph.json
+- .ua/meta.json
+- .ua/gwc/graph-snapshot.json
+- .ua/gwc/graph-summary.md
+authorized_actions:
+- claim_work_item
+- update_work_item_status
+- modify_approved_files
+- run_sandboxed_validation
+- push_working_branch
+excluded_actions:
+- direct_main_write
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- merge_approved_pr
+- auto_merge
+- deploy_approved_release
+- release
+- runtime_reload
+- production_data_read
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration_execution
+- force_push
+- branch_deletion
+- shared_history_rewrite
+- pr_base_change
+work_item:
+  provider: Atlassian Jira MCP
+  id: SCRUM-142
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  expected_owner: Nhat Nguyen Quang
+  initial_state: Done
+  review_state: In Progress
+artifact_hashes:
+  change_plan: sha256:1e27d03f0f29b5ae75cddeb0068db4bd4d412c43511960746c791e41eeac9ad3
+  mermaid: sha256:b0c2c875e170975a3318f3407d75f13a07f06e0dbd2a97ac9dc52f8c2e559981
+  png: sha256:a961134049bd0f55bd3c250b6baa3ab5fac4f1c74f621e9d662acc571da51fa8
+  svg: sha256:aecfd690fa1b5fb2b002b132ba32c21dc1d8ac59cd417e2c0ceb1fb5e6287187
+scope_hash: sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b
