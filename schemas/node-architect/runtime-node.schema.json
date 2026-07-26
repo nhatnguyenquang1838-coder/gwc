@@ -1,17 +1,77 @@
 {
-  "$id": "https://gwc.local/schemas/node-architect/runtime-node.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-node.schema.json",
+  "title": "Canonical Runtime Node",
+  "type": "object",
   "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "identity", "authority", "effects", "execution", "interfaces", "audit"],
   "properties": {
-    "authority_boundary": {"enum": ["none", "read_only", "g2_required", "g3_required", "g4_required", "g5_required", "g6_required"]},
-    "canonical": {"enum": ["canonical", "delivery_evidence", "audit_projection", "resume_hint"]},
-    "description": {"type": "string"},
-    "gates": {"items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]}, "type": "array", "uniqueItems": true},
-    "node_id": {"pattern": "^[a-z0-9][a-z0-9._-]*$", "type": "string"},
-    "node_type": {"enum": ["actor", "workflow", "gate", "tool", "schema", "state", "projection", "connector"]},
-    "title": {"minLength": 1, "type": "string"}
-  },
-  "required": ["node_id", "node_type", "title", "canonical", "authority_boundary", "gates"],
-  "title": "GWC Runtime Node",
-  "type": "object"
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-node"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stable_id", "family", "capability", "runtime_slot", "artifact_version"],
+      "properties": {
+        "stable_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "family": {"enum": ["intake_context", "gate_authority", "repo_delivery", "runtime_checkpoint", "validation_quality", "sync_projection", "package_export", "failure_recovery", "scale_control"]},
+        "capability": {"type": "string", "minLength": 1},
+        "runtime_slot": {"type": "integer", "minimum": 1, "maximum": 81},
+        "artifact_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_gate", "required_evidence", "may_mutate", "projection_only"],
+      "properties": {
+        "required_gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+        "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "may_mutate": {"type": "array", "items": {"type": "string"}},
+        "projection_only": {"type": "boolean"}
+      }
+    },
+    "effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "side_effects", "reversibility", "idempotency"],
+      "properties": {
+        "classification": {"enum": ["read_only", "repo_write", "external_projection", "deployment", "production_data"]},
+        "side_effects": {"type": "array", "items": {"type": "string"}},
+        "reversibility": {"enum": ["reversible", "compensatable", "irreversible"]},
+        "idempotency": {"enum": ["idempotent", "idempotent_with_key", "non_idempotent"]}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["determinism", "suspendable", "resume_metadata"],
+      "properties": {
+        "determinism": {"enum": ["deterministic", "external_state_dependent", "non_deterministic"]},
+        "suspendable": {"type": "boolean"},
+        "resume_metadata": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "interfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputs", "outputs", "preconditions", "postconditions"],
+      "properties": {
+        "inputs": {"type": "array", "items": {"type": "string"}},
+        "outputs": {"type": "array", "items": {"type": "string"}},
+        "preconditions": {"type": "array", "items": {"type": "string"}},
+        "postconditions": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["history_refs", "decision_refs"],
+      "properties": {
+        "history_refs": {"type": "array", "items": {"type": "string"}},
+        "decision_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
 }

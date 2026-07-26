@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/decision-rule.schema.json",
+  "title": "Canonical Decision Rule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "expression_type", "inputs", "evaluation_record"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "decision-rule"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "expression_type": {"enum": ["typed_predicate", "schema_validation", "status_match", "threshold"]},
+    "inputs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "evaluation_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_fields", "deterministic"],
+      "properties": {
+        "record_fields": {"type": "array", "items": {"type": "string"}},
+        "deterministic": {"type": "boolean"}
+      }
+    }
+  }
+}

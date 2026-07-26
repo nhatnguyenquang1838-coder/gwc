@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-scenario.schema.json",
+  "title": "Canonical Runtime Scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "entry_criteria", "terminal_outcomes", "decision_rules", "authority"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-scenario"},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "entry_criteria": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "terminal_outcomes": {"type": "array", "minItems": 1, "items": {"enum": ["PASS", "FAIL", "BLOCKED", "PENDING", "NOT_APPLICABLE"]}},
+    "decision_rules": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate", "human_boundary"],
+      "properties": {
+        "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+        "human_boundary": {"type": "boolean"}
+      }
+    }
+  }
+}

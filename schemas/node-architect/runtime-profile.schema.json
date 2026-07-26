@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-profile.schema.json",
+  "title": "Canonical Runtime Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "composition", "precedence"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-profile"},
+    "id": {"type": "string", "minLength": 1},
+    "composition": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "precedence": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}
