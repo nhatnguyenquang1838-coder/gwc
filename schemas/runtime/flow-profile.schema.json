@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/flow-profile.schema.json",
+  "title": "Canonical Runtime Flow Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "version", "node_registry_ref", "scenario_registry_ref", "graph_registry_ref", "routes", "green_targets", "visibility", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "flow-profile"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "node_registry_ref": {"type": "string", "minLength": 1},
+    "scenario_registry_ref": {"type": "string", "minLength": 1},
+    "graph_registry_ref": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "pilot_nodes": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1}},
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["route_id", "kind", "nodes", "outcome", "human_boundary"],
+        "properties": {
+          "route_id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["happy_path", "history", "valid", "conditional", "blocked", "human_authority"]},
+          "nodes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "outcome": {"enum": ["GREEN", "CONDITIONAL", "BLOCKED", "HUMAN_REQUIRED"]},
+          "human_boundary": {"type": "boolean"}
+        }
+      }
+    },
+    "green_targets": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "visibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retain_inactive_nodes", "inactive_node_class"],
+      "properties": {
+        "retain_inactive_nodes": {"const": true},
+        "inactive_node_class": {"const": "inactive"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_sha"],
+      "properties": {
+        "source_path": {"type": "string", "minLength": 1},
+        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

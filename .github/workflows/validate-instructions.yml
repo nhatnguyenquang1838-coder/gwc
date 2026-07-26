@@ -31,6 +31,16 @@ jobs:
           set -o pipefail
           python tools/validate_instructions.py 2>&1 | tee validate-instructions.log
 
+      - name: Validate canonical runtime registries
+        run: |
+          set -o pipefail
+          python tools/node_architect/validate_runtime_registry.py --root . 2>&1 | tee runtime-registry-validation.log
+
+      - name: Run registry and v3 focused tests
+        run: |
+          set -o pipefail
+          python -m unittest tests/test_runtime_registry_validation.py tests/test_v3_registry_adapter.py 2>&1 | tee runtime-registry-tests.log
+
       - name: Run governance unit tests
         run: |
           set -o pipefail
@@ -48,6 +58,8 @@ jobs:
           name: validation-evidence-${{ github.run_id }}
           path: |
             validate-instructions.log
+            runtime-registry-validation.log
+            runtime-registry-tests.log
             governance-unit-tests.log
             compile-python-tools.log
           if-no-files-found: warn

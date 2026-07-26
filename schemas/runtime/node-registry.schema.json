@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/node-registry.schema.json",
+  "title": "Canonical Runtime Node Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "revision", "declared_slot_count", "nodes", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "node-registry"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "declared_slot_count": {"const": 81},
+    "nodes": {"type": "array", "minItems": 81, "maxItems": 81, "items": {"$ref": "node-contract.schema.json"}},
+    "provenance": {"type": "string", "minLength": 1}
+  }
+}

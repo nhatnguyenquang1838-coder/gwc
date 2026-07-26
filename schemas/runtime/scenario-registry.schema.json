@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/scenario-registry.schema.json",
+  "title": "Canonical Runtime Scenario Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "revision", "declared_scenario_count", "materialized_scenario_count", "scenarios", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "scenario-registry"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "declared_scenario_count": {"type": "integer", "minimum": 0},
+    "materialized_scenario_count": {"type": "integer", "minimum": 0},
+    "scenarios": {"type": "array", "minItems": 1, "items": {"$ref": "scenario-contract.schema.json"}},
+    "provenance": {"type": "string", "minLength": 1}
+  }
+}

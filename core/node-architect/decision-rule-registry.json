@@ -1,0 +1,46 @@
+{
+  "artifact_type": "decision-rule-registry",
+  "provenance": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+  "registry_id": "gwc-runtime-decision-rule-registry",
+  "revision": "scrum-104-20260726",
+  "rules": [
+    {
+      "artifact_type": "decision-rule",
+      "evaluation_record": {"deterministic": true, "record_fields": ["workflow_run_id"]},
+      "expression_type": "typed_presence",
+      "id": "workflow-run-missing",
+      "inputs": ["workflow_run_id"],
+      "operator": "absent",
+      "provenance": {"source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md", "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"},
+      "schema_version": "1.0.0",
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "decision-rule",
+      "evaluation_record": {"deterministic": true, "record_fields": ["head_sha", "expected_head_sha"]},
+      "expression_type": "typed_comparison",
+      "id": "head-sha-mismatch",
+      "inputs": ["head_sha", "expected_head_sha"],
+      "operator": "not_equals",
+      "provenance": {"source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md", "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"},
+      "schema_version": "1.0.0",
+      "value": "expected_head_sha",
+      "value_type": "string",
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "decision-rule",
+      "evaluation_record": {"deterministic": true, "record_fields": ["ci_status"]},
+      "expression_type": "typed_comparison",
+      "id": "ci-run-pending",
+      "inputs": ["ci_status"],
+      "operator": "equals",
+      "provenance": {"source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md", "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"},
+      "schema_version": "1.0.0",
+      "value": "PENDING",
+      "value_type": "status",
+      "version": "1.0.0"
+    }
+  ],
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,62 @@
+{
+  "artifact_type": "scenario-registry",
+  "declared_scenario_count": 116,
+  "materialized_scenario_count": 3,
+  "provenance": "tools/node_architect/project_runtime_knowledge_graph.py",
+  "registry_id": "gwc-runtime-scenario-registry",
+  "revision": "scrum-104-20260726",
+  "scenarios": [
+    {
+      "activation_facts": ["workflow_run_id"],
+      "artifact_type": "runtime-scenario",
+      "edges": [
+        {"edge_type": "runtime", "provenance": "KG projector: missing_workflow_run", "runtime_executable": true, "source": "repo_delivery.ci-run-capture", "target": "runtime_checkpoint.checkpoint-persist"}
+      ],
+      "evidence_refs": ["tools/node_architect/project_runtime_knowledge_graph.py", "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": ["runtime_checkpoint.checkpoint-persist"],
+      "human_boundaries": ["G5_DEPLOY"],
+      "id": "missing-workflow-run",
+      "provenance": {"source_path": "tools/node_architect/project_runtime_knowledge_graph.py", "source_sha": "121a6a4851d768558b502e63acc2f8b31e06386c9fcd288f74d3745d9a4e93e8", "source_status": "canonical_explicit"},
+      "route_nodes": ["repo_delivery.ci-run-capture", "runtime_checkpoint.checkpoint-persist"],
+      "rules": ["workflow-run-missing"],
+      "schema_version": "1.0.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": ["head_sha", "expected_head_sha"],
+      "artifact_type": "runtime-scenario",
+      "edges": [
+        {"edge_type": "runtime", "provenance": "KG projector: sha_mismatch", "runtime_executable": true, "source": "repo_delivery.ci-run-capture", "target": "failure_recovery.timeout-recovery"}
+      ],
+      "evidence_refs": ["tools/node_architect/project_runtime_knowledge_graph.py", "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": ["failure_recovery.timeout-recovery"],
+      "human_boundaries": ["G5_DEPLOY"],
+      "id": "sha-mismatch",
+      "provenance": {"source_path": "tools/node_architect/project_runtime_knowledge_graph.py", "source_sha": "121a6a4851d768558b502e63acc2f8b31e06386c9fcd288f74d3745d9a4e93e8", "source_status": "canonical_explicit"},
+      "route_nodes": ["repo_delivery.ci-run-capture", "failure_recovery.timeout-recovery"],
+      "rules": ["head-sha-mismatch"],
+      "schema_version": "1.0.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": ["ci_status"],
+      "artifact_type": "runtime-scenario",
+      "edges": [
+        {"edge_type": "runtime", "provenance": "KG projector: ci_pending", "runtime_executable": true, "source": "runtime_checkpoint.checkpoint-persist", "target": "validation_quality.ci-evidence-capture"}
+      ],
+      "evidence_refs": ["tools/node_architect/project_runtime_knowledge_graph.py", "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": ["validation_quality.ci-evidence-capture"],
+      "human_boundaries": ["G5_DEPLOY"],
+      "id": "ci-pending",
+      "provenance": {"source_path": "tools/node_architect/project_runtime_knowledge_graph.py", "source_sha": "121a6a4851d768558b502e63acc2f8b31e06386c9fcd288f74d3745d9a4e93e8", "source_status": "canonical_explicit"},
+      "route_nodes": ["runtime_checkpoint.checkpoint-persist", "validation_quality.ci-evidence-capture"],
+      "rules": ["ci-run-pending"],
+      "schema_version": "1.0.0",
+      "version": "1.0.0"
+    }
+  ],
+  "schema_version": "1.0.0"
+}

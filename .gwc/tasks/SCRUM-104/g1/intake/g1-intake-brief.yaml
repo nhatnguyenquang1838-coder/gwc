@@ -1,0 +1,77 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T07:23:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-104
+  base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC has 81 node descriptors and partial taxonomy/KG projection, but lacks canonical node, scenario and profile registries with cross-registry validation and a data-driven Cytoscape v3 binding.
+  why_now: SCRUM-103 is merged and SCRUM-104 is the next implementation predecessor for the durable runtime lane.
+desired_outcome: Materialize source-backed registries, preserve maturity and provenance, separate runtime edges from visual-only edges, validate all cross-references, and load v3 visualization data externally.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+    - GWC maintainers
+    - GWC consumer package users
+    - SCRUM-96 durable runtime lane
+scope:
+  in_scope:
+    - Canonical node, scenario and flow/profile registry data and schemas.
+    - Explicit maturity, provenance and source_status for all 81 catalog slots.
+    - Runtime-edge and visual-only-edge separation with negative validation tests.
+    - Cross-registry validators and focused CI/test integration.
+    - GWC-local data-driven v3 viewer adapter under tools/node_architect/viewer/.
+    - Package/export and integrity updates required by the new source surfaces.
+  non_goals:
+    - Implementing the durable runtime, scheduler, worker, storage adapter, or graph compiler.
+    - Modifying SCRUM-103 artifacts or any other repository.
+    - Merge, auto-merge, deployment, release, runtime reload, production configuration/data, credentials, or migrations.
+constraints:
+  - Work only from the verified 43daebcffbd71cf0339c4de8c82d3c91db95be1d main base.
+  - Keep proposed registry slots visibly non-stable without promotion evidence.
+  - Do not use free-form LLM text as executable policy or guard expressions.
+  - Preserve consumer package and authority boundaries.
+assumptions:
+  - The v3 consumer surface is to be added as the GWC-local adapter described by the protected-base design; no second repository is authorized.
+  - Existing 9-family, 81-slot taxonomy remains unchanged.
+  - Jira remains a work-tracking projection; GWC artifacts and GitHub/CI remain delivery authority.
+risks:
+  - id: RISK-1
+    description: Proposed slots could be presented as canonical executable nodes without evidence.
+    impact: high
+    mitigation: Require source_status, maturity, provenance, promotion evidence and negative validator tests.
+  - id: RISK-2
+    description: Runtime and visual edges could be conflated, changing downstream graph semantics.
+    impact: high
+    mitigation: Use separate typed edge collections and reject visual-only edges in runtime validation.
+  - id: RISK-3
+    description: The repository does not currently contain a Cytoscape v3 source implementation.
+    impact: medium
+    mitigation: Implement only the protected-base GWC-local adapter path; stop for a new scope decision if an external consumer is required.
+acceptance_criteria:
+  - id: AC-1
+    statement: All 81 catalog slots are represented with explicit family, maturity, provenance and source_status.
+    verifiable: true
+  - id: AC-2
+    statement: Node, scenario and profile registries validate against versioned schemas.
+    verifiable: true
+  - id: AC-3
+    statement: Scenario node, flow and green-target references resolve to canonical registry IDs.
+    verifiable: true
+  - id: AC-4
+    statement: Visual-only edges are rejected when supplied to runtime-edge validation.
+    verifiable: true
+  - id: AC-5
+    statement: The v3 adapter loads external registry JSON, retains all nodes, dims inactive nodes, and classifies route types.
+    verifiable: true
+  - id: AC-6
+    statement: Focused tests, repository validation, package/integrity checks and the Validate instructions CI workflow pass.
+    verifiable: true
+  - id: AC-7
+    statement: No SCRUM-103, merge, deploy, release, production, credential or cross-repository change is included.
+    verifiable: true
+unresolved_questions: []
+status: READY
