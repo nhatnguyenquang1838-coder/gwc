@@ -1,0 +1,52 @@
+{
+  "task_id": "SCRUM-106",
+  "run_id": "g1-scrum-106-r2-20260726-2310",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "old_base_sha": "76644885f4b25cb49a2a34bfea0e2ede941caa01",
+  "current_base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+  "base_delta_summary": "SCRUM-105 durable contracts and SCRUM-142 supporting graph/task artifacts merged; validator and G0/G1 schemas unchanged.",
+  "validator_hashes": {
+    "tools/validate_g01.py": "31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb",
+    "g0": "4d2e306e503a50b0aa5600146d020d636ffb7c7cefe18a0c6a3e623ca6fb52c5",
+    "intake": "5d8684ebba0444ec15f87f532a8cc648a1f2d35bdc097fa360b9e8cb6e291384",
+    "options": "89958f0bdcefb594fa41cd90dcc014c275b2103bba4f31eba2577fec0670cf11",
+    "preflight": "2105b22bfcba2ff12f420d5ae772ad731fe295adda643a37c7d92f0863352389",
+    "decision": "5551a9710efd15f0b16878f7cb207f3c495515a55d657c848989ad19f20e1a75"
+  },
+  "contract_binding": {
+    "status": "BOUND",
+    "source_task": "SCRUM-105",
+    "source_merge": "0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf",
+    "protected_base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+    "contract_paths": [
+      "core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md",
+      "schemas/runtime/durable-run.schema.json",
+      "schemas/runtime/durable-event.schema.json",
+      "schemas/runtime/durable-checkpoint.schema.json",
+      "schemas/runtime/pending-action.schema.json",
+      "schemas/runtime/adapter-contract.schema.json",
+      "schemas/runtime/storage-migration.schema.json"
+    ],
+    "event_projection": {
+      "logical_event_name": "stored as the node/event outcome label while canonical event identity uses event_id and sequence",
+      "causal_order": "predecessor/sequence fields in durable-event",
+      "actor_and_gate": "actor, node and gate fields in durable-event",
+      "result": "outcome plus evidence references in durable-event",
+      "run_binding": "durable-run binds run_id, task, repository, gate, runtime version and current checkpoint",
+      "resume_binding": "durable-checkpoint binds current/next node, next action, scope hash, revision, lease and fencing token",
+      "external_effect_boundary": "pending-action binds intent, idempotency, unknown outcome and deterministic readback"
+    }
+  },
+  "supporting_inputs": {
+    "scrum_142": {
+      "status": "PROVENANCE_QUALIFIED_SUPPORTING_INPUT",
+      "path": ".ua/gwc/graph-snapshot.json",
+      "limitation": "Repository-derived UA-compatible snapshot; not evidence of a direct full UA engine run.",
+      "gate_effect": "WARNING_ONLY_NOT_A_K2_BLOCKER"
+    },
+    "context7": {
+      "status": "PRIMARY_DOCUMENT_RESEARCH_RETAINED",
+      "path": "g1/research/context7-research-notes.md"
+    }
+  }
+}

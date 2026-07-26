@@ -1,0 +1,103 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+status: ACTIVE
+activation_state: APPROVED
+generated_at_utc: '2026-07-26T16:10:32Z'
+approval_id: APPROVE_G2_EXECUTION_SCRUM-106_R2_20260726T161032Z
+task_id: SCRUM-106
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c855336dc17f20115e640516107999b08e9d783e
+working_branch: knowledge/scrum-106-p2-scenario-matrix-r2-20260726
+risk_class: R1
+scope_hash: sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+scope:
+  task_id: SCRUM-106
+  repository: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  working_branch: knowledge/scrum-106-p2-scenario-matrix-r2-20260726
+  matrix_sha256: e5af87d89e2e6bafeb43d2658d54f7b7cebc02e9d6c01f4ab9c4faec24c5d705
+  files_write:
+  - .gwc/tasks/SCRUM-106/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-106/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-106/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-106/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.json
+  - .gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv
+  - .gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md
+  - .gwc/tasks/SCRUM-106/g1/research/context7-research-notes.md
+  - .gwc/tasks/SCRUM-106/evidence/**
+  - .gwc/tasks/SCRUM-106/g2/execution-envelope.yaml
+  authorized_actions: &id001
+  - create_guarded_branch_from_exact_base
+  - modify_approved_task_artifacts
+  - run_sandboxed_validation
+  - create_commit
+  - push_working_branch
+  excluded_actions: &id002
+  - direct_main_write
+  - runtime_implementation
+  - schema_or_validator_change
+  - workflow_change
+  - package_change
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - runtime_reload
+  - production_config_change
+  - credential_rotation
+  - migration_execution
+  - production_data_access
+  - force_push
+  - branch_deletion
+authorized_actions: *id001
+excluded_actions: *id002
+work_item:
+  provider: Atlassian Jira
+  id: SCRUM-106
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: In Progress
+g0_context_ref: g0/context-snapshot.yaml
+g1_decision_ref: g1/decision/g1-decision-record.yaml
+g1_validation_evidence: evidence/g01-validator-r2.json
+matrix_validation_evidence: evidence/matrix-structural-validation-r2.json
+expires_at_utc: '2026-07-27T16:10:32Z'
+approval_command: APPROVE_G2_SCRUM_106_R2 sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+  c855336dc17f20115e640516107999b08e9d783e 2026-07-27T16:10:32Z
+prerequisites:
+- id: G0_CONTEXT
+  status: READY
+  evidence: g0/context-snapshot.yaml
+- id: G1_ALIGNMENT
+  status: PASS
+  evidence: evidence/g01-validator-r2.json
+- id: MATRIX_STRUCTURE
+  status: PASS
+  evidence: evidence/matrix-structural-validation-r2.json
+- id: BASE_READBACK
+  status: PASS
+  evidence: c855336dc17f20115e640516107999b08e9d783e
+invalidation_conditions:
+- current main SHA changes
+- scope hash changes
+- matrix SHA changes
+- working branch changes
+- approval expires
+- approval command mismatch
+warning: Exact G2 approval accepted. Authority remains limited to authorized_actions
+  and approved SCRUM-106 paths; G3 PR remains separate.
+approval_received:
+  command: APPROVE_G2_SCRUM_106_R2 sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+    c855336dc17f20115e640516107999b08e9d783e 2026-07-27T16:10:32Z
+  actor: user
+  received_at_utc: '2026-07-26T16:31:15Z'
+  base_sha_match: true
+  scope_hash_match: true
+  branch_match: true
+  unexpired: true

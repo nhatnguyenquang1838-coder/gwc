@@ -1,0 +1,14 @@
+{
+  "outcome": "PASS",
+  "valid": true,
+  "task_id": "SCRUM-106",
+  "run_id": "g1-scrum-106-r2-20260726-2310",
+  "protected_base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+  "scenario_count": 27,
+  "unique_scenario_ids": 27,
+  "node_failure_pairs": 27,
+  "required_pairs": 27,
+  "crash_boundary_count": 6,
+  "matrix_sha256": "e5af87d89e2e6bafeb43d2658d54f7b7cebc02e9d6c01f4ab9c4faec24c5d705",
+  "issues": []
+}

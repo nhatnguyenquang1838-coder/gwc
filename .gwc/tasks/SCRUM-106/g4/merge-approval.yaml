@@ -1,0 +1,63 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+task_id: SCRUM-106
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c855336dc17f20115e640516107999b08e9d783e
+working_branch: knowledge/scrum-106-p2-scenario-matrix-r2-20260726
+pull_request:
+  number: 111
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/111
+  state: open
+  draft: false
+approved_head_sha: cca715515245b6513d635fa542d1637e9743de3d
+scope_hash: sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+approval:
+  command: APPROVE_G4_SCRUM_106_PR111 cca715515245b6513d635fa542d1637e9743de3d sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386 2026-07-27T18:00:00Z
+  actor: user
+  received_at_utc: '2026-07-27T00:00:00Z'
+  expires_at_utc: '2026-07-27T18:00:00Z'
+  head_sha_match_at_receipt: true
+  scope_hash_match: true
+  pr_ready_for_review: true
+preconditions:
+  g3_outcome: PASS
+  pr_state: open
+  pr_draft: false
+  pr_mergeable: true
+  required_ci:
+  - name: Validate instructions
+    run_id: 30212753079
+    status: completed
+    conclusion: success
+    head_sha: cca715515245b6513d635fa542d1637e9743de3d
+  - name: Build instruction packages
+    run_id: 30212753097
+    status: completed
+    conclusion: success
+    head_sha: cca715515245b6513d635fa542d1637e9743de3d
+  scope_review:
+    status: PASS
+    changed_paths_root: .gwc/tasks/SCRUM-106/
+    out_of_scope_paths: []
+permitted_action:
+  - merge_pr_111_with_expected_head_sha
+excluded_actions:
+  - auto_merge
+  - deploy
+  - release
+  - runtime_reload
+  - production_config_change
+  - credential_rotation
+  - migration_execution
+  - production_data_access
+  - force_push
+  - branch_deletion
+  - history_rewrite
+post_merge_required_actions:
+  - record_merge_commit
+  - perform_read_only_G5_STATUS_VERIFY
+  - record_G6_not_applicable_unless_production_action_requested
+status: RECORDED
+warning: This artifact records approval for head cca715515245b6513d635fa542d1637e9743de3d. Because persisting this artifact creates a successor PR head, merge execution must rebind to the new head and refresh CI/review evidence before merge.

@@ -1,0 +1,19 @@
+{
+  "artifact_type": "g2-approval-evidence",
+  "task_id": "SCRUM-106",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "working_branch": "knowledge/scrum-106-p2-scenario-matrix-r2-20260726",
+  "base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+  "scope_hash": "sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386",
+  "approval_command": "APPROVE_G2_SCRUM_106_R2 sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386 c855336dc17f20115e640516107999b08e9d783e 2026-07-27T16:10:32Z",
+  "received_at_utc": "2026-07-26T16:31:15Z",
+  "expires_at_utc": "2026-07-27T16:10:32Z",
+  "checks": {
+    "exact_command_match": "PASS",
+    "protected_base_match": "PASS",
+    "scope_hash_match": "PASS",
+    "working_branch_match": "PASS",
+    "expiry": "PASS"
+  },
+  "outcome": "APPROVED"
+}

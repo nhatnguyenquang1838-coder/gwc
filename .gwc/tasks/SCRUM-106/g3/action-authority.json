@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "gate-action-authority",
+  "task_id": "SCRUM-106",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+  "head_sha": "78bd500e11a44a8f1df97dec97d010f39927d37a",
+  "working_branch": "knowledge/scrum-106-p2-scenario-matrix-r2-20260726",
+  "gate": "G3_PR",
+  "action": "open_draft_pull_request",
+  "scope": {
+    "authorized_paths": [
+      ".gwc/tasks/SCRUM-106/**",
+      "pull_request_metadata"
+    ],
+    "authorized_actions": [
+      "open_draft_pull_request",
+      "update_draft_pr_body",
+      "read_only_review",
+      "read_only_ci_poll"
+    ],
+    "excluded_actions": [
+      "mark_ready_for_review_before_g3_pass",
+      "merge",
+      "auto_merge",
+      "deploy",
+      "release",
+      "production_change",
+      "force_push",
+      "branch_delete"
+    ],
+    "risk_class": "R1"
+  },
+  "scope_hash": "sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386",
+  "issued_at": "2026-07-26T17:20:28Z",
+  "expires_at": "2026-07-26T18:20:28Z",
+  "actor": {
+    "kind": "human",
+    "id": "user"
+  },
+  "evidence_readback": {
+    "status": "confirmed",
+    "observed_at": "2026-07-26T17:20:28Z",
+    "task_id": "SCRUM-106",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+    "head_sha": "78bd500e11a44a8f1df97dec97d010f39927d37a",
+    "gate": "G3_PR",
+    "action": "open_draft_pull_request",
+    "scope_hash": "sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386",
+    "event_id_or_idempotency_key": "chat-continue-g3-20260726T172028Z"
+  }
+}
