@@ -1,0 +1,28 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+task_id: SCRUM-141
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+working_branch: codex/scrum-141-p1-validation-evidence-20260726
+scope_hash: sha256:bca37c36440b33b551e55c4bce20a55ce1883b67e240d99a92674bb341527bd1
+approval_command: APPROVE_G2_SCRUM-141_GWC_AC_UPDATE sha256:bca37c36440b33b551e55c4bce20a55ce1883b67e240d99a92674bb341527bd1 9c79409052db73868cb76f4e04822fca07b2a0d7 2026-07-27T10:15:00Z
+readback_status: MATCH
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- merge_approved_pr
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_read
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+observed_at: '2026-07-26T17:42:00+07:00'
