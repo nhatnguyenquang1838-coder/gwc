@@ -1,67 +1,25 @@
-# SCRUM-142 — UA-compatible GWC Knowledge Graph Refresh Report
+# SCRUM-142 UA Refresh R2 — Partial G2 Execution
 
-## Result
+- Base: `nhatnguyenquang1838-coder/gwc@c855336dc17f20115e640516107999b08e9d783e`
+- Scope: `sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b`
+- Envelope state: `APPROVED_AND_REVALIDATED`
+- Working branch: `repair/scrum-142-canonical-ua-refresh-r2-20260726`
 
-`READY_LOCAL_WITH_G2_REQUIRED_FOR_REPO_WRITE`
+## Completed in this partial G2 step
 
-## Baseline
+- Guarded branch created from the exact approved base.
+- Canonical G0/G1 remediation packet prepared and validated.
+- G2 governance, review, validation, and audit artifacts authorized for persistence.
 
-- Repository: `nhatnguyenquang1838-coder/gwc`
-- Default branch: `main`
-- Latest recovered main SHA: `76644885f4b25cb49a2a34bfea0e2ede941caa01`
-- Jira task: `SCRUM-142`
-- Feeds: `SCRUM-106`
+## Pending UA execution
 
-## UA evidence
-
-The repo contains `.codex_plugins/understand-anything/plugin.json` with plugin name `understand-anything`, version `2.9.4`, and skills including `understand`, `understand-knowledge`, and `understand-domain`.
-
-Current chat runtime does not expose a direct UA execution connector or local shell. This report is therefore a UA-compatible repo-derived graph refresh packet, not an external UA engine execution claim.
-
-## Graph refresh findings
-
-| Surface | Finding | Impact on SCRUM-106 |
-|---|---|---|
-| Runtime graph | 81 nodes / 11 edges | Enough for dependency mapping; not enough for P2 matrix alone |
-| Scenario registry | 116 declared / 3 materialized | SCRUM-106 must define additional scenario matrix |
-| Profile registry | 1 profile / 3 pilot nodes | P2 can anchor read/checkpoint/CI evidence paths |
-| Graph revision | Standalone schema exists and runtime graph refs it | Good anchor for graph snapshot identity |
-| UA paths | `.ua/tmp/` and `.ua/intermediate/` ignored | Persistent outputs should use `.ua/gwc/**` |
-
-## Recommended SCRUM-106 action
-
-Define matrix rows for:
-
-- read-only exact-state success/failure/pending/SHA mismatch;
-- bounded external write success/timeout-before-side-effect/timeout-after-side-effect/duplicate-worker;
-- resume clean/stale checkpoint/lease expiry;
-- ambiguous post-state / human takeover.
-
-## Proposed persistence scope
+Canonical UA outputs remain intentionally absent:
 
 ```text
+.ua/knowledge-graph.json
+.ua/meta.json
 .ua/gwc/graph-snapshot.json
 .ua/gwc/graph-summary.md
-.gwc/tasks/SCRUM-142/ua-refresh-report.md
-.gwc/tasks/SCRUM-142/g0/context-snapshot.yaml
-.gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml
-.gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml
-.gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml
-.gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml
 ```
 
-## Scope hash
-
-```text
-sha256:d95e1decbdf04dba0ad56edf92192ccd5953024cd21ea93599c01cc7acdb5126
-```
-
-## Approval command
-
-```text
-APPROVE_G2_SCRUM_142_UA_GRAPH_REFRESH sha256:d95e1decbdf04dba0ad56edf92192ccd5953024cd21ea93599c01cc7acdb5126 76644885f4b25cb49a2a34bfea0e2ede941caa01 2026-07-27T10:15:00Z
-```
-
-## Exclusions
-
-No implementation runtime behavior, PR, merge, deploy, release, runtime reload, production config, credential change, migration, or production-data action.
+The current runtime does not provide a trusted repository checkout plus the complete executable Understand-Anything scanner/assembler/validator package. No direct-UA execution claim is made. G2 may resume the UA portion when that evidence is available.
