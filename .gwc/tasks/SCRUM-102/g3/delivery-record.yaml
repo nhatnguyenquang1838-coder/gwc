@@ -1,0 +1,124 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-102
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 319e611d1a318df8ec5eccd3210078652e01369d
+working_branch: docs/SCRUM-102-canonical-schema-design
+pull_request:
+  number: 99
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/99
+  draft: true
+head_sha: 942e67589f5e5f07e3dcf9f01eaa54461a9ec648
+scope_hash: sha256:1cb9b700bb45f60d25929a7916a28d5bd8e688f0083f10a1d270d5e6ecc23268
+changed_paths:
+  - .gwc/tasks/SCRUM-102/g2/execution-envelope.yaml
+  - schemas/node-architect/runtime-node.schema.json
+  - schemas/node-architect/runtime-scenario.schema.json
+  - schemas/node-architect/runtime-profile.schema.json
+  - schemas/node-architect/runtime-history.schema.json
+  - schemas/node-architect/runtime-graph.schema.json
+  - schemas/node-architect/decision-rule.schema.json
+  - tests/test_canonical_runtime_schema_contracts.py
+validation:
+  head_sha: 942e67589f5e5f07e3dcf9f01eaa54461a9ec648
+  status: pass
+  commands:
+    - command: GitHub Actions Validate instructions
+      result: pass
+      evidence: Validate instructions run 30173900654 completed successfully for reviewed head 942e67589f5e5f07e3dcf9f01eaa54461a9ec648.
+    - command: GitHub Actions Build instruction packages
+      result: pass
+      evidence: Build instruction packages run 30173900643 completed successfully for reviewed head 942e67589f5e5f07e3dcf9f01eaa54461a9ec648.
+    - command: G2 exact diff allowlist readback
+      result: pass
+      evidence: GitHub compare from base 319e611d1a318df8ec5eccd3210078652e01369d to reviewed head found 8 files, all inside the approved SCRUM-102 scope.
+review:
+  implementer_id: chatgpt-agent-primary
+  reviewer_id: chatgpt-agent-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 942e67589f5e5f07e3dcf9f01eaa54461a9ec648
+  reviewed_scope_hash: sha256:1cb9b700bb45f60d25929a7916a28d5bd8e688f0083f10a1d270d5e6ecc23268
+  reviewed_at: '2026-07-26T03:53:06Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Canonical schemas cover runtime node, scenario, profile, history, graph revision and decision-rule metadata required by SCRUM-102.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Schema design records stable IDs, independent versions, authority, effects, reversibility, idempotency, suspension, determinism, routing history and profile routing constraints.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Changes are schema and test scoped; no graph compiler, durable runtime engine, deploy path, secret or production path was changed.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - tests/test_canonical_runtime_schema_contracts.py parses all canonical runtime schema files and asserts required GWC-specific fields.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope records approval id, scope hash, authorized paths and explicit exclusions for graph compiler, durable engine, G4/G5/G6 and protected-main authority.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR 99 is open, mergeable and bound to the reviewed implementation head; no changed path is outside approved SCRUM-102 scope.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30173900654 and Build instruction packages run 30173900643 both completed successfully on the reviewed head.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Runtime node schema defines stable identity, versioning, authority, effects, execution, interfaces and audit metadata.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Runtime scenario/profile/history/graph schemas cover routing, flow profile, checkpoint/history and graph revision structures.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Decision-rule schema records deterministic evaluation inputs and evaluation-record fields.
+    - id: AC-4
+      result: pass
+      evidence:
+        - Contract tests parse all schema files and assert canonical field presence and semantic constraints.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 942e67589f5e5f07e3dcf9f01eaa54461a9ec648
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30173900654
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30173900643
+residual_risks:
+  - This G3 delivery record is an evidence-only commit after the reviewed implementation head; CI must pass again on the resulting PR head before Ready-for-review and G4 preparation.
+  - Review uses repository-defined fresh-context independence rather than an external human reviewer; G4 remains human-authorized.
+  - SCRUM-102 consumes authority terminology from SCRUM-101 and should be reconciled after SCRUM-101 merge if terminology changes before G4.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass
