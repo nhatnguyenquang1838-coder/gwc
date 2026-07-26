@@ -1,0 +1,180 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-26T16:10:32Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-106
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity and current protected main are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@main:c855336dc17f20115e640516107999b08e9d783e
+- id: TASK_READBACK
+  status: PASS
+  code: TASK_VERIFIED
+  message: SCRUM-106 remains In Progress and defines the three node and nine failure classes.
+  evidence:
+  - Atlassian Jira SCRUM-106 readback
+- id: K1_CONTRACT_BINDING
+  status: PASS
+  code: DURABLE_CONTRACTS_MERGED
+  message: SCRUM-105 durable run/event/checkpoint/pending-action/adapter contracts are merged and available on current main.
+  evidence:
+  - 'PR #108 merge 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf'
+  - core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+  - schemas/runtime/durable-event.schema.json
+  - schemas/runtime/durable-checkpoint.schema.json
+  - schemas/runtime/pending-action.schema.json
+- id: SCRUM142_INPUT
+  status: WARN
+  code: UA_PROVENANCE_QUALIFIED
+  message: SCRUM-142 is usable as repository-derived supporting context but is not represented as a direct UA engine execution.
+  evidence:
+  - 'PR #109 merge c855336dc17f20115e640516107999b08e9d783e'
+  - .ua/gwc/graph-snapshot.json
+- id: DEEP_RESEARCH
+  status: PASS
+  code: PRIMARY_DOCS_RETAINED
+  message: SQLite, PostgreSQL and Supabase primary-document constraints remain incorporated.
+  evidence:
+  - g1/research/context7-research-notes.md
+- id: MATRIX_COMPLETENESS
+  status: PASS
+  code: SCENARIO_COVERAGE_COMPLETE
+  message: 27 unique scenarios and six crash boundaries are materialized with deterministic oracles.
+  evidence:
+  - g1/decision/p2-scenario-matrix.json
+  - g1/decision/P2_SCENARIO_MATRIX.md
+  - sha256:e5af87d89e2e6bafeb43d2658d54f7b7cebc02e9d6c01f4ab9c4faec24c5d705
+- id: CURRENT_VALIDATOR
+  status: PASS
+  code: EXACT_CURRENT_VALIDATOR_AVAILABLE
+  message: Exact current validator and five schemas are locally available with manifest-matching hashes.
+  evidence:
+  - tools/validate_g01.py sha256:31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+  - g1-preflight schema sha256:2105b22bfcba2ff12f420d5ae772ad731fe295adda643a37c7d92f0863352389
+  - g1-decision schema sha256:5551a9710efd15f0b16878f7cb207f3c495515a55d657c848989ad19f20e1a75
+- id: BOUNDED_G2_SCOPE
+  status: PASS
+  code: KNOWLEDGE_ONLY_SCOPE
+  message: Proposed G2 scope contains task-owned knowledge/evidence artifacts only and excludes G3-G6 authority.
+  evidence:
+  - sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+  - knowledge/scrum-106-p2-scenario-matrix-r2-20260726
+process_readback:
+  process_id: governed-scrum-106-current-base-rebaseline
+  terminal_outcome: Exact-current G0/G1 PASS and generation of an awaiting-approval G2 envelope for task-owned knowledge artifacts.
+  required_sources:
+  - AGENTS.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - SCRUM-106
+  - SCRUM-105 durable contracts
+  - SCRUM-142 qualified supporting input
+  - Context7 primary docs
+  - tools/validate_g01.py
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+  route_steps:
+  - id: STEP-01
+    name: current-base-task-and-contract-readback
+    gate: G0_CONTEXT
+    actor: agent
+    action_class: read
+    capability_required: repository_and_jira_read
+    capability_status: VERIFIED
+    primary_route: GitHub + Atlassian connectors
+    fallback_routes: []
+    continuation: immediate
+    expected_evidence: Exact current main, Jira task and merged SCRUM-105 contract paths.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-02
+    name: matrix-current-contract-rebinding
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_artifact_generation
+    capability_required: local_workspace
+    capability_status: VERIFIED
+    primary_route: local task workspace
+    fallback_routes: []
+    continuation: immediate
+    expected_evidence: Current-base JSON, CSV and Markdown with 27×9 coverage and durable-contract projection.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-03
+    name: exact-current-g01-validation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_validation
+    capability_required: python_jsonschema_validator
+    capability_status: VERIFIED
+    primary_route: exact current tools/validate_g01.py
+    fallback_routes: []
+    continuation: immediate
+    expected_evidence: Exit code 0 and zero-issue JSON report.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-04
+    name: bounded-g2-envelope-generation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_artifact_generation
+    capability_required: g2_envelope_render
+    capability_status: VERIFIED
+    primary_route: local governed artifact generation
+    fallback_routes: []
+    continuation: stop_at_exact_human_approval_boundary
+    expected_evidence: Awaiting-approval envelope bound to base, branch, scope hash and expiry.
+    bypass_eligibility: FORBIDDEN
+runtime_context:
+  agent_runtime_id: chatgpt-connector-session
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
+implementation_plan:
+  applicability: not_applicable
+  reason: SCRUM-106 is itself a bounded knowledge/acceptance-contract artifact. This G1 lane performs no implementation or
+    source mutation; the generated matrix is the implementation input for SCRUM-107 through SCRUM-109.
+  source: plan_not_applicable
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-106
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: c855336dc17f20115e640516107999b08e9d783e
+  plan_root: null
+  requirements_path: null
+  design_path: null
+  tasks_path: null
+  plan_revision: null
+  validation_status: NOT_APPLICABLE
+  validation_evidence: null
+  generated_by: chatgpt-governed-g1
+  generated_at_utc: '2026-07-26T16:10:32Z'
