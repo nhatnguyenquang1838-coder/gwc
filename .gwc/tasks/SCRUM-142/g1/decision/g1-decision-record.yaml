@@ -1,0 +1,15 @@
+task_id: SCRUM-142
+run_id: g1-scrum-142-20260726-1945
+decision: PREPARE_G2_FOR_REPO_PERSISTENCE
+scope_hash: sha256:d95e1decbdf04dba0ad56edf92192ccd5953024cd21ea93599c01cc7acdb5126
+branch: fastlane/scrum-142-ua-graph-refresh-20260726
+base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+write_scope:
+  - .ua/gwc/graph-snapshot.json
+  - .ua/gwc/graph-summary.md
+  - .gwc/tasks/SCRUM-142/ua-refresh-report.md
+  - .gwc/tasks/SCRUM-142/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml
