@@ -1,0 +1,50 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-07-26T17:42:00+07:00'
+task_id: SCRUM-141
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+working_branch: codex/scrum-141-p1-validation-evidence-20260726
+risk_class: R1
+scope_hash: sha256:bca37c36440b33b551e55c4bce20a55ce1883b67e240d99a92674bb341527bd1
+approved_command: APPROVE_G2_SCRUM-141_GWC_AC_UPDATE sha256:bca37c36440b33b551e55c4bce20a55ce1883b67e240d99a92674bb341527bd1 9c79409052db73868cb76f4e04822fca07b2a0d7 2026-07-27T10:15:00Z
+approval:
+  approved_by: current_chat_user
+  approved_at: '2026-07-26T17:40:00+07:00'
+  expires_at: '2026-07-27T10:15:00Z'
+  source: chat
+  status: ACCEPTED
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- merge_approved_pr
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_read
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+file_scope:
+- .gwc/tasks/SCRUM-141/**
+ci_evidence:
+  run_id: '30196137772'
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30196137772
+  head_branch: main
+  head_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+  job: validate
+  status: completed
+  conclusion: success
+  artifact:
+    id: '8630162434'
+    name: validation-evidence-30196137772
+    digest: sha256:0846ee094da54363c3ef67b0e9539831e68792e358a0d70031e28c36a3443d18
+status: APPROVED_FOR_G2_WRITE_ONLY
