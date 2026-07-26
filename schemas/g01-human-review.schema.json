@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g01-human-review.schema.json",
+  "title": "G0/G1 Human Review Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "generated_at_utc",
+    "gates",
+    "impact_ref",
+    "html",
+    "presentation",
+    "authority_notice"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g01-human-review"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "generated_at_utc": {"type": "string", "format": "date-time"},
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["g0", "g1", "g2"],
+      "properties": {
+        "g0": {"enum": ["READY", "BLOCKED", "NOT_RUN"]},
+        "g1": {"enum": ["PASS", "BLOCKED", "NOT_RUN"]},
+        "g2": {"enum": ["AWAITING_APPROVAL", "APPROVED", "NOT_REQUESTED", "SUPERSEDED"]}
+      }
+    },
+    "impact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "html": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["template_version", "title", "sections", "self_contained"],
+      "properties": {
+        "template_version": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "sections": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "self_contained": {"const": true},
+        "remote_assets_allowed": {"const": false}
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chat_summary", "slack_summary", "html_ref", "slack_thread_required"],
+      "properties": {
+        "chat_summary": {"type": "string", "minLength": 1},
+        "slack_summary": {"type": "string", "minLength": 1},
+        "html_ref": {"type": "string", "minLength": 1},
+        "slack_thread_required": {"const": true}
+      }
+    },
+    "authority_notice": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "does not grant|not grant|không cấp"
+    }
+  }
+}

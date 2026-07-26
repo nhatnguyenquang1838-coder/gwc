@@ -1,0 +1,13 @@
+{
+  "task_id": "SCRUM-138",
+  "base_sha": "43daebcffbd71cf0339c4de8c82d3c91db95be1d",
+  "branch": "feat/SCRUM-138-g01-impact-contracts-r2",
+  "validator": "pytest tests/test_g01_human_review_contracts.py",
+  "outcome": "PASS_LOCAL",
+  "tests": 6,
+  "notes": [
+    "Task Me applicable + available requires invoked=true.",
+    "Synthetic UA graph nodes are rejected.",
+    "Human-review HTML projection must contain an authority-separation notice."
+  ]
+}
