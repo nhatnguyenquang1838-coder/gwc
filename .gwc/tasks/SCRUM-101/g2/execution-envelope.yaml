@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+authority_gate: G2_EXECUTION
+task_id: SCRUM-101
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 319e611d1a318df8ec5eccd3210078652e01369d
+working_branch: docs/SCRUM-101-authority-matrix
+scope_hash: sha256:e2bfb8da5f6db539eb600df80bec690dc8f845d0117e3ce8a3cd7f2deae9ccfb
+approval_request_id: SCRUM-101-G2-AUTHORITY-MATRIX-20260725T203000Z
+approved_at_utc: '2026-07-25T18:40:00Z'
+expires_at_utc: '2026-07-26T20:30:00Z'
+risk_class: R2
+authorized_actions:
+  - create_guarded_branch
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+authorized_paths:
+  - .gwc/tasks/SCRUM-101/**
+  - .kiro/specs/GWC-P1-scrum-101-authority-matrix/**
+  - docs/authority/dw-super-app-source-of-truth-authority-matrix.md
+  - tests/test_authority_matrix_contract.py
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - runtime_reload
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - protected_main_write
+approval_evidence: Exact user approval command received in current ChatGPT conversation.
