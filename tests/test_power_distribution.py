@@ -132,16 +132,28 @@ class GWCPowerDistributionTests(unittest.TestCase):
         self.assertFalse(spec["externalWritesEnabled"])
         self.assertTrue(spec["approvalRequiredForRepositoryWrites"])
 
-    def test_workflow_is_immutable_and_publication_defaults_false(self) -> None:
+    def test_workflow_is_immutable_and_auto_publishes_main(self) -> None:
         text = WORKFLOW_PATH.read_text(encoding="utf-8")
         self.assertIn(
             f"DW-SuperApps/.github/workflows/reusable-publish-power.yml@{FOUNDATION_SHA}",
             text,
         )
         self.assertIn(f"foundation_ref: {FOUNDATION_SHA}", text)
+        self.assertIn("push:", text)
+        self.assertIn("      - main", text)
         self.assertGreaterEqual(text.count("default: false"), 2)
-        self.assertIn("publish_release: ${{ inputs.publish_release }}", text)
-        self.assertIn("publish_distribution_branch: ${{ inputs.publish_distribution_branch }}", text)
+        self.assertIn(
+            "package_version: ${{ github.event.inputs.package_version || format('gwc-main-{0}-{1}', github.run_number, github.sha) }}",
+            text,
+        )
+        self.assertIn(
+            "publish_release: ${{ github.event_name == 'push' || github.event.inputs.publish_release == 'true' }}",
+            text,
+        )
+        self.assertIn(
+            "publish_distribution_branch: ${{ github.event_name == 'push' || github.event.inputs.publish_distribution_branch == 'true' }}",
+            text,
+        )
 
     def test_package_does_not_embed_task_evidence(self) -> None:
         include = "\n".join(self.recipe["spec"]["include"])

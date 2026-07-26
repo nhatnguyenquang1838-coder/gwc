@@ -1,11 +1,15 @@
 name: Publish GWC Power
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       package_version:
-        description: Immutable package version.
-        required: true
+        description: Optional immutable package version override.
+        required: false
+        default: ""
         type: string
       publish_release:
         description: Publish a GitHub Release after validation.
@@ -27,10 +31,10 @@ jobs:
     with:
       power_id: gwc
       recipe_path: distribution/power-package.yaml
-      package_version: ${{ inputs.package_version }}
+      package_version: ${{ github.event.inputs.package_version || format('gwc-main-{0}-{1}', github.run_number, github.sha) }}
       foundation_ref: 299cd605899467377cd31651b27d31c3f88db759
       source_date_epoch: 0
       distribution_branch: power-dist
-      publish_release: ${{ inputs.publish_release }}
-      publish_distribution_branch: ${{ inputs.publish_distribution_branch }}
+      publish_release: ${{ github.event_name == 'push' || github.event.inputs.publish_release == 'true' }}
+      publish_distribution_branch: ${{ github.event_name == 'push' || github.event.inputs.publish_distribution_branch == 'true' }}
     secrets: inherit
