@@ -51,6 +51,7 @@
 100644 blob a71147040a58a7f1b5e5944852518dce3df9b2ae    6321	.gwc/tasks/SCRUM-103/g1/intake/g1-intake-brief.yaml
 100644 blob 9c70b4290533213d8dfc3927f992cb4bbe048fe9    5529	.gwc/tasks/SCRUM-103/g1/preflight/g1-preflight-report.yaml
 100644 blob c71faf2e1747aaf477c3597d4719dc58fb53ce49    3071	.gwc/tasks/SCRUM-103/g2/execution-envelope.yaml
+100644 blob 75c2e17a1db9da7e68edc9b3b233679b94a36813    6699	.gwc/tasks/SCRUM-103/g3/delivery-record.yaml
 100644 blob c0e461e2a639d831f3f9fc61bb983d580df0fd3c    5966	.gwc/tasks/SCRUM-68/g0/context-snapshot.yaml
 100644 blob c4243644bf38ece07ff92c5ea8d4e711b7a3e2d1    2435	.gwc/tasks/SCRUM-68/g1/brainstorming/g1-options.yaml
 100644 blob 5532a85c8916b7683372421ad0dbe2e3be06fb66    2986	.gwc/tasks/SCRUM-68/g1/decision/g1-decision-record.yaml
@@ -256,7 +257,7 @@
 100644 blob 75d4aeb7ec4ffeb268a69b1c12dca7beac219db0     244	HEARTBEAT.md
 100644 blob 9e2f98ce9f02e0e152d1ca8dee2d65ac41af9e46    1278	IDENTITY.md
 100644 blob c6ad6f0cdbb5ffce1496d6447639cfbfdab53f54    8714	README.md
-100644 blob 77ff388ecb2e69682c1563d8bc410f56f758fa15   93097	SHA256SUMS.txt
+100644 blob e9fdaa007967132cbd9d0ce44ccf8b29b5b1e6ce   93208	SHA256SUMS.txt
 100644 blob 674b5ca657c9e24dd7b6275d6655f3d2f969f61a    1518	SOUL.md
 100644 blob a844ed77620cf9c9d65be1db9e6f98d325cbbc01     555	TODO.md
 100644 blob bab460a41740dfb875bbcdf638dc00ddd8cf0165     876	TOOLS.md

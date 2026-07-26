@@ -1,0 +1,160 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-103
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+working_branch: codex/scrum-103-lifecycle-authority
+pull_request:
+  number: 101
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/101
+  draft: true
+head_sha: c8f3fb3f0254feb7e64df435dd8e4d0a010355f1
+scope_hash: sha256:c9968e55c691ef9f397aec6696b08a305264d1b1c282b88300a7fc5cc9129a7a
+changed_paths:
+  - .gwc/tasks/SCRUM-103/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-103/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-103/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-103/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-103/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-103/g2/execution-envelope.yaml
+  - BUNDLE-REPORT.json
+  - SHA256SUMS.txt
+  - TREE.txt
+  - agents/chatgpt-agent/agent-instructions.md
+  - agents/dwc/agent-instructions.md
+  - core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/task-lifecycle/gate-transition-map.yaml
+  - docs/project-consumer-agent-instructions.md
+  - projects/gwc/package.yaml
+  - releases/changelog.d/2026-07-26-scrum-103-lifecycle-authority.md
+  - schemas/g5-status-evidence.schema.json
+  - schemas/gate-action-authority.schema.json
+  - tests/test_g5_status_resolver.py
+  - tests/test_validate_gate_action.py
+  - tools/resolve_g5_status.py
+  - tools/validate_g5_status.py
+  - tools/validate_gate_action.py
+validation:
+  head_sha: c8f3fb3f0254feb7e64df435dd8e4d0a010355f1
+  status: pass
+  commands:
+    - command: tools/validate_g01.py --gate G2_EXECUTION
+      result: pass
+      evidence: SCRUM-103 G0/G1/G2 artifacts validated with no issues.
+    - command: tools/validate_instructions.py
+      result: pass
+      evidence: Instruction repository validation passed on the guarded worktree.
+    - command: Focused action-authority, G5, lifecycle, and package tests
+      result: pass
+      evidence: 30 focused tests passed.
+    - command: Full governance unit test suite
+      result: pass
+      evidence: 302 tests passed with exit code 0; negative-fixture diagnostics were expected test output.
+    - command: Package export smoke
+      result: pass
+      evidence: GWC package export passed for 217 entries at package_version 1.16.0.
+    - command: SHA256 integrity readback
+      result: pass
+      evidence: SHA256SUMS.txt verified 752 readable files; TREE.txt and the manifest are excluded by contract.
+    - command: git diff --check and scoped diff review
+      result: pass
+      evidence: No whitespace errors; 24 changed paths match the SCRUM-103 G2 allowlist and task workspace.
+review:
+  implementer_id: codex-local-agent
+  reviewer_id: codex-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: c8f3fb3f0254feb7e64df435dd8e4d0a010355f1
+  reviewed_scope_hash: sha256:c9968e55c691ef9f397aec6696b08a305264d1b1c282b88300a7fc5cc9129a7a
+  reviewed_at: '2026-07-26T06:29:26Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - SCRUM-103 audit blockers are mapped to lifecycle, authority, G5, workspace, and package changes.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - G3 review, G4 merge, G5 verification/deployment, and conditional G6 states are explicit and separate.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Action validation is local and fail-closed; G5 resolution is data-only and has no connector or deployment side effect.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Focused and full repository test suites pass; malformed scope, expiry, SHA mismatch, pending, and observability cases are covered.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope, scope hash, branch, exact base SHA, exclusions, Jira projection boundary, and canonical task workspace are recorded.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR 101 is open against main at the reviewed implementation head; no protected-main write or merge occurred.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30191104147 and Build instruction packages run 30191104138 both completed successfully for the exact reviewed head.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Lifecycle map no longer transitions VALIDATION_PASSED directly to completed and includes explicit G4/G5/G6 routes.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Gate-action schema and validator bind task, repository, base/head SHA, action, gate, scope hash, expiry, actor, and readback.
+    - id: AC-3
+      result: pass
+      evidence:
+        - G5 resolver selects only exact merge-SHA runs and classifies pending, failure, SHA mismatch, and connector observability gaps.
+    - id: AC-4
+      result: pass
+      evidence:
+        - SCRUM-103 gate artifacts use .gwc/tasks/SCRUM-103/ and consumer instructions document the canonical workspace and authority boundaries.
+    - id: AC-5
+      result: pass
+      evidence:
+        - Package entries, changelog fragment, BUNDLE-REPORT.json, TREE.txt, and SHA256SUMS.txt are synchronized and validated.
+    - id: AC-6
+      result: pass
+      evidence:
+        - The Draft PR body and exclusions preserve separate G4 merge, G5 manual action, and G6 production authority gates.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: c8f3fb3f0254feb7e64df435dd8e4d0a010355f1
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30191104147
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30191104138
+residual_risks:
+  - This delivery record is an evidence-only commit after the reviewed implementation head; CI and review evidence must be refreshed if that record commit changes the PR head before G3 closure.
+  - G5 push/main workflow observability remains connector-dependent and must use exact-SHA lookup with documented fallback classification after any G4 merge.
+  - Jira status is a work-tracking projection and does not grant GWC gate authority.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass

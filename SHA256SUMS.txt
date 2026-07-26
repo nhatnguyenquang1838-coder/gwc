@@ -41,6 +41,7 @@ a38a06df83c7b9fa7199695efff007098ef2adda86407c7d2e50b8ae96ae0271  .gwc/tasks/SCR
 136faa730795963525c7a6d5f209cad0e28880f421798c7eef8321c0e865c861  .gwc/tasks/SCRUM-103/g1/intake/g1-intake-brief.yaml
 fe713f53a725f96cb7c532c0fcf55649f77ac28ea905ee1f2ebef4aea191b526  .gwc/tasks/SCRUM-103/g1/preflight/g1-preflight-report.yaml
 34d11674bd9973f9ca37451c4755a86d0e2b66492363904bd1c59d0f2bc3887d  .gwc/tasks/SCRUM-103/g2/execution-envelope.yaml
+6d1c753c7c8fa5bc4a9756b186cde5c27efb0b8eef12e26e6d32461c7106a6b6  .gwc/tasks/SCRUM-103/g3/delivery-record.yaml
 f95731120528366d7ba3e1774b72bfac262cafc346a5a1d568a755bd53d08b5e  .gwc/tasks/SCRUM-68/g0/context-snapshot.yaml
 a07d0dabe5cec45e393cc84a73d55ffac338e71b5502ea6f47b4f1dd26046709  .gwc/tasks/SCRUM-68/g1/brainstorming/g1-options.yaml
 afd69b58dea24630209b7f3b0243955997b8cc910ded31c75c12b0dd2fc56199  .gwc/tasks/SCRUM-68/g1/decision/g1-decision-record.yaml
