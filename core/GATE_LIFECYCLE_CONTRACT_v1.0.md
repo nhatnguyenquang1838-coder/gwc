@@ -62,6 +62,21 @@ The task workspace is the source of truth for gate applicability and evidence:
 | G5_DEPLOY | .gwc/tasks/<task-id>/g5/deployment-approval.yaml | Manual deploy, release, publish, or runtime reload |
 | G6_PRODUCTION_DATA | .gwc/tasks/<task-id>/g6/production-approval.yaml | Production data/configuration/credential/migration/secret action |
 
+Every action packet that can cause a gate-scoped side effect must conform to
+`schemas/gate-action-authority.schema.json` and pass
+`tools/validate_gate_action.py`. The validator binds task, repository, base
+SHA, head SHA, branch, gate, action, canonical scope hash, expiry, actor, and
+readback event. A valid packet is evidence of a matching envelope; it is not a
+new approval and never broadens the envelope's authorized actions.
+
+The executable state transitions are defined in
+`core/task-lifecycle/gate-transition-map.yaml`. G3 validation/review now ends
+in `merge_pending`; G4 approval and merge move through `merge_running` to
+`verification_running`; read-only G5 status verification ends in `completed`
+only when no production operation is required. Manual deployment and
+production operations use separate pending/running states and cannot be
+inferred from a successful prior transition.
+
 The G4, G5, and G6 rows are conditional. If a row is not applicable, the
 current gate record must state not_applicable; absence is not permission.
 Before invoking an action, the runtime must verify the applicable artifact's
