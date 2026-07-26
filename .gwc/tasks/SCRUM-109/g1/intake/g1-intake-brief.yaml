@@ -1,0 +1,61 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T18:51:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-109
+  base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement the P2-I3 durable checkpoint/CAS/lease/resume node so runtime state can advance safely and reject stale or duplicate workers.
+  why_now: SCRUM-105 and SCRUM-106 are Done, and SCRUM-110 remains blocked until I3 produces durable checkpoint behavior.
+desired_outcome: A bounded runtime-state module and focused tests that prove revision CAS, active lease, fencing token, binding-preserving resume, stale checkpoint rejection, and safe takeover after lease expiry.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+    - GWC runtime maintainers
+    - SCRUM-110 crash/replay integration lane
+scope:
+  in_scope:
+    - Add a provider-neutral in-memory durable checkpoint runtime pilot.
+    - Add focused unit tests for CAS, lease, fencing, stale resume binding, and takeover behavior.
+    - Record task-scoped GWC gate artifacts for SCRUM-109.
+    - Add changelog evidence for the P2-I3 implementation lane.
+  non_goals:
+    - No scheduler, worker daemon, database adapter, migration, deployment, production configuration, credentials, or production data.
+    - No merge, auto-merge, release, runtime reload, force-push, branch deletion, or PR base change.
+constraints:
+  - Work must remain bounded to SCRUM-109 approved files/modules.
+  - Resume must bind to task, repository, base SHA, scope hash, and graph revision.
+  - Terminal success cannot be emitted when lease, checkpoint, and evidence disagree.
+assumptions:
+  - The first implementation can be in-memory and provider-neutral while preserving observable semantics for future SQLite/PostgreSQL adapters.
+  - SCRUM-108 bounded external-write integration will consume similar pending-action/readback semantics later.
+risks:
+  - id: RISK-1
+    description: Runtime-state behavior change could be over-broadened into scheduler or database work.
+    impact: medium
+    mitigation: Keep implementation pure, in-memory, and explicitly exclude scheduler/database/migration/deployment scope.
+  - id: RISK-2
+    description: Lease takeover could accidentally allow stale owner writes.
+    impact: high
+    mitigation: Tests assert fencing token increments after takeover and old owner writes fail closed.
+acceptance_criteria:
+  - id: AC-1
+    statement: Checkpoint CAS advances revision exactly once and rejects stale expected revisions without overwrite.
+    verifiable: true
+  - id: AC-2
+    statement: Active lease ownership and current fencing token are required before checkpoint mutation.
+    verifiable: true
+  - id: AC-3
+    statement: Resume rejects task/repository/SHA/scope/graph binding mismatch.
+    verifiable: true
+  - id: AC-4
+    statement: Safe takeover after lease expiry increments fencing token and prevents stale owner advancement.
+    verifiable: true
+  - id: AC-5
+    statement: Suspend or human-wait state records next action, gate, and pending action before waiting.
+    verifiable: true
+unresolved_questions: []
+status: READY
