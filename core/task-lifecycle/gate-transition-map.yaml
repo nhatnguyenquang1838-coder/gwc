@@ -42,11 +42,67 @@ rules:
   - outcome: VALIDATION_PASSED
     from_state: validation_running
     transition: VALIDATION_PASSED
-    expected_state: completed
+    expected_state: review_pending
+  - outcome: G3_REVIEW_PASSED
+    from_state: review_pending
+    transition: REVIEW_PASSED
+    expected_state: merge_pending
+  - outcome: PR_READY_FOR_REVIEW
+    from_state: review_pending
+    transition: MARK_READY_FOR_REVIEW
+    expected_state: merge_pending
   - outcome: VALIDATION_FAILED
     from_state: validation_running
     transition: VALIDATION_FAILED
     expected_state: pending_review
+  - outcome: MERGE_APPROVED
+    from_state: merge_pending
+    transition: APPROVE_MERGE
+    expected_state: merge_running
+  - outcome: MERGE_REJECTED
+    from_state: merge_pending
+    transition: REJECT_MERGE
+    expected_state: review_pending
+  - outcome: MERGED
+    from_state: merge_running
+    transition: MERGE_COMPLETED
+    expected_state: verification_running
+  - outcome: G5_STATUS_VERIFIED
+    from_state: verification_running
+    transition: STATUS_VERIFIED
+    expected_state: completed
+  - outcome: G5_MANUAL_ACTION_REQUIRED
+    from_state: verification_running
+    transition: REQUEST_DEPLOYMENT
+    expected_state: deployment_pending
+  - outcome: DEPLOY_APPROVED
+    from_state: deployment_pending
+    transition: APPROVE_DEPLOY
+    expected_state: deployment_running
+  - outcome: DEPLOY_REJECTED
+    from_state: deployment_pending
+    transition: REJECT_DEPLOY
+    expected_state: verification_running
+  - outcome: DEPLOY_COMPLETED
+    from_state: deployment_running
+    transition: DEPLOYMENT_COMPLETED
+    expected_state: verification_running
+  - outcome: G6_REQUIRED
+    from_state: verification_running
+    transition: REQUEST_PRODUCTION_OPERATION
+    expected_state: production_pending
+  - outcome: PRODUCTION_APPROVED
+    from_state: production_pending
+    transition: APPROVE_PRODUCTION_OPERATION
+    expected_state: production_running
+  - outcome: PRODUCTION_REJECTED
+    from_state: production_pending
+    transition: REJECT_PRODUCTION_OPERATION
+    expected_state: verification_running
+  - outcome: PRODUCTION_COMPLETED
+    from_state: production_running
+    transition: PRODUCTION_OPERATION_COMPLETED
+    expected_state: completed
   - outcome: BLOCKED
     from_state: ready
     transition: BLOCK
@@ -68,3 +124,4 @@ verification:
     - expected_state
     - observed_state
     - event_id_or_idempotency_key
+  readback_required: true

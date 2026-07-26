@@ -4,6 +4,12 @@
 
 This contract defines the read-only G5 status-verification runtime for GitHub Actions after a G4 merge. It turns the existing exact-SHA rule into an executable resolver, evidence bundle, and checkpoint protocol.
 
+The local implementation is split into `tools/resolve_g5_status.py`, which
+normalizes connector-provided candidates without making connector calls, and
+`tools/validate_g5_status.py`, which validates the resulting
+`schemas/g5-status-evidence.schema.json` artifact. The resolver is not a
+workflow runner and cannot create, merge, deploy, or reload anything.
+
 G5 CI verification is not a deployment authority. It never permits merge, deploy, release, publish, runtime reload, production configuration, credentials, secrets, migrations, or production-data operations.
 
 ## Scope
@@ -105,6 +111,11 @@ max_attempts: 20
 ```
 
 The checkpoint must be resumed against the same repository, task, gate, merge SHA, and scope hash. A resumed run may not silently switch to a newer commit or latest workflow run.
+
+If no exact-SHA run can be observed, the resolver must retain the discovery
+attempt and fallback list and classify the result as
+`CONNECTOR_OBSERVABILITY_INCOMPLETE`. It must never turn an empty result into
+`CI_PENDING` or select the latest green run by recency alone.
 
 ## Evidence bundle
 

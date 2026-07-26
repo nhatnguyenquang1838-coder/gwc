@@ -1,0 +1,63 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-26T05:56:22Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-103
+  base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Synchronized contract and validator extension
+    description: Reuse the existing lifecycle contracts, task-scoped artifact model, validators, G5 evidence surfaces, package/export tools, and regression tests; extend only the missing state, authority, workspace, and integrity behavior.
+    benefits:
+      - Smallest compatible change across existing mechanisms.
+      - Directly addresses the SCRUM-100 blocker register.
+      - Keeps Jira projection and GWC authority separate.
+    tradeoffs:
+      - Requires coordinated source, consumer, validator, test, and package updates.
+      - Exact G5 connector observability remains evidence-driven when provider surfaces are incomplete.
+    risks:
+      - Consumer drift if package metadata is not regenerated and checked.
+      - Authority regression if validator failures are not fail-closed.
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: governance-contract-implementation
+        description: Update lifecycle, G2/G3/G5, workspace, and projection contracts.
+        is_required: true
+      - skill_id: authority-validator-testing
+        description: Implement fail-closed action validation and regression coverage.
+        is_required: true
+      - skill_id: package-integrity-validation
+        description: Refresh and verify package manifests, checksums, bundle metadata, and reproducibility.
+        is_required: true
+  - id: OPT-2
+    title: Add a new runtime orchestration layer
+    description: Build a new service or adapter to own lifecycle transitions, connector action validation, durable checkpoints, and package publication.
+    benefits:
+      - Could centralize future runtime behavior.
+      - Could expose richer connector observability.
+    tradeoffs:
+      - Much larger blast radius and implementation surface.
+      - Conflicts with the current package-versus-runtime boundary and SCRUM-103 scope.
+    risks:
+      - Introduces architecture, deployment, credential, and production concerns.
+      - Delays the current blocker resolution.
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Documentation-only clarification
+    description: Update contracts and consumer instructions without implementing the missing action validator or integrity checks.
+    benefits:
+      - Lowest immediate code change.
+      - Fastest review path.
+    tradeoffs:
+      - Leaves the explicit validator and package blockers unresolved.
+      - Does not satisfy fail-closed or reproducibility acceptance criteria.
+    risks:
+      - Creates a false sense of enforcement and readiness.
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 reuses the repository-native mechanisms, closes the named SCRUM-103 blockers with the lowest compatible blast radius, and preserves G4/G5/G6 and production exclusions.
+decision_required: true
+status: READY

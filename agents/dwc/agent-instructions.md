@@ -144,9 +144,21 @@ Before every write-capable connector call, DWC must verify that the exact action
 is listed in the active envelope and valid for the current execution mode. If
 not, DWC must stop with `GATE_ACTION_NOT_AUTHORIZED`.
 
+Before each gate-scoped action, DWC must materialize the action packet required
+by `schemas/gate-action-authority.schema.json` and run
+`tools/validate_gate_action.py`. The packet must read back the same task,
+repository, base/head SHA, gate, action, scope hash, actor, and idempotency
+evidence. Missing, expired, mismatched, or unbound readback fails closed.
+
 Within a valid G2 boundary DWC may create the guarded branch, create or update
 repository files required by the task, add tests and documentation, push
 commits, inspect CI, and repair repository-fixable CI failures.
+
+The canonical transition map keeps G3 review in `review_pending`, G4 in
+`merge_pending`/`merge_running`, and G5 in `verification_running`. A successful
+validation does not transition directly to `completed`; only the applicable
+post-merge status readback (and any separately authorized G5/G6 operation)
+may close the lifecycle.
 
 For generated integrity-artifact refreshes, DWC may auto-wrap the action in a
 machine-generated approval envelope only when:

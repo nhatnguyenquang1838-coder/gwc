@@ -1,0 +1,215 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-26T05:27:51Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+  protected_branches:
+    - main
+  connector: DWC
+  write_enabled: true
+constraints:
+  - 'Never write directly to main.'
+  - 'Jira MCP is the work-tracking source of truth for new GWC tasks; GWC gate artifacts remain authoritative for G0-G6 evidence and approvals.'
+  - 'Use the task-scoped artifact root .gwc/tasks/SCRUM-103/ for formal gate evidence.'
+  - 'Create a dedicated guarded branch/worktree from the verified protected base before any G2 repository write.'
+  - 'G4 merge, G5 deploy, and G6 production remain separate human-authority gates.'
+  - 'No merge, deploy, release, production configuration, credentials, secrets, migration, or production-data action is in scope for G0.'
+  - 'The local main checkout is dirty and is not an implementation checkout; do not use it for implementation.'
+  - 'GitHub main refresh was completed through the authenticated GitHub MCP after local SSH/DNS resolution failed. The verified local origin/main ref and implementation base are 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9.'
+applicable_policies:
+  - id: GWC-PROTECTED-BASE-AGENTS
+    path: AGENTS.md
+    ref: main
+    source_sha: 599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - id: GATE-LIFECYCLE-CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 0ebb556371c4b88cef1487488b54d3c0eecf7be83456b53633803bd257e9e7ec
+  - id: E2E-DRAFT-PR-DELIVERY
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: 3df7d8a647065d5d836fd26c8cafe6346b6820096b2891c3af479f1a4a633946
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: main
+    source_sha: f3bdff255483aa1c03f2a2061346e91417083b667d54e69138c94b8d6cf9cf83
+  - id: GWC-PROJECT-EXTENSION
+    path: projects/gwc/project-extension.md
+    ref: main
+    source_sha: d23ba7148409e3d2a9b420790a1c7d11d2523c9fc472fbc0d62aa5b230ccde2e
+  - id: CHATGPT-AGENT-INSTRUCTIONS
+    path: agents/chatgpt-agent/agent-instructions.md
+    ref: main
+    source_sha: 37cb998a3025b862e1384a570ccecc740d5d9634250afea1926bae331ec8fc42
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d
+  - path: core/Coding_Project_Governance_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 0ebb556371c4b88cef1487488b54d3c0eecf7be83456b53633803bd257e9e7ec
+  - path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 0d0001e1575edeb8f99fd93882f62add90b2aea38178140301a7274174e52501
+  - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 10dd851a670bf54a952cb736d64d2b3d06e134baec46cc50e7fc9f8e670dd215
+  - path: core/Agent_Response_Presentation_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: e95c7529c4bbee6bfbe18028eb780832803759d29e63a5e11fa2ab39de024f2a
+  - path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+    status: AVAILABLE
+    source_sha: 3df7d8a647065d5d836fd26c8cafe6346b6820096b2891c3af479f1a4a633946
+  - path: governance/instruction-source-registry.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: d0f60f49ebe1bb3ecdf6a829eaa9a28dd22fe2143fd53909c6f88923f023f600
+  - path: docs/project-consumer-agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: d497965ce43a73748f2b07a89a25efbd1a074605b4581138e5076b909def900e
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: f3bdff255483aa1c03f2a2061346e91417083b667d54e69138c94b8d6cf9cf83
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: d23ba7148409e3d2a9b420790a1c7d11d2523c9fc472fbc0d62aa5b230ccde2e
+  - path: projects/gwc/package.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 19c83b29bedb7070ecccc8adc689f81c3e9fbd92bb235ce3e3289dd3e197bc54
+  - path: agents/dwc/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 7060f8dee2af1d5ef4d954af479342b5a8cf203d1c07a43d02922509c656be42
+  - path: agents/dwc/capabilities.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: dbacc281112e523b7398353c26549bac2f3df83a305a6c75387d8f42e270bff4
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 37cb998a3025b862e1384a570ccecc740d5d9634250afea1926bae331ec8fc42
+  - path: README.md
+    required: true
+    status: AVAILABLE
+    source_sha: 102a66b1da55cc363788fc7aed667152b43897bf8911a94e677ac7ac077049bf
+  - path: catalog.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 54889727603280b5a62cf432caf273430dd3a489b26baa10709c9aa541ba2bd0
+  - path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e8
+  - path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 1304b7d9923b9e5805a0f42cf159a87dab4c6d76086467fc6929396893635fbc
+  - path: schemas/g0-context-snapshot.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 4d2e306e503a50b0aa5600146d020d636ffb7c7cefe18a0c6a3e623ca6fb52c5
+  - path: schemas/g01-runtime-input.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: e7fb3e1c682e61847a51adda6f90d2ae74cfbdc4332bb3b4b1113ba2cfc26193
+  - path: tools/generate_g01_runtime.py
+    required: true
+    status: AVAILABLE
+    source_sha: 4bc46989c951d32cdcbeeeaeede2b149f436942c38fa95fbc5ae5421c6641004
+  - path: tools/validate_g01.py
+    required: true
+    status: AVAILABLE
+    source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+  - path: .github/workflows/build-packages.yml
+    required: true
+    status: AVAILABLE
+    source_sha: 5a18c735b51d3dd5079f3c86e9c461bbf9b8dbc139b490242a66068cc0e45e94
+  - path: .github/workflows/publish-power.yml
+    required: true
+    status: AVAILABLE
+    source_sha: ce2d90112408744d035ceebcba7b575589882888e8e16e28db712da08a2bc6b0
+  - path: .github/workflows/publish-release.yml
+    required: true
+    status: AVAILABLE
+    source_sha: 673b9971e5b057c77306ccaa55eac415b73f62e9aad288c3ec06a1e8b49fb85f
+  - path: .github/workflows/validate-instructions.yml
+    required: true
+    status: AVAILABLE
+    source_sha: aeb32a3e84a972c5887afbe5eb22b1b949658006542aa91e0bf55a6e84b92325
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: codex-local-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: DWC
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+contextual_discovery:
+  historical_context:
+    - id: SCRUM-103
+      description: 'Jira task is In Progress, assigned to Nhat Nguyen Quang, and requests lifecycle alignment, connector action-authority validation, canonical task workspaces, G3 clarification, G2 strengthening, and package/integrity repair.'
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-103
+    - id: SCRUM-101
+      description: 'Completed prerequisite defining the DW SUPER APP source-of-truth and authority matrix; Jira readback confirms Done.'
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-101
+    - id: SCRUM-102
+      description: 'Completed prerequisite defining canonical node, scenario, profile, and history schemas; Jira readback confirms Done.'
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-102
+    - id: SCRUM-104
+      description: 'Downstream implementation task is blocked by SCRUM-103 and consumes the lifecycle, authority, workspace, and package contracts addressed here.'
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-104
+  downstream_impact:
+    - target: GWC lifecycle contracts and gate validators
+      impact_type: SCHEMA_CHANGE
+      description: 'G4/G5 semantics, connector action authority, task workspace binding, and G2 operational validation may change.'
+    - target: GWC project package and generated .governance consumers
+      impact_type: SCHEMA_CHANGE
+      description: 'Package declarations, integrity manifests, exports, and consumer validation must remain synchronized.'
+    - target: GWC agents, reviewers, and Jira work-tracking projection
+      impact_type: NON_BREAKING
+      description: 'Consumers need consistent task identity, gate state, evidence expectations, and Jira projection semantics.'
+  stakeholder_reach:
+    - persona: GWC implementer
+      impact: 'Needs a bounded, validator-backed task scope and a guarded execution handoff.'
+    - persona: GWC reviewer and maintainer
+      impact: 'Needs synchronized contracts, tests, package evidence, and exact-head delivery evidence.'
+    - persona: Downstream GWC package consumers
+      impact: 'Need deterministic, integrity-checked instruction and validator exports.'
+    - persona: Jira work-tracking owner
+      impact: 'Needs SCRUM-103 state and evidence projection kept separate from GWC gate authority.'
