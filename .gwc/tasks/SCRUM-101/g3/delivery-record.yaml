@@ -1,0 +1,118 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-101
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 319e611d1a318df8ec5eccd3210078652e01369d
+working_branch: docs/SCRUM-101-authority-matrix
+pull_request:
+  number: 98
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/98
+  draft: true
+head_sha: 7eec72681de79c8e3b2a53f68e562ce5ee77c4bb
+scope_hash: sha256:e2bfb8da5f6db539eb600df80bec690dc8f845d0117e3ce8a3cd7f2deae9ccfb
+changed_paths:
+  - .gwc/tasks/SCRUM-101/g2/execution-envelope.yaml
+  - docs/authority/dw-super-app-source-of-truth-authority-matrix.md
+  - tests/test_authority_matrix_contract.py
+validation:
+  head_sha: 7eec72681de79c8e3b2a53f68e562ce5ee77c4bb
+  status: pass
+  commands:
+    - command: GitHub Actions Validate instructions
+      result: pass
+      evidence: Validate instructions run 30173895030 completed successfully for reviewed head 7eec72681de79c8e3b2a53f68e562ce5ee77c4bb.
+    - command: GitHub Actions Build instruction packages
+      result: pass
+      evidence: Build instruction packages run 30173895022 completed successfully for reviewed head 7eec72681de79c8e3b2a53f68e562ce5ee77c4bb.
+    - command: G2 exact diff allowlist readback
+      result: pass
+      evidence: GitHub compare from base 319e611d1a318df8ec5eccd3210078652e01369d to reviewed head found 3 files, all inside the approved SCRUM-101 scope.
+review:
+  implementer_id: chatgpt-agent-primary
+  reviewer_id: chatgpt-agent-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 7eec72681de79c8e3b2a53f68e562ce5ee77c4bb
+  reviewed_scope_hash: sha256:e2bfb8da5f6db539eb600df80bec690dc8f845d0117e3ce8a3cd7f2deae9ccfb
+  reviewed_at: '2026-07-26T03:53:06Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Authority matrix covers DW SUPER APP source-of-truth ownership for product source, .kiro, .ua, .task-me, .bmad, .gwc, GitHub/CI, deployment state, Jira and Slack projection surfaces.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Matrix separates canonical authority, readers, mutators, projections and explicit denials without granting new runtime authority.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Changed executable surface is limited to a focused contract test; no runtime, deployment, secret or production path was changed.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - tests/test_authority_matrix_contract.py asserts projection boundaries, provider/consumer ownership and single-owner language.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope records approval id, scope hash, authorized paths and explicit G4/G5/G6/protected-main exclusions.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR 98 is open, mergeable and bound to the reviewed implementation head; no changed path is outside approved SCRUM-101 scope.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30173895030 and Build instruction packages run 30173895022 both completed successfully on the reviewed head.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Source-of-truth ownership is explicitly assigned across DW SUPER APP product, governance, generated knowledge, planning and projection surfaces.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Jira and Slack are declared projection-only and cannot grant GWC authority.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Provider-owned source is separated from consumer-owned runtime and generated data.
+    - id: AC-4
+      result: pass
+      evidence:
+        - Contract tests guard the critical authority matrix claims.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 7eec72681de79c8e3b2a53f68e562ce5ee77c4bb
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30173895030
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30173895022
+residual_risks:
+  - This G3 delivery record is an evidence-only commit after the reviewed implementation head; CI must pass again on the resulting PR head before Ready-for-review and G4 preparation.
+  - Review uses repository-defined fresh-context independence rather than an external human reviewer; G4 remains human-authorized.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass
