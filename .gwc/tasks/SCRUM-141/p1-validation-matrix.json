@@ -1,0 +1,100 @@
+{
+  "task": "SCRUM-141",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "9c79409052db73868cb76f4e04822fca07b2a0d7",
+  "ac2": "DEFERRED_BY_USER",
+  "acceptance_criteria": [
+    {
+      "id": "AC2",
+      "status": "DEFERRED_BY_USER",
+      "result": "Not checked in this pass.",
+      "severity": "none",
+      "evidence": ["user instruction"]
+    },
+    {
+      "id": "AC3",
+      "status": "PASS",
+      "result": "G0-G6 sequence and G3/G4/G5/G6 separation are proven by lifecycle contract and transition map.",
+      "severity": "none",
+      "evidence": ["core/GATE_LIFECYCLE_CONTRACT_v1.0.md", "core/task-lifecycle/gate-transition-map.yaml"]
+    },
+    {
+      "id": "AC4",
+      "status": "PASS",
+      "result": "Gate action authority validator exists and fail-closes by gate/action, scope hash, expiry, actor, repository, base/head SHA, and readback checks.",
+      "severity": "none",
+      "evidence": ["tools/validate_gate_action.py"]
+    },
+    {
+      "id": "AC5",
+      "status": "PASS_LOCAL",
+      "result": "Task-scoped workspace pattern is documented and SCRUM-141 workspace was materialized accordingly.",
+      "severity": "none",
+      "evidence": [".gwc/tasks/SCRUM-141/**"]
+    },
+    {
+      "id": "AC6",
+      "status": "WARNING",
+      "result": "Registry/schema foundation is largely implemented; standalone graph-revision schema is missing while runtime-graph.revision and routing-history.graph_revision exist. Needs G2 reconciliation.",
+      "severity": "warning",
+      "evidence": ["tools/node_architect/validate_runtime_registry.py", "schemas/runtime/runtime-graph.schema.json", "schemas/runtime/routing-history.schema.json", "schemas/runtime/graph-revision.schema.json: 404"]
+    },
+    {
+      "id": "AC7",
+      "status": "PASS_BY_REPO_EVIDENCE",
+      "result": "Runtime registry validator enforces exactly 81 slots, 4 canonical explicit nodes, 77 proposed slots, family coverage and provenance SHA checks; PR #102 reported validator PASS and 12 focused registry/v3 tests.",
+      "severity": "none",
+      "evidence": ["tools/node_architect/validate_runtime_registry.py", "PR #102"]
+    },
+    {
+      "id": "AC8",
+      "status": "PASS_BY_REPO_EVIDENCE",
+      "result": "V3 registry adapter is registry-backed and tests assert 81 retained nodes, inactive classes, visual-only non-runtime edges, and runtime route enumeration.",
+      "severity": "none",
+      "evidence": ["tools/node_architect/viewer/registry_adapter.py", "tests/test_v3_registry_adapter.py"]
+    },
+    {
+      "id": "AC9",
+      "status": "PASS_WITH_WARNING",
+      "result": "Package exports include GWC governance/runtime registry artifacts and validator entries; package version active. Remaining warning is graph-revision naming/export ambiguity.",
+      "severity": "warning",
+      "evidence": ["projects/gwc/package.yaml"]
+    },
+    {
+      "id": "AC10",
+      "status": "PASS",
+      "result": "Exact latest main SHA 9c79409052db73868cb76f4e04822fca07b2a0d7 has run-id fallback CI evidence: GitHub Actions run 30196137772 on main completed successfully, validate job succeeded, and artifact validation-evidence-30196137772 is attached to the same head SHA.",
+      "severity": "none",
+      "evidence": ["https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30196137772", "workflow_run.head_sha=9c79409052db73868cb76f4e04822fca07b2a0d7", "job validate: completed/success", "artifact 8630162434 digest sha256:0846ee094da54363c3ef67b0e9539831e68792e358a0d70031e28c36a3443d18"]
+    },
+    {
+      "id": "AC11",
+      "status": "READY_WITH_WARNINGS",
+      "result": "P2 can be unlocked with warning only after this SCRUM-141 evidence PR is merged and AC14 follow-up tracking is accepted. Remaining warning: graph-revision schema naming/export ambiguity.",
+      "severity": "warning",
+      "evidence": ["AC10 run-id fallback CI evidence PASS", "AC6 graph-revision reconciliation warning", "SCRUM-141 evidence PR required before canonical close-out"]
+    },
+    {
+      "id": "AC12",
+      "status": "PASS",
+      "result": "No unsupported authority escalation occurred in this session.",
+      "severity": "none",
+      "evidence": ["session operation log"]
+    },
+    {
+      "id": "AC14",
+      "status": "PASS_WITH_FOLLOWUP_REQUIRED",
+      "result": "Remaining graph-revision ambiguity is captured in p1-blocker-reconciliation.md as a follow-up work item. No silent repair is performed in this validation-only G2 scope.",
+      "severity": "warning",
+      "evidence": [".gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md", "follow-up key GWC-P1-FOLLOWUP-GRAPH-REVISION"]
+    }
+  ],
+  "ci_run_id": "30196137772",
+  "ci_url": "https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30196137772",
+  "ci_artifact": {
+    "id": "8630162434",
+    "digest": "sha256:0846ee094da54363c3ef67b0e9539831e68792e358a0d70031e28c36a3443d18",
+    "name": "validation-evidence-30196137772"
+  },
+  "updated_at": "2026-07-26T17:42:00+07:00"
+}

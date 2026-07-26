@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-26T17:42:00+07:00'
+trace: &trace
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-141
+  base_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Persist SCRUM-141 P1 validation evidence only
+  description: Commit G0/G1/G2 evidence and P1 validation outputs under .gwc/tasks/SCRUM-141 without implementing graph-revision repair.
+  benefits:
+  - Preserves validation evidence in the canonical repository workspace.
+  - Resolves exact-main CI evidence using run-id fallback.
+  - Avoids silent implementation changes outside validation scope.
+  tradeoffs:
+  - Leaves graph-revision naming/export ambiguity as a warning.
+  - Requires separate G3 approval for Draft PR.
+  risks:
+  - P2 should remain READY_WITH_WARNINGS until follow-up is accepted or implemented.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Implement graph-revision schema repair now
+  description: Add standalone graph-revision schema and package exports in the same lane.
+  benefits:
+  - Could remove the remaining graph-revision warning.
+  tradeoffs:
+  - Expands scope beyond evidence persistence.
+  risks:
+  - Would require a separate implementation plan, validator evidence, and G2/G3 approval.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 matches the approved G2 scope hash and avoids silent repair work outside .gwc/tasks/SCRUM-141/**.
+decision_required: true
+status: READY

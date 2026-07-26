@@ -1,0 +1,83 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T17:42:00+07:00'
+trace: &trace
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-141
+  base_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-141 needs GWC-related P1 close-out acceptance criteria validated and persisted as canonical task evidence.
+  why_now: The user supplied exact-main GitHub Actions run 30196137772 for GWC main and approved the G2 evidence update.
+desired_outcome: Persist G0/G1/G2 evidence and P1 validation outputs for GWC-related ACs, excluding AC2 per user direction.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC
+  - SCRUM-95
+  - SCRUM-141
+  - DW SUPER P2 planning
+scope:
+  in_scope:
+  - Validate G0-G6 lifecycle and G3/G4/G5/G6 separation.
+  - Validate gate-action authority behavior.
+  - Validate canonical .gwc/tasks/SCRUM-141 workspace evidence.
+  - Validate runtime registry, 81-node catalog, V3 adapter, package exports, and exact-main CI evidence.
+  - Persist SCRUM-141 P1 report, matrix, and blocker reconciliation.
+  non_goals:
+  - Do not validate AC2 in this pass.
+  - Do not mark PR ready for review without G3 approval.
+  - Do not merge, deploy, release, reload runtime, access credentials, or touch production data.
+constraints:
+- Scope is limited to .gwc/tasks/SCRUM-141/**.
+- G2 approval authorizes branch write only.
+- Jira and Slack remain projections.
+assumptions:
+- GitHub Actions run 30196137772 is accepted as run-id fallback evidence for exact main SHA 9c79409052db73868cb76f4e04822fca07b2a0d7.
+- Standalone graph-revision schema ambiguity remains a follow-up warning.
+risks:
+- id: RISK-1
+  description: Graph-revision naming/export ambiguity may block a clean P2 unlock.
+  impact: medium
+  mitigation: Track as GWC-P1-FOLLOWUP-GRAPH-REVISION.
+- id: RISK-2
+  description: Evidence branch still needs G3 PR review before merge.
+  impact: medium
+  mitigation: Stop after G2 and request separate G3 approval.
+acceptance_criteria:
+- id: AC-3
+  statement: G0-G6 lifecycle and G3/G4/G5/G6 separation are verified.
+  verifiable: true
+- id: AC-4
+  statement: Gate-action authority validation behavior is verified.
+  verifiable: true
+- id: AC-5
+  statement: Canonical task workspace evidence is persisted.
+  verifiable: true
+- id: AC-6
+  statement: Registry and graph-revision state are classified.
+  verifiable: true
+- id: AC-7
+  statement: 81-node catalog evidence is verified.
+  verifiable: true
+- id: AC-8
+  statement: V3 registry adapter evidence is verified.
+  verifiable: true
+- id: AC-9
+  statement: Package/export evidence is verified.
+  verifiable: true
+- id: AC-10
+  statement: Exact-main CI evidence is verified.
+  verifiable: true
+- id: AC-11
+  statement: P2 readiness decision is produced.
+  verifiable: true
+- id: AC-12
+  statement: Unsupported authority escalation is avoided.
+  verifiable: true
+- id: AC-14
+  statement: Remaining blockers are reconciled or tracked as follow-up.
+  verifiable: true
+unresolved_questions: []
+status: READY
