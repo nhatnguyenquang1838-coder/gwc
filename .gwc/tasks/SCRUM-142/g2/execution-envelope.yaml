@@ -1,0 +1,106 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+status: ACTIVE
+activation_state: APPROVED
+generated_at_utc: '2026-07-26T13:50:33Z'
+approval_id: APPROVE_G2_SCRUM_142_REVISIT_R2
+supersedes_approval_id: APPROVE_G2_SCRUM_142_UA_GRAPH_REFRESH
+task_id: SCRUM-142
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c855336dc17f20115e640516107999b08e9d783e
+working_branch: repair/scrum-142-canonical-ua-refresh-r2-20260726
+scope:
+  task_id: SCRUM-142
+  repository: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  working_branch: repair/scrum-142-canonical-ua-refresh-r2-20260726
+  files_write:
+  - .gwc/tasks/SCRUM-142/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-142/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-142/g2/approval-envelope.yaml
+  - .gwc/tasks/SCRUM-142/evidence/revisit-review.md
+  - .gwc/tasks/SCRUM-142/evidence/revisit-change-plan.md
+  - .gwc/tasks/SCRUM-142/evidence/revisit-flow.mmd
+  - .gwc/tasks/SCRUM-142/evidence/revisit-flow.svg
+  - .gwc/tasks/SCRUM-142/evidence/revisit-flow.png
+  - .gwc/tasks/SCRUM-142/evidence/g01-validator-r2.json
+  - .gwc/tasks/SCRUM-142/evidence/envelope-validation-r2.json
+  - .gwc/tasks/SCRUM-142/ua-refresh-report.md
+  - .ua/.understandignore
+  - .ua/config.json
+  - .ua/knowledge-graph.json
+  - .ua/meta.json
+  - .ua/gwc/graph-snapshot.json
+  - .ua/gwc/graph-summary.md
+  authorized_actions:
+  - claim_work_item
+  - update_work_item_status
+  - create_guarded_branch_from_exact_base
+  - modify_approved_files
+  - run_ua_skill_full_refresh
+  - run_sandboxed_validation
+  - create_commit
+  - push_working_branch
+  excluded_actions:
+  - direct_main_write
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge_approved_pr
+  - auto_merge
+  - deploy_approved_release
+  - release
+  - runtime_reload
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - migration_execution
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+  scope_version: 2
+scope_hash: sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b
+approval_envelope_ref: .gwc/tasks/SCRUM-142/g2/approval-envelope.yaml
+g1_validation_evidence: .gwc/tasks/SCRUM-142/evidence/g01-validator-r2.json
+expires_at_utc: '2026-07-27T13:50:33Z'
+approval_command: APPROVE_G2_SCRUM_142_REVISIT_R2 sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b
+  c855336dc17f20115e640516107999b08e9d783e 2026-07-27T13:50:33Z
+prerequisites:
+- id: G0_CONTEXT
+  status: READY
+  evidence: g0/context-snapshot.yaml
+- id: G1_VALIDATOR
+  status: PASS_EQUIVALENT_CURRENT_MAIN
+  evidence: evidence/g01-validator-r2.json
+- id: G1_DECISION
+  status: PASS
+  evidence: g1/decision/g1-decision-record.yaml
+- id: BASE_READBACK
+  status: PASS
+  evidence: c855336dc17f20115e640516107999b08e9d783e
+- id: PRIOR_WORK_REVIEW
+  status: PASS_WITH_REMEDIATION_REQUIRED
+  evidence: evidence/revisit-review.md
+- id: WORK_TRACKING_PROJECTION
+  status: RECORDED_IN_PROGRESS_NON_AUTHORITATIVE
+  evidence: Jira SCRUM-142 reopened to In Progress; comments 10207 and 10208
+activation_blockers: []
+invalidation_conditions:
+- current main SHA changes
+- scope hash changes
+- working branch changes
+- approval expires
+- approval command mismatch
+- UA outputs are not bound to approved base
+- out-of-scope file or action appears
+approval_received_at_utc: '2026-07-26T14:05:00Z'
+approval_source: current_chat_user
+approval_status: ACCEPTED_AND_REVALIDATED
+warning: This envelope is non-retroactive. It authorizes only the listed G2 branch and scoped writes. UA-generated outputs remain pending until a trusted UA runtime is available.
