@@ -1,10 +1,130 @@
-task_id: SCRUM-142
-run_id: g1-scrum-142-20260726-1945
-status: READY_LOCAL
-objective: Produce UA-compatible GWC knowledge graph snapshot for SCRUM-106 planning.
-base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
-requested_command: START_FASTLANE_GWC_UA_GRAPH_REFRESH_FOR_SCRUM_106
-non_goals:
-  - implement runtime behavior
-  - approve SCRUM-107 to SCRUM-110
-  - deploy or release
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T13:50:33Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-142
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-142 was merged and marked Done with non-canonical G0/G1 summaries,
+    no committed G2 execution envelope, no G3 delivery record, no G4 merge artifact,
+    no G5 post-merge evidence, and a graph snapshot generated before SCRUM-105 durable
+    runtime contracts merged.
+  why_now: The user explicitly requested a review, revisit, and regenerated envelope;
+    SCRUM-142 feeds active SCRUM-106 planning and stale graph provenance can misdirect
+    P2 implementation.
+desired_outcome: Create a validated, current-main remediation packet and approval-ready
+  G2 envelope for a fresh UA full refresh and canonical evidence repair, without retroactively
+  legitimizing prior actions.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC runtime maintainers
+  - SCRUM-106 scenario-matrix maintainers
+  - UA graph consumers
+  - governance auditors
+scope:
+  in_scope:
+  - Replace SCRUM-142 G0/G1 summaries with canonical validated artifacts.
+  - Add a current-main G2 execution and approval envelope for the repair lane.
+  - Run Understand-Anything --full from a trusted local checkout and refresh canonical
+    .ua outputs.
+  - Refresh .ua/gwc projection and SCRUM-142 report to include merged SCRUM-105 durable
+    runtime surfaces.
+  - Record an explicit non-retroactive review/remediation report and validator evidence.
+  non_goals:
+  - 'Do not rewrite history or claim the original PR #109 actions were authorized.'
+  - Do not change runtime behavior, schemas, validators, workflows or package contracts
+    except generated graph/evidence outputs.
+  - Do not create or update a Draft PR under G2; G3 remains separate.
+  - Do not merge, deploy, release, reload runtime, touch credentials, migrate data
+    or access production data.
+constraints:
+- Use current protected base main@c855336dc17f20115e640516107999b08e9d783e.
+- 'Follow the UA skill output convention: .ua/knowledge-graph.json and .ua/meta.json
+  are canonical.'
+- Preserve Jira and Slack as projections only; repository artifacts remain authoritative.
+- Stop and regenerate the envelope if main, scope, branch, expiry or scope hash changes.
+assumptions:
+- A trusted local agent with Node.js >=22 and pnpm >=10 can execute the UA skill.
+- 'PR #108 durable runtime contracts are present on current main and must appear in
+  refreshed graph outputs.'
+- 'Current G0/G1 validator behavior remains unchanged by PRs #108 and #109.'
+risks:
+- id: RISK-1
+  description: A cosmetic envelope-only repair would leave invalid G0/G1 and stale
+    graph content.
+  impact: high
+  mitigation: Repair canonical artifacts and graph outputs in one bounded branch.
+- id: RISK-2
+  description: Backfilled records could be mistaken for historical authorization.
+  impact: high
+  mitigation: Label all new evidence as remediation and non-retroactive; never fabricate
+    past G3/G4 approvals.
+- id: RISK-3
+  description: UA-generated graph may produce a large diff or unrelated churn.
+  impact: medium
+  mitigation: Use --full at exact base, review generated diff, keep only canonical
+    outputs and task projections.
+- id: RISK-4
+  description: Main may advance before approval.
+  impact: high
+  mitigation: Invalidate and regenerate on any base drift.
+acceptance_criteria:
+- id: AC-1
+  statement: All five SCRUM-142 G0/G1 artifacts conform to canonical schemas and validate
+    with zero issues.
+  verifiable: true
+- id: AC-2
+  statement: A new G2 envelope binds current main, exact repair branch, file scope,
+    actions, expiry and scope hash.
+  verifiable: true
+- id: AC-3
+  statement: The UA refresh uses the Understand-Anything skill workflow and emits
+    canonical .ua/knowledge-graph.json and .ua/meta.json.
+  verifiable: true
+- id: AC-4
+  statement: Graph outputs include SCRUM-105 durable store contract and six merged
+    runtime schema surfaces.
+  verifiable: true
+- id: AC-5
+  statement: The remediation report records prior missing G2/G3/G4/G5 evidence without
+    retroactive approval claims.
+  verifiable: true
+- id: AC-6
+  statement: No runtime behavior, merge, deploy, release, runtime reload or production
+    operation is included.
+  verifiable: true
+- id: AC-7
+  statement: Exact-head CI and independent G3 review are required after the repair
+    branch is pushed.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_ua_full_refresh
+  - run_sandboxed_validation
+  - push_working_branch
+  downstream_non_goals:
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY
