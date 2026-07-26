@@ -1,10 +1,50 @@
-task_id: SCRUM-142
-run_id: g1-scrum-142-20260726-1945
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-26T13:50:33Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-142
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
 options:
-  - id: local_ua_compatible_snapshot_only
-    status: selected_for_current_chat
-    rationale: Safe in chat_connector_only mode.
-  - id: persist_to_repo_branch
-    status: requires_g2_approval_and_validator_evidence
-    rationale: Repository mutation requires formal G2.
-selected: local_ua_compatible_snapshot_only
+- id: OPT-1
+  title: Canonical repair plus full UA refresh
+  description: Replace invalid gate artifacts, run the actual UA skill from current
+    main, refresh canonical and projected graph outputs, and persist a non-retroactive
+    audit report.
+  benefits:
+  - Closes the governance gap
+  - Removes stale K1 graph assumptions
+  - Produces canonical UA outputs
+  tradeoffs:
+  - Requires a new guarded branch and review cycle
+  - UA output may create a larger generated diff
+  risks:
+  - Generated graph churn must be reviewed
+  constraint_fit: FIT
+- id: OPT-2
+  title: Add only the missing G2 envelope
+  description: Commit a G2 file without replacing prior G0/G1 or graph outputs.
+  benefits:
+  - Smallest diff
+  tradeoffs:
+  - Leaves canonical validation and graph staleness unresolved
+  risks:
+  - Creates misleading appearance of repaired authority
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Accept prior merge and close review
+  description: Treat PR CI and Jira Done as sufficient evidence.
+  benefits:
+  - No repository work
+  tradeoffs:
+  - Contradicts AGENTS gate requirements and current graph truth
+  risks:
+  - Future tasks consume stale or unauditable evidence
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Only OPT-1 fixes both authority evidence and the stale graph
+  while preserving a bounded knowledge-only scope.
+decision_required: true
+status: READY
