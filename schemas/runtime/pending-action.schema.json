@@ -1,0 +1,50 @@
+{
+  "$id": "https://gwc.local/schemas/runtime/pending-action.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GWC Pending External Action",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "action_id",
+    "run_id",
+    "adapter_id",
+    "operation",
+    "idempotency_key",
+    "status",
+    "attempt_count",
+    "readback_required",
+    "readback_status",
+    "requested_at_utc",
+    "updated_at_utc"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "artifact_type": {"const": "pending-action"},
+    "action_id": {"type": "string", "pattern": "^act_[a-z0-9][a-z0-9._-]*$"},
+    "run_id": {"type": "string", "pattern": "^run_[a-z0-9][a-z0-9._-]*$"},
+    "adapter_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "operation": {"type": "string", "minLength": 1},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "status": {"enum": ["pending", "unknown", "reconciled", "succeeded", "failed", "cancelled"]},
+    "attempt_count": {"type": "integer", "minimum": 1},
+    "readback_required": {"const": true},
+    "readback_status": {"enum": ["pending", "confirmed", "rejected"]},
+    "external_reference": {"type": ["string", "null"]},
+    "readback_evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "last_error": {"type": ["string", "null"]},
+    "requested_at_utc": {"type": "string", "format": "date-time"},
+    "updated_at_utc": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"enum": ["succeeded", "reconciled"]}}},
+      "then": {"properties": {"readback_status": {"const": "confirmed"}, "readback_evidence_refs": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "unknown"}}},
+      "then": {"properties": {"readback_status": {"enum": ["pending", "confirmed"]}}}
+    }
+  ]
+}

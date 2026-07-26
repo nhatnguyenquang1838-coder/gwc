@@ -1,0 +1,52 @@
+{
+  "$id": "https://gwc.local/schemas/runtime/durable-event.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GWC Durable Runtime Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "event_id",
+    "run_id",
+    "sequence",
+    "event_type",
+    "occurred_at_utc",
+    "actor",
+    "gate",
+    "node_id",
+    "outcome",
+    "runtime_version",
+    "node_version",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "artifact_type": {"const": "durable-event"},
+    "event_id": {"type": "string", "pattern": "^evt_[a-z0-9][a-z0-9._-]*$"},
+    "run_id": {"type": "string", "pattern": "^run_[a-z0-9][a-z0-9._-]*$"},
+    "sequence": {"type": "integer", "minimum": 0},
+    "parent_event_id": {"type": ["string", "null"], "pattern": "^evt_[a-z0-9][a-z0-9._-]*$"},
+    "event_type": {"enum": ["run_started", "node_started", "node_completed", "side_effect_scheduled", "side_effect_completed", "side_effect_failed", "checkpoint_written", "lease_acquired", "lease_renewed", "lease_expired", "suspend_requested", "resume_requested", "readback_completed", "reconciliation_required", "gate_passed", "gate_failed", "run_completed", "run_failed"]},
+    "occurred_at_utc": {"type": "string", "format": "date-time"},
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {"enum": ["chatgpt", "dwc", "dw1", "kiro", "github_actions", "human", "node"]},
+        "id": {"type": "string", "minLength": 1},
+        "execution_mode": {"enum": ["chat_connector_only", "local_agent", "repo_ci", "external"]}
+      }
+    },
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "node_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "outcome": {"enum": ["pending", "success", "failure", "blocked", "unknown", "superseded", "expired", "rejected"]},
+    "runtime_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "node_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "checkpoint_revision": {"type": "integer", "minimum": 0},
+    "idempotency_key": {"type": ["string", "null"], "minLength": 1},
+    "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "payload": {"type": "object", "additionalProperties": true}
+  }
+}

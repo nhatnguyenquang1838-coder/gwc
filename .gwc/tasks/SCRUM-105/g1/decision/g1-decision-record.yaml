@@ -1,0 +1,52 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-26T12:36:07Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-105
+  base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-07-26T12:36:07Z'
+  source: user-requested-SCRUM-105-work
+  explicit: true
+rationale: Work the Jira task from the current protected main, but keep the implementation
+  contract-only and gated before repository writes.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+scope_hash: sha256:660244d9db20eed1493d5ff30f10950de477913104d0407286b172c4f2985fb1
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-105
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+  plan_root: /private/tmp/gwc-scrum-105-fastlane/plan
+  plan_revision: sha256:b60b3c196db9e4fb343fd50e7a1170e79235410e84e80aa6713ddee154a0d919
+  validation_evidence: headings, traceability, task dependency graph, and task/base
+    binding checked against KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md at protected base.

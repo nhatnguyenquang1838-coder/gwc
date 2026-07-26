@@ -227,6 +227,15 @@ instructions:
   - {id: scrum-104-decision-rule-schema, path: schemas/runtime/decision-rule.schema.json, target: .governance/schemas/runtime/decision-rule.schema.json, required: true}
   - {id: scrum-104-runtime-graph-schema, path: schemas/runtime/runtime-graph.schema.json, target: .governance/schemas/runtime/runtime-graph.schema.json, required: true}
   - {id: scrum-141-graph-revision-schema, path: schemas/runtime/graph-revision.schema.json, target: .governance/schemas/runtime/graph-revision.schema.json, required: true}
+  - {id: scrum-105-durable-run-schema, path: schemas/runtime/durable-run.schema.json, target: .governance/schemas/runtime/durable-run.schema.json, required: true}
+  - {id: scrum-105-durable-event-schema, path: schemas/runtime/durable-event.schema.json, target: .governance/schemas/runtime/durable-event.schema.json, required: true}
+  - {id: scrum-105-durable-checkpoint-schema, path: schemas/runtime/durable-checkpoint.schema.json, target: .governance/schemas/runtime/durable-checkpoint.schema.json, required: true}
+  - {id: scrum-105-pending-action-schema, path: schemas/runtime/pending-action.schema.json, target: .governance/schemas/runtime/pending-action.schema.json, required: true}
+  - {id: scrum-105-adapter-contract-schema, path: schemas/runtime/adapter-contract.schema.json, target: .governance/schemas/runtime/adapter-contract.schema.json, required: true}
+  - {id: scrum-105-storage-migration-schema, path: schemas/runtime/storage-migration.schema.json, target: .governance/schemas/runtime/storage-migration.schema.json, required: true}
+  - {id: scrum-105-durable-runtime-store-contract, path: core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md, target: .governance/core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md, required: true}
+  - {id: scrum-105-durable-runtime-contract-tests, path: tests/test_durable_runtime_contracts.py, target: .governance/tests/test_durable_runtime_contracts.py, required: true}
+  - {id: scrum-105-changelog-fragment, path: releases/changelog.d/2026-07-26-scrum-105-durable-runtime-contracts.md, target: .governance/releases/changelog.d/2026-07-26-scrum-105-durable-runtime-contracts.md, required: true}
   - {id: scrum-104-routing-history-schema, path: schemas/runtime/routing-history.schema.json, target: .governance/schemas/runtime/routing-history.schema.json, required: true}
   - {id: scrum-104-node-registry-schema, path: schemas/runtime/node-registry.schema.json, target: .governance/schemas/runtime/node-registry.schema.json, required: true}
   - {id: scrum-104-scenario-registry-schema, path: schemas/runtime/scenario-registry.schema.json, target: .governance/schemas/runtime/scenario-registry.schema.json, required: true}

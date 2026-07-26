@@ -1,0 +1,60 @@
+{
+  "$id": "https://gwc.local/schemas/runtime/durable-checkpoint.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GWC Durable Runtime Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "checkpoint_id",
+    "run_id",
+    "revision",
+    "cas",
+    "lease",
+    "current_node_id",
+    "current_node_version",
+    "next_node_id",
+    "next_action",
+    "gate",
+    "status",
+    "pending_action_ids",
+    "scope_hash",
+    "created_at_utc",
+    "updated_at_utc"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "artifact_type": {"const": "durable-checkpoint"},
+    "checkpoint_id": {"type": "string", "pattern": "^chk_[a-z0-9][a-z0-9._-]*$"},
+    "run_id": {"type": "string", "pattern": "^run_[a-z0-9][a-z0-9._-]*$"},
+    "revision": {"type": "integer", "minimum": 0},
+    "cas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_revision"],
+      "properties": {"expected_revision": {"type": "integer", "minimum": 0}}
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "expires_at_utc", "fencing_token"],
+      "properties": {
+        "owner": {"type": "string", "minLength": 1},
+        "expires_at_utc": {"type": "string", "format": "date-time"},
+        "fencing_token": {"type": "integer", "minimum": 1}
+      }
+    },
+    "current_node_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "current_node_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "next_node_id": {"type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "next_action": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "status": {"enum": ["running", "suspended", "pending_reconciliation", "completed", "failed", "blocked"]},
+    "pending_action_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^act_[a-z0-9][a-z0-9._-]*$"}},
+    "suspend_reason": {"type": ["string", "null"]},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "created_at_utc": {"type": "string", "format": "date-time"},
+    "updated_at_utc": {"type": "string", "format": "date-time"}
+  }
+}

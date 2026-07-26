@@ -1,0 +1,81 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-26T12:36:07Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+  protected_branches:
+  - main
+  connector: DWC
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: chatgpt
+  execution_mode: local_agent
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: DWC
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+constraints:
+- Reuse existing RUNTIME_KERNEL@0.1, runtime-event, checkpoint, transition-envelope,
+  node-pack, and runtime registry contracts.
+- Preserve provider-neutral logical operations and fail closed on stale revision,
+  lease, fencing, version, or readback state.
+- Work only from protected main SHA 76644885f4b25cb49a2a34bfea0e2ede941caa01 on a
+  dedicated SCRUM-105 branch.
+- Keep G4_MERGE, G5_DEPLOY, and G6_PRODUCTION_DATA explicitly excluded.
+applicable_policies:
+- id: CODING_PROJECT_GOVERNANCE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main
+  source_sha: cc933fb641451a65d0deb82a5100c5e872c39fe23dfe4edf277792ee4be46043
+- id: AGENT_OPERATING_RUNTIME_CONTRACT
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: main
+  source_sha: 0d0001e1575edeb8f99fd93882f62add90b2aea38178140301a7274174e52501
+- id: KIRO_SPEC_DRIVEN_DELIVERY_RULE
+  path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  ref: main
+  source_sha: aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e8
+- id: GATE_G0_G1_OPERATIONAL_RUNBOOK
+  path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  ref: main
+  source_sha: 1304b7d9923b9e5805a0f42cf159a87dab4c6d76086467fc6929396893635fbc
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: f3bdff255483aa1c03f2a2061346e91417083b667d54e69138c94b8d6cf9cf83
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: d23ba7148409e3d2a9b420790a1c7d11d2523c9fc472fbc0d62aa5b230ccde2e
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 7f45852998ece250a35e296b94de49e086fa5c46e6348046d3ea277638f214cb
+status: READY
+blockers: []
