@@ -1,0 +1,118 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-26T07:23:37Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - Never write directly to protected main.
+  - SCRUM-103 remains unchanged; its merged commit is read-only predecessor evidence.
+  - G4 merge, G5 deploy, and G6 production remain separate human gates.
+  - No credentials, secrets, production data, production configuration, migration, release, or runtime reload.
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE-LIFECYCLE-CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 3730bd9e1e8e4cc2054bd90654dbcbea87d48588
+  - id: E2E-DRAFT-PR-DELIVERY
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: a41f2221c4242b0efc7a808a4f2121473945669b
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: main
+    source_sha: 7be8aa1f85f414db975c65cc6035494d61d65162
+  - id: GWC-G0-G1-RUNBOOK
+    path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    ref: main
+    source_sha: 47b4b59e22e9cc868e20f17b61580b27726ba106
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 7be8aa1f85f414db975c65cc6035494d61d65162
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: af302cda2ef0327e295e01911c09cd683f951385
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 47b898522bdf0becc78abafbf371181ef536cf2f
+  - path: agents/dwc/capabilities.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: f83d5b055e52b549e20261dee1e34d492b6f7a67
+  - path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md
+    required: true
+    status: AVAILABLE
+    source_sha: 05192d267055d106dd20d6df517aca505a4c7aa2
+  - path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+    required: true
+    status: AVAILABLE
+    source_sha: 3102379d5525ef822def867e621fe7a845a79fcf
+  - path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md
+    required: true
+    status: AVAILABLE
+    source_sha: 07f6332c70274d2eacb415521f1b4e9f093dc37d
+  - path: .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/task.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 3c3620b84b5f406c4dfcfe7fede83c1c68faad1c
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: codex-local-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+contextual_discovery:
+  historical_context:
+    - id: SCRUM-103-MERGED
+      description: SCRUM-103 merged as PR #101 with merge commit 43daebcffbd71cf0339c4de8c82d3c91db95be1d.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/101
+    - id: SCRUM-103-G5
+      description: Post-merge Validate instructions run 30191783257 succeeded.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30191783257
+  downstream_impact:
+    - target: SCRUM-96
+      impact_type: NON_BREAKING
+      description: SCRUM-104 is a predecessor for SCRUM-96.
+    - target: GWC-consumer-packages
+      impact_type: SCHEMA_CHANGE
+      description: Generated GWC consumer packages may require package and integrity readback.
+  stakeholder_reach:
+    - persona: Jira-assignee
+      impact: SCRUM-104 is assigned to Nhat Nguyen Quang.

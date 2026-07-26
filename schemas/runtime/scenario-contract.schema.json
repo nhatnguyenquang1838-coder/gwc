@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/scenario-contract.schema.json",
+  "title": "Canonical Runtime Scenario Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "version", "activation_facts", "facts_schema", "rules", "route_nodes", "edges", "green_targets", "human_boundaries", "evidence_refs", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-scenario"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "activation_facts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "facts_schema": {"type": "string", "minLength": 1},
+    "rules": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
+    "route_nodes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "edge_type", "runtime_executable", "provenance"],
+        "properties": {
+          "source": {"type": "string", "minLength": 1},
+          "target": {"type": "string", "minLength": 1},
+          "edge_type": {"enum": ["runtime", "visualization", "suggested_sequence", "human_authority", "blocked", "dependency"]},
+          "runtime_executable": {"type": "boolean"},
+          "provenance": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "green_targets": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "human_boundaries": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_sha", "source_status"],
+      "properties": {
+        "source_path": {"type": "string", "minLength": 1},
+        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "source_status": {"enum": ["canonical_explicit", "declared_scenario_space"]}
+      }
+    }
+  }
+}

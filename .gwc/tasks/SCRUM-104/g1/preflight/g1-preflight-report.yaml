@@ -1,0 +1,136 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-26T07:23:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-104
+  base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity, default branch and protected base are verified.
+    evidence:
+      - nhatnguyenquang1838-coder/gwc@main:43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  - id: PREDECESSOR_READBACK
+    status: PASS
+    code: DEPENDENCIES_SATISFIED
+    message: SCRUM-101, SCRUM-102 and SCRUM-103 are Done in Jira.
+    evidence:
+      - Jira SCRUM-104 issue-link readback
+  - id: PREDECESSOR_MERGE
+    status: PASS
+    code: MERGE_VERIFIED
+    message: SCRUM-103 PR #101 is merged at the protected main base.
+    evidence:
+      - GitHub PR #101 merge_commit_sha 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+      - GitHub Actions run 30191783257 conclusion success
+  - id: PLAN_READBACK
+    status: PASS
+    code: IMPLEMENTATION_PLAN_VERIFIED
+    message: The protected-base Kiro requirements, design and tasks files and SCRUM-104 task plan are available.
+    evidence:
+      - .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md
+      - .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+      - .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md
+      - .task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/implementation-plan.md
+process_readback:
+  process_id: governed-repository-delivery
+  terminal_outcome: guarded branch with validated scoped commit; Draft PR requires G3
+  required_sources:
+    - AGENTS.md
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+  route_steps:
+    - id: STEP-01
+      name: protected-base-readback
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: read
+      capability_required: repository_read
+      capability_status: VERIFIED
+      primary_route: GitHub connector
+      fallback_routes:
+        - DWC
+        - DW1
+      continuation: immediate
+      expected_evidence: Exact protected main SHA and required source paths.
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-02
+      name: formal-g0-g1-and-plan-validation
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: read
+      capability_required: validator_runner
+      capability_status: VERIFIED
+      primary_route: local tools/validate_g01.py
+      fallback_routes: []
+      continuation: immediate
+      expected_evidence: G0 READY, G1 PASS, G2 plan-read receipt and exact scope binding.
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-03
+      name: exact-human-g2-approval
+      gate: G2_EXECUTION
+      actor: human
+      action_class: approve
+      capability_required: human_approval
+      capability_status: VERIFIED
+      primary_route: current chat approval
+      fallback_routes: []
+      continuation: immediate
+      expected_evidence: APPROVE G2_EXECUTION APPROVE_G2_SCRUM104_20260726 0ba0a69d603c0dea 2026-07-27T07:16:58Z
+      bypass_eligibility: FORBIDDEN
+implementation_plan:
+  applicability: required
+  reason: Protected-base Kiro specification is the canonical implementation plan for SCRUM-104; the Task-Me package is supplemental evidence.
+  source: existing_kiro
+  task_me_applicable: false
+  task_me_available: true
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-104
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  plan_root: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry
+  requirements_path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md
+  design_path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+  tasks_path: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md
+  plan_revision: sha256:07f6332c70274d2eacb415521f1b4e9f093dc37d
+  validation_status: PASS
+  validation_evidence: GitHub protected-base readback of requirements, design and tasks at 43daebcffbd71cf0339c4de8c82d3c91db95be1d.
+  generated_by: codex-local-agent
+  generated_at_utc: '2026-07-26T07:23:37Z'
+runtime_context:
+  agent_runtime_id: codex-local-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

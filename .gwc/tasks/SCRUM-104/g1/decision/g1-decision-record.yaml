@@ -1,0 +1,84 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-26T07:23:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-104
+  base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: current-user
+  decided_at: '2026-07-26T07:16:58Z'
+  source: 'chat: APPROVE G2_EXECUTION APPROVE_G2_SCRUM104_20260726 0ba0a69d603c0dea 2026-07-27T07:16:58Z'
+  explicit: true
+rationale: Proceed with the bounded GWC-local contract-first registry and v3 adapter implementation after exact G2 approval; keep G4, G5 and G6 separate.
+rejected_option_ids:
+  - OPT-2
+  - OPT-3
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+  - AC-5
+  - AC-6
+  - AC-7
+scope_hash: sha256:0ba0a69d603c0deabefa504cdaacfe2ef7e8d86bdfdaf1ea828c2b82b1456a87
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Materialize registry schemas, source-backed data and 81-slot maturity/provenance records.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Implement cross-registry and runtime-versus-visual-edge validators with focused tests.
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-3
+      description: Implement the GWC-local data-driven v3 adapter and route/dimming tests.
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-4
+      description: Update package/export surfaces and run complete validation readback.
+      dependencies:
+        - SUB-TASK-2
+        - SUB-TASK-3
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: schema_design
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: validator_testing
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: v3_data_binding
+      agent_type: primary
+    - sub_task_id: SUB-TASK-4
+      skill_id: package_validation
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+    - SUB-TASK-4
+  summary: Single local-agent execution with validator checkpoints; no subagent or second-repository writes.
+implementation_plan_ref:
+  applicability: required
+  source: existing_kiro
+  canonical_task_uid: SCRUM-104
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  plan_root: .kiro/specs/GWC-P1-architecture-readiness-canonical-registry
+  plan_revision: sha256:07f6332c70274d2eacb415521f1b4e9f093dc37d
+  validation_evidence: GitHub protected-base readback of requirements, design and tasks at 43daebcffbd71cf0339c4de8c82d3c91db95be1d.

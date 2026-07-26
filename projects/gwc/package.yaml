@@ -221,6 +221,25 @@ instructions:
   - {id: runtime-catalog-taxonomy-validator, path: tools/node_architect/validate_runtime_catalog_taxonomy.py, target: .governance/tools/node_architect/validate_runtime_catalog_taxonomy.py, required: true}
   - {id: runtime-knowledge-graph-projector, path: tools/node_architect/project_runtime_knowledge_graph.py, target: .governance/tools/node_architect/project_runtime_knowledge_graph.py, required: true}
   - {id: scrum-75-g5-ci-kg-changelog-fragment, path: releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md, target: .governance/releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md, required: true}
+  - {id: scrum-104-node-contract-schema, path: schemas/runtime/node-contract.schema.json, target: .governance/schemas/runtime/node-contract.schema.json, required: true}
+  - {id: scrum-104-scenario-contract-schema, path: schemas/runtime/scenario-contract.schema.json, target: .governance/schemas/runtime/scenario-contract.schema.json, required: true}
+  - {id: scrum-104-flow-profile-schema, path: schemas/runtime/flow-profile.schema.json, target: .governance/schemas/runtime/flow-profile.schema.json, required: true}
+  - {id: scrum-104-decision-rule-schema, path: schemas/runtime/decision-rule.schema.json, target: .governance/schemas/runtime/decision-rule.schema.json, required: true}
+  - {id: scrum-104-runtime-graph-schema, path: schemas/runtime/runtime-graph.schema.json, target: .governance/schemas/runtime/runtime-graph.schema.json, required: true}
+  - {id: scrum-104-routing-history-schema, path: schemas/runtime/routing-history.schema.json, target: .governance/schemas/runtime/routing-history.schema.json, required: true}
+  - {id: scrum-104-node-registry-schema, path: schemas/runtime/node-registry.schema.json, target: .governance/schemas/runtime/node-registry.schema.json, required: true}
+  - {id: scrum-104-scenario-registry-schema, path: schemas/runtime/scenario-registry.schema.json, target: .governance/schemas/runtime/scenario-registry.schema.json, required: true}
+  - {id: scrum-104-profile-registry-schema, path: schemas/runtime/profile-registry.schema.json, target: .governance/schemas/runtime/profile-registry.schema.json, required: true}
+  - {id: scrum-104-decision-rule-registry-schema, path: schemas/runtime/decision-rule-registry.schema.json, target: .governance/schemas/runtime/decision-rule-registry.schema.json, required: true}
+  - {id: scrum-104-node-registry, path: core/node-architect/node-registry.json, target: .governance/core/node-architect/node-registry.json, required: true}
+  - {id: scrum-104-scenario-registry, path: core/node-architect/scenario-registry.json, target: .governance/core/node-architect/scenario-registry.json, required: true}
+  - {id: scrum-104-profile-registry, path: core/node-architect/profile-registry.json, target: .governance/core/node-architect/profile-registry.json, required: true}
+  - {id: scrum-104-decision-rule-registry, path: core/node-architect/decision-rule-registry.json, target: .governance/core/node-architect/decision-rule-registry.json, required: true}
+  - {id: scrum-104-runtime-graph-registry, path: core/node-architect/runtime-graph-registry.json, target: .governance/core/node-architect/runtime-graph-registry.json, required: true}
+  - {id: scrum-104-runtime-registry-validator, path: tools/node_architect/validate_runtime_registry.py, target: .governance/tools/node_architect/validate_runtime_registry.py, required: true}
+  - {id: scrum-104-v3-registry-adapter, path: tools/node_architect/viewer/registry_adapter.py, target: .governance/tools/node_architect/viewer/registry_adapter.py, required: true}
+  - {id: scrum-104-v3-registry-adapter-readme, path: tools/node_architect/viewer/README.md, target: .governance/tools/node_architect/viewer/README.md, required: true}
+  - {id: scrum-104-changelog-fragment, path: releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md, target: .governance/releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md, required: true}
 delivery:
   mode: git-pr
   target_repository: nhatnguyenquang1838-coder/gwc

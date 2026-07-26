@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/decision-rule.schema.json",
+  "title": "Typed Runtime Decision Rule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "id", "version", "expression_type", "inputs", "operator", "evaluation_record", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "decision-rule"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "expression_type": {"enum": ["typed_presence", "typed_comparison", "typed_membership", "typed_transition"]},
+    "inputs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "operator": {"enum": ["present", "absent", "equals", "not_equals", "in", "not_in", "less_than", "greater_than", "transitioned_to"]},
+    "value": {},
+    "value_type": {"enum": ["boolean", "number", "string", "string_set", "status"]},
+    "evaluation_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_fields", "deterministic"],
+      "properties": {
+        "record_fields": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "deterministic": {"const": true}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_sha"],
+      "properties": {
+        "source_path": {"type": "string", "minLength": 1},
+        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"expression_type": {"const": "typed_presence"}}}, "then": {"properties": {"operator": {"enum": ["present", "absent"]}}}},
+    {"if": {"properties": {"expression_type": {"const": "typed_comparison"}}}, "then": {"required": ["value", "value_type"]}},
+    {"if": {"properties": {"expression_type": {"const": "typed_membership"}}}, "then": {"required": ["value", "value_type"]}},
+    {"if": {"properties": {"expression_type": {"const": "typed_transition"}}}, "then": {"required": ["value", "value_type"]}}
+  ]
+}

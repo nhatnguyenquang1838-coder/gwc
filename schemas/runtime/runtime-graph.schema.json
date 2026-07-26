@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/runtime-graph.schema.json",
+  "title": "Canonical Runtime Graph Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "graph_id", "revision", "nodes", "edges", "provenance"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-graph"},
+    "graph_id": {"type": "string", "minLength": 1},
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision_id", "parent_revision_id", "source_sha"],
+      "properties": {
+        "revision_id": {"type": "string", "minLength": 1},
+        "parent_revision_id": {"type": ["string", "null"]},
+        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "nodes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "target", "edge_type", "runtime_executable", "provenance"],
+        "properties": {
+          "source": {"type": "string", "minLength": 1},
+          "target": {"type": "string", "minLength": 1},
+          "edge_type": {"enum": ["runtime", "visualization", "suggested_sequence", "human_authority", "blocked", "dependency", "audit"]},
+          "runtime_executable": {"type": "boolean"},
+          "provenance": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_sha"],
+      "properties": {
+        "source_path": {"type": "string", "minLength": 1},
+        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

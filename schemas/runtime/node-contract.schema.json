@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/node-contract.schema.json",
+  "title": "Canonical Runtime Node Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "id",
+    "version",
+    "family",
+    "maturity",
+    "source_status",
+    "effect_class",
+    "authority_class",
+    "reversibility",
+    "idempotency",
+    "suspension",
+    "determinism",
+    "evidence_contract",
+    "implementation_refs",
+    "provenance",
+    "slot_review"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "runtime-node"},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "family": {"enum": ["intake_context", "gate_authority", "repo_delivery", "runtime_checkpoint", "validation_quality", "sync_projection", "package_export", "failure_recovery", "scale_control"]},
+    "maturity": {"enum": ["experimental", "candidate", "pilot", "stable", "deprecated", "retired"]},
+    "source_status": {"enum": ["canonical_explicit", "proposed_registry_slot"]},
+    "effect_class": {"enum": ["read_only", "local_write", "external_write", "destructive"]},
+    "authority_class": {"enum": ["automatic", "delegated", "human_required", "prohibited"]},
+    "reversibility": {"enum": ["reversible", "compensatable", "irreversible", "unknown"]},
+    "idempotency": {"enum": ["intrinsic", "key_required", "readback_required", "non_idempotent"]},
+    "suspension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suspendable", "resume_metadata"],
+      "properties": {
+        "suspendable": {"type": "boolean"},
+        "resume_metadata": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "determinism": {"enum": ["deterministic", "external_state_dependent", "human_decision_dependent"]},
+    "evidence_contract": {"type": "string", "minLength": 1},
+    "implementation_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_sha", "discovery_basis"],
+      "properties": {
+        "source_path": {"type": "string", "minLength": 1},
+        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "discovery_basis": {"type": "string", "minLength": 1}
+      }
+    },
+    "slot_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "rationale"],
+      "properties": {
+        "decision": {"enum": ["keep", "rename", "merge", "split", "reject", "defer"]},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
