@@ -1,0 +1,70 @@
+{
+  "artifact_type": "ua_compatible_gwc_knowledge_graph_snapshot",
+  "base_sha": "76644885f4b25cb49a2a34bfea0e2ede941caa01",
+  "default_branch": "main",
+  "generated_at": "2026-07-26T12:45:00Z",
+  "graph_edges": [
+    {"edge_type": "knowledge_refresh", "runtime_executable": false, "source": "ua.plugin_manifest", "target": "runtime.registry.graph"},
+    {"edge_type": "schema_ref", "runtime_executable": false, "source": "runtime.schema.runtime_graph", "target": "runtime.schema.graph_revision"},
+    {"edge_type": "registry_consistency", "runtime_executable": false, "source": "runtime.registry.graph", "target": "runtime.registry.nodes"},
+    {"edge_type": "scenario_route", "runtime_executable": false, "source": "runtime.registry.scenarios", "target": "runtime.registry.nodes"},
+    {"edge_type": "profile_ref", "runtime_executable": false, "source": "runtime.registry.profile", "target": "runtime.registry.scenarios"},
+    {"edge_type": "validates", "runtime_executable": false, "source": "validator.runtime_registry", "target": "runtime.registry.graph"},
+    {"edge_type": "exports", "runtime_executable": false, "source": "package.gwc_manifest", "target": "runtime.schema.runtime_graph"},
+    {"edge_type": "ci_runs", "runtime_executable": false, "source": "ci.validate_instructions", "target": "validator.runtime_registry"},
+    {"edge_type": "ci_packages", "runtime_executable": false, "source": "ci.build_packages", "target": "package.gwc_manifest"}
+  ],
+  "graph_nodes": [
+    {"id": "governance.agents_boot", "kind": "governance_contract", "p2_relevance": "authority and gate rules", "path": "AGENTS.md"},
+    {"id": "ua.plugin_manifest", "kind": "ua_source", "p2_relevance": "UA skill availability", "path": ".codex_plugins/understand-anything/plugin.json"},
+    {"id": "runtime.schema.runtime_graph", "kind": "schema", "p2_relevance": "runtime graph registry contract", "path": "schemas/runtime/runtime-graph.schema.json"},
+    {"id": "runtime.schema.graph_revision", "kind": "schema", "p2_relevance": "graph revision binding", "path": "schemas/runtime/graph-revision.schema.json"},
+    {"id": "runtime.registry.graph", "kind": "registry", "p2_relevance": "node-route runtime/visual edges", "path": "core/node-architect/runtime-graph-registry.json"},
+    {"id": "runtime.registry.scenarios", "kind": "registry", "p2_relevance": "existing scenario seed", "path": "core/node-architect/scenario-registry.json"},
+    {"id": "runtime.registry.profile", "kind": "registry", "p2_relevance": "pilot node/profile selection", "path": "core/node-architect/profile-registry.json"},
+    {"id": "runtime.registry.nodes", "kind": "registry", "p2_relevance": "81-node catalog", "path": "core/node-architect/node-registry.json"},
+    {"id": "validator.runtime_registry", "kind": "validator", "p2_relevance": "registry/schema/edge validation", "path": "tools/node_architect/validate_runtime_registry.py"},
+    {"id": "package.gwc_manifest", "kind": "package_manifest", "p2_relevance": "consumer export and runtime schema distribution", "path": "projects/gwc/package.yaml"},
+    {"id": "ci.validate_instructions", "kind": "ci_workflow", "p2_relevance": "post-merge validation", "path": ".github/workflows/validate-instructions.yml"},
+    {"id": "ci.build_packages", "kind": "ci_workflow", "p2_relevance": "package artifact validation", "path": ".github/workflows/build-packages.yml"}
+  ],
+  "observed_counts": {
+    "canonical_explicit_nodes_expected": 4,
+    "profile_pilot_nodes": 3,
+    "profile_registry_profiles": 1,
+    "proposed_registry_slots_expected": 77,
+    "runtime_graph_edges": 11,
+    "runtime_graph_nodes": 81,
+    "scenario_registry_declared_scenarios": 116,
+    "scenario_registry_materialized_scenarios": 3
+  },
+  "p2_implications": {
+    "SCRUM-105": [
+      "Runtime store/event/checkpoint contracts must be defined before I1-I4 implementation.",
+      "Graph revision schema is available and can anchor runtime graph snapshot identity."
+    ],
+    "SCRUM-106": [
+      "Do not rely only on existing scenario-registry: it has 3 materialized scenarios against 116 declared.",
+      "Use SCRUM-106 to define P2 vertical slice scenario matrix explicitly.",
+      "Existing profile pilots are read/checkpoint/validation oriented; bounded external write scenarios still need definition.",
+      "Failure recovery nodes exist in catalog; crash/recovery matrix should map stale checkpoint, lease expiry, duplicate worker, unknown write reconciliation, and timeout recovery."
+    ]
+  },
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "run_id": "g1-scrum-142-20260726-1945",
+  "schema_version": "0.1.0",
+  "stale_or_ambiguous_surfaces": [
+    {"impact": "repo artifact should not claim direct UA run without local UA engine evidence", "status": "adapter_present_but_engine_not_invoked_in_chat_runtime", "surface": "UA execution"},
+    {"impact": "3 materialized scenarios insufficient for P2 crash/recovery matrix", "status": "partial_seed", "surface": "scenario registry"},
+    {"impact": "SCRUM-106 must define timeout before/after side effect and duplicate-worker cases", "status": "not_materialized_as_P2_scenario", "surface": "bounded external write node"}
+  ],
+  "task_id": "SCRUM-142",
+  "ua_source": {
+    "plugin_name": "understand-anything",
+    "plugin_path": ".codex_plugins/understand-anything/plugin.json",
+    "plugin_version": "2.9.4",
+    "skills": ["understand", "understand-chat", "understand-dashboard", "understand-diff", "understand-domain", "understand-explain", "understand-figma", "understand-knowledge", "understand-onboard"],
+    "status": "repo_plugin_present_chat_connector_runtime_no_direct_ua_engine",
+    "temp_ignored_paths": [".ua/tmp/", ".ua/intermediate/"]
+  }
+}

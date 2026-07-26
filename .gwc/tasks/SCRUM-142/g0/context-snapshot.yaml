@@ -1,0 +1,21 @@
+task_id: SCRUM-142
+run_id: g1-scrum-142-20260726-1945
+status: READY_LOCAL
+execution_mode: chat_connector_only
+repository: nhatnguyenquang1838-coder/gwc
+default_branch: main
+base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+purpose: Refresh GWC knowledge graph using UA-compatible structural analysis before SCRUM-106.
+authority_boundary:
+  allowed_now:
+    - repository_read
+    - jira_projection_update
+    - local_artifact_generation
+  blocked_until_g2:
+    - repository_write
+    - branch_creation
+    - pull_request_creation
+blockers:
+  - code: UA_ENGINE_NOT_DIRECTLY_AVAILABLE_IN_CHAT
+    severity: warning
+    detail: Repo has understand-anything plugin manifest, but current ChatGPT runtime has no direct UA execution connector/local shell.

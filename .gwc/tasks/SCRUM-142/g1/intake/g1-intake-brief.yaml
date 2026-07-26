@@ -1,0 +1,10 @@
+task_id: SCRUM-142
+run_id: g1-scrum-142-20260726-1945
+status: READY_LOCAL
+objective: Produce UA-compatible GWC knowledge graph snapshot for SCRUM-106 planning.
+base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+requested_command: START_FASTLANE_GWC_UA_GRAPH_REFRESH_FOR_SCRUM_106
+non_goals:
+  - implement runtime behavior
+  - approve SCRUM-107 to SCRUM-110
+  - deploy or release
