@@ -1,15 +1,72 @@
-task_id: SCRUM-142
-run_id: g1-scrum-142-20260726-1945
-decision: PREPARE_G2_FOR_REPO_PERSISTENCE
-scope_hash: sha256:d95e1decbdf04dba0ad56edf92192ccd5953024cd21ea93599c01cc7acdb5126
-branch: fastlane/scrum-142-ua-graph-refresh-20260726
-base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
-write_scope:
-  - .ua/gwc/graph-snapshot.json
-  - .ua/gwc/graph-summary.md
-  - .gwc/tasks/SCRUM-142/ua-refresh-report.md
-  - .gwc/tasks/SCRUM-142/g0/context-snapshot.yaml
-  - .gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml
-  - .gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml
-  - .gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml
-  - .gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-26T13:50:33Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-142
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: current-user
+  decided_at: '2026-07-26T13:50:33Z'
+  source: 'chat: Review SCRUM-142, revisit work, regenerate envelope'
+  explicit: true
+rationale: The user explicitly requested a review and regenerated envelope. OPT-1
+  is required because an envelope-only patch would leave invalid G0/G1 and stale graph
+  provenance.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+scope_hash: sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Run full UA refresh at exact approved base and validate canonical
+      graph/meta outputs.
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Replace canonical G0/G1, graph projections and remediation report
+      in approved scope.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Run exact diff, G0/G1, graph and package-neutral validation before
+      push.
+    dependencies:
+    - SUB-TASK-2
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: understand-anything
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: gwc-g0-g1
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: governance-validation
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  summary: Run canonical UA first, then repair evidence and validate; G3 remains a
+    separate approval.
