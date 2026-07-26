@@ -37,7 +37,8 @@ class FastLaneJiraProjectionAfterG5Tests(unittest.TestCase):
             "names",
             "connector could not query",
             "push/main Actions runs",
-            "not connector-confirmed `PASS`",
+            "not",
+            "connector-confirmed `PASS`",
         ]
         for token in required_tokens:
             with self.subTest(token=token):
