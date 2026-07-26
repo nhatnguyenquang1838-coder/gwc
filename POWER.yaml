@@ -3,7 +3,7 @@ kind: PowerPackage
 metadata:
   id: gwc
   name: GWC
-  version: gwc-main-4-be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  version: gwc-main-5-776b6ac9558cdcc623fc1631b0036db24d4d7b73
   description: Curated G0/G1 governance skills and their verified offline dependencies.
 spec:
   entrypoints:
