@@ -1,0 +1,82 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-26T18:50:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - G2 is scoped to SCRUM-109 durable checkpoint/CAS/lease/resume only.
+  - No merge, deployment, release, credential, production configuration, production data, force-push, branch deletion, or PR base change authority.
+  - K1/SCRUM-105 durable runtime contracts and K2/SCRUM-106 scenario matrix are prerequisites.
+  - Jira and Slack are projections only; repository artifacts remain GWC evidence.
+applicable_policies:
+  - id: AGENTS
+    path: AGENTS.md
+    ref: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+    source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE-LIFECYCLE-CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+    source_sha: 3730bd9e1e8e4cc2054bd90654dbcbea87d48588
+  - id: E2E-DRAFT-PR-DELIVERY
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+    source_sha: a41f2221c4242b0efc7a808a4f2121473945669b
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 7be8aa1f85f414db975c65cc6035494d61d65162
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: af302cda2ef0327e295e01911c09cd683f951385
+  - path: core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+    required: true
+    status: AVAILABLE
+    source_sha: 83c2a6c1ad6fa43f255a5c830df574496acffc95
+  - path: .gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md
+    required: true
+    status: AVAILABLE
+    source_sha: 977d7c303e5447aab80113ce9dcf7aaa1ff92bb0
+  - path: Jira SCRUM-109
+    required: true
+    status: AVAILABLE
+    source_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: chatgpt-connector-session
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - agents/chatgpt-agent/agent-instructions.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
