@@ -1,0 +1,26 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+gate: G2_EXECUTION
+approved_at: 2026-07-26T18:31:00+07:00
+approval_command: "APPROVE_G2_GWC_P1_FOLLOWUP_GRAPH_REVISION sha256:64f644d85e589c8be01f510d3649553844333f3152ee10aa7676e930b087a127 c050ee6c30f007060d756642825de039af254c12 2026-07-27T10:15:00Z"
+base_sha: c050ee6c30f007060d756642825de039af254c12
+branch: codex/gwc-p1-followup-graph-revision-20260726
+scope_hash: sha256:64f644d85e589c8be01f510d3649553844333f3152ee10aa7676e930b087a127
+allowed_paths:
+  - .gwc/tasks/GWC-P1-FOLLOWUP-GRAPH-REVISION/**
+  - schemas/runtime/graph-revision.schema.json
+  - schemas/runtime/runtime-graph.schema.json
+  - projects/gwc/package.yaml
+  - tests/test_graph_revision_schema_contracts.py
+  - releases/changelog.d/2026-07-26-gwc-p1-followup-graph-revision.md
+excluded_actions:
+  - pull_request_create
+  - ready_for_review
+  - merge
+  - deploy
+  - release
+  - runtime_reload
+  - production_config
+  - credential_change
+  - migration
+  - production_data_access
+status: APPROVED_FOR_SCOPED_REPO_WRITE
