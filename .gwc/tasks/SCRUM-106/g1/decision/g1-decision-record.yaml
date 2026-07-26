@@ -1,0 +1,88 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-26T16:10:32Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-106
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-07-26T16:10:32Z'
+  source: 'chat: continue 106'
+  explicit: true
+rationale: The user explicitly instructed continuation of SCRUM-106. OPT-1 corrects the stale base, binds to merged SCRUM-105
+  contracts, carries SCRUM-142 as a qualified warning, and remains a knowledge-only lane.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+- AC-8
+- AC-9
+- AC-10
+scope_hash: sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Use the merged SCRUM-105 durable contracts as the canonical event/store/checkpoint/pending-action binding.
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Implement reusable B0-B5 crash injection harness and adapter fixtures.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Execute 27 scenarios for SQLite and PostgreSQL/Supabase adapters.
+    dependencies:
+    - SUB-TASK-2
+  - sub_task_id: SUB-TASK-4
+    description: Validate human takeover packets and negative authority paths.
+    dependencies:
+    - SUB-TASK-2
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: runtime_contract_binding
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: crash_replay_harness
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: adapter_conformance_testing
+    agent_type: validator
+  - sub_task_id: SUB-TASK-4
+    skill_id: human_takeover_audit
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Merged contract binding first, then deterministic harness and adapter conformance; this G1 decision grants no repository
+    execution.
+implementation_plan_ref:
+  applicability: not_applicable
+  source: plan_not_applicable
+  canonical_task_uid: SCRUM-106
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: c855336dc17f20115e640516107999b08e9d783e
+  plan_root: null
+  plan_revision: null
+  validation_evidence: null
