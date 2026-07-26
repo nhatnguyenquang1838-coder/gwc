@@ -1,0 +1,11 @@
+flowchart TD
+  A[Recover current main and SCRUM-142] --> B[Review PR 109 and merged artifacts]
+  B --> C{Canonical G0/G1 valid?}
+  C -- No --> D[Build canonical remediation packet]
+  D --> E[Run G0/G1 and envelope validation]
+  E --> F[Generate G2 approval envelope]
+  F --> G{Exact human approval?}
+  G -- Yes --> H[Create guarded repair branch]
+  H --> I[Persist governance and audit evidence]
+  I --> J[Run UA full refresh when trusted runtime is available]
+  J --> K[Separate G3 Draft PR approval]
