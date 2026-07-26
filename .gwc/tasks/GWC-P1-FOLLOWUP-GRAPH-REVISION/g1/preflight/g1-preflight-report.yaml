@@ -1,0 +1,20 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+run_id: g1-gwc-p1-followup-graph-revision-20260726-1825
+generated_at: 2026-07-26T18:25:00+07:00
+base_sha: c050ee6c30f007060d756642825de039af254c12
+finding:
+  status: WARNING_CONFIRMED
+  summary: >
+    Standalone graph revision schema is absent from package exports. Current
+    runtime-graph schema embeds a revision object, and routing-history stores a
+    graph_revision reference string. This is functionally usable but leaves the
+    revision contract unexported and duplicated.
+constraints:
+  - Do not change runtime graph payload shape beyond replacing inline revision object with an equivalent $ref.
+  - Do not change routing-history.graph_revision from string to object in this pass.
+  - Preserve validator behavior by keeping schema $id resolution compatible with validate_runtime_registry.py.
+  - Keep scope docs/schema/tests only; no runtime execution or production authority.
+g1_validator:
+  status: NOT_RUN
+  reason: chat_connector_only; exact repo validator cannot be claimed from local reasoning in this session.
+  mitigation: proposed schema was locally JSON-schema smoke validated and G2 approval is required before repo mutation.
