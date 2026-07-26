@@ -315,17 +315,23 @@ not support those filters or returns empty results. Empty PR-filtered results
 without run-id/artifact fallback evidence must be classified
 `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`. G5 checks those
 workflow/deployment statuses as read-only evidence and does not perform a
-separate deploy action. G5 approval is required only for manual deploy, redeploy,
-release, publish, or runtime reload. G6 is generated only when production data,
+separate deploy action. When a human confirms post-merge CI success from the
+GitHub UI because the connector cannot query push/main Actions, the agent may
+record `HUMAN_OBSERVED_CI_SUCCESS` with `connector_status:
+CONNECTOR_OBSERVABILITY_INCOMPLETE`; this is accepted G5 status evidence, not
+connector-confirmed `PASS`, and the limitation must remain visible in the final
+report. G5 approval is required only for manual deploy, redeploy, release,
+publish, or runtime reload. G6 is generated only when production data,
 production configuration, migrations, credentials, or secrets are actually in
 scope.
 
-### Work-tracking projection after G5 PASS
+### Work-tracking projection after G5 PASS or accepted human-observed success
 
-After read-only `G5_STATUS_VERIFY` reaches `PASS`, the agent must project the
-final gate state to the active work-tracking provider before declaring the scope
-fully reconciled. For `projects/gwc`, the active provider is Jira through the
-Atlassian connector declared by the project profile.
+After read-only `G5_STATUS_VERIFY` reaches `PASS`, or after accepted
+`HUMAN_OBSERVED_CI_SUCCESS` with `CONNECTOR_OBSERVABILITY_INCOMPLETE`, the agent
+must project the final gate state to the active work-tracking provider before
+declaring the scope fully reconciled. For `projects/gwc`, the active provider is
+Jira through the Atlassian connector declared by the project profile.
 
 The projection is traceability only. Jira, DS Admin, task-center, Confluence, or
 any external tool state never grants repository write, PR, merge, deploy,
@@ -335,8 +341,11 @@ GWC gate artifacts and exact approvals remain the authority source.
 The projection must attempt, in order:
 
 1. Add or update an audit comment on the active task containing the PR number,
-   merge SHA, G5 run or deployment evidence, gate outcomes, and explicit
-   exclusions.
+   merge SHA, G5 run or deployment evidence, gate outcomes, explicit exclusions,
+   and, when applicable, `evidence_source: human_observed_github_ui`,
+   `connector_status: CONNECTOR_OBSERVABILITY_INCOMPLETE`, required workflow
+   names, and the explicit limitation that the connector could not query
+   push/main Actions runs.
 2. Apply the legal provider transition that matches the final state, such as
    `Done` when the scope is complete, `In Review` when project review remains,
    or `In Progress` when downstream authorized work remains.

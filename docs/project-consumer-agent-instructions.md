@@ -145,13 +145,20 @@ Plain phrases such as `ok`, `approve`, `continue`, `go`, or `yes` are acknowledg
 G3 may create or update a Draft PR only. G4, G5, and G6 require separate human
 authority for the exact PR/release/environment/operation.
 
-After read-only G5 status verification passes, the agent must project the final
-state to the active work-tracking provider when the provider is configured. The
-projection must add/update an audit comment, apply the legal provider transition,
-read back status/comment/update evidence, and record that readback in the final
-report. If provider update or readback fails, report `JIRA_UPDATE_BLOCKED` or the
-provider-specific blocker code and keep the gate evidence honest. External task
-state is traceability only and never grants GWC authority.
+After read-only G5 status verification passes, or after accepted
+`HUMAN_OBSERVED_CI_SUCCESS` with `CONNECTOR_OBSERVABILITY_INCOMPLETE`, the agent
+must project the final state to the active work-tracking provider when the
+provider is configured. The projection must add/update an audit comment, apply
+the legal provider transition, read back status/comment/update evidence, and
+record that readback in the final report. When the evidence source is human
+observed because connector Actions lookup cannot query push/main workflow runs,
+the comment and final report must include `evidence_source:
+human_observed_github_ui`, `connector_status:
+CONNECTOR_OBSERVABILITY_INCOMPLETE`, exact merge SHA, required workflow names,
+and the connector limitation. If provider update or readback fails, report
+`JIRA_UPDATE_BLOCKED` or the provider-specific blocker code and keep the gate
+evidence honest. External task state is traceability only and never grants GWC
+authority.
 
 ## Project `AGENTS.md` minimum snippet
 
