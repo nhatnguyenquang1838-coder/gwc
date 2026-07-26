@@ -1,18 +1,212 @@
-task_id: SCRUM-142
-run_id: g1-scrum-142-20260726-1945
-status: READY_WITH_WARNINGS
-repo_evidence:
-  latest_main_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
-  ua_plugin_manifest: .codex_plugins/understand-anything/plugin.json
-  runtime_graph_schema: schemas/runtime/runtime-graph.schema.json
-  graph_revision_schema: schemas/runtime/graph-revision.schema.json
-  runtime_registry: core/node-architect/runtime-graph-registry.json
-  scenario_registry: core/node-architect/scenario-registry.json
-  profile_registry: core/node-architect/profile-registry.json
-risk:
-  - id: direct_ua_engine_unavailable
-    severity: warning
-    mitigation: persist graph as UA-compatible repo-derived snapshot, not direct UA engine output.
-  - id: scenario_registry_partial
-    severity: warning
-    mitigation: SCRUM-106 must expand scenario matrix before implementation.
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-26T13:50:33Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-142
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Current protected main and repository identity are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@c855336dc17f20115e640516107999b08e9d783e
+- id: TASK_READBACK
+  status: PASS
+  code: TASK_HISTORY_VERIFIED
+  message: SCRUM-142 history, Done status and links were recovered.
+  evidence:
+  - Jira SCRUM-142 updated 2026-07-26T20:32:56.161+0700
+- id: PR_REVIEW
+  status: PASS
+  code: PR109_REVIEWED
+  message: 'PR #109 diff, merge SHA, CI and review state were read back.'
+  evidence:
+  - 'PR #109 head 199689308dc63aa85c382e9ad32b2c4f2f5e7a42'
+  - merge c855336dc17f20115e640516107999b08e9d783e
+  - PR-head CI runs 30203988756 and 30203988763 success
+- id: CANONICAL_G01
+  status: PASS
+  code: PRIOR_G01_INVALID_REPAIR_READY
+  message: All five committed SCRUM-142 G0/G1 files are non-canonical summaries and
+    require replacement.
+  evidence:
+  - .gwc/tasks/SCRUM-142/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-142/g1/**
+- id: GATE_ARTIFACT_GAP
+  status: PASS
+  code: MISSING_GATE_ARTIFACTS_IDENTIFIED
+  message: Prior work lacks committed G2 execution envelope, G3 delivery record, G4
+    merge evidence and G5 post-merge evidence.
+  evidence:
+  - 'PR #109 changed exactly 8 files; none are under g2, g3, g4 or g5'
+- id: GRAPH_STALENESS
+  status: PASS
+  code: STALE_GRAPH_INPUT_IDENTIFIED
+  message: Graph was generated from 76644885 before SCRUM-105 merged durable runtime
+    contracts and is stale for SCRUM-106.
+  evidence:
+  - 'PR #108 merge 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf'
+  - core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+  - schemas/runtime/durable-*.schema.json
+- id: UA_SKILL_READBACK
+  status: PASS
+  code: UA_WORKFLOW_VERIFIED
+  message: Understand-Anything skill source and canonical output convention were read.
+  evidence:
+  - UA skill sha256:b09dcea9aa162902e291ef65123d056c5b77b1ca24a038ab57ab404de13422cb
+  - canonical outputs .ua/knowledge-graph.json and .ua/meta.json
+- id: REMEDIATION_SCOPE
+  status: PASS
+  code: BOUNDED_REPAIR_SCOPE_READY
+  message: The repair scope is knowledge/evidence-only and keeps G3-G6 actions separate.
+  evidence:
+  - sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b
+process_readback:
+  process_id: governed-scrum-142-non-retroactive-remediation
+  terminal_outcome: Approval-ready G2 repair envelope for canonical gate artifacts
+    and current UA graph refresh; no repository mutation yet.
+  required_sources:
+  - AGENTS.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - Jira SCRUM-142
+  - 'GitHub PR #109'
+  - Understand-Anything SKILL.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-01
+    name: current-main-task-and-pr-readback
+    gate: G0_CONTEXT
+    actor: agent
+    action_class: read
+    capability_required: github_and_jira_read
+    capability_status: VERIFIED
+    primary_route: GitHub + Atlassian connectors
+    fallback_routes: []
+    continuation: immediate
+    expected_evidence: 'Current main SHA, Jira history, PR #109 diff and merge evidence.'
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-02
+    name: canonical-g01-rebuild-and-validation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_validation
+    capability_required: python_yaml_jsonschema
+    capability_status: VERIFIED
+    primary_route: validate_g01.py in isolated packet
+    fallback_routes:
+    - trusted current checkout
+    - repo CI
+    continuation: immediate
+    expected_evidence: Zero-issue G0/G1 validator report and current-delta equivalence
+      record.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-03
+    name: exact-g2-envelope-generation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: governance_artifact_generation
+    capability_required: scope_hash_and_envelope_builder
+    capability_status: VERIFIED
+    primary_route: deterministic local packet builder
+    fallback_routes: []
+    continuation: stop_for_exact_human_approval
+    expected_evidence: Execution envelope, approval envelope, scope hash, expiry and
+      approval command.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-04
+    name: guarded-repair-branch
+    gate: G2_EXECUTION
+    actor: agent_or_human
+    action_class: repository_write
+    capability_required: guarded_branch_create
+    capability_status: VERIFIED
+    primary_route: GitHub connector or trusted local git
+    fallback_routes:
+    - human local git
+    continuation: checkpoint and exact ref readback
+    expected_evidence: Branch starts exactly at approved base SHA.
+    bypass_eligibility: OPERATIONAL_ONLY
+  - id: STEP-05
+    name: understand-anything-full-refresh
+    gate: G2_EXECUTION
+    actor: agent_or_human
+    action_class: local_generated_artifact_write
+    capability_required: ua_skill_node22_pnpm10
+    capability_status: VERIFIED
+    primary_route: /understand --full --language en in trusted local checkout
+    fallback_routes:
+    - human-operated UA local runner
+    continuation: complete all UA phases then validate graph and meta commit binding
+    expected_evidence: .ua/knowledge-graph.json, .ua/meta.json and phase completion
+      logs.
+    bypass_eligibility: OPERATIONAL_ONLY
+  - id: STEP-06
+    name: scoped-repair-write-and-validation
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: repository_write
+    capability_required: scoped_file_write_and_validation
+    capability_status: VERIFIED
+    primary_route: trusted local worktree or GitHub connector
+    fallback_routes: []
+    continuation: exact diff and validator readback
+    expected_evidence: Only approved paths changed; G0/G1, envelope, graph and audit
+      validation pass.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-07
+    name: draft-pr-and-exact-head-ci
+    gate: G3_PR
+    actor: agent_or_human
+    action_class: repository_metadata_write
+    capability_required: draft_pr_and_ci
+    capability_status: SEPARATE_GATE
+    primary_route: separate G3 approval
+    fallback_routes: []
+    continuation: stop at G3 authority boundary
+    expected_evidence: G3 delivery record, Draft PR, exact-head CI and independent
+      review.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-08
+    name: merge-and-post-merge-verification
+    gate: G4_MERGE
+    actor: human_authorized_agent
+    action_class: protected_action
+    capability_required: exact_g4_authority
+    capability_status: SEPARATE_GATE
+    primary_route: separate G4 approval followed by G5 read-only status verification
+    fallback_routes: []
+    continuation: stop at G4 authority boundary
+    expected_evidence: Exact PR head, merge SHA and post-merge CI evidence.
+    bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+runtime_context:
+  agent_runtime_id: chatgpt-connector-review
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
