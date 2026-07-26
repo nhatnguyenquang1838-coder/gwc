@@ -1,21 +1,121 @@
-task_id: SCRUM-142
-run_id: g1-scrum-142-20260726-1945
-status: READY_LOCAL
-execution_mode: chat_connector_only
-repository: nhatnguyenquang1838-coder/gwc
-default_branch: main
-base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
-purpose: Refresh GWC knowledge graph using UA-compatible structural analysis before SCRUM-106.
-authority_boundary:
-  allowed_now:
-    - repository_read
-    - jira_projection_update
-    - local_artifact_generation
-  blocked_until_g2:
-    - repository_write
-    - branch_creation
-    - pull_request_creation
-blockers:
-  - code: UA_ENGINE_NOT_DIRECTLY_AVAILABLE_IN_CHAT
-    severity: warning
-    detail: Repo has understand-anything plugin manifest, but current ChatGPT runtime has no direct UA execution connector/local shell.
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-26T13:50:33Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: chatgpt-connector-review
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+constraints:
+- 'This is a non-retroactive remediation; it must not represent the prior PR #109
+  merge as valid gate evidence.'
+- Generate and validate canonical G0/G1 artifacts before any new repository write.
+- Run the Understand-Anything skill from a trusted local checkout and write canonical
+  .ua outputs.
+- Refresh graph coverage against current main including merged SCRUM-105 durable runtime
+  contracts.
+- Keep Draft PR, ready-for-review, merge, deploy, release, runtime reload and production
+  operations in separate gates.
+applicable_policies:
+- id: CODING_PROJECT_GOVERNANCE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: c855336dc17f20115e640516107999b08e9d783e
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: c855336dc17f20115e640516107999b08e9d783e
+  source_sha: cc933fb641451a65d0deb82a5100c5e872c39fe23dfe4edf277792ee4be46043
+- id: E2E_DRAFT_PR_DELIVERY
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: c855336dc17f20115e640516107999b08e9d783e
+  source_sha: 3df7d8a647065d5d836fd26c8cafe6346b6820096b2891c3af479f1a4a633946
+- id: G0_G1_OPERATIONAL_RUNBOOK
+  path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  ref: c855336dc17f20115e640516107999b08e9d783e
+  source_sha: 1304b7d9923b9e5805a0f42cf159a87dab4c6d76086467fc6929396893635fbc
+- id: UA_UNDERSTAND_SKILL
+  path: uploaded-static-validation/ua/skills/understand-anything/SKILL.md
+  ref: uploaded-static-validation
+  source_sha: b09dcea9aa162902e291ef65123d056c5b77b1ca24a038ab57ab404de13422cb
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: f3bdff255483aa1c03f2a2061346e91417083b667d54e69138c94b8d6cf9cf83
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: d23ba7148409e3d2a9b420790a1c7d11d2523c9fc472fbc0d62aa5b230ccde2e
+- path: core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+  required: true
+  status: AVAILABLE
+  source_sha: 83c2a6c1ad6fa43f255a5c830df574496acffc95
+- path: 'GitHub PR #108 / merge 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf'
+  required: true
+  status: AVAILABLE
+  source_sha: 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf
+- path: 'GitHub PR #109 / merge c855336dc17f20115e640516107999b08e9d783e'
+  required: true
+  status: AVAILABLE
+  source_sha: c855336dc17f20115e640516107999b08e9d783e
+- path: Jira SCRUM-142 readback
+  required: true
+  status: AVAILABLE
+  source_sha: e2453514a1b56abdd7d61e453499950d5ed0e28b68c2d8a023d6b8ff778528d5
+- path: Understand-Anything skill source
+  required: true
+  status: AVAILABLE
+  source_sha: b09dcea9aa162902e291ef65123d056c5b77b1ca24a038ab57ab404de13422cb
+status: READY
+blockers: []
+contextual_discovery:
+  historical_context:
+  - id: PR-109
+    description: Merged graph packet created from stale base and missing canonical
+      downstream gate artifacts.
+    link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/109
+  - id: SCRUM-142
+    description: Jira is Done, but canonical repository evidence is incomplete and
+      contradictory.
+    link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-142
+  downstream_impact:
+  - target: SCRUM-106
+    impact_type: SCHEMA_CHANGE
+    description: Graph input must include merged SCRUM-105 durable runtime contracts
+      before scenario binding is treated as current.
+  stakeholder_reach:
+  - persona: GWC runtime maintainers
+    impact: Corrects graph provenance and gate authority evidence.
+  - persona: SCRUM-106 implementers
+    impact: Provides a current K1/K2 dependency view.
