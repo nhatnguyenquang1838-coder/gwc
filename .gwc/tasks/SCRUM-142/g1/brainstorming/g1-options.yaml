@@ -1,0 +1,10 @@
+task_id: SCRUM-142
+run_id: g1-scrum-142-20260726-1945
+options:
+  - id: local_ua_compatible_snapshot_only
+    status: selected_for_current_chat
+    rationale: Safe in chat_connector_only mode.
+  - id: persist_to_repo_branch
+    status: requires_g2_approval_and_validator_evidence
+    rationale: Repository mutation requires formal G2.
+selected: local_ua_compatible_snapshot_only
