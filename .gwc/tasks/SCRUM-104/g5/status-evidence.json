@@ -1,0 +1,39 @@
+{
+  "artifact_type": "g5-status-evidence",
+  "checkpoint_required": false,
+  "classification": "success",
+  "discovery": {
+    "exact_sha_lookup_attempted": true,
+    "fallbacks_attempted": ["known_run_id", "combined_commit_status"],
+    "method": "exact_push_lookup"
+  },
+  "g4_approval_id": "APPROVE_G4_SCRUM104_20260726",
+  "g4_scope_hash": "sha256:0ba0a69d603c0deabefa504cdaacfe2ef7e8d86bdfdaf1ea828c2b82b1456a87",
+  "gate": "G5_DEPLOY",
+  "generated_at": "2026-07-26T08:18:48Z",
+  "manual_action_authorized": false,
+  "merge_commit_sha": "b2ae40405ca98f12d3d46324da8fdfa5f9c30775",
+  "rejected_candidates": [],
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "required_workflows": ["Validate instructions"],
+  "schema_version": "1.0",
+  "selected_runs": [
+    {
+      "conclusion": "success",
+      "head_sha": "b2ae40405ca98f12d3d46324da8fdfa5f9c30775",
+      "jobs": [
+        {
+          "conclusion": "success",
+          "job_id": 89773159592,
+          "name": "validate",
+          "status": "completed"
+        }
+      ],
+      "run_attempt": 1,
+      "run_id": 30194384774,
+      "status": "completed",
+      "workflow": "Validate instructions"
+    }
+  ],
+  "task_id": "SCRUM-104"
+}
