@@ -1,0 +1,49 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-26T16:10:32Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-106
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Current-base normalized 27-scenario contract matrix
+  description: Preserve the 3×9 matrix and B0-B5 boundaries, rebind it to current main and the merged SCRUM-105 durable contracts,
+    and persist only task-owned knowledge artifacts after G2 approval.
+  benefits:
+  - Complete Jira-required coverage.
+  - Exact current validator closure.
+  - No runtime/schema/package blast radius.
+  - Portable deterministic adapter oracles.
+  tradeoffs:
+  - Runtime implementation and executable crash harness remain downstream.
+  risks:
+  - Logical event labels require disciplined projection to canonical durable-event fields.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Wait for a direct UA full scan before K2
+  description: Suspend SCRUM-106 until the SCRUM-142 direct-UA limitation is closed.
+  benefits:
+  - Adds richer structural graph evidence.
+  tradeoffs:
+  - Unnecessarily blocks the K2 knowledge lane and downstream tasks.
+  risks:
+  - Treats a supporting input as a hard authority dependency.
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Expand to full Cartesian runtime implementation
+  description: Add every adapter, provider and concurrency interleaving plus runtime code now.
+  benefits:
+  - Maximum theoretical coverage.
+  tradeoffs:
+  - Unbounded scope and mixes K2 contract work with implementation.
+  risks:
+  - Governance and maintainability failure.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 closes the stale-base and formal-validator gaps while using merged K1 contracts and preserving
+  all downstream authority boundaries.
+decision_required: true
+status: READY
