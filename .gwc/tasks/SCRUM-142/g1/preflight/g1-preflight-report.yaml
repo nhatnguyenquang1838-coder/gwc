@@ -1,0 +1,18 @@
+task_id: SCRUM-142
+run_id: g1-scrum-142-20260726-1945
+status: READY_WITH_WARNINGS
+repo_evidence:
+  latest_main_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+  ua_plugin_manifest: .codex_plugins/understand-anything/plugin.json
+  runtime_graph_schema: schemas/runtime/runtime-graph.schema.json
+  graph_revision_schema: schemas/runtime/graph-revision.schema.json
+  runtime_registry: core/node-architect/runtime-graph-registry.json
+  scenario_registry: core/node-architect/scenario-registry.json
+  profile_registry: core/node-architect/profile-registry.json
+risk:
+  - id: direct_ua_engine_unavailable
+    severity: warning
+    mitigation: persist graph as UA-compatible repo-derived snapshot, not direct UA engine output.
+  - id: scenario_registry_partial
+    severity: warning
+    mitigation: SCRUM-106 must expand scenario matrix before implementation.
