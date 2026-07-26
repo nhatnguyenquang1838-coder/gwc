@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-26T17:42:00+07:00'
+trace: &trace
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-141
+  base_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 9c79409052db73868cb76f4e04822fca07b2a0d7
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: CHK-LIFECYCLE
+  status: PASS
+  code: GWC_LIFECYCLE_SEPARATION
+  message: G0-G6 sequence and G3/G4/G5/G6 separation are represented in GWC lifecycle evidence.
+  evidence:
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/task-lifecycle/gate-transition-map.yaml
+- id: CHK-AUTHORITY
+  status: PASS
+  code: GWC_AUTHORITY_VALIDATOR
+  message: Gate-action validator fail-closes by gate/action, scope hash, expiry, repository, SHA, actor, and readback.
+  evidence:
+  - tools/validate_gate_action.py
+- id: CHK-WORKSPACE
+  status: PASS
+  code: GWC_TASK_WORKSPACE
+  message: SCRUM-141 evidence uses the canonical .gwc/tasks/<task-id>/ workspace.
+  evidence:
+  - .gwc/tasks/SCRUM-141/**
+- id: CHK-REGISTRY
+  status: PASS
+  code: GWC_RUNTIME_REGISTRY
+  message: Runtime registry validator covers 81 nodes, 4 explicit nodes, 77 proposed nodes, provenance, family coverage, and edge separation.
+  evidence:
+  - tools/node_architect/validate_runtime_registry.py
+  - core/node-architect/node-registry.json
+- id: CHK-V3
+  status: PASS
+  code: GWC_V3_BINDING
+  message: V3 registry adapter and tests keep registry-backed data separate from executable runtime behavior.
+  evidence:
+  - tools/node_architect/viewer/registry_adapter.py
+  - tests/test_v3_registry_adapter.py
+- id: CHK-GRAPH-REVISION
+  status: WARN
+  code: GWC_GRAPH_REVISION_RECONCILIATION
+  message: Standalone schemas/runtime/graph-revision.schema.json was not found; runtime-graph.revision and routing-history.graph_revision exist and need naming/export reconciliation.
+  evidence:
+  - schemas/runtime/runtime-graph.schema.json
+  - schemas/runtime/routing-history.schema.json
+  - GWC-P1-FOLLOWUP-GRAPH-REVISION
+- id: CHK-CI
+  status: PASS
+  code: GWC_EXACT_MAIN_CI_VERIFIED
+  message: Run-id fallback confirms GitHub Actions run 30196137772 completed successfully for main@9c79409052db73868cb76f4e04822fca07b2a0d7.
+  evidence:
+  - https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30196137772
+  - workflow_run.head_sha=9c79409052db73868cb76f4e04822fca07b2a0d7
+  - validate job completed/success
+  - artifact 8630162434 digest sha256:0846ee094da54363c3ef67b0e9539831e68792e358a0d70031e28c36a3443d18
+- id: CHK-AUTHORITY-SCOPE
+  status: PASS
+  code: NO_UNSUPPORTED_ESCALATION
+  message: This G2 write is limited to .gwc/tasks/SCRUM-141/** and excludes G3, G4, G5, and G6 authority.
+  evidence:
+  - g2/execution-envelope.yaml
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
