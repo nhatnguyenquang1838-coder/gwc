@@ -1,0 +1,72 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+generated_at: '2026-07-26T08:11:36Z'
+task_id: SCRUM-104
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+pr_number: 102
+pr_head_sha: b539774f900b379b3f1caa86f64880c61cd2eeba
+merge_commit_sha: b2ae40405ca98f12d3d46324da8fdfa5f9c30775
+approved_files:
+  - .github/workflows/validate-instructions.yml
+  - .gwc/tasks/SCRUM-104/**
+  - BUNDLE-REPORT.json
+  - SHA256SUMS.txt
+  - TREE.txt
+  - core/node-architect/decision-rule-registry.json
+  - core/node-architect/node-registry.json
+  - core/node-architect/profile-registry.json
+  - core/node-architect/runtime-graph-registry.json
+  - core/node-architect/scenario-registry.json
+  - projects/gwc/package.yaml
+  - releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md
+  - schemas/runtime/decision-rule-registry.schema.json
+  - schemas/runtime/decision-rule.schema.json
+  - schemas/runtime/flow-profile.schema.json
+  - schemas/runtime/node-contract.schema.json
+  - schemas/runtime/node-registry.schema.json
+  - schemas/runtime/profile-registry.schema.json
+  - schemas/runtime/routing-history.schema.json
+  - schemas/runtime/runtime-graph.schema.json
+  - schemas/runtime/scenario-contract.schema.json
+  - schemas/runtime/scenario-registry.schema.json
+  - tests/test_runtime_registry_validation.py
+  - tests/test_v3_registry_adapter.py
+  - tools/node_architect/validate_runtime_registry.py
+  - tools/node_architect/viewer/README.md
+  - tools/node_architect/viewer/registry_adapter.py
+authorized_actions:
+  - merge_pull_request
+excluded_actions:
+  - force_push
+  - change_pr_base
+  - auto_merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+g3_evidence_ref: .gwc/tasks/SCRUM-104/g3/delivery-record.yaml
+risk_class: R2
+scope_hash: sha256:0ba0a69d603c0deabefa504cdaacfe2ef7e8d86bdfdaf1ea828c2b82b1456a87
+approval_id: APPROVE_G4_SCRUM104_20260726
+approval_scope_hash_prefix: 0ba0a69d603c0dea
+issued_at: '2026-07-26T08:09:45Z'
+expires_at: '2026-07-27T08:09:45Z'
+approval_status: ACCEPTED
+pr_readback:
+  state: closed
+  merged: true
+  draft: false
+  base_ref: main
+  base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+  head_sha: b539774f900b379b3f1caa86f64880c61cd2eeba
+  merge_commit_sha: b2ae40405ca98f12d3d46324da8fdfa5f9c30775
+  required_ci:
+    - name: Validate instructions
+      status: success
+      run_id: 30194056574
+    - name: Build instruction packages
+      status: success
+      run_id: 30194056571
