@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-26T18:52:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-109
+  base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: K1-DONE
+    status: PASS
+    code: K1_DONE
+    message: SCRUM-105 durable runtime contracts are Done and available on protected base.
+    evidence:
+      - core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+  - id: K2-DONE
+    status: PASS
+    code: K2_DONE
+    message: SCRUM-106 scenario/crash-recovery matrix is Done and includes durable checkpoint scenarios.
+    evidence:
+      - .gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md
+  - id: SCOPE-BOUND
+    status: PASS
+    code: SCOPE_BOUND
+    message: Implementation scope is limited to provider-neutral runtime-state pilot, tests, GWC task artifacts, and changelog.
+    evidence:
+      - APPROVE CP-20260727-SCRUM-109-G2 5779d0be8def7b48
+  - id: EXCLUSIONS
+    status: PASS
+    code: EXCLUSIONS_RETAINED
+    message: Merge, deploy, release, production operations, credentials, force-push, branch deletion, and PR base change remain excluded.
+    evidence:
+      - projects/gwc/project-extension.md
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
