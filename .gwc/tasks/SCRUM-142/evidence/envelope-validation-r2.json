@@ -1,0 +1,8 @@
+{
+  "approval_command": "APPROVE_G2_SCRUM_142_REVISIT_R2 sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b c855336dc17f20115e640516107999b08e9d783e 2026-07-27T13:50:33Z",
+  "issues": [],
+  "outcome": "PASS",
+  "schema_source": "schemas/approval-envelope.schema.json@c855336dc17f20115e640516107999b08e9d783e",
+  "scope_hash": "sha256:fccfa84b02f6e178b4d14342759c7eebc5149f7c7ece4b5df3808f6cdee8620b",
+  "valid": true
+}
