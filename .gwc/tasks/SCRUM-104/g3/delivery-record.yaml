@@ -1,0 +1,184 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-104
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+working_branch: codex/scrum-104-canonical-registries-20260726
+pull_request:
+  number: 102
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/102
+  draft: true
+head_sha: fa7c158ce196e3d9e7024f194c3045e51dfd42b6
+scope_hash: sha256:0ba0a69d603c0deabefa504cdaacfe2ef7e8d86bdfdaf1ea828c2b82b1456a87
+changed_paths:
+  - .github/workflows/validate-instructions.yml
+  - .gwc/tasks/SCRUM-104/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-104/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-104/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-104/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-104/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-104/g2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-104/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-104/g2/plan-read-receipt.yaml
+  - BUNDLE-REPORT.json
+  - SHA256SUMS.txt
+  - TREE.txt
+  - core/node-architect/decision-rule-registry.json
+  - core/node-architect/node-registry.json
+  - core/node-architect/profile-registry.json
+  - core/node-architect/runtime-graph-registry.json
+  - core/node-architect/scenario-registry.json
+  - projects/gwc/package.yaml
+  - releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md
+  - schemas/runtime/decision-rule-registry.schema.json
+  - schemas/runtime/decision-rule.schema.json
+  - schemas/runtime/flow-profile.schema.json
+  - schemas/runtime/node-contract.schema.json
+  - schemas/runtime/node-registry.schema.json
+  - schemas/runtime/profile-registry.schema.json
+  - schemas/runtime/routing-history.schema.json
+  - schemas/runtime/runtime-graph.schema.json
+  - schemas/runtime/scenario-contract.schema.json
+  - schemas/runtime/scenario-registry.schema.json
+  - tests/test_runtime_registry_validation.py
+  - tests/test_v3_registry_adapter.py
+  - tools/node_architect/validate_runtime_registry.py
+  - tools/node_architect/viewer/README.md
+  - tools/node_architect/viewer/registry_adapter.py
+validation:
+  head_sha: fa7c158ce196e3d9e7024f194c3045e51dfd42b6
+  status: pass
+  commands:
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-104 --gate G2_EXECUTION --json
+      result: pass
+      evidence: G2 governance envelope and approval readback validated with no issues.
+    - command: python3 tools/node_architect/validate_runtime_registry.py --root .
+      result: pass
+      evidence: 81 nodes, 77 proposed slots, 4 explicit nodes, 116 declared scenarios, 3 materialized scenarios, 11 graph edges, and 1 profile passed cross-registry validation.
+    - command: python3 -m unittest tests/test_canonical_runtime_schema_contracts.py tests/test_runtime_registry_validation.py tests/test_v3_registry_adapter.py
+      result: pass
+      evidence: 12 focused registry, schema and v3 adapter tests passed.
+    - command: python3 -m unittest discover -s tests -p 'test_*.py'
+      result: pass
+      evidence: 310 governance tests passed with exit code 0; negative-fixture diagnostics were expected test output.
+    - command: PYTHONPYCACHEPREFIX=/tmp/gwc-scrum104-full-pycache python3 -m compileall -q tools
+      result: pass
+      evidence: Tool compilation completed with exit code 0.
+    - command: Draft 2020-12 runtime schema meta-validation
+      result: pass
+      evidence: 10 runtime schemas passed Draft 2020-12 schema validation.
+    - command: python3 tools/validate_instructions.py --project gwc
+      result: pass
+      evidence: Instruction repository validation passed.
+    - command: python3 tools/build_project_package.py gwc --output /tmp/gwc-scrum104-dist --clean
+      result: pass
+      evidence: GWC package 1.16.0 built with 236 files.
+    - command: python3 tools/verify_package_export_smoke.py --root . --source-ref codex/scrum-104-canonical-registries-20260726 --source-base-sha 43daebcffbd71cf0339c4de8c82d3c91db95be1d
+      result: pass
+      evidence: Package export smoke returned ok=true with 236 entries, 235 required and 0 skipped.
+    - command: python3 tools/hash_integrity_artifacts.py --verify --manifest SHA256SUMS.txt
+      result: pass
+      evidence: SHA256SUMS.txt verified 782 files.
+    - command: git diff --check 43daebcffbd71cf0339c4de8c82d3c91db95be1d..fa7c158ce196e3d9e7024f194c3045e51dfd42b6
+      result: pass
+      evidence: No whitespace errors in the scoped diff.
+review:
+  implementer_id: codex-local-agent
+  reviewer_id: codex-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: fa7c158ce196e3d9e7024f194c3045e51dfd42b6
+  reviewed_scope_hash: sha256:0ba0a69d603c0deabefa504cdaacfe2ef7e8d86bdfdaf1ea828c2b82b1456a87
+  reviewed_at: '2026-07-26T08:06:18Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - SCRUM-104 objective and six delivery acceptance themes are covered by the registry, validator, adapter, test, CI and export changes.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Canonical registries are external data sources; runtime/dependency edges remain executable while visualization, suggested-sequence and audit edges remain visual-only.
+        - The v3 adapter is renderer-neutral and keeps Cytoscape data binding separate from runtime execution.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Cross-registry validation enforces cardinality, provenance hashes, stable references, edge executability and profile references.
+        - Route enumeration uses only executable runtime/dependency edges and does not mutate registries.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Focused registry/schema/v3 tests and the full 310-test governance suite pass; compileall and schema meta-validation also pass.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope, scope hash, dedicated branch, exact base SHA, exclusions, integrity artifacts and Jira projection boundary are recorded.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR #102 is open against main with 34 changed files at the reviewed implementation head; no protected-main write, merge or ready-for-review transition occurred.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30193946481 and Build instruction packages run 30193946473 both completed successfully for the exact reviewed head.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Node registry materializes all 81 catalog slots with maturity and provenance; 4 are explicit source-backed nodes and 77 remain proposed non-stable slots.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Scenario registry preserves declared count 116 separately from 3 materialized scenarios and graph edge count 11.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Runtime graph and scenario edge checks reject executable visual scaffold edges and require resolved runtime endpoints.
+    - id: AC-4
+      result: pass
+      evidence:
+        - External v3 binding retains all 81 nodes, assigns inactive classes when filtered, preserves provenance and enumerates routes over runtime edges only.
+    - id: AC-5
+      result: pass
+      evidence:
+        - Focused/full tests, CI, package export smoke, schema validation and SHA256 integrity readback all pass.
+    - id: AC-6
+      result: pass
+      evidence:
+        - Scope and PR exclusions preserve runtime/consumer boundaries and separate G4 merge, G5 deploy and G6 production authority.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: fa7c158ce196e3d9e7024f194c3045e51dfd42b6
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30193946481
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30193946473
+residual_risks:
+  - The repository has no owned Cytoscape runtime; the delivered adapter is intentionally a renderer-neutral external data-binding boundary and requires the downstream v3 consumer to integrate it.
+  - The G3 record is an evidence-only commit after the reviewed implementation head; if that record commit changes the PR head, CI and review evidence must be refreshed for the final PR head before G3 closure.
+  - Jira remains a work-tracking projection; G4 merge, G5 deployment verification and G6 production authority remain separate.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass
