@@ -1,0 +1,80 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+status: ACTIVE
+activation_state: APPROVED
+generated_at_utc: '2026-07-27T01:29:00Z'
+approval_id: APPROVE_G2_SCRUM_108_20260727
+task_id: SCRUM-108
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+working_branch: knowledge/scrum-108-p2-bounded-external-write-node-20260727
+risk_class: R1
+scope_hash: sha256:3891d696e766bd4cf648019c0e0d027615a7bdd7b075532a356dce3aa91c5620
+scope:
+  task_id: SCRUM-108
+  repository: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  working_branch: knowledge/scrum-108-p2-bounded-external-write-node-20260727
+  files_write:
+    - runtime/**/*.py
+    - tests/runtime/**/*.py
+    - .gwc/tasks/SCRUM-108/**/*.yaml
+  authorized_actions: &id001
+    - create_guarded_branch_from_exact_base
+    - modify_approved_runtime_artifacts
+    - run_sandboxed_validation
+    - create_commit
+    - push_working_branch
+    - create_draft_pr
+  excluded_actions: &id002
+    - direct_main_write
+    - schema_or_validator_change
+    - workflow_change
+    - package_change
+    - merge
+    - auto_merge
+    - deploy
+    - release
+    - runtime_reload
+    - production_config_change
+    - credential_rotation
+    - migration_execution
+    - production_data_access
+    - force_push
+    - branch_deletion
+  authorized_actions: *id001
+  excluded_actions: *id002
+work_item:
+  provider: Atlassian Jira
+  id: SCRUM-108
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: In Progress
+g0_context_ref: g0/context-snapshot.yaml
+g1_decision_ref: g1/decision/g1-decision-record.yaml
+g1_validation_evidence: g1/decision/g1-decision-record.yaml
+expires_at_utc: '2026-07-28T01:29:00Z'
+approval_command: APPROVE G2 APPROVE_G2_SCRUM_108_20260727 sha256:3891d696e766bd4cf648019c0e0d027615a7bdd7b075532a356dce3aa91c5620 2026-07-28T01:29:00Z
+prerequisites:
+  - id: G0_CONTEXT
+    status: READY
+    evidence: g0/context-snapshot.yaml
+  - id: G1_ALIGNMENT
+    status: PASS
+    evidence: tools/validate_g01.py --workspace .gwc/tasks/SCRUM-108
+  - id: BASE_READBACK
+    status: PASS
+    evidence: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+invalidation_conditions:
+  - current main SHA changes
+  - scope hash changes
+  - working branch changes
+  - approval expires
+  - approval command mismatch
+warning: Exact G2 approval accepted. Authority remains limited to authorized_actions and approved SCRUM-108 paths; G3 PR remains separate.
+approval_received:
+  actor: user
+  received_at_utc: '2026-07-27T01:29:00Z'
+  base_sha_match: true

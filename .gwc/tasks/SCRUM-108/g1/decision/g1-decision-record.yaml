@@ -1,0 +1,86 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-27T01:29:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-07-27T01:29:00Z'
+  source: 'chat: implement SCRUM-108'
+  explicit: true
+rationale: The user requested implementation of SCRUM-108. OPT-1 delivers the bounded external-write node, pending-action state machine, adapter handshake, and unit tests within task scope.
+rejected_option_ids:
+  - OPT-2
+  - OPT-3
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+  - AC-5
+  - AC-6
+  - AC-7
+  - AC-8
+  - AC-9
+  - AC-10
+scope_hash: sha256:7aba695e002471b3d5cf51fdedf5bc3001b5fa8e26959920d46524f3d05a102f
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Implement SQLite-backed runtime store with events, checkpoints, pending actions, and lease/fencing.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Implement bounded external-write node with validation, connector call, readback, and idempotency.
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-3
+      description: Implement adapter handshake and request routing aligned with adapter-contract schema.
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-4
+      description: Add unit tests for store and node covering the 9 bounded-external-write scenarios.
+      dependencies:
+        - SUB-TASK-2
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: runtime_store_implementation
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: bounded_external_write_node
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: adapter_handshake
+      agent_type: primary
+    - sub_task_id: SUB-TASK-4
+      skill_id: runtime_testing
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+    - SUB-TASK-4
+  summary: Runtime store first, then node and adapter, then tests.
+implementation_plan_ref:
+  applicability: not_applicable
+  source: plan_not_applicable
+  canonical_task_uid: SCRUM-108
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  plan_root: null
+  plan_revision: null
+  validation_evidence: null

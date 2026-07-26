@@ -1,0 +1,162 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-27T01:29:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity and current protected main are verified.
+    evidence:
+      - nhatnguyenquang1838-coder/gwc@main:73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  - id: TASK_READBACK
+    status: PASS
+    code: TASK_VERIFIED
+    message: SCRUM-108 is a High-priority subtask of SCRUM-96 and defines the bounded external-write implementation lane.
+    evidence:
+      - Atlassian Jira SCRUM-108 readback
+  - id: K1_CONTRACT_BINDING
+    status: PASS
+    code: DURABLE_CONTRACTS_MERGED
+    message: SCRUM-105 durable run/event/checkpoint/pending-action/adapter contracts are merged and available on current main.
+    evidence:
+      - 'PR #108 merge 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf'
+      - core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+      - schemas/runtime/durable-event.schema.json
+      - schemas/runtime/durable-checkpoint.schema.json
+      - schemas/runtime/pending-action.schema.json
+  - id: K2_MATRIX_BINDING
+    status: PASS
+    code: SCENARIO_MATRIX_MERGED
+    message: SCRUM-106 crash/recovery scenario matrix is merged and provides the 9 bounded-external-write scenarios.
+    evidence:
+      - 'PR #111 merge be46a89'
+      - .gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md
+  - id: EXACT_STATE_NODE
+    status: PASS
+    code: REFERENCE_NODE_AVAILABLE
+    message: SCRUM-106 delivered exact-state capture node; bounded external-write node can follow the same pattern.
+    evidence:
+      - tools/node_architect/exact_state_capture.py
+      - tests/test_exact_state_capture.py
+  - id: CURRENT_VALIDATOR
+    status: PASS
+    code: EXACT_CURRENT_VALIDATOR_AVAILABLE
+    message: Exact current validator is locally available.
+    evidence:
+      - tools/validate_g01.py
+process_readback:
+  process_id: governed-scrum-108-bounded-external-write-implementation
+  terminal_outcome: Exact-current G0/G1 PASS and generation of an awaiting-approval G2 envelope for bounded external-write runtime artifacts.
+  required_sources:
+    - AGENTS.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    - SCRUM-108
+    - SCRUM-105 durable contracts
+    - SCRUM-106 scenario matrix
+    - tools/validate_g01.py
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+  route_steps:
+    - id: STEP-01
+      name: task-and-contract-readback
+      gate: G0_CONTEXT
+      actor: agent
+      action_class: read
+      capability_required: repository_and_jira_read
+      capability_status: VERIFIED
+      primary_route: GitHub + Atlassian connectors
+      fallback_routes: []
+      continuation: immediate
+      expected_evidence: Exact current main, Jira task and merged SCRUM-105/106 contract paths.
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-02
+      name: g0-g1-artifact-generation
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: local_artifact_generation
+      capability_required: local_workspace
+      capability_status: VERIFIED
+      primary_route: local task workspace
+      fallback_routes: []
+      continuation: immediate
+      expected_evidence: G0 snapshot and G1 intake/preflight/options/decision artifacts.
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-03
+      name: exact-current-g01-validation
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: local_validation
+      capability_required: python_jsonschema_validator
+      capability_status: VERIFIED
+      primary_route: exact current tools/validate_g01.py
+      fallback_routes: []
+      continuation: immediate
+      expected_evidence: Exit code 0 and zero-issue JSON report.
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-04
+      name: bounded-g2-envelope-generation
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: local_artifact_generation
+      capability_required: g2_envelope_render
+      capability_status: VERIFIED
+      primary_route: local governed artifact generation
+      fallback_routes: []
+      continuation: stop_at_exact_human_approval_boundary
+      expected_evidence: Awaiting-approval envelope bound to base, branch, scope hash and expiry.
+      bypass_eligibility: FORBIDDEN
+runtime_context:
+  agent_runtime_id: local_agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
+implementation_plan:
+  applicability: not_applicable
+  reason: SCRUM-108 is itself an implementation task. G1 artifacts define the bounded scope; implementation occurs under exact G2 approval.
+  source: plan_not_applicable
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-108
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  plan_root: null
+  requirements_path: null
+  design_path: null
+  tasks_path: null
+  plan_revision: null
+  validation_status: NOT_APPLICABLE
+  validation_evidence: null
+  generated_by: chatgpt-governed-g1
+  generated_at_utc: '2026-07-27T01:29:00Z'

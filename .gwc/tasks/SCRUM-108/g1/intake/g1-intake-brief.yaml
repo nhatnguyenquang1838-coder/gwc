@@ -1,0 +1,120 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-27T01:29:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The GWC runtime lacks an implementation of the bounded external-write node class. Without it, the P2-K2 crash/recovery matrix cannot be validated against live behavior, and the durable runtime store contracts remain unproven for connector mutations with intent-before-action, idempotency, and readback guarantees.
+  why_now: SCRUM-105 contracts and SCRUM-106 scenario matrix are merged. The bounded external-write lane is the next implementation step and runs in parallel with P2-I1 and P2-I3.
+desired_outcome: A bounded external-write runtime node that persists intent before action, binds idempotency keys, enforces exact scope, performs connector calls, reads back actual state, reconciles ambiguous timeouts, and prevents duplicate side effects. The node must satisfy the 9 bounded-external-write scenarios from SCRUM-106.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+    - GWC runtime maintainers
+    - SCRUM-106/107/108/109 implementers
+    - CI crash/replay harness maintainers
+    - SQLite and PostgreSQL/Supabase adapter implementers
+scope:
+  in_scope:
+    - Bounded external-write runtime node implementation
+    - Runtime store SQLite pilot adapter with event append, checkpoint CAS, lease/fencing, pending-action state machine
+    - Pending-action submit/claim/execute/succeed/fail/reconcile lifecycle
+    - Adapter handshake and request routing
+    - Idempotency key binding and duplicate-side-effect prevention
+    - Pre-action validation and exact scope enforcement
+    - Connector call with timeout handling
+    - Deterministic readback before terminal PASS
+    - Durable event emission for node lifecycle and side effects
+    - Validator and unit tests for the 9 bounded-external-write scenarios
+    - Package export updates for new runtime artifacts
+  non_goals:
+    - Implement runtime, store, worker, scheduler or connectors beyond bounded external-write scope.
+    - Modify durable runtime schemas or validators.
+    - Claim a direct UA engine run from any supporting snapshot.
+    - Create a branch or mutate the repository without exact G2 approval.
+    - Create a PR, merge, deploy, release, reload runtime or access production data.
+    - Guarantee exactly-once external effects without provider idempotency and readback.
+constraints:
+  - Bind to current protected main and merged SCRUM-105 contracts.
+  - No false PASS.
+  - Unknown write result must reconcile before retry.
+  - Every state advance uses CAS and active lease/fencing.
+  - Node must remain executable by a deterministic harness, not free-form prose only.
+  - SCRUM-105/106 provenance is required; no separate blocking dependency.
+assumptions:
+  - Pilot runtime begins with SQLite and retains migration compatibility to PostgreSQL/Supabase.
+  - External providers may return timeouts after applying an effect.
+  - Node identifiers are unique and stable per deployment.
+risks:
+  - id: RISK-1
+    description: Connector timeout may cause duplicate side effects if readback is skipped.
+    impact: high
+    mitigation: Pending action state machine and idempotency keys enforce single-effect semantics.
+  - id: RISK-2
+    description: Stale checkpoint or fencing token may allow unauthorized writes.
+    impact: medium
+    mitigation: CAS expected revision and fencing token checks are mandatory before every state advance.
+  - id: RISK-3
+    description: Ambiguous readback may be misclassified as success.
+    impact: medium
+    mitigation: Readback must return explicit confirmed/rejected/pending status; ambiguous states route to human resolution.
+acceptance_criteria:
+  - id: AC-1
+    statement: Bounded external-write node persists intent before connector call.
+    verifiable: true
+  - id: AC-2
+    statement: Idempotency key prevents duplicate side effects for the same run/operation.
+    verifiable: true
+  - id: AC-3
+    statement: Pre-action validation rejects writes outside exact scope before connector call.
+    verifiable: true
+  - id: AC-4
+    statement: Connector call is performed exactly once per successful validation.
+    verifiable: true
+  - id: AC-5
+    statement: Readback confirms actual external state before terminal PASS.
+    verifiable: true
+  - id: AC-6
+    statement: Ambiguous timeout or pending readback routes to human resolution.
+    verifiable: true
+  - id: AC-7
+    statement: "Pending action follows defined state machine: pending -> claimed -> executing -> succeeded/failed."
+    verifiable: true
+  - id: AC-8
+    statement: "All 9 SCRUM-106 bounded-external-write scenarios are covered by unit tests."
+    verifiable: true
+  - id: AC-9
+    statement: "Durable events are emitted for node_started, side_effect_completed, side_effect_failed, node_completed."
+    verifiable: true
+  - id: AC-10
+    statement: Package export includes new runtime artifacts.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - Generate local task artifacts
+    - Run exact current validator
+    - Prepare G2 approval envelope
+    - Create branch and worktree after G2 approval
+    - Write scoped runtime artifacts
+    - Run unit tests and validators
+    - Create Draft PR after G3 approval
+  downstream_non_goals:
+    - Repository write before G2 approval
+    - Draft PR before G3 approval
+    - Merge
+    - Deploy
+    - Release
+    - Production config or data
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+      - Exact branch head
+      - G0/G1 validation
+      - Complete approved-scope diff
+      - Required CI success
+unresolved_questions: []
+status: READY

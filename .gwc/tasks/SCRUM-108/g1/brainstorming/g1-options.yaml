@@ -1,0 +1,56 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-27T01:29:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Minimal bounded external-write node with SQLite pilot
+    description: >
+      Implement the bounded external-write node against the existing SCRUM-105
+      schemas and a new SQLite-backed runtime store pilot. Include pending-action
+      state machine, adapter handshake, and unit tests for the 9 scenarios.
+    benefits:
+      - Aligned with SCRUM-106 matrix and SCRUM-105 contracts.
+      - Minimal scope reduces review and rollback risk.
+      - SQLite pilot enables deterministic testing.
+    tradeoffs:
+      - PostgreSQL adapter is deferred.
+      - No live production validation in this lane.
+    risks:
+      - Connector timeout paths require careful readback handling.
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Full runtime store engine with PostgreSQL adapter skeleton
+    description: >
+      Implement both SQLite and PostgreSQL adapters, plus all three pilot nodes,
+      in a single change. This would exceed SCRUM-108 scope and overlap P2-I1/P2-I3.
+    benefits:
+      - More complete runtime surface in one PR.
+    tradeoffs:
+      - Exceeds SCRUM-108 bounded scope.
+      - High review complexity and blast radius.
+    risks:
+      - Conflicts with parallel P2-I1 and P2-I3 lanes.
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Contract-only bounded-write interface without implementation
+    description: >
+      Add only interfaces and schemas, deferring SQLite implementation to a follow-up task.
+    benefits:
+      - Lowest implementation risk.
+    tradeoffs:
+      - Does not satisfy SCRUM-108 implementation-lane requirement.
+    risks:
+      - SCRUM-106 scenarios remain unvalidated against live code.
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >
+  SCRUM-108 is an implementation lane. OPT-1 delivers the required node, pending-action
+  state machine, adapter handshake, and unit tests while remaining within task scope.
+decision_required: true
+status: READY

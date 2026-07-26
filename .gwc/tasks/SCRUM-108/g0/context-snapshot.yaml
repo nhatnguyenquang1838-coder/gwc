@@ -1,0 +1,122 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-27T01:29:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - G0/G1 remain read-only; repository mutation requires an exact G2 approval.
+  - SCRUM-105 durable runtime contracts are merged and are the canonical K2 binding.
+  - SCRUM-106 scenario matrix is merged and is the P2-K2 behavioral contract.
+  - SCRUM-108 is bounded to the bounded external-write node implementation only.
+  - Only task-owned runtime artifacts are proposed for G2; no protected-main write without approval.
+  - Slack and Jira are projections, not runtime or governance authority.
+  - G3, G4, G5 and G6 remain separate authority boundaries.
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE-LIFECYCLE-CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+    source_sha: 3730bd9e1e8e4cc2054bd90654dbcbea87d48588
+  - id: E2E-DRAFT-PR-DELIVERY
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+    source_sha: a41f2221c4242b0efc7a808a4f2121473945669b
+  - id: G0-G1-RUNBOOK
+    path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    ref: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+    source_sha: 47b4b59e22e9cc868e20f17b61580b27726ba106
+  - id: DURABLE-RUNTIME-STORE-CONTRACT
+    path: core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+    ref: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+    source_sha: 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: fafe4099ffc7c576ec05fa38be5dd1bb1670cddb
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 7be8aa1f85f414db975c65cc6035494d61d65162
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: af302cda2ef0327e295e01911c09cd683f951385
+  - path: core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+    required: true
+    status: AVAILABLE
+    source_sha: 0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf
+  - path: schemas/runtime/durable-event.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  - path: schemas/runtime/durable-checkpoint.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  - path: schemas/runtime/pending-action.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  - path: schemas/runtime/adapter-contract.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  - path: .gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md
+    required: true
+    status: AVAILABLE
+    source_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+  - path: .gwc/tasks/SCRUM-105/design.md
+    required: true
+    status: AVAILABLE
+    source_sha: 73794f7e8f64eefc9cf96aa3a24a1c19c5a2d21b
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: local_agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+contextual_discovery:
+  historical_context:
+    - id: SCRUM-105-MERGED
+      description: Durable runtime contract schemas are merged and canonical for K2 binding.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/108
+    - id: SCRUM-106-MERGED
+      description: Crash/recovery scenario matrix is merged and is the P2-K2 behavioral contract.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/111
+  downstream_impact:
+    - target: SCRUM-108
+      impact_type: NON_BREAKING
+      description: Bounded external-write node implementation requires these contracts and matrix.
+  stakeholder_reach:
+    - persona: GWC runtime maintainers
+      impact: Bounded external-write node is the first implementation proof of durable runtime contracts.
