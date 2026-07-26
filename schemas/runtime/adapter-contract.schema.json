@@ -1,0 +1,62 @@
+{
+  "$id": "https://gwc.local/schemas/runtime/adapter-contract.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GWC Node Adapter Request and Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "adapter_id", "adapter_version", "capabilities", "request", "result"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "artifact_type": {"const": "adapter-contract"},
+    "adapter_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "adapter_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side_effects", "idempotency", "readback"],
+      "properties": {
+        "side_effects": {"type": "boolean"},
+        "idempotency": {"const": true},
+        "readback": {"type": "boolean"}
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "checkpoint_id", "checkpoint_revision", "fencing_token", "node_id", "node_version", "gate", "idempotency_key", "payload"],
+      "properties": {
+        "run_id": {"type": "string", "pattern": "^run_[a-z0-9][a-z0-9._-]*$"},
+        "checkpoint_id": {"type": "string", "pattern": "^chk_[a-z0-9][a-z0-9._-]*$"},
+        "checkpoint_revision": {"type": "integer", "minimum": 0},
+        "fencing_token": {"type": "integer", "minimum": 1},
+        "node_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "node_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+        "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+        "idempotency_key": {"type": "string", "minLength": 1},
+        "payload": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "adapter_version", "readback_status", "evidence_refs"],
+      "properties": {
+        "outcome": {"enum": ["success", "blocked", "retryable_failure", "permanent_failure", "unknown_external_outcome", "version_mismatch", "fencing_rejected"]},
+        "adapter_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+        "readback_status": {"enum": ["not_required", "required", "confirmed", "rejected"]},
+        "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "error_code": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"capabilities": {"properties": {"side_effects": {"const": true}}}}},
+      "then": {"properties": {"capabilities": {"properties": {"readback": {"const": true}}}}}
+    },
+    {
+      "if": {"properties": {"result": {"properties": {"outcome": {"const": "success"}}}}},
+      "then": {"properties": {"result": {"properties": {"readback_status": {"enum": ["not_required", "confirmed"]}}}}}
+    }
+  ]
+}

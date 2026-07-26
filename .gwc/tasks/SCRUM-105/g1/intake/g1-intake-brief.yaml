@@ -1,0 +1,120 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T12:36:07Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-105
+  base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC has runtime kernel, event, checkpoint, transition, and node-pack
+    primitives but lacks one durable store contract connecting run state, append-only
+    events, CAS/lease/fencing, pending actions, adapter boundaries, and storage portability.
+  why_now: SCRUM-105 is the P2-K1 prerequisite for the read-only, bounded-write, and
+    durable-checkpoint runtime nodes.
+desired_outcome: Define and validate the durable runtime store, event, checkpoint,
+  pending-action/readback, node adapter, and SQLite-to-PostgreSQL/Supabase migration
+  contracts without implementing runtime execution or production operations.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC runtime maintainers
+  - P2-K1 node implementers
+  - package consumers
+scope:
+  in_scope:
+  - Add provider-neutral durable run, event, checkpoint, pending-action, adapter,
+    and storage-migration schemas under schemas/runtime.
+  - Add the durable runtime store contract under core/node-architect.
+  - Add targeted schema/invariant tests and package export entries.
+  - Add a release fragment documenting the contract-only change.
+  - Produce a guarded branch and Draft PR only after validation and G3 evidence.
+  non_goals:
+  - Implement a runtime loop, scheduler, worker, or database client.
+  - Execute SQLite, PostgreSQL, or Supabase migrations or access production data.
+  - Change production configuration, credentials, secrets, deploy, release, merge,
+    or auto-merge.
+  - Add new node catalog implementations beyond contract fixtures.
+constraints:
+- Reuse existing RUNTIME_KERNEL@0.1, runtime-event, checkpoint, transition-envelope,
+  node-pack, and runtime registry contracts.
+- Preserve provider-neutral logical operations and fail closed on stale revision,
+  lease, fencing, version, or readback state.
+- Work only from protected main SHA 76644885f4b25cb49a2a34bfea0e2ede941caa01 on a
+  dedicated SCRUM-105 branch.
+- Keep G4_MERGE, G5_DEPLOY, and G6_PRODUCTION_DATA explicitly excluded.
+assumptions:
+- Jira SCRUM-105 is the single active work item and is currently In Progress under
+  the configured Atlassian project.
+- The SQLite pilot and future PostgreSQL/Supabase implementations are design inputs
+  only; no live provider access is available or required.
+risks:
+- id: RISK-1
+  description: New durable schemas could diverge from existing node-architect runtime
+    primitives.
+  impact: high
+  mitigation: Reuse existing schemas, bind references in tests, and run all existing
+    runtime/package validators.
+- id: RISK-2
+  description: Migration wording could be misread as authorization for production
+    data changes.
+  impact: high
+  mitigation: Keep provider-neutral phases and explicit no-production-operation exclusions
+    in schema, docs, tests, and package metadata.
+- id: RISK-3
+  description: Unknown side-effect outcomes could be retried and duplicated.
+  impact: high
+  mitigation: Require pending-action persistence, stable idempotency, deterministic
+    readback, and fail-closed retry rules.
+acceptance_criteria:
+- id: AC-1
+  statement: Durable run, event, checkpoint, lease, and fencing schemas define exact
+    identity, revision, causal ordering, and append-only invariants.
+  verifiable: true
+- id: AC-2
+  statement: Pending-action and adapter schemas require stable idempotency, typed
+    unknown outcomes, readback evidence, capability/version checks, and no false PASS.
+  verifiable: true
+- id: AC-3
+  statement: The storage migration contract describes SQLite pilot to PostgreSQL/Supabase
+    compatibility, verification, rollback, and cutover evidence without authorizing
+    live migration.
+  verifiable: true
+- id: AC-4
+  statement: Targeted tests validate representative valid/rejected instances and cross-contract
+    CAS, lease, fencing, and reconciliation properties.
+  verifiable: true
+- id: AC-5
+  statement: The package manifest exports the approved contract artifacts and repository
+    validation passes with no scope drift.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-26T12:36:07Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-105
+  base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Contract-only vertical slice
+  description: Add provider-neutral durable schemas, store contract, tests, and package
+    traceability while deferring all runtime execution and migration code.
+  benefits:
+  - Matches SCRUM-105 scope
+  - Unblocks dependent node contracts
+  - Keeps production authority excluded
+  tradeoffs:
+  - Requires follow-up implementation tasks
+  - Does not prove live provider behavior
+  risks:
+  - Contract gaps may surface when node implementations begin
+  constraint_fit: FIT
+- id: OPT-2
+  title: Implement SQLite runtime now
+  description: Build a concrete SQLite store and runtime loop alongside the contracts.
+  benefits:
+  - Immediate executable prototype
+  tradeoffs:
+  - Expands beyond contract scope
+  - Couples design to one provider
+  risks:
+  - Migration and production-boundary confusion
+  - Larger unreviewed blast radius
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Design contracts in a new parallel runtime package
+  description: Create a second runtime schema and authority layer separate from existing
+    node-architect contracts.
+  benefits:
+  - Local conceptual isolation
+  tradeoffs:
+  - Duplicates existing primitives
+  - Increases package and compatibility drift
+  risks:
+  - Two competing sources of truth
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: The contract-only vertical slice is the smallest compatible
+  change that satisfies SCRUM-105 and unblocks P2 implementation while preserving
+  the existing Runtime Kernel and all G4-G6 exclusions.
+decision_required: true
+status: READY

@@ -1,0 +1,43 @@
+{
+  "$id": "https://gwc.local/schemas/runtime/storage-migration.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GWC Storage Migration Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "contract_version", "source_backend", "target_backend", "provider_neutral_operations", "phases", "rollback_required", "production_authorized", "cutover"],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "artifact_type": {"const": "storage-migration"},
+    "contract_version": {"type": "string", "pattern": "^\\d+\\.\\d+$"},
+    "source_backend": {"enum": ["sqlite_pilot"]},
+    "target_backend": {"enum": ["postgresql", "supabase"]},
+    "provider_neutral_operations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["append_event", "read_run", "read_events", "read_checkpoint", "cas_checkpoint", "acquire_lease", "renew_lease", "release_lease", "read_pending_action", "record_readback"]}},
+    "phases": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "purpose", "verification_required", "rollback_evidence"],
+        "properties": {
+          "id": {"enum": ["contract_freeze", "compatibility_probe", "backfill_verify", "dual_read_compare", "cutover_readback", "retire_pilot"]},
+          "purpose": {"type": "string", "minLength": 1},
+          "verification_required": {"const": true},
+          "rollback_evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "rollback_required": {"const": true},
+    "production_authorized": {"const": false},
+    "cutover": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requires_exact_readback", "requires_human_gate", "data_loss_tolerance"],
+      "properties": {
+        "requires_exact_readback": {"const": true},
+        "requires_human_gate": {"const": true},
+        "data_loss_tolerance": {"const": "zero"}
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+status: VERIFIED
+reader: codex-local-agent
+read_at_utc: '2026-07-26T12:40:00Z'
+task_id: SCRUM-105
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+canonical_task_uid: SCRUM-105
+base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+working_branch: codex/scrum-105-durable-runtime-contracts-20260726
+plan_root: /private/tmp/gwc-scrum-105-fastlane/plan
+plan_revision: sha256:b60b3c196db9e4fb343fd50e7a1170e79235410e84e80aa6713ddee154a0d919
+paths_read:
+  - /private/tmp/gwc-scrum-105-fastlane/plan/requirements.md
+  - /private/tmp/gwc-scrum-105-fastlane/plan/design.md
+  - /private/tmp/gwc-scrum-105-fastlane/plan/tasks.md
+file_sha256:
+  requirements.md: 7d3e50620fffc22474b53e46905291a752dafc4f0043a0efb0ba6d0df4ddb8ef
+  design.md: f1cb66c253d5b5232f15d3e58cc80acf60f9b01eebbe95df68e18498da23550c
+  tasks.md: eac0e7e3d0ee897b3e17c4757a8b56fb5180dbcae72af1f1a3ba75cf6f484b1a
+verification:
+  task_uid_matches: true
+  repository_matches: true
+  protected_base_matches: true
+  revision_matches: true
+  scope_matches_g1: true
+  unresolved_dependencies: []
+  result: VERIFIED
+scope_consistency: MATCH
+repository_state: MATCH

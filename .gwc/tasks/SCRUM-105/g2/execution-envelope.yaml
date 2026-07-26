@@ -1,0 +1,69 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+task_id: SCRUM-105
+approval_id: CP-20260726-001
+approval_request_id: scrum-105-g2-20260726-01
+authority_gate: G2_EXECUTION
+issued_at: '2026-07-26T12:36:07Z'
+expires_at: '2026-07-27T12:36:07Z'
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 76644885f4b25cb49a2a34bfea0e2ede941caa01
+working_branch: codex/scrum-105-durable-runtime-contracts-20260726
+modules_or_files:
+  - .gwc/tasks/SCRUM-105/**
+  - .kiro/specs/scrum-105-durable-runtime-contracts/requirements.md
+  - .kiro/specs/scrum-105-durable-runtime-contracts/design.md
+  - .kiro/specs/scrum-105-durable-runtime-contracts/tasks.md
+  - schemas/runtime/durable-run.schema.json
+  - schemas/runtime/durable-event.schema.json
+  - schemas/runtime/durable-checkpoint.schema.json
+  - schemas/runtime/pending-action.schema.json
+  - schemas/runtime/adapter-contract.schema.json
+  - schemas/runtime/storage-migration.schema.json
+  - core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md
+  - tests/test_durable_runtime_contracts.py
+  - projects/gwc/package.yaml
+  - releases/changelog.d/2026-07-26-scrum-105-durable-runtime-contracts.md
+authorized_actions:
+  - create_guarded_branch
+  - modify_approved_files
+  - run_sandboxed_validation
+  - create_commit
+excluded_actions:
+  - protected_branch_write
+  - push_working_branch
+  - open_or_update_draft_pr
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - migration_execution
+  - production_data_access
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+work_item:
+  provider: Atlassian Jira MCP
+  id: SCRUM-105
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: In Progress
+implementation_plan_ref:
+  source: generated_kiro
+  plan_root: .kiro/specs/scrum-105-durable-runtime-contracts
+  plan_revision: sha256:b60b3c196db9e4fb343fd50e7a1170e79235410e84e80aa6713ddee154a0d919
+  canonical_task_uid: SCRUM-105
+scope_hash: sha256:963ec355ad3940bb78edd9f7d08ad17a68813065b92b92babe5b1b0fce29ca38
+g1_decision_ref: .gwc/tasks/SCRUM-105/g1/decision/g1-decision-record.yaml
+g0_context_ref: .gwc/tasks/SCRUM-105/g0/context-snapshot.yaml
+notes:
+  - Exact G2 approval was received before scoped file writes.
+  - G3 push and Draft PR actions require a separate approval and remain excluded.
+  - G4 merge, G5 deploy/release, and G6 production data/configuration/credentials remain excluded.
