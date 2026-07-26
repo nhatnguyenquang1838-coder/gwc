@@ -226,6 +226,7 @@ instructions:
   - {id: scrum-104-flow-profile-schema, path: schemas/runtime/flow-profile.schema.json, target: .governance/schemas/runtime/flow-profile.schema.json, required: true}
   - {id: scrum-104-decision-rule-schema, path: schemas/runtime/decision-rule.schema.json, target: .governance/schemas/runtime/decision-rule.schema.json, required: true}
   - {id: scrum-104-runtime-graph-schema, path: schemas/runtime/runtime-graph.schema.json, target: .governance/schemas/runtime/runtime-graph.schema.json, required: true}
+  - {id: scrum-141-graph-revision-schema, path: schemas/runtime/graph-revision.schema.json, target: .governance/schemas/runtime/graph-revision.schema.json, required: true}
   - {id: scrum-104-routing-history-schema, path: schemas/runtime/routing-history.schema.json, target: .governance/schemas/runtime/routing-history.schema.json, required: true}
   - {id: scrum-104-node-registry-schema, path: schemas/runtime/node-registry.schema.json, target: .governance/schemas/runtime/node-registry.schema.json, required: true}
   - {id: scrum-104-scenario-registry-schema, path: schemas/runtime/scenario-registry.schema.json, target: .governance/schemas/runtime/scenario-registry.schema.json, required: true}

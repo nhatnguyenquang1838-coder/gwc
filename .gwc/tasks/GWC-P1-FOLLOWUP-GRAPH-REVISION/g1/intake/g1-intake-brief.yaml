@@ -1,0 +1,37 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+run_id: g1-gwc-p1-followup-graph-revision-20260726-1825
+generated_at: 2026-07-26T18:25:00+07:00
+request_type: docs
+source_instruction: REPO
+execution_mode: chat_connector_only
+risk_flags:
+  - schema
+required_reads:
+  - AGENTS.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - .gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md
+  - .gwc/tasks/SCRUM-141/p1-validation-matrix.json
+  - schemas/runtime/runtime-graph.schema.json
+  - schemas/runtime/routing-history.schema.json
+  - projects/gwc/package.yaml
+files_read:
+  - AGENTS.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - .gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md
+  - .gwc/tasks/SCRUM-141/p1-validation-matrix.json
+  - schemas/runtime/runtime-graph.schema.json
+  - schemas/runtime/routing-history.schema.json
+  - schemas/node-architect/runtime-graph.schema.json
+  - core/node-architect/runtime-graph-registry.json
+  - tools/node_architect/validate_runtime_registry.py
+  - .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+  - projects/gwc/package.yaml
+files_write_planned:
+  - schemas/runtime/graph-revision.schema.json
+  - schemas/runtime/runtime-graph.schema.json
+  - projects/gwc/package.yaml
+  - tests/test_graph_revision_schema_contracts.py
+  - releases/changelog.d/2026-07-26-gwc-p1-followup-graph-revision.md
+  - .gwc/tasks/GWC-P1-FOLLOWUP-GRAPH-REVISION/**
+gate_required: G2_EXECUTION
+next_action: ask_approval

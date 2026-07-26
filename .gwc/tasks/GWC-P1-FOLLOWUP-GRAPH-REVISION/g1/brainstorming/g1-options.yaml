@@ -1,0 +1,17 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+run_id: g1-gwc-p1-followup-graph-revision-20260726-1825
+generated_at: 2026-07-26T18:25:00+07:00
+options:
+  - id: A
+    title: Keep embedded revision only
+    result: reject
+    rationale: Keeps current behavior but does not close AC6/AC14 naming-export ambiguity.
+  - id: B
+    title: Add standalone runtime graph revision schema and ref it from runtime graph
+    result: selected
+    rationale: Minimal compatible fix; exports the contract and preserves current payload shape.
+  - id: C
+    title: Convert routing-history.graph_revision to full object
+    result: reject_for_now
+    rationale: Larger data model change; likely unnecessary and may break existing routing-history contract.
+selected_option: B

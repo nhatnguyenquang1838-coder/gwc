@@ -1,0 +1,21 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+run_id: g1-gwc-p1-followup-graph-revision-20260726-1825
+generated_at: 2026-07-26T18:25:00+07:00
+decision: ADD_STANDALONE_GRAPH_REVISION_SCHEMA
+decision_status: READY_FOR_G2_APPROVAL
+selected_option: B
+planned_branch: codex/gwc-p1-followup-graph-revision-20260726
+scope_hash: sha256:64f644d85e589c8be01f510d3649553844333f3152ee10aa7676e930b087a127
+planned_changes:
+  - Add schemas/runtime/graph-revision.schema.json.
+  - Update schemas/runtime/runtime-graph.schema.json revision to $ref the standalone schema.
+  - Export graph-revision schema in projects/gwc/package.yaml.
+  - Add focused tests for graph revision schema and runtime graph ref wiring.
+  - Add changelog fragment.
+non_goals:
+  - Do not convert routing-history.graph_revision to an object in this pass.
+  - Do not alter node registry counts, runtime graph nodes, runtime graph edges, or v3 adapter behavior.
+  - Do not deploy, release, reload runtime, or touch production data/config.
+approval_required:
+  gate: G2_EXECUTION
+  command: "APPROVE_G2_GWC_P1_FOLLOWUP_GRAPH_REVISION sha256:64f644d85e589c8be01f510d3649553844333f3152ee10aa7676e930b087a127 c050ee6c30f007060d756642825de039af254c12 2026-07-27T10:15:00Z"

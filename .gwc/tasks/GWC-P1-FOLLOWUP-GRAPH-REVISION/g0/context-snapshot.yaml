@@ -1,0 +1,47 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+run_id: g1-gwc-p1-followup-graph-revision-20260726-1825
+generated_at: 2026-07-26T18:25:00+07:00
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: c050ee6c30f007060d756642825de039af254c12
+execution_mode: chat_connector_only
+source_instruction: REPO
+risk_class: R1
+current_gate: G0_CONTEXT
+required_next_gate: G1_ALIGNMENT
+authority:
+  allowed_actions:
+    - repository_read
+    - local_session_artifact_generation
+    - patch_plan_preparation
+  excluded_actions:
+    - repository_write
+    - branch_create
+    - pull_request_create
+    - merge
+    - deploy
+    - release
+    - runtime_reload
+    - production_config
+    - credential_change
+    - migration
+    - production_data_access
+context:
+  trigger: GWC-P1-FOLLOWUP-GRAPH-REVISION
+  parent_task: SCRUM-141
+  parent_merge_sha: c050ee6c30f007060d756642825de039af254c12
+  problem_statement: >
+    SCRUM-141 closed P1 as READY_WITH_WARNINGS with one remaining graph revision
+    ambiguity: no standalone schemas/runtime/graph-revision.schema.json export exists,
+    while runtime-graph embeds a revision object and routing-history references
+    graph_revision.
+read_evidence:
+  - AGENTS.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - .gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md
+  - .gwc/tasks/SCRUM-141/p1-validation-matrix.json
+  - schemas/runtime/runtime-graph.schema.json
+  - schemas/runtime/routing-history.schema.json
+  - core/node-architect/runtime-graph-registry.json
+  - tools/node_architect/validate_runtime_registry.py
+  - .kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md
+  - projects/gwc/package.yaml

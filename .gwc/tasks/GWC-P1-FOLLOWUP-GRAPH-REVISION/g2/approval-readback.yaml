@@ -1,0 +1,20 @@
+task_id: GWC-P1-FOLLOWUP-GRAPH-REVISION
+gate: G2_EXECUTION
+approval_token: APPROVE_G2_GWC_P1_FOLLOWUP_GRAPH_REVISION
+scope_hash: sha256:64f644d85e589c8be01f510d3649553844333f3152ee10aa7676e930b087a127
+approved_base_sha: c050ee6c30f007060d756642825de039af254c12
+approved_until: 2026-07-27T10:15:00Z
+readback:
+  repository: nhatnguyenquang1838-coder/gwc
+  branch: codex/gwc-p1-followup-graph-revision-20260726
+  source_instruction: REPO
+  execution_mode: chat_connector_only
+  status: MATCH
+boundaries:
+  allowed_gate: G2_EXECUTION
+  next_gate_required_for_pr: G3_PR
+  exclusions:
+    - no pull request without G3 approval
+    - no merge without G4 approval
+    - no deploy or runtime reload
+    - no production config, credentials, migrations, or production data

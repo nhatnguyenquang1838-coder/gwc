@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/graph-revision.schema.json",
+  "title": "Canonical Runtime Graph Revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "revision_id",
+    "parent_revision_id",
+    "source_sha"
+  ],
+  "properties": {
+    "revision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}
