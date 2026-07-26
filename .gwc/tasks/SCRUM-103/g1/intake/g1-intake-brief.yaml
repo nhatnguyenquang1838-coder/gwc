@@ -1,0 +1,94 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T05:56:22Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-103
+  base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: 'The SCRUM-100 audit identified incomplete G4/G5/G6 lifecycle state modeling, a missing fail-closed action-authority validator, contract-only G5 resolution, inconsistent task-workspace and Jira projection semantics, and stale/non-reproducible package integrity evidence.'
+  why_now: 'SCRUM-103 is the active implementation task after SCRUM-101 and SCRUM-102 completed; downstream SCRUM-104 is blocked on these contracts and validators.'
+desired_outcome: 'Implement the smallest synchronized GWC contract, validator, workspace, G5 evidence, test, and package-integrity changes that close the SCRUM-103 blockers while preserving GWC gate authority and excluding merge, deploy, and production operations.'
+stakeholders:
+  requester: user
+  affected:
+    - GWC maintainers
+    - DWC and ChatGPT-style GWC agents
+    - GWC reviewers and delivery validators
+    - Downstream GWC package consumers
+    - Jira work-tracking owner
+scope:
+  in_scope:
+    - Update the task lifecycle transition model to represent G3 validation, G4 merge, G5 post-merge verification, and conditional G6 separately.
+    - Implement fail-closed action-authority validation for task, repository, base/head SHA, action, gate, scope hash, expiry, actor, and evidence readback.
+    - Align G2/G3/G5 contracts and validators with the canonical .gwc/tasks/<task-id>/ workspace and exact-head evidence semantics.
+    - Define or implement the smallest reusable G5 exact-SHA status/resolver evidence path supported by existing repository mechanisms.
+    - Refresh package manifest, tree, checksum, bundle, and reproducibility validation through existing package/export tooling.
+    - Add focused regression tests and update synchronized source/package consumer declarations required by the implementation.
+  non_goals:
+    - Build a general Jira adapter or make Jira status a GWC gate authority.
+    - Implement SCRUM-104 registry or v3 data binding work.
+    - Expand the catalog, runtime engine, scheduler, worker, or production service.
+    - Merge, auto-merge, deploy, release, reload runtime, change production configuration, access production data, or rotate credentials.
+    - Modify unrelated dirty worktree files or historical DS Admin/Rental Home task records.
+constraints:
+  - Use the verified protected base origin/main at 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9.
+  - Use one dedicated codex-prefixed branch and isolated worktree; never write directly to main.
+  - Reuse existing contracts, schemas, validators, package/export tooling, and tests before adding mechanisms.
+  - Keep Jira as non-authoritative work-tracking projection and GWC artifacts as G0-G6 authority.
+  - Preserve unrelated local changes in the existing main checkout.
+assumptions:
+  - SCRUM-103 remains the single Jira task identity for this implementation lane.
+  - The current protected-base repository and existing Python validation toolchain are available locally.
+  - The implementation can remain repository-local and non-production.
+risks:
+  - id: RISK-1
+    description: Contract and action-authority changes may affect multiple agent and package consumers.
+    impact: high
+    mitigation: Keep the file scope explicit, preserve exclusion boundaries, add focused regression tests, validate package exports, and perform full diff review.
+  - id: RISK-2
+    description: Incomplete exact-SHA or expiry checks could allow stale or unauthorized connector actions.
+    impact: high
+    mitigation: Fail closed on missing or mismatched task, repository, SHA, gate, action, scope, actor, expiry, or readback evidence.
+  - id: RISK-3
+    description: Generated package metadata can drift from source content or become non-reproducible.
+    impact: medium
+    mitigation: Use one inspected generation path, deterministic inputs, checksum verification, and drift tests.
+acceptance_criteria:
+  - id: AC-1
+    statement: The lifecycle model and consumer contracts represent G3 validation, G4 merge, G5 post-merge verification, and conditional G6 as separate states and authority boundaries.
+    verifiable: true
+  - id: AC-2
+    statement: The action-authority validator fails closed for missing or mismatched task, repository, base/head SHA, action, gate, scope hash, expiry, actor, or evidence readback and passes a valid bounded packet.
+    verifiable: true
+  - id: AC-3
+    statement: Canonical .gwc/tasks/<task-id>/ binding, exact-head G5 evidence, Jira projection non-authority, and G3 ready-for-review semantics are consistent across applicable contracts, validators, and tests.
+    verifiable: true
+  - id: AC-4
+    statement: Package manifest, TREE.txt, SHA256SUMS.txt, BUNDLE-REPORT.json, and reproducibility/drift checks are refreshed or validated from the same protected-base implementation and no unrelated files are changed.
+    verifiable: true
+  - id: AC-5
+    statement: Applicable YAML/JSON schema checks, focused tests, package/export checks, and full diff review pass or are reported with exact limitations before G3.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - Create a guarded branch and isolated worktree from verified origin/main after G2 approval.
+    - Modify only the approved SCRUM-103 implementation, test, contract, package, and task-evidence scope.
+    - Run inspected local validation and focused tests.
+    - Create a commit and push the guarded branch when G2/G3 evidence permits.
+    - Assemble or update a Draft PR after G3 entry requirements are met.
+  downstream_non_goals:
+    - Merge or auto-merge.
+    - Deploy, release, or runtime reload.
+    - Production configuration, credentials, secrets, migrations, or production data.
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+      - Exact branch head SHA and protected-base comparison.
+      - Full diff review and scope-drift check.
+      - YAML/JSON/schema, focused test, and package/export validation results.
+      - Independent read-only G3 review bound to the exact head SHA.
+unresolved_questions: []
+status: READY

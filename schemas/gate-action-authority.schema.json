@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-action-authority.schema.json",
+  "title": "GWC Gate Action Authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_ref",
+    "base_sha",
+    "head_sha",
+    "working_branch",
+    "gate",
+    "action",
+    "scope",
+    "scope_hash",
+    "issued_at",
+    "expires_at",
+    "actor",
+    "evidence_readback"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-action-authority"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_ref": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "working_branch": {"type": "string", "minLength": 1},
+    "gate": {
+      "enum": [
+        "G0_CONTEXT",
+        "G1_ALIGNMENT",
+        "G2_EXECUTION",
+        "G3_PR",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION_DATA"
+      ]
+    },
+    "action": {"type": "string", "minLength": 1},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorized_paths", "authorized_actions", "excluded_actions", "risk_class"],
+      "properties": {
+        "authorized_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "authorized_actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "excluded_actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "risk_class": {"enum": ["R0", "R1", "R2", "R3"]}
+      }
+    },
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {"enum": ["human", "local_agent", "repo_ci", "connector"]},
+        "id": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence_readback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "observed_at",
+        "task_id",
+        "repository",
+        "base_sha",
+        "head_sha",
+        "gate",
+        "action",
+        "scope_hash",
+        "event_id_or_idempotency_key"
+      ],
+      "properties": {
+        "status": {"enum": ["observed", "confirmed", "not_applicable"]},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "task_id": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "gate": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "event_id_or_idempotency_key": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

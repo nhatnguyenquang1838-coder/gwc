@@ -1,0 +1,93 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+task_id: SCRUM-103
+approval_request_id: APPROVE_G2_SCRUM103_20260726
+authority_gate: G2_EXECUTION
+issued_at: '2026-07-26T05:56:22Z'
+expires_at: '2026-07-27T05:56:22Z'
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+working_branch: codex/scrum-103-lifecycle-authority
+target_pr_base: main
+draft_pr: true
+modules_or_files:
+  - core/task-lifecycle/gate-transition-map.yaml
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+  - docs/project-consumer-agent-instructions.md
+  - agents/dwc/agent-instructions.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - projects/gwc/project-instructions.md
+  - projects/gwc/project-extension.md
+  - projects/gwc/package.yaml
+  - schemas/gate-action-authority.schema.json
+  - schemas/g5-status-evidence.schema.json
+  - tools/validate_gate_action.py
+  - tools/resolve_g5_status.py
+  - tools/validate_g5_status.py
+  - tests/test_validate_gate_action.py
+  - tests/test_g5_status_resolver.py
+  - tests/test_gate_lifecycle_process_contract.py
+  - TREE.txt
+  - SHA256SUMS.txt
+  - BUNDLE-REPORT.json
+  - releases/changelog.d
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage_approved_files
+  - create_commit
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - credentials
+  - production_data
+  - existing_ds_admin_task_migration
+  - existing_rental_home_task_migration
+  - jira_adapter
+  - story_7
+  - force_push
+  - branch_deletion
+  - shared_history_rewrite
+  - pr_base_change
+required_checks:
+  - validate_g01
+  - validate_instructions
+  - focused action-authority and G5 tests
+  - YAML and JSON validation
+  - package export validation
+  - git diff --check
+  - complete diff and scope review
+work_item:
+  provider: jira-mcp
+  id: SCRUM-103
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  current_state: In Progress
+  expected_assignee: Nhat Nguyen Quang
+artifact_hashes:
+  g0: .gwc/tasks/SCRUM-103/g0/context-snapshot.yaml
+  g1: validator-pass
+scope_hash: sha256:c9968e55c691ef9f397aec6696b08a305264d1b1c282b88300a7fc5cc9129a7a
+g0_context_ref: .gwc/tasks/SCRUM-103/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/SCRUM-103/g1/decision/g1-decision-record.yaml
+notes:
+  - Branch and worktree must be created from verified origin/main at the exact base SHA.
+  - Jira status is a non-authoritative work-tracking projection; GWC gate artifacts remain authoritative.
+  - G3 Draft PR delivery requires exact-head validation and independent read-only review.
+  - G4 merge, G5 manual deploy/release/reload, and G6 production operations remain excluded.

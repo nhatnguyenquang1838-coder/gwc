@@ -1,0 +1,138 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-26T05:56:22Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-103
+  base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+  profile_path: projects/gwc/project-profile.yaml
+  connector: DWC
+checks:
+  - id: REPO_IDENTITY
+    status: PASS
+    code: REPOSITORY_VERIFIED
+    message: Repository identity, default branch, protected branch, and GitHub MCP base are verified.
+    evidence:
+      - nhatnguyenquang1838-coder/gwc@0ccee27ec2e2d07e2a0f4c277e2d93f564a0e7c9
+      - projects/gwc/project-profile.yaml
+      - GitHub MCP repository metadata and compare evidence
+  - id: G0_READY
+    status: PASS
+    code: G0_CONTEXT_READY
+    message: SCRUM-103 G0 snapshot is schema-valid, READY, blocker-free, and hash-checked against the protected base.
+    evidence:
+      - g0/context-snapshot.yaml
+      - 28 source hashes matched against origin/main base SHA
+  - id: JIRA_TASK
+    status: PASS
+    code: JIRA_TASK_PRESENT
+    message: SCRUM-103 is the single active Jira task identity, In Progress, assigned to Nhat Nguyen Quang, with SCRUM-101 and SCRUM-102 complete.
+    evidence:
+      - https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-103
+      - Atlassian Jira MCP readback 2026-07-26
+  - id: DEPENDENCIES
+    status: PASS
+    code: PREREQUISITES_COMPLETE
+    message: SCRUM-101 and SCRUM-102 are Done and SCRUM-104 remains downstream of SCRUM-103.
+    evidence:
+      - SCRUM-101 status Done from Jira readback
+      - SCRUM-102 status Done from Jira readback
+      - SCRUM-103 issue links
+  - id: REQUIRED_SOURCES
+    status: PASS
+    code: REQUIRED_SOURCES_AVAILABLE
+    message: Protected-base contracts, project instructions, DWC capability declaration, task evidence, validators, and package tooling are available.
+    evidence:
+      - AGENTS.md
+      - core/Coding_Project_Governance_v1.0.md
+      - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+      - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+      - projects/gwc/project-profile.yaml
+      - agents/dwc/agent-instructions.md
+      - tools/validate_g01.py
+      - tools/build_project_package.py
+      - tools/export_project_package.py
+  - id: SCOPE_BOUNDARY
+    status: PASS
+    code: BOUNDED_NON_PRODUCTION_SCOPE
+    message: Scope is limited to repository contracts, validators, tests, package integrity, and task evidence; later-gate and production actions are excluded.
+    evidence:
+      - SCRUM-103 description
+      - g1/intake/g1-intake-brief.yaml
+  - id: HUMAN_DIRECTION
+    status: PASS
+    code: USER_IMPLEMENTATION_DIRECTION
+    message: The user explicitly requested a guarded worktree from origin/main and implementation of SCRUM-103.
+    evidence:
+      - 'Current user request: tách worktree từ origin/main, tiến hành thực hiện change'
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: codex-local-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: DWC
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+process_readback:
+  process_id: SCRUM-103-G1-20260726
+  terminal_outcome: G1 alignment ready for G2 human-direction approval.
+  required_sources:
+    - g0/context-snapshot.yaml
+    - g1/intake/g1-intake-brief.yaml
+    - g1/brainstorming/g1-options.yaml
+    - g1/decision/g1-decision-record.yaml
+    - tools/validate_g01.py
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE_WITH_HUMAN_BYPASS
+  route_steps:
+    - id: STEP-01
+      name: guarded-worktree
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: repository_worktree_write
+      capability_required: isolated_worktree
+      capability_status: UNKNOWN
+      primary_route: local git worktree from verified origin/main
+      fallback_routes: [manual checkpoint]
+      continuation: continue only on guarded branch with exact base binding
+      expected_evidence: branch and worktree path, base SHA, clean baseline
+      bypass_eligibility: MANUAL_CHECKPOINT_ONLY
+    - id: STEP-02
+      name: scoped-implementation
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: bounded_repository_write
+      capability_required: task-scoped G2 envelope
+      capability_status: VERIFIED
+      primary_route: local file edits and tests in guarded worktree
+      fallback_routes: [manual checkpoint]
+      continuation: retain exact scope and stop on material drift
+      expected_evidence: changed paths, tests, schema/package validation, diff review
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-03
+      name: draft-pr-delivery
+      gate: G3_PR
+      actor: agent_or_human
+      action_class: draft_pr_delivery
+      capability_required: g3 delivery record and exact-head review
+      capability_status: SEPARATE_GATE
+      primary_route: GitHub connector after G2 validation
+      fallback_routes: [manual checkpoint]
+      continuation: wait for G3 evidence before ready-for-review metadata completion
+      expected_evidence: Draft PR, exact head SHA, independent review, CI evidence
+      bypass_eligibility: MANUAL_CHECKPOINT_ONLY
+  continuation_coverage: COMPLETE
+  human_bypass_required: true
+blockers: []
+outcome: PASS

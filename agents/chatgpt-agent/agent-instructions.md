@@ -158,6 +158,16 @@ G0/G1 evidence, a valid execution envelope, and the exact active approval when
 the runtime contract requires it. Missing gate files are preparation work: build
 and validate them before treating the request as blocked.
 
+For every gate-scoped action, validate a task-scoped action packet with
+`tools/validate_gate_action.py`. The packet must bind task, repository,
+base/head SHA, branch, gate, action, scope hash, expiry, actor, and evidence
+readback. A Jira status or connector response alone is never sufficient
+authority evidence.
+
+Use `core/task-lifecycle/gate-transition-map.yaml` for state readback. G3
+review, G4 merge, G5 status/deployment, and conditional G6 production states
+are separate; `VALIDATION_PASSED` must not be treated as final completion.
+
 ### G3_PR and later
 
 Follow the parent gate contract. G3 permits a Draft PR and may complete the

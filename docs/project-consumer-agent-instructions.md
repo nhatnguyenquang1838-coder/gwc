@@ -130,6 +130,14 @@ G2 may only allow task-bounded guarded-branch work:
 G2 never grants merge, deployment, production configuration, credential changes,
 production migration, or production-data access.
 
+Before executing a gate-scoped action, validate the action packet against
+`schemas/gate-action-authority.schema.json` with
+`tools/validate_gate_action.py`. The packet must preserve task, repository,
+base/head SHA, gate, action, scope hash, expiry, actor, and readback identity.
+Consumers must use the canonical lifecycle map and must not interpret Jira
+status, a connector response, or `VALIDATION_PASSED` as G4/G5/G6 authority or
+final completion.
+
 ### Agent-generated approval commands
 
 Humans do not create approval tokens or scope hashes. The agent must generate an approval request from current evidence and show the exact command for the human to copy-paste:
