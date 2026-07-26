@@ -1,0 +1,207 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-106
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c855336dc17f20115e640516107999b08e9d783e
+working_branch: knowledge/scrum-106-p2-scenario-matrix-r2-20260726
+pull_request:
+  number: 111
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/111
+  draft: true
+head_sha: d582d260a388a27cc6043aed0c1750bc5c1c64f6
+scope_hash: sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+changed_paths:
+- .gwc/tasks/SCRUM-106/evidence/g01-validator-r2.json
+- .gwc/tasks/SCRUM-106/evidence/g01-validator-r2.meta.json
+- .gwc/tasks/SCRUM-106/evidence/g2-approval-r2.json
+- .gwc/tasks/SCRUM-106/evidence/g2-post-approval-validator-r2.json
+- .gwc/tasks/SCRUM-106/evidence/matrix-structural-validation-r2.json
+- .gwc/tasks/SCRUM-106/evidence/source-provenance-r2.json
+- .gwc/tasks/SCRUM-106/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-106/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md
+- .gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv
+- .gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.json
+- .gwc/tasks/SCRUM-106/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-106/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-106/g1/research/context7-research-notes.md
+- .gwc/tasks/SCRUM-106/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-106/g3/action-authority.json
+validation:
+  head_sha: d582d260a388a27cc6043aed0c1750bc5c1c64f6
+  status: pass
+  commands:
+  - command: python tools/validate_g01.py --root <exact-current-root> --workspace
+      <SCRUM-106-workspace> --json
+    result: pass
+    evidence: .gwc/tasks/SCRUM-106/evidence/g01-validator-r2.json — PASS, exit 0,
+      zero issues using exact current validator/schema bytes.
+  - command: SCRUM-106 matrix structural validator
+    result: pass
+    evidence: .gwc/tasks/SCRUM-106/evidence/matrix-structural-validation-r2.json —
+      27 unique scenarios, complete 3×9 pair coverage, six B0–B5 boundaries.
+  - command: YAML/JSON parse and projection consistency review
+    result: pass
+    evidence: All task YAML/JSON artifacts parse; CSV contains the same 27 scenario
+      IDs; Markdown records the same semantic matrix hash and coverage.
+  - command: Full PR diff and scope review against c855336dc17f20115e640516107999b08e9d783e
+    result: pass
+    evidence: 'PR #111 contains 17 additions-only paths, all under .gwc/tasks/SCRUM-106/**;
+      no runtime, schema, validator, workflow, package, lockfile, migration, secret
+      or protected-branch change.'
+  - command: GitHub Actions exact-head validation
+    result: pass
+    evidence: Validate instructions run 30212417533 and Build instruction packages
+      run 30212417520 completed successfully for d582d260a388a27cc6043aed0c1750bc5c1c64f6.
+review:
+  implementer_id: chatgpt-governed-executor
+  reviewer_id: chatgpt-fresh-context-read-only-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: d582d260a388a27cc6043aed0c1750bc5c1c64f6
+  reviewed_scope_hash: sha256:badbf2a8868339a9e5ef583e59d8a428cffb7165c54765ece82478f9fc5bc386
+  reviewed_at: '2026-07-26T17:25:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - Jira SCRUM-106 requires scenario specification for three pilot node classes
+      and nine named success/failure modes with deterministic events and evidence.
+    - The matrix provides exactly 27 node/failure pairs plus six crash boundaries.
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Scenario semantics are contract-first and explicitly bound to merged SCRUM-105
+      durable run, event, checkpoint, pending-action and adapter contracts.
+    - Unknown external-write outcomes require deterministic readback and never permit
+      blind retry or false PASS.
+  - name: code
+    applicable: false
+    status: not_applicable
+    evidence:
+    - This is a knowledge/contract delivery. No runtime implementation, API, schema,
+      validator, workflow or package code is changed.
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - Structural matrix validation passes 27 unique IDs, full 3×9 coverage and six
+      crash boundaries.
+    - All scenario rows contain injection boundary, ordered events, terminal state,
+      retry policy, forbidden behavior, evidence and deterministic oracle.
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G0 READY, G1 exact-current PASS and exact G2 approval evidence are present.
+    - Scope is confined to task-owned paths and later-gate exclusions remain explicit.
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - 'Draft PR #111 targets main from the guarded branch at exact reviewed head d582d260a388a27cc6043aed0c1750bc5c1c64f6.'
+    - PR body records objective, hashes, scope, impact, validation, risks, rollback
+      and exclusions.
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - Validate instructions run 30212417533 completed success.
+    - Build instruction packages run 30212417520 completed success for gwc, ds-mcp,
+      rental-home and pm-skills.
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - 27 scenarios exist and cover the complete 3 node class × 9 failure class Cartesian
+      product.
+  - id: AC-2
+    result: pass
+    evidence:
+    - Every scenario contains injection boundary, ordered events, terminal status,
+      retry policy, forbidden behavior, evidence and deterministic oracle.
+  - id: AC-3
+    result: pass
+    evidence:
+    - Global and per-scenario invariants forbid false PASS, stale-owner advancement
+      and blind retry after unknown write result.
+  - id: AC-4
+    result: pass
+    evidence:
+    - Bounded-write rows require durable intent, stable idempotency, deterministic
+      readback, revision/CAS and fencing evidence.
+  - id: AC-5
+    result: pass
+    evidence:
+    - All three human-takeover rows define suspension/takeover events, exact evidence
+      packets and bounded human decisions.
+  - id: AC-6
+    result: pass
+    evidence:
+    - Canonical event/evidence labels are projected onto merged SCRUM-105 run/event/checkpoint/pending-action
+      contracts.
+  - id: AC-7
+    result: pass
+    evidence:
+    - The contract matrix defines one shared behavior set for SQLite and PostgreSQL/Supabase
+      adapters with contention and RLS-specific checks; executable adapters remain
+      downstream implementation scope.
+  - id: AC-8
+    result: pass
+    evidence:
+    - B0–B5 injection points and post-restart durable/live-state oracles are explicitly
+      defined; executable harness implementation remains downstream scope.
+  - id: AC-9
+    result: pass
+    evidence:
+    - Exact-current validate_g01.py evidence is PASS with zero issues.
+  - id: AC-10
+    result: pass
+    evidence:
+    - G2 is restricted to task-owned artifacts and excludes G3-G6 operational actions;
+      G3 is limited to Draft PR/review/CI metadata.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: d582d260a388a27cc6043aed0c1750bc5c1c64f6
+  checks:
+  - name: Validate instructions
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30212417533
+  - name: Build instruction packages
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30212417520
+residual_risks:
+- The machine-readable matrix file is a deterministic gzip+base64 JSON container and
+  must be decoded before direct programmatic consumption; decoded and semantic hashes
+  are recorded.
+- The delivery defines scenario and test contracts only. Runtime nodes, storage adapters
+  and executable crash injection are intentionally deferred to SCRUM-107 through SCRUM-110.
+- The G3 action-authority evidence records the pre-evidence head 78bd500e11a44a8f1df97dec97d010f39927d37a;
+  the Draft PR head adds only that task-owned authorization record.
+- Committing this delivery record will create an evidence-only successor head; CI
+  and read-only scope review must be repeated for that final head before ready-for-review
+  transition.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+- PROTECTED_MAIN_WRITE
+- RUNTIME_IMPLEMENTATION
+- SCHEMA_OR_VALIDATOR_CHANGE
+- WORKFLOW_OR_PACKAGE_CHANGE
+- DEPLOY_OR_RELEASE
+- PRODUCTION_CONFIG_OR_CREDENTIAL_CHANGE
+- MIGRATION_OR_PRODUCTION_DATA
+- FORCE_PUSH_OR_HISTORY_REWRITE
+- BRANCH_DELETION
+outcome: pass
