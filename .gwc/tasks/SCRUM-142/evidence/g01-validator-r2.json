@@ -1,0 +1,21 @@
+{
+  "command": "python /mnt/data/scrum-142-revisit/repo/tools/validate_g01.py --root /mnt/data/scrum-142-revisit/repo --workspace /mnt/data/scrum-142-revisit/repo/.gwc/tasks/SCRUM-142 --json",
+  "current_main_equivalence": {
+    "base_sha": "c855336dc17f20115e640516107999b08e9d783e",
+    "outcome": "PASS_EQUIVALENT",
+    "reasoning": [
+      "PR #108 and PR #109 changed no G0/G1 validator or G0/G1 schema files.",
+      "Artifacts use legacy schema_version 1.0 with both implementation_plan and implementation_plan_ref absent.",
+      "Current validate_g01.py explicitly preserves legacy pair absence."
+    ]
+  },
+  "executed_at": "2026-07-26T13:50:33Z",
+  "stderr": "",
+  "validator_exit_code": 0,
+  "validator_report": {
+    "issues": [],
+    "outcome": "PASS",
+    "valid": true
+  },
+  "validator_source": "uploaded static validation bundle"
+}
