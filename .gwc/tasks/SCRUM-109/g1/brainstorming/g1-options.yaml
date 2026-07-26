@@ -1,0 +1,38 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-26T18:53:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-109
+  base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Provider-neutral in-memory checkpoint runtime pilot
+    description: Implement the durable checkpoint/CAS/lease/resume semantics as a pure Python module with tests, leaving storage adapters and external workers out of scope.
+    benefits:
+      - Proves the core correctness boundary before SCRUM-110 crash/replay integration.
+      - Keeps implementation portable to SQLite and PostgreSQL/Supabase later.
+      - Avoids production, deployment, migration, and connector side effects.
+    tradeoffs:
+      - Does not provide a real persistent database backend yet.
+      - Does not run as a scheduler or background worker.
+    risks:
+      - Future adapters must preserve the same observable semantics.
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Defer implementation until SCRUM-108 completes
+    description: Keep SCRUM-109 To Do until external-write semantics are available.
+    benefits:
+      - Avoids parallel runtime-lane coordination.
+    tradeoffs:
+      - Leaves SCRUM-110 blocked longer.
+      - Does not use completed K1/K2 contract readiness.
+    risks:
+      - P2 integration progress remains stalled.
+    constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is bounded, contract-aligned, testable, and gives SCRUM-110 the I3 runtime-state behavior it requires without expanding into storage, scheduler, or production scope.
+decision_required: true
+status: READY

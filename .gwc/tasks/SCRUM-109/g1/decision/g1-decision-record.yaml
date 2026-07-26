@@ -1,0 +1,63 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-07-26T18:54:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-109
+  base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-07-26T18:46:13Z'
+  source: chat approval command
+  explicit: true
+rationale: The approved G2 command selected a bounded implementation of SCRUM-109 to unblock the durable checkpoint/CAS/lease/resume lane while preserving G4-G6 exclusions.
+rejected_option_ids:
+  - OPT-2
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+  - AC-5
+scope_hash: sha256:5779d0be8def7b48fc8848ea9c226778e463a2befdefd00a103c8bde6eac7f8e
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Implement provider-neutral durable checkpoint runtime semantics.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Add focused tests for CAS, lease, fencing, stale checkpoint, and takeover behavior.
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-3
+      description: Record task-scoped gate artifacts and changelog evidence.
+      dependencies:
+        - SUB-TASK-1
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: GWC runtime implementation
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: GWC runtime validation
+      agent_type: validator
+    - sub_task_id: SUB-TASK-3
+      skill_id: Governance evidence
+      agent_type: primary
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+  summary: Single-agent connector execution with local focused validation and repository Draft PR delivery.
