@@ -1,0 +1,128 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-26T16:10:32Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-106
+  base_sha: c855336dc17f20115e640516107999b08e9d783e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: P2 lacks a current-base, deterministic cross-node crash/recovery scenario contract bound to the merged durable
+    runtime schemas.
+  why_now: SCRUM-106 blocks SCRUM-107, SCRUM-108 and SCRUM-109; its previous packet was bound to an older main and treated
+    SCRUM-105 as pending.
+desired_outcome: Rebaseline and validate a normalized machine-readable and human-reviewable 27-scenario matrix against current
+  main and the merged SCRUM-105 durable run/event/checkpoint/pending-action contracts, then prepare a bounded G2 persistence
+  envelope.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC runtime maintainers
+  - SCRUM-107/108/109 implementers
+  - CI crash/replay harness maintainers
+  - SQLite and PostgreSQL/Supabase adapter implementers
+scope:
+  in_scope:
+  - Three pilot node classes.
+  - Nine mandatory scenario classes per node.
+  - B0-B5 crash-injection boundaries.
+  - Expected logical events, durable contract projection, evidence, terminal outcomes, retry/stop rules and forbidden behavior.
+  - SQLite and PostgreSQL/Supabase adapter conformance constraints.
+  - Human takeover packet and decision boundaries.
+  - Current-base G0/G1 validation and a G2 envelope for task-owned knowledge artifacts.
+  non_goals:
+  - Implement runtime, store, worker, scheduler or connectors.
+  - Modify durable runtime schemas or validators.
+  - Claim a direct UA engine run from the SCRUM-142 supporting snapshot.
+  - Create a branch or mutate the repository without exact G2 approval.
+  - Create a PR, merge, deploy, release, reload runtime or access production data.
+  - Guarantee exactly-once external effects without provider idempotency and readback.
+constraints:
+- Bind to current protected main and merged SCRUM-105 contracts.
+- No false PASS.
+- Unknown write result must reconcile before retry.
+- Every state advance uses CAS and active lease/fencing.
+- Matrix must remain executable by a deterministic harness, not free-form prose only.
+- SCRUM-142 provenance limitation is carried as a warning, not a blocking dependency.
+assumptions:
+- Pilot runtime begins with SQLite and retains migration compatibility to PostgreSQL/Supabase.
+- External providers may return timeouts after applying an effect.
+- Logical event names remain readable test labels projected onto durable-event canonical fields.
+risks:
+- id: RISK-1
+  description: Logical event labels could be mistaken for a second event schema.
+  impact: high
+  mitigation: Record explicit projection to durable-event fields and keep merged schemas canonical.
+- id: RISK-2
+  description: Blind retry duplicates bounded external writes.
+  impact: high
+  mitigation: Durable pending action, idempotency key, live readback, CAS and fencing.
+- id: RISK-3
+  description: Clock skew or stale workers violate lease safety.
+  impact: high
+  mitigation: Persist server-derived expiry and monotonic fencing; reject old tokens.
+- id: RISK-4
+  description: Qualified SCRUM-142 graph input may be mistaken for direct UA evidence.
+  impact: medium
+  mitigation: Label it supporting/provenance-qualified and make no direct-UA claim.
+- id: RISK-5
+  description: Matrix grows into unmaintainable Cartesian combinations.
+  impact: medium
+  mitigation: Retain normalized 27 base scenarios plus reusable boundaries, invariants and targeted overlays.
+acceptance_criteria:
+- id: AC-1
+  statement: 'Exactly 27 base scenarios exist: 3 node classes × 9 required classes.'
+  verifiable: true
+- id: AC-2
+  statement: Every scenario defines injection boundary, ordered logical events, terminal status, retry policy, forbidden behavior,
+    evidence and deterministic oracle.
+  verifiable: true
+- id: AC-3
+  statement: No scenario permits false PASS, stale-owner advancement or blind retry after an unknown write result.
+  verifiable: true
+- id: AC-4
+  statement: Bounded external-write scenarios require durable pending action, unique idempotency key, deterministic readback,
+    CAS and fencing.
+  verifiable: true
+- id: AC-5
+  statement: Human takeover scenarios produce a complete audited takeover packet and bounded decisions.
+  verifiable: true
+- id: AC-6
+  statement: Logical event/evidence labels are explicitly projected onto merged SCRUM-105 durable run/event/checkpoint/pending-action
+    contracts.
+  verifiable: true
+- id: AC-7
+  statement: SQLite and PostgreSQL/Supabase adapter suites can run the same behavioral matrix with adapter-specific contention
+    and RLS checks.
+  verifiable: true
+- id: AC-8
+  statement: The crash harness can inject at B0-B5 and verify durable store and live-state outcomes after restart.
+  verifiable: true
+- id: AC-9
+  statement: Exact current validate_g01.py returns PASS for the regenerated G0/G1 packet.
+  verifiable: true
+- id: AC-10
+  statement: A bounded G2 envelope authorizes only task-owned knowledge artifacts and excludes G3-G6 actions.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - Generate local task artifacts
+  - Run exact current validator
+  - Prepare G2 approval envelope
+  downstream_non_goals:
+  - Repository write before G2 approval
+  - Draft PR before G3 approval
+  - Merge
+  - Deploy
+  - Release
+  - Production config or data
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - Exact branch head
+    - Current matrix and G0/G1 validation
+    - Complete approved-scope diff
+    - Required CI success
+unresolved_questions: []
+status: READY
