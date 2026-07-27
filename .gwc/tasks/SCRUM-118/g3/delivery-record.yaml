@@ -1,0 +1,19 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+task_id: SCRUM-118
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+working_branch: feat/scrum-118-task-me-host-mode-contract
+approval_id: CP-20260728-118-G2-R2
+scope_hash: sha256:ab723f95d5ba5229dcc1c9cf8b3b9c9baed27a2afd6d3141a9f07106093719b8
+accepted_scrum_117_contract_digest: sha256:ad349050bd2424ee45082657c3afab6a3245b4cbd8ed277d47fb896b16162cc7
+status: PRE_PR_VALIDATED
+local_validation:
+  g2_envelope: PASS
+  contract_validator: PASS
+  py_compile: PASS
+  unit_tests: PASS
+authority_boundary:
+  merge: EXCLUDED_G4_REQUIRED
+  deploy: EXCLUDED_G5_G6_REQUIRED
+  production_data: EXCLUDED_G6_REQUIRED
