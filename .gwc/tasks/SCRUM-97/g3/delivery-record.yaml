@@ -1,0 +1,13 @@
+task_id: SCRUM-97
+gate: G3_PR_VALIDATION
+status: PENDING_CI
+approval_id: CP-20260727-097-G2
+scope_hash: sha256:f4d813abc1a267ae11209eff246f243a1b479e1e2821057cfb6ad07497b86145
+base_sha: 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+branch: codex/scrum-97-p3-k1-k2-contracts-20260727
+validation:
+  result: PASS
+  evidence: .gwc/tasks/SCRUM-97/g2/validation/fastlane-scoped-validation.json
+ci:
+  status: PENDING_PR_CREATION
+merge_authorized: false

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/p3-route-decision.schema.json",
+  "type": "object",
+  "required": ["schema_version", "scenario_id", "route_id", "route_class", "guard_results"],
+  "properties": {
+    "schema_version": {"const": "p3-route-decision/v1"},
+    "scenario_id": {"type": "string"},
+    "route_id": {"type": "string"},
+    "route_class": {"enum": ["VALID_AUTO", "VALID_HUMAN", "CONDITIONAL", "BLOCKED", "UNSAFE"]},
+    "guard_results": {"type": "array"}
+  }
+}

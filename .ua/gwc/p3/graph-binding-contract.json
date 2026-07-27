@@ -1,0 +1,10 @@
+{
+  "schema_version": "ua-compatible-p3-binding/v1",
+  "task_id": "SCRUM-97",
+  "status": "CONTRACT_ONLY",
+  "cytoscape_elements_shape": {
+    "nodes": "data.id,label,kind",
+    "edges": "data.source,target,label,route_class"
+  },
+  "visual_edges_authoritative": false
+}

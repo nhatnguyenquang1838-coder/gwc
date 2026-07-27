@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-27T07:45:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-97
+  base_sha: 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from GitHub connector.
+  evidence:
+  - 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+- id: P2-DONE
+  status: PASS
+  code: P2_DONE
+  message: SCRUM-96 and SCRUM-110 are Done; PR #119 merged.
+  evidence:
+  - SCRUM-96
+  - SCRUM-110
+  - PR #119
+- id: SCOPE
+  status: PASS
+  code: K1_K2_ONLY
+  message: G2 scope is SCRUM-111 + SCRUM-112 only.
+  evidence:
+  - SCRUM-111
+  - SCRUM-112
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
