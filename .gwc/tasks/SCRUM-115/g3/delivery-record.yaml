@@ -1,6 +1,6 @@
-schema_version: '1.1'
+schema_version: '1.2'
 artifact_type: g3-delivery-record
-generated_at: '2026-07-27T13:05:00Z'
+generated_at: '2026-07-27T13:22:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -9,59 +9,67 @@ trace:
   base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
   branch: feat/scrum-115-canonical-scenarios-v3
   pull_request: 122
-  reviewed_head_sha: 2a876ffae6f9c4799058beb2b878145dc2d6d2af
+  reviewed_code_head_sha: 7e9af6533711721711e01cbb1ef270bff91dfef9
 g2:
   approval_id: CP-20260727-115-G2-R2
   scope_hash: sha256:76167bccb429735b8ba5937561fd13f460a6adb41d08c624945588b28f090712
   plan_revision: sha256:0ca6de11e1d2abe90304f83ac1a5fe80b3a7876c2474bb419e7d951b4b6d56a2
-review:
-  mode: independent read-only connector review
-  outcome: REOPENED
+scope:
+  changed_files_count: 22
+  approved_scope: PASS
+  scope_drift: PASS
+  predecessor_integrity:
+    SCRUM-113: UNCHANGED
+    SCRUM-114: UNCHANGED
+repair:
+  repair_commit: 7e9af6533711721711e01cbb1ef270bff91dfef9
   findings:
     - id: G3-FINDING-001
       severity: high
-      path: tools/p3_backward_graph.py
-      issue: Canonical node authority_class was not mapped into scenario route classification, allowing a human-required node to be emitted as VALID_AUTO.
-      disposition: repair_required
+      disposition: RESOLVED
+      evidence: Canonical node authority_class is mapped into route authority and prohibited nodes are unsafe; explicit tests prevent auto-promotion.
     - id: G3-FINDING-002
       severity: medium
-      path: tools/node_architect/viewer/registry_adapter.py
-      issue: Existing CLI entrypoint and regression behavior were removed while adding scenario overlays.
-      disposition: repair_required
+      disposition: RESOLVED
+      evidence: Cytoscape v3 CLI and existing durable run-history behavior are restored while scenario overlays remain projection-only.
     - id: G3-FINDING-003
       severity: medium
-      path: tools/node_architect/validate_runtime_registry.py
-      issue: Existing profile and node maturity validation coverage was removed during the compact rewrite.
-      disposition: repair_required
+      disposition: RESOLVED
+      evidence: Node maturity, family, provenance, explicit/proposed counts and profile cross-reference checks are restored.
     - id: G3-FINDING-004
       severity: medium
-      paths:
-        - tests/test_p3_backward_graph.py
-        - tests/test_runtime_registry_validation.py
-        - tests/test_v3_run_history_adapter.py
-      issue: Predecessor regression tests were replaced rather than extended.
-      disposition: repair_required
-repair_scope:
-  authorized: true
-  paths:
-    - tools/p3_backward_graph.py
-    - tools/node_architect/validate_runtime_registry.py
-    - tools/node_architect/viewer/registry_adapter.py
-    - schemas/runtime/scenario-contract.schema.json
-    - tests/test_p3_backward_graph.py
-    - tests/test_runtime_registry_validation.py
-    - tests/test_v3_run_history_adapter.py
-  local_validation:
-    python_compileall: PASS
-    focused_tests: 20 passed
-    full_repository_validation: pending_exact_head_ci
+      disposition: RESOLVED
+      evidence: Predecessor regression tests are restored and extended instead of replaced.
+validation:
+  python_compileall: PASS
+  focused_tests: 20 passed
+  full_governance_unit_tests: PASS
+  runtime_registry_validation: PASS
+  authority_safety: PASS
+  immutable_decision_history: PASS
+  projection_edge_safety: PASS
+  unauthorized_file_check: PASS
 ci_evidence:
-  prior_runs:
-    - id: 30268091500
+  exact_code_head_sha: 7e9af6533711721711e01cbb1ef270bff91dfef9
+  runs:
+    - id: 30269688754
       workflow: Validate instructions
       conclusion: success
-    - id: 30268091511
+    - id: 30269688913
       workflow: Build instruction packages
       conclusion: success
-  note: Prior CI passed but did not contain a test asserting scenario authority_class propagation.
-status: G3_REVIEW_REOPENED
+  exact_head_match: true
+review:
+  mode: fresh independent read-only connector review
+  outcome: PASS
+  review_commit: 7e9af6533711721711e01cbb1ef270bff91dfef9
+  review_threads_open: 0
+  prior_review_status: SUPERSEDED
+  notes:
+    - 14 canonical scenarios are materialized while declared scenario space remains 116.
+    - Human-required routes classify VALID_HUMAN and never auto-execute.
+    - Prohibited routes classify UNSAFE and never auto-execute.
+    - Scenario and durable-history Cytoscape edges are non-executable.
+    - Existing registry validator, CLI and predecessor behavior are preserved.
+status: G3_PR_VALIDATION_PASS
+next_gate: G4_MERGE_APPROVAL
