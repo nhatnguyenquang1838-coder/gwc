@@ -1,0 +1,24 @@
+{
+  "task_id": "SCRUM-110",
+  "gate": "G2_EXECUTION",
+  "approval_id": "FL-SCRUM-110-20260727-0917",
+  "scope_hash": "sha256:a3dec16e486137aa4633e5ef00bc146dd78a9d9009e327c40e3bc87c54effbe9",
+  "base_sha": "53b23f38cf7412fffd8bc1adce8c3d6b8277b1b6",
+  "branch": "fastlane/scrum-110-crash-replay-v3",
+  "validation_mode": "scoped_materialized_sandbox",
+  "commands": [
+    "python -m unittest tests.test_exact_state_capture tests.test_bounded_external_write tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_human_takeover_packet tests.test_v3_run_history_adapter",
+    "python -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "result": "SCOPED_VALIDATION_PASSED",
+  "tests_run": 24,
+  "failures": 0,
+  "errors": 0,
+  "full_repository_validation": false,
+  "limitations": [
+    "GitHub connector did not expose a repository archive or mounted checkout to the sandbox",
+    "Only exact-ref runtime dependencies and tests required by the FastLane envelope were materialized",
+    "Authoritative CI must validate the exact Draft PR head SHA before G3 can pass"
+  ],
+  "validated_at": "2026-07-27T03:03:00Z"
+}
