@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.1",
+  "contract": "dw-super-e2e-replayable-pilot",
+  "authority": {
+    "gwc": "gates",
+    "github": "repo_pr_ci",
+    "jira": "projection",
+    "slack": "projection",
+    "notion": "projection"
+  },
+  "providers": [
+    "gwc",
+    "ua",
+    "task-me",
+    "bmad",
+    "github",
+    "jira",
+    "slack",
+    "notion"
+  ],
+  "required_guards": [
+    "version_bound_artifacts",
+    "idempotency_keys",
+    "checkpoint_revisions",
+    "exact_sha_binding",
+    "projection_authority_denial",
+    "g6_not_applicable"
+  ],
+  "failure_codes": [
+    "STALE_ARTIFACT",
+    "DUPLICATE_SIDE_EFFECT",
+    "REPLAY_DIVERGENCE",
+    "PROJECTION_AUTHORITY_LEAKAGE",
+    "BMAD_SCOPE_VIOLATION",
+    "G6_REQUIRED",
+    "CI_UNAVAILABLE_AT_CHECK"
+  ]
+}
