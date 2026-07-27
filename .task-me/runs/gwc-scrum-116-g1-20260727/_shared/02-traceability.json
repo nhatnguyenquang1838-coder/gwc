@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-116-g1-20260727",
+  "links": [
+    {"requirement": "SCRUM-116-AC-1", "evidence": "DW-SuperApps/AGENTS.md; workspace.yaml; Power manifests", "confidence": 0.98},
+    {"requirement": "SCRUM-116-AC-2", "evidence": "projects/gwc/project-profile.yaml; .gwc task workspace convention", "confidence": 0.98},
+    {"requirement": "SCRUM-116-AC-3", "evidence": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json", "confidence": 0.91},
+    {"requirement": "SCRUM-116-AC-4", "evidence": "core/node-architect/runtime checkpoint CAS/lease node cards; scrum-105/scrum-108 design", "confidence": 0.92},
+    {"requirement": "SCRUM-116-AC-5", "evidence": "distribution/power-package.yaml; publish-power.yml; publish-release.yml", "confidence": 0.9},
+    {"requirement": "SCRUM-116-AC-6", "evidence": ".ua/extensions/traceability-graph.json; existing GWC gate validators", "confidence": 0.83},
+    {"requirement": "SCRUM-116-AC-7", "evidence": "Jira SCRUM-116 live readback; SCRUM-120 outward Blocks link", "confidence": 0.99}
+  ],
+  "unresolved": [
+    "Exact target implementation symbols and final contract filenames require G2 plan-read receipt and protected-base write scope.",
+    "DW-SuperApps boilerplate branch is absent from the live input and must remain an explicit compatibility gap.",
+    "BMAD ready-unpublished provider state is a contract state to model, not a currently verified published artifact."
+  ]
+}

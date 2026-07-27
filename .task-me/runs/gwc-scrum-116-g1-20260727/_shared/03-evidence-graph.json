@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-116-g1-20260727",
+  "nodes": [
+    {"id": "GWC-PROTECTED-BASE", "kind": "repository-ref", "path": "main@32d8c308f7d67de3dbd914a19837871d99c22ab4"},
+    {"id": "DW-SUPERAPPS-INPUT", "kind": "repository-ref", "path": "main@fc93228c721b59a5ac1de7e916a615eb452ef70a"},
+    {"id": "GATE-ARTIFACTS", "kind": "authority", "path": ".gwc/tasks/<task-id>/g0..g6"},
+    {"id": "PACKAGE-STORE", "kind": "owner-root", "path": "DW-SuperApps/.dw/powers"},
+    {"id": "TARGET-RUNTIME", "kind": "owner-root", "path": "<system>/.gwc|.ua|.task-me|.bmad"},
+    {"id": "CAS-LEASE", "kind": "runtime-contract", "path": "core/node-architect/node-catalog/runtime_checkpoint"},
+    {"id": "PROJECTIONS", "kind": "projection", "path": "Jira|Notion|Slack"}
+  ],
+  "edges": [
+    {"source": "GWC-PROTECTED-BASE", "target": "GATE-ARTIFACTS", "type": "binds"},
+    {"source": "DW-SUPERAPPS-INPUT", "target": "PACKAGE-STORE", "type": "supplies"},
+    {"source": "PACKAGE-STORE", "target": "TARGET-RUNTIME", "type": "distributes-to"},
+    {"source": "CAS-LEASE", "target": "TARGET-RUNTIME", "type": "guards-mutation"},
+    {"source": "GATE-ARTIFACTS", "target": "PROJECTIONS", "type": "projects-read-only"}
+  ]
+}

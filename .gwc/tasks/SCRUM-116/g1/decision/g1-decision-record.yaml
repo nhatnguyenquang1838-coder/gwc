@@ -1,0 +1,93 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-27T15:41:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-116
+  base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: current-user
+  decided_at: '2026-07-27T15:49:43Z'
+  source: 'chat: ACCEPT G1 SCRUM-116 OPT-1 ba66fd55dbf7fddc PROCEED_G2_ENVELOPE'
+  explicit: true
+rationale: The requester accepted OPT-1 and the exact bounded scope hash. OPT-1 satisfies the SCRUM-116 deliverables while keeping G1 read-only, preserving exact-base evidence, and avoiding unapproved cross-repository implementation.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+scope_hash: sha256:ba66fd55dbf7fddc70d5407d52ef73b0e83721a113f36ed6e930a25e5ddf8cee
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Confirm exact G2 target paths and protected-base plan-read receipt.
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Author topology, source-of-truth, ownership and denied-write contract.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Author provenance envelope and collision/fencing/idempotency examples.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-4
+    description: Author compatibility matrix and downstream reference map.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-5
+    description: Run focused validators/tests and prepare G3 evidence after G2.
+    dependencies:
+    - SUB-TASK-2
+    - SUB-TASK-3
+    - SUB-TASK-4
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-g2-plan-read
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: ua-authority-topology
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: task-me-provenance-decomposition
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-4
+    skill_id: bmad-architecture-spine
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-5
+    skill_id: gwc-validator-review
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  - SUB-TASK-5
+  summary: One bounded GWC contract delivery after explicit human option selection and separate exact G2 approval; no merge, deploy or production authority.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-116
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  plan_root: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance
+  plan_revision: sha256:b18100f1d28a710d5f75322db9a795456f5d363f895b57fea250917ed6848726
+  validation_evidence: CONFIG_VALID plus output-layout validation and the self-contained requirements/design/tasks handoff under the configured Task-Me output root.

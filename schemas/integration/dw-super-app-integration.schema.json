@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/integration/dw-super-app-integration.schema.json",
+  "title": "DW SUPER APP Integration Topology and Provenance Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "contract_id",
+    "task_id",
+    "generated_at",
+    "source_context",
+    "artifact_classes",
+    "integrations",
+    "concurrency",
+    "compatibility_modes",
+    "provenance_examples",
+    "downstream_tasks",
+    "explicit_gaps"
+  ],
+  "$defs": {
+    "artifactClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "canonical_owner", "storage_root", "authority", "allowed_writes", "denied_writes"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "canonical_owner": {"type": "string", "minLength": 1},
+        "storage_root": {"type": "string", "minLength": 1},
+        "authority": {"enum": ["canonical", "derived", "projection"]},
+        "allowed_writes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "denied_writes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "integration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "authority", "reads", "allowed_writes", "denied_writes"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+        "role": {"type": "string", "minLength": 1},
+        "authority": {"enum": ["canonical", "derived", "projection"]},
+        "reads": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "allowed_writes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "denied_writes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "parent_artifact_id", "source_repo", "source_ref", "source_sha", "tool_package", "tool_source_commit", "schema_version", "owner_root", "generated_at", "resolves"],
+      "properties": {
+        "artifact_id": {"type": "string", "minLength": 1},
+        "parent_artifact_id": {"type": ["string", "null"]},
+        "source_repo": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "source_ref": {"type": "string", "minLength": 1},
+        "source_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tool_package": {"type": "string", "minLength": 1},
+        "tool_source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "schema_version": {"type": "string", "minLength": 1},
+        "owner_root": {"type": "string", "minLength": 1},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "resolves": {"type": "boolean"},
+        "failure_code": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "dw-super-app-integration-contract"},
+    "contract_id": {"const": "DW-SUPER-APP-INTEGRATION-TOPOLOGY"},
+    "task_id": {"const": "SCRUM-116"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gwc", "dw_superapps"],
+      "properties": {
+        "gwc": {"$ref": "#/$defs/provenance"},
+        "dw_superapps": {"$ref": "#/$defs/provenance"}
+      }
+    },
+    "artifact_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/artifactClass"}},
+    "integrations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/integration"}},
+    "concurrency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_guards", "rejection_outcomes"],
+      "properties": {
+        "required_guards": {"type": "array", "uniqueItems": true, "items": {"enum": ["owner_root", "scope_hash", "checkpoint_revision", "lease_token", "fencing_token", "idempotency_key"]}},
+        "rejection_outcomes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "compatibility_modes": {"type": "array", "uniqueItems": true, "items": {"enum": ["submodule", "power-dist", "immutable-release", "offline-zip"]}},
+    "provenance_examples": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/provenance"}},
+    "downstream_tasks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^SCRUM-[0-9]+$"}},
+    "explicit_gaps": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

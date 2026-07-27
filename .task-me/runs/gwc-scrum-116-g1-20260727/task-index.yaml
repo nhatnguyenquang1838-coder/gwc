@@ -1,0 +1,17 @@
+schema_version: '1.0'
+run_id: gwc-scrum-116-g1-20260727
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+tasks:
+- task_id: SCRUM-116
+  slug: lock-topology-ownership-provenance
+  title: Lock DW SUPER APP integration topology, ownership and provenance
+  folder: tasks/SCRUM-116-lock-topology-ownership-provenance
+  wave: 1
+  requires: []
+  parallel_with:
+  - SCRUM-117
+  - SCRUM-118
+  - SCRUM-119
+  risk: R2
+  likely_hours: 14

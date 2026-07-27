@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "dw-super-app-integration-contract",
+  "contract_id": "DW-SUPER-APP-INTEGRATION-TOPOLOGY",
+  "task_id": "SCRUM-116",
+  "generated_at": "2026-07-27T16:08:00Z",
+  "source_context": {
+    "gwc": {
+      "artifact_id": "source-gwc-main-32d8c308",
+      "parent_artifact_id": null,
+      "source_repo": "nhatnguyenquang1838-coder/gwc",
+      "source_ref": "main",
+      "source_sha": "32d8c308f7d67de3dbd914a19837871d99c22ab4",
+      "tool_package": "gwc-governance-contracts@1.0",
+      "tool_source_commit": "32d8c308f7d67de3dbd914a19837871d99c22ab4",
+      "schema_version": "1.0",
+      "owner_root": "GWC repository",
+      "generated_at": "2026-07-27T16:08:00Z",
+      "resolves": true,
+      "failure_code": null
+    },
+    "dw_superapps": {
+      "artifact_id": "source-dw-superapps-main-fc93228c",
+      "parent_artifact_id": null,
+      "source_repo": "nhatnguyenquang1838-coder/DW-SuperApps",
+      "source_ref": "main",
+      "source_sha": "fc93228c721b59a5ac1de7e916a615eb452ef70a",
+      "tool_package": "dw-superapps-distribution@1.0",
+      "tool_source_commit": "fc93228c721b59a5ac1de7e916a615eb452ef70a",
+      "schema_version": "1.0",
+      "owner_root": "DW-SuperApps workspace",
+      "generated_at": "2026-07-27T16:08:00Z",
+      "resolves": true,
+      "failure_code": null
+    }
+  },
+  "artifact_classes": [
+    {"id": "gate-state", "canonical_owner": "GWC maintainers", "storage_root": ".gwc/tasks/<task-id>/g0..g6", "authority": "canonical", "allowed_writes": ["task-scoped gate artifacts after the applicable gate authority"], "denied_writes": ["direct protected-main mutation", "projection-only status changes"]},
+    {"id": "product-source", "canonical_owner": "DW-SuperApps maintainers", "storage_root": "DW-SuperApps source checkout", "authority": "canonical", "allowed_writes": ["approved guarded branch changes in DW-SuperApps"], "denied_writes": ["GWC agent mutation without a separate DW-SuperApps scope", "target runtime output"]},
+    {"id": "power-package", "canonical_owner": "DW-SuperApps distribution", "storage_root": "DW-SuperApps/.dw/powers", "authority": "canonical", "allowed_writes": ["validated package installation/update flow"], "denied_writes": ["package payload under a registered system", "unverified overwrite"]},
+    {"id": "gwc-runtime-output", "canonical_owner": "GWC project", "storage_root": "<system>/.gwc", "authority": "canonical", "allowed_writes": ["selected target GWC runtime state"], "denied_writes": ["Power package payload", "host adapter logic"]},
+    {"id": "ua-output", "canonical_owner": "selected target system", "storage_root": "<system>/.ua", "authority": "derived", "allowed_writes": ["UA graph and extension outputs"], "denied_writes": ["GWC gate authority", "product source"]},
+    {"id": "task-me-output", "canonical_owner": "selected target system", "storage_root": "<system>/.task-me/runs", "authority": "derived", "allowed_writes": ["validated planning runs"], "denied_writes": ["GWC gate authority", "product source"]},
+    {"id": "bmad-output", "canonical_owner": "selected target system", "storage_root": "<system>/.bmad|_bmad|_bmad-output", "authority": "derived", "allowed_writes": ["BMAD project artifacts"], "denied_writes": ["GWC gate authority", "product source"]},
+    {"id": "host-adapter", "canonical_owner": "DW-SuperApps host-control plane", "storage_root": "DW-SuperApps/<host-adapter-roots>", "authority": "canonical", "allowed_writes": ["thin routing adapters"], "denied_writes": ["copied Power implementation", "target-owned runtime payload"]},
+    {"id": "code-ci-evidence", "canonical_owner": "GitHub and CI", "storage_root": "repository refs, commits, PRs and workflow runs", "authority": "canonical", "allowed_writes": ["guarded branch and PR evidence after gate approval"], "denied_writes": ["merge without G4", "gate authority from a projection"]},
+    {"id": "roadmap-status", "canonical_owner": "Jira", "storage_root": "Jira issue SCRUM-116 and linked work items", "authority": "canonical", "allowed_writes": ["authorized work-item status/roadmap updates"], "denied_writes": ["granting G0-G6 authority", "overriding exact repository evidence"]},
+    {"id": "human-projection", "canonical_owner": "Notion", "storage_root": "Notion human-readable hub", "authority": "projection", "allowed_writes": ["human-readable projection"], "denied_writes": ["canonical gate state", "approval authority"]},
+    {"id": "communication", "canonical_owner": "Slack", "storage_root": "Slack root task message and thread", "authority": "projection", "allowed_writes": ["visibility updates and communication"], "denied_writes": ["canonical task state", "approval authority", "source-of-truth mutation"]}
+  ],
+  "integrations": [
+    {"id": "dw-superapps-control-plane", "role": "package distribution, binding and host routing", "authority": "canonical", "reads": ["workspace.yaml", "Power manifests", "GWC contracts"], "allowed_writes": ["workspace package store and thin host adapters in its own scope"], "denied_writes": ["registered-system Power payload", "GWC gate artifacts without GWC scope"]},
+    {"id": "target-system-runtime", "role": "target-owned runtime configuration and generated outputs", "authority": "canonical", "reads": ["selected package", "selected system instructions"], "allowed_writes": [".gwc, .ua, .task-me and .bmad under the selected target"], "denied_writes": ["DW-SuperApps package source", "protected GWC main"]},
+    {"id": "gwc", "role": "governance, gate artifacts and exact approval authority", "authority": "canonical", "reads": ["repository state", "exact refs", "validator evidence"], "allowed_writes": ["approved GWC task-scoped artifacts and guarded branch scope"], "denied_writes": ["direct main push", "merge before G4", "production actions"]},
+    {"id": "ua", "role": "semantic graph and impact analysis", "authority": "derived", "reads": ["target source and existing graph snapshot"], "allowed_writes": ["selected target .ua outputs"], "denied_writes": ["GWC authority", "product source mutation"]},
+    {"id": "task-me", "role": "impact analysis, decomposition and implementation planning", "authority": "derived", "reads": ["requirements, design, system graph and verified code"], "allowed_writes": ["selected target .task-me/runs outputs"], "denied_writes": ["product source", "GWC gate authority"]},
+    {"id": "bmad", "role": "architecture invariants and solutioning", "authority": "derived", "reads": ["requirements and brownfield evidence"], "allowed_writes": ["selected target BMAD project artifacts"], "denied_writes": ["product source without G2", "GWC gate authority"]},
+    {"id": "github-ci", "role": "code, branch, PR and exact-head CI evidence", "authority": "canonical", "reads": ["repository refs and workflow runs"], "allowed_writes": ["guarded branch and draft PR after applicable gates"], "denied_writes": ["protected main before G4", "deployment before G5"]},
+    {"id": "jira", "role": "roadmap and work-item status", "authority": "canonical", "reads": ["task and linked work items"], "allowed_writes": ["authorized work-item projection/status"], "denied_writes": ["G0-G6 authority", "repository mutation"]},
+    {"id": "notion", "role": "human-readable projection", "authority": "projection", "reads": ["Jira and canonical evidence"], "allowed_writes": ["projection content"], "denied_writes": ["roadmap authority", "gate authority"]},
+    {"id": "slack", "role": "visibility communication", "authority": "projection", "reads": ["canonical task status and report links"], "allowed_writes": ["root task message and threaded updates when permitted"], "denied_writes": ["task storage", "approval authority", "canonical state"]}
+  ],
+  "concurrency": {
+    "required_guards": ["owner_root", "scope_hash", "checkpoint_revision", "lease_token", "fencing_token", "idempotency_key"],
+    "rejection_outcomes": ["OWNER_ROOT_COLLISION", "SCOPE_HASH_MISMATCH", "CHECKPOINT_REVISION_MISMATCH", "STALE_LEASE_OR_FENCING", "IDEMPOTENCY_KEY_COLLISION"]
+  },
+  "compatibility_modes": ["submodule", "power-dist", "immutable-release", "offline-zip"],
+  "provenance_examples": [
+    {"artifact_id": "g1-scrum-116-intake", "parent_artifact_id": "g0-scrum-116-context", "source_repo": "nhatnguyenquang1838-coder/gwc", "source_ref": "main", "source_sha": "32d8c308f7d67de3dbd914a19837871d99c22ab4", "tool_package": "gwc-g1@1.0", "tool_source_commit": "32d8c308f7d67de3dbd914a19837871d99c22ab4", "schema_version": "g1-intake-brief/1.0", "owner_root": ".gwc/tasks/SCRUM-116/g1", "generated_at": "2026-07-27T16:08:00Z", "resolves": true, "failure_code": null},
+    {"artifact_id": "rejected-write-stale-fence", "parent_artifact_id": "g2-scrum-116-run", "source_repo": "nhatnguyenquang1838-coder/gwc", "source_ref": "main", "source_sha": "32d8c308f7d67de3dbd914a19837871d99c22ab4", "tool_package": "gwc-g2@1.0", "tool_source_commit": "32d8c308f7d67de3dbd914a19837871d99c22ab4", "schema_version": "g2-execution/1.0", "owner_root": ".gwc/tasks/SCRUM-116/g2", "generated_at": "2026-07-27T16:08:00Z", "resolves": false, "failure_code": "STALE_LEASE_OR_FENCING"}
+  ],
+  "downstream_tasks": ["SCRUM-117", "SCRUM-118", "SCRUM-119", "SCRUM-120", "SCRUM-121"],
+  "explicit_gaps": ["DW-SuperApps/boilerplate branch is absent from the verified input and is not invented.", "BMAD provider state ready-unpublished is modeled as an explicit non-published state until provider/release evidence exists."]
+}

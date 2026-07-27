@@ -1,0 +1,45 @@
+schema_version: '1.0'
+artifact_type: ua-impact-map
+generated_at: '2026-07-27T15:41:53Z'
+source:
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  snapshot_meta: .ua/meta.json
+  snapshot_last_analyzed_at: '2026-07-22T18:10:10.611Z'
+  refresh_mode: disabled
+  mode: read_only_existing_snapshot
+findings:
+- id: UA-IMPACT-1
+  category: authority
+  source_paths:
+  - .ua/extensions/traceability-graph.json
+  - AGENTS.md
+  finding: GWC, UA, Task-Me, BMAD and GitHub/Jira authority/source-of-truth separation is already represented as a planning traceability concern and must be locked in SCRUM-116.
+  downstream:
+  - SCRUM-117
+  - SCRUM-118
+  - SCRUM-119
+  - SCRUM-120
+- id: UA-IMPACT-2
+  category: mutation-safety
+  source_paths:
+  - .ua/knowledge-graph.json
+  - core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json
+  - core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json
+  finding: Existing CAS and lease node surfaces support a fail-closed parallel-write rule and should be reused rather than replaced.
+  downstream:
+  - provenance-envelope
+  - collision-fixtures
+- id: UA-IMPACT-3
+  category: distribution
+  source_paths:
+  - distribution/power-package.yaml
+  - .github/workflows/publish-power.yml
+  - .github/workflows/publish-release.yml
+  finding: Package source, release/power-dist modes and CI publication are distinct evidence surfaces; target runtime output must not be treated as package source.
+  downstream:
+  - compatibility-matrix
+  - ownership-matrix
+limitations:
+- Snapshot is not refreshed in G1 because UA refresh is disabled and the selected run is read-only.
+- Findings do not claim current product/runtime implementation behavior.

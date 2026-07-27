@@ -1,0 +1,33 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+task_id: SCRUM-116
+canonical_task_uid: SCRUM-116
+reader: codex-local-agent
+read_at_utc: '2026-07-27T15:50:18Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+working_branch: codex/scrum-116-topology-provenance-20260727
+plan_root: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance
+plan_revision: sha256:b18100f1d28a710d5f75322db9a795456f5d363f895b57fea250917ed6848726
+paths_read:
+- .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/requirements.md
+- .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/design.md
+- .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/tasks.md
+file_sha256:
+  requirements.md: e1f202a0dccdee50cea25e5fd274e6b82c32466cbe79f04952ac84d3bb899d28
+  design.md: 4e854485fd3fc4e429820e0caf2edcacbc096f411e8b4593363969bf8bf6b2c7
+  tasks.md: 8924e3f5005cbcac59e4af5e2712591fd654e251da9a0921d2e2d5eafe4bc2fd
+verification:
+  task_uid_matches: true
+  repository_matches: true
+  protected_base_matches: true
+  revision_matches: true
+  scope_matches_g1: true
+  unresolved_dependencies: []
+  result: VERIFIED
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+approval_id: CP-20260727-116-G2
+note: This receipt records the required plan read and grants no authority beyond the separately approved G2 envelope.
