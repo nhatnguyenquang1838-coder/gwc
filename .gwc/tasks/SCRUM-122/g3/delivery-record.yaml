@@ -1,0 +1,25 @@
+schema_version: "1.0"
+task_id: SCRUM-122
+gate: G3_PR_VALIDATION
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: cd9b49cf9e6fd97413bc49ed480b2fc9941513af
+branch: feat/scrum-122-126-p5-evaluation-r1
+scope_hash: sha256:965869cb4b1fc8b0d142f54f2052bc337813347afa7aab0f087c18d552171bc8
+pr_number: 130
+pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/130
+head_sha: 06547706a238b02bb2f9e2131f541748a4cf56de
+status: draft_pr_open
+implementation_summary:
+  - added a bounded P5 evaluation and promotion contract
+  - added a P5 evaluation schema and local validator
+  - added a Cytoscape overlay for stable-versus-candidate comparison
+  - added Task Me fallback evidence and the Kiro 3-file spec package
+  - added focused unittest coverage for the overlay and validator
+validation:
+  - python3 -m unittest tests.test_p5_evaluation_adapter tests.test_v3_registry_adapter tests.test_v3_run_history_adapter
+  - python3 tools/validate_p5_evaluation.py --suite
+exclusions:
+  g4_merge: not_authorized
+  g5_manual_deploy_or_release: not_authorized
+  g6_production_data_or_config: not_applicable
+
