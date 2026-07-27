@@ -1,0 +1,21 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+task_id: SCRUM-119
+run_id: g1-scrum-119-20260728-0045
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+problem_statement: >
+  Define a versioned BMAD procedure adapter that can execute approved methodology
+  steps without owning canonical GWC state, broadening scope, self-approving,
+  or mutating unowned runtime roots.
+desired_outcome:
+  - versioned procedure, request, result and permission schemas
+  - authority and action matrix encoded in the canonical contract
+  - positive architecture, TDD and review-only examples
+  - rejected scope-violation and duplicate-idempotency examples
+  - validator and automated regression tests
+non_goals:
+  - package publication
+  - merge, deploy, release or production operation
+  - direct mutation of DW-SuperApps or target project source
+status: READY

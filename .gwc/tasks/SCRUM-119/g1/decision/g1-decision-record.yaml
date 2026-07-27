@@ -1,0 +1,16 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+task_id: SCRUM-119
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+selected_option_id: OPT-1
+scope_hash: sha256:279c71c1803664e12e47868ba546bcbeb09ad68cdc5ddc236914da6c2576c872
+rationale: >
+  GWC owns canonical procedure authority contracts. DW-SuperApps remains the
+  distribution and host-adapter owner, while generated BMAD outputs remain
+  target-owned under .bmad-compatible roots.
+authority:
+  granted: [G2_EXECUTION]
+  excluded: [G4_MERGE, G5_MANUAL_ACTION, G6_PRODUCTION_DATA]
+status: ACCEPTED

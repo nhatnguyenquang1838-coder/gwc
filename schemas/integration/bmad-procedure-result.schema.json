@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/integration/bmad-procedure-result.schema.json",
+  "title": "BMAD Procedure Adapter Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "status",
+    "evidence_refs",
+    "changed_paths",
+    "checks",
+    "findings",
+    "residual_risks",
+    "provenance",
+    "recommendation",
+    "checkpoint"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "SUCCESS",
+        "REJECTED",
+        "PARTIAL",
+        "FAILED",
+        "UNAVAILABLE",
+        "DUPLICATE"
+      ]
+    },
+    "failure_code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "INVALID_INPUT",
+        "SCOPE_VIOLATION",
+        "UNSUPPORTED_PROCEDURE",
+        "PARTIAL_RESULT",
+        "TOOL_UNAVAILABLE",
+        "STALE_CHECKPOINT",
+        "DUPLICATE_IDEMPOTENCY_KEY",
+        "PROVIDER_NOT_PUBLISHED"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "changed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "status"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "SKIP"
+            ]
+          },
+          "evidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "residual_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "repository",
+        "base_sha",
+        "procedure_id",
+        "procedure_version",
+        "adapter_version",
+        "scope_hash",
+        "provider_commit",
+        "request_digest",
+        "generated_at"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "head_sha": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "procedure_id": {
+          "type": "string"
+        },
+        "procedure_version": {
+          "type": "string"
+        },
+        "adapter_version": {
+          "type": "string"
+        },
+        "scope_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "provider_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "request_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "message",
+        "scope_change_required"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "PROCEED",
+            "BLOCK",
+            "PROPOSE_SCOPE_CHANGE",
+            "NO_ACTION"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "scope_change_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision",
+        "resume_supported",
+        "resume_token"
+      ],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resume_supported": {
+          "type": "boolean"
+        },
+        "resume_token": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

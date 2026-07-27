@@ -1,0 +1,22 @@
+schema_version: "1.0"
+artifact_type: g1-options
+task_id: SCRUM-119
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+options:
+  - option_id: OPT-1
+    title: Canonical bounded GWC contract
+    summary: Port and harden the BMAD adapter semantics into GWC-owned schemas, validation and evidence.
+    pros: [single authority owner, exact provenance, testable boundary, distribution remains separate]
+    cons: [requires later DW-SuperApps consumption task]
+  - option_id: OPT-2
+    title: Keep contract only in DW-SuperApps
+    summary: Treat distribution implementation as canonical authority.
+    pros: [fewer immediate files in GWC]
+    cons: [violates SCRUM-116 ownership, weakens gate authority]
+  - option_id: OPT-3
+    title: Allow BMAD self-governance
+    summary: Permit BMAD to expand scope and approve transitions.
+    pros: []
+    cons: [violates SCRUM-119 objective and GWC gate separation]
+selected_option_id: OPT-1
+status: READY

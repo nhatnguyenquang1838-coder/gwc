@@ -1,0 +1,23 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+task_id: SCRUM-119
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+working_branch: feat/scrum-119-bmad-procedure-adapter-contract
+scope_hash: sha256:279c71c1803664e12e47868ba546bcbeb09ad68cdc5ddc236914da6c2576c872
+workflow: GWC_FASTLANE_BOOTSTRAP
+approval_id: FL-G2-SCRUM-119-20260728-0045
+status: PENDING_EXACT_HEAD_VALIDATION
+validation:
+  local_materialized_validator: planned
+  repository_ci: pending
+pr:
+  number: null
+  head_sha: null
+boundaries:
+  merge_authorized: false
+  deploy_authorized: false
+  production_authorized: false
+note: >
+  This record is committed with the implementation package and is finalized by
+  exact-head PR/CI readback in the PR body and Jira projection. It does not grant G4.
