@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.1",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "evidence_type": "pr_head",
+  "expected": {
+    "head_sha": "1111111111111111111111111111111111111111"
+  },
+  "observed": {
+    "head_sha": "2222222222222222222222222222222222222222"
+  },
+  "ci": {
+    "required": true,
+    "workflow_runs": [
+      {
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ]
+  },
+  "projection": {
+    "authority": "projection",
+    "grants_gate_authority": false
+  }
+}

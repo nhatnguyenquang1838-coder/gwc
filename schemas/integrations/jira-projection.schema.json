@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["schema_version","issue_key","authority"],"properties":{"schema_version":{"const":"0.1"},"issue_key":{"type":"string"},"authority":{"const":"projection"},"grants_gate_authority":{"const":false},"status":{"enum":["PENDING","APPLIED","FAILED","SKIPPED"]},"failure_code":{"type":["string","null"]}}}

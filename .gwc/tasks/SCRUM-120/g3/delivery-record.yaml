@@ -1,0 +1,17 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+task_id: SCRUM-120
+gate: G3_PR
+base_sha: 68deae88f686ecb66b15cb8aa2e5b943ad02adf1
+working_branch: feat/scrum-120-github-g5-g6-jira-projection-r2
+approval_id: CP-20260728-120-G2-R2
+scope_hash: sha256:e10c8fc8e91dd59c3addad6b33536d6d2fa1b5d648a2ef82a68fae6a484d0601
+status: READY_FOR_DRAFT_PR
+validation:
+  local_validator: PASS
+  py_compile: PASS
+  unit_tests: PASS
+boundaries:
+  g4_merge: excluded
+  g5_post_merge: verification_only
+  g6_production_data: excluded

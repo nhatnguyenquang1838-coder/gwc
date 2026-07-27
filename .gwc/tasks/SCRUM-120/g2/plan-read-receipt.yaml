@@ -1,0 +1,14 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+task_id: SCRUM-120
+canonical_task_uid: SCRUM-120
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 68deae88f686ecb66b15cb8aa2e5b943ad02adf1
+plan_revision: sha256:7fee659f740c4fd2b59b38f19a0772d518588beece882ea0752bfdbf4e4980a4
+paths_read:
+- .kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/requirements.md
+- .kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/design.md
+- .kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
