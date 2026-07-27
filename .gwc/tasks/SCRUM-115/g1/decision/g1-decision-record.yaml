@@ -1,0 +1,92 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-27T12:02:14Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-115
+  base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: current-user
+  decided_at: '2026-07-27T12:02:14Z'
+  source: 'chat: exact G2 approval received; agent invalidated stale plan reference
+    and returned to G1 for task-specific repair'
+  explicit: true
+rationale: Proceed only with a task-specific SCRUM-115 plan that materializes 14 scenarios,
+  deterministic decision history and non-executable v3 projection; retain exact G2/G4/G5/G6
+  separation.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:76167bccb429735b8ba5937561fd13f460a6adb41d08c624945588b28f090712
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Author and validate 14 canonical scenario entries and provenance.
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Bind registry scenarios to typed guards, deterministic route decisions
+      and immutable routing history.
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Bind selected scenario and route history into Cytoscape v3 without
+      executable visual edges.
+    dependencies:
+    - SUB-TASK-1
+    - SUB-TASK-2
+  - sub_task_id: SUB-TASK-4
+    description: Run focused registry, engine, v3, governance and CI validation.
+    dependencies:
+    - SUB-TASK-2
+    - SUB-TASK-3
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: scenario-contract-authoring
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: deterministic-routing
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: registry-v3-binding
+    agent_type: primary
+  - sub_task_id: SUB-TASK-4
+    skill_id: validator-testing
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Single bounded guarded-branch delivery with exact-SHA validation and independent
+    G3 review.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-115
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  plan_root: .kiro/specs/GWC-P3-I3-canonical-scenarios-v3
+  plan_revision: sha256:0ca6de11e1d2abe90304f83ac1a5fe80b3a7876c2474bb419e7d951b4b6d56a2
+  validation_evidence: Local task-specific Kiro structure, dependency, scope and traceability
+    validation in isolated G2 repair session; exact protected base confirmed by GitHub
+    connector.

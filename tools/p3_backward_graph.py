@@ -1,212 +1,125 @@
 #!/usr/bin/env python3
-"""Deterministic P3 backward graph compiler and scenario routing engine.
-
-The module intentionally uses only the Python standard library so repository and
-CI consumers can execute it without adding a runtime dependency.
-"""
+"""Deterministic P3 backward graph compiler and scenario routing engine."""
 from __future__ import annotations
-
 from dataclasses import dataclass
 from enum import Enum
 from hashlib import sha256
 import json
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, MutableSequence, Sequence
 
-
-class CompileError(ValueError):
-    """Raised when a graph cannot produce a governed deterministic plan."""
-
-
+class CompileError(ValueError): pass
 class RouteClass(str, Enum):
-    VALID_AUTO = "VALID_AUTO"
-    VALID_HUMAN = "VALID_HUMAN"
-    CONDITIONAL = "CONDITIONAL"
-    BLOCKED = "BLOCKED"
-    UNSAFE = "UNSAFE"
-
-
+    VALID_AUTO="VALID_AUTO"; VALID_HUMAN="VALID_HUMAN"; CONDITIONAL="CONDITIONAL"; BLOCKED="BLOCKED"; UNSAFE="UNSAFE"
 @dataclass(frozen=True)
 class GuardResult:
     passed: bool
-    conditional: bool = False
-    reason: str = ""
+    conditional: bool=False
+    reason: str=""
 
-
-def _stable(value: Any) -> str:
-    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
-
-
-def _graph_revision(nodes: Sequence[Mapping[str, Any]]) -> str:
-    payload = [{k: node[k] for k in sorted(node)} for node in sorted(nodes, key=lambda n: str(n["id"]))]
-    return "sha256:" + sha256(_stable(payload).encode("utf-8")).hexdigest()
-
-
-def _index(nodes: Sequence[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
-    indexed: dict[str, Mapping[str, Any]] = {}
+def _stable(value: Any)->str: return json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=True)
+def _digest(value: Any)->str: return "sha256:"+sha256(_stable(value).encode()).hexdigest()
+def _graph_revision(nodes: Sequence[Mapping[str,Any]])->str:
+    return _digest([{k:n[k] for k in sorted(n)} for n in sorted(nodes,key=lambda n:str(n["id"]))])
+def _index(nodes):
+    out={}
     for node in nodes:
-        node_id = str(node.get("id", ""))
-        if not node_id or node_id in indexed:
-            raise CompileError("MISSING_DEPENDENCY: node ids must be unique and non-empty")
-        indexed[node_id] = node
-    return indexed
+        i=str(node.get("id",""))
+        if not i or i in out: raise CompileError("MISSING_DEPENDENCY: node ids must be unique and non-empty")
+        out[i]=node
+    return out
+def _dependencies(node): return tuple(sorted(str(i) for i in node.get("dependencies",[])))
 
-
-def _dependencies(node: Mapping[str, Any]) -> tuple[str, ...]:
-    return tuple(sorted(str(item) for item in node.get("dependencies", [])))
-
-
-def compile_backward_graph(
-    nodes: Sequence[Mapping[str, Any]],
-    desired_outcome: str,
-    safe_failure_outcome: str,
-    *,
-    profile: str = "standard",
-    allowed_authorities: Iterable[str] = (),
-) -> dict[str, Any]:
-    """Compile the dependency closure for a desired outcome.
-
-    Selection order is deterministic: dependencies are visited lexicographically
-    and emitted in topological order. Profile overlays may disable nodes or add a
-    required profile. Human/production authorities are never silently promoted.
-    """
-    indexed = _index(nodes)
-    if desired_outcome not in indexed:
-        raise CompileError("MISSING_TERMINAL: desired outcome is absent")
-    if safe_failure_outcome not in indexed:
-        raise CompileError("MISSING_TERMINAL: safe-failure outcome is absent")
-
-    authorities = set(allowed_authorities)
-    state: dict[str, int] = {}
-    order: list[str] = []
-    rejected: list[dict[str, str]] = []
-
-    def visit(node_id: str) -> None:
-        if node_id not in indexed:
-            raise CompileError(f"MISSING_DEPENDENCY: {node_id}")
-        if state.get(node_id) == 1:
-            raise CompileError(f"CYCLE_UNSAFE: {node_id}")
-        if state.get(node_id) == 2:
-            return
-        state[node_id] = 1
-        node = indexed[node_id]
-        overlays = node.get("profiles", {})
-        overlay = overlays.get(profile, {}) if isinstance(overlays, Mapping) else {}
-        if overlay.get("enabled") is False:
-            raise CompileError(f"PROFILE_MISMATCH: {node_id} disabled for {profile}")
-        required_profile = node.get("required_profile")
-        if required_profile and required_profile != profile:
-            raise CompileError(f"PROFILE_MISMATCH: {node_id} requires {required_profile}")
-        authority = str(node.get("authority", "AUTO"))
-        if authority not in {"AUTO", "READ_ONLY"} and authority not in authorities:
-            rejected.append({"id": node_id, "reason": "AUTHORITY_MISMATCH"})
-            raise CompileError(f"AUTHORITY_MISMATCH: {node_id} requires {authority}")
-        if node.get("unsafe") is True:
-            raise CompileError(f"UNSAFE_TERMINAL: {node_id}")
-        for dependency in _dependencies(node):
-            visit(dependency)
-        state[node_id] = 2
-        order.append(node_id)
-
+def compile_backward_graph(nodes,desired_outcome,safe_failure_outcome,*,profile="standard",allowed_authorities=()):
+    indexed=_index(nodes)
+    if desired_outcome not in indexed or safe_failure_outcome not in indexed: raise CompileError("MISSING_TERMINAL: desired or safe-failure outcome is absent")
+    authorities=set(allowed_authorities); state={}; order=[]; rejected=[]
+    def visit(i):
+        if i not in indexed: raise CompileError(f"MISSING_DEPENDENCY: {i}")
+        if state.get(i)==1: raise CompileError(f"CYCLE_UNSAFE: {i}")
+        if state.get(i)==2:return
+        state[i]=1; node=indexed[i]; overlay=(node.get("profiles") or {}).get(profile,{})
+        if overlay.get("enabled") is False: raise CompileError(f"PROFILE_MISMATCH: {i} disabled for {profile}")
+        if node.get("required_profile") and node["required_profile"]!=profile: raise CompileError(f"PROFILE_MISMATCH: {i} requires {node['required_profile']}")
+        authority=str(node.get("authority","AUTO"))
+        if authority not in {"AUTO","READ_ONLY"} and authority not in authorities:
+            rejected.append({"id":i,"reason":"AUTHORITY_MISMATCH"}); raise CompileError(f"AUTHORITY_MISMATCH: {i} requires {authority}")
+        if node.get("unsafe") is True: raise CompileError(f"UNSAFE_TERMINAL: {i}")
+        for dep in _dependencies(node): visit(dep)
+        state[i]=2; order.append(i)
     visit(desired_outcome)
-    return {
-        "graph_revision": _graph_revision(nodes),
-        "profile": profile,
-        "desired_outcome": desired_outcome,
-        "safe_failure_outcome": safe_failure_outcome,
-        "selected_nodes": order,
-        "rejected_nodes": rejected,
-        "status": "COMPILED",
-    }
+    return {"graph_revision":_graph_revision(nodes),"profile":profile,"desired_outcome":desired_outcome,"safe_failure_outcome":safe_failure_outcome,"selected_nodes":order,"rejected_nodes":rejected,"status":"COMPILED"}
 
+def evaluate_guard(guard,context):
+    kind=guard.get("type"); field=guard.get("field"); actual=context.get(field); expected=guard.get("value")
+    if kind=="exists": passed=field in context
+    elif kind=="equals":
+        if isinstance(expected,str) and expected in context and field!=expected: expected=context[expected]
+        passed=type(actual) is type(expected) and actual==expected
+    elif kind=="in": passed=any(type(actual) is type(i) and actual==i for i in guard.get("values",[]))
+    elif kind=="gte": passed=isinstance(actual,(int,float)) and not isinstance(actual,bool) and isinstance(expected,(int,float)) and not isinstance(expected,bool) and actual>=expected
+    elif kind=="lte": passed=isinstance(actual,(int,float)) and not isinstance(actual,bool) and isinstance(expected,(int,float)) and not isinstance(expected,bool) and actual<=expected
+    else:return GuardResult(False,False,f"UNKNOWN_GUARD_TYPE:{kind}")
+    return GuardResult(True) if passed else GuardResult(False,bool(guard.get("conditional")),str(guard.get("reason","GUARD_FAILED")))
 
-def evaluate_guard(guard: Mapping[str, Any], context: Mapping[str, Any]) -> GuardResult:
-    """Evaluate a typed guard without implicit truthiness coercion."""
-    kind = guard.get("type")
-    field = guard.get("field")
-    actual = context.get(field)
-    expected = guard.get("value")
-    if kind == "exists":
-        passed = field in context
-    elif kind == "equals":
-        passed = type(actual) is type(expected) and actual == expected
-    elif kind == "in":
-        values = guard.get("values", [])
-        passed = any(type(actual) is type(item) and actual == item for item in values)
-    elif kind == "gte":
-        passed = isinstance(actual, (int, float)) and not isinstance(actual, bool) and actual >= expected
-    elif kind == "lte":
-        passed = isinstance(actual, (int, float)) and not isinstance(actual, bool) and actual <= expected
-    else:
-        return GuardResult(False, False, f"UNKNOWN_GUARD_TYPE:{kind}")
-    if passed:
-        return GuardResult(True)
-    return GuardResult(False, bool(guard.get("conditional")), str(guard.get("reason", "GUARD_FAILED")))
-
-
-def enumerate_routes(
-    nodes: Sequence[Mapping[str, Any]],
-    start: str,
-    green: str,
-    context: Mapping[str, Any],
-    *,
-    max_depth: int = 32,
-) -> list[dict[str, Any]]:
-    """Enumerate and rank all simple routes from start to green."""
-    indexed = _index(nodes)
-    if start not in indexed or green not in indexed:
-        raise CompileError("MISSING_TERMINAL: route endpoint absent")
-    routes: list[dict[str, Any]] = []
-
-    def walk(node_id: str, path: list[str], conditional: bool, human: bool, blocked: bool, unsafe: bool) -> None:
-        if len(path) > max_depth:
-            return
-        node = indexed[node_id]
-        guard_results = [evaluate_guard(item, context) for item in node.get("guards", [])]
-        node_conditional = conditional or any(result.conditional and not result.passed for result in guard_results)
-        node_blocked = blocked or any(not result.passed and not result.conditional for result in guard_results)
-        node_human = human or str(node.get("authority", "AUTO")) not in {"AUTO", "READ_ONLY"}
-        node_unsafe = unsafe or node.get("unsafe") is True
-        if node_id == green:
-            if node_unsafe:
-                route_class = RouteClass.UNSAFE
-            elif node_blocked:
-                route_class = RouteClass.BLOCKED
-            elif node_conditional:
-                route_class = RouteClass.CONDITIONAL
-            elif node_human:
-                route_class = RouteClass.VALID_HUMAN
-            else:
-                route_class = RouteClass.VALID_AUTO
-            routes.append({"path": path, "class": route_class.value, "length": len(path)})
-            return
-        for successor in sorted(str(item) for item in node.get("successors", [])):
-            if successor not in indexed:
-                raise CompileError(f"MISSING_DEPENDENCY: {successor}")
-            if successor not in path:
-                walk(successor, path + [successor], node_conditional, node_human, node_blocked, node_unsafe)
-
-    walk(start, [start], False, False, False, False)
-    rank = {
-        RouteClass.VALID_AUTO.value: 0,
-        RouteClass.VALID_HUMAN.value: 1,
-        RouteClass.CONDITIONAL.value: 2,
-        RouteClass.BLOCKED.value: 3,
-        RouteClass.UNSAFE.value: 4,
-    }
-    routes.sort(key=lambda route: (rank[route["class"]], route["length"], tuple(route["path"])))
-    for position, route in enumerate(routes, start=1):
-        route["rank"] = position
+def enumerate_routes(nodes,start,green,context,*,max_depth=32):
+    indexed=_index(nodes)
+    if start not in indexed or green not in indexed: raise CompileError("MISSING_TERMINAL: route endpoint absent")
+    routes=[]
+    def walk(i,path,conditional,human,blocked,unsafe):
+        if len(path)>max_depth:return
+        node=indexed[i]; results=[evaluate_guard(x,context) for x in node.get("guards",[])]
+        conditional=conditional or any(r.conditional and not r.passed for r in results)
+        blocked=blocked or any(not r.passed and not r.conditional for r in results)
+        human=human or str(node.get("authority","AUTO")) not in {"AUTO","READ_ONLY"}
+        unsafe=unsafe or node.get("unsafe") is True
+        if i==green:
+            cls=RouteClass.UNSAFE if unsafe else RouteClass.BLOCKED if blocked else RouteClass.CONDITIONAL if conditional else RouteClass.VALID_HUMAN if human else RouteClass.VALID_AUTO
+            routes.append({"path":path,"class":cls.value,"length":len(path)}); return
+        for nxt in sorted(str(x) for x in node.get("successors",[])):
+            if nxt not in indexed: raise CompileError(f"MISSING_DEPENDENCY: {nxt}")
+            if nxt not in path: walk(nxt,path+[nxt],conditional,human,blocked,unsafe)
+    walk(start,[start],False,False,False,False)
+    rank={c.value:i for i,c in enumerate(RouteClass)}
+    routes.sort(key=lambda r:(rank[r["class"]],r["length"],tuple(r["path"])))
+    for i,r in enumerate(routes,1):r["rank"]=i
     return routes
 
+def route_decision(nodes,start,green,context):
+    routes=enumerate_routes(nodes,start,green,context); selected=routes[0] if routes else None
+    return {"graph_revision":_graph_revision(nodes),"routes":routes,"selected_route":selected,"status":"ROUTED" if selected else "NO_ROUTE"}
 
-def route_decision(
-    nodes: Sequence[Mapping[str, Any]], start: str, green: str, context: Mapping[str, Any]
-) -> dict[str, Any]:
-    routes = enumerate_routes(nodes, start, green, context)
-    selected = routes[0] if routes else None
-    return {
-        "graph_revision": _graph_revision(nodes),
-        "routes": routes,
-        "selected_route": selected,
-        "status": "ROUTED" if selected else "NO_ROUTE",
-    }
+def scenario_nodes(scenario, node_metadata=()):
+    meta={str(n["id"]):dict(n) for n in node_metadata}; out={i:{"id":i,"successors":[]} for i in scenario.get("route_nodes",[])}
+    for i,m in meta.items():
+        if i in out:out[i].update(m);out[i].setdefault("successors",[])
+    for e in scenario.get("edges",[]):
+        if e.get("runtime_executable") and e.get("edge_type") in {"runtime","dependency"}:
+            out.setdefault(e["source"],{"id":e["source"],"successors":[]})["successors"].append(e["target"])
+            out.setdefault(e["target"],{"id":e["target"],"successors":[]})
+    return [out[i] for i in sorted(out)]
+
+def append_scenario_decision(history: MutableSequence[Mapping[str,Any]], decision: Mapping[str,Any]):
+    for existing in history:
+        if existing.get("decision_id")==decision.get("decision_id"):
+            if _stable(existing)!=_stable(decision): raise CompileError("IMMUTABILITY_VIOLATION: decision id rebound")
+            return existing
+    history.append(dict(decision)); return decision
+
+def decide_scenario(scenario,facts,*,node_metadata=(),history=None):
+    missing=[f for f in scenario.get("activation_facts",[]) if f not in facts]
+    guard_results=[]
+    for guard in scenario.get("guards",[]):
+        result=evaluate_guard(guard,facts); guard_results.append({"id":guard.get("id"),"passed":result.passed,"conditional":result.conditional,"reason":result.reason})
+    policy=scenario["route_policy"]; nodes=scenario_nodes(scenario,node_metadata)
+    routes=[]
+    for green in policy.get("green_targets",[]): routes.extend(enumerate_routes(nodes,policy["start_node"],green,facts,max_depth=policy.get("max_depth",32)))
+    routes.sort(key=lambda r:(r["rank"],r["length"],tuple(r["path"])))
+    for i,r in enumerate(routes,1):r["rank"]=i
+    blocked=any(not r["passed"] and not r["conditional"] for r in guard_results)
+    conditional=bool(missing) or any(not r["passed"] and r["conditional"] for r in guard_results)
+    selected=routes[0] if routes else None
+    classification="BLOCKED" if blocked or not selected else "CONDITIONAL" if conditional else selected["class"]
+    record={"scenario_id":scenario["id"],"scenario_version":scenario["version"],"graph_revision":_graph_revision(nodes),"facts_digest":_digest(facts),"missing_activation_facts":missing,"guard_results":guard_results,"candidate_routes":routes,"selected_route":selected,"classification":classification,"auto_execute":classification=="VALID_AUTO"}
+    record["decision_id"]=_digest(record); record["decision_digest"]=record["decision_id"]
+    if history is not None: append_scenario_decision(history,record)
+    return record

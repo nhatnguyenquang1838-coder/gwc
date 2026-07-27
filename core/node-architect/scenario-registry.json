@@ -1,62 +1,835 @@
 {
   "artifact_type": "scenario-registry",
   "declared_scenario_count": 116,
-  "materialized_scenario_count": 3,
-  "provenance": "tools/node_architect/project_runtime_knowledge_graph.py",
+  "materialized_scenario_count": 14,
+  "provenance": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
   "registry_id": "gwc-runtime-scenario-registry",
-  "revision": "scrum-104-20260726",
+  "revision": "scrum-115-20260727",
   "scenarios": [
     {
-      "activation_facts": ["workflow_run_id"],
-      "artifact_type": "runtime-scenario",
-      "edges": [
-        {"edge_type": "runtime", "provenance": "KG projector: missing_workflow_run", "runtime_executable": true, "source": "repo_delivery.ci-run-capture", "target": "runtime_checkpoint.checkpoint-persist"}
+      "activation_facts": [
+        "context_complete"
       ],
-      "evidence_refs": ["tools/node_architect/project_runtime_knowledge_graph.py", "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"],
-      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
-      "green_targets": ["runtime_checkpoint.checkpoint-persist"],
-      "human_boundaries": ["G5_DEPLOY"],
-      "id": "missing-workflow-run",
-      "provenance": {"source_path": "tools/node_architect/project_runtime_knowledge_graph.py", "source_sha": "121a6a4851d768558b502e63acc2f8b31e06386c9fcd288f74d3745d9a4e93e8", "source_status": "canonical_explicit"},
-      "route_nodes": ["repo_delivery.ci-run-capture", "runtime_checkpoint.checkpoint-persist"],
-      "rules": ["workflow-run-missing"],
-      "schema_version": "1.0.0",
+      "artifact_type": "runtime-scenario",
+      "category": "missing-context",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "intake_context.context-gap-escalation",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "context_complete",
+          "id": "context-complete",
+          "reason": "CONTEXT_MISSING",
+          "type": "equals",
+          "value": true
+        }
+      ],
+      "human_boundaries": [
+        "G1_ALIGNMENT"
+      ],
+      "id": "missing-context",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "intake_context.context-gap-escalation",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "intake_context.context-gap-escalation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
       "version": "1.0.0"
     },
     {
-      "activation_facts": ["head_sha", "expected_head_sha"],
-      "artifact_type": "runtime-scenario",
-      "edges": [
-        {"edge_type": "runtime", "provenance": "KG projector: sha_mismatch", "runtime_executable": true, "source": "repo_delivery.ci-run-capture", "target": "failure_recovery.timeout-recovery"}
+      "activation_facts": [
+        "ambiguity_count"
       ],
-      "evidence_refs": ["tools/node_architect/project_runtime_knowledge_graph.py", "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"],
-      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
-      "green_targets": ["failure_recovery.timeout-recovery"],
-      "human_boundaries": ["G5_DEPLOY"],
-      "id": "sha-mismatch",
-      "provenance": {"source_path": "tools/node_architect/project_runtime_knowledge_graph.py", "source_sha": "121a6a4851d768558b502e63acc2f8b31e06386c9fcd288f74d3745d9a4e93e8", "source_status": "canonical_explicit"},
-      "route_nodes": ["repo_delivery.ci-run-capture", "failure_recovery.timeout-recovery"],
-      "rules": ["head-sha-mismatch"],
-      "schema_version": "1.0.0",
+      "artifact_type": "runtime-scenario",
+      "category": "ambiguity",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "intake_context.context-gap-escalation",
+          "target": "gate_authority.gate-state-resolution"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "gate_authority.gate-state-resolution"
+      ],
+      "guards": [
+        {
+          "conditional": true,
+          "field": "ambiguity_count",
+          "id": "ambiguity-cleared",
+          "reason": "AMBIGUITY_REMAINS",
+          "type": "equals",
+          "value": 0
+        }
+      ],
+      "human_boundaries": [
+        "G1_ALIGNMENT"
+      ],
+      "id": "ambiguity",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "intake_context.context-gap-escalation",
+        "gate_authority.gate-state-resolution"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.gate-state-resolution"
+        ],
+        "max_depth": 32,
+        "start_node": "intake_context.context-gap-escalation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
       "version": "1.0.0"
     },
     {
-      "activation_facts": ["ci_status"],
-      "artifact_type": "runtime-scenario",
-      "edges": [
-        {"edge_type": "runtime", "provenance": "KG projector: ci_pending", "runtime_executable": true, "source": "runtime_checkpoint.checkpoint-persist", "target": "validation_quality.ci-evidence-capture"}
+      "activation_facts": [
+        "base_sha",
+        "expected_base_sha"
       ],
-      "evidence_refs": ["tools/node_architect/project_runtime_knowledge_graph.py", "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"],
+      "artifact_type": "runtime-scenario",
+      "category": "baseline-drift",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "failure_recovery.version-drift-rollback-routing",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": true,
+          "field": "base_sha",
+          "id": "baseline-matches",
+          "reason": "BASELINE_DRIFT",
+          "type": "equals",
+          "value": "expected_base_sha"
+        }
+      ],
+      "human_boundaries": [
+        "G2_EXECUTION"
+      ],
+      "id": "baseline-drift",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "failure_recovery.version-drift-rollback-routing",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "failure_recovery.version-drift-rollback-routing"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "scope_hash",
+        "approved_scope_hash"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "scope-drift",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "gate_authority.scope-hash-calculation",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "scope_hash",
+          "id": "scope-matches",
+          "reason": "SCOPE_DRIFT",
+          "type": "equals",
+          "value": "approved_scope_hash"
+        }
+      ],
+      "human_boundaries": [
+        "G2_EXECUTION"
+      ],
+      "id": "scope-drift",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "gate_authority.scope-hash-calculation",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "gate_authority.scope-hash-calculation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "write_outcome"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "ambiguous-write-outcome",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "failure_recovery.unknown-write-reconciliation",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": true,
+          "field": "write_outcome",
+          "id": "write-outcome-known",
+          "reason": "WRITE_OUTCOME_AMBIGUOUS",
+          "type": "in",
+          "values": [
+            "confirmed",
+            "rejected"
+          ]
+        }
+      ],
+      "human_boundaries": [
+        "G2_EXECUTION"
+      ],
+      "id": "ambiguous-write-outcome",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "failure_recovery.unknown-write-reconciliation",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "failure_recovery.unknown-write-reconciliation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "observability_complete"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "observability-gap",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "validation_quality.ci-evidence-capture",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
       "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
-      "green_targets": ["validation_quality.ci-evidence-capture"],
-      "human_boundaries": ["G5_DEPLOY"],
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": true,
+          "field": "observability_complete",
+          "id": "observability-complete",
+          "reason": "OBSERVABILITY_GAP",
+          "type": "equals",
+          "value": true
+        }
+      ],
+      "human_boundaries": [
+        "G5_DEPLOY"
+      ],
+      "id": "observability-gap",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "validation_quality.ci-evidence-capture",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "validation_quality.ci-evidence-capture"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "ci_status"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "ci-pending",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "runtime_checkpoint.checkpoint-persist",
+          "target": "validation_quality.ci-evidence-capture"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": [
+        "validation_quality.ci-evidence-capture"
+      ],
+      "guards": [
+        {
+          "conditional": true,
+          "field": "ci_status",
+          "id": "ci-pending",
+          "reason": "CI_PENDING",
+          "type": "equals",
+          "value": "PENDING"
+        }
+      ],
+      "human_boundaries": [
+        "G3_PR"
+      ],
       "id": "ci-pending",
-      "provenance": {"source_path": "tools/node_architect/project_runtime_knowledge_graph.py", "source_sha": "121a6a4851d768558b502e63acc2f8b31e06386c9fcd288f74d3745d9a4e93e8", "source_status": "canonical_explicit"},
-      "route_nodes": ["runtime_checkpoint.checkpoint-persist", "validation_quality.ci-evidence-capture"],
-      "rules": ["ci-run-pending"],
-      "schema_version": "1.0.0",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "validation_quality.ci-evidence-capture"
+        ],
+        "max_depth": 32,
+        "start_node": "runtime_checkpoint.checkpoint-persist"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "ci_status"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "ci-failure",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "validation_quality.ci-evidence-capture",
+          "target": "failure_recovery.timeout-recovery"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": [
+        "failure_recovery.timeout-recovery"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "ci_status",
+          "id": "ci-success",
+          "reason": "CI_FAILED",
+          "type": "equals",
+          "value": "SUCCESS"
+        }
+      ],
+      "human_boundaries": [
+        "G3_PR"
+      ],
+      "id": "ci-failure",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "validation_quality.ci-evidence-capture",
+        "failure_recovery.timeout-recovery"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "failure_recovery.timeout-recovery"
+        ],
+        "max_depth": 32,
+        "start_node": "validation_quality.ci-evidence-capture"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "head_sha",
+        "expected_head_sha"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "ci-sha-mismatch",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "repo_delivery.ci-run-capture",
+          "target": "failure_recovery.timeout-recovery"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": [
+        "failure_recovery.timeout-recovery"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "head_sha",
+          "id": "head-sha-matches",
+          "reason": "CI_SHA_MISMATCH",
+          "type": "equals",
+          "value": "expected_head_sha"
+        }
+      ],
+      "human_boundaries": [
+        "G3_PR",
+        "G5_DEPLOY"
+      ],
+      "id": "ci-sha-mismatch",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "repo_delivery.ci-run-capture",
+        "failure_recovery.timeout-recovery"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "failure_recovery.timeout-recovery"
+        ],
+        "max_depth": 32,
+        "start_node": "repo_delivery.ci-run-capture"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "review_head_sha",
+        "current_head_sha"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "stale-review",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "gate_authority.approval-command-validation",
+          "target": "failure_recovery.approval-expiry-recovery"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "failure_recovery.approval-expiry-recovery"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "review_head_sha",
+          "id": "review-current",
+          "reason": "STALE_REVIEW",
+          "type": "equals",
+          "value": "current_head_sha"
+        }
+      ],
+      "human_boundaries": [
+        "G4_MERGE"
+      ],
+      "id": "stale-review",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "gate_authority.approval-command-validation",
+        "failure_recovery.approval-expiry-recovery"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "failure_recovery.approval-expiry-recovery"
+        ],
+        "max_depth": 32,
+        "start_node": "gate_authority.approval-command-validation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "approval_valid"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "approval-expiry",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "gate_authority.approval-command-validation",
+          "target": "failure_recovery.approval-expiry-recovery"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "failure_recovery.approval-expiry-recovery"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "approval_valid",
+          "id": "approval-valid",
+          "reason": "APPROVAL_EXPIRED",
+          "type": "equals",
+          "value": true
+        }
+      ],
+      "human_boundaries": [
+        "G2_EXECUTION",
+        "G4_MERGE"
+      ],
+      "id": "approval-expiry",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "gate_authority.approval-command-validation",
+        "failure_recovery.approval-expiry-recovery"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "failure_recovery.approval-expiry-recovery"
+        ],
+        "max_depth": 32,
+        "start_node": "gate_authority.approval-command-validation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "deployment_state"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "partial-deployment",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "failure_recovery.version-drift-rollback-routing",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "deployment_state",
+          "id": "deployment-complete",
+          "reason": "PARTIAL_DEPLOYMENT",
+          "type": "equals",
+          "value": "complete"
+        }
+      ],
+      "human_boundaries": [
+        "G5_DEPLOY"
+      ],
+      "id": "partial-deployment",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "failure_recovery.version-drift-rollback-routing",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "failure_recovery.version-drift-rollback-routing"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "production_state"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "production-partial-success",
+      "edges": [
+        {
+          "edge_type": "runtime",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": true,
+          "source": "failure_recovery.unknown-write-reconciliation",
+          "target": "gate_authority.authority-boundary-check"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/g5-ci-verification-evidence.schema.json",
+      "green_targets": [
+        "gate_authority.authority-boundary-check"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "production_state",
+          "id": "production-complete",
+          "reason": "PRODUCTION_PARTIAL_SUCCESS",
+          "type": "equals",
+          "value": "complete"
+        }
+      ],
+      "human_boundaries": [
+        "G6_PRODUCTION"
+      ],
+      "id": "production-partial-success",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "failure_recovery.unknown-write-reconciliation",
+        "gate_authority.authority-boundary-check"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.authority-boundary-check"
+        ],
+        "max_depth": 32,
+        "start_node": "failure_recovery.unknown-write-reconciliation"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
+      "version": "1.0.0"
+    },
+    {
+      "activation_facts": [
+        "authority_granted"
+      ],
+      "artifact_type": "runtime-scenario",
+      "category": "blocked-authority",
+      "edges": [
+        {
+          "edge_type": "human_authority",
+          "provenance": "SCRUM-115 canonical scenario route",
+          "runtime_executable": false,
+          "source": "gate_authority.authority-boundary-check",
+          "target": "gate_authority.blocked-action-escalation"
+        }
+      ],
+      "evidence_refs": [
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md"
+      ],
+      "facts_schema": "schemas/runtime/scenario-contract.schema.json",
+      "green_targets": [
+        "gate_authority.blocked-action-escalation"
+      ],
+      "guards": [
+        {
+          "conditional": false,
+          "field": "authority_granted",
+          "id": "authority-granted",
+          "reason": "AUTHORITY_BLOCKED",
+          "type": "equals",
+          "value": true
+        }
+      ],
+      "human_boundaries": [
+        "G2_EXECUTION",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION"
+      ],
+      "id": "blocked-authority",
+      "provenance": {
+        "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
+        "source_status": "canonical_explicit"
+      },
+      "route_nodes": [
+        "gate_authority.authority-boundary-check",
+        "gate_authority.blocked-action-escalation"
+      ],
+      "route_policy": {
+        "allowed_authorities": [],
+        "green_targets": [
+          "gate_authority.blocked-action-escalation"
+        ],
+        "max_depth": 32,
+        "start_node": "gate_authority.authority-boundary-check"
+      },
+      "rules": [],
+      "schema_version": "1.1.0",
       "version": "1.0.0"
     }
   ],
-  "schema_version": "1.0.0"
+  "schema_version": "1.1.0"
 }

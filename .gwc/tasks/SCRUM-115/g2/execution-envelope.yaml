@@ -1,0 +1,79 @@
+gate: G2_EXECUTION
+approval_request_id: CP-20260727-115-G2-R2
+task_id: SCRUM-115
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+working_branch: feat/scrum-115-canonical-scenarios-v3
+expected_head_sha: null
+scope_version: 2
+risk_class: R2
+selected_option_id: OPT-1
+approved_modules:
+- .gwc/tasks/SCRUM-115/**
+- .kiro/specs/GWC-P3-I3-canonical-scenarios-v3/**
+- core/node-architect/scenario-registry.json
+- schemas/runtime/scenario-registry.schema.json
+- schemas/runtime/scenario-contract.schema.json
+- tools/p3_backward_graph.py
+- tools/node_architect/validate_runtime_registry.py
+- tools/node_architect/viewer/registry_adapter.py
+- tests/test_p3_backward_graph.py
+- tests/test_runtime_registry_validation.py
+- tests/test_v3_run_history_adapter.py
+- tests/test_p3_scenario_registry.py
+- releases/changelog.d/*scrum-115*
+authorized_actions:
+- create_guarded_branch_from_verified_base
+- persist_task_scoped_g0_g1_g2_artifacts
+- persist_task_specific_kiro_plan
+- modify_approved_modules_only
+- run_sandboxed_validation_and_tests
+- commit_and_push_working_branch
+- prepare_g3_delivery_record
+- open_or_update_draft_pr_after_g3_artifact_validation
+- monitor_ci_and_apply_in_scope_repairs
+- perform_independent_read_only_g3_review
+- mark_ready_for_review_after_g3_pass
+excluded_actions:
+- direct_main_push
+- modify_SCRUM-113
+- modify_SCRUM-114
+- modify_other_repositories
+- merge
+- auto_merge
+- deploy
+- release
+- runtime_reload
+- production_config_change
+- production_data_read_or_write
+- credential_or_secret_handling
+- migration
+- destructive_operation
+- force_push
+- branch_delete
+- pr_base_change
+required_checks:
+- tools/validate_g01.py --gate G2_EXECUTION before first repository write
+- tools/node_architect/validate_runtime_registry.py
+- focused P3 scenario registry and routing tests
+- tests/test_p3_backward_graph.py
+- tests/test_runtime_registry_validation.py
+- tests/test_v3_run_history_adapter.py
+- full governance unit tests and python compileall
+- complete diff, integrity, secret and unauthorized-file checks
+- required GitHub Actions checks for exact PR head SHA
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-115
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  plan_root: .kiro/specs/GWC-P3-I3-canonical-scenarios-v3
+  plan_revision: sha256:0ca6de11e1d2abe90304f83ac1a5fe80b3a7876c2474bb419e7d951b4b6d56a2
+  validation_evidence: Local task-specific Kiro structure, dependency, scope and traceability
+    validation in isolated G2 repair session; exact protected base confirmed by GitHub
+    connector.
+issued_at: '2026-07-27T12:02:14Z'
+expires_at: '2026-07-28T12:02:00Z'
+scope_hash: sha256:76167bccb429735b8ba5937561fd13f460a6adb41d08c624945588b28f090712

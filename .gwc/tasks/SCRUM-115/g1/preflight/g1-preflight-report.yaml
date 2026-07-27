@@ -1,0 +1,191 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-27T12:02:14Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-115
+  base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity, default branch and protected base are verified through
+    GitHub.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@main:9e79dd6e3cffbe452647cc339701eb4b937d41ba
+- id: PREDECESSOR_MERGE
+  status: PASS
+  code: DEPENDENCIES_SATISFIED
+  message: 'SCRUM-113 and SCRUM-114 implementation is merged through PR #121 and both
+    Jira projections are Done.'
+  evidence:
+  - 'GitHub PR #121 merged at 9e79dd6e3cffbe452647cc339701eb4b937d41ba'
+  - Jira SCRUM-113 Done readback
+  - Jira SCRUM-114 Done readback
+- id: P3_ENGINE_READBACK
+  status: PASS
+  code: IMPLEMENTATION_AVAILABLE
+  message: Deterministic compiler, typed guard evaluator, all-path routing engine
+    and focused tests are present on protected main.
+  evidence:
+  - tools/p3_backward_graph.py@8d4899865777f1daf610f7e4db4fc65a97855c7a
+  - tests/test_p3_backward_graph.py@1865304daed191cb249c249908a2ce7e062de499
+- id: REGISTRY_V3_READBACK
+  status: PASS
+  code: INTEGRATION_SURFACES_AVAILABLE
+  message: Canonical scenario registry, schemas, runtime validator and v3 adapter
+    exist and can be extended in place.
+  evidence:
+  - core/node-architect/scenario-registry.json@9d852cc4f4462a25db75e3dc0201c8b82e99f26e
+  - tools/node_architect/viewer/registry_adapter.py@7b6eb2a9001cdd913a716134004d918968ad1567
+- id: PLAN_READBACK
+  status: PASS
+  code: IMPLEMENTATION_PLAN_VERIFIED
+  message: The protected-base P3 Kiro requirements, design and tasks files are available
+    and bound to the current base.
+  evidence:
+  - .kiro/specs/GWC-P3-backward-graph-compiler/requirements.md
+  - .kiro/specs/GWC-P3-backward-graph-compiler/design.md
+  - .kiro/specs/GWC-P3-backward-graph-compiler/tasks.md
+- id: PLAN_COMPATIBILITY
+  status: PASS
+  code: TASK_SPECIFIC_PLAN_VALIDATED
+  message: SCRUM-115 task-specific plan replaces stale K1/K2-only plan and matches
+    current merged prerequisites and approved scope.
+  evidence:
+  - .kiro/specs/GWC-P3-I3-canonical-scenarios-v3
+  - sha256:0ca6de11e1d2abe90304f83ac1a5fe80b3a7876c2474bb419e7d951b4b6d56a2
+  - GitHub main@9e79dd6e3cffbe452647cc339701eb4b937d41ba
+process_readback:
+  process_id: governed-repository-delivery
+  terminal_outcome: validated guarded branch and reviewed Draft PR; merge remains
+    G4
+  required_sources:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+  route_steps:
+  - id: STEP-01
+    name: protected-base-readback
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read
+    capability_required: repository_read
+    capability_status: VERIFIED
+    primary_route: GitHub connector
+    fallback_routes:
+    - DWC
+    - DW1
+    continuation: immediate
+    expected_evidence: Exact main SHA and source blob readbacks.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-02
+    name: formal-g0-g1-validation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: validate
+    capability_required: filesystem_and_validator_runner
+    capability_status: VERIFIED
+    primary_route: isolated /mnt session
+    fallback_routes: []
+    continuation: immediate
+    expected_evidence: G0 READY, G1 artifacts, validator report and hashes.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-03
+    name: exact-human-g2-approval
+    gate: G2_EXECUTION
+    actor: human
+    action_class: approve
+    capability_required: human_approval
+    capability_status: VERIFIED
+    primary_route: current chat exact command
+    fallback_routes: []
+    continuation: wait for exact command
+    expected_evidence: Exact G2 approval ID, scope hash prefix and expiry.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-04
+    name: guarded-implementation
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: repository_write
+    capability_required: GitHub guarded branch writes
+    capability_status: VERIFIED
+    primary_route: GitHub connector
+    fallback_routes: []
+    continuation: after valid G2 only
+    expected_evidence: Approved files changed on guarded branch; tests and complete
+      diff evidence.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-05
+    name: draft-pr-validation
+    gate: G3_PR
+    actor: agent
+    action_class: draft_pr_and_review
+    capability_required: GitHub PR and CI readback
+    capability_status: VERIFIED
+    primary_route: GitHub connector and scheduled CI continuation
+    fallback_routes:
+    - manual checkpoint
+    continuation: CI recheck after PT2M and repeat until terminal
+    expected_evidence: Exact PR head, CI, tests, independent review and no scope drift.
+    bypass_eligibility: MANUAL_CHECKPOINT_ONLY
+implementation_plan:
+  applicability: required
+  reason: SCRUM-115 is a material multi-file runtime/schema/visualization integration
+    and the prior K1/K2 plan is stale for I3.
+  source: generated_kiro
+  task_me_applicable: true
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: Task Me is not exposed as an invokable connector/skill
+    in the current ChatGPT connector runtime.
+  canonical_task_uid: SCRUM-115
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  plan_root: .kiro/specs/GWC-P3-I3-canonical-scenarios-v3
+  requirements_path: .kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md
+  design_path: .kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md
+  tasks_path: .kiro/specs/GWC-P3-I3-canonical-scenarios-v3/tasks.md
+  plan_revision: sha256:0ca6de11e1d2abe90304f83ac1a5fe80b3a7876c2474bb419e7d951b4b6d56a2
+  validation_status: PASS
+  validation_evidence: Local task-specific Kiro structure, dependency, scope and traceability
+    validation in isolated G2 repair session; exact protected base confirmed by GitHub
+    connector.
+  generated_by: chatgpt-gwc-agent
+  generated_at_utc: '2026-07-27T12:02:14Z'
+runtime_context:
+  agent_runtime_id: chatgpt-gwc-agent
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
