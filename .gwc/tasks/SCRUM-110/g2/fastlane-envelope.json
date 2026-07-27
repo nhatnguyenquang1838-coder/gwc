@@ -1,0 +1,67 @@
+{
+  "schema_version": "fastlane-execution-envelope/v1",
+  "approval_id": "FL-SCRUM-110-20260727-0917",
+  "gate": "G2_EXECUTION",
+  "scope_hash": "a3dec16e486137aa4633e5ef00bc146dd78a9d9009e327c40e3bc87c54effbe9",
+  "scope_hash_prefix": "a3dec16e486137aa",
+  "created_at": "2026-07-27T02:41:10Z",
+  "status": "APPROVED",
+  "activation_is_not_approval": true,
+  "scope": {
+    "task_id": "SCRUM-110",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "source_instruction": "REPO",
+    "execution_mode": "chat_connector_only",
+    "base_branch": "main",
+    "base_sha": "53b23f38cf7412fffd8bc1adce8c3d6b8277b1b6",
+    "branch": "fastlane/scrum-110-crash-replay-v3",
+    "risk_class": "R2",
+    "objective": "Build a crash/replay harness, deterministic recovery coverage, duplicate-worker protection, human takeover packets, and a Cytoscape v3 real run-history adapter for SCRUM-110.",
+    "acceptance_scope": {
+      "scenario_source": ".gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md",
+      "scenario_count": 27,
+      "branches": ["B0", "B1", "B2", "B3", "B4", "B5"],
+      "required_capabilities": [
+        "crash injection at action and checkpoint boundaries",
+        "deterministic replay and resume classification",
+        "duplicate-worker and stale-fence protection",
+        "human takeover packet with evidence and bounded recovery actions",
+        "real v3 run/event/checkpoint history projection for Cytoscape"
+      ]
+    },
+    "allowed_file_scope": [
+      ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/**",
+      ".gwc/tasks/SCRUM-110/**",
+      "tools/node_architect/crash_replay_harness.py",
+      "tools/node_architect/human_takeover_packet.py",
+      "tools/node_architect/viewer/run_history_adapter.py",
+      "tools/node_architect/viewer/registry_adapter.py",
+      "tools/node_architect/viewer/README.md",
+      "tests/test_crash_replay_harness.py",
+      "tests/test_human_takeover_packet.py",
+      "tests/test_v3_run_history_adapter.py",
+      "docs/changelog/latest.md"
+    ],
+    "validation_plan": [
+      "python -m unittest tests.test_exact_state_capture tests.test_bounded_external_write tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_human_takeover_packet tests.test_v3_run_history_adapter",
+      "python -m unittest discover -s tests -p \"test_*.py\"",
+      "Run the repository FastLane/G2 validator when materialized and available",
+      "Create Draft PR only; validate checks against the exact PR head SHA",
+      "Poll CI at the configured governed interval; stop on terminal failure"
+    ],
+    "forbidden_operations": [
+      "write to protected main", "merge or enable auto-merge", "force-push", "delete branch", "change PR base", "deploy or release", "production data or database migration", "credential or secret changes", "destructive operations", "expand writes outside the approved file scope"
+    ],
+    "approval_expires_at": "2026-07-27T04:11:10Z"
+  },
+  "exact_approval_command": "APPROVE G2 FL-SCRUM-110-20260727-0917 a3dec16e486137aa 2026-07-27T04:11:10Z",
+  "effects_after_valid_approval": [
+    "create the guarded task branch from the locked base SHA",
+    "write only within the allowlisted scope",
+    "run focused and full validation",
+    "create a Draft PR and validate its exact head SHA",
+    "project updates to Jira and Slack without making them authoritative"
+  ],
+  "approval_received_at": "2026-07-27T02:52:26Z",
+  "approval_command_received": "APPROVE G2 FL-SCRUM-110-20260727-0917 a3dec16e486137aa 2026-07-27T04:11:10Z"
+}
