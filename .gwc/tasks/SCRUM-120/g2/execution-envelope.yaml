@@ -1,0 +1,33 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+gate: G2_EXECUTION
+task_id: SCRUM-120
+approval_id: CP-20260728-120-G2-R2
+base_sha: 68deae88f686ecb66b15cb8aa2e5b943ad02adf1
+working_branch: feat/scrum-120-github-g5-g6-jira-projection-r2
+scope_version: 2
+risk_class: R2
+selected_option_id: OPT-1
+scope_hash: sha256:e10c8fc8e91dd59c3addad6b33536d6d2fa1b5d648a2ef82a68fae6a484d0601
+scope_hash_16: e10c8fc8e91dd59c
+approved_modules:
+- .gwc/tasks/SCRUM-120/**
+- .kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/**
+- .task-me/runs/scrum-120-github-g5-g6-jira-projection/**
+- core/integrations/GITHUB_G5_G6_JIRA_PROJECTION_CONTRACT_v0.1.md
+- schemas/integrations/github-evidence.schema.json
+- schemas/integrations/g5-verification.schema.json
+- schemas/integrations/jira-projection.schema.json
+- examples/integrations/github-g5-g6-jira/**
+- tools/validate_github_g5_g6_jira_projection.py
+- tests/test_github_g5_g6_jira_projection.py
+- releases/changelog.d/2026-07-28-scrum-120-github-g5-g6-jira-projection.md
+required_checks:
+- plan-read receipt verified before first repository write
+- validate_g01 G2 PASS
+- validator PASS
+- unit tests PASS
+- exact PR-head CI PASS before G4
+issued_at: '2026-07-27T18:39:30Z'
+expires_at: '2026-07-28T18:39:30Z'
+status: APPROVED_BY_HUMAN
