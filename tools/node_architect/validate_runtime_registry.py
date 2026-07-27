@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
-"""Validate the canonical SCRUM-104 registries and their cross-references."""
-
+"""Validate canonical runtime registries and their cross-references."""
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
 from pathlib import Path
-import sys
 from typing import Any
 
 from jsonschema import Draft202012Validator, RefResolver
-
 
 FAMILIES = {
     "intake_context",
@@ -30,8 +27,15 @@ EXPLICIT_NODES = {
     "validation_quality.ci-evidence-capture",
     "failure_recovery.timeout-recovery",
 }
-VISUAL_EDGE_TYPES = {"visualization", "suggested_sequence", "audit"}
+VISUAL_EDGE_TYPES = {
+    "visualization",
+    "suggested_sequence",
+    "audit",
+    "human_authority",
+    "blocked",
+}
 RUNTIME_EDGE_TYPES = {"runtime", "dependency"}
+GUARD_TYPES = {"exists", "equals", "in", "gte", "lte"}
 
 
 def load(path: Path) -> Any:
@@ -80,7 +84,10 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "graph": "runtime-graph.schema.json",
     }
     for name, schema_name in schema_map.items():
-        issues.extend(f"{name}: {error}" for error in validate_schema(payloads[name], runtime / schema_name, runtime))
+        issues.extend(
+            f"{name}: {error}"
+            for error in validate_schema(payloads[name], runtime / schema_name, runtime)
+        )
 
     nodes = payloads["nodes"].get("nodes", [])
     node_ids = [node.get("id") for node in nodes]
@@ -89,6 +96,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         issues.append(f"node registry must materialize exactly 81 slots, got {len(nodes)}")
     if len(node_set) != len(node_ids):
         issues.append("node registry contains duplicate stable IDs")
+
     families = {family: 0 for family in FAMILIES}
     for node in nodes:
         family = node.get("family")
@@ -104,9 +112,15 @@ def validate_registry(root: Path) -> dict[str, Any]:
             issues.append(f"node {node.get('id')} provenance source is missing")
         elif actual != provenance.get("source_sha"):
             issues.append(f"node {node.get('id')} provenance SHA does not match source")
-    if set(family for family, count in families.items() if count) != FAMILIES:
+
+    if {family for family, count in families.items() if count} != FAMILIES:
         issues.append(f"node registry families are incomplete: {families}")
-    if set(node.get("id") for node in nodes if node.get("source_status") == "canonical_explicit") != EXPLICIT_NODES:
+    explicit_nodes = {
+        node.get("id")
+        for node in nodes
+        if node.get("source_status") == "canonical_explicit"
+    }
+    if explicit_nodes != EXPLICIT_NODES:
         issues.append("canonical explicit node set does not match the four source-backed KG nodes")
     if sum(node.get("source_status") == "proposed_registry_slot" for node in nodes) != 77:
         issues.append("node registry must classify exactly 77 proposed registry slots")
@@ -114,23 +128,79 @@ def validate_registry(root: Path) -> dict[str, Any]:
     rules = payloads["rules"].get("rules", [])
     rule_ids = {rule.get("id") for rule in rules}
     scenarios = payloads["scenarios"].get("scenarios", [])
-    scenario_ids = {scenario.get("id") for scenario in scenarios}
+    scenario_ids = [scenario.get("id") for scenario in scenarios]
+    if len(scenario_ids) != len(set(scenario_ids)):
+        issues.append("scenario registry contains duplicate stable IDs")
     if payloads["scenarios"].get("materialized_scenario_count") != len(scenarios):
         issues.append("materialized scenario count does not match scenario entries")
+    if len(scenarios) != 14:
+        issues.append(f"scenario registry must materialize exactly 14 scenarios, got {len(scenarios)}")
     if payloads["scenarios"].get("declared_scenario_count") != 116:
         issues.append("declared scenario count must remain 116 and separate from materialized entries")
+
     for scenario in scenarios:
+        scenario_id = scenario.get("id")
+        activation_facts = set(scenario.get("activation_facts", []))
         missing_rules = set(scenario.get("rules", [])) - rule_ids
         if missing_rules:
-            issues.append(f"scenario {scenario.get('id')} has unresolved rules {sorted(missing_rules)}")
-        missing_nodes = set(scenario.get("route_nodes", [])) - node_set
+            issues.append(f"scenario {scenario_id} has unresolved rules {sorted(missing_rules)}")
+        route_nodes = set(scenario.get("route_nodes", []))
+        missing_nodes = route_nodes - node_set
         if missing_nodes:
-            issues.append(f"scenario {scenario.get('id')} has unresolved route nodes {sorted(missing_nodes)}")
+            issues.append(f"scenario {scenario_id} has unresolved route nodes {sorted(missing_nodes)}")
+
+        guards = scenario.get("guards", [])
+        guard_ids = [guard.get("id") for guard in guards]
+        if len(guard_ids) != len(set(guard_ids)):
+            issues.append(f"scenario {scenario_id} has duplicate guard ids")
+        for guard in guards:
+            guard_id = guard.get("id")
+            guard_type = guard.get("type")
+            if guard_type not in GUARD_TYPES:
+                issues.append(f"scenario {scenario_id} has unsupported guard type {guard_type}")
+            if guard.get("field") not in activation_facts:
+                issues.append(
+                    f"scenario {scenario_id} guard {guard_id} field is not declared as an activation fact"
+                )
+            if guard_type == "in" and "values" not in guard:
+                issues.append(f"scenario {scenario_id} guard {guard_id} requires values")
+            if guard_type in {"equals", "gte", "lte"} and not {
+                "value",
+                "value_from_field",
+            }.intersection(guard):
+                issues.append(f"scenario {scenario_id} guard {guard_id} requires a comparison value")
+            value_from_field = guard.get("value_from_field")
+            if value_from_field is not None and value_from_field not in activation_facts:
+                issues.append(
+                    f"scenario {scenario_id} guard {guard_id} comparison field is not an activation fact"
+                )
+
+        policy = scenario.get("route_policy", {})
+        start = policy.get("start_node")
+        targets = set(policy.get("green_targets", []))
+        if start not in node_set or start not in route_nodes:
+            issues.append(f"scenario {scenario_id} has unresolved route-policy start node")
+        if not targets or not targets <= node_set or not targets <= route_nodes:
+            issues.append(f"scenario {scenario_id} has unresolved route-policy green target")
+        if targets != set(scenario.get("green_targets", [])):
+            issues.append(f"scenario {scenario_id} route-policy green targets drift from scenario targets")
+
+        provenance = scenario.get("provenance", {})
+        actual = source_hash(root, provenance.get("source_path", ""))
+        if actual is None:
+            issues.append(f"scenario {scenario_id} provenance source is missing")
+        elif actual != provenance.get("source_sha"):
+            issues.append(f"scenario {scenario_id} provenance SHA does not match source")
+
         for edge in scenario.get("edges", []):
             if edge.get("source") not in node_set or edge.get("target") not in node_set:
-                issues.append(f"scenario {scenario.get('id')} has an unresolved edge endpoint")
-            if edge.get("edge_type") in VISUAL_EDGE_TYPES and edge.get("runtime_executable"):
-                issues.append(f"scenario {scenario.get('id')} marks a visual edge executable")
+                issues.append(f"scenario {scenario_id} has an unresolved edge endpoint")
+            edge_type = edge.get("edge_type")
+            executable = edge.get("runtime_executable")
+            if edge_type in VISUAL_EDGE_TYPES and executable:
+                issues.append(f"scenario {scenario_id} marks a visual edge executable")
+            if edge_type in RUNTIME_EDGE_TYPES and not executable:
+                issues.append(f"scenario {scenario_id} marks a runtime edge non-executable")
 
     graph = payloads["graph"]
     graph_nodes = set(graph.get("nodes", []))
@@ -153,7 +223,11 @@ def validate_registry(root: Path) -> dict[str, Any]:
         payloads["graph"].get("graph_id"),
     }
     for profile in profiles:
-        refs = {profile.get("node_registry_ref"), profile.get("scenario_registry_ref"), profile.get("graph_registry_ref")}
+        refs = {
+            profile.get("node_registry_ref"),
+            profile.get("scenario_registry_ref"),
+            profile.get("graph_registry_ref"),
+        }
         if not refs.issubset(registry_ids):
             issues.append(f"profile {profile.get('id')} has unresolved registry reference")
         if len(profile.get("pilot_nodes", [])) != 3:
@@ -162,7 +236,9 @@ def validate_registry(root: Path) -> dict[str, Any]:
             issues.append(f"profile {profile.get('id')} has unresolved green target")
         for route in profile.get("routes", []):
             if not set(route.get("nodes", [])) <= node_set:
-                issues.append(f"profile {profile.get('id')} route {route.get('route_id')} has unresolved node")
+                issues.append(
+                    f"profile {profile.get('id')} route {route.get('route_id')} has unresolved node"
+                )
 
     return {
         "outcome": "PASS" if not issues else "FAIL",
@@ -170,8 +246,12 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "issues": issues,
         "counts": {
             "nodes": len(nodes),
-            "proposed_nodes": sum(node.get("source_status") == "proposed_registry_slot" for node in nodes),
-            "explicit_nodes": sum(node.get("source_status") == "canonical_explicit" for node in nodes),
+            "proposed_nodes": sum(
+                node.get("source_status") == "proposed_registry_slot" for node in nodes
+            ),
+            "explicit_nodes": sum(
+                node.get("source_status") == "canonical_explicit" for node in nodes
+            ),
             "materialized_scenarios": len(scenarios),
             "declared_scenarios": payloads["scenarios"].get("declared_scenario_count"),
             "graph_edges": len(graph.get("edges", [])),

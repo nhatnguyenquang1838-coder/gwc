@@ -1,46 +1,254 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/runtime/scenario-contract.schema.json",
-  "title": "Canonical Runtime Scenario Contract",
-  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "required": ["schema_version", "artifact_type", "id", "version", "activation_facts", "facts_schema", "rules", "route_nodes", "edges", "green_targets", "human_boundaries", "evidence_refs", "provenance"],
   "properties": {
-    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
-    "artifact_type": {"const": "runtime-scenario"},
-    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
-    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
-    "activation_facts": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-    "facts_schema": {"type": "string", "minLength": 1},
-    "rules": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}},
-    "route_nodes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-    "edges": {
-      "type": "array",
+    "activation_facts": {
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["source", "target", "edge_type", "runtime_executable", "provenance"],
-        "properties": {
-          "source": {"type": "string", "minLength": 1},
-          "target": {"type": "string", "minLength": 1},
-          "edge_type": {"enum": ["runtime", "visualization", "suggested_sequence", "human_authority", "blocked", "dependency"]},
-          "runtime_executable": {"type": "boolean"},
-          "provenance": {"type": "string", "minLength": 1}
-        }
-      }
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
     },
-    "green_targets": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-    "human_boundaries": {"type": "array", "items": {"type": "string", "minLength": 1}},
-    "evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "artifact_type": {
+      "const": "runtime-scenario"
+    },
+    "category": {
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "type": "string"
+    },
+    "edges": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "edge_type": {
+            "enum": [
+              "runtime",
+              "visualization",
+              "suggested_sequence",
+              "human_authority",
+              "blocked",
+              "dependency"
+            ]
+          },
+          "provenance": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "runtime_executable": {
+            "type": "boolean"
+          },
+          "source": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "target": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "edge_type",
+          "runtime_executable",
+          "provenance"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "evidence_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "facts_schema": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "green_targets": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "guards": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "conditional": {
+            "type": "boolean"
+          },
+          "field": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "exists",
+              "equals",
+              "in",
+              "gte",
+              "lte"
+            ]
+          },
+          "value": {},
+          "values": {
+            "type": "array"
+          },
+          "value_from_field": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "field",
+          "conditional",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "human_boundaries": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "id": {
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "type": "string"
+    },
     "provenance": {
-      "type": "object",
       "additionalProperties": false,
-      "required": ["source_path", "source_sha", "source_status"],
       "properties": {
-        "source_path": {"type": "string", "minLength": 1},
-        "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-        "source_status": {"enum": ["canonical_explicit", "declared_scenario_space"]}
-      }
+        "source_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_sha": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source_status": {
+          "enum": [
+            "canonical_explicit",
+            "declared_scenario_space"
+          ]
+        }
+      },
+      "required": [
+        "source_path",
+        "source_sha",
+        "source_status"
+      ],
+      "type": "object"
+    },
+    "route_nodes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "route_policy": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_authorities": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "green_targets": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "max_depth": {
+          "maximum": 256,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "start_node": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_node",
+        "green_targets",
+        "allowed_authorities",
+        "max_depth"
+      ],
+      "type": "object"
+    },
+    "rules": {
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9-]*$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
     }
-  }
+  },
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "id",
+    "version",
+    "category",
+    "activation_facts",
+    "facts_schema",
+    "rules",
+    "guards",
+    "route_nodes",
+    "route_policy",
+    "edges",
+    "green_targets",
+    "human_boundaries",
+    "evidence_refs",
+    "provenance"
+  ],
+  "title": "Canonical Runtime Scenario Contract",
+  "type": "object"
 }

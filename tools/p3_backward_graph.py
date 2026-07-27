@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from enum import Enum
 from hashlib import sha256
 import json
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, MutableSequence, Sequence
 
 
 class CompileError(ValueError):
@@ -36,9 +36,16 @@ def _stable(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
+def _digest(value: Any) -> str:
+    return "sha256:" + sha256(_stable(value).encode("utf-8")).hexdigest()
+
+
 def _graph_revision(nodes: Sequence[Mapping[str, Any]]) -> str:
-    payload = [{k: node[k] for k in sorted(node)} for node in sorted(nodes, key=lambda n: str(n["id"]))]
-    return "sha256:" + sha256(_stable(payload).encode("utf-8")).hexdigest()
+    payload = [
+        {key: node[key] for key in sorted(node)}
+        for node in sorted(nodes, key=lambda item: str(item["id"]))
+    ]
+    return _digest(payload)
 
 
 def _index(nodes: Sequence[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
@@ -120,11 +127,22 @@ def compile_backward_graph(
 
 
 def evaluate_guard(guard: Mapping[str, Any], context: Mapping[str, Any]) -> GuardResult:
-    """Evaluate a typed guard without implicit truthiness coercion."""
+    """Evaluate a typed guard without implicit truthiness coercion.
+
+    ``value_from_field`` is the explicit form for comparing two context fields.
+    The legacy form, where ``value`` names another present context field, remains
+    supported for the initial SCRUM-115 registry entries.
+    """
     kind = guard.get("type")
     field = guard.get("field")
     actual = context.get(field)
     expected = guard.get("value")
+    value_from_field = guard.get("value_from_field")
+    if value_from_field is not None:
+        expected = context.get(value_from_field)
+    elif kind == "equals" and isinstance(expected, str) and expected in context and field != expected:
+        expected = context[expected]
+
     if kind == "exists":
         passed = field in context
     elif kind == "equals":
@@ -133,9 +151,21 @@ def evaluate_guard(guard: Mapping[str, Any], context: Mapping[str, Any]) -> Guar
         values = guard.get("values", [])
         passed = any(type(actual) is type(item) and actual == item for item in values)
     elif kind == "gte":
-        passed = isinstance(actual, (int, float)) and not isinstance(actual, bool) and actual >= expected
+        passed = (
+            isinstance(actual, (int, float))
+            and not isinstance(actual, bool)
+            and isinstance(expected, (int, float))
+            and not isinstance(expected, bool)
+            and actual >= expected
+        )
     elif kind == "lte":
-        passed = isinstance(actual, (int, float)) and not isinstance(actual, bool) and actual <= expected
+        passed = (
+            isinstance(actual, (int, float))
+            and not isinstance(actual, bool)
+            and isinstance(expected, (int, float))
+            and not isinstance(expected, bool)
+            and actual <= expected
+        )
     else:
         return GuardResult(False, False, f"UNKNOWN_GUARD_TYPE:{kind}")
     if passed:
@@ -157,13 +187,24 @@ def enumerate_routes(
         raise CompileError("MISSING_TERMINAL: route endpoint absent")
     routes: list[dict[str, Any]] = []
 
-    def walk(node_id: str, path: list[str], conditional: bool, human: bool, blocked: bool, unsafe: bool) -> None:
+    def walk(
+        node_id: str,
+        path: list[str],
+        conditional: bool,
+        human: bool,
+        blocked: bool,
+        unsafe: bool,
+    ) -> None:
         if len(path) > max_depth:
             return
         node = indexed[node_id]
         guard_results = [evaluate_guard(item, context) for item in node.get("guards", [])]
-        node_conditional = conditional or any(result.conditional and not result.passed for result in guard_results)
-        node_blocked = blocked or any(not result.passed and not result.conditional for result in guard_results)
+        node_conditional = conditional or any(
+            result.conditional and not result.passed for result in guard_results
+        )
+        node_blocked = blocked or any(
+            not result.passed and not result.conditional for result in guard_results
+        )
         node_human = human or str(node.get("authority", "AUTO")) not in {"AUTO", "READ_ONLY"}
         node_unsafe = unsafe or node.get("unsafe") is True
         if node_id == green:
@@ -183,17 +224,24 @@ def enumerate_routes(
             if successor not in indexed:
                 raise CompileError(f"MISSING_DEPENDENCY: {successor}")
             if successor not in path:
-                walk(successor, path + [successor], node_conditional, node_human, node_blocked, node_unsafe)
+                walk(
+                    successor,
+                    path + [successor],
+                    node_conditional,
+                    node_human,
+                    node_blocked,
+                    node_unsafe,
+                )
 
     walk(start, [start], False, False, False, False)
-    rank = {
+    priority = {
         RouteClass.VALID_AUTO.value: 0,
         RouteClass.VALID_HUMAN.value: 1,
         RouteClass.CONDITIONAL.value: 2,
         RouteClass.BLOCKED.value: 3,
         RouteClass.UNSAFE.value: 4,
     }
-    routes.sort(key=lambda route: (rank[route["class"]], route["length"], tuple(route["path"])))
+    routes.sort(key=lambda route: (priority[route["class"]], route["length"], tuple(route["path"])))
     for position, route in enumerate(routes, start=1):
         route["rank"] = position
     return routes
@@ -210,3 +258,152 @@ def route_decision(
         "selected_route": selected,
         "status": "ROUTED" if selected else "NO_ROUTE",
     }
+
+
+def scenario_nodes(
+    scenario: Mapping[str, Any],
+    node_metadata: Iterable[Mapping[str, Any]] = (),
+) -> list[dict[str, Any]]:
+    """Build a deterministic route graph from a canonical scenario.
+
+    Canonical node ``authority_class`` values are mapped into the route engine's
+    authority/unsafe flags. This is the critical bridge that prevents a scenario
+    route through a human or prohibited boundary from becoming ``VALID_AUTO``.
+    """
+    metadata = {str(node["id"]): dict(node) for node in node_metadata}
+    indexed: dict[str, dict[str, Any]] = {
+        str(node_id): {"id": str(node_id), "successors": []}
+        for node_id in scenario.get("route_nodes", [])
+    }
+    for node_id, node in metadata.items():
+        if node_id not in indexed:
+            continue
+        indexed[node_id].update(node)
+        indexed[node_id].setdefault("successors", [])
+        authority_class = str(node.get("authority_class", "automatic"))
+        if authority_class in {"delegated", "human_required"}:
+            indexed[node_id]["authority"] = authority_class.upper()
+        elif authority_class == "prohibited":
+            indexed[node_id]["authority"] = "PROHIBITED"
+            indexed[node_id]["unsafe"] = True
+        else:
+            indexed[node_id]["authority"] = "AUTO"
+
+    for edge in scenario.get("edges", []):
+        if edge.get("runtime_executable") and edge.get("edge_type") in {"runtime", "dependency"}:
+            source = str(edge["source"])
+            target = str(edge["target"])
+            indexed.setdefault(source, {"id": source, "successors": []})["successors"].append(target)
+            indexed.setdefault(target, {"id": target, "successors": []})
+
+    for node in indexed.values():
+        node["successors"] = sorted(set(str(item) for item in node.get("successors", [])))
+    return [indexed[node_id] for node_id in sorted(indexed)]
+
+
+def append_scenario_decision(
+    history: MutableSequence[Mapping[str, Any]],
+    decision: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    """Append a decision without permitting an existing ID to be rebound."""
+    for existing in history:
+        if existing.get("decision_id") == decision.get("decision_id"):
+            if _stable(existing) != _stable(decision):
+                raise CompileError("IMMUTABILITY_VIOLATION: decision id rebound")
+            return existing
+    history.append(dict(decision))
+    return decision
+
+
+def decide_scenario(
+    scenario: Mapping[str, Any],
+    facts: Mapping[str, Any],
+    *,
+    node_metadata: Iterable[Mapping[str, Any]] = (),
+    history: MutableSequence[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Evaluate one canonical scenario and emit an immutable decision record."""
+    missing = [field for field in scenario.get("activation_facts", []) if field not in facts]
+    guard_results = []
+    for guard in scenario.get("guards", []):
+        result = evaluate_guard(guard, facts)
+        guard_results.append(
+            {
+                "id": guard.get("id"),
+                "passed": result.passed,
+                "conditional": result.conditional,
+                "reason": result.reason,
+            }
+        )
+
+    policy = scenario["route_policy"]
+    nodes = scenario_nodes(scenario, node_metadata)
+    candidate_routes: list[dict[str, Any]] = []
+    for green in sorted(str(item) for item in policy.get("green_targets", [])):
+        candidate_routes.extend(
+            enumerate_routes(
+                nodes,
+                str(policy["start_node"]),
+                green,
+                facts,
+                max_depth=int(policy.get("max_depth", 32)),
+            )
+        )
+
+    priority = {
+        RouteClass.VALID_AUTO.value: 0,
+        RouteClass.VALID_HUMAN.value: 1,
+        RouteClass.CONDITIONAL.value: 2,
+        RouteClass.BLOCKED.value: 3,
+        RouteClass.UNSAFE.value: 4,
+    }
+    candidate_routes.sort(
+        key=lambda route: (
+            priority[route["class"]],
+            route["length"],
+            tuple(route["path"]),
+        )
+    )
+    for position, route in enumerate(candidate_routes, start=1):
+        route["rank"] = position
+
+    blocked = any(not item["passed"] and not item["conditional"] for item in guard_results)
+    conditional = bool(missing) or any(
+        not item["passed"] and item["conditional"] for item in guard_results
+    )
+    eligible = [
+        route
+        for route in candidate_routes
+        if route["class"] in {RouteClass.VALID_AUTO.value, RouteClass.VALID_HUMAN.value}
+    ]
+
+    selected_route: dict[str, Any] | None = None
+    if conditional:
+        classification = RouteClass.CONDITIONAL.value
+    elif blocked:
+        classification = RouteClass.BLOCKED.value
+    elif eligible:
+        selected_route = eligible[0]
+        classification = selected_route["class"]
+    elif candidate_routes:
+        classification = candidate_routes[0]["class"]
+    else:
+        classification = RouteClass.BLOCKED.value
+
+    record: dict[str, Any] = {
+        "scenario_id": scenario["id"],
+        "scenario_version": scenario["version"],
+        "graph_revision": _graph_revision(nodes),
+        "facts_digest": _digest(facts),
+        "missing_activation_facts": missing,
+        "guard_results": guard_results,
+        "candidate_routes": candidate_routes,
+        "selected_route": selected_route,
+        "classification": classification,
+        "auto_execute": classification == RouteClass.VALID_AUTO.value,
+    }
+    record["decision_id"] = _digest(record)
+    record["decision_digest"] = record["decision_id"]
+    if history is not None:
+        append_scenario_decision(history, record)
+    return record

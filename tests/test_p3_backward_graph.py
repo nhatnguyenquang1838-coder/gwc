@@ -1,6 +1,13 @@
 import unittest
 
-from tools.p3_backward_graph import CompileError, compile_backward_graph, enumerate_routes, evaluate_guard
+from tools.p3_backward_graph import (
+    CompileError,
+    append_scenario_decision,
+    compile_backward_graph,
+    decide_scenario,
+    enumerate_routes,
+    evaluate_guard,
+)
 
 
 class BackwardCompilerTests(unittest.TestCase):
@@ -40,6 +47,13 @@ class GuardAndRouteTests(unittest.TestCase):
         result = evaluate_guard({"type": "equals", "field": "value", "value": 1}, {"value": True})
         self.assertFalse(result.passed)
 
+    def test_guard_can_compare_two_context_fields(self):
+        result = evaluate_guard(
+            {"type": "equals", "field": "head_sha", "value_from_field": "expected_head_sha"},
+            {"head_sha": "abc", "expected_head_sha": "abc"},
+        )
+        self.assertTrue(result.passed)
+
     def test_all_paths_are_classified_and_ranked(self):
         nodes = [
             {"id": "start", "successors": ["human", "auto", "conditional"]},
@@ -65,6 +79,91 @@ class GuardAndRouteTests(unittest.TestCase):
         ]
         routes = enumerate_routes(nodes, "start", "green", {})
         self.assertEqual(routes[-1]["class"], "UNSAFE")
+
+
+class ScenarioDecisionTests(unittest.TestCase):
+    def _scenario(self):
+        return {
+            "id": "ci-failure",
+            "version": "1.0.0",
+            "activation_facts": ["ci_status"],
+            "guards": [
+                {
+                    "id": "ci-success",
+                    "type": "equals",
+                    "field": "ci_status",
+                    "value": "success",
+                    "conditional": False,
+                    "reason": "CI_FAILED",
+                }
+            ],
+            "route_nodes": ["start", "green"],
+            "edges": [
+                {
+                    "source": "start",
+                    "target": "green",
+                    "edge_type": "runtime",
+                    "runtime_executable": True,
+                }
+            ],
+            "route_policy": {
+                "start_node": "start",
+                "green_targets": ["green"],
+                "allowed_authorities": [],
+                "max_depth": 8,
+            },
+        }
+
+    def test_decision_digest_is_deterministic_and_history_is_immutable(self):
+        scenario = self._scenario()
+        first = decide_scenario(scenario, {"ci_status": "failure"})
+        second = decide_scenario(scenario, {"ci_status": "failure"})
+        self.assertEqual(first["decision_id"], second["decision_id"])
+        self.assertEqual(first["classification"], "BLOCKED")
+        history = []
+        append_scenario_decision(history, first)
+        append_scenario_decision(history, second)
+        self.assertEqual(len(history), 1)
+        mutated = dict(first)
+        mutated["classification"] = "VALID_AUTO"
+        with self.assertRaisesRegex(CompileError, "IMMUTABILITY_VIOLATION"):
+            append_scenario_decision(history, mutated)
+
+    def test_missing_activation_fact_is_conditional(self):
+        decision = decide_scenario(self._scenario(), {})
+        self.assertEqual(decision["classification"], "CONDITIONAL")
+        self.assertFalse(decision["auto_execute"])
+        self.assertIsNone(decision["selected_route"])
+
+    def test_human_required_node_is_never_auto_promoted(self):
+        scenario = self._scenario()
+        scenario["guards"] = []
+        decision = decide_scenario(
+            scenario,
+            {"ci_status": "success"},
+            node_metadata=[
+                {"id": "start", "authority_class": "automatic"},
+                {"id": "green", "authority_class": "human_required"},
+            ],
+        )
+        self.assertEqual(decision["classification"], "VALID_HUMAN")
+        self.assertFalse(decision["auto_execute"])
+        self.assertIsNotNone(decision["selected_route"])
+
+    def test_prohibited_node_is_unsafe(self):
+        scenario = self._scenario()
+        scenario["guards"] = []
+        decision = decide_scenario(
+            scenario,
+            {"ci_status": "success"},
+            node_metadata=[
+                {"id": "start", "authority_class": "automatic"},
+                {"id": "green", "authority_class": "prohibited"},
+            ],
+        )
+        self.assertEqual(decision["classification"], "UNSAFE")
+        self.assertFalse(decision["auto_execute"])
+        self.assertIsNone(decision["selected_route"])
 
 
 if __name__ == "__main__":

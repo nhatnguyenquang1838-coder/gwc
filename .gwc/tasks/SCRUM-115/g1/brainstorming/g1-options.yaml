@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-27T10:42:56Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-115
+  base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Bounded canonical scenarios plus registry-backed P3/v3 binding
+  description: Materialize 14 high-value scenarios in the existing registry, extend
+    the current deterministic engine integration, and bind selected scenario plus
+    immutable route history into the existing v3 adapter.
+  benefits:
+  - Satisfies the full SCRUM-115 integration objective.
+  - Reuses current registries, compiler/router and v3 adapter.
+  - Keeps scope bounded and testable.
+  tradeoffs:
+  - Touches data, validator, engine integration, adapter and focused tests.
+  risks:
+  - Cross-surface semantic drift if references are not validated.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Scenario registry data only
+  description: Add the 14 scenarios but defer engine and v3 binding.
+  benefits:
+  - Smallest data change.
+  tradeoffs:
+  - Does not satisfy the registry-backed routing-history and v3 objective.
+  risks:
+  - Leaves duplicated or manual interpretation between registry and runtime.
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Broad P3 runtime redesign
+  description: Replace current scenario, route and visualization mechanisms with a
+    new unified runtime.
+  benefits:
+  - Could consolidate long-term surfaces.
+  tradeoffs:
+  - Large architecture and blast-radius expansion.
+  risks:
+  - Invalidates predecessor assumptions and exceeds SCRUM-115 scope.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest compatible extension that satisfies
+  all Jira requirements while reusing the merged P3 engine and canonical registry/v3
+  surfaces.
+decision_required: true
+status: READY

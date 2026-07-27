@@ -1,10 +1,14 @@
 import unittest
 
-from tools.node_architect.viewer.registry_adapter import build_cytoscape_elements
+from tools.node_architect.viewer.registry_adapter import (
+    build_cytoscape_elements,
+    build_scenario_decision_elements,
+)
 from tools.node_architect.viewer.run_history_adapter import (
     build_run_history_elements,
     overlay_run_history,
 )
+
 
 HISTORY = {
     "run": {
@@ -46,6 +50,27 @@ HISTORY = {
             "fencing_token": 2,
         }
     ],
+}
+
+
+SCENARIO_DECISION = {
+    "decision_id": "sha256:abc",
+    "scenario_id": "ci-failure",
+    "scenario_version": "1.0.0",
+    "classification": "BLOCKED",
+    "graph_revision": "sha256:g",
+    "facts_digest": "sha256:f",
+    "candidate_routes": [
+        {
+            "rank": 1,
+            "class": "BLOCKED",
+            "path": [
+                "repo_delivery.ci-run-capture",
+                "failure_recovery.timeout-recovery",
+            ],
+        }
+    ],
+    "selected_route": None,
 }
 
 
@@ -105,9 +130,7 @@ class V3RunHistoryAdapterTests(unittest.TestCase):
             "graph": {"edges": []},
         }
         elements = build_cytoscape_elements(bundle, run_history=HISTORY)
-        self.assertTrue(
-            any(node["data"].get("kind") == "run" for node in elements["nodes"])
-        )
+        self.assertTrue(any(node["data"].get("kind") == "run" for node in elements["nodes"]))
         history_edges = [
             edge
             for edge in elements["edges"]
@@ -121,6 +144,49 @@ class V3RunHistoryAdapterTests(unittest.TestCase):
     def test_missing_run_id_is_rejected(self):
         with self.assertRaises(ValueError):
             build_run_history_elements({"run": {}, "events": [], "checkpoints": []})
+
+    def test_scenario_overlay_edges_are_non_executable(self):
+        overlay = build_scenario_decision_elements(SCENARIO_DECISION)
+        self.assertTrue(any(node["data"].get("kind") == "scenario" for node in overlay["nodes"]))
+        self.assertTrue(any(node["data"].get("kind") == "candidate-route" for node in overlay["nodes"]))
+        self.assertTrue(all(not edge["data"]["runtime_executable"] for edge in overlay["edges"]))
+        self.assertTrue(all("visual-only" in edge["classes"] for edge in overlay["edges"]))
+
+    def test_registry_adapter_accepts_scenario_decision(self):
+        bundle = {
+            "nodes": {
+                "nodes": [
+                    {
+                        "id": "repo_delivery.ci-run-capture",
+                        "family": "repo_delivery",
+                        "maturity": "candidate",
+                        "source_status": "canonical_explicit",
+                        "provenance": {},
+                    },
+                    {
+                        "id": "failure_recovery.timeout-recovery",
+                        "family": "failure_recovery",
+                        "maturity": "candidate",
+                        "source_status": "canonical_explicit",
+                        "provenance": {},
+                    },
+                ]
+            },
+            "graph": {"edges": []},
+        }
+        elements = build_cytoscape_elements(bundle, scenario_decision=SCENARIO_DECISION)
+        self.assertTrue(any(node["data"].get("kind") == "scenario" for node in elements["nodes"]))
+        projected_edges = [
+            edge
+            for edge in elements["edges"]
+            if edge["data"]["edge_type"].startswith("scenario-")
+        ]
+        self.assertTrue(projected_edges)
+        self.assertTrue(all(not edge["data"]["runtime_executable"] for edge in projected_edges))
+
+    def test_missing_scenario_decision_id_is_rejected(self):
+        with self.assertRaises(ValueError):
+            build_scenario_decision_elements({"scenario_id": "ci-failure"})
 
 
 if __name__ == "__main__":

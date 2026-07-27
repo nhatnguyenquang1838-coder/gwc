@@ -1,0 +1,121 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-27T10:42:56Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-115
+  base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The P3 compiler and route engine are merged, but the canonical scenario
+    registry still materializes only three scenarios and the v3 adapter is not yet
+    bound to the expanded scenario set and deterministic routing history.
+  why_now: 'PR #121 merged SCRUM-113 and SCRUM-114, satisfying the explicit predecessors
+    for SCRUM-115.'
+desired_outcome: Materialize a bounded initial set of 14 canonical scenarios, bind
+  them to the registry-backed P3 routing engine and Cytoscape v3 history projection,
+  and preserve deterministic authority-safe behavior.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - DW SUPER runtime consumers
+  - SCRUM-98 integration lane
+scope:
+  in_scope:
+  - Canonicalize 14 initial scenarios covering missing context, ambiguity, baseline/scope
+    drift, ambiguous write, CI pending/failure/SHA mismatch, stale review, approval
+    expiry, observability gaps, partial deployment, and production partial success.
+  - Preserve declared_scenario_count=116 while updating materialized_scenario_count
+    to match entries.
+  - Bind scenario registry entries to deterministic typed-guard and route-decision
+    behavior.
+  - Bind selected scenario and immutable routing history to the existing Cytoscape
+    v3 registry adapter without making visual edges executable.
+  - Update focused validators, tests, and task-scoped governance evidence.
+  non_goals:
+  - Modify SCRUM-113 or SCRUM-114 artifacts or implementation history.
+  - Redesign the full 116-scenario space or the 81-node catalog.
+  - Change public deployment, production configuration/data, credentials, secrets,
+    or migrations.
+  - Merge, auto-merge, release, deploy, force-push, delete branches, or change PR
+    base.
+constraints:
+- Base all work on main@9e79dd6e3cffbe452647cc339701eb4b937d41ba.
+- Reuse existing scenario registry, P3 engine, runtime validator, and v3 adapter before
+  adding mechanisms.
+- All scenario references, rules, nodes, edges and green targets must resolve to canonical
+  registry IDs.
+- Human authority boundaries must never be promoted to VALID_AUTO.
+assumptions:
+- The existing P3 Kiro package remains the canonical plan source for SCRUM-115.
+- The current scenario contract can express the initial 14 scenarios without an incompatible
+  migration.
+- Jira status is projection-only; GitHub and GWC artifacts remain authoritative.
+risks:
+- id: RISK-1
+  description: Expanded scenarios could contain unresolved rule or node references.
+  impact: high
+  mitigation: Run schema and cross-registry validation plus negative tests.
+- id: RISK-2
+  description: v3 history binding could accidentally promote visual history edges
+    to runtime execution.
+  impact: high
+  mitigation: Keep history edges runtime_executable=false and assert this in focused
+    tests.
+- id: RISK-3
+  description: Registry scenarios and P3 route classifications could drift semantically.
+  impact: medium
+  mitigation: Add deterministic registry-to-engine tests for route class, ranking,
+    graph revision and authority stops.
+acceptance_criteria:
+- id: AC-1
+  statement: Exactly 14 canonical initial scenarios are materialized and materialized_scenario_count
+    equals the scenario entry count while declared_scenario_count remains 116.
+  verifiable: true
+- id: AC-2
+  statement: Each scenario validates against the canonical scenario contract and has
+    unique ID, typed activation facts, evidence provenance and resolvable rules/nodes/edges/green
+    targets.
+  verifiable: true
+- id: AC-3
+  statement: The P3 engine deterministically classifies and ranks registry-backed
+    routes without implicit type coercion or human-authority auto-promotion.
+  verifiable: true
+- id: AC-4
+  statement: Cytoscape v3 consumes the expanded registry and overlays immutable routing
+    history while all visual/history edges remain non-executable.
+  verifiable: true
+- id: AC-5
+  statement: Focused scenario, routing, registry and v3 tests pass and no unauthorized
+    file is changed.
+  verifiable: true
+- id: AC-6
+  statement: SCRUM-113 and SCRUM-114 files remain unchanged and no merge, deployment,
+    production, credential, migration or destructive action occurs.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_approved_files
+  - run_sandboxed_validation
+  - commit_and_push_guarded_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - perform_independent_read_only_g3_review
+  downstream_non_goals:
+  - merge
+  - deploy
+  - release
+  - production_operation
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - exact PR head SHA
+    - complete diff review
+    - required CI success
+    - independent review closure
+    - scope-drift PASS
+unresolved_questions: []
+status: READY
