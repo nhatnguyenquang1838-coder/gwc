@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/integration/bmad-permission-model.schema.json",
+  "title": "BMAD Permission Model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mode",
+    "allowed_actions",
+    "allowed_paths",
+    "denied_actions",
+    "denied_paths",
+    "g2_evidence"
+  ],
+  "properties": {
+    "mode": {
+      "enum": [
+        "read_only_analysis",
+        "bounded_repository_write"
+      ]
+    },
+    "allowed_actions": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "read",
+          "analyze",
+          "write_declared_outputs",
+          "run_declared_tests"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "denied_actions": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "enum": [
+          "approve_g2",
+          "approve_g4",
+          "approve_g5",
+          "approve_g6",
+          "mutate_gwc_state",
+          "broaden_scope",
+          "merge",
+          "deploy",
+          "release",
+          "production_operation",
+          "write_projection",
+          "change_credentials",
+          "run_migration"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "denied_paths": {
+      "type": "array",
+      "contains": {
+        "const": ".gwc/**"
+      },
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "g2_evidence": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "approval_id",
+            "scope_hash",
+            "expires_at"
+          ],
+          "properties": {
+            "approval_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "scope_hash": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "expires_at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "read_only_analysis"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "g2_evidence": {
+            "type": "null"
+          },
+          "allowed_actions": {
+            "not": {
+              "contains": {
+                "const": "write_declared_outputs"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "bounded_repository_write"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "g2_evidence": {
+            "type": "object"
+          },
+          "allowed_actions": {
+            "contains": {
+              "const": "write_declared_outputs"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

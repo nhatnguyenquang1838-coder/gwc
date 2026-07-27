@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/integration/bmad-procedure-registry.schema.json",
+  "title": "BMAD Procedure Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "registry_id",
+    "adapter_version",
+    "provider",
+    "procedures"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "registry_id": {
+      "const": "GWC-BMAD-PROCEDURE-REGISTRY"
+    },
+    "adapter_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_repo",
+        "source_commit",
+        "source_version",
+        "state"
+      ],
+      "properties": {
+        "source_repo": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "published",
+            "ready-unpublished"
+          ]
+        }
+      }
+    },
+    "procedures": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "version",
+          "mode",
+          "allowed_actions",
+          "allowed_output_roots",
+          "timeout_seconds",
+          "retry"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "architecture-analysis",
+              "story-preparation",
+              "tdd-implementation",
+              "code-review",
+              "release-readiness"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mode": {
+            "enum": [
+              "read_only_analysis",
+              "bounded_repository_write"
+            ]
+          },
+          "allowed_actions": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "read",
+                "analyze",
+                "write_declared_outputs",
+                "run_declared_tests"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "allowed_output_roots": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7200
+          },
+          "retry": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "max_attempts",
+              "backoff_seconds"
+            ],
+            "properties": {
+              "max_attempts": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
+              },
+              "backoff_seconds": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 300
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
