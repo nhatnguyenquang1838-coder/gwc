@@ -1,0 +1,18 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+task_id: SCRUM-117
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+working_branch: feat/scrum-117-ua-host-mode-contract
+approval_id: CP-20260728-117-G2-R2
+scope_hash: sha256:358696f3f834caa40e25d74427cfc5b964e38b7581a940a6b92cc0a2a3227a8b
+status: PRE_PR_VALIDATED
+local_validation:
+  g2_envelope: PASS
+  contract_validator: PASS
+  py_compile: PASS
+  unit_tests: PASS
+authority_boundary:
+  merge: EXCLUDED_G4_REQUIRED
+  deploy: EXCLUDED_G5_G6_REQUIRED
+  production_data: EXCLUDED_G6_REQUIRED
