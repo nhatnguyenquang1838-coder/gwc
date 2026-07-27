@@ -1,0 +1,10 @@
+{
+  "schema_version": "0.1",
+  "task_id": "SCRUM-121",
+  "pilot_id": "PILOT-121-A",
+  "g6": {"applicable": true, "action": "deploy"},
+  "nodes": [{"id": "g0", "provider": "gwc", "version": "e664d48579764e56d53223d606768ba5ae8d07a4", "checkpoint_revision": 1}],
+  "side_effects": [{"type": "jira_comment", "idempotency_key": "SCRUM-121:jira:root", "status": "applied"}],
+  "replay": {"route_matches": true, "decision_matches": true, "live_state_divergence": null},
+  "projections": [{"system": "jira", "authority": "projection", "grants_gate_authority": false, "status": "applied"}]
+}

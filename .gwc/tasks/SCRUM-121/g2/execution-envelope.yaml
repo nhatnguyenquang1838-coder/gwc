@@ -1,0 +1,35 @@
+schema_version: "1.0"
+task_id: SCRUM-121
+gate: G2_EXECUTION
+approval_id: CP-20260728-121-G2
+approval_command: "APPROVE G2_EXECUTION CP-20260728-121-G2 772a371c01d0cdca 2026-07-28T20:20:00Z"
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: e664d48579764e56d53223d606768ba5ae8d07a4
+branch: feat/scrum-121-replayable-e2e-pilot-r1
+scope_hash: sha256:772a371c01d0cdca2be1bceb92f74eebbc154e7a86a9875f2b021cd30923f3ad
+risk_class: low_medium
+selected_pilot: PILOT-121-A
+status: approved_for_guarded_branch_only
+authorized_actions:
+  - create_guarded_branch
+  - write_task_scoped_artifacts
+  - add_replayable_pilot_contract
+  - add_validator_and_tests
+  - run_local_validation
+  - create_draft_pr
+excluded_actions:
+  - protected_main_write
+  - merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials_or_secrets
+  - migration
+  - destructive_operation
+  - force_push
+  - branch_deletion
+  - pr_base_change
+limitations:
+  - scrum_120_commit_bound_g5_status_connector_observability_incomplete

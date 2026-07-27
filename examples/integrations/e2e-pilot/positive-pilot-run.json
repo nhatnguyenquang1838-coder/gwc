@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "task_id": "SCRUM-121",
+  "pilot_id": "PILOT-121-A",
+  "g6": {"applicable": false},
+  "nodes": [
+    {"id": "g0", "provider": "gwc", "version": "e664d48579764e56d53223d606768ba5ae8d07a4", "input_hash": "sha256:a", "output_hash": "sha256:b", "decision": "ready", "checkpoint_revision": 1},
+    {"id": "ua-snapshot", "provider": "ua", "version": "snapshot-001", "input_hash": "sha256:b", "output_hash": "sha256:c", "decision": "accepted", "checkpoint_revision": 2},
+    {"id": "bmad-procedure", "provider": "bmad", "version": "6.10.0", "procedure": "code_review", "allowed_actions": ["read", "validate"], "attempted_actions": ["read", "validate"], "input_hash": "sha256:c", "output_hash": "sha256:d", "decision": "pass", "checkpoint_revision": 3}
+  ],
+  "side_effects": [
+    {"type": "jira_comment", "idempotency_key": "SCRUM-121:jira:root", "status": "applied"},
+    {"type": "slack_root", "idempotency_key": "SCRUM-121:slack:root", "status": "skipped", "reason": "connector_unavailable"}
+  ],
+  "replay": {"route_matches": true, "decision_matches": true, "live_state_divergence": null},
+  "projections": [
+    {"system": "jira", "authority": "projection", "grants_gate_authority": false, "status": "applied"},
+    {"system": "slack", "authority": "projection", "grants_gate_authority": false, "status": "skipped"}
+  ]
+}
