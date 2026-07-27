@@ -1,0 +1,13 @@
+canonical_task_uid: SCRUM-108
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 604a92c9100703e2aa7181b1de338bd2dc34250f
+plan_revision: sha256:c74878a1e8da500da4cb03afc46560ea3be2addacbae596a734966f88c78b190
+paths_read:
+- .kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md
+- .kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md
+- .kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+read_at_utc: '2026-07-27T00:50:15Z'
+reader: ChatGPT connector session
