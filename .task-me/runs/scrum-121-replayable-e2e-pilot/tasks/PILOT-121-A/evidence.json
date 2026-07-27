@@ -1,0 +1,28 @@
+{
+  "task_id": "SCRUM-121",
+  "pilot_id": "PILOT-121-A",
+  "selected_route": [
+    "g0_context",
+    "ua_snapshot",
+    "task_me_plan",
+    "g1_alignment",
+    "scenario_route",
+    "g2_authority",
+    "bmad_bounded_procedure",
+    "github_pr_ci",
+    "g3_review",
+    "g4_request",
+    "g5_status_verify"
+  ],
+  "excluded_operations": [
+    "production_data",
+    "production_config",
+    "secret",
+    "credential",
+    "migration",
+    "deploy",
+    "release",
+    "destructive"
+  ],
+  "scope_hash": "sha256:772a371c01d0cdca2be1bceb92f74eebbc154e7a86a9875f2b021cd30923f3ad"
+}
