@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-27T00:50:15Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 604a92c9100703e2aa7181b1de338bd2dc34250f
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Pure bounded external-write classifier
+  description: Implement a pure helper/classifier with immutable evidence objects
+    and no live provider calls.
+  benefits:
+  - Lowest integration risk
+  - Deterministic tests
+  - Matches SCRUM-106 scenario matrix
+  tradeoffs:
+  - Provider adapter integration remains later work
+  risks:
+  - Contract/code drift if later adapter bypasses helper
+  constraint_fit: FIT
+- id: OPT-2
+  title: Live Jira projection adapter
+  description: Implement direct Jira mutation path now.
+  benefits:
+  - End-to-end external write sooner
+  tradeoffs:
+  - Higher duplicate-effect risk
+  - Requires connector credentials and live integration tests
+  risks:
+  - R3 escalation risk
+  - Harder deterministic testing
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: A pure classifier satisfies SCRUM-108 runtime behavior requirements
+  while keeping live side effects outside implementation scope.
+decision_required: true
+status: READY

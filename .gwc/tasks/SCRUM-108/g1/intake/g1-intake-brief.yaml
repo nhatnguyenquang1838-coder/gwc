@@ -1,0 +1,93 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-27T00:50:15Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 604a92c9100703e2aa7181b1de338bd2dc34250f
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-108 needs a bounded external-write runtime node/helper for GWC
+    durable runtime semantics.
+  why_now: SCRUM-105 durable store contract, SCRUM-106 scenario matrix, and SCRUM-107
+    exact-state capture predecessor are available on current main.
+desired_outcome: Deliver a scoped implementation plan and G2 envelope for a pure bounded
+  external-write classifier/helper that prevents duplicate side effects and records
+  deterministic readback decisions.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC runtime maintainers
+  - future governed execution agents
+  - Jira/GitHub connector integration paths
+scope:
+  in_scope:
+  - .gwc/tasks/SCRUM-108/**
+  - .kiro/specs/scrum-108-bounded-external-write-runtime-node/**
+  - tools/node_architect/bounded_external_write.py
+  - tests/test_bounded_external_write.py
+  - releases/changelog.d/2026-07-27-scrum-108-bounded-external-write-runtime-node.md
+  non_goals:
+  - No merge
+  - No deploy/release
+  - No production data/configuration
+  - No credentials/secrets
+  - No live external connector mutation inside helper
+  - No protected branch write
+  - No catalog total change beyond current approved architecture
+constraints:
+- R2 behavior/runtime change
+- dedicated guarded branch only
+- exact protected-base SHA binding
+- G2 envelope required before repository writes
+- G3 Draft PR only after validation and review
+assumptions:
+- SCRUM-105 and SCRUM-106 contracts remain valid inputs
+- SCRUM-107 merge does not conflict with bounded external write helper
+- Implementation can remain pure Python with no provider SDK dependency
+risks:
+- id: RISK-1
+  description: Incorrect retry semantics could permit duplicate external effects.
+  impact: high
+  mitigation: Default to repeat_dispatch_allowed=false unless readback proves zero
+    effect.
+- id: RISK-2
+  description: Scope drift into live connector calls.
+  impact: medium
+  mitigation: Keep implementation helper/classifier pure and test with provided evidence
+    objects only.
+acceptance_criteria:
+- id: AC-1
+  statement: Persisted intent is required before mutation dispatch.
+  verifiable: true
+- id: AC-2
+  statement: Scope, idempotency, lease, checkpoint, timeout, duplicate worker, and
+    ambiguous readback cases are covered by unit tests.
+  verifiable: true
+- id: AC-3
+  statement: No live provider call or production operation exists in implementation.
+  verifiable: true
+- id: AC-4
+  statement: Draft PR delivery remains separated from merge/deploy/production gates.
+  verifiable: true
+unresolved_questions: []
+status: READY
+delivery_lifecycle:
+  authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  downstream_non_goals:
+  - merge
+  - deploy
+  - production_data
+  - credential_rotation
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - validator output
+    - diff review
+    - CI readback
+    - fresh-context review

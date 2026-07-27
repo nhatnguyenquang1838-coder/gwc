@@ -1,0 +1,38 @@
+{
+  "task_id": "SCRUM-108",
+  "gate": "G2_EXECUTION",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "604a92c9100703e2aa7181b1de338bd2dc34250f",
+  "working_branch": "codex/scrum-108-bounded-external-write-g2-20260727",
+  "scope_hash": "sha256:0bd8475b61ae352ff91027d0236dd83542dfe31952184dd066ea8d252cdbb4d9",
+  "validation": [
+    {
+      "command": "python -m unittest tests/test_bounded_external_write.py",
+      "exit_code": 0,
+      "summary": "Ran 10 tests; OK"
+    },
+    {
+      "command": "python -m py_compile tools/node_architect/bounded_external_write.py tests/test_bounded_external_write.py",
+      "exit_code": 0,
+      "summary": "py_compile PASS"
+    },
+    {
+      "command": "python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-108 --gate G2_EXECUTION --json",
+      "exit_code": 0,
+      "summary": "G2 envelope validator PASS"
+    }
+  ],
+  "excluded_actions_preserved": [
+    "merge",
+    "auto_merge",
+    "deploy",
+    "release",
+    "production_data_write",
+    "production_config_change",
+    "credential_rotation",
+    "destructive_migration",
+    "force_push",
+    "delete_branch",
+    "protected_branch_write"
+  ]
+}
