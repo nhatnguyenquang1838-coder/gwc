@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/p3-route-history.schema.json",
+  "type": "object",
+  "required": ["schema_version", "event_id", "repository", "base_sha", "route_decision_ref", "immutable"],
+  "properties": {
+    "schema_version": {"const": "p3-route-history-event/v1"},
+    "event_id": {"type": "string"},
+    "repository": {"type": "string"},
+    "base_sha": {"type": "string"},
+    "route_decision_ref": {"type": "string"},
+    "immutable": {"const": true}
+  }
+}

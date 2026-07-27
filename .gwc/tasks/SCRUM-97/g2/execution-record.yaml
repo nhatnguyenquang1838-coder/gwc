@@ -1,0 +1,9 @@
+task_id: SCRUM-97
+gate: G2_EXECUTION
+status: PASS
+mode: FASTLANE_TWO_THREAD_CONTRACTS
+approval_id: CP-20260727-097-G2
+scope_hash: sha256:f4d813abc1a267ae11209eff246f243a1b479e1e2821057cfb6ad07497b86145
+branch: codex/scrum-97-p3-k1-k2-contracts-20260727
+implementation_code_changed: false
+merge_authorized: false

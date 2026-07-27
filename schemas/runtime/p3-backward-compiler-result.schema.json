@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/p3-backward-compiler-result.schema.json",
+  "type": "object",
+  "required": ["schema_version", "request_hash", "selected_nodes", "rejected_alternatives", "result"],
+  "properties": {
+    "schema_version": {"const": "p3-backward-compiler-result/v1"},
+    "request_hash": {"type": "string"},
+    "selected_nodes": {"type": "array"},
+    "rejected_alternatives": {"type": "array"},
+    "result": {"enum": ["PASS", "CONDITIONAL", "BLOCKED", "UNSAFE"]}
+  }
+}

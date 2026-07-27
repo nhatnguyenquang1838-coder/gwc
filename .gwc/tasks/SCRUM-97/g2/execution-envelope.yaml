@@ -1,0 +1,44 @@
+approval_id: CP-20260727-097-G2
+authority_gate: G2_EXECUTION
+task_id: SCRUM-97
+subtasks:
+- SCRUM-111
+- SCRUM-112
+issued_at: '2026-07-27T06:45:00Z'
+expires_at: '2026-07-28T06:45:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+working_branch: codex/scrum-97-p3-k1-k2-contracts-20260727
+modules_or_files:
+- .gwc/tasks/SCRUM-97/**
+- .gwc/tasks/SCRUM-111/**
+- .gwc/tasks/SCRUM-112/**
+- .kiro/specs/GWC-P3-backward-graph-compiler/**
+- docs/p3-*.md
+- schemas/runtime/*compiler*.schema.json
+- schemas/runtime/*route*.schema.json
+- .task-me/runs/gwc-scrum-97-p3/**
+- .ua/gwc/p3/**
+authorized_actions:
+- modify_approved_files
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+excluded_actions:
+- merge
+- auto_merge
+- deploy
+- release
+- production_data_write
+- production_config_change
+- credential_rotation
+- destructive_migration
+- force_push
+- delete_branch
+- protected_branch_write
+- runtime_implementation_code
+scope_hash: sha256:f4d813abc1a267ae11209eff246f243a1b479e1e2821057cfb6ad07497b86145
+scope_hash_16: f4d813abc1a267ae
+approval_command: APPROVE G2_EXECUTION CP-20260727-097-G2 f4d813abc1a267ae 2026-07-28T06:45:00Z

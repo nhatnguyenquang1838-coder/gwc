@@ -1,0 +1,67 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-27T07:45:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-97
+  base_sha: 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-97 needs P3 backward compiler and scenario routing contracts before implementation.
+  why_now: SCRUM-96/P2 and SCRUM-110 are Done and PR #119 is merged.
+desired_outcome: Freeze K1/K2 contract lane for SCRUM-111 and SCRUM-112, then keep I1/I2/I3 blocked until contract order is satisfied.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - DW SUPER P4
+scope:
+  in_scope:
+  - .gwc/tasks/SCRUM-97/**
+  - .gwc/tasks/SCRUM-111/**
+  - .gwc/tasks/SCRUM-112/**
+  - .kiro/specs/GWC-P3-backward-graph-compiler/**
+  - docs/p3-*.md
+  - schemas/runtime/*compiler*.schema.json
+  - schemas/runtime/*route*.schema.json
+  - .task-me/runs/gwc-scrum-97-p3/**
+  - .ua/gwc/p3/**
+  non_goals:
+  - runtime implementation code
+  - merge
+  - deploy
+  - release
+  - production data/config
+  - credentials
+  - force-push
+  - branch deletion
+  - PR base change
+constraints:
+- FastLane two-thread contract lane only
+- SCRUM-113/SCRUM-114 blocked until K1/K2 freeze
+- SCRUM-115 blocked until I1/I2 complete
+assumptions:
+- P2 base remains main@2c019de2caab0cd7337747dae48af81ca5e1c2d9
+- Jira/Notion are projection only
+risks:
+- id: RISK-1
+  description: Contract ambiguity could lead to unsafe implementation later.
+  impact: high
+  mitigation: Define typed schemas, route classes and authority stop rules.
+acceptance_criteria:
+- id: AC-1
+  statement: K1 compiler semantics and planning-evidence contract are documented and schema-backed.
+  verifiable: true
+- id: AC-2
+  statement: K2 scenario taxonomy, typed guards and route-ranking policy are documented and schema-backed.
+  verifiable: true
+- id: AC-3
+  statement: No runtime implementation code is changed.
+  verifiable: true
+- id: AC-4
+  statement: I1/I2/I3 dependency gates remain blocked.
+  verifiable: true
+unresolved_questions: []
+status: READY

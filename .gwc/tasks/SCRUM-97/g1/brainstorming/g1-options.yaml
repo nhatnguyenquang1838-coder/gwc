@@ -1,0 +1,34 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-27T07:45:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-97
+  base_sha: 2c019de2caab0cd7337747dae48af81ca5e1c2d9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Two-thread contract lane first
+  description: Freeze K1 and K2 before implementation lanes.
+  benefits:
+  - Lowest execution risk
+  tradeoffs:
+  - Implementation starts later
+  risks:
+  - Contract PR CI may fail
+  constraint_fit: FIT
+- id: OPT-2
+  title: Implement compiler/router now
+  description: Start I1/I2 immediately.
+  benefits:
+  - Faster visible code
+  tradeoffs:
+  - Violates dependency gate
+  risks:
+  - Unsafe contract drift
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: P3 requires K1/K2 contract freeze before I1/I2 implementation.
+decision_required: true
+status: READY

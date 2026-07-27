@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/p3-backward-compiler-request.schema.json",
+  "type": "object",
+  "required": ["schema_version", "task_id", "repository", "base_sha", "desired_outcome", "safe_failure_outcome"],
+  "properties": {
+    "schema_version": {"const": "p3-backward-compiler-request/v1"},
+    "task_id": {"const": "SCRUM-97"},
+    "repository": {"type": "string"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "desired_outcome": {"type": "string"},
+    "safe_failure_outcome": {"type": "string"}
+  }
+}
