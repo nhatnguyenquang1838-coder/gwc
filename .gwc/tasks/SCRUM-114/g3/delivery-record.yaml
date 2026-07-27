@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+generated_at: '2026-07-27T09:03:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-114
+  base_ref: main
+  base_sha: 41d296bdac7898249630385d5c54a089374dc4a1
+  branch: feat/scrum-113-114-p3-compiler-router
+  pull_request: 121
+  validated_head_sha: 5a203e437c9eefcaff3106cc923273cf98216497
+g2:
+  approval_id: CP-20260727-113-114-G2
+  scope_hash: sha256:b755ce70295d4819eb1cf7d228725c1995f4d8149e447ea1c5be881593d7d001
+scope:
+  changed_files:
+    - tools/p3_backward_graph.py
+    - tests/test_p3_backward_graph.py
+  task_capability: typed guard evaluator and all-path scenario routing engine
+  excluded:
+    - SCRUM-115
+    - merge
+    - deployment
+    - production
+ci_evidence:
+  runs:
+    - id: 30252150651
+      workflow: Build instruction packages
+      conclusion: success
+    - id: 30252150652
+      workflow: Validate instructions
+      conclusion: success
+  exact_head_match: true
+validation:
+  scope_drift: PASS
+  base_binding: PASS
+  unit_and_governance_ci: PASS
+  outcome: PASS
+status: G3_EVIDENCE_RECORDED
