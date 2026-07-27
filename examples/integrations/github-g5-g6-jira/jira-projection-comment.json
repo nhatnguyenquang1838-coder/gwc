@@ -1,0 +1,8 @@
+{
+  "schema_version": "0.1",
+  "issue_key": "SCRUM-120",
+  "authority": "projection",
+  "grants_gate_authority": false,
+  "status": "APPLIED",
+  "failure_code": null
+}
