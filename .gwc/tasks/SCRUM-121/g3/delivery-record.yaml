@@ -1,0 +1,17 @@
+schema_version: "1.0"
+task_id: SCRUM-121
+gate: G3_PR_VALIDATION
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e664d48579764e56d53223d606768ba5ae8d07a4
+branch: feat/scrum-121-replayable-e2e-pilot-r1
+scope_hash: sha256:772a371c01d0cdca2be1bceb92f74eebbc154e7a86a9875f2b021cd30923f3ad
+status: draft_pr_pending_ci
+implementation_summary:
+  - added replayable no-production pilot contract
+  - added deterministic run-history evidence schema
+  - added fault scenario examples for stale inputs, duplicate side effects, replay drift, projection leakage and BMAD scope violation
+  - added validator and focused unit tests
+exclusions:
+  g4_merge: not_authorized
+  g5_manual_deploy_or_release: not_authorized
+  g6_production_data_or_config: not_applicable
