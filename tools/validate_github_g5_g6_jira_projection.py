@@ -40,7 +40,7 @@ def validate_any(r):
     if "g6_excluded" in r: return validate_g5_verification(r)
     return validate_jira_projection(r)
 def run_suite(root):
-    exp={"rejected-pr-head-drift.json":"PR_HEAD_DRIFT","rejected-ci-unavailable.json":"CI_UNAVAILABLE_AT_CHECK","rejected-projection-authority-leakage.json":"PROJECTION_AUTHORITY_LEAKAGE"}; issues=[]; cases=[]
+    exp={"rejected-pr-head-drift.json":"PR_HEAD_DRIFT","rejected-ci-unavailable.json":"CI_UNAVAILABLE_AT_CHECK","rejected-ci-failed.json":"VALIDATION_FAILED","rejected-projection-authority-leakage.json":"PROJECTION_AUTHORITY_LEAKAGE"}; issues=[]; cases=[]
     for p in sorted((root/"examples/integrations/github-g5-g6-jira").glob("*.json")):
         got=validate_any(json.loads(p.read_text())); codes={i["code"] for i in got}; need=exp.get(p.name); ok=(need in codes) if need else not got
         if not ok: issues.append(issue("VALIDATION_FAILED",f"{p.name} expectation failed",str(p)))
