@@ -1,0 +1,12 @@
+{
+  "task_id": "SCRUM-110",
+  "delivery_record": ".gwc/tasks/SCRUM-110/g3/delivery-record.yaml",
+  "branch": "fastlane/scrum-110-crash-replay-v3",
+  "base_sha": "53b23f38cf7412fffd8bc1adce8c3d6b8277b1b6",
+  "pre_pr_head_sha": "bf55895ed717e296acfebcd2310b373486655961",
+  "changed_file_count_before_record": 13,
+  "scope_check": "PASS",
+  "scope_drift": false,
+  "ci_required": true,
+  "merge_authorized": false
+}
