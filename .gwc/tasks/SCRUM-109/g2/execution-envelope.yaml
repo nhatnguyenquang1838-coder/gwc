@@ -1,0 +1,44 @@
+approval_id: CP-20260727-SCRUM-109-G2
+authority_gate: G2_EXECUTION
+task_id: SCRUM-109
+issued_at: '2026-07-26T18:46:13Z'
+approved_at: '2026-07-26T18:46:13Z'
+expires_at: '2026-07-27T18:46:13Z'
+scope_version: 1
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: be46a89f3a31bafbc95f1faf2e62978f98510ba2
+working_branch: codex/scrum-109-durable-checkpoint-cas-lease-resume-20260727
+scope_hash: sha256:5779d0be8def7b48fc8848ea9c226778e463a2befdefd00a103c8bde6eac7f8e
+approved_command: APPROVE CP-20260727-SCRUM-109-G2 5779d0be8def7b48
+modules_or_files:
+  - .gwc/tasks/SCRUM-109/
+  - tools/node_architect/durable_checkpoint_runtime.py
+  - tests/test_durable_checkpoint_runtime.py
+  - releases/changelog.d/2026-07-27-scrum-109-durable-checkpoint-cas-lease-resume.md
+authorized_actions:
+  - create_guarded_branch
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - branch_deletion
+  - pr_base_change
+approval_readback:
+  actor: Nhat Nguyen Quang
+  source: current ChatGPT conversation
+  exact_command_match: PASS
+  scope_prefix_match: PASS
+  base_sha_match: PASS
+  outcome: APPROVED

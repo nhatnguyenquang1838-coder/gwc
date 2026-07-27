@@ -1,0 +1,74 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-27T00:50:15Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-108
+  base_sha: 604a92c9100703e2aa7181b1de338bd2dc34250f
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 604a92c9100703e2aa7181b1de338bd2dc34250f
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+  current_main_evidence: GitHub.search_commits turn9
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from GitHub connector.
+  evidence:
+  - 604a92c9100703e2aa7181b1de338bd2dc34250f
+- id: POLICY-READ
+  status: PASS
+  code: POLICY_AVAILABLE
+  message: Required governance files read from protected base via GitHub connector.
+  evidence:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - projects/gwc/project-profile.yaml
+  - projects/gwc/project-instructions.md
+  - projects/gwc/project-extension.md
+  - agents/chatgpt-agent/agent-instructions.md
+- id: VALIDATOR-READY
+  status: PASS
+  code: VALIDATOR_MATERIALIZED
+  message: validate_g01.py and schemas materialized in isolated session.
+  evidence:
+  - tools/validate_g01.py
+  - schemas/*.schema.json
+- id: RISK-CLASS
+  status: PASS
+  code: R2_HUMAN_DIRECTION
+  message: R2 runtime behavior change requires G2 human direction before repository
+    write.
+  evidence:
+  - core/Coding_Project_Governance_v1.0.md GATE-02/GATE-03
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
+implementation_plan:
+  applicability: required
+  reason: SCRUM-108 is implementation work with runtime behavior semantics.
+  source: generated_kiro
+  task_me_applicable: true
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: Task Me connector is not available in this ChatGPT connector
+    session; generated Kiro-compatible plan is used as fallback.
+  canonical_task_uid: SCRUM-108
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 604a92c9100703e2aa7181b1de338bd2dc34250f
+  plan_root: .kiro/specs/scrum-108-bounded-external-write-runtime-node
+  requirements_path: .kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md
+  design_path: .kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md
+  tasks_path: .kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md
+  plan_revision: sha256:c74878a1e8da500da4cb03afc46560ea3be2addacbae596a734966f88c78b190
+  validation_status: PASS
+  validation_evidence: /mnt/data/dw_super_sessions/20260727-0047-SCRUM-108-G2/validation/plan-hash.json
+  generated_by: ChatGPT connector session
+  generated_at_utc: '2026-07-27T00:50:15Z'
