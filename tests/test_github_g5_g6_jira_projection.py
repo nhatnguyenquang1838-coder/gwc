@@ -7,7 +7,10 @@ class T(unittest.TestCase):
  def codes(self,x): return {i["code"] for i in x}
  def test_positive(self): self.assertEqual([],v.validate_github_evidence(rec()))
  def test_pr_drift(self): r=rec(); r.update({"evidence_type":"pr_head","expected":{"head_sha":SHA1},"observed":{"head_sha":SHA2}}); self.assertIn("PR_HEAD_DRIFT",self.codes(v.validate_github_evidence(r)))
+ def test_stale_main(self): r=rec(); r["observed"]["main_sha"]=SHA2; self.assertIn("STALE_MAIN_SHA",self.codes(v.validate_github_evidence(r)))
+ def test_merge_mismatch(self): r=rec(); r["observed"]["merge_sha"]=SHA2; self.assertIn("MERGE_SHA_MISMATCH",self.codes(v.validate_github_evidence(r)))
  def test_ci_absent(self): r=rec(); r["ci"]={"required":True,"workflow_runs":[]}; self.assertIn("CI_UNAVAILABLE_AT_CHECK",self.codes(v.validate_github_evidence(r)))
+ def test_ci_failed(self): r=rec(); r["ci"]["workflow_runs"][0]["conclusion"]="failure"; self.assertIn("VALIDATION_FAILED",self.codes(v.validate_github_evidence(r)))
  def test_projection_leak(self): r=rec(); r["projection"]={"authority":"canonical","grants_gate_authority":True}; self.assertIn("PROJECTION_AUTHORITY_LEAKAGE",self.codes(v.validate_github_evidence(r)))
  def test_g6_required(self): self.assertIn("G6_REQUIRED",self.codes(v.validate_g5_verification({"g6_excluded":False,"merge_sha":SHA1,"current_main_sha":SHA1,"action_class":"deploy"})))
  def test_suite(self): self.assertTrue(v.run_suite(ROOT)["valid"])
