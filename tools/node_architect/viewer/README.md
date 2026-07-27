@@ -1,11 +1,15 @@
-# Cytoscape v3 registry adapter
+# Cytoscape v3 registry and run-history adapters
 
-`registry_adapter.py` is the renderer-neutral data boundary for the v3 full-flow
-view. It loads node, scenario, profile and graph JSON from the canonical
-registries and emits Cytoscape-compatible elements.
+`registry_adapter.py` is the renderer-neutral data boundary for the v3 full-flow view. It retains every canonical registry node. Active routes change CSS classes only; visual scaffold edges never become executable runtime dependencies.
 
-The adapter deliberately keeps all 81 nodes in the element set. A selected
-route or active-node set changes classes only; it does not delete inactive
-nodes. Runtime edges are executable only when the registry marks them as
-`runtime` or `dependency`. Visualization and suggested-sequence scaffold
-edges are retained for context and marked `visual-only`.
+SCRUM-110 adds `run_history_adapter.py`, which consumes real durable run, event, and checkpoint records and emits Cytoscape-compatible history nodes and visual-only history edges. Exact task, repository, SHA, scope, graph revision, event sequence, checkpoint revision, lease owner, and fencing token remain visible in element data.
+
+Use:
+
+```bash
+python tools/node_architect/viewer/registry_adapter.py \
+  --root . \
+  --run-history /path/to/durable-run-history.json
+```
+
+The history overlay marks observed canonical nodes with `history-observed`. History edges are always `runtime_executable: false`; they visualize evidence and never grant execution authority.

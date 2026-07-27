@@ -1,0 +1,6 @@
+{
+  "task_id": "SCRUM-110",
+  "pre_pr_head_sha": "949a1445ea1693c01dfd577327466ffe843b5067",
+  "binding_method": "GitHub connector branch readback before Draft PR creation",
+  "note": "Authoritative PR metadata readback supersedes this pre-PR record after creation."
+}

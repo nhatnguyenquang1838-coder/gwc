@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
-"""Data-only Cytoscape v3 adapter for the canonical runtime registries.
-
-The repository does not own a Cytoscape runtime. This module supplies the
-external-data binding contract used by a v3 renderer: every registry node is
-retained, inactive nodes receive an ``inactive`` class, and visual scaffold
-edges are never promoted to executable runtime dependencies.
-"""
-
+"""Data-only Cytoscape v3 adapter for canonical registries and run history."""
 from __future__ import annotations
-
 import argparse
 from collections import defaultdict
 import json
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
+from tools.node_architect.viewer.run_history_adapter import (
+    build_run_history_elements,
+    overlay_run_history,
+)
 
 REGISTRY_FILES = {
     "nodes": "core/node-architect/node-registry.json",
@@ -25,8 +21,6 @@ REGISTRY_FILES = {
 
 
 def load_registry_bundle(root: Path) -> dict[str, Any]:
-    """Load the external registry data used by the v3 view."""
-
     bundle: dict[str, Any] = {}
     for name, relative in REGISTRY_FILES.items():
         with (root / relative).open("r", encoding="utf-8") as handle:
@@ -47,9 +41,9 @@ def _edge_classes(edge: dict[str, Any]) -> list[str]:
 def build_cytoscape_elements(
     bundle: dict[str, Any],
     active_node_ids: Iterable[str] | None = None,
+    run_history: Mapping[str, Any] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
-    """Build Cytoscape-compatible node and edge elements without filtering."""
-
+    """Build the full registry graph and optionally overlay durable run history."""
     active = set(active_node_ids or ())
     nodes = []
     for node in bundle["nodes"]["nodes"]:
@@ -85,7 +79,14 @@ def build_cytoscape_elements(
                 "classes": " ".join(_edge_classes(edge)),
             }
         )
-    return {"nodes": nodes, "edges": edges}
+
+    elements = {"nodes": nodes, "edges": edges}
+    if run_history is not None:
+        elements = overlay_run_history(
+            elements,
+            build_run_history_elements(run_history),
+        )
+    return elements
 
 
 def enumerate_routes_to_green(
@@ -94,12 +95,13 @@ def enumerate_routes_to_green(
     green_targets: Iterable[str],
     max_routes: int = 256,
 ) -> list[list[str]]:
-    """Enumerate bounded simple routes using runtime edges only."""
-
     green = set(green_targets)
     adjacency: dict[str, list[str]] = defaultdict(list)
     for edge in bundle["graph"]["edges"]:
-        if edge["runtime_executable"] and edge["edge_type"] in {"runtime", "dependency"}:
+        if edge["runtime_executable"] and edge["edge_type"] in {
+            "runtime",
+            "dependency",
+        }:
             adjacency[edge["source"]].append(edge["target"])
 
     routes: list[list[str]] = []
@@ -125,8 +127,6 @@ def classify_route(
     green_targets: Iterable[str],
     human_boundaries: Iterable[str] = (),
 ) -> str:
-    """Classify a route without treating visual edges as runtime evidence."""
-
     if any(boundary in route for boundary in human_boundaries):
         return "HUMAN_REQUIRED"
     if route and route[-1] in set(green_targets):
@@ -136,11 +136,23 @@ def classify_route(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[3])
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path(__file__).resolve().parents[3],
+    )
     parser.add_argument("--active-node", action="append", default=[])
+    parser.add_argument("--run-history", type=Path)
     args = parser.parse_args(argv)
     bundle = load_registry_bundle(args.root.resolve())
-    elements = build_cytoscape_elements(bundle, args.active_node or None)
+    history = None
+    if args.run_history:
+        history = json.loads(args.run_history.read_text(encoding="utf-8"))
+    elements = build_cytoscape_elements(
+        bundle,
+        args.active_node or None,
+        history,
+    )
     print(json.dumps(elements, indent=2, sort_keys=True))
     return 0
 

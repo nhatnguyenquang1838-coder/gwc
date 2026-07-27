@@ -1,0 +1,20 @@
+task_id: SCRUM-110
+gate: G3_PR_VALIDATION
+workflow: GWC_FASTLANE_BOOTSTRAP
+approval_id: FL-SCRUM-110-20260727-0917
+scope_hash: sha256:a3dec16e486137aa4633e5ef00bc146dd78a9d9009e327c40e3bc87c54effbe9
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 53b23f38cf7412fffd8bc1adce8c3d6b8277b1b6
+working_branch: fastlane/scrum-110-crash-replay-v3
+validation:
+  mode: scoped_materialized_sandbox
+  result: PASS
+  tests_run: 24
+  full_repository_validation: false
+ci:
+  status: PENDING_PR_CREATION
+boundaries:
+  merge_authorized: false
+  deployment_authorized: false
+  production_operations_authorized: false
