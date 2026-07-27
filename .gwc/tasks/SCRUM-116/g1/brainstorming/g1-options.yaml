@@ -1,0 +1,61 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-27T15:41:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-116
+  base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: GWC contract-first topology with bounded downstream references
+  description: Define the topology, source-of-truth, owner/denied-write, provenance, collision-control and compatibility contracts in GWC, with explicit read-only DW-SuperApps inputs and downstream references; implement only after G2 approval.
+  benefits:
+  - Gives every P4 artifact one canonical owner and exact evidence path.
+  - Reuses existing GWC governance, distribution and durable-runtime mechanisms.
+  - Keeps the current task bounded to one repository and reviewable before connector implementation.
+  tradeoffs:
+  - Requires careful contract/schema and focused validator work before downstream integrations.
+  - Cross-repository consumer changes remain follow-up work.
+  risks:
+  - A stale DW-SuperApps input or missing provider state could require a compatibility amendment.
+  constraint_fit: FIT
+  skills_distribution:
+  - skill_id: ua-impact-mapping
+    description: Map existing authority and downstream consumers from the read-only graph snapshot.
+    is_required: true
+  - skill_id: task-me-contract-decomposition
+    description: Produce atomic, validated contract and test tasks under the configured output root.
+    is_required: true
+  - skill_id: bmad-architecture-spine
+    description: Define durable invariants, dependency direction and deferred decisions.
+    is_required: true
+- id: OPT-2
+  title: Coordinated dual-repository topology implementation
+  description: Modify GWC and DW-SuperApps together to land the topology and consumer bindings in one coordinated change.
+  benefits:
+  - Consumer references could be updated immediately.
+  - Fewer temporary compatibility documents.
+  tradeoffs:
+  - Requires two repository scopes and synchronized approvals/branches.
+  - Expands the task beyond the verified GWC protected-base execution boundary.
+  risks:
+  - Cross-repository partial completion and provenance drift.
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Documentation-only topology memo
+  description: Write a human-readable topology memo without machine-readable provenance or collision validators.
+  benefits:
+  - Lowest immediate implementation effort.
+  - Easy for human stakeholders to review.
+  tradeoffs:
+  - Does not provide enforceable ownership, provenance or parallel-write rules.
+  - Downstream consumers would still need to interpret prose.
+  risks:
+  - Silent authority overlap and non-reproducible outputs remain possible.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest compatible boundary that satisfies all SCRUM-116 acceptance criteria while keeping G1 read-only and avoiding an unapproved cross-repository write.
+decision_required: true
+status: READY

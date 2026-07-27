@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SCRUM-116 G0 Context Report</title>
+  <style>
+    :root { color-scheme: light dark; --bg:#0f172a; --card:#172033; --text:#e5e7eb; --muted:#a8b1c1; --good:#34d399; --warn:#fbbf24; --line:#334155; }
+    body { margin:0; padding:20px; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,sans-serif; }
+    main { max-width:760px; margin:auto; }
+    h1 { font-size:1.55rem; margin:0 0 6px; }
+    h2 { font-size:1.05rem; margin:0 0 10px; }
+    .sub { color:var(--muted); margin:0 0 16px; }
+    .grid { display:grid; gap:12px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+    .status { color:var(--good); font-weight:700; }
+    .label { color:var(--muted); }
+    code { overflow-wrap:anywhere; }
+    ul { margin:8px 0 0; padding-left:20px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>SCRUM-116 — G0 Context</h1>
+    <p class="sub">Generated 2026-07-27T15:14:46Z · run <code>g1-scrum-116-20260727-1515</code></p>
+    <div class="grid">
+      <section class="card"><h2>Executive Summary</h2><p class="status">G0_CONTEXT: READY</p><p>Context is usable for G1 read-only alignment. No repository or remote implementation write was authorized.</p></section>
+      <section class="card"><h2>Repository Truth</h2><ul><li>Repository: <code>nhatnguyenquang1838-coder/gwc</code></li><li>Protected base: <code>main@32d8c308f7d67de3dbd914a19837871d99c22ab4</code></li><li>Connector: GitHub; permissions observed: admin, maintain, pull, push, triage</li><li>Cross-repo input: DW-SuperApps <code>main@fc93228c721b59a5ac1de7e916a615eb452ef70a</code></li></ul></section>
+      <section class="card"><h2>Task and Scope</h2><p>Jira <code>SCRUM-116</code> is a High-priority To Do subtask to lock DW SUPER APP topology, ownership, provenance, and parallel-write rules. The Jira non-goals exclude implementation, migration, package publication, merge, deploy, production operations, and direct mutation by projection systems.</p></section>
+      <section class="card"><h2>Risk and Impact</h2><ul><li>Architecture/provenance design signal: R2 for later alignment; G0 itself is read-only.</li><li>Downstream: SCRUM-120 is blocked by this contract; SCRUM-117 through SCRUM-121 consume the resulting boundary.</li><li>Owners in scope: workspace package store and host adapters in DW-SuperApps; .gwc/.ua/.task-me/.bmad in the registered system.</li></ul></section>
+      <section class="card"><h2>Evidence and Next Gate</h2><ul><li>G0 artifact: <code>g0/context-snapshot.yaml</code></li><li>Validation: protected-base G0 schema PASS</li><li>Next gate: G1_ALIGNMENT, with UA impact mapping, Task Me decomposition, and BMAD architecture/data-model input as applicable</li><li>Excluded: G2 branch or repository writes, G3 Draft PR, G4 merge, G5 deploy, G6 production</li></ul></section>
+    </div>
+  </main>
+</body>
+</html>

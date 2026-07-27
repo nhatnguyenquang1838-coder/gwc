@@ -1,0 +1,184 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-07-27T15:41:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-116
+  base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: GWC repository identity, default branch and protected base are verified through GitHub and local HEAD.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@main:32d8c308f7d67de3dbd914a19837871d99c22ab4
+- id: LIVE_TASK_READBACK
+  status: PASS
+  code: JIRA_TASK_VERIFIED
+  message: SCRUM-116 live readback confirms the refined P4-K1 objective, To Do status, High priority, required deliverables, and outward Blocks link to SCRUM-120.
+  evidence:
+  - Jira SCRUM-116 id 10115 read through Atlassian Rovo
+  - Jira SCRUM-116 status To Do and SCRUM-120 outward Blocks link
+- id: CROSS_REPOSITORY_INPUT
+  status: PASS
+  code: CROSS_REPO_REF_VERIFIED
+  message: DW-SuperApps input is read-only and pinned to the exact main SHA recorded by G0.
+  evidence:
+  - nhatnguyenquang1838-coder/DW-SuperApps@main:fc93228c721b59a5ac1de7e916a615eb452ef70a
+- id: UA_IMPACT_READBACK
+  status: PASS
+  code: UA_SNAPSHOT_MAPPED
+  message: Existing UA snapshot and traceability extension identify authority/source-of-truth and CAS/lease impact surfaces; no rebuild was run because UA refresh is disabled and the snapshot is dated.
+  evidence:
+  - .ua/meta.json lastAnalyzedAt 2026-07-22T18:10:10.611Z
+  - .ua/extensions/traceability-graph.json REQ-P1-02 authority ownership node
+  - .ua/knowledge-graph.json runtime checkpoint CAS/lease node references
+- id: TASK_ME_PREFLIGHT
+  status: PASS
+  code: TASK_ME_CONFIG_VALID
+  message: Task-Me config and documented per-task output contract validate; a bounded SCRUM-116 run and task folder were materialized under the configured output root.
+  evidence:
+  - CONFIG_VALID from .dw/powers/task-me/.kiro/skills/implementation-task-architect/scripts/validate_config.py
+  - .task-me/runs/gwc-scrum-116-g1-20260727/task-index.yaml
+  - .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/task.yaml
+- id: BMAD_ARCHITECTURE_INPUT
+  status: PASS
+  code: BMAD_HEADLESS_GUIDANCE_READ
+  message: BMAD architecture headless guidance was read and applied as invariants, dependency direction, structural seed and deferred/open-question discipline; no BMAD project artifact was invented.
+  evidence:
+  - .dw/powers/bmad/src/bmm-skills/3-solutioning/bmad-architecture/references/headless.md
+  - .dw/powers/bmad/src/bmm-skills/3-solutioning/bmad-architecture/assets/spine-template.md
+- id: G1_HITL_DECISION
+  status: PASS
+  code: HUMAN_OPTION_SELECTED
+  message: The requester explicitly selected OPT-1, accepted the bounded scope hash prefix, and requested preparation of the G2 envelope; G2 execution remains separately approval-gated.
+  evidence:
+  - .gwc/tasks/SCRUM-116/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-116/g1/decision/g1-decision-record.yaml
+process_readback:
+  process_id: governed-repository-delivery
+  terminal_outcome: G1 alignment package accepted; prepare the separate G2 execution envelope and stop for exact G2 approval.
+  required_sources:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE_WITH_HUMAN_BYPASS
+  continuation_coverage: COMPLETE
+  human_bypass_required: true
+  route_steps:
+  - id: STEP-01
+    name: protected-base-readback
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read
+    capability_required: repository_read
+    capability_status: VERIFIED
+    primary_route: GitHub connector
+    fallback_routes:
+    - DWC
+    - DW1
+    continuation: immediate
+    expected_evidence: Exact GWC and DW-SuperApps main SHA readbacks.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-02
+    name: local-g1-artifact-validation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: validate
+    capability_required: filesystem_and_validator_runner
+    capability_status: VERIFIED
+    primary_route: trusted local checkout
+    fallback_routes: []
+    continuation: immediate
+    expected_evidence: Four schema-valid G1 artifacts and Task-Me output-layout validation.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-03
+    name: explicit-option-selection
+    gate: G1_ALIGNMENT
+    actor: human
+    action_class: approve
+    capability_required: human_direction
+    capability_status: VERIFIED
+    primary_route: current chat exact response
+    fallback_routes: []
+    continuation: wait for exact option and scope acceptance
+    expected_evidence: Explicit selected option, acceptance of bounded scope and permission to generate G2 envelope.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-04
+    name: g2-human-approval
+    gate: G2_EXECUTION
+    actor: human
+    action_class: approve
+    capability_required: human_approval
+    capability_status: SEPARATE_GATE
+    primary_route: current chat exact approval command
+    fallback_routes: []
+    continuation: after G1 PASS only
+    expected_evidence: Exact G2 approval ID, scope hash prefix and expiry.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-05
+    name: guarded-implementation
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: repository_write
+    capability_required: exact_g2_approval
+    capability_status: HARD_BLOCKED
+    primary_route: current chat exact approval command
+    fallback_routes:
+    - stop_and_request_human
+    continuation: remain stopped until the requester supplies the exact G2 approval command
+    expected_evidence: Valid G2 approval ID, scope hash prefix and expiry matching the task envelope.
+    bypass_eligibility: MANUAL_CHECKPOINT_ONLY
+implementation_plan:
+  applicability: required
+  reason: SCRUM-116 is a material cross-surface contract and governance task; the documented Task-Me output contract is required for bounded decomposition and validation planning.
+  source: generated_kiro
+  task_me_applicable: true
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: The installed Task-Me package exposes its runbook, config validator and output-layout validator but no invokable planning runner in this local chat runtime; the documented per-task output contract was materialized and validated as a bounded fallback.
+  canonical_task_uid: SCRUM-116
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  plan_root: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance
+  requirements_path: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/requirements.md
+  design_path: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/design.md
+  tasks_path: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/tasks.md
+  plan_revision: sha256:b18100f1d28a710d5f75322db9a795456f5d363f895b57fea250917ed6848726
+  validation_status: PASS
+  validation_evidence: CONFIG_VALID plus output-layout validation and the self-contained requirements/design/tasks handoff under the configured Task-Me output root.
+  generated_by: chatgpt-gwc-agent/task-me-fallback
+  generated_at_utc: '2026-07-27T15:41:53Z'
+runtime_context:
+  agent_runtime_id: chatgpt-gwc-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

@@ -1,0 +1,23 @@
+{
+  "task_id": "SCRUM-116",
+  "protected_base_sha": "32d8c308f7d67de3dbd914a19837871d99c22ab4",
+  "source_refs": [
+    "AGENTS.md",
+    "projects/gwc/project-profile.yaml",
+    "distribution/power-package.yaml",
+    ".ua/extensions/traceability-graph.json",
+    "core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json",
+    "core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json",
+    ".kiro/specs/scrum-105-durable-runtime-contracts/design.md",
+    ".kiro/specs/scrum-108-bounded-external-write-runtime/design.md"
+  ],
+  "external_readbacks": [
+    "Jira SCRUM-116 status To Do and SCRUM-120 outward Blocks link",
+    "GitHub gwc default branch main and protected base 32d8c308f7d67de3dbd914a19837871d99c22ab4",
+    "GitHub DW-SuperApps input main@fc93228c721b59a5ac1de7e916a615eb452ef70a"
+  ],
+  "limitations": [
+    "UA graph is a read-only snapshot dated 2026-07-22.",
+    "No implementation, product test, CI, branch or PR evidence is claimed in G1."
+  ]
+}

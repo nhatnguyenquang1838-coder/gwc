@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-116-g1-20260727",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "32d8c308f7d67de3dbd914a19837871d99c22ab4",
+  "sources": [
+    {"path": "AGENTS.md", "kind": "instruction", "verified": true},
+    {"path": "projects/gwc/project-profile.yaml", "kind": "profile", "verified": true},
+    {"path": "projects/gwc/project-instructions.md", "kind": "instruction", "verified": true},
+    {"path": "projects/gwc/project-extension.md", "kind": "instruction", "verified": true},
+    {"path": "core/Coding_Project_Governance_v1.0.md", "kind": "governance", "verified": true},
+    {"path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md", "kind": "governance", "verified": true},
+    {"path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md", "kind": "delivery", "verified": true},
+    {"path": ".kiro/specs/scrum-105-durable-runtime-contracts/design.md", "kind": "design", "verified": true},
+    {"path": ".kiro/specs/scrum-108-bounded-external-write-runtime/design.md", "kind": "design", "verified": true},
+    {"path": "core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json", "kind": "runtime-contract", "verified": true},
+    {"path": "core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json", "kind": "runtime-contract", "verified": true},
+    {"path": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json", "kind": "authority-contract", "verified": true},
+    {"path": "tools/validate_g01.py", "kind": "validator", "verified": true},
+    {"path": ".ua/knowledge-graph.json", "kind": "UA-snapshot", "verified": true},
+    {"path": ".ua/extensions/traceability-graph.json", "kind": "UA-traceability", "verified": true},
+    {"path": ".task-architect/config.json", "kind": "Task-Me-config", "verified": true},
+    {"path": "distribution/power-package.yaml", "kind": "distribution-contract", "verified": true},
+    {"path": ".github/workflows/publish-power.yml", "kind": "CI", "verified": true},
+    {"path": ".github/workflows/publish-release.yml", "kind": "CI", "verified": true}
+  ],
+  "excluded_by_config": [".task-me/**", ".ua/generated/**", ".gwc/tasks/**/g4/**", ".gwc/tasks/**/g5/**", ".gwc/tasks/**/g6/**"],
+  "limitations": ["UA snapshot metadata is 2026-07-22 and is used read-only; no graph rebuild was authorized before G2."]
+}

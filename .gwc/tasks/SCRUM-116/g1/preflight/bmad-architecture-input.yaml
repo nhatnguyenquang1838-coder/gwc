@@ -1,0 +1,26 @@
+schema_version: '1.0'
+artifact_type: bmad-architecture-input
+generated_at: '2026-07-27T15:41:53Z'
+status: partial
+source_skill: .dw/powers/bmad/src/bmm-skills/3-solutioning/bmad-architecture/SKILL.md
+headless_guidance: .dw/powers/bmad/src/bmm-skills/3-solutioning/bmad-architecture/references/headless.md
+architecture_spine_template: .dw/powers/bmad/src/bmm-skills/3-solutioning/bmad-architecture/assets/spine-template.md
+invariants:
+- id: AD-1
+  rule: One artifact class has one canonical owner root.
+- id: AD-2
+  rule: Provenance uses exact repository/ref/SHA and tool/package source commit; conversation memory is not evidence.
+- id: AD-3
+  rule: Mutation requires owner, scope hash, current checkpoint revision and valid lease/fencing token.
+- id: AD-4
+  rule: Projection failure cannot alter canonical state or gate outcome.
+- id: AD-5
+  rule: Compatibility fallback is additive and preserves existing installations.
+deferred:
+- Final implementation filenames and symbols require G2 protected-base readback.
+- The absent DW-SuperApps boilerplate branch is modeled as a compatibility gap, not invented.
+- BMAD ready-unpublished provider state requires provider/release evidence before implementation.
+open_questions:
+- Which exact versioned contract filename and schema namespace should be selected after G2 path readback?
+limitations:
+- No BMAD project artifact was written because G1 is read-only and the target deliverable is the GWC task gate bundle.

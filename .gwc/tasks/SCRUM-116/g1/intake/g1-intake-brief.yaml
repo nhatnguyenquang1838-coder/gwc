@@ -1,0 +1,112 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-27T15:41:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-116
+  base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: DW SUPER APP P4 implementation needs one evidence-backed topology that separates workspace package source, target-owned runtime outputs, GWC gate authority, and non-authoritative human projections while preserving exact provenance and safe parallel writes.
+  why_now: Jira SCRUM-116 is refined and ready to start, remains To Do, explicitly blocks SCRUM-120, and its stated inputs are verified at GWC main@32d8c308f7d67de3dbd914a19837871d99c22ab4 and DW-SuperApps main@fc93228c721b59a5ac1de7e916a615eb452ef70a.
+desired_outcome: A versioned, reviewable topology/ownership/provenance contract and bounded implementation plan that downstream SCRUM-117 through SCRUM-121 can consume without conversation memory or authority ambiguity.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - DW-SuperApps maintainers
+  - Registered target-system maintainers
+  - UA, Task-Me and BMAD Power maintainers
+  - GitHub/CI, Jira, Notion and Slack integration owners
+  - SCRUM-117 through SCRUM-121 implementers
+scope:
+  in_scope:
+  - Integration topology across DW-SuperApps, target systems, GWC, UA, Task-Me, BMAD, GitHub, Jira, Notion and Slack.
+  - Source-of-truth matrix for gate state, code/CI, roadmap/status, human-readable projection and communication.
+  - Ownership and denied-write matrix for .gwc, .ua, .task-me, .bmad, package store and native host adapters.
+  - Provenance envelope fields, exact source/tool refs, schema version, owner root and generated time.
+  - Lease/fencing/CAS/idempotency and scope-hash collision rules.
+  - Compatibility rules for submodule, power-dist, immutable release and offline ZIP, including absent boilerplate and ready-unpublished states.
+  - UA impact mapping, Task-Me decomposition/validation plan and BMAD architecture invariants as G1 evidence.
+  non_goals:
+  - Product or connector implementation.
+  - Repository migration, package publication, release, merge, deploy or production operation.
+  - Jira, Notion or Slack status mutation.
+  - Credential, secret, production data/configuration or destructive cleanup.
+  - Direct write to protected main or any cross-repository source mutation.
+constraints:
+- G0 is READY and all G1 evidence remains bound to main@32d8c308f7d67de3dbd914a19837871d99c22ab4.
+- DW-SuperApps main@fc93228c721b59a5ac1de7e916a615eb452ef70a is a read-only cross-repository input for G1.
+- GWC artifacts and exact repository/CI evidence are authoritative; Jira, Notion and Slack are projections/communication.
+- Reuse -> Extend -> Refactor -> Replace is the required design order.
+- G2 requires explicit human direction; G1 grants no execution, merge, deploy or production authority.
+assumptions:
+- The existing GWC task workspace and validators remain the canonical gate mechanism.
+- Existing durable-runtime checkpoint, CAS, lease/fencing and idempotency contracts can be reused and extended.
+- The exact final implementation filenames can be confirmed during the G2 plan-read precondition without broadening the approved intent.
+- The missing DW-SuperApps boilerplate branch and BMAD ready-unpublished provider are compatibility states to model, not artifacts to invent.
+risks:
+- id: RISK-1
+  description: Ownership overlap could cause two agents or systems to mutate one artifact/root.
+  impact: high
+  mitigation: Require one canonical owner, scope hash, checkpoint revision, lease/fencing and idempotency checks with fail-closed collision behavior.
+- id: RISK-2
+  description: Projection systems could be mistaken for gate authority or status truth.
+  impact: high
+  mitigation: Make GitHub/GWC authority and Jira/Notion/Slack projection roles explicit in the source-of-truth matrix and tests.
+- id: RISK-3
+  description: Distribution fallback modes could drift from the canonical package/runtime ownership boundary.
+  impact: medium
+  mitigation: Add a compatibility matrix covering submodule, power-dist, immutable release and offline ZIP with backward-compatible fallback rules.
+- id: RISK-4
+  description: Stale UA snapshot or unpublished BMAD provider evidence could be overclaimed as current implementation.
+  impact: medium
+  mitigation: Label UA as read-only snapshot evidence, keep BMAD ready-unpublished explicit, and require G2 protected-base readback.
+acceptance_criteria:
+- id: AC-1
+  statement: Every P4 artifact type maps to exactly one canonical owner and storage root.
+  verifiable: true
+- id: AC-2
+  statement: Read-only Power/tool source is separated from target-owned generated runtime output and package/host adapter ownership.
+  verifiable: true
+- id: AC-3
+  statement: GWC gate artifacts and exact GitHub/CI evidence are authoritative while Jira, Notion and Slack are explicitly non-authoritative projections.
+  verifiable: true
+- id: AC-4
+  statement: A provenance envelope resolves an output to exact project and tool repositories, refs, SHAs, schema version, owner root and generation time without conversation memory.
+  verifiable: true
+- id: AC-5
+  statement: Parallel execution rejects stale lease/fencing/CAS, checkpoint revision, scope hash, idempotency or owner-root collisions instead of silently overwriting or merging.
+  verifiable: true
+- id: AC-6
+  statement: Submodule, power-dist, immutable release and offline ZIP compatibility paths preserve backward compatibility and explicitly represent absent boilerplate and ready-unpublished states.
+  verifiable: true
+- id: AC-7
+  statement: The contract is versioned, reviewable and referenceable by SCRUM-117 through SCRUM-121, with SCRUM-120 remaining blocked until this boundary is complete.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - read_live_jira_and_github_evidence
+  - read_existing_ua_snapshot_and_extensions
+  - read_task_me_and_bmad_runbooks
+  - materialize_task_scoped_g1_artifacts
+  - run_local_schema_and_output_validation
+  - prepare_bounded_g2_human_approval_request
+  downstream_non_goals:
+  - create_branch
+  - modify_product_source
+  - modify_protected_main
+  - merge
+  - deploy
+  - production_operation
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+    - exact approved G2 scope and branch head SHA
+    - complete diff and unauthorized-file review
+    - focused validator and test results
+    - exact PR-head CI readback
+    - independent G3 review
+unresolved_questions: []
+status: READY

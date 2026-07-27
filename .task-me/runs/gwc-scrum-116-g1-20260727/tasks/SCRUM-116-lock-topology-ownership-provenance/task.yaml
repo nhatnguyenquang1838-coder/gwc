@@ -1,0 +1,108 @@
+schema_version: '1.0'
+task_id: SCRUM-116
+title: Lock DW SUPER APP integration topology, ownership and provenance
+slug: lock-topology-ownership-provenance
+objective: Produce a versioned, source-backed topology and provenance contract that gives each P4 artifact exactly one canonical owner, separates tool source from target output, and prevents unsafe parallel mutation.
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+requirements:
+- SCRUM-116-AC-1
+- SCRUM-116-AC-2
+- SCRUM-116-AC-3
+- SCRUM-116-AC-4
+- SCRUM-116-AC-5
+- SCRUM-116-AC-6
+- SCRUM-116-AC-7
+scope:
+  included:
+  - DW-SuperApps control plane, package store and host adapters
+  - Target-owned .gwc, .ua, .task-me and .bmad roots
+  - GWC gate artifacts and exact-base evidence
+  - UA read-only semantic/impact evidence
+  - Task-Me planning output and BMAD architecture invariants
+  - GitHub/CI, Jira, Notion and Slack authority/projection boundaries
+  - Provenance envelope, collision/fencing rules and compatibility matrix
+  excluded:
+  - Product implementation or adapter code
+  - Repository migration, package publication or release
+  - Jira/Notion/Slack status mutation
+  - Merge, deployment, production data/configuration, credentials or migration
+  - Broad cleanup of legacy target installations
+verified_paths:
+- AGENTS.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- .kiro/specs/scrum-105-durable-runtime-contracts/design.md
+- .kiro/specs/scrum-108-bounded-external-write-runtime/design.md
+- core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json
+- core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json
+- tools/validate_g01.py
+- distribution/power-package.yaml
+- .github/workflows/publish-power.yml
+- .github/workflows/publish-release.yml
+- .ua/knowledge-graph.json
+- .ua/extensions/traceability-graph.json
+- .task-architect/config.json
+dependencies:
+  requires: []
+  parallel_with:
+  - SCRUM-117
+  - SCRUM-118
+  - SCRUM-119
+  delivery_wave: 1
+complexity:
+  class: medium
+  risk: R2
+  effort:
+    optimistic_hours: 8
+    likely_hours: 14
+    pessimistic_hours: 20
+  drivers:
+  - cross-repository ownership and projection boundaries
+  - provenance schema and exact-SHA binding
+  - parallel-write collision prevention
+  - compatibility across submodule, power-dist, release and offline ZIP modes
+implementation_plan:
+- Confirm exact protected-base paths and existing contracts in an isolated G2 plan-read receipt.
+- Define topology and source-of-truth matrix with one canonical owner per artifact class.
+- Define owner-root matrix and denied writes for GWC, UA, Task-Me, BMAD, package store and adapters.
+- Define provenance envelope fields and positive/negative examples bound to exact repo/tool refs.
+- Define lease/fencing/CAS and idempotency collision behavior without replacing durable-runtime contracts.
+- Define compatibility/fallback behavior for submodule, power-dist, immutable release and offline ZIP.
+- Add contract validation, focused tests and task-scoped evidence only within the approved G2 file list.
+test_plan:
+- Validate YAML/JSON schemas and exact-SHA references.
+- Assert exactly one canonical owner for every P4 artifact class.
+- Assert projection systems cannot grant gate authority.
+- Assert stale lease/fencing/CAS and scope mismatch are rejected.
+- Assert compatibility modes preserve backward compatibility and no broad cleanup is required.
+- Run focused GWC governance tests, compile checks and diff/scope review after G2 only.
+definition_of_done:
+- Versioned topology, ownership, provenance and compatibility contract is reviewable.
+- Every acceptance criterion has source evidence and a validation command.
+- Positive provenance and collision/fencing failure examples are present.
+- SCRUM-117 through SCRUM-121 can reference the contract without conversation memory.
+- No excluded action or unrelated file is changed.
+evidence_refs:
+- .task-me/runs/gwc-scrum-116-g1-20260727/_shared/03-evidence-graph.json
+- .task-me/runs/gwc-scrum-116-g1-20260727/_shared/04-impact-analysis.md
+- .ua/extensions/traceability-graph.json
+- core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json
+- core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json
+- .kiro/specs/scrum-105-durable-runtime-contracts/design.md
+- .kiro/specs/scrum-108-bounded-external-write-runtime/design.md
+decisions:
+- decision: Reuse and extend existing GWC, distribution and durable-runtime mechanisms before refactor or replacement.
+  rule: Reuse -> Extend -> Refactor -> Replace
+  confidence: 0.96
+- decision: Treat Jira, Notion and Slack as projections/communication, never as gate authority.
+  rule: Canonical artifacts and exact repository/CI evidence remain authoritative.
+  confidence: 0.99
+unresolved:
+- Final contract filenames and exact implementation symbols require G2 plan-read receipt.
+- DW-SuperApps boilerplate branch is absent and must remain an explicit compatibility gap.
+- BMAD ready-unpublished provider state needs a concrete provider/release readback before implementation.

@@ -1,0 +1,104 @@
+gate: G2_EXECUTION
+approval_request_id: CP-20260727-116-G2
+task_id: SCRUM-116
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+working_branch: codex/scrum-116-topology-provenance-20260727
+expected_head_sha: null
+scope_version: 1
+risk_class: R2
+selected_option_id: OPT-1
+approved_modules:
+- .gwc/tasks/SCRUM-116/**
+- .task-me/runs/gwc-scrum-116-g1-20260727/**
+- .kiro/specs/scrum-116-dw-superapp-topology/**
+- core/integration/**
+- schemas/integration/**
+- tools/validate_dw_super_app_integration.py
+- tests/test_dw_super_app_integration.py
+- releases/changelog.d/2026-07-27-scrum-116-dw-super-app-integration-topology.md
+authorized_actions:
+- create_guarded_branch_from_verified_base
+- persist_task_scoped_g0_g1_g2_artifacts
+- persist_task_specific_kiro_plan
+- modify_approved_modules_only
+- run_sandboxed_validation_and_tests
+- commit_and_push_working_branch
+- prepare_g3_delivery_record
+- open_or_update_draft_pr_after_g3_artifact_validation
+- monitor_ci_and_apply_in_scope_repairs
+- perform_independent_read_only_g3_review
+- mark_ready_for_review_after_g3_pass
+excluded_actions:
+- direct_main_push
+- modify_DW-SuperApps_source
+- modify_other_repositories
+- merge
+- auto_merge
+- deploy
+- release
+- runtime_reload
+- production_config_change
+- production_data_read_or_write
+- credential_or_secret_handling
+- migration
+- destructive_operation
+- force_push
+- branch_delete
+- pr_base_change
+- unrelated_cleanup
+required_checks:
+- tools/validate_g01.py --workspace .gwc/tasks/SCRUM-116 --gate G2_EXECUTION before first repository write
+- Task-Me plan-read receipt with exact paths, revision and protected base
+- topology/ownership/provenance schema validation
+- positive provenance and collision/fencing failure fixtures
+- compatibility matrix validation for submodule, power-dist, immutable release and offline ZIP
+- focused governance, CAS/lease/idempotency and integration tests
+- Python compile checks, git diff --check, secret scan and unauthorized-file scope review
+- exact PR-head GitHub Actions checks before G3 readiness
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-116
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  plan_root: .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance
+  plan_revision: sha256:b18100f1d28a710d5f75322db9a795456f5d363f895b57fea250917ed6848726
+  validation_evidence: CONFIG_VALID plus output-layout validation and the self-contained requirements/design/tasks handoff under the configured Task-Me output root.
+plan_read_precondition:
+  required_before_first_write: true
+  required_paths:
+  - .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/requirements.md
+  - .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/design.md
+  - .task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/tasks.md
+  must_match_task_uid: SCRUM-116
+  must_match_base_sha: 32d8c308f7d67de3dbd914a19837871d99c22ab4
+  on_mismatch: STOP_AND_RETURN_TO_G1
+  must_match_plan_revision: sha256:b18100f1d28a710d5f75322db9a795456f5d363f895b57fea250917ed6848726
+issued_at: '2026-07-27T15:49:43Z'
+expires_at: '2026-07-28T15:49:43Z'
+scope_hash: sha256:ba66fd55dbf7fddc70d5407d52ef73b0e83721a113f36ed6e930a25e5ddf8cee
+scope_hash_16: ba66fd55dbf7fddc
+approval_id: CP-20260727-116-G2
+artifact_hashes:
+  g0: sha256:8d1d232a8bf723d4d675d3e336e0c021697f7df1e718cdd0ba17397de8486ae5
+  intake: sha256:cbe248cc7a948568ba686a16862c2ca3d3b399a7d8e9cdb0efb48b73650d1498
+  preflight: sha256:f09a95762bfc7c510c2c2d83414af5b2b739c181ff5ef6d90637297891d22199
+  options: sha256:70c680012ac21fa409979b42a765a26bb04ece66830d7b3fc6c4f0689dd59ff2
+  decision: sha256:172155e31c8d0a0fc8a4acd5ef7acb45cb53fd6ed2fdebb2ccf9b1fb83b9d102
+  implementation_plan: sha256:d94f2df0e121266ce30fba214ddd7e9fa99f45815dfa4467e11789c2e3c8c09f
+approval_required: true
+approval_command_format: APPROVE G2_EXECUTION <approval_id> <scope_hash_16> <expires_at_utc>
+source_instruction: REPO
+execution_mode: local_agent
+gates_excluded_after_g2:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+g0_context_ref: .gwc/tasks/SCRUM-116/g0/context-snapshot.yaml
+g1_decision_ref: .gwc/tasks/SCRUM-116/g1/decision/g1-decision-record.yaml
+notes:
+- G1 is PASS and explicitly accepted OPT-1; the exact G2 approval command was received at 2026-07-27T15:49:43Z.
+- The envelope permits only the approved GWC repository modules and preserves the DW-SuperApps input as read-only.
+- No branch, commit, push, PR, merge, deploy, release, production or credential action has occurred.
