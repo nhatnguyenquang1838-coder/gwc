@@ -1,6 +1,6 @@
-schema_version: '1.0'
+schema_version: '1.1'
 artifact_type: g3-delivery-record
-generated_at: '2026-07-27T13:00:00Z'
+generated_at: '2026-07-27T13:05:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -9,44 +9,59 @@ trace:
   base_sha: 9e79dd6e3cffbe452647cc339701eb4b937d41ba
   branch: feat/scrum-115-canonical-scenarios-v3
   pull_request: 122
-  implementation_head_sha: 4d3763a4719eacd6bdc6ada53b24f7984fcd2bb9
+  reviewed_head_sha: 2a876ffae6f9c4799058beb2b878145dc2d6d2af
 g2:
   approval_id: CP-20260727-115-G2-R2
   scope_hash: sha256:76167bccb429735b8ba5937561fd13f460a6adb41d08c624945588b28f090712
   plan_revision: sha256:0ca6de11e1d2abe90304f83ac1a5fe80b3a7876c2474bb419e7d951b4b6d56a2
-scope:
-  changed_files_count_before_g3_record: 21
-  task_capability: canonical initial scenarios, deterministic decision history and registry-backed Cytoscape v3 binding
-  excluded:
-    - SCRUM-113
-    - SCRUM-114
-    - merge
-    - deployment
-    - release
-    - production
-validation:
-  g2_prewrite_contract: PASS
-  task_plan_compatibility: PASS
-  focused_tests: 9 passed
-  python_compileall: PASS
-  diff_scope: PASS
-  unauthorized_file_check: PASS
-ci_evidence:
-  exact_head_sha: 4d3763a4719eacd6bdc6ada53b24f7984fcd2bb9
-  runs:
-    - id: 30267781774
-      workflow: Validate instructions
-      conclusion: success
-    - id: 30267781684
-      workflow: Build instruction packages
-      conclusion: success
-  exact_head_match: true
 review:
   mode: independent read-only connector review
-  outcome: PASS
-  notes:
-    - 14 scenarios materialized while declared count remains 116
-    - non-runtime visual and history edges remain non-executable
-    - authority boundaries are not auto-promoted
-    - SCRUM-113 and SCRUM-114 paths are unchanged
-status: G3_EVIDENCE_RECORDED
+  outcome: REOPENED
+  findings:
+    - id: G3-FINDING-001
+      severity: high
+      path: tools/p3_backward_graph.py
+      issue: Canonical node authority_class was not mapped into scenario route classification, allowing a human-required node to be emitted as VALID_AUTO.
+      disposition: repair_required
+    - id: G3-FINDING-002
+      severity: medium
+      path: tools/node_architect/viewer/registry_adapter.py
+      issue: Existing CLI entrypoint and regression behavior were removed while adding scenario overlays.
+      disposition: repair_required
+    - id: G3-FINDING-003
+      severity: medium
+      path: tools/node_architect/validate_runtime_registry.py
+      issue: Existing profile and node maturity validation coverage was removed during the compact rewrite.
+      disposition: repair_required
+    - id: G3-FINDING-004
+      severity: medium
+      paths:
+        - tests/test_p3_backward_graph.py
+        - tests/test_runtime_registry_validation.py
+        - tests/test_v3_run_history_adapter.py
+      issue: Predecessor regression tests were replaced rather than extended.
+      disposition: repair_required
+repair_scope:
+  authorized: true
+  paths:
+    - tools/p3_backward_graph.py
+    - tools/node_architect/validate_runtime_registry.py
+    - tools/node_architect/viewer/registry_adapter.py
+    - schemas/runtime/scenario-contract.schema.json
+    - tests/test_p3_backward_graph.py
+    - tests/test_runtime_registry_validation.py
+    - tests/test_v3_run_history_adapter.py
+  local_validation:
+    python_compileall: PASS
+    focused_tests: 20 passed
+    full_repository_validation: pending_exact_head_ci
+ci_evidence:
+  prior_runs:
+    - id: 30268091500
+      workflow: Validate instructions
+      conclusion: success
+    - id: 30268091511
+      workflow: Build instruction packages
+      conclusion: success
+  note: Prior CI passed but did not contain a test asserting scenario authority_class propagation.
+status: G3_REVIEW_REOPENED

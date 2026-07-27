@@ -113,6 +113,10 @@
           "value": {},
           "values": {
             "type": "array"
+          },
+          "value_from_field": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "required": [
