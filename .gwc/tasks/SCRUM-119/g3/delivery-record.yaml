@@ -1,0 +1,40 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+task_id: SCRUM-119
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 9de88c0bdaf4ca58733f7dba8a0dd376df69a408
+working_branch: feat/scrum-119-bmad-procedure-adapter-contract-r2
+scope_hash: sha256:459250502a42a44d88c970169102ca1e9d98d2d874ee957b6bd7ea9981cd0a60
+workflow: GWC_FASTLANE_BOOTSTRAP
+approval_id: FL-G2-SCRUM-119-BASEDRIFT-20260728-0110
+status: IMPLEMENTATION_HEAD_VALIDATED
+implementation:
+  head_sha: 16e8f9ad44862175653975ec84b9946a544fb59c
+  changed_files: 20
+  compare_status: ahead
+  ahead_by: 1
+  behind_by: 0
+validation:
+  local_materialized_validator: PASS
+  pytest: 5 passed
+  repository_ci: PASS
+  workflow_runs:
+    - name: Validate instructions
+      run_id: 30294126050
+      conclusion: success
+    - name: Build instruction packages
+      run_id: 30294126261
+      conclusion: success
+pr:
+  number: 127
+  state: open
+  draft: true
+  implementation_head_sha: 16e8f9ad44862175653975ec84b9946a544fb59c
+boundaries:
+  merge_authorized: false
+  deploy_authorized: false
+  production_authorized: false
+note: >
+  This evidence commit records validation of the implementation head. The evidence
+  commit itself requires final exact-head CI readback before Ready for Review.
+  No G4 authority is granted.

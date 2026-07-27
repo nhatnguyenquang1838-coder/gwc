@@ -1,0 +1,38 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-07-27T17:55:01Z"
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 9de88c0bdaf4ca58733f7dba8a0dd376df69a408
+  protected_branches: [main]
+  connector: GitHub
+  write_enabled: true
+task:
+  id: SCRUM-119
+  title: Design BMAD procedure-adapter contracts and authority boundaries
+  parent: SCRUM-98
+constraints:
+  - BMAD is a bounded procedure adapter and never canonical gate authority.
+  - Writes are limited to the approved guarded branch and declared paths.
+  - DW-SuperApps commit 3570324a64c2ba542d0de14d664e6ce95cba2421 is read-only reference input.
+  - BMAD provider state ready-unpublished must be pinned, never resolved as implicit latest.
+sources:
+  - path: AGENTS.md
+    ref: 9de88c0bdaf4ca58733f7dba8a0dd376df69a408
+    status: AVAILABLE
+  - path: core/integration/DW_SUPER_APP_INTEGRATION_TOPOLOGY_v1.0.md
+    ref: 9de88c0bdaf4ca58733f7dba8a0dd376df69a408
+    status: AVAILABLE
+  - path: core/integration/dw-super-app-integration-contract.json
+    ref: 9de88c0bdaf4ca58733f7dba8a0dd376df69a408
+    status: AVAILABLE
+  - path: DW-SuperApps/manifests/powers/bmad.yaml
+    ref: 3570324a64c2ba542d0de14d664e6ce95cba2421
+    status: AVAILABLE
+status: READY
+blockers: []

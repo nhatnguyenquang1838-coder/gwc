@@ -1,0 +1,20 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+task_id: SCRUM-119
+base_sha: 9de88c0bdaf4ca58733f7dba8a0dd376df69a408
+execution_mode: chat_connector_only
+workflow: GWC_FASTLANE_BOOTSTRAP
+risk_class: R1
+feasibility: PASS
+findings:
+  - SCRUM-116 establishes GWC as canonical gate owner and target .bmad as derived output.
+  - BMAD 6.10.0 is pinned to source commit bb45db4aa4496c69239f9c0629c290fd1b072fc9.
+  - Provider state is ready-unpublished and is modeled explicitly.
+  - JSON Schema Draft 2020-12 supports closed contracts and conditional permission validation.
+risks:
+  - scope drift if additional repository paths are introduced
+  - self-approval or .gwc mutation if authority checks are omitted
+  - duplicate side effects if idempotency keys are not enforced
+required_next_gate: G2_EXECUTION
+excluded_actions: [merge, deploy, release, migration, credentials, production_data]
+status: PASS
