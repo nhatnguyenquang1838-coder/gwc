@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+task_id: SCRUM-117
+reader: chatgpt-gwc-agent
+read_at_utc: '2026-07-27T17:35:00Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+working_branch: feat/scrum-117-ua-host-mode-contract
+verification:
+  task_uid_matches: true
+  repository_matches: true
+  protected_base_matches: true
+  scope_matches_g2: true
+  result: VERIFIED
+status: VERIFIED

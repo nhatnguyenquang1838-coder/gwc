@@ -1,0 +1,43 @@
+gate: G2_EXECUTION
+approval_request_id: CP-20260728-117-G2-R2
+task_id: SCRUM-117
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: e0031b01ea9ea4f72a1119a81d732bbaee2b4921
+working_branch: feat/scrum-117-ua-host-mode-contract
+risk_class: R2
+scope_hash: sha256:358696f3f834caa40e25d74427cfc5b964e38b7581a940a6b92cc0a2a3227a8b
+scope_hash_16: 358696f3f834caa4
+approved_modules:
+- .gwc/tasks/SCRUM-117/**
+- .kiro/specs/GWC-P4-K2-ua-host-mode-contract/**
+- .ua/analysis/SCRUM-117/**
+- core/integrations/UA_HOST_MODE_CONTRACT_v0.1.md
+- schemas/integrations/ua-host-request.schema.json
+- schemas/integrations/ua-snapshot.schema.json
+- schemas/integrations/ua-host-result.schema.json
+- examples/integrations/ua-host/**
+- tools/validate_ua_host_contract.py
+- tests/test_ua_host_contract.py
+- releases/changelog.d/2026-07-28-scrum-117-ua-host-mode-contract.md
+authorized_actions:
+- create_guarded_branch_from_verified_base
+- modify_approved_modules_only
+- run_sandboxed_validation_and_tests
+- commit_and_push_working_branch
+- open_or_update_draft_pr_after_g3_artifact_validation
+excluded_actions:
+- direct_main_push
+- merge
+- auto_merge
+- deploy
+- release
+- production_data_read_or_write
+- credential_or_secret_handling
+- migration
+- destructive_operation
+- force_push
+- branch_delete
+issued_at: '2026-07-28T00:35:00+07:00'
+expires_at: '2026-07-28T17:15:25Z'
+status: APPROVED_AND_EXECUTED_TO_DRAFT_PR
