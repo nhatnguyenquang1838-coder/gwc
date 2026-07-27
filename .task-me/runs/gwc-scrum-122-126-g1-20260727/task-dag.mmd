@@ -1,0 +1,17 @@
+graph TD
+  T122[SCRUM-122 Metrics]
+  T123[SCRUM-123 Governance]
+  T124[SCRUM-124 History + replay]
+  T125[SCRUM-125 Shadow planner]
+  T126[SCRUM-126 Promotion view]
+
+  T122 --> T124
+  T123 --> T124
+  T122 --> T125
+  T123 --> T125
+  T124 --> T126
+  T125 --> T126
+
+  T122 -. PARALLEL .- T123
+  T124 -. PARALLEL .- T125
+

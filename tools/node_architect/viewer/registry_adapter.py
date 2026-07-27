@@ -12,6 +12,10 @@ from tools.node_architect.viewer.run_history_adapter import (
     build_run_history_elements,
     overlay_run_history,
 )
+from tools.node_architect.viewer.p5_evaluation_adapter import (
+    build_p5_evaluation_elements,
+    overlay_p5_evaluation,
+)
 
 REGISTRY_FILES = {
     "nodes": "core/node-architect/node-registry.json",
@@ -140,6 +144,7 @@ def build_cytoscape_elements(
     active_node_ids: Iterable[str] | None = None,
     run_history: Mapping[str, Any] | None = None,
     scenario_decision: Mapping[str, Any] | None = None,
+    p5_evaluation: Mapping[str, Any] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Build the registry graph and optionally overlay durable histories."""
     active = set(active_node_ids or ())
@@ -185,6 +190,11 @@ def build_cytoscape_elements(
         elements = overlay_run_history(
             elements,
             build_scenario_decision_elements(scenario_decision),
+        )
+    if p5_evaluation is not None:
+        elements = overlay_p5_evaluation(
+            elements,
+            build_p5_evaluation_elements(p5_evaluation),
         )
     return elements
 
@@ -243,6 +253,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--active-node", action="append", default=[])
     parser.add_argument("--run-history", type=Path)
     parser.add_argument("--scenario-decision", type=Path)
+    parser.add_argument("--p5-evaluation", type=Path)
     args = parser.parse_args(argv)
 
     bundle = load_registry_bundle(args.root.resolve())
@@ -252,12 +263,16 @@ def main(argv: list[str] | None = None) -> int:
     scenario_decision = None
     if args.scenario_decision:
         scenario_decision = json.loads(args.scenario_decision.read_text(encoding="utf-8"))
+    p5_evaluation = None
+    if args.p5_evaluation:
+        p5_evaluation = json.loads(args.p5_evaluation.read_text(encoding="utf-8"))
 
     elements = build_cytoscape_elements(
         bundle,
         args.active_node or None,
         run_history,
         scenario_decision,
+        p5_evaluation,
     )
     print(json.dumps(elements, indent=2, sort_keys=True))
     return 0

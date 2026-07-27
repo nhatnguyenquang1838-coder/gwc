@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw.superapps/schemas/integrations/p5-evaluation-run.schema.json",
+  "title": "P5 Evaluation Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "chain_id",
+    "linked_task_ids",
+    "repository",
+    "base_sha",
+    "scope_hash",
+    "run_id",
+    "history",
+    "metrics",
+    "shadow",
+    "comparison",
+    "promotion",
+    "projections"
+  ],
+  "properties": {
+    "schema_version": { "const": "0.1" },
+    "task_id": { "const": "SCRUM-122" },
+    "chain_id": { "const": "SCRUM-122-126" },
+    "linked_task_ids": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "string"
+      }
+    },
+    "repository": { "type": "string", "minLength": 1 },
+    "base_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "run_id": { "type": "string", "minLength": 1 },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run", "events", "checkpoints"],
+      "properties": {
+        "run": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["run_id", "status"],
+          "properties": {
+            "run_id": { "type": "string", "minLength": 1 },
+            "status": { "type": "string", "minLength": 1 }
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "checkpoints": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric_id", "label", "value", "target", "direction", "status"],
+        "properties": {
+          "metric_id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "value": { "type": "number" },
+          "target": { "type": "number" },
+          "direction": {
+            "type": "string",
+            "enum": ["higher_is_better", "lower_is_better"]
+          },
+          "status": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "shadow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_allowed", "confidence", "stable_fallback", "side_effect_free", "canary"],
+      "properties": {
+        "candidate_allowed": { "type": "boolean" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "stable_fallback": { "type": "boolean" },
+        "side_effect_free": { "type": "boolean" },
+        "canary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed", "allowlisted", "bounded", "eligible"],
+          "properties": {
+            "allowed": { "type": "boolean" },
+            "allowlisted": { "type": "boolean" },
+            "bounded": { "type": "boolean" },
+            "eligible": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stable", "candidate", "replay"],
+      "properties": {
+        "stable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["graph_revision", "route_signature", "decision_signature"],
+          "properties": {
+            "graph_revision": { "type": "string", "minLength": 1 },
+            "route_signature": { "type": "string", "minLength": 1 },
+            "decision_signature": { "type": "string", "minLength": 1 }
+          }
+        },
+        "candidate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["graph_revision", "route_signature", "decision_signature"],
+          "properties": {
+            "graph_revision": { "type": "string", "minLength": 1 },
+            "route_signature": { "type": "string", "minLength": 1 },
+            "decision_signature": { "type": "string", "minLength": 1 }
+          }
+        },
+        "replay": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["route_matches", "decision_matches"],
+          "properties": {
+            "route_matches": { "type": "boolean" },
+            "decision_matches": { "type": "boolean" },
+            "typed_divergence": { "type": ["object", "null"] }
+          }
+        }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lifecycle",
+        "current_stage",
+        "human_approval_required",
+        "automatic_promotion",
+        "rollback_plan"
+      ],
+      "properties": {
+        "lifecycle": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "string",
+            "enum": [
+              "experimental",
+              "candidate",
+              "pilot",
+              "stable",
+              "deprecated",
+              "retired"
+            ]
+          }
+        },
+        "current_stage": {
+          "type": "string",
+          "enum": [
+            "experimental",
+            "candidate",
+            "pilot",
+            "stable",
+            "deprecated",
+            "retired"
+          ]
+        },
+        "human_approval_required": { "type": "boolean" },
+        "automatic_promotion": { "type": "boolean" },
+        "rollback_plan": { "type": "string", "minLength": 1 }
+      }
+    },
+    "projections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["system", "authority", "grants_gate_authority"],
+        "properties": {
+          "system": { "type": "string", "minLength": 1 },
+          "authority": { "type": "string", "const": "projection" },
+          "grants_gate_authority": { "type": "boolean", "const": false }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}
+

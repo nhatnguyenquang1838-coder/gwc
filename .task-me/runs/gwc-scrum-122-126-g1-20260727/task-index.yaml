@@ -1,0 +1,56 @@
+schema_version: "1.0"
+run_id: gwc-scrum-122-126-g1-20260727
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: cd9b49cf9e6fd97413bc49ed480b2fc9941513af
+tasks:
+  - task_id: SCRUM-122
+    slug: define-planning-runtime-outcome-and-catalog-quality-metrics
+    title: Define planning, runtime, outcome and catalog quality metrics
+    wave: 1
+    requires: []
+    parallel_with:
+      - SCRUM-123
+    risk: R2
+    likely_hours: 8
+  - task_id: SCRUM-123
+    slug: define-improvement-shadow-canary-and-catalog-promotion-governance
+    title: Define improvement, shadow, canary and catalog-promotion governance
+    wave: 1
+    requires: []
+    parallel_with:
+      - SCRUM-122
+    risk: R2
+    likely_hours: 8
+  - task_id: SCRUM-124
+    slug: implement-execution-history-outcome-evaluation-and-replay-comparison-pipeline
+    title: Implement execution-history, outcome evaluation and replay comparison pipeline
+    wave: 2
+    requires:
+      - SCRUM-122
+      - SCRUM-123
+    parallel_with:
+      - SCRUM-125
+    risk: R2
+    likely_hours: 12
+  - task_id: SCRUM-125
+    slug: implement-shadow-planner-confidence-calibration-and-bounded-canary-controls
+    title: Implement shadow planner, confidence calibration and bounded canary controls
+    wave: 2
+    requires:
+      - SCRUM-122
+      - SCRUM-123
+    parallel_with:
+      - SCRUM-124
+    risk: R2
+    likely_hours: 12
+  - task_id: SCRUM-126
+    slug: implement-catalog-promotion-workflow-and-v3-stable-vs-candidate-view
+    title: Implement catalog promotion workflow and v3 stable-vs-candidate view
+    wave: 3
+    requires:
+      - SCRUM-124
+      - SCRUM-125
+    parallel_with: []
+    risk: R2
+    likely_hours: 10
+

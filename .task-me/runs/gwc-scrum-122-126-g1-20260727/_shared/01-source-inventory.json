@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-122-126-g1-20260727",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "cd9b49cf9e6fd97413bc49ed480b2fc9941513af",
+  "sources": [
+    {"path": "AGENTS.md", "kind": "instruction", "verified": true},
+    {"path": "workspace.yaml", "kind": "workspace", "verified": true},
+    {"path": "projects/gwc/project-profile.yaml", "kind": "profile", "verified": true},
+    {"path": "projects/gwc/project-instructions.md", "kind": "instruction", "verified": true},
+    {"path": "projects/gwc/project-extension.md", "kind": "instruction", "verified": true},
+    {"path": "projects/gwc/core/integrations/DW_SUPER_E2E_REPLAYABLE_PILOT_CONTRACT_v0.1.md", "kind": "contract", "verified": true},
+    {"path": "projects/gwc/core/integrations/dw-super-e2e-replayable-pilot-contract.json", "kind": "contract", "verified": true},
+    {"path": "projects/gwc/schemas/integrations/e2e-pilot-run.schema.json", "kind": "schema", "verified": true},
+    {"path": "projects/gwc/tools/node_architect/viewer/run_history_adapter.py", "kind": "code", "verified": true},
+    {"path": "projects/gwc/tools/node_architect/viewer/registry_adapter.py", "kind": "code", "verified": true},
+    {"path": "projects/gwc/tests/test_v3_run_history_adapter.py", "kind": "test", "verified": true},
+    {"path": "projects/gwc/tests/test_v3_registry_adapter.py", "kind": "test", "verified": true},
+    {"path": "projects/gwc/core/task-lifecycle/gate-transition-map.yaml", "kind": "system_graph", "verified": true}
+  ],
+  "limitations": [
+    "Task Me exposes the configuration and output validators, but no invokable planning runner in this chat runtime.",
+    "Jira status mutation is intentionally deferred until the execution envelope explicitly authorizes it."
+  ]
+}
+

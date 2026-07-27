@@ -1,0 +1,42 @@
+schema_version: "1.0"
+task_id: SCRUM-122
+gate: G2_EXECUTION
+approval_id: CP-20260728-001
+approval_command: "APPROVE G2_EXECUTION CP-20260728-001 965869cb4b1fc8b0 2026-07-28T20:05:58Z"
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: cd9b49cf9e6fd97413bc49ed480b2fc9941513af
+branch: feat/scrum-122-126-p5-evaluation-r1
+scope_hash: sha256:965869cb4b1fc8b0d142f54f2052bc337813347afa7aab0f087c18d552171bc8
+risk_class: R2
+chain_task_ids:
+  - SCRUM-122
+  - SCRUM-123
+  - SCRUM-124
+  - SCRUM-125
+  - SCRUM-126
+status: approved_for_guarded_branch_only
+authorized_actions:
+  - create_guarded_branch
+  - write_task_scoped_artifacts
+  - add_contract_and_schema
+  - add_validator_and_tests
+  - update_viewer_overlay
+  - create_draft_pr
+  - run_local_validation
+excluded_actions:
+  - protected_main_write
+  - merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials_or_secrets
+  - migration
+  - destructive_operation
+  - force_push
+  - branch_deletion
+  - pr_base_change
+limitations:
+  - jira_status_mutation_is_not_authorized_by_this_envelope
+

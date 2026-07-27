@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-122-126-g1-20260727",
+  "nodes": [
+    {
+      "id": "repo:gwc",
+      "type": "repository",
+      "label": "nhatnguyenquang1838-coder/gwc"
+    },
+    {
+      "id": "task:SCRUM-122-126",
+      "type": "jira_chain",
+      "label": "SCRUM-122 through SCRUM-126"
+    },
+    {
+      "id": "spec:GWC-P5",
+      "type": "kiro_spec",
+      "label": "P5 evaluation and controlled self-improvement"
+    },
+    {
+      "id": "contract:P5",
+      "type": "contract",
+      "label": "P5 evaluation contract"
+    },
+    {
+      "id": "schema:P5",
+      "type": "schema",
+      "label": "P5 evaluation run schema"
+    },
+    {
+      "id": "viewer:P5",
+      "type": "viewer",
+      "label": "P5 evaluation overlay"
+    },
+    {
+      "id": "validator:P5",
+      "type": "validator",
+      "label": "P5 evaluation validator"
+    },
+    {
+      "id": "taskme:run",
+      "type": "planning_run",
+      "label": "gwc-scrum-122-126-g1-20260727"
+    }
+  ],
+  "edges": [
+    {"source": "task:SCRUM-122-126", "target": "spec:GWC-P5", "type": "DECOMPOSES"},
+    {"source": "spec:GWC-P5", "target": "contract:P5", "type": "SPECIFIES"},
+    {"source": "spec:GWC-P5", "target": "schema:P5", "type": "SPECIFIES"},
+    {"source": "spec:GWC-P5", "target": "viewer:P5", "type": "SPECIFIES"},
+    {"source": "spec:GWC-P5", "target": "validator:P5", "type": "SPECIFIES"},
+    {"source": "taskme:run", "target": "task:SCRUM-122-126", "type": "OUTPUTS"}
+  ]
+}
+

@@ -1,0 +1,14 @@
+task_id: SCRUM-122
+base_sha: cd9b49cf9e6fd97413bc49ed480b2fc9941513af
+plan_source: .kiro/specs/GWC-P5-evaluation-controlled-self-improvement/tasks.md
+scope_hash: sha256:965869cb4b1fc8b0d142f54f2052bc337813347afa7aab0f087c18d552171bc8
+chain_task_ids:
+  - SCRUM-122
+  - SCRUM-123
+  - SCRUM-124
+  - SCRUM-125
+  - SCRUM-126
+read_at_utc: "2026-07-27T20:30:02Z"
+accepted_limitations:
+  - The P5 chain is planned as one bounded no-production evaluation package.
+  - Jira status mutation is deferred because this envelope authorizes only guarded-branch execution.

@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-122-126-g1-20260727",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "requirements": [
+    {
+      "id": "REQ-P5-01",
+      "statement": "Planning, runtime, outcome and catalog quality metrics must be defined and versioned.",
+      "jira": ["SCRUM-122"],
+      "files": [
+        ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+        ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md"
+      ]
+    },
+    {
+      "id": "REQ-P5-02",
+      "statement": "Improvement proposal lifecycle, stable/candidate boundaries and bounded shadow/canary governance must be explicit.",
+      "jira": ["SCRUM-123"],
+      "files": [
+        ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+        ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md",
+        "core/integrations/P5_EVALUATION_CONTROLLED_SELF_IMPROVEMENT_CONTRACT_v0.1.md"
+      ]
+    },
+    {
+      "id": "REQ-P5-03",
+      "statement": "Execution history, replay comparison and metric aggregation must preserve deterministic readback evidence.",
+      "jira": ["SCRUM-124"],
+      "files": [
+        "tools/node_architect/viewer/run_history_adapter.py",
+        "tools/node_architect/viewer/registry_adapter.py",
+        "tools/validate_p5_evaluation.py"
+      ]
+    },
+    {
+      "id": "REQ-P5-04",
+      "statement": "Shadow planning, confidence calibration and bounded canary controls must fail closed and remain side-effect free when ineligible.",
+      "jira": ["SCRUM-125"],
+      "files": [
+        "schemas/integrations/p5-evaluation-run.schema.json",
+        "tools/validate_p5_evaluation.py",
+        "tests/test_p5_evaluation_adapter.py"
+      ]
+    },
+    {
+      "id": "REQ-P5-05",
+      "statement": "Promotion workflow and stable-vs-candidate view must remain human-governed and projection-only.",
+      "jira": ["SCRUM-126"],
+      "files": [
+        "tools/node_architect/viewer/p5_evaluation_adapter.py",
+        "tools/node_architect/viewer/registry_adapter.py",
+        "tests/test_p5_evaluation_adapter.py"
+      ]
+    }
+  ]
+}
+
