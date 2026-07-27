@@ -1,0 +1,9 @@
+task_id: SCRUM-121
+base_sha: e664d48579764e56d53223d606768ba5ae8d07a4
+plan_source: /mnt/data/SCRUM-121-FASTLANE-20260728-0212/reports/fastlane-summary.json
+scope_hash: sha256:772a371c01d0cdca2be1bceb92f74eebbc154e7a86a9875f2b021cd30923f3ad
+selected_pilot: PILOT-121-A
+read_at_utc: "2026-07-27T19:25:00Z"
+accepted_limitations:
+  - SCRUM-120 package/release evidence exists but commit-bound G5 status is connector-observability-incomplete.
+  - This G2 scope permits only no-production pilot evidence artifacts and validators.
