@@ -1,0 +1,62 @@
+{
+  "schema_version": "0.1",
+  "contract": "p5-evaluation-controlled-self-improvement",
+  "authority": {
+    "gwc": "gates",
+    "github": "repo_pr_ci",
+    "jira": "projection",
+    "slack": "projection",
+    "notion": "projection"
+  },
+  "task_chain": [
+    "SCRUM-122",
+    "SCRUM-123",
+    "SCRUM-124",
+    "SCRUM-125",
+    "SCRUM-126"
+  ],
+  "metric_families": [
+    "planning",
+    "runtime",
+    "outcome",
+    "catalog_quality",
+    "route_selection",
+    "human_override",
+    "evidence_completeness",
+    "escaped_defects",
+    "policy_violations",
+    "recovery_success",
+    "confidence_calibration"
+  ],
+  "required_guards": [
+    "version_bound_artifacts",
+    "exact_base_sha_binding",
+    "checkpoint_replay_readback",
+    "stable_idempotency_keys",
+    "shadow_no_side_effects",
+    "canary_allowlist",
+    "human_promotion_approval",
+    "stable_fallback_on_low_confidence",
+    "projection_authority_denial"
+  ],
+  "promotion_lifecycle": [
+    "experimental",
+    "candidate",
+    "pilot",
+    "stable",
+    "deprecated",
+    "retired"
+  ],
+  "failure_codes": [
+    "STALE_ARTIFACT",
+    "DUPLICATE_SIDE_EFFECT",
+    "REPLAY_DIVERGENCE",
+    "PROJECTION_AUTHORITY_LEAKAGE",
+    "SHADOW_SIDE_EFFECT",
+    "CANARY_POLICY_VIOLATION",
+    "CONFIDENCE_CALIBRATION_DRIFT",
+    "PROMOTION_POLICY_VIOLATION",
+    "G6_REQUIRED"
+  ]
+}
+

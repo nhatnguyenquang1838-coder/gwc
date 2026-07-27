@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "task-me-plan-validation",
+  "run_id": "gwc-scrum-122-126-g1-20260727",
+  "canonical_task_uid": "SCRUM-122",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "cd9b49cf9e6fd97413bc49ed480b2fc9941513af",
+  "plan_root": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement",
+  "files": [
+    {
+      "path": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+      "sha256": "57456c95175b0003cb7ac505c8b2482b1a1cf45764d2097d5641b5e8036dec02"
+    },
+    {
+      "path": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md",
+      "sha256": "6962cfaae961c58ac76354dbc3a9586ad5c28fb4627e66faaf289675348ff9d1"
+    },
+    {
+      "path": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/tasks.md",
+      "sha256": "61f85d3e1bd8a912a2cb36693c91dda3eda362369dde340194dd1216f3899106"
+    }
+  ],
+  "plan_revision": "sha256:6a3534c02538a4f99c0dbe10b860bf90f535b365aa7bc97e2a53bd8b4144fe46",
+  "checks": {
+    "requirements_heading": true,
+    "requirements_sections": true,
+    "design_heading": true,
+    "design_sections": true,
+    "tasks_heading": true,
+    "tasks_sections": true,
+    "mermaid_present": true,
+    "requirement_mapping_present": true,
+    "task_me_per_task_layout_valid": true
+  },
+  "outcome": "PASS"
+}
+
