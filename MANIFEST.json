@@ -10,19 +10,19 @@
     {
       "mode": "0600",
       "path": "POWER.yaml",
-      "sha256": "242b8660016f1d94784be1e17a8e556f0bc0d872c9105c7511f357529f68589d",
+      "sha256": "5c1b021f5c0a525db06641353ace65ed2f14f9d21585a843380f0f5291309012",
       "size": 632
     },
     {
       "mode": "0600",
       "path": "SOURCE.json",
-      "sha256": "523c56f588ff6745bba607ac027f063ca859156f97d2cc897974ed0dcf485bf8",
+      "sha256": "18af962e847c86c82576366aa1dbbb38ec718aa6149dc06248068a27633e5022",
       "size": 187
     },
     {
       "mode": "0600",
       "path": "VERSION",
-      "sha256": "d2fe20210a306ffecbb6e7349cabcebd29ee636258c60d28f20b8cd57f174fe9",
+      "sha256": "b4dc3fe961168ac074bca5dc8c76dd76759f55b20f11b9af7f163f6850239030",
       "size": 53
     },
     {
@@ -120,6 +120,12 @@
       "path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
       "sha256": "3df7d8a647065d5d836fd26c8cafe6346b6820096b2891c3af479f1a4a633946",
       "size": 16695
+    },
+    {
+      "mode": "0644",
+      "path": "core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
+      "sha256": "43a6082089b50ec14165091bff7e7d19e3206642fe40c17561aa742a61bd08b4",
+      "size": 2730
     },
     {
       "mode": "0644",
@@ -361,8 +367,8 @@
     "powerId": "gwc",
     "sourceRef": "main",
     "sourceRepository": "nhatnguyenquang1838-coder/gwc",
-    "sourceSha": "6e94950acec6918458a92842ff21625545b3871b",
-    "version": "gwc-main-22-6e94950acec6918458a92842ff21625545b3871b"
+    "sourceSha": "b0341da8414aacad93719a6919babcd183e03f02",
+    "version": "gwc-main-23-b0341da8414aacad93719a6919babcd183e03f02"
   },
   "spec": {
     "entrypoints": [
