@@ -1,0 +1,23 @@
+{
+  "artifact_type": "scrum-150-cross-phase-validation-report",
+  "task_id": "SCRUM-150",
+  "base_sha": "6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be",
+  "working_branch": "codex/fastlane-scrum-150-20260728",
+  "results": {
+    "g0_g1": {"status": "PASS", "command": "python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-150 --json"},
+    "g2_gate": {"status": "PASS", "command": "python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-150 --gate G2_EXECUTION --json"},
+    "scrum_150_suite": {"status": "PASS", "cases": 7, "command": "python3 tools/validate_scrum_150_cross_phase.py --suite --root . --json"},
+    "scrum_150_unittest": {"status": "PASS", "count": 4, "command": "python3 -m unittest -v tests.test_scrum_150_cross_phase"},
+    "dependency_regression_unittest": {"status": "PASS", "count": 33, "command": "python3 -m unittest -v tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_p5_evaluation_adapter tests.test_github_g5_g6_jira_projection tests.test_g5_status_resolver tests.test_scrum_150_cross_phase"},
+    "no_production_pilot": {"status": "PASS", "validator": "tools/validate_dw_super_e2e_pilot.py"},
+    "p5_evaluation": {"status": "PASS", "validator": "tools/validate_p5_evaluation.py --suite"},
+    "exact_head_projection": {"status": "PASS", "validator": "tools/validate_github_g5_g6_jira_projection.py"},
+    "compile_changed_files": {"status": "PASS", "files": ["tools/validate_scrum_150_cross_phase.py", "tests/test_scrum_150_cross_phase.py"]},
+    "diff_check": {"status": "PASS", "command": "git diff --check"}
+  },
+  "limitations": [
+    "Live provider calls, live host E2E and remote CI for the new head are not claimed.",
+    "Existing SCRUM-146 dependency evidence remains stale-input evidence until exact current rebaseline records are supplied.",
+    "No merge, deployment, release, production configuration, credentials or production data operation was performed."
+  ]
+}

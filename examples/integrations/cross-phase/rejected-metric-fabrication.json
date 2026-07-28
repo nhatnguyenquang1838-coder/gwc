@@ -1,0 +1,5 @@
+{
+  "fixture_type": "mutation",
+  "base": "positive-cross-phase-run.json",
+  "mutations": [{"path": "p5.metrics.0.value", "value": 0.25}]
+}

@@ -1,0 +1,9 @@
+{
+  "task_id": "SCRUM-150",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be",
+  "evidence_classes": ["contract_fixture", "focused_unit_test", "exact_state_readback"],
+  "planned_validators": ["tools/validate_scrum_150_cross_phase.py", "tools/validate_github_g5_g6_jira_projection.py", "tools/validate_p5_evaluation.py"],
+  "planned_results": ["positive composite record accepted", "typed rejection fixtures fail closed"],
+  "not_claimed": ["live provider execution", "host E2E", "merge", "deploy", "production operation"]
+}

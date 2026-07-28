@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "nodes": [
+    {"id": "p2", "task": "SCRUM-147", "kind": "dependency-evidence"},
+    {"id": "p3", "task": "SCRUM-148", "kind": "dependency-evidence"},
+    {"id": "p4", "task": "SCRUM-149", "kind": "dependency-evidence"},
+    {"id": "authority", "task": "SCRUM-151", "kind": "dependency-evidence"},
+    {"id": "cross-phase", "task": "SCRUM-150", "kind": "implementation"}
+  ],
+  "edges": [
+    {"from": "p2", "to": "cross-phase", "relation": "requires"},
+    {"from": "p3", "to": "cross-phase", "relation": "requires"},
+    {"from": "p4", "to": "cross-phase", "relation": "requires"},
+    {"from": "authority", "to": "cross-phase", "relation": "requires"}
+  ]
+}

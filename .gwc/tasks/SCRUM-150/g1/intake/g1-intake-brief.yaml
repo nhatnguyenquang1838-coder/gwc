@@ -1,0 +1,114 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-28T12:00:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-150
+  base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: P2-P5 acceptance evidence needs one bounded cross-phase replay and authority
+    regression after the 149 merge.
+  why_now: The user explicitly requested continuation of FastLane for SCRUM-150 after
+    SCRUM-147, SCRUM-148, SCRUM-149 and SCRUM-151 completed.
+desired_outcome: Deliver a reviewable validator and focused evidence that fail closed
+  on stale exact-head state, replay divergence, invented P5 metrics, projection authority
+  leakage and automatic promotion.
+stakeholders:
+  requester: user
+  affected:
+  - GWC runtime contracts
+  - durable replay acceptance
+  - P5 evaluation
+  - exact-head gate evidence
+scope:
+  in_scope:
+  - Cross-phase observed-record contract and deterministic validator
+  - Positive and typed negative fixtures
+  - Focused unit tests and existing validator regression checks
+  - SCRUM-150 G0/G1/G2/G3 task evidence
+  non_goals:
+  - Protected-main write
+  - Merge or auto-merge
+  - Deployment, release or runtime reload
+  - Production data, production configuration, credentials or secrets
+  - Provider invocation or live host E2E as an inferred result
+  - Jira, Slack or Notion as gate authority
+constraints:
+- Reuse existing durable runtime, replay, P5 and exact-head contracts.
+- Keep the composite validator pure and side-effect free.
+- Preserve pre-existing .ua graph modifications and unrelated root state.
+- Revalidate if base, scope, plan or head changes materially.
+assumptions:
+- The protected base candidate is origin/main at 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be.
+- Dependency evidence bound to the prior pre-149 base is stale input and must be classified,
+  not promoted.
+risks:
+- id: RISK-1
+  description: Existing dependency evidence is bound to an older base and may be mistaken
+    for current gate truth.
+  impact: high
+  mitigation: Require per-dependency exact source/base/head/merge/CI binding and emit
+    typed stale-evidence failures.
+- id: RISK-2
+  description: A composite fixture PASS could be misreported as live provider or host
+    proof.
+  impact: high
+  mitigation: Preserve explicit evidence classes and report live checks as unrun unless
+    independently observed.
+- id: RISK-3
+  description: Projection records could be treated as approval or promotion authority.
+  impact: high
+  mitigation: Reject projection authority leakage and keep G4/G5/G6 excluded from
+    validator authority.
+acceptance_criteria:
+- id: AC-1
+  statement: A bounded replay record converges to the same terminal state and reports
+    zero duplicate external effects.
+  verifiable: true
+- id: AC-2
+  statement: Dependency and gate evidence is accepted only when source, base, head,
+    merge and required CI bindings match exact observed state.
+  verifiable: true
+- id: AC-3
+  statement: P5 metrics are calculated from observed event history and value-only
+    constants are rejected.
+  verifiable: true
+- id: AC-4
+  statement: Human interrupt/resume, audited bypass, fail-closed canary and human
+    promotion/rollback controls remain enforced.
+  verifiable: true
+- id: AC-5
+  statement: Jira, Slack and Notion projection records cannot grant gate authority,
+    and the result can feed SCRUM-146 as evidence.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

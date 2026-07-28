@@ -1,0 +1,5 @@
+{
+  "fixture_type": "mutation",
+  "base": "positive-cross-phase-run.json",
+  "mutations": [{"path": "replay.terminal_state_replayed", "value": "completed:diverged"}, {"path": "replay.typed_live_state_divergence", "value": null}]
+}

@@ -1,0 +1,23 @@
+task_id: SCRUM-150
+title: Run P2-to-P5 replay, authority and outcome regression
+objective: Validate one bounded no-production cross-phase record against durable replay, exact-head authority, P5 observed-outcome and projection-boundary contracts.
+wave: 1
+requires: [SCRUM-147, SCRUM-148, SCRUM-149, SCRUM-151]
+parallel_with: []
+risk: R2
+likely_hours: 10
+protected_base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+verified_paths:
+  - tools/node_architect/durable_checkpoint_runtime.py
+  - tools/node_architect/crash_replay_harness.py
+  - tools/node_architect/exact_state_capture.py
+  - tools/validate_p5_evaluation.py
+  - tools/validate_github_g5_g6_jira_projection.py
+  - tools/resolve_g5_status.py
+  - tools/validate_g5_status.py
+  - tests/test_durable_checkpoint_runtime.py
+  - tests/test_crash_replay_harness.py
+  - tests/test_p5_evaluation_adapter.py
+  - tests/test_github_g5_g6_jira_projection.py
+  - tests/test_g5_status_resolver.py
+excluded: [merge, deploy, release, production_data, production_configuration, credentials, automatic_promotion]

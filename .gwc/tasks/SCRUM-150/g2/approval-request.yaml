@@ -1,0 +1,68 @@
+schema_version: '1.0'
+artifact_type: approval-request
+approval_request_id: scrum-150-g2-fastlane-20260728
+gate: G2
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+working_branch: codex/fastlane-scrum-150-20260728
+scope_hash: sha256:2f9b2fead69100014742138f8a60fe5d3983d2945b7214c48f5b799915e60ba3
+scope_hash_short: 2f9b2fead6910001
+files_read:
+  - AGENTS.md
+  - projects/gwc/project-profile.yaml
+  - projects/gwc/project-instructions.md
+  - projects/gwc/project-extension.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - .gwc/tasks/SCRUM-150/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-150/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-150/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-150/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-150/g1/decision/g1-decision-record.yaml
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md
+  - tools/node_architect/durable_checkpoint_runtime.py
+  - tools/node_architect/crash_replay_harness.py
+  - tools/node_architect/exact_state_capture.py
+  - tools/validate_p5_evaluation.py
+  - tools/validate_github_g5_g6_jira_projection.py
+  - tools/resolve_g5_status.py
+  - tools/validate_g5_status.py
+  - tools/validate_dw_super_e2e_pilot.py
+  - tests/test_durable_checkpoint_runtime.py
+  - tests/test_crash_replay_harness.py
+  - tests/test_p5_evaluation_adapter.py
+  - tests/test_github_g5_g6_jira_projection.py
+  - tests/test_g5_status_resolver.py
+files_write:
+  - .gwc/tasks/SCRUM-150/**
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/**
+  - tools/validate_scrum_150_cross_phase.py
+  - tests/test_scrum_150_cross_phase.py
+  - examples/integrations/cross-phase/**
+authorized_actions:
+  - claim_work_item
+  - update_work_item_status
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+excluded_actions:
+  - protected_main_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials_or_secrets
+  - migration
+  - destructive_operation
+  - force_push
+  - branch_deletion
+  - pr_base_change
+expires_at: '2026-07-28T18:45:00Z'
+generated_command: APPROVE G2 cp-20260728-1501 2f9b2fead6910001 2026-07-28T18:45:00Z

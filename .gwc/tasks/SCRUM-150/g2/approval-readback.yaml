@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+approval_id: CP-20260728-1501
+authority_gate: G2_EXECUTION
+task_id: SCRUM-150
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+working_branch: codex/fastlane-scrum-150-20260728
+scope_hash: sha256:2f9b2fead69100014742138f8a60fe5d3983d2945b7214c48f5b799915e60ba3
+approval_command: APPROVE G2 cp-20260728-1501 2f9b2fead6910001 2026-07-28T18:45:00Z
+readback_status: MATCH
+approved_by: current_chat_user
+source: exact-command-user-message
+status: APPROVED_FOR_G2_WRITE_ONLY
+authorized_actions:
+  - create_guarded_branch
+  - claim_work_item
+  - update_work_item_status
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+excluded_actions:
+  - protected_main_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials_or_secrets
+  - migration
+  - destructive_operation
+  - force_push
+  - branch_deletion
+  - pr_base_change
+observed_at: '2026-07-28T12:10:00Z'

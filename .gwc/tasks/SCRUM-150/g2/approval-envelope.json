@@ -1,0 +1,61 @@
+{
+  "approval_id": "CP-20260728-1501",
+  "authority_gate": "G2_EXECUTION",
+  "task_id": "SCRUM-150",
+  "issued_at": "2026-07-28T12:10:00Z",
+  "expires_at": "2026-07-28T18:45:00Z",
+  "scope_version": 1,
+  "risk_class": "R2",
+  "project_profile": "projects/gwc/project-profile.yaml",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be",
+  "working_branch": "codex/fastlane-scrum-150-20260728",
+  "modules_or_files": [
+    ".gwc/tasks/SCRUM-150/**",
+    ".task-me/runs/gwc-scrum-150-fastlane-20260728/**",
+    "tools/validate_scrum_150_cross_phase.py",
+    "tests/test_scrum_150_cross_phase.py",
+    "examples/integrations/cross-phase/**"
+  ],
+  "authorized_actions": [
+    "claim_work_item",
+    "renew_work_item_lease",
+    "update_work_item_status",
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "push_working_branch",
+    "open_or_update_draft_pr"
+  ],
+  "excluded_actions": [
+    "protected_main_write",
+    "merge",
+    "auto_merge",
+    "deploy",
+    "release",
+    "production_configuration",
+    "production_data",
+    "credentials_or_secrets",
+    "migration",
+    "destructive_operation",
+    "force_push",
+    "branch_deletion",
+    "pr_base_change"
+  ],
+  "work_item": {
+    "provider": "Atlassian Jira MCP",
+    "id": "SCRUM-150",
+    "claim_required": false,
+    "expected_repository": "nhatnguyenquang1838-coder/gwc",
+    "expected_owner": "nhatnguyenquang1838-coder",
+    "initial_state": "In Progress",
+    "review_state": "In Progress"
+  },
+  "artifact_hashes": {
+    "change_plan": "sha256:b42ef8d62f69a2350909e8b79bbedeb609c9a1193b15fe1ff4b82af723ee0ee0",
+    "mermaid": "sha256:e900e23c529d237b34fad925f3729b7aa7c912fd9710e4fceaff751d6fc5d99e",
+    "png": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "svg": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "scope_hash": "sha256:2f9b2fead69100014742138f8a60fe5d3983d2945b7214c48f5b799915e60ba3"
+}
