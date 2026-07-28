@@ -44,6 +44,10 @@ GATE_MINIMUM_ACTIONS = {
     },
 }
 
+G4_MERGE_GATE = "G4_MERGE"
+G4_MERGE_ACTION = "merge_approved_pr"
+OPEN_PR_STATE = "open"
+
 
 def load(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as handle:
@@ -85,6 +89,7 @@ def semantic_errors(
     expected_base_sha: str | None = None,
     expected_head_sha: str | None = None,
     expected_scope_hash: str | None = None,
+    observed_pr_state: str | None = None,
 ) -> list[str]:
     errors: list[str] = []
     now = now or datetime.now(timezone.utc)
@@ -122,6 +127,14 @@ def semantic_errors(
     if gate in GATE_MINIMUM_ACTIONS and action not in GATE_MINIMUM_ACTIONS[gate]:
         errors.append(f"action {action!r} is not valid for {gate}")
 
+    if gate == G4_MERGE_GATE and action == G4_MERGE_ACTION:
+        if expected_head_sha is None:
+            errors.append("G4 merge requires expected current PR head SHA")
+        if observed_pr_state is None:
+            errors.append("G4 merge requires observed PR state before merge")
+        elif observed_pr_state != OPEN_PR_STATE:
+            errors.append("G4 merge requires observed PR state 'open' before merge")
+
     readback = packet.get("evidence_readback", {})
     comparisons = {
         "task_id": "task_id",
@@ -148,6 +161,7 @@ def validate(
     expected_base_sha: str | None = None,
     expected_head_sha: str | None = None,
     expected_scope_hash: str | None = None,
+    observed_pr_state: str | None = None,
 ) -> list[str]:
     errors = schema_errors(packet, schema_path)
     if not errors:
@@ -158,6 +172,7 @@ def validate(
                 expected_base_sha=expected_base_sha,
                 expected_head_sha=expected_head_sha,
                 expected_scope_hash=expected_scope_hash,
+                observed_pr_state=observed_pr_state,
             )
         )
     return errors
@@ -171,6 +186,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-base-sha")
     parser.add_argument("--expected-head-sha")
     parser.add_argument("--expected-scope-hash")
+    parser.add_argument(
+        "--observed-pr-state",
+        choices=["open", "closed", "merged"],
+        help="Current PR state observed immediately before a G4 merge attempt.",
+    )
     args = parser.parse_args(argv)
     try:
         packet = load(args.packet)
@@ -184,6 +204,7 @@ def main(argv: list[str] | None = None) -> int:
             expected_base_sha=args.expected_base_sha,
             expected_head_sha=args.expected_head_sha,
             expected_scope_hash=args.expected_scope_hash,
+            observed_pr_state=args.observed_pr_state,
         )
     except (OSError, ValueError, TypeError, yaml.YAMLError, json.JSONDecodeError) as exc:
         errors = [str(exc)]
