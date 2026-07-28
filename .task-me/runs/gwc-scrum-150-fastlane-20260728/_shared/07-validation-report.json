@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-150-fastlane-20260728",
+  "status": "PASS",
+  "checks": [
+    {"name": "config-read", "status": "PASS", "evidence": ".task-architect/config.json"},
+    {"name": "source-inventory", "status": "PASS", "evidence": "01-source-inventory.json"},
+    {"name": "dependency-dag", "status": "PASS", "evidence": "task-dag.mmd"},
+    {"name": "one-task-folder", "status": "PASS", "evidence": "tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression"},
+    {"name": "output-boundary", "status": "PASS", "evidence": "output root is .task-me/runs"}
+  ],
+  "limitations": ["No application source or test files were changed by Task Me planning."]
+}

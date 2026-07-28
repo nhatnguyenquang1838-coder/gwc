@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "run_id": "gwc-scrum-150-fastlane-20260728",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "verified_at": "2026-07-28T12:00:00Z",
+  "files": [
+    {"path": "tools/node_architect/durable_checkpoint_runtime.py", "role": "durable runtime", "verified": true},
+    {"path": "tools/node_architect/crash_replay_harness.py", "role": "crash/replay harness", "verified": true},
+    {"path": "tools/node_architect/exact_state_capture.py", "role": "exact-state readback", "verified": true},
+    {"path": "tools/validate_p5_evaluation.py", "role": "P5 evaluation validator", "verified": true},
+    {"path": "tools/validate_github_g5_g6_jira_projection.py", "role": "projection authority validator", "verified": true},
+    {"path": "tools/resolve_g5_status.py", "role": "exact-SHA G5 resolver", "verified": true},
+    {"path": "tools/validate_g5_status.py", "role": "exact-SHA G5 validator", "verified": true},
+    {"path": "tools/validate_dw_super_e2e_pilot.py", "role": "no-production replay/side-effect validator", "verified": true},
+    {"path": "tests/test_durable_checkpoint_runtime.py", "role": "durable runtime tests", "verified": true},
+    {"path": "tests/test_crash_replay_harness.py", "role": "replay tests", "verified": true},
+    {"path": "tests/test_p5_evaluation_adapter.py", "role": "P5 evaluation tests", "verified": true},
+    {"path": "tests/test_github_g5_g6_jira_projection.py", "role": "projection/exact-head tests", "verified": true},
+    {"path": "tests/test_g5_status_resolver.py", "role": "G5 exact-SHA tests", "verified": true},
+    {"path": ".gwc/tasks/SCRUM-146/evidence/scrum-147-integrated-runtime.json", "role": "dependency evidence", "verified": true},
+    {"path": ".gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json", "role": "dependency evidence", "verified": true},
+    {"path": ".gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json", "role": "dependency evidence", "verified": true}
+  ],
+  "excluded": [".gwc/tasks/**/g4/**", ".gwc/tasks/**/g5/**", ".gwc/tasks/**/g6/**", ".task-me/**", ".ua/generated/**"]
+}

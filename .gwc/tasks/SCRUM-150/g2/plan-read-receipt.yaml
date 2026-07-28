@@ -1,0 +1,22 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+task_id: SCRUM-150
+canonical_task_uid: SCRUM-150
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+working_branch: codex/fastlane-scrum-150-20260728
+plan_revision: sha256:b42ef8d62f69a2350909e8b79bbedeb609c9a1193b15fe1ff4b82af723ee0ee0
+paths_read:
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/task-index.yaml
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/test-plan.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+observed_at: '2026-07-28T12:10:00Z'
+notes: Exact user G2 approval was read back against the generated request; execution is limited to the approved validator, fixtures, tests and task evidence.

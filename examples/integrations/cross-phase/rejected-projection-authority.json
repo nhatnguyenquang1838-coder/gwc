@@ -1,0 +1,5 @@
+{
+  "fixture_type": "mutation",
+  "base": "positive-cross-phase-run.json",
+  "mutations": [{"path": "projections.0.grants_gate_authority", "value": true}]
+}

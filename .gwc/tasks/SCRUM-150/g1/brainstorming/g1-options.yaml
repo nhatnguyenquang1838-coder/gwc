@@ -1,0 +1,28 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-28T12:05:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-150
+  base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Composite cross-phase contract validator
+    description: Join observed P2/P3/P4/P5 and exact-head evidence in one pure validator with positive and typed negative fixtures.
+    benefits: [Smallest verified seam, Reuses existing validators, Fail-closed evidence classification]
+    tradeoffs: [Requires current exact dependency evidence, Does not provide live provider proof]
+    risks: [Stale dependency evidence may be misclassified, Composite schema may drift]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Expand the existing P5 validator
+    description: Add SCRUM-150 cross-phase and dependency handling directly to the SCRUM-122 P5 validator.
+    benefits: [Fewer validator entrypoints, Shared P5 code path]
+    tradeoffs: [Mixes independent task chains, Larger regression surface]
+    risks: [Could weaken P5 chain-specific invariants, Harder exact evidence ownership]
+    constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: Existing P5 validation is intentionally scoped to SCRUM-122 through SCRUM-126; a separate pure composite validator preserves authority boundaries and makes stale dependency evidence explicit.
+decision_required: true
+status: READY

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "task_id": "SCRUM-150",
+  "requirements": [
+    {"id": "AC-1", "statement": "Replay converges to the same terminal state without duplicate side effects.", "evidence": ["tools/node_architect/crash_replay_harness.py"]},
+    {"id": "AC-2", "statement": "Gate evidence is bound to exact source/base/head/merge/CI state.", "evidence": ["tools/resolve_g5_status.py", "tools/validate_github_g5_g6_jira_projection.py"]},
+    {"id": "AC-3", "statement": "P5 outcomes are calculated from observed history and cannot use supplied constants.", "evidence": ["tools/validate_p5_evaluation.py"]},
+    {"id": "AC-4", "statement": "Human interrupt/resume, audited bypass and promotion controls remain authoritative.", "evidence": ["tools/node_architect/durable_checkpoint_runtime.py", "tools/validate_p5_evaluation.py"]},
+    {"id": "AC-5", "statement": "Projection outages or records cannot grant gate authority.", "evidence": ["tools/validate_github_g5_g6_jira_projection.py"]}
+  ],
+  "candidate_outputs": [
+    "tools/validate_scrum_150_cross_phase.py",
+    "tests/test_scrum_150_cross_phase.py",
+    "examples/integrations/cross-phase/"
+  ]
+}

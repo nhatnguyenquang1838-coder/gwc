@@ -1,0 +1,14 @@
+schema_version: "1.0"
+run_id: gwc-scrum-150-fastlane-20260728
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+remote_verification: VERIFIED_BY_GIT_LS_REMOTE
+tasks:
+  - task_id: SCRUM-150
+    title: Run P2-to-P5 replay, authority and outcome regression
+    folder: tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression
+    wave: 1
+    requires: [SCRUM-147, SCRUM-148, SCRUM-149, SCRUM-151]
+    parallel_with: []
+    risk: R2
+    likely_hours: 10

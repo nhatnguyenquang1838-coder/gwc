@@ -1,0 +1,39 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-28T12:05:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-150
+  base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-28T12:05:00Z'
+  source: explicit-user-fastlane-request
+  explicit: true
+rationale: Proceed with the bounded SCRUM-150 FastLane continuation using a separate composite validator, while preserving stale evidence classification and all later human gates.
+rejected_option_ids: [OPT-2]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5]
+scope_hash: sha256:990e4485b37d0b050e67fc8e5c1490222d799883db7f936db8872ba52e7cdb6a
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-150
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+  plan_root: .task-me/runs/gwc-scrum-150-fastlane-20260728
+  plan_revision: sha256:b42ef8d62f69a2350909e8b79bbedeb609c9a1193b15fe1ff4b82af723ee0ee0
+  validation_evidence: Task Me output has one unique task folder with all eight required files, valid YAML, an acyclic DAG and output-boundary PASS.

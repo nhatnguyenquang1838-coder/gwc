@@ -1,0 +1,5 @@
+{
+  "fixture_type": "mutation",
+  "base": "positive-cross-phase-run.json",
+  "mutations": [{"path": "promotion.automatic_promotion", "value": true}]
+}

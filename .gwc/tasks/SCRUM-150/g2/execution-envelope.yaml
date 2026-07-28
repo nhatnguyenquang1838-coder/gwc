@@ -1,0 +1,88 @@
+{
+  "schema_version": "0.1",
+  "workflow": "GWC_FASTLANE_BOOTSTRAP",
+  "temporary": true,
+  "sunset_condition": "Remove or deprecate FastLane when the permanent GWC governed delivery workflow supersedes it.",
+  "task": {
+    "id": "SCRUM-150",
+    "title": "Run P2-to-P5 replay, authority and outcome regression",
+    "risk_class": "R2"
+  },
+  "repository": {
+    "full_name": "nhatnguyenquang1838-coder/gwc",
+    "base_branch": "main",
+    "base_sha": "6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be",
+    "working_branch": "codex/fastlane-scrum-150-20260728"
+  },
+  "connector_route": {
+    "primary": "GitHub",
+    "fallback": ["DWC", "DW1"],
+    "selected": "DWC"
+  },
+  "scope": {
+    "files_read": [
+      "AGENTS.md",
+      "projects/gwc/project-profile.yaml",
+      "projects/gwc/project-instructions.md",
+      "projects/gwc/project-extension.md",
+      "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      ".gwc/tasks/SCRUM-150/**",
+      ".task-me/runs/gwc-scrum-150-fastlane-20260728/**",
+      "tools/node_architect/durable_checkpoint_runtime.py",
+      "tools/node_architect/crash_replay_harness.py",
+      "tools/node_architect/exact_state_capture.py",
+      "tools/validate_p5_evaluation.py",
+      "tools/validate_github_g5_g6_jira_projection.py",
+      "tools/resolve_g5_status.py",
+      "tools/validate_g5_status.py",
+      "tools/validate_dw_super_e2e_pilot.py",
+      "tests/test_durable_checkpoint_runtime.py",
+      "tests/test_crash_replay_harness.py",
+      "tests/test_p5_evaluation_adapter.py",
+      "tests/test_github_g5_g6_jira_projection.py",
+      "tests/test_g5_status_resolver.py"
+    ],
+    "files_write": [
+      ".gwc/tasks/SCRUM-150/**",
+      ".task-me/runs/gwc-scrum-150-fastlane-20260728/**",
+      "tools/validate_scrum_150_cross_phase.py",
+      "tests/test_scrum_150_cross_phase.py",
+      "examples/integrations/cross-phase/**"
+    ],
+    "authorized_actions": [
+      "create_guarded_branch",
+      "modify_scoped_files",
+      "run_sandboxed_validation",
+      "push_working_branch",
+      "open_or_update_draft_pr"
+    ],
+    "excluded_actions": [
+      "direct_push_main",
+      "force_push",
+      "delete_branch",
+      "change_pr_base",
+      "merge",
+      "auto_merge",
+      "deploy",
+      "release",
+      "production_config",
+      "credentials",
+      "secrets",
+      "migration",
+      "production_data"
+    ]
+  },
+  "authority": {
+    "g2_approval_required": true,
+    "g4_merge_approval_required": true,
+    "g5_deploy_approval_required": false,
+    "g6_production_approval_required": false
+  },
+  "audit_projection": {
+    "jira": "optional",
+    "tc_ds_mcp": "disabled",
+    "blocking": false
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "fixture_type": "mutation",
+  "base": "positive-cross-phase-run.json",
+  "mutations": [{"path": "dependencies.0.binding.rebaseline_status", "value": "STALE"}]
+}
