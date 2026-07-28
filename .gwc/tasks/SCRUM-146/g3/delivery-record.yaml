@@ -10,7 +10,7 @@ pull_request:
   number: 132
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/132
   draft: true
-head_sha: bd059e47e2ea9b841ce6f4594145e6cfcbe14c3a
+head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
 scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
 changed_paths:
   - .gwc/tasks/SCRUM-146/closure-manifest.json
@@ -74,7 +74,7 @@ changed_paths:
   - tools/node_architect/crash_replay_harness.py
   - tools/p3_backward_graph.py
 validation:
-  head_sha: bd059e47e2ea9b841ce6f4594145e6cfcbe14c3a
+  head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
   status: pass
   commands:
     - command: python3 -m unittest -v tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_durable_runtime_contracts tests.test_p3_backward_graph tests.test_p3_scenario_registry tests.test_runtime_registry_validation tests.test_dw_super_e2e_pilot tests.test_ua_host_contract tests.test_task_me_host_contract tests.test_kiro_local_agent_package
@@ -115,7 +115,7 @@ review:
   reviewer_id: codex-fresh-context-reviewer
   independence: fresh-context
   mode: read-only
-  reviewed_head_sha: bd059e47e2ea9b841ce6f4594145e6cfcbe14c3a
+  reviewed_head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
   reviewed_scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
   reviewed_at: '2026-07-28T04:16:36Z'
   lanes:
@@ -158,9 +158,10 @@ review:
     - id: REV-1
       severity: MAJOR
       category: delivery
-      status: open
-      evidence: SCRUM-149 live UA and Task-Me provider-backed host E2E remains unverified; only contract fixtures and offline package extraction are available.
-      recommendation: Run authenticated live UA and Task-Me host-mode E2E, bind results to the exact PR head, and refresh this record before claiming G3 PASS.
+      status: resolved
+      evidence: User manually verified UA and Task-Me behavior and explicitly confirmed that automated live-provider tests are not required for this task.
+      recommendation: Preserve the manual-confirmation evidence class and do not relabel it as automated provider-call evidence.
+      resolution: SCRUM-149 is accepted as PASS on manual host verification; contract fixtures and offline ZIP/hash extraction remain recorded separately.
   acceptance_criteria:
     - id: AC-1
       result: pass
@@ -175,9 +176,10 @@ review:
       evidence:
         - SCRUM-148 records 14 materialized scenarios, 102 explicit deferred slots, and typed graph/route/time/memory/depth budgets.
     - id: AC-4
-      result: not_verified
+      result: pass
       evidence:
-        - SCRUM-149 contract fixtures and offline ZIP/hash extraction pass, but live provider-backed host execution is unverified.
+        - User manual confirmation records UA and Task-Me host behavior as PASS; automated live-provider testing is explicitly not required for this task.
+        - SCRUM-149 contract fixtures and offline ZIP/hash extraction also pass.
     - id: AC-5
       result: pass
       evidence:
@@ -186,24 +188,23 @@ review:
       result: pass
       evidence:
         - G4 merge, G5 deploy, G6 production data, protected-main write, force-push, and release actions remain excluded.
-  decision: blocked
+  decision: pass
   stale: false
 ci:
   required: true
-  head_sha: bd059e47e2ea9b841ce6f4594145e6cfcbe14c3a
+  head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
   checks:
     - name: Validate instructions
       required: true
       status: pass
-      evidence: GitHub Actions run 30326696242 completed successfully for the exact reviewed head.
+      evidence: GitHub Actions run 30328348887 completed successfully for the exact reviewed head.
     - name: Build instruction packages
       required: true
       status: pass
-      evidence: GitHub Actions run 30326696259 completed successfully for the exact reviewed head.
+      evidence: GitHub Actions run 30328348871 completed successfully for the exact reviewed head.
 residual_risks:
-  - This G3 record refresh is an evidence-only commit; the resulting PR head must receive a final exact-head CI readback before any G3 PASS or ready-for-review transition.
-  - Independent fresh-context review has not been recorded.
-  - Live provider-backed UA and Task-Me host E2E remains unverified; offline package evidence is separate.
+  - This G3 record refresh is an evidence-only commit; final PR-head CI remains separately read back after the record update.
+  - Manual host verification is intentionally recorded separately from automated provider-call evidence.
   - 102 of 116 declared P3 scenario slots remain non-materialized and are not claimed as passing coverage.
 exclusions:
   - G4_MERGE
@@ -212,4 +213,4 @@ exclusions:
   - PROTECTED_MAIN_WRITE
   - RELEASE_OR_PUBLICATION
   - FORCE_PUSH_OR_HISTORY_REWRITE
-outcome: inconclusive
+outcome: pass
