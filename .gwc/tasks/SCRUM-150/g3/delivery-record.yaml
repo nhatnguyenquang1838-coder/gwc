@@ -1,0 +1,172 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-150
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be
+working_branch: codex/fastlane-scrum-150-20260728
+pull_request:
+  number: 133
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/133
+  draft: true
+head_sha: c0a5f814841c3d0a65c1ad2cf8d07f5fe3a94a7e
+scope_hash: sha256:2f9b2fead69100014742138f8a60fe5d3983d2945b7214c48f5b799915e60ba3
+changed_paths:
+  - .gwc/tasks/SCRUM-150/evidence/validation-report.json
+  - .gwc/tasks/SCRUM-150/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-150/g0/runtime-input.yaml
+  - .gwc/tasks/SCRUM-150/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-150/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-150/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-150/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-150/g2/approval-envelope.json
+  - .gwc/tasks/SCRUM-150/g2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-150/g2/approval-request.yaml
+  - .gwc/tasks/SCRUM-150/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-150/g2/plan-read-receipt.yaml
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/01-source-inventory.json
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/02-traceability.json
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/03-evidence-graph.json
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/07-validation-report.json
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/task-index.yaml
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/README.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/decisions.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/evidence.json
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/impact-analysis.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml
+  - .task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/test-plan.md
+  - examples/integrations/cross-phase/positive-cross-phase-run.json
+  - examples/integrations/cross-phase/rejected-automatic-promotion.json
+  - examples/integrations/cross-phase/rejected-gate-head-drift.json
+  - examples/integrations/cross-phase/rejected-metric-fabrication.json
+  - examples/integrations/cross-phase/rejected-projection-authority.json
+  - examples/integrations/cross-phase/rejected-replay-divergence.json
+  - examples/integrations/cross-phase/rejected-stale-dependency.json
+  - tests/test_scrum_150_cross_phase.py
+  - tools/validate_scrum_150_cross_phase.py
+validation:
+  head_sha: c0a5f814841c3d0a65c1ad2cf8d07f5fe3a94a7e
+  status: pass
+  commands:
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-150 --gate G2_EXECUTION --json
+      result: pass
+      evidence: G0/G1/G2 task artifacts and exact approval readback validated.
+    - command: python3 tools/validate_scrum_150_cross_phase.py --suite --root . --json
+      result: pass
+      evidence: Positive contract fixture and six typed rejection fixtures passed.
+    - command: python3 -m unittest -v tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_p5_evaluation_adapter tests.test_github_g5_g6_jira_projection tests.test_g5_status_resolver tests.test_scrum_150_cross_phase
+      result: pass
+      evidence: 33 focused regression tests passed.
+    - command: python3 tools/validate_dw_super_e2e_pilot.py --root . --json
+      result: pass
+      evidence: No-production positive and expected-negative pilot cases passed.
+    - command: python3 tools/validate_p5_evaluation.py --suite --json
+      result: pass
+      evidence: P5 evaluation positive, promotion rejection and projection rejection cases passed.
+    - command: python3 tools/validate_github_g5_g6_jira_projection.py --root . --json
+      result: pass
+      evidence: Exact-head/projection positive and expected-negative cases passed.
+    - command: git diff --cached --check
+      result: pass
+      evidence: Staged scoped diff has no whitespace errors.
+    - command: python3 -m py_compile tools/validate_scrum_150_cross_phase.py tests/test_scrum_150_cross_phase.py
+      result: pass
+      evidence: Changed Python files compile successfully.
+review:
+  implementer_id: codex-local-agent
+  reviewer_id: codex-scrum-150-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: c0a5f814841c3d0a65c1ad2cf8d07f5fe3a94a7e
+  reviewed_scope_hash: sha256:2f9b2fead69100014742138f8a60fe5d3983d2945b7214c48f5b799915e60ba3
+  reviewed_at: '2026-07-28T12:20:00Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence: ["SCRUM-150 acceptance criteria are mapped to replay, exact binding, P5 provenance, human control and projection checks."]
+    - name: design
+      applicable: true
+      status: pass
+      evidence: ["Validator is pure and composes existing durable, P5 and exact-head contracts without widening their authorities."]
+    - name: code
+      applicable: true
+      status: pass
+      evidence: ["Read-only review of the new validator found deterministic typed failures, no provider calls and no mutation path."]
+    - name: test
+      applicable: true
+      status: pass
+      evidence: ["33 focused regression tests and seven SCRUM-150 fixture cases passed."]
+    - name: governance
+      applicable: true
+      status: pass
+      evidence: ["G0/G1/G2 artifacts, exact approval readback, scope hash and later-gate exclusions are present."]
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence: ["Draft PR #133 is open against main with exact base/head binding; protected main was not written."]
+    - name: ci
+      applicable: true
+      status: pass
+      evidence: ["Five required exact-head checks passed: Validate instructions and four package builds."]
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence: [SCRUM-150 positive replay fixture and duplicate-effect rejection tests.]
+    - id: AC-2
+      result: pass
+      evidence: ["Dependency and gate bindings require exact source/base/head/merge/CI values; stale and drift fixtures reject."]
+    - id: AC-3
+      result: pass
+      evidence: ["P5 metrics require numerator, denominator, observed event IDs and calculated value; fabrication fixture rejects."]
+    - id: AC-4
+      result: pass
+      evidence: [Human control, shadow side-effect, canary, promotion and rollback checks are enforced.]
+    - id: AC-5
+      result: pass
+      evidence: [Projection authority rejection and SCRUM-146 feed reference are covered.]
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: c0a5f814841c3d0a65c1ad2cf8d07f5fe3a94a7e
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30331174351 completed successfully for exact head c0a5f814841c3d0a65c1ad2cf8d07f5fe3a94a7e.
+    - name: build (gwc)
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30331174360 job 90186446819 completed successfully for exact head.
+    - name: build (rental-home)
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30331174360 job 90186446772 completed successfully for exact head.
+    - name: build (pm-skills)
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30331174360 job 90186446825 completed successfully for exact head.
+    - name: build (ds-mcp)
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30331174360 job 90186446806 completed successfully for exact head.
+residual_risks:
+  - Existing SCRUM-146 dependency evidence is stale-input evidence until exact current rebaseline records are supplied; the new validator detects this drift.
+  - Live provider calls and live host E2E are not claimed by fixture or unit-test PASS.
+  - The PR remains Draft; ready-for-review and G4 merge require their own authority/readback.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass
