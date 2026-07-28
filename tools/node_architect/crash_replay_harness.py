@@ -349,3 +349,47 @@ def verify_matrix(
     ):
         raise AssertionError("replay invariants failed")
     return results
+
+
+def integrated_acceptance(
+    scenarios: Iterable[Scenario],
+    harness: CrashReplayHarness,
+) -> dict[str, object]:
+    """Run the P2 path as one acceptance record across all durable seams."""
+    results = verify_matrix(scenarios, harness)
+    effect_counts = [result.external_effect_count for result in results]
+    human_escalations = sum(1 for result in results if result.human_required)
+    return {
+        "artifact_type": "p2-integrated-durable-runtime-acceptance",
+        "task_id": harness.binding.task_id,
+        "repository": harness.binding.repository,
+        "base_sha": harness.binding.base_sha,
+        "scope_hash": harness.binding.scope_hash,
+        "graph_revision": harness.binding.graph_revision,
+        "status": "PASS",
+        "scenario_count": len(results),
+        "boundaries": sorted({result.boundary.value for result in results}),
+        "stale_worker_rejections": sum(result.stale_worker_rejected for result in results),
+        "duplicate_effect_preventions": sum(result.duplicate_effect_prevented for result in results),
+        "max_external_effect_count": max(effect_counts, default=0),
+        "human_escalations": human_escalations,
+        "no_duplicate_effects": max(effect_counts, default=0) <= 1,
+        "components": [
+            "DurableCheckpointStore",
+            "BoundedWriteIntent",
+            "capture_exact_state",
+            "CrashReplayHarness",
+        ],
+    }
+
+
+__all__ = [
+    "CrashBoundary",
+    "CrashReplayHarness",
+    "NodeClass",
+    "ReplayEvidence",
+    "Scenario",
+    "integrated_acceptance",
+    "parse_scenario_matrix",
+    "verify_matrix",
+]

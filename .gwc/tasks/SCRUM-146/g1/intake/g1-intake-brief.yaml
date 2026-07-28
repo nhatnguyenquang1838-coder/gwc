@@ -1,0 +1,120 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-07-28T06:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-146
+  base_sha: b0341da8414aacad93719a6919babcd183e03f02
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-146 through SCRUM-149 need one dependency-correct governed recovery
+    path with exact evidence and no false closure.
+  why_now: User explicitly activated temporary GWC FastLane for the post-P5 recovery
+    subtasks.
+desired_outcome: Deliver a reviewed Draft PR candidate for the four-task recovery
+  chain after exact G0/G1/G2/G3 evidence, stopping before G4 merge.
+stakeholders:
+  requester: user
+  affected:
+  - GWC runtime
+  - P2 durable acceptance
+  - P3 router/scenario acceptance
+  - P4 host/offline acceptance
+  - P1-P5 closure evidence
+scope:
+  in_scope:
+  - SCRUM-147 durable checkpoint/CAS/lease/fencing and replay acceptance
+  - SCRUM-148 canonical scenario coverage and bounded router performance
+  - SCRUM-149 real bounded host-mode and offline package pilot
+  - SCRUM-146 exact-SHA P1-P5 closure manifest and evidence classification
+  - Task Me plan and task-scoped GWC gate artifacts
+  non_goals:
+  - protected-main write
+  - merge or auto-merge
+  - deployment, release or runtime reload
+  - production data, production configuration, credentials or secrets
+  - live migration or destructive operation
+  - Jira status as gate authority
+constraints:
+- Use existing GWC contracts, validators, registries, adapters and tests.
+- Keep repository changes on one dedicated guarded branch after G2 approval.
+- Bind all head-bound evidence to the exact current SHA.
+- Keep Jira as traceability/projection only; GWC artifacts remain gate authority.
+- Revalidate if base, scope, plan, or head changes materially.
+assumptions:
+- The local origin/main ref b0341da is the protected-base candidate until live GitHub
+  verification is restored.
+- SCRUM-146 is the chain task identity and SCRUM-147/148/149 are linked subtasks.
+- The existing Task Me plan output is the bounded implementation-plan source.
+risks:
+- id: RISK-1
+  description: Local GitHub reachability is unavailable and remote base freshness
+    cannot be independently confirmed
+  impact: high
+  mitigation: Record SKIPPED_OFFLINE, bind to local origin/main SHA, and re-read the
+    base before G2 branch creation.
+- id: RISK-2
+  description: Four acceptance lanes can widen into unrelated platform work
+  impact: high
+  mitigation: Enforce the Task Me DAG and verified-path scope; return to G1 on scope
+    drift.
+- id: RISK-3
+  description: Fixture or validator PASS could be misreported as real host/runtime
+    proof
+  impact: high
+  mitigation: Separate live-provider, fixture, validator and unverified evidence classes.
+acceptance_criteria:
+- id: AC-1
+  statement: Task Me output contains four unique self-contained task folders and an
+    acyclic dependency DAG
+  verifiable: true
+- id: AC-2
+  statement: SCRUM-147 proves durable checkpoint/replay and duplicate-side-effect
+    rejection with executable focused tests
+  verifiable: true
+- id: AC-3
+  statement: SCRUM-148 covers the canonical scenario set and typed budget/authority
+    failures deterministically
+  verifiable: true
+- id: AC-4
+  statement: SCRUM-149 distinguishes real host/provider and offline-consumer evidence
+    from fixtures and preserves no-production constraints
+  verifiable: true
+- id: AC-5
+  statement: SCRUM-146 binds every closure claim to exact refs/head/merge/CI evidence
+    and records stale or deferred claims without false PASS
+  verifiable: true
+- id: AC-6
+  statement: Draft PR is the terminal requested delivery state; G4 merge, G5 manual
+    operation and G6 production operation remain excluded
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

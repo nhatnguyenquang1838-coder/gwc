@@ -1,0 +1,17 @@
+task_id: SCRUM-149
+title: Prove real host-mode E2E and offline package consumption
+objective: Execute approved UA, Task-Me, BMAD, GitHub/CI and offline package paths with exact provenance, replay safety, and no production authority.
+wave: 2
+requires: [SCRUM-147, SCRUM-148]
+parallel_with: []
+risk: R2
+likely_hours: 14
+protected_base_sha: b0341da8414aacad93719a6919babcd183e03f02
+verified_paths:
+  - tools/validate_dw_super_e2e_pilot.py
+  - examples/integrations/e2e-pilot
+  - examples/integrations/ua-host
+  - examples/integrations/task-me-host
+  - tests/test_dw_super_e2e_pilot.py
+  - tools/node_architect/validate_kiro_local_agent_package.py
+excluded: [production_data, deployment, release, credentials, migration, merge]

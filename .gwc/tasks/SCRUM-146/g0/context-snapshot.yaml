@@ -1,0 +1,104 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-07-28T06:30:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: origin/main
+  base_sha: b0341da8414aacad93719a6919babcd183e03f02
+  protected_branches:
+  - main
+  connector: DWC
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+constraints:
+- Use existing GWC contracts, validators, registries, adapters and tests.
+- Keep repository changes on one dedicated guarded branch after G2 approval.
+- Bind all head-bound evidence to the exact current SHA.
+- Keep Jira as traceability/projection only; GWC artifacts remain gate authority.
+- Revalidate if base, scope, plan, or head changes materially.
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: origin/main
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GWC_GATE_LIFECYCLE
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: origin/main
+  source_sha: cc933fb641451a65d0deb82a5100c5e872c39fe23dfe4edf277792ee4be46043
+- id: GWC_FASTLANE
+  path: core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md
+  ref: origin/main
+  source_sha: ff56ddb3952cfaee6f70819af7499d36e5038afc5865dba6882677533223bbba
+- id: GWC_E2E
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: origin/main
+  source_sha: 3df7d8a647065d5d836fd26c8cafe6346b68209b2891c3af479f1a4a633946
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: cc933fb641451a65d0deb82a5100c5e872c39fe23dfe4edf277792ee4be46043
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 3df7d8a647065d5d836fd26c8cafe6346b68209b2891c3af479f1a4a633946
+- path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 1304b7d9923b9e5805a0f42cf159a87dab4c6d76086467fc6929396893635fbc
+- path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 10dd851a670bf54a952cb736d64d2b3d06e134baec46cc50e7fc9f8e670dd215
+- path: core/Agent_Response_Presentation_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: e95c7529c4bbee6bfbe18028eb780832803759d29e63a5e11fa2ab39de024f2a
+- path: governance/agent-runtime-profiles/dwc.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: a1d41a32fcc3c8a87348bb6f3754c87a13479cfe1a6735d68586a8bb965ad8d5
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: f3bdff255483aa1c03f2a2061346e91417083b667d54e69138c94c8d6cf9cf83
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: d23ba7148409e3d2a9b420790a1c7d11d2523c9fc472fbc0d62aa5b230ccde2e
+status: READY
+blockers: []

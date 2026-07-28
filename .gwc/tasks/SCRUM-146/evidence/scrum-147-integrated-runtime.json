@@ -1,0 +1,22 @@
+{
+  "artifact_type": "p2-integrated-durable-runtime-acceptance",
+  "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+  "boundaries": ["B0", "B1", "B2", "B3", "B4", "B5"],
+  "components": [
+    "DurableCheckpointStore",
+    "BoundedWriteIntent",
+    "capture_exact_state",
+    "CrashReplayHarness"
+  ],
+  "duplicate_effect_preventions": 27,
+  "graph_revision": "scrum-147-integrated-acceptance-v1",
+  "human_escalations": 6,
+  "max_external_effect_count": 1,
+  "no_duplicate_effects": true,
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "scenario_count": 27,
+  "scope_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "stale_worker_rejections": 27,
+  "status": "PASS",
+  "task_id": "SCRUM-147"
+}

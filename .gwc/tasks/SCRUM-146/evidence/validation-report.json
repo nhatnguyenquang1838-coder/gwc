@@ -1,0 +1,19 @@
+{
+  "artifact_type": "scrum-146-fastlane-validation-report",
+  "task_id": "SCRUM-146",
+  "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+  "working_branch": "codex/fastlane-scrum-146-149-20260728",
+  "results": {
+    "focused_unittest": {"status": "PASS", "count": 52, "command": "python3 -m unittest -v tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_durable_runtime_contracts tests.test_p3_backward_graph tests.test_p3_scenario_registry tests.test_runtime_registry_validation tests.test_dw_super_e2e_pilot tests.test_ua_host_contract tests.test_task_me_host_contract tests.test_kiro_local_agent_package"},
+    "g2_gate": {"status": "PASS", "validator": "tools/validate_g01.py --gate G2_EXECUTION"},
+    "runtime_registry": {"status": "PASS", "nodes": 81, "declared_scenarios": 116, "materialized_scenarios": 14},
+    "ua_host_contract": {"status": "PASS"},
+    "task_me_host_contract": {"status": "PASS"},
+    "no_production_e2e_pilot": {"status": "PASS"},
+    "offline_package": {"status": "PASS", "entries": 246, "hashes_checked": 246, "zip_sha256": "766d2e70beb770f363ca53c9382ec97c61460a09c6f15011ec65c4556ea5db22"},
+    "pytest": {"status": "UNAVAILABLE", "reason": "pytest is not installed in the bundled Python runtime"},
+    "repository_compileall": {"status": "BLOCKED_PREEXISTING_SYNTAX_ERROR", "path": "tests/test_g2-execution-library.py", "reason": "The existing file contains prose without Python comment markers."},
+    "remote_ci": {"status": "SKIPPED_OFFLINE", "reason": "GitHub DNS resolution unavailable"}
+  },
+  "scope_note": "The .ua planning graph changes predate G2 and remain uncommitted outside the FastLane write scope."
+}

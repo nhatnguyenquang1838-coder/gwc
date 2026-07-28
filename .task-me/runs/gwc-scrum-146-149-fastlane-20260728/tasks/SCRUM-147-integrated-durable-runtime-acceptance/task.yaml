@@ -1,0 +1,16 @@
+task_id: SCRUM-147
+title: Prove integrated durable runtime acceptance
+objective: Bind checkpoint/CAS/lease/fencing, bounded external outcomes, crash replay, and provider-neutral evidence into one executable acceptance path.
+wave: 1
+requires: []
+parallel_with: [SCRUM-148]
+risk: R2
+likely_hours: 12
+protected_base_sha: b0341da8414aacad93719a6919babcd183e03f02
+verified_paths:
+  - tools/node_architect/durable_checkpoint_runtime.py
+  - tools/node_architect/crash_replay_harness.py
+  - tests/test_durable_checkpoint_runtime.py
+  - tests/test_crash_replay_harness.py
+  - tests/test_durable_runtime_contracts.py
+excluded: [production_data, deployment, migration, credentials, merge]

@@ -1,0 +1,16 @@
+{
+  "nodes": [
+    {"id":"durable-store","type":"file","path":"tools/node_architect/durable_checkpoint_runtime.py"},
+    {"id":"crash-replay","type":"file","path":"tools/node_architect/crash_replay_harness.py"},
+    {"id":"p3-router","type":"file","path":"tools/p3_backward_graph.py"},
+    {"id":"e2e-validator","type":"file","path":"tools/validate_dw_super_e2e_pilot.py"},
+    {"id":"g5-resolver","type":"file","path":"tools/resolve_g5_status.py"},
+    {"id":"g5-validator","type":"file","path":"tools/validate_g5_status.py"}
+  ],
+  "edges": [
+    {"from":"durable-store","to":"crash-replay","type":"requires"},
+    {"from":"durable-store","to":"e2e-validator","type":"tested_by"},
+    {"from":"p3-router","to":"e2e-validator","type":"requires"},
+    {"from":"g5-resolver","to":"g5-validator","type":"validated_by"}
+  ]
+}

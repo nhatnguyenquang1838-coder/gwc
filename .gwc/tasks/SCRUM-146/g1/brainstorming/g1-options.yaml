@@ -1,0 +1,44 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-07-28T06:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-146
+  base_sha: b0341da8414aacad93719a6919babcd183e03f02
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Coordinated four-task FastLane chain
+  description: Execute SCRUM-147 and SCRUM-148 in parallel, then SCRUM-149, then SCRUM-146
+    closure evidence on one guarded branch and Draft PR.
+  benefits:
+  - Dependency-correct
+  - One exact-head evidence chain
+  - Reuses existing validators
+  tradeoffs:
+  - Broader R2 scope
+  - Requires exact G2 approval before repository writes
+  risks:
+  - Cross-lane scope drift
+  - GitHub reachability is currently unavailable
+  constraint_fit: FIT
+- id: OPT-2
+  title: Separate PR per subtask
+  description: Deliver four independent branches and PRs with separate evidence chains.
+  benefits:
+  - Smaller diffs
+  - Independent review
+  tradeoffs:
+  - Duplicate gate overhead
+  - Harder exact P1-P5 reconciliation
+  risks:
+  - Cross-PR base drift
+  - Integration evidence fragmentation
+  constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: The issue descriptions and Task Me DAG form one P1-P5 recovery
+  chain; a single guarded branch preserves exact-head and dependency evidence while
+  still keeping four independently testable task folders.
+decision_required: true
+status: READY

@@ -1,0 +1,116 @@
+{
+  "schema_version": "0.1",
+  "workflow": "GWC_FASTLANE_BOOTSTRAP",
+  "temporary": true,
+  "sunset_condition": "Remove or deprecate FastLane when the permanent GWC governed delivery workflow supersedes it.",
+  "task": {
+    "id": "SCRUM-146",
+    "title": "Coordinated SCRUM-146–149 post-P5 recovery and acceptance reconciliation",
+    "risk_class": "R2"
+  },
+  "repository": {
+    "full_name": "nhatnguyenquang1838-coder/gwc",
+    "base_branch": "main",
+    "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+    "working_branch": "codex/fastlane-scrum-146-149-20260728"
+  },
+  "connector_route": {
+    "primary": "GitHub",
+    "fallback": ["DWC", "DW1"],
+    "selected": "DWC"
+  },
+  "scope": {
+    "files_read": [
+      "AGENTS.md",
+      "core/Coding_Project_Governance_v1.0.md",
+      "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+      "core/workflows/GWC_FASTLANE_BOOTSTRAP_WORKFLOW_v0.1.md",
+      "projects/gwc/project-profile.yaml",
+      "projects/gwc/project-instructions.md",
+      "projects/gwc/project-extension.md",
+      ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/**",
+      ".kiro/specs/scrum-105-durable-runtime-contracts/**",
+      ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/**",
+      ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/**",
+      ".kiro/specs/GWC-P4-K2-ua-host-mode-contract/**",
+      ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/**",
+      ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/**",
+      "schemas/runtime/**",
+      "tools/**",
+      "tests/**",
+      "examples/integrations/**"
+    ],
+    "files_write": [
+      ".gwc/tasks/SCRUM-146/**",
+      ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/**",
+      "tools/node_architect/durable_checkpoint_runtime.py",
+      "tools/node_architect/crash_replay_harness.py",
+      "tools/node_architect/exact_state_capture.py",
+      "tools/node_architect/bounded_external_write.py",
+      "tools/node_architect/validate_checkpoint_resume.py",
+      "tools/p3_backward_graph.py",
+      "tools/node_architect/validate_runtime_registry.py",
+      "tools/validate_dw_super_e2e_pilot.py",
+      "tools/node_architect/validate_kiro_local_agent_package.py",
+      "tools/node_architect/render_kiro_local_agent_package.py",
+      "tools/resolve_g5_status.py",
+      "tools/validate_g5_status.py",
+      "tools/validate_github_g5_g6_jira_projection.py",
+      "tools/hash_integrity_artifacts.py",
+      "core/node-architect/scenario-registry.json",
+      "schemas/runtime/**",
+      "examples/integrations/e2e-pilot/**",
+      "examples/integrations/ua-host/**",
+      "examples/integrations/task-me-host/**",
+      "examples/integrations/github-g5-g6-jira/**",
+      "tests/test_durable_checkpoint_runtime.py",
+      "tests/test_crash_replay_harness.py",
+      "tests/test_durable_runtime_contracts.py",
+      "tests/test_exact_state_capture.py",
+      "tests/test_bounded_external_write.py",
+      "tests/test_p3_scenario_registry.py",
+      "tests/test_p3_backward_graph.py",
+      "tests/test_runtime_registry_validation.py",
+      "tests/test_dw_super_e2e_pilot.py",
+      "tests/test_ua_host_contract.py",
+      "tests/test_task_me_host_contract.py",
+      "tests/test_kiro_local_agent_package.py",
+      "tests/test_g5_status_resolver.py",
+      "tests/test_github_g5_g6_jira_projection.py",
+      "<canonical-P1-P5-manifest-target-discovered-within-existing-evidence-conventions>"
+    ],
+    "authorized_actions": [
+      "create_guarded_branch",
+      "modify_scoped_files",
+      "open_or_update_draft_pr",
+      "readback_branch_pr_diff_ci"
+    ],
+    "excluded_actions": [
+      "direct_push_main",
+      "force_push",
+      "delete_branch",
+      "change_pr_base",
+      "merge",
+      "auto_merge",
+      "deploy",
+      "release",
+      "production_config",
+      "credentials",
+      "secrets",
+      "migration",
+      "production_data"
+    ]
+  },
+  "authority": {
+    "g2_approval_required": true,
+    "g4_merge_approval_required": true,
+    "g5_deploy_approval_required": false,
+    "g6_production_approval_required": false
+  },
+  "audit_projection": {
+    "jira": "optional",
+    "tc_ds_mcp": "disabled",
+    "blocking": false
+  }
+}

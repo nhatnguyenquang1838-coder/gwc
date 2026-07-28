@@ -1,0 +1,19 @@
+task_id: SCRUM-146
+title: Build exact-SHA P1-P5 evidence and closure manifest
+objective: Produce one phase-indexed P1-P5 closure record with exact refs, maturity classification, residual risk, deferrals, and current CI/gate evidence.
+wave: 3
+requires: [SCRUM-147, SCRUM-148, SCRUM-149]
+parallel_with: []
+risk: R2
+likely_hours: 10
+protected_base_sha: b0341da8414aacad93719a6919babcd183e03f02
+verified_paths:
+  - tools/validate_g5_status.py
+  - tools/resolve_g5_status.py
+  - tools/validate_github_g5_g6_jira_projection.py
+  - examples/integrations/github-g5-g6-jira
+  - tests/test_g5_status_resolver.py
+  - tests/test_github_g5_g6_jira_projection.py
+  - tools/hash_integrity_artifacts.py
+excluded: [merge, deploy, release, production_data, credentials]
+discovery_required: canonical new P1-P5 manifest destination

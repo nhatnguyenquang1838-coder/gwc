@@ -1,0 +1,35 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+approval_id: CP-20260728-1461492
+authority_gate: G2_EXECUTION
+task_id: SCRUM-146
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: b0341da8414aacad93719a6919babcd183e03f02
+working_branch: codex/fastlane-scrum-146-149-20260728
+scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
+approval_command: APPROVE G2 CP-20260728-1461492 58c48ba5452657fa 2026-07-28T18:45:00Z
+readback_status: MATCH
+approved_by: current_chat_user
+source: exact-command-user-message
+status: APPROVED_FOR_G2_WRITE_ONLY
+authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+excluded_actions:
+  - protected_main_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials_or_secrets
+  - migration
+  - destructive_operation
+  - force_push
+  - branch_deletion
+  - pr_base_change
+observed_at: '2026-07-28T03:20:21Z'

@@ -1,0 +1,52 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-07-28T06:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-146
+  base_sha: b0341da8414aacad93719a6919babcd183e03f02
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-07-28T06:35:00Z'
+  source: explicit-user-fastlane-request
+  explicit: true
+rationale: Proceed with the coordinated GWC FastLane for 146, 147, 148 and 149, while
+  preserving separate task scopes and all later human gates.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:21669a147890c57fbf3b6bc88129401a258d59938dfae7a4edc853dbab08b8ae
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-146
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: b0341da8414aacad93719a6919babcd183e03f02
+  plan_root: .task-me/runs/gwc-scrum-146-149-fastlane-20260728
+  plan_revision: sha256:bbe96f8be7408d7c229d5135701e12d4dbfc7c0b7b9d993b4c180474a6d2e28a
+  validation_evidence: python3 validate_config.py and validate_output_layout.py returned
+    CONFIG_VALID and OUTPUT_LAYOUT_VALID for four unique task folders.
