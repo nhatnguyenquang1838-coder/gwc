@@ -13,12 +13,14 @@ RECIPE_PATH = ROOT / "distribution" / "power-package.yaml"
 CONFIG_PATH = ROOT / "distribution" / "config" / "gwc.defaults.yaml"
 CONFIG_SCHEMA_PATH = ROOT / "distribution" / "contracts" / "gwc-config.schema.json"
 WORKFLOW_PATH = ROOT / ".github" / "workflows" / "publish-power.yml"
+G5_STANDING_AUTOMATION_POLICY_PATH = ROOT / "core" / "G5_STANDING_AUTOMATION_POLICY_v1.0.md"
 FOUNDATION_SHA = "299cd605899467377cd31651b27d31c3f88db759"
 
 REQUIRED_SOURCE_PATHS = (
     "AGENTS.md",
     "core/Coding_Project_Governance_v1.0.md",
     "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
     "core/Agent_Operating_Runtime_Contract_v1.0.md",
     "core/Agent_Behavior_Semantic_Contract_v1.0.md",
     "core/Agent_Response_Presentation_Contract_v1.0.md",
@@ -154,6 +156,18 @@ class GWCPowerDistributionTests(unittest.TestCase):
             "publish_distribution_branch: ${{ github.event_name == 'push' || github.event.inputs.publish_distribution_branch == 'true' }}",
             text,
         )
+
+    def test_auto_publish_has_standing_g5_policy_and_audit_boundary(self) -> None:
+        text = WORKFLOW_PATH.read_text(encoding="utf-8")
+        policy = G5_STANDING_AUTOMATION_POLICY_PATH.read_text(encoding="utf-8")
+        self.assertIn("github.event_name == 'push'", text)
+        self.assertIn("standing automated g5", policy.lower())
+        self.assertIn("push` to `main`", policy)
+        self.assertIn("publish a GitHub Release", policy)
+        self.assertIn("`power-dist` branch", policy)
+        self.assertIn("workflow run ID", policy)
+        self.assertIn("power-dist` branch SHA", policy)
+        self.assertIn("does not grant merge authority", policy)
 
     def test_package_does_not_embed_task_evidence(self) -> None:
         include = "\n".join(self.recipe["spec"]["include"])

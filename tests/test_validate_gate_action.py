@@ -11,6 +11,7 @@ from tools.validate_gate_action import canonical_scope_hash, validate
 ROOT = Path(__file__).resolve().parents[1]
 BASE_SHA = "a" * 40
 HEAD_SHA = "b" * 40
+DRIFTED_HEAD_SHA = "c" * 40
 
 
 def packet() -> dict:
@@ -47,6 +48,31 @@ def packet() -> dict:
         "scope_hash": "sha256:" + "0" * 64,
         "event_id_or_idempotency_key": "evt-scrum-103-1",
     }
+    value["scope_hash"] = canonical_scope_hash(value)
+    value["evidence_readback"]["scope_hash"] = value["scope_hash"]
+    return value
+
+
+def g4_merge_packet() -> dict:
+    value = packet()
+    value["task_id"] = "SCRUM-151"
+    value["working_branch"] = "hotfix/14d18a5027ab3f11/scrum-151-authority-guard"
+    value["gate"] = "G4_MERGE"
+    value["action"] = "merge_approved_pr"
+    value["scope"] = {
+        "authorized_paths": ["tools/validate_gate_action.py"],
+        "authorized_actions": ["merge_approved_pr"],
+        "excluded_actions": ["deploy", "release", "production_data_write"],
+        "risk_class": "R2",
+    }
+    value["evidence_readback"].update(
+        {
+            "task_id": value["task_id"],
+            "gate": value["gate"],
+            "action": value["action"],
+            "event_id_or_idempotency_key": "evt-scrum-151-g4-1",
+        }
+    )
     value["scope_hash"] = canonical_scope_hash(value)
     value["evidence_readback"]["scope_hash"] = value["scope_hash"]
     return value
@@ -92,6 +118,45 @@ class GateActionAuthorityTests(unittest.TestCase):
         value["evidence_readback"]["scope_hash"] = value["scope_hash"]
         errors = validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")
         self.assertTrue(any("not valid for G2_EXECUTION" in error for error in errors))
+
+    def test_g4_merge_valid_only_for_current_open_pr_head(self):
+        errors = validate(
+            g4_merge_packet(),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="open",
+        )
+        self.assertEqual([], errors)
+
+    def test_g4_merge_requires_runtime_current_head(self):
+        errors = validate(
+            g4_merge_packet(),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            observed_pr_state="open",
+        )
+        self.assertTrue(any("expected current PR head SHA" in error for error in errors))
+
+    def test_g4_merge_rejects_stale_head_approval(self):
+        errors = validate(
+            g4_merge_packet(),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=DRIFTED_HEAD_SHA,
+            observed_pr_state="open",
+        )
+        self.assertTrue(any("head SHA" in error for error in errors))
+
+    def test_g4_merge_rejects_post_merge_or_closed_pr_state(self):
+        errors = validate(
+            g4_merge_packet(),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="merged",
+        )
+        self.assertTrue(any("observed PR state 'open'" in error for error in errors))
 
 
 if __name__ == "__main__":

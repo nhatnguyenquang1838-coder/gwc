@@ -1,0 +1,20 @@
+schema_version: '1.0'
+artifact_type: g1-hotfix-minimal-preflight
+task_id: SCRUM-151
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 6e94950acec6918458a92842ff21625545b3871b
+working_branch: hotfix/14d18a5027ab3f11/scrum-151-authority-guard
+scope_decision: proceed_hotfix
+options_considered:
+  - option: manual_only_publish
+    decision: rejected
+    reason: user clarified that auto publish must remain enabled
+  - option: standing_g5_automation_policy_plus_g4_guard
+    decision: selected
+    reason: preserves current publish behavior while documenting audit boundary and fixing exact-head G4 guard
+validation_plan:
+  - python -m unittest tests.test_validate_gate_action tests.test_power_distribution
+expected_behavior:
+  - push main continues to auto publish release and power-dist
+  - G4 merge validator requires current PR head SHA and open PR state
+  - stale-head and post-merge approvals fail closed

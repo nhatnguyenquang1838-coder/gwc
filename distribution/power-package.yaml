@@ -32,6 +32,7 @@ spec:
     - AGENTS.md
     - core/Coding_Project_Governance_v1.0.md
     - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/G5_STANDING_AUTOMATION_POLICY_v1.0.md
     - core/Agent_Operating_Runtime_Contract_v1.0.md
     - core/Agent_Behavior_Semantic_Contract_v1.0.md
     - core/Agent_Response_Presentation_Contract_v1.0.md

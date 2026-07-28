@@ -1,0 +1,30 @@
+schema_version: '1.0'
+artifact_type: g0-hotfix-intake
+mode: hotfix
+task_id: SCRUM-151
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 6e94950acec6918458a92842ff21625545b3871b
+working_branch: hotfix/14d18a5027ab3f11/scrum-151-authority-guard
+activation_phrase: ACTIVATE HOTFIX 14d18a5027ab3f11 SCRUM-151 restart from main@6e94950, keep auto publish, add G5 standing automation audit, and fix G4 exact-head guard
+scope_hash_prefix: 14d18a5027ab3f11
+risk_assessment: medium
+affected_files:
+  - core/G5_STANDING_AUTOMATION_POLICY_v1.0.md
+  - distribution/power-package.yaml
+  - tools/validate_gate_action.py
+  - tests/test_validate_gate_action.py
+  - tests/test_power_distribution.py
+approval_recorded: true
+human_author: current_chat_user
+prohibited_actions_excluded:
+  - direct_main_write
+  - merge
+  - deploy
+  - production_data
+  - production_config
+  - credentials
+notes:
+  - Auto publish on push main is intentionally preserved.
+  - SCRUM-143 is treated as standing automated G5 audit documentation, not workflow blocking.
+  - SCRUM-144 is treated as executable exact-head G4 merge guard remediation.

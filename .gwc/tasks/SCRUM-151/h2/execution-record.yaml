@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: h2-hotfix-execution-record
+task_id: SCRUM-151
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 6e94950acec6918458a92842ff21625545b3871b
+working_branch: hotfix/14d18a5027ab3f11/scrum-151-authority-guard
+activation_scope_hash_prefix: 14d18a5027ab3f11
+changed_files:
+  - core/G5_STANDING_AUTOMATION_POLICY_v1.0.md
+  - distribution/power-package.yaml
+  - tools/validate_gate_action.py
+  - tests/test_validate_gate_action.py
+  - tests/test_power_distribution.py
+  - .gwc/tasks/SCRUM-151/g0/hotfix-intake.yaml
+  - .gwc/tasks/SCRUM-151/g1/minimal-preflight.yaml
+  - .gwc/tasks/SCRUM-151/h2/execution-record.yaml
+local_validation:
+  command: python -m unittest tests.test_validate_gate_action tests.test_power_distribution
+  result: PASS
+  tests_run: 16
+  note: Local validation used materialized connector-fetched files in isolated session; GitHub CI remains authoritative after Draft PR.
+behavior_preserved:
+  - .github/workflows/publish-power.yml unchanged
+  - push main continues to auto publish release and power-dist
+behavior_changed:
+  - G4 merge validator requires expected current PR head SHA
+  - G4 merge validator requires observed PR state open before merge
+  - standing G5 publication policy and package inventory added
+excluded_actions:
+  - main_branch_write
+  - merge
+  - deploy
+  - release_trigger
+  - production_data
+  - production_config
+  - credentials
