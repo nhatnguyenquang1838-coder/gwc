@@ -10,7 +10,7 @@ pull_request:
   number: 132
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/132
   draft: true
-head_sha: 8827a67795e6fd173f2008160ad155faaaedb0f5
+head_sha: e899dca2b66df212c1f3a15c87db11807cf38282
 scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
 changed_paths:
   - .gwc/tasks/SCRUM-146/closure-manifest.json
@@ -74,7 +74,7 @@ changed_paths:
   - tools/node_architect/crash_replay_harness.py
   - tools/p3_backward_graph.py
 validation:
-  head_sha: 8827a67795e6fd173f2008160ad155faaaedb0f5
+  head_sha: e899dca2b66df212c1f3a15c87db11807cf38282
   status: pass
   commands:
     - command: python3 -m unittest -v tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_durable_runtime_contracts tests.test_p3_backward_graph tests.test_p3_scenario_registry tests.test_runtime_registry_validation tests.test_dw_super_e2e_pilot tests.test_ua_host_contract tests.test_task_me_host_contract tests.test_kiro_local_agent_package
@@ -115,7 +115,7 @@ review:
   reviewer_id: not-yet-assigned
   independence: fresh-context
   mode: read-only
-  reviewed_head_sha: 8827a67795e6fd173f2008160ad155faaaedb0f5
+  reviewed_head_sha: e899dca2b66df212c1f3a15c87db11807cf38282
   reviewed_scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
   reviewed_at: '2026-07-28T18:45:00Z'
   lanes:
@@ -184,18 +184,18 @@ review:
   stale: false
 ci:
   required: true
-  head_sha: 8827a67795e6fd173f2008160ad155faaaedb0f5
+  head_sha: e899dca2b66df212c1f3a15c87db11807cf38282
   checks:
     - name: Validate instructions
       required: true
-      status: pending
-      evidence: GitHub Actions run 30326265238 was in_progress for the exact implementation head.
+      status: pass
+      evidence: GitHub Actions run 30326496250 completed successfully for the exact implementation head.
     - name: Build instruction packages
       required: true
-      status: pending
-      evidence: GitHub Actions run 30326265278 was in_progress for the exact implementation head.
+      status: pass
+      evidence: GitHub Actions run 30326496261 completed successfully for the exact implementation head.
 residual_risks:
-  - Exact-head CI was pending at record creation and must be read back before G3 closure.
+  - Exact-head CI passed for the implementation head; this evidence-only record update changes the PR head and requires final-head readback.
   - Independent fresh-context review has not been recorded.
   - Live provider-backed UA and Task-Me host E2E remains unverified; offline package evidence is separate.
   - 102 of 116 declared P3 scenario slots remain non-materialized and are not claimed as passing coverage.
