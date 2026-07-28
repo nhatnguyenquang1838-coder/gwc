@@ -1,0 +1,54 @@
+{
+  "artifact_type": "p3-scenario-coverage-and-router-budget-evidence",
+  "task_id": "SCRUM-148",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+  "status": "RECONCILED_WITH_DEFERRED_REMAINDER",
+  "coverage": {
+    "declared_scenario_count": 116,
+    "materialized_scenario_count": 14,
+    "materialized_ids": [
+      "missing-context",
+      "ambiguity",
+      "baseline-drift",
+      "scope-drift",
+      "ambiguous-write-outcome",
+      "ci-pending",
+      "ci-failure",
+      "ci-sha-mismatch",
+      "stale-review",
+      "approval-expiry",
+      "observability-gap",
+      "partial-deployment",
+      "production-partial-success",
+      "blocked-authority"
+    ],
+    "declared_remainder": {
+      "count": 102,
+      "classification": "DEFERRED",
+      "reason": "The canonical registry declares capacity for 116 scenarios but exposes no stable IDs or source-backed contracts for the remaining 102. They are not executable coverage and cannot be silently represented as PASS.",
+      "follow_up": "Materialize each remainder only when a source-backed scenario contract and evidence references exist."
+    }
+  },
+  "router_budgets": {
+    "max_nodes": 256,
+    "max_routes": 1024,
+    "timeout_ms": 250,
+    "max_memory_bytes": 4194304,
+    "max_depth": 32,
+    "exceeded_behavior": "typed BUDGET_EXCEEDED evidence with fail_closed=true and BLOCKED decision"
+  },
+  "adversarial_coverage": [
+    "cycle rejection",
+    "dense route-count exhaustion",
+    "tied-route deterministic ordering",
+    "strict typed guard comparison",
+    "human/prohibited authority stop"
+  ],
+  "validation_refs": [
+    "tools/p3_backward_graph.py",
+    "tests/test_p3_backward_graph.py",
+    "tests/test_p3_scenario_registry.py",
+    "tools/node_architect/validate_runtime_registry.py"
+  ]
+}

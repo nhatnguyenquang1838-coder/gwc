@@ -4,6 +4,7 @@ import unittest
 from tools.node_architect.crash_replay_harness import (
     CrashBoundary,
     CrashReplayHarness,
+    integrated_acceptance,
     parse_scenario_matrix,
     verify_matrix,
 )
@@ -53,6 +54,22 @@ class CrashReplayHarnessTests(unittest.TestCase):
         result = self.harness.run(scenario)
         self.assertTrue(result.human_required)
         self.assertIn("human.takeover.required", result.events)
+
+    def test_integrated_acceptance_binds_all_durable_seams(self):
+        harness = CrashReplayHarness(
+            task_id="SCRUM-147",
+            repository="nhatnguyenquang1838-coder/gwc",
+            base_sha="b0341da8414aacad93719a6919babcd183e03f02",
+            scope_hash="sha256:" + "b" * 64,
+            graph_revision="scrum-147-integrated-acceptance-v1",
+        )
+        evidence = integrated_acceptance(self.scenarios, harness)
+        self.assertEqual(evidence["status"], "PASS")
+        self.assertEqual(evidence["scenario_count"], 27)
+        self.assertEqual(evidence["boundaries"], ["B0", "B1", "B2", "B3", "B4", "B5"])
+        self.assertEqual(evidence["stale_worker_rejections"], 27)
+        self.assertEqual(evidence["duplicate_effect_preventions"], 27)
+        self.assertTrue(evidence["no_duplicate_effects"])
 
 
 if __name__ == "__main__":

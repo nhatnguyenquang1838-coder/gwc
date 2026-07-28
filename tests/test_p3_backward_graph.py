@@ -1,7 +1,9 @@
 import unittest
 
 from tools.p3_backward_graph import (
+    BudgetExceeded,
     CompileError,
+    RouteBudget,
     append_scenario_decision,
     compile_backward_graph,
     decide_scenario,
@@ -79,6 +81,29 @@ class GuardAndRouteTests(unittest.TestCase):
         ]
         routes = enumerate_routes(nodes, "start", "green", {})
         self.assertEqual(routes[-1]["class"], "UNSAFE")
+
+    def test_route_budget_fails_closed_with_typed_evidence(self):
+        nodes = [
+            {"id": "start", "successors": ["left", "right"]},
+            {"id": "left", "successors": ["green"]},
+            {"id": "right", "successors": ["green"]},
+            {"id": "green", "successors": []},
+        ]
+        with self.assertRaises(BudgetExceeded) as raised:
+            enumerate_routes(nodes, "start", "green", {}, budget=RouteBudget(max_routes=1))
+        self.assertEqual(raised.exception.as_dict()["code"], "BUDGET_EXCEEDED")
+        self.assertTrue(raised.exception.as_dict()["fail_closed"])
+
+    def test_dense_route_budget_is_bounded(self):
+        nodes = [
+            {"id": "start", "successors": ["a", "b", "c"]},
+            {"id": "a", "successors": ["green"]},
+            {"id": "b", "successors": ["green"]},
+            {"id": "c", "successors": ["green"]},
+            {"id": "green", "successors": []},
+        ]
+        with self.assertRaisesRegex(BudgetExceeded, "BUDGET_EXCEEDED:max_routes"):
+            enumerate_routes(nodes, "start", "green", {}, budget=RouteBudget(max_routes=2))
 
 
 class ScenarioDecisionTests(unittest.TestCase):
@@ -164,6 +189,28 @@ class ScenarioDecisionTests(unittest.TestCase):
         self.assertEqual(decision["classification"], "UNSAFE")
         self.assertFalse(decision["auto_execute"])
         self.assertIsNone(decision["selected_route"])
+
+    def test_budget_exhaustion_returns_blocked_typed_decision(self):
+        scenario = self._scenario()
+        decision = decide_scenario(
+            scenario,
+            {"ci_status": "success"},
+            budget=RouteBudget(max_nodes=1),
+        )
+        self.assertEqual(decision["classification"], "BLOCKED")
+        self.assertFalse(decision["auto_execute"])
+        self.assertEqual(decision["budget_evidence"]["code"], "BUDGET_EXCEEDED")
+
+    def test_tied_routes_are_stable_under_input_reordering(self):
+        scenario = self._scenario()
+        scenario["edges"] = [
+            {"source": "start", "target": "green", "edge_type": "runtime", "runtime_executable": True},
+        ]
+        first = decide_scenario(scenario, {"ci_status": "success"})
+        reordered = dict(scenario)
+        reordered["route_nodes"] = list(reversed(scenario["route_nodes"]))
+        second = decide_scenario(reordered, {"ci_status": "success"})
+        self.assertEqual(first["decision_id"], second["decision_id"])
 
 
 if __name__ == "__main__":

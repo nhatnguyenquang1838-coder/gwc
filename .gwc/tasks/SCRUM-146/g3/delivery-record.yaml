@@ -1,0 +1,216 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-146
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: b0341da8414aacad93719a6919babcd183e03f02
+working_branch: codex/fastlane-scrum-146-149-20260728
+pull_request:
+  number: 132
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/132
+  draft: true
+head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
+scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
+changed_paths:
+  - .gwc/tasks/SCRUM-146/closure-manifest.json
+  - .gwc/tasks/SCRUM-146/closure-manifest.md
+  - .gwc/tasks/SCRUM-146/evidence/scrum-147-integrated-runtime.json
+  - .gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json
+  - .gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json
+  - .gwc/tasks/SCRUM-146/evidence/validation-report.json
+  - .gwc/tasks/SCRUM-146/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-146/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-146/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-146/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-146/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-146/g2/approval-envelope.json
+  - .gwc/tasks/SCRUM-146/g2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-146/g2/execution-envelope.json
+  - .gwc/tasks/SCRUM-146/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-146/g2/plan-read-receipt.yaml
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/RUN-SUMMARY.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/01-source-inventory.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/02-traceability.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/03-evidence-graph.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/04-impact-analysis.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/07-validation-report.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-dag.mmd
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-index.yaml
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/README.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/coding-guide.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/decisions.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/evidence.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/impact-analysis.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/implementation-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/task.yaml
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/test-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/README.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/coding-guide.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/decisions.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/evidence.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/impact-analysis.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/implementation-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/task.yaml
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/test-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/README.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/coding-guide.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/decisions.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/evidence.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/impact-analysis.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/implementation-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/task.yaml
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/test-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/README.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/coding-guide.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/decisions.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/evidence.json
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/impact-analysis.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/implementation-plan.md
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/task.yaml
+  - .task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/test-plan.md
+  - tests/test_crash_replay_harness.py
+  - tests/test_p3_backward_graph.py
+  - tools/node_architect/crash_replay_harness.py
+  - tools/p3_backward_graph.py
+validation:
+  head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
+  status: pass
+  commands:
+    - command: python3 -m unittest -v tests.test_durable_checkpoint_runtime tests.test_crash_replay_harness tests.test_durable_runtime_contracts tests.test_p3_backward_graph tests.test_p3_scenario_registry tests.test_runtime_registry_validation tests.test_dw_super_e2e_pilot tests.test_ua_host_contract tests.test_task_me_host_contract tests.test_kiro_local_agent_package
+      result: pass
+      evidence: 52 focused tests passed.
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-146 --gate G2_EXECUTION --json
+      result: pass
+      evidence: G2 execution envelope and approval readback validated.
+    - command: python3 tools/node_architect/validate_runtime_registry.py --root .
+      result: pass
+      evidence: 81 nodes, 116 declared scenarios and 14 materialized scenarios passed registry validation.
+    - command: python3 tools/validate_ua_host_contract.py --root . --json
+      result: pass
+      evidence: UA host contract passed.
+    - command: python3 tools/validate_task_me_host_contract.py --root . --json
+      result: pass
+      evidence: Task-Me host contract passed.
+    - command: python3 tools/validate_dw_super_e2e_pilot.py --root . --json
+      result: pass
+      evidence: Positive and expected-negative no-production E2E cases passed.
+    - command: python3 tools/validate_bmad_procedure_adapter.py --json
+      result: pass
+      evidence: BMAD procedure adapter validation passed.
+    - command: offline package ZIP extraction and SHA-256 readback
+      result: pass
+      evidence: 246 of 246 copied hashes verified; ZIP SHA-256 766d2e70beb770f363ca53c9382ec97c61460a09c6f15011ec65c4556ea5db22.
+    - command: git diff --check b0341da8414aacad93719a6919babcd183e03f02..8827a67795e6fd173f2008160ad155faaaedb0f5
+      result: pass
+      evidence: No whitespace errors in the scoped diff.
+    - command: python3 -m compileall -q tools tests
+      result: skipped
+      evidence: Pre-existing invalid syntax in tests/test_g2-execution-library.py; not modified by this task.
+    - command: pytest
+      result: skipped
+      evidence: pytest is not installed in the bundled Python; unittest was used instead.
+review:
+  implementer_id: codex-local-agent
+  reviewer_id: codex-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
+  reviewed_scope_hash: sha256:58c48ba5452657faa5ccf47758d3adc48db8204744b711f728f8b6892a22109a
+  reviewed_at: '2026-07-28T04:16:36Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - The four requested task outcomes are mapped to P1-P5 closure, durable runtime, bounded routing, and host/offline evidence.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Typed fail-closed route budgets and durable replay seams remain within the approved architecture and authority boundaries.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Read-only review of the changed router, crash/replay harness, and focused regression tests found no blocker or scope drift.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 52 focused tests and the registry, host-contract, no-production, and BMAD validators passed.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G0/G1/G2 artifacts, scope hash, exclusions, guarded branch, and Jira projection boundary are recorded.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - PR #132 is open as Draft against the protected base with exact base/head and no protected-main write.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 30326696242 and Build instruction packages run 30326696259 passed for the reviewed head.
+  findings:
+    - id: REV-1
+      severity: MAJOR
+      category: delivery
+      status: resolved
+      evidence: User manually verified UA and Task-Me behavior and explicitly confirmed that automated live-provider tests are not required for this task.
+      recommendation: Preserve the manual-confirmation evidence class and do not relabel it as automated provider-call evidence.
+      resolution: SCRUM-149 is accepted as PASS on manual host verification; contract fixtures and offline ZIP/hash extraction remain recorded separately.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - P1-P5 closure manifest and task-scoped G0/G1/G2 evidence are present with explicit later-gate exclusions.
+    - id: AC-2
+      result: pass
+      evidence:
+        - SCRUM-147 integrated acceptance covers 27 scenarios across B0-B5 with stale-worker rejection and duplicate-effect prevention.
+    - id: AC-3
+      result: pass
+      evidence:
+        - SCRUM-148 records 14 materialized scenarios, 102 explicit deferred slots, and typed graph/route/time/memory/depth budgets.
+    - id: AC-4
+      result: pass
+      evidence:
+        - User manual confirmation records UA and Task-Me host behavior as PASS; automated live-provider testing is explicitly not required for this task.
+        - SCRUM-149 contract fixtures and offline ZIP/hash extraction also pass.
+    - id: AC-5
+      result: pass
+      evidence:
+        - Exact-head CI and focused local validation pass; repository-wide compileall and pytest limitations are recorded.
+    - id: AC-6
+      result: pass
+      evidence:
+        - G4 merge, G5 deploy, G6 production data, protected-main write, force-push, and release actions remain excluded.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 5cec066ec2653356b7743c81771394a7a2a7a665
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30328348887 completed successfully for the exact reviewed head.
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30328348871 completed successfully for the exact reviewed head.
+residual_risks:
+  - This G3 record refresh is an evidence-only commit; final PR-head CI remains separately read back after the record update.
+  - Manual host verification is intentionally recorded separately from automated provider-call evidence.
+  - 102 of 116 declared P3 scenario slots remain non-materialized and are not claimed as passing coverage.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - PROTECTED_MAIN_WRITE
+  - RELEASE_OR_PUBLICATION
+  - FORCE_PUSH_OR_HISTORY_REWRITE
+outcome: pass

@@ -1,0 +1,34 @@
+{
+  "artifact_type": "p4-host-and-offline-e2e-evidence",
+  "task_id": "SCRUM-149",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+  "status": "PASS",
+  "evidence": {
+    "ua_host_contract": {"status": "PASS", "class": "contract_fixture", "validator": "tools/validate_ua_host_contract.py"},
+    "task_me_host_contract": {"status": "PASS", "class": "contract_fixture", "validator": "tools/validate_task_me_host_contract.py"},
+    "bmad_procedure_contract": {"status": "PASS", "class": "contract_fixture", "validator": "tools/validate_bmad_procedure_adapter.py"},
+    "no_production_e2e_pilot": {"status": "PASS", "class": "fixture_suite", "validator": "tools/validate_dw_super_e2e_pilot.py"},
+    "live_ua_provider_call": {"status": "PASS", "class": "manual_confirmation", "reason": "User manually verified UA behavior; an automated live-provider test is not required for this task."},
+    "live_task_me_provider_call": {"status": "PASS", "class": "manual_confirmation", "reason": "User manually verified Task-Me behavior; an automated live-provider test is not required for this task."},
+    "manual_confirmation": {"status": "PASS", "class": "human_attestation", "confirmed_by": "current_chat_user", "scope": ["UA manual check", "Task-Me manual check"], "note": "Manual verification is accepted as the SCRUM-149 host evidence for this task."}
+  },
+  "offline_package": {
+    "status": "PASS",
+    "source_ref": "main",
+    "source_base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+    "package_version": "1.16.0",
+    "zip_sha256": "766d2e70beb770f363ca53c9382ec97c61460a09c6f15011ec65c4556ea5db22",
+    "entries": 246,
+    "copied_hashes_checked": 246,
+    "clean_extract_readback": "PASS",
+    "consumer_root": "/private/tmp/gwc-fastlane-offline-consumer-20260728/clean/.governance",
+    "source_state": "UNCOMMITTED_GUARDED_BRANCH_WORKTREE"
+  },
+  "production_constraints": {
+    "production_configuration": false,
+    "production_data": false,
+    "secrets_or_credentials": false,
+    "deployment_or_release": false
+  }
+}

@@ -1,0 +1,38 @@
+schema_version: "1.0"
+run_id: gwc-scrum-146-149-fastlane-20260728
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: b0341da8414aacad93719a6919babcd183e03f02
+remote_verification: SKIPPED_OFFLINE
+tasks:
+  - task_id: SCRUM-147
+    title: Prove integrated durable runtime acceptance
+    folder: tasks/SCRUM-147-integrated-durable-runtime-acceptance
+    wave: 1
+    requires: []
+    parallel_with: [SCRUM-148]
+    risk: R2
+    likely_hours: 12
+  - task_id: SCRUM-148
+    title: Complete scenario coverage and bounded router performance
+    folder: tasks/SCRUM-148-scenario-coverage-router-budgets
+    wave: 1
+    requires: []
+    parallel_with: [SCRUM-147]
+    risk: R2
+    likely_hours: 12
+  - task_id: SCRUM-149
+    title: Prove real host-mode E2E and offline package consumption
+    folder: tasks/SCRUM-149-host-offline-e2e
+    wave: 2
+    requires: [SCRUM-147, SCRUM-148]
+    parallel_with: []
+    risk: R2
+    likely_hours: 14
+  - task_id: SCRUM-146
+    title: Build exact-SHA P1-P5 evidence and closure manifest
+    folder: tasks/SCRUM-146-exact-sha-closure-manifest
+    wave: 3
+    requires: [SCRUM-147, SCRUM-148, SCRUM-149]
+    parallel_with: []
+    risk: R2
+    likely_hours: 10

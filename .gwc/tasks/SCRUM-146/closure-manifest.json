@@ -1,0 +1,79 @@
+{
+  "artifact_type": "p1-p5-closure-manifest",
+  "schema_version": "1.0",
+  "task_id": "SCRUM-146",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+  "working_branch": "codex/fastlane-scrum-146-149-20260728",
+  "working_tree_head": "5cec066ec2653356b7743c81771394a7a2a7a665",
+  "status": "DRAFT_PR_OPEN_G3_PASS_PENDING_READY",
+  "phases": [
+    {
+      "phase": "P1",
+      "refs": ["319e611d1a318df8ec5eccd3210078652e01369d", "9654b9116393320aee4b0c607be9c6255e3c4093"],
+      "classification": "contract_validator_proof",
+      "claim": "GWC audit baseline, lifecycle authority and canonical registry foundations are present.",
+      "evidence": [".kiro/specs/GWC-P1-architecture-readiness-canonical-registry", "tools/validate_runtime_registry.py"]
+    },
+    {
+      "phase": "P2",
+      "refs": [
+        "0e6104ff40af6076dd3cf547a3b081e8b7d9a7cf",
+        "be46a89f3a31bafbc95f1faf2e62978f98510ba2",
+        "638ec9fe3d5ceaca564e42f72e53329765914219",
+        "1826df2945ff5fd25af256fb8ba604ba6a7e09c7",
+        "776b6ac9558cdcc623fc1631b0036db24d4d7b73",
+        "2c019de2caab0cd7337747dae48af81ca5e1c2d9"
+      ],
+      "classification": "executable_local_proof",
+      "claim": "Durable checkpoint/CAS/lease/fencing, bounded-write classification, exact-state capture and crash/replay seams are integrated by the SCRUM-147 acceptance harness.",
+      "evidence": ["evidence/scrum-147-integrated-runtime.json", "tools/node_architect/crash_replay_harness.py", "tests/test_crash_replay_harness.py"]
+    },
+    {
+      "phase": "P3",
+      "refs": ["9e79dd6e3cffbe452647cc339701eb4b937d41ba", "32d8c308f7d67de3dbd914a19837871d99c22ab4"],
+      "classification": "executable_local_proof_with_deferred_space",
+      "claim": "The 14 materialized scenarios remain registry-valid and routing now has typed graph/route/time/memory budgets; 102 declared slots remain explicitly deferred because no source-backed IDs exist.",
+      "evidence": ["evidence/scrum-148-scenario-coverage-and-budgets.json", "tools/p3_backward_graph.py", "tests/test_p3_backward_graph.py", "tools/node_architect/validate_runtime_registry.py"]
+    },
+    {
+      "phase": "P4",
+      "refs": ["e0031b01ea9ea4f72a1119a81d732bbaee2b4921", "68deae88f686ecb66b15cb8aa2e5b943ad02adf1", "e664d48579764e56d53223d606768ba5ae8d07a4", "cd9b49cf9e6fd97413bc49ed480b2fc9941513af"],
+      "classification": "offline_proof_plus_contract_fixture_and_manual_host_confirmation",
+      "claim": "Host contracts, BMAD boundaries, no-production replay fixtures and offline package ZIP/hash extraction pass; UA and Task-Me host behavior is manually confirmed, with automated live-provider testing not required for this task.",
+      "evidence": ["evidence/scrum-149-host-offline-e2e.json", "tools/validate_ua_host_contract.py", "tools/validate_task_me_host_contract.py", "tools/validate_dw_super_e2e_pilot.py"]
+    },
+    {
+      "phase": "P5",
+      "refs": ["a4ed82d82cc518fffc8e6d699f1aac0ada51d6b4", "57cd885a6c8e1cb0c0c09247ea6b40e8ea7ddfef"],
+      "classification": "projection_validator_proof_and_stale_evidence_reconciled",
+      "claim": "PR #130 P5 final head and merge/main are recorded; overlay/projection evidence is kept separate from executable runtime proof.",
+      "evidence": ["P5 Jira acceptance record", "releases/changelog.d/2026-07-28-scrum-121-replayable-e2e-pilot.md"]
+    }
+  ],
+  "known_stale_or_deferred": [
+    {"id": "P5-G3-STALE", "classification": "stale_g3_evidence", "detail": "Committed P5 head 06547706a238b02bb2f9e2131f541748a4cf56de and draft_pr_open state do not match final merged P5 state."},
+    {"id": "P3-REMAINDER-102", "classification": "deferred", "detail": "Declared scenario capacity is not executable coverage without stable source-backed contracts."},
+    {"id": "HOST-MANUAL-CONFIRMATION", "classification": "manual_verification", "detail": "Current chat user manually verified UA and Task-Me behavior; automated live-provider testing is not required for this task."},
+    {"id": "CI-EXACT-HEAD", "classification": "verified", "detail": "Validate instructions and Build instruction packages passed for reviewed head 5cec066ec2653356b7743c81771394a7a2a7a665; final evidence-only PR head requires its own readback."}
+  ],
+  "gate_state": {
+    "G0_CONTEXT": "PASS_READY",
+    "G1_ALIGNMENT": "PASS",
+    "G2_EXECUTION": "PASS_APPROVED",
+    "G3_PR": "PASS_DRAFT_OPEN",
+    "G4_MERGE": "EXCLUDED",
+    "G5_DEPLOY": "EXCLUDED",
+    "G6_PRODUCTION_DATA": "EXCLUDED"
+  },
+  "exact_head_ci": {
+    "status": "PASS",
+    "expected_head": "5cec066ec2653356b7743c81771394a7a2a7a665",
+    "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
+    "remote_verification": "VERIFIED_BY_GITHUB_CONNECTOR"
+  },
+  "residual_risks": [
+    "The 102 undeclared-by-ID scenario remainder requires source-backed contracts before executable coverage claims.",
+    "The evidence-only G3 record commit changes the PR head; final-head CI is read back separately before ready-for-review metadata completion."
+  ]
+}

@@ -1,0 +1,16 @@
+task_id: SCRUM-148
+title: Complete scenario coverage and bounded router performance
+objective: Close the canonical scenario space with deterministic typed routing, adversarial graph cases, and enforceable size/path/timeout/memory budgets.
+wave: 1
+requires: []
+parallel_with: [SCRUM-147]
+risk: R2
+likely_hours: 12
+protected_base_sha: b0341da8414aacad93719a6919babcd183e03f02
+verified_paths:
+  - core/node-architect/scenario-registry.json
+  - tools/p3_backward_graph.py
+  - tools/node_architect/validate_runtime_registry.py
+  - tests/test_p3_scenario_registry.py
+  - tests/test_p3_backward_graph.py
+excluded: [visualization_authority, production_data, merge]

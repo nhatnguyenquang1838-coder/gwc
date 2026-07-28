@@ -10,11 +10,56 @@ from dataclasses import dataclass
 from enum import Enum
 from hashlib import sha256
 import json
+from time import perf_counter_ns
 from typing import Any, Iterable, Mapping, MutableSequence, Sequence
 
 
 class CompileError(ValueError):
     """Raised when a graph cannot produce a governed deterministic plan."""
+
+
+class BudgetExceeded(CompileError):
+    """Raised when bounded routing cannot safely finish within its contract."""
+
+    def __init__(self, budget: str, observed: int | float, limit: int | float):
+        self.budget = budget
+        self.observed = observed
+        self.limit = limit
+        super().__init__(f"BUDGET_EXCEEDED:{budget} observed={observed} limit={limit}")
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "code": "BUDGET_EXCEEDED",
+            "budget": self.budget,
+            "observed": self.observed,
+            "limit": self.limit,
+            "fail_closed": True,
+        }
+
+
+@dataclass(frozen=True)
+class RouteBudget:
+    """Explicit fail-closed limits for graph and route evaluation."""
+
+    max_nodes: int = 256
+    max_routes: int = 1024
+    timeout_ms: int = 250
+    max_memory_bytes: int = 4 * 1024 * 1024
+    max_depth: int = 32
+
+    def validate(self) -> None:
+        for name in ("max_nodes", "max_routes", "timeout_ms", "max_memory_bytes", "max_depth"):
+            if getattr(self, name) <= 0:
+                raise ValueError(f"{name} must be positive")
+
+    def as_dict(self) -> dict[str, int]:
+        return {
+            "max_nodes": self.max_nodes,
+            "max_routes": self.max_routes,
+            "timeout_ms": self.timeout_ms,
+            "max_memory_bytes": self.max_memory_bytes,
+            "max_depth": self.max_depth,
+        }
 
 
 class RouteClass(str, Enum):
@@ -180,12 +225,28 @@ def enumerate_routes(
     context: Mapping[str, Any],
     *,
     max_depth: int = 32,
+    budget: RouteBudget | None = None,
 ) -> list[dict[str, Any]]:
     """Enumerate and rank all simple routes from start to green."""
     indexed = _index(nodes)
     if start not in indexed or green not in indexed:
         raise CompileError("MISSING_TERMINAL: route endpoint absent")
+    if budget is not None:
+        budget.validate()
+        if len(indexed) > budget.max_nodes:
+            raise BudgetExceeded("max_nodes", len(indexed), budget.max_nodes)
     routes: list[dict[str, Any]] = []
+    started_at_ns = perf_counter_ns()
+
+    def check_budget(path: Sequence[str]) -> None:
+        if budget is None:
+            return
+        elapsed_ms = (perf_counter_ns() - started_at_ns) / 1_000_000
+        if elapsed_ms > budget.timeout_ms:
+            raise BudgetExceeded("timeout_ms", round(elapsed_ms, 3), budget.timeout_ms)
+        estimated_memory = (len(routes) * max(1, max_depth) * 64) + (len(path) * 64)
+        if estimated_memory > budget.max_memory_bytes:
+            raise BudgetExceeded("max_memory_bytes", estimated_memory, budget.max_memory_bytes)
 
     def walk(
         node_id: str,
@@ -195,7 +256,11 @@ def enumerate_routes(
         blocked: bool,
         unsafe: bool,
     ) -> None:
-        if len(path) > max_depth:
+        check_budget(path)
+        depth_limit = min(max_depth, budget.max_depth) if budget is not None else max_depth
+        if len(path) > depth_limit:
+            if budget is not None:
+                raise BudgetExceeded("max_depth", len(path), depth_limit)
             return
         node = indexed[node_id]
         guard_results = [evaluate_guard(item, context) for item in node.get("guards", [])]
@@ -218,6 +283,8 @@ def enumerate_routes(
                 route_class = RouteClass.VALID_HUMAN
             else:
                 route_class = RouteClass.VALID_AUTO
+            if budget is not None and len(routes) >= budget.max_routes:
+                raise BudgetExceeded("max_routes", len(routes) + 1, budget.max_routes)
             routes.append({"path": path, "class": route_class.value, "length": len(path)})
             return
         for successor in sorted(str(item) for item in node.get("successors", [])):
@@ -248,9 +315,14 @@ def enumerate_routes(
 
 
 def route_decision(
-    nodes: Sequence[Mapping[str, Any]], start: str, green: str, context: Mapping[str, Any]
+    nodes: Sequence[Mapping[str, Any]],
+    start: str,
+    green: str,
+    context: Mapping[str, Any],
+    *,
+    budget: RouteBudget | None = None,
 ) -> dict[str, Any]:
-    routes = enumerate_routes(nodes, start, green, context)
+    routes = enumerate_routes(nodes, start, green, context, budget=budget)
     selected = routes[0] if routes else None
     return {
         "graph_revision": _graph_revision(nodes),
@@ -321,6 +393,7 @@ def decide_scenario(
     *,
     node_metadata: Iterable[Mapping[str, Any]] = (),
     history: MutableSequence[Mapping[str, Any]] | None = None,
+    budget: RouteBudget | None = None,
 ) -> dict[str, Any]:
     """Evaluate one canonical scenario and emit an immutable decision record."""
     missing = [field for field in scenario.get("activation_facts", []) if field not in facts]
@@ -339,16 +412,21 @@ def decide_scenario(
     policy = scenario["route_policy"]
     nodes = scenario_nodes(scenario, node_metadata)
     candidate_routes: list[dict[str, Any]] = []
-    for green in sorted(str(item) for item in policy.get("green_targets", [])):
-        candidate_routes.extend(
-            enumerate_routes(
-                nodes,
-                str(policy["start_node"]),
-                green,
-                facts,
-                max_depth=int(policy.get("max_depth", 32)),
+    budget_evidence: dict[str, Any] | None = None
+    try:
+        for green in sorted(str(item) for item in policy.get("green_targets", [])):
+            candidate_routes.extend(
+                enumerate_routes(
+                    nodes,
+                    str(policy["start_node"]),
+                    green,
+                    facts,
+                    max_depth=int(policy.get("max_depth", 32)),
+                    budget=budget,
+                )
             )
-        )
+    except BudgetExceeded as exc:
+        budget_evidence = exc.as_dict()
 
     priority = {
         RouteClass.VALID_AUTO.value: 0,
@@ -378,7 +456,9 @@ def decide_scenario(
     ]
 
     selected_route: dict[str, Any] | None = None
-    if conditional:
+    if budget_evidence is not None:
+        classification = RouteClass.BLOCKED.value
+    elif conditional:
         classification = RouteClass.CONDITIONAL.value
     elif blocked:
         classification = RouteClass.BLOCKED.value
@@ -402,6 +482,11 @@ def decide_scenario(
         "classification": classification,
         "auto_execute": classification == RouteClass.VALID_AUTO.value,
     }
+    if budget is not None:
+        budget.validate()
+        record["budget"] = budget.as_dict()
+    if budget_evidence is not None:
+        record["budget_evidence"] = budget_evidence
     record["decision_id"] = _digest(record)
     record["decision_digest"] = record["decision_id"]
     if history is not None:

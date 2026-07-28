@@ -1,0 +1,16 @@
+{
+  "status": "PLANNED",
+  "planner": "task-me implementation-task-architect",
+  "runner": "generated_fallback_documented_no_invokable_runner",
+  "checks": [
+    "Task folder contract satisfied after materialization",
+    "Dependency DAG is acyclic",
+    "All coding-guide paths are verified repository paths or explicitly marked discovery",
+    "Protected base is bound to local origin/main observation"
+  ],
+  "not_run": [
+    "python tools/validate_g01.py",
+    "product/runtime E2E",
+    "GitHub exact-SHA CI lookup"
+  ]
+}
