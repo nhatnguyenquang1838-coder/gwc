@@ -2,11 +2,31 @@
   "schema_version": "1.0",
   "generated_at": "2026-07-25T01:40:52+07:00",
   "source": {
-    "run_id": "gwc-scrum-95-20260725-r2",
+    "run_id": "gwc-scrum-146-149-fastlane-20260728",
     "repository": "nhatnguyenquang1838-coder/gwc",
-    "base_sha": "d33ab8a52d341fa7f9ae65a1a88cb193ba61aded"
+    "base_sha": "b0341da8414aacad93719a6919babcd183e03f02"
   },
   "nodes": [
+    {
+      "id": "SCRUM-147",
+      "type": "task",
+      "label": "Prove integrated durable runtime acceptance"
+    },
+    {
+      "id": "SCRUM-148",
+      "type": "task",
+      "label": "Complete scenario coverage and bounded router performance"
+    },
+    {
+      "id": "SCRUM-149",
+      "type": "task",
+      "label": "Prove real host-mode E2E and offline package consumption"
+    },
+    {
+      "id": "SCRUM-146",
+      "type": "task",
+      "label": "Build exact-SHA P1-P5 evidence and closure manifest"
+    },
     {
       "id": "REQ-P1-01",
       "type": "requirement",
@@ -59,6 +79,21 @@
     }
   ],
   "edges": [
+    {
+      "source": "SCRUM-147",
+      "target": "SCRUM-149",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "SCRUM-148",
+      "target": "SCRUM-149",
+      "type": "SATISFIED_BY"
+    },
+    {
+      "source": "SCRUM-149",
+      "target": "SCRUM-146",
+      "type": "SATISFIED_BY"
+    },
     {
       "source": "REQ-P1-01",
       "target": "SCRUM-100",
