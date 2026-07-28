@@ -5,8 +5,8 @@
   "repository": "nhatnguyenquang1838-coder/gwc",
   "protected_base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
   "working_branch": "codex/fastlane-scrum-146-149-20260728",
-  "working_tree_head": "UNCOMMITTED",
-  "status": "PARTIAL_RECONCILIATION",
+  "working_tree_head": "e899dca2b66df212c1f3a15c87db11807cf38282",
+  "status": "DRAFT_PR_OPEN_PENDING_REVIEW",
   "phases": [
     {
       "phase": "P1",
@@ -55,26 +55,26 @@
     {"id": "P5-G3-STALE", "classification": "stale_g3_evidence", "detail": "Committed P5 head 06547706a238b02bb2f9e2131f541748a4cf56de and draft_pr_open state do not match final merged P5 state."},
     {"id": "P3-REMAINDER-102", "classification": "deferred", "detail": "Declared scenario capacity is not executable coverage without stable source-backed contracts."},
     {"id": "HOST-LIVE-CALLS", "classification": "unverified", "detail": "No authenticated live UA/Task-Me provider result is available in the current local/offline environment."},
-    {"id": "CI-EXACT-HEAD", "classification": "unverified", "detail": "GitHub exact-head lookup is unavailable because DNS resolution failed; record CI_UNAVAILABLE_AT_CHECK."}
+    {"id": "CI-EXACT-HEAD", "classification": "verified", "detail": "Validate instructions and Build instruction packages passed for implementation head e899dca2b66df212c1f3a15c87db11807cf38282; final evidence-only PR head requires its own readback."}
   ],
   "gate_state": {
     "G0_CONTEXT": "PASS_READY",
     "G1_ALIGNMENT": "PASS",
     "G2_EXECUTION": "PASS_APPROVED",
-    "G3_PR": "NOT_ENTERED",
+    "G3_PR": "DRAFT_PR_OPEN_PENDING_REVIEW",
     "G4_MERGE": "EXCLUDED",
     "G5_DEPLOY": "EXCLUDED",
     "G6_PRODUCTION_DATA": "EXCLUDED"
   },
   "exact_head_ci": {
-    "status": "CI_UNAVAILABLE_AT_CHECK",
-    "expected_head": "UNCOMMITTED",
+    "status": "PASS",
+    "expected_head": "e899dca2b66df212c1f3a15c87db11807cf38282",
     "base_sha": "b0341da8414aacad93719a6919babcd183e03f02",
-    "remote_verification": "SKIPPED_OFFLINE"
+    "remote_verification": "VERIFIED_BY_GITHUB_CONNECTOR",
   },
   "residual_risks": [
     "Live provider/host execution must be performed before closure can become PASS.",
     "The 102 undeclared-by-ID scenario remainder requires source-backed contracts before executable coverage claims.",
-    "A commit, push, Draft PR and exact-head CI readback are still required for G3 evidence."
+    "The evidence-only G3 record commit changes the PR head; final-head CI is read back separately before any G3 closure decision."
   ]
 }

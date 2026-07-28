@@ -4,7 +4,7 @@ Protected base: `b0341da8414aacad93719a6919babcd183e03f02`
 
 Working branch: `codex/fastlane-scrum-146-149-20260728`
 
-Current state: `PARTIAL_RECONCILIATION`. G0, G1 and G2 are recorded as passed. The implementation is not yet bound to a committed PR head, so G3 is not entered.
+Current state: `DRAFT_PR_OPEN_PENDING_REVIEW`. G0, G1 and G2 are recorded as passed. The implementation is bound to implementation head `e899dca2b66df212c1f3a15c87db11807cf38282`; PR #132 is open as Draft and G3 review remains pending.
 
 ## Evidence classification
 
@@ -18,6 +18,6 @@ Current state: `PARTIAL_RECONCILIATION`. G0, G1 and G2 are recorded as passed. T
 
 ## Exact refs and residual risk
 
-The machine-readable record is [closure-manifest.json](./closure-manifest.json). It records exact historical refs, stale G3 evidence, current base, CI unavailability, deferred scenario space, and the remaining G3 requirements.
+The machine-readable record is [closure-manifest.json](./closure-manifest.json). It records exact historical refs, the Draft PR state, implementation-head CI success, deferred scenario space, and the remaining G3 requirements.
 
-The current worktree head is intentionally `UNCOMMITTED`; no exact-head CI or Draft PR claim is made. G4 merge, G5 deploy and G6 production actions remain excluded.
+Implementation-head CI passed for Validate instructions and Build instruction packages. The evidence-only G3 record commit changes the final PR head, so final-head CI is read back separately. G4 merge, G5 deploy and G6 production actions remain excluded.
