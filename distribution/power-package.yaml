@@ -12,6 +12,7 @@ spec:
     entrypoints:
       - skills/gwc-g0/SKILL.md
       - skills/gwc-g1/SKILL.md
+      - tools/power_help.py
     managedPaths:
       - AGENTS.md
       - core
@@ -62,6 +63,7 @@ spec:
     - tools/generate_g01_runtime.py
     - tools/capture_g01_decision.py
     - tools/validate_g01.py
+    - tools/power_help.py
     - distribution/config/**
     - distribution/contracts/**
     - requirements.txt
