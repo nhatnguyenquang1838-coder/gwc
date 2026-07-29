@@ -10,19 +10,19 @@
     {
       "mode": "0600",
       "path": "POWER.yaml",
-      "sha256": "77af04efa541ca8ec51ef7db5bb3e0b62860a1d28edeff2cc2b0bd421032c876",
-      "size": 632
+      "sha256": "84deb554b05f09d4a704a7e067ac69fb08220f8105cfd51c5d711838b0eb0cab",
+      "size": 656
     },
     {
       "mode": "0600",
       "path": "SOURCE.json",
-      "sha256": "67a782bde66bae03fdff04e806421dfcb6e957e52b534ed65d5a59434cba16ce",
+      "sha256": "69bb717d748dcbba10c38d15e2e6382442a5ef0f9fb750a77e4bdd5131f4a627",
       "size": 187
     },
     {
       "mode": "0600",
       "path": "VERSION",
-      "sha256": "411d39f91d6f55d0c2a6ec73e112526b5db83800cf802a41e1ae0962c0c59242",
+      "sha256": "4d12ab9dec1b16ffd0a32ac7fe19876cc39e486e2106a5a2988df758d38339f5",
       "size": 53
     },
     {
@@ -356,6 +356,12 @@
       "size": 29539
     },
     {
+      "mode": "0644",
+      "path": "tools/power_help.py",
+      "sha256": "97f91cb2e385b35270be6bf238b02e2d62486dc13603a3e07460e730c5ba0b25",
+      "size": 2578
+    },
+    {
       "mode": "0755",
       "path": "tools/validate_g01.py",
       "sha256": "31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb",
@@ -367,13 +373,14 @@
     "powerId": "gwc",
     "sourceRef": "main",
     "sourceRepository": "nhatnguyenquang1838-coder/gwc",
-    "sourceSha": "9627e0bd43c531396bc3a00275a5f04a61571208",
-    "version": "gwc-main-26-9627e0bd43c531396bc3a00275a5f04a61571208"
+    "sourceSha": "1db5cdde7666e95e0a5d864633a3255a2a6ad40e",
+    "version": "gwc-main-27-1db5cdde7666e95e0a5d864633a3255a2a6ad40e"
   },
   "spec": {
     "entrypoints": [
       "skills/gwc-g0/SKILL.md",
-      "skills/gwc-g1/SKILL.md"
+      "skills/gwc-g1/SKILL.md",
+      "tools/power_help.py"
     ],
     "generatedFiles": [
       "POWER.yaml",

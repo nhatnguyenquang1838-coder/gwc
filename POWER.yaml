@@ -3,12 +3,13 @@ kind: PowerPackage
 metadata:
   id: gwc
   name: GWC
-  version: gwc-main-26-9627e0bd43c531396bc3a00275a5f04a61571208
+  version: gwc-main-27-1db5cdde7666e95e0a5d864633a3255a2a6ad40e
   description: Curated G0/G1 governance skills and their verified offline dependencies.
 spec:
   entrypoints:
   - skills/gwc-g0/SKILL.md
   - skills/gwc-g1/SKILL.md
+  - tools/power_help.py
   managedPaths:
   - AGENTS.md
   - core
