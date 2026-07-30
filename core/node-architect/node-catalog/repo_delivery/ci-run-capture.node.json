@@ -1,31 +1,12 @@
 {
-  "artifact_type": "runtime-node-catalog-entry",
-  "authority_boundary": "g2_required",
+  "node_id": "repo_delivery.ci-run-capture",
+  "node_type": "tool",
+  "title": "Ci Run Capture",
   "canonical": "delivery_evidence",
-  "catalog_id": "repo-delivery-ci-run-capture",
-  "description": "Capture exact-head CI workflow status with fail-closed unavailable and SHA-mismatch outcomes.",
-  "family": "repo_delivery",
+  "authority_boundary": "g2_required",
   "gates": [
     "G2_EXECUTION",
     "G3_PR"
   ],
-  "implementation": "tools/node_architect/ci_run_capture.py",
-  "node_id": "repo_delivery.ci-run-capture",
-  "node_type": "tool",
-  "replay_safe_claims": [
-    "missing provider data is UNAVAILABLE, never PASS",
-    "head drift is SHA_MISMATCH with rejected candidates",
-    "pending CI requires checkpoint continuation",
-    "same provider payload produces stable replay digest"
-  ],
-  "schema_version": "1.0",
-  "schemas": [
-    "schemas/ci-observation.schema.json"
-  ],
-  "target_maturity": "M5_REPLAY_SAFE",
-  "task_id": "SCRUM-198",
-  "tests": [
-    "tests/test_ci_run_capture_replay.py"
-  ],
-  "title": "CI Run Capture"
+  "description": "Capture exact-head CI workflow status for G3 evidence."
 }
