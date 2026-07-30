@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/ci-observation.schema.json",
+  "title": "GWC CI Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "task_id", "repository", "branch", "base_sha", "head_sha", "scope_hash", "observed_at", "classification", "selected_runs", "rejected_candidates", "checkpoint_required", "provider_payload_digest", "observation_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "ci-observation"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "classification": {"enum": ["PENDING", "PASSED", "FAILED", "CANCELLED", "UNAVAILABLE", "SHA_MISMATCH"]},
+    "selected_runs": {"type": "array", "items": {"type": "object"}},
+    "rejected_candidates": {"type": "array", "items": {"type": "object"}},
+    "checkpoint_required": {"type": "boolean"},
+    "provider_payload_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "observation_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
