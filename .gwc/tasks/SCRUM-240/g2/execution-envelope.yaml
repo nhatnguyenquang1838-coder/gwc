@@ -1,0 +1,31 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+gate: G2_EXECUTION
+task_id: SCRUM-240
+node_id: failure_recovery.stale-session-reconciliation
+target_maturity: M5_REPLAY_SAFE
+approval_id: CP-20260731-240-G2-R1
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 1a27705f221d8095ce30f192b5313f108ea1e830
+working_branch: codex/scrum-240-242-failure-recovery-m5-20260731
+scope_hash_16: 90956a9b6d2961b4
+approved_modules:
+  - .gwc/tasks/SCRUM-240/**
+  - tools/node_architect/stale_session_reconciliation.py
+  - schemas/stale-session-reconciliation-decision.schema.json
+  - tests/test_stale_session_reconciliation.py
+  - releases/changelog.d/2026-07-31-scrum-240-stale-session-reconciliation-m5.md
+authorized_actions:
+  - write_only_approved_modules
+  - run_scoped_validators_and_tests
+  - commit_and_push_guarded_branch
+prohibited_actions:
+  - write_to_main
+  - merge_or_auto_merge
+  - deploy_release_publish_or_runtime_reload
+  - production_configuration_data_secret_credential_or_migration
+  - force_push_branch_delete_history_rewrite_or_pr_base_change
+  - scope_expansion_or_unrelated_cleanup
+approval_command: APPROVE CP-20260731-240-G2-R1 90956a9b6d2961b4
+status: G2_APPROVED_IMPLEMENTED_ON_BATCH_BRANCH
