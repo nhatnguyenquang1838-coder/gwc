@@ -7,5 +7,36 @@
   "authority_boundary": "g2_required",
   "gates": [
     "G2_EXECUTION"
-  ]
+  ],
+  "maturity": {
+    "current": "M2_PROVISIONAL",
+    "target": "M5_REPLAY_SAFE"
+  },
+  "implementation": {
+    "module": "tools.node_architect.crash_checkpoint_recovery",
+    "entrypoint": "decide_crash_checkpoint_recovery",
+    "schema": "schemas/crash-checkpoint-recovery-decision.schema.json",
+    "tests": [
+      "tests/test_crash_checkpoint_recovery.py"
+    ]
+  },
+  "recovery_contract": {
+    "checkpoint_source": "canonical_checkpoint",
+    "readback_required_before_effect": true,
+    "blind_redispatch_allowed": false,
+    "duplicate_effect_policy": "deny unless verified checkpoint/readback evidence proves resume-safe zero effect or already-completed action",
+    "reason_codes": [
+      "CHECKPOINT_NOT_CANONICAL",
+      "INVALID_CHECKPOINT_REVISION",
+      "READBACK_NOT_VERIFIED",
+      "NO_PENDING_ACTION",
+      "PENDING_ACTION_ALREADY_COMPLETED",
+      "PENDING_ACTION_ZERO_EFFECT",
+      "UNKNOWN_EXTERNAL_EFFECT_AFTER_CRASH",
+      "PENDING_ACTION_MAY_HAVE_COMMITTED",
+      "PENDING_ACTION_CONFIRMED_FAILED",
+      "STALE_PENDING_ACTION",
+      "UNSUPPORTED_CRASH_RECOVERY_STATE"
+    ]
+  }
 }
