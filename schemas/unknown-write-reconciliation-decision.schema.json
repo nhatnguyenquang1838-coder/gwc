@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/unknown-write-reconciliation-decision.schema.json",
+  "title": "GWC Unknown Write Reconciliation Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "task_id", "repository", "branch", "base_sha", "head_sha", "scope_hash", "operation_id", "provider_readback_status", "external_effect_status", "idempotency_key", "retry_count", "max_retries", "pending_action_recorded", "observed_at", "outcome", "reason_code", "blind_retry_allowed", "pass_allowed", "checkpoint_required", "decision_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "unknown-write-reconciliation-decision"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "operation_id": {"type": "string", "minLength": 1},
+    "provider_readback_status": {"enum": ["VERIFIED", "UNAVAILABLE", "STALE"]},
+    "external_effect_status": {"enum": ["ZERO_EFFECT", "COMMITTED", "UNKNOWN", "FAILED"]},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "retry_count": {"type": "integer", "minimum": 0},
+    "max_retries": {"type": "integer", "minimum": 0},
+    "pending_action_recorded": {"type": "boolean"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "outcome": {"enum": ["BOUNDED_RETRY", "RECONCILE", "HUMAN_REQUIRED", "FAIL"]},
+    "reason_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+    "blind_retry_allowed": {"const": false},
+    "pass_allowed": {"type": "boolean"},
+    "checkpoint_required": {"type": "boolean"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
