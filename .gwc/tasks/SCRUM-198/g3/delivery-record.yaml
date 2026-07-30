@@ -1,25 +1,114 @@
 schema_version: '1.0'
 artifact_type: g3-delivery-record
+gate: G3_PR
 task_id: SCRUM-198
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
 base_sha: 3b0938065e71e699d327d041f5b6023ed30a29dc
 working_branch: codex/scrum-198-ci-run-capture-m5-fastlane-r3-20260730
-approval_id: CP-20260730-198-G2-R3
+pull_request:
+  number: 137
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/137
+  draft: true
+head_sha: 003b89fda7ed309f8942f0a16ef71c1e7c38e914
 scope_hash: sha256:234b96f0de6a07fb7ab8c2d444ea6feeb4274230a6be3e0d530331648fd2d0f6
-implementation_status: IMPLEMENTED
-dependency_tasks:
-  - SCRUM-203
+changed_paths:
+  - .gwc/tasks/SCRUM-198/FASTLANE-G2-R3-HANDOFF.md
+  - .gwc/tasks/SCRUM-198/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-198/g3/delivery-record.yaml
+  - releases/changelog.d/2026-07-30-scrum-198-ci-run-capture-m5.md
+  - schemas/ci-observation.schema.json
+  - tests/test_ci_run_capture_replay.py
+  - tests/test_power_distribution.py
+  - tools/node_architect/ci_run_capture.py
 validation:
-  local_syntax: PASS
-  scoped_unittest: PASS
-  command: python -m unittest tests/test_ci_run_capture_replay.py
-  limitation: connector-only runtime; repository CI pending after Draft PR creation
+  head_sha: 003b89fda7ed309f8942f0a16ef71c1e7c38e914
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_ci_run_capture_replay tests.test_power_distribution tests.test_g3_delivery tests.test_g3_skill_contract
+      result: pass
+      evidence: Focused CI capture, package distribution, and G3 contract tests passed locally.
+    - command: python3 tools/validate_g3_delivery.py --record .gwc/tasks/SCRUM-198/g3/delivery-record.yaml --json
+      result: pass
+      evidence: The G3 delivery record matches the active schema and semantic rules for the exact head SHA.
+review:
+  implementer_id: codex-local-agent
+  reviewer_id: codex-scrum-198-fresh-context-reviewer
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 003b89fda7ed309f8942f0a16ef71c1e7c38e914
+  reviewed_scope_hash: sha256:234b96f0de6a07fb7ab8c2d444ea6feeb4274230a6be3e0d530331648fd2d0f6
+  reviewed_at: '2026-07-30T16:21:11Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - SCRUM-198 scope remains bounded to exact-head CI observation capture and replay safety.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Capture logic remains pure, fail-closed, and deterministic for replay equivalence.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Diff is limited to the capture helper, schema, tests, changelog, and task artifacts.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Focused unittest coverage passes for success, pending, unavailable, and head-drift cases.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G0 through G3 artifacts are present and later-gate exclusions remain explicit.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR #137 remains bound to the exact base and head SHA.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions and build instruction packages completed successfully on the exact head SHA.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Exact-head completed success is classified as PASSED and is replay-equivalent across observation times.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Missing provider data is UNAVAILABLE, in-progress runs require checkpointing, and head drift is SHA_MISMATCH.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Entry point alignment is covered by the updated package distribution test and the scoped replay tests.
+  decision: pass
+  stale: false
 ci:
-  status: PENDING_PR_CI
-pr:
-  draft_pr_requested: true
-excluded_authorities:
+  required: true
+  head_sha: 003b89fda7ed309f8942f0a16ef71c1e7c38e914
+  checks:
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30555905604 completed successfully for exact head 003b89fda7ed309f8942f0a16ef71c1e7c38e914.
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: GitHub Actions run 30555905565 completed successfully for exact head 003b89fda7ed309f8942f0a16ef71c1e7c38e914.
+residual_risks:
+  - PR remains Draft, so the review boundary is still separate from merge authority.
+  - Live provider calls are not claimed by the replay-safe helper or local unit tests.
+  - G4, G5, and G6 remain out of scope for this delivery record.
+exclusions:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION_DATA
+outcome: pass
