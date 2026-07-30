@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime-event.schema.json",
+  "title": "GWC Runtime Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "event_type", "task_id", "run_id", "node_id", "repository", "branch", "head_sha", "scope_hash", "revision", "state_digest", "occurred_at", "event_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "runtime-event"},
+    "event_type": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "event_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

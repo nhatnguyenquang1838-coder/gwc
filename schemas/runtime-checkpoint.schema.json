@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime-checkpoint.schema.json",
+  "title": "GWC Runtime Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "task_id", "run_id", "node_id", "repository", "branch", "base_sha", "head_sha", "scope_hash", "revision", "previous_revision", "state", "state_digest", "committed_at"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "runtime-checkpoint"},
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "graph_revision": {"type": ["string", "null"]},
+    "lease_id": {"type": ["string", "null"]},
+    "fencing_token": {"type": ["string", "null"]},
+    "revision": {"type": "integer", "minimum": 1},
+    "previous_revision": {"type": "integer", "minimum": 0},
+    "state": {"type": "object"},
+    "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "committed_at": {"type": "string", "format": "date-time"}
+  }
+}
