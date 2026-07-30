@@ -1,31 +1,11 @@
 {
-  "artifact_type": "runtime-node-catalog-entry",
-  "authority_boundary": "g2_required",
-  "canonical": "canonical",
-  "catalog_id": "runtime-checkpoint-checkpoint-persist",
-  "description": "Persist checkpoint artifacts with CAS, event binding and replay-safe readback.",
-  "family": "runtime_checkpoint",
-  "gates": [
-    "G2_EXECUTION",
-    "G3_PR"
-  ],
-  "implementation": "tools/node_architect/checkpoint_store.py",
   "node_id": "runtime_checkpoint.checkpoint-persist",
   "node_type": "tool",
-  "replay_safe_claims": [
-    "CAS_MISMATCH prevents overwrite",
-    "crash-after-commit readback does not append duplicate event",
-    "checkpoint and event share deterministic state digest"
-  ],
-  "schema_version": "1.0",
-  "schemas": [
-    "schemas/runtime-checkpoint.schema.json",
-    "schemas/runtime-event.schema.json"
-  ],
-  "target_maturity": "M5_REPLAY_SAFE",
-  "task_id": "SCRUM-203",
-  "tests": [
-    "tests/test_checkpoint_persist_replay.py"
-  ],
-  "title": "Checkpoint Persist"
+  "title": "Checkpoint Persist",
+  "description": "Persist checkpoint artifacts to the approved workspace without production data access.",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G2_EXECUTION"
+  ]
 }
