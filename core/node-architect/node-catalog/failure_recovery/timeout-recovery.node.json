@@ -1,11 +1,31 @@
 {
+  "artifact_type": "runtime-node-catalog-entry",
+  "authority_boundary": "g2_required",
+  "canonical": "canonical",
+  "catalog_id": "failure-recovery-timeout-recovery",
+  "description": "Classify bounded timeout recovery from readback evidence without blind redispatch.",
+  "family": "failure_recovery",
+  "gates": [
+    "G2_EXECUTION",
+    "G3_PR"
+  ],
+  "implementation": "tools/node_architect/timeout_recovery.py",
   "node_id": "failure_recovery.timeout-recovery",
   "node_type": "workflow",
-  "title": "Timeout Recovery",
-  "description": "Classify a bounded timeout, preserve current checkpoint evidence, and stop or resume without assuming the side effect failed.",
-  "canonical": "canonical",
-  "authority_boundary": "g2_required",
-  "gates": [
-    "G2_EXECUTION"
-  ]
+  "replay_safe_claims": [
+    "unknown external effect routes to RECONCILE",
+    "unverified readback routes to RECONCILE",
+    "bounded retry requires zero-effect proof and retry budget",
+    "blind redispatch is always false"
+  ],
+  "schema_version": "1.0",
+  "schemas": [
+    "schemas/timeout-recovery-decision.schema.json"
+  ],
+  "target_maturity": "M5_REPLAY_SAFE",
+  "task_id": "SCRUM-238",
+  "tests": [
+    "tests/test_timeout_recovery.py"
+  ],
+  "title": "Timeout Recovery"
 }
