@@ -1,0 +1,23 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+task_id: SCRUM-239
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: b9c6dddf3da4394cc0f3d52e030aeaecf4f5d380
+working_branch: codex/scrum-239-crash-checkpoint-recovery-m5-20260730
+approval_id: CP-20260730-239-G2-R1
+scope_hash: sha256:42793641d2d5dd38000000000000000000000000000000000000000000000000
+implementation_status: IMPLEMENTED
+validation:
+  local_syntax: PASS
+  scoped_unittest: PASS
+  command: python -m unittest tests/test_crash_checkpoint_recovery.py
+  limitation: connector-only materialization; repository CI pending after Draft PR creation
+ci:
+  status: PENDING_PR_CI
+pr:
+  draft_pr_requested: true
+excluded_authorities:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
