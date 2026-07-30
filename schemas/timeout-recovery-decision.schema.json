@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/timeout-recovery-decision.schema.json",
+  "title": "GWC Timeout Recovery Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "task_id", "repository", "branch", "base_sha", "head_sha", "scope_hash", "operation_id", "timed_out", "readback_status", "effect_status", "retry_count", "max_retries", "idempotency_key", "deadline_at", "observed_at", "outcome", "reason_code", "blind_redispatch_allowed", "checkpoint_required", "decision_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "timeout-recovery-decision"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "operation_id": {"type": "string", "minLength": 1},
+    "timed_out": {"type": "boolean"},
+    "readback_status": {"enum": ["VERIFIED", "UNAVAILABLE", "STALE"]},
+    "effect_status": {"enum": ["ZERO_EFFECT", "COMMITTED", "UNKNOWN", "FAILED"]},
+    "retry_count": {"type": "integer", "minimum": 0},
+    "max_retries": {"type": "integer", "minimum": 0},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "deadline_at": {"type": "string", "format": "date-time"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "outcome": {"enum": ["WAIT", "BOUNDED_RETRY", "RECONCILE", "FAIL", "HUMAN_REQUIRED"]},
+    "reason_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+    "blind_redispatch_allowed": {"const": false},
+    "checkpoint_required": {"type": "boolean"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
