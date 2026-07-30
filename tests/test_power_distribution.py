@@ -60,6 +60,7 @@ REQUIRED_SOURCE_PATHS = (
     "tools/generate_g01_runtime.py",
     "tools/capture_g01_decision.py",
     "tools/validate_g01.py",
+    "tools/power_help.py",
     "requirements.txt",
 )
 
@@ -95,7 +96,7 @@ class GWCPowerDistributionTests(unittest.TestCase):
     def test_entrypoints_and_runtime_root(self) -> None:
         self.assertEqual("gwc", self.recipe["metadata"]["id"])
         self.assertEqual(
-            ["skills/gwc-g0/SKILL.md", "skills/gwc-g1/SKILL.md"],
+            ["skills/gwc-g0/SKILL.md", "skills/gwc-g1/SKILL.md", "tools/power_help.py"],
             self.recipe["spec"]["package"]["entrypoints"],
         )
         self.assertEqual(".gwc", self.recipe["spec"]["runtime"]["dataRoot"])
