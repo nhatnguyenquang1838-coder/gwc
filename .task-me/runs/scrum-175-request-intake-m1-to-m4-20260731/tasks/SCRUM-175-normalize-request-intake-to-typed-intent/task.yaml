@@ -1,0 +1,24 @@
+task_id: SCRUM-175
+title: Normalize request intake into typed intent, outcomes, constraints and exclusions
+objective: Upgrade the existing intake_context.request-intake node into a deterministic G0 intake contract with machine-readable input/output, entry guards, stable reason codes, and regression coverage.
+wave: 1
+requires: []
+parallel_with: []
+risk: R2
+likely_hours: 12
+protected_base_sha: d4b62295a6d36badca23e9254997e040b0ee19cf
+verified_paths:
+  - core/node-architect/node-catalog/intake_context/request-intake.node.json
+  - core/node-architect/node-catalog/intake_context/README.md
+  - tools/node_architect/validate_node_catalog_intake_context.py
+  - tests/test_node_catalog_intake_context.py
+  - core/node-architect/runtime-graph-registry.json
+  - core/node-architect/node-registry.json
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+excluded:
+  - production_data
+  - deployment
+  - migration
+  - credentials
+  - merge

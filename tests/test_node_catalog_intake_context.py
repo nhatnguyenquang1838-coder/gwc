@@ -395,6 +395,150 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             errors = self.validator.validate_family(family_dir)
             self.assertEqual([], errors, f"G0 gate and read-only authority should persist: {errors}")
 
+    def test_source_resolution_accepts_typed_source_contract(self):
+        """Test that source-resolution with typed source-resolution fields validates successfully."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        # Add typed source-resolution fields to source-resolution node
+        nodes[1].update({
+            "intent": "Determine the authoritative source of active instructions.",
+            "outcome": "Typed source-resolution record with mode, authority, provenance, and reason codes.",
+            "constraints": [
+                "Source mode must be deterministically resolved as REPO, PACKAGE, or MIXED.",
+                "Fail closed when source authority cannot be distinguished."
+            ],
+            "exclusions": [
+                "Production runtime behavior",
+                "Deployment logic",
+                "Migration logic"
+            ],
+            "entry_guards": [
+                "G0_CONTEXT",
+                "read_only"
+            ],
+            "reason_codes": {
+                "ACCEPTED": "Source mode resolved deterministically with verified provenance.",
+                "AMBIGUOUS": "Repository and package authority cannot be distinguished.",
+                "MALFORMED": "Provenance evidence is incomplete or invalid.",
+                "MISSING_EVIDENCE": "Required source inputs cannot be audited.",
+                "INVALID_MODE": "Resolved source mode token is not REPO, PACKAGE, or MIXED."
+            }
+        })
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"Typed source-resolution contract should validate: {errors}")
+
+    def test_source_resolution_rejects_malformed_reason_codes(self):
+        """Test that malformed reason_codes in source-resolution are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[1]["reason_codes"] = {"key": {"nested": "object"}}  # Nested object should be rejected
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("reason_codes" in error for error in errors))
+
+    def test_source_resolution_rejects_malformed_constraints(self):
+        """Test that malformed constraints in source-resolution are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[1]["constraints"] = "not a list"  # Should be list
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("constraints must be a list" in error for error in errors))
+
+    def test_source_resolution_rejects_malformed_entry_guards(self):
+        """Test that malformed entry_guards in source-resolution are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[1]["entry_guards"] = "not a list"  # Should be list
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("entry_guards must be a list" in error for error in errors))
+
+    def test_source_resolution_rejects_malformed_exclusions(self):
+        """Test that malformed exclusions in source-resolution are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[1]["exclusions"] = "not a list"  # Should be list
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("exclusions must be a list" in error for error in errors))
+
+    def test_source_resolution_accepts_string_reason_code(self):
+        """Test that string reason_codes in source-resolution are accepted."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[1]["reason_codes"] = "ACCEPTED"
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"String reason_codes should validate: {errors}")
+
 
 if __name__ == "__main__":
     unittest.main()

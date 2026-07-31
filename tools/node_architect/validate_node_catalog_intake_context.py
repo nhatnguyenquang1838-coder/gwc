@@ -46,6 +46,22 @@ TYPED_FIELD_GROUPS = {
         "entry_guards",
         "reason_codes",
     },
+    "intake_context.source-resolution": {
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions",
+        "entry_guards",
+        "reason_codes",
+    },
+    "intake_context.repo-identity-check": {
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions",
+        "entry_guards",
+        "reason_codes",
+    },
     "intake_context.protected-base-capture": {
         "protected_base_sha",
         "evidence_source",
@@ -131,7 +147,11 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     if description is not None and not isinstance(description, str):
         errors.append(f"{path}: description must be a string when present")
 
-    if node_id == "intake_context.request-intake":
+    if node_id in {
+        "intake_context.request-intake",
+        "intake_context.source-resolution",
+        "intake_context.repo-identity-check",
+    }:
         intent = node.get("intent")
         if intent is not None and not isinstance(intent, str):
             errors.append(f"{path}: intent must be a string when present")

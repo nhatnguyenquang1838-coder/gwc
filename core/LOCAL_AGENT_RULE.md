@@ -31,7 +31,8 @@ Creating these proposal artifacts does not authorize repository writes.
 Before a valid exact scoped approval token, the local agent must not:
 
 - create a Git branch;
-- create a Git worktree;
+- create a Git worktree, except to move off a dirty `main` checkout into a
+  fresh isolated worktree before any repository mutation;
 - modify tracked repository files;
 - create Kiro specs inside the repository;
 - install dependencies;

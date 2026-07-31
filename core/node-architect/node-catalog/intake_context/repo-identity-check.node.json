@@ -7,5 +7,30 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Verifies repository identity, default branch, protected branch, and execution mode assumptions."
+  "description": "Verifies repository identity, default branch, protected branch, and execution mode assumptions.",
+  "intent": "Typed repository-identity validation request with evidence.",
+  "outcome": "Machine-readable RepoIdentityRecord with verified identity, branch, mode, and reason codes.",
+  "constraints": [
+    "Repository identity must be deterministic and verifiable.",
+    "Default branch, protected branch, and execution mode must match verified source.",
+    "Mismatched or incomplete evidence must cause fail-closed rejection."
+  ],
+  "exclusions": [
+    "Production runtime behavior.",
+    "Deployment, migration, or credential operations.",
+    "Broader gate authority beyond G0_CONTEXT."
+  ],
+  "entry_guards": [
+    "G0_CONTEXT",
+    "read_only authority_boundary"
+  ],
+  "reason_codes": {
+    "ACCEPTED": "Repository identity validated successfully.",
+    "REPO_MISMATCH": "Repository identity does not match verified source.",
+    "DEFAULT_BRANCH_MISMATCH": "Default branch does not match verified source.",
+    "PROTECTED_BRANCH_MISMATCH": "Protected branch does not match verified source.",
+    "EXECUTION_MODE_MISMATCH": "Execution mode does not match verified environment.",
+    "EVIDENCE_GAP": "Required evidence is missing or incomplete.",
+    "MALFORMED_INPUT": "Input structure is invalid or missing required fields."
+  }
 }

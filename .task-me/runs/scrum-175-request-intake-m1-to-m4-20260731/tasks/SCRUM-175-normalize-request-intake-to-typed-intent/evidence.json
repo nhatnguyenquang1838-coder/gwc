@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "task_id": "SCRUM-175",
+  "issue_summary": "[MAT-F1-N01] intake_context.request-intake -- M1 -> M4",
+  "evidence": [
+    {
+      "path": "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+      "finding": "Descriptor-only workflow node already exists with G0_CONTEXT and read_only boundary."
+    },
+    {
+      "path": "core/node-architect/node-catalog/intake_context/README.md",
+      "finding": "Family README already defines request-intake as the node that normalizes the user request into a bounded intake fact set."
+    },
+    {
+      "path": "tools/node_architect/validate_node_catalog_intake_context.py",
+      "finding": "Validator currently enforces the nine-node family, G0_CONTEXT only, and read-only/none authority."
+    },
+    {
+      "path": "tests/test_node_catalog_intake_context.py",
+      "finding": "Regression tests already pin family size, gate drift, and authority drift failures."
+    },
+    {
+      "path": "core/node-architect/runtime-graph-registry.json",
+      "finding": "The node is already registered in the runtime graph registry."
+    },
+    {
+      "path": "core/node-architect/node-registry.json",
+      "finding": "The node is already present in the authoritative runtime node registry."
+    }
+  ],
+  "decision": {
+    "selected_scope": "Extend the existing intake_context family rather than create a parallel family.",
+    "reason": "The repository already has a descriptor, validator, tests, and registry entries for the node family, so the lowest-risk path is to enrich that contract in place."
+  }
+}
