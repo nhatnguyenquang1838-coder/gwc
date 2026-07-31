@@ -1,0 +1,13 @@
+schema_version: "1.0"
+run_id: scrum-175-request-intake-m1-to-m4-20260731
+repository: nhatnguyenquang1838-coder/gwc
+protected_base_sha: d4b62295a6d36badca23e9254997e040b0ee19cf
+tasks:
+  - task_id: SCRUM-175
+    slug: normalize-request-intake-to-typed-intent
+    title: Normalize request intake into typed intent, outcomes, constraints and exclusions
+    wave: 1
+    requires: []
+    parallel_with: []
+    risk: R2
+    likely_hours: 12

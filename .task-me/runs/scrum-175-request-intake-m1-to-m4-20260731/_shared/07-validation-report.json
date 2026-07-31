@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "run_id": "scrum-175-request-intake-m1-to-m4-20260731",
+  "task_id": "SCRUM-175",
+  "status": "not_executed",
+  "reason": "planning-only task-me output; no repository mutation or CI run performed",
+  "planned_checks": [
+    "python tools/node_architect/validate_node_catalog_intake_context.py",
+    "python -m unittest tests/test_node_catalog_intake_context.py",
+    "python -m unittest tests/test_node_catalog_package_export.py",
+    "git diff --check"
+  ],
+  "notes": [
+    "The task plan is ready for implementation.",
+    "Exact-head CI evidence remains a required downstream proof point."
+  ]
+}

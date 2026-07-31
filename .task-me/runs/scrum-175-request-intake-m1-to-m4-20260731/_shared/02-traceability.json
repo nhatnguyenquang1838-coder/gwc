@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "run_id": "scrum-175-request-intake-m1-to-m4-20260731",
+  "task_id": "SCRUM-175",
+  "issue": {
+    "key": "SCRUM-175",
+    "summary": "[MAT-F1-N01] intake_context.request-intake -- M1 -> M4",
+    "status": "To Do",
+    "project": "SCRUM"
+  },
+  "requirements": [
+    {
+      "id": "S175-REQ-1",
+      "statement": "The node must expose machine-readable input/output, entry guards, and stable reason codes.",
+      "sources": [
+        "SCRUM-175 description",
+        "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+        "core/node-architect/node-catalog/intake_context/README.md"
+      ],
+      "confidence": 0.93
+    },
+    {
+      "id": "S175-REQ-2",
+      "statement": "Normalization must be deterministic and covered by malformed-input and ambiguity tests.",
+      "sources": [
+        "SCRUM-175 description",
+        "tests/test_node_catalog_intake_context.py",
+        "tools/node_architect/validate_node_catalog_intake_context.py"
+      ],
+      "confidence": 0.88
+    },
+    {
+      "id": "S175-REQ-3",
+      "statement": "The work must produce an evidence snapshot and generated runbook for the task plan.",
+      "sources": [
+        "SCRUM-175 description",
+        ".task-me output contract",
+        "task-me run output"
+      ],
+      "confidence": 0.82
+    },
+    {
+      "id": "S175-REQ-4",
+      "statement": "Validation must pass at the exact repository head and preserve deterministic CI evidence.",
+      "sources": [
+        "SCRUM-175 description",
+        "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+        "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "scope": {
+    "included": [
+      "intake_context.request-intake node descriptor",
+      "intake_context family README",
+      "family validator",
+      "family regression tests",
+      "task-me evidence and run outputs"
+    ],
+    "excluded": [
+      "production behavior",
+      "deployment",
+      "migration",
+      "credentials",
+      "merge",
+      "external task systems"
+    ]
+  }
+}
