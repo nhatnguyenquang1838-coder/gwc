@@ -58,7 +58,7 @@ The `intake_context.source-resolution` node extends the basic descriptor with ty
 | `intake_context.request-intake` | Normalize the user request into a typed intake contract with intent, outcome, constraints, exclusions, entry_guards, and reason_codes while preserving G0_CONTEXT gate and read_only authority. |
 | `intake_context.source-resolution` | Resolve REPO / PACKAGE / MIXED source instruction. |
 | `intake_context.repo-identity-check` | Verify repository identity, default branch, protected branch, and execution mode assumptions. |
-| `intake_context.protected-base-capture` | Capture exact protected-base SHA for later evidence. |
+| `intake_context.protected-base-capture` | Capture exact protected-base SHA and typed readback/drift evidence for later validation. |
 | `intake_context.risk-classification` | Classify risk flags before gate routing. |
 | `intake_context.files-read-scope` | Render required reads for the current task. |
 | `intake_context.files-write-scope` | Render bounded write paths and exclusions. |

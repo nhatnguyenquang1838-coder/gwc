@@ -7,5 +7,16 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Captures the exact protected base commit SHA used for later gate and PR evidence."
+  "description": "Captures the exact protected base commit SHA used for later gate and PR evidence.",
+  "protected_base_sha": "5aea52a73cfcee02576766db4adf290a94212157",
+  "evidence_source": "Verified source-of-truth readback.",
+  "readback_status": "VERIFIED",
+  "drift_state": "NONE",
+  "reason_codes": {
+    "VERIFIED": "Captured protected base matches the verified source of truth.",
+    "MISMATCH": "Captured SHA does not match the verified source of truth.",
+    "STALE": "Captured SHA is stale relative to the current task context.",
+    "DRIFTED": "Protected base evidence drifted from the verified source of truth."
+  },
+  "captured_at": "2026-07-31T00:00:00Z"
 }
