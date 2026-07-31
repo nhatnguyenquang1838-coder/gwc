@@ -189,6 +189,8 @@ Before repository mutation, the local agent must materialize task-scoped G0/G1
 artifacts, run `tools/validate_g01.py`, and retain the validator evidence. Only
 then may it enter G2, create the guarded branch/worktree, and perform scoped
 repository writes.
+If the current `main` checkout is dirty, stop using it and switch to a fresh
+isolated worktree before any repository mutation.
 
 ### `repo_ci`
 
