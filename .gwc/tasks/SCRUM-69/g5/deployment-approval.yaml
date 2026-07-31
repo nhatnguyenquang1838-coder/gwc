@@ -1,0 +1,23 @@
+approval_id: G5_SCRUM-69_20260801
+authority_gate: G5_DEPLOY
+task_id: SCRUM-69
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+merge_commit_sha: bbf41ee96493f3dfa166c5d9a3a6944b4163a590
+pr_number: 149
+ci_status: pass
+ci_run_id: 30650953146
+manual_action_authorized: false
+action_type: read_only_status_verification
+authorized_actions:
+  - verify_post_merge_ci
+  - verify_deployment_status
+excluded_actions:
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+issued_at: 2026-07-31T17:42:34Z
+expires_at: 2026-08-01T18:42:34Z
