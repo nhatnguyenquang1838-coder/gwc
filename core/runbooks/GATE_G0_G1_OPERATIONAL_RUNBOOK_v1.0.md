@@ -99,6 +99,7 @@ Use validator-specific root arguments when required by the checked-in tool.
 16. Resolve remediable validation issues and rerun. Do not stop after the first correctable failure.
 17. Preserve validator stdout, exit code, artifact hashes, workspace path, plan revision, and plan-validation evidence.
 18. Enter G2 only after G0 `READY`, G1 `PASS`, a valid task-scoped execution envelope, and all mandatory checks pass.
+19. When canonical artifacts exist, generate the deterministic human-review HTML with `tools/generate_g01_human_review.py` and record the output path in the G1 decision record. If the presentation payload conflicts with canonical artifacts, mark it `STALE` or `INVALID` and do not alter gate authority.
 
 A required plan with a missing path, missing revision, failed validation, stale base binding, incomplete evidence pair, or Task Me routing contradiction MUST block G1. Legacy artifacts that contain neither plan field remain compatible; a partial new-format pair is invalid.
 

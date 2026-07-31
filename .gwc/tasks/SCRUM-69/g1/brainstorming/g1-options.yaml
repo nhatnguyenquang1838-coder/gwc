@@ -1,0 +1,14 @@
+task_id: SCRUM-69
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+options:
+  - id: OPT-1
+    title: Implement SCRUM-69 scope with existing conventions
+    selected: true
+    recommendation: recommended
+    trade_offs: []
+  - id: OPT-2
+    title: Defer SCRUM-69 to later fastlane
+    selected: false
+    recommendation: rejected
+    trade_offs: []

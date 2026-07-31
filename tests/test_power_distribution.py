@@ -135,39 +135,33 @@ class GWCPowerDistributionTests(unittest.TestCase):
         self.assertFalse(spec["externalWritesEnabled"])
         self.assertTrue(spec["approvalRequiredForRepositoryWrites"])
 
-    def test_workflow_is_immutable_and_auto_publishes_main(self) -> None:
+    def test_workflow_requires_explicit_approval_and_no_auto_publish(self) -> None:
         text = WORKFLOW_PATH.read_text(encoding="utf-8")
         self.assertIn(
             f"DW-SuperApps/.github/workflows/reusable-publish-power.yml@{FOUNDATION_SHA}",
             text,
         )
         self.assertIn(f"foundation_ref: {FOUNDATION_SHA}", text)
-        self.assertIn("push:", text)
-        self.assertIn("      - main", text)
+        self.assertNotIn("push:", text)
+        self.assertNotIn("      - main", text)
         self.assertGreaterEqual(text.count("default: false"), 2)
         self.assertIn(
             "package_version: ${{ github.event.inputs.package_version || format('gwc-main-{0}-{1}', github.run_number, github.sha) }}",
             text,
         )
         self.assertIn(
-            "publish_release: ${{ github.event_name == 'push' || github.event.inputs.publish_release == 'true' }}",
+            "publish_release: ${{ github.event.inputs.publish_release == 'true' }}",
             text,
         )
         self.assertIn(
-            "publish_distribution_branch: ${{ github.event_name == 'push' || github.event.inputs.publish_distribution_branch == 'true' }}",
+            "publish_distribution_branch: ${{ github.event.inputs.publish_distribution_branch == 'true' }}",
             text,
         )
 
-    def test_auto_publish_has_standing_g5_policy_and_audit_boundary(self) -> None:
+    def test_explicit_approval_policy_and_audit_boundary(self) -> None:
         text = WORKFLOW_PATH.read_text(encoding="utf-8")
         policy = G5_STANDING_AUTOMATION_POLICY_PATH.read_text(encoding="utf-8")
-        self.assertIn("github.event_name == 'push'", text)
-        self.assertIn("standing automated g5", policy.lower())
-        self.assertIn("push` to `main`", policy)
-        self.assertIn("publish a GitHub Release", policy)
-        self.assertIn("`power-dist` branch", policy)
-        self.assertIn("workflow run ID", policy)
-        self.assertIn("power-dist` branch SHA", policy)
+        self.assertNotIn("github.event_name == 'push'", text)
         self.assertIn("does not grant merge authority", policy)
 
     def test_package_does_not_embed_task_evidence(self) -> None:

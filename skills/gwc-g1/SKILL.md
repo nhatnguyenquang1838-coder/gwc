@@ -137,11 +137,19 @@ Required references:
 - `schemas/g1-decision-record.schema.json`;
 - `schemas/g01-runtime-input.schema.json`;
 - `schemas/g01-decision-input.schema.json`;
+- `schemas/g1-option-impact.schema.json`;
+- `schemas/g01-human-review.schema.json`;
 - `templates/g01/g01-runtime-input.template.yaml`;
 - `templates/g01/g01-decision-input.template.yaml`;
+- `templates/g01/g01-human-review.template.html`;
 - `tools/generate_g01_runtime.py`;
 - `tools/capture_g01_decision.py`;
-- `tools/validate_g01.py`.
+- `tools/generate_g01_human_review.py`;
+- `tools/validate_g01.py`;
+- `core/Agent_Response_Presentation_Contract_v1.0.md`;
+- `tests/test_g01_human_review_contracts.py`;
+- `tests/test_g01_human_review_renderer.py`;
+- `tests/test_g01_human_review.py`.
 
 Repository evidence wins over conversation memory, stale handoff text, third-party examples, screenshots, and generic best practices.
 
@@ -528,6 +536,25 @@ A G2 handoff candidate must include:
 - unresolved blockers if any.
 
 Do not call implementation complete. A G2 handoff candidate is not G2 execution authority.
+
+## Human review output
+
+When G1 produces a bounded G2 handoff candidate, generate a deterministic human-review HTML artifact when canonical artifacts exist:
+
+```bash
+python tools/generate_g01_human_review.py \
+  --impact <g1-option-impact-artifact> \
+  --review <g01-human-review-payload> \
+  --output <html-path>
+```
+
+Presentation rules:
+
+- Local agent: return concise summary plus clickable or served local HTML path.
+- Chat connector: return concise summary plus HTML artifact or link.
+- Slack: use the existing root task thread and include concise summary plus same HTML artifact or link.
+- If presentation conflicts with canonical artifacts, mark it `STALE` or `INVALID` and do not alter gate authority.
+- The HTML must be self-contained, mobile-first, printable, dark-mode compatible, and must not depend on remote JavaScript, CSS, fonts, or external runtime dependencies.
 
 ## Chat-only response shape
 

@@ -1,0 +1,23 @@
+approval_id: G2_SCRUM-138_20260731
+authority_gate: G2_EXECUTION
+task_id: SCRUM-138
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+working_branch: codex/fl-gwc-g01-governance-hardening-20260731
+risk_class: R1
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+excluded_actions:
+  - merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+approved_files:
+  - schemas/g1-option-impact.schema.json, schemas/g01-human-review.schema.json, tests/test_g01_human_review_contracts.py, fixtures, .gwc/tasks/SCRUM-138
+scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
+issued_at: 2026-07-31T23:00:00Z
+expires_at: 2026-08-01T23:00:00Z

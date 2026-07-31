@@ -279,6 +279,16 @@ results without run-id/artifact fallback evidence must be classified
 `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
 `CI_PENDING` is reserved only when a run is found but has not yet completed.
 
+## Presentation contract
+
+After G1, when a human-review HTML artifact is generated, follow the presentation contract:
+
+- Local agent: return concise summary plus clickable or served local HTML path.
+- Chat connector: return concise summary plus HTML artifact or link.
+- Slack delivery: use the existing root task thread and include concise summary plus same HTML artifact or link.
+- If presentation conflicts with canonical artifacts, mark it `STALE` or `INVALID` and do not alter gate authority.
+- The HTML must be self-contained, mobile-first, printable, dark-mode compatible, and must not depend on remote JavaScript, CSS, fonts, or external runtime dependencies.
+
 Refresh the active source, gate, task, repository, branch, scope, risk, and
 authority before every write-capable action and whenever the user says to
 continue or the context changes materially.

@@ -1,9 +1,6 @@
 name: Publish GWC Power
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       package_version:
@@ -35,6 +32,6 @@ jobs:
       foundation_ref: 299cd605899467377cd31651b27d31c3f88db759
       source_date_epoch: 0
       distribution_branch: power-dist
-      publish_release: ${{ github.event_name == 'push' || github.event.inputs.publish_release == 'true' }}
-      publish_distribution_branch: ${{ github.event_name == 'push' || github.event.inputs.publish_distribution_branch == 'true' }}
+      publish_release: ${{ github.event.inputs.publish_release == 'true' }}
+      publish_distribution_branch: ${{ github.event.inputs.publish_distribution_branch == 'true' }}
     secrets: inherit

@@ -1,0 +1,19 @@
+task_id: SCRUM-140
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+problem: Support FL-GWC-G01 governance hardening for SCRUM-140
+scope: skills/gwc-g1/SKILL.md, core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md, core/Agent_Response_Presentation_Contract_v1.0.md, agents/chatgpt-agent/agent-instructions.md, projects/gwc/package.yaml, tests, .gwc/tasks/SCRUM-140
+non_goals:
+  - merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+acceptance_criteria:
+  - schemas validate positive fixtures and reject negative fixtures
+  - renderer output is deterministic and self-contained
+  - CI observability distinguishes PR/push/pending/fail/connector-incomplete
+  - release/publish requires explicit approval
+  - all new tests pass
+stakeholders: []
+constraints: []

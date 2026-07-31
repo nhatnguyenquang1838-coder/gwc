@@ -1,0 +1,12 @@
+task_id: SCRUM-143
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+selected_option: OPT-1
+rationale: Aligns with FL-GWC-G01 fastlane scope and existing repository conventions
+final_scope: .github/workflows/publish-power.yml, .github/workflows/publish-release.yml, tests/test_release_publish_guard.py, .gwc/tasks/SCRUM-143
+validation_plan: run sandboxed unit tests and schema validators
+rollback: revert branch changes and remove task artifacts
+explicit_user_decision: true
+implementation_plan_ref:
+  source: local_agent
+  plan_revision: sha256:0000000000000000000000000000000000000000000000000000000000000000
