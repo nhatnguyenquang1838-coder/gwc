@@ -1,0 +1,19 @@
+schema_version: '1.0'
+task_id: SCRUM-243
+gate: G1_ALIGNMENT
+artifact: options
+status: READY
+options:
+  - id: A
+    name: Descriptor-only maturity projection
+    decision: rejected
+    reason: Does not supply replay-safe behavior, fault fixtures, or deterministic evidence.
+  - id: B
+    name: Runtime lease recovery utility with schema and scoped tests
+    decision: selected
+    reason: Smallest compatible implementation that proves lease expiry, reacquisition, fencing, duplicate-agent, and replay behavior.
+  - id: C
+    name: Registry-wide refactor
+    decision: rejected
+    reason: Larger blast radius and unnecessary for SCRUM-243 acceptance criteria.
+selected_option: B
