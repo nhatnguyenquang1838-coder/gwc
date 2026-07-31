@@ -1,0 +1,45 @@
+schema_version: '1.0'
+task_id: SCRUM-243
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: CP-20260731-243-G2-R1
+  command: APPROVE G2_EXECUTION CP-20260731-243-G2-R1 91d003f52727f62a 2026-07-31T12:56:00Z
+  received_at: '2026-07-31T11:50:00+07:00'
+  expires_at: '2026-07-31T12:56:00Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3abc72eb8dc30759e5731d0c9492b11262567f56
+branch: codex/scrum-243-lease-expiry-recovery-m5-20260731
+scope_hash: sha256:91d003f52727f62abf8f5cb39df3529951d8bb99c14b2065dfa29fb6f9e42c30
+authorized_actions:
+  - create_guarded_branch
+  - create_task_gate_artifacts
+  - create_schema
+  - create_runtime_utility
+  - create_scoped_unit_tests
+  - create_changelog
+  - create_draft_pr
+approved_paths:
+  - .gwc/tasks/SCRUM-243/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-243/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-243/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-243/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-243/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-243/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-243/g3/delivery-record.yaml
+  - schemas/lease-expiry-recovery-decision.schema.json
+  - tools/node_architect/lease_expiry_recovery.py
+  - tests/test_lease_expiry_recovery.py
+  - releases/changelog.d/2026-07-31-scrum-243-lease-expiry-recovery-m5.md
+prohibited_actions:
+  - protected_branch_write
+  - merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - secrets
+  - migration
+  - force_push
+  - branch_deletion
+  - pr_base_change

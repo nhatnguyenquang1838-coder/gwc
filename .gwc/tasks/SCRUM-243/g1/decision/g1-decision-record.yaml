@@ -1,0 +1,16 @@
+schema_version: '1.0'
+task_id: SCRUM-243
+gate: G1_ALIGNMENT
+artifact: decision
+status: PASS
+decision: Implement deterministic lease-expiry recovery utility with schema, unit tests, and task evidence.
+selected_option: B
+rationale:
+  - Provides M5 replay-safe decision evidence without changing registry identity.
+  - Covers expiry, reacquisition, monotonic fencing, duplicate-agent race, and replay determinism.
+  - Keeps implementation within approved task-bounded scope.
+validation_plan:
+  - python -m unittest tests/test_lease_expiry_recovery.py
+  - python -m compileall -q tools
+  - GitHub Actions validate-instructions
+  - GitHub Actions build-packages

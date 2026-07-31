@@ -1,0 +1,28 @@
+schema_version: '1.0'
+task_id: SCRUM-243
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3abc72eb8dc30759e5731d0c9492b11262567f56
+branch: codex/scrum-243-lease-expiry-recovery-m5-20260731
+scope_hash: sha256:91d003f52727f62abf8f5cb39df3529951d8bb99c14b2065dfa29fb6f9e42c30
+validation:
+  scoped_unit_tests: pending_ci_or_connector_validation
+  full_ci: pending_pr_creation
+pr:
+  number: null
+  url: null
+  head_sha: pending
+review:
+  status: pending
+  independence: fresh-context-required
+acceptance_evidence:
+  expired_lease_stops_advancement: tests/test_lease_expiry_recovery.py
+  safe_readback_required: tests/test_lease_expiry_recovery.py
+  monotonic_fencing: tests/test_lease_expiry_recovery.py
+  duplicate_agent_race: tests/test_lease_expiry_recovery.py
+  replay_equivalence: tests/test_lease_expiry_recovery.py
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_deploy_requested
+  g6_production_data: not_applicable
