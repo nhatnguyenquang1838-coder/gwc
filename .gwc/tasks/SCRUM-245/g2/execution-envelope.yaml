@@ -1,0 +1,40 @@
+schema_version: '1.0'
+task_id: SCRUM-245
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: CP-20260731-244-246-G2-R1
+  command: APPROVE G2_EXECUTION CP-20260731-244-246-G2-R1 6ce7a82dcfe6f4b7 2026-07-31T11:38:00Z
+  received_at: '2026-07-31T14:49:00+07:00'
+  expires_at: '2026-07-31T11:38:00Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: d4b62295a6d36badca23e9254997e040b0ee19cf
+branch: codex/scrum-244-246-f8-recovery-m5-20260731
+scope_hash: sha256:6ce7a82dcfe6f4b78621ac9bada47946cb3856fb35c2a0a39e94cd507aa655f2
+authorized_actions:
+  - create_guarded_branch
+  - create_task_gate_artifacts
+  - modify_approved_files
+  - create_schema
+  - create_runtime_utility
+  - create_scoped_unit_tests
+  - create_changelog
+  - create_draft_pr
+approved_paths:
+  - .gwc/tasks/SCRUM-245/**
+  - schemas/duplicate-agent-fencing-decision.schema.json
+  - tools/node_architect/duplicate_agent_fencing.py
+  - tests/test_failure_recovery_m5_batch.py
+  - releases/changelog.d/2026-07-31-scrum-244-246-f8-recovery-m5.md
+prohibited_actions:
+  - protected_branch_write
+  - merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - secrets
+  - migration
+  - force_push
+  - branch_deletion
+  - pr_base_change
