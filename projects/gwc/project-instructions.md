@@ -100,6 +100,8 @@ required by the active Jira task on a dedicated guarded branch.
 Repository access is task-bounded rather than path-bounded. DWC must not use
 this permission for unrelated cleanup, broad refactoring, dependency changes,
 formatting sweeps, or opportunistic edits.
+If the current `main` checkout is dirty, DWC must stop using it and switch to
+a fresh isolated worktree before any repository mutation.
 
 ## Human direction boundary
 
