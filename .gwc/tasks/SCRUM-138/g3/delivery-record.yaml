@@ -1,8 +1,9 @@
 task_id: SCRUM-138
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: 3b6c22be933036887a7ae96002e5a48677583812
-head_sha: PENDING
-pr_number: PENDING
+head_sha: b2c93acc5aff89557f6502f1a4eaf9fe72e2b1c7
+pr_number: 149
+pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/149
 outcome: pending
 validation_status: pending
 review:
