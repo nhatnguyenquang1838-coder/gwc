@@ -60,6 +60,7 @@ def sample_impact() -> dict:
                     "summary": "Add derived contracts without changing canonical gate authority.",
                     "files": ["schemas/g1-option-impact.schema.json"],
                     "symbols": ["g1-option-impact"],
+                    "components": ["gwc-runtime", "schemas"],
                     "dependencies": ["Task Me", "UA"],
                     "tests": ["python -m unittest tests.test_g01_human_review_contracts"],
                     "rollback": "Remove the added schemas and tests from the branch.",
@@ -74,7 +75,7 @@ def sample_impact() -> dict:
     }
 
 
-def sample_human_review(notice: str | None = None) -> dict:
+def sample_human_review(notice: str | None = None, presentation_state: str = "CURRENT") -> dict:
     return {
         "schema_version": "1.0",
         "artifact_type": "g01-human-review",
@@ -100,6 +101,7 @@ def sample_human_review(notice: str | None = None) -> dict:
             "html_ref": "g01-human-review.html",
             "slack_thread_required": True,
         },
+        "presentation_state": presentation_state,
         "authority_notice": notice
         or "This derived review does not grant G2, G3, G4, G5, or G6 authority.",
     }
@@ -119,13 +121,20 @@ class G01HumanReviewContractTests(unittest.TestCase):
         payload["analysis_source"]["task_me"]["invoked"] = False
         self.assertTrue(validate("g1-option-impact.schema.json", payload))
 
-    def test_g01_human_review_accepts_authority_separated_projection(self) -> None:
-        self.assertEqual(validate("g01-human-review.schema.json", sample_human_review()), [])
+    def test_g1_option_impact_accepts_components(self) -> None:
+        payload = sample_impact()
+        payload["options"][0]["impact"]["components"] = ["schemas", "tools"]
+        self.assertEqual(validate("g1-option-impact.schema.json", payload), [])
 
-    def test_g01_human_review_rejects_missing_authority_warning(self) -> None:
-        for notice in ("approve this", "G2 granted by HTML"):
-            with self.subTest(notice=notice):
-                self.assertTrue(validate("g01-human-review.schema.json", sample_human_review(notice)))
+    def test_g01_human_review_accepts_presentation_state(self) -> None:
+        for state in ("CURRENT", "STALE", "INVALID"):
+            with self.subTest(state=state):
+                self.assertEqual(validate("g01-human-review.schema.json", sample_human_review(presentation_state=state)), [])
+
+    def test_g01_human_review_rejects_unknown_presentation_state(self) -> None:
+        payload = sample_human_review()
+        payload["presentation_state"] = "UNKNOWN"
+        self.assertTrue(validate("g01-human-review.schema.json", payload))
 
 
 if __name__ == "__main__":

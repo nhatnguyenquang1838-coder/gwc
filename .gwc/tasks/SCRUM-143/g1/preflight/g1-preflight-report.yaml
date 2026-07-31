@@ -1,0 +1,16 @@
+task_id: SCRUM-143
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+profile_consistent: true
+connector_fallback:
+  primary: GitHub
+  fallback: DWC
+risk_signals: []
+dependency_checks: []
+capability_checks: []
+blockers: []
+implementation_plan:
+  applicability: applicable
+  source: local_agent
+  plan_revision: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  validation: PASS

@@ -15,6 +15,7 @@
     "impact_ref",
     "html",
     "presentation",
+    "presentation_state",
     "authority_notice"
   ],
   "properties": {
@@ -70,6 +71,10 @@
       "type": "string",
       "minLength": 1,
       "pattern": "does not grant|not grant|không cấp"
+    },
+    "presentation_state": {
+      "enum": ["CURRENT", "STALE", "INVALID"],
+      "description": "State of this presentation relative to canonical GWC artifacts."
     }
   }
 }

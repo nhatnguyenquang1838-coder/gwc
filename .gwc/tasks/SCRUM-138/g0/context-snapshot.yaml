@@ -1,0 +1,31 @@
+status: READY
+task_id: SCRUM-138
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+profile: projects/gwc/project-profile.yaml
+governance_sources:
+  - path: core/Coding_Project_Governance_v1.0.md
+    sha256: sha256:ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    sha256: sha256:cc933fb641451a65d0deb82a5100c5e872c39fe23dfe4edf277792ee4be46043
+  - path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    sha256: sha256:3df7d8a647065d5d836fd26c8cafe6346b6820096b2891c3af479f1a4a633946
+connectors:
+  - GitHub
+  - Atlassian Jira MCP
+risk_class: R1
+scope: schemas/g1-option-impact.schema.json, schemas/g01-human-review.schema.json, tests/test_g01_human_review_contracts.py, fixtures, .gwc/tasks/SCRUM-138
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+excluded_actions:
+  - merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+blockers: []
+drift_classification: REVALIDATE
+drift_notes: Baseline 761315f is ancestor of current main 3b6c22be933036887a7ae96002e5a48677583812; two governance-only merges ahead. Approval preserved; validation required before continuation.

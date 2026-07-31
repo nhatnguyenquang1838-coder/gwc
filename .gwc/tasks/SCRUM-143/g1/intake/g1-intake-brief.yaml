@@ -1,0 +1,19 @@
+task_id: SCRUM-143
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+problem: Support FL-GWC-G01 governance hardening for SCRUM-143
+scope: .github/workflows/publish-power.yml, .github/workflows/publish-release.yml, tests/test_release_publish_guard.py, .gwc/tasks/SCRUM-143
+non_goals:
+  - merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+acceptance_criteria:
+  - schemas validate positive fixtures and reject negative fixtures
+  - renderer output is deterministic and self-contained
+  - CI observability distinguishes PR/push/pending/fail/connector-incomplete
+  - release/publish requires explicit approval
+  - all new tests pass
+stakeholders: []
+constraints: []

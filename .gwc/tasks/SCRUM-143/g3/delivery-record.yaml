@@ -1,0 +1,19 @@
+task_id: SCRUM-143
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+head_sha: PENDING
+pr_number: PENDING
+outcome: pending
+validation_status: pending
+review:
+  reviewer: local_agent
+  independence: fresh-context
+  decision: pending
+  findings: []
+residual_risks: []
+exclusions:
+  - merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change

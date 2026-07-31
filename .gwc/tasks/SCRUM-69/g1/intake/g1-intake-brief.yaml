@@ -1,0 +1,19 @@
+task_id: SCRUM-69
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3b6c22be933036887a7ae96002e5a48677583812
+problem: Support FL-GWC-G01 governance hardening for SCRUM-69
+scope: tools/resolve_g5_status.py, .github/workflows/validate-instructions.yml, tests/test_ci_observability.py, .gwc/tasks/SCRUM-69
+non_goals:
+  - merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+acceptance_criteria:
+  - schemas validate positive fixtures and reject negative fixtures
+  - renderer output is deterministic and self-contained
+  - CI observability distinguishes PR/push/pending/fail/connector-incomplete
+  - release/publish requires explicit approval
+  - all new tests pass
+stakeholders: []
+constraints: []
