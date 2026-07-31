@@ -36,6 +36,15 @@ REQUIRED_KEYS = {
     "authority_boundary",
     "gates",
 }
+# Typed intake contract fields (optional)
+TYPED_INTAKE_FIELDS = {
+    "intent",
+    "outcome",
+    "constraints",
+    "exclusions",
+    "entry_guards",
+    "reason_codes",
+}
 
 
 def _repo_root() -> Path:
@@ -57,7 +66,8 @@ def _load_node(path: Path) -> dict[str, Any]:
 def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     errors: list[str] = []
 
-    extra = sorted(set(node) - (REQUIRED_KEYS | {"description"}))
+    allowed_keys = REQUIRED_KEYS | TYPED_INTAKE_FIELDS | {"description"}
+    extra = sorted(set(node) - allowed_keys)
     missing = sorted(REQUIRED_KEYS - set(node))
     if missing:
         errors.append(f"{path}: missing required keys: {', '.join(missing)}")
@@ -93,6 +103,40 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     description = node.get("description")
     if description is not None and not isinstance(description, str):
         errors.append(f"{path}: description must be a string when present")
+
+    # Typed intake contract field validations
+    intent = node.get("intent")
+    if intent is not None and not isinstance(intent, str):
+        errors.append(f"{path}: intent must be a string when present")
+
+    outcome = node.get("outcome")
+    if outcome is not None and not isinstance(outcome, str):
+        errors.append(f"{path}: outcome must be a string when present")
+
+    constraints = node.get("constraints")
+    if constraints is not None:
+        if not isinstance(constraints, list) or not all(isinstance(c, str) for c in constraints):
+            errors.append(f"{path}: constraints must be a list of strings when present")
+
+    exclusions = node.get("exclusions")
+    if exclusions is not None:
+        if not isinstance(exclusions, list) or not all(isinstance(e, str) for e in exclusions):
+            errors.append(f"{path}: exclusions must be a list of strings when present")
+
+    entry_guards = node.get("entry_guards")
+    if entry_guards is not None:
+        if not isinstance(entry_guards, list) or not all(isinstance(g, str) for g in entry_guards):
+            errors.append(f"{path}: entry_guards must be a list of strings when present")
+
+    reason_codes = node.get("reason_codes")
+    if reason_codes is not None:
+        if not isinstance(reason_codes, (str, dict)):
+            errors.append(f"{path}: reason_codes must be a string or object when present")
+        if isinstance(reason_codes, dict):
+            if not all(isinstance(k, str) for k in reason_codes.keys()):
+                errors.append(f"{path}: reason_codes object must have string keys")
+            if not all(isinstance(v, (str, int, float, bool, type(None))) for v in reason_codes.values()):
+                errors.append(f"{path}: reason_codes object must have only primitive values")
 
     return errors
 

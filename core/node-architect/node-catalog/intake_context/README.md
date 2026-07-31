@@ -30,7 +30,7 @@ The nodes are **read-only G0 context nodes**. They structure request intake, sou
 
 | Node | Purpose |
 |---|---|
-| `intake_context.request-intake` | Normalize the user request into a bounded intake fact set. |
+| `intake_context.request-intake` | Normalize the user request into a typed intake contract with intent, outcome, constraints, exclusions, entry_guards, and reason_codes while preserving G0_CONTEXT gate and read_only authority. |
 | `intake_context.source-resolution` | Resolve REPO / PACKAGE / MIXED source instruction. |
 | `intake_context.repo-identity-check` | Verify repository identity, default branch, protected branch, and execution mode assumptions. |
 | `intake_context.protected-base-capture` | Capture exact protected-base SHA for later evidence. |

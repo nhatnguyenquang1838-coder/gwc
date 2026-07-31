@@ -7,5 +7,27 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Normalizes the user request into a bounded intake fact set before any gate decision."
+  "description": "Normalizes the user request into a bounded intake fact set before any gate decision.",
+  "intent": "User-specified task scope and deliverable.",
+  "outcome": "Normalized typed intake record with structured intent, outcome, constraints, exclusions, entry_guards, and reason_codes.",
+  "constraints": [
+    "Input must be provided via the canonical request shape.",
+    "Ambiguous or conflicting signals must cause fail-closed rejection.",
+    "Typed intake fields must remain bounded to the existing node family."
+  ],
+  "exclusions": [
+    "Production runtime behavior.",
+    "Deployment, migration, or credential operations.",
+    "Broader gate authority beyond G0_CONTEXT."
+  ],
+  "entry_guards": [
+    "G0_CONTEXT",
+    "read_only authority_boundary"
+  ],
+  "reason_codes": {
+    "ACCEPTED": "Request normalized successfully.",
+    "MALFORMED_INPUT": "Request structure is invalid or missing required fields.",
+    "AMBIGUOUS_INTENT": "Request contains conflicting intent or scope signals.",
+    "SCOPE_DRIFT": "Requested scope exceeds the node family boundary."
+  }
 }
