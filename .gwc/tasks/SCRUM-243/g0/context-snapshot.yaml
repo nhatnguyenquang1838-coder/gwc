@@ -1,0 +1,28 @@
+schema_version: '1.0'
+task_id: SCRUM-243
+gate: G0_CONTEXT
+status: READY
+created_at: '2026-07-31T11:50:00+07:00'
+repository: nhatnguyenquang1838-coder/gwc
+project_id: gwc
+execution_mode: chat_connector_only
+protected_base:
+  branch: main
+  sha: 3abc72eb8dc30759e5731d0c9492b11262567f56
+jira:
+  key: SCRUM-243
+  parent: SCRUM-173
+  summary: '[MAT-F8-N06] failure_recovery.lease-expiry-recovery — M1 → M5'
+node:
+  node_id: failure_recovery.lease-expiry-recovery
+  node_type: gate
+  descriptor_path: core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json
+  authority_boundary: g2_required
+objective: Raise lease-expiry recovery behavior from M1 provisional to M5 replay-safe.
+known_blockers: []
+read_sources:
+  - AGENTS.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - projects/gwc/project-profile.yaml
+  - projects/gwc/project-instructions.md
+  - Jira SCRUM-243
