@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -36,15 +37,27 @@ REQUIRED_KEYS = {
     "authority_boundary",
     "gates",
 }
-# Typed intake contract fields (optional)
-TYPED_INTAKE_FIELDS = {
-    "intent",
-    "outcome",
-    "constraints",
-    "exclusions",
-    "entry_guards",
-    "reason_codes",
+TYPED_FIELD_GROUPS = {
+    "intake_context.request-intake": {
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions",
+        "entry_guards",
+        "reason_codes",
+    },
+    "intake_context.protected-base-capture": {
+        "protected_base_sha",
+        "evidence_source",
+        "readback_status",
+        "drift_state",
+        "reason_codes",
+        "captured_at",
+    },
 }
+ALLOWED_READBACK_STATUS = {"VERIFIED", "MISMATCH", "STALE", "UNKNOWN"}
+ALLOWED_DRIFT_STATE = {"NONE", "STALE", "DRIFTED"}
+PROTECTED_BASE_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
 
 def _repo_root() -> Path:
@@ -63,10 +76,25 @@ def _load_node(path: Path) -> dict[str, Any]:
     return data
 
 
+def _validate_reason_codes(path: Path, reason_codes: Any) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(reason_codes, (str, dict)):
+        errors.append(f"{path}: reason_codes must be a string or object when present")
+        return errors
+    if isinstance(reason_codes, dict):
+        if not all(isinstance(k, str) for k in reason_codes.keys()):
+            errors.append(f"{path}: reason_codes object must have string keys")
+        if not all(isinstance(v, (str, int, float, bool, type(None))) for v in reason_codes.values()):
+            errors.append(f"{path}: reason_codes object must have only primitive values")
+    return errors
+
+
 def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     errors: list[str] = []
 
-    allowed_keys = REQUIRED_KEYS | TYPED_INTAKE_FIELDS | {"description"}
+    node_id = node.get("node_id")
+    typed_fields = TYPED_FIELD_GROUPS.get(node_id, set()) if isinstance(node_id, str) else set()
+    allowed_keys = REQUIRED_KEYS | typed_fields | {"description"}
     extra = sorted(set(node) - allowed_keys)
     missing = sorted(REQUIRED_KEYS - set(node))
     if missing:
@@ -74,7 +102,6 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     if extra:
         errors.append(f"{path}: unexpected keys: {', '.join(extra)}")
 
-    node_id = node.get("node_id")
     if not isinstance(node_id, str) or not node_id.startswith(f"{EXPECTED_FAMILY}."):
         errors.append(f"{path}: node_id must start with {EXPECTED_FAMILY}.")
 
@@ -104,39 +131,60 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     if description is not None and not isinstance(description, str):
         errors.append(f"{path}: description must be a string when present")
 
-    # Typed intake contract field validations
-    intent = node.get("intent")
-    if intent is not None and not isinstance(intent, str):
-        errors.append(f"{path}: intent must be a string when present")
+    if node_id == "intake_context.request-intake":
+        intent = node.get("intent")
+        if intent is not None and not isinstance(intent, str):
+            errors.append(f"{path}: intent must be a string when present")
 
-    outcome = node.get("outcome")
-    if outcome is not None and not isinstance(outcome, str):
-        errors.append(f"{path}: outcome must be a string when present")
+        outcome = node.get("outcome")
+        if outcome is not None and not isinstance(outcome, str):
+            errors.append(f"{path}: outcome must be a string when present")
 
-    constraints = node.get("constraints")
-    if constraints is not None:
-        if not isinstance(constraints, list) or not all(isinstance(c, str) for c in constraints):
-            errors.append(f"{path}: constraints must be a list of strings when present")
+        constraints = node.get("constraints")
+        if constraints is not None:
+            if not isinstance(constraints, list) or not all(isinstance(c, str) for c in constraints):
+                errors.append(f"{path}: constraints must be a list of strings when present")
 
-    exclusions = node.get("exclusions")
-    if exclusions is not None:
-        if not isinstance(exclusions, list) or not all(isinstance(e, str) for e in exclusions):
-            errors.append(f"{path}: exclusions must be a list of strings when present")
+        exclusions = node.get("exclusions")
+        if exclusions is not None:
+            if not isinstance(exclusions, list) or not all(isinstance(e, str) for e in exclusions):
+                errors.append(f"{path}: exclusions must be a list of strings when present")
 
-    entry_guards = node.get("entry_guards")
-    if entry_guards is not None:
-        if not isinstance(entry_guards, list) or not all(isinstance(g, str) for g in entry_guards):
-            errors.append(f"{path}: entry_guards must be a list of strings when present")
+        entry_guards = node.get("entry_guards")
+        if entry_guards is not None:
+            if not isinstance(entry_guards, list) or not all(isinstance(g, str) for g in entry_guards):
+                errors.append(f"{path}: entry_guards must be a list of strings when present")
 
-    reason_codes = node.get("reason_codes")
-    if reason_codes is not None:
-        if not isinstance(reason_codes, (str, dict)):
-            errors.append(f"{path}: reason_codes must be a string or object when present")
-        if isinstance(reason_codes, dict):
-            if not all(isinstance(k, str) for k in reason_codes.keys()):
-                errors.append(f"{path}: reason_codes object must have string keys")
-            if not all(isinstance(v, (str, int, float, bool, type(None))) for v in reason_codes.values()):
-                errors.append(f"{path}: reason_codes object must have only primitive values")
+        reason_codes = node.get("reason_codes")
+        if reason_codes is not None:
+            errors.extend(_validate_reason_codes(path, reason_codes))
+
+    if node_id == "intake_context.protected-base-capture":
+        protected_base_sha = node.get("protected_base_sha")
+        if not isinstance(protected_base_sha, str) or not PROTECTED_BASE_SHA_PATTERN.fullmatch(protected_base_sha):
+            errors.append(f"{path}: protected_base_sha must be a 40-character lowercase hex string")
+
+        evidence_source = node.get("evidence_source")
+        if not isinstance(evidence_source, str) or not evidence_source.strip():
+            errors.append(f"{path}: evidence_source must be a non-empty string")
+
+        readback_status = node.get("readback_status")
+        if readback_status not in ALLOWED_READBACK_STATUS:
+            errors.append(
+                f"{path}: readback_status must be one of {sorted(ALLOWED_READBACK_STATUS)}"
+            )
+
+        drift_state = node.get("drift_state")
+        if drift_state not in ALLOWED_DRIFT_STATE:
+            errors.append(f"{path}: drift_state must be one of {sorted(ALLOWED_DRIFT_STATE)}")
+
+        captured_at = node.get("captured_at")
+        if not isinstance(captured_at, str) or not captured_at.strip():
+            errors.append(f"{path}: captured_at must be a non-empty string")
+
+        reason_codes = node.get("reason_codes")
+        if reason_codes is not None:
+            errors.extend(_validate_reason_codes(path, reason_codes))
 
     return errors
 

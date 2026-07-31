@@ -22,7 +22,7 @@ def load_validator():
 
 
 def valid_node(slug: str) -> dict:
-    return {
+    node = {
         "node_id": f"intake_context.{slug}",
         "node_type": "workflow",
         "title": slug.replace("-", " ").title(),
@@ -31,6 +31,26 @@ def valid_node(slug: str) -> dict:
         "gates": ["G0_CONTEXT"],
         "description": f"{slug} validation fixture.",
     }
+    if slug == "protected-base-capture":
+        node.update(
+            {
+                "protected_base_sha": PROTECTED_BASE_SHA,
+                "evidence_source": "Verified source-of-truth readback.",
+                "readback_status": "VERIFIED",
+                "drift_state": "NONE",
+                "reason_codes": {
+                    "VERIFIED": "Captured protected base matches the verified source of truth.",
+                    "MISMATCH": "Captured SHA does not match the verified source of truth.",
+                    "STALE": "Captured SHA is stale relative to the current task context.",
+                    "DRIFTED": "Protected base evidence drifted from the verified source of truth.",
+                },
+                "captured_at": "2026-07-31T00:00:00Z",
+            }
+        )
+    return node
+
+
+PROTECTED_BASE_SHA = "5aea52a73cfcee02576766db4adf290a94212157"
 
 
 class IntakeContextNodeCatalogTests(unittest.TestCase):
@@ -220,6 +240,156 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "entry_guards": [],
             "reason_codes": {}
         })
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"G0 gate and read-only authority should persist: {errors}")
+
+    def test_accepts_typed_protected_base_contract(self):
+        """Test that protected-base capture with typed fields validates successfully."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[3].update(
+            {
+                "protected_base_sha": PROTECTED_BASE_SHA,
+                "evidence_source": "Verified source-of-truth readback.",
+                "readback_status": "VERIFIED",
+                "drift_state": "NONE",
+                "reason_codes": {
+                    "VERIFIED": "Captured protected base matches the verified source of truth.",
+                    "MISMATCH": "Captured SHA does not match the verified source of truth.",
+                    "STALE": "Captured SHA is stale relative to the current task context.",
+                    "DRIFTED": "Protected base evidence drifted from the verified source of truth.",
+                },
+                "captured_at": "2026-07-31T00:00:00Z",
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"Typed protected-base contract should validate: {errors}")
+
+    def test_rejects_malformed_protected_base_sha(self):
+        """Test that malformed protected-base SHA values are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[3].update(
+            {
+                "protected_base_sha": 123,
+                "evidence_source": "Verified source-of-truth readback.",
+                "readback_status": "VERIFIED",
+                "drift_state": "NONE",
+                "reason_codes": {},
+                "captured_at": "2026-07-31T00:00:00Z",
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("protected_base_sha" in error for error in errors))
+
+    def test_rejects_stale_protected_base_status(self):
+        """Test that unsupported readback statuses are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[3].update(
+            {
+                "protected_base_sha": PROTECTED_BASE_SHA,
+                "evidence_source": "Verified source-of-truth readback.",
+                "readback_status": "BROKEN",
+                "drift_state": "NONE",
+                "reason_codes": {},
+                "captured_at": "2026-07-31T00:00:00Z",
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("readback_status" in error for error in errors))
+
+    def test_rejects_malformed_protected_base_reason_codes(self):
+        """Test that malformed protected-base reason_codes are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[3].update(
+            {
+                "protected_base_sha": PROTECTED_BASE_SHA,
+                "evidence_source": "Verified source-of-truth readback.",
+                "readback_status": "VERIFIED",
+                "drift_state": "NONE",
+                "reason_codes": {"nested": {"obj": "value"}},
+                "captured_at": "2026-07-31T00:00:00Z",
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("reason_codes" in error for error in errors))
+
+    def test_typed_protected_base_fields_preserve_g0_gate_and_readonly(self):
+        """Test that protected-base capture preserves G0_CONTEXT and read_only boundary."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[3].update(
+            {
+                "protected_base_sha": PROTECTED_BASE_SHA,
+                "evidence_source": "Verified source-of-truth readback.",
+                "readback_status": "VERIFIED",
+                "drift_state": "NONE",
+                "reason_codes": {},
+                "captured_at": "2026-07-31T00:00:00Z",
+            }
+        )
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
