@@ -1,0 +1,24 @@
+schema_version: '1.0'
+task_id: SCRUM-243
+gate: G1_ALIGNMENT
+artifact: intake
+status: READY
+problem_statement: Lease expiry recovery must prevent stale or duplicate agents from advancing work after a lease has expired.
+current_maturity: M1_PROVISIONAL
+target_maturity: M5_REPLAY_SAFE
+stakeholders:
+  - GWC runtime operators
+  - Node architect maintainers
+  - Delivery governance reviewers
+acceptance_criteria:
+  - Expired lease stops advancement before side effect.
+  - Safe readback is required before continuation.
+  - Lease reacquisition records a monotonic fencing token.
+  - Stale worker with lower fencing token cannot advance.
+  - Duplicate-agent race resolves deterministically without duplicate effect.
+  - Replay with the same evidence yields the same decision.
+  - Schema, scoped unit tests, and required CI pass.
+non_goals:
+  - Change existing node descriptor or registry identity.
+  - Add production lease infrastructure.
+  - Perform deployment, release, migration, credential, or production-data action.
