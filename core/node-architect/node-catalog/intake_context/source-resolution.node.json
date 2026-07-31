@@ -7,5 +7,31 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Resolves whether the active instruction source is REPO, PACKAGE, or MIXED."
+  "description": "Resolves whether the active instruction source is REPO, PACKAGE, or MIXED.",
+  "intent": "Determine the authoritative source of active instructions (repository, package, or mixed) to govern task execution boundaries.",
+  "outcome": "Typed source-resolution record with mode, authority, provenance evidence, and reason codes.",
+  "constraints": [
+    "Source mode must be deterministically resolved as REPO, PACKAGE, or MIXED.",
+    "Fail closed when source authority cannot be distinguished.",
+    "Provenance evidence must be verified, not guessed.",
+    "Must stay inside intake_context family with G0_CONTEXT gate only."
+  ],
+  "exclusions": [
+    "Production runtime behavior",
+    "Deployment logic",
+    "Migration logic",
+    "Credentials or external secrets",
+    "Broader workflow authority beyond intake_context"
+  ],
+  "entry_guards": [
+    "G0_CONTEXT",
+    "read_only"
+  ],
+  "reason_codes": {
+    "ACCEPTED": "Source mode resolved deterministically with verified provenance.",
+    "AMBIGUOUS": "Repository and package authority cannot be distinguished.",
+    "MALFORMED": "Provenance evidence is incomplete or invalid.",
+    "MISSING_EVIDENCE": "Required source inputs cannot be audited.",
+    "INVALID_MODE": "Resolved source mode token is not REPO, PACKAGE, or MIXED."
+  }
 }

@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "run_id": "scrum-175-request-intake-m1-to-m4-20260731",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "d4b62295a6d36badca23e9254997e040b0ee19cf",
+  "generated_at_utc": "2026-07-31T00:00:00Z",
+  "scope": "bounded",
+  "selection_reason": "files directly used to derive the SCRUM-175 plan",
+  "entries": [
+    {
+      "category": "requirements",
+      "path": "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+      "kind": "json",
+      "size": 310,
+      "sha256": "dc16b69173ed4d057a998d82e2921cbff0d6bcbbae3e641a0cfb54e0bf87e4f2"
+    },
+    {
+      "category": "design",
+      "path": "core/node-architect/node-catalog/intake_context/README.md",
+      "kind": "markdown",
+      "size": 2261,
+      "sha256": "490aa4a5144fbe02d1bcb8be8c7b5289a86eddcdbf790286c8cd6e42daf07854"
+    },
+    {
+      "category": "tests",
+      "path": "tests/test_node_catalog_intake_context.py",
+      "kind": "python",
+      "size": 3371,
+      "sha256": "3096b6952d4827c5ecee406386564b76def7af2cfe7bca701d350466ad17637f"
+    },
+    {
+      "category": "code",
+      "path": "tools/node_architect/validate_node_catalog_intake_context.py",
+      "kind": "python",
+      "size": 4219,
+      "sha256": "59bcdf6cf6a449b8ea49f10b41efa08c69fc0db14124c5ed3eb95339df4841d8"
+    },
+    {
+      "category": "system_graph",
+      "path": "core/node-architect/runtime-graph-registry.json",
+      "kind": "json",
+      "size": 7017,
+      "sha256": "fc69f1b34bd7207aea6eb8330621edd14444ba7ddc1589354166da0e9902b84c"
+    },
+    {
+      "category": "system_graph",
+      "path": "core/node-architect/node-registry.json",
+      "kind": "json",
+      "size": 70708,
+      "sha256": "5dc7cf22d4231b22f0dee93fe5cf3210ed1f74c25ea273f4d1a295e12d284261"
+    },
+    {
+      "category": "repository_context",
+      "path": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "kind": "markdown",
+      "size": 10626,
+      "sha256": "aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e8"
+    },
+    {
+      "category": "repository_context",
+      "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "kind": "markdown",
+      "size": 15645,
+      "sha256": "1304b7d9923b9e5805a0f42cf159a87dab4c6d76086467fc6929396893635fbc"
+    },
+    {
+      "category": "reference_spec",
+      "path": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md",
+      "kind": "markdown",
+      "size": 1129,
+      "sha256": "4825fae1be46264d6b9586872553e0f3851efffbaf81fcfc77397b05fc899f2c"
+    },
+    {
+      "category": "reference_spec",
+      "path": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md",
+      "kind": "markdown",
+      "size": 938,
+      "sha256": "270adb1d45a1f4da0b2ea8e186f731f4a78d702510891a240257c40268bb529d"
+    },
+    {
+      "category": "reference_spec",
+      "path": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md",
+      "kind": "markdown",
+      "size": 508,
+      "sha256": "c518ba3570836171f5f0e315c786963dd8d66a7c6a79190af13596f0a11f2265"
+    }
+  ]
+}

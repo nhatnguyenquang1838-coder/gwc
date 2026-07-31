@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "run_id": "scrum-175-request-intake-m1-to-m4-20260731",
+  "nodes": [
+    {
+      "id": "jira:SCRUM-175",
+      "type": "issue",
+      "label": "SCRUM-175"
+    },
+    {
+      "id": "file:request-intake-node",
+      "type": "source",
+      "label": "core/node-architect/node-catalog/intake_context/request-intake.node.json"
+    },
+    {
+      "id": "file:intake-context-readme",
+      "type": "source",
+      "label": "core/node-architect/node-catalog/intake_context/README.md"
+    },
+    {
+      "id": "file:intake-context-validator",
+      "type": "source",
+      "label": "tools/node_architect/validate_node_catalog_intake_context.py"
+    },
+    {
+      "id": "file:intake-context-tests",
+      "type": "source",
+      "label": "tests/test_node_catalog_intake_context.py"
+    },
+    {
+      "id": "file:runtime-graph",
+      "type": "source",
+      "label": "core/node-architect/runtime-graph-registry.json"
+    },
+    {
+      "id": "file:node-registry",
+      "type": "source",
+      "label": "core/node-architect/node-registry.json"
+    },
+    {
+      "id": "file:kiro-rule",
+      "type": "context",
+      "label": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md"
+    },
+    {
+      "id": "file:op-runbook",
+      "type": "context",
+      "label": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md"
+    },
+    {
+      "id": "file:scrum-108-spec",
+      "type": "reference",
+      "label": ".kiro/specs/scrum-108-bounded-external-write-runtime-node"
+    }
+  ],
+  "edges": [
+    {
+      "from": "jira:SCRUM-175",
+      "to": "file:request-intake-node",
+      "relation": "describes"
+    },
+    {
+      "from": "jira:SCRUM-175",
+      "to": "file:intake-context-readme",
+      "relation": "scope-shapes"
+    },
+    {
+      "from": "file:request-intake-node",
+      "to": "file:intake-context-validator",
+      "relation": "is-validated-by"
+    },
+    {
+      "from": "file:intake-context-tests",
+      "to": "file:intake-context-validator",
+      "relation": "covers"
+    },
+    {
+      "from": "file:runtime-graph",
+      "to": "file:request-intake-node",
+      "relation": "registers"
+    },
+    {
+      "from": "file:node-registry",
+      "to": "file:request-intake-node",
+      "relation": "records"
+    },
+    {
+      "from": "file:kiro-rule",
+      "to": "file:scrum-108-spec",
+      "relation": "pattern-reference"
+    },
+    {
+      "from": "file:op-runbook",
+      "to": "file:intake-context-validator",
+      "relation": "constrains"
+    }
+  ]
+}
