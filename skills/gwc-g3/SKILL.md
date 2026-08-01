@@ -1,8 +1,8 @@
 ---
 name: gwc-g3
-description: Use after G2 implementation and validation are complete for Draft PR assembly, independent code-review-agent execution, exact-head CI verification, review closure, Ready-for-Review promotion, and G4 approval preparation.
-when_to_use: Trigger for start G3, create or update Draft PR, invoke a code reviewer agent, review the current PR head, close findings, validate G3 evidence, promote Draft PR to Ready for Review, or prepare a G4 approval request.
-version: 0.3.0
+description: Use after G2 implementation and validation are complete for Draft PR assembly, capability-aware independent review, exact-head CI verification, review closure, Ready-for-Review promotion, and G4 approval preparation.
+when_to_use: Trigger for start G3, create or update Draft PR, obtain an independent agent or human review, review the current PR head, close findings, validate G3 evidence, promote Draft PR to Ready for Review, or prepare a G4 approval request.
+version: 0.3.1
 project: gwc
 owner: GWC
 ---
@@ -11,9 +11,9 @@ owner: GWC
 
 ## Purpose
 
-Operate the existing GWC G3 delivery mechanism consistently. G3 asks whether the exact current Draft PR head is independently reviewed by a read-only `code_reviewer` agent, validated, CI-verified, acceptance-criteria-complete, and safe to promote to Ready for Review for a separate G4 merge decision.
+Operate the existing GWC G3 delivery mechanism consistently. G3 asks whether the exact current Draft PR head is independently reviewed through a capability-supported read-only reviewer source, validated, CI-verified, acceptance-criteria-complete, and safe to promote to Ready for Review for a separate G4 merge decision.
 
-This skill reuses `tools/validate_g3_delivery.py`, `schemas/g3-delivery-record.schema.json`, `templates/gates/g3-delivery-record.template.yaml`, and `tests/test_g3_delivery.py`. It extends that evidence with the additive invocation receipt:
+This skill reuses `tools/validate_g3_delivery.py`, `schemas/g3-delivery-record.schema.json`, `templates/gates/g3-delivery-record.template.yaml`, and `tests/test_g3_delivery.py`. It extends that evidence with the additive independent-review receipt:
 
 ```text
 .gwc/tasks/<task-id>/g3/code-review-invocation.json
@@ -23,7 +23,7 @@ The receipt must validate with `tools/validate_g3_review_invocation.py` against 
 
 ## Authority boundary
 
-G3 may create or update a Draft PR when authorized, assemble the delivery record, invoke one independent read-only `code_reviewer` agent, verify CI for the exact current head SHA, close findings, validate both G3 evidence records, and mark the same Draft PR Ready for Review after every guard passes.
+G3 may create or update a Draft PR when authorized, assemble the delivery record, obtain one independent read-only review, verify CI for the exact current head SHA, close findings, validate both G3 evidence records, and mark the same Draft PR Ready for Review after every guard passes.
 
 Do not merge or enable auto-merge in G3. Ready-for-Review promotion is G3 metadata completion. It does not deploy, release, publish, reload runtime, touch production configuration, perform credential operations, run migrations, access production data, direct-push to protected branches, force-push, delete branches, rewrite shared history, or change the PR base.
 
@@ -33,12 +33,12 @@ Do not merge or enable auto-merge in G3. Ready-for-Review promotion is G3 metada
 flowchart LR
     A[G2 exact-head evidence] --> B[G3.1 PR Assembly]
     B --> C[Exact-head validation and required CI]
-    C --> D[G3.2 Independent Review by code_reviewer]
+    C --> D[G3.2 Independent Review]
     D --> E{Review result}
     E -- Changes required --> F[Return to bounded G2 repair]
     F --> B
     E -- Pass --> G[G3.3 Review Closure]
-    G --> H[Validate delivery record and invocation receipt]
+    G --> H[Validate delivery record and independent-review receipt]
     H --> I[Mark Draft PR Ready for Review]
     I --> J[Read back draft=false and unchanged head SHA]
     J --> K[G4 approval request]
@@ -90,19 +90,33 @@ Verify repository, base SHA, guarded branch, exact current head SHA, scope hash,
 
 ## G3.2 Independent Review
 
-Invoke an agent whose role is exactly `code_reviewer`. Bind the request and result to the same task, repository, PR number, head SHA, and scope hash used by the delivery record.
+Select the reviewer source from verified runtime capability:
 
-The invocation must be read-only and record:
+```text
+local_agent or repo_ci with independent reviewer runtime
+  -> reviewer.kind=agent
+  -> reviewer.role=code_reviewer
 
-- implementer ID and reviewer agent ID;
-- reviewer role and independence mode;
-- provider and invocation ID;
+chat_connector_only without independent-agent capability
+  -> reviewer.kind=human
+  -> reviewer.role=human_reviewer
+```
+
+The human path is a capability fallback, not a waiver. It requires an explicit independent human review decision bound to the exact current PR head SHA. A plain acknowledgement such as `next`, `continue`, `ok`, or `go to G4` is not review evidence.
+
+Never fabricate an agent invocation, relabel the implementer's self-review as independent, or claim that conversation reasoning produced a separate reviewer. The reviewer must differ from the implementer and operate read-only.
+
+Bind the request and result to the same task, repository, PR number, head SHA, and scope hash used by the delivery record. The evidence must record:
+
+- implementer ID and reviewer ID;
+- reviewer kind, role, and independence mode;
+- provider and invocation or review ID;
 - requested and completed timestamps;
 - requested and completed head SHA;
-- result reference;
+- traceable result reference;
 - result, findings, stale state, and an empty `write_actions` list.
 
-An `independent` reviewer must differ from the implementer. A `fresh-context` fallback must be labelled honestly. A reviewer that performs a repository write loses independence; the changed head must return to validation and be reviewed again by another read-only invocation.
+An agent may use `independent` or honestly labelled `fresh-context`. A human reviewer must use `independent`. A reviewer that performs a repository write loses independence; the changed head must return to validation and be reviewed again by another read-only reviewer.
 
 Validate the receipt:
 
@@ -132,7 +146,7 @@ Promotion is allowed only when all of the following are true for the same curren
 - the PR is open and Draft;
 - local/applicable validation passed;
 - every required CI check passed;
-- the code-review-agent invocation receipt passed and is not stale;
+- an agent or human independent-review receipt passed and is not stale;
 - the delivery record passed and has no unresolved blocker;
 - acceptance criteria are complete;
 - scope drift is false;
@@ -146,6 +160,6 @@ observed state == open
 observed head SHA == reviewed head SHA
 ```
 
-Store the promotion/readback receipt in the PR timeline, GitHub Check, Actions artifact, or append-only audit event. Do not commit a post-promotion receipt to the reviewed PR branch because that would change the head SHA and stale the review.
+Store the review and promotion/readback receipts in the PR timeline, GitHub Check, Actions artifact, or append-only audit event. Do not commit a post-review or post-promotion receipt to the reviewed PR branch because that would change the head SHA and stale the review.
 
-After successful readback, transition the work state to `merge_pending` and prepare the exact G4 approval request. If promotion or readback fails, remain in G3 and report `G3_READY_FOR_REVIEW_BLOCKED`; do not generate a merge-ready G4 request.
+After successful readback, transition the work state to `merge_pending` and prepare the exact G4 approval request. If review evidence, promotion, or readback fails, remain in G3 and report `G3_READY_FOR_REVIEW_BLOCKED`; do not generate a merge-ready G4 request.
