@@ -1,0 +1,70 @@
+schema_version: '1.0'
+task_id: SCRUM-259
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: CP-20260801-259-G2-IMPL-R1
+  received_at: '2026-08-01T16:57:00Z'
+  expires_at: '2026-08-02T16:40:00Z'
+  scope_hash_prefix: 8abdd851acee2ac0
+  command_redacted_after_approval: true
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 3acf169b91fa2d4c4c32f573fa3318d00dad9088
+branch: codex/scrum-259-client-runtime-node-architect-vertical-slice
+scope_hash: sha256:8abdd851acee2ac07aa94b9ee648d395688cb320b0ecf13fda0cd12a484be170
+selected_option_id: OPT-1
+route:
+- client_request
+- route_scenario_validation
+- repo_delivery.ci-run-capture
+- runtime_checkpoint.checkpoint-persist
+- validation_quality.ci-evidence-capture
+- validation_quality.evidence-quality-check
+- validation_quality.g3-pass-decision
+- terminal_typed_result
+approved_paths:
+- tools/node_architect/client_runtime.py
+- schemas/client-runtime-request.schema.json
+- schemas/client-runtime-result.schema.json
+- tests/test_client_runtime_vertical_slice.py
+- releases/changelog.d/2026-08-01-scrum-259-client-runtime.md
+- .gwc/tasks/SCRUM-259/**
+authorized_actions:
+- create_guarded_branch
+- create_task_gate_artifacts
+- modify_approved_files
+- create_schema
+- create_runtime_utility
+- create_scoped_unit_tests
+- create_changelog
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+prohibited_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- production_configuration
+- production_data
+- secrets
+- credentials
+- migration
+- force_push
+- branch_deletion
+- pr_base_change
+- broad_81_node_rollout
+- f9_scale_control
+- scrum_258_recovery
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-259
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 3acf169b91fa2d4c4c32f573fa3318d00dad9088
+  plan_root: .kiro/specs/SCRUM-259-client-runtime-node-architect-vertical-slice
+  plan_revision: sha256:8a0e5d5f8851fb12a62559024031ba704d7c446cd6bfcd045fb127aedf38d903
+  validation_evidence: validation/validate_g01.json and validation/validate_g01_gate_g2.json from SCRUM-259 G2R3 package
+notes: Approved after current-base G1 PASS; grants no G4/G5/G6, merge, deploy, release, production, credential, migration, or broad rollout authority.
