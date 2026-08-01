@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "artifact_type": "g3-code-review-invocation",
   "gate": "G3_PR",
   "task_id": "HOTFIX-G3-READY-REVIEW",
@@ -9,7 +9,8 @@
   "scope_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
   "implementer_id": "agent-implementer",
   "reviewer": {
-    "agent_id": "agent-code-reviewer",
+    "reviewer_id": "agent-code-reviewer",
+    "kind": "agent",
     "role": "code_reviewer",
     "independence": "independent",
     "access_mode": "read_only"
@@ -21,7 +22,7 @@
     "completed_at": "2026-08-01T09:05:00Z",
     "requested_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     "completed_head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "result_ref": "github-check://g3-code-review/example-001"
+    "result_ref": "github-check://g3-independent-review/example-001"
   },
   "result": "pass",
   "findings": [],
