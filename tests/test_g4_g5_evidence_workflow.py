@@ -182,7 +182,8 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
         ):
             self.assertIn(marker, text)
         self.assertIn("The evidence workflow must not merge the PR", text)
-        self.assertIn("G4 authority or merge proof alone never satisfies G5", text)
+        self.assertIn("G5 status verification starts only after a merge commit exists", text)
+        self.assertIn("never satisfies G5", text)
 
 
 if __name__ == "__main__":
