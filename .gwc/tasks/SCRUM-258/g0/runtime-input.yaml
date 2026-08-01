@@ -1,0 +1,241 @@
+schema_version: '1.0'
+artifact_type: g01-runtime-input
+generated_at: '2026-08-01T19:19:19Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+  verified: true
+runtime:
+  agent_runtime_id: chatgpt-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+    status: active
+    source_sha: c040d8c023fbe4113018172f94f47e8f96514c23
+    supported_execution_modes:
+      - chat_connector_only
+      - local_agent
+      - repo_ci
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  selected_connector: GitHub
+  connector_fallback_evidence:
+    - connector: GitHub
+      role: primary
+      status: AVAILABLE
+      evidence: GitHub CLI authentication, exact protected-base readback, and post-merge Actions inspection are verified for the current remediation scope.
+    - connector: DWC
+      role: fallback
+      status: SKIPPED
+      evidence: GitHub and the trusted local checkout were sufficient for protected-base, workflow, and CI evidence in this session.
+    - connector: DW1
+      role: fallback
+      status: SKIPPED
+      evidence: No DW1 fallback was required because GitHub remained available.
+  required_behavior_contracts:
+    - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: 956e557fedee58bc7d6eb2d53c2615524db8b16f
+    - path: core/Agent_Response_Presentation_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: 244ba257d995971f5026a86e5668bc8ede8767e2
+    - path: core/Agent_Operating_Runtime_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: 5551a474b060e89560ada2bb3614417425069fde
+task:
+  id: SCRUM-258
+  claimed: true
+request:
+  requester: Nhat Nguyen Quang
+  problem:
+    statement: Protected main now contains an invalid `.github/workflows/g4-g5-evidence.yml` because `g5-recovery` is defined twice, so the post-merge evidence workflow fails before any jobs run.
+    why_now: PR #164 merged on 2026-08-01 and immediately exposed the parser failure on push run 30714057455 for merge commit 32f680332357b91778905f8474e389fdc6a0c83e.
+  desired_outcome: Refresh SCRUM-258 to the current protected base and deliver a bounded remediation that restores one canonical `g5-recovery` job plus regression coverage without widening the bootstrap recovery contract.
+  affected:
+    - GWC maintainers
+    - G4/G5 evidence workflow consumers
+    - Auditors of bootstrap recovery provenance
+  in_scope:
+    - Refresh `.gwc/tasks/SCRUM-258` G0/G1/G2 artifacts to protected main 32f680332357b91778905f8474e389fdc6a0c83e.
+    - Remove the duplicated `g5-recovery` job definition from `.github/workflows/g4-g5-evidence.yml`.
+    - Add regression coverage that fails when the workflow defines `g5-recovery` more than once.
+    - Re-run bounded workflow and instruction validation for the remediation scope.
+  non_goals:
+    - Protected-main write
+    - Merge or auto-merge
+    - Deployment, release, publish, or runtime reload
+    - Production data, production configuration, credentials, secrets, or migrations
+    - Rewriting bootstrap recovery semantics, approval syntax, or recovery provenance
+    - Unrelated task cleanup, node-count changes, or broad contract refactors
+  constraints:
+    - Base on main@32f680332357b91778905f8474e389fdc6a0c83e.
+    - Use Jira SCRUM-258 as the single active task identity for this remediation lane.
+    - Reuse the existing `.kiro/specs/SCRUM-258-g5-bootstrap-recovery` plan without widening scope.
+    - Keep writes bounded to task artifacts, `.github/workflows/g4-g5-evidence.yml`, and focused regression tests.
+    - Preserve the current bootstrap recovery behavior, markers, outputs, and fail-closed authority contract.
+  assumptions:
+    - The duplicate `g5-recovery` job definition is the direct cause of the invalid workflow parse on push run 30714057455.
+    - The existing SCRUM-258 Kiro plan revision `sha256:416439f80bc57b89df0ff3a0db6c524c3a84eb96e99efc509ff12de32a754040` remains compatible with this narrower remediation.
+  risks:
+    - id: RISK-1
+      description: Removing the wrong duplicated block could silently drop required recovery behavior.
+      impact: high
+      mitigation: Keep the canonical full block intact and validate expected recovery markers and outputs after the edit.
+    - id: RISK-2
+      description: Existing tests may continue to miss duplicate workflow job IDs.
+      impact: high
+      mitigation: Add a focused regression assertion for exactly one `g5-recovery` job definition.
+    - id: RISK-3
+      description: Protected-base drift before G2 approval could stale the refreshed envelope.
+      impact: medium
+      mitigation: Bind every refreshed artifact to exact main SHA 32f680332357b91778905f8474e389fdc6a0c83e and reapprove if main changes again.
+  acceptance_criteria:
+    - id: AC-1
+      statement: The refreshed remediation scope preserves one canonical `g5-recovery` job with the expected recovery markers, authority validation, and artifact/comment outputs.
+      verifiable: true
+    - id: AC-2
+      statement: A regression test fails when `.github/workflows/g4-g5-evidence.yml` defines `g5-recovery` more than once.
+      verifiable: true
+    - id: AC-3
+      statement: Focused workflow tests and `python tools/validate_instructions.py` pass locally for the exact remediation branch head before G3.
+      verifiable: true
+    - id: AC-4
+      statement: No merge, deploy, production, credential, projection-authority, or scope-expansion behavior occurs under this remediation lane.
+      verifiable: true
+  unresolved_questions: []
+policies:
+  - id: GWC_CORE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: 32f680332357b91778905f8474e389fdc6a0c83e
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GWC_GATE_LIFECYCLE
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: 32f680332357b91778905f8474e389fdc6a0c83e
+    source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+  - id: GWC_FASTLANE
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: 32f680332357b91778905f8474e389fdc6a0c83e
+    source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+  - id: GWC_KIRO
+    path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+    ref: 32f680332357b91778905f8474e389fdc6a0c83e
+    source_sha: 51283934bde6df414248dded3ba960cdec5d2b25
+  - id: GWC_G01_RUNBOOK
+    path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    ref: 32f680332357b91778905f8474e389fdc6a0c83e
+    source_sha: bc116f07b27ae08c2646a73a021e3cf2e06a0362
+  - id: GWC_G5_CONTRACT
+    path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+    ref: 32f680332357b91778905f8474e389fdc6a0c83e
+    source_sha: c7ec7c65c58995e1e2f17d0e5487302704bb6a1b
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: b55193a7e5cae6727335670823d7900c30589f34
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: af6debcb32cfbbedbcd3e064fb355dca3bb90fbd
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: af302cda2ef0327e295e01911c09cd683f951385
+  - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 956e557fedee58bc7d6eb2d53c2615524db8b16f
+  - path: core/Agent_Response_Presentation_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 244ba257d995971f5026a86e5668bc8ede8767e2
+  - path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5551a474b060e89560ada2bb3614417425069fde
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: ebd13a171c365a1b33f0d47e012491cc80a6b882
+  - path: agents/dwc/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 3d7798da2e9448336e96ca1d0f82c5f02a26a300
+  - path: agents/dwc/capabilities.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 5b1dd9f6b9662e2df1d695b32c345c8ba3fdc698
+  - path: governance/agent-runtime-profiles/chatgpt.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: c040d8c023fbe4113018172f94f47e8f96514c23
+  - path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: bc116f07b27ae08c2646a73a021e3cf2e06a0362
+  - path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 51283934bde6df414248dded3ba960cdec5d2b25
+  - path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: c7ec7c65c58995e1e2f17d0e5487302704bb6a1b
+  - path: .github/workflows/g4-g5-evidence.yml
+    required: true
+    status: AVAILABLE
+    source_sha: e521141702dd70405ea526a21fc32a77e1c58342
+  - path: .kiro/specs/SCRUM-258-g5-bootstrap-recovery/requirements.md
+    required: true
+    status: AVAILABLE
+    source_sha: 227767e56f554a9fd39890d50242b8712b7f77f2
+  - path: .kiro/specs/SCRUM-258-g5-bootstrap-recovery/design.md
+    required: true
+    status: AVAILABLE
+    source_sha: e0c2346980711a571e38096f2ac67cda483e1efc
+  - path: .kiro/specs/SCRUM-258-g5-bootstrap-recovery/tasks.md
+    required: true
+    status: AVAILABLE
+    source_sha: 3deba2bc073e99935e1743b640a5ca3c1258ea5a
+risk:
+  class: R2
+  human_direction_confirmed: true
+implementation_plan_observation:
+  applicability: required
+  reason: The existing SCRUM-258 Kiro plan already covers the same recovery workflow and regression-test lane, and the current defect is a bounded remediation inside that exact plan.
+  source: existing_kiro
+  task_me_applicable: false
+  task_me_available: true
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-258
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
+  plan_root: .kiro/specs/SCRUM-258-g5-bootstrap-recovery
+  requirements_path: .kiro/specs/SCRUM-258-g5-bootstrap-recovery/requirements.md
+  design_path: .kiro/specs/SCRUM-258-g5-bootstrap-recovery/design.md
+  tasks_path: .kiro/specs/SCRUM-258-g5-bootstrap-recovery/tasks.md
+  plan_revision: sha256:416439f80bc57b89df0ff3a0db6c524c3a84eb96e99efc509ff12de32a754040
+  validation_status: PASS
+  validation_evidence: Protected-base readback confirms the SCRUM-258 requirements, design, and tasks files remain unchanged and still cover this duplicate-job remediation.
+  generated_by: chatgpt-agent local review
+  generated_at_utc: '2026-08-01T19:19:19Z'

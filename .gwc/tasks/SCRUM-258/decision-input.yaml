@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g01-decision-input
+generated_at: '2026-08-01T19:19:19Z'
+options:
+  - id: OPT-1
+    title: Remove the duplicate workflow job and add uniqueness regression coverage
+    description: Keep the canonical recovery implementation, delete the duplicated `g5-recovery` job header/body, and add a focused regression assertion.
+    benefits:
+      - Smallest compatible remediation
+      - Preserves the current bootstrap recovery semantics
+      - Restores parser validity on protected main
+    tradeoffs:
+      - Requires refreshed G2 approval because the protected base and task state changed after the prior envelope
+    risks:
+      - The retained block must be the canonical full implementation
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Rewrite the full recovery job from scratch
+    description: Reconstruct `g5-recovery` as a fresh job implementation while trying to preserve current behavior.
+    benefits:
+      - Could remove local duplication and formatting inconsistencies in one pass
+    tradeoffs:
+      - Larger diff and higher semantic-regression risk
+    risks:
+      - Rewriting the job can widen scope beyond the bounded remediation
+    constraint_fit: PARTIAL
+  - id: OPT-3
+    title: Disable bootstrap recovery temporarily
+    description: Remove the recovery lane to make the workflow valid again and defer SCRUM-258 capability restoration.
+    benefits:
+      - Fast parser recovery
+    tradeoffs:
+      - Breaks the governed recovery capability introduced by SCRUM-258
+    risks:
+      - Leaves the canonical recovery lane incomplete and regresses accepted task behavior
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest compatible fix because it restores a single canonical `g5-recovery` job without weakening the existing recovery contract.
+decision:
+  status: ACCEPTED
+  selected_option_id: OPT-1
+  actor: current-user
+  decided_at: '2026-08-01T19:19:19Z'
+  source: 'chat: explicit direction to continue SCRUM-258 remediation after protected-main verification of the duplicate `g5-recovery` workflow defect'
+  explicit: true
+  rationale: Proceed with the bounded parser repair and regression coverage only; keep merge, deploy, and broader recovery-contract changes out of scope.
+  acceptance_criteria_refs:
+    - AC-1
+    - AC-2
+    - AC-3
+    - AC-4

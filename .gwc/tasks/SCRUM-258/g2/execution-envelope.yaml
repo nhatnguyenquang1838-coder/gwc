@@ -1,31 +1,22 @@
 gate: G2_EXECUTION
-approval_request_id: APPROVE_G2_SCRUM-258_20260801_R2
+approval_request_id: APPROVE_G2_SCRUM-258_20260801_R3
 task_id: SCRUM-258
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
-base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
-working_branch: hotfix/scrum-258-g5-bootstrap-recovery
+base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
+working_branch: hotfix/scrum-258-g5-recovery-dup-fix
 expected_head_sha: null
-scope_version: 2
+scope_version: 3
 risk_class: R2
 selected_option_id: OPT-1
 approved_modules:
 - .gwc/tasks/SCRUM-258/**
-- .kiro/specs/SCRUM-258-g5-bootstrap-recovery/**
 - .github/workflows/g4-g5-evidence.yml
-- schemas/g5-recovery-authority.schema.json
-- tools/validate_g5_recovery_authority.py
-- templates/gates/g5-recovery-authority.template.json
 - tests/test_g4_g5_evidence_workflow.py
 - tests/test_g5_recovery_authority.py
-- core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
-- agents/chatgpt-agent/agent-instructions.md
-- agents/dwc/capabilities.yaml
-- releases/changelog.d/*scrum-258*
 authorized_actions:
 - create_guarded_branch_from_verified_base
 - persist_task_scoped_g0_g1_g2_artifacts
-- persist_task_specific_kiro_plan
 - modify_approved_modules_only
 - run_sandboxed_validation_and_tests
 - commit_and_push_guarded_branch
@@ -54,26 +45,24 @@ excluded_actions:
 - pr_base_change
 - evidence_commit_to_main
 - recursive_evidence_pr
+- bootstrap_recovery_contract_expansion
 required_checks:
 - tools/validate_g01.py --gate G2_EXECUTION before first repository write
-- schema and semantic validation for recovery authority
-- focused recovery workflow positive and negative tests
-- full instruction repository validation
-- build instruction packages
-- python compileall
+- Read .kiro/specs/SCRUM-258-g5-bootstrap-recovery/{requirements,design,tasks}.md and persist g2/plan-read-receipt.yaml
+- focused workflow regression tests for g4/g5 evidence
+- python tools/validate_instructions.py
+- python tools/build_project_package.py gwc --output dist
 - complete diff, integrity, secret and unauthorized-file checks
 - required GitHub Actions checks for exact PR head SHA
 implementation_plan_ref:
   applicability: required
-  source: generated_kiro
+  source: existing_kiro
   canonical_task_uid: SCRUM-258
   repository: nhatnguyenquang1838-coder/gwc
-  protected_base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  protected_base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
   plan_root: .kiro/specs/SCRUM-258-g5-bootstrap-recovery
   plan_revision: sha256:416439f80bc57b89df0ff3a0db6c524c3a84eb96e99efc509ff12de32a754040
-  validation_evidence: 'Task-specific Kiro plan remains unchanged; protected-base
-    drift to PR #153 was compared and confirmed non-overlapping with recovery implementation
-    scope.'
-issued_at: '2026-08-01T12:05:00Z'
-expires_at: '2026-08-02T12:05:00Z'
-scope_hash: sha256:ac4d8e1cf6d0bd73667afc478d457512d754ba270887c47fb66eb97e46dcb495
+  validation_evidence: Protected-base readback confirms the SCRUM-258 requirements, design, and tasks files remain unchanged and still cover this duplicate-job remediation.
+issued_at: '2026-08-01T19:24:30Z'
+expires_at: '2026-08-02T19:24:30Z'
+scope_hash: sha256:d08e5fd4117b2918a9ea5f51a75fb9ed4f8a2ec33a66ef8c8d962f625b05bfbc
