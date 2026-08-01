@@ -45,7 +45,7 @@
       "id": "missing-context",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -103,7 +103,7 @@
       "id": "ambiguity",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -162,7 +162,7 @@
       "id": "baseline-drift",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -221,7 +221,7 @@
       "id": "scope-drift",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -282,7 +282,7 @@
       "id": "ambiguous-write-outcome",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -340,7 +340,7 @@
       "id": "observability-gap",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -398,7 +398,7 @@
       "id": "ci-pending",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -456,7 +456,7 @@
       "id": "ci-failure",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -516,7 +516,7 @@
       "id": "ci-sha-mismatch",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -575,7 +575,7 @@
       "id": "stale-review",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -634,7 +634,7 @@
       "id": "approval-expiry",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -692,7 +692,7 @@
       "id": "partial-deployment",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -750,7 +750,7 @@
       "id": "production-partial-success",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [
@@ -811,7 +811,7 @@
       "id": "blocked-authority",
       "provenance": {
         "source_path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
-        "source_sha": "51d8af67d51d414e45b878f3971ad2f2a77f9661bf756bbc7e1e9b721fa279b2",
+        "source_sha": "bb3ba9d8fc7193f957856ccc38ecffd7aae296720bf547ed770a0ed98634f742",
         "source_status": "canonical_explicit"
       },
       "route_nodes": [

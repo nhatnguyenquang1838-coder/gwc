@@ -1,1 +1,2764 @@
-{"artifact_type":"node-registry","declared_slot_count":81,"nodes":[{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.approval-expiry-recovery","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json","source_sha":"0738bd22d1d11cc450467352f1f2b62789c24a45851d28ce48eb56c509cf5afe"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.cas-mismatch-recovery","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json","source_sha":"bd7a5ceb0c899a825840cf393c3772bb846150bbfda50589d5ebb97601197f1b"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.crash-checkpoint-recovery","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json","source_sha":"5b8e7754ebcea1b02bbb1e263017b72bf33ee93f2618586facd9c04d2fdf9fb7"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.duplicate-agent-fencing","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json","source_sha":"69d57a07e8d518a2576188338b667e01a09122dd722d8ebdf9baaf793e9d7089"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.lease-expiry-recovery","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json","source_sha":"8f659620841430e32f77c3a985eee7fc5dfcac4720fb7e8f9c5143837041b26c"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.stale-session-reconciliation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json","source_sha":"8b08557107ceaf5c362eb1b052a9616a9301b6e92b64ccf79b3bd7f371dcaf7e"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.timeout-recovery","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json"],"maturity":"candidate","provenance":{"discovery_basis":"kg","source_path":"core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json","source_sha":"5f74758c54e9b83f6bd91468a3fb3d2782905d0500523b3b6196724a0cb64cf0"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"keep","rationale":"source-backed"},"source_status":"canonical_explicit","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.unknown-write-reconciliation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json","source_sha":"f274b6a29abef16be8432204f1c7287928b6e3cac35015e6447fec9cc7e93e0d"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"failure_recovery","id":"failure_recovery.version-drift-rollback-routing","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json","source_sha":"9867f53234c8d351d5ee3c0a57ded2339ddcf7350ea391abb43fa4173fa71468"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.approval-command-validation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json","source_sha":"cc0758bf2e127e1e9067dcd468443c7c0f4d7c7adcbef9fae22ed9cfd8e68f4c"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.approval-token-generation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json","source_sha":"6ff0be7a93b9015df61a96788282ee9d890533c732d885957c2cca1231eae9e8"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.authority-boundary-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json","source_sha":"8388f48c2eecfbf424bd94a0019cf9ba78ccbe3da5e529fbd17ea64ef7aed98a"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.blocked-action-escalation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json","source_sha":"ded663e67f4cef0c6aef6fe184605d151f465d5d632df444d2a83ada9575c1cd"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.evidence-artifact-map","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json","source_sha":"8f69398669783fbc88bef056b1d967f62e7a89a07c13c90a2aff6fa8718b230b"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.g2-execution-envelope-render","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json","source_sha":"19ff32c91469a651c9716452f5d8af9d4301cc6702903ae72bc515d31d89acd0"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.gate-state-resolution","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json","source_sha":"0a921733f49713a47e69834a6d342e3bfb460d84b78674db801fd398f4dd1650"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.gate-transition-decision","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json","source_sha":"68c61c043798a9a3e18c9f2e01e03a07f1442f87f174ef87a338aa6eda4f92dc"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"gate_authority","id":"gate_authority.scope-hash-calculation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json","source_sha":"24d1b94b8036309e2507fa9e8cc7ec6eac08dd814b358b584ff4c22fe966480b"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.context-gap-escalation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json","source_sha":"1313aeec520f0cf4e1be6ce7ddda7df648163da81fe155993b636ebec8014672"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.files-read-scope","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/files-read-scope.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/files-read-scope.node.json","source_sha":"f1238a77009907c42a93a6bd055204db1513aa06897a11659ba5e78818ef7a1b"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.files-write-scope","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/files-write-scope.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/files-write-scope.node.json","source_sha":"43bceb7b985249c4ec63f840b60dd0999acf16c57fa1f060e6dd74af64dc23fa"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.intake-card-render","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/intake-card-render.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/intake-card-render.node.json","source_sha":"754e93b17e8540033b122fec41be99eed01c013a5ce054ea84006baabdf11838"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.protected-base-capture","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/protected-base-capture.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/protected-base-capture.node.json","source_sha":"94cb561fabafa6ccad870607c1f621e4c8a85e48f9c17a62dc8669c6927f5473"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.repo-identity-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/repo-identity-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/repo-identity-check.node.json","source_sha":"83b4223af135ebd12db10ec213a837e74b761263bd523a0116104b24c9d42187"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.request-intake","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/request-intake.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/request-intake.node.json","source_sha":"406a39fc7bad2a93cbaa23781464512816e73bb9ba4f58781f81424a367f3488"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.risk-classification","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/risk-classification.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/risk-classification.node.json","source_sha":"0c9e06d8dadc6de00dcdbd23a8601b4ed4fa96581731db98596f0443ca6c1ea5"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"intake_context","id":"intake_context.source-resolution","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/intake_context/source-resolution.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/intake_context/source-resolution.node.json","source_sha":"9ea5e0e1ce3f1d752935fcd5bfb04309e71886ea7059a59d8c1394de9cebaa92"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.deterministic-hash-verification","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json","source_sha":"ab357d8fcf5f6c18664ea47b64d6fda2f96934fa0759eca0e5c173de19c9c5f5"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.entry-schema-validation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/entry-schema-validation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/entry-schema-validation.node.json","source_sha":"dfac06e668ff2b71f9ea492f5f1dad9cae93f84edb11b47d79cbe39f053f4cff"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.export-failure-routing","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/export-failure-routing.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/export-failure-routing.node.json","source_sha":"6ceeb3726686c6776a3a1b94ae9fdf7e988475eedf0f1f0d317636791f6a72b0"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.export-manifest-generation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/export-manifest-generation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/export-manifest-generation.node.json","source_sha":"4f74e2cc3c202b503abd5d24f3db82e1182e3c47b7566b3836b578a9812f6184"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.governance-tree-build","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/governance-tree-build.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/governance-tree-build.node.json","source_sha":"b034431d562a95e839e9680170b372691d95ac2511ad46c62571ee9e5408ed0e"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.package-manifest-load","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/package-manifest-load.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/package-manifest-load.node.json","source_sha":"0e91ec39e992fc99ba048bb426bb0b7ee9f8748b0f94ed4fdbf599b3716c83b6"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.smoke-verification","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/smoke-verification.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/smoke-verification.node.json","source_sha":"56f16597ef9a0b4c41c21021c021512b93d7b6d79484d9bf51aadc61cd6b652e"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.source-path-safety-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/source-path-safety-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/source-path-safety-check.node.json","source_sha":"83afd5c53ad34c09fc6ea0e5956f9cb96da334abbcd4f08026d897389175aad4"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"package_export","id":"package_export.target-path-safety-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/package_export/target-path-safety-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/package_export/target-path-safety-check.node.json","source_sha":"6906da93f8bd8166dced3b240f1e1e4759ecb6264359e48d9fd1bdc8a6092e7b"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.base-drift-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json","source_sha":"6f39d9230d2a0a228ff3dcbe561839229fde57d5b48bf509352ae2d5a74601c1"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.branch-creation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/branch-creation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/branch-creation.node.json","source_sha":"cd582931853151ee46f9fa5d7d5804825f0c821c766adc4b9817024e472a2da7"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.ci-failure-repair","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json","source_sha":"ed7d6e6b0144c85553f923d8d59359d30602bd51682fb1675062e0e0208fd913"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.ci-run-capture","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json"],"maturity":"candidate","provenance":{"discovery_basis":"kg","source_path":"core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json","source_sha":"9a003cd7e42cb38471039932e3f0719fa8579d20c92f5ff2e094253a5b57b0e1"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"keep","rationale":"source-backed"},"source_status":"canonical_explicit","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.diff-readback","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/diff-readback.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/diff-readback.node.json","source_sha":"04f1d80c882707c419f1e2f03ec3cff6eae9466d1f5772e0e09c6336121c9ec9"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.draft-pr-creation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json","source_sha":"e2528c17f4a9abc62ed8bcdc3a33082e80aa27d6fe66b4a4a4c0d2b1647f8a22"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.pr-blocker-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json","source_sha":"8aa2633daa9652a78d344384e1da2d07493309e1ff46038628bd6fb3f511c951"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.ready-for-review-promotion","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json","source_sha":"a6a44605bd375779172a65453655067e363e51769c1a96f703d1ab8eea16899a"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"repo_delivery","id":"repo_delivery.scoped-file-write","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json","source_sha":"7f6b10c2d16db7de8ea4b0575b4bc688da3ba1dc7b27a99615369318bf5b0dcf"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.cas-write-guard","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json","source_sha":"65b8da68fe41823211e6f5cf3620fdcd7ff58b9091c2dc06799459575b8483ed"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.checkpoint-capture","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json","source_sha":"c9e22c90fc545f4cef30dc4a4a6189d4181b15f202fd427eedfeefdc2dd31bac"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.checkpoint-expiry-cleanup","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json","source_sha":"d86ee9cd64d85252ba547f8b86b6a5db9af9fd0a4bcfd1e2034592de8db9262f"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.checkpoint-persist","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json"],"maturity":"candidate","provenance":{"discovery_basis":"kg","source_path":"core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json","source_sha":"b857733ddb320f9e0e731c0bf511f4abf5d0b0fd71f008058c673ae5dd8c3146"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"keep","rationale":"source-backed"},"source_status":"canonical_explicit","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.lease-acquisition","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json","source_sha":"797e18962b085a9b0e9c988f954eb2dc9bb68f4df296a3049f796197f3293cf1"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.lease-renewal","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json","source_sha":"4baab9ae98d0dafacab7b1df298f50d90fe90856faad3b3452eef4d28b1a5562"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.resume-token-generation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json","source_sha":"7410d2c428b394da490b02092a3355e61bc2e19f2ce54734fb6e61c567d62e56"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.resume-token-validation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json","source_sha":"0d4e921cece69a63a141770cc65eb8f07432f6382f22be8c7edd9cbfb1270d9c"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"runtime_checkpoint","id":"runtime_checkpoint.state-reconciliation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json","source_sha":"17292b5e5b058838f3df5ef441aaebc736e61546f93ba2b55b22a911d80f261b"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.batch-admission-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/batch-admission-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/batch-admission-check.node.json","source_sha":"cefb9ff10265a34cee5f403a56dbbe4ef360feb13551aadf6763f6ee2db0cdbc"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.batch-size-limit-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json","source_sha":"a1cf7f31cb70d4e9bb8bc5d3cf54ecb902bc9fdc693e49181d0d049e85a209a7"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.catalog-cardinality-readiness","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json","source_sha":"e7b779a67ce778b083c69fa9348070f615766a2f7a1cfeb0c42a58e989feff60"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.exact-head-readiness-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json","source_sha":"d0fdaaeabf7ebde6d72b6e8884077d92f9972d4bad87eba32fd9659563b7b0f6"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.execution-throttle-control","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json","source_sha":"ff5c074fc3fee1a4d8270468ca67bcfe7d7e3b4f9850272fb72bd2b810558529"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.independent-audit-handoff","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json","source_sha":"87911ae6835261039355837733beeeab1a33c289646bb7bfeb987d9f8720ee3a"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.previous-batch-g5-verification","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json","source_sha":"eb950f1956f87041132788e33bfb87fe6934c16684b8a4887a33d4e2b95ec5c3"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.rollout-progress-projection","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json","source_sha":"7141d20614202a0f228beeeda527ff688c81f906c5f3e8675007ae020058c72c"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"scale_control","id":"scale_control.workflow-run-observability","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json","source_sha":"6e4e4c0d20e0ddcc251ee8cd1a4f5db04434840ffd39728cb129f3788c1a855e"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.ds-admin-state-projection","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json","source_sha":"7d078dda36f89fd44490062001e5b394056721c496c7e973dd528fda5639a18e"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.external-audit-event-projection","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json","source_sha":"2db9d634bcb86a431a9d3eba7d2f38f2f78397ae5b11706cb2fdcde1c42b073e"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.projection-drift-detection","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json","source_sha":"6323ff4229f45cf4f7f2a1d8ef8bc221090a57342d77a763ceba1161a00c0fb1"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.projection-evidence-linking","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json","source_sha":"8f4cd86aa0f2255eaa5744224e79492eaffe61822f0ac992ebbae76505448f0f"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.projection-failure-routing","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json","source_sha":"9fc32252b15856ae873768321de0be1530aad20e5f9cfc3c518519effe335045"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.projection-privacy-boundary-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json","source_sha":"f789cb544b752ea779381e12d19a3eea8a015c261cd3fcfc2dd7222c5928a9e0"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.projection-reconcile-readback","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json","source_sha":"ab13b71f05aeaf2897ab1ec1df33f168d3a72746bcb7dd5f23d1c707276a52c6"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.projection-source-authority-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json","source_sha":"705694648f2d11397ec1007f90f4a978ae0303fcc55f0aba1c16a18e7c624f5f"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"automatic","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"sync_projection","id":"sync_projection.task-center-sync","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/sync_projection/task-center-sync.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/sync_projection/task-center-sync.node.json","source_sha":"a9f68b72cc3b019354c09c76a4de11ccb3d0c469cdf4178f4a3d8ac4bf073395"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.blocker-severity-classification","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json","source_sha":"d446d8c9a12233f39384c9756ae5670b46c32c85162714d30f8f0edcf63b4449"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.ci-evidence-capture","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json"],"maturity":"candidate","provenance":{"discovery_basis":"kg","source_path":"core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json","source_sha":"781121066b82029a3ed59b8f277cfd21f860d675522ec70a7177d14ade8ddc2a"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"keep","rationale":"source-backed"},"source_status":"canonical_explicit","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.evidence-quality-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json","source_sha":"13ce7d32bc1f14555186ba3011f11f820ce9c52ff9df8948c82a5d34fd874bec"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.g3-pass-decision","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json","source_sha":"6d9a3c9e168b3628132d1ec8959aef3a07658eac83fa9c7d08d768b26db4478f"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.reproducibility-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json","source_sha":"7e5046ba9a29074a7f14163cc243e335eb1050fe88a6b64537c9fc813bd43a72"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.schema-validation","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/schema-validation.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/schema-validation.node.json","source_sha":"be154c88c506648a2dd31eb2ca7a9b4083a08bd475a694888de4b27ecf1cc698"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.side-effect-check","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/side-effect-check.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/side-effect-check.node.json","source_sha":"93cd88fd17652004d752d003fda3fb12f71641d9fcddf76eec9b4b2f1aef2c17"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.unit-test-mapping","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json","source_sha":"1ac912d1e006a6e765e861bad58b4b7a9740c9ed7398903ff66c33b1d00bfcbf"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"},{"artifact_type":"runtime-node","authority_class":"human_required","determinism":"external_state_dependent","effect_class":"read_only","evidence_contract":"descriptor","family":"validation_quality","id":"validation_quality.validator-execution","idempotency":"readback_required","implementation_refs":["core/node-architect/node-catalog/validation_quality/validator-execution.node.json"],"maturity":"experimental","provenance":{"discovery_basis":"plan","source_path":"core/node-architect/node-catalog/validation_quality/validator-execution.node.json","source_sha":"9a058bee0e3d008dcb55b8cbac4bdc625af030db0b7699a43e01e530f20db960"},"reversibility":"reversible","schema_version":"1.0.0","slot_review":{"decision":"defer","rationale":"proposed"},"source_status":"proposed_registry_slot","suspension":{"resume_metadata":["task","revision"],"suspendable":true},"version":"1.0.0"}],"provenance":"core/node-architect/node-catalog descriptors and SCRUM-100 current-state audit","registry_id":"gwc-runtime-node-registry","revision":"scrum-104-20260726","schema_version":"1.0.0"}
+{
+  "artifact_type": "node-registry",
+  "declared_slot_count": 81,
+  "nodes": [
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.approval-expiry-recovery",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json",
+        "source_sha": "f237eca939e0a795f672d024d170e249721eadb2591b4846264dd3371ca5ac18"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.cas-mismatch-recovery",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json",
+        "source_sha": "2472481d933cb9a89c063ad2e557b29d0b507da698eb4baa7326e4ba71546c0c"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.crash-checkpoint-recovery",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json",
+        "source_sha": "5dc556635830d626d7ae971fe986c6ffaf6ae9c46c979ee3b859310e616e1317"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.duplicate-agent-fencing",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json",
+        "source_sha": "71dd5ae162149b4216b5d5bfcf05c9089f7c3fd5a69df4d067c4e5a2dbf9cfba"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.lease-expiry-recovery",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json",
+        "source_sha": "7e4ad3bbc13d2ed84e987554ab90327278305e93995caa77ff98e909b6b43aad"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.stale-session-reconciliation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json",
+        "source_sha": "922963e9b73ee52d48a6ebe41c7ea7243f5565a5c86fcbe78b6882cff63173dc"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.timeout-recovery",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json"
+      ],
+      "maturity": "candidate",
+      "provenance": {
+        "discovery_basis": "kg",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json",
+        "source_sha": "06956d501e6f03de1490b633e9779ffd07773bae46e3604dba71bddc010c79d3"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "keep",
+        "rationale": "source-backed"
+      },
+      "source_status": "canonical_explicit",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.unknown-write-reconciliation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json",
+        "source_sha": "228e37c66071094e493bd818ccacfffabf6135d5b9dbcb8b6c14d2467f393f6d"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "failure_recovery",
+      "id": "failure_recovery.version-drift-rollback-routing",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json",
+        "source_sha": "da449ae56173bedf79727353f908b2927a294a4ee528b279839572ea4f18eef4"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.approval-command-validation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json",
+        "source_sha": "06c9216e6610a89f16e400d5a3d758cdf5ca5d2b115e406017517157be6a1711"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.approval-token-generation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json",
+        "source_sha": "cfce9b54bb9b05ed3f25d5203cdf6e3bbdab227ba641de9218f8bc3e8d672bfe"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.authority-boundary-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/authority-boundary-check.node.json",
+        "source_sha": "0481c62021565dbaec81d785cff7557bf696f6beca17d6f5877c878d22a62caf"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.blocked-action-escalation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/blocked-action-escalation.node.json",
+        "source_sha": "22d8da5aeeaee5d1b1f29de30c194b9cbfd1398d2fe43b9e8b0f90484cb0c577"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.evidence-artifact-map",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
+        "source_sha": "0cfadd394b481ced6e917849023458fc015c203907991758183b5c8bdb45040e"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.g2-execution-envelope-render",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/g2-execution-envelope-render.node.json",
+        "source_sha": "fc882c36d1e0c542a026b8c95bdfc0cf8fde61a56a84648bedede24290f4a8c7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.gate-state-resolution",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json",
+        "source_sha": "7091126590f55ffe3cce5931063ae933ba0d492c83f4f32df78a108cffc33c53"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.gate-transition-decision",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json",
+        "source_sha": "33c7920777a9043ee07fbe0c1fd2a6ef159b827bd248f32c6234fdb52648dbf5"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "gate_authority",
+      "id": "gate_authority.scope-hash-calculation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json",
+        "source_sha": "b840bd55ecc85c5408f788b0ce097e5d794001a622b88352cf04a06505fd5aae"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.context-gap-escalation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json",
+        "source_sha": "7664876f3a7ad77d946c0862529654ec4de49ebc1dc255b936221e61be42eaff"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.files-read-scope",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/files-read-scope.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/files-read-scope.node.json",
+        "source_sha": "a57ba5907d7e9f3d90790db12810fadef0db490d8fd9adfd82657ccfad5d898a"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.files-write-scope",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/files-write-scope.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/files-write-scope.node.json",
+        "source_sha": "47bff1783274855112de0b716b6dd408c32f61a6d298d841e620717162574f60"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.intake-card-render",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/intake-card-render.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/intake-card-render.node.json",
+        "source_sha": "a09b59297fcde14a7011158750b78a67c9559b59d6fa3f30ae001cc66e56daaf"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.protected-base-capture",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+        "source_sha": "d94e00a01f790d9c8455cc341ec25da4accad8d22e3c004adc17c194d2976f53"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.repo-identity-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+        "source_sha": "f3a6427a88e8e56d6554d8a921602d1be20fb2f063b5e37368810c4fab5b7bcd"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.request-intake",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/request-intake.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+        "source_sha": "b76a34689e3c2161e7798fb89e192b527e903035a0de034b494027d9587ca273"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.risk-classification",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/risk-classification.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/risk-classification.node.json",
+        "source_sha": "0c9e06d8dadc6de00dcdbd23a8601b4ed4fa96581731db98596f0443ca6c1ea5"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "intake_context",
+      "id": "intake_context.source-resolution",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/intake_context/source-resolution.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/intake_context/source-resolution.node.json",
+        "source_sha": "aff2dc93c98cea3d4763dc5d3bebfe77d01f8f2c898f16f38d560aba86e85694"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.deterministic-hash-verification",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json",
+        "source_sha": "e8b62a437e58f1b6f64eccc46ecdf90c4b207da17fd77da8ba11bd57516dd7d2"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.entry-schema-validation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+        "source_sha": "5e5c6509d8691655fc762caff00f52c3b401ac600a626dc32702049135a9ce84"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.export-failure-routing",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/export-failure-routing.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/export-failure-routing.node.json",
+        "source_sha": "25e00ba11fd451ce9a4a5e34e54f527a4a927374fca1b4f92043f8b58caa26f7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.export-manifest-generation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/export-manifest-generation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/export-manifest-generation.node.json",
+        "source_sha": "6ec209736bd93b23b4337e2eddfe153973e39d3843e3c8bfb8b3adcc6127a953"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.governance-tree-build",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/governance-tree-build.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/governance-tree-build.node.json",
+        "source_sha": "73373ae4f8fe73f6c52e9dfec966340b41924d0bd51805fe736b1ffd4a92f272"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.package-manifest-load",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/package-manifest-load.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/package-manifest-load.node.json",
+        "source_sha": "f84385f87ef03b49559aae090ced98325116273f3c876496df5a332ddeeb8215"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.smoke-verification",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/smoke-verification.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/smoke-verification.node.json",
+        "source_sha": "5dba6a112bd8c08300c43de44abe12954fd6c66e2f9176c415fd80a06bc9dbf9"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.source-path-safety-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/source-path-safety-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/source-path-safety-check.node.json",
+        "source_sha": "645ab5c761b2474beb8c836bb779d6beb2dba77daa70c5c0cedcc75b1e0e5858"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "package_export",
+      "id": "package_export.target-path-safety-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
+        "source_sha": "e67e328d455125cbd2f2fdd070134982567dab39f715327a2f6a5e84ddc3a273"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.base-drift-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json",
+        "source_sha": "92026132708380e9bf118ddacb9b4e7a406e79a6a44c32831d04f57655b0c859"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.branch-creation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/branch-creation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/branch-creation.node.json",
+        "source_sha": "7b5c820a182cd8a020d5273231e99aa3cc5f818881d7a6abefade886a1cbca0f"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.ci-failure-repair",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json",
+        "source_sha": "ce87a95eedf164d082b25be7075a683c8192c6f46fd6fd65f5246ff7f7ce6ac0"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.ci-run-capture",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json"
+      ],
+      "maturity": "candidate",
+      "provenance": {
+        "discovery_basis": "kg",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json",
+        "source_sha": "7423020d97b2b6a7b5bf1cb77c200c1b0b18c323636d0fdb143bb6031c287f5c"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "keep",
+        "rationale": "source-backed"
+      },
+      "source_status": "canonical_explicit",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.diff-readback",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/diff-readback.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/diff-readback.node.json",
+        "source_sha": "f704117967b68f426b0545e1ab12622c4c80887d65fe2afd328a00cd8f0e5303"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.draft-pr-creation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json",
+        "source_sha": "8d193980ee23f230cb8b580754bfd982d2c28c3b0b9453b6761b624f31971228"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.pr-blocker-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/pr-blocker-check.node.json",
+        "source_sha": "7712565b19963066b1d149d8d16833a95837dd3e9d091b86664bd4bfe7214d83"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.ready-for-review-promotion",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/ready-for-review-promotion.node.json",
+        "source_sha": "84d71ffa9e9720b24376880532a218d2ad5184c4d3bdac022887e35d84dd4821"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "repo_delivery",
+      "id": "repo_delivery.scoped-file-write",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json",
+        "source_sha": "db7ae1c7b08953d56482f1f0d65371ffd72b44769630af3597455e8e13d60cf7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.cas-write-guard",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json",
+        "source_sha": "b9d16ccef80fcbab208bc3289a635281e41ba881b7dabe0f30d09539f17d0251"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.checkpoint-capture",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-capture.node.json",
+        "source_sha": "95b4adc592872e8a6657c392d0824783c4744aa3dcb5bd29b4465e754abea522"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.checkpoint-expiry-cleanup",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json",
+        "source_sha": "6d1c037e912073b3a05e5f5951620a4ec1051b3c7f16d07ef267c4d44e7741e7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.checkpoint-persist",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json"
+      ],
+      "maturity": "candidate",
+      "provenance": {
+        "discovery_basis": "kg",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/checkpoint-persist.node.json",
+        "source_sha": "3f12552106f3da81516fda9603642450a43a0ee0b86992366187772bb85c09c7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "keep",
+        "rationale": "source-backed"
+      },
+      "source_status": "canonical_explicit",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.lease-acquisition",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json",
+        "source_sha": "8d28de4335ef64a5e6466a5639a862549f91af3bff0ad8069f6b0a2072dcee1f"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.lease-renewal",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/lease-renewal.node.json",
+        "source_sha": "8da931af83c83cddab9021680d1f346603bbb60c23f7dc7f9b5ba772579c1833"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.resume-token-generation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json",
+        "source_sha": "180537ed1b767c6ccc75accd1b4c8eaea2c14aeaf1fa5bbc7551b05a1afde4d8"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.resume-token-validation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json",
+        "source_sha": "0ed404adc4790194d6bf1bb8d4b35424bef1071b8351d060929358d2e012bb3d"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "runtime_checkpoint",
+      "id": "runtime_checkpoint.state-reconciliation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json",
+        "source_sha": "45347a0725fc89f5f26e55b87f476f14ceef3b9e8d1e84d9a62edb0c6e30020b"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.batch-admission-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/batch-admission-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/batch-admission-check.node.json",
+        "source_sha": "9530b3c448f4c3901373981690f979a21ebedcecbb16c05afae45167c2136564"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.batch-size-limit-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json",
+        "source_sha": "1963eca0d745562b6ee3e4b4b06ea34970e64b6de9940f6bac0e7e88e7a1c255"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.catalog-cardinality-readiness",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json",
+        "source_sha": "6229171375562bb59dbe8fd44009b6f8ad3e3d5099d0c91b800f624bb4774b67"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.exact-head-readiness-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json",
+        "source_sha": "1d3c224c2eb9fd188c71be25f6559dc8b1f1893b4531cb82174911742ccde5c0"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.execution-throttle-control",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json",
+        "source_sha": "328f61b18ebcb557f90903f3562ccee4832ab10e09e4023b60d50719487eaef7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.independent-audit-handoff",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json",
+        "source_sha": "3779af11d7722e57fb59a77542ec74c66dfd38ffd722648d7fe519e4c76e1a0e"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.previous-batch-g5-verification",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json",
+        "source_sha": "a393eed716c106fa535e474504ab29d8482be8e92de19b8c794e39359afc7b31"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.rollout-progress-projection",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json",
+        "source_sha": "6508e69fdbecd2df41177400ed0a6b244defaafe39d6581f032029bc35095dad"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "scale_control",
+      "id": "scale_control.workflow-run-observability",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json",
+        "source_sha": "130c3b4495b7e1a3df649bb2480800add538028127b11e9b415cd57dc03eb8c3"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.ds-admin-state-projection",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json",
+        "source_sha": "c324c9dbe3f32af89448c1c37f7a3fd45bd6c7ab9afcbffa33a26bdccfc65dbd"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.external-audit-event-projection",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json",
+        "source_sha": "871e0ceb29bfa9ad398004bafadb649f47f0a4ee6d901386c463b11059b13113"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.projection-drift-detection",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json",
+        "source_sha": "443cb6ca1edfb1130782b07a1800b817b8539b892e8dde1688161e2938cb6df6"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.projection-evidence-linking",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json",
+        "source_sha": "ef075cdc9def6b9afa37760e9d8699133322a8bf7c2b5c902cdeee19f51f2025"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.projection-failure-routing",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json",
+        "source_sha": "cae8ebcde26da22798eed3b45bca2dfa5a36331ac01a359ee9755b2c17c8c0fb"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.projection-privacy-boundary-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json",
+        "source_sha": "52b9596930a4e25673e30f1936bcc39469881d4a1d19e30a1072bd6640baf343"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.projection-reconcile-readback",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json",
+        "source_sha": "ad0c2b123aca22b2a0796cfb4d90916684681ec9418acb6ce26fc78b7d4afc52"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.projection-source-authority-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json",
+        "source_sha": "71bd114f030236db5180c14240b387f308baff93e7ad8b5f30866e896a5d0fbd"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "automatic",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "sync_projection",
+      "id": "sync_projection.task-center-sync",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/sync_projection/task-center-sync.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/sync_projection/task-center-sync.node.json",
+        "source_sha": "8347b744781592ff2466c2bad000c24d52a00e4bf1b30fdd6fb00f50fc006cf6"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.blocker-severity-classification",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json",
+        "source_sha": "56342616b87af84ec8503b078d5923e42504fcc5830046331cefff30737854eb"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.ci-evidence-capture",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json"
+      ],
+      "maturity": "candidate",
+      "provenance": {
+        "discovery_basis": "kg",
+        "source_path": "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json",
+        "source_sha": "2ff5462663ee8e98e0671f2890006e78f2b5474244ddfc78b8c7ef7fddfbf2dc"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "keep",
+        "rationale": "source-backed"
+      },
+      "source_status": "canonical_explicit",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.evidence-quality-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json",
+        "source_sha": "e4c75e1af94b182f4b79a555022ec73a76ca1b3765daeaa36dff0776e3fe0257"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.g3-pass-decision",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json",
+        "source_sha": "36317411fdd68065d5ba1044726d8fa81694ae37431f660c1ac884d04eab6982"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.reproducibility-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json",
+        "source_sha": "22a9c8eefa54ab98c10ab6fada2d1feeed0a60d6b1991ab2c684961e5fe6e0f2"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.schema-validation",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/schema-validation.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/schema-validation.node.json",
+        "source_sha": "f14c68e18987c530fd1bf0a848b24b45072b12d4536f919dba1ea674e0350d60"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.side-effect-check",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/side-effect-check.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/side-effect-check.node.json",
+        "source_sha": "6bce1b9d56680b084ba3589ede56b13d7954a970ed085355bafd85eaf3e3f39f"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.unit-test-mapping",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json",
+        "source_sha": "029d0c931e11c83afc861e4f8ef3ea8a9ef3fb18a916a3f1e7fa795a82884410"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    },
+    {
+      "artifact_type": "runtime-node",
+      "authority_class": "human_required",
+      "determinism": "external_state_dependent",
+      "effect_class": "read_only",
+      "evidence_contract": "descriptor",
+      "family": "validation_quality",
+      "id": "validation_quality.validator-execution",
+      "idempotency": "readback_required",
+      "implementation_refs": [
+        "core/node-architect/node-catalog/validation_quality/validator-execution.node.json"
+      ],
+      "maturity": "experimental",
+      "provenance": {
+        "discovery_basis": "plan",
+        "source_path": "core/node-architect/node-catalog/validation_quality/validator-execution.node.json",
+        "source_sha": "599a8273590c7e22de1fbb7f808bc69803d8030c5ad6be21c69fb7d304f5b3a7"
+      },
+      "reversibility": "reversible",
+      "schema_version": "1.0.0",
+      "slot_review": {
+        "decision": "defer",
+        "rationale": "proposed"
+      },
+      "source_status": "proposed_registry_slot",
+      "suspension": {
+        "resume_metadata": [
+          "task",
+          "revision"
+        ],
+        "suspendable": true
+      },
+      "version": "1.0.0"
+    }
+  ],
+  "provenance": "core/node-architect/node-catalog descriptors and SCRUM-100 current-state audit",
+  "registry_id": "gwc-runtime-node-registry",
+  "revision": "scrum-104-20260726",
+  "schema_version": "1.0.0"
+}
