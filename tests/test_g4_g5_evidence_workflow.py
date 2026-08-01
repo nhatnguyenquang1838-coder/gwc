@@ -82,7 +82,7 @@ def enhanced_g5() -> dict:
                 "merged_head_sha": HEAD_SHA,
                 "merge_commit_sha": MERGE_SHA,
                 "merged_at": "2026-08-01T10:01:00Z",
-                "merged_by": "human",
+                "merged_by": "human-merger",
                 "exact_head_match": True,
             },
             "canonical_machine_evidence": {
@@ -142,7 +142,7 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
         self.assertNotEqual(0, result.returncode)
         self.assertIn("approved head", result.stdout)
 
-    def test_workflow_separates_g4_and_g5_without_recursive_pr(self) -> None:
+    def test_workflow_separates_and_hardens_g4_g5_evidence(self) -> None:
         text = WORKFLOW.read_text(encoding="utf-8")
         for marker in (
             "issue_comment:",
@@ -151,6 +151,12 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
             "gwc:g4-authority-receipt",
             "gwc:g4-merge-proof",
             "gwc:g5-status",
+            "github-actions[bot]",
+            "issues.getComment",
+            "getCollaboratorPermissionLevel",
+            "pr.merged_by.login",
+            "hasPending",
+            "CONNECTOR_OBSERVABILITY_INCOMPLETE",
             "github_actions_artifact",
             "projection_only",
             "no_recursive_evidence_pr: true",
