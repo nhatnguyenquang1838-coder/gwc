@@ -1,0 +1,14 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+canonical_task_uid: SCRUM-214
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+plan_revision: sha256:a7362f6247be76d57d5acf05ffaf09f29a08221b37f5759a7ca98dbee255703c
+paths_read:
+  - .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/requirements.md
+  - .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/design.md
+  - .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+read_at: '2026-08-01T18:57:00Z'
