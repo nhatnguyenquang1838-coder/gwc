@@ -7,5 +7,5 @@
   "gates": [
     "G3_PR"
   ],
-  "description": "Check G3 evidence completeness, including a schema-valid code_reviewer invocation receipt with exact task, repository, PR, head SHA, scope hash, read-only access, empty write-actions evidence, and non-stale result before declaring G3 review closure."
+  "description": "Check G3 evidence completeness, including a schema-valid independent-review receipt from a capability-supported agent or human source with exact task, repository, PR, head SHA, scope hash, reviewer identity, read-only access, empty write-actions evidence, and non-stale result before declaring G3 review closure."
 }
