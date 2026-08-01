@@ -1,0 +1,99 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-01T18:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-214
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The SCRUM-259 Client route contains an optimistic placeholder for validation_quality.ci-evidence-capture and cannot produce immutable exact-head replay-safe CI evidence.
+  why_now: SCRUM-214 is the first unresolved node in the active SCRUM-256 dependency chain and blocks SCRUM-215 and SCRUM-219.
+desired_outcome: Deliver one M5 replay-safe CI evidence capture node integrated into the existing Client route without granting later-gate authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - SCRUM-256 Client runtime
+  - SCRUM-215 evidence-quality-check
+  - SCRUM-219 G3 decision
+scope:
+  in_scope:
+  - Closed CI-evidence decision schema
+  - Replay-safe CI evidence utility
+  - Focused tests
+  - SCRUM-214 Client handler binding
+  - Task/Kiro/changelog evidence
+  non_goals:
+  - SCRUM-215 implementation
+  - SCRUM-219 implementation
+  - F9 or broad 81-node rollout
+  - Package/export
+  - Merge, deploy, release, production config/data, secrets, migration or G6
+constraints:
+- Reuse current ci_run_capture.py and checkpoint_store.py
+- Absence is never PASS
+- Exact head SHA binding is mandatory
+- Checkpoint before wait/poll
+- Jira/Slack are projection only
+assumptions:
+- Current main remains 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+- Existing CI capture and checkpoint utilities are reusable compatibility surfaces
+risks:
+- id: RISK-1
+  description: Optimistic evidence may synthesize readiness
+  impact: high
+  mitigation: Closed reason codes and fail-closed tests
+- id: RISK-2
+  description: Replay may duplicate evidence/checkpoints
+  impact: high
+  mitigation: Stable digest and idempotency tests
+- id: RISK-3
+  description: Scope may leak into SCRUM-215/219
+  impact: medium
+  mitigation: Separate downstream handlers and explicit exclusions
+acceptance_criteria:
+- id: AC-1
+  statement: Exact-head terminal success/failure/cancelled states are classified deterministically.
+  verifiable: true
+- id: AC-2
+  statement: Pending, unavailable and timeout states persist a resumable checkpoint before continuation.
+  verifiable: true
+- id: AC-3
+  statement: Stale head and SHA mismatch fail closed.
+  verifiable: true
+- id: AC-4
+  statement: Identical replay returns the same digest without duplicate effect.
+  verifiable: true
+- id: AC-5
+  statement: Client runtime uses the new SCRUM-214 handler and no manual fallback.
+  verifiable: true
+- id: AC-6
+  statement: Focused validation and exact PR-head CI pass; G4/G5/G6 remain excluded.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch_after_g2
+  - modify_approved_files
+  - run_sandboxed_validation
+  - commit_and_push_guarded_branch
+  - open_or_update_draft_pr
+  - monitor_exact_head_ci
+  - independent_g3_review
+  downstream_non_goals:
+  - merge
+  - deploy
+  - release
+  - production_operation
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - exact head SHA
+    - focused tests
+    - schema validation
+    - full diff review
+    - required CI
+    - independent review
+unresolved_questions: []
+status: READY
