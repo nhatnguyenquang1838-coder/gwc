@@ -1,0 +1,13 @@
+schema_version: '1.0'
+canonical_task_uid: SCRUM-254
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 4c3ca535a3e9d9c71fb4bd0ca7e0f0264e664f3a
+plan_revision: sha256:1e0223d0dc96019de463c49a7ed138b81697f830ee856a40e1d02405b7f8b25c
+status: VERIFIED
+read_at_utc: '2026-08-01T14:41:00Z'
+paths_read:
+- .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-254/requirements.md
+- .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-254/design.md
+- .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-254/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH

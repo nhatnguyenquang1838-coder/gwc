@@ -1,0 +1,57 @@
+schema_version: '1.0'
+task_id: SCRUM-253
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: APPROVE_G2_FL-MAT-F9-B3_20260801
+  received_at: '2026-08-01T14:41:00Z'
+  expires_at: '2026-08-02T14:20:00Z'
+  scope_hash_prefix: dc5f9de389851ffd
+  command_redacted_after_approval: true
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 4c3ca535a3e9d9c71fb4bd0ca7e0f0264e664f3a
+branch: codex/scrum-253-255-f9-scale-control-m4-20260801
+scope_hash: sha256:dc5f9de389851ffd8925ea5186d0cf947fda6a67f2387b537fb9430a53984fa6
+authorized_actions:
+- create_guarded_branch
+- create_task_gate_artifacts
+- modify_approved_files
+- create_schema
+- create_runtime_utility
+- create_scoped_unit_tests
+- create_changelog
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+approved_paths:
+- schemas/exact-head-readiness-decision.schema.json
+- tools/node_architect/exact_head_readiness.py
+- tests/test_scale_control_m4_batch_b3.py
+- .gwc/tasks/SCRUM-253/**
+- releases/changelog.d/2026-08-01-f9-scale-control-b3.md
+prohibited_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- production_configuration
+- production_data
+- secrets
+- credentials
+- migration
+- force_push
+- branch_deletion
+- pr_base_change
+- audit_completion_authority
+- scale_authority
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-253
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 4c3ca535a3e9d9c71fb4bd0ca7e0f0264e664f3a
+  plan_root: .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-253
+  plan_revision: sha256:3b20f4b8c55db91b6c97fddb21d2502363106a3eacf844fdb53963848fb53194
+  validation_evidence: validation/SCRUM-253-implementation-plan-validation.json
+notes: Approved after G0 READY and G1 PASS; grants no merge, deploy, audit completion, or scale authority.
