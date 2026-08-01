@@ -90,6 +90,24 @@ capabilities:
     add_or_update_documentation: true
     push_working_branch: true
     open_or_update_draft_pr: true
+    invoke_code_reviewer_agent:
+      approval:
+        required: false
+      action_class: read_only
+      minimum_gate: G3_PR
+      evidence_schema: schemas/g3-code-review-invocation.schema.json
+      validator: tools/validate_g3_review_invocation.py
+      guard:
+        - pr_state == draft
+        - reviewer_role == code_reviewer
+        - reviewer_access_mode == read_only
+        - requested_head_sha == current_head_sha
+        - completed_head_sha == current_head_sha
+        - reviewed_scope_hash == current_scope_hash
+        - write_actions == []
+      notes:
+        - Reviewer PASS is evidence only.
+        - A reviewer write invalidates independence and requires a new exact-head review.
     mark_pr_ready_for_review:
       tool: github_mark_pr_ready_for_review
       approval:
@@ -97,12 +115,25 @@ capabilities:
       guard:
         - pr_state == draft
         - g3_delivery_record == PASS
+        - g3_code_review_invocation == PASS
+        - reviewer_role == code_reviewer
+        - reviewer_access_mode == read_only
+        - reviewer_write_actions == []
         - expected_head_sha == current_head_sha
         - required_ci == success
         - scope_drift == false
+        - no_unresolved_blocker == true
         - no_merge_permission
+      readback:
+        required: true
+        guard:
+          - observed_pr_state == open
+          - observed_draft == false
+          - observed_head_sha == expected_head_sha
       notes:
         - G3 metadata completion only.
+        - Review PASS alone does not move work to merge_pending.
+        - Do not commit the promotion receipt to the reviewed PR branch.
         - Does not grant G4 merge authority.
     comment_on_pull_request: true
     merge_human_approved_pull_request: true
