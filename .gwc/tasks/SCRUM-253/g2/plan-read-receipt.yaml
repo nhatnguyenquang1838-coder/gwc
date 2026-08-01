@@ -1,0 +1,13 @@
+schema_version: '1.0'
+canonical_task_uid: SCRUM-253
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 4c3ca535a3e9d9c71fb4bd0ca7e0f0264e664f3a
+plan_revision: sha256:3b20f4b8c55db91b6c97fddb21d2502363106a3eacf844fdb53963848fb53194
+status: VERIFIED
+read_at_utc: '2026-08-01T14:41:00Z'
+paths_read:
+- .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-253/requirements.md
+- .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-253/design.md
+- .kiro/specs/fl-mat-f9-scale-control-b3-20260801/scrum-253/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
