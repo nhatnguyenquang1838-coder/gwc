@@ -21,6 +21,79 @@ Authority: automatic read-only after G4 merge
 Manual G5 approval: required only for manual deploy/redeploy/release/publish/runtime reload
 ```
 
+## G4-to-G5 evidence chain
+
+The following evidence sources are deliberately separate:
+
+```text
+Human G4 PR comment
+→ validated G4 authority receipt
+→ GitHub pull_request.closed merge event
+→ G4 merge-proof artifact/comment
+→ exact merge-SHA post-merge workflow observation
+→ canonical G5 Actions artifact
+→ G5 PR trace comment
+→ optional Jira/Slack projections
+```
+
+Authority rules:
+
+- The original human PR comment containing the exact G4 approval command is the merge authority.
+- The bot-generated `gwc:g4-authority-receipt` comment is a sanitized receipt; it does not create authority.
+- The GitHub `pull_request.closed` event with `merged=true` is merge proof.
+- G4 approval evidence never satisfies G5. G5 starts only after a merge commit exists and exact-SHA post-merge evidence is observed.
+- The GitHub Actions artifact is canonical machine evidence for G5.
+- The `gwc:g5-status` PR comment is human traceability only.
+- Jira and Slack are `projection_only`; they never replace the GitHub authority, merge event, or Actions artifact.
+- Evidence is never committed back to the merged branch and never delivered through a recursive evidence PR.
+
+The executable workflow is `.github/workflows/g4-g5-evidence.yml`.
+It validates G4 comment authority, records merge proof, observes the required
+post-merge workflows for the exact merge SHA, uploads the canonical G5 artifact,
+and updates the PR trace comment. It does not invoke merge, deploy, release,
+publish, runtime reload, repository write, branch creation, or Pull Request
+creation APIs.
+
+## Required G4 authority receipt
+
+Before merge, a G4 authority receipt must validate against:
+
+```text
+schemas/g4-merge-authority-receipt.schema.json
+tools/validate_g4_merge_authority.py
+```
+
+The receipt must bind:
+
+- repository and PR number;
+- exact current Ready-for-Review head SHA;
+- G4 approval ID and scope-hash prefix;
+- original human PR comment ID and URL;
+- approver identity with `write`, `maintain`, or `admin` permission;
+- issue and expiry timestamps;
+- authorized action `merge_pull_request` only;
+- `manual_g5_action_authorized: false`.
+
+A Draft PR, expired command, unauthorized commenter, changed head SHA, or
+malformed command fails closed.
+
+## Required merge proof
+
+After merge, GitHub event evidence must bind:
+
+```text
+provider: github
+event: pull_request.closed
+merged: true
+approved_head_sha: <G4 exact head>
+merged_head_sha: <PR head at merge>
+merge_commit_sha: <GitHub merge commit>
+exact_head_match: true
+```
+
+If the approved head and merged head differ, G4 evidence is stale and the chain
+is invalid. The merge event is proof of what GitHub merged; it is not a G5 PASS.
+
 ## Required input
 
 A G5 CI verification run must be bound to:
@@ -49,16 +122,17 @@ G5 verification reuses the existing runtime catalog instead of creating a new to
 
 | Capability | Existing family | Runtime node role |
 |---|---|---|
-| protected base / merge SHA binding | `repo_delivery` | resolve commit and workflow identity |
+| G4 authority and merge SHA binding | `repo_delivery` | bind human authority, merged head, merge event, and commit identity |
 | pending state persistence | `runtime_checkpoint` | persist and resume same SHA |
 | failure classification | `failure_recovery` | route failed/cancelled/timeout states |
-| evidence quality | `validation_quality` | reject stale, neutral, skipped, or unrelated checks |
-| audit projection | `sync_projection` | expose non-authoritative external/audit state |
+| evidence quality | `validation_quality` | reject stale, neutral, skipped, unrelated, or authority-incomplete checks |
+| audit projection | `sync_projection` | link the canonical artifact and PR comment to non-authoritative external projections |
 
 ## Resolver algorithm
 
 ```text
-G4 merge evidence
+G4 authority receipt
+→ GitHub merge event
 → bind merge_commit_sha
 → discover required workflows
 → resolve candidate workflow runs
@@ -67,7 +141,8 @@ G4 merge evidence
 → select latest attempt per workflow
 → inspect jobs/artifacts/status
 → classify result
-→ persist G5 evidence or checkpoint pending state
+→ persist G5 Actions artifact or checkpoint pending state
+→ update G5 PR trace comment
 ```
 
 ### Candidate run discovery order
@@ -86,9 +161,9 @@ A PR-only run must not satisfy post-merge G5 unless it is explicitly recorded as
 
 | Classification | Required evidence | Runtime action |
 |---|---|---|
-| `success` | Every required workflow has a selected run for the exact merge SHA and terminal successful conclusion. | Record G5 PASS evidence. |
-| `failure` | Any required workflow for the exact merge SHA has `failure`, `cancelled`, `timed_out`, or `action_required`. | Record blocker and route according to failure policy. |
-| `CI_PENDING` | At least one exact merge-SHA run exists and is `queued`, `waiting`, `requested`, or `in_progress`. | Persist checkpoint and continuation. |
+| `success` | Every required workflow has a selected run for the exact merge SHA and terminal successful conclusion. | Upload canonical G5 artifact and update PR trace comment. |
+| `failure` | Any required workflow for the exact merge SHA has `failure`, `cancelled`, `timed_out`, or `action_required`. | Upload blocker evidence and route according to failure policy. |
+| `CI_PENDING` | At least one exact merge-SHA run exists and is `queued`, `waiting`, `requested`, or `in_progress`. | Persist checkpoint artifact and continue on the next required `workflow_run` completion. |
 | `CONNECTOR_OBSERVABILITY_INCOMPLETE` | No exact run can be observed after exact lookup and fallback attempts. | Stop automatic pass; record connector gap. |
 | `SHA_MISMATCH` | A candidate run exists but its head SHA does not equal the merge SHA. | Reject evidence and record blocker. |
 
@@ -122,25 +197,37 @@ attempt and fallback list and classify the result as
 A successful G5 evidence artifact must conform to `schemas/g5-ci-verification-evidence.schema.json` and include:
 
 - repository and merge commit SHA;
+- G4 authority comment reference and approved head SHA;
+- GitHub merge-event proof and exact approved-head/merged-head match;
 - required workflow identities;
 - selected workflow run IDs and run attempts;
 - job IDs, status, conclusion, and step summary when available;
 - connector method used for discovery;
 - rejected candidate reason when any candidate was rejected;
 - final classification;
+- canonical GitHub Actions artifact name and workflow run ID;
+- PR trace-comment marker;
+- Jira/Slack `projection_only` declaration;
+- `no_recursive_evidence_pr: true`;
 - timestamp and actor/runtime identity.
 
 ## Forbidden outcomes
 
 ```text
+❌ bot receipt treated as the original G4 authority
+❌ merge without exact Ready-for-Review head binding
+❌ G4 receipt treated as G5 PASS
 ❌ latest green run without exact SHA binding
 ❌ PR-only run used as post-merge evidence without explicit classification
 ❌ empty run list reported as CI_PENDING
 ❌ pending state without checkpoint/continuation
+❌ PR comment treated as canonical G5 machine evidence
+❌ Jira or Slack projection treated as authority
+❌ recursive evidence commit or evidence PR
 ❌ G5 status check used to deploy or reload runtime
 ❌ human bypass of failed CI, SHA mismatch, or missing required evidence
 ```
 
 ## Compatibility
 
-This contract extends the current G5 exact-SHA language in `AGENTS.md`, `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`, and `core/E2E_DRAFT_PR_DELIVERY_RULE.md`. Existing G5 records remain valid when they already bind evidence to the exact merge commit. New G5 CI records should use the schema and checkpoint contract in this change.
+This contract extends the current G4/G5 exact-SHA language in `AGENTS.md`, `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`, and `core/E2E_DRAFT_PR_DELIVERY_RULE.md`. Existing G5 records remain valid when they already bind evidence to the exact merge commit. New event-driven G5 records should include the additive `evidence_chain` object and use the schema, workflow, and checkpoint contract in this change.
