@@ -66,6 +66,7 @@ def _result(*, payload: Mapping[str, Any], observation: Mapping[str, Any], statu
         "production_authority_granted": False,
     }
     digest_basis = {k: v for k, v in result.items() if k not in {"evidence_digest", "replayed"}}
+    # Observation time is operational metadata, not part of replay identity.
     digest_basis["provider_observation"] = {k: v for k, v in result["provider_observation"].items() if k not in {"observed_at", "observation_digest"}}
     result["evidence_digest"] = digest_payload(digest_basis)
     return result
