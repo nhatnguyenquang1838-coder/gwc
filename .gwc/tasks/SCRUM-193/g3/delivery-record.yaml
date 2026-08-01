@@ -1,0 +1,27 @@
+schema_version: '1.0'
+task_id: SCRUM-193
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+branch: codex/scrum-193-195-f3-repo-delivery-m5-20260801
+scope_hash: sha256:2b7483530c3ebf5b7885de097b770a07b2c04ddaf7b7ec5e4dbe9b8c8199f6e2
+node: repo_delivery.branch-creation
+validation:
+  scoped_unit_tests: pass_11_tests
+  compileall: pass
+  schema_validation: pass_draft_2020_12_and_decision_fixtures
+  full_ci: pending_pr_creation
+pr:
+  number: null
+  url: null
+  head_sha: pending
+review:
+  status: pending
+  independence: fresh_context_required
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  audit_completion_authority: not_granted
+  scale_authority: not_granted
