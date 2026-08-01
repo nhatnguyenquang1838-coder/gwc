@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Validate G3 code-review-agent invocation evidence."""
+"""Validate G3 independent-review evidence."""
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -28,24 +29,39 @@ def _schema_issues(record: Any, schema: dict[str, Any]) -> list[str]:
     return issues
 
 
+def _parse_time(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
 def _semantic_issues(record: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     head_sha = record["head_sha"]
     reviewer = record["reviewer"]
     invocation = record["invocation"]
+    reviewer_kind = reviewer["kind"]
 
-    if reviewer["role"] != "code_reviewer":
-        issues.append("reviewer.role must be code_reviewer")
+    expected_role = "code_reviewer" if reviewer_kind == "agent" else "human_reviewer"
+    if reviewer["role"] != expected_role:
+        issues.append(f"reviewer.role must be {expected_role} when reviewer.kind={reviewer_kind}")
     if reviewer["access_mode"] != "read_only":
         issues.append("reviewer.access_mode must be read_only")
-    if reviewer["independence"] == "independent" and reviewer["agent_id"] == record["implementer_id"]:
-        issues.append("independent code reviewer must differ from implementer")
+    if reviewer["reviewer_id"] == record["implementer_id"]:
+        issues.append("independent reviewer must differ from implementer")
+    if reviewer_kind == "human" and reviewer["independence"] != "independent":
+        issues.append("human reviewer must use independence=independent")
     if invocation["requested_head_sha"] != head_sha:
         issues.append("invocation.requested_head_sha must match head_sha")
     if invocation["completed_head_sha"] != head_sha:
         issues.append("invocation.completed_head_sha must match head_sha")
     if record["write_actions"]:
-        issues.append("code reviewer invocation must not perform write actions")
+        issues.append("independent review must not perform write actions")
+
+    try:
+        if _parse_time(invocation["completed_at"]) < _parse_time(invocation["requested_at"]):
+            issues.append("invocation.completed_at must not precede requested_at")
+    except (TypeError, ValueError):
+        # JSON Schema format errors are reported separately.
+        pass
 
     if record["result"] == "pass":
         if record["stale"]:
