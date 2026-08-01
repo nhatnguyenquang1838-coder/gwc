@@ -328,8 +328,8 @@ fc882c36d1e0c542a026b8c95bdfc0cf8fde61a56a84648bedede24290f4a8c7  core/node-arch
 b840bd55ecc85c5408f788b0ce097e5d794001a622b88352cf04a06505fd5aae  core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json
 490aa4a5144fbe02d1bcb8be8c7b5289a86eddcdbf790286c8cd6e42daf07854  core/node-architect/node-catalog/intake_context/README.md
 7664876f3a7ad77d946c0862529654ec4de49ebc1dc255b936221e61be42eaff  core/node-architect/node-catalog/intake_context/context-gap-escalation.node.json
-a57ba5907d7e9f3d90790db12810fadef0db490d8fd9adfd82657ccfad5d898a  core/node-architect/node-catalog/intake_context/files-read-scope.node.json
-47bff1783274855112de0b716b6dd408c32f61a6d298d841e620717162574f60  core/node-architect/node-catalog/intake_context/files-write-scope.node.json
+d57453f6d571994e181df73592a693bd6d433941d6f9575372a1d93f919667f9  core/node-architect/node-catalog/intake_context/files-read-scope.node.json
+7a919fcef2df03d057554f7f274f38445abfda8d24d13ad77f05d8ded8348014  core/node-architect/node-catalog/intake_context/files-write-scope.node.json
 a09b59297fcde14a7011158750b78a67c9559b59d6fa3f30ae001cc66e56daaf  core/node-architect/node-catalog/intake_context/intake-card-render.node.json
 9b5edeb8785239d1fb46ebf6318203bf3426022bd5aba611980c37ca4b92f16c  core/node-architect/node-catalog/intake_context/protected-base-capture.node.json
 7ceddc20102f14d7ccbc550ae9fbee5489a7b14d17697b2ab5e013173830ddb2  core/node-architect/node-catalog/intake_context/repo-identity-check.node.json

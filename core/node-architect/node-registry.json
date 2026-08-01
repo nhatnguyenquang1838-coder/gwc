@@ -664,7 +664,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/intake_context/files-read-scope.node.json",
-        "source_sha": "a57ba5907d7e9f3d90790db12810fadef0db490d8fd9adfd82657ccfad5d898a"
+        "source_sha": "1e8156148fab773d9d59f3a53cc2cb8e4f1a19eb3ccecff1cb6036a57f2f7062"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -698,7 +698,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/intake_context/files-write-scope.node.json",
-        "source_sha": "47bff1783274855112de0b716b6dd408c32f61a6d298d841e620717162574f60"
+        "source_sha": "1751504747c1703825e295fd920a376fafe31069ac9b8af4a54509dc5fb6eeb0"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
