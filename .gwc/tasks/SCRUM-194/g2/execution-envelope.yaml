@@ -1,0 +1,47 @@
+schema_version: '1.0'
+task_id: SCRUM-194
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: APPROVE_G2_FL-MAT-F3-B1_20260801
+  received_at: '2026-08-01T15:42:00Z'
+  expires_at: '2026-08-02T15:45:00Z'
+  scope_hash_prefix: 2b7483530c3ebf5b
+  command_redacted_after_approval: true
+fastlane: FL-MAT-F3-REPO-DELIVERY-B1-20260801
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+branch: codex/scrum-193-195-f3-repo-delivery-m5-20260801
+scope_hash: sha256:2b7483530c3ebf5b7885de097b770a07b2c04ddaf7b7ec5e4dbe9b8c8199f6e2
+node: repo_delivery.base-drift-check
+maturity_target:
+  from: M2
+  to: M5
+authorized_actions:
+- create_guarded_branch
+- create_task_gate_artifacts
+- modify_approved_files
+- create_schema
+- create_runtime_utility
+- create_scoped_unit_tests
+- create_changelog
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+prohibited_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- production_configuration
+- production_data
+- secrets
+- credentials
+- migration
+- force_push
+- branch_deletion
+- pr_base_change
+- audit_completion_authority
+- scale_authority
+notes: Approved after G0 READY and G1 PASS; grants no merge, deploy, audit-completion, or scale authority.
