@@ -5,8 +5,7 @@
   "canonical": "delivery_evidence",
   "authority_boundary": "g3_required",
   "gates": [
-    "G3_PR",
-    "G5_DEPLOY"
+    "G3_PR"
   ],
-  "description": "Capture G3 exact-head workflow evidence and G5 exact merge-SHA post-merge evidence. For G5, the GitHub Actions artifact is canonical machine evidence; the PR status comment is human traceability only."
+  "description": "Capture G3 exact-head workflow evidence and define the evidence-quality handoff used later by G5, where the exact merge-SHA GitHub Actions artifact is canonical machine evidence and the PR status comment is human traceability only."
 }
