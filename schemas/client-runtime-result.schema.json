@@ -1,0 +1,69 @@
+{
+  "$id": "https://gwc.local/schemas/client-runtime-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "blocked_node": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checkpoints": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "evidence": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "executed_nodes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "manual_fallback_used": {
+      "const": false
+    },
+    "protected_base_sha": {
+      "type": "string"
+    },
+    "repository": {
+      "type": "string"
+    },
+    "scenario_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "BLOCKED"
+      ]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "terminal_code": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "repository",
+    "protected_base_sha",
+    "scenario_id",
+    "status",
+    "terminal_code",
+    "executed_nodes",
+    "blocked_node",
+    "evidence",
+    "checkpoints",
+    "manual_fallback_used"
+  ],
+  "title": "GWC Client Runtime Result",
+  "type": "object"
+}
