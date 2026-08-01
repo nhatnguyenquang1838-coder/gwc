@@ -1,0 +1,147 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-01T18:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-214
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPO_VERIFIED
+  message: Repository and protected base match the active GWC profile.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc
+  - main@32b28f4887405d0311f55c3fae0f7b2c0e252df6
+- id: ACTIVE_LANE
+  status: PASS
+  code: LANE_MATCH
+  message: SCRUM-214 is the first blocking F5 node in SCRUM-256.
+  evidence:
+  - SCRUM-214 -> SCRUM-215 -> SCRUM-219 -> SCRUM-256
+- id: CURRENT_MECHANISMS
+  status: PASS
+  code: REUSE_AVAILABLE
+  message: CI capture and checkpoint primitives exist on exact main.
+  evidence:
+  - tools/node_architect/ci_run_capture.py
+  - tools/node_architect/checkpoint_store.py
+- id: DONE_DEPENDENCY
+  status: WARN
+  code: SCRUM_259_G5_UNSAFE
+  message: SCRUM-259 has real deliverables but its G4/G5 evidence workflow failed; it is not used as G5/end-to-end proof.
+  evidence:
+  - 'PR #161'
+  - run 30710030962 failure
+  - g5-status skipped
+- id: CURRENT_MAIN_CI
+  status: WARN
+  code: CI_UNAVAILABLE_AT_CHECK
+  message: Connector returned no current-main workflow/status evidence; no PASS or FAIL inferred.
+  evidence:
+  - main@32b28f4887405d0311f55c3fae0f7b2c0e252df6
+- id: SCOPE_BOUNDARY
+  status: PASS
+  code: EXCLUSIONS_PRESERVED
+  message: Excluded lanes and later authorities remain out of scope.
+  evidence:
+  - No F9
+  - No SCRUM-258
+  - No package/export
+  - No G4/G5/G6 action
+process_readback:
+  process_id: FL-MAT-F5-CI-EVIDENCE-CAPTURE-20260802
+  terminal_outcome: Reviewed exact-head Draft PR for SCRUM-214
+  required_sources:
+  - GWC gate lifecycle
+  - SCRUM-214 Jira contract
+  - current main runtime files
+  - exact-head CI
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-1
+    name: G0/G1 evidence
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_and_validate
+    capability_required: GitHub connector plus local validator
+    capability_status: VERIFIED
+    primary_route: materialized exact validator
+    fallback_routes: []
+    continuation: Generate exact G2 envelope after PASS.
+    expected_evidence: validate_g01 exit 0
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-2
+    name: Scoped implementation
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: guarded_branch_write
+    capability_required: GitHub write connector
+    capability_status: VERIFIED
+    primary_route: dedicated guarded branch
+    fallback_routes: []
+    continuation: Validate, push and assemble Draft PR inside approved scope.
+    expected_evidence: branch head, tests and diff
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-3
+    name: Draft PR and exact-head CI
+    gate: G3_PR
+    actor: agent
+    action_class: draft_pr_validation
+    capability_required: GitHub PR and Actions readback
+    capability_status: VERIFIED
+    primary_route: Draft PR plus active-thread CI polling
+    fallback_routes:
+    - manual checkpoint if active-thread sleep unavailable
+    continuation: Repair only in approved scope or stop on terminal blocker.
+    expected_evidence: exact-head CI and independent review
+    bypass_eligibility: MANUAL_CHECKPOINT_ONLY
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+implementation_plan:
+  applicability: required
+  reason: R2 runtime integration needs a bounded test-first plan.
+  source: generated_kiro
+  task_me_applicable: true
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: Task Me connector is unavailable in the current chat; generated Kiro is based on exact GitHub/Jira readback.
+  canonical_task_uid: SCRUM-214
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  plan_root: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214
+  requirements_path: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/requirements.md
+  design_path: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/design.md
+  tasks_path: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/tasks.md
+  plan_revision: sha256:a7362f6247be76d57d5acf05ffaf09f29a08221b37f5759a7ca98dbee255703c
+  validation_status: PASS
+  validation_evidence: validation/SCRUM-214-implementation-plan-validation.json
+  generated_by: chatgpt-agent
+  generated_at_utc: '2026-08-01T18:30:00Z'
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: chatgpt-agent
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - AGENTS.md
+  - agents/chatgpt-agent/agent-instructions.md
+blockers: []
+outcome: PASS
