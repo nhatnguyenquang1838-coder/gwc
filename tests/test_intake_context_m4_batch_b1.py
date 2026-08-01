@@ -104,6 +104,53 @@ def build_scope_family_node(slug: str) -> dict:
                 },
             }
         )
+    if slug == "risk-classification":
+        node.update(
+            {
+                "intent": "Classify the current intake evidence into a closed risk profile.",
+                "outcome": "Deterministic risk_profile evidence with bounded gate and reason codes.",
+                "constraints": [
+                    "Risk classification must be deterministic for equivalent intake facts.",
+                    "Risk classification must fail closed on missing or ambiguous evidence.",
+                ],
+                "exclusions": [
+                    "No production, migration, credential, or release authority.",
+                    "No writes, merges, or deployments.",
+                ],
+                "entry_guards": ["G0_CONTEXT", "read_only authority_boundary"],
+                "reason_codes": {
+                    "RISK_PRODUCTION_OPERATION": "The intake implies production data, configuration, or runtime change.",
+                    "RISK_SECRET_CHANGE": "The intake implies credential or secret handling.",
+                    "RISK_DESTRUCTIVE_OPERATION": "The intake implies a destructive write path.",
+                    "RISK_MIGRATION": "The intake implies a migration or schema change.",
+                    "RISK_RELEASE_DEPLOYMENT": "The intake implies deployment or release activity.",
+                    "RISK_SCOPE_AMBIGUOUS": "The intake scope is not sufficiently bounded.",
+                    "RISK_SOURCE_STALE": "The source evidence is stale or inconsistent.",
+                    "RISK_UNCLASSIFIED": "The intake has no supported risk classification.",
+                },
+                "risk_profile": {
+                    "risk_level": "R1",
+                    "risk_flags": ["scope_ambiguous"],
+                    "required_gate": "G2_AUTOMATIC_BOUNDED",
+                    "approval_requirements": [
+                        "Bounded G2 execution envelope required before any write.",
+                    ],
+                    "reason_codes": [
+                        "RISK_SCOPE_AMBIGUOUS",
+                        "RISK_UNCLASSIFIED",
+                    ],
+                    "source_bindings": {
+                        "request_intake": "request-intake",
+                        "source_resolution": "source-resolution",
+                        "repo_identity_check": "repo-identity-check",
+                        "protected_base_capture": "protected-base-capture",
+                        "repository": "nhatnguyenquang1838-coder/gwc",
+                        "base_sha": "5aea52a73cfcee02576766db4adf290a94212157",
+                    },
+                    "classified_at": "2026-08-01T00:00:00Z",
+                },
+            }
+        )
     return node
 
 
