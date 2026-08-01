@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/branch-creation-decision.schema.json",
+  "title": "BranchCreationDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["node_id", "outcome", "reason_codes", "repository", "branch_name", "base_sha", "observed_ref_sha", "idempotency_key", "pending_action", "decision_digest", "may_create_branch", "requires_reapproval", "requires_human", "merge_authority_granted", "deployment_authority_granted", "production_authority_granted"],
+  "properties": {
+    "node_id": {"const": "repo_delivery.branch-creation"},
+    "outcome": {"enum": ["READY_TO_CREATE", "CREATED", "RECONCILED_EXISTING", "BLOCKED_BASE_DRIFT", "BLOCKED_BRANCH_COLLISION", "PENDING_READBACK_REQUIRED", "BLOCKED_PROVIDER_FAILURE", "INVALID_INPUT"]},
+    "reason_codes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "repository": {"type": "string"},
+    "branch_name": {"type": "string"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$|^$"},
+    "observed_ref_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "idempotency_key": {"type": "string"},
+    "pending_action": {"type": ["string", "null"]},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "may_create_branch": {"type": "boolean"},
+    "requires_reapproval": {"type": "boolean"},
+    "requires_human": {"type": "boolean"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  }
+}
