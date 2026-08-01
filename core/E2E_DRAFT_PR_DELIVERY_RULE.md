@@ -255,12 +255,20 @@ For pending states:
 - Keep the active work-tracking task in its validation state.
 - Record the PR number, branch, current head SHA, next check time, and continuation mechanism.
 - Continue monitoring the same SHA through the strongest available mechanism:
-  1. webhook or CI event callback;
-  2. local sleep or poll loop;
-  3. ChatGPT Scheduled Tasks or another platform scheduler;
-  4. manual checkpoint when no async mechanism is available.
+1. webhook or CI event callback;
+2. local sleep or poll loop;
+3. a two-minute sleep of the active thread for a ChatGPT chat connector;
+4. another platform scheduler when supported by that runtime;
+5. manual checkpoint when no async mechanism is available.
 
-For ChatGPT Scheduled Tasks or other schedulers:
+For a ChatGPT chat connector thread sleep:
+
+- Record the repository, PR number, expected head SHA when available, allowed actions, excluded actions, and a two-minute wake time.
+- Sleep the current thread for exactly two minutes; do not create a scheduler task or automation.
+- On wake, check and report status only unless a separate active approval covers repository mutation.
+- If the runtime cannot sleep and wake the current thread, record a manual checkpoint rather than create a scheduler task or automation.
+
+For other platform schedulers:
 
 - The task prompt must include repository, PR number, expected head SHA when available, allowed actions, excluded actions, and the next check time.
 - The task is not active unless a concrete next run is visible or recorded.

@@ -180,12 +180,13 @@ Continuation mechanisms are selected in this order:
 
 1. webhook or CI event callback;
 2. local sleep or poll loop for `local_agent` execution;
-3. platform scheduler, including ChatGPT Scheduled Tasks when available;
-4. manual checkpoint when no async mechanism is available.
+3. a two-minute sleep of the active thread for a ChatGPT chat connector;
+4. a platform scheduler for another runtime when available;
+5. manual checkpoint when no async mechanism is available.
 
-The default next-check interval is 3 minutes when supported by the active environment. Hosted schedulers that require a slower cadence must use the supported cadence and report that limitation.
+For a ChatGPT chat connector, record repository, PR, expected head SHA, check-and-report-only authority, and the two-minute wake time before sleeping the current thread for exactly two minutes. It must not create a scheduler task or automation. The default next-check interval remains 3 minutes for every other continuation mechanism when supported by its active environment. Hosted non-ChatGPT schedulers that require a slower cadence must use the supported cadence and report that limitation.
 
-A scheduled CI continuation must be treated as inactive unless a concrete next run is visible or recorded. If no next run exists, the agent must not claim async continuation is active.
+If the ChatGPT chat connector cannot sleep and wake the current thread, it must use a manual checkpoint rather than create a scheduler task or automation. Other scheduled CI continuations remain inactive unless a concrete next run is visible or recorded.
 
 If CI fails, the agent may diagnose and repair only repository-fixable failures within the active G2 scope. Any repair commit changes the latest head SHA and invalidates prior CI, review, and G4-readiness evidence. G4 approval may be generated only after required checks pass for the latest head SHA.
 

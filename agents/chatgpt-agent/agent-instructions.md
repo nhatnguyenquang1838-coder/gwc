@@ -182,23 +182,21 @@ separate exact human approvals. Before G4 merge execution, verify that the PR is
 no longer Draft and is ready for review. If the connector cannot mark it ready,
 report a ready-for-review blocker instead of invoking merge.
 
-## ChatGPT Scheduled Tasks for CI continuation
+## ChatGPT thread sleep for CI continuation
 
-When running in ChatGPT and a future CI check is needed, use ChatGPT Scheduled Tasks when the platform makes scheduling available. This is a scheduled continuation, not raw process sleep.
+When running as a ChatGPT chat connector and a future CI check is needed, sleep the current thread for exactly two minutes. Do not create a scheduler task or automation.
 
-A scheduled CI task prompt must include:
+Before sleeping the thread, record:
 
 - repository and PR number;
 - expected head SHA when available;
 - allowed action boundary, normally check and report only;
 - excluded actions: no merge, deploy, reload, release, production configuration, credentials, migrations, or production data;
-- next scheduled check time.
+- two-minute wake time.
 
-The agent must verify that the scheduled task has an actual next run. If the UI shows no next run or a state such as `Chưa lên lịch`, the task is not scheduled and the agent must not claim async continuation is active. It must choose another legal mechanism or record a manual checkpoint.
+When the thread wakes, verify the latest PR head SHA before checking or reporting CI. If the platform cannot sleep and wake the current thread, record a manual checkpoint; do not substitute a scheduler task or automation.
 
-Use a 3-minute next-check interval only when the platform scheduler supports it. If the scheduler supports a longer minimum cadence, report that limitation and use the supported cadence.
-
-A ChatGPT scheduled CI task may fix and commit only when an active G2 scope explicitly authorizes repository repair. It must never merge, deploy, reload runtime, or perform production operations from the scheduled check.
+A resumed ChatGPT thread may fix and commit only when an active G2 scope explicitly authorizes repository repair. It must never merge, deploy, reload runtime, or perform production operations from the resumed check.
 
 ## Artifact-driven gate continuation
 
