@@ -176,7 +176,7 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
             "pull_request.closed",
             "gwc:g4-merge-proof",
             "gwc:g5-status",
-            "github_actions_artifact",
+            "GitHub Actions artifact",
             "projection_only",
             "recursive evidence PR",
         ):
