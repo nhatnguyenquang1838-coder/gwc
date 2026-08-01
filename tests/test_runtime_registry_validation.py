@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import importlib.util
 import json
+import tempfile
 from pathlib import Path
 import subprocess
 import sys
@@ -11,7 +14,18 @@ ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "tools/node_architect/validate_runtime_registry.py"
 
 
+def load_validator():
+    spec = importlib.util.spec_from_file_location("validate_runtime_registry", VALIDATOR)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
 class RuntimeRegistryValidationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.validator = load_validator()
+
     def test_canonical_registries_pass_cross_registry_validation(self) -> None:
         result = subprocess.run(
             [sys.executable, str(VALIDATOR), "--root", str(ROOT)],
@@ -59,6 +73,18 @@ class RuntimeRegistryValidationTests(unittest.TestCase):
             self.assertIn("source_sha", node["provenance"])
             if node["source_status"] == "proposed_registry_slot":
                 self.assertNotEqual(node["maturity"], "stable")
+
+    def test_source_hash_normalizes_line_endings(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source_path = root / "docs" / "line-endings.txt"
+            source_path.parent.mkdir(parents=True, exist_ok=True)
+            source_path.write_bytes(b"alpha\r\nbeta\r\n")
+            expected = hashlib.sha256(b"alpha\nbeta\n").hexdigest()
+            self.assertEqual(expected, self._source_hash(root, "docs/line-endings.txt"))
+
+    def _source_hash(self, repo_root: Path, relative: str) -> str | None:
+        return self.validator.source_hash(repo_root, relative)
 
     def test_scenario_count_is_not_graph_edge_count(self) -> None:
         scenarios = json.loads(

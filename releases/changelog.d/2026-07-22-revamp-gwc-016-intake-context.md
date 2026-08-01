@@ -12,6 +12,7 @@ Authority boundary: G0_CONTEXT
 
 - Added the first controlled catalog batch with 9 `intake_context` runtime node definitions.
 - Added a family README for request intake, source resolution, repo identity, protected-base capture, risk classification, read/write scope, intake-card rendering, and context-gap escalation.
+- Tightened the `intake_context.risk-classification` contract with a closed `risk_profile` object, stable risk reason codes, and evidence bindings.
 - Added a stdlib validator for the `intake_context` node family.
 - Added regression tests for valid family count, G0-only gate boundaries, max-node enforcement, and authority-boundary rejection.
 

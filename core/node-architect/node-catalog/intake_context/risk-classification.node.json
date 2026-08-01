@@ -7,5 +7,64 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Classifies request risk flags before deciding which gate path is required."
+  "description": "Derives a closed risk_profile from canonical intake facts before gate routing.",
+  "intent": "Classify the bounded request into a deterministic risk profile before gate routing.",
+  "outcome": "Typed risk_profile record with risk_level, risk_flags, required_gate, approval_requirements, reason_codes, source_bindings, and classified_at.",
+  "constraints": [
+    "Equivalent intake facts must classify to the same risk_profile.",
+    "Missing, stale, ambiguous, or conflicting evidence must fail closed.",
+    "The node must not grant approval, execution, merge, deploy, or production authority.",
+    "The risk_profile schema must remain closed to undeclared fields."
+  ],
+  "exclusions": [
+    "Merge, deploy, release, or production authority.",
+    "Credential, secret, migration, or destructive operations.",
+    "Mutating repository state or changing gate authority."
+  ],
+  "entry_guards": [
+    "G0_CONTEXT",
+    "read_only",
+    "verified intake facts"
+  ],
+  "reason_codes": {
+    "RISK_PRODUCTION_OPERATION": "Production data, configuration, or operational scope is present.",
+    "RISK_SECRET_CHANGE": "Credentials or secrets are present or would change.",
+    "RISK_DESTRUCTIVE_OPERATION": "The request includes destructive or irreversible work.",
+    "RISK_MIGRATION": "A migration or storage cutover is required.",
+    "RISK_RELEASE_DEPLOYMENT": "A release or deployment action is required.",
+    "RISK_SCOPE_AMBIGUOUS": "The requested scope is ambiguous or conflicting.",
+    "RISK_SOURCE_STALE": "The evidence source is stale or no longer verified.",
+    "RISK_UNCLASSIFIED": "The signal set cannot be classified deterministically."
+  },
+  "risk_profile": {
+    "risk_level": "R2",
+    "risk_flags": [
+      "scope_ambiguous",
+      "source_stale"
+    ],
+    "required_gate": "G2_HUMAN_DIRECTION",
+    "approval_requirements": [
+      "Explicit human direction is required.",
+      "Verified source and protected-base evidence must be present."
+    ],
+    "reason_codes": [
+      "RISK_PRODUCTION_OPERATION",
+      "RISK_SECRET_CHANGE",
+      "RISK_DESTRUCTIVE_OPERATION",
+      "RISK_MIGRATION",
+      "RISK_RELEASE_DEPLOYMENT",
+      "RISK_SCOPE_AMBIGUOUS",
+      "RISK_SOURCE_STALE",
+      "RISK_UNCLASSIFIED"
+    ],
+    "source_bindings": {
+      "request_intake": "intake_context.request-intake",
+      "source_resolution": "intake_context.source-resolution",
+      "repo_identity_check": "intake_context.repo-identity-check",
+      "protected_base_capture": "intake_context.protected-base-capture",
+      "repository": "nhatnguyenquang1838-coder/gwc",
+      "base_sha": "5aea52a73cfcee02576766db4adf290a94212157"
+    },
+    "classified_at": "2026-08-01T00:00:00Z"
+  }
 }

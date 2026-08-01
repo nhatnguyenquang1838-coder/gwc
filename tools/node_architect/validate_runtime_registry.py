@@ -60,7 +60,9 @@ def source_hash(repo_root: Path, relative: str) -> str | None:
     path = repo_root / relative
     if not path.is_file():
         return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # Normalize line endings so provenance hashes stay stable across Windows and Linux checkouts.
+    data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def validate_registry(root: Path) -> dict[str, Any]:

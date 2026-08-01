@@ -47,10 +47,66 @@ def valid_node(slug: str) -> dict:
                 "captured_at": "2026-07-31T00:00:00Z",
             }
         )
+    elif slug == "risk-classification":
+        node.update(
+            {
+                "intent": "Classify request risk before gate routing.",
+                "outcome": "Typed risk_profile record with risk_level, risk_flags, required_gate, approval_requirements, reason_codes, source_bindings, and classified_at.",
+                "constraints": [
+                    "Equivalent intake facts must classify to the same risk_profile.",
+                    "Missing, stale, ambiguous, or conflicting evidence must fail closed.",
+                    "The node must not grant approval, execution, merge, deploy, or production authority.",
+                    "The risk_profile schema must remain closed to undeclared fields.",
+                ],
+                "exclusions": [
+                    "Merge, deploy, release, or production authority.",
+                    "Credential, secret, migration, or destructive operations.",
+                    "Mutating repository state or changing gate authority.",
+                ],
+                "entry_guards": [
+                    "G0_CONTEXT",
+                    "read_only",
+                    "verified intake facts",
+                ],
+                "reason_codes": RISK_CLASSIFICATION_REASON_CODES,
+                "risk_profile": {
+                    "risk_level": "R2",
+                    "risk_flags": [
+                        "scope_ambiguous",
+                        "source_stale",
+                    ],
+                    "required_gate": "G2_HUMAN_DIRECTION",
+                    "approval_requirements": [
+                        "Explicit human direction is required.",
+                        "Verified source and protected-base evidence must be present.",
+                    ],
+                    "reason_codes": list(RISK_CLASSIFICATION_REASON_CODES.keys()),
+                    "source_bindings": {
+                        "request_intake": "intake_context.request-intake",
+                        "source_resolution": "intake_context.source-resolution",
+                        "repo_identity_check": "intake_context.repo-identity-check",
+                        "protected_base_capture": "intake_context.protected-base-capture",
+                        "repository": "nhatnguyenquang1838-coder/gwc",
+                        "base_sha": PROTECTED_BASE_SHA,
+                    },
+                    "classified_at": "2026-08-01T00:00:00Z",
+                },
+            }
+        )
     return node
 
 
 PROTECTED_BASE_SHA = "5aea52a73cfcee02576766db4adf290a94212157"
+RISK_CLASSIFICATION_REASON_CODES = {
+    "RISK_PRODUCTION_OPERATION": "Production data, configuration, or operational scope is present.",
+    "RISK_SECRET_CHANGE": "Credentials or secrets are present or would change.",
+    "RISK_DESTRUCTIVE_OPERATION": "The request includes destructive or irreversible work.",
+    "RISK_MIGRATION": "A migration or storage cutover is required.",
+    "RISK_RELEASE_DEPLOYMENT": "A release or deployment action is required.",
+    "RISK_SCOPE_AMBIGUOUS": "The requested scope is ambiguous or conflicting.",
+    "RISK_SOURCE_STALE": "The evidence source is stale or no longer verified.",
+    "RISK_UNCLASSIFIED": "The signal set cannot be classified deterministically.",
+}
 
 
 class IntakeContextNodeCatalogTests(unittest.TestCase):
@@ -244,6 +300,69 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
             self.assertEqual([], errors, f"G0 gate and read-only authority should persist: {errors}")
+
+    def test_accepts_typed_risk_classification_contract(self):
+        """Test that risk-classification with typed risk_profile fields validates successfully."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"Typed risk-classification contract should validate: {errors}")
+
+    def test_rejects_malformed_risk_profile(self):
+        """Test that malformed risk_profile fields are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[4]["risk_profile"]["risk_level"] = 123
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("risk_profile.risk_level" in error for error in errors))
+
+    def test_rejects_drifted_risk_reason_codes(self):
+        """Test that unsupported risk reason codes are rejected."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[4]["risk_profile"]["reason_codes"] = [
+            "RISK_PRODUCTION_OPERATION",
+            "RISK_SOURCE_STALE",
+            "RISK_UNKNOWN",
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertTrue(any("unsupported values" in error for error in errors))
 
     def test_accepts_typed_protected_base_contract(self):
         """Test that protected-base capture with typed fields validates successfully."""
