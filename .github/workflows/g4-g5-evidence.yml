@@ -358,55 +358,6 @@ jobs:
               }
               observedRuns.push({ workflow: run.name, run_id: run.id, run_attempt: run.run_attempt || 1, event: run.event, branch: run.head_branch, head_sha: run.head_sha, status: run.status, conclusion: run.conclusion });
             }
-  g5-recovery:
-    if: github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, 'APPROVE G5 RECOVERY ')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout protected base
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-      - name: Install dependencies
-        run: python -m pip install -r requirements.txt
-      - name: Materialize bootstrap recovery authority
-        id: recovery
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const body = (context.payload.comment.body || '').trim();
-            const command = /^APPROVE G5 RECOVERY ([A-Za-z0-9._-]+) ([^\s]+\/[^\s]+) ([1-9][0-9]*) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) ([0-9a-f]{40}) ([0-9a-f]{40}) ([1-9][0-9]*) ([1-9][0-9]*) ([0-9a-f]{64}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
-            const match = body.match(command);
-            if (!match) { core.setFailed('Malformed G5 recovery approval command.'); return; }
-            const { owner, repo } = context.repo;
-            const repository = `${owner}/${repo}`;
-            const prNumber = Number(match[3]);
-            if (match[2] !== repository || prNumber !== context.payload.issue.number) { core.setFailed('Recovery repository or PR binding does not match comment context.'); return; }
-            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({ owner, repo, username: context.payload.comment.user.login });
-            if (!['admin', 'maintain', 'write'].includes(permission.permission)) { core.setFailed(`Recovery approver lacks write authority: ${permission.permission}`); return; }
-            const expiresAt = new Date(match[11]);
-            if (!Number.isFinite(expiresAt.getTime()) || expiresAt <= new Date()) { core.setFailed('G5 recovery approval is invalid or expired.'); return; }
-            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
-            if (!pr.merged || pr.state !== 'closed' || !pr.merged_at || !pr.merged_by) { core.setFailed('G5 recovery requires an immutable merged PR.'); return; }
-            if (pr.head.sha !== match[6] || pr.merge_commit_sha !== match[7]) { core.setFailed('Recovery approved-head or merge-SHA binding does not match GitHub PR state.'); return; }
-            const { data: mergeCommit } = await github.rest.repos.getCommit({ owner, repo, ref: match[7] });
-            const commitMessage = mergeCommit.commit?.message || '';
-            if (!commitMessage.includes(match[4]) || !commitMessage.includes(match[6])) { core.setFailed('Merge commit does not carry the claimed original G4 approval/head provenance.'); return; }
-            const requestedRuns = [
-              { name: 'Validate instructions', run_id: Number(match[8]) },
-              { name: 'Build instruction packages', run_id: Number(match[9]) },
-            ];
-            const observedRuns = [];
-            for (const requested of requestedRuns) {
-              const { data: run } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: requested.run_id });
-              if (run.name !== requested.name || run.event !== 'push' || run.head_branch !== 'main' || run.head_sha !== match[7] || run.status !== 'completed' || run.conclusion !== 'success') {
-                core.setFailed(`Required workflow run is not exact-SHA successful: ${requested.name}:${requested.run_id}`); return;
-              }
-              observedRuns.push({ workflow: run.name, run_id: run.id, run_attempt: run.run_attempt || 1, event: run.event, branch: run.head_branch, head_sha: run.head_sha, status: run.status, conclusion: run.conclusion });
-            }
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: prNumber, per_page: 100 });
             const trusted = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes('<!-- gwc:g5-recovery-authority '));
             const signature = `recovery_id=${match[1]} repository=${repository} pr=${prNumber} approval_id=${match[4]} scope=${match[5]} head=${match[6]} merge=${match[7]} source_digest=${match[10]}`;
