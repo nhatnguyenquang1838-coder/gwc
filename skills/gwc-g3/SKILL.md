@@ -25,19 +25,19 @@ The receipt must validate with `tools/validate_g3_review_invocation.py` against 
 
 G3 may create or update a Draft PR when authorized, assemble the delivery record, invoke one independent read-only `code_reviewer` agent, verify CI for the exact current head SHA, close findings, validate both G3 evidence records, and mark the same Draft PR Ready for Review after every guard passes.
 
-Ready-for-Review promotion is G3 metadata completion. It does not merge, enable auto-merge, deploy, release, publish, reload runtime, touch production configuration, perform credential operations, run migrations, access production data, direct-push to protected branches, force-push, delete branches, rewrite shared history, or change the PR base.
+Do not merge or enable auto-merge in G3. Ready-for-Review promotion is G3 metadata completion. It does not deploy, release, publish, reload runtime, touch production configuration, perform credential operations, run migrations, access production data, direct-push to protected branches, force-push, delete branches, rewrite shared history, or change the PR base.
 
 ## Canonical flow
 
 ```mermaid
 flowchart LR
-    A[G2 exact-head evidence] --> B[G3.1 Create or update Draft PR]
+    A[G2 exact-head evidence] --> B[G3.1 PR Assembly]
     B --> C[Exact-head validation and required CI]
-    C --> D[Invoke independent code_reviewer agent]
+    C --> D[G3.2 Independent Review by code_reviewer]
     D --> E{Review result}
     E -- Changes required --> F[Return to bounded G2 repair]
     F --> B
-    E -- Pass --> G[G3.3 Review closure]
+    E -- Pass --> G[G3.3 Review Closure]
     G --> H[Validate delivery record and invocation receipt]
     H --> I[Mark Draft PR Ready for Review]
     I --> J[Read back draft=false and unchanged head SHA]
@@ -54,6 +54,8 @@ Use Context7 first with exact library ID:
 /obra/superpowers
 ```
 
+Context7 is attempted before reading the offline skill contents.
+
 Resolution order:
 
 ```text
@@ -64,13 +66,29 @@ Resolution order:
 5. If neither source is valid, stop with G3_SKILL_SOURCE_BLOCKED.
 ```
 
-A G3 run uses exactly one source mode: `CONTEXT7_LIVE` or `OFFLINE_PINNED`. Do not mix bundles. The bundle must cover requesting code review, verification before completion, receiving code review, and finishing a development branch as PR-only delivery.
+### bundle-atomic rule
 
-## G3.1 Draft PR assembly
+A G3 run uses exactly one source mode:
+
+```text
+CONTEXT7_LIVE
+or
+OFFLINE_PINNED
+```
+
+Do not mix bundles. The required compatible skill composition is:
+
+- `requesting-code-review`;
+- `verification-before-completion`;
+- `receiving-code-review`;
+- `finishing-development-branch-pr-only`;
+- optional `dispatching-parallel-review`.
+
+## G3.1 PR Assembly
 
 Verify repository, base SHA, guarded branch, exact current head SHA, scope hash, changed paths, validation output, required CI status, acceptance criteria, and exclusions. Create or update the Pull Request as Draft. Any head SHA change makes prior validation, CI, review, and readiness evidence stale.
 
-## G3.2 Code reviewer agent invocation
+## G3.2 Independent Review
 
 Invoke an agent whose role is exactly `code_reviewer`. Bind the request and result to the same task, repository, PR number, head SHA, and scope hash used by the delivery record.
 
@@ -93,7 +111,7 @@ python tools/validate_g3_review_invocation.py \
   --record .gwc/tasks/<task-id>/g3/code-review-invocation.json
 ```
 
-## G3.3 Review closure
+## G3.3 Review Closure
 
 - `BLOCKER`: return to G2.
 - `MAJOR`: fix in G2 or capture exact-head human risk acceptance in the delivery record.
