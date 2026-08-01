@@ -108,13 +108,13 @@ def export_package(
         if not source_path.is_file():
             if required:
                 raise FileNotFoundError(f"{entry_id}: missing required source {source_rel}")
-            entries.append({"id": entry_id, "source_path": str(source_rel), "target_path": str(target_rel), "required": False, "status": "skipped_optional", "sha256": None, "bytes": None})
+            entries.append({"id": entry_id, "source_path": source_rel.as_posix(), "target_path": target_rel.as_posix(), "required": False, "status": "skipped_optional", "sha256": None, "bytes": None})
             continue
 
         target_path.parent.mkdir(parents=True, exist_ok=True)
         data = source_path.read_bytes()
         target_path.write_bytes(data)
-        entries.append({"id": entry_id, "source_path": str(source_rel), "target_path": str(target_rel), "required": required, "status": "copied", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
+        entries.append({"id": entry_id, "source_path": source_rel.as_posix(), "target_path": target_rel.as_posix(), "required": required, "status": "copied", "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)})
 
     manifest = {
         "schema_version": "1.0",

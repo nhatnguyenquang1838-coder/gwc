@@ -36,16 +36,16 @@ skills:
   - id: g0-context-loading
     path: libs/g0-g1-skill-library/skills/g0-context-loading.md
     required: true
-    sha256: sha256:60de8b024031941d6ae377e9b738f1b67ffb9851f73130f0733af7f8d240feb6
+    sha256: sha256:c2b9fa553a6836d890f947a0ec698b4e02e6d2eb62e7f756a86646be109853f4
   - id: g1-intake-options-preflight
     path: libs/g0-g1-skill-library/skills/g1-intake-options-preflight.md
     required: true
-    sha256: sha256:d81e8f35c431f82dd19acaae9327d48d306141654d29a58105d9cdbbdf190d53
+    sha256: sha256:c4aa2ff3482a1a661afa6bc4399332607ef34bff0bfc21f2b92e8b97349e275a
   - id: g1-decision-record
     path: libs/g0-g1-skill-library/skills/g1-decision-record.md
     required: true
-    sha256: sha256:cd2f4a1f6a144a6e31e2e07976357cb734c684334b5d929dacd74692d043934c
+    sha256: sha256:a4cf660ad5d827b1bc361055d129f0127c6aa963ca29b43c96d3603da52bc0c8
   - id: g0-g1-approval-envelope
     path: libs/g0-g1-skill-library/skills/g0-g1-approval-envelope.md
     required: true
-    sha256: sha256:69056d8a3b16a01596888b96ee308d0183e1c2cbac2b7872a4533efe3d5db761
+    sha256: sha256:ead7c70eb480e2814dad34a167666c7a3adf3d30235a5311c85f9e069bab2edb
