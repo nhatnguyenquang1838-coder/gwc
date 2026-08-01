@@ -27,17 +27,44 @@ class G3ReviewInvocationTests(unittest.TestCase):
     def issues(self, record: dict) -> list[str]:
         return MODULE.validate_record(record, self.schema)
 
-    def test_valid_template_passes(self) -> None:
+    def human_record(self) -> dict:
+        record = copy.deepcopy(self.valid)
+        record["reviewer"] = {
+            "reviewer_id": "human-reviewer",
+            "kind": "human",
+            "role": "human_reviewer",
+            "independence": "independent",
+            "access_mode": "read_only",
+        }
+        record["invocation"]["provider"] = "github_review"
+        record["invocation"]["invocation_id"] = "github-review-123"
+        record["invocation"]["result_ref"] = "github-review://example-org/example-repo/pull/123/review/123"
+        return record
+
+    def test_valid_agent_template_passes(self) -> None:
         self.assertEqual([], self.issues(copy.deepcopy(self.valid)))
 
-    def test_reviewer_role_must_be_code_reviewer(self) -> None:
+    def test_valid_human_fallback_passes(self) -> None:
+        self.assertEqual([], self.issues(self.human_record()))
+
+    def test_agent_role_must_be_code_reviewer(self) -> None:
         record = copy.deepcopy(self.valid)
-        record["reviewer"]["role"] = "developer"
+        record["reviewer"]["role"] = "human_reviewer"
         self.assertTrue(any("reviewer.role" in issue for issue in self.issues(record)))
+
+    def test_human_role_must_be_human_reviewer(self) -> None:
+        record = self.human_record()
+        record["reviewer"]["role"] = "code_reviewer"
+        self.assertTrue(any("reviewer.role" in issue for issue in self.issues(record)))
+
+    def test_human_reviewer_cannot_use_fresh_context(self) -> None:
+        record = self.human_record()
+        record["reviewer"]["independence"] = "fresh-context"
+        self.assertTrue(any("independence" in issue for issue in self.issues(record)))
 
     def test_independent_reviewer_must_differ_from_implementer(self) -> None:
         record = copy.deepcopy(self.valid)
-        record["reviewer"]["agent_id"] = record["implementer_id"]
+        record["reviewer"]["reviewer_id"] = record["implementer_id"]
         self.assertTrue(any("must differ" in issue for issue in self.issues(record)))
 
     def test_requested_head_mismatch_fails(self) -> None:
@@ -49,6 +76,11 @@ class G3ReviewInvocationTests(unittest.TestCase):
         record = copy.deepcopy(self.valid)
         record["invocation"]["completed_head_sha"] = "e" * 40
         self.assertTrue(any("completed_head_sha" in issue for issue in self.issues(record)))
+
+    def test_completed_before_requested_fails(self) -> None:
+        record = copy.deepcopy(self.valid)
+        record["invocation"]["completed_at"] = "2026-08-01T08:59:00Z"
+        self.assertTrue(any("completed_at" in issue for issue in self.issues(record)))
 
     def test_write_action_fails(self) -> None:
         record = copy.deepcopy(self.valid)
