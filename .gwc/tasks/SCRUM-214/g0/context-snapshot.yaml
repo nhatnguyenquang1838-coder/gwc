@@ -1,0 +1,132 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-01T18:30:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G0/G1 are read-only
+- Exact G2 approval is required before branch or repository write
+- Active lane is SCRUM-256
+- No F9, SCRUM-258, broad rollout, package/export, deploy, release, production, secrets,
+  migration or G6
+applicable_policies:
+- id: AGENTS.md
+  path: AGENTS.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: b55193a7e5cae6727335670823d7900c30589f34
+- id: core-Coding_Project_Governance_v1.0.md
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+- id: core-GATE_LIFECYCLE_CONTRACT_v1.0.md
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: d88bcb8b551436f250f3ffed88357f4877cdfa58
+- id: core-E2E_DRAFT_PR_DELIVERY_RULE.md
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- id: core-runbooks-GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: bc116f07b27ae08c2646a73a021e3cf2e06a0362
+- id: agents-chatgpt-agent-agent-instructions.md
+  path: agents/chatgpt-agent/agent-instructions.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: 6a8a8e060daafecb83756c931bc6d18b74200fc1
+- id: projects-gwc-project-profile.yaml
+  path: projects/gwc/project-profile.yaml
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- id: projects-gwc-project-instructions.md
+  path: projects/gwc/project-instructions.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: af6debcb32cfbbedbcd3e064fb355dca3bb90fbd
+- id: projects-gwc-project-extension.md
+  path: projects/gwc/project-extension.md
+  ref: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  source_sha: af302cda2ef0327e295e01911c09cd683f951385
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: b55193a7e5cae6727335670823d7900c30589f34
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: d88bcb8b551436f250f3ffed88357f4877cdfa58
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bc116f07b27ae08c2646a73a021e3cf2e06a0362
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 6a8a8e060daafecb83756c931bc6d18b74200fc1
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: af6debcb32cfbbedbcd3e064fb355dca3bb90fbd
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: af302cda2ef0327e295e01911c09cd683f951385
+- path: core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json
+  required: true
+  status: AVAILABLE
+  source_sha: d0906b180f86eac8fd4307fa8905eebdf8aa4c33
+- path: tools/node_architect/client_runtime.py
+  required: true
+  status: AVAILABLE
+  source_sha: 0b4c3a4a3bd9f61ade666c89b8bee61f8a81c46c
+- path: tools/node_architect/ci_run_capture.py
+  required: true
+  status: AVAILABLE
+  source_sha: 188c7abff66d3b0645036033b65e688d2775326c
+- path: tools/node_architect/checkpoint_store.py
+  required: true
+  status: AVAILABLE
+  source_sha: 9f19095c104f59734618905c3aa06dfec3bcec38
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 4fbc4fc57657ce0df1fde308743646a996156721
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: chatgpt-agent
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - AGENTS.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
