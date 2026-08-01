@@ -6,7 +6,9 @@
   "authority_boundary": "read_only",
   "gates": [
     "G2_EXECUTION",
-    "G3_PR"
+    "G3_PR",
+    "G4_MERGE",
+    "G5_DEPLOY"
   ],
-  "description": "Project sanitized lifecycle events to external audit surfaces without copying secrets or approval commands."
+  "description": "Project sanitized G4 authority receipts, GitHub merge-proof identifiers, and G5 artifact/status references to external audit surfaces. Jira and Slack remain projection-only and never replace human authority, merge proof, or canonical Actions evidence."
 }
