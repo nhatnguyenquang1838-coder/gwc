@@ -1,0 +1,17 @@
+schema_version: '1.0'
+task_id: SCRUM-197
+gate: G2_EXECUTION
+node: repo_delivery.draft-pr-creation
+plan_read: true
+base_sha: 3acf169b91fa2d4c4c32f573fa3318d00dad9088
+scope_hash: sha256:982041dc3fbc436e36768b65106b338500cb3a8e755b8acf0da8f1ee06838642
+sources:
+- SCRUM-168 Jira parent
+- SCRUM-197 Jira subtask
+- AGENTS.md
+- core governance contracts
+- core/node-architect/node-catalog/repo_delivery/draft-pr-creation.node.json
+- B2 G0/G1 evidence
+read_at_utc: '2026-08-01T16:43:00Z'
+scope_consistency: MATCH
+repository_state: MATCH

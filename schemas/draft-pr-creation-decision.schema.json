@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/draft-pr-creation-decision.schema.json",
+  "title": "draft-pr-creation-decision",
+  "type": "object",
+  "required": ["outcome", "reason_codes", "repository", "base_branch", "branch", "base_sha", "head_sha", "pr_number", "idempotency_key", "decision_digest", "merge_authority_granted", "deployment_authority_granted", "production_authority_granted"],
+  "properties": {
+    "outcome": {"enum": ["CREATE_DRAFT_PR", "DRAFT_PR_BOUND", "PENDING_READBACK", "BLOCKED"]},
+    "reason_codes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "repository": {"type": "string"},
+    "base_branch": {"type": "string"},
+    "branch": {"type": "string"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$|^$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$|^$"},
+    "pr_number": {"type": ["integer", "null"]},
+    "idempotency_key": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  },
+  "additionalProperties": false
+}

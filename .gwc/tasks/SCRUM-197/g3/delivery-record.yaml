@@ -1,12 +1,12 @@
 schema_version: '1.0'
-task_id: SCRUM-198
+task_id: SCRUM-197
 gate: G3_PR
 status: DRAFT_PENDING_PR
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: 3acf169b91fa2d4c4c32f573fa3318d00dad9088
 branch: codex/scrum-196-198-f3-repo-delivery-b2-20260801
 scope_hash: sha256:982041dc3fbc436e36768b65106b338500cb3a8e755b8acf0da8f1ee06838642
-node: repo_delivery.ci-run-capture
+node: repo_delivery.draft-pr-creation
 validation:
   scoped_unit_tests: pass_10_tests
   compileall: pass
@@ -19,7 +19,6 @@ pr:
 review:
   status: pending
   independence: fresh_context_required
-remediation_note: Prior R3 packet and Jira Done state were stale; this record is intentionally rebound to current F3 B2 scope and must not reuse PR #137 evidence.
 exclusions:
   g4_merge: requires_explicit_approval
   g5_deploy: not_applicable_unless_manual_action_requested
