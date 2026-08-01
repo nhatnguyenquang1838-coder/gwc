@@ -1,0 +1,82 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-01T18:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-214
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-01T18:16:00Z'
+  source: 'User message: ok do it, interpreted only as G1 plan selection'
+  explicit: true
+rationale: Use the narrow reuse-first path for SCRUM-214 while preserving the active SCRUM-256 lane and all exclusions.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:4e4029d0124c47414478175f87371e8434e66a94ff5b7b84e1cc3dc533b7838a
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Schema and decision utility
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Replay/checkpoint tests and implementation
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Client binding and integration validation
+    dependencies:
+    - SUB-TASK-2
+  - sub_task_id: SUB-TASK-4
+    description: Independent exact-head review
+    dependencies:
+    - SUB-TASK-3
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-g2
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: test-driven-development
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: gwc-g3
+    agent_type: validator
+  - sub_task_id: SUB-TASK-4
+    skill_id: code-review
+    agent_type: reviewer
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Sequential test-first delivery with fresh-context review.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-214
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  plan_root: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214
+  plan_revision: sha256:a7362f6247be76d57d5acf05ffaf09f29a08221b37f5759a7ca98dbee255703c
+  validation_evidence: validation/SCRUM-214-implementation-plan-validation.json
