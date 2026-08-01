@@ -10,3 +10,4 @@
 - Persist pending G5 checkpoints externally and forbid evidence commits or recursive evidence PRs.
 - Strengthen existing G3/G4/G5 Node Architect descriptors without adding an 82nd catalog node.
 - Preserve separate G4 merge authority and all G5 manual-action/G6 exclusions.
+- Activate the new event-driven G4/G5 workflow only after this PR reaches the protected base; PR #152 itself continues through the pre-existing manual G4 path.
