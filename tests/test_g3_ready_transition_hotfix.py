@@ -27,10 +27,14 @@ class G3ReadyTransitionHotfixTests(unittest.TestCase):
         merge_pending_rules = [rule for rule in rules if rule["expected_state"] == "merge_pending"]
         self.assertEqual(["PR_READY_FOR_REVIEW"], [rule["outcome"] for rule in merge_pending_rules])
 
-    def test_g3_skill_requires_code_reviewer_and_readback(self) -> None:
+    def test_g3_skill_requires_capability_aware_review_and_readback(self) -> None:
         skill = (ROOT / "skills" / "gwc-g3" / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("code-review-invocation.json", skill)
-        self.assertIn("role is exactly `code_reviewer`", skill)
+        self.assertIn("reviewer.kind=agent", skill)
+        self.assertIn("reviewer.role=code_reviewer", skill)
+        self.assertIn("reviewer.kind=human", skill)
+        self.assertIn("reviewer.role=human_reviewer", skill)
+        self.assertIn("plain acknowledgement", skill)
         self.assertIn("mark_pull_request_ready_for_review", skill)
         self.assertIn("observed draft == false", skill)
         self.assertIn("Review PASS alone does not transition", skill)
@@ -45,10 +49,10 @@ class G3ReadyTransitionHotfixTests(unittest.TestCase):
         }
         descriptions = {name: json.loads(path.read_text(encoding="utf-8"))["description"] for name, path in paths.items()}
 
-        self.assertIn("code_reviewer", descriptions["draft"])
+        self.assertIn("capability-supported agent or human", descriptions["draft"])
         self.assertIn("draft=false", descriptions["promotion"])
         self.assertIn("reviewed head SHA", descriptions["promotion"])
-        self.assertIn("stale code-review-agent evidence", descriptions["blocker"])
+        self.assertIn("stale independent-review evidence", descriptions["blocker"])
         self.assertIn("merge_pending", descriptions["decision"])
         self.assertIn("empty write-actions evidence", descriptions["evidence"])
 
