@@ -1,0 +1,10 @@
+{
+  "validator_path": "tools/validate_g01.py",
+  "validator_git_blob_sha": "4fbc4fc57657ce0df1fde308743646a996156721",
+  "command": "python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-258 --gate G2_EXECUTION --json",
+  "exit_code": 0,
+  "outcome": "PASS",
+  "protected_base_sha": "63318bb8f7b7c9d140a3b1e7f554ee4107ca0313",
+  "scope_hash": "sha256:ac4d8e1cf6d0bd73667afc478d457512d754ba270887c47fb66eb97e46dcb495",
+  "recorded_at": "2026-08-01T12:35:00Z"
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g5-recovery-authority.schema.json",
+  "title": "G5 Recovery Authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "generated_at", "recovery_mode",
+    "recovery_id", "repository", "pr_number", "gate", "g4_approval_id",
+    "scope_hash_prefix", "approved_head_sha", "merge_commit_sha",
+    "source_authority", "source_comment", "approver", "issued_at",
+    "expires_at", "merged_pr", "required_workflows", "authorized_action",
+    "manual_action_authorized", "projection_authority",
+    "no_recursive_evidence_pr", "canonical_artifact_name"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g5-recovery-authority"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "recovery_mode": {"const": "bootstrap_manual_authority"},
+    "recovery_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "pr_number": {"type": "integer", "minimum": 1},
+    "gate": {"const": "G5_DEPLOY"},
+    "g4_approval_id": {"type": "string", "minLength": 1},
+    "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "approved_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider", "sha256", "merge_commit_message_verified"],
+      "properties": {
+        "provider": {"const": "governed_chat_receipt"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "merge_commit_message_verified": {"const": true}
+      }
+    },
+    "source_comment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider", "comment_id", "url"],
+      "properties": {
+        "provider": {"const": "github_pr_comment"},
+        "comment_id": {"type": "integer", "minimum": 1},
+        "url": {"type": "string", "format": "uri"}
+      }
+    },
+    "approver": {
+      "type": "object", "additionalProperties": false,
+      "required": ["login", "permission"],
+      "properties": {
+        "login": {"type": "string", "minLength": 1},
+        "permission": {"enum": ["write", "maintain", "admin"]}
+      }
+    },
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "merged_pr": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "merged", "merged_at", "merged_by", "approved_head_match", "merge_commit_match"],
+      "properties": {
+        "state": {"const": "closed"},
+        "merged": {"const": true},
+        "merged_at": {"type": "string", "format": "date-time"},
+        "merged_by": {"type": "string", "minLength": 1},
+        "approved_head_match": {"const": true},
+        "merge_commit_match": {"const": true}
+      }
+    },
+    "required_workflows": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["workflow", "run_id", "run_attempt", "event", "branch", "head_sha", "status", "conclusion"],
+        "properties": {
+          "workflow": {"enum": ["Validate instructions", "Build instruction packages"]},
+          "run_id": {"type": "integer", "minimum": 1},
+          "run_attempt": {"type": "integer", "minimum": 1},
+          "event": {"const": "push"},
+          "branch": {"const": "main"},
+          "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "status": {"const": "completed"},
+          "conclusion": {"const": "success"}
+        }
+      }
+    },
+    "authorized_action": {"const": "materialize_g5_recovery_evidence"},
+    "manual_action_authorized": {"const": false},
+    "projection_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["jira", "slack"],
+      "properties": {"jira": {"const": "projection_only"}, "slack": {"const": "projection_only"}}
+    },
+    "no_recursive_evidence_pr": {"const": true},
+    "canonical_artifact_name": {"type": "string", "pattern": "^g5-recovery-pr-[1-9][0-9]*-merge-[0-9a-f]{12}-[A-Za-z0-9._-]+$"}
+  }
+}

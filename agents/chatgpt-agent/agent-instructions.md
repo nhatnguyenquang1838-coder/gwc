@@ -249,76 +249,73 @@ workflow runs, jobs, and artifacts through GitHub connector readback. Never
 fabricate a G5 comment or PASS when the PR is still Draft/unmerged, required
 workflows are non-terminal, or the exact merge-SHA evidence chain is absent.
 
+### G5 bootstrap recovery handling
+
+Use bootstrap recovery only when a merged PR could not emit the normal receipt
+chain because it introduced or activated that chain itself. Recovery must use
+the existing `.github/workflows/g4-g5-evidence.yml`; do not create a parallel
+workflow, evidence PR, or conversation-only PASS.
+
+The agent generates and presents this exact human command only after the
+recovery mechanism has been merged to the protected base:
+
+```text
+APPROVE G5 RECOVERY <recovery_id> <owner/repo> <pr_number> <g4_approval_id> <scope_hash_16> <approved_head_sha> <merge_commit_sha> <validate_run_id> <build_run_id> <source_authority_sha256> <expires_at_utc>
+```
+
+Before accepting it, verify the commenter has current write/maintain/admin
+permission, the command is attached to the exact merged PR and is unexpired,
+the PR head and merge SHA match, the merge commit message carries the original
+G4 approval/head provenance, and both supplied required workflow runs are
+successful `push:main` runs for the exact merge SHA.
+
+The workflow must validate `schemas/g5-recovery-authority.schema.json` with
+`tools/validate_g5_recovery_authority.py`, emit a canonical Actions artifact,
+and publish recovery-labelled `gwc:g5-recovery-authority`,
+`gwc:g4-merge-proof`, and `gwc:g5-status` traces. Recovery mode is always
+`bootstrap_manual_authority`.
+
+Exact duplicate commands are idempotent no-ops. Conflicting trusted recovery
+receipts fail closed. Recovered evidence must state that historical events were
+not rewritten and must never be described as the original event-driven workflow.
+Recovery authorizes evidence materialization only; it never authorizes merge,
+deploy, release, publish, runtime reload, production configuration/data,
+credentials, secrets, migration, or a recursive evidence PR.
+
 ## ChatGPT thread sleep for CI continuation
 
 When running as a ChatGPT chat connector and a future CI check is needed, sleep the current thread for exactly two minutes. Do not create a scheduler task or automation.
 
-Before sleeping the thread, record:
+Before sleeping the thread, record repository and PR, expected SHA, allowed action boundary, excluded actions, and two-minute wake time. When the thread wakes, verify the latest PR head SHA before reporting CI. If the platform cannot sleep and wake the current thread, record a manual checkpoint; do not substitute a scheduler task or automation.
 
-- repository and PR number;
-- expected head SHA when available;
-- allowed action boundary, normally check and report only;
-- excluded actions: no merge, deploy, reload, release, production configuration, credentials, migrations, or production data;
-- two-minute wake time.
-
-When the thread wakes, verify the latest PR head SHA before checking or reporting CI. If the platform cannot sleep and wake the current thread, record a manual checkpoint; do not substitute a scheduler task or automation.
-
-A resumed ChatGPT thread may fix and commit only when an active G2 scope explicitly authorizes repository repair. It must never merge, deploy, reload runtime, or perform production operations from the resumed check.
+A resumed ChatGPT thread may fix and commit only when active G2 scope explicitly authorizes repair. It must never merge, deploy, reload runtime, or perform production operations from the resumed check.
 
 ## Artifact-driven gate continuation
 
-The agent owns gate preparation; the human owns explicit authority boundaries.
-For each transition:
-
-```text
-Read protected-base runbook
--> resolve current gate and exact action
--> obtain current evidence from the pinned SHA
--> obtain matching schemas, templates, and validators
--> materialize and validate in an isolated workspace
--> repair remediable evidence gaps
--> generate the next gate artifact and approval request
--> present the exact APPROVE command
--> stop only at a real human-authority boundary or hard denial
-```
+The agent owns gate preparation; the human owns explicit authority boundaries. Read the protected-base runbook, resolve the current gate/action, obtain exact-SHA evidence and validators, materialize/validate, repair remediable gaps, generate the next artifact/request, and stop only at a real authority boundary or hard denial.
 
 | Gate exit | Agent-generated next artifact |
 |---|---|
 | G0 READY | G1 intake, preflight, options, and decision inputs/artifacts |
 | G1 PASS | G2 execution envelope plus approval request |
 | G2 PASS | G3 delivery record bound to exact branch head SHA |
-| G3 PASS | G4 merge approval request after marking Draft PR ready for review when supported; request is bound to exact PR/head SHA and PR-ready status |
-| G4 PASS | G5 deployment approval request only for manual G5 action; otherwise automatic read-only G5 status verification bound to exact commit/environment/checks |
-| G5 PASS | G6 production approval request only when production operation scope exists; otherwise record `not_applicable` |
+| G3 PASS | G4 merge approval request after Ready-for-Review metadata completion |
+| G4 PASS | G5 approval only for manual G5 action; otherwise automatic read-only verification |
+| G5 PASS | G6 request only when production operation scope exists; otherwise `not_applicable` |
 
-Use the existing canonical mechanism first:
-
-```text
-Find existing -> Reuse -> Extend -> Refactor -> Replace only if required
-```
-
-Missing local files, transport failures, stale generated artifacts, and
-remediable schema errors are recovery conditions. A protected-branch write,
-merge, deployment, production configuration, credential, migration,
-production-data operation, scope drift, expired approval, or
-`connector hard denial` is a real stop condition.
+Use `Find existing -> Reuse -> Extend -> Refactor -> Replace only if required`.
 
 ## Agent-generated approval commands
 
 The agent generates approval identifiers, scope hashes, branch names, file
-scope, expiry, and the exact command. The human grants authority only by sending
-the active command exactly:
+scope, expiry, and exact command. The human grants authority only by sending the active command exactly:
 
 ```text
 APPROVE <GATE> <approval_request_id> <scope_hash_16> <expires_at_utc>
 ```
 
-Plain acknowledgements such as `ok`, `approve`, `continue`, `go`, `yes`, or
-equivalents are `ACKNOWLEDGEMENT_ONLY` and do not grant gate authority.
-
-Do not copy full executable approval commands into connector payloads, commit
-messages, PR titles, or long-lived comments. Use sanitized metadata: gate,
-approval ID, scope-hash prefix, expected SHA, and expiry.
+Plain acknowledgements are `ACKNOWLEDGEMENT_ONLY`. Do not copy full executable
+approval commands into connector payloads, commit messages, PR titles, or long-lived comments. Use sanitized metadata only.
 
 ## File tracking and context refresh
 
@@ -329,34 +326,16 @@ New write path -> refresh scope and approval before writing.
 Actual write outside approved scope -> stop before commit or PR.
 ```
 
-For G5, do not infer a manual deploy/reload from the gate name. If deployment is
-integrated into GitHub Actions or Vercel checks, G5 is status verification only:
-inspect the relevant post-merge workflow, deployment check, runtime status, or
-tool surface for the exact approved commit. Read-only `G5_STATUS_VERIFY` is
-automatic after G4 merge. Manual deploy, redeploy, release, publish, or runtime
-reload requires explicit G5 manual-action scope.
-
-For post-merge verification, first attempt exact lookup using `event=push`,
-`branch=main`, and `head_sha=<merge_sha>` or equivalent connector parameters. If
-the connector surface does not support those filters or returns empty results,
-fall back to a known `run_id` and direct jobs/artifacts lookup. Empty PR-filtered
-results without run-id/artifact fallback evidence must be classified
-`CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
-`CI_PENDING` is reserved only when a run is found but has not yet completed.
+For G5, do not infer manual deploy/reload from the gate name. First attempt exact
+`event=push`, `branch=main`, and `head_sha=<merge_sha>` lookup, then known run-ID
+and direct jobs/artifacts fallback. Empty PR-filtered results without fallback
+evidence are `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`.
 
 ## Presentation contract
 
-After G1, when a human-review HTML artifact is generated, follow the presentation contract:
+After G1, human-review presentation artifacts must remain secondary to canonical artifacts, self-contained, mobile-first, printable, dark-mode compatible, and free of remote runtime dependencies. Mark stale or conflicting presentations invalid.
 
-- Local agent: return concise summary plus clickable or served local HTML path.
-- Chat connector: return concise summary plus HTML artifact or link.
-- Slack delivery: use the existing root task thread and include concise summary plus same HTML artifact or link.
-- If presentation conflicts with canonical artifacts, mark it `STALE` or `INVALID` and do not alter gate authority.
-- The HTML must be self-contained, mobile-first, printable, dark-mode compatible, and must not depend on remote JavaScript, CSS, fonts, or external runtime dependencies.
-
-Refresh the active source, gate, task, repository, branch, scope, risk, and
-authority before every write-capable action and whenever the user says to
-continue or the context changes materially.
+Refresh active source, gate, task, repository, branch, scope, risk, and authority before every write-capable action and whenever context materially changes.
 
 Every delivery reports:
 
@@ -368,23 +347,10 @@ Scope drift: NONE | DETECTED
 
 ## User-visible reporting
 
-Show concise status with evidence and the actual recovery or approval boundary:
-
-```text
-GWC BOOT: PASS - execution_mode=<mode>
-G0_CONTEXT: READY - evidence: <repo/profile/task refs>
-G1_ALIGNMENT: PASS - validator: <path, command, exit code, hashes>
-G2_EXECUTION: AWAITING_APPROVAL - <request id, scope hash, expiry>
-```
-
-Do not expose hidden reasoning. Report evidence, decisions, blockers, and the
-next allowed action. Never use `validator unavailable` generically when exact-SHA
-fetch and isolated validation are possible.
+Show concise gate status with evidence and the actual recovery or approval boundary. Do not expose hidden reasoning or claim validator/CI/repository facts that were not observed.
 
 ## Safety boundary
 
 Tool availability, a user request, or CI success does not replace gate artifacts
 or grant unrelated authority. Never invent repository paths, task artifacts,
-validator output, CI state, connector identity, or DS Admin transitions. DS
-Admin transitions must be legal State Engine transitions and should be updated
-at each gate boundary; late reconciliation must be disclosed as late.
+validator output, CI state, connector identity, or task transitions.

@@ -1,0 +1,112 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-01T12:05:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-258
+  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: 'PR #152 has successful exact merge-SHA CI but lacks canonical G4 authority,
+    merge-proof and G5 artifacts because it bootstrapped the evidence workflow itself.'
+  why_now: 'PR #153 advanced main after the first envelope. Its F9 scale-control changes
+    do not overlap this lane, so the recovery plan is rebound to current protected
+    main before any write.'
+desired_outcome: Add a fail-closed, idempotent, human-authorized bootstrap recovery
+  route that emits canonical Actions evidence and clearly labelled PR traces without
+  rewriting history.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - ChatGPT and DWC governed runtimes
+  - Auditors of G4/G5 evidence
+scope:
+  in_scope:
+  - Extend `.github/workflows/g4-g5-evidence.yml` with an exact merged-PR recovery
+    command.
+  - Add recovery authority schema, validator, template and negative tests.
+  - Verify exact PR/head/merge SHA, approver, expiry and exact successful workflow
+    run IDs.
+  - Emit canonical artifact and sanitized recovery-mode G4/G5 PR traces.
+  - Update permanent G5 and agent contracts.
+  non_goals:
+  - Do not rewrite or fabricate the original G4 event.
+  - Do not commit evidence to main or create an evidence PR.
+  - Do not change node count or unrelated runtime families.
+  - Do not merge, deploy, release, publish, reload runtime, touch production configuration/data,
+    secrets or migrations under this envelope.
+constraints:
+- Base on main@63318bb8f7b7c9d140a3b1e7f554ee4107ca0313.
+- Use Jira SCRUM-258 as the active task.
+- Reuse the existing workflow and evidence schema family.
+- Recovery must fail closed and remain idempotent.
+assumptions:
+- 'PR #152 immutable metadata and exact successful workflow run IDs remain readable
+  through GitHub.'
+- A later exact human recovery comment on the merged PR can serve as recovery authority
+  without retroactively pretending it was original G4 authority.
+risks:
+- id: RISK-1
+  description: Recovery could accidentally weaken normal G4/G5 authority requirements.
+  impact: high
+  mitigation: Limit recovery to merged PRs, require a distinct exact command and explicit
+    recovery provenance.
+- id: RISK-2
+  description: Duplicate or conflicting recovery requests could create ambiguous evidence.
+  impact: high
+  mitigation: Reject conflicts and make exact duplicates idempotent.
+- id: RISK-3
+  description: Workflow-run selection could bind to a different SHA or rerun.
+  impact: high
+  mitigation: Require exact merge SHA, workflow identity, run IDs and successful conclusions.
+acceptance_criteria:
+- id: AC-1
+  statement: Recovery accepts only an exact human command on a merged PR and binds
+    to exact head, merge SHA, approval ID and expiry.
+  verifiable: true
+- id: AC-2
+  statement: 'PR #152 recovery verifies runs 30697350537 and 30697350559 as successful
+    for merge SHA bb1269ba913b548a58ec97ff65c54d00ab16e19e.'
+  verifiable: true
+- id: AC-3
+  statement: Canonical Actions artifacts and sanitized G4/G5 traces include explicit
+    bootstrap recovery provenance.
+  verifiable: true
+- id: AC-4
+  statement: Expired, unauthorized, mismatched, missing, duplicate-conflicting and
+    non-success cases fail closed.
+  verifiable: true
+- id: AC-5
+  statement: Normal event-driven G4/G5 behavior remains unchanged and exactly 81 runtime
+    nodes remain.
+  verifiable: true
+- id: AC-6
+  statement: Full validators, tests and exact-head CI pass on a Draft PR; no excluded
+    operation occurs.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_approved_files
+  - run_sandboxed_validation
+  - commit_and_push_guarded_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - perform_independent_read_only_g3_review
+  downstream_non_goals:
+  - merge
+  - deploy
+  - release
+  - production_operation
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - exact PR head SHA
+    - complete diff review
+    - required CI success
+    - independent review closure
+    - scope-drift PASS
+unresolved_questions: []
+status: READY

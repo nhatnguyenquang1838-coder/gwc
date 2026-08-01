@@ -211,6 +211,24 @@ A successful G5 evidence artifact must conform to `schemas/g5-ci-verification-ev
 - `no_recursive_evidence_pr: true`;
 - timestamp and actor/runtime identity.
 
+## Human-authorized bootstrap recovery
+
+Bootstrap recovery is permitted only when a merged PR could not have emitted the normal G4/G5 receipt chain because it introduced or activated that chain itself. Recovery extends `.github/workflows/g4-g5-evidence.yml`; it is not a parallel governance system.
+
+The exact human command is attached to the immutable merged PR:
+
+```text
+APPROVE G5 RECOVERY <recovery_id> <owner/repo> <pr_number> <g4_approval_id> <scope_hash_16> <approved_head_sha> <merge_commit_sha> <validate_run_id> <build_run_id> <source_authority_sha256> <expires_at_utc>
+```
+
+Before evidence materialization, the workflow must verify the repository/PR context, current approver permission, expiry, merged PR state, exact head and merge SHA, original G4 approval/head provenance in the merge commit message, and the exact successful `push:main` run IDs for `Validate instructions` and `Build instruction packages`. The external governed-chat receipt is bound by its SHA-256 digest.
+
+Recovery evidence must validate against `schemas/g5-recovery-authority.schema.json` with `tools/validate_g5_recovery_authority.py`, carry `recovery_mode: bootstrap_manual_authority`, upload a canonical GitHub Actions artifact, and publish sanitized `gwc:g5-recovery-authority`, recovered `gwc:g4-merge-proof`, and recovered `gwc:g5-status` comments.
+
+Exact duplicates are idempotent no-ops. Conflicting trusted receipts for the same PR and merge SHA fail closed. Recovery must state that historical events were not rewritten and must never claim the original automated event ran.
+
+Recovery authorizes evidence materialization only. It never authorizes merge, deploy, redeploy, release, publish, runtime reload, production configuration/data, credentials, secrets, migration, force-push, branch deletion, or a recursive evidence PR.
+
 ## Forbidden outcomes
 
 ```text
@@ -226,8 +244,10 @@ A successful G5 evidence artifact must conform to `schemas/g5-ci-verification-ev
 ❌ recursive evidence commit or evidence PR
 ❌ G5 status check used to deploy or reload runtime
 ❌ human bypass of failed CI, SHA mismatch, or missing required evidence
+❌ recovery without exact human authority and immutable merged-PR bindings
+❌ recovery that hides or rewrites its provenance
 ```
 
 ## Compatibility
 
-This contract extends the current G4/G5 exact-SHA language in `AGENTS.md`, `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`, and `core/E2E_DRAFT_PR_DELIVERY_RULE.md`. Existing G5 records remain valid when they already bind evidence to the exact merge commit. New event-driven G5 records should include the additive `evidence_chain` object and use the schema, workflow, and checkpoint contract in this change.
+This contract extends the current G4/G5 exact-SHA language in `AGENTS.md`, `core/GATE_LIFECYCLE_CONTRACT_v1.0.md`, and `core/E2E_DRAFT_PR_DELIVERY_RULE.md`. Existing G5 records remain valid when they already bind evidence to the exact merge commit. New event-driven G5 records should include the additive `evidence_chain` object and use the schema, workflow, and checkpoint contract in this change. Bootstrap recovery is additive and does not change the normal event-driven path or the 81-node runtime catalog.
