@@ -109,7 +109,7 @@ class HumanBypassSchemaTests(unittest.TestCase):
         after = deepcopy(before)
         after["repository"]["head_sha"] = "2" * 40
         self.assertNotEqual(before["repository"]["head_sha"], after["repository"]["head_sha"])
-        self.assertIn("invalidated by task, base SHA, head SHA", (ROOT / "core/HUMAN_BYPASS_CONTRACT_v1.0.md").read_text())
+        self.assertIn("invalidated by task, base SHA, head SHA", (ROOT / "core/HUMAN_BYPASS_CONTRACT_v1.0.md").read_text(encoding="utf-8"))
 
     def test_duplicate_acceptance_is_idempotent_only_for_same_binding(self) -> None:
         first = valid_record()

@@ -1,9 +1,13 @@
+.gitattributes text eol=lf
 AGENTS.md text eol=lf
 core/*.md text eol=lf
 agents/dwc/agent-instructions.md text eol=lf
 projects/gwc/package.yaml text eol=lf
 projects/gwc/project-instructions.md text eol=lf
 projects/gwc/project-profile.yaml text eol=lf
+libs/*-skill-library/manifest.yaml text eol=lf
+libs/*-skill-library/*.md text eol=lf
+libs/*-skill-library/skills/*.md text eol=lf
 releases/changelog.md text eol=lf
 SHA256SUMS.txt text eol=lf
 TREE.txt text eol=lf
