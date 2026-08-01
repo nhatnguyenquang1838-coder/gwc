@@ -1,0 +1,62 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-01T12:05:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-258
+  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPOSITORY_VERIFIED
+  message: Repository identity and protected base are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc@main:63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+- id: BASE_DRIFT_RECONCILIATION
+  status: PASS
+  code: NON_OVERLAPPING_BASE_ADVANCE
+  message: 'PR #153 advanced main after the first envelope; compare evidence shows
+    no overlap with SCRUM-258 implementation files.'
+  evidence:
+  - main advanced bb1269ba913b548a58ec97ff65c54d00ab16e19e -> 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  - 'PR #153 changed only F9 scale-control task artifacts, schemas, tools, tests and
+    a separate changelog'
+- id: TASK_CLAIM
+  status: PASS
+  code: JIRA_TASK_CLAIMED
+  message: SCRUM-258 exists, is assigned, claimed and In Progress.
+  evidence:
+  - SCRUM-258
+  - Jira comment 10464
+- id: BOOTSTRAP_GAP
+  status: PASS
+  code: RECOVERY_GAP_CONFIRMED
+  message: 'PR #152 exact merge-SHA CI passed but canonical receipt chain is absent.'
+  evidence:
+  - 'PR #152 merge bb1269ba913b548a58ec97ff65c54d00ab16e19e'
+  - Validate instructions run 30697350537 success
+  - Build instruction packages run 30697350559 success
+- id: REUSE_ANALYSIS
+  status: PASS
+  code: EXTEND_EXISTING_WORKFLOW
+  message: The smallest compatible route is to extend the existing issue_comment workflow.
+  evidence:
+  - .github/workflows/g4-g5-evidence.yml@313ef54050a31cc43aa9058e4e6e0f7d7853fdd0
+- id: PLAN_READY
+  status: PASS
+  code: LOCAL_KIRO_PLAN_VALIDATED
+  message: Requirements, design and task plan are materialized for SCRUM-258.
+  evidence:
+  - .kiro/specs/SCRUM-258-g5-bootstrap-recovery
+  - sha256:416439f80bc57b89df0ff3a0db6c524c3a84eb96e99efc509ff12de32a754040
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

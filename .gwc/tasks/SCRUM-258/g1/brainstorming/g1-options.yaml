@@ -1,0 +1,48 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-01T12:05:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-258
+  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Extend existing issue_comment evidence workflow
+  description: Add a distinct exact G5 recovery command/job to the existing workflow,
+    with recovery provenance and idempotency.
+  benefits:
+  - Reuses canonical authority/evidence surfaces.
+  - 'Can recover PR #152 after the hotfix reaches main.'
+  - Does not create a parallel governance system.
+  tradeoffs:
+  - Requires a follow-up hotfix PR and later exact recovery comment.
+  risks:
+  - Must prevent recovery mode from weakening normal G4/G5 checks.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Standalone workflow_dispatch recovery workflow
+  description: Add a separate manually dispatched workflow.
+  benefits:
+  - Simple operator invocation.
+  tradeoffs:
+  - Creates a parallel path and depends on workflow-dispatch tooling.
+  risks:
+  - Authority and evidence logic could drift from the canonical workflow.
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Manual PR comments without canonical artifact
+  description: Post human or bot comments based on observed CI only.
+  benefits:
+  - No code change.
+  tradeoffs:
+  - Does not create canonical machine evidence.
+  risks:
+  - Would preserve the current evidence gap and could fabricate authority.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: 'OPT-1 is the smallest compatible extension: it reuses the
+  canonical workflow, fails closed and produces auditable recovery provenance.'
+decision_required: true
+status: READY

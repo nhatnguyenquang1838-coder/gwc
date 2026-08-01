@@ -249,6 +249,39 @@ workflow runs, jobs, and artifacts through GitHub connector readback. Never
 fabricate a G5 comment or PASS when the PR is still Draft/unmerged, required
 workflows are non-terminal, or the exact merge-SHA evidence chain is absent.
 
+### G5 bootstrap recovery handling
+
+Use bootstrap recovery only when a merged PR could not emit the normal receipt
+chain because it introduced or activated that chain itself. Recovery must use
+the existing `.github/workflows/g4-g5-evidence.yml`; do not create a parallel
+workflow, evidence PR, or conversation-only PASS.
+
+The agent generates and presents this exact human command only after the
+recovery mechanism has been merged to the protected base:
+
+```text
+APPROVE G5 RECOVERY <recovery_id> <owner/repo> <pr_number> <g4_approval_id> <scope_hash_16> <approved_head_sha> <merge_commit_sha> <validate_run_id> <build_run_id> <source_authority_sha256> <expires_at_utc>
+```
+
+Before accepting it, verify the commenter has current write/maintain/admin
+permission, the command is attached to the exact merged PR and is unexpired,
+the PR head and merge SHA match, the merge commit message carries the original
+G4 approval/head provenance, and both supplied required workflow runs are
+successful `push:main` runs for the exact merge SHA.
+
+The workflow must validate `schemas/g5-recovery-authority.schema.json` with
+`tools/validate_g5_recovery_authority.py`, emit a canonical Actions artifact,
+and publish recovery-labelled `gwc:g5-recovery-authority`,
+`gwc:g4-merge-proof`, and `gwc:g5-status` traces. Recovery mode is always
+`bootstrap_manual_authority`.
+
+Exact duplicate commands are idempotent no-ops. Conflicting trusted recovery
+receipts fail closed. Recovered evidence must state that historical events were
+not rewritten and must never be described as the original event-driven workflow.
+Recovery authorizes evidence materialization only; it never authorizes merge,
+deploy, release, publish, runtime reload, production configuration/data,
+credentials, secrets, migration, or a recursive evidence PR.
+
 ## ChatGPT thread sleep for CI continuation
 
 When running as a ChatGPT chat connector and a future CI check is needed, sleep the current thread for exactly two minutes. Do not create a scheduler task or automation.

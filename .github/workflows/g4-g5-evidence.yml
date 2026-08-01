@@ -538,3 +538,168 @@ jobs:
             } else {
               await github.rest.issues.createComment({ owner, repo, issue_number, body });
             }
+
+  g5-recovery:
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.comment.body, 'APPROVE G5 RECOVERY ')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout protected base
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Materialize bootstrap recovery authority
+        id: recovery
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = (context.payload.comment.body || '').trim();
+            const command = /^APPROVE G5 RECOVERY ([A-Za-z0-9._-]+) ([^\s]+\/[^\s]+) ([1-9][0-9]*) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) ([0-9a-f]{40}) ([0-9a-f]{40}) ([1-9][0-9]*) ([1-9][0-9]*) ([0-9a-f]{64}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
+            const match = body.match(command);
+            if (!match) { core.setFailed('Malformed G5 recovery approval command.'); return; }
+            const { owner, repo } = context.repo;
+            const repository = `${owner}/${repo}`;
+            const prNumber = Number(match[3]);
+            if (match[2] !== repository || prNumber !== context.payload.issue.number) { core.setFailed('Recovery repository or PR binding does not match comment context.'); return; }
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({ owner, repo, username: context.payload.comment.user.login });
+            if (!['admin', 'maintain', 'write'].includes(permission.permission)) { core.setFailed(`Recovery approver lacks write authority: ${permission.permission}`); return; }
+            const expiresAt = new Date(match[11]);
+            if (!Number.isFinite(expiresAt.getTime()) || expiresAt <= new Date()) { core.setFailed('G5 recovery approval is invalid or expired.'); return; }
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            if (!pr.merged || pr.state !== 'closed' || !pr.merged_at || !pr.merged_by) { core.setFailed('G5 recovery requires an immutable merged PR.'); return; }
+            if (pr.head.sha !== match[6] || pr.merge_commit_sha !== match[7]) { core.setFailed('Recovery approved-head or merge-SHA binding does not match GitHub PR state.'); return; }
+            const { data: mergeCommit } = await github.rest.repos.getCommit({ owner, repo, ref: match[7] });
+            const commitMessage = mergeCommit.commit?.message || '';
+            if (!commitMessage.includes(match[4]) || !commitMessage.includes(match[6])) { core.setFailed('Merge commit does not carry the claimed original G4 approval/head provenance.'); return; }
+            const requestedRuns = [
+              { name: 'Validate instructions', run_id: Number(match[8]) },
+              { name: 'Build instruction packages', run_id: Number(match[9]) },
+            ];
+            const observedRuns = [];
+            for (const requested of requestedRuns) {
+              const { data: run } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: requested.run_id });
+              if (run.name !== requested.name || run.event !== 'push' || run.head_branch !== 'main' || run.head_sha !== match[7] || run.status !== 'completed' || run.conclusion !== 'success') {
+                core.setFailed(`Required workflow run is not exact-SHA successful: ${requested.name}:${requested.run_id}`); return;
+              }
+              observedRuns.push({ workflow: run.name, run_id: run.id, run_attempt: run.run_attempt || 1, event: run.event, branch: run.head_branch, head_sha: run.head_sha, status: run.status, conclusion: run.conclusion });
+            }
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: prNumber, per_page: 100 });
+            const trusted = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes('<!-- gwc:g5-recovery-authority '));
+            const signature = `recovery_id=${match[1]} repository=${repository} pr=${prNumber} approval_id=${match[4]} scope=${match[5]} head=${match[6]} merge=${match[7]} source_digest=${match[10]}`;
+            const exact = trusted.find((item) => item.body.includes(signature));
+            const proofMarker = `recovery_id=${match[1]} recovery_mode=bootstrap_manual_authority`;
+            const proofExists = comments.some((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes('<!-- gwc:g4-merge-proof ') && item.body.includes(proofMarker));
+            const statusExists = comments.some((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes('<!-- gwc:g5-status ') && item.body.includes(proofMarker));
+            const conflict = trusted.find((item) => item.body.includes(`pr=${prNumber} `) && item.body.includes(`merge=${match[7]} `) && !item.body.includes(signature));
+            if (conflict) { core.setFailed('A conflicting trusted G5 recovery receipt already exists for this PR/merge SHA.'); return; }
+            if (exact && proofExists && statusExists) { core.setOutput('duplicate', 'true'); core.setOutput('recovery_id', match[1]); return; }
+            const artifactName = `g5-recovery-pr-${prNumber}-merge-${match[7].slice(0, 12)}-${match[1]}`;
+            const receipt = {
+              schema_version: '1.0', artifact_type: 'g5-recovery-authority', generated_at: new Date().toISOString(),
+              recovery_mode: 'bootstrap_manual_authority', recovery_id: match[1], repository, pr_number: prNumber,
+              gate: 'G5_DEPLOY', g4_approval_id: match[4], scope_hash_prefix: match[5], approved_head_sha: match[6], merge_commit_sha: match[7],
+              source_authority: { provider: 'governed_chat_receipt', sha256: match[10], merge_commit_message_verified: true },
+              source_comment: { provider: 'github_pr_comment', comment_id: context.payload.comment.id, url: context.payload.comment.html_url },
+              approver: { login: context.payload.comment.user.login, permission: permission.permission },
+              issued_at: context.payload.comment.created_at, expires_at: match[11],
+              merged_pr: { state: pr.state, merged: pr.merged, merged_at: pr.merged_at, merged_by: pr.merged_by.login, approved_head_match: true, merge_commit_match: true },
+              required_workflows: observedRuns,
+              authorized_action: 'materialize_g5_recovery_evidence', manual_action_authorized: false,
+              projection_authority: { jira: 'projection_only', slack: 'projection_only' }, no_recursive_evidence_pr: true,
+              canonical_artifact_name: artifactName,
+            };
+            fs.writeFileSync('g5-recovery-authority.json', JSON.stringify(receipt, null, 2));
+            core.setOutput('duplicate', 'false'); core.setOutput('artifact_name', artifactName); core.setOutput('recovery_id', receipt.recovery_id);
+            core.setOutput('approval_id', receipt.g4_approval_id); core.setOutput('scope', receipt.scope_hash_prefix); core.setOutput('head_sha', receipt.approved_head_sha);
+            core.setOutput('merge_sha', receipt.merge_commit_sha); core.setOutput('source_digest', receipt.source_authority.sha256);
+            core.setOutput('validate_run', String(observedRuns[0].run_id)); core.setOutput('build_run', String(observedRuns[1].run_id));
+            core.setOutput('source_comment_id', String(receipt.source_comment.comment_id));
+      - name: Validate G5 recovery authority
+        if: steps.recovery.outputs.duplicate != 'true'
+        run: python tools/validate_g5_recovery_authority.py g5-recovery-authority.json
+      - name: Upload canonical G5 recovery artifact
+        if: steps.recovery.outputs.duplicate != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.recovery.outputs.artifact_name }}
+          path: g5-recovery-authority.json
+          if-no-files-found: error
+      - name: Publish sanitized recovered evidence chain
+        if: steps.recovery.outputs.duplicate != 'true'
+        uses: actions/github-script@v7
+        env:
+          RECOVERY_ID: ${{ steps.recovery.outputs.recovery_id }}
+          APPROVAL_ID: ${{ steps.recovery.outputs.approval_id }}
+          SCOPE: ${{ steps.recovery.outputs.scope }}
+          HEAD_SHA: ${{ steps.recovery.outputs.head_sha }}
+          MERGE_SHA: ${{ steps.recovery.outputs.merge_sha }}
+          SOURCE_DIGEST: ${{ steps.recovery.outputs.source_digest }}
+          VALIDATE_RUN: ${{ steps.recovery.outputs.validate_run }}
+          BUILD_RUN: ${{ steps.recovery.outputs.build_run }}
+          SOURCE_COMMENT_ID: ${{ steps.recovery.outputs.source_comment_id }}
+          ARTIFACT_NAME: ${{ steps.recovery.outputs.artifact_name }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.issue.number;
+            const authorityMarker = `<!-- gwc:g5-recovery-authority recovery_id=${process.env.RECOVERY_ID} repository=${owner}/${repo} pr=${issue_number} approval_id=${process.env.APPROVAL_ID} scope=${process.env.SCOPE} head=${process.env.HEAD_SHA} merge=${process.env.MERGE_SHA} source_digest=${process.env.SOURCE_DIGEST} -->`;
+            const authorityBody = `${authorityMarker}
+            ## G5 Bootstrap Recovery Authority
+
+            | Field | Value |
+            |---|---|
+            | Recovery ID | \`${process.env.RECOVERY_ID}\` |
+            | Recovery mode | \`bootstrap_manual_authority\` |
+            | Original G4 approval | \`${process.env.APPROVAL_ID}\` |
+            | Approved head | \`${process.env.HEAD_SHA}\` |
+            | Merge commit | \`${process.env.MERGE_SHA}\` |
+            | Source authority digest | \`sha256:${process.env.SOURCE_DIGEST}\` |
+            | Human recovery comment | \`${process.env.SOURCE_COMMENT_ID}\` |
+            | Authorized action | Evidence recovery only |
+            | Manual deploy/release/reload | Not authorized |
+
+            This is recovered evidence with explicit provenance. It does not claim that the original event-driven workflow ran.`;
+            const proofMarker = `<!-- gwc:g4-merge-proof approval_id=${process.env.APPROVAL_ID} head=${process.env.HEAD_SHA} merge=${process.env.MERGE_SHA} recovery_id=${process.env.RECOVERY_ID} recovery_mode=bootstrap_manual_authority -->`;
+            const proofBody = `${proofMarker}
+            ## Recovered G4 Merge Proof
+
+            | Field | Value |
+            |---|---|
+            | Recovery mode | \`bootstrap_manual_authority\` |
+            | Original G4 approval | \`${process.env.APPROVAL_ID}\` |
+            | Approved/merged head | \`${process.env.HEAD_SHA}\` |
+            | Merge commit | \`${process.env.MERGE_SHA}\` |
+            | Source | Immutable merged PR state, merge commit provenance, and exact human recovery authority |
+
+            Historical events were not rewritten.`;
+            const statusMarker = `<!-- gwc:g5-status recovery_id=${process.env.RECOVERY_ID} recovery_mode=bootstrap_manual_authority -->`;
+            const statusBody = `${statusMarker}
+            ## Recovered G5 Post-Merge Status
+
+            | Field | Value |
+            |---|---|
+            | Classification | **success** |
+            | Recovery mode | \`bootstrap_manual_authority\` |
+            | Merge commit | \`${process.env.MERGE_SHA}\` |
+            | Validate instructions | run \`${process.env.VALIDATE_RUN}\` — success |
+            | Build instruction packages | run \`${process.env.BUILD_RUN}\` — success |
+            | Canonical machine evidence | Actions artifact \`${process.env.ARTIFACT_NAME}\` |
+            | Jira / Slack | Projection only |
+            | Manual deploy/release/reload | Not authorized |
+            | Recursive evidence PR | Forbidden |
+
+            G5 recovery is distinct from normal event-driven G5 and is explicitly provenance-labelled.`;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
+            const upsert = async (marker, body) => {
+              const existing = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes(marker));
+              if (existing) await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              else await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            };
+            await upsert(`gwc:g5-recovery-authority recovery_id=${process.env.RECOVERY_ID} `, authorityBody);
+            await upsert(`gwc:g4-merge-proof approval_id=${process.env.APPROVAL_ID} head=${process.env.HEAD_SHA} merge=${process.env.MERGE_SHA} recovery_id=${process.env.RECOVERY_ID} `, proofBody);
+            await upsert(`gwc:g5-status recovery_id=${process.env.RECOVERY_ID} `, statusBody);

@@ -108,6 +108,43 @@ capabilities:
         - Read-only G5 status verification only.
         - The Actions artifact is canonical; the PR comment is human traceability.
         - Does not authorize deploy, release, publish, runtime reload, merge, production data, production configuration, credentials, secrets, or migration.
+    g5_bootstrap_recovery:
+      contract: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+      evidence_schema: schemas/g5-recovery-authority.schema.json
+      validator: tools/validate_g5_recovery_authority.py
+      approval:
+        required: true
+        source: exact_human_pr_comment
+      action_class: evidence_only
+      minimum_gate: G5_DEPLOY
+      recovery_mode: bootstrap_manual_authority
+      trigger: merged_pr_issue_comment
+      guard:
+        - pr_state == closed
+        - pr_merged == true
+        - approver_permission in [write, maintain, admin]
+        - recovery_approval_not_expired
+        - approved_head_sha == merged_head_sha
+        - merge_commit_sha == observed_merge_commit_sha
+        - merge_commit_message_contains_original_g4_approval_and_head
+        - validate_instructions_run_is_exact_push_main_success
+        - build_instruction_packages_run_is_exact_push_main_success
+        - source_authority_sha256_is_present
+        - conflicting_recovery_receipt_absent
+        - manual_action_authorized == false
+        - no_recursive_evidence_pr == true
+      idempotency:
+        exact_duplicate: no_op
+        conflicting_same_pr_merge: fail_closed
+      outputs:
+        - github_actions_canonical_recovery_artifact
+        - gwc:g5-recovery-authority
+        - recovered_gwc:g4-merge-proof
+        - recovered_gwc:g5-status
+      notes:
+        - Use only for immutable bootstrap/historical merges that could not run the normal evidence workflow.
+        - Recovered evidence must declare bootstrap_manual_authority and must not rewrite history.
+        - This capability never authorizes merge, deploy, release, publish, runtime reload, production operations, or evidence PRs.
   approval_policy:
     generated_artifact_refresh:
       risk: low

@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g5-recovery-authority",
+  "generated_at": "2026-08-01T12:40:00Z",
+  "recovery_mode": "bootstrap_manual_authority",
+  "recovery_id": "RECOVER_G5_PR-152_20260801",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "pr_number": 152,
+  "gate": "G5_DEPLOY",
+  "g4_approval_id": "APPROVE_G4_PR-152_20260801T105946Z",
+  "scope_hash_prefix": "e3644e7ca5b67c03",
+  "approved_head_sha": "b9d58ea239273c107ee9c2dd2c4cfb49418777df",
+  "merge_commit_sha": "bb1269ba913b548a58ec97ff65c54d00ab16e19e",
+  "source_authority": {
+    "provider": "governed_chat_receipt",
+    "sha256": "47619f9585915859e8fc4264b99957a9701b0313b416eac9b7d08f6e265b0a35",
+    "merge_commit_message_verified": true
+  },
+  "source_comment": {
+    "provider": "github_pr_comment",
+    "comment_id": 5152000000,
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/152#issuecomment-5152000000"
+  },
+  "approver": {"login": "authorized-maintainer", "permission": "admin"},
+  "issued_at": "2026-08-01T12:40:00Z",
+  "expires_at": "2026-08-02T12:40:00Z",
+  "merged_pr": {
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-08-01T11:15:46Z",
+    "merged_by": "nhatnguyenquang1838-coder",
+    "approved_head_match": true,
+    "merge_commit_match": true
+  },
+  "required_workflows": [
+    {
+      "workflow": "Validate instructions", "run_id": 30697350537, "run_attempt": 1,
+      "event": "push", "branch": "main",
+      "head_sha": "bb1269ba913b548a58ec97ff65c54d00ab16e19e",
+      "status": "completed", "conclusion": "success"
+    },
+    {
+      "workflow": "Build instruction packages", "run_id": 30697350559, "run_attempt": 1,
+      "event": "push", "branch": "main",
+      "head_sha": "bb1269ba913b548a58ec97ff65c54d00ab16e19e",
+      "status": "completed", "conclusion": "success"
+    }
+  ],
+  "authorized_action": "materialize_g5_recovery_evidence",
+  "manual_action_authorized": false,
+  "projection_authority": {"jira": "projection_only", "slack": "projection_only"},
+  "no_recursive_evidence_pr": true,
+  "canonical_artifact_name": "g5-recovery-pr-152-merge-bb1269ba913b-RECOVER_G5_PR-152_20260801"
+}

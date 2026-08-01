@@ -1,0 +1,140 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-01T12:05:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- Never write directly to protected main.
+- Recovery must extend the existing G4/G5 evidence chain rather than create a parallel
+  authority system.
+- No merge, auto-merge, deploy, release, publish, runtime reload, production configuration/data,
+  credentials, secrets, migrations, force-push, branch deletion, history rewrite or
+  PR-base change under G2/G3.
+- Preserve exactly 81 runtime nodes.
+- Evidence recovery must remain explicitly labelled and must not rewrite historical
+  events.
+applicable_policies:
+- id: CODING-PROJECT-GOVERNANCE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: GATE-LIFECYCLE-CONTRACT
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  source_sha: d88bcb8b551436f250f3ffed88357f4877cdfa58
+- id: E2E-DRAFT-PR-DELIVERY
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- id: G5-CI-VERIFICATION
+  path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+  ref: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  source_sha: 88b773500b104d27587aeaedb9a1deeee5027d48
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: b55193a7e5cae6727335670823d7900c30589f34
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: d88bcb8b551436f250f3ffed88357f4877cdfa58
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: fc960b5d02367c02b142f5a9c635b138c3ea766c
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: af6debcb32cfbbedbcd3e064fb355dca3bb90fbd
+- path: .github/workflows/g4-g5-evidence.yml
+  required: true
+  status: AVAILABLE
+  source_sha: 313ef54050a31cc43aa9058e4e6e0f7d7853fdd0
+- path: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 88b773500b104d27587aeaedb9a1deeee5027d48
+- path: schemas/g0-context-snapshot.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: bef0d03797f31693c43ca2b87ee6722c2b441422
+- path: schemas/g1-intake-brief.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 7a746e8b555fbe531819f70ea33f0b9803681c74
+- path: schemas/g1-preflight-report.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: b29a8044038d7ad251d8410de5a4754f8f7ebac9
+- path: schemas/g1-options.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 2ceecc0be2242e7aaa0013e60c64024e0db261ff
+- path: schemas/g1-decision-record.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 31f62d1ee7863d4f267b5d0d5e19d57f5c9b7c9e
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 4fbc4fc57657ce0df1fde308743646a996156721
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: chatgpt-gwc-agent
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+contextual_discovery:
+  historical_context:
+  - id: PR-152-BOOTSTRAP-MERGE
+    description: 'PR #152 introduced the G4/G5 evidence workflow and merged before
+      that workflow could create its own authority/merge-proof chain.'
+    link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/152
+  - id: PR-153-NON-OVERLAP-BASE-ADVANCE
+    description: 'PR #153 advanced main after the first SCRUM-258 envelope; compare
+      evidence shows no overlap with the approved recovery workflow/schema/instruction
+      scope.'
+    link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/153
+  downstream_impact:
+  - target: future G4/G5 recoveries
+    impact_type: NON_BREAKING
+    description: Adds an explicit recovery provenance path without weakening normal
+      event-driven evidence.
+  stakeholder_reach:
+  - persona: GWC maintainers
+    impact: Can recover bootstrap evidence only through exact, auditable human authority.
