@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/g3-code-review-invocation.schema.json",
-  "title": "GWC G3 Code Reviewer Invocation Evidence",
+  "title": "GWC G3 Independent Review Evidence",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -32,7 +32,7 @@
     }
   },
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {"const": "1.1"},
     "artifact_type": {"const": "g3-code-review-invocation"},
     "gate": {"const": "G3_PR"},
     "task_id": {"type": "string", "minLength": 1, "maxLength": 120},
@@ -44,13 +44,37 @@
     "reviewer": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["agent_id", "role", "independence", "access_mode"],
+      "required": ["reviewer_id", "kind", "role", "independence", "access_mode"],
       "properties": {
-        "agent_id": {"type": "string", "minLength": 1},
-        "role": {"const": "code_reviewer"},
+        "reviewer_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["agent", "human"]},
+        "role": {"enum": ["code_reviewer", "human_reviewer"]},
         "independence": {"enum": ["independent", "fresh-context"]},
         "access_mode": {"const": "read_only"}
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"kind": {"const": "agent"}},
+            "required": ["kind"]
+          },
+          "then": {
+            "properties": {"role": {"const": "code_reviewer"}}
+          }
+        },
+        {
+          "if": {
+            "properties": {"kind": {"const": "human"}},
+            "required": ["kind"]
+          },
+          "then": {
+            "properties": {
+              "role": {"const": "human_reviewer"},
+              "independence": {"const": "independent"}
+            }
+          }
+        }
+      ]
     },
     "invocation": {
       "type": "object",
