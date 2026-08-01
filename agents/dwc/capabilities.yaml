@@ -37,6 +37,38 @@ capabilities:
         - http_status
       secret_redaction_required: true
       backend_implementation_required: true
+    g4_merge_authority_receipt:
+      contract: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+      evidence_schema: schemas/g4-merge-authority-receipt.schema.json
+      validator: tools/validate_g4_merge_authority.py
+      action_class: evidence_only
+      minimum_gate: G4_MERGE
+      source: human_pr_comment
+      guard:
+        - pr_state == open
+        - pr_draft == false
+        - approver_permission in [write, maintain, admin]
+        - approved_head_sha == current_head_sha
+        - approval_not_expired
+        - authorized_action == merge_pull_request
+        - manual_g5_action_authorized == false
+      notes:
+        - The original human PR comment is authority.
+        - The bot receipt is sanitized evidence and never creates authority.
+        - This capability does not invoke merge.
+    g4_merge_event_proof:
+      contract: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
+      action_class: read_only
+      minimum_gate: G4_MERGE
+      source: github_pull_request_closed_event
+      guard:
+        - merged == true
+        - approved_head_sha == merged_head_sha
+        - merge_commit_sha_is_known
+        - g4_authority_not_expired_at_merge
+      notes:
+        - GitHub merge event is merge proof.
+        - Merge proof is not G5 PASS.
     g5_ci_status_verify:
       contract: core/G5_CI_VERIFICATION_CONTRACT_v1.0.md
       evidence_schema: schemas/g5-ci-verification-evidence.schema.json
@@ -53,8 +85,15 @@ capabilities:
         - fetch_workflow_run_artifacts
         - fetch_workflow_job_steps
       guard:
+        - g4_authority_receipt_is_known
+        - github_merge_event_proof_is_known
         - merge_commit_sha_is_known
         - selected_run_head_sha_equals_merge_commit_sha
+        - canonical_machine_evidence == github_actions_artifact
+        - human_traceability == github_pr_comment
+        - jira_authority == projection_only
+        - slack_authority == projection_only
+        - no_recursive_evidence_pr == true
         - empty_pr_filtered_results_are_not_ci_pending
         - pending_state_has_checkpoint
         - manual_action_authorized == false
@@ -65,7 +104,9 @@ capabilities:
         - CONNECTOR_OBSERVABILITY_INCOMPLETE
         - SHA_MISMATCH
       notes:
+        - G4 evidence never satisfies G5.
         - Read-only G5 status verification only.
+        - The Actions artifact is canonical; the PR comment is human traceability.
         - Does not authorize deploy, release, publish, runtime reload, merge, production data, production configuration, credentials, secrets, or migration.
   approval_policy:
     generated_artifact_refresh:
@@ -90,6 +131,52 @@ capabilities:
     add_or_update_documentation: true
     push_working_branch: true
     open_or_update_draft_pr: true
+    invoke_code_reviewer_agent:
+      approval:
+        required: false
+      action_class: read_only
+      minimum_gate: G3_PR
+      evidence_schema: schemas/g3-code-review-invocation.schema.json
+      validator: tools/validate_g3_review_invocation.py
+      guard:
+        - pr_state == draft
+        - reviewer_kind == agent
+        - reviewer_role == code_reviewer
+        - reviewer_access_mode == read_only
+        - requested_head_sha == current_head_sha
+        - completed_head_sha == current_head_sha
+        - scope_hash == current_scope_hash
+        - write_actions == []
+      notes:
+        - Use only when an independent reviewer runtime is available.
+        - Reviewer PASS is evidence only.
+        - A reviewer write invalidates independence and requires a new exact-head review.
+    record_independent_human_review:
+      approval:
+        required: false
+      action_class: read_only
+      minimum_gate: G3_PR
+      execution_mode:
+        - chat_connector_only
+        - local_agent
+      evidence_schema: schemas/g3-code-review-invocation.schema.json
+      validator: tools/validate_g3_review_invocation.py
+      guard:
+        - pr_state == draft
+        - reviewer_kind == human
+        - reviewer_role == human_reviewer
+        - reviewer_independence == independent
+        - reviewer_id != implementer_id
+        - reviewer_access_mode == read_only
+        - requested_head_sha == current_head_sha
+        - completed_head_sha == current_head_sha
+        - scope_hash == current_scope_hash
+        - explicit_review_decision == true
+        - write_actions == []
+      notes:
+        - Capability fallback when an independent-agent runtime is unavailable.
+        - Plain acknowledgements do not qualify as review evidence.
+        - Human review PASS is evidence only and grants no merge authority.
     mark_pr_ready_for_review:
       tool: github_mark_pr_ready_for_review
       approval:
@@ -97,12 +184,27 @@ capabilities:
       guard:
         - pr_state == draft
         - g3_delivery_record == PASS
+        - g3_independent_review_evidence == PASS
+        - reviewer_kind in [agent, human]
+        - reviewer_role in [code_reviewer, human_reviewer]
+        - reviewer_access_mode == read_only
+        - reviewer_id != implementer_id
+        - write_actions == []
         - expected_head_sha == current_head_sha
         - required_ci == success
         - scope_drift == false
+        - no_unresolved_blocker == true
         - no_merge_permission
+      readback:
+        required: true
+        guard:
+          - observed_pr_state == open
+          - observed_draft == false
+          - observed_head_sha == expected_head_sha
       notes:
         - G3 metadata completion only.
+        - Review PASS alone does not move work to merge_pending.
+        - Do not commit the promotion receipt to the reviewed PR branch.
         - Does not grant G4 merge authority.
     comment_on_pull_request: true
     merge_human_approved_pull_request: true

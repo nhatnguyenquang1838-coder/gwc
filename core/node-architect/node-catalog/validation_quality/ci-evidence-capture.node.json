@@ -7,5 +7,5 @@
   "gates": [
     "G3_PR"
   ],
-  "description": "Capture exact-head workflow runs and status evidence for G3."
+  "description": "Capture G3 exact-head workflow evidence and define the evidence-quality handoff used later by G5, where the exact merge-SHA GitHub Actions artifact is canonical machine evidence and the PR status comment is human traceability only."
 }

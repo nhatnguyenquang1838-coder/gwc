@@ -2,7 +2,7 @@
   "node_id": "runtime_checkpoint.checkpoint-persist",
   "node_type": "tool",
   "title": "Checkpoint Persist",
-  "description": "Persist checkpoint artifacts to the approved workspace without production data access.",
+  "description": "Persist approved execution checkpoints and define the external-artifact persistence rule later used for exact merge-SHA G5 pending checkpoints, without production data access, branch commits, or recursive evidence PRs.",
   "canonical": "canonical",
   "authority_boundary": "g2_required",
   "gates": [

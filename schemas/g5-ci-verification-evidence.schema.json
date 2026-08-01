@@ -131,7 +131,86 @@
     },
     "checkpoint_required": {"type": "boolean"},
     "checkpoint_path": {"type": "string"},
-    "manual_action_authorized": {"const": false}
+    "manual_action_authorized": {"const": false},
+    "evidence_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "g4_authority",
+        "merge_proof",
+        "canonical_machine_evidence",
+        "human_traceability",
+        "projection_authority",
+        "no_recursive_evidence_pr"
+      ],
+      "properties": {
+        "g4_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approval_id", "source_comment_id", "approved_head_sha", "scope_hash_prefix"],
+          "properties": {
+            "approval_id": {"type": "string", "minLength": 1},
+            "source_comment_id": {"type": "integer", "minimum": 1},
+            "approved_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"}
+          }
+        },
+        "merge_proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider",
+            "event",
+            "pr_number",
+            "merged_head_sha",
+            "merge_commit_sha",
+            "merged_at",
+            "merged_by",
+            "exact_head_match"
+          ],
+          "properties": {
+            "provider": {"const": "github"},
+            "event": {"const": "pull_request.closed"},
+            "pr_number": {"type": "integer", "minimum": 1},
+            "merged_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "merged_at": {"type": "string", "format": "date-time"},
+            "merged_by": {"type": "string", "minLength": 1},
+            "exact_head_match": {"const": true}
+          }
+        },
+        "canonical_machine_evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "artifact_name", "workflow_run_id"],
+          "properties": {
+            "provider": {"const": "github_actions_artifact"},
+            "artifact_name": {"type": "string", "minLength": 1},
+            "workflow_run_id": {"type": "integer", "minimum": 1}
+          }
+        },
+        "human_traceability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "pr_number", "comment_marker"],
+          "properties": {
+            "provider": {"const": "github_pr_comment"},
+            "pr_number": {"type": "integer", "minimum": 1},
+            "comment_marker": {"const": "gwc:g5-status"}
+          }
+        },
+        "projection_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["jira", "slack"],
+          "properties": {
+            "jira": {"const": "projection_only"},
+            "slack": {"const": "projection_only"}
+          }
+        },
+        "no_recursive_evidence_pr": {"const": true}
+      }
+    }
   },
   "allOf": [
     {

@@ -90,6 +90,13 @@ class G5CiVerificationRuntimeTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("checkpoint", result.stdout)
 
+    def test_ci_pending_requires_observed_pending_status(self):
+        payload = evidence(classification="CI_PENDING", checkpoint_required=True)
+        payload["checkpoint_path"] = "actions://123/g5-checkpoint.json"
+        result = run_validator(payload)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("pending status", result.stdout)
+
     def test_sha_mismatch_requires_rejected_candidate(self):
         payload = evidence(classification="SHA_MISMATCH", selected_runs=[], rejected_candidates=[])
         result = run_validator(payload)

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g4-merge-authority-receipt",
+  "generated_at": "2026-08-01T10:00:00Z",
+  "repository": "example-org/example-repo",
+  "gate": "G4_MERGE",
+  "pr_number": 123,
+  "approval_id": "G4-example-001",
+  "scope_hash_prefix": "0123456789abcdef",
+  "approved_head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "source_comment": {
+    "provider": "github_pr_comment",
+    "comment_id": 123456,
+    "url": "https://github.com/example-org/example-repo/pull/123#issuecomment-123456"
+  },
+  "approver": {
+    "login": "human-approver",
+    "permission": "write"
+  },
+  "issued_at": "2026-08-01T09:59:00Z",
+  "expires_at": "2026-08-01T11:00:00Z",
+  "pr_state": {
+    "state": "open",
+    "draft": false,
+    "mergeable": true
+  },
+  "authorized_action": "merge_pull_request",
+  "manual_g5_action_authorized": false
+}

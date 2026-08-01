@@ -8,5 +8,5 @@
     "G2_EXECUTION",
     "G3_PR"
   ],
-  "description": "Open Draft PRs with approved scope, base, head, and exclusions."
+  "description": "Create or update a Draft PR bound to the approved branch, scope, and exact head SHA. Keep it Draft until required CI passes, an independent read-only reviewer completes through a capability-supported agent or human source for the same head and scope, G3 evidence closes, and Ready-for-Review promotion guards pass."
 }

@@ -8,5 +8,5 @@
     "G2_EXECUTION",
     "G3_PR"
   ],
-  "description": "Project sanitized lifecycle events to external audit surfaces without copying secrets or approval commands."
+  "description": "Project sanitized lifecycle references, including later G4 authority receipts, GitHub merge-proof identifiers, and G5 artifact/status references, while keeping Jira and Slack projection-only and non-authoritative."
 }
