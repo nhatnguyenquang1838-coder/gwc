@@ -8,10 +8,12 @@ from jsonschema import Draft202012Validator
 
 from tools.node_architect.diff_readback import decide_diff_readback
 from tools.node_architect.draft_pr_creation import decide_draft_pr_creation
+from tools.node_architect.ci_run_capture import decide_ci_run_capture
 
 REPO = "nhatnguyenquang1838-coder/gwc"
 BASE = "3acf169b91fa2d4c4c32f573fa3318d00dad9088"
 HEAD = "a" * 40
+STALE = "b" * 40
 BRANCH = "codex/scrum-196-198-f3-repo-delivery-b2-20260801"
 APPROVED = [
     ".gwc/tasks/SCRUM-196/**",
@@ -103,10 +105,10 @@ class RepoDeliveryB2Tests(unittest.TestCase):
         decision = decide_draft_pr_creation({
             "repository": REPO, "base_branch": "main", "branch": BRANCH,
             "base_sha": BASE, "head_sha": HEAD, "connector_status": "available",
-            "pr": {"number": 159, "state": "open", "base": "main", "head": BRANCH, "head_sha": HEAD, "draft": True, "merged": False},
+            "pr": {"number": 160, "state": "open", "base": "main", "head": BRANCH, "head_sha": HEAD, "draft": True, "merged": False},
         })
         self.assertEqual(decision["outcome"], "DRAFT_PR_BOUND")
-        self.assertEqual(decision["pr_number"], 159)
+        self.assertEqual(decision["pr_number"], 160)
 
     def test_draft_pr_creation_requires_readback_after_unknown_create(self) -> None:
         decision = decide_draft_pr_creation({
@@ -121,15 +123,54 @@ class RepoDeliveryB2Tests(unittest.TestCase):
         decision = decide_draft_pr_creation({
             "repository": REPO, "base_branch": "main", "branch": BRANCH,
             "base_sha": BASE, "head_sha": HEAD,
-            "pr": {"number": 159, "state": "open", "base": "main", "head": BRANCH, "head_sha": HEAD, "draft": False, "merged": False},
+            "pr": {"number": 160, "state": "open", "base": "main", "head": BRANCH, "head_sha": HEAD, "draft": False, "merged": False},
         })
         self.assertEqual(decision["outcome"], "BLOCKED")
         self.assertIn("PR_NOT_DRAFT", decision["reason_codes"])
+
+    def test_ci_run_capture_passes_exact_head_success(self) -> None:
+        decision = decide_ci_run_capture({
+            "repository": REPO,
+            "branch": BRANCH,
+            "head_sha": HEAD,
+            "required_workflows": ["Validate instructions", "Build instruction packages"],
+            "runs": [
+                {"name": "Validate instructions", "run_id": 1, "attempt": 1, "status": "completed", "conclusion": "success", "head_sha": HEAD},
+                {"name": "Build instruction packages", "run_id": 2, "attempt": 1, "status": "completed", "conclusion": "success", "head_sha": HEAD},
+            ],
+        })
+        self.assertEqual(decision["outcome"], "PASSED")
+        self.assertEqual(decision["reason_codes"], ["CI_EXACT_HEAD_PASSED"])
+        Draft202012Validator(load_schema("ci-run-capture-decision.schema.json")).validate(decision)
+
+    def test_ci_run_capture_ignores_stale_head_and_blocks_missing_current(self) -> None:
+        decision = decide_ci_run_capture({
+            "repository": REPO,
+            "branch": BRANCH,
+            "head_sha": HEAD,
+            "required_workflows": ["Validate instructions"],
+            "runs": [{"name": "Validate instructions", "run_id": 3, "attempt": 1, "status": "completed", "conclusion": "success", "head_sha": STALE}],
+        })
+        self.assertEqual(decision["outcome"], "UNAVAILABLE")
+        self.assertIn("CI_RUN_MISSING", decision["reason_codes"])
+        self.assertIn("STALE_HEAD_RUNS_IGNORED", decision["reason_codes"])
+
+    def test_ci_run_capture_non_terminal_is_pending(self) -> None:
+        decision = decide_ci_run_capture({
+            "repository": REPO,
+            "branch": BRANCH,
+            "head_sha": HEAD,
+            "required_workflows": ["Validate instructions"],
+            "runs": [{"name": "Validate instructions", "run_id": 4, "attempt": 1, "status": "in_progress", "conclusion": None, "head_sha": HEAD}],
+        })
+        self.assertEqual(decision["outcome"], "PENDING")
+        self.assertIn("CI_NON_TERMINAL", decision["reason_codes"])
 
     def test_decisions_have_no_merge_or_production_authority(self) -> None:
         decisions = [
             decide_diff_readback({"repository": REPO, "base_sha": BASE, "head_sha": HEAD, "branch": BRANCH, "compare_status": "ahead", "ahead_by": 1, "behind_by": 0, "approved_paths": APPROVED, "changed_files": [{"filename": "tools/node_architect/diff_readback.py"}]}),
             decide_draft_pr_creation({"repository": REPO, "base_branch": "main", "branch": BRANCH, "base_sha": BASE, "head_sha": HEAD}),
+            decide_ci_run_capture({"repository": REPO, "branch": BRANCH, "head_sha": HEAD, "required_workflows": ["Validate instructions"], "runs": [{"name": "Validate instructions", "run_id": 1, "status": "completed", "conclusion": "success", "head_sha": HEAD}]}),
         ]
         for decision in decisions:
             self.assertFalse(decision["merge_authority_granted"])
