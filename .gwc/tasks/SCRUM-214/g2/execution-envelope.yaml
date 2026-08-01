@@ -1,0 +1,81 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_SCRUM-214_R3_20260802
+task_id: SCRUM-214
+fastlane_id: FL-MAT-F5-CI-EVIDENCE-CAPTURE-20260802
+issued_at: '2026-08-01T20:09:00Z'
+expires_at: '2026-08-02T20:09:00Z'
+scope_version: 3
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c3fa858c1ff5d0ceb09a165f0df32825b219e257
+working_branch: codex/scrum-214-f5-ci-evidence-capture-m5-r3-20260802
+supersedes_approval_id: APPROVE_G2_SCRUM-214_R2_20260802
+prior_implementation_branch: codex/scrum-214-f5-ci-evidence-capture-m5-20260802
+prior_implementation_branch_head: 67e07ded97f4ee899c085fb5154d62c112a9f05a
+unmaterialized_r2_branch: codex/scrum-214-f5-ci-evidence-capture-m5-r2-20260802
+active_lane: SCRUM-256 — Client runtime binding and CI → G3 M5 vertical slice
+selected_option_id: OPT-1
+g1_scope_hash: sha256:938e328bbdf9f9da91e7f7ac58b9f932bb8cec0a24e85f027f031f0e4c81dbdd
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-214
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: c3fa858c1ff5d0ceb09a165f0df32825b219e257
+  plan_root: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214
+  plan_revision: sha256:a7362f6247be76d57d5acf05ffaf09f29a08221b37f5759a7ca98dbee255703c
+  validation_evidence: validation/SCRUM-214-r3-plan-validation.json
+modules_or_files:
+- schemas/ci-evidence-capture-decision.schema.json
+- tools/node_architect/ci_evidence_capture.py
+- tests/test_validation_quality_ci_evidence_capture_m5.py
+- tools/node_architect/client_runtime.py
+- releases/changelog.d/2026-08-02-scrum-214-ci-evidence-capture-m5.md
+- .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/**
+- .gwc/tasks/SCRUM-214/**
+authorized_actions:
+- create_new_guarded_branch_from_current_main
+- apply_validated_scrum_214_patch
+- update_task_gate_artifacts_to_current_base
+- run_sandboxed_validation
+- commit_to_guarded_branch
+- push_guarded_branch
+- monitor_exact_head_ci
+excluded_actions:
+- protected_branch_write
+- merge_pr
+- auto_merge
+- force_push
+- branch_deletion
+- history_rewrite
+- deploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credentials
+- secrets
+- migration
+- scrum_215_implementation
+- scrum_219_implementation
+- f9_scale_control
+- scrum_258_recovery
+- broad_81_node_rollout
+- package_export
+- g6
+required_validation:
+- python -m unittest tests/test_validation_quality_ci_evidence_capture_m5.py -v
+- python -m unittest tests/test_client_runtime_vertical_slice.py -v
+- python -m compileall -q tools/node_architect
+- Draft 2020-12 schema validation
+- exact G0/G1/G2 validator
+- current-base full diff and secret/scope review
+- exact PR-head required CI after G3
+ci_continuation: Active in-session poll after G3 PR creation; no detached automation.
+rollback: Leave all prior branches intact. Delete nothing. Stop the r3 branch before PR if validation fails.
+g4_g5_g6_authority_granted: false
+scope_hash: sha256:27522c4da98987d6439d9a407bb3ee4c7407162eae10207389d991d6498ea872
