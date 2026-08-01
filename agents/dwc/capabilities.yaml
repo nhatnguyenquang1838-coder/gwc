@@ -103,7 +103,7 @@ capabilities:
         - reviewer_access_mode == read_only
         - requested_head_sha == current_head_sha
         - completed_head_sha == current_head_sha
-        - reviewed_scope_hash == current_scope_hash
+        - scope_hash == current_scope_hash
         - write_actions == []
       notes:
         - Reviewer PASS is evidence only.
@@ -118,7 +118,7 @@ capabilities:
         - g3_code_review_invocation == PASS
         - reviewer_role == code_reviewer
         - reviewer_access_mode == read_only
-        - reviewer_write_actions == []
+        - write_actions == []
         - expected_head_sha == current_head_sha
         - required_ci == success
         - scope_drift == false
