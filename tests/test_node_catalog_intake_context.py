@@ -658,6 +658,91 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             errors = self.validator.validate_family(family_dir)
             self.assertEqual([], errors, f"String reason_codes should validate: {errors}")
 
+    def test_files_read_scope_accepts_typed_scope_contract(self):
+        """Test that files-read-scope with typed scope fields validates successfully."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[5].update(
+            {
+                "intent": "Render the bounded read set for the current task from governance and task-specific inputs.",
+                "outcome": "Deterministic files_read scope evidence with bounded provenance and reason codes.",
+                "constraints": [
+                    "Read scope must be derived from verified governance and task-specific inputs only.",
+                    "Read scope must remain read-only and fail closed on missing evidence.",
+                    "Read paths must stay within the repository boundary.",
+                ],
+                "exclusions": [
+                    "Production runtime behavior.",
+                    "Merge, deploy, release, or production-data operations.",
+                    "Write paths and destructive side effects.",
+                ],
+                "entry_guards": ["G0_CONTEXT", "read_only authority_boundary"],
+                "reason_codes": {
+                    "ACCEPTED": "Required read scope rendered successfully.",
+                    "MISSING_EVIDENCE": "Required read inputs are missing or incomplete.",
+                    "MALFORMED_INPUT": "Read scope inputs are invalid or ambiguous.",
+                    "SCOPE_DRIFT": "Requested read scope exceeds the bounded task envelope.",
+                },
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"Typed files-read-scope contract should validate: {errors}")
+
+    def test_files_write_scope_accepts_typed_scope_contract(self):
+        """Test that files-write-scope with typed scope fields validates successfully."""
+        slugs = [
+            "request-intake",
+            "source-resolution",
+            "repo-identity-check",
+            "protected-base-capture",
+            "risk-classification",
+            "files-read-scope",
+            "files-write-scope",
+            "intake-card-render",
+            "context-gap-escalation",
+        ]
+        nodes = [valid_node(slug) for slug in slugs]
+        nodes[6].update(
+            {
+                "intent": "Render the bounded write set and explicit exclusions for a later G2 execution envelope.",
+                "outcome": "Deterministic files_write scope evidence with bounded write paths, excluded actions, and reason codes.",
+                "constraints": [
+                    "Write scope must be repo-relative and bounded to approved task files only.",
+                    "Write scope must exclude protected-branch, merge, deploy, release, credential, migration, and production-data actions.",
+                    "Write scope must fail closed when the candidate write set is empty or ambiguous.",
+                ],
+                "exclusions": [
+                    "Direct push to protected branches.",
+                    "Force push, branch deletion, or PR base changes.",
+                    "Merge, auto-merge, deploy, release, production config, credentials, secrets, migration, and production data.",
+                ],
+                "entry_guards": ["G0_CONTEXT", "read_only authority_boundary"],
+                "reason_codes": {
+                    "ACCEPTED": "Required write scope rendered successfully.",
+                    "EMPTY_SCOPE": "No bounded write paths were available for the task.",
+                    "PROHIBITED_ACTION": "Candidate write scope includes a prohibited action or target.",
+                    "MALFORMED_INPUT": "Write scope inputs are invalid or ambiguous.",
+                    "SCOPE_DRIFT": "Requested write scope exceeds the bounded task envelope.",
+                },
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            family_dir = self.write_family(Path(tmp), nodes)
+            errors = self.validator.validate_family(family_dir)
+            self.assertEqual([], errors, f"Typed files-write-scope contract should validate: {errors}")
+
 
 if __name__ == "__main__":
     unittest.main()

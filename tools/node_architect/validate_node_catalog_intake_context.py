@@ -71,6 +71,22 @@ TYPED_FIELD_GROUPS = {
         "reason_codes",
         "risk_profile",
     },
+    "intake_context.files-read-scope": {
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions",
+        "entry_guards",
+        "reason_codes",
+    },
+    "intake_context.files-write-scope": {
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions",
+        "entry_guards",
+        "reason_codes",
+    },
     "intake_context.protected-base-capture": {
         "protected_base_sha",
         "evidence_source",
@@ -320,6 +336,9 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
         "intake_context.request-intake",
         "intake_context.source-resolution",
         "intake_context.repo-identity-check",
+        "intake_context.risk-classification",
+        "intake_context.files-read-scope",
+        "intake_context.files-write-scope",
     }:
         intent = node.get("intent")
         if intent is not None and not isinstance(intent, str):

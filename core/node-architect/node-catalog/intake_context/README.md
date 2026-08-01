@@ -71,6 +71,19 @@ Supported `reason_codes` are closed to:
 
 **Evidence binding:** the output must stay bound to request intake, source resolution, repository identity, and protected-base capture.
 
+## Read / Write Scope Typed Contracts
+
+The scope nodes are the two batch-1 renderers that turn intake evidence into bounded file sets for later envelope assembly.
+
+| Field | Read scope | Write scope |
+|---|---|---|
+| `intent` | Build the bounded read set from governance and task inputs. | Build the bounded write set and explicit exclusions for later G2. |
+| `outcome` | Deterministic `files_read` evidence with bounded provenance. | Deterministic `files_write` evidence with blocked actions. |
+| `constraints` | Verified inputs only, read-only, fail closed, repo-bounded. | Repo-relative paths only, fail closed, exclude protected actions. |
+| `exclusions` | Runtime behavior, deployment, migration, credentials, write paths. | Direct push, force push, branch deletion, merge, deploy, release, production config, credentials, secrets, migration, production data. |
+| `entry_guards` | `G0_CONTEXT`, `read_only` | `G0_CONTEXT`, `read_only` |
+| `reason_codes` | `ACCEPTED`, `MISSING_EVIDENCE`, `MALFORMED_INPUT`, `SCOPE_DRIFT` | `ACCEPTED`, `EMPTY_SCOPE`, `PROHIBITED_ACTION`, `MALFORMED_INPUT`, `SCOPE_DRIFT` |
+
 ## Guardrails
 
 ```text
@@ -91,8 +104,8 @@ Supported `reason_codes` are closed to:
 | `intake_context.repo-identity-check` | Verify repository identity, default branch, protected branch, and execution mode assumptions. |
 | `intake_context.protected-base-capture` | Capture exact protected-base SHA and typed readback/drift evidence for later validation. |
 | `intake_context.risk-classification` | Classify risk flags before gate routing. |
-| `intake_context.files-read-scope` | Render required reads for the current task. |
-| `intake_context.files-write-scope` | Render bounded write paths and exclusions. |
+| `intake_context.files-read-scope` | Render the required read set and provenance for the current task. |
+| `intake_context.files-write-scope` | Render bounded write paths, exclusions, and later G2 guardrails. |
 | `intake_context.intake-card-render` | Produce the standard GWC intake card. |
 | `intake_context.context-gap-escalation` | Fail closed when required context or evidence is missing. |
 
