@@ -87,18 +87,32 @@ def capture_ci_evidence(
     provider_payload = _legacy_provider_payload(payload, payload["head_sha"])
     stable = _stable_input(payload, provider_payload); input_digest = digest_payload(stable)
     cache_key = payload["idempotency_key"]
+    identity_fields = ("task_id","run_id","repository","branch","base_sha","head_sha","scope_hash","graph_revision","idempotency_key")
+
+    def same_identity(result: Mapping[str, Any]) -> bool:
+        return all(str(result.get(field, "")) == payload[field] for field in identity_fields)
+
     if replay_cache is not None and cache_key in replay_cache:
         cached = replay_cache[cache_key]
-        if cached.get("input_digest") != input_digest:
+        if not same_identity(cached):
             observation = capture_ci_observation(task_id=payload["task_id"], repository=payload["repository"], branch=payload["branch"], base_sha=payload["base_sha"], head_sha=payload["head_sha"], scope_hash=payload["scope_hash"], provider_payload=provider_payload, observed_at=observed_at)
             return _result(payload=payload, observation=observation, status=BLOCKED, reason_code="CI_FAILURE", input_digest=input_digest, checkpoint_required=False, detail_code="IDEMPOTENCY_CONFLICT")
-        replay = deepcopy(cached); replay["replayed"] = True; return replay
+        if cached.get("input_digest") == input_digest:
+            replay = deepcopy(cached); replay["replayed"] = True; return replay
+        if cached.get("status") != WAIT:
+            observation = capture_ci_observation(task_id=payload["task_id"], repository=payload["repository"], branch=payload["branch"], base_sha=payload["base_sha"], head_sha=payload["head_sha"], scope_hash=payload["scope_hash"], provider_payload=provider_payload, observed_at=observed_at)
+            return _result(payload=payload, observation=observation, status=BLOCKED, reason_code="CI_FAILURE", input_digest=input_digest, checkpoint_required=False, detail_code="IDEMPOTENCY_CONFLICT")
 
     existing = replay_checkpoint(checkpoint_store, payload["task_id"], payload["run_id"], NODE_ID) if checkpoint_store is not None else None
-    if existing and existing.get("state", {}).get("input_digest") == input_digest:
-        replay = deepcopy(existing["state"]["result"]); replay["replayed"] = True
-        if replay_cache is not None: replay_cache[cache_key] = deepcopy(existing["state"]["result"])
-        return replay
+    if existing:
+        existing_result = existing.get("state", {}).get("result", {})
+        if not same_identity(existing_result):
+            observation = capture_ci_observation(task_id=payload["task_id"], repository=payload["repository"], branch=payload["branch"], base_sha=payload["base_sha"], head_sha=payload["head_sha"], scope_hash=payload["scope_hash"], provider_payload=provider_payload, observed_at=observed_at)
+            return _result(payload=payload, observation=observation, status=BLOCKED, reason_code="CI_FAILURE", input_digest=input_digest, checkpoint_required=False, detail_code="IDEMPOTENCY_CONFLICT")
+        if existing.get("state", {}).get("input_digest") == input_digest:
+            replay = deepcopy(existing_result); replay["replayed"] = True
+            if replay_cache is not None: replay_cache[cache_key] = deepcopy(existing_result)
+            return replay
 
     observation = capture_ci_observation(task_id=payload["task_id"], repository=payload["repository"], branch=payload["branch"], base_sha=payload["base_sha"], head_sha=payload["head_sha"], scope_hash=payload["scope_hash"], provider_payload=provider_payload, observed_at=observed_at)
     prior = payload.get("prior_evidence") or {}
