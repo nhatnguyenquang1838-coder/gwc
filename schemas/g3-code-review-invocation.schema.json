@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g3-code-review-invocation.schema.json",
+  "title": "GWC G3 Code Reviewer Invocation Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "gate",
+    "task_id",
+    "repository",
+    "pr_number",
+    "head_sha",
+    "scope_hash",
+    "implementer_id",
+    "reviewer",
+    "invocation",
+    "result",
+    "findings",
+    "write_actions",
+    "stale"
+  ],
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g3-code-review-invocation"},
+    "gate": {"const": "G3_PR"},
+    "task_id": {"type": "string", "minLength": 1, "maxLength": 120},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "pr_number": {"type": "integer", "minimum": 1},
+    "head_sha": {"$ref": "#/$defs/sha"},
+    "scope_hash": {"$ref": "#/$defs/scope_hash"},
+    "implementer_id": {"type": "string", "minLength": 1},
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_id", "role", "independence", "access_mode"],
+      "properties": {
+        "agent_id": {"type": "string", "minLength": 1},
+        "role": {"const": "code_reviewer"},
+        "independence": {"enum": ["independent", "fresh-context"]},
+        "access_mode": {"const": "read_only"}
+      }
+    },
+    "invocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "invocation_id",
+        "requested_at",
+        "completed_at",
+        "requested_head_sha",
+        "completed_head_sha",
+        "result_ref"
+      ],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "invocation_id": {"type": "string", "minLength": 1},
+        "requested_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "requested_head_sha": {"$ref": "#/$defs/sha"},
+        "completed_head_sha": {"$ref": "#/$defs/sha"},
+        "result_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "result": {"enum": ["pass", "changes_required", "blocked"]},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "status", "summary"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^REV-[0-9]+$"},
+          "severity": {"enum": ["BLOCKER", "MAJOR", "MINOR", "NIT"]},
+          "status": {"enum": ["open", "resolved", "deferred", "accepted_risk"]},
+          "summary": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "write_actions": {
+      "type": "array",
+      "maxItems": 0,
+      "items": {"type": "string"}
+    },
+    "stale": {"type": "boolean"}
+  }
+}
