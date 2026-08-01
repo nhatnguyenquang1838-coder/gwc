@@ -7,5 +7,27 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Renders the required read set for the current task from governance and task-specific inputs."
+  "description": "Renders the required read set for the current task from governance and task-specific inputs.",
+  "intent": "Render the bounded read set for the current task from governance and task-specific inputs.",
+  "outcome": "Deterministic files_read scope evidence with bounded provenance and reason codes.",
+  "constraints": [
+    "Read scope must be derived from verified governance and task-specific inputs only.",
+    "Read scope must remain read-only and fail closed on missing evidence.",
+    "Read paths must stay within the repository boundary."
+  ],
+  "exclusions": [
+    "Production runtime behavior.",
+    "Merge, deploy, release, or production-data operations.",
+    "Write paths and destructive side effects."
+  ],
+  "entry_guards": [
+    "G0_CONTEXT",
+    "read_only authority_boundary"
+  ],
+  "reason_codes": {
+    "ACCEPTED": "Required read scope rendered successfully.",
+    "MISSING_EVIDENCE": "Required read inputs are missing or incomplete.",
+    "MALFORMED_INPUT": "Read scope inputs are invalid or ambiguous.",
+    "SCOPE_DRIFT": "Requested read scope exceeds the bounded task envelope."
+  }
 }
