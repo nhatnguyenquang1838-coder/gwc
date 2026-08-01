@@ -163,21 +163,47 @@ jobs:
             const fs = require('fs');
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
+            const command = /^APPROVE G4 ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner,
               repo,
               issue_number: pr.number,
               per_page: 100,
             });
-            const receipts = comments.filter((item) => item.body && item.body.includes('<!-- gwc:g4-authority-receipt '));
+            const receipts = comments.filter((item) =>
+              item.user?.login === 'github-actions[bot]' &&
+              item.body &&
+              item.body.includes('<!-- gwc:g4-authority-receipt ')
+            );
             const latest = receipts.at(-1);
             if (!latest) {
-              core.setFailed('Merged PR has no G4 authority receipt.');
+              core.setFailed('Merged PR has no trusted G4 authority receipt.');
               return;
             }
             const parsed = latest.body.match(/approval_id=([^ ]+) head=([0-9a-f]{40}) scope=([0-9a-f]{16}) expires=([^ ]+) source_comment_id=(\d+)/);
             if (!parsed) {
               core.setFailed('G4 authority receipt marker is malformed.');
+              return;
+            }
+
+            const sourceCommentId = Number(parsed[5]);
+            const { data: sourceComment } = await github.rest.issues.getComment({ owner, repo, comment_id: sourceCommentId });
+            const sourceCommand = (sourceComment.body || '').trim().match(command);
+            if (!sourceCommand || sourceCommand[1] !== parsed[1] || sourceCommand[2] !== parsed[3] || sourceCommand[3] !== parsed[4]) {
+              core.setFailed('Original G4 authority comment does not match the sanitized receipt.');
+              return;
+            }
+            if (!sourceComment.issue_url.endsWith(`/issues/${pr.number}`)) {
+              core.setFailed('Original G4 authority comment is not attached to the merged PR.');
+              return;
+            }
+            const { data: sourcePermission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner,
+              repo,
+              username: sourceComment.user.login,
+            });
+            if (!['admin', 'maintain', 'write'].includes(sourcePermission.permission)) {
+              core.setFailed(`Original G4 approver lacks write authority: ${sourcePermission.permission}`);
               return;
             }
             if (parsed[2] !== pr.head.sha) {
@@ -196,7 +222,7 @@ jobs:
               gate: 'G4_MERGE',
               approval_id: parsed[1],
               scope_hash_prefix: parsed[3],
-              source_comment_id: Number(parsed[5]),
+              source_comment_id: sourceCommentId,
               pr_number: pr.number,
               approved_head_sha: parsed[2],
               merged_head_sha: pr.head.sha,
@@ -268,10 +294,16 @@ jobs:
             const fs = require('fs');
             const { owner, repo } = context.repo;
             const mergeSha = context.payload.workflow_run.head_sha;
+            const command = /^APPROVE G4 ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
             const associated = await github.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: mergeSha });
-            const pr = associated.data.find((item) => item.merged_at && item.merge_commit_sha === mergeSha) || associated.data.find((item) => item.merged_at);
-            if (!pr) {
+            const associatedPr = associated.data.find((item) => item.merged_at && item.merge_commit_sha === mergeSha) || associated.data.find((item) => item.merged_at);
+            if (!associatedPr) {
               core.setFailed(`No merged PR is associated with ${mergeSha}.`);
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: associatedPr.number });
+            if (!pr.merged || pr.merge_commit_sha !== mergeSha || !pr.merged_by) {
+              core.setFailed(`Associated PR does not prove merge commit ${mergeSha}.`);
               return;
             }
 
@@ -281,16 +313,38 @@ jobs:
               issue_number: pr.number,
               per_page: 100,
             });
-            const authorityComment = comments.filter((item) => item.body && item.body.includes('<!-- gwc:g4-authority-receipt ')).at(-1);
-            const proofComment = comments.filter((item) => item.body && item.body.includes('<!-- gwc:g4-merge-proof ')).at(-1);
+            const trustedBotComments = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body);
+            const authorityComment = trustedBotComments.filter((item) => item.body.includes('<!-- gwc:g4-authority-receipt ')).at(-1);
+            const proofComment = trustedBotComments.filter((item) => item.body.includes('<!-- gwc:g4-merge-proof ')).at(-1);
             if (!authorityComment || !proofComment) {
-              core.setFailed('G5 requires both G4 authority and GitHub merge-proof receipts.');
+              core.setFailed('G5 requires trusted G4 authority and GitHub merge-proof receipts.');
               return;
             }
             const authority = authorityComment.body.match(/approval_id=([^ ]+) head=([0-9a-f]{40}) scope=([0-9a-f]{16}) expires=([^ ]+) source_comment_id=(\d+)/);
             const proof = proofComment.body.match(/approval_id=([^ ]+) head=([0-9a-f]{40}) merge=([0-9a-f]{40})/);
-            if (!authority || !proof || proof[3] !== mergeSha || authority[2] !== proof[2]) {
+            if (!authority || !proof || authority[1] !== proof[1] || proof[3] !== mergeSha || authority[2] !== proof[2]) {
               core.setFailed('G4-to-merge evidence chain is malformed or SHA-mismatched.');
+              return;
+            }
+
+            const sourceCommentId = Number(authority[5]);
+            const { data: sourceComment } = await github.rest.issues.getComment({ owner, repo, comment_id: sourceCommentId });
+            const sourceCommand = (sourceComment.body || '').trim().match(command);
+            if (!sourceCommand || sourceCommand[1] !== authority[1] || sourceCommand[2] !== authority[3] || sourceCommand[3] !== authority[4]) {
+              core.setFailed('Original human G4 authority does not match the receipt chain.');
+              return;
+            }
+            if (!sourceComment.issue_url.endsWith(`/issues/${pr.number}`)) {
+              core.setFailed('Original G4 authority comment is not attached to the merged PR.');
+              return;
+            }
+            const { data: sourcePermission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner,
+              repo,
+              username: sourceComment.user.login,
+            });
+            if (!['admin', 'maintain', 'write'].includes(sourcePermission.permission)) {
+              core.setFailed(`Original G4 approver lacks write authority: ${sourcePermission.permission}`);
               return;
             }
 
@@ -304,6 +358,8 @@ jobs:
               per_page: 100,
             });
             const selected = [];
+            let usedKnownRunFallback = false;
+            const fallbacksAttempted = [];
             for (const name of requiredNames) {
               const matches = runs.filter((run) => run.name === name && run.head_sha === mergeSha)
                 .sort((a, b) => (b.run_attempt - a.run_attempt) || (b.id - a.id));
@@ -321,9 +377,48 @@ jobs:
               }
             }
 
-            const failed = selected.some((run) => ['failure', 'cancelled', 'timed_out', 'action_required'].includes(run.conclusion));
+            const triggerRun = context.payload.workflow_run;
+            if (
+              requiredNames.includes(triggerRun.name) &&
+              triggerRun.head_sha === mergeSha &&
+              !selected.some((run) => run.workflow === triggerRun.name)
+            ) {
+              selected.push({
+                workflow: triggerRun.name,
+                run_id: triggerRun.id,
+                run_attempt: triggerRun.run_attempt || 1,
+                head_sha: triggerRun.head_sha,
+                status: triggerRun.status,
+                conclusion: triggerRun.conclusion,
+                jobs: [],
+              });
+              usedKnownRunFallback = true;
+              fallbacksAttempted.push('known_run_id');
+            }
+
+            const failedConclusions = ['failure', 'cancelled', 'timed_out', 'action_required'];
+            const pendingStatuses = ['queued', 'waiting', 'requested', 'in_progress'];
+            const failed = selected.some((run) => failedConclusions.includes(run.conclusion));
             const allSuccessful = selected.length === requiredNames.length && selected.every((run) => run.status === 'completed' && run.conclusion === 'success');
-            const classification = failed ? 'failure' : allSuccessful ? 'success' : selected.length ? 'CI_PENDING' : 'CONNECTOR_OBSERVABILITY_INCOMPLETE';
+            const hasPending = selected.some((run) => pendingStatuses.includes(run.status));
+            const indeterminate = !failed && !allSuccessful && !hasPending;
+            if (indeterminate) {
+              await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: mergeSha });
+              fallbacksAttempted.push('combined_commit_status');
+            }
+
+            const classification = failed
+              ? 'failure'
+              : allSuccessful
+                ? 'success'
+                : hasPending
+                  ? 'CI_PENDING'
+                  : 'CONNECTOR_OBSERVABILITY_INCOMPLETE';
+            const method = classification === 'CONNECTOR_OBSERVABILITY_INCOMPLETE'
+              ? 'connector_incomplete'
+              : usedKnownRunFallback && runs.length === 0
+                ? 'known_run_id'
+                : 'exact_push_lookup';
             const artifactName = `g5-evidence-pr-${pr.number}-merge-${mergeSha.slice(0, 12)}-run-${context.runId}`;
             const evidence = {
               schema_version: '1.0',
@@ -336,9 +431,9 @@ jobs:
               g4_approval_id: authority[1],
               classification,
               discovery: {
-                method: selected.length ? 'exact_push_lookup' : 'connector_incomplete',
+                method,
                 exact_sha_lookup_attempted: true,
-                fallbacks_attempted: ['workflow_run_id', 'combined_commit_status'],
+                fallbacks_attempted: fallbacksAttempted,
               },
               required_workflows: requiredNames.map((name) => ({ name, required: true })),
               selected_runs: selected,
@@ -348,7 +443,7 @@ jobs:
               evidence_chain: {
                 g4_authority: {
                   approval_id: authority[1],
-                  source_comment_id: Number(authority[5]),
+                  source_comment_id: sourceCommentId,
                   approved_head_sha: authority[2],
                   scope_hash_prefix: authority[3],
                 },
@@ -359,7 +454,7 @@ jobs:
                   merged_head_sha: proof[2],
                   merge_commit_sha: proof[3],
                   merged_at: pr.merged_at,
-                  merged_by: pr.user.login,
+                  merged_by: pr.merged_by.login,
                   exact_head_match: true,
                 },
                 canonical_machine_evidence: {
@@ -437,7 +532,7 @@ jobs:
 
             G5 is a distinct post-merge event. G4 evidence alone never satisfies G5.`;
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
-            const existing = comments.find((item) => item.body && item.body.includes(marker));
+            const existing = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes(marker));
             if (existing) {
               await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
             } else {
