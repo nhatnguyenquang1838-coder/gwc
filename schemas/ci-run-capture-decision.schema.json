@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/ci-run-capture-decision.schema.json",
+  "title": "ci-run-capture-decision",
+  "type": "object",
+  "required": ["outcome", "reason_codes", "repository", "branch", "head_sha", "required_workflows", "captured_runs", "missing_workflows", "decision_digest", "merge_authority_granted", "deployment_authority_granted", "production_authority_granted"],
+  "properties": {
+    "outcome": {"enum": ["PASSED", "PENDING", "FAILED", "CANCELLED", "UNAVAILABLE", "BLOCKED"]},
+    "reason_codes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "repository": {"type": "string"},
+    "branch": {"type": "string"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$|^$"},
+    "required_workflows": {"type": "array", "items": {"type": "string"}},
+    "captured_runs": {"type": "array", "items": {"type": "object"}},
+    "missing_workflows": {"type": "array", "items": {"type": "string"}},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  },
+  "additionalProperties": false
+}
