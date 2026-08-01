@@ -118,6 +118,22 @@ def run_g5(payload: dict) -> subprocess.CompletedProcess[str]:
         )
 
 
+def workflow_job_names() -> list[str]:
+    names: list[str] = []
+    in_jobs = False
+    for line in WORKFLOW.read_text(encoding="utf-8").splitlines():
+        if line == "jobs:":
+            in_jobs = True
+            continue
+        if not in_jobs:
+            continue
+        if line and not line.startswith(" "):
+            break
+        if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+            names.append(line.strip()[:-1])
+    return names
+
+
 class G4G5EvidenceWorkflowTests(unittest.TestCase):
     def test_g4_template_is_valid_and_unexpired_at_generation(self) -> None:
         record = json.loads(G4_TEMPLATE.read_text(encoding="utf-8"))
@@ -166,6 +182,11 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
         self.assertNotIn("git push", text)
         self.assertNotIn("merge_pull_request(", text)
         self.assertNotIn("create_pull_request", text)
+
+    def test_workflow_job_keys_are_unique(self) -> None:
+        names = workflow_job_names()
+        self.assertEqual(len(names), len(set(names)), f"duplicate workflow jobs: {names}")
+        self.assertEqual(1, names.count("g5-recovery"))
 
     def test_agent_instruction_materializes_full_g4_g5_flow(self) -> None:
         text = AGENT_INSTRUCTIONS.read_text(encoding="utf-8")
