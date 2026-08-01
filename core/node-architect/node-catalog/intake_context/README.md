@@ -40,6 +40,37 @@ The `intake_context.source-resolution` node extends the basic descriptor with ty
 
 **Provenance:** Evidence must be verified, not guessed.
 
+## Risk Classification Typed Contract
+
+The `intake_context.risk-classification` node emits a closed `risk_profile` object before gate routing:
+
+| Field | Type | Purpose |
+|---|---|---|
+| `risk_level` | string | Repo risk class, expressed as `R0`, `R1`, `R2`, or `R3` |
+| `risk_flags` | string[] | Canonical escalation flags such as source stale, scope ambiguous, or production-triggered risk |
+| `required_gate` | string | Minimum next gate required by the classification |
+| `approval_requirements` | string[] | Human-readable control requirements that must be satisfied before advancing |
+| `reason_codes` | string[] | Closed vocabulary of supported risk reason codes |
+| `source_bindings` | object | Exact intake, source, repository, and protected-base evidence bindings |
+| `classified_at` | string | ISO-8601 timestamp for the classification event |
+
+Supported `reason_codes` are closed to:
+
+- `RISK_PRODUCTION_OPERATION`
+- `RISK_SECRET_CHANGE`
+- `RISK_DESTRUCTIVE_OPERATION`
+- `RISK_MIGRATION`
+- `RISK_RELEASE_DEPLOYMENT`
+- `RISK_SCOPE_AMBIGUOUS`
+- `RISK_SOURCE_STALE`
+- `RISK_UNCLASSIFIED`
+
+**Deterministic classification:** equivalent intake facts must produce the same `risk_profile`.
+
+**Fail closed:** missing, stale, ambiguous, or conflicting evidence must not classify as low risk.
+
+**Evidence binding:** the output must stay bound to request intake, source resolution, repository identity, and protected-base capture.
+
 ## Guardrails
 
 ```text
