@@ -1,0 +1,87 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_SCRUM-214_20260802
+task_id: SCRUM-214
+fastlane_id: FL-MAT-F5-CI-EVIDENCE-CAPTURE-20260802
+issued_at: '2026-08-01T18:30:00Z'
+expires_at: '2026-08-02T18:30:00Z'
+scope_version: 1
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+working_branch: codex/scrum-214-f5-ci-evidence-capture-m5-20260802
+active_lane: SCRUM-256 — Client runtime binding and CI → G3 M5 vertical slice
+selected_option_id: OPT-1
+g1_scope_hash: sha256:4e4029d0124c47414478175f87371e8434e66a94ff5b7b84e1cc3dc533b7838a
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-214
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  plan_root: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214
+  plan_revision: sha256:a7362f6247be76d57d5acf05ffaf09f29a08221b37f5759a7ca98dbee255703c
+  validation_evidence: validation/SCRUM-214-implementation-plan-validation.json
+modules_or_files:
+- schemas/ci-evidence-capture-decision.schema.json
+- tools/node_architect/ci_evidence_capture.py
+- tests/test_validation_quality_ci_evidence_capture_m5.py
+- tools/node_architect/client_runtime.py
+- releases/changelog.d/2026-08-02-scrum-214-ci-evidence-capture-m5.md
+- .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/**
+- .gwc/tasks/SCRUM-214/**
+authorized_actions:
+- create_guarded_branch
+- create_task_gate_artifacts
+- modify_approved_files
+- add_closed_schema
+- implement_ci_evidence_capture
+- bind_scrum_214_client_handler
+- add_focused_tests
+- run_sandboxed_validation
+- commit_to_guarded_branch
+- push_guarded_branch
+- open_or_update_draft_pr
+- monitor_exact_head_ci
+- repair_repository_fixable_failures_within_scope
+- perform_independent_g3_review
+- mark_ready_after_g3_pass
+excluded_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credentials
+- secrets
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+- scrum_215_implementation
+- scrum_219_implementation
+- f9_scale_control
+- scrum_258_recovery
+- broad_81_node_rollout
+- package_export
+- g6
+required_validation:
+- python -m unittest tests/test_validation_quality_ci_evidence_capture_m5.py -v
+- python -m compileall -q tools/node_architect
+- Draft 2020-12 schema validation
+- client runtime focused regression
+- complete diff and secret/scope review
+- exact PR-head Validate instructions
+- exact PR-head Build instruction packages
+- independent G3 review
+ci_continuation: Active in-session poll; no scheduled automation. Non-terminal CI remains in current execution.
+rollback: Revert only the SCRUM-214 utility, schema, tests, Client handler binding, changelog and task/Kiro artifacts. Existing CI capture and checkpoint primitives remain unchanged.
+g4_g5_g6_authority_granted: false
+scope_hash: sha256:fd289c4c18c2ec71d50f554b7bf02b3f985ada9fab15774d03047732784f99d6
