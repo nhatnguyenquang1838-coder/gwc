@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "gate-action-authority",
+  "task_id": "SCRUM-180-181",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "32b28f4887405d0311f55c3fae0f7b2c0e252df6",
+  "head_sha": "765ecf4dd43a02f19b186eca255f39d494592971",
+  "working_branch": "codex/fastlane-scrum-180-181-intake-context-20260801",
+  "gate": "G4_MERGE",
+  "action": "merge_approved_pr",
+  "scope": {
+    "authorized_paths": [
+      ".gitattributes",
+      "agents/chatgpt-agent/agent-instructions.md",
+      "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "tests/test_human_bypass_contract.py",
+      "tools/export_project_package.py",
+      "pull_request_metadata"
+    ],
+    "authorized_actions": [
+      "merge_approved_pr"
+    ],
+    "excluded_actions": [
+      "force_push",
+      "change_pr_base",
+      "auto_merge",
+      "deploy",
+      "release",
+      "production_data_write",
+      "production_config_change",
+      "credential_rotation",
+      "destructive_migration"
+    ],
+    "risk_class": "R1"
+  },
+  "scope_hash": "sha256:4b0312b9bcaa487e31f65e6b447f83c99711be88284dabc1a5ab322e0a955a25",
+  "issued_at": "2026-08-01T19:04:04Z",
+  "expires_at": "2026-08-02T19:04:04Z",
+  "actor": {
+    "kind": "human",
+    "id": "user"
+  },
+  "evidence_readback": {
+    "status": "confirmed",
+    "observed_at": "2026-08-01T19:04:04Z",
+    "task_id": "SCRUM-180-181",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "base_sha": "32b28f4887405d0311f55c3fae0f7b2c0e252df6",
+    "head_sha": "765ecf4dd43a02f19b186eca255f39d494592971",
+    "gate": "G4_MERGE",
+    "action": "merge_approved_pr",
+    "scope_hash": "sha256:4b0312b9bcaa487e31f65e6b447f83c99711be88284dabc1a5ab322e0a955a25",
+    "event_id_or_idempotency_key": "g4-approval-request-20260801T190404Z"
+  }
+}

@@ -1,0 +1,74 @@
+schema_version: "1.0"
+artifact_type: g4-merge-approval
+generated_at: "2026-08-01T19:04:04Z"
+task_id: SCRUM-180-181
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+pr_number: 164
+pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/164
+pr_title: "fix(gwc): align gate and package export validation"
+working_branch: codex/fastlane-scrum-180-181-intake-context-20260801
+pr_head_sha: 765ecf4dd43a02f19b186eca255f39d494592971
+approved_files:
+  - .gitattributes
+  - agents/chatgpt-agent/agent-instructions.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - tests/test_human_bypass_contract.py
+  - tools/export_project_package.py
+authorized_actions:
+  - merge_pull_request
+excluded_actions:
+  - force_push
+  - change_pr_base
+  - auto_merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+g3_evidence_ref: remote-readback:pr-164-exact-head-green
+risk_class: R1
+scope_hash: sha256:4b0312b9bcaa487e31f65e6b447f83c99711be88284dabc1a5ab322e0a955a25
+approval_id: APPROVE_G4_SCRUM-180-181_20260801
+approval_scope_hash_prefix: 4b0312b9bcaa487e
+issued_at: "2026-08-01T19:04:04Z"
+expires_at: "2026-08-02T19:04:04Z"
+approval_status: PENDING_HUMAN
+approval_command_format: APPROVE G4 <approval_id> <scope_hash_16> <expires_at_utc>
+exact_approval_command: APPROVE G4 APPROVE_G4_SCRUM-180-181_20260801 4b0312b9bcaa487e 2026-08-02T19:04:04Z
+pr_readback:
+  state: open
+  merged: false
+  draft: false
+  merge_state_status: CLEAN
+  base_ref: main
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  head_sha: 765ecf4dd43a02f19b186eca255f39d494592971
+  required_ci:
+    - name: build (ds-mcp)
+      workflow: Build instruction packages
+      status: success
+      completed_at: "2026-08-01T18:59:24Z"
+      run_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30713761064/job/91405705678
+    - name: build (gwc)
+      workflow: Build instruction packages
+      status: success
+      completed_at: "2026-08-01T18:59:23Z"
+      run_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30713761064/job/91405705686
+    - name: build (pm-skills)
+      workflow: Build instruction packages
+      status: success
+      completed_at: "2026-08-01T18:59:21Z"
+      run_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30713761064/job/91405705665
+    - name: build (rental-home)
+      workflow: Build instruction packages
+      status: success
+      completed_at: "2026-08-01T18:59:24Z"
+      run_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30713761064/job/91405705649
+    - name: validate
+      workflow: Validate instructions
+      status: success
+      completed_at: "2026-08-01T18:59:28Z"
+      run_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30713761081/job/91405705640
