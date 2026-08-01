@@ -99,6 +99,7 @@ capabilities:
       validator: tools/validate_g3_review_invocation.py
       guard:
         - pr_state == draft
+        - reviewer_kind == agent
         - reviewer_role == code_reviewer
         - reviewer_access_mode == read_only
         - requested_head_sha == current_head_sha
@@ -106,8 +107,35 @@ capabilities:
         - scope_hash == current_scope_hash
         - write_actions == []
       notes:
+        - Use only when an independent reviewer runtime is available.
         - Reviewer PASS is evidence only.
         - A reviewer write invalidates independence and requires a new exact-head review.
+    record_independent_human_review:
+      approval:
+        required: false
+      action_class: read_only
+      minimum_gate: G3_PR
+      execution_mode:
+        - chat_connector_only
+        - local_agent
+      evidence_schema: schemas/g3-code-review-invocation.schema.json
+      validator: tools/validate_g3_review_invocation.py
+      guard:
+        - pr_state == draft
+        - reviewer_kind == human
+        - reviewer_role == human_reviewer
+        - reviewer_independence == independent
+        - reviewer_id != implementer_id
+        - reviewer_access_mode == read_only
+        - requested_head_sha == current_head_sha
+        - completed_head_sha == current_head_sha
+        - scope_hash == current_scope_hash
+        - explicit_review_decision == true
+        - write_actions == []
+      notes:
+        - Capability fallback when an independent-agent runtime is unavailable.
+        - Plain acknowledgements do not qualify as review evidence.
+        - Human review PASS is evidence only and grants no merge authority.
     mark_pr_ready_for_review:
       tool: github_mark_pr_ready_for_review
       approval:
@@ -115,9 +143,11 @@ capabilities:
       guard:
         - pr_state == draft
         - g3_delivery_record == PASS
-        - g3_code_review_invocation == PASS
-        - reviewer_role == code_reviewer
+        - g3_independent_review_evidence == PASS
+        - reviewer_kind in [agent, human]
+        - reviewer_role in [code_reviewer, human_reviewer]
         - reviewer_access_mode == read_only
+        - reviewer_id != implementer_id
         - write_actions == []
         - expected_head_sha == current_head_sha
         - required_ci == success
