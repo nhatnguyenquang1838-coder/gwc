@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-01T20:09:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-214
+  base_sha: c3fa858c1ff5d0ceb09a165f0df32825b219e257
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: New guarded branch from current main
+  description: Create a fresh r3 branch from current main and apply the already validated bounded SCRUM-214 patch.
+  benefits:
+  - No force push or history rewrite
+  - Clean current-base provenance
+  - Preserves prior branches as evidence
+  tradeoffs:
+  - Requires reapplying the bounded patch
+  risks:
+  - Artifact base references must be refreshed
+  constraint_fit: FIT
+- id: OPT-2
+  title: Merge current main into old branch
+  description: Create a non-force merge commit on the existing branch.
+  benefits:
+  - Retains current branch history
+  tradeoffs:
+  - More complex connector-side merge construction
+  - Mixed old/new gate evidence history
+  risks:
+  - Harder audit trail
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Continue on stale base
+  description: Proceed without reapproval or current-main integration.
+  benefits:
+  - No additional branch work
+  tradeoffs:
+  - Violates protected-base binding
+  risks:
+  - Invalid authority and stale governance
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 provides the cleanest fail-closed recovery after governance drift and does not mutate or delete the existing branch.
+decision_required: true
+status: READY
