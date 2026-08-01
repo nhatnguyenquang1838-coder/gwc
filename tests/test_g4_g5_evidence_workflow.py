@@ -15,6 +15,7 @@ G4_SCHEMA = ROOT / "schemas" / "g4-merge-authority-receipt.schema.json"
 G4_TEMPLATE = ROOT / "templates" / "gates" / "g4-merge-authority-receipt.template.json"
 G5_TOOL = ROOT / "tools" / "node_architect" / "validate_g5_ci_verification.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "g4-g5-evidence.yml"
+AGENT_INSTRUCTIONS = ROOT / "agents" / "chatgpt-agent" / "agent-instructions.md"
 
 SPEC = importlib.util.spec_from_file_location("validate_g4_merge_authority", G4_TOOL)
 assert SPEC and SPEC.loader
@@ -165,6 +166,23 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
         self.assertNotIn("git push", text)
         self.assertNotIn("merge_pull_request(", text)
         self.assertNotIn("create_pull_request", text)
+
+    def test_agent_instruction_materializes_full_g4_g5_flow(self) -> None:
+        text = AGENT_INSTRUCTIONS.read_text(encoding="utf-8")
+        for marker in (
+            "G4/G5 GitHub evidence flow",
+            "APPROVE G4 <approval_id> <scope_hash_16> <expires_at_utc>",
+            "gwc:g4-authority-receipt",
+            "pull_request.closed",
+            "gwc:g4-merge-proof",
+            "gwc:g5-status",
+            "github_actions_artifact",
+            "projection_only",
+            "recursive evidence PR",
+        ):
+            self.assertIn(marker, text)
+        self.assertIn("The evidence workflow must not merge the PR", text)
+        self.assertIn("G4 authority or merge proof alone never satisfies G5", text)
 
 
 if __name__ == "__main__":
