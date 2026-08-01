@@ -1,0 +1,31 @@
+schema_version: '1.0'
+task_id: SCRUM-251
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+branch: codex/scrum-250-252-f9-scale-control-m4-20260801
+scope_hash: sha256:e3c82287ea53ea12792ca4a6f08f7d95351c22692547d6052fadea69af13facf
+validation:
+  scoped_unit_tests: pass_18_tests
+  compileall: pass
+  schema_validation: pass_draft_2020_12_and_decision_fixtures
+  full_ci: pending_pr_creation
+pr:
+  number: null
+  url: null
+  head_sha: pending
+review:
+  status: pending
+  independence: fresh-context-required
+acceptance_evidence:
+  shared_tests: tests/test_scale_control_m4_batch_b2.py
+  decision_schema: task-specific schema
+  runtime_utility: task-specific utility
+  plan_read_receipt: .gwc/tasks/SCRUM-251/g2/plan-read-receipt.yaml
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  audit_authority: not_granted
+  scale_authority: not_granted
