@@ -182,6 +182,73 @@ separate exact human approvals. Before G4 merge execution, verify that the PR is
 no longer Draft and is ready for review. If the connector cannot mark it ready,
 report a ready-for-review blocker instead of invoking merge.
 
+## G4/G5 GitHub evidence flow
+
+When `.github/workflows/g4-g5-evidence.yml` exists, ChatGPT-style agents must
+use the repository event chain below rather than inventing conversation-local
+evidence:
+
+```text
+G3 exact-head PASS and Ready-for-Review readback
+-> exact human G4 PR comment
+-> validated G4 authority Actions artifact
+-> sanitized `gwc:g4-authority-receipt` PR comment
+-> separately authorized merge action
+-> GitHub `pull_request.closed` event with `merged=true`
+-> G4 merge-proof Actions artifact
+-> `gwc:g4-merge-proof` PR comment
+-> exact merge-SHA required workflows on `main`
+-> canonical G5 Actions artifact
+-> `gwc:g5-status` PR trace comment
+-> optional Jira/Slack projections
+```
+
+### G4 authority handling
+
+The only executable G4 authority source is the original human PR comment in the
+exact format:
+
+```text
+APPROVE G4 <approval_id> <scope_hash_16> <expires_at_utc>
+```
+
+Before using it, verify that the PR is open, no longer Draft, the commenter has
+repository write/maintain/admin authority, the command is unexpired, and the
+approved head equals the current PR head. The bot-generated
+`gwc:g4-authority-receipt` comment and its GitHub Actions artifact are receipts
+only; they never create authority and never authorize G5 manual actions.
+
+The evidence workflow must not merge the PR. Merge remains a separate
+write-capable action and must use the current exact approved head SHA. After a
+successful merge, the GitHub `pull_request.closed` event with `merged=true` is
+the source for `gwc:g4-merge-proof`. If approved head and merged head differ,
+the evidence chain is stale and fails closed.
+
+### G5 post-merge handling
+
+G5 status verification starts only after a merge commit exists. G4 authority or
+merge proof alone never satisfies G5. Resolve the required `push` workflows on
+`main` for the exact merge commit SHA and classify only as:
+
+```text
+success
+failure
+CI_PENDING
+CONNECTOR_OBSERVABILITY_INCOMPLETE
+SHA_MISMATCH
+```
+
+The canonical machine evidence is the GitHub Actions artifact produced by the
+G4/G5 evidence workflow. The `gwc:g5-status` PR comment is human traceability
+only. Jira and Slack are `projection_only` and cannot replace the human G4
+comment, GitHub merge event, exact-SHA workflow evidence, or Actions artifact.
+
+Do not commit post-merge evidence back to the merged branch and do not create a
+recursive evidence PR. In `chat_connector_only`, inspect the PR comments,
+workflow runs, jobs, and artifacts through GitHub connector readback. Never
+fabricate a G5 comment or PASS when the PR is still Draft/unmerged, required
+workflows are non-terminal, or the exact merge-SHA evidence chain is absent.
+
 ## ChatGPT thread sleep for CI continuation
 
 When running as a ChatGPT chat connector and a future CI check is needed, sleep the current thread for exactly two minutes. Do not create a scheduler task or automation.
