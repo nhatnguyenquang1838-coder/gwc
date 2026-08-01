@@ -1,49 +1,48 @@
 schema_version: '1.0'
-artifact_type: g2-execution-envelope
-gate: G2_EXECUTION
 task_id: SCRUM-198
-coordination_task: SCRUM-256
-node_id: repo_delivery.ci-run-capture
-catalog_node_id: repo-delivery-ci-run-capture
-target_maturity: M5_REPLAY_SAFE
-approval_id: CP-20260730-198-G2-R3
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: APPROVE_G2_FL-MAT-F3-B2_20260801
+  received_at: '2026-08-01T16:43:00Z'
+  expires_at: '2026-08-02T16:30:00Z'
+  scope_hash_prefix: 982041dc3fbc436e
+  command_redacted_after_approval: true
+fastlane: FL-MAT-F3-REPO-DELIVERY-B2-20260801
 repository: nhatnguyenquang1838-coder/gwc
-base_ref: main
-base_sha: 3b0938065e71e699d327d041f5b6023ed30a29dc
-previous_invalidated_base_sha: 1db5cdde7666e95e0a5d864633a3255a2a6ad40e
-working_branch: codex/scrum-198-ci-run-capture-m5-fastlane-r3-20260730
-risk_class: R2
-scope_hash: sha256:234b96f0de6a07fb7ab8c2d444ea6feeb4274230a6be3e0d530331648fd2d0f6
-scope_hash_16: 234b96f0de6a07fb
-approved_modules:
-  - .gwc/tasks/SCRUM-198/**
-  - .kiro/specs/scrum-198-ci-run-capture-m5/**
-  - core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json
-  - schemas/ci-observation.schema.json
-  - tools/node_architect/ci_run_capture.py
-  - tests/test_ci_run_capture_replay.py
-  - releases/changelog.d/2026-07-30-scrum-198-ci-run-capture-m5.md
+base_sha: 3acf169b91fa2d4c4c32f573fa3318d00dad9088
+branch: codex/scrum-196-198-f3-repo-delivery-b2-20260801
+scope_hash: sha256:982041dc3fbc436e36768b65106b338500cb3a8e755b8acf0da8f1ee06838642
+node: repo_delivery.ci-run-capture
+maturity_target:
+  from: M3
+  to: M5
+remediation_note: Jira Done status was unsafe as implementation evidence; this B2 envelope rebinds SCRUM-198 to current main and exact scope.
 authorized_actions:
-  - materialize_task_scoped_G0_G1_G2
-  - write_only_approved_modules
-  - run_scoped_validators_and_tests
-  - commit_and_push_guarded_branch
+- create_guarded_branch
+- create_task_gate_artifacts
+- modify_approved_files
+- create_schema
+- create_runtime_utility
+- create_scoped_unit_tests
+- create_changelog
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
 prohibited_actions:
-  - write_to_main
-  - draft_pr_before_G3
-  - merge_or_auto_merge
-  - deploy_release_publish_or_runtime_reload
-  - production_configuration_data_secret_credential_or_migration
-  - force_push_branch_delete_history_rewrite_or_pr_base_change
-  - scope_expansion_or_unrelated_cleanup
-dependency_tasks:
-  - SCRUM-203
-issued_at: '2026-07-30T12:56:00Z'
-expires_at: '2026-07-31T12:56:00Z'
-approved_at: '2026-07-30T13:20:00Z'
-approval_command: APPROVE G2_EXECUTION CP-20260730-198-G2-R3 234b96f0de6a07fb 2026-07-31T12:56:00Z
-status: G2_APPROVAL_RECORDED_HANDOFF
-implementation_performed: false
-draft_pr_allowed: false
-merge_allowed: false
-production_allowed: false
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- production_configuration
+- production_data
+- secrets
+- credentials
+- migration
+- force_push
+- branch_deletion
+- pr_base_change
+- audit_completion_authority
+- scale_authority
+notes: Approved after G0 READY and G1 PASS; grants no merge, deploy, audit-completion, or scale authority.
