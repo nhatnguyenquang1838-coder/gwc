@@ -62,6 +62,15 @@ TYPED_FIELD_GROUPS = {
         "entry_guards",
         "reason_codes",
     },
+    "intake_context.risk-classification": {
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions",
+        "entry_guards",
+        "reason_codes",
+        "risk_profile",
+    },
     "intake_context.protected-base-capture": {
         "protected_base_sha",
         "evidence_source",
@@ -74,6 +83,36 @@ TYPED_FIELD_GROUPS = {
 ALLOWED_READBACK_STATUS = {"VERIFIED", "MISMATCH", "STALE", "UNKNOWN"}
 ALLOWED_DRIFT_STATE = {"NONE", "STALE", "DRIFTED"}
 PROTECTED_BASE_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+RISK_CLASSIFICATION_REASON_CODES = {
+    "RISK_PRODUCTION_OPERATION",
+    "RISK_SECRET_CHANGE",
+    "RISK_DESTRUCTIVE_OPERATION",
+    "RISK_MIGRATION",
+    "RISK_RELEASE_DEPLOYMENT",
+    "RISK_SCOPE_AMBIGUOUS",
+    "RISK_SOURCE_STALE",
+    "RISK_UNCLASSIFIED",
+}
+RISK_PROFILE_ALLOWED_RISK_LEVELS = {"R0", "R1", "R2", "R3"}
+RISK_PROFILE_ALLOWED_RISK_FLAGS = {
+    "authentication_or_authorization",
+    "broad_blast_radius",
+    "credentials_or_secrets",
+    "deployment_or_release",
+    "destructive_data_or_migration",
+    "production_configuration",
+    "scope_ambiguous",
+    "source_stale",
+    "unclassified",
+}
+RISK_PROFILE_ALLOWED_GATES = {
+    "G2_AUTOMATIC_BOUNDED",
+    "G2_HUMAN_DIRECTION",
+    "G3_PR",
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION_DATA",
+}
 
 
 def _repo_root() -> Path:
@@ -102,6 +141,136 @@ def _validate_reason_codes(path: Path, reason_codes: Any) -> list[str]:
             errors.append(f"{path}: reason_codes object must have string keys")
         if not all(isinstance(v, (str, int, float, bool, type(None))) for v in reason_codes.values()):
             errors.append(f"{path}: reason_codes object must have only primitive values")
+    return errors
+
+
+def _validate_closed_string_list(
+    path: Path,
+    field_name: str,
+    value: Any,
+    *,
+    allowed_values: set[str] | None = None,
+    allow_empty: bool = True,
+) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(value, list):
+        errors.append(f"{path}: {field_name} must be a list of strings")
+        return errors
+    if not allow_empty and not value:
+        errors.append(f"{path}: {field_name} must not be empty")
+        return errors
+    if not all(isinstance(item, str) and item.strip() for item in value):
+        errors.append(f"{path}: {field_name} must be a list of non-empty strings")
+        return errors
+    if allowed_values is not None:
+        unexpected = sorted(set(value) - allowed_values)
+        if unexpected:
+            errors.append(
+                f"{path}: {field_name} contains unsupported values: {', '.join(unexpected)}"
+            )
+    if len(value) != len(set(value)):
+        errors.append(f"{path}: {field_name} must not contain duplicate values")
+    return errors
+
+
+def _validate_risk_profile(path: Path, risk_profile: Any) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(risk_profile, dict):
+        errors.append(f"{path}: risk_profile must be a JSON object")
+        return errors
+
+    required_keys = {
+        "risk_level",
+        "risk_flags",
+        "required_gate",
+        "approval_requirements",
+        "reason_codes",
+        "source_bindings",
+        "classified_at",
+    }
+    missing = sorted(required_keys - set(risk_profile))
+    extra = sorted(set(risk_profile) - required_keys)
+    if missing:
+        errors.append(f"{path}: risk_profile missing required keys: {', '.join(missing)}")
+    if extra:
+        errors.append(f"{path}: risk_profile has unexpected keys: {', '.join(extra)}")
+
+    risk_level = risk_profile.get("risk_level")
+    if risk_level not in RISK_PROFILE_ALLOWED_RISK_LEVELS:
+        errors.append(
+            f"{path}: risk_profile.risk_level must be one of {sorted(RISK_PROFILE_ALLOWED_RISK_LEVELS)}"
+        )
+
+    errors.extend(
+        _validate_closed_string_list(
+            path,
+            "risk_profile.risk_flags",
+            risk_profile.get("risk_flags"),
+            allowed_values=RISK_PROFILE_ALLOWED_RISK_FLAGS,
+        )
+    )
+    required_gate = risk_profile.get("required_gate")
+    if required_gate not in RISK_PROFILE_ALLOWED_GATES:
+        errors.append(
+            f"{path}: risk_profile.required_gate must be one of {sorted(RISK_PROFILE_ALLOWED_GATES)}"
+        )
+
+    errors.extend(
+        _validate_closed_string_list(
+            path,
+            "risk_profile.approval_requirements",
+            risk_profile.get("approval_requirements"),
+            allow_empty=False,
+        )
+    )
+
+    reason_codes = risk_profile.get("reason_codes")
+    if not isinstance(reason_codes, list):
+        errors.append(f"{path}: risk_profile.reason_codes must be a list of strings")
+    else:
+        if not reason_codes:
+            errors.append(f"{path}: risk_profile.reason_codes must not be empty")
+        if not all(isinstance(code, str) and code.strip() for code in reason_codes):
+            errors.append(f"{path}: risk_profile.reason_codes must be a list of non-empty strings")
+        unexpected = sorted(set(reason_codes) - RISK_CLASSIFICATION_REASON_CODES)
+        if unexpected:
+            errors.append(
+                f"{path}: risk_profile.reason_codes contains unsupported values: {', '.join(unexpected)}"
+            )
+        if len(reason_codes) != len(set(reason_codes)):
+            errors.append(f"{path}: risk_profile.reason_codes must not contain duplicate values")
+
+    source_bindings = risk_profile.get("source_bindings")
+    if not isinstance(source_bindings, dict):
+        errors.append(f"{path}: risk_profile.source_bindings must be an object")
+    else:
+        expected_bindings = {
+            "request_intake",
+            "source_resolution",
+            "repo_identity_check",
+            "protected_base_capture",
+            "repository",
+            "base_sha",
+        }
+        missing_bindings = sorted(expected_bindings - set(source_bindings))
+        extra_bindings = sorted(set(source_bindings) - expected_bindings)
+        if missing_bindings:
+            errors.append(
+                f"{path}: risk_profile.source_bindings missing required keys: {', '.join(missing_bindings)}"
+            )
+        if extra_bindings:
+            errors.append(
+                f"{path}: risk_profile.source_bindings has unexpected keys: {', '.join(extra_bindings)}"
+            )
+        if not all(isinstance(value, str) and value.strip() for value in source_bindings.values()):
+            errors.append(
+                f"{path}: risk_profile.source_bindings values must be non-empty strings"
+            )
+
+    classified_at = risk_profile.get("classified_at")
+    if not isinstance(classified_at, str) or not classified_at.strip():
+        errors.append(f"{path}: risk_profile.classified_at must be a non-empty string")
+
     return errors
 
 
@@ -205,6 +374,26 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
         reason_codes = node.get("reason_codes")
         if reason_codes is not None:
             errors.extend(_validate_reason_codes(path, reason_codes))
+
+    if node_id == "intake_context.risk-classification":
+        reason_codes = node.get("reason_codes")
+        if not isinstance(reason_codes, dict):
+            errors.append(f"{path}: reason_codes must be an object for risk-classification")
+        else:
+            unexpected = sorted(set(reason_codes) - RISK_CLASSIFICATION_REASON_CODES)
+            missing = sorted(RISK_CLASSIFICATION_REASON_CODES - set(reason_codes))
+            if missing:
+                errors.append(
+                    f"{path}: reason_codes missing required keys: {', '.join(missing)}"
+                )
+            if unexpected:
+                errors.append(
+                    f"{path}: reason_codes has unexpected keys: {', '.join(unexpected)}"
+                )
+            if not all(isinstance(v, str) and v.strip() for v in reason_codes.values()):
+                errors.append(f"{path}: reason_codes values must be non-empty strings")
+
+        errors.extend(_validate_risk_profile(path, node.get("risk_profile")))
 
     return errors
 
