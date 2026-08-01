@@ -1,0 +1,31 @@
+schema_version: '1.0'
+task_id: SCRUM-259
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 3acf169b91fa2d4c4c32f573fa3318d00dad9088
+branch: codex/scrum-259-client-runtime-node-architect-vertical-slice
+scope_hash: sha256:8abdd851acee2ac07aa94b9ee648d395688cb320b0ecf13fda0cd12a484be170
+validation:
+  scoped_unit_tests: pass_5_tests
+  compileall: pass
+  schema_validation: pass_draft_2020_12_contract_examples
+  full_ci: pending_pr_creation
+pr:
+  number: null
+  url: null
+  head_sha: pending
+review:
+  status: pending
+  independence: fresh-context-required
+acceptance_evidence:
+  unit_tests: tests/test_client_runtime_vertical_slice.py
+  runtime_utility: tools/node_architect/client_runtime.py
+  request_schema: schemas/client-runtime-request.schema.json
+  result_schema: schemas/client-runtime-result.schema.json
+  plan_read_receipt: .gwc/tasks/SCRUM-259/g2/plan-read-receipt.yaml
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  broad_81_node_rollout: not_granted
