@@ -49,7 +49,7 @@ class G5RecoveryAuthorityTests(unittest.TestCase):
         self.assertTrue(any("no_recursive_evidence_pr" in issue for issue in issues))
 
     def test_workflow_binds_exact_recovery_and_idempotency(self) -> None:
-        text = WORKFLOW.read_text()
+        text = WORKFLOW.read_text(encoding="utf-8")
         for marker in (
             "APPROVE G5 RECOVERY",
             "bootstrap_manual_authority",
