@@ -6,9 +6,7 @@
   "authority_boundary": "read_only",
   "gates": [
     "G2_EXECUTION",
-    "G3_PR",
-    "G4_MERGE",
-    "G5_DEPLOY"
+    "G3_PR"
   ],
-  "description": "Link the original G4 human approval comment, sanitized authority receipt, GitHub merge event, canonical G5 Actions artifact, and G5 PR trace comment by exact PR head and merge SHA without creating an evidence commit or recursive PR."
+  "description": "Link sanitized task and PR delivery evidence to the later G4 human approval comment, GitHub merge event, canonical G5 Actions artifact, and G5 PR trace without creating an evidence commit or recursive PR."
 }
