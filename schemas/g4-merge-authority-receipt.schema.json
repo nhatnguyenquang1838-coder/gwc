@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g4-merge-authority-receipt.schema.json",
+  "title": "G4 Merge Authority Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "generated_at",
+    "repository",
+    "gate",
+    "pr_number",
+    "approval_id",
+    "scope_hash_prefix",
+    "approved_head_sha",
+    "source_comment",
+    "approver",
+    "issued_at",
+    "expires_at",
+    "pr_state",
+    "authorized_action",
+    "manual_g5_action_authorized"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g4-merge-authority-receipt"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "gate": {"const": "G4_MERGE"},
+    "pr_number": {"type": "integer", "minimum": 1},
+    "approval_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+    "approved_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_comment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "comment_id", "url"],
+      "properties": {
+        "provider": {"const": "github_pr_comment"},
+        "comment_id": {"type": "integer", "minimum": 1},
+        "url": {"type": "string", "format": "uri"}
+      }
+    },
+    "approver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["login", "permission"],
+      "properties": {
+        "login": {"type": "string", "minLength": 1},
+        "permission": {"enum": ["admin", "maintain", "write"]}
+      }
+    },
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "pr_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "draft", "mergeable"],
+      "properties": {
+        "state": {"const": "open"},
+        "draft": {"const": false},
+        "mergeable": {"type": ["boolean", "null"]}
+      }
+    },
+    "authorized_action": {"const": "merge_pull_request"},
+    "manual_g5_action_authorized": {"const": false}
+  }
+}
