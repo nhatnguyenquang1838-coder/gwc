@@ -1,0 +1,70 @@
+name: Refresh G4 G5 provenance
+
+on:
+  push:
+    branches:
+      - codex/hotfix-g3-code-review-ready-transition-20260801
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-g4-g5-provenance
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/hotfix-g3-code-review-ready-transition-20260801
+          fetch-depth: 0
+
+      - name: Refresh exactly five descriptor hashes
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          registry_path = Path("core/node-architect/node-registry.json")
+          payload = json.loads(registry_path.read_text(encoding="utf-8"))
+          expected = {
+              "repo_delivery.ci-run-capture",
+              "validation_quality.ci-evidence-capture",
+              "sync_projection.external-audit-event-projection",
+              "sync_projection.projection-evidence-linking",
+              "runtime_checkpoint.checkpoint-persist",
+          }
+          changed = set()
+          for node in payload["nodes"]:
+              source_path = node["provenance"]["source_path"]
+              digest = hashlib.sha256(Path(source_path).read_bytes()).hexdigest()
+              if digest != node["provenance"]["source_sha"]:
+                  node["provenance"]["source_sha"] = digest
+                  changed.add(node["id"])
+
+          if changed and changed != expected:
+              raise SystemExit(f"unexpected provenance drift: {sorted(changed)}")
+          if not changed:
+              print("registry already current")
+              raise SystemExit(0)
+
+          registry_path.write_text(
+              json.dumps(payload, sort_keys=True, separators=(",", ":")),
+              encoding="utf-8",
+          )
+          print(f"refreshed: {sorted(changed)}")
+          PY
+
+      - name: Commit generated registry
+        run: |
+          if git diff --quiet -- core/node-architect/node-registry.json; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add core/node-architect/node-registry.json
+          git commit -m "chore(g4-g5): refresh node registry provenance"
+          git push origin HEAD:codex/hotfix-g3-code-review-ready-transition-20260801
