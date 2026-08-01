@@ -52,6 +52,29 @@ def semantic_errors(evidence: dict[str, Any]) -> list[str]:
     if evidence["manual_action_authorized"] is not False:
         errors.append("G5_STATUS_VERIFY evidence must not authorize manual actions")
 
+    chain = evidence.get("evidence_chain")
+    if chain:
+        authority = chain["g4_authority"]
+        proof = chain["merge_proof"]
+        machine = chain["canonical_machine_evidence"]
+        trace = chain["human_traceability"]
+        projections = chain["projection_authority"]
+
+        if authority["approved_head_sha"] != proof["merged_head_sha"]:
+            errors.append("G4 approved head must equal the head recorded by the merge event")
+        if proof["merge_commit_sha"] != merge_sha:
+            errors.append("merge proof must bind the root merge_commit_sha")
+        if proof["exact_head_match"] is not True:
+            errors.append("merge proof requires exact_head_match=true")
+        if machine["provider"] != "github_actions_artifact":
+            errors.append("canonical G5 machine evidence must be a GitHub Actions artifact")
+        if trace["provider"] != "github_pr_comment":
+            errors.append("G5 human traceability must be a PR comment")
+        if projections != {"jira": "projection_only", "slack": "projection_only"}:
+            errors.append("Jira and Slack must remain projection_only")
+        if chain["no_recursive_evidence_pr"] is not True:
+            errors.append("G5 evidence must not create a recursive evidence PR")
+
     if classification == "success":
         missing = sorted(set(required) - selected_workflows)
         if missing:
