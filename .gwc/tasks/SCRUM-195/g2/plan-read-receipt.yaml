@@ -1,0 +1,17 @@
+schema_version: '1.0'
+task_id: SCRUM-195
+gate: G2_EXECUTION
+node: repo_delivery.scoped-file-write
+plan_read: true
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+scope_hash: sha256:2b7483530c3ebf5b7885de097b770a07b2c04ddaf7b7ec5e4dbe9b8c8199f6e2
+sources:
+- SCRUM-168 Jira parent
+- SCRUM-195 Jira subtask
+- AGENTS.md
+- core governance contracts
+- core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json
+- B1 G0/G1 evidence
+read_at_utc: '2026-08-01T15:42:00Z'
+scope_consistency: MATCH
+repository_state: MATCH
