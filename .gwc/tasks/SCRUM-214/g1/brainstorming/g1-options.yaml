@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-01T18:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-214
+  base_sha: 32b28f4887405d0311f55c3fae0f7b2c0e252df6
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Reuse and extend current primitives
+  description: Add one narrow CI-evidence adapter using current CI capture/checkpoint utilities and bind it into Client runtime.
+  benefits:
+  - Smallest compatible change
+  - Preserves current runtime architecture
+  - Directly satisfies replay and exact-head requirements
+  tradeoffs:
+  - Requires explicit adapter and integration tests
+  risks:
+  - Potential schema/handler binding drift
+  constraint_fit: FIT
+- id: OPT-2
+  title: Expand ci_run_capture directly
+  description: Put validation-quality behavior into the existing repo-delivery utility.
+  benefits:
+  - Fewer files
+  tradeoffs:
+  - Mixes F3 and F5 ownership
+  - Higher regression risk
+  risks:
+  - Family boundary erosion
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Replace runtime evidence path
+  description: Create a new evidence subsystem and route.
+  benefits:
+  - Maximum redesign freedom
+  tradeoffs:
+  - Architecture change and broad blast radius
+  risks:
+  - Duplicates current P2/P3/runtime mechanisms
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 follows Reuse -> Extend, keeps SCRUM-214 isolated, and avoids architecture or downstream-lane expansion.
+decision_required: true
+status: READY
