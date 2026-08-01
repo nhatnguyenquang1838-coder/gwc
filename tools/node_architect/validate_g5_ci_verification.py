@@ -88,6 +88,8 @@ def semantic_errors(evidence: dict[str, Any]) -> list[str]:
     if classification == "CI_PENDING":
         if not selected_runs:
             errors.append("CI_PENDING requires at least one exact-SHA observed run")
+        if not any(run.get("status") in PENDING_STATUS for run in selected_runs):
+            errors.append("CI_PENDING requires at least one observed exact-SHA run in a pending status")
         if not evidence.get("checkpoint_required"):
             errors.append("CI_PENDING requires checkpoint_required=true")
         if not evidence.get("checkpoint_path"):
