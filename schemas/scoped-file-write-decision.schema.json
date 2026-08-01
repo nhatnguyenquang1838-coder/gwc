@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/scoped-file-write-decision.schema.json",
+  "title": "ScopedFileWriteDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["node_id", "outcome", "reason_codes", "approved_paths", "requested_paths", "observed_diff_paths", "idempotency_key", "pending_action", "may_write", "requires_reconciliation", "requires_human", "decision_digest", "merge_authority_granted", "deployment_authority_granted", "production_authority_granted"],
+  "properties": {
+    "node_id": {"const": "repo_delivery.scoped-file-write"},
+    "outcome": {"enum": ["WRITE_ALLOWED", "WRITE_RECONCILED", "BLOCKED_OUT_OF_SCOPE_REQUEST", "BLOCKED_OUT_OF_SCOPE_DIFF", "PENDING_READBACK_REQUIRED", "BLOCKED_PROVIDER_FAILURE", "RECONCILE_DIFF_MISMATCH", "DUPLICATE_EFFECT_REPLAYED", "INVALID_INPUT"]},
+    "reason_codes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "approved_paths": {"type": "array", "items": {"type": "string"}},
+    "requested_paths": {"type": "array", "items": {"type": "string"}},
+    "observed_diff_paths": {"type": "array", "items": {"type": "string"}},
+    "idempotency_key": {"type": "string"},
+    "pending_action": {"type": ["string", "null"]},
+    "may_write": {"type": "boolean"},
+    "requires_reconciliation": {"type": "boolean"},
+    "requires_human": {"type": "boolean"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  }
+}
