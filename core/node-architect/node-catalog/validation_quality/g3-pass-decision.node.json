@@ -7,5 +7,5 @@
   "gates": [
     "G3_PR"
   ],
-  "description": "Decide whether exact-head CI, tests, and blocker checks satisfy G3."
+  "description": "Fail closed unless exact-head validation and required CI pass, a read-only code_reviewer invocation receipt passes for the same head SHA and scope hash, findings are closed, and evidence is non-stale. Review PASS is evidence only; merge_pending begins only after Ready-for-Review promotion readback."
 }
