@@ -5,9 +5,8 @@
   "canonical": "delivery_evidence",
   "authority_boundary": "g2_required",
   "gates": [
-    "G3_PR",
-    "G4_MERGE",
-    "G5_DEPLOY"
+    "G2_EXECUTION",
+    "G3_PR"
   ],
-  "description": "Capture G3 exact-head CI, bind the G4 GitHub merge event to the approved PR head and merge commit, then capture G5 post-merge workflow runs only when their head SHA equals that merge commit."
+  "description": "Capture G3 exact-head CI and prepare delivery evidence identifiers that later bind the G4 GitHub merge event to the approved PR head and G5 post-merge workflow runs to the exact merge commit."
 }
