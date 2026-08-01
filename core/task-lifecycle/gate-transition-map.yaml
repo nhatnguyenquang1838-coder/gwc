@@ -1,4 +1,4 @@
-contract_version: 1.0.0
+contract_version: 1.0.1
 authority:
   state_machine: ds-mcp-state-engine
   discovery_tool: task_state_contract_get
@@ -43,10 +43,6 @@ rules:
     from_state: validation_running
     transition: VALIDATION_PASSED
     expected_state: review_pending
-  - outcome: G3_REVIEW_PASSED
-    from_state: review_pending
-    transition: REVIEW_PASSED
-    expected_state: merge_pending
   - outcome: PR_READY_FOR_REVIEW
     from_state: review_pending
     transition: MARK_READY_FOR_REVIEW
@@ -125,3 +121,6 @@ verification:
     - observed_state
     - event_id_or_idempotency_key
   readback_required: true
+notes:
+  - Independent code-review-agent PASS is G3 evidence and does not transition task state by itself.
+  - Only successful Ready-for-Review promotion and readback move review_pending to merge_pending.
