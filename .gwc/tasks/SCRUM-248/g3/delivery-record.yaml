@@ -1,0 +1,29 @@
+schema_version: '1.0'
+task_id: SCRUM-248
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e2f8da5263546222228a234867389f613bbed558
+branch: codex/scrum-247-249-f9-scale-control-m4-20260801
+scope_hash: sha256:f27f096ceee0bee9b5e04741ed1a5c85de0cc8ac32e724b2a17ae61ebb64e966
+validation:
+  scoped_unit_tests: pass_15_tests
+  compileall: pass
+  schema_validation: pass_draft_2020_12_and_decision_fixtures
+  full_ci: pending_pr_creation
+pr:
+  number: null
+  url: null
+  head_sha: pending
+review:
+  status: pending
+  independence: fresh-context-required
+acceptance_evidence:
+  shared_tests: tests/test_scale_control_m4_batch.py
+  decision_schema: task-specific schema
+  runtime_utility: task-specific utility
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  scale_authority: not_granted

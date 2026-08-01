@@ -1,0 +1,68 @@
+schema_version: '1.0'
+task_id: SCRUM-247
+gate: G2_EXECUTION
+status: APPROVED
+approval:
+  id: APPROVE_G2_FL-MAT-F9_20260801
+  received_at: '2026-08-01T10:33:00Z'
+  expires_at: '2026-08-02T09:44:00Z'
+  scope_hash_prefix: f27f096ceee0bee9
+  command_redacted_after_approval: true
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: e2f8da5263546222228a234867389f613bbed558
+branch: codex/scrum-247-249-f9-scale-control-m4-20260801
+scope_hash: sha256:f27f096ceee0bee9b5e04741ed1a5c85de0cc8ac32e724b2a17ae61ebb64e966
+authorized_actions:
+- create_guarded_branch
+- create_task_gate_artifacts
+- modify_approved_files
+- create_schema
+- create_runtime_utility
+- create_scoped_unit_tests
+- create_changelog
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+approved_paths:
+- .gwc/tasks/SCRUM-247/**
+- tools/node_architect/batch_admission_check.py
+- schemas/batch-admission-decision.schema.json
+- tests/test_scale_control_m4_batch.py
+- releases/changelog.d/2026-08-01-scrum-247-249-f9-scale-control-m4.md
+prohibited_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- deploy
+- release
+- production_configuration
+- production_data
+- secrets
+- credentials
+- migration
+- force_push
+- branch_deletion
+- pr_base_change
+- scale_authority
+implementation_plan:
+  applicability: required
+  reason: This is a multi-file behavior/control implementation with schemas, utilities,
+    tests, and shared fastlane coordination.
+  source: generated_kiro
+  task_me_applicable: true
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: Task Me capability is not available in the active connector
+    surface; generated Kiro fallback is required by the runbook.
+  canonical_task_uid: SCRUM-247
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: e2f8da5263546222228a234867389f613bbed558
+  plan_root: .kiro/specs/fl-mat-f9-scale-control-20260801/scrum-247
+  requirements_path: .kiro/specs/fl-mat-f9-scale-control-20260801/scrum-247/requirements.md
+  design_path: .kiro/specs/fl-mat-f9-scale-control-20260801/scrum-247/design.md
+  tasks_path: .kiro/specs/fl-mat-f9-scale-control-20260801/scrum-247/tasks.md
+  plan_revision: sha256:4f7f6f0dfd7b6c075973899c3735d4009f1643da63c31e85fc7c1d68fe1bb254
+  validation_status: PASS
+  validation_evidence: validation/SCRUM-247-implementation-plan-validation.json
+  generated_by: chatgpt-governed-g1
+  generated_at_utc: '2026-08-01T09:44:00Z'
