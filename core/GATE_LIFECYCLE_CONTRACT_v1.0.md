@@ -223,6 +223,7 @@ If CI fails, the agent may diagnose and repair only repository-fixable failures 
 ## Proactive Gate Transition
 
 Every gate exit requires the agent to proactively generate the next needed artifact or action. Approval commands are required only at human-authority boundaries. Read-only `G5_STATUS_VERIFY` after G4 merge is automatic, and G6 is generated only when production data, production configuration, migration, credentials, or secrets are actually in scope. This ensures no gate ends in a silent state and the user always has a clear, actionable next step.
+Read-only `G5_STATUS_VERIFY` starts automatically after G4 merge.
 
 Compatibility note: legacy wording that the agent must present the corresponding approval command to the user applies only when the next step is a human-authority boundary. It does not apply to automatic read-only `G5_STATUS_VERIFY`.
 
