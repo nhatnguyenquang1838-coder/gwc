@@ -1,11 +1,11 @@
-schema_version: '1.0'
+schema_version: '1.1'
 artifact_type: g1-decision-record
-generated_at: '2026-08-01T12:05:00Z'
+generated_at: '2026-08-01T19:19:19Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-258
-  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
   g0_snapshot: ../../g0/context-snapshot.yaml
 options_ref: ../brainstorming/g1-options.yaml
 preflight_ref: ../preflight/g1-preflight-report.yaml
@@ -13,12 +13,12 @@ status: ACCEPTED
 selected_option_id: OPT-1
 user_decision:
   actor: current-user
-  decided_at: '2026-08-01T12:03:00Z'
-  source: 'chat: authorized G5 recovery mechanism; original G2 approval rejected after
-    protected-base drift; plan rebound to non-overlapping current main'
+  decided_at: '2026-08-01T19:19:19Z'
+  source: 'chat: explicit direction to continue SCRUM-258 remediation after protected-main
+    verification of the duplicate `g5-recovery` workflow defect'
   explicit: true
-rationale: Extend the canonical issue_comment evidence workflow with a distinct bootstrap
-  recovery provenance path; do not use unrelated projection/release/runtime lanes.
+rationale: Proceed with the bounded parser repair and regression coverage only; keep
+  merge, deploy, and broader recovery-contract changes out of scope.
 rejected_option_ids:
 - OPT-2
 - OPT-3
@@ -27,9 +27,7 @@ acceptance_criteria_refs:
 - AC-2
 - AC-3
 - AC-4
-- AC-5
-- AC-6
-scope_hash: sha256:ac4d8e1cf6d0bd73667afc478d457512d754ba270887c47fb66eb97e46dcb495
+scope_hash: sha256:3c9169b2f89aba88b3b7b94bd3a70ea9bac4a8eafa0c6fe14f1bb18c146b8418
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -38,42 +36,17 @@ authority_boundaries:
   - G5_DEPLOY
   - G6_PRODUCTION
 subagent_distribution_plan:
-  task_decomposition:
-  - sub_task_id: SUB-TASK-1
-    description: Implement recovery authority schema, template and validator.
-    dependencies: []
-  - sub_task_id: SUB-TASK-2
-    description: Extend the existing evidence workflow with exact recovery validation
-      and idempotent artifact/comment emission.
-    dependencies:
-    - SUB-TASK-1
-  - sub_task_id: SUB-TASK-3
-    description: Update contracts and permanent agent capability rules.
-    dependencies:
-    - SUB-TASK-2
-  - sub_task_id: SUB-TASK-4
-    description: Run focused negative tests, full validation and exact-head CI.
-    dependencies:
-    - SUB-TASK-1
-    - SUB-TASK-2
-    - SUB-TASK-3
-  agent_allocation:
-  - sub_task_id: SUB-TASK-1
-    skill_id: schema-validator-authoring
-    agent_type: primary
-  - sub_task_id: SUB-TASK-2
-    skill_id: github-actions-governance
-    agent_type: primary
-  - sub_task_id: SUB-TASK-3
-    skill_id: governance-contract-update
-    agent_type: specialist
-  - sub_task_id: SUB-TASK-4
-    skill_id: validator-testing
-    agent_type: validator
-  execution_order:
-  - SUB-TASK-1
-  - SUB-TASK-2
-  - SUB-TASK-3
-  - SUB-TASK-4
-  summary: 'One bounded guarded-branch hotfix followed by independent G3 review; merge
-    and actual PR #152 recovery remain separate authorities.'
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.
+implementation_plan_ref:
+  applicability: required
+  source: existing_kiro
+  canonical_task_uid: SCRUM-258
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
+  plan_root: .kiro/specs/SCRUM-258-g5-bootstrap-recovery
+  plan_revision: sha256:416439f80bc57b89df0ff3a0db6c524c3a84eb96e99efc509ff12de32a754040
+  validation_evidence: Protected-base readback confirms the SCRUM-258 requirements,
+    design, and tasks files remain unchanged and still cover this duplicate-job remediation.

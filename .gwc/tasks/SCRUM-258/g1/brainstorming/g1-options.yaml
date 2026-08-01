@@ -1,48 +1,51 @@
 schema_version: '1.0'
 artifact_type: g1-options
-generated_at: '2026-08-01T12:05:00Z'
+generated_at: '2026-08-01T19:19:19Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-258
-  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
-  title: Extend existing issue_comment evidence workflow
-  description: Add a distinct exact G5 recovery command/job to the existing workflow,
-    with recovery provenance and idempotency.
+  title: Remove the duplicate workflow job and add uniqueness regression coverage
+  description: Keep the canonical recovery implementation, delete the duplicated `g5-recovery`
+    job header/body, and add a focused regression assertion.
   benefits:
-  - Reuses canonical authority/evidence surfaces.
-  - 'Can recover PR #152 after the hotfix reaches main.'
-  - Does not create a parallel governance system.
+  - Smallest compatible remediation
+  - Preserves the current bootstrap recovery semantics
+  - Restores parser validity on protected main
   tradeoffs:
-  - Requires a follow-up hotfix PR and later exact recovery comment.
+  - Requires refreshed G2 approval because the protected base and task state changed
+    after the prior envelope
   risks:
-  - Must prevent recovery mode from weakening normal G4/G5 checks.
+  - The retained block must be the canonical full implementation
   constraint_fit: FIT
 - id: OPT-2
-  title: Standalone workflow_dispatch recovery workflow
-  description: Add a separate manually dispatched workflow.
+  title: Rewrite the full recovery job from scratch
+  description: Reconstruct `g5-recovery` as a fresh job implementation while trying
+    to preserve current behavior.
   benefits:
-  - Simple operator invocation.
+  - Could remove local duplication and formatting inconsistencies in one pass
   tradeoffs:
-  - Creates a parallel path and depends on workflow-dispatch tooling.
+  - Larger diff and higher semantic-regression risk
   risks:
-  - Authority and evidence logic could drift from the canonical workflow.
+  - Rewriting the job can widen scope beyond the bounded remediation
   constraint_fit: PARTIAL
 - id: OPT-3
-  title: Manual PR comments without canonical artifact
-  description: Post human or bot comments based on observed CI only.
+  title: Disable bootstrap recovery temporarily
+  description: Remove the recovery lane to make the workflow valid again and defer
+    SCRUM-258 capability restoration.
   benefits:
-  - No code change.
+  - Fast parser recovery
   tradeoffs:
-  - Does not create canonical machine evidence.
+  - Breaks the governed recovery capability introduced by SCRUM-258
   risks:
-  - Would preserve the current evidence gap and could fabricate authority.
+  - Leaves the canonical recovery lane incomplete and regresses accepted task behavior
   constraint_fit: NOT_FIT
 recommended_option_id: OPT-1
-recommendation_rationale: 'OPT-1 is the smallest compatible extension: it reuses the
-  canonical workflow, fails closed and produces auditable recovery provenance.'
+recommendation_rationale: OPT-1 is the smallest compatible fix because it restores
+  a single canonical `g5-recovery` job without weakening the existing recovery contract.
 decision_required: true
 status: READY

@@ -1,112 +1,115 @@
 schema_version: '1.0'
 artifact_type: g1-intake-brief
-generated_at: '2026-08-01T12:05:00Z'
+generated_at: '2026-08-01T19:19:19Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-258
-  base_sha: 63318bb8f7b7c9d140a3b1e7f554ee4107ca0313
+  base_sha: 32f680332357b91778905f8474e389fdc6a0c83e
   g0_snapshot: ../../g0/context-snapshot.yaml
 problem:
-  statement: 'PR #152 has successful exact merge-SHA CI but lacks canonical G4 authority,
-    merge-proof and G5 artifacts because it bootstrapped the evidence workflow itself.'
-  why_now: 'PR #153 advanced main after the first envelope. Its F9 scale-control changes
-    do not overlap this lane, so the recovery plan is rebound to current protected
-    main before any write.'
-desired_outcome: Add a fail-closed, idempotent, human-authorized bootstrap recovery
-  route that emits canonical Actions evidence and clearly labelled PR traces without
-  rewriting history.
+  statement: Protected main now contains an invalid `.github/workflows/g4-g5-evidence.yml`
+    because `g5-recovery` is defined twice, so the post-merge evidence workflow fails
+    before any jobs run.
+  why_now: PR
+desired_outcome: Refresh SCRUM-258 to the current protected base and deliver a bounded
+  remediation that restores one canonical `g5-recovery` job plus regression coverage
+  without widening the bootstrap recovery contract.
 stakeholders:
   requester: Nhat Nguyen Quang
   affected:
   - GWC maintainers
-  - ChatGPT and DWC governed runtimes
-  - Auditors of G4/G5 evidence
+  - G4/G5 evidence workflow consumers
+  - Auditors of bootstrap recovery provenance
 scope:
   in_scope:
-  - Extend `.github/workflows/g4-g5-evidence.yml` with an exact merged-PR recovery
-    command.
-  - Add recovery authority schema, validator, template and negative tests.
-  - Verify exact PR/head/merge SHA, approver, expiry and exact successful workflow
-    run IDs.
-  - Emit canonical artifact and sanitized recovery-mode G4/G5 PR traces.
-  - Update permanent G5 and agent contracts.
+  - Refresh `.gwc/tasks/SCRUM-258` G0/G1/G2 artifacts to protected main 32f680332357b91778905f8474e389fdc6a0c83e.
+  - Remove the duplicated `g5-recovery` job definition from `.github/workflows/g4-g5-evidence.yml`.
+  - Add regression coverage that fails when the workflow defines `g5-recovery` more
+    than once.
+  - Re-run bounded workflow and instruction validation for the remediation scope.
   non_goals:
-  - Do not rewrite or fabricate the original G4 event.
-  - Do not commit evidence to main or create an evidence PR.
-  - Do not change node count or unrelated runtime families.
-  - Do not merge, deploy, release, publish, reload runtime, touch production configuration/data,
-    secrets or migrations under this envelope.
+  - Protected-main write
+  - Merge or auto-merge
+  - Deployment, release, publish, or runtime reload
+  - Production data, production configuration, credentials, secrets, or migrations
+  - Rewriting bootstrap recovery semantics, approval syntax, or recovery provenance
+  - Unrelated task cleanup, node-count changes, or broad contract refactors
 constraints:
-- Base on main@63318bb8f7b7c9d140a3b1e7f554ee4107ca0313.
-- Use Jira SCRUM-258 as the active task.
-- Reuse the existing workflow and evidence schema family.
-- Recovery must fail closed and remain idempotent.
+- Base on main@32f680332357b91778905f8474e389fdc6a0c83e.
+- Use Jira SCRUM-258 as the single active task identity for this remediation lane.
+- Reuse the existing `.kiro/specs/SCRUM-258-g5-bootstrap-recovery` plan without widening
+  scope.
+- Keep writes bounded to task artifacts, `.github/workflows/g4-g5-evidence.yml`, and
+  focused regression tests.
+- Preserve the current bootstrap recovery behavior, markers, outputs, and fail-closed
+  authority contract.
 assumptions:
-- 'PR #152 immutable metadata and exact successful workflow run IDs remain readable
-  through GitHub.'
-- A later exact human recovery comment on the merged PR can serve as recovery authority
-  without retroactively pretending it was original G4 authority.
+- The duplicate `g5-recovery` job definition is the direct cause of the invalid workflow
+  parse on push run 30714057455.
+- The existing SCRUM-258 Kiro plan revision `sha256:416439f80bc57b89df0ff3a0db6c524c3a84eb96e99efc509ff12de32a754040`
+  remains compatible with this narrower remediation.
 risks:
 - id: RISK-1
-  description: Recovery could accidentally weaken normal G4/G5 authority requirements.
+  description: Removing the wrong duplicated block could silently drop required recovery
+    behavior.
   impact: high
-  mitigation: Limit recovery to merged PRs, require a distinct exact command and explicit
-    recovery provenance.
+  mitigation: Keep the canonical full block intact and validate expected recovery
+    markers and outputs after the edit.
 - id: RISK-2
-  description: Duplicate or conflicting recovery requests could create ambiguous evidence.
+  description: Existing tests may continue to miss duplicate workflow job IDs.
   impact: high
-  mitigation: Reject conflicts and make exact duplicates idempotent.
+  mitigation: Add a focused regression assertion for exactly one `g5-recovery` job
+    definition.
 - id: RISK-3
-  description: Workflow-run selection could bind to a different SHA or rerun.
-  impact: high
-  mitigation: Require exact merge SHA, workflow identity, run IDs and successful conclusions.
+  description: Protected-base drift before G2 approval could stale the refreshed envelope.
+  impact: medium
+  mitigation: Bind every refreshed artifact to exact main SHA 32f680332357b91778905f8474e389fdc6a0c83e
+    and reapprove if main changes again.
 acceptance_criteria:
 - id: AC-1
-  statement: Recovery accepts only an exact human command on a merged PR and binds
-    to exact head, merge SHA, approval ID and expiry.
+  statement: The refreshed remediation scope preserves one canonical `g5-recovery`
+    job with the expected recovery markers, authority validation, and artifact/comment
+    outputs.
   verifiable: true
 - id: AC-2
-  statement: 'PR #152 recovery verifies runs 30697350537 and 30697350559 as successful
-    for merge SHA bb1269ba913b548a58ec97ff65c54d00ab16e19e.'
+  statement: A regression test fails when `.github/workflows/g4-g5-evidence.yml` defines
+    `g5-recovery` more than once.
   verifiable: true
 - id: AC-3
-  statement: Canonical Actions artifacts and sanitized G4/G5 traces include explicit
-    bootstrap recovery provenance.
+  statement: Focused workflow tests and `python tools/validate_instructions.py` pass
+    locally for the exact remediation branch head before G3.
   verifiable: true
 - id: AC-4
-  statement: Expired, unauthorized, mismatched, missing, duplicate-conflicting and
-    non-success cases fail closed.
-  verifiable: true
-- id: AC-5
-  statement: Normal event-driven G4/G5 behavior remains unchanged and exactly 81 runtime
-    nodes remain.
-  verifiable: true
-- id: AC-6
-  statement: Full validators, tests and exact-head CI pass on a Draft PR; no excluded
-    operation occurs.
+  statement: No merge, deploy, production, credential, projection-authority, or scope-expansion
+    behavior occurs under this remediation lane.
   verifiable: true
 delivery_lifecycle:
   authorized_actions:
   - create_guarded_branch
-  - modify_approved_files
+  - modify_scoped_files
   - run_sandboxed_validation
-  - commit_and_push_guarded_branch
+  - push_working_branch
   - open_or_update_draft_pr
   - monitor_ci
-  - perform_independent_read_only_g3_review
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
   downstream_non_goals:
   - merge
+  - auto_merge
   - deploy
   - release
-  - production_operation
+  - production_config_change
+  - credential_rotation
+  - production_data_access
   g3_metadata_completion:
     ready_for_review_after_g3_pass: true
     required_evidence:
-    - exact PR head SHA
-    - complete diff review
-    - required CI success
-    - independent review closure
-    - scope-drift PASS
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
 unresolved_questions: []
 status: READY
