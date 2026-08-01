@@ -485,12 +485,13 @@ After creating or updating a Draft PR, the agent must not stop silently when CI 
 
 1. webhook or event callback when available;
 2. local sleep or poll loop when running as a capable local agent;
-3. ChatGPT Scheduled Tasks when running in ChatGPT and the platform scheduler is available;
-4. manual checkpoint only when no async mechanism is available.
+3. a two-minute sleep of the active thread when running as a ChatGPT chat connector;
+4. another platform scheduler when its own runtime supports it;
+5. manual checkpoint only when no async mechanism is available.
 
-The default next-check interval is 3 minutes when the selected environment supports that cadence. If the platform supports only a slower cadence, use the supported cadence and report the limitation.
+For a ChatGPT chat connector, record the repository, PR, expected head SHA, check-and-report-only boundary, and a two-minute wake time; then sleep the current thread for exactly two minutes. Do not create a scheduler task or automation. For every other continuation mechanism, the default next-check interval remains 3 minutes when the selected environment supports that cadence. If a non-ChatGPT platform supports only a slower cadence, use the supported cadence and report the limitation.
 
-For ChatGPT Scheduled Tasks, the agent must verify that the task has an actual next run. If the task UI or scheduler state shows no next run, including `Chưa lên lịch`, the agent must treat async continuation as not scheduled and fall back to another legal mechanism or a manual checkpoint.
+If the ChatGPT chat connector cannot sleep and wake the current thread, it must record a manual checkpoint rather than create a scheduler task or automation.
 
 A CI wait task may check and report CI state only. It must not modify repository content, merge, deploy, reload runtime, release, touch production configuration, handle credentials, run migrations, or access production data unless a separate active approval covers that exact action.
 

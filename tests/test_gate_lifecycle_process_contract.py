@@ -118,16 +118,18 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("The default next-check interval is 3 minutes", dwc)
         self.assertIn("manual checkpoint when no async mechanism is available", e2e)
 
-    def test_chatgpt_scheduled_tasks_require_actual_next_run(self) -> None:
+    def test_chatgpt_ci_continuation_sleeps_the_current_thread(self) -> None:
         agents = self.normalized_text("AGENTS.md")
         chatgpt = self.normalized_text("agents/chatgpt-agent/agent-instructions.md")
         e2e = self.normalized_text("core/E2E_DRAFT_PR_DELIVERY_RULE.md")
 
-        self.assertIn("ChatGPT Scheduled Tasks", chatgpt)
-        self.assertIn("This is a scheduled continuation, not raw process sleep.", chatgpt)
-        self.assertIn("If the UI shows no next run or a state such as `Chưa lên lịch`", chatgpt)
-        self.assertIn("including `Chưa lên lịch`", agents)
-        self.assertIn("The task is not active unless a concrete next run is visible or recorded.", e2e)
+        self.assertIn("two-minute sleep of the active thread", agents)
+        self.assertIn("sleep the current thread for exactly two minutes", chatgpt)
+        self.assertIn("Do not create a scheduler task or automation", chatgpt)
+        self.assertIn("two-minute sleep of the active thread", e2e)
+        self.assertIn("For other platform schedulers", e2e)
+        self.assertNotIn("## ChatGPT Scheduled Tasks", chatgpt)
+        self.assertNotIn("3-minute next-check interval", chatgpt)
 
     def test_ci_failure_repair_invalidates_stale_g4_evidence(self) -> None:
         gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
