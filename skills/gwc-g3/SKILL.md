@@ -1,8 +1,8 @@
 ---
 name: gwc-g3
-description: Use after G2 implementation and validation are complete for Draft PR assembly, independent read-only review, exact-head CI verification, review closure, Context7-first skill resolution, offline fallback, and G4 approval preparation.
-when_to_use: Trigger for start G3, create or update Draft PR, review current PR head, resolve Context7 review skills, use offline G3 skill library, close findings, validate delivery record, or prepare G4 approval request.
-version: 0.2.0
+description: Use after G2 implementation and validation are complete for Draft PR assembly, independent code-review-agent execution, exact-head CI verification, review closure, Ready-for-Review promotion, and G4 approval preparation.
+when_to_use: Trigger for start G3, create or update Draft PR, invoke a code reviewer agent, review the current PR head, close findings, validate G3 evidence, promote Draft PR to Ready for Review, or prepare a G4 approval request.
+version: 0.3.0
 project: gwc
 owner: GWC
 ---
@@ -11,29 +11,40 @@ owner: GWC
 
 ## Purpose
 
-Operate the existing GWC G3 delivery mechanism consistently. G3 asks whether the exact current Draft PR head is independently reviewed, validated, CI-verified, acceptance-criteria-complete, and safe to present for a separate G4 merge decision.
+Operate the existing GWC G3 delivery mechanism consistently. G3 asks whether the exact current Draft PR head is independently reviewed by a read-only `code_reviewer` agent, validated, CI-verified, acceptance-criteria-complete, and safe to promote to Ready for Review for a separate G4 merge decision.
 
-This skill reuses `tools/validate_g3_delivery.py`, `schemas/g3-delivery-record.schema.json`, `templates/gates/g3-delivery-record.template.yaml`, and `tests/test_g3_delivery.py`. Do not create a parallel G3 artifact or lifecycle.
+This skill reuses `tools/validate_g3_delivery.py`, `schemas/g3-delivery-record.schema.json`, `templates/gates/g3-delivery-record.template.yaml`, and `tests/test_g3_delivery.py`. It extends that evidence with the additive invocation receipt:
+
+```text
+.gwc/tasks/<task-id>/g3/code-review-invocation.json
+```
+
+The receipt must validate with `tools/validate_g3_review_invocation.py` against `schemas/g3-code-review-invocation.schema.json`. It is supplemental G3 evidence, not a parallel gate or approval.
 
 ## Authority boundary
 
-G3 may create or update a Draft PR when authorized, assemble the delivery record, record a read-only review, verify CI for the exact current head SHA, close findings, and generate a G4 approval request after G3 PASS.
+G3 may create or update a Draft PR when authorized, assemble the delivery record, invoke one independent read-only `code_reviewer` agent, verify CI for the exact current head SHA, close findings, validate both G3 evidence records, and mark the same Draft PR Ready for Review after every guard passes.
 
-Do not merge, enable auto-merge, mark ready for review, deploy, release, touch production configuration, perform credential operation, run migration, access production data, direct-push to protected branches, force-push, delete branches, rewrite shared history, or change PR base. Reviewer PASS is evidence only.
+Ready-for-Review promotion is G3 metadata completion. It does not merge, enable auto-merge, deploy, release, publish, reload runtime, touch production configuration, perform credential operations, run migrations, access production data, direct-push to protected branches, force-push, delete branches, rewrite shared history, or change the PR base.
 
-## Existing flow
+## Canonical flow
 
 ```mermaid
 flowchart LR
-    A[G2 exact-head evidence] --> B[G3.1 PR Assembly]
-    B --> C[Resolve review skill bundle]
-    C --> D[G3.2 Independent Review]
-    D --> E{Required change?}
-    E -- Yes --> F[Return to G2]
+    A[G2 exact-head evidence] --> B[G3.1 Create or update Draft PR]
+    B --> C[Exact-head validation and required CI]
+    C --> D[Invoke independent code_reviewer agent]
+    D --> E{Review result}
+    E -- Changes required --> F[Return to bounded G2 repair]
     F --> B
-    E -- No --> G[G3.3 Review Closure]
-    G --> H[G4 approval request]
+    E -- Pass --> G[G3.3 Review closure]
+    G --> H[Validate delivery record and invocation receipt]
+    H --> I[Mark Draft PR Ready for Review]
+    I --> J[Read back draft=false and unchanged head SHA]
+    J --> K[G4 approval request]
 ```
+
+Review PASS alone does not transition the task to `merge_pending`. Only successful Ready-for-Review promotion and readback may do that.
 
 ## Skill source resolution
 
@@ -53,50 +64,70 @@ Resolution order:
 5. If neither source is valid, stop with G3_SKILL_SOURCE_BLOCKED.
 ```
 
-Context7 is attempted before reading offline skill contents. When the exact library ID is known, direct `query-docs` is acceptable.
+A G3 run uses exactly one source mode: `CONTEXT7_LIVE` or `OFFLINE_PINNED`. Do not mix bundles. The bundle must cover requesting code review, verification before completion, receiving code review, and finishing a development branch as PR-only delivery.
 
-### Retry policy
+## G3.1 Draft PR assembly
 
-- `forbidden` or hard `unavailable`: fallback immediately.
-- `timeout`: retry once, then fallback.
-- `empty_result`, `incomplete_bundle`, or `incompatible_bundle`: retry once with deeper research when available, then fallback.
-- Never exceed two live queries for one G3 run.
+Verify repository, base SHA, guarded branch, exact current head SHA, scope hash, changed paths, validation output, required CI status, acceptance criteria, and exclusions. Create or update the Pull Request as Draft. Any head SHA change makes prior validation, CI, review, and readiness evidence stale.
 
-### bundle-atomic rule
+## G3.2 Code reviewer agent invocation
 
-A G3 run uses exactly one source mode:
+Invoke an agent whose role is exactly `code_reviewer`. Bind the request and result to the same task, repository, PR number, head SHA, and scope hash used by the delivery record.
+
+The invocation must be read-only and record:
+
+- implementer ID and reviewer agent ID;
+- reviewer role and independence mode;
+- provider and invocation ID;
+- requested and completed timestamps;
+- requested and completed head SHA;
+- result reference;
+- result, findings, stale state, and an empty `write_actions` list.
+
+An `independent` reviewer must differ from the implementer. A `fresh-context` fallback must be labelled honestly. A reviewer that performs a repository write loses independence; the changed head must return to validation and be reviewed again by another read-only invocation.
+
+Validate the receipt:
 
 ```text
-CONTEXT7_LIVE
-or
-OFFLINE_PINNED
+python tools/validate_g3_review_invocation.py \
+  --record .gwc/tasks/<task-id>/g3/code-review-invocation.json
 ```
 
-Do not mix live and offline skill cards. Record `source_mix: NONE`.
+## G3.3 Review closure
 
-### Required compatible skills
+- `BLOCKER`: return to G2.
+- `MAJOR`: fix in G2 or capture exact-head human risk acceptance in the delivery record.
+- `MINOR`: fix or defer with traceable follow-up.
+- `NIT`: record as non-blocking.
 
-The bundle is complete only when it covers:
+Run both validators before claiming review closure:
 
-- `requesting-code-review`;
-- `verification-before-completion`;
-- `receiving-code-review`;
-- `finishing-development-branch-pr-only`;
-- optional `dispatching-parallel-review`.
+```text
+python tools/validate_g3_review_invocation.py --record .gwc/tasks/<task-id>/g3/code-review-invocation.json
+python tools/validate_g3_delivery.py --record .gwc/tasks/<task-id>/g3/delivery-record.yaml
+```
 
-## G3.1 PR Assembly
+## Ready-for-Review promotion
 
-Verify repository, base SHA, guarded branch, exact current head SHA, scope hash, changed paths, validation output, CI status, acceptance criteria, and exclusions. Any head SHA change makes prior validation, CI, and review stale.
+Promotion is allowed only when all of the following are true for the same current PR head SHA:
 
-## G3.2 Independent Review
+- the PR is open and Draft;
+- local/applicable validation passed;
+- every required CI check passed;
+- the code-review-agent invocation receipt passed and is not stale;
+- the delivery record passed and has no unresolved blocker;
+- acceptance criteria are complete;
+- scope drift is false;
+- no prohibited action occurred.
 
-Reviewer must be independent from implementer and operate read-only. Review lanes: requirement, design, code, test, governance, delivery, CI. Findings use BLOCKER, MAJOR, MINOR, or NIT.
+Invoke `mark_pull_request_ready_for_review`, then read the PR back. Promotion passes only when:
 
-## G3.3 Review Closure
+```text
+observed draft == false
+observed state == open
+observed head SHA == reviewed head SHA
+```
 
-- BLOCKER: return to G2.
-- MAJOR: fix in G2 or capture exact-head human risk acceptance.
-- MINOR: fix or defer with traceable follow-up.
-- NIT: record as non-blocking.
+Store the promotion/readback receipt in the PR timeline, GitHub Check, Actions artifact, or append-only audit event. Do not commit a post-promotion receipt to the reviewed PR branch because that would change the head SHA and stale the review.
 
-Run `tools/validate_g3_delivery.py` before claiming G3 PASS. If PASS, prepare a G4 approval request; do not merge.
+After successful readback, transition the work state to `merge_pending` and prepare the exact G4 approval request. If promotion or readback fails, remain in G3 and report `G3_READY_FOR_REVIEW_BLOCKED`; do not generate a merge-ready G4 request.
