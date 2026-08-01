@@ -1,0 +1,31 @@
+schema_version: '1.0'
+task_id: SCRUM-254
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 4c3ca535a3e9d9c71fb4bd0ca7e0f0264e664f3a
+branch: codex/scrum-253-255-f9-scale-control-m4-20260801
+scope_hash: sha256:dc5f9de389851ffd8925ea5186d0cf947fda6a67f2387b537fb9430a53984fa6
+validation:
+  scoped_unit_tests: pass_19_tests
+  compileall: pass
+  schema_validation: pass_draft_2020_12_and_decision_fixtures
+  full_ci: pending_pr_creation
+pr:
+  number: null
+  url: null
+  head_sha: pending
+review:
+  status: pending
+  independence: fresh-context-required
+acceptance_evidence:
+  shared_tests: tests/test_scale_control_m4_batch_b3.py
+  decision_schema: schemas/rollout-progress-projection-decision.schema.json
+  runtime_utility: tools/node_architect/rollout_progress_projection.py
+  plan_read_receipt: .gwc/tasks/SCRUM-254/g2/plan-read-receipt.yaml
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  audit_completion_authority: not_granted
+  scale_authority: not_granted
