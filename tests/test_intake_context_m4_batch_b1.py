@@ -206,5 +206,10 @@ class IntakeContextM4BatchB1Tests(unittest.TestCase):
             self.assertEqual([], self.validator.validate_family(family_dir))
 
 
+# Compatibility aliases for the documented focused unittest entrypoints.
+BoundedReadScopeTests = IntakeContextM4BatchB1Tests
+BoundedWriteScopeTests = IntakeContextM4BatchB1Tests
+
+
 if __name__ == "__main__":
     unittest.main()
