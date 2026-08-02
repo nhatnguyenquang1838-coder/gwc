@@ -1,0 +1,33 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+task_id: SCRUM-206
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+pr_number: 189
+  pr_head_sha: e541bc7d7e3de7739de95c10f899990a6ba26e38
+working_branch: g1-206-20260802-2328
+scope_hash: sha256:2f456c896fedbe8cdb4adbac2c12258057333f3b68c895e4e07da14fe32bf4b3
+scope_hash_16: 2f456c896fedbe8c
+approval_id: CP-20260802-206-G4-R1
+approved_files:
+  - .gwc/tasks/SCRUM-206/**
+  - tools/node_architect/lease_acquisition.py
+  - tests/test_lease_acquisition.py
+  - schemas/lease-acquisition-decision.schema.json
+  - core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json
+  - releases/changelog.d/2026-08-02-scrum-206-lease-acquisition-m5.md
+authorized_actions:
+  - merge_approved_pr
+excluded_actions:
+  - force_push
+  - delete_branch
+  - change_pr_base
+  - deploy_release_publish_or_runtime_reload
+  - production_configuration_data_secret_credential_or_migration
+  - scope_expansion_or_unrelated_cleanup
+issued_at: '2026-08-03T00:13:00Z'
+expires_at: '2026-08-03T16:50:00Z'
+approval_command: APPROVE G4_MERGE CP-20260802-206-G4-R1 2f456c896fedbe8c 2026-08-03T16:50:00Z
+status: G4_APPROVAL_PENDING
