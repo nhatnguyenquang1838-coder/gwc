@@ -3,6 +3,13 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Make the repo ``tools/`` namespace package importable under bare
+# ``python -m unittest discover -s tests`` (no PYTHONPATH set in CI).
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+
 import unittest
 from datetime import datetime, timedelta, timezone
 
