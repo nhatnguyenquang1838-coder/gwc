@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/intake-card.schema.json",
   "title": "Intake Card",
-  "description": "A deterministic, immutable and redacted intake_card projection from verified upstream artifacts. Read-only G0_CONTEXT gate; no authority is granted.",
+  "description": "A deterministic, immutable and redacted read-only intake projection from verified upstream artifacts.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -62,16 +62,40 @@
     },
     "request": {
       "type": "object",
-      "description": "Normalized request intent, outcome, constraints and exclusions."
+      "additionalProperties": false,
+      "required": [
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions"
+      ],
+      "properties": {
+        "intent": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "constraints": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "exclusions": {
+          "$ref": "#/$defs/uniqueStringArray"
+        }
+      }
     },
     "source_bindings": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "description": "Canonical source bindings and source mode.",
       "items": {
         "type": "object",
-        "required": ["source", "binding"],
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "binding",
+          "revision"
+        ],
         "properties": {
           "source": {
             "type": "string",
@@ -80,14 +104,33 @@
           "binding": {
             "type": "string",
             "minLength": 1
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mode": {
+            "enum": [
+              "REPO",
+              "PACKAGE",
+              "MIXED"
+            ]
+          },
+          "status": {
+            "enum": [
+              "VERIFIED",
+              "STALE",
+              "MISSING",
+              "AMBIGUOUS",
+              "CONFLICT"
+            ]
           }
-        },
-        "additionalProperties": false
+        }
       }
     },
     "repository_context": {
       "type": "object",
-      "description": "Repository identity, protected branch and exact protected-base SHA.",
+      "additionalProperties": false,
       "required": [
         "repository",
         "protected_branch",
@@ -96,7 +139,7 @@
       "properties": {
         "repository": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
         },
         "protected_branch": {
           "type": "string",
@@ -106,29 +149,163 @@
           "type": "string",
           "pattern": "^[0-9a-f]{40}$"
         }
-      },
-      "additionalProperties": false
+      }
     },
     "risk_projection": {
       "type": "object",
-      "description": "Risk outcome, risk level, flags, required gate, additional authority gates and digest."
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "risk_level",
+        "risk_flags",
+        "required_gate",
+        "additional_authority_gates",
+        "risk_profile_digest"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "READY",
+            "BLOCKED"
+          ]
+        },
+        "risk_level": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3",
+            null
+          ]
+        },
+        "risk_flags": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "required_gate": {
+          "enum": [
+            "G0_CONTEXT",
+            "G2_EXECUTION"
+          ]
+        },
+        "additional_authority_gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "G5_DEPLOY",
+              "G6_PRODUCTION_DATA"
+            ]
+          }
+        },
+        "risk_profile_digest": {
+          "$ref": "#/$defs/optionalHash"
+        }
+      }
     },
     "read_scope_projection": {
       "type": "object",
-      "description": "Read-scope outcome, failure classification, include/exclude/missing paths and scope_hash."
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "failure_classification",
+        "files_read",
+        "files_exclude",
+        "files_missing",
+        "read_scope_hash"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "READY",
+            "BLOCKED"
+          ]
+        },
+        "failure_classification": {
+          "enum": [
+            null,
+            "NONE",
+            "AGENT_PREPARATION_BLOCKED",
+            "REPOSITORY_EVIDENCE_MISSING",
+            "VALIDATION_FAILED"
+          ]
+        },
+        "files_read": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "files_exclude": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "files_missing": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "read_scope_hash": {
+          "$ref": "#/$defs/optionalHash"
+        }
+      }
     },
     "write_scope_projection": {
       "type": "object",
-      "description": "Write-scope outcome, candidate paths, exclusions, prohibited operations, branch-binding status and scope_hash."
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "candidate_paths",
+        "exclusions",
+        "prohibited_operations",
+        "branch_binding_status",
+        "required_authority_gates",
+        "write_scope_hash"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "READY",
+            "BLOCKED"
+          ]
+        },
+        "candidate_paths": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "exclusions": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "prohibited_operations": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "branch_binding_status": {
+          "enum": [
+            "BOUND",
+            "REQUIRED_AT_G2",
+            "UNBOUND"
+          ]
+        },
+        "required_authority_gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "G2_EXECUTION",
+              "G5_DEPLOY",
+              "G6_PRODUCTION_DATA"
+            ]
+          }
+        },
+        "write_scope_hash": {
+          "$ref": "#/$defs/optionalHash"
+        }
+      }
     },
     "upstream_artifacts": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "description": "Upstream artifact type/version/digest summary.",
       "items": {
         "type": "object",
-        "required": ["artifact_type", "schema_version"],
+        "additionalProperties": false,
+        "required": [
+          "artifact_type",
+          "schema_version",
+          "digest"
+        ],
         "properties": {
           "artifact_type": {
             "type": "string",
@@ -140,41 +317,56 @@
           },
           "digest": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^(?:sha256:)?[0-9a-f]{64}$"
           }
-        },
-        "additionalProperties": false
+        }
       }
     },
     "context_status": {
-      "enum": ["READY", "BLOCKED"]
+      "enum": [
+        "READY",
+        "BLOCKED"
+      ]
     },
     "outcome": {
-      "enum": ["READY", "BLOCKED"]
+      "enum": [
+        "READY",
+        "BLOCKED"
+      ]
     },
     "next_required_action": {
-      "enum": ["CONTINUE_CONTEXT_EVALUATION", "ESCALATE_CONTEXT_GAP"]
+      "enum": [
+        "CONTINUE_CONTEXT_EVALUATION",
+        "ESCALATE_CONTEXT_GAP"
+      ]
     },
     "scope_hash": {
       "type": "string",
-      "minLength": 1,
-      "description": "SHA-256 hex digest of the canonical scope payload."
+      "pattern": "^[0-9a-f]{64}$"
     },
     "snapshot_hash": {
       "type": "string",
-      "minLength": 1,
-      "description": "SHA-256 hex digest of the complete redacted card payload."
+      "pattern": "^[0-9a-f]{64}$"
     },
     "redaction_status": {
-      "enum": ["NONE", "APPLIED", "BLOCKED"]
+      "enum": [
+        "NONE",
+        "APPLIED",
+        "BLOCKED"
+      ]
     },
     "redactions": {
       "type": "array",
       "uniqueItems": true,
-      "description": "Redaction records; never contains original values.",
       "items": {
         "type": "object",
-        "required": ["pointer", "classification", "replacement", "reason_code"],
+        "additionalProperties": false,
+        "required": [
+          "pointer",
+          "classification",
+          "replacement",
+          "reason_code"
+        ],
         "properties": {
           "pointer": {
             "type": "string",
@@ -197,8 +389,7 @@
             "type": "string",
             "minLength": 1
           }
-        },
-        "additionalProperties": false
+        }
       }
     },
     "reason_code": {
@@ -240,6 +431,20 @@
     },
     "production_authority_granted": {
       "const": false
+    }
+  },
+  "$defs": {
+    "uniqueStringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "optionalHash": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{64})?$"
     }
   }
 }

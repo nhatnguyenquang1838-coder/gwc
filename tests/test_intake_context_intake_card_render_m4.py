@@ -1,32 +1,23 @@
-"""Regression tests for the deterministic intake-card renderer."""
+"""Focused regression tests for the SCRUM-182 intake-card renderer."""
 from __future__ import annotations
 
+import copy
 import importlib.util
 import json
 import unittest
 from pathlib import Path
 from typing import Any
 
-_TASK_ID = "SCRUM-182"
-_REPOSITORY = "nhatnguyenquang1838-coder/gwc"
-_BASE_SHA = "a" * 40
-_REQUEST_CONTRACT = {
-    "intent": "Implement feature X from repo instructions",
-    "outcome": "A working implementation in the gwc repo",
-    "constraints": ["No production deploy", "M4 maturity only"],
-    "exclusions": ["Credentials", "Migration scripts"],
-}
-_SOURCE_RESOLUTION = {"artifact_type": "source-resolution", "schema_version": "1.0", "source_mode": "REPO"}
-_REPO_IDENTITY = {"artifact_type": "repo-identity", "schema_version": "1.0", "repository": _REPOSITORY, "default_branch": "main"}
-_PROTECTED_BASE_SNAPSHOT = {"artifact_type": "protected-base-snapshot", "schema_version": "1.0", "protected_base_sha": _BASE_SHA}
-_RISK_PROFILE = {"artifact_type": "risk-profile", "schema_version": "1.0", "decision_digest": "digest-r1-test", "risk_level": "R2", "risk_flags": ["scope_ambiguous"], "required_gate": "G2_HUMAN_DIRECTION", "additional_authority_gates": []}
-_BOUNDED_READ_SCOPE = {"artifact_type": "bounded-read-scope", "schema_version": "1.0", "outcome": "ACCEPTED", "failure_classification": None, "files_read": ["projects/gwc/README.md"], "files_exclude": [], "files_missing": [], "scope_hash": "a" * 64}
-_BOUNDED_WRITE_SCOPE = {"artifact_type": "bounded-write-scope", "schema_version": "1.0", "outcome": "ACCEPTED", "candidate_paths": ["projects/gwc/README.md"], "exclusions": ["No production data"], "prohibited_operations": ["push", "deploy"], "branch_binding_status": "UNBOUND", "scope_hash": "b" * 64}
-_REDACTION_DIRECTIVES = [{"json_pointer": "/request/outcome", "classification": "POLICY_REDACTED", "reason_code": "REQUEST_OUTCOME_REDACTED", "replacement": "[REDACTED]"}]
+from jsonschema import Draft202012Validator
+
+ROOT = Path(__file__).resolve().parents[1]
+TASK = "SCRUM-182"
+REPO = "nhatnguyenquang1838-coder/gwc"
+BASE = "a" * 40
 
 
-def _import_module():
-    path = Path(__file__).resolve().parents[1] / "tools/node_architect/intake_card_render.py"
+def load_module():
+    path = ROOT / "tools/node_architect/intake_card_render.py"
     spec = importlib.util.spec_from_file_location("intake_card_render", path)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
@@ -34,90 +25,249 @@ def _import_module():
     return module
 
 
-def _kwargs(**overrides: Any) -> dict[str, Any]:
-    result: dict[str, Any] = {
-        "task_id": _TASK_ID, "repository": _REPOSITORY, "base_sha": _BASE_SHA,
-        "request_contract": dict(_REQUEST_CONTRACT), "source_resolution": dict(_SOURCE_RESOLUTION),
-        "repo_identity": dict(_REPO_IDENTITY), "protected_base_snapshot": dict(_PROTECTED_BASE_SNAPSHOT),
-        "risk_profile": dict(_RISK_PROFILE), "bounded_read_scope": dict(_BOUNDED_READ_SCOPE),
-        "bounded_write_scope": dict(_BOUNDED_WRITE_SCOPE), "redaction_directives": list(_REDACTION_DIRECTIVES),
-        "expected_snapshot_hash": None, "created_at": "2026-08-02T00:00:00Z",
+def fixtures(mod: Any) -> dict[str, Any]:
+    binding = [{"source_type": "repository", "ref": "main", "revision": BASE, "status": "VERIFIED"}]
+    request = {
+        "artifact_type": "request-contract", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "revision": "request/v1",
+        "intent": "Repair intake card", "outcome": "Validated card",
+        "constraints": ["M4 only", "No deploy"], "exclusions": ["Production"],
     }
-    result.update(overrides)
-    return result
+    source = {
+        "artifact_type": "source-resolution", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "revision": "source/v1",
+        "source_mode": "REPO", "source_bindings": binding,
+    }
+    repo = {
+        "artifact_type": "repo-identity", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "revision": "repo/v1",
+        "default_branch": "main", "protected_branch": "main",
+    }
+    protected = {
+        "artifact_type": "protected-base-snapshot", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "revision": "base/v1", "protected_base_sha": BASE,
+    }
+    risk = {
+        "artifact_type": "risk-profile", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "source_bindings": binding,
+        "outcome": "READY", "risk_level": "R2", "risk_flags": ["scope_ambiguous"],
+        "required_gate": "G2_EXECUTION", "additional_authority_gates": [],
+        "reason_code": "RISK_CLASSIFIED_R2", "reason_codes": ["RISK_CLASSIFIED_R2"],
+        "classified_at": "2026-08-02T00:00:00Z",
+    }
+    risk["decision_digest"] = mod.compute_risk_decision_digest(risk)
+    read_scope = {
+        "artifact_type": "bounded-read-scope", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "source_bindings": binding,
+        "outcome": "READY", "failure_classification": None,
+        "files_read": ["projects/gwc/README.md"], "files_exclude": [], "files_missing": [],
+        "observed_at": "2026-08-02T00:00:00Z",
+    }
+    read_scope["scope_hash"] = mod.compute_scope_digest(read_scope)
+    write_scope = {
+        "artifact_type": "bounded-write-scope", "schema_version": "1.0", "task_id": TASK,
+        "repository": REPO, "base_sha": BASE, "source_bindings": binding,
+        "outcome": "READY", "candidate_paths": ["schemas/intake-card.schema.json"],
+        "exclusions": ["Production"], "prohibited_operations": ["FORCE_PUSH"],
+        "branch_binding_status": "REQUIRED_AT_G2", "required_authority_gates": ["G2_EXECUTION"],
+        "evaluated_at": "2026-08-02T00:00:00Z",
+    }
+    write_scope["scope_hash"] = mod.compute_scope_digest(write_scope)
+    return {
+        "task_id": TASK, "repository": REPO, "base_sha": BASE,
+        "request_contract": request, "source_resolution": source, "repo_identity": repo,
+        "protected_base_snapshot": protected, "risk_profile": risk,
+        "bounded_read_scope": read_scope, "bounded_write_scope": write_scope,
+        "redaction_directives": [], "expected_snapshot_hash": None,
+        "created_at": "2026-08-02T00:00:00Z",
+    }
 
 
-class TestIntakeCardRenderM4(unittest.TestCase):
+class IntakeCardRendererTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.mod = load_module()
+        cls.schema = json.loads((ROOT / "schemas/intake-card.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(cls.schema)
+        cls.validator = Draft202012Validator(cls.schema)
+
     def setUp(self) -> None:
-        self.mod = _import_module()
-        self.render = self.mod.render_intake_card
+        self.kwargs = fixtures(self.mod)
 
-    def test_01_render_happy_path_card(self):
-        card = self.render(**_kwargs())
-        self.assertEqual(card["context_status"], "READY")
-        self.assertEqual(card["outcome"], "READY")
-        self.assertTrue(card["read_only_projection"])
-        for field in ("write_authority_granted", "commit_authority_granted", "push_authority_granted", "pr_authority_granted", "merge_authority_granted", "deployment_authority_granted", "production_authority_granted"):
-            self.assertFalse(card[field])
+    def render(self, **changes: Any) -> dict[str, Any]:
+        args = copy.deepcopy(self.kwargs)
+        args.update(changes)
+        return self.mod.render_intake_card(**args)
 
-    def test_02_happy_path_reason_codes(self): self.assertIn("CARD_RENDERED", self.render(**_kwargs())["reason_codes"])
-    def test_03_elevated_risk_card(self):
-        risk = {**_RISK_PROFILE, "risk_level": "R3", "required_gate": "G4_MERGE"}
-        self.assertEqual(self.render(**_kwargs(risk_profile=risk))["outcome"], "READY")
-    def test_04_upstream_blocked_yields_blocked_card(self):
-        card = self.render(**_kwargs(risk_profile={**_RISK_PROFILE, "outcome": "BLOCKED"}))
-        self.assertEqual(card["context_status"], "BLOCKED")
-        self.assertIn("CARD_UPSTREAM_BLOCKED", card["reason_codes"])
-    def test_05_task_repository_sha_mismatch(self): self.assertIn("CARD_INPUT_INVALID", self.render(**_kwargs(request_contract={**_REQUEST_CONTRACT, "task_id": "SCRUM-OTHER"}))["reason_codes"])
-    def test_06_base_sha_mismatch(self): self.assertIn("CARD_INPUT_INVALID", self.render(**_kwargs(protected_base_snapshot={**_PROTECTED_BASE_SNAPSHOT, "protected_base_sha": "b" * 40}))["reason_codes"])
-    def test_07_upstream_digest_mismatch(self): self.assertIn("CARD_UPSTREAM_DIGEST_MISMATCH", self.render(**_kwargs(risk_profile={**_RISK_PROFILE, "decision_digest": "WRONG", "_test_force_recomputed_digest": True}))["reason_codes"])
-    def test_08_scope_hash_mismatch(self): self.assertIn("CARD_SCOPE_HASH_MISMATCH", self.render(**_kwargs(bounded_read_scope={**_BOUNDED_READ_SCOPE, "scope_hash": "WRONG-HASH"}))["reason_codes"])
-    def test_09_explicit_directive_redaction(self):
-        card = self.render(**_kwargs())
-        self.assertEqual(card["redaction_status"], "APPLIED")
-        self.assertTrue(card["redactions"])
-    def test_10_auto_protected_key_redaction(self):
-        modified, _ = self.mod.apply_redactions({"password": "x", "api_token": "y"}, [])
-        self.assertNotIn("x", json.dumps(modified)); self.assertNotIn("y", json.dumps(modified))
-    def test_11_invalid_redaction_directive_blocks(self): self.assertIn("CARD_REDACTION_DIRECTIVE_INVALID", self.render(**_kwargs(redaction_directives=[{"json_pointer": "/missing", "classification": "SECRET"}]))["reason_codes"])
-    def test_12_protected_value_leakage_rejection(self):
-        modified, _ = self.mod.apply_redactions({"api_token": "raw-secret"}, [])
-        self.assertNotIn("raw-secret", json.dumps(modified))
-    def test_13_hash_order_independence(self):
-        a = {"intent": "X", "outcome": "Y", "constraints": ["C"], "exclusions": ["E"]}; b = {"exclusions": ["E"], "constraints": ["C"], "outcome": "Y", "intent": "X"}
-        self.assertEqual(self.render(**_kwargs(request_contract=a))["snapshot_hash"], self.render(**_kwargs(request_contract=b))["snapshot_hash"])
-    def test_14_hash_timestamp_independence(self): self.assertEqual(self.render(**_kwargs(created_at="2026-01-01T00:00:00Z"))["snapshot_hash"], self.render(**_kwargs(created_at="2026-12-31T00:00:00Z"))["snapshot_hash"])
-    def test_15_snapshot_drift_on_material_change(self): self.assertNotEqual(self.render(**_kwargs())["snapshot_hash"], self.render(**_kwargs(request_contract={**_REQUEST_CONTRACT, "intent": "DIFFERENT"}))["snapshot_hash"])
-    def test_16_expected_snapshot_hash_mismatch(self): self.assertIn("CARD_SNAPSHOT_HASH_MISMATCH", self.render(**_kwargs(expected_snapshot_hash="0" * 64))["reason_codes"])
-    def test_17_all_authority_fields_always_false(self):
-        card = self.render(**_kwargs()); self.assertFalse(any(card[key] for key in card if key.endswith("authority_granted")))
-    def test_18_reason_code_card_rendered_present(self): self.assertIn("CARD_RENDERED", self.render(**_kwargs())["reason_codes"])
-    def test_19_card_is_schema_valid_shape(self):
-        card = self.render(**_kwargs()); self.assertEqual(card["artifact_type"], "intake-card"); self.assertEqual(card["contract_revision"], "intake-context/v1")
-    def test_20_canonical_json_is_deterministic(self): self.assertEqual(self.mod.canonical_json({"b": 1, "a": 2}), '{"a":2,"b":1}')
-    def test_21_canonical_json_no_trailing_whitespace(self):
-        value = self.mod.canonical_json({"a": [1, 2]}); self.assertEqual(value, value.rstrip())
-    def test_22_digest_payload_is_sha256(self):
-        digest = self.mod.digest_payload({"key": "value"}); self.assertEqual(len(digest), 64); self.assertRegex(digest, r"^[0-9a-f]+$")
-    def test_23_apply_redactions_replaces_values(self):
-        modified, redactions = self.mod.apply_redactions({"a": {"b": "secret"}}, [{"json_pointer": "/a/b", "classification": "SECRET", "reason_code": "IS_SECRET"}])
-        self.assertEqual(modified["a"]["b"], "[REDACTED]"); self.assertEqual(len(redactions), 1)
-    def test_24_apply_redactions_protected_keys(self):
-        modified, _ = self.mod.apply_redactions({"password": "pass123", "api_token": "tok", "private_key": "pk"}, [])
-        serialized = json.dumps(modified); self.assertNotIn("pass123", serialized); self.assertEqual(modified["api_token"], "[REDACTED]"); self.assertEqual(modified["private_key"], "[REDACTED]")
-    def test_25_non_deterministic_detection(self): self.assertEqual(self.render(**_kwargs())["snapshot_hash"], self.render(**_kwargs())["snapshot_hash"])
-    def test_26_validate_upstream_bindings_ok(self):
-        result = self.mod.validate_upstream_bindings(task_id=_TASK_ID, repository=_REPOSITORY, base_sha=_BASE_SHA, request_contract={"task_id": _TASK_ID}, source_resolution={}, repo_identity={"repository": _REPOSITORY}, protected_base_snapshot={"protected_base_sha": _BASE_SHA}); self.assertFalse(result["has_errors"])
-    def test_27_validate_upstream_bindings_fails_on_mismatch(self):
-        result = self.mod.validate_upstream_bindings(task_id="WRONG", repository=_REPOSITORY, base_sha=_BASE_SHA, request_contract={"task_id": _TASK_ID}, source_resolution={}, repo_identity={"repository": _REPOSITORY}, protected_base_snapshot={"protected_base_sha": _BASE_SHA}); self.assertTrue(result["has_errors"])
-    def test_28_snapshot_excludes_created_at_from_hash(self): self.test_14_hash_timestamp_independence()
-    def test_29_blocked_card_retains_evidence(self):
-        card = self.render(**_kwargs(bounded_read_scope={**_BOUNDED_READ_SCOPE, "outcome": "BLOCKED"})); self.assertEqual(card["context_status"], "BLOCKED"); self.assertTrue(all(key in card for key in ("task_id", "repository", "base_sha")))
-    def test_30_created_at_can_be_none(self): self.assertIsNotNone(self.render(**_kwargs(created_at=None)))
-    def test_31_expected_snapshot_hash_is_optional(self): self.assertEqual(self.render(**_kwargs(expected_snapshot_hash=None))["context_status"], "READY")
-    def test_32_snapshot_mismatch_does_not_leak_original(self): self.assertEqual(self.render(**_kwargs(expected_snapshot_hash="deadbeef" * 8))["context_status"], "BLOCKED")
-    def test_33_upstream_contract_invalid(self): self.assertIn("CARD_UPSTREAM_CONTRACT_INVALID", self.render(**_kwargs(risk_profile={"artifact_type": "unsupported", "schema_version": "2.0"}))["reason_codes"])
-    def test_34_source_binding_mismatch(self): self.assertIn("CARD_SOURCE_BINDING_MISMATCH", self.render(**_kwargs(repo_identity={"repository": "other/repo"}))["reason_codes"])
+    def assert_schema(self, card: dict[str, Any]) -> None:
+        errors = sorted(self.validator.iter_errors(card), key=lambda error: list(error.path))
+        self.assertEqual([], [error.message for error in errors])
+
+    def test_ready_card_is_schema_valid(self):
+        card = self.render()
+        self.assertEqual(("READY", "CARD_RENDERED"), (card["outcome"], card["reason_code"]))
+        self.assert_schema(card)
+
+    def test_all_authority_fields_are_false(self):
+        card = self.render()
+        self.assertFalse(any(value for key, value in card.items() if key.endswith("authority_granted")))
+
+    def test_actual_source_ref_is_projected(self):
+        card = self.render()
+        row = next(item for item in card["source_bindings"] if item["source"] == "repository")
+        self.assertEqual(("main", BASE, "VERIFIED", "REPO"), (row["binding"], row["revision"], row["status"], row["mode"]))
+
+    def test_blocked_upstream_yields_blocked_card(self):
+        risk = copy.deepcopy(self.kwargs["risk_profile"])
+        risk["outcome"] = "BLOCKED"
+        risk["decision_digest"] = self.mod.compute_risk_decision_digest(risk)
+        card = self.render(risk_profile=risk)
+        self.assertEqual(("BLOCKED", "CARD_UPSTREAM_BLOCKED"), (card["outcome"], card["reason_code"]))
+        self.assert_schema(card)
+
+    def test_invalid_top_level_input_blocks(self):
+        self.assertEqual("CARD_INPUT_INVALID", self.render(repository="bad")["reason_code"])
+
+    def test_missing_required_identity_blocks(self):
+        request = copy.deepcopy(self.kwargs["request_contract"])
+        request.pop("task_id")
+        self.assertEqual("CARD_REQUIRED_FIELD_MISSING", self.render(request_contract=request)["reason_code"])
+
+    def test_unsupported_artifact_type_blocks(self):
+        source = copy.deepcopy(self.kwargs["source_resolution"])
+        source["artifact_type"] = "wrong"
+        self.assertEqual("CARD_UPSTREAM_CONTRACT_INVALID", self.render(source_resolution=source)["reason_code"])
+
+    def test_binding_mismatch_blocks(self):
+        repo = copy.deepcopy(self.kwargs["repo_identity"])
+        repo["base_sha"] = "b" * 40
+        self.assertEqual("CARD_SOURCE_BINDING_MISMATCH", self.render(repo_identity=repo)["reason_code"])
+
+    def test_invalid_risk_semantics_block(self):
+        risk = copy.deepcopy(self.kwargs["risk_profile"])
+        risk["risk_level"] = "R9"
+        risk["decision_digest"] = self.mod.compute_risk_decision_digest(risk)
+        self.assertEqual("CARD_UPSTREAM_CONTRACT_INVALID", self.render(risk_profile=risk)["reason_code"])
+
+    def test_invalid_outcome_semantics_block(self):
+        scope = copy.deepcopy(self.kwargs["bounded_read_scope"])
+        scope["outcome"] = "UNKNOWN"
+        scope["scope_hash"] = self.mod.compute_scope_digest(scope)
+        self.assertEqual("CARD_UPSTREAM_CONTRACT_INVALID", self.render(bounded_read_scope=scope)["reason_code"])
+
+    def test_invalid_source_status_blocks(self):
+        source = copy.deepcopy(self.kwargs["source_resolution"])
+        source["source_bindings"][0]["status"] = "UNKNOWN"
+        self.assertEqual("CARD_UPSTREAM_CONTRACT_INVALID", self.render(source_resolution=source)["reason_code"])
+
+    def test_invalid_branch_status_blocks(self):
+        scope = copy.deepcopy(self.kwargs["bounded_write_scope"])
+        scope["branch_binding_status"] = "UNKNOWN"
+        scope["scope_hash"] = self.mod.compute_scope_digest(scope)
+        self.assertEqual("CARD_UPSTREAM_CONTRACT_INVALID", self.render(bounded_write_scope=scope)["reason_code"])
+
+    def test_risk_digest_mismatch_blocks(self):
+        risk = copy.deepcopy(self.kwargs["risk_profile"])
+        risk["decision_digest"] = "sha256:" + "0" * 64
+        self.assertEqual("CARD_UPSTREAM_DIGEST_MISMATCH", self.render(risk_profile=risk)["reason_code"])
+
+    def test_scope_hash_mismatch_blocks(self):
+        scope = copy.deepcopy(self.kwargs["bounded_read_scope"])
+        scope["scope_hash"] = "sha256:" + "0" * 64
+        card = self.render(bounded_read_scope=scope)
+        self.assertIn("CARD_SCOPE_HASH_MISMATCH", card["reason_codes"])
+
+    def test_explicit_redaction_is_recorded(self):
+        directive = {"json_pointer": "/request/outcome", "classification": "POLICY_REDACTED", "reason_code": "POLICY", "replacement": "[REDACTED]"}
+        card = self.render(redaction_directives=[directive])
+        self.assertEqual("[REDACTED]", card["request"]["outcome"])
+        self.assertEqual("APPLIED", card["redaction_status"])
+        self.assertNotIn("Validated card", json.dumps(card))
+
+    def test_redacted_raw_value_does_not_change_hidden_hashes(self):
+        directive = {"json_pointer": "/request/outcome", "classification": "POLICY_REDACTED", "reason_code": "POLICY", "replacement": "[REDACTED]"}
+        first = copy.deepcopy(self.kwargs["request_contract"])
+        second = copy.deepcopy(self.kwargs["request_contract"])
+        first["outcome"] = "SECRET-A"
+        second["outcome"] = "SECRET-B"
+        a = self.render(request_contract=first, redaction_directives=[directive])
+        b = self.render(request_contract=second, redaction_directives=[directive])
+        self.assertEqual(a["request"], b["request"])
+        self.assertEqual(a["upstream_artifacts"], b["upstream_artifacts"])
+        self.assertEqual(a["snapshot_hash"], b["snapshot_hash"])
+
+    def test_hidden_protected_key_blocks_before_hashing(self):
+        request = copy.deepcopy(self.kwargs["request_contract"])
+        request["client_secret"] = "RAW-SECRET"
+        card = self.render(request_contract=request)
+        self.assertEqual("CARD_REDACTION_REQUIRED", card["reason_code"])
+        self.assertNotIn("RAW-SECRET", json.dumps(card))
+
+    def test_unsafe_projection_redaction_blocks(self):
+        directive = {"json_pointer": "/risk_projection/risk_flags/0", "classification": "POLICY_REDACTED", "reason_code": "POLICY", "replacement": "[REDACTED]"}
+        card = self.render(redaction_directives=[directive])
+        self.assertEqual("CARD_REDACTION_REQUIRED", card["reason_code"])
+
+    def test_optional_upstream_blocked_outcome_is_honored(self):
+        source = copy.deepcopy(self.kwargs["source_resolution"])
+        source["outcome"] = "BLOCKED"
+        card = self.render(source_resolution=source)
+        self.assertEqual(("BLOCKED", "CARD_UPSTREAM_BLOCKED"), (card["outcome"], card["reason_code"]))
+
+    def test_invalid_redaction_directive_blocks(self):
+        directive = {"json_pointer": "/missing", "classification": "SECRET", "reason_code": "X", "replacement": "[REDACTED]"}
+        self.assertEqual("CARD_REDACTION_DIRECTIVE_INVALID", self.render(redaction_directives=[directive])["reason_code"])
+
+    def test_automatic_protected_key_redaction(self):
+        request = copy.deepcopy(self.kwargs["request_contract"])
+        request["intent"] = {"client_secret": {"raw": "leak"}}
+        card = self.render(request_contract=request)
+        self.assertEqual("CARD_UPSTREAM_CONTRACT_INVALID", card["reason_code"])
+
+    def test_hashes_ignore_created_at(self):
+        first = self.render(created_at="2026-08-02T00:00:00Z")
+        second = self.render(created_at="2099-01-01T00:00:00Z")
+        self.assertEqual((first["scope_hash"], first["snapshot_hash"]), (second["scope_hash"], second["snapshot_hash"]))
+
+    def test_hashes_ignore_semantic_array_order(self):
+        request = copy.deepcopy(self.kwargs["request_contract"])
+        request["constraints"].reverse()
+        card = self.render(request_contract=request)
+        original = self.render()
+        self.assertEqual((original["scope_hash"], original["snapshot_hash"]), (card["scope_hash"], card["snapshot_hash"]))
+
+    def test_material_request_drift_changes_snapshot(self):
+        request = copy.deepcopy(self.kwargs["request_contract"])
+        request["intent"] = "Different intent"
+        self.assertNotEqual(self.render()["snapshot_hash"], self.render(request_contract=request)["snapshot_hash"])
+
+    def test_source_revision_drift_changes_hashes(self):
+        source = copy.deepcopy(self.kwargs["source_resolution"])
+        source["revision"] = "source/v2"
+        source["source_bindings"][0]["revision"] = "b" * 40
+        risk = copy.deepcopy(self.kwargs["risk_profile"])
+        read_scope = copy.deepcopy(self.kwargs["bounded_read_scope"])
+        write_scope = copy.deepcopy(self.kwargs["bounded_write_scope"])
+        for artifact in (risk, read_scope, write_scope):
+            artifact["source_bindings"] = copy.deepcopy(source["source_bindings"])
+        risk["decision_digest"] = self.mod.compute_risk_decision_digest(risk)
+        read_scope["scope_hash"] = self.mod.compute_scope_digest(read_scope)
+        write_scope["scope_hash"] = self.mod.compute_scope_digest(write_scope)
+        changed = self.render(source_resolution=source, risk_profile=risk, bounded_read_scope=read_scope, bounded_write_scope=write_scope)
+        original = self.render()
+        self.assertNotEqual((original["scope_hash"], original["snapshot_hash"]), (changed["scope_hash"], changed["snapshot_hash"]))
+
+    def test_expected_snapshot_mismatch_blocks(self):
+        card = self.render(expected_snapshot_hash="0" * 64)
+        self.assertEqual("CARD_SNAPSHOT_HASH_MISMATCH", card["reason_code"])
+
+    def test_validate_upstream_bindings_reports_error(self):
+        args = copy.deepcopy(self.kwargs)
+        args["bounded_write_scope"]["base_sha"] = "b" * 40
+        result = self.mod.validate_upstream_bindings(**{key: args[key] for key in (
+            "task_id", "repository", "base_sha", "request_contract", "source_resolution", "repo_identity",
+            "protected_base_snapshot", "risk_profile", "bounded_read_scope", "bounded_write_scope")})
+        self.assertTrue(result["has_errors"])
 
 
 if __name__ == "__main__":

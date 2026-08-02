@@ -179,7 +179,6 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        # Add typed intake contract fields to request-intake
         nodes[0].update({
             "intent": "User-specified task scope.",
             "outcome": "Normalized typed intake record.",
@@ -207,7 +206,7 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        nodes[0]["intent"] = 123  # Should be string
+        nodes[0]["intent"] = 123
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
@@ -227,7 +226,7 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        nodes[0]["constraints"] = "not a list"  # Should be list
+        nodes[0]["constraints"] = "not a list"
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
@@ -247,7 +246,6 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        # Nested dict in reason_codes values should be rejected
         nodes[0]["reason_codes"] = {"key": "value", "nested": {"obj": "value"}}
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
@@ -528,7 +526,6 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        # Add typed source-resolution fields to source-resolution node
         nodes[1].update({
             "intent": "Determine the authoritative source of active instructions.",
             "outcome": "Typed source-resolution record with mode, authority, provenance, and reason codes.",
@@ -572,7 +569,7 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        nodes[1]["reason_codes"] = {"key": {"nested": "object"}}  # Nested object should be rejected
+        nodes[1]["reason_codes"] = {"key": {"nested": "object"}}
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
@@ -592,7 +589,7 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        nodes[1]["constraints"] = "not a list"  # Should be list
+        nodes[1]["constraints"] = "not a list"
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
@@ -612,7 +609,7 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        nodes[1]["entry_guards"] = "not a list"  # Should be list
+        nodes[1]["entry_guards"] = "not a list"
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
@@ -632,7 +629,7 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
             "context-gap-escalation",
         ]
         nodes = [valid_node(slug) for slug in slugs]
-        nodes[1]["exclusions"] = "not a list"  # Should be list
+        nodes[1]["exclusions"] = "not a list"
         with tempfile.TemporaryDirectory() as tmp:
             family_dir = self.write_family(Path(tmp), nodes)
             errors = self.validator.validate_family(family_dir)
@@ -746,3 +743,62 @@ class IntakeContextNodeCatalogTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class IntakeContextRuntimeContractLinkageTests(unittest.TestCase):
+    def setUp(self):
+        self.validator = load_validator()
+        self.repo_root = Path(__file__).resolve().parents[1]
+
+    def _copy_runtime_contract(self, root: Path) -> None:
+        schema_target = root / "schemas/intake-card.schema.json"
+        evaluator_target = root / "tools/node_architect/intake_card_render.py"
+        schema_target.parent.mkdir(parents=True, exist_ok=True)
+        evaluator_target.parent.mkdir(parents=True, exist_ok=True)
+        schema_target.write_text(
+            (self.repo_root / "schemas/intake-card.schema.json").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        evaluator_target.write_text(
+            (self.repo_root / "tools/node_architect/intake_card_render.py").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+
+    def test_current_intake_card_runtime_contract_linkage_passes(self):
+        self.assertEqual([], self.validator.validate_runtime_contracts(self.repo_root))
+
+    def test_missing_runtime_schema_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._copy_runtime_contract(root)
+            (root / "schemas/intake-card.schema.json").unlink()
+            errors = self.validator.validate_runtime_contracts(root)
+            self.assertTrue(any("runtime schema missing" in error for error in errors))
+
+    def test_wrong_schema_artifact_type_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._copy_runtime_contract(root)
+            schema_path = root / "schemas/intake-card.schema.json"
+            schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            schema["properties"]["artifact_type"]["const"] = "wrong-artifact"
+            schema_path.write_text(json.dumps(schema), encoding="utf-8")
+            errors = self.validator.validate_runtime_contracts(root)
+            self.assertTrue(any("artifact_type" in error for error in errors))
+
+    def test_missing_runtime_evaluator_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._copy_runtime_contract(root)
+            (root / "tools/node_architect/intake_card_render.py").unlink()
+            errors = self.validator.validate_runtime_contracts(root)
+            self.assertTrue(any("runtime evaluator missing" in error for error in errors))
+
+    def test_missing_runtime_entrypoint_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._copy_runtime_contract(root)
+            evaluator_path = root / "tools/node_architect/intake_card_render.py"
+            evaluator_path.write_text("VALUE = 1\n", encoding="utf-8")
+            errors = self.validator.validate_runtime_contracts(root)
+            self.assertTrue(any("missing callable render_intake_card" in error for error in errors))
