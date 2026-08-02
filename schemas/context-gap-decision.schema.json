@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/context-gap-decision.schema.json",
+  "title": "GWC Context Gap Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "current_base_sha",
+    "intake_card_snapshot_hash",
+    "outcome",
+    "preparation_block",
+    "remediation_readset",
+    "reason_code",
+    "reason_codes",
+    "observed_at",
+    "read_only_projection",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "context-gap-decision"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "current_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "intake_card_snapshot_hash": {"type": "string"},
+    "outcome": {"enum": ["READY", "BLOCKED"]},
+    "preparation_block": {"$ref": "#/$defs/preparation_block"},
+    "remediation_readset": {"$ref": "#/$defs/remediation_readset"},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reason_code"},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "observed_at": {"type": "string"},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "reason_code": {
+      "enum": [
+        "CONTEXT_READY",
+        "CONTEXT_INPUT_INVALID",
+        "CONTEXT_CARD_INVALID",
+        "CONTEXT_REQUIRED_FIELD_MISSING",
+        "CONTEXT_SOURCE_UNRESOLVED",
+        "CONTEXT_SOURCE_CONFLICT",
+        "CONTEXT_REPO_IDENTITY_UNCONFIRMED",
+        "CONTEXT_BASE_STALE",
+        "CONTEXT_EVIDENCE_MISSING",
+        "CONTEXT_AGENT_PREPARATION_BLOCKED",
+        "CONTEXT_REPOSITORY_EVIDENCE_MISSING",
+        "CONTEXT_CI_UNAVAILABLE",
+        "CONTEXT_VALIDATION_FAILED",
+        "CONTEXT_SCOPE_DRIFT",
+        "CONTEXT_HUMAN_INPUT_REQUIRED",
+        "CONTEXT_REMEDIATION_TARGET_UNKNOWN"
+      ]
+    },
+    "classification": {
+      "enum": [
+        "NONE",
+        "AGENT_PREPARATION_BLOCKED",
+        "REPOSITORY_EVIDENCE_MISSING",
+        "CI_UNAVAILABLE_AT_CHECK",
+        "VALIDATION_FAILED",
+        "HUMAN_INPUT_REQUIRED"
+      ]
+    },
+    "route": {
+      "enum": [
+        "READY_FOR_FAMILY_VERIFICATION",
+        "RETRY_SOURCE_READBACK",
+        "RECAPTURE_PROTECTED_BASE",
+        "READ_REQUIRED_EVIDENCE",
+        "REQUEST_HUMAN_INPUT",
+        "RETRY_CI_OBSERVABILITY",
+        "FIX_VALIDATION_FAILURE",
+        "BLOCK_G1_REVIEW"
+      ]
+    },
+    "owner": {
+      "enum": ["AGENT", "HUMAN_REQUESTER", "REPOSITORY_OWNER", "CI_PROVIDER", "VALIDATION_OWNER", "NONE"]
+    },
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    },
+    "preparation_block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "blocked",
+        "classification",
+        "blocker_type",
+        "severity",
+        "missing_evidence",
+        "source_bindings",
+        "owner",
+        "route",
+        "next_action",
+        "stop_condition",
+        "reason_code",
+        "reason_codes"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "blocked": {"type": "boolean"},
+        "classification": {"$ref": "#/$defs/classification"},
+        "blocker_type": {"$ref": "#/$defs/classification"},
+        "severity": {"enum": ["INFO", "WARNING", "BLOCKER"]},
+        "missing_evidence": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
+        },
+        "source_bindings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/source_binding"}
+        },
+        "owner": {"$ref": "#/$defs/owner"},
+        "route": {"$ref": "#/$defs/route"},
+        "next_action": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1},
+        "reason_code": {"$ref": "#/$defs/reason_code"},
+        "reason_codes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/reason_code"},
+          "uniqueItems": true,
+          "minItems": 1
+        }
+      }
+    },
+    "remediation_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_key",
+        "source_type",
+        "target",
+        "connector_route",
+        "fallback_route",
+        "reason_code",
+        "stop_condition"
+      ],
+      "properties": {
+        "evidence_key": {"type": "string", "minLength": 1},
+        "source_type": {
+          "enum": [
+            "REPOSITORY_FILE",
+            "PROTECTED_BASE_REF",
+            "SOURCE_BINDING",
+            "UPSTREAM_ARTIFACT",
+            "CI_RUN_LOOKUP"
+          ]
+        },
+        "target": {"type": "string", "minLength": 1},
+        "ref": {"type": "string"},
+        "revision": {"type": "string"},
+        "connector_route": {"type": "string", "minLength": 1},
+        "fallback_route": {"type": "string", "minLength": 1},
+        "reason_code": {"$ref": "#/$defs/reason_code"},
+        "stop_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "remediation_readset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "required_reads",
+        "connector_route",
+        "fallback_route",
+        "stop_condition",
+        "readset_hash"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "required_reads": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/remediation_entry"}
+        },
+        "connector_route": {"type": "string", "minLength": 1},
+        "fallback_route": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1},
+        "readset_hash": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
