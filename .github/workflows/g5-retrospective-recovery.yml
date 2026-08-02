@@ -109,4 +109,24 @@ jobs:
             | G6 authorized | \`${proof.g6_authorized}\` |
 
             This is a retrospective evidence-recovery receipt only. It does not backdate G4 authority and does not authorize deployment, release, production data/config changes, migration, or G6.`;
-            await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            try {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              core.notice(`Published retrospective G5 recovery receipt for PR #${issue_number}.`);
+            } catch (error) {
+              const status = error?.status || error?.response?.status || 'unknown';
+              const message = error?.message || String(error);
+              core.warning(`Retrospective G5 recovery evidence is valid and artifact upload already completed, but PR receipt publication failed with status ${status}: ${message}`);
+              await core.summary
+                .addHeading('G5 retrospective recovery trace publish skipped')
+                .addRaw('Canonical machine evidence remains the uploaded `g5-retrospective-recovery-pr-*` artifact.\n\n')
+                .addTable([
+                  [{data: 'Field', header: true}, {data: 'Value', header: true}],
+                  ['PR', `#${proof.pr_number}`],
+                  ['Merge commit', `\`${proof.merge_commit_sha}\``],
+                  ['Source comment', `\`${proof.source_comment_id}\``],
+                  ['Publish status', `\`${status}\``],
+                  ['Manual G5 action authorized', `\`${proof.manual_g5_action_authorized}\``],
+                  ['G6 authorized', `\`${proof.g6_authorized}\``],
+                ])
+                .write();
+            }
