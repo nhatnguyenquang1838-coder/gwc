@@ -240,7 +240,15 @@ Observe and report:
 - task state;
 - repository owner/name and branch on the task;
 - whether a valid claim or legal next transition is required;
+- whether an AI agent has already claimed the task via the `AI Agent` custom
+  field, and which agent (ChatGPT, Kilo, OpenClaw, Hermes, Codex);
 - mismatch between the task and current repository/branch.
+
+For multi-agent ownership, an `AI Agent` value set by another agent is a
+double-claim conflict: report it and do not claim the task unless the human
+explicitly forces an override. When claiming, set `AI Agent` to the acting agent
+and `Claimed At` to the current UTC timestamp; keep `Assignee` as Nhat Nguyen
+Quang. See `projects/gwc/AGENTS.md` (AI agent task claim).
 
 Important current contract limitation:
 
