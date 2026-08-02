@@ -1,0 +1,166 @@
+schema_version: '1.0'
+artifact_type: g01-runtime-input
+generated_at: '2026-08-02T16:35:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  protected_branches: [main]
+  connector: local_git
+  write_enabled: true
+  verified: true
+runtime:
+  agent_runtime_id: chatgpt-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+    status: active
+    source_sha: 050091551d2d70709d455723aee6b9d4ec07fe7f70c6406c4eceab1d356ca134
+    supported_execution_modes: [chat_connector_only, local_agent, repo_ci]
+  connector_priority: [local_git]
+  selected_connector: local_git
+  connector_fallback_evidence:
+    - connector: local_git
+      role: primary
+      status: AVAILABLE
+      evidence: Fresh isolated worktree at origin/main@d4e507a is available; direct GitHub DNS verification is unavailable.
+  required_behavior_contracts:
+    - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: 10dd851a670bf54a952cb736d64d2b3d06e134baec46cc50e7fc9f8e670dd215
+    - path: core/Agent_Response_Presentation_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: e95c7529c4bbee6bfbe18028eb780832803759d29e63a5e11fa2ab39de024f2a
+task:
+  id: SCRUM-204
+  claimed: true
+request:
+  requester: user
+  problem:
+    statement: Refresh SCRUM-204 G2/G3 evidence after protected main advanced beyond the PR base, without reusing stale authority or bypassing Node Architect runtime requirements.
+    why_now: PR #186 is based on 65c93c5 while the latest available protected-main readback is d4e507a after SCRUM-264; the prior G4 approval is therefore stale.
+  desired_outcome: Produce current-base G0/G1 evidence and a bounded G2 proposal for non-force branch/base reconciliation followed by exact-head G3 revalidation, with no action before exact G2 approval.
+  affected: [SCRUM-204, 'PR #186', Node Architect runtime, GWC task evidence]
+  in_scope:
+    - Re-read current protected-main contracts and task projection state.
+    - Bind refreshed evidence to main@d4e507aec14db4f62fd4f21f8f84436df08e6216.
+    - Reconcile the existing PR branch to the current base only by an explicitly approved non-force operation.
+    - Revalidate exact-head G3 evidence and CI after the refreshed branch is delivered.
+    - Preserve MODE_DOES_NOT_BYPASS_NODE_RUNTIME and all authority=false boundaries.
+  non_goals:
+    - Any implementation change before exact refreshed G2 approval.
+    - Merge, auto-merge, deploy, release, production/config/data, credentials, secrets, migration, package export, force-push, branch deletion, or history rewrite.
+    - Treat Jira, PR metadata, route decisions, node instructions, or CI as gate authority.
+  constraints:
+    - Latest available protected base is main@d4e507aec14db4f62fd4f21f8f84436df08e6216.
+    - Existing PR #186 head is 81d5c9a2b0be6239b5230630fa8974cf0615d848 and its current base is stale.
+    - Fresh isolated worktree is required before materializing refreshed artifacts.
+    - Exact G2 approval must bind the refresh operation, repository, base SHA, branch, scope, files, exclusions, and expiry.
+    - Direct remote main verification is unavailable due DNS; d4e507a is local origin/main evidence only.
+  assumptions:
+    - Jira SCRUM-263 remains projection-only and is already Done.
+    - The existing implementation branch is retained; no branch deletion or force-push is permitted.
+    - Local validators and Git worktree are available.
+  risks:
+    - id: RISK-1
+      description: A stale PR base could cause G4 approval to bind the wrong repository state.
+      impact: high
+      mitigation: Stop on base drift and require a refreshed exact G2 approval.
+    - id: RISK-2
+      description: Base reconciliation could accidentally alter implementation scope.
+      impact: high
+      mitigation: Require non-force operation, exact diff readback, and changed-path allowlist.
+    - id: RISK-3
+      description: Offline remote verification could be mistaken for authoritative current-main proof.
+      impact: medium
+      mitigation: Mark remote verification SKIPPED_OFFLINE and do not claim remote freshness beyond local origin/main.
+  acceptance_criteria:
+    - id: AC-1
+      statement: Refreshed G0/G1 artifacts bind SCRUM-204 to the latest available main SHA d4e507a.
+      verifiable: true
+    - id: AC-2
+      statement: Refreshed G2 scope explicitly authorizes only non-force base reconciliation and bounded G3 revalidation after exact approval.
+      verifiable: true
+    - id: AC-3
+      statement: No G4 merge authority is implied by the refresh, and MODE_DOES_NOT_BYPASS_NODE_RUNTIME remains explicit.
+      verifiable: true
+    - id: AC-4
+      statement: Refreshed G3 evidence will require exact PR head, current CI, review closure, and Draft/Ready state readback.
+      verifiable: true
+  unresolved_questions: []
+policies:
+  - id: GWC_CORE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - id: GWC_RUNTIME
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    ref: main
+    source_sha: 44ca483b4e5f1ff8f6562ce9a7d6021a45ab3f01149c1619f66dda9172f38b84
+  - id: GWC_GATES
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 4ac80717e4fbec6d367a6605a03b9e1a431f624092085526c25cda683e9d9923
+  - id: GWC_NODE_BINDING
+    path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 5deb497224dacbcd3389337464b4997c89abcb3de4bdde9c08a4bccfc550c7ff
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: a9ca4939b26d50b18ef9ce346f000a65de391c00e294309e16d4362d9d2111b9
+  - path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 44ca483b4e5f1ff8f6562ce9a7d6021a45ab3f01149c1619f66dda9172f38b84
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 4ac80717e4fbec6d367a6605a03b9e1a431f624092085526c25cda683e9d9923
+  - path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5deb497224dacbcd3389337464b4997c89abcb3de4bdde9c08a4bccfc550c7ff
+  - path: core/node-architect/gate-node-route-profile.json
+    required: true
+    status: AVAILABLE
+    source_sha: 45e0eec316ca813804e8237af694dfcb22a314fe471d5eb1b26b45eacea34c2c
+  - path: core/node-architect/node-registry.json
+    required: true
+    status: AVAILABLE
+    source_sha: e05990a5f514adb3d047a9290318800fad9006c99b2f4dc5e867d227aa70239e
+  - path: core/task-lifecycle/gate-transition-map.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 40f829f2cbedbf4e08761b01f20532d84c75dfd8402d65188810b17b6b7f746a
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: c3ff5cb159213b64334a9bbe210a63b0e086608f9fa6cf7c55c136c608551a34
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: c49c67408ce3ee9a51725f6597ddbf6a059c692738d06fbb178d5033a4c26a86
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 763c75daf188a800113628395fc28c6d1fa5d815a6b5cd5795fd72875f2e0e72
+  - path: agents/dwc/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 157b8707b583bfdbb66af04e68f725bd6c1f6c011ac9a006a5ed780c65fed121
+risk:
+  class: R2
+  human_direction_confirmed: true
