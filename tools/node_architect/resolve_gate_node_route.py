@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
-import importlib.util
 import json
 from pathlib import Path
-import sys
 from typing import Any, Mapping
 
 MATURITY = {"experimental": 0, "pilot": 1, "stable": 2}
@@ -51,33 +50,25 @@ def _node_map(registry: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
 
 
 def _implementation_available(root: Path, implementation: Mapping[str, Any], context: Mapping[str, Any]) -> bool:
+    """Check implementation presence without importing or executing implementation code."""
     kind = implementation.get("kind")
     ref = str(implementation.get("ref", ""))
     if kind == "connector":
         return ref in set(context.get("available_connectors", []))
     if kind not in {"python", "resolver"} or not ref:
         return False
-    path_text, _, callable_name = ref.partition(":")
+    path_text, separator, callable_name = ref.partition(":")
     path = root / path_text
-    if not path.is_file() or not callable_name:
+    if not separator or not path.is_file() or not callable_name.isidentifier():
         return False
-    module_name = "_gwc_route_impl_check_" + hashlib.sha256(str(path.resolve()).encode("utf-8")).hexdigest()[:12]
-    previous_module = sys.modules.get(module_name)
     try:
-        spec = importlib.util.spec_from_file_location(module_name, path)
-        if spec is None or spec.loader is None:
-            return False
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[module_name] = module
-        spec.loader.exec_module(module)
-        return callable(getattr(module, callable_name, None))
-    except Exception:
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    except (OSError, UnicodeError, SyntaxError):
         return False
-    finally:
-        if previous_module is None:
-            sys.modules.pop(module_name, None)
-        else:
-            sys.modules[module_name] = previous_module
+    return any(
+        isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == callable_name
+        for node in tree.body
+    )
 
 
 def _blocked(
@@ -153,11 +144,17 @@ def resolve_gate_node_route(
     route_id = str(route.get("route_id", ""))
     node_id = str(route.get("current_node", ""))
     required_context = list(route.get("required_context", []))
-    loaded_context = sorted(key for key in required_context if context.get("context", {}).get(key))
+    context_payload = context.get("context", {})
+    if not isinstance(context_payload, Mapping):
+        context_payload = {}
+    loaded_context = sorted(
+        key for key in required_context
+        if key in context_payload and context_payload[key] is not None
+    )
     if len(loaded_context) != len(required_context):
         return _blocked(task_id=task_id, gate=gate, requested_action=action, profile_id=profile_id, profile_revision=profile_revision, graph_revision=graph_revision, route_id=route_id, current_node=node_id, implementation=route.get("implementation"), required_context=required_context, loaded_context=loaded_context, reasons=["NODE_CONTEXT_NOT_LOADED"])
 
-    envelope = context.get("context", {}).get("g2_envelope", {})
+    envelope = context_payload.get("g2_envelope", {})
     if not isinstance(envelope, Mapping) or any([
         str(envelope.get("task_id", "")) != task_id,
         str(envelope.get("authority_gate", "")) != gate,
