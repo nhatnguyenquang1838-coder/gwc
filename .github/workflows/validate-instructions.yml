@@ -23,8 +23,9 @@ jobs:
       - name: Verify drift-sensitive checksum records
         run: |
           set -o pipefail
-          grep -E '  (AGENTS.md|skills/gwc-g0/SKILL.md)$' SHA256SUMS.txt > drift-sensitive-sums.txt
-          sha256sum -c drift-sensitive-sums.txt | tee drift-sensitive-checksums.log
+          sha256sum AGENTS.md skills/gwc-g0/SKILL.md | tee drift-sensitive-actual.txt
+          grep -E '  (AGENTS.md|skills/gwc-g0/SKILL.md)$' SHA256SUMS.txt | tee drift-sensitive-recorded.txt
+          sha256sum -c drift-sensitive-recorded.txt | tee drift-sensitive-checksums.log
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -77,6 +78,8 @@ jobs:
         with:
           name: validation-evidence-${{ github.run_id }}
           path: |
+            drift-sensitive-actual.txt
+            drift-sensitive-recorded.txt
             drift-sensitive-checksums.log
             line-ending-validation.log
             validate-instructions.log
