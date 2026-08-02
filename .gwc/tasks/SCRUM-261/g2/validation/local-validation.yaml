@@ -1,0 +1,22 @@
+schema_version: "1.0"
+artifact_type: g2-local-validation
+task_id: SCRUM-261
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+working_branch: hotfix/scrum-261-gate-node-binding-20260802
+scope_hash: sha256:bb6e3c7a1304ab0890b1beb03aeec2188e09cad571a7d156cb794f36d410594f
+results:
+  intake_card_tests: "PASS 34/34"
+  gate_node_route_tests: "PASS 15/15"
+  combined_focused_tests: "PASS 49/49"
+  intake_card_schema_ready: PASS
+  intake_card_schema_blocked: PASS
+  route_profile_schema: PASS
+  route_decision_schema: PASS
+  python_compileall: PASS
+  g0_g1_g2_validator: PASS
+limitations:
+  full_governance_suite: "Requires exact repository checkout or GitHub CI"
+  validate_instructions: "Requires exact repository checkout or GitHub CI"
+  runtime_registry_validator: "Requires exact repository checkout or GitHub CI"
+next_required_validation: exact-head GitHub CI after scoped commit
