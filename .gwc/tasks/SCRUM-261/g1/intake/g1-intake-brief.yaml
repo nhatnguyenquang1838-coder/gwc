@@ -1,0 +1,135 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-02T06:12:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-261
+  base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: 'Agents enter G2 without deterministic Node Architect routing, while
+    the current protected base is also invalid because merged PR #173 introduced failing
+    intake-card implementation/tests.'
+  why_now: The merged-but-red protected base blocks safe execution of the P0 SCRUM-256
+    gate-node hotfix; both the prerequisite validation defect and the original runtime
+    disconnect must be repaired in one bounded hotfix.
+desired_outcome: 'Restore protected-base validation for the PR #173 intake-card slice,
+  then implement the additive gate-node resolver and mandatory context rehydration
+  slice on the same guarded branch.'
+stakeholders:
+  requester: Nhat
+  affected:
+  - GWC ChatGPT-style agents
+  - Node Architect runtime
+  - Intake-card rendering validation
+  - DW SuperApps governed projects
+scope:
+  in_scope:
+  - Bounded repair of tools/node_architect/intake_card_render.py
+  - Bounded repair of tests/test_intake_context_intake_card_render_m4.py
+  - Gate-node runtime binding contract
+  - Machine-readable route profile and decision schemas
+  - Deterministic route resolver
+  - G2 scoped-file-write route enforcement
+  - Node entry context rehydration
+  - Automatic next-node or exact human-gate decision
+  - Focused tests, full governance regression, and changelog
+  - ChatGPT agent instruction binding
+  - UTF-8 LF normalization and validation ordering
+  non_goals:
+  - Unrelated SCRUM-182 intake-context maturity work
+  - Full 81-node runtime engine
+  - F9 scale-control
+  - SCRUM-258 recovery
+  - Merge or auto-merge
+  - Deployment or release
+  - Production data or configuration
+  - Credentials or secrets
+  - Migration
+  - Package export
+  - Scheduler or database adapter
+constraints:
+- Preserve current G0-G6 authority boundaries
+- Use a pure provider-neutral resolver with no external side effects
+- Bind to exact main SHA 0b05dcce1865cdce58e5fff22ee8784428735df0
+- Use one guarded branch after refreshed exact G2 authority
+- Repair intake-card baseline before implementing route binding
+- Normalize generated text before hashes and validators
+assumptions:
+- SCRUM-256 remains the active lane
+- 'The PR #173 repair is a bounded prerequisite recovery exception, not a lane switch'
+- SCRUM-261 remains claimed by ChatGPT and In Progress
+- 'The user explicitly directed that the PR #173 repair be included in this hotfix'
+risks:
+- id: RISK-1
+  description: Central routing changes affect governed agent behavior.
+  impact: high
+  mitigation: Closed fail-closed resolver, focused tests, no external side effects.
+- id: RISK-2
+  description: Combined repair crosses intake-card and runtime-binding surfaces.
+  impact: high
+  mitigation: Sequence baseline repair first, constrain writes to two drift-owned
+    files plus original approved paths, run full governance tests.
+- id: RISK-3
+  description: Protected-base drift or non-green main can invalidate execution.
+  impact: high
+  mitigation: Bind refreshed scope to 0b05dcce..., run local/full validation and exact-head
+    CI before G3.
+acceptance_criteria:
+- id: AC-1
+  statement: 'PR #173 intake-card failures and errors are repaired without weakening intended behavior.'
+  verifiable: true
+- id: AC-2
+  statement: Full governance unit tests pass on the combined branch.
+  verifiable: true
+- id: AC-3
+  statement: A G2 repository-write request deterministically resolves through the approved repo-delivery route.
+  verifiable: true
+- id: AC-4
+  statement: Missing G0, G1, or G2 context returns NODE_CONTEXT_NOT_LOADED and grants no write authority.
+  verifiable: true
+- id: AC-5
+  statement: Unknown, missing, catalog-only, maturity-ineligible, implementation-unavailable, or ambiguous routes fail closed.
+  verifiable: true
+- id: AC-6
+  statement: Route profile and resolver output validate against Draft 2020-12 schemas.
+  verifiable: true
+- id: AC-7
+  statement: Tests cover intake-card regression, G2 entry, scoped write, diff readback, next-gate continuation, missing context, and ambiguity.
+  verifiable: true
+- id: AC-8
+  statement: ChatGPT agent instructions require resolver and context rehydration before writes and transitions.
+  verifiable: true
+- id: AC-9
+  statement: Modified and new tracked text passes UTF-8 LF validation before hashes and later validators.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY
