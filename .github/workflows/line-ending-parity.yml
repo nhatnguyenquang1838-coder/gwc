@@ -66,13 +66,24 @@ jobs:
           )
           PY
 
-      - name: Upload parity evidence
+      - name: Upload parity and exact-source evidence
         uses: actions/upload-artifact@v4
         with:
           name: lf-sha-parity-${{ runner.os }}-${{ github.run_id }}
+          include-hidden-files: true
           path: |
             line-ending-validation.log
             cross-os-sha-parity-${{ runner.os }}.json
+            .editorconfig
+            .gitattributes
+            .github/workflows/line-ending-parity.yml
+            .github/workflows/validate-instructions.yml
+            core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md
+            projects/gwc/package.yaml
+            releases/changelog.d/2026-08-02-cross-platform-lf-normalization.md
+            SHA256SUMS.txt
+            tests/test_line_ending_policy.py
+            tools/validate_line_endings.py
 
   compare-parity:
     needs: calculate-parity
