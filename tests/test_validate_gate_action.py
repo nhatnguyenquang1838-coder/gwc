@@ -12,6 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE_SHA = "a" * 40
 HEAD_SHA = "b" * 40
 DRIFTED_HEAD_SHA = "c" * 40
+G4_APPROVAL_ID = "G4-SCRUM-151-PR151-20260726T0600Z"
+G4_SCOPE_PREFIX = "0123456789abcdef"
 
 
 def packet() -> dict:
@@ -53,7 +55,30 @@ def packet() -> dict:
     return value
 
 
-def g4_merge_packet() -> dict:
+def g4_receipt(
+    *,
+    head_sha: str = HEAD_SHA,
+    status: str = "present",
+    approval_id: str = G4_APPROVAL_ID,
+    scope_prefix: str = G4_SCOPE_PREFIX,
+    expires_at: str = "2026-07-27T05:56:22Z",
+) -> dict:
+    return {
+        "status": status,
+        "source": "github_actions_bot_comment",
+        "bot_login": "github-actions[bot]",
+        "marker": "gwc:g4-authority-receipt",
+        "approval_id": approval_id,
+        "pr_number": 151,
+        "receipt_comment_id": 515001,
+        "source_comment_id": 515000,
+        "approved_head_sha": head_sha,
+        "scope_hash_prefix": scope_prefix,
+        "expires_at": expires_at,
+    }
+
+
+def g4_merge_packet(*, include_receipt: bool = True, receipt: dict | None = None) -> dict:
     value = packet()
     value["task_id"] = "SCRUM-151"
     value["working_branch"] = "hotfix/14d18a5027ab3f11/scrum-151-authority-guard"
@@ -73,6 +98,8 @@ def g4_merge_packet() -> dict:
             "event_id_or_idempotency_key": "evt-scrum-151-g4-1",
         }
     )
+    if include_receipt:
+        value["evidence_readback"]["g4_authority_receipt"] = receipt or g4_receipt()
     value["scope_hash"] = canonical_scope_hash(value)
     value["evidence_readback"]["scope_hash"] = value["scope_hash"]
     return value
@@ -119,13 +146,15 @@ class GateActionAuthorityTests(unittest.TestCase):
         errors = validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")
         self.assertTrue(any("not valid for G2_EXECUTION" in error for error in errors))
 
-    def test_g4_merge_valid_only_for_current_open_pr_head(self):
+    def test_g4_merge_valid_only_for_current_open_pr_head_and_trusted_receipt(self):
         errors = validate(
             g4_merge_packet(),
             schema_path=ROOT / "schemas/gate-action-authority.schema.json",
             now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
             expected_head_sha=HEAD_SHA,
             observed_pr_state="open",
+            expected_g4_approval_id=G4_APPROVAL_ID,
+            expected_g4_scope_prefix=G4_SCOPE_PREFIX,
         )
         self.assertEqual([], errors)
 
@@ -157,6 +186,57 @@ class GateActionAuthorityTests(unittest.TestCase):
             observed_pr_state="merged",
         )
         self.assertTrue(any("observed PR state 'open'" in error for error in errors))
+
+    def test_g4_merge_requires_pr_native_authority_receipt(self):
+        errors = validate(
+            g4_merge_packet(include_receipt=False),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="open",
+        )
+        self.assertTrue(any("g4_authority_receipt" in error for error in errors))
+
+    def test_g4_merge_rejects_untrusted_or_missing_receipt_status(self):
+        errors = validate(
+            g4_merge_packet(receipt=g4_receipt(status="missing")),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="open",
+        )
+        self.assertTrue(any("G4_AUTHORITY_RECEIPT_MISSING_OR_STALE" in error for error in errors))
+
+    def test_g4_merge_rejects_receipt_head_mismatch(self):
+        errors = validate(
+            g4_merge_packet(receipt=g4_receipt(head_sha=DRIFTED_HEAD_SHA)),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="open",
+        )
+        self.assertTrue(any("receipt head" in error for error in errors))
+
+    def test_g4_merge_rejects_receipt_scope_mismatch(self):
+        errors = validate(
+            g4_merge_packet(),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="open",
+            expected_g4_scope_prefix="f" * 16,
+        )
+        self.assertTrue(any("scope hash prefix" in error for error in errors))
+
+    def test_g4_merge_rejects_expired_receipt(self):
+        errors = validate(
+            g4_merge_packet(receipt=g4_receipt(expires_at="2026-07-26T06:30:00Z")),
+            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 7, 26, 7, 0, tzinfo=timezone.utc),
+            expected_head_sha=HEAD_SHA,
+            observed_pr_state="open",
+        )
+        self.assertTrue(any("authority receipt is expired" in error for error in errors))
 
 
 if __name__ == "__main__":
