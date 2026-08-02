@@ -62,10 +62,10 @@ The validator must inspect tracked text files and reject:
 - bare carriage returns;
 - UTF-8 BOM unless explicitly allowlisted;
 - invalid UTF-8 in files classified as text;
-- missing final newline for governed text files;
+- missing final newline when strict migration mode is enabled for the bounded scope;
 - `.gitattributes` classifications inconsistent with the LF policy.
 
-Binary files must not be decoded as text.
+Binary files must not be decoded as text. Default CI must not fail on pre-existing missing-final-newline debt outside the approved migration scope; use `--require-final-newline` only for bounded normalization work.
 
 Required result codes:
 
