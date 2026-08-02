@@ -1,0 +1,65 @@
+schema_version: '1.0'
+artifact_type: gate-action-authority
+task_id: SCRUM-261
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+head_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+working_branch: hotfix/scrum-261-gate-node-binding-20260802
+gate: G2_EXECUTION
+action: modify_approved_files
+scope:
+  authorized_paths:
+  - .kiro/specs/scrum-261-gate-node-runtime-binding-hotfix/requirements.md
+  - .kiro/specs/scrum-261-gate-node-runtime-binding-hotfix/design.md
+  - .kiro/specs/scrum-261-gate-node-runtime-binding-hotfix/tasks.md
+  - tools/node_architect/intake_card_render.py
+  - tests/test_intake_context_intake_card_render_m4.py
+  - core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  - core/node-architect/gate-node-route-profile.json
+  - schemas/node-architect/gate-node-route-profile.schema.json
+  - schemas/node-architect/gate-node-route-decision.schema.json
+  - tools/node_architect/resolve_gate_node_route.py
+  - tests/test_gate_node_route_resolution.py
+  - agents/chatgpt-agent/agent-instructions.md
+  - releases/changelog.d/2026-08-02-gate-node-runtime-binding-hotfix.md
+  - .gwc/tasks/SCRUM-261/**
+  authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+  excluded_actions:
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge_approved_pr
+  - deploy_approved_release
+  - reload_approved_runtime
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - migration
+  - force_push
+  - branch_delete
+  - history_rewrite
+  - pr_base_change
+  risk_class: R3
+issued_at: '2026-08-02T06:17:30Z'
+expires_at: '2026-08-02T10:14:00Z'
+actor:
+  kind: connector
+  id: ChatGPT:GitHub
+evidence_readback:
+  status: confirmed
+  observed_at: '2026-08-02T06:18:00Z'
+  task_id: SCRUM-261
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+  head_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+  gate: G2_EXECUTION
+  action: modify_approved_files
+  event_id_or_idempotency_key: SCRUM-261:modify_approved_files:0b05dcce
+  scope_hash: sha256:16a001cc99f2ec24542aa8a237df3f5d47428a6341546918ae6876787166b311
+scope_hash: sha256:16a001cc99f2ec24542aa8a237df3f5d47428a6341546918ae6876787166b311
