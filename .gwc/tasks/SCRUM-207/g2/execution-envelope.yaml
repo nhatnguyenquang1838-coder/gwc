@@ -1,0 +1,41 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+task_id: SCRUM-207
+node_id: runtime_checkpoint.lease-renewal
+family_gate: G2_EXECUTION
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+working_branch: hermes/scrum-207-lease-renewal-m5-20260802
+risk_class: R2
+authorized_paths:
+  - tools/node_architect/lease_renewal.py
+  - tests/test_lease_renewal.py
+  - releases/changelog.d/2026-08-02-scrum-207-lease-renewal-m5.md
+  - .gwc/tasks/SCRUM-207/**
+authorized_actions:
+  - create_files
+  - run_unit_tests
+  - commit
+  - push_branch
+  - open_draft_pr
+excluded_actions:
+  - merge_to_main
+  - deploy
+  - release
+  - edit_core_governance
+  - credentials
+  - migrations
+  - manual_g5_deploy
+  - recursive_evidence_pr
+additional_bindings:
+  - name: node_id
+    value: runtime_checkpoint.lease-renewal
+  - name: family_gate
+    value: G2_EXECUTION
+  - name: target_maturity
+    value: M5_REPLAY_SAFE
+scope_hash: sha256:39b17f86e89b29876ac025dccfe36e1d24d03f678dd7b731775ec1e61ae1f0e7
+scope_hash_16: 39b17f86e89b2987
+approval_status: pending_human_g2
+approval_command: 'APPROVE G2_EXECUTION APPROVE_G2_SCRUM-207_R1_20260802 39b17f86e89b2987 2026-08-03T23:25:00+0700'

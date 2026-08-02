@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+task_id: SCRUM-207
+decision: proceed_under_g2_execution_envelope
+rationale: >
+  Node runtime_checkpoint.lease-renewal is g2_required with family gate G2_EXECUTION only.
+  SCRUM-207 is unclaimed, dependency-free, parent SCRUM-169 in progress. Hermes claims and
+  delivers through Draft PR (G3); merge (G4) and G5 recovery require human APPROVE commands.
+authorized_scope:
+  create: [tools/node_architect/lease_renewal.py, tests/test_lease_renewal.py, releases/changelog.d/2026-08-02-scrum-207-lease-renewal-m5.md, .gwc/tasks/SCRUM-207/**]
+  modify: [tools/node_architect/lease_renewal.py, tests/test_lease_renewal.py]
+  run: [unit_tests_via_PYTHONPATH=.]
+excluded: [merge_to_main, deploy, release, edit_core_governance, credentials, migrations, manual_g5_deploy, recursive_evidence_pr]
+branch_prefix: hermes/
+risk_class: R2
