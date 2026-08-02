@@ -27,8 +27,12 @@ class LineEndingPolicyTests(unittest.TestCase):
         )
         return root
 
-    def reasons(self, root: Path) -> set[str]:
-        violations, _, _ = module.validate(root, force_recursive=True)
+    def reasons(self, root: Path, *, require_final_newline: bool = False) -> set[str]:
+        violations, _, _ = module.validate(
+            root,
+            force_recursive=True,
+            require_final_newline=require_final_newline,
+        )
         return {item.reason for item in violations}
 
     def test_lf_utf8_file_passes(self) -> None:
@@ -59,7 +63,11 @@ class LineEndingPolicyTests(unittest.TestCase):
     def test_missing_final_newline_is_rejected(self) -> None:
         root = self.make_root()
         (root / "bad.py").write_bytes(b"print('x')")
-        self.assertIn("FINAL_NEWLINE_MISSING", self.reasons(root))
+        self.assertNotIn("FINAL_NEWLINE_MISSING", self.reasons(root))
+        self.assertIn(
+            "FINAL_NEWLINE_MISSING",
+            self.reasons(root, require_final_newline=True),
+        )
 
     def test_binary_file_is_not_decoded(self) -> None:
         root = self.make_root()
