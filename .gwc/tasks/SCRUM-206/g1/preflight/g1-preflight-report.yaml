@@ -1,0 +1,96 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-02T23:28:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-206
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: REPO_READY
+    status: PASS
+    code: REPO_READY
+    message: Repository identity and protected base are verified.
+    evidence:
+      - git remote -v
+      - git rev-parse origin/main
+  - id: WORKING_TREE_CLEAN
+    status: PASS
+    code: WORKING_TREE_CLEAN
+    message: Worktree is clean relative to origin/main.
+    evidence:
+      - git status --short
+  - id: SCOPE_BOUNDED
+    status: PASS
+    code: SCOPE_BOUNDED
+    message: Blast radius is bounded to lease-acquisition module, schema, tests, and gate artifacts.
+    evidence:
+      - core/node-architect/node-catalog/runtime_checkpoint/README.md
+      - core/node-architect/node-registry.json
+  - id: NO_EXTERNAL_DEPS
+    status: PASS
+    code: NO_EXTERNAL_DEPS
+    message: Implementation does not introduce external network, scheduler, or production dependencies.
+    evidence:
+      - tools/node_architect/lease_acquisition.py
+risk_class: R2
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS
+process_readback:
+  process_id: GWC_G0_G1_OPERATIONAL_RUNBOOK
+  terminal_outcome: G1_ALIGNMENT
+  required_sources:
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+    - id: STEP-1
+      name: Materialize G0/G1 artifacts
+      gate: G0_CONTEXT
+      actor: agent
+      action_class: create_artifacts
+      capability_required: filesystem_write
+      capability_status: VERIFIED
+      primary_route: local_agent worktree
+      fallback_routes:
+        - chat_connector_only isolated workspace
+      continuation: proceed_to_g1
+      expected_evidence: .gwc/tasks/SCRUM-206/g0/context-snapshot.yaml
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-2
+      name: Validate G0/G1 artifacts
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: run_validator
+      capability_required: python_validator
+      capability_status: VERIFIED
+      primary_route: python tools/validate_g01.py
+      fallback_routes:
+        - CI validate-instructions workflow
+      continuation: generate_g2_approval
+      expected_evidence: validator PASS report
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-3
+      name: Implement bounded G2 slice
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: guarded_branch_write
+      capability_required: git_push
+      capability_status: VERIFIED
+      primary_route: local_agent worktree push
+      fallback_routes:
+        - manual checkpoint
+      continuation: create_draft_pr
+      expected_evidence: g2/execution-envelope.yaml + branch head SHA
+      bypass_eligibility: MANUAL_CHECKPOINT_ONLY
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
