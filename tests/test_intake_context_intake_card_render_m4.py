@@ -184,6 +184,36 @@ class IntakeCardRendererTests(unittest.TestCase):
         self.assertEqual("APPLIED", card["redaction_status"])
         self.assertNotIn("Validated card", json.dumps(card))
 
+    def test_redacted_raw_value_does_not_change_hidden_hashes(self):
+        directive = {"json_pointer": "/request/outcome", "classification": "POLICY_REDACTED", "reason_code": "POLICY", "replacement": "[REDACTED]"}
+        first = copy.deepcopy(self.kwargs["request_contract"])
+        second = copy.deepcopy(self.kwargs["request_contract"])
+        first["outcome"] = "SECRET-A"
+        second["outcome"] = "SECRET-B"
+        a = self.render(request_contract=first, redaction_directives=[directive])
+        b = self.render(request_contract=second, redaction_directives=[directive])
+        self.assertEqual(a["request"], b["request"])
+        self.assertEqual(a["upstream_artifacts"], b["upstream_artifacts"])
+        self.assertEqual(a["snapshot_hash"], b["snapshot_hash"])
+
+    def test_hidden_protected_key_blocks_before_hashing(self):
+        request = copy.deepcopy(self.kwargs["request_contract"])
+        request["client_secret"] = "RAW-SECRET"
+        card = self.render(request_contract=request)
+        self.assertEqual("CARD_REDACTION_REQUIRED", card["reason_code"])
+        self.assertNotIn("RAW-SECRET", json.dumps(card))
+
+    def test_unsafe_projection_redaction_blocks(self):
+        directive = {"json_pointer": "/risk_projection/risk_flags/0", "classification": "POLICY_REDACTED", "reason_code": "POLICY", "replacement": "[REDACTED]"}
+        card = self.render(redaction_directives=[directive])
+        self.assertEqual("CARD_REDACTION_REQUIRED", card["reason_code"])
+
+    def test_optional_upstream_blocked_outcome_is_honored(self):
+        source = copy.deepcopy(self.kwargs["source_resolution"])
+        source["outcome"] = "BLOCKED"
+        card = self.render(source_resolution=source)
+        self.assertEqual(("BLOCKED", "CARD_UPSTREAM_BLOCKED"), (card["outcome"], card["reason_code"]))
+
     def test_invalid_redaction_directive_blocks(self):
         directive = {"json_pointer": "/missing", "classification": "SECRET", "reason_code": "X", "replacement": "[REDACTED]"}
         self.assertEqual("CARD_REDACTION_DIRECTIVE_INVALID", self.render(redaction_directives=[directive])["reason_code"])
