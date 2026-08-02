@@ -7,5 +7,5 @@
   "gates": [
     "G3_PR"
   ],
-  "description": "Fail closed unless exact-head validation and required CI pass, a capability-supported independent agent or human review receipt passes for the same head SHA and scope hash, findings are closed, and evidence is non-stale. Review PASS is evidence only; merge_pending begins only after Ready-for-Review promotion readback."
+  "description": "Run the replay-safe SCRUM-219 final G3 decision only after SCRUM-215 PASS, exact-head validations, current Ready-for-Review eligibility and closed findings are present for the same scope. Drift, rejected or missing evidence, non-success CI, stale review and unresolved blockers fail closed; G3 PASS never grants merge, deploy or production authority."
 }
