@@ -1,0 +1,45 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+status: PASS
+task_id: SCRUM-204
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_EXECUTION_SCRUM-204_DELIVER_E2E_PR_REFRESH2_20260802
+received_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-204_DELIVER_E2E_PR_REFRESH2_20260802 c8cf26e96255282d 2026-08-03T16:05:31Z
+received_at_utc: '2026-08-02T16:07:14Z'
+scope_hash: sha256:c8cf26e96255282d8ab79faa372004bf0d90d863d8f12c0f96bc6e0360408084
+scope_hash_prefix: c8cf26e96255282d
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+working_branch: codex/scrum-204-deliver-e2e-20260802
+expires_at_utc: '2026-08-03T16:05:31Z'
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - create_fresh_isolated_worktree
+  - commit_working_branch
+  - push_working_branch
+  - open_or_update_draft_pr
+  - record_g3_delivery_evidence
+excluded_actions:
+  - merge
+  - deploy
+  - release
+  - production_data_or_configuration
+  - credentials_or_secrets
+  - migration
+  - force_push
+  - branch_delete
+  - direct_main_write
+  - package_export_or_publish
+validation:
+  exact_command_match: PASS
+  protected_base_sha_match: PASS
+  working_branch_match: PASS
+  scope_hash_match: PASS
+  expiry_check: PASS
+  claim_readback: PASS
+  current_jira_status: In Progress
+  current_main_ci: SKIPPED_OFFLINE
+  current_head: 65c93c5927013c750631933495c5ecb5e22fae88
+  merge_base: 65c93c5927013c750631933495c5ecb5e22fae88

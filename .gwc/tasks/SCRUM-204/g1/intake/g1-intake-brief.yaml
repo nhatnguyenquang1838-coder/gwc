@@ -1,0 +1,113 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-02T15:20:17Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-204
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Recreate a current-base G2 handoff for SCRUM-204 after the prior G2 envelope
+    was invalidated by protected-main drift, while preserving the universal Node Architect
+    runtime invariant.
+  why_now: The prior approval referenced aad17d28, while current protected main is
+    520aa196 after the SCRUM-263 Node Architect merge; stale G2 evidence cannot authorize
+    execution.
+desired_outcome: Produce fresh G0/G1 evidence and a bounded G2 execution envelope
+  tied to current main, with no implementation until exact approval.
+stakeholders:
+  requester: user
+  affected:
+  - Node Architect runtime
+  - GWC agents
+  - task-scoped evidence
+  - runtime_checkpoint.resume-token-generation
+scope:
+  in_scope:
+  - Re-read and pin current protected-main governance, Node Architect, project, and
+    agent sources.
+  - Confirm existing SCRUM-204 claim readback and SCRUM-263 read-only context.
+  - Verify current main SHA, local worktree isolation, and offline CI status boundary.
+  - Recreate task-scoped G0/G1 artifacts and current-base G2 envelope.
+  - Keep MODE_DOES_NOT_BYPASS_NODE_RUNTIME and authority=false boundaries explicit.
+  non_goals:
+  - Implement, commit, push, PR, merge, deploy, release, manual G5, or G6 work before
+    exact G2 approval.
+  - Treat Jira, Slack, Notion, route decisions, node instructions, or CI as gate authority.
+  - Reuse stale aad17d28 G0/G1/G2 evidence as current evidence.
+  - Production configuration/data, credentials, secrets, migration, force-push, branch
+    deletion, or package export.
+constraints:
+- Protected base is main at 520aa1968a0809001e8994192278e52a59c86c61.
+- G0/G1 artifacts are task-scoped and validated before G2.
+- Fresh isolated worktree is required before creating task artifacts.
+- Exact G2 approval must bind repository, base SHA, branch, scope hash, files, actions,
+  exclusions, and expiry.
+- The prior SCRUM-204 claim remains traceability only; Jira does not grant authority.
+assumptions:
+- Local Git/worktree and Python/jsonschema validators are available.
+- GitHub API is unavailable at this check; no CI PASS is claimed.
+- SCRUM-263 is read-only context because its implementation is already merged into
+  current main.
+risks:
+- id: RISK-1
+  description: Stale G2 evidence could authorize work against the wrong base.
+  impact: high
+  mitigation: Bind every artifact to 520aa196 and stop on base drift.
+- id: RISK-2
+  description: A refresh could accidentally broaden from SCRUM-204 into already merged
+    SCRUM-263 implementation.
+  impact: high
+  mitigation: Keep the envelope bounded and require exact user approval before any
+    code write.
+- id: RISK-3
+  description: Offline CI may be misrepresented as PASS.
+  impact: medium
+  mitigation: Record SKIPPED_OFFLINE/NO_COMBINED_STATUS explicitly.
+acceptance_criteria:
+- id: AC-1
+  statement: G0 and G1 artifacts validate against current protected-main schemas and
+    bind SCRUM-204 to 520aa196.
+  verifiable: true
+- id: AC-2
+  statement: The G2 envelope contains exact current-base branch, scope, authorized
+    actions, excluded actions, and expiry.
+  verifiable: true
+- id: AC-3
+  statement: The handoff preserves MODE_DOES_NOT_BYPASS_NODE_RUNTIME and separate
+    gate authority.
+  verifiable: true
+- id: AC-4
+  statement: No implementation or later gate action occurs before the new exact G2
+    approval.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

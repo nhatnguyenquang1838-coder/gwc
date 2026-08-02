@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g01-decision-input
+generated_at: '2026-08-02T15:20:17Z'
+options:
+  - id: OPT-1
+    title: Current-base bounded G2 handoff
+    description: Rebuild G0/G1 and prepare a new G2 envelope from 520aa196, treating the merged Node Architect contract as current read-only baseline and requiring exact approval for any SCRUM-204 implementation.
+    benefits: [Fresh base-bound evidence, no stale approval reuse, preserves authority boundaries]
+    tradeoffs: [Requires a new approval and may expose that implementation is already present on main]
+    risks: [Further work may be unnecessary if current main fully satisfies the requested scope]
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Reuse prior aad17d28 G2 envelope
+    description: Continue the prior envelope without refreshing the protected base.
+    benefits: [No regeneration effort]
+    tradeoffs: [Base drift makes the approval invalid]
+    risks: [Could authorize work against stale governance evidence]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Treat merged SCRUM-263 as SCRUM-204 completion
+    description: Use SCRUM-263 merge evidence as if it were SCRUM-204 delivery authority.
+    benefits: [No new G2 artifacts]
+    tradeoffs: [Jira task identity and authority scope do not match]
+    risks: [Cross-task evidence and authority contamination]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Only a fresh current-base handoff can satisfy the request without reusing invalidated approval or conflating SCRUM-263 projection evidence with SCRUM-204 authority.
+decision:
+  status: ACCEPTED
+  selected_option_id: OPT-1
+  actor: user
+  decided_at: '2026-08-02T15:20:17Z'
+  source: explicit-user-request-to-recreate-g2
+  explicit: true
+  rationale: Recreate G2 from the latest protected main and stop before implementation pending exact approval.
+  acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4]

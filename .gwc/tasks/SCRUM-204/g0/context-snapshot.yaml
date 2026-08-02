@@ -1,0 +1,118 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-02T15:20:17Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  protected_branches:
+  - main
+  connector: local_git
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: chatgpt-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: local_git
+  connector_priority:
+  - local_git
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+constraints:
+- Protected base is main at 520aa1968a0809001e8994192278e52a59c86c61.
+- G0/G1 artifacts are task-scoped and validated before G2.
+- Fresh isolated worktree is required before creating task artifacts.
+- Exact G2 approval must bind repository, base SHA, branch, scope hash, files, actions,
+  exclusions, and expiry.
+- The prior SCRUM-204 claim remains traceability only; Jira does not grant authority.
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GWC_RUNTIME
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: main
+  source_sha: 44ca483b4e5f1ff8f6562ce9a7d6021a45ab3f01149c1619f66dda9172f38b84
+- id: GWC_GATES
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main
+  source_sha: 4ac80717e4fbec6d367a6605a03b9e1a431f624092085526c25cda683e9d9923
+- id: GWC_NODE_BINDING
+  path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  ref: main
+  source_sha: 5deb497224dacbcd3389337464b4997c89abcb3de4bdde9c08a4bccfc550c7ff
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: a9ca4939b26d50b18ef9ce346f000a65de391c00e294309e16d4362d9d2111b9
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 44ca483b4e5f1ff8f6562ce9a7d6021a45ab3f01149c1619f66dda9172f38b84
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 4ac80717e4fbec6d367a6605a03b9e1a431f624092085526c25cda683e9d9923
+- path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5deb497224dacbcd3389337464b4997c89abcb3de4bdde9c08a4bccfc550c7ff
+- path: core/node-architect/gate-node-route-profile.json
+  required: true
+  status: AVAILABLE
+  source_sha: 45e0eec316ca813804e8237af694dfcb22a314fe471d5eb1b26b45eacea34c2c
+- path: core/node-architect/node-registry.json
+  required: true
+  status: AVAILABLE
+  source_sha: e05990a5f514adb3d047a9290318800fad9006c99b2f4dc5e867d227aa70239e
+- path: core/task-lifecycle/gate-transition-map.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 40f829f2cbedbf4e08761b01f20532d84c75dfd8402d65188810b17b6b7f746a
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: c3ff5cb159213b64334a9bbe210a63b0e086608f9fa6cf7c55c136c608551a34
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: c49c67408ce3ee9a51725f6597ddbf6a059c692738d06fbb178d5033a4c26a86
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 763c75daf188a800113628395fc28c6d1fa5d815a6b5cd5795fd72875f2e0e72
+- path: agents/dwc/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 157b8707b583bfdbb66af04e68f725bd6c1f6c011ac9a006a5ed780c65fed121
+- path: governance/agent-runtime-profiles/chatgpt.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 050091551d2d70709d455723aee6b9d4ec07fe7f70c6406c4eceab1d356ca134
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e8
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 4905d7f48ac99ca1cdccdf954339ef64ad06ced59cafcb839b9cedc0a22f4cef
+status: READY
+blockers: []

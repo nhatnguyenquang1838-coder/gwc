@@ -1,0 +1,69 @@
+schema_version: '1.0'
+artifact_type: g2-implementation-validation
+task_id: SCRUM-204
+gate: G2_EXECUTION
+status: PASS
+validated_at_utc: '2026-08-02T16:12:00Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+head_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+working_branch: codex/scrum-204-deliver-e2e-20260802
+scope_hash: sha256:c8cf26e96255282d8ab79faa372004bf0d90d863d8f12c0f96bc6e0360408084
+approval_readback: .gwc/tasks/SCRUM-204/g2/approval-readback.yaml
+validation:
+  schema_validation: PASS
+  instruction_validation:
+    normal: PASS
+    fastlane: PASS
+    e2e: PASS
+    hotfix: PASS
+    rescue: PASS
+  route_resolution: PASS
+  route_id: g2-resume-token-generation
+  resolved_node: runtime_checkpoint.resume-token-generation
+  authority_flags_all_false: true
+  expanded_resume_validator: PASS
+  focused_tests:
+    command: python3 -m unittest tests.test_resume_token_generation tests.test_checkpoint_resume_cleanup tests.test_node_instruction_contract tests.test_node_evidence_ledger tests.test_gate_node_route_resolution -v
+    result: PASS
+    tests_run: 45
+  full_tests:
+    command: python3 -m unittest discover -s tests -p 'test*.py' -v
+    result: PASS
+    tests_run: 798
+  diff_check: PASS
+  protected_base_drift_revalidated: PASS
+  ci:
+    status: SKIPPED_OFFLINE
+    reason: GitHub API unavailable from execution environment
+files_changed:
+  - .gwc/tasks/SCRUM-204/g2/implementation-validation.yaml
+  - .gwc/tasks/SCRUM-204/g1/validation/g01-validator.json
+  - core/node-architect/gate-node-route-profile.json
+  - core/node-architect/node-instructions/runtime_checkpoint/resume-token-generation.node-instruction.yaml
+  - schemas/node-architect/resume-token.schema.json
+  - tools/node_architect/generate_resume_token.py
+  - tools/node_architect/validate_checkpoint_resume.py
+  - tests/test_resume_token_generation.py
+  - releases/changelog.d/2026-08-02-scrum-204-resume-token-node.md
+authority:
+  gate_authority_granted: false
+  write_authority_granted: false
+  pr_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+  excluded_actions:
+    - commit
+    - push
+    - pull_request
+    - merge
+    - deploy
+    - release
+    - production_config_or_data
+    - migration
+    - g3_or_later_gate_execution
+notes:
+  - G2 approval is exact and active; implementation remains bounded to the approved file set.
+  - Legacy checkpoint/resume-token validation remains compatible when expanded binding fields are absent.
+  - The current worktree is intentionally uncommitted pending later authorized delivery gates.

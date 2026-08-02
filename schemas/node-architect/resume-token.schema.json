@@ -6,19 +6,37 @@
   "additionalProperties": false,
   "required": [
     "schema_version",
+    "task_id",
+    "run_id",
+    "node_id",
+    "gate",
+    "scope_hash",
+    "base_sha",
+    "head_sha",
     "resume_token_id",
     "checkpoint_id",
+    "state_digest",
+    "lease_token",
+    "fencing_token",
     "issued_at_utc",
     "expires_at_utc",
     "next_gate",
     "next_action",
     "requires_human_approval",
+    "approval_envelope_ref",
     "audit_projection"
   ],
   "properties": {
     "schema_version": {
       "const": "0.1"
     },
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "pattern": "^[a-z0-9_]+\\.[a-z0-9-]+$"},
+    "gate": {"const": "G2_EXECUTION"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
     "resume_token_id": {
       "type": "string",
       "minLength": 1
@@ -27,6 +45,9 @@
       "type": "string",
       "minLength": 1
     },
+    "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "lease_token": {"type": "string", "minLength": 1},
+    "fencing_token": {"type": "string", "minLength": 1},
     "issued_at_utc": {
       "type": "string",
       "format": "date-time"
@@ -53,6 +74,7 @@
     "requires_human_approval": {
       "type": "boolean"
     },
+    "approval_envelope_ref": {"type": ["string", "null"], "minLength": 1},
     "approval_command": {
       "type": [
         "string",
@@ -79,6 +101,12 @@
           "uniqueItems": true
         }
       }
-    }
+    },
+    "authority_granted": {"const": false},
+    "write_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "token_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
   }
 }

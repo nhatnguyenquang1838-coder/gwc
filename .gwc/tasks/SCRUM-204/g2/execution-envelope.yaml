@@ -1,0 +1,82 @@
+gate: G2_EXECUTION
+task_id: SCRUM-204
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+working_branch: codex/scrum-204-deliver-e2e-20260802
+expected_head_sha: null
+scope_version: 1
+risk_class: R2
+status: ACTIVE
+activation_state: APPROVED
+approval_id: APPROVE_G2_EXECUTION_SCRUM-204_DELIVER_E2E_PR_REFRESH2_20260802
+approved_modules:
+  - .gwc/tasks/SCRUM-204/**
+  - core/node-architect/node-instructions/runtime_checkpoint/resume-token-generation.node-instruction.yaml
+  - core/node-architect/gate-node-route-profile.json
+  - core/node-architect/runtime-graph-registry.json
+  - schemas/node-architect/resume-token.schema.json
+  - tools/node_architect/generate_resume_token.py
+  - tools/node_architect/validate_checkpoint_resume.py
+  - tools/node_architect/validate_node_instruction.py
+  - tests/test_resume_token_generation.py
+  - tests/test_node_instruction_contract.py
+  - tests/test_node_evidence_ledger.py
+  - releases/changelog.d/*scrum-204*
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - create_fresh_isolated_worktree
+  - commit_working_branch
+  - push_working_branch
+  - open_or_update_draft_pr
+  - record_g3_delivery_evidence
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - manual_g5
+  - g6_production_data_or_configuration
+  - production_data_read_or_write
+  - credential_or_secret_handling
+  - migration
+  - force_push
+  - branch_delete
+  - direct_main_write
+  - package_export_or_publish
+  - jira_as_gate_authority
+  - slack_or_notion_as_canonical_evidence
+scope_hash: sha256:c8cf26e96255282d8ab79faa372004bf0d90d863d8f12c0f96bc6e0360408084
+issued_at: '2026-08-02T16:05:31Z'
+expires_at: '2026-08-03T16:05:31Z'
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-204_DELIVER_E2E_PR_REFRESH2_20260802 c8cf26e96255282d 2026-08-03T16:05:31Z
+g1_validation_evidence: g1/validation/g01-validator.json
+prerequisites:
+  - id: G0_CONTEXT
+    status: PASS
+    evidence: g0/context-snapshot.yaml
+  - id: G1_ALIGNMENT
+    status: PASS
+    evidence: g1/decision/g1-decision-record.yaml
+  - id: G1_VALIDATOR
+    status: PASS
+    evidence: g1/validation/g01-validator.json
+  - id: CLAIM_READBACK
+    status: PASS
+    evidence: Jira SCRUM-204 AI Agent=ChatGPT, Claimed At=2026-08-02T21:49:00+07:00, status=In Progress
+  - id: BASE_READBACK
+    status: PASS
+    evidence: main@65c93c5927013c750631933495c5ecb5e22fae88
+  - id: CI_READBACK
+    status: SKIPPED_OFFLINE
+    evidence: GitHub API unavailable; no current combined-status PASS claimed
+invalidation_conditions:
+  - protected main SHA changes
+  - scope hash changes
+  - working branch head changes before approval
+  - approval expires
+  - approval command mismatch
+  - any file outside approved modules is required
+  - authority scope expands beyond bounded Draft PR/G3 evidence to G4, G5, or G6
+warning: ACTIVE means exact G2 E2E approval was received; merge, deploy, release, and production authority are not granted.
