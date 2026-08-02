@@ -41,6 +41,16 @@ It keeps branch creation, bounded writes, diff readback, Draft PR creation, CI c
 ✅ no all-81 catalog implementation
 ```
 
+## B3 replay-safe delivery criteria
+
+The final SCRUM-168 F3 B3 slice covers the remaining repository-delivery controls:
+
+- `repo_delivery.ci-failure-repair` allows repair only for exact-head, terminal, repository-fixable CI failures and only inside the approved G2 scope. Unknown external outcomes require readback; stale heads and out-of-scope repair paths block.
+- `repo_delivery.ready-for-review-promotion` treats Draft-to-Ready as G3 metadata completion only. It requires exact-head CI success, current review pass, no unresolved threads, and no scope drift. It never grants G4 merge authority.
+- `repo_delivery.pr-blocker-check` classifies current-head PR blockers from mergeability, checks, review threads, review submissions, and stale evidence. A clear blocker check is readback evidence only; G4 remains separate.
+
+B3 retains the family boundary: guarded branch, scoped writes, Draft PR, exact-head CI, bounded repair, review metadata, and blocker readback are allowed under G2/G3; merge, deploy, production data/configuration, credentials, migrations, audit completion, package export, and broad 81-node rollout remain excluded.
+
 ## Admission criteria
 
 This batch is valid only after:
