@@ -7,3 +7,4 @@
 - Require normalization before SHA calculation, manifest generation, package export, commit, and G3 evidence.
 - Preserve historical `.gwc/tasks/**` evidence instead of mass-updating old hashes.
 - Revalidate derived SHA and package metadata against current protected `main` after approved base drift repair.
+- Normalize the newly merged G0 skill to canonical LF before recomputing derived integrity metadata.
