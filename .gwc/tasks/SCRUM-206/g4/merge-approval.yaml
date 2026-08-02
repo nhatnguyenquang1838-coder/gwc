@@ -6,10 +6,10 @@ repository: nhatnguyenquang1838-coder/gwc
 base_branch: main
 base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
 pr_number: 189
-pr_head_sha: 664f2fce58fddffd541d17a6ee73e96538ee71b5
+pr_head_sha: 092d88d419cc61c3d99b36f854b60b9702dece7b
 working_branch: g1-206-20260802-2328
-scope_hash: sha256:b3db1eba37c3060886d13eab1387b0ee2677990a3f4204dfb7b000f2e6ca3f4e
-scope_hash_16: b3db1eba37c30608
+scope_hash: sha256:d0c19526db187a9415a1eba7dc6967872993d423c1aab5103fa711c6cfe182e1
+scope_hash_16: d0c19526db187a94
 approval_id: CP-20260802-206-G4-R1
 approved_files:
   - .gwc/tasks/SCRUM-206/**
@@ -29,5 +29,5 @@ excluded_actions:
   - scope_expansion_or_unrelated_cleanup
 issued_at: '2026-08-03T00:13:00Z'
 expires_at: '2026-08-03T16:50:00Z'
-approval_command: APPROVE G4_MERGE CP-20260802-206-G4-R1 b3db1eba37c30608 2026-08-03T16:50:00Z
+approval_command: APPROVE G4_MERGE CP-20260802-206-G4-R1 d0c19526db187a94 2026-08-03T16:50:00Z
 status: G4_APPROVAL_PENDING
