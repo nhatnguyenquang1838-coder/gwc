@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.example/schemas/g3-pass-decision.schema.json",
+  "title": "G3 Pass Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "node_id",
+    "task_id",
+    "repository",
+    "branch",
+    "base_sha",
+    "head_sha",
+    "scope_hash",
+    "graph_revision",
+    "policy_digest",
+    "idempotency_key",
+    "outcome",
+    "reason_codes",
+    "input_digest",
+    "decision_digest",
+    "transition_effect_applied",
+    "replayed",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "g3-pass-decision"},
+    "node_id": {"const": "validation_quality.g3-pass-decision"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "minLength": 1},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "graph_revision": {"type": "string", "minLength": 1},
+    "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "outcome": {"enum": ["G3_PASS", "G3_CHANGES_REQUIRED", "G3_BLOCKED", "G3_INCONCLUSIVE"]},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "G3_PASS",
+          "G3_CHANGES_REQUIRED",
+          "G3_BLOCKED",
+          "G3_INCONCLUSIVE",
+          "REQUIRED_EVIDENCE_MISSING",
+          "EVIDENCE_REJECTED",
+          "CI_NOT_SUCCESS",
+          "REVIEW_STALE",
+          "HEAD_DRIFT",
+          "UNRESOLVED_BLOCKER",
+          "SIDE_EFFECT_UNRESOLVED"
+        ]
+      }
+    },
+    "input_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "transition_effect_applied": {"type": "boolean"},
+    "replayed": {"type": "boolean"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  }
+}
