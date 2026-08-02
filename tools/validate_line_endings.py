@@ -14,8 +14,8 @@ from typing import Sequence
 BINARY_EXTENSIONS = {
     ".7z", ".avi", ".bin", ".db", ".gif", ".gz", ".ico", ".jar",
     ".jpeg", ".jpg", ".mov", ".mp3", ".mp4", ".otf", ".pdf", ".png",
-    ".sqlite", ".sqlite3", ".tgz", ".ttf", ".war", ".webp", ".woff",
-    ".woff2", ".zip",
+    ".pyc", ".pyo", ".sqlite", ".sqlite3", ".tgz", ".ttf", ".war",
+    ".webp", ".woff", ".woff2", ".zip",
 }
 SKIP_DIRS = {".git", ".mypy_cache", ".pytest_cache", "__pycache__", "node_modules"}
 UTF8_BOM = b"\xef\xbb\xbf"
@@ -46,13 +46,22 @@ def is_git_repo(root: Path) -> bool:
         return False
 
 
-def candidate_paths(root: Path, recursive: bool) -> list[str]:
-    if not recursive and is_git_repo(root):
-        return [
-            item.decode("utf-8", errors="strict")
-            for item in git(root, ["ls-files", "-z"]).split(b"\0")
-            if item
-        ]
+def decode_paths(raw: bytes) -> list[str]:
+    return [item.decode("utf-8", errors="strict") for item in raw.split(b"\0") if item]
+
+
+def candidate_paths(root: Path, recursive: bool, changed_since: str | None = None) -> list[str]:
+    repository = is_git_repo(root)
+    if changed_since:
+        if not repository:
+            raise RuntimeError("--changed-since requires a Git repository")
+        raw = git(
+            root,
+            ["diff", "--name-only", "-z", "--diff-filter=ACMR", f"{changed_since}...HEAD"],
+        )
+        return sorted(set(decode_paths(raw)))
+    if not recursive and repository:
+        return decode_paths(git(root, ["ls-files", "-z"]))
     paths: list[str] = []
     for path in root.rglob("*"):
         if not path.is_file():
@@ -85,7 +94,7 @@ def is_binary(path: Path, data: bytes, attrs: dict[str, str] | None) -> bool:
             return True
         if attrs.get("diff") == "unset" and attrs.get("text") != "set":
             return True
-        if attrs.get("text") in {"set", "auto"}:
+        if attrs.get("text") == "set":
             return False
     return path.suffix.lower() in BINARY_EXTENSIONS or b"\0" in data[:8192]
 
@@ -153,9 +162,10 @@ def validate(
     *,
     force_recursive: bool = False,
     require_final_newline: bool = False,
+    changed_since: str | None = None,
 ) -> tuple[list[Violation], int, str]:
     root = root.resolve()
-    paths = candidate_paths(root, force_recursive)
+    paths = candidate_paths(root, force_recursive, changed_since)
     attr_map = attributes(root, paths)
     failures = validate_controls(root)
     for relative in paths:
@@ -165,7 +175,10 @@ def validate(
                 require_final_newline=require_final_newline,
             )
         )
-    mode = "recursive" if force_recursive or not is_git_repo(root) else "git-tracked"
+    if changed_since:
+        mode = f"git-diff:{changed_since}"
+    else:
+        mode = "recursive" if force_recursive or not is_git_repo(root) else "git-tracked"
     return failures, len(paths), mode
 
 
@@ -175,12 +188,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true", dest="as_json")
     parser.add_argument("--recursive", action="store_true")
     parser.add_argument("--require-final-newline", action="store_true")
+    parser.add_argument(
+        "--changed-since",
+        help="validate only added/copied/modified/renamed files since this Git ref",
+    )
     args = parser.parse_args(argv or sys.argv[1:])
     try:
         failures, checked, mode = validate(
             args.root,
             force_recursive=args.recursive,
             require_final_newline=args.require_final_newline,
+            changed_since=args.changed_since,
         )
         payload = {
             "status": "PASS" if not failures else "FAIL",
