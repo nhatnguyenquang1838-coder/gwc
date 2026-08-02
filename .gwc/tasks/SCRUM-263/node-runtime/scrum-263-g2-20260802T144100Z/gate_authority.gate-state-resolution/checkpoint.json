@@ -1,0 +1,23 @@
+{
+  "artifact_type": "checkpoint",
+  "base_sha": "aad17d28be539c88ecef4b9fbaf3eaa08f59461b",
+  "branch": "feature/scrum-263-node-instruction-evidence-ledger",
+  "head_sha": "e927420d8619bc9b45fda1e15d9ff9f374dc01db",
+  "idempotency_key": "SCRUM-263:scrum-263-g2-20260802T144100Z:gate_authority.gate-state-resolution",
+  "node_id": "gate_authority.gate-state-resolution",
+  "occurred_at": "2026-08-02T14:41:00Z",
+  "payload": {
+    "current_node": "gate_authority.gate-state-resolution",
+    "head_sha": "e927420d8619bc9b45fda1e15d9ff9f374dc01db",
+    "scope_hash": "sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e",
+    "status": "COMMITTED"
+  },
+  "record_digest": "sha256:4659765f5f2510881e1dfcaeecce66db1beadb6a6db69c76d65175c5365b701a",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "run_id": "scrum-263-g2-20260802T144100Z",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e",
+  "sequence": 5,
+  "state_digest": "sha256:1ff6d73c9cc64767406b273a5421efca47da9fb60a540d96345ae62f657f437f",
+  "task_id": "SCRUM-263"
+}
