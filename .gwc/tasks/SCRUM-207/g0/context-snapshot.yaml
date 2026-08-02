@@ -1,0 +1,33 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+task_id: SCRUM-207
+created_at: '2026-08-02T23:25:00+0700'
+agent: Hermes
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+working_branch: hermes/scrum-207-lease-renewal-m5-20260802
+node_id: runtime_checkpoint.lease-renewal
+family_gate: G2_EXECUTION
+target_maturity: M5_REPLAY_SAFE
+parent_task: SCRUM-169
+claimed: true
+claimed_at: '2026-08-02T23:24:35.000+0700'
+sot_boot:
+  resolved_from: DW-SuperApps
+  power_package: .dw/powers/gwc
+  power_source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  submodule_note: compatibility fallback only
+node_descriptor:
+  node_type: workflow
+  authority_boundary: g2_required
+  gates: [G2_EXECUTION]
+exclusions_planned:
+  - merge_to_main
+  - deploy
+  - release
+  - edit_core_governance
+  - credentials
+  - migrations
+  - manual_g5_deploy
+  - recursive_evidence_pr
