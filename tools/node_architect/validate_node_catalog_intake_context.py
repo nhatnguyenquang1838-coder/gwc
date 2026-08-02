@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 from pathlib import Path
@@ -128,6 +129,16 @@ RISK_PROFILE_ALLOWED_GATES = {
     "G4_MERGE",
     "G5_DEPLOY",
     "G6_PRODUCTION_DATA",
+}
+
+
+RUNTIME_CONTRACTS = {
+    "intake_context.intake-card-render": {
+        "schema": "schemas/intake-card.schema.json",
+        "evaluator": "tools/node_architect/intake_card_render.py",
+        "entrypoint": "render_intake_card",
+        "artifact_type": "intake-card",
+    }
 }
 
 
@@ -417,6 +428,62 @@ def _validate_node(path: Path, node: dict[str, Any]) -> list[str]:
     return errors
 
 
+
+def validate_runtime_contracts(repo_root: Path) -> list[str]:
+    """Validate static node-to-runtime schema/evaluator bindings."""
+    errors: list[str] = []
+    for node_id, contract in sorted(RUNTIME_CONTRACTS.items()):
+        schema_path = repo_root / contract["schema"]
+        evaluator_path = repo_root / contract["evaluator"]
+
+        if not schema_path.is_file():
+            errors.append(f"{node_id}: runtime schema missing: {contract['schema']}")
+        else:
+            try:
+                schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            except Exception as exc:
+                errors.append(f"{node_id}: runtime schema is not valid JSON: {exc}")
+            else:
+                try:
+                    from jsonschema import Draft202012Validator
+
+                    Draft202012Validator.check_schema(schema)
+                except Exception as exc:
+                    errors.append(f"{node_id}: runtime schema is invalid: {exc}")
+                artifact_type = (
+                    schema.get("properties", {})
+                    .get("artifact_type", {})
+                    .get("const")
+                )
+                if artifact_type != contract["artifact_type"]:
+                    errors.append(
+                        f"{node_id}: runtime schema artifact_type must be "
+                        f"{contract['artifact_type']!r}, got {artifact_type!r}"
+                    )
+
+        if not evaluator_path.is_file():
+            errors.append(f"{node_id}: runtime evaluator missing: {contract['evaluator']}")
+        else:
+            try:
+                spec = importlib.util.spec_from_file_location(
+                    f"validate_{node_id.replace('.', '_').replace('-', '_')}",
+                    evaluator_path,
+                )
+                if spec is None or spec.loader is None:
+                    raise ImportError("unable to create import specification")
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+            except Exception as exc:
+                errors.append(f"{node_id}: runtime evaluator import failed: {exc}")
+            else:
+                if not callable(getattr(module, contract["entrypoint"], None)):
+                    errors.append(
+                        f"{node_id}: runtime evaluator missing callable "
+                        f"{contract['entrypoint']}"
+                    )
+
+    return errors
+
 def validate_family(family_dir: Path) -> list[str]:
     errors: list[str] = []
     files = sorted(family_dir.glob("*.node.json"))
@@ -430,7 +497,7 @@ def validate_family(family_dir: Path) -> list[str]:
     for path in files:
         try:
             node = _load_node(path)
-        except Exception as exc:  # noqa: BLE001 - CLI validator should report all file failures.
+        except Exception as exc:
             errors.append(f"{path}: failed to load JSON: {exc}")
             continue
 
@@ -456,12 +523,16 @@ def main() -> int:
     args = parser.parse_args()
 
     errors = validate_family(args.family_dir)
+    errors.extend(validate_runtime_contracts(_repo_root()))
     if errors:
         for error in errors:
             print(f"ERROR: {error}")
         return 1
 
-    print(f"PASS: {EXPECTED_FAMILY} node family has {EXPECTED_COUNT} valid nodes")
+    print(
+        f"PASS: {EXPECTED_FAMILY} node family has {EXPECTED_COUNT} valid nodes "
+        f"and {len(RUNTIME_CONTRACTS)} valid runtime contract binding(s)"
+    )
     return 0
 
 
