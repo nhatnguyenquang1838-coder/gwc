@@ -81,6 +81,7 @@ GATE_SEQUENCE_INVALID
 GATE_SCOPE_MISMATCH
 GATE_ACTION_NOT_AUTHORIZED
 GATE_HUMAN_APPROVAL_REQUIRED
+AI_AGENT_CLAIM_CONFLICT
 ```
 
 ## Conversational G0/G1 mode
@@ -478,6 +479,47 @@ Recommended mapping:
 | CI and validation pass | `completed` |
 | Blocker found | `blocked` |
 | Irrecoverable failure | `failed` |
+
+## AI agent task claim (multi-agent ownership)
+
+The task provider for `gwc` is `jira-mcp`. Multiple AI agents (ChatGPT, Kilo,
+OpenClaw, Hermes, Codex) may claim Jira tasks through their own Jira MCP. The
+claim records *which* agent logically owns the task; it does not create Jira user
+accounts for the agents.
+
+When an agent claims a task, it must set two custom fields in addition to the
+existing work-tracking transition:
+
+| Field | Jira type | Jira ID (SCRUM) | Purpose |
+|---|---|---|---|
+| `AI Agent` (text) | free text | `customfield_10046` | which AI agent owns the task (one of `ChatGPT`, `Kilo`, `OpenClaw`, `Hermes`, `Codex`) |
+| `Claimed At` (datetime) | datetime | `customfield_10047` | timestamp of the claim (ISO-8601 UTC); powers stale detection |
+
+> Field IDs are SCRUM-project configuration. If the fields are recreated in
+> another project, replace the IDs with those project's values.
+
+Claim invariant:
+
+- `Assignee` stays **Nhat Nguyen Quang** (the human owner). Agents must NOT set
+  assignee; the claim records ownership in `AI Agent` only.
+- Each agent claims through its own Jira MCP, so web-only agents (e.g. ChatGPT)
+  claim identically to local agents.
+- The claim is **idempotent and race-guarded**:
+  1. Read the issue and the current `AI Agent` value.
+  2. If `AI Agent` is empty, set `AI Agent = <agent>`, set `Claimed At = <now>`,
+     post a claim comment, and transition to `agent_running`.
+  3. If `AI Agent` already equals this agent, do not overwrite; post a progress
+     comment only.
+  4. If `AI Agent` holds a *different* agent, this is a **double-claim**: stop,
+     report `AI_AGENT_CLAIM_CONFLICT`, and do not overwrite the other agent's
+     claim unless the human explicitly forces an override.
+- A claim, like a work-tracking transition, is traceability only. It never grants
+  G2, G4, G5, or G6 authority.
+
+The PROGRESS REPORTER capability (skill `jira-progress-reporter`) reads the same
+`AI Agent` / `Claimed At` fields to report, per agent, which tasks are claimed and
+their status, and to flag stale (no update beyond the configured threshold) and
+blocked tasks. Reporting is read-only and does not mutate task state.
 
 ## G3 async CI continuation
 
