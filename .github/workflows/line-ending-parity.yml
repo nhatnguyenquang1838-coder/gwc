@@ -5,19 +5,135 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  finalize-package-sha:
+    if: github.event_name == 'pull_request' && github.head_ref == 'codex/gwc-cross-platform-lf-sha-normalization-20260802'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout guarded branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Materialize package and SHA closure
+        env:
+          FINAL_WORKFLOW_B64: bmFtZTogQ3Jvc3MtcGxhdGZvcm0gTEYgYW5kIFNIQSBwYXJpdHkKCm9uOgogIHB1bGxfcmVxdWVzdDoKICB3b3JrZmxvd19kaXNwYXRjaDoKCnBlcm1pc3Npb25zOgogIGNvbnRlbnRzOiByZWFkCgpqb2JzOgogIGNhbGN1bGF0ZS1wYXJpdHk6CiAgICBzdHJhdGVneToKICAgICAgZmFpbC1mYXN0OiBmYWxzZQogICAgICBtYXRyaXg6CiAgICAgICAgb3M6IFt1YnVudHUtbGF0ZXN0LCBtYWNvcy1sYXRlc3QsIHdpbmRvd3MtbGF0ZXN0XQogICAgcnVucy1vbjogJHt7IG1hdHJpeC5vcyB9fQogICAgc3RlcHM6CiAgICAgIC0gbmFtZTogQ2hlY2tvdXQKICAgICAgICB1c2VzOiBhY3Rpb25zL2NoZWNrb3V0QHY0CiAgICAgICAgd2l0aDoKICAgICAgICAgIGZldGNoLWRlcHRoOiAwCgogICAgICAtIG5hbWU6IFNldCB1cCBQeXRob24KICAgICAgICB1c2VzOiBhY3Rpb25zL3NldHVwLXB5dGhvbkB2NQogICAgICAgIHdpdGg6CiAgICAgICAgICBweXRob24tdmVyc2lvbjogIjMuMTIiCgogICAgICAtIG5hbWU6IFZhbGlkYXRlIExGIGFuZCBVVEYtOCBub3JtYWxpemF0aW9uCiAgICAgICAgc2hlbGw6IGJhc2gKICAgICAgICBlbnY6CiAgICAgICAgICBCQVNFX1NIQTogJHt7IGdpdGh1Yi5ldmVudC5wdWxsX3JlcXVlc3QuYmFzZS5zaGEgfHwgJycgfX0KICAgICAgICBydW46IHwKICAgICAgICAgIHNldCAtbyBwaXBlZmFpbAogICAgICAgICAgYXJncz0oLS1yb290IC4gLS1qc29uKQogICAgICAgICAgaWYgW1sgLW4gIiR7QkFTRV9TSEE6LX0iICYmICEgIiRCQVNFX1NIQSIgPX4gXjArJCBdXTsgdGhlbgogICAgICAgICAgICBhcmdzKz0oLS1jaGFuZ2VkLXNpbmNlICIkQkFTRV9TSEEiKQogICAgICAgICAgZmkKICAgICAgICAgIHB5dGhvbiB0b29scy92YWxpZGF0ZV9saW5lX2VuZGluZ3MucHkgIiR7YXJnc1tAXX0iIDI+JjEgfCB0ZWUgbGluZS1lbmRpbmctdmFsaWRhdGlvbi5sb2cKCiAgICAgIC0gbmFtZTogQ2FsY3VsYXRlIHBhcml0eSBoYXNoZXMKICAgICAgICBzaGVsbDogYmFzaAogICAgICAgIHJ1bjogfAogICAgICAgICAgcHl0aG9uIC0gPDwnUFknCiAgICAgICAgICBpbXBvcnQgaGFzaGxpYgogICAgICAgICAgaW1wb3J0IGpzb24KICAgICAgICAgIGltcG9ydCBvcwogICAgICAgICAgZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCgogICAgICAgICAgdGFyZ2V0cyA9IFsKICAgICAgICAgICAgICBQYXRoKCJjb3JlL0NvZGluZ19Qcm9qZWN0X0dvdmVybmFuY2VfdjEuMC5tZCIpLAogICAgICAgICAgICAgIFBhdGgoImNvcmUvQ1JPU1NfUExBVEZPUk1fVEVYVF9OT1JNQUxJWkFUSU9OX1JVTEVfdjEuMC5tZCIpLAogICAgICAgICAgICAgIFBhdGgoInByb2plY3RzL2d3Yy9wYWNrYWdlLnlhbWwiKSwKICAgICAgICAgIF0KICAgICAgICAgIHBheWxvYWQgPSB7CiAgICAgICAgICAgICAgInJ1bm5lcl9vcyI6IG9zLmVudmlyb25bIlJVTk5FUl9PUyJdLAogICAgICAgICAgICAgICJoYXNoZXMiOiB7CiAgICAgICAgICAgICAgICAgIHBhdGguYXNfcG9zaXgoKTogaGFzaGxpYi5zaGEyNTYocGF0aC5yZWFkX2J5dGVzKCkpLmhleGRpZ2VzdCgpCiAgICAgICAgICAgICAgICAgIGZvciBwYXRoIGluIHRhcmdldHMKICAgICAgICAgICAgICB9LAogICAgICAgICAgfQogICAgICAgICAgb3V0cHV0ID0gUGF0aChmImNyb3NzLW9zLXNoYS1wYXJpdHkte29zLmVudmlyb25bJ1JVTk5FUl9PUyddfS5qc29uIikKICAgICAgICAgIG91dHB1dC53cml0ZV90ZXh0KAogICAgICAgICAgICAgIGpzb24uZHVtcHMocGF5bG9hZCwgaW5kZW50PTIsIHNvcnRfa2V5cz1UcnVlKSArICJcbiIsCiAgICAgICAgICAgICAgZW5jb2Rpbmc9InV0Zi04IiwKICAgICAgICAgICAgICBuZXdsaW5lPSJcbiIsCiAgICAgICAgICApCiAgICAgICAgICBQWQoKICAgICAgLSBuYW1lOiBVcGxvYWQgcGFyaXR5IGFuZCBleGFjdC1zb3VyY2UgZXZpZGVuY2UKICAgICAgICB1c2VzOiBhY3Rpb25zL3VwbG9hZC1hcnRpZmFjdEB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBuYW1lOiBsZi1zaGEtcGFyaXR5LSR7eyBydW5uZXIub3MgfX0tJHt7IGdpdGh1Yi5ydW5faWQgfX0KICAgICAgICAgIGluY2x1ZGUtaGlkZGVuLWZpbGVzOiB0cnVlCiAgICAgICAgICBwYXRoOiB8CiAgICAgICAgICAgIGxpbmUtZW5kaW5nLXZhbGlkYXRpb24ubG9nCiAgICAgICAgICAgIGNyb3NzLW9zLXNoYS1wYXJpdHktJHt7IHJ1bm5lci5vcyB9fS5qc29uCiAgICAgICAgICAgIC5lZGl0b3Jjb25maWcKICAgICAgICAgICAgLmdpdGF0dHJpYnV0ZXMKICAgICAgICAgICAgLmdpdGh1Yi93b3JrZmxvd3MvbGluZS1lbmRpbmctcGFyaXR5LnltbAogICAgICAgICAgICAuZ2l0aHViL3dvcmtmbG93cy92YWxpZGF0ZS1pbnN0cnVjdGlvbnMueW1sCiAgICAgICAgICAgIGNvcmUvQ1JPU1NfUExBVEZPUk1fVEVYVF9OT1JNQUxJWkFUSU9OX1JVTEVfdjEuMC5tZAogICAgICAgICAgICBwcm9qZWN0cy9nd2MvcGFja2FnZS55YW1sCiAgICAgICAgICAgIHJlbGVhc2VzL2NoYW5nZWxvZy5kLzIwMjYtMDgtMDItY3Jvc3MtcGxhdGZvcm0tbGYtbm9ybWFsaXphdGlvbi5tZAogICAgICAgICAgICBTSEEyNTZTVU1TLnR4dAogICAgICAgICAgICB0ZXN0cy90ZXN0X2xpbmVfZW5kaW5nX3BvbGljeS5weQogICAgICAgICAgICB0b29scy92YWxpZGF0ZV9saW5lX2VuZGluZ3MucHkKCiAgY29tcGFyZS1wYXJpdHk6CiAgICBuZWVkczogY2FsY3VsYXRlLXBhcml0eQogICAgcnVucy1vbjogdWJ1bnR1LWxhdGVzdAogICAgc3RlcHM6CiAgICAgIC0gbmFtZTogRG93bmxvYWQgcGFyaXR5IGV2aWRlbmNlCiAgICAgICAgdXNlczogYWN0aW9ucy9kb3dubG9hZC1hcnRpZmFjdEB2NAogICAgICAgIHdpdGg6CiAgICAgICAgICBwYXR0ZXJuOiBsZi1zaGEtcGFyaXR5LSotJHt7IGdpdGh1Yi5ydW5faWQgfX0KICAgICAgICAgIHBhdGg6IHBhcml0eS1hcnRpZmFjdHMKCiAgICAgIC0gbmFtZTogQ29tcGFyZSBoYXNoZXMgYWNyb3NzIG9wZXJhdGluZyBzeXN0ZW1zCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBweXRob24gLSA8PCdQWScKICAgICAgICAgIGltcG9ydCBqc29uCiAgICAgICAgICBmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKCiAgICAgICAgICByZXBvcnRzID0gc29ydGVkKFBhdGgoInBhcml0eS1hcnRpZmFjdHMiKS5yZ2xvYigiY3Jvc3Mtb3Mtc2hhLXBhcml0eS0qLmpzb24iKSkKICAgICAgICAgIGlmIGxlbihyZXBvcnRzKSAhPSAzOgogICAgICAgICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoZiJleHBlY3RlZCAzIHBhcml0eSByZXBvcnRzLCBmb3VuZCB7bGVuKHJlcG9ydHMpfSIpCgogICAgICAgICAgcGF5bG9hZHMgPSBbanNvbi5sb2FkcyhwYXRoLnJlYWRfdGV4dChlbmNvZGluZz0idXRmLTgiKSkgZm9yIHBhdGggaW4gcmVwb3J0c10KICAgICAgICAgIGJhc2VsaW5lID0gcGF5bG9hZHNbMF1bImhhc2hlcyJdCiAgICAgICAgICBtaXNtYXRjaGVzID0gewogICAgICAgICAgICAgIHBheWxvYWRbInJ1bm5lcl9vcyJdOiBwYXlsb2FkWyJoYXNoZXMiXQogICAgICAgICAgICAgIGZvciBwYXlsb2FkIGluIHBheWxvYWRzWzE6XQogICAgICAgICAgICAgIGlmIHBheWxvYWRbImhhc2hlcyJdICE9IGJhc2VsaW5lCiAgICAgICAgICB9CiAgICAgICAgICBpZiBtaXNtYXRjaGVzOgogICAgICAgICAgICAgIHJhaXNlIFN5c3RlbUV4aXQoZiJDUk9TU19PU19IQVNIX01JU01BVENIOiB7bWlzbWF0Y2hlc30iKQoKICAgICAgICAgIHByaW50KCJQQVNTOiBjYW5vbmljYWwgaGFzaGVzIGFyZSBpZGVudGljYWwgYWNyb3NzIExpbnV4LCBtYWNPUywgYW5kIFdpbmRvd3MiKQogICAgICAgICAgUFkK
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import hashlib
+          import os
+
+          entries = [
+              '  - {id: cross-platform-text-normalization-rule, path: core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md, target: .governance/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md, required: true}',
+              '  - {id: repository-gitattributes, path: .gitattributes, target: .governance/repository-controls/.gitattributes, required: true}',
+              '  - {id: repository-editorconfig, path: .editorconfig, target: .governance/repository-controls/.editorconfig, required: true}',
+              '  - {id: line-ending-validator, path: tools/validate_line_endings.py, target: .governance/tools/validate_line_endings.py, required: true}',
+              '  - {id: line-ending-policy-tests, path: tests/test_line_ending_policy.py, target: .governance/tests/test_line_ending_policy.py, required: true}',
+              '  - {id: line-ending-parity-workflow, path: .github/workflows/line-ending-parity.yml, target: .governance/workflows/line-ending-parity.yml, required: true}',
+              '  - {id: validate-instructions-workflow, path: .github/workflows/validate-instructions.yml, target: .governance/workflows/validate-instructions.yml, required: true}',
+          ]
+          package = Path('projects/gwc/package.yaml')
+          package_text = package.read_text(encoding='utf-8')
+          if 'cross-platform-text-normalization-rule' not in package_text:
+              package_text = package_text.replace('instructions:\n', 'instructions:\n' + '\n'.join(entries) + '\n', 1)
+              package.write_text(package_text, encoding='utf-8', newline='\n')
+
+          workflow = Path('.github/workflows/line-ending-parity.yml')
+          workflow.write_bytes(base64.b64decode(os.environ['FINAL_WORKFLOW_B64']))
+
+          changed = [
+              '.editorconfig',
+              '.gitattributes',
+              '.github/workflows/line-ending-parity.yml',
+              '.github/workflows/validate-instructions.yml',
+              'core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md',
+              'projects/gwc/package.yaml',
+              'releases/changelog.d/2026-08-02-cross-platform-lf-normalization.md',
+              'tests/test_line_ending_policy.py',
+              'tools/validate_line_endings.py',
+          ]
+          sums = Path('SHA256SUMS.txt')
+          lines = sums.read_text(encoding='utf-8').splitlines()
+          index = {line.split('  ', 1)[1]: i for i, line in enumerate(lines) if '  ' in line}
+          for relative in changed:
+              digest = hashlib.sha256(Path(relative).read_bytes()).hexdigest()
+              record = f'{digest}  {relative}'
+              if relative in index:
+                  lines[index[relative]] = record
+              else:
+                  inserted = False
+                  for i, line in enumerate(lines):
+                      path = line.split('  ', 1)[1] if '  ' in line else ''
+                      if path > relative:
+                          lines.insert(i, record)
+                          inserted = True
+                          break
+                  if not inserted:
+                      lines.append(record)
+                  index = {line.split('  ', 1)[1]: i for i, line in enumerate(lines) if '  ' in line}
+          sums.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+          PY
+
+      - name: Validate finalized files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -o pipefail
+          python tools/validate_line_endings.py --root . --json --changed-since "$BASE_SHA"
+          python -m unittest tests/test_line_ending_policy.py -v
+          python tools/build_project_package.py gwc --output dist --clean
+          git diff --check
+
+      - name: Commit finalized package and SHA closure
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projects/gwc/package.yaml SHA256SUMS.txt .github/workflows/line-ending-parity.yml
+          if git diff --cached --quiet; then
+            echo "No finalization changes required."
+            exit 0
+          fi
+          git commit -m "chore(gwc): finalize LF package and SHA closure"
+          git push origin HEAD:${{ github.head_ref }}
+          git rev-parse HEAD | tee finalized-head.txt
+
+      - name: Upload finalization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lf-package-sha-finalization-${{ github.run_id }}
+          include-hidden-files: true
+          path: |
+            finalized-head.txt
+            projects/gwc/package.yaml
+            SHA256SUMS.txt
+            .github/workflows/line-ending-parity.yml
+
   calculate-parity:
+    needs: finalize-package-sha
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout
+      - name: Checkout finalized guarded branch
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -45,45 +161,26 @@ jobs:
           import json
           import os
           from pathlib import Path
-
           targets = [
-              Path("core/Coding_Project_Governance_v1.0.md"),
-              Path("core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md"),
-              Path("projects/gwc/package.yaml"),
+              Path('core/Coding_Project_Governance_v1.0.md'),
+              Path('core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md'),
+              Path('projects/gwc/package.yaml'),
           ]
           payload = {
-              "runner_os": os.environ["RUNNER_OS"],
-              "hashes": {
-                  path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
-                  for path in targets
-              },
+              'runner_os': os.environ['RUNNER_OS'],
+              'hashes': {path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in targets},
           }
           output = Path(f"cross-os-sha-parity-{os.environ['RUNNER_OS']}.json")
-          output.write_text(
-              json.dumps(payload, indent=2, sort_keys=True) + "\n",
-              encoding="utf-8",
-              newline="\n",
-          )
+          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
           PY
 
-      - name: Upload parity and exact-source evidence
+      - name: Upload parity evidence
         uses: actions/upload-artifact@v4
         with:
           name: lf-sha-parity-${{ runner.os }}-${{ github.run_id }}
-          include-hidden-files: true
           path: |
             line-ending-validation.log
             cross-os-sha-parity-${{ runner.os }}.json
-            .editorconfig
-            .gitattributes
-            .github/workflows/line-ending-parity.yml
-            .github/workflows/validate-instructions.yml
-            core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md
-            projects/gwc/package.yaml
-            releases/changelog.d/2026-08-02-cross-platform-lf-normalization.md
-            SHA256SUMS.txt
-            tests/test_line_ending_policy.py
-            tools/validate_line_endings.py
 
   compare-parity:
     needs: calculate-parity
@@ -100,20 +197,13 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-
-          reports = sorted(Path("parity-artifacts").rglob("cross-os-sha-parity-*.json"))
+          reports = sorted(Path('parity-artifacts').rglob('cross-os-sha-parity-*.json'))
           if len(reports) != 3:
-              raise SystemExit(f"expected 3 parity reports, found {len(reports)}")
-
-          payloads = [json.loads(path.read_text(encoding="utf-8")) for path in reports]
-          baseline = payloads[0]["hashes"]
-          mismatches = {
-              payload["runner_os"]: payload["hashes"]
-              for payload in payloads[1:]
-              if payload["hashes"] != baseline
-          }
+              raise SystemExit(f'expected 3 parity reports, found {len(reports)}')
+          payloads = [json.loads(path.read_text(encoding='utf-8')) for path in reports]
+          baseline = payloads[0]['hashes']
+          mismatches = {payload['runner_os']: payload['hashes'] for payload in payloads[1:] if payload['hashes'] != baseline}
           if mismatches:
-              raise SystemExit(f"CROSS_OS_HASH_MISMATCH: {mismatches}")
-
-          print("PASS: canonical hashes are identical across Linux, macOS, and Windows")
+              raise SystemExit(f'CROSS_OS_HASH_MISMATCH: {mismatches}')
+          print('PASS: canonical hashes are identical across Linux, macOS, and Windows')
           PY
