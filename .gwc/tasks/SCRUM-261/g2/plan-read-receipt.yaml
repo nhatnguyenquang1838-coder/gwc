@@ -1,0 +1,20 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+task_id: SCRUM-261
+gate: G2_EXECUTION
+canonical_task_uid: SCRUM-261
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+plan_revision: sha256:e21cc2421dcb542bdef413585336456b212b92b7e738e221145af7628247c92c
+paths_read:
+- /mnt/data/gwc_sessions/20260802-1218-SCRUM-261-expanded/20260802-1218-SCRUM-261/plan/requirements.md
+- /mnt/data/gwc_sessions/20260802-1218-SCRUM-261-expanded/20260802-1218-SCRUM-261/plan/design.md
+- /mnt/data/gwc_sessions/20260802-1218-SCRUM-261-expanded/20260802-1218-SCRUM-261/plan/tasks.md
+reader: chatgpt
+read_at_utc: '2026-08-02T06:14:00Z'
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+current_entry_node: gate_authority.gate-state-resolution
+next_planned_node: repo_delivery.base-drift-check
+recovery_precondition: 'Repair PR #173 intake-card failures before gate-node implementation.'
