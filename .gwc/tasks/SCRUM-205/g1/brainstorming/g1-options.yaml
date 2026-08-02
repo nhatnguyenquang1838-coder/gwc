@@ -1,0 +1,37 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-08-02T15:58:00Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-205
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  g0_snapshot: "../../g0/context-snapshot.yaml"
+options:
+  - id: OPT-01
+    title: Single-function validator with RouteDecision dataclass
+    description: Implement validate_resume_token() returning a frozen RouteDecision with route, reason, evidence, and authority_granted=false. Cover all EARS requirements in one function with ordered checks.
+    benefits:
+      - Simple, deterministic, auditable
+      - Easy to test with unit tests
+      - Matches sibling M5 pattern (SCRUM-202)
+    tradeoffs:
+      - Single function may be long
+    risks:
+      - None identified
+    constraint_fit: FIT
+  - id: OPT-02
+    title: Class-based validator with separate check methods
+    description: Implement a ResumeTokenValidator class with individual check methods for each binding.
+    benefits:
+      - More granular testing
+    tradeoffs:
+      - More complex than needed
+      - Deviates from sibling pattern
+    risks:
+      - Over-engineering
+    constraint_fit: FIT
+recommended_option_id: OPT-01
+recommendation_rationale: Option OPT-01 is chosen because a single-function validator with a RouteDecision dataclass is simple, deterministic, auditable, and matches the sibling M5 pattern. It covers all requirements in ordered checks and is highly testable.
+decision_required: true
+status: READY
