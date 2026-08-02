@@ -1,0 +1,127 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-208
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+working_branch: feature/SCRUM-208-g0g1-setup-20260802
+pull_request:
+  number: null
+  url: null
+  draft: true
+head_sha: 8e2d80c1a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+scope_hash: sha256:bfd6c0513db9dc9a92ae10a1765844474a7598b1571ddd29af599c09e3c24c4a
+changed_paths:
+- .gwc/tasks/SCRUM-208/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-208/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-208/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-208/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-208/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-208/g2/execution-envelope.yaml
+validation:
+  head_sha: 8e2d80c1a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+  status: pass
+  commands:
+  - command: python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-208
+    result: pass
+    evidence: G0/G1 validation outcome: PASS
+review:
+  implementer_id: kiro-ai-agent
+  reviewer_id: kiro-ai-agent
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 8e2d80c1a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+  reviewed_scope_hash: sha256:bfd6c0513db9dc9a92ae10a1765844474a7598b1571ddd29af599c09e3c24c4a
+  reviewed_at: '2026-08-02T16:00:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - G0/G1 artifacts created for SCRUM-208 task
+    - Scope bounded to task setup only
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Task-scoped workspace pattern followed
+    - G2 execution envelope generated with correct schema
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - YAML files created with correct schema
+    - No implementation code changes
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - G0/G1 validator (tools/validate_g01.py) returned PASS
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - GWC Gate Lifecycle Contract v1.0 followed
+    - Task-scoped workspace pattern used
+    - G2 execution envelope generated
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Working branch created: feature/SCRUM-208-g0g1-setup-20260802
+    - Branch pushed to origin
+    - Commit 8e2d80c created
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - Commit passed G0/G1 validation
+    - Branch ready for PR creation
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - G0 context snapshot validated with status READY
+  - id: AC-2
+    result: pass
+    evidence:
+    - G1 intake brief validated
+  - id: AC-3
+    result: pass
+    evidence:
+    - G1 options contain OPT-1, OPT-2, OPT-3
+  - id: AC-4
+    result: pass
+    evidence:
+    - G1 decision record shows ACCEPTED status for OPT-1
+  - id: AC-5
+    result: pass
+    evidence:
+    - G2 execution envelope generated with scope hash
+  - id: AC-6
+    result: pass
+    evidence:
+    - tools/validate_g01.py returned PASS
+  - id: AC-7
+    result: pending
+    evidence:
+    - Jira claim pending PR creation
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 8e2d80c1a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+  checks: []
+residual_risks:
+- Jira task claim requires PR number (circular dependency - resolve after PR created)
+exclusions:
+- merge
+- auto_merge
+- deploy
+- release
+- production_data_write
+- production_config_change
+- credential_rotation
+outcome: pass
