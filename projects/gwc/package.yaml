@@ -4,6 +4,13 @@ package_version: "1.16.0"
 status: active
 profile: projects/gwc/project-profile.yaml
 instructions:
+  - {id: cross-platform-text-normalization-rule, path: core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md, target: .governance/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md, required: true}
+  - {id: repository-gitattributes, path: .gitattributes, target: .governance/repository-controls/.gitattributes, required: true}
+  - {id: repository-editorconfig, path: .editorconfig, target: .governance/repository-controls/.editorconfig, required: true}
+  - {id: line-ending-validator, path: tools/validate_line_endings.py, target: .governance/tools/validate_line_endings.py, required: true}
+  - {id: line-ending-policy-tests, path: tests/test_line_ending_policy.py, target: .governance/tests/test_line_ending_policy.py, required: true}
+  - {id: line-ending-parity-workflow, path: .github/workflows/line-ending-parity.yml, target: .governance/workflows/line-ending-parity.yml, required: true}
+  - {id: validate-instructions-workflow, path: .github/workflows/validate-instructions.yml, target: .governance/workflows/validate-instructions.yml, required: true}
   - {id: coding-project-governance, path: core/Coding_Project_Governance_v1.0.md, target: .governance/Coding_Project_Governance_v1.0.md, required: true}
   - {id: gate-lifecycle-contract, path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md, target: .governance/GATE_LIFECYCLE_CONTRACT_v1.0.md, required: true}
   - {id: gate-transition-map, path: core/task-lifecycle/gate-transition-map.yaml, target: .governance/core/task-lifecycle/gate-transition-map.yaml, required: true}
