@@ -3,161 +3,102 @@ artifact_type: g3-delivery-record
 gate: G3_PR
 task_id: SCRUM-214
 repository: nhatnguyenquang1838-coder/gwc
+record_purpose: canonical_g3_delivery_record_for_g4_g5_recovery_pr_170
 base_ref: main
-base_sha: c3fa858c1ff5d0ceb09a165f0df32825b219e257
-working_branch: codex/scrum-214-f5-ci-evidence-capture-m5-r3-20260802
+base_sha: e1452a4f8a035f18569bc190030654a56d040f7e
+working_branch: codex/scrum-214-g4-g5-evidence-recovery-r1-20260802
 pull_request:
-  number: 169
-  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/169
+  number: 170
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/170
   draft: true
-head_sha: 214cad5aa2a6528a6d4601649104ff3fa4bae188
-scope_hash: sha256:1e4c24f09f6643dbe86c745e7621c3ff1fd78789c71f1f784d2fe4da38e589c8
-changed_paths:
-  - .gwc/tasks/SCRUM-214/g0/context-snapshot.yaml
-  - .gwc/tasks/SCRUM-214/g1/brainstorming/g1-options.yaml
-  - .gwc/tasks/SCRUM-214/g1/decision/g1-decision-record.yaml
-  - .gwc/tasks/SCRUM-214/g1/intake/g1-intake-brief.yaml
-  - .gwc/tasks/SCRUM-214/g1/preflight/g1-preflight-report.yaml
-  - .gwc/tasks/SCRUM-214/g2/execution-envelope.yaml
-  - .gwc/tasks/SCRUM-214/g2/plan-read-receipt.yaml
-  - .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/design.md
-  - .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/requirements.md
-  - .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214/tasks.md
-  - releases/changelog.d/2026-08-02-scrum-214-ci-evidence-capture-m5.md
-  - schemas/ci-evidence-capture-decision.schema.json
-  - tests/test_validation_quality_ci_evidence_capture_m5.py
-  - tools/node_architect/ci_evidence_capture.py
-  - tools/node_architect/client_runtime.py
+  state: open
+  merged: false
+pre_record_head_sha: 1c2d5e3b41c658578ba5d0d0d156a7662be3d1da
+scope_hash: sha256:51a2793ecefc4d2e755a5476c5a127fc76a5da638c499b67dbde1f389f152359
+approved_scope_hash_prefix: 51a2793ecefc4d2e
+approval:
+  gate: G2_EXECUTION
+  approval_id: APPROVE_G2_SCRUM-214_G3-DELIVERY-EVIDENCE_R1_20260802
+  command: APPROVE G2_EXECUTION APPROVE_G2_SCRUM-214_G3-DELIVERY-EVIDENCE_R1_20260802 51a2793ecefc4d2e 2026-08-03T01:15:00Z
+  expires_at: '2026-08-03T01:15:00Z'
+  accepted_at: '2026-08-02T03:49:00Z'
+  authorized_files:
+    - .gwc/tasks/SCRUM-214/g3/delivery-record.yaml
+  authorized_actions:
+    - create_or_update_single_g3_delivery_record
+    - run_or_read_exact_head_ci
+    - update_pr_body_with_g3_delivery_record_status
+    - perform_read_only_review_refresh_if_head_changes
+changed_paths_before_record_update:
+  status: approved_scope_matched
+  count: 5
+  paths:
+    - .github/workflows/g4-g5-evidence.yml
+    - .gwc/tasks/SCRUM-214/g4/merge-approval.yaml
+    - .gwc/tasks/SCRUM-214/g5/status-verification.yaml
+    - releases/changelog.d/2026-08-02-scrum-214-g4-g5-evidence-recovery.md
+    - tests/test_g4_g5_evidence_workflow.py
+recovery_intent:
+  - Materialize G4 merge approval evidence for already merged SCRUM-214 PR #169 without claiming the normal pre-merge bot receipt existed.
+  - Materialize G5 read-only status verification evidence for merge commit e1452a4f8a035f18569bc190030654a56d040f7e without granting deployment authority.
+  - Fix parser compatibility so canonical APPROVE G4_MERGE and legacy APPROVE G4 are accepted consistently at G4 readback call sites.
+  - Preserve Jira as projection-only and do not perform SCRUM-215, SCRUM-219, F9, deployment, release, production, credential, secret, or migration work.
 validation:
-  head_sha: 214cad5aa2a6528a6d4601649104ff3fa4bae188
+  target_head_sha: 1c2d5e3b41c658578ba5d0d0d156a7662be3d1da
   status: pass
-  commands:
-    - command: python -m unittest tests/test_validation_quality_ci_evidence_capture_m5.py -v
+  evidence:
+    - command: GitHub Actions / Validate instructions
       result: pass
-      evidence: 9 of 9 SCRUM-214 focused tests passed on the exact reviewed implementation head.
-    - command: python -m unittest tests/test_client_runtime_vertical_slice.py -v
+      run_id: 30730395657
+      event: pull_request
+      head_sha: 1c2d5e3b41c658578ba5d0d0d156a7662be3d1da
+      evidence: Workflow completed successfully for exact PR #170 head before this delivery-record update.
+    - command: GitHub Actions / Build instruction packages
       result: pass
-      evidence: 5 of 5 Client-runtime regression tests passed.
-    - command: python -m compileall -q tools/node_architect
+      run_id: 30730395624
+      event: pull_request
+      head_sha: 1c2d5e3b41c658578ba5d0d0d156a7662be3d1da
+      evidence: Workflow completed successfully for exact PR #170 head before this delivery-record update.
+    - command: GitHub compare e1452a4f8a035f18569bc190030654a56d040f7e..codex/scrum-214-g4-g5-evidence-recovery-r1-20260802
       result: pass
-      evidence: Changed and dependent Node Architect Python modules compiled successfully.
-    - command: Draft 2020-12 schema validation
-      result: pass
-      evidence: CI evidence decision schema and produced examples validated successfully.
-    - command: python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-214 --gate G2_EXECUTION --json
-      result: pass
-      evidence: Exact task-scoped G0, G1 and G2 artifacts validated with no issues.
-    - command: full diff scope and secret review
-      result: pass
-      evidence: Exactly 15 approved paths changed before G3 record materialization; no secret or excluded-path finding.
+      evidence: Branch was ahead by 5, behind by 0, with exactly the five approved recovery paths before adding this canonical G3 record.
 review:
-  implementer_id: chatgpt-agent-g2-r3
-  reviewer_id: chatgpt-agent-scrum-214-fresh-context-reviewer
-  independence: fresh-context
-  mode: read-only
-  reviewed_head_sha: 214cad5aa2a6528a6d4601649104ff3fa4bae188
-  reviewed_scope_hash: sha256:1e4c24f09f6643dbe86c745e7621c3ff1fd78789c71f1f784d2fe4da38e589c8
-  reviewed_at: '2026-08-02T00:49:25Z'
-  lanes:
-    - name: requirement
-      applicable: true
-      status: pass
-      evidence:
-        - G1 AC-1 through AC-6 map to deterministic classification, checkpointing, drift rejection, replay, Client binding and exact-head CI.
-    - name: design
-      applicable: true
-      status: pass
-      evidence:
-        - Reuses canonical ci_run_capture and checkpoint_store primitives without adding a parallel runtime or provider client.
-    - name: code
-      applicable: true
-      status: pass
-      evidence:
-        - Closed reason codes, exact identity binding, WAIT checkpointing, readback reconciliation and zero later-gate authority are implemented.
-    - name: test
-      applicable: true
-      status: pass
-      evidence:
-        - 9 focused tests and 5 Client-runtime regressions cover terminal, pending, unavailable, timeout, stale, mismatch, crash, duplicate and reconciliation behavior.
-    - name: governance
-      applicable: true
-      status: pass
-      evidence:
-        - G0/G1/G2 evidence and exclusions are present; unrelated protected-base drift was classified SAFE_CONTINUE under the E2E rule.
-    - name: delivery
-      applicable: true
-      status: pass
-      evidence:
-        - Draft PR 169 is open, mergeable and bound to exact reviewed head 214cad5aa2a6528a6d4601649104ff3fa4bae188.
-    - name: ci
-      applicable: true
-      status: pass
-      evidence:
-        - Exact-head GitHub Actions runs 30725817956 and 30725817955 completed successfully, including four package-build jobs.
-  findings: []
-  acceptance_criteria:
-    - id: AC-1
-      result: pass
-      evidence:
-        - Terminal success, failure and cancelled classifications are covered by focused tests.
-    - id: AC-2
-      result: pass
-      evidence:
-        - Pending, unavailable and timeout states persist a resumable checkpoint before continuation.
-    - id: AC-3
-      result: pass
-      evidence:
-        - Stale-head and SHA-mismatch cases fail closed.
-    - id: AC-4
-      result: pass
-      evidence:
-        - Identical replay returns the same digest without duplicate checkpoint events.
-    - id: AC-5
-      result: pass
-      evidence:
-        - Client runtime invokes the SCRUM-214 handler and returns a typed blocked result without manual fallback when evidence is unavailable.
-    - id: AC-6
-      result: pass
-      evidence:
-        - Focused validation and exact reviewed-head CI passed; G4, G5 and G6 remain excluded.
-  decision: pass
-  stale: false
-ci:
-  required: true
-  head_sha: 214cad5aa2a6528a6d4601649104ff3fa4bae188
-  checks:
-    - name: Validate instructions
-      required: true
-      status: pass
-      evidence: GitHub Actions run 30725817956 job 91437197669 completed successfully for the exact reviewed head.
-    - name: build (gwc)
-      required: true
-      status: pass
-      evidence: GitHub Actions run 30725817955 job 91437197806 completed successfully for the exact reviewed head.
-    - name: build (rental-home)
-      required: true
-      status: pass
-      evidence: GitHub Actions run 30725817955 job 91437197824 completed successfully for the exact reviewed head.
-    - name: build (ds-mcp)
-      required: true
-      status: pass
-      evidence: GitHub Actions run 30725817955 job 91437197825 completed successfully for the exact reviewed head.
-    - name: build (pm-skills)
-      required: true
-      status: pass
-      evidence: GitHub Actions run 30725817955 job 91437197833 completed successfully for the exact reviewed head.
-residual_risks:
-  - The PR base advanced to 0ed70ffe7f76b4affcea0b6a8951363e200bb415 after G3 approval; the unrelated four-path delta was classified SAFE_CONTINUE and recorded in the PR.
-  - SCRUM-215 and SCRUM-219 remain separate downstream blockers for complete SCRUM-256 acceptance.
-  - The G3 delivery-record commit is evidence-only and follows the repository's established pre-record-head convention.
+  mode: read_only
+  reviewed_head_sha: 1c2d5e3b41c658578ba5d0d0d156a7662be3d1da
+  review_id: 4836891544
+  status: pass
+  decision: no_blocker_inside_approved_scope
+  limitation: This delivery-record update changes the PR head after the first review; a review refresh is required after exact-head CI completes for the new head.
+existing_record_handling:
+  prior_record_detected: true
+  prior_record_context: The canonical path already contained the original SCRUM-214 PR #169 G3 delivery record from the earlier M5 implementation.
+  update_mode: authorized_recovery_record_replacement
+  preservation_note: The original PR #169 record remains available in repository history and PR #169 evidence; this branch now records the G3 evidence for recovery PR #170.
+post_record_requirements:
+  - Re-read PR #170 head after this file update.
+  - Run or read exact-head CI for the new PR #170 head.
+  - Refresh read-only review evidence if the head changed.
+  - Update PR body with the new head, CI result, and review refresh status.
+  - Keep PR #170 Draft until G3 is complete and no G4 approval has been granted.
 exclusions:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION_DATA
   - PROTECTED_MAIN_WRITE
+  - MERGE
+  - AUTO_MERGE
+  - DEPLOY
+  - RELEASE
+  - PRODUCTION_CONFIGURATION
+  - PRODUCTION_DATA
+  - CREDENTIALS
+  - SECRETS
+  - MIGRATION
   - SCRUM_215_IMPLEMENTATION
   - SCRUM_219_IMPLEMENTATION
   - F9_SCALE_CONTROL
+  - SCRUM_258
+  - BROAD_81_NODE_ROLLOUT
   - PACKAGE_EXPORT
   - FORCE_PUSH_OR_HISTORY_REWRITE
-outcome: pass
+outcome: g3_record_materialized_pending_new_head_ci_and_review_refresh

@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -134,6 +135,12 @@ def workflow_job_names() -> list[str]:
     return names
 
 
+def g4_command_patterns() -> list[str]:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    patterns = re.findall(r"const command = /(\^APPROVE .*?\$)/;", text)
+    return [pattern for pattern in patterns if "G4" in pattern and "G5 RECOVERY" not in pattern]
+
+
 class G4G5EvidenceWorkflowTests(unittest.TestCase):
     def test_g4_template_is_valid_and_unexpired_at_generation(self) -> None:
         record = json.loads(G4_TEMPLATE.read_text(encoding="utf-8"))
@@ -182,6 +189,29 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
         self.assertNotIn("git push", text)
         self.assertNotIn("merge_pull_request(", text)
         self.assertNotIn("create_pull_request", text)
+
+    def test_workflow_accepts_canonical_and_legacy_g4_tokens_consistently(self) -> None:
+        patterns = g4_command_patterns()
+        self.assertEqual(3, len(patterns), patterns)
+        self.assertTrue(all("APPROVE (?:G4_MERGE|G4)" in pattern for pattern in patterns))
+        self.assertEqual(len(set(patterns)), 1, patterns)
+        compiled = re.compile(patterns[0])
+        for command in (
+            "APPROVE G4_MERGE APPROVE_G4_SCRUM-214_R3_20260802 0af8d2a448b8ff06 2026-08-03T00:53:49Z",
+            "APPROVE G4 APPROVE_G4_SCRUM-214_R3_20260802 0af8d2a448b8ff06 2026-08-03T00:53:49Z",
+        ):
+            match = compiled.fullmatch(command)
+            self.assertIsNotNone(match, command)
+            assert match is not None
+            self.assertEqual("APPROVE_G4_SCRUM-214_R3_20260802", match.group(1))
+            self.assertEqual("0af8d2a448b8ff06", match.group(2))
+            self.assertEqual("2026-08-03T00:53:49Z", match.group(3))
+        for malformed in (
+            "APPROVE G4MERGE id 0af8d2a448b8ff06 2026-08-03T00:53:49Z",
+            "APPROVE G4_MERGE id short 2026-08-03T00:53:49Z",
+            "APPROVE G4_MERGE id 0af8d2a448b8ff06 not-a-date",
+        ):
+            self.assertIsNone(compiled.fullmatch(malformed), malformed)
 
     def test_workflow_job_keys_are_unique(self) -> None:
         names = workflow_job_names()

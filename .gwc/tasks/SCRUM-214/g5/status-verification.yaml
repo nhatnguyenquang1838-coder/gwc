@@ -1,0 +1,62 @@
+schema_version: '1.0'
+artifact_type: g5-status-verification-recovery-record
+gate: G5_DEPLOY
+task_id: SCRUM-214
+repository: nhatnguyenquang1838-coder/gwc
+pr_number: 169
+approved_head_sha: ac47c060bf18f47f0989f195581ffcf676b7b2ab
+merge_commit_sha: e1452a4f8a035f18569bc190030654a56d040f7e
+verification_mode: read_only_status_check
+components:
+  exact_merge_sha_ci:
+    status: PASS
+    required_workflows:
+      - name: Validate instructions
+        run_id: 30726515418
+        job_id: 91439126289
+        event: push
+        branch: main
+        head_sha: e1452a4f8a035f18569bc190030654a56d040f7e
+        conclusion: success
+      - name: Build instruction packages
+        run_id: 30726515417
+        event: push
+        branch: main
+        head_sha: e1452a4f8a035f18569bc190030654a56d040f7e
+        conclusion: success
+        jobs:
+          - {name: build (gwc), job_id: 91439126325, conclusion: success}
+          - {name: build (pm-skills), job_id: 91439126343, conclusion: success}
+          - {name: build (rental-home), job_id: 91439126358, conclusion: success}
+          - {name: build (ds-mcp), job_id: 91439126365, conclusion: success}
+  g4_to_merge_receipt_chain:
+    status: BLOCKED
+    reason_code: G4_RECEIPT_CHAIN_MISSING
+    expected_authority_marker: gwc:g4-authority-receipt
+    expected_merge_proof_marker: gwc:g4-merge-proof
+    normal_chain_observed: false
+    historical_event_rewritten: false
+overall:
+  status: BLOCKED
+  reason_code: BLOCKED_G4_RECEIPT_CHAIN_MISSING
+  ci_pass_does_not_override_governance_blocker: true
+recovery:
+  approved_g2_id: APPROVE_G2_SCRUM-214_G4-G5-RECOVERY_R1_20260802
+  approved_scope_hash: sha256:2c6c14e5221ed6a5d1917bacc8e5090bf1642b17d58b1520b12125825a696c55
+  parser_change: Accept canonical APPROVE G4_MERGE and legacy APPROVE G4 at all G4 readback call-sites.
+  normal_event_chain_claimed: false
+  jira_projection: In Review
+manual_action_authorized: false
+excluded_authority:
+  - deploy
+  - redeploy
+  - release
+  - publish
+  - runtime_reload
+  - production_configuration
+  - production_data
+  - credentials
+  - secrets
+  - migration
+  - scrum_215_implementation
+  - scrum_219_implementation
