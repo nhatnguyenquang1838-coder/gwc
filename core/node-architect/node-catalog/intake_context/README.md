@@ -84,6 +84,29 @@ The scope nodes are the two batch-1 renderers that turn intake evidence into bou
 | `entry_guards` | `G0_CONTEXT`, `read_only` | `G0_CONTEXT`, `read_only` |
 | `reason_codes` | `ACCEPTED`, `MISSING_EVIDENCE`, `MALFORMED_INPUT`, `SCOPE_DRIFT` | `ACCEPTED`, `EMPTY_SCOPE`, `PROHIBITED_ACTION`, `MALFORMED_INPUT`, `SCOPE_DRIFT` |
 
+## Intake Card Runtime Contract
+
+`intake_context.intake-card-render` remains a thin static `G0_CONTEXT` / `read_only` descriptor. Its runtime contract is explicitly mapped to:
+
+| Surface | Path |
+|---|---|
+| Closed schema | `schemas/intake-card.schema.json` |
+| Pure evaluator | `tools/node_architect/intake_card_render.py` |
+| Entrypoint | `render_intake_card` |
+| Focused regression | `tests/test_intake_context_intake_card_render_m4.py` |
+
+The family validator checks that the schema and evaluator exist, the schema is valid Draft 2020-12 JSON Schema, `artifact_type` is exactly `intake-card`, and the evaluator exports the expected callable.
+
+The renderer:
+
+- validates required fields, artifact type/version, and task/repository/base bindings across all upstream artifacts;
+- recomputes the SCRUM-179 `decision_digest` and SCRUM-180/181 `scope_hash` values from canonical semantic payloads;
+- binds `scope_hash` to source mode/revisions, risk digest, read-scope hash, and write-scope hash;
+- hashes the complete redacted card except `created_at` and `snapshot_hash`, including status and reason codes;
+- redacts protected keys regardless of value type and validates the closed explicit-directive vocabulary;
+- emits a schema-valid blocked card on ordinary contract, binding, hash, or redaction failures;
+- keeps every authority field fixed to `false`.
+
 ## Guardrails
 
 ```text
@@ -114,21 +137,24 @@ The scope nodes are the two batch-1 renderers that turn intake evidence into bou
 Run:
 
 ```bash
+python -m unittest tests.test_intake_context_intake_card_render_m4 -v
+python -m unittest tests.test_node_catalog_intake_context -v
 python tools/node_architect/validate_node_catalog_intake_context.py
-python -m unittest tests/test_node_catalog_intake_context.py
 ```
 
 ## Compatibility
 
 This batch extends the runtime kernel and the controlled catalog plan. It does not replace existing reference nodes, checkpoint contracts, simulation rules, or package export rules.
 
+The SCRUM-182 renderer validates upstream artifact contracts but does not implement or repair the separate SCRUM-179, SCRUM-180, or SCRUM-181 evaluators.
+
 ## Impact
 
 ```text
-✅ adds 9 catalog node definitions
-✅ adds a family README
-✅ adds a stdlib validator
-✅ adds tests
+✅ retains 9 catalog node definitions
+✅ adds closed intake-card runtime schema/evaluator linkage
+✅ adds deterministic digest, binding, redaction, and drift validation
+✅ adds focused and family regression coverage
 ❌ does not implement all 81 nodes
-❌ does not change runtime behavior
+❌ does not grant execution, merge, deploy, release, or production authority
 ```
