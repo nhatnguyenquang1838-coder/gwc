@@ -1,0 +1,114 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-02T13:55:31Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-263
+  base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Node Architect can select route-backed executable nodes without a universal node instruction contract or canonical
+    per-node evidence/log/next-route ledger.
+  why_now: SCRUM-261 and SCRUM-262 established route binding and claim intake; the next maturity boundary is fail-closed instruction
+    and evidence enforcement before execution.
+desired_outcome: Enforce MODE_DOES_NOT_BYPASS_NODE_RUNTIME and provide validated instruction/evidence/log/next-route contracts
+  for the current executable G2 repository-write path.
+stakeholders:
+  requester: Nhat
+  affected:
+  - GWC agents
+  - Node Architect maintainers
+  - DW SUPER governed projects
+scope:
+  in_scope:
+  - Node Instruction Contract and schema
+  - Four G2 route instruction cards
+  - Instruction validator
+  - Universal task-scoped evidence ledger
+  - Resolver fail-closed integration
+  - Mode invariant for normal/fastlane/e2e/hotfix/rescue
+  - Requested tests and runtime instruction updates
+  non_goals:
+  - Broad 81-node semantic rollout
+  - F9 scale control
+  - SCRUM-258 recovery
+  - Package/export
+  - PR creation during G2
+  - Merge/deploy/release/production operations
+constraints:
+- Reuse existing resolver, descriptors, registry, route profile, checkpoint, and digest primitives.
+- Preserve gate authority separation and current failure precedence.
+- No repository write before exact G2 approval.
+- Work only from exact protected base and fresh isolated worktree after G2.
+assumptions:
+- Current four-route G2 profile is the executable vertical slice; catalog nodes outside validated instruction-backed routes
+  remain non-executable.
+- Task Me is not available in this chat surface, so a canonical Kiro plan is generated locally.
+risks:
+- id: RISK-1
+  description: A generic fallback instruction could accidentally make catalog-only nodes executable.
+  impact: high
+  mitigation: Require explicit card resolution for each route-selected node and fail closed otherwise.
+- id: RISK-2
+  description: Evidence emission after an effect could leave unaudited writes.
+  impact: high
+  mitigation: Require instruction/evidence/log contract validation and node-start emission before effectful execution.
+- id: RISK-3
+  description: Mode-specific shortcuts could bypass runtime controls.
+  impact: high
+  mitigation: Validate a root mode policy and parameterize tests across all supported workflow modes.
+acceptance_criteria:
+- id: AC-1
+  statement: Missing node instruction fails closed.
+  verifiable: true
+- id: AC-2
+  statement: Missing evidence contract fails closed.
+  verifiable: true
+- id: AC-3
+  statement: Missing log contract fails closed.
+  verifiable: true
+- id: AC-4
+  statement: Missing next route fails closed.
+  verifiable: true
+- id: AC-5
+  statement: Node instruction cannot grant merge, deploy, or production authority.
+  verifiable: true
+- id: AC-6
+  statement: Fastlane mode still requires node runtime.
+  verifiable: true
+- id: AC-7
+  statement: E2E mode still requires node runtime.
+  verifiable: true
+- id: AC-8
+  statement: Hotfix mode still requires node runtime.
+  verifiable: true
+- id: AC-9
+  statement: Rescue mode still requires node runtime.
+  verifiable: true
+- id: AC-10
+  statement: The G2 scoped-write path validates instruction, evidence, logs, and next route and ends at G3_PR without PR authority.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch_from_exact_base
+  - create_isolated_worktree
+  - create_or_update_approved_files
+  - run_sandboxed_validation
+  - create_task_scoped_commit
+  - push_working_branch
+  - perform_exact_diff_readback
+  - record_task_scoped_node_runtime_evidence
+  downstream_non_goals:
+  - G4 merge
+  - manual G5 deploy/reload/release
+  - G6 production/config/data/secret/migration
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+    - exact branch head SHA
+    - focused/full validation
+    - complete diff readback
+    - independent G3 review and CI for exact head before ready-for-review
+unresolved_questions: []
+status: READY
