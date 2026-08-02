@@ -41,7 +41,7 @@ jobs:
           script: |
             const fs = require('fs');
             const body = (context.payload.comment.body || '').trim();
-            const command = /^APPROVE G4 ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
+            const command = /^APPROVE (?:G4_MERGE|G4) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
             const match = body.match(command);
             if (!match) {
               core.setOutput('matched', 'false');
@@ -140,7 +140,7 @@ jobs:
             const fs = require('fs');
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
-            const command = /^APPROVE G4 ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
+            const command = /^APPROVE (?:G4_MERGE|G4) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
             const receipts = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes('<!-- gwc:g4-authority-receipt '));
             const latest = receipts.at(-1);
@@ -216,7 +216,7 @@ jobs:
             const fs = require('fs');
             const { owner, repo } = context.repo;
             const mergeSha = context.payload.workflow_run.head_sha;
-            const command = /^APPROVE G4 ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
+            const command = /^APPROVE (?:G4_MERGE|G4) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
             const associated = await github.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: mergeSha });
             const associatedPr = associated.data.find((item) => item.merged_at && item.merge_commit_sha === mergeSha) || associated.data.find((item) => item.merged_at);
             if (!associatedPr) { core.setFailed(`No merged PR is associated with ${mergeSha}.`); return; }
