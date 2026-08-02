@@ -1,0 +1,71 @@
+schema_version: '1.0'
+artifact_type: gate-action-authority
+task_id: SCRUM-263
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+head_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+working_branch: feature/scrum-263-node-instruction-evidence-ledger
+gate: G2_EXECUTION
+action: push_working_branch
+scope:
+  authorized_paths:
+  - .kiro/specs/scrum-263-node-instruction-evidence-ledger/requirements.md
+  - .kiro/specs/scrum-263-node-instruction-evidence-ledger/design.md
+  - .kiro/specs/scrum-263-node-instruction-evidence-ledger/tasks.md
+  - core/node-architect/NODE_INSTRUCTION_CONTRACT_v1.0.md
+  - core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  - core/node-architect/node-instructions/gate_authority/gate-state-resolution.node-instruction.yaml
+  - core/node-architect/node-instructions/repo_delivery/scoped-file-write.node-instruction.yaml
+  - core/node-architect/node-instructions/repo_delivery/diff-readback.node-instruction.yaml
+  - core/node-architect/node-instructions/gate_authority/gate-transition-decision.node-instruction.yaml
+  - core/node-architect/gate-node-route-profile.json
+  - schemas/node-architect/node-instruction.schema.json
+  - schemas/node-architect/node-runtime-evidence.schema.json
+  - schemas/node-architect/gate-node-route-profile.schema.json
+  - schemas/node-architect/gate-node-route-decision.schema.json
+  - tools/node_architect/validate_node_instruction.py
+  - tools/node_architect/node_evidence_ledger.py
+  - tools/node_architect/resolve_gate_node_route.py
+  - tests/test_node_instruction_contract.py
+  - tests/test_node_evidence_ledger.py
+  - tests/test_gate_node_route_resolution.py
+  - agents/chatgpt-agent/agent-instructions.md
+  - projects/gwc/project-extension.md
+  - releases/changelog.d/2026-08-02-node-instruction-evidence-ledger.md
+  - .gwc/tasks/SCRUM-263/**
+  authorized_actions:
+  - push_working_branch
+  excluded_actions:
+  - protected_branch_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials
+  - secrets
+  - migration
+  - force_push
+  - branch_deletion
+  - history_rewrite
+  - pr_base_change
+  risk_class: R3
+issued_at: '2026-08-02T14:18:00Z'
+expires_at: '2026-08-03T13:55:31Z'
+actor:
+  kind: connector
+  id: ChatGPT
+evidence_readback:
+  status: confirmed
+  observed_at: '2026-08-02T14:18:00Z'
+  task_id: SCRUM-263
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  head_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  gate: G2_EXECUTION
+  action: push_working_branch
+  event_id_or_idempotency_key: scrum-263-g2-push-working-branch-aad17d28
+  scope_hash: sha256:c58253075e7cd39b71753fb08dd66522621e65dc6da7109f674aa80faefb7267
+scope_hash: sha256:c58253075e7cd39b71753fb08dd66522621e65dc6da7109f674aa80faefb7267

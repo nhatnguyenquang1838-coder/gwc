@@ -1,0 +1,52 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-02T13:55:31Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-263
+  base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Extend current route runtime
+  description: Add explicit instruction cards for the current executable G2 route, a strict validator, shared evidence ledger,
+    and mandatory resolver integration.
+  benefits:
+  - Smallest compatible evolution
+  - Fail-closed runtime enforcement
+  - Reuses existing descriptor/registry/route/checkpoint primitives
+  - Avoids broad 81-node rollout
+  tradeoffs:
+  - Only validated route-backed nodes are executable until later cards are added
+  risks:
+  - Route/card revisions must remain synchronized
+  constraint_fit: FIT
+- id: OPT-2
+  title: Embed instructions across all 81 catalog slots
+  description: Populate every registry/descriptor entry with a full instruction contract in one change.
+  benefits:
+  - Immediate catalog-wide coverage
+  tradeoffs:
+  - Very large semantic diff
+  - High risk of generic or inaccurate cards
+  - Cross-lane maturity work
+  risks:
+  - Could accidentally make immature catalog nodes executable
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Documentation-only contract
+  description: Add policy text without runtime validator or ledger integration.
+  benefits:
+  - Small diff
+  tradeoffs:
+  - No deterministic enforcement
+  - No canonical node evidence
+  risks:
+  - Modes and agents can still bypass the intended runtime
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: It closes the verified fail-open gap using existing mechanisms while keeping the broad 81-node rollout
+  outside SCRUM-263.
+decision_required: true
+status: READY

@@ -1,0 +1,146 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-02T13:55:31Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- No repository branch, worktree, file, commit, push, or PR before exact G2 approval.
+- Use a fresh isolated worktree from the approved exact base after G2.
+- Node and route artifacts never grant gate authority.
+- Jira, Slack, and Notion are projection only.
+- No merge, deploy, release, production, secret, migration, package/export, force-push, or branch deletion authority.
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+- id: CODING_PROJECT_GOVERNANCE_V1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: AGENT_OPERATING_RUNTIME_CONTRACT_V1.0
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: efc6411ae816b0f54d0efc9ac943811a709993d2
+- id: GATE_LIFECYCLE_CONTRACT_V1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+- id: GATE_NODE_RUNTIME_BINDING_CONTRACT_V1.0
+  path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: 4ee8a588797bd82ec05dcccb58cbaa848b0f799b
+- id: PROJECT_INSTRUCTIONS
+  path: projects/gwc/project-instructions.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+- id: PROJECT_EXTENSION
+  path: projects/gwc/project-extension.md
+  ref: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  source_sha: f46c67c1942dbaedbe53edf79207e0adbb46178c
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: efc6411ae816b0f54d0efc9ac943811a709993d2
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+- path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 4ee8a588797bd82ec05dcccb58cbaa848b0f799b
+- path: core/node-architect/gate-node-route-profile.json
+  required: true
+  status: AVAILABLE
+  source_sha: 4816238f4a6c75b52a19530973cf512a3f5de9f1
+- path: core/node-architect/node-registry.json
+  required: true
+  status: AVAILABLE
+  source_sha: d45cbaea26cef97c060467658101e80935875859
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: f46c67c1942dbaedbe53edf79207e0adbb46178c
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 227261a02f3a0945707a6de99fe0931f3cebcbd9
+- path: agents/dwc/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 3d7798da2e9448336e96ca1d0f82c5f02a26a300
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bc116f07b27ae08c2646a73a021e3cf2e06a0362
+- path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 956e557fedee58bc7d6eb2d53c2615524db8b16f
+- path: core/Agent_Response_Presentation_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 244ba257d995971f5026a86e5668bc8ede8767e2
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: chatgpt-agent
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: chatgpt-agent
+    path: agents/chatgpt-agent/agent-instructions.md
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+contextual_discovery:
+  historical_context:
+  - id: SCRUM-261
+    description: Delivered gate-node route binding and current G2 executable vertical slice.
+    link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-261
+  - id: SCRUM-262
+    description: Delivered default GWC boot and agent claim intake.
+    link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-262
+  downstream_impact:
+  - target: Gate-node route profile and decision consumers
+    impact_type: SCHEMA_CHANGE
+    description: Routes gain mandatory instruction/evidence/log/next-contract binding and validation readback.
+  stakeholder_reach:
+  - persona: GWC agents
+    impact: Must load and validate node instruction cards before execution.
+  - persona: Node Architect maintainers
+    impact: Must maintain card, route, descriptor, registry, and runtime evidence compatibility.
+  - persona: Governed project runtimes
+    impact: All supported workflow modes remain on the same node runtime boundary.

@@ -1,0 +1,23 @@
+{
+  "artifact_type": "node-start",
+  "base_sha": "aad17d28be539c88ecef4b9fbaf3eaa08f59461b",
+  "branch": "feature/scrum-263-node-instruction-evidence-ledger",
+  "head_sha": "e927420d8619bc9b45fda1e15d9ff9f374dc01db",
+  "idempotency_key": "SCRUM-263:scrum-263-g2-20260802T144100Z:repo_delivery.diff-readback",
+  "node_id": "repo_delivery.diff-readback",
+  "occurred_at": "2026-08-02T14:41:00Z",
+  "payload": {
+    "gate": "G2_EXECUTION",
+    "instruction_digest": "sha256:627dd5faeedcd0cd5852258be0d3659648c70a663cc024d0926ada083c225c30",
+    "requested_action": "post_write_readback",
+    "status": "STARTED"
+  },
+  "record_digest": "sha256:1ec60f4b9bda37043ce7bf0795e6aeb68ab2d5b04c89d45a3545e067cc40dba3",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "run_id": "scrum-263-g2-20260802T144100Z",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e",
+  "sequence": 1,
+  "state_digest": "sha256:91d059f3aee161a4c2fee4f763febef9819ac5511e02f52a56d4223cbe4e4cf0",
+  "task_id": "SCRUM-263"
+}

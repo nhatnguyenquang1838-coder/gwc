@@ -5,9 +5,12 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "artifact_type", "task_id", "gate",
-    "requested_action", "profile_id", "profile_revision", "graph_revision",
+    "schema_version", "artifact_type", "task_id", "gate", "requested_action",
+    "workflow_mode", "profile_id", "profile_revision", "graph_revision",
     "route_id", "outcome", "current_node", "implementation",
+    "node_instruction_ref", "instruction_digest", "instruction_validated",
+    "evidence_contract_valid", "log_contract_valid",
+    "next_route_contract_valid", "mode_runtime_required",
     "required_context", "loaded_context", "next_node", "next_action",
     "next_gate", "reason_code", "reason_codes", "decision_digest",
     "authority_granted", "write_authority_granted", "pr_authority_granted",
@@ -15,11 +18,12 @@
     "production_authority_granted"
   ],
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {"const": "1.1"},
     "artifact_type": {"const": "gate-node-route-decision"},
     "task_id": {"type": "string", "minLength": 1},
     "gate": {"type": "string", "minLength": 1},
     "requested_action": {"type": "string", "minLength": 1},
+    "workflow_mode": {"enum": ["normal", "fastlane", "e2e", "hotfix", "rescue"]},
     "profile_id": {"type": "string"},
     "profile_revision": {"type": "string"},
     "graph_revision": {"type": "string"},
@@ -27,14 +31,20 @@
     "outcome": {"enum": ["ROUTE_SELECTED", "BLOCKED"]},
     "current_node": {"type": ["string", "null"]},
     "implementation": {
-      "type": ["object", "null"],
-      "additionalProperties": false,
+      "type": ["object", "null"], "additionalProperties": false,
       "required": ["kind", "ref"],
       "properties": {
         "kind": {"enum": ["python", "connector", "resolver"]},
         "ref": {"type": "string", "minLength": 1}
       }
     },
+    "node_instruction_ref": {"type": ["string", "null"]},
+    "instruction_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+    "instruction_validated": {"type": "boolean"},
+    "evidence_contract_valid": {"type": "boolean"},
+    "log_contract_valid": {"type": "boolean"},
+    "next_route_contract_valid": {"type": "boolean"},
+    "mode_runtime_required": {"type": "boolean"},
     "required_context": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
     "loaded_context": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
     "next_node": {"type": ["string", "null"]},

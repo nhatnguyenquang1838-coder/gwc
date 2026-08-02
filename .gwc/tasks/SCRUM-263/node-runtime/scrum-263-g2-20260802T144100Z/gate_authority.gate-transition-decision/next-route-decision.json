@@ -1,0 +1,25 @@
+{
+  "artifact_type": "next-route-decision",
+  "base_sha": "aad17d28be539c88ecef4b9fbaf3eaa08f59461b",
+  "branch": "feature/scrum-263-node-instruction-evidence-ledger",
+  "decision_digest": "sha256:79c847748fc19e7b51650e40d780606c96e1399a718cdfd8f455ce4472e32ef3",
+  "head_sha": "e927420d8619bc9b45fda1e15d9ff9f374dc01db",
+  "idempotency_key": "SCRUM-263:scrum-263-g2-20260802T144100Z:gate_authority.gate-transition-decision",
+  "node_id": "gate_authority.gate-transition-decision",
+  "occurred_at": "2026-08-02T14:41:00Z",
+  "payload": {
+    "authority_granted": false,
+    "next_action": null,
+    "next_gate": "G3_PR",
+    "next_node": null,
+    "outcome": "PASS"
+  },
+  "record_digest": "sha256:d3cbcc8932e96fb59aed347a64e7cd2d5e1c51f6f8933f1d0736973526155a1a",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "run_id": "scrum-263-g2-20260802T144100Z",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e",
+  "sequence": 6,
+  "state_digest": "sha256:4326c284d6cfa07ca58d771e4109f42c2c005115151ab8bdf97e9256de9ad400",
+  "task_id": "SCRUM-263"
+}

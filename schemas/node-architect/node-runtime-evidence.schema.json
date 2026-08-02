@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/node-runtime-evidence.schema.json",
+  "title": "GWC Node Runtime Evidence Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "task_id", "run_id", "node_id",
+    "repository", "branch", "base_sha", "head_sha", "scope_hash",
+    "sequence", "occurred_at", "idempotency_key", "payload",
+    "state_digest", "record_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {
+      "enum": ["node-start", "node-decision", "node-result", "node-readback", "checkpoint", "next-route-decision"]
+    },
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"},
+    "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "record_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"artifact_type": {"enum": ["node-decision", "next-route-decision"]}}},
+      "then": {"required": ["decision_digest"]}
+    }
+  ]
+}

@@ -9,52 +9,86 @@ authority. Both must be valid before an execution action occurs.
 
 ## 2. Mandatory sequence
 
-For every G2 repository mutation:
+For every governed executable node, including normal, fastlane, e2e, hotfix, and
+rescue execution:
 
-1. Rehydrate the task-scoped G0 context snapshot, G1 decision, G2 execution
-envelope, exact approval receipt, work-item claim, and protected-base readback.
-2. Resolve exactly one route from the canonical route profile.
-3. Verify the selected node contract, registry entry, maturity, implementation,
-graph revision, and profile revision.
-4. Execute only the action already authorized by G2.
-5. Route a successful repository write to `repo_delivery.diff-readback`.
-6. Resolve the next node or the exact human gate. Do not stop at an ambiguous
-conversation state or wait for a generic continuation prompt.
+1. Complete GWC boot and agent task claim intake.
+2. Rehydrate task-scoped gate authority and required context.
+3. Resolve exactly one route from the canonical route profile.
+4. Verify registry entry, descriptor, maturity, implementation, graph revision,
+   profile revision, and the node instruction contract.
+5. Validate the instruction's evidence, logs, next-route, retry, rollback, mode,
+   and authority boundary before invoking implementation.
+6. Record node-start, decision, result, readback, checkpoint, runtime event,
+   digests, and next-route decision in the canonical task/run/node ledger.
+7. Continue only to the declared next node, action, or separately authorized gate.
 
-## 3. Authority invariant
+## 3. Mode invariant
 
-A route decision must set all authority fields to `false`. Authority comes only
-from validated gate artifacts and exact human approval where required. A node,
-profile, implementation, connector, Jira state, branch, commit, or CI result
-cannot create or expand authority.
+```text
+MODE_DOES_NOT_BYPASS_NODE_RUNTIME
+```
 
-## 4. Fail-closed reason codes
+Fastlane, e2e, hotfix, rescue, and normal execution may alter validation depth,
+batching, or continuation strategy. They must never bypass GWC boot, task claim,
+gate authority, route resolution, node instruction validation, evidence/log
+recording, or next-route resolution. A mode that disables any required runtime
+stage fails closed with `MODE_BYPASSES_NODE_RUNTIME`.
 
-- `NODE_CONTEXT_NOT_LOADED`
-- `NODE_ROUTE_MISSING`
-- `NODE_ROUTE_AMBIGUOUS`
-- `NODE_CONTRACT_MISSING`
-- `NODE_CONTRACT_INCOMPLETE`
-- `NODE_IMPLEMENTATION_UNAVAILABLE`
-- `NODE_NOT_EXECUTABLE_AT_MATURITY`
-- `GATE_NODE_BINDING_MISMATCH`
-- `GRAPH_REVISION_DRIFT`
-- `PROFILE_REVISION_DRIFT`
+## 4. Authority invariant
 
-When any code applies, the outcome is `BLOCKED`, no implementation is invoked,
-and no write or later-gate authority is granted.
+A route decision and node instruction must set all authority fields to false.
+Authority comes only from validated gate artifacts and exact human approval where
+required. Node instructions constrain execution; they do not grant G2, G3, G4,
+G5, or G6 authority. CI success, Jira/Slack/Notion projection, node maturity, or a
+route decision cannot create or expand authority.
 
-## 5. Canonical G2 route
+## 5. Fail-closed reason codes
 
-The `repository_write` action at `G2_EXECUTION` must resolve to
-`repo_delivery.scoped-file-write`. A PASS continues to
-`repo_delivery.diff-readback`. A successful exact diff readback continues to
-`gate_authority.gate-transition-decision`, which may identify `G3_PR` as the
-next authority boundary but may not create the G3 artifact or Draft PR without
-the applicable G3 contract.
+Existing route/runtime codes remain valid. Instruction-backed execution adds:
 
-## 6. Revision binding
+- `NODE_INSTRUCTION_MISSING`
+- `NODE_INSTRUCTION_INVALID`
+- `NODE_EVIDENCE_CONTRACT_MISSING`
+- `NODE_LOG_CONTRACT_MISSING`
+- `NODE_NEXT_ROUTE_MISSING`
+- `MODE_BYPASSES_NODE_RUNTIME`
+- `NODE_AUTHORITY_ESCALATION_ATTEMPT`
 
-The profile binds to exact node-registry and runtime-graph revisions. A mismatch
-is not an informational warning; it is a blocking drift condition requiring a
-new profile revision or refreshed gate evidence.
+When any code applies, implementation is not invoked and no write or later-gate
+authority is granted.
+
+## 6. Canonical G2 route
+
+```text
+gate_authority.gate-state-resolution
+→ repo_delivery.scoped-file-write
+→ repo_delivery.diff-readback
+→ gate_authority.gate-transition-decision
+→ next_gate = G3_PR
+```
+
+The route identifies the next authority boundary only. It does not create the G3
+artifact or Draft PR without the applicable G3 action authority.
+
+## 7. Canonical evidence ledger
+
+Every execution emits task-scoped evidence under:
+
+```text
+.gwc/tasks/<task-id>/node-runtime/<run-id>/<node-id>/node-start.json
+.gwc/tasks/<task-id>/node-runtime/<run-id>/<node-id>/node-decision.json
+.gwc/tasks/<task-id>/node-runtime/<run-id>/<node-id>/node-result.json
+.gwc/tasks/<task-id>/node-runtime/<run-id>/<node-id>/node-readback.json
+.gwc/tasks/<task-id>/node-runtime/<run-id>/<node-id>/checkpoint.json
+.gwc/tasks/<task-id>/node-runtime/<run-id>/<node-id>/next-route-decision.json
+.gwc/tasks/<task-id>/node-runtime/<run-id>/runtime-events.jsonl
+```
+
+The ledger is append/readback oriented and replay-safe. Jira, Slack, and Notion
+remain projection-only and cannot replace canonical repository evidence.
+
+## 8. Revision binding
+
+The profile binds exact node-registry and runtime-graph revisions. A mismatch is
+a blocking drift condition requiring refreshed profile or gate evidence.

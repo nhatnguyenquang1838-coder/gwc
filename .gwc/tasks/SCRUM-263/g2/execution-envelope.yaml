@@ -1,0 +1,156 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+approval_id: APPROVE_G2_EXECUTION_SCRUM-263_NODE_INSTRUCTION_LEDGER_20260802
+authority_gate: G2_EXECUTION
+task_id: SCRUM-263
+issued_at: '2026-08-02T13:55:31Z'
+expires_at: '2026-08-03T13:55:31Z'
+scope_version: 1
+risk_class: R3
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+working_branch: feature/scrum-263-node-instruction-evidence-ledger
+active_lane: SCRUM-256 — Client runtime binding and CI → G3 M5 vertical slice / SCRUM-263 Node Architect maturity
+selected_option_id: OPT-1
+g1_scope_hash: sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-263
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  plan_root: .kiro/specs/scrum-263-node-instruction-evidence-ledger
+  plan_revision: sha256:7f98fcdf5b6837c77ecf483f8828c6091a6fd5c99bc4352d1029d470b54727a7
+  validation_evidence: /mnt/data/gwc_sessions/20260802-2045-SCRUM-263/validation/kiro-spec-validation.json
+modules_or_files:
+- .kiro/specs/scrum-263-node-instruction-evidence-ledger/requirements.md
+- .kiro/specs/scrum-263-node-instruction-evidence-ledger/design.md
+- .kiro/specs/scrum-263-node-instruction-evidence-ledger/tasks.md
+- core/node-architect/NODE_INSTRUCTION_CONTRACT_v1.0.md
+- core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+- core/node-architect/node-instructions/gate_authority/gate-state-resolution.node-instruction.yaml
+- core/node-architect/node-instructions/repo_delivery/scoped-file-write.node-instruction.yaml
+- core/node-architect/node-instructions/repo_delivery/diff-readback.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/gate-transition-decision.node-instruction.yaml
+- core/node-architect/gate-node-route-profile.json
+- schemas/node-architect/node-instruction.schema.json
+- schemas/node-architect/node-runtime-evidence.schema.json
+- schemas/node-architect/gate-node-route-profile.schema.json
+- schemas/node-architect/gate-node-route-decision.schema.json
+- tools/node_architect/validate_node_instruction.py
+- tools/node_architect/node_evidence_ledger.py
+- tools/node_architect/resolve_gate_node_route.py
+- tests/test_node_instruction_contract.py
+- tests/test_node_evidence_ledger.py
+- tests/test_gate_node_route_resolution.py
+- agents/chatgpt-agent/agent-instructions.md
+- projects/gwc/project-extension.md
+- releases/changelog.d/2026-08-02-node-instruction-evidence-ledger.md
+- .gwc/tasks/SCRUM-263/**
+files_read:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/Agent_Operating_Runtime_Contract_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+- core/Agent_Behavior_Semantic_Contract_v1.0.md
+- core/Agent_Response_Presentation_Contract_v1.0.md
+- core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+- core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+- core/node-architect/gate-node-route-profile.json
+- core/node-architect/node-registry.json
+- core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json
+- core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json
+- core/node-architect/node-catalog/repo_delivery/diff-readback.node.json
+- core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json
+- core/task-lifecycle/gate-transition-map.yaml
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- agents/chatgpt-agent/agent-instructions.md
+- agents/dwc/agent-instructions.md
+- agents/dwc/capabilities.yaml
+- tools/validate_g01.py
+- tools/node_architect/resolve_gate_node_route.py
+- tools/node_architect/scoped_file_write.py
+- tools/node_architect/diff_readback.py
+- tools/node_architect/checkpoint_store.py
+- schemas/runtime-event.schema.json
+- schemas/node-architect/gate-node-route-profile.schema.json
+- tests/test_gate_node_route_resolution.py
+- SCRUM-261 Jira state
+- SCRUM-262 Jira state
+- SCRUM-263 Jira state and claim readback
+- 'PR #181 merge/readback'
+- main@aad17d28be539c88ecef4b9fbaf3eaa08f59461b CI/status readback
+authorized_actions:
+- create_guarded_branch_from_exact_base
+- create_isolated_worktree
+- create_or_update_approved_files
+- run_sandboxed_validation
+- create_task_scoped_commit
+- push_working_branch
+- perform_exact_diff_readback
+- record_task_scoped_node_runtime_evidence
+excluded_actions:
+- protected_branch_write
+- create_or_update_pull_request
+- mark_ready_for_review
+- merge
+- auto_merge
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credentials
+- secrets
+- migration
+- package_export
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+- f9_scale_control
+- scrum_258_recovery
+- broad_81_node_rollout
+- unrelated_cleanup
+- manual_g5_action
+- g6
+required_validation:
+- python tools/validate_g01.py --root <exact-validator-root> --workspace <task-workspace> --json
+- python -m unittest tests/test_node_instruction_contract.py -v
+- python -m unittest tests/test_node_evidence_ledger.py -v
+- python -m unittest tests/test_gate_node_route_resolution.py -v
+- python -m unittest discover -s tests -p test_*.py
+- JSON Schema Draft 2020-12 validation for instruction, runtime evidence, route profile, and route decision
+- python -m compileall -q tools/node_architect
+- python tools/node_architect/validate_runtime_registry.py
+- python tools/validate_instructions.py
+- python tools/validate_line_endings.py
+- complete diff, secret, deletion, generated-noise, and scope review
+- exact PR-head CI terminal readback at G3
+artifact_hashes:
+  g0: sha256:c7b7dbb27949adf765ab7ca6e286ce7d0619e81322a1ed4ce6400c81a0084696
+  intake: sha256:b783b85bf66994a92de8151c24ddd58cf8c9e350eeec2ceee044007d7d4be892
+  preflight: sha256:52c31522600d40c332354b30e93f73e758f905128db9bec32abd36e8bf42a353
+  options: sha256:3eb06313a9ef1612998c664e0ee66454b057ce02128e9eaeea7cf8b745f02434
+  decision: sha256:6b1a1fd6c0917779ae7363dd8da66e07d52b528061876bd2d0d6dc20513698b3
+  implementation_plan: sha256:7f98fcdf5b6837c77ecf483f8828c6091a6fd5c99bc4352d1029d470b54727a7
+approval_required: true
+approval_command_format: APPROVE G2_EXECUTION <approval_id> <scope_hash_16> <expires_at_utc>
+source_instruction: REPO
+execution_mode: chat_connector_only
+gates_excluded_after_g2:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+rollback: Stop before push on instruction/ledger/route/test/diff/scope failure. Preserve the guarded branch and evidence for audit; delete nothing and request re-approval for scope drift.
+g4_g5_g6_authority_granted: false
+scope_hash: sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e
+scope_hash_16: a5807aeaa976988d
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-263_NODE_INSTRUCTION_LEDGER_20260802 a5807aeaa976988d 2026-08-03T13:55:31Z

@@ -83,8 +83,21 @@ Retrospective claiming must never backdate `Claimed At`.
 
 **No mode overrides:**
 - Explicit GWC boot unless the user says `NO GWC`, `Không GWC`, `loại bỏ GWC`, or `ignored GWC`
-- Agent-only claim intake before write-capable action
+- Agent-only task claim intake before write-capable action
 - Production data reads/writes (G6)
 - Credential/secret rotation
 - Merge authority (G4 requires human approval)
 - Deploy authority (G5 requires human approval)
+
+## Node runtime mode invariant
+
+All executable Node Architect routes enforce `MODE_DOES_NOT_BYPASS_NODE_RUNTIME`.
+Normal, fastlane, e2e, hotfix, and rescue modes may alter validation depth,
+batching, or continuation strategy, but they must still complete GWC boot, agent
+claim intake, separate gate-authority validation, route resolution, node
+instruction validation, canonical evidence/log recording, and next-route
+resolution. Missing instruction, evidence, logs, next route, or an authority-
+escalating instruction fails closed before implementation.
+
+Jira, Slack, and Notion remain projection-only. Node instructions and route
+decisions never grant G2, G3, G4, G5, or G6 authority.

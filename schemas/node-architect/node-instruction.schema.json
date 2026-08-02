@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/node-instruction.schema.json",
+  "title": "GWC Node Instruction Card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "node_id", "gate", "purpose",
+    "entry_conditions", "inputs", "allowed_actions", "forbidden_actions",
+    "outputs", "evidence_required", "logs_required", "next", "retry",
+    "rollback", "authority_boundary", "mode_policy"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "node-instruction"},
+    "node_id": {"type": "string", "pattern": "^[a-z0-9_]+\\.[a-z0-9-]+$"},
+    "gate": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]}
+    },
+    "purpose": {"type": "string", "minLength": 1},
+    "entry_conditions": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "inputs": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "allowed_actions": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "forbidden_actions": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "outputs": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "evidence_required": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "logs_required": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "next": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pass", "blocked", "pending", "retry"],
+      "properties": {
+        "pass": {"$ref": "#/$defs/nextRoute"},
+        "blocked": {"$ref": "#/$defs/nextRoute"},
+        "pending": {"$ref": "#/$defs/nextRoute"},
+        "retry": {"$ref": "#/$defs/nextRoute"}
+      }
+    },
+    "retry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["idempotency_key_fields", "replay_check", "max_attempts", "pending_reconciliation"],
+      "properties": {
+        "idempotency_key_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+        "replay_check": {"type": "string", "minLength": 1},
+        "max_attempts": {"type": "integer", "minimum": 0, "maximum": 10},
+        "pending_reconciliation": {"type": "string", "minLength": 1}
+      }
+    },
+    "rollback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reversible", "strategy", "reconciliation", "human_required_when"],
+      "properties": {
+        "reversible": {"type": "boolean"},
+        "strategy": {"type": "string", "minLength": 1},
+        "reconciliation": {"type": "string", "minLength": 1},
+        "human_required_when": {"$ref": "#/$defs/nonEmptyStringArray"}
+      }
+    },
+    "authority_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "statement", "node_grants_gate_authority", "g2_authority_granted",
+        "g3_authority_granted", "merge_authority_granted",
+        "deployment_authority_granted", "production_authority_granted"
+      ],
+      "properties": {
+        "statement": {"type": "string", "minLength": 1},
+        "node_grants_gate_authority": {"const": false},
+        "g2_authority_granted": {"const": false},
+        "g3_authority_granted": {"const": false},
+        "merge_authority_granted": {"const": false},
+        "deployment_authority_granted": {"const": false},
+        "production_authority_granted": {"const": false}
+      }
+    },
+    "mode_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "supported_modes", "runtime_required", "boot_required", "claim_required",
+        "gate_authority_required", "route_required", "instruction_required",
+        "evidence_required", "logs_required", "next_route_required"
+      ],
+      "properties": {
+        "supported_modes": {
+          "type": "array", "uniqueItems": true, "minItems": 5,
+          "items": {"enum": ["normal", "fastlane", "e2e", "hotfix", "rescue"]},
+          "allOf": [
+            {"contains": {"const": "normal"}}, {"contains": {"const": "fastlane"}},
+            {"contains": {"const": "e2e"}}, {"contains": {"const": "hotfix"}},
+            {"contains": {"const": "rescue"}}
+          ]
+        },
+        "runtime_required": {"const": true},
+        "boot_required": {"const": true},
+        "claim_required": {"const": true},
+        "gate_authority_required": {"const": true},
+        "route_required": {"const": true},
+        "instruction_required": {"const": true},
+        "evidence_required": {"const": true},
+        "logs_required": {"const": true},
+        "next_route_required": {"const": true}
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyStringArray": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "nextRoute": {
+      "type": "object", "additionalProperties": false,
+      "required": ["disposition", "reason", "next_node", "next_action", "next_gate"],
+      "properties": {
+        "disposition": {"enum": ["continue", "stop", "wait", "retry"]},
+        "reason": {"type": "string", "minLength": 1},
+        "next_node": {"type": ["string", "null"], "minLength": 1},
+        "next_action": {"type": ["string", "null"], "minLength": 1},
+        "next_gate": {"type": ["string", "null"], "minLength": 1}
+      },
+      "anyOf": [
+        {"properties": {"next_node": {"type": "string", "minLength": 1}}},
+        {"properties": {"next_action": {"type": "string", "minLength": 1}}},
+        {"properties": {"next_gate": {"type": "string", "minLength": 1}}}
+      ]
+    }
+  }
+}

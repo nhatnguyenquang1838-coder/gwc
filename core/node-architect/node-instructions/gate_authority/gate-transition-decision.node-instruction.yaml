@@ -1,0 +1,125 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+gate:
+- G2_EXECUTION
+forbidden_actions:
+- grant_gate_authority
+- grant_g2_authority
+- grant_g3_authority
+- merge
+- auto_merge
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credential_change
+- secret_change
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+evidence_required:
+- node-start
+- node-decision
+- node-result
+- node-readback
+- checkpoint
+- runtime-event
+- next-route-decision
+logs_required:
+- runtime-events.jsonl
+- decision_digest
+- state_digest
+- event_digest
+retry:
+  idempotency_key_fields:
+  - task_id
+  - run_id
+  - node_id
+  - scope_hash
+  replay_check: Read canonical node evidence and external effect readback before repeating the implementation.
+  max_attempts: 3
+  pending_reconciliation: Unknown or pending effects must route to checkpoint/reconciliation; never repeat blindly.
+rollback:
+  reversible: true
+  strategy: Reconcile current state against the approved scope and restore only reversible task-scoped effects.
+  reconciliation: Record rollback or no-op readback in the canonical node evidence ledger.
+  human_required_when:
+  - scope drift
+  - authority mismatch
+  - unknown external effect
+  - irreversible effect
+authority_boundary:
+  statement: Node instructions constrain execution and do not grant G2, G3, G4, G5, or G6 authority.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes:
+  - normal
+  - fastlane
+  - e2e
+  - hotfix
+  - rescue
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: true
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true
+node_id: gate_authority.gate-transition-decision
+purpose: Decide the next legal gate boundary from exact G2 result and readback evidence without granting that gate authority.
+entry_conditions:
+- G2 write result reconciled
+- exact diff readback passed
+- node evidence ledger complete
+- current task and scope still match
+inputs:
+- g2_envelope
+- write_result
+- diff_readback
+- node_runtime_evidence
+- task_state_readback
+allowed_actions:
+- evaluate_gate_exit
+- emit_next_gate_boundary
+- record_transition_decision
+outputs:
+- gate_transition_decision
+- next_gate_boundary
+- g3_preparation_signal
+next:
+  pass:
+    disposition: continue
+    reason: Node outcome passed; continue only through the canonical route.
+    next_node: null
+    next_action: null
+    next_gate: G3_PR
+  blocked:
+    disposition: stop
+    reason: Fail closed and report the stable blocker without invoking later effects.
+    next_node: null
+    next_action: stop_and_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Persist a checkpoint and reconcile the pending external state before continuation.
+    next_node: null
+    next_action: persist_checkpoint_and_wait
+    next_gate: null
+  retry:
+    disposition: retry
+    reason: Replay only after idempotency and readback reconciliation pass.
+    next_node: null
+    next_action: reconcile_then_retry
+    next_gate: null

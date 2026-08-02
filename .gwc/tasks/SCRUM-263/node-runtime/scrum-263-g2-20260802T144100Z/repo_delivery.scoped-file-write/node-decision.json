@@ -1,0 +1,73 @@
+{
+  "artifact_type": "node-decision",
+  "base_sha": "aad17d28be539c88ecef4b9fbaf3eaa08f59461b",
+  "branch": "feature/scrum-263-node-instruction-evidence-ledger",
+  "decision_digest": "sha256:9fa69ee57e0007b6f67f1446c75f9d900f60b67381446ba8c2539bc25eb994fa",
+  "head_sha": "e927420d8619bc9b45fda1e15d9ff9f374dc01db",
+  "idempotency_key": "SCRUM-263:scrum-263-g2-20260802T144100Z:repo_delivery.scoped-file-write",
+  "node_id": "repo_delivery.scoped-file-write",
+  "occurred_at": "2026-08-02T14:41:00Z",
+  "payload": {
+    "artifact_type": "gate-node-route-decision",
+    "authority_granted": false,
+    "current_node": "repo_delivery.scoped-file-write",
+    "decision_digest": "sha256:d810a7757cdb62bfe7a05c4a6b6ece453ed8b8dbe50df9755cc09b218d2e2428",
+    "deployment_authority_granted": false,
+    "evidence_contract_valid": true,
+    "gate": "G2_EXECUTION",
+    "graph_revision": "scrum-104-20260726",
+    "implementation": {
+      "kind": "python",
+      "ref": "tools/node_architect/scoped_file_write.py:decide_scoped_file_write"
+    },
+    "instruction_digest": "sha256:71524fc75977bf1a5d3070cc61a9091f619d163a58378c338671bc26fcc1dc6f",
+    "instruction_validated": true,
+    "loaded_context": [
+      "approval_receipt",
+      "base_sha_readback",
+      "g0_context",
+      "g1_decision",
+      "g2_envelope",
+      "task_claim"
+    ],
+    "log_contract_valid": true,
+    "merge_authority_granted": false,
+    "mode_runtime_required": true,
+    "next_action": "post_write_readback",
+    "next_gate": null,
+    "next_node": "repo_delivery.diff-readback",
+    "next_route_contract_valid": true,
+    "node_instruction_ref": "core/node-architect/node-instructions/repo_delivery/scoped-file-write.node-instruction.yaml",
+    "outcome": "ROUTE_SELECTED",
+    "pr_authority_granted": false,
+    "production_authority_granted": false,
+    "profile_id": "gwc-gate-node-runtime-binding",
+    "profile_revision": "scrum-263-20260802-r1",
+    "reason_code": "ROUTE_SELECTED",
+    "reason_codes": [
+      "ROUTE_SELECTED"
+    ],
+    "requested_action": "repository_write",
+    "required_context": [
+      "g0_context",
+      "g1_decision",
+      "g2_envelope",
+      "approval_receipt",
+      "task_claim",
+      "base_sha_readback"
+    ],
+    "route_id": "g2-scoped-repository-write",
+    "schema_version": "1.1",
+    "task_id": "SCRUM-263",
+    "workflow_mode": "normal",
+    "write_authority_granted": false
+  },
+  "record_digest": "sha256:4249d12d03de64eb5264a61b873e42a792f86d757439d59f82effd71cc235666",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "run_id": "scrum-263-g2-20260802T144100Z",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e",
+  "sequence": 2,
+  "state_digest": "sha256:483038e5793b877ef686a956a58f6ee8ad9dfafa55501fd18a3cc88c962cacf7",
+  "task_id": "SCRUM-263"
+}
