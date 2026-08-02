@@ -1,0 +1,19 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+task_id: SCRUM-202
+node_id: runtime_checkpoint.checkpoint-capture
+target_maturity: M5_REPLAY_SAFE
+intake:
+  problem: Current checkpoint capture is provisional. An interrupted worker can lose exact next action, pending action, gate context, or scope binding. This node must make captured state replayable without allowing stale worker advancement.
+  goal: Capture a deterministic checkpoint bound to task, run, node, gate, scope, and repository base before any bounded execution state change, interrupt suspension, or handoff.
+  out_of_scope:
+    - merge, auto_merge, deploy, release, runtime reload
+    - production data / configuration / credentials / secrets / migration
+    - scheduler or worker implementation
+    - full runtime-engine implementation
+    - all-81 node catalog implementation
+  acceptance_criteria:
+    - Unit tests cover deterministic digest, missing binding rejection, pending-action capture, crash-before-persist, and replay-read compatibility.
+    - Fixture demonstrates resume can reconstruct the exact next action from the snapshot.
+    - No production data, no merge/deploy authority, no scheduler/worker implementation.
+    - Exact-head CI is required before claiming M5.

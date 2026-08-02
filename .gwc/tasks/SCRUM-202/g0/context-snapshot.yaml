@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+status: READY
+task_id: SCRUM-202
+task_url: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-202
+summary: '[MAT-F4-N01] runtime_checkpoint.checkpoint-capture — M2 → M5'
+node_id: runtime_checkpoint.checkpoint-capture
+family_gate: G2_EXECUTION
+execution_mode: local_agent
+project_profile: projects/gwc/project-profile.yaml
+repository:
+  owner: nhatnguyenquang1838-coder
+  name: gwc
+  full_name: nhatnguyenquang1838-coder/gwc
+  default_branch: main
+  protected_base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  write_enabled: true
+  identity_status: verified
+connector:
+  git_provider: GitHub
+  api_connector: Atlassian Jira MCP
+  claim_state:
+    ai_agent: Hermes
+    claimed_at: '2026-08-02T21:33:00Z'
+    status: In Progress
+governance_sources:
+  - .dw/powers/gwc/core/Coding_Project_Governance_v1.0.md
+  - .dw/powers/gwc/core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - .dw/powers/gwc/core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - projects/gwc/AGENTS.md
+  - projects/gwc/projects/gwc/project-profile.yaml
+  - schemas/fastlane/fastlane-envelope.schema.json
+  - core/user_command_format_rule.md
+core_sha256: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+risk_class: R2
+blockers: []
+known_signals:
+  - no scrum-202 branch exists; clean claim, no multi-agent collision
+  - sibling node runtime_checkpoint.checkpoint-persist (SCRUM-203) already on main

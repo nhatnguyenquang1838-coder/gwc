@@ -1,0 +1,23 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+task_id: SCRUM-202
+node_id: runtime_checkpoint.checkpoint-capture
+repository_readiness: PASS
+working_tree: clean
+base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+branch_created: hermes/scrum-202-checkpoint-capture-m5-20260802
+impact_analysis:
+  method: UA knowledge-graph absence check + repo content grep + sibling-node review
+  ua_graph_nodes_for_new_tokens: none (no existing checkpoint-capture token in committed graph)
+  repo_consumers: none; checkpoint_store.persist_checkpoint is the downstream sink (caller-supplied)
+  blast_radius: bounded; new module + tests + node descriptor + changelog only
+  coupled_existing_nodes:
+    - runtime_checkpoint.checkpoint-persist (SCRUM-203) — sibling; shares checkpoint_store primitives
+  governance_constraints_satisfied:
+    - family authority_boundary == g2_required
+    - gates == [G2_EXECUTION]
+    - controlled 81-node catalog cardinality unchanged
+    - no runtime engine / scheduler / worker / production data
+risk_class: R2
+risk_rationale: New capability code, bounded, reversible, no authority escalation.
+ready_for_options: true

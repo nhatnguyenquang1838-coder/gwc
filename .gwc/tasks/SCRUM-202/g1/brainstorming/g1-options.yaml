@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g1-options
+task_id: SCRUM-202
+node_id: runtime_checkpoint.checkpoint-capture
+options:
+  - id: opt-1
+    title: Deterministic in-memory capture module with fail-closed binding
+    selected: true
+    rationale: Matches issue EARS requirements and sibling checkpoint_store design; no provider/external calls; replay-safe digest.
+    tradeoffs: In-memory snapshot model; persistence delegated to checkpoint_store.persist_checkpoint (caller).
+  - id: opt-2
+    title: Capture module that also writes to store
+    selected: false
+    rationale: Rejected — duplicates checkpoint_store responsibility and widens scope beyond G2 capture contract.
+decision: opt-1
