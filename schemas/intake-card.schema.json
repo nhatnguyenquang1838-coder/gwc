@@ -39,21 +39,49 @@
     "production_authority_granted"
   ],
   "properties": {
-    "schema_version": {"const": "1.0"},
-    "artifact_type": {"const": "intake-card"},
-    "contract_revision": {"const": "intake-context/v1"},
-    "task_id": {"type": "string", "minLength": 1},
-    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
-    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "const": "intake-card"
+    },
+    "contract_revision": {
+      "const": "intake-context/v1"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "base_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
     "request": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intent", "outcome", "constraints", "exclusions"],
+      "required": [
+        "intent",
+        "outcome",
+        "constraints",
+        "exclusions"
+      ],
       "properties": {
-        "intent": {"type": "string"},
-        "outcome": {"type": "string"},
-        "constraints": {"$ref": "#/$defs/uniqueStringArray"},
-        "exclusions": {"$ref": "#/$defs/uniqueStringArray"}
+        "intent": {
+          "type": "string"
+        },
+        "outcome": {
+          "type": "string"
+        },
+        "constraints": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "exclusions": {
+          "$ref": "#/$defs/uniqueStringArray"
+        }
       }
     },
     "source_bindings": {
@@ -63,63 +91,207 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["source", "binding", "revision"],
+        "required": [
+          "source",
+          "binding",
+          "revision"
+        ],
         "properties": {
-          "source": {"type": "string", "minLength": 1},
-          "binding": {"type": "string", "minLength": 1},
-          "revision": {"type": "string"},
-          "mode": {"type": "string", "minLength": 1}
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "binding": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mode": {
+            "enum": [
+              "REPO",
+              "PACKAGE",
+              "MIXED"
+            ]
+          },
+          "status": {
+            "enum": [
+              "VERIFIED",
+              "STALE",
+              "MISSING",
+              "AMBIGUOUS",
+              "CONFLICT"
+            ]
+          }
         }
       }
     },
     "repository_context": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "protected_branch", "protected_base_sha"],
+      "required": [
+        "repository",
+        "protected_branch",
+        "protected_base_sha"
+      ],
       "properties": {
-        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
-        "protected_branch": {"type": "string", "minLength": 1},
-        "protected_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+        "repository": {
+          "type": "string",
+          "pattern": "^[^/\\s]+/[^/\\s]+$"
+        },
+        "protected_branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "protected_base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
       }
     },
     "risk_projection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["outcome", "risk_level", "risk_flags", "required_gate", "additional_authority_gates", "risk_profile_digest"],
+      "required": [
+        "outcome",
+        "risk_level",
+        "risk_flags",
+        "required_gate",
+        "additional_authority_gates",
+        "risk_profile_digest"
+      ],
       "properties": {
-        "outcome": {"type": "string", "minLength": 1},
-        "risk_level": {"type": ["string", "null"]},
-        "risk_flags": {"$ref": "#/$defs/uniqueStringArray"},
-        "required_gate": {"type": "string"},
-        "additional_authority_gates": {"$ref": "#/$defs/uniqueStringArray"},
-        "risk_profile_digest": {"$ref": "#/$defs/optionalHash"}
+        "outcome": {
+          "enum": [
+            "READY",
+            "BLOCKED"
+          ]
+        },
+        "risk_level": {
+          "enum": [
+            "R0",
+            "R1",
+            "R2",
+            "R3",
+            null
+          ]
+        },
+        "risk_flags": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "required_gate": {
+          "enum": [
+            "G0_CONTEXT",
+            "G2_EXECUTION"
+          ]
+        },
+        "additional_authority_gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "G5_DEPLOY",
+              "G6_PRODUCTION_DATA"
+            ]
+          }
+        },
+        "risk_profile_digest": {
+          "$ref": "#/$defs/optionalHash"
+        }
       }
     },
     "read_scope_projection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["outcome", "failure_classification", "files_read", "files_exclude", "files_missing", "read_scope_hash"],
+      "required": [
+        "outcome",
+        "failure_classification",
+        "files_read",
+        "files_exclude",
+        "files_missing",
+        "read_scope_hash"
+      ],
       "properties": {
-        "outcome": {"type": "string", "minLength": 1},
-        "failure_classification": {"type": ["string", "null"]},
-        "files_read": {"$ref": "#/$defs/uniqueStringArray"},
-        "files_exclude": {"$ref": "#/$defs/uniqueStringArray"},
-        "files_missing": {"$ref": "#/$defs/uniqueStringArray"},
-        "read_scope_hash": {"$ref": "#/$defs/optionalHash"}
+        "outcome": {
+          "enum": [
+            "READY",
+            "BLOCKED"
+          ]
+        },
+        "failure_classification": {
+          "enum": [
+            null,
+            "NONE",
+            "AGENT_PREPARATION_BLOCKED",
+            "REPOSITORY_EVIDENCE_MISSING",
+            "VALIDATION_FAILED"
+          ]
+        },
+        "files_read": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "files_exclude": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "files_missing": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "read_scope_hash": {
+          "$ref": "#/$defs/optionalHash"
+        }
       }
     },
     "write_scope_projection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["outcome", "candidate_paths", "exclusions", "prohibited_operations", "branch_binding_status", "required_authority_gates", "write_scope_hash"],
+      "required": [
+        "outcome",
+        "candidate_paths",
+        "exclusions",
+        "prohibited_operations",
+        "branch_binding_status",
+        "required_authority_gates",
+        "write_scope_hash"
+      ],
       "properties": {
-        "outcome": {"type": "string", "minLength": 1},
-        "candidate_paths": {"$ref": "#/$defs/uniqueStringArray"},
-        "exclusions": {"$ref": "#/$defs/uniqueStringArray"},
-        "prohibited_operations": {"$ref": "#/$defs/uniqueStringArray"},
-        "branch_binding_status": {"type": "string"},
-        "required_authority_gates": {"$ref": "#/$defs/uniqueStringArray"},
-        "write_scope_hash": {"$ref": "#/$defs/optionalHash"}
+        "outcome": {
+          "enum": [
+            "READY",
+            "BLOCKED"
+          ]
+        },
+        "candidate_paths": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "exclusions": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "prohibited_operations": {
+          "$ref": "#/$defs/uniqueStringArray"
+        },
+        "branch_binding_status": {
+          "enum": [
+            "BOUND",
+            "REQUIRED_AT_G2",
+            "UNBOUND"
+          ]
+        },
+        "required_authority_gates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "G2_EXECUTION",
+              "G5_DEPLOY",
+              "G6_PRODUCTION_DATA"
+            ]
+          }
+        },
+        "write_scope_hash": {
+          "$ref": "#/$defs/optionalHash"
+        }
       }
     },
     "upstream_artifacts": {
@@ -129,57 +301,146 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["artifact_type", "schema_version", "digest"],
+        "required": [
+          "artifact_type",
+          "schema_version",
+          "digest"
+        ],
         "properties": {
-          "artifact_type": {"type": "string", "minLength": 1},
-          "schema_version": {"type": "string", "minLength": 1},
-          "digest": {"type": "string", "pattern": "^(?:sha256:)?[0-9a-f]{64}$"}
+          "artifact_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "schema_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^(?:sha256:)?[0-9a-f]{64}$"
+          }
         }
       }
     },
-    "context_status": {"enum": ["READY", "BLOCKED"]},
-    "outcome": {"enum": ["READY", "BLOCKED"]},
-    "next_required_action": {"enum": ["CONTINUE_CONTEXT_EVALUATION", "ESCALATE_CONTEXT_GAP"]},
-    "scope_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "snapshot_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "redaction_status": {"enum": ["NONE", "APPLIED", "BLOCKED"]},
+    "context_status": {
+      "enum": [
+        "READY",
+        "BLOCKED"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "READY",
+        "BLOCKED"
+      ]
+    },
+    "next_required_action": {
+      "enum": [
+        "CONTINUE_CONTEXT_EVALUATION",
+        "ESCALATE_CONTEXT_GAP"
+      ]
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "snapshot_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "redaction_status": {
+      "enum": [
+        "NONE",
+        "APPLIED",
+        "BLOCKED"
+      ]
+    },
     "redactions": {
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["pointer", "classification", "replacement", "reason_code"],
+        "required": [
+          "pointer",
+          "classification",
+          "replacement",
+          "reason_code"
+        ],
         "properties": {
-          "pointer": {"type": "string", "minLength": 1},
-          "classification": {"enum": ["SECRET", "CREDENTIAL", "TOKEN", "PRIVATE_KEY", "PERSONAL_SENSITIVE", "POLICY_REDACTED"]},
-          "replacement": {"const": "[REDACTED]"},
-          "reason_code": {"type": "string", "minLength": 1}
+          "pointer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "classification": {
+            "enum": [
+              "SECRET",
+              "CREDENTIAL",
+              "TOKEN",
+              "PRIVATE_KEY",
+              "PERSONAL_SENSITIVE",
+              "POLICY_REDACTED"
+            ]
+          },
+          "replacement": {
+            "const": "[REDACTED]"
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
-    "reason_code": {"type": "string", "minLength": 1},
+    "reason_code": {
+      "type": "string",
+      "minLength": 1
+    },
     "reason_codes": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": {"type": "string", "minLength": 1}
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
-    "created_at": {"type": "string"},
-    "read_only_projection": {"const": true},
-    "write_authority_granted": {"const": false},
-    "commit_authority_granted": {"const": false},
-    "push_authority_granted": {"const": false},
-    "pr_authority_granted": {"const": false},
-    "merge_authority_granted": {"const": false},
-    "deployment_authority_granted": {"const": false},
-    "production_authority_granted": {"const": false}
+    "created_at": {
+      "type": "string"
+    },
+    "read_only_projection": {
+      "const": true
+    },
+    "write_authority_granted": {
+      "const": false
+    },
+    "commit_authority_granted": {
+      "const": false
+    },
+    "push_authority_granted": {
+      "const": false
+    },
+    "pr_authority_granted": {
+      "const": false
+    },
+    "merge_authority_granted": {
+      "const": false
+    },
+    "deployment_authority_granted": {
+      "const": false
+    },
+    "production_authority_granted": {
+      "const": false
+    }
   },
   "$defs": {
     "uniqueStringArray": {
       "type": "array",
       "uniqueItems": true,
-      "items": {"type": "string"}
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "optionalHash": {
       "type": "string",
