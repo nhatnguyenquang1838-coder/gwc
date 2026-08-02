@@ -83,6 +83,8 @@ Dockerfile text eol=lf
 .dw/** text eol=lf
 
 # Explicit binary files.
+*.pyc binary
+*.pyo binary
 *.png binary
 *.jpg binary
 *.jpeg binary
