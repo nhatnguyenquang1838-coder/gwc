@@ -1,14 +1,112 @@
+# Canonical cross-platform text behavior.
+* text=auto eol=lf
+
+# Governance and repository metadata.
 .gitattributes text eol=lf
+.editorconfig text eol=lf
 AGENTS.md text eol=lf
-core/*.md text eol=lf
-agents/dwc/agent-instructions.md text eol=lf
-projects/gwc/package.yaml text eol=lf
-projects/gwc/project-instructions.md text eol=lf
-projects/gwc/project-profile.yaml text eol=lf
-libs/*-skill-library/manifest.yaml text eol=lf
-libs/*-skill-library/*.md text eol=lf
-libs/*-skill-library/skills/*.md text eol=lf
-releases/changelog.md text eol=lf
-SHA256SUMS.txt text eol=lf
-TREE.txt text eol=lf
-BUNDLE-REPORT.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+*.adoc text eol=lf
+
+# Structured configuration and evidence.
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+*.conf text eol=lf
+*.properties text eol=lf
+*.xml text eol=lf
+*.csv text eol=lf
+*.tsv text eol=lf
+
+# Source and scripts.
+*.py text eol=lf
+*.pyi text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.fish text eol=lf
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+*.psd1 text eol=lf
+*.sql text eol=lf
+*.graphql text eol=lf
+*.gql text eol=lf
+*.java text eol=lf
+*.kt text eol=lf
+*.kts text eol=lf
+*.go text eol=lf
+*.rs text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.cpp text eol=lf
+*.hpp text eol=lf
+*.cs text eol=lf
+
+# Web, style, and templates.
+*.html text eol=lf
+*.htm text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+*.svg text eol=lf
+*.vue text eol=lf
+*.svelte text eol=lf
+*.hbs text eol=lf
+*.j2 text eol=lf
+
+# GitHub and container configuration.
+Dockerfile text eol=lf
+*.dockerfile text eol=lf
+.github/** text eol=lf
+.devcontainer/** text eol=lf
+
+# GWC and DW SuperApps artifacts.
+.gwc/** text eol=lf
+.kiro/** text eol=lf
+.ua/** text eol=lf
+.task-me/** text eol=lf
+.bmad/** text eol=lf
+.governance/** text eol=lf
+.dw/** text eol=lf
+
+# Explicit binary files.
+*.pyc binary
+*.pyo binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tgz binary
+*.7z binary
+*.jar binary
+*.war binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.mp3 binary
+*.mp4 binary
+*.mov binary
+*.avi binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.bin binary
