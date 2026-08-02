@@ -7,5 +7,5 @@
   "gates": [
     "G3_PR"
   ],
-  "description": "Check G3 evidence completeness, including a schema-valid independent-review receipt from a capability-supported agent or human source with exact task, repository, PR, head SHA, scope hash, reviewer identity, read-only access, empty write-actions evidence, and non-stale result before declaring G3 review closure."
+  "description": "Run the replay-safe SCRUM-215 evidence-quality decision against terminal exact-head CI evidence and a schema-valid, read-only independent-review receipt bound to the same task, repository, PR, head SHA and scope hash. Missing, stale, malformed, projection-only, contradictory or mismatched evidence fails closed; PASS is evidence only and grants no G4, G5 or G6 authority."
 }
