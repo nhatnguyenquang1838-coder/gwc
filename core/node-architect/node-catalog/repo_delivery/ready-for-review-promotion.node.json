@@ -8,5 +8,5 @@
     "G2_EXECUTION",
     "G3_PR"
   ],
-  "description": "Replay-safe Ready for Review promotion. Promotes Draft PR metadata only after exact-head G3 CI success, current review pass, no unresolved threads, and no scope drift. This transition grants no G4 merge authority."
+  "description": "After exact-head CI and both G3 validators pass with capability-supported independent agent or human review evidence, mark the Draft PR Ready for Review exactly once and read it back. Pass only when draft=false, state=open, and the observed head SHA still equals the reviewed head SHA. This metadata transition grants no merge authority."
 }

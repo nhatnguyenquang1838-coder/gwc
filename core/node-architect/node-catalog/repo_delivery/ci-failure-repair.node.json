@@ -8,5 +8,5 @@
     "G2_EXECUTION",
     "G3_PR"
   ],
-  "description": "Replay-safe CI failure repair. Allows bounded repair only for exact-head terminal repository-fixable CI failures inside the approved G2 scope; stale, unknown, non-terminal, or out-of-scope outcomes require readback or block."
+  "description": "Repair CI failures within the same bounded PR scope."
 }

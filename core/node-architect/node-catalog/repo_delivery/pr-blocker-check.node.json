@@ -8,5 +8,5 @@
     "G2_EXECUTION",
     "G3_PR"
   ],
-  "description": "Replay-safe PR blocker check. Classifies current-head blockers from mergeability, required checks, review threads, review submissions, and stale evidence without granting G4 merge authority."
+  "description": "Before promotion, reject stale independent-review evidence, unsupported reviewer source, head or scope drift, missing required CI, unresolved blocking findings, and blocking review threads. After promotion, verify the PR remains open, Ready for Review, and bound to the exact reviewed head SHA."
 }
