@@ -107,6 +107,32 @@ The renderer:
 - emits a schema-valid blocked card on ordinary contract, binding, hash, or redaction failures;
 - keeps every authority field fixed to `false`.
 
+
+## Context Gap Escalation Runtime Contract
+
+`intake_context.context-gap-escalation` remains a thin static `G0_CONTEXT` / `read_only` descriptor. Its runtime contract is explicitly mapped to:
+
+| Surface | Path |
+|---|---|
+| Closed schema | `schemas/context-gap-decision.schema.json` |
+| Pure evaluator | `tools/node_architect/context_gap_escalation.py` |
+| Entrypoint | `decide_context_gap_escalation` |
+| Focused regression | `tests/test_intake_context_context_gap_escalation_m4.py` |
+| B2 integration | `tests/test_intake_context_m4_batch_b2.py` |
+
+The family validator now checks that both the SCRUM-182 `intake-card` runtime and the SCRUM-183 `context-gap-decision` runtime exist, import, expose their expected entrypoints, and declare the expected schema `artifact_type`.
+
+The evaluator:
+
+- consumes only the canonical, redacted `intake_card`;
+- validates task, repository, protected-base SHA, snapshot hash, source bindings, upstream artifacts, and read-scope evidence keys;
+- classifies context gaps with deterministic precedence into `AGENT_PREPARATION_BLOCKED`, `REPOSITORY_EVIDENCE_MISSING`, `CI_UNAVAILABLE_AT_CHECK`, `VALIDATION_FAILED`, `HUMAN_INPUT_REQUIRED`, or `NONE`;
+- emits a minimal, deterministic `remediation_readset` from exact facts already present in the card;
+- treats connector/materialization/CI observability gaps as preparation or observability gaps, not repository or validator failures;
+- returns `VALIDATION_FAILED` only after complete exact-bound evidence is available and an actual validator/test result failed;
+- routes no-gap cards only to `READY_FOR_FAMILY_VERIFICATION`;
+- keeps every authority field fixed to `false`.
+
 ## Guardrails
 
 ```text
@@ -137,7 +163,9 @@ The renderer:
 Run:
 
 ```bash
+python -m unittest tests.test_intake_context_context_gap_escalation_m4 -v
 python -m unittest tests.test_intake_context_intake_card_render_m4 -v
+python -m unittest tests.test_intake_context_m4_batch_b2 -v
 python -m unittest tests.test_node_catalog_intake_context -v
 python tools/node_architect/validate_node_catalog_intake_context.py
 ```
