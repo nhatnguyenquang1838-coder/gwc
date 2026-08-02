@@ -40,7 +40,7 @@ All GWC agents follow `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` for
 Every new modifying task must have exactly one Jira issue in project `SCRUM`.
 Atlassian MCP records the repository, base branch, working branch, PR, validation
 outcome, and final task state. Jira task status does not grant G0-G6 authority.
-Existing DS Admin and Rental Home tasks records remain unchanged.
+Existing DS Admin and Rental Home tasks remain unchanged.
 
 For AI or automated agent execution, the existing Jira fields `AI Agent` and
 `Claimed At` are mandatory intake evidence and must be read back before any
