@@ -490,13 +490,13 @@ accounts for the agents.
 When an agent claims a task, it must set two custom fields in addition to the
 existing work-tracking transition:
 
-| Field | Type | Purpose |
-|---|---|---|
-| `AI Agent` (select list) | one of `ChatGPT`, `Kilo`, `OpenClaw`, `Hermes`, `Codex` | which AI agent owns the task |
-| `Claimed At` (datetime) | ISO-8601 UTC | timestamp of the claim; powers stale detection |
+| Field | Jira type | Jira ID (SCRUM) | Purpose |
+|---|---|---|---|
+| `AI Agent` (text) | free text | `customfield_10046` | which AI agent owns the task (one of `ChatGPT`, `Kilo`, `OpenClaw`, `Hermes`, `Codex`) |
+| `Claimed At` (datetime) | datetime | `customfield_10047` | timestamp of the claim (ISO-8601 UTC); powers stale detection |
 
-> Field numeric IDs are profile/project configuration, not instruction content.
-> Replace `customfield_XXXXX` with the IDs visible in the SCRUM issue screens.
+> Field IDs are SCRUM-project configuration. If the fields are recreated in
+> another project, replace the IDs with those project's values.
 
 Claim invariant:
 
