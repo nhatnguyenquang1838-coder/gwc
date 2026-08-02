@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-204
-  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
   g0_snapshot: ../../g0/context-snapshot.yaml
 options_ref: ../brainstorming/g1-options.yaml
 preflight_ref: ../preflight/g1-preflight-report.yaml

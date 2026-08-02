@@ -4,7 +4,7 @@ generated_at: '2026-08-02T15:20:17Z'
 options:
   - id: OPT-1
     title: Current-base bounded G2 handoff
-    description: Rebuild G0/G1 and prepare a new G2 envelope from 520aa196, treating the merged Node Architect contract as current read-only baseline and requiring exact approval for any SCRUM-204 implementation.
+    description: Rebuild G0/G1 and prepare a new G2 envelope from 65c93c5, treating the merged Node Architect contract as current read-only baseline and requiring exact approval for any SCRUM-204 implementation.
     benefits: [Fresh base-bound evidence, no stale approval reuse, preserves authority boundaries]
     tradeoffs: [Requires a new approval and may expose that implementation is already present on main]
     risks: [Further work may be unnecessary if current main fully satisfies the requested scope]

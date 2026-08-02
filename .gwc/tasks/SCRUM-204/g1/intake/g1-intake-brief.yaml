@@ -5,14 +5,14 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-204
-  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
   g0_snapshot: ../../g0/context-snapshot.yaml
 problem:
   statement: Recreate a current-base G2 handoff for SCRUM-204 after the prior G2 envelope
     was invalidated by protected-main drift, while preserving the universal Node Architect
     runtime invariant.
   why_now: The prior approval referenced aad17d28, while current protected main is
-    520aa196 after the SCRUM-263 Node Architect merge; stale G2 evidence cannot authorize
+    65c93c5 after the SCRUM-263 Node Architect merge; stale G2 evidence cannot authorize
     execution.
 desired_outcome: Produce fresh G0/G1 evidence and a bounded G2 execution envelope
   tied to current main, with no implementation until exact approval.
@@ -39,7 +39,7 @@ scope:
   - Production configuration/data, credentials, secrets, migration, force-push, branch
     deletion, or package export.
 constraints:
-- Protected base is main at 520aa1968a0809001e8994192278e52a59c86c61.
+- Protected base is main at 65c93c5927013c750631933495c5ecb5e22fae88.
 - G0/G1 artifacts are task-scoped and validated before G2.
 - Fresh isolated worktree is required before creating task artifacts.
 - Exact G2 approval must bind repository, base SHA, branch, scope hash, files, actions,
@@ -54,7 +54,7 @@ risks:
 - id: RISK-1
   description: Stale G2 evidence could authorize work against the wrong base.
   impact: high
-  mitigation: Bind every artifact to 520aa196 and stop on base drift.
+  mitigation: Bind every artifact to 65c93c5 and stop on base drift.
 - id: RISK-2
   description: A refresh could accidentally broaden from SCRUM-204 into already merged
     SCRUM-263 implementation.
@@ -68,7 +68,7 @@ risks:
 acceptance_criteria:
 - id: AC-1
   statement: G0 and G1 artifacts validate against current protected-main schemas and
-    bind SCRUM-204 to 520aa196.
+    bind SCRUM-204 to 65c93c5.
   verifiable: true
 - id: AC-2
   statement: The G2 envelope contains exact current-base branch, scope, authorized

@@ -5,12 +5,12 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-204
-  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
   title: Current-base bounded G2 handoff
-  description: Rebuild G0/G1 and prepare a new G2 envelope from 520aa196, treating
+  description: Rebuild G0/G1 and prepare a new G2 envelope from 65c93c5, treating
     the merged Node Architect contract as current read-only baseline and requiring
     exact approval for any SCRUM-204 implementation.
   benefits:

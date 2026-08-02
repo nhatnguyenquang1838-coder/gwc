@@ -5,11 +5,11 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-204
-  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
   profile_path: projects/gwc/project-profile.yaml
   connector: local_git
 checks:
@@ -18,7 +18,7 @@ checks:
   code: REPOSITORY_VERIFIED
   message: Repository identity and base evidence are verified.
   evidence:
-  - nhatnguyenquang1838-coder/gwc@520aa1968a0809001e8994192278e52a59c86c61
+  - nhatnguyenquang1838-coder/gwc@65c93c5927013c750631933495c5ecb5e22fae88
   - projects/gwc/project-profile.yaml
 - id: REQUIRED_SOURCES
   status: PASS

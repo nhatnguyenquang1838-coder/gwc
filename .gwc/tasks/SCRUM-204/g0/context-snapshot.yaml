@@ -8,7 +8,7 @@ project:
 repository:
   full_name: nhatnguyenquang1838-coder/gwc
   base_ref: main
-  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
   protected_branches:
   - main
   connector: local_git
@@ -26,7 +26,7 @@ runtime_context:
   - core/Agent_Behavior_Semantic_Contract_v1.0.md
   - core/Agent_Response_Presentation_Contract_v1.0.md
 constraints:
-- Protected base is main at 520aa1968a0809001e8994192278e52a59c86c61.
+- Protected base is main at 65c93c5927013c750631933495c5ecb5e22fae88.
 - G0/G1 artifacts are task-scoped and validated before G2.
 - Fresh isolated worktree is required before creating task artifacts.
 - Exact G2 approval must bind repository, base SHA, branch, scope hash, files, actions,

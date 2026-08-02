@@ -8,5 +8,5 @@
   "issues": [],
   "command": "python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-204 --json",
   "scope_hash": "sha256:fe3db380cdcb70af4d74ee7b4ed09d67e00ddd11edf1b3b743cd311a2d5ce270",
-  "base_sha": "520aa1968a0809001e8994192278e52a59c86c61"
+  "base_sha": "65c93c5927013c750631933495c5ecb5e22fae88"
 }
