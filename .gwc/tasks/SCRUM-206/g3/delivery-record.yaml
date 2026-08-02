@@ -10,9 +10,9 @@ pull_request:
   number: 189
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/189
   state: draft
-  head_sha: 0fd00be3a47080ccb73322ec88e00b48fb193546
-head_sha: 0fd00be3a47080ccb73322ec88e00b48fb193546
-scope_hash: sha256:991434ae87484ed99d194ba3202fbf8b206f034b3605718e0f638ae7d3b2baa3
+  head_sha: 82dcf3f1dc9f6eeef8ee85fa3d4fc64ba2f426f8
+head_sha: 82dcf3f1dc9f6eeef8ee85fa3d4fc64ba2f426f8
+scope_hash: sha256:ee56b7ee7953caedd04f928dc5d4f8e2cfd1fe989570d96a6048bb9270ca8dcd
 changed_paths:
   - tools/node_architect/lease_acquisition.py
   - tests/test_lease_acquisition.py
@@ -51,11 +51,11 @@ review:
 ci:
   required_workflows:
     - validate-instructions
-  exact_head_sha: 0fd00be3a47080ccb73322ec88e00b48fb193546
+  exact_head_sha: 82dcf3f1dc9f6eeef8ee85fa3d4fc64ba2f426f8
   state: PENDING
 residual_risks:
   - risk: Exact-head CI not yet complete
-    mitigation: M5 claim requires green CI for head_sha 0fd00be3a47080ccb73322ec88e00b48fb193546
+    mitigation: M5 claim requires green CI for head_sha 82dcf3f1dc9f6eeef8ee85fa3d4fc64ba2f426f8
   - risk: Node maturity remains experimental in node-registry.json
     mitigation: M5_REPLAY_SAFE is claimed in task artifacts; registry update is out of scope for this slice
 exclusions:
