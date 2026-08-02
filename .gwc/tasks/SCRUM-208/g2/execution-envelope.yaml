@@ -1,0 +1,33 @@
+approval_id: CP-20260802-208-G2
+authority_gate: G2_EXECUTION
+task_id: SCRUM-208
+issued_at: '2026-08-02T16:00:00Z'
+expires_at: '2026-08-03T16:00:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+working_branch: feature/SCRUM-208-g0g1-setup-20260802
+modules_or_files:
+- .gwc/tasks/SCRUM-208/**
+authorized_actions:
+- modify_approved_files
+- run_sandboxed_validation
+- push_working_branch
+- open_or_update_draft_pr
+excluded_actions:
+- merge
+- auto_merge
+- deploy
+- release
+- production_data_write
+- production_config_change
+- credential_rotation
+- destructive_migration
+- force_push
+- delete_branch
+- protected_branch_write
+- runtime_implementation_code
+scope_hash: sha256:bfd6c0513db9dc9a92ae10a1765844474a7598b1571ddd29af599c09e3c24c4a
+scope_hash_16: bfd6c0513db9dc9a
+approval_command: APPROVE G2 CP-20260802-208-G2 bfd6c0513db9dc9a 2026-08-03T16:00:00Z
