@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g4-merge-approval",
+  "approval_id": "CP-20260802-178",
+  "authority_gate": "G4_MERGE",
+  "task_id": "SCRUM-187+SCRUM-189",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "pull_request": 178,
+  "base_ref": "main",
+  "base_sha": "1db5cdde7666e95e0a5d864633a3255a2ad40e",
+  "working_branch": "fastlane/scrum-187-189-gate-authority-nodes-20260802",
+  "head_sha": "1187569573e81c5b8733809b61eb34cd312f951a",
+  "merge_method": "squash",
+  "risk_class": "R2",
+  "authorized_actions": [
+    "merge_approved_pr"
+  ],
+  "excluded_actions": [
+    "deploy_approved_release",
+    "production_data_write",
+    "production_config_change",
+    "credential_rotation",
+    "auto_merge"
+  ],
+  "g2_lineage_scope_hash": "sha256:372cbca3216575d8000000000000000000000000000000000000000000000000",
+  "issued_at": "2026-08-02T09:53:15Z",
+  "expires_at": "2026-08-03T09:53:15Z",
+  "authority_granted": true,
+  "scope_hash": "sha256:7019418b736b5ec054eae5f10c585bd286842995d649bf353804840797db18a7",
+  "approved_at": "2026-08-02T10:18:37Z",
+  "approved_by": "human_exact_token"
+}
