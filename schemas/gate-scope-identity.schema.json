@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-scope-identity.schema.json",
+  "title": "GWC Gate Scope Identity",
+  "description": "Canonical identity + semantic scope_hash for a proposed gate action. This artifact identifies scope only; it never grants authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_ref",
+    "base_sha",
+    "risk_class",
+    "authorized_paths",
+    "authorized_actions",
+    "excluded_actions",
+    "outcome",
+    "scope_hash",
+    "authority_granted"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-scope-identity"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_ref": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "working_branch": {"type": ["string", "null"], "minLength": 1},
+    "head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+    "authorized_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "authorized_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "excluded_actions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "additional_bindings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "value"],
+        "properties": {
+          "key": {"type": "string", "minLength": 1},
+          "value": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "outcome": {"enum": ["READY", "BLOCKED"]},
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "SCOPE_HASH_CALCULATED",
+          "SCOPE_INPUT_INVALID",
+          "SCOPE_PATH_INVALID",
+          "SCOPE_PATH_OVERBROAD",
+          "SCOPE_ACTION_CONFLICT",
+          "SCOPE_BINDING_REQUIRED",
+          "SCOPE_UNKNOWN_SEMANTIC",
+          "SCOPE_WRITE_SET_EMPTY",
+          "SCOPE_SEMANTIC_DRIFT"
+        ]
+      }
+    },
+    "calculated_at": {"type": ["string", "null"], "format": "date-time"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "approval_request_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authority_granted": {"const": false}
+  }
+}
