@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import sys
 from typing import Any, Mapping
 
 MATURITY = {"experimental": 0, "pilot": 1, "stable": 2}
@@ -60,15 +61,23 @@ def _implementation_available(root: Path, implementation: Mapping[str, Any], con
     path = root / path_text
     if not path.is_file() or not callable_name:
         return False
+    module_name = "_gwc_route_impl_check_" + hashlib.sha256(str(path.resolve()).encode("utf-8")).hexdigest()[:12]
+    previous_module = sys.modules.get(module_name)
     try:
-        spec = importlib.util.spec_from_file_location("_gwc_route_impl_check", path)
+        spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None or spec.loader is None:
             return False
         module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
         spec.loader.exec_module(module)
         return callable(getattr(module, callable_name, None))
     except Exception:
         return False
+    finally:
+        if previous_module is None:
+            sys.modules.pop(module_name, None)
+        else:
+            sys.modules[module_name] = previous_module
 
 
 def _blocked(
