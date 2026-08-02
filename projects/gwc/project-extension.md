@@ -42,6 +42,12 @@ Atlassian MCP records the repository, base branch, working branch, PR, validatio
 outcome, and final task state. Jira task status does not grant G0-G6 authority.
 Existing DS Admin and Rental Home task records remain unchanged.
 
+For AI or automated agent execution, the existing Jira fields `AI Agent` and
+`Claimed At` are mandatory intake evidence and must be read back before any
+write-capable repository, PR, Jira transition, Slack projection, or gate action.
+This is an agent-only requirement; human-executed work is not blocked by empty
+agent claim fields.
+
 ## Hotfix and Rescue Mode Support
 
 This project acknowledges the existence of HOTFIX and RESCUE mode policies
@@ -53,11 +59,13 @@ core safety guarantees:
 - Light validation (skips some optional checks)
 - Standard documentation required
 - Bounded to explicitly stated scope
+- Agent-only task claim intake still required before any write-capable action
 - Draft PR only, no merge authority
 
-### RESCUE MODE  
+### RESCUE MODE
 - Minimal validation (best-effort testing only)
 - Post-facto audit trail required
+- Agent-only task claim intake still required before any write-capable action when Jira is reachable
 - Still no production data access or main branch writes
 - Draft PR only, no merge authority
 
@@ -68,12 +76,15 @@ ACTIVATE RESCUE <scope-hash-prefix> [description]
 TRULY EMERGENCY OVERRIDE [brief description]
 ```
 
-All activation commands must be in standalone fenced text blocks. The user 
-acknowledges that bypassing standard gates requires post-facto review and 
-retroactive task claiming through the active Jira workflow when applicable.
+All activation commands must be in standalone fenced text blocks. The user
+acknowledges that bypassing standard gates requires post-facto review and
+retrospective task claiming through the active Jira workflow when applicable.
+Retrospective claiming must never backdate `Claimed At`.
 
 **No mode overrides:**
+- Explicit GWC boot unless the user says `NO GWC`, `Không GWC`, `loại bỏ GWC`, or `ignored GWC`
+- Agent-only claim intake before write-capable action
 - Production data reads/writes (G6)
-- Credential/secret rotation  
+- Credential/secret rotation
 - Merge authority (G4 requires human approval)
 - Deploy authority (G5 requires human approval)

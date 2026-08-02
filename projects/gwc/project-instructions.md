@@ -48,6 +48,52 @@ Reuse → Extend → Refactor → Replace
 A significant recommendation identifies the current mechanism, purpose,
 limitation, smallest compatible improvement, compatibility, and impact.
 
+## GWC boot default
+
+GWC boot is on by default for GWC-governed work. A request involving repository,
+PR, coding, governance, delivery, validation, Jira projection, Slack projection,
+CI, branch, worktree, package, release, deployment, migration, credential,
+production configuration, production data, or explicit GWC workflow must run the
+protected-base GWC boot unless the user explicitly opts out.
+
+Valid opt-out phrases are explicit and narrow:
+
+```text
+NO GWC
+Không GWC
+loại bỏ GWC
+ignored GWC
+```
+
+Speed or scope language such as `quick`, `simple`, `just do`, `skip ceremony`,
+`minor fix`, `hotfix`, or `rescue` does not disable GWC. It only selects a
+bounded workflow inside GWC.
+
+## Agent-only task claim intake
+
+For agent-executed modifying work, task claim intake is mandatory before any
+write-capable action.
+
+When the executor is an AI or automated agent, the agent must:
+
+1. create or resolve exactly one Jira issue in project `SCRUM`;
+2. read current issue state;
+3. claim the task by filling the existing Jira fields `AI Agent` and `Claimed At`;
+4. add an intake/claim trace comment when supported;
+5. transition or verify the task in the appropriate active state;
+6. read back `AI Agent`, `Claimed At`, and status before branch creation or repository mutation.
+
+This requirement applies to agents only. Human-executed work is not blocked by
+empty `AI Agent` or `Claimed At` fields. Do not change Jira field definitions for
+this rule.
+
+Jira is planning, coordination, and projection. Jira field values or Jira status
+never grant G0-G6 authority by themselves.
+
+If the claim is absent, stale, unreadable, or conflicting, the agent must stop
+before repository mutation with `AGENT_TASK_CLAIM_BLOCKED` or
+`AI_AGENT_CLAIM_CONFLICT`.
+
 ## Connector precedence
 
 When repository connector access is available, agents must resolve the

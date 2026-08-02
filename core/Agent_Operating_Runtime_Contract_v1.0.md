@@ -4,11 +4,12 @@
 
 This contract converts project-level operating guides into centralized GWC behavior for ChatGPT-style agents, DWC, local coding agents, and project consumer agents.
 
-It addresses three failure modes:
+It addresses four failure modes:
 
 1. Long conversations losing active instructions.
 2. Plain acknowledgements such as `ok`, `approve`, or `continue` being mistaken for gate authority.
 3. Project-local instructions drifting without central governance.
+4. Agent-executed governed work starting before task intake, claim, and readback are complete.
 
 This contract is additive. It does not replace `Coding_Project_Governance_v1.0`, `GATE_LIFECYCLE_CONTRACT_v1.0`, project profiles, approval envelopes, or stricter project instructions.
 
@@ -23,6 +24,21 @@ EXECUTION MODE: <chat_connector_only|local_agent|repo_ci>
 
 When sources conflict, the agent must report the conflict rule and follow the highest-priority active source.
 
+## GWC boot default
+
+GWC boot is enabled by default for any GWC-governed request, including repository, PR, coding, governance, delivery, validation, Jira projection, Slack projection, CI, branch, worktree, package, release, deployment, migration, credential, production configuration, production data, or explicit GWC workflow request.
+
+The agent may treat GWC as disabled only when the user gives an explicit opt-out phrase such as:
+
+```text
+NO GWC
+Không GWC
+loại bỏ GWC
+ignored GWC
+```
+
+Ambiguous speed or simplicity requests such as `quick`, `simple`, `just do`, `skip ceremony`, `minor fix`, `hotfix`, or `rescue` do not disable GWC. They may select a bounded workflow, but boot, intake, claim, source refresh, file scope, and gate authority still apply.
+
 ## Chat-only exploration
 
 G0/G1 brainstorming is conversation-local by default. It may produce an
@@ -31,7 +47,7 @@ persisting artifacts, creating a task, or generating an approval token. Label
 this state `CHAT_ONLY_PREPARATION` and grant no execution authority.
 
 Formal G0/G1 artifacts, active-provider task creation or claim, and the exact G2
-approval command are required only when the user explicitly requests transition
+approval command are required when the user explicitly requests transition
 to G2 or asks for a write-capable action.
 
 ## Intake Card
@@ -43,6 +59,10 @@ Before repository-changing work, the agent must produce an Intake Card:
 | Request Type | implementation / review / docs / orchestration / data / visual / other |
 | Source Instruction | exact active instruction source and fallback chain |
 | Execution Mode | chat_connector_only / local_agent / repo_ci |
+| Executor Type | agent / human / pair / ci / recovery |
+| Work Item | active Jira/DS/Admin/task ID, or why planning-only work has no task yet |
+| Agent Claim | required for executor_type=agent; otherwise not_applicable |
+| Claim Readback | PASS / BLOCKED / CONFLICT / not_applicable |
 | Risk Flags | schema / auth / RLS / finance / security / production / none |
 | Required Reads | exact policy and project paths |
 | Files READ | exact file paths or connectors to inspect |
@@ -51,6 +71,36 @@ Before repository-changing work, the agent must produce an Intake Card:
 | Next Action | proceed / blocked / ask approval / prepare patch only |
 
 No repository mutation is allowed until `Files WRITE` is explicit. Writing outside `Files WRITE` is scope drift and requires a new approval request.
+
+## Agent-only task claim
+
+When `executor_type=agent`, the work-tracking task claim is mandatory before any governed write-capable action, including branch creation, worktree creation, repository file update, commit, push, PR creation/update, Jira transition, Slack projection, gate movement, merge check, or release/deploy/config/data action.
+
+For Jira-backed GWC tasks, the agent must:
+
+1. read current task state;
+2. verify the task is unclaimed or already claimed by the same active agent;
+3. set existing fields `AI Agent` and `Claimed At` when unclaimed;
+4. add an intake or claim trace comment when the connector supports it;
+5. transition to the appropriate active state when required by the project workflow;
+6. read back the task;
+7. stop before governed writes unless `AI Agent`, `Claimed At`, and active task state match the current agent execution.
+
+This requirement applies to agent execution only. Empty `AI Agent` or `Claimed At` fields do not invalidate human-owned or human-executed work. Jira remains planning and projection evidence; Jira status or field values never grant G0-G6 authority by themselves.
+
+If the task is already claimed by another active agent, stop with:
+
+```text
+AI_AGENT_CLAIM_CONFLICT
+```
+
+If the claim cannot be written or read back, stop with:
+
+```text
+AGENT_TASK_CLAIM_BLOCKED
+```
+
+If agent work already occurred before claim, do not backdate `Claimed At`. Record a retrospective correction and use the correction timestamp only.
 
 ## Files READ / Files WRITE discipline
 
@@ -87,6 +137,7 @@ The agent must refresh context before any write-capable action and whenever one 
 - long conversation or unclear current gate;
 - user says `continue`, `ok`, `approve`, `go`, `yes`, or equivalent;
 - task type, repo, branch, scope, risk, or authority changes;
+- executor type changes, or an agent claim is missing, stale, conflicting, or unreadable;
 - protected-base drift is detected; classify the changed files and refresh only
   the evidence required by `SAFE_CONTINUE`, `REVALIDATE`, `REAPPROVE`, or
   `STOP`.
@@ -98,6 +149,8 @@ Refresh output:
 SOURCE INSTRUCTION:
 Last known gate:
 Current request:
+Executor Type:
+Claim Readback:
 Still valid:
 Needs reread:
 Allowed next action:
