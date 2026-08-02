@@ -1,0 +1,101 @@
+{
+  "node_id": "gate_authority.gate-state-resolution",
+  "gate": "G1_ALIGNMENT",
+  "purpose": "Determine the next gate state based on current execution context",
+  "entry_conditions": {
+    "prerequisite_gate": "G0_CONTEXT",
+    "artifacts_required": [".gwc/tasks/<task-id>/g0/context-snapshot.yaml"],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g0/context-snapshot.yaml"
+      },
+      {
+        "type": "artifact_valid",
+        "expression": "schema: schemas/gate-context.schema.json"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "context_snapshot",
+        "type": "path",
+        "description": "Path to G0 context snapshot file"
+      },
+      {
+        "name": "current_gate",
+        "type": "string",
+        "description": "Current gate state"
+      }
+    ],
+    "optional": [
+      {
+        "name": "profile_id",
+        "type": "string",
+        "description": "Route profile identifier",
+        "default": "full-flow-v3"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "read_repository",
+    "read_gate_artifact",
+    "resolve_route",
+    "create_checkpoint"
+  ],
+  "forbidden_actions": [
+    "write_file",
+    "create_branch",
+    "create_commit",
+    "push_branch",
+    "merge",
+    "deploy"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g1/brainstorming/g1-options.yaml",
+      ".gwc/tasks/<task-id>/g1/decision/g1-decision-record.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g1/decision/g1-decision-record.yaml"
+  },
+  "logs_required": {
+    "type": "decision",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": "gate_authority.gate-transition-decision",
+    "next_gate": "G2_EXECUTION",
+    "next_route": "full-flow-v3",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff": "exponential",
+    "exponential_base": 2.0,
+    "retryable_errors": [
+      "NODE_ENTRY_CONDITIONS_FAILED",
+      "NODE_INPUTS_INCOMPLETE"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "previous checkpoint exists",
+    "action": "restore_checkpoint",
+    "conditions": [
+      "context-snapshot.yaml is valid",
+      "checkpoint timestamp is recent"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": false,
+    "grants_merge_authority": false
+  }
+}

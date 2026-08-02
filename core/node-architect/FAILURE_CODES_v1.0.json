@@ -1,0 +1,98 @@
+{
+  "artifact_type": "failure-codes-registry",
+  "version": "1.0.0",
+  "provenance": "core/node-architect/FAILURE_CODES_v1.0.json",
+  "failure_codes": {
+    "NODE_INSTRUCTION_MISSING": {
+      "code": "NODE_INSTRUCTION_MISSING",
+      "severity": "critical",
+      "description": "Node instruction pack not found or could not be loaded",
+      "resolution": "Ensure node instruction card exists at the expected location",
+      "recovery": "Load default instruction pack or route to failure handler"
+    },
+    "NODE_EVIDENCE_CONTRACT_MISSING": {
+      "code": "NODE_EVIDENCE_CONTRACT_MISSING",
+      "severity": "critical",
+      "description": "Evidence contract schema not found",
+      "resolution": "Create or locate evidence contract schema",
+      "recovery": "Skip evidence production and route to failure handler"
+    },
+    "NODE_LOG_CONTRACT_MISSING": {
+      "code": "NODE_LOG_CONTRACT_MISSING",
+      "severity": "critical",
+      "description": "Log contract schema not found",
+      "resolution": "Create or locate log contract schema",
+      "recovery": "Skip log production and route to failure handler"
+    },
+    "NODE_NEXT_ROUTE_MISSING": {
+      "code": "NODE_NEXT_ROUTE_MISSING",
+      "severity": "critical",
+      "description": "Next route identifier not resolvable",
+      "resolution": "Verify route exists in profile registry",
+      "recovery": "Route to default next-node or fail-closed"
+    },
+    "NODE_ENTRY_CONDITIONS_FAILED": {
+      "code": "NODE_ENTRY_CONDITIONS_FAILED",
+      "severity": "warning",
+      "description": "Node entry conditions not satisfied",
+      "resolution": "Verify prerequisite gate is complete and required artifacts exist",
+      "recovery": "Retry after conditions are met or escalate to human"
+    },
+    "NODE_INPUTS_INCOMPLETE": {
+      "code": "NODE_INPUTS_INCOMPLETE",
+      "severity": "warning",
+      "description": "Required inputs not provided",
+      "resolution": "Provide all required inputs or use defaults",
+      "recovery": "Use defaults or retry with complete inputs"
+    },
+    "NODE_ACTION_VIOLATION": {
+      "code": "NODE_ACTION_VIOLATION",
+      "severity": "critical",
+      "description": "Node attempted action not in allowed_actions list",
+      "resolution": "Review node implementation and update allowed_actions",
+      "recovery": "Fail-closed and escalate to human"
+    },
+    "NODE_EVIDENCE_FAILED": {
+      "code": "NODE_EVIDENCE_FAILED",
+      "severity": "warning",
+      "description": "Evidence production failed",
+      "resolution": "Verify evidence schema compliance",
+      "recovery": "Retry evidence production or emit event only"
+    },
+    "NODE_LOG_FAILED": {
+      "code": "NODE_LOG_FAILED",
+      "severity": "warning",
+      "description": "Log production failed",
+      "resolution": "Verify log format compliance",
+      "recovery": "Retry log production or skip if non-critical"
+    },
+    "NODE_NEXT_RESOLVE_FAILED": {
+      "code": "NODE_NEXT_RESOLVE_FAILED",
+      "severity": "critical",
+      "description": "Next node/gate resolution failed",
+      "resolution": "Verify route profile and resolution logic",
+      "recovery": "Route to failure handler or human escalation"
+    },
+    "NODE_RETRY_EXCEEDED": {
+      "code": "NODE_RETRY_EXCEEDED",
+      "severity": "warning",
+      "description": "Max retry attempts exceeded",
+      "resolution": "Increase max_attempts or fix root cause",
+      "recovery": "Route to failure handler with full context"
+    },
+    "NODE_ROLLBACK_FAILED": {
+      "code": "NODE_ROLLBACK_FAILED",
+      "severity": "critical",
+      "description": "Rollback action failed",
+      "resolution": "Verify rollback prerequisites and action validity",
+      "recovery": "Manual intervention required"
+    }
+  },
+  "failure_mapping": {
+    "NODE_INSTRUCTION_MISSING": ["NODE_EVIDENCE_CONTRACT_MISSING", "NODE_LOG_CONTRACT_MISSING"],
+    "NODE_EVIDENCE_CONTRACT_MISSING": ["NODE_EVIDENCE_FAILED"],
+    "NODE_LOG_CONTRACT_MISSING": ["NODE_LOG_FAILED"],
+    "NODE_NEXT_ROUTE_MISSING": ["NODE_NEXT_RESOLVE_FAILED"]
+  },
+  "severity_order": ["critical", "warning", "info"]
+}

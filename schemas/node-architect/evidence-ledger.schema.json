@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.example.com/schemas/node-architect/evidence-ledger.schema.json",
+  "title": "Node Evidence Ledger",
+  "description": "Evidence produced by Node Architect node execution",
+  "type": "object",
+  "required": [
+    "node_id",
+    "node_execution_id",
+    "gate",
+    "timestamp",
+    "evidence_type",
+    "status",
+    "result"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "description": "The node that produced this evidence"
+    },
+    "node_execution_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique execution identifier"
+    },
+    "gate": {
+      "type": "string",
+      "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA", "NONE"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of evidence creation"
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": ["descriptor", "artifact", "emitted"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failure", "pending", "cancelled"]
+    },
+    "result": {
+      "type": "object",
+      "description": "Execution result"
+    },
+    "context": {
+      "type": "object",
+      "required": ["task_id", "repository", "base_sha", "branch"],
+      "properties": {
+        "task_id": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "branch": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional evidence metadata"
+    }
+  },
+  "additionalProperties": true
+}
