@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g0-g1-validation",
+  "task_id": "SCRUM-204",
+  "validated_at_utc": "2026-08-02T15:35:10Z",
+  "outcome": "PASS",
+  "valid": true,
+  "issues": [],
+  "command": "python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-204 --json",
+  "scope_hash": "sha256:fe3db380cdcb70af4d74ee7b4ed09d67e00ddd11edf1b3b743cd311a2d5ce270",
+  "base_sha": "65c93c5927013c750631933495c5ecb5e22fae88"
+}

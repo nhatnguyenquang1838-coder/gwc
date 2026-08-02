@@ -1,0 +1,146 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-204
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+working_branch: codex/scrum-204-deliver-e2e-20260802
+pull_request:
+  number: 186
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/186
+  draft: true
+head_sha: 7c9cef1b2bdacb7590e45fcac061c0ab58683730
+scope_hash: sha256:2e06f4a7042099537a89a4c2e98aa566d09cdc1624e402e429bc5befda9248f0
+changed_paths:
+  - .gwc/tasks/SCRUM-204/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-204/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-204/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-204/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-204/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-204/g1/validation/g01-validator.json
+  - .gwc/tasks/SCRUM-204/g2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-204/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-204/g2/implementation-validation.yaml
+  - .gwc/tasks/SCRUM-204/g3/delivery-record.yaml
+  - .gwc/tasks/SCRUM-204/g3/refresh-plan.yaml
+  - .gwc/tasks/SCRUM-204/inputs/g01-decision-input.yaml
+  - .gwc/tasks/SCRUM-204/inputs/g01-runtime-input.yaml
+  - core/node-architect/gate-node-route-profile.json
+  - core/node-architect/node-instructions/runtime_checkpoint/resume-token-generation.node-instruction.yaml
+  - releases/changelog.d/2026-08-02-scrum-204-resume-token-node.md
+  - schemas/node-architect/resume-token.schema.json
+  - tests/test_resume_token_generation.py
+  - tools/node_architect/generate_resume_token.py
+  - tools/node_architect/validate_checkpoint_resume.py
+validation:
+  head_sha: 7c9cef1b2bdacb7590e45fcac061c0ab58683730
+  status: pass
+  commands:
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-204 --json
+      result: pass
+      evidence: G0/G1 validator returned outcome PASS with no issues.
+    - command: python3 -m unittest discover -s tests -p 'test*.py' -q
+      result: pass
+      evidence: 803 repository tests passed locally.
+    - command: git diff --check d4e507aec14db4f62fd4f21f8f84436df08e6216...7c9cef1b2bdacb7590e45fcac061c0ab58683730
+      result: pass
+      evidence: No whitespace errors in the refreshed base-to-head diff.
+review:
+  implementer_id: chatgpt-agent
+  reviewer_id: ChatGPT-fresh-context-G3-read-only-review
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 7c9cef1b2bdacb7590e45fcac061c0ab58683730
+  reviewed_scope_hash: sha256:2e06f4a7042099537a89a4c2e98aa566d09cdc1624e402e429bc5befda9248f0
+  reviewed_at: '2026-08-02T16:50:00Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Refreshed G1 acceptance criteria and approved G2 scope were read against the current diff.
+        - MODE_DOES_NOT_BYPASS_NODE_RUNTIME remains explicit in the instruction contract.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Route, instruction card, schema, checkpoint binding, next-action, and authority boundaries remain consistent after the base refresh.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Current base-to-head diff was reviewed read-only; generator and validator fail closed on binding, digest, time, and authority violations.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Full 803-test local suite passed.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - Refreshed G0/G1 validation and exact G2 approval readback bind the current base, scope, and non-merge exclusions.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - PR #186 is open, Draft, mergeable, based on main@d4e507a, and points to the reviewed head.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Exact-head workflow and job evidence for 7c9cef1 completed successfully.
+        - Combined-status projection returned an empty list; direct workflow-run/job evidence is retained.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Refreshed G0/G1 artifacts validate and bind SCRUM-204 to main@d4e507a.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Refreshed G2 envelope and approval readback bind repository, base, branch, full scope hash, actions, exclusions, and expiry.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Node instruction, route, generator, and validator preserve runtime, claim, gate, route, evidence, logging, and next-route requirements without granting authority.
+    - id: AC-4
+      result: pass
+      evidence:
+        - Refreshed implementation and PR delivery occurred only after exact refreshed G2 approval readback passed.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 7c9cef1b2bdacb7590e45fcac061c0ab58683730
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30757450756
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30757450778
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30757450792
+residual_risks:
+  - GitHub combined-status projection is empty for this head; direct exact-head workflow and job evidence is retained instead.
+  - The PR remains Draft and requires separate exact G4 human approval before merge.
+  - Direct remote main verification was unavailable due DNS; d4e507a is local origin/main evidence.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - release
+  - production_configuration
+  - credentials_and_secrets
+  - migration
+  - force_push
+  - branch_deletion
+  - history_rewrite
+outcome: pass

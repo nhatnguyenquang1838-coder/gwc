@@ -1,0 +1,125 @@
+{
+  "node_id": "repo_delivery.scoped-file-write",
+  "gate": "G2_EXECUTION",
+  "purpose": "Write scoped files to the repository within G2 boundaries",
+  "entry_conditions": {
+    "prerequisite_gate": "G1_ALIGNMENT",
+    "artifacts_required": [
+      ".gwc/tasks/<task-id>/g0/context-snapshot.yaml",
+      ".gwc/tasks/<task-id>/g1/intake/g1-intake-brief.yaml",
+      ".gwc/tasks/<task-id>/g1/preflight/g1-preflight-report.yaml",
+      ".gwc/tasks/<task-id>/g1/brainstorming/g1-options.yaml",
+      ".gwc/tasks/<task-id>/g1/decision/g1-decision-record.yaml",
+      ".gwc/tasks/<task-id>/g2/execution-envelope.yaml"
+    ],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/execution-envelope.yaml"
+      },
+      {
+        "type": "artifact_valid",
+        "expression": "schema: schemas/gate-action-authority.schema.json"
+      },
+      {
+        "type": "state_match",
+        "expression": "envelope.base_sha == repository.base_sha"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "execution_envelope",
+        "type": "path",
+        "description": "Path to G2 execution envelope"
+      },
+      {
+        "name": "files_to_write",
+        "type": "array",
+        "description": "List of file paths and content to write"
+      },
+      {
+        "name": "branch",
+        "type": "branch",
+        "description": "Target branch for writes"
+      }
+    ],
+    "optional": [
+      {
+        "name": "author_name",
+        "type": "string",
+        "description": "Git author name",
+        "default": "AI Agent"
+      },
+      {
+        "name": "author_email",
+        "type": "string",
+        "description": "Git author email",
+        "default": "ai-agent@gwc.example.com"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "read_repository",
+    "write_file",
+    "create_branch",
+    "create_commit",
+    "push_branch",
+    "create_checkpoint"
+  ],
+  "forbidden_actions": [
+    "merge",
+    "deploy",
+    "release",
+    "production_config",
+    "credential_rotation",
+    "production_data"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g2/execution-record.yaml",
+      ".gwc/tasks/<task-id>/g2/write-evidence.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g2/write-evidence.yaml"
+  },
+  "logs_required": {
+    "type": "event",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": "repo_delivery.diff-readback",
+    "next_gate": "G2_EXECUTION",
+    "next_route": "full-flow-v3",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff": "exponential",
+    "exponential_base": 2.0,
+    "retryable_errors": [
+      "CONNECTOR_TEMPORARY_FAILURE",
+      "RESOURCE_CONTENTION"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "files were written to branch",
+    "action": "delete_artifact",
+    "conditions": [
+      "branch exists",
+      "files written to branch"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": true,
+    "grants_merge_authority": false
+  }
+}

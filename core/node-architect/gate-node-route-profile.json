@@ -65,6 +65,21 @@
       "next_node": null,
       "next_action": null,
       "next_gate": "G3_PR"
+    },
+    {
+      "route_id": "g2-resume-token-generation",
+      "gate": "G2_EXECUTION",
+      "requested_action": "generate_resume_token",
+      "current_node": "runtime_checkpoint.resume-token-generation",
+      "node_descriptor_ref": "core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/runtime_checkpoint/resume-token-generation.node-instruction.yaml",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "checkpoint"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "python", "ref": "tools/node_architect/generate_resume_token.py:generate_resume_token"},
+      "next_node": null,
+      "next_action": "validate_resume_token",
+      "next_gate": "G2_EXECUTION"
     }
   ]
 }

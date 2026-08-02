@@ -1,0 +1,41 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-02T16:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-204
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-08-02T16:35:00Z'
+  source: explicit-user-request-to-refresh-g2-g3
+  explicit: true
+rationale: Refresh G2/G3 after protected-main drift and stop for exact G2 approval
+  before branch reconciliation.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+scope_hash: sha256:e85fda963ad635cb628c90284efc4d7c3820279d83e5ba92cf51e8e3ce33dc1a
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.

@@ -1,0 +1,53 @@
+artifact_type: g4-merge-approval
+version: "1.0.0"
+task_id: SCRUM-229
+repository: nhatnguyenquang1838-coder/gwc
+base_branch: main
+base_sha: 2e1aa141f8469460909e43cc6e40d46ae955492f
+working_branch: scrum-229-node-architect-instruction-pack
+head_sha: 9a29b4fcd6c818d521e6b3bfc7b19a77d1c42360
+pr_number: 185
+scope_hash: 2e1aa141f8469460
+files_read:
+  - core/node-architect/INSTRUCTION_CONTRACT_v1.0.md
+  - core/node-architect/INSTRUCTION_CARD_SCHEMA_v1.0.json
+  - core/node-architect/FAILURE_CODES_v1.0.json
+  - tools/node_architect/validate_node_instruction.py
+  - core/node-architect/node-catalog/*/instruction-card.json
+  - schemas/node-architect/*.schema.json
+files_write:
+  - core/node-architect/INSTRUCTION_CONTRACT_v1.0.md
+  - core/node-architect/INSTRUCTION_CARD_SCHEMA_v1.0.json
+  - core/node-architect/FAILURE_CODES_v1.0.json
+  - tools/node_architect/validate_node_instruction.py
+  - core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.instruction-card.json
+  - core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.instruction-card.json
+  - core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.instruction-card.json
+  - core/node-architect/node-catalog/repo_delivery/diff-readback.node.instruction-card.json
+  - schemas/node-architect/instruction-card.schema.json
+  - schemas/node-architect/evidence-ledger.schema.json
+  - schemas/node-architect/log-ledger.schema.json
+authorized_actions:
+  - create_branch
+  - write_file
+  - create_commit
+  - push_branch
+  - create_pr
+excluded_actions:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config
+  - credential_rotation
+  - production_data
+  - migration
+  - branch_delete
+  - force_push
+created_at: "2026-08-02T21:57:57Z"
+expires_at: "2026-08-03T21:57:57Z"
+validated: true
+validation_evidence:
+  validator: tools/node_architect/validate_node_instruction.py
+  result: PASS
+  nodes_validated: 4
