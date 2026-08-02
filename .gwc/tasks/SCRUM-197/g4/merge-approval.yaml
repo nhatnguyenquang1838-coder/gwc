@@ -1,0 +1,48 @@
+schema_version: "1.0"
+artifact_type: "g4-merge-approval"
+gate: "G4_MERGE"
+task_id: "SCRUM-197"
+node_id: "repo_delivery.draft-pr-creation"
+repository: "nhatnguyenquang1838-coder/gwc"
+fastlane: "FL-MAT-F3-REPO-DELIVERY-B2-20260801"
+recovery_fastlane: "FL-MAT-F3-B2-G4-EVIDENCE-RECOVERY-20260802"
+
+status: "RETROSPECTIVE_AUTHORITY_EVIDENCE_ONLY"
+retrospective: true
+backdated: false
+
+approved_pr:
+  number: 160
+  approved_head_sha: "ae571300194f3007e2e543fbbf8120ec0035d97d"
+  merge_commit_sha: "1bef8cad835206c71d619b89da27ae002d7451df"
+
+human_authority_source:
+  provider: "github_pr_comment"
+  comment_id: 5152611680
+  command: "APPROVE G4 APPROVE_G4_FL-MAT-F3-B2_20260801 ae571300194f3007 2026-08-02T17:10:00Z"
+  issued_after_merge: true
+  issued_at_actual: "2026-08-01T17:41:00Z"
+  note: "This is not represented as pre-merge authority. It records the actual post-merge G4 source for recovery traceability."
+
+workflow_readback:
+  failed_g4_g5_run_id: 30710242381
+  failed_issue_comment_run_id: 30710900506
+  failure_reason: "The trusted G4 authority receipt was absent at merge-event time; later issue-comment workflow rejected the already-closed PR."
+  push_main_validate_build_on_merge_sha: "success"
+
+governance_position:
+  jira_done_projection_allowed: false
+  merge_already_completed: true
+  recovery_required: true
+  allowed_use: "Task-scoped evidence record for later governed G5 recovery or audit reconciliation."
+  forbidden_use: "Must not be used to claim the original merge had pre-merge trusted G4 receipt."
+
+excluded_authority:
+  - deploy
+  - release
+  - production_config_change
+  - production_data_write
+  - credential_or_secret_change
+  - migration
+  - audit_completion_authority
+  - scale_authority
