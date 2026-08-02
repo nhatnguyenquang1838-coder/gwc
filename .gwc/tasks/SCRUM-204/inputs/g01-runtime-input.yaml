@@ -1,6 +1,6 @@
 schema_version: '1.0'
 artifact_type: g01-runtime-input
-generated_at: '2026-08-02T15:20:17Z'
+generated_at: '2026-08-02T16:35:00Z'
 project:
   id: gwc
   name: GWC
@@ -8,7 +8,7 @@ project:
 repository:
   full_name: nhatnguyenquang1838-coder/gwc
   base_ref: main
-  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
   protected_branches: [main]
   connector: local_git
   write_enabled: true
@@ -28,7 +28,7 @@ runtime:
     - connector: local_git
       role: primary
       status: AVAILABLE
-      evidence: Fresh isolated worktree and exact origin/main readback are available locally.
+      evidence: Fresh isolated worktree at origin/main@d4e507a is available; direct GitHub DNS verification is unavailable.
   required_behavior_contracts:
     - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
       required: true
@@ -44,56 +44,55 @@ task:
 request:
   requester: user
   problem:
-    statement: Recreate a current-base G2 handoff for SCRUM-204 after the prior G2 envelope was invalidated by protected-main drift, while preserving the universal Node Architect runtime invariant.
-    why_now: The prior approval referenced aad17d28, while current protected main is 65c93c5 after the SCRUM-263 Node Architect merge; stale G2 evidence cannot authorize execution.
-  desired_outcome: Produce fresh G0/G1 evidence and a bounded G2 execution envelope tied to current main, with no implementation until exact approval.
-  affected: [Node Architect runtime, GWC agents, task-scoped evidence, runtime_checkpoint.resume-token-generation]
+    statement: Refresh SCRUM-204 G2/G3 evidence after protected main advanced beyond the PR base, without reusing stale authority or bypassing Node Architect runtime requirements.
+    why_now: PR #186 is based on 65c93c5 while the latest available protected-main readback is d4e507a after SCRUM-264; the prior G4 approval is therefore stale.
+  desired_outcome: Produce current-base G0/G1 evidence and a bounded G2 proposal for non-force branch/base reconciliation followed by exact-head G3 revalidation, with no action before exact G2 approval.
+  affected: [SCRUM-204, 'PR #186', Node Architect runtime, GWC task evidence]
   in_scope:
-    - Re-read and pin current protected-main governance, Node Architect, project, and agent sources.
-    - Confirm existing SCRUM-204 claim readback and SCRUM-263 read-only context.
-    - Verify current main SHA, local worktree isolation, and offline CI status boundary.
-    - Recreate task-scoped G0/G1 artifacts and current-base G2 envelope.
-    - Keep MODE_DOES_NOT_BYPASS_NODE_RUNTIME and authority=false boundaries explicit.
+    - Re-read current protected-main contracts and task projection state.
+    - Bind refreshed evidence to main@d4e507aec14db4f62fd4f21f8f84436df08e6216.
+    - Reconcile the existing PR branch to the current base only by an explicitly approved non-force operation.
+    - Revalidate exact-head G3 evidence and CI after the refreshed branch is delivered.
+    - Preserve MODE_DOES_NOT_BYPASS_NODE_RUNTIME and all authority=false boundaries.
   non_goals:
-    - Implement, commit, push, PR, merge, deploy, release, manual G5, or G6 work before exact G2 approval.
-    - Treat Jira, Slack, Notion, route decisions, node instructions, or CI as gate authority.
-    - Reuse stale aad17d28 G0/G1/G2 evidence as current evidence.
-    - Production configuration/data, credentials, secrets, migration, force-push, branch deletion, or package export.
+    - Any implementation change before exact refreshed G2 approval.
+    - Merge, auto-merge, deploy, release, production/config/data, credentials, secrets, migration, package export, force-push, branch deletion, or history rewrite.
+    - Treat Jira, PR metadata, route decisions, node instructions, or CI as gate authority.
   constraints:
-    - Protected base is main at 65c93c5927013c750631933495c5ecb5e22fae88.
-    - G0/G1 artifacts are task-scoped and validated before G2.
-    - Fresh isolated worktree is required before creating task artifacts.
-    - Exact G2 approval must bind repository, base SHA, branch, scope hash, files, actions, exclusions, and expiry.
-    - The prior SCRUM-204 claim remains traceability only; Jira does not grant authority.
+    - Latest available protected base is main@d4e507aec14db4f62fd4f21f8f84436df08e6216.
+    - Existing PR #186 head is 81d5c9a2b0be6239b5230630fa8974cf0615d848 and its current base is stale.
+    - Fresh isolated worktree is required before materializing refreshed artifacts.
+    - Exact G2 approval must bind the refresh operation, repository, base SHA, branch, scope, files, exclusions, and expiry.
+    - Direct remote main verification is unavailable due DNS; d4e507a is local origin/main evidence only.
   assumptions:
-    - Local Git/worktree and Python/jsonschema validators are available.
-    - GitHub API is unavailable at this check; no CI PASS is claimed.
-    - SCRUM-263 is read-only context because its implementation is already merged into current main.
+    - Jira SCRUM-263 remains projection-only and is already Done.
+    - The existing implementation branch is retained; no branch deletion or force-push is permitted.
+    - Local validators and Git worktree are available.
   risks:
     - id: RISK-1
-      description: Stale G2 evidence could authorize work against the wrong base.
+      description: A stale PR base could cause G4 approval to bind the wrong repository state.
       impact: high
-      mitigation: Bind every artifact to 65c93c5 and stop on base drift.
+      mitigation: Stop on base drift and require a refreshed exact G2 approval.
     - id: RISK-2
-      description: A refresh could accidentally broaden from SCRUM-204 into already merged SCRUM-263 implementation.
+      description: Base reconciliation could accidentally alter implementation scope.
       impact: high
-      mitigation: Keep the envelope bounded and require exact user approval before any code write.
+      mitigation: Require non-force operation, exact diff readback, and changed-path allowlist.
     - id: RISK-3
-      description: Offline CI may be misrepresented as PASS.
+      description: Offline remote verification could be mistaken for authoritative current-main proof.
       impact: medium
-      mitigation: Record SKIPPED_OFFLINE/NO_COMBINED_STATUS explicitly.
+      mitigation: Mark remote verification SKIPPED_OFFLINE and do not claim remote freshness beyond local origin/main.
   acceptance_criteria:
     - id: AC-1
-      statement: G0 and G1 artifacts validate against current protected-main schemas and bind SCRUM-204 to 65c93c5.
+      statement: Refreshed G0/G1 artifacts bind SCRUM-204 to the latest available main SHA d4e507a.
       verifiable: true
     - id: AC-2
-      statement: The G2 envelope contains exact current-base branch, scope, authorized actions, excluded actions, and expiry.
+      statement: Refreshed G2 scope explicitly authorizes only non-force base reconciliation and bounded G3 revalidation after exact approval.
       verifiable: true
     - id: AC-3
-      statement: The handoff preserves MODE_DOES_NOT_BYPASS_NODE_RUNTIME and separate gate authority.
+      statement: No G4 merge authority is implied by the refresh, and MODE_DOES_NOT_BYPASS_NODE_RUNTIME remains explicit.
       verifiable: true
     - id: AC-4
-      statement: No implementation or later gate action occurs before the new exact G2 approval.
+      statement: Refreshed G3 evidence will require exact PR head, current CI, review closure, and Draft/Ready state readback.
       verifiable: true
   unresolved_questions: []
 policies:
@@ -162,22 +161,6 @@ sources:
     required: true
     status: AVAILABLE
     source_sha: 157b8707b583bfdbb66af04e68f725bd6c1f6c011ac9a006a5ed780c65fed121
-  - path: governance/agent-runtime-profiles/chatgpt.yaml
-    required: true
-    status: AVAILABLE
-    source_sha: 050091551d2d70709d455723aee6b9d4ec07fe7f70c6406c4eceab1d356ca134
-  - path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
-    required: true
-    status: AVAILABLE
-    source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
-  - path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
-    required: true
-    status: AVAILABLE
-    source_sha: aed8ad1c267a7caa26060911e14c1793e2199ae5eb37753927c8946a1043d1e8
-  - path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
-    required: true
-    status: AVAILABLE
-    source_sha: 4905d7f48ac99ca1cdccdf954339ef64ad06ced59cafcb839b9cedc0a22f4cef
 risk:
   class: R2
   human_direction_confirmed: true

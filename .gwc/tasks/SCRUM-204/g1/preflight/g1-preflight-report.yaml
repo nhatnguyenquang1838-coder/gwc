@@ -1,15 +1,15 @@
 schema_version: '1.0'
 artifact_type: g1-preflight-report
-generated_at: '2026-08-02T15:20:17Z'
+generated_at: '2026-08-02T16:35:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-204
-  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: 65c93c5927013c750631933495c5ecb5e22fae88
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
   profile_path: projects/gwc/project-profile.yaml
   connector: local_git
 checks:
@@ -18,7 +18,7 @@ checks:
   code: REPOSITORY_VERIFIED
   message: Repository identity and base evidence are verified.
   evidence:
-  - nhatnguyenquang1838-coder/gwc@65c93c5927013c750631933495c5ecb5e22fae88
+  - nhatnguyenquang1838-coder/gwc@d4e507aec14db4f62fd4f21f8f84436df08e6216
   - projects/gwc/project-profile.yaml
 - id: REQUIRED_SOURCES
   status: PASS
@@ -37,10 +37,6 @@ checks:
   - projects/gwc/project-extension.md
   - agents/chatgpt-agent/agent-instructions.md
   - agents/dwc/agent-instructions.md
-  - governance/agent-runtime-profiles/chatgpt.yaml
-  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
-  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
-  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
 - id: EXECUTION_MODE_COMPATIBILITY
   status: PASS
   code: EXECUTION_MODE_SUPPORTED
@@ -118,8 +114,9 @@ checks:
   - STEP-09
 process_readback:
   process_id: governed-repository-delivery
-  terminal_outcome: Produce fresh G0/G1 evidence and a bounded G2 execution envelope
-    tied to current main, with no implementation until exact approval.
+  terminal_outcome: Produce current-base G0/G1 evidence and a bounded G2 proposal
+    for non-force branch/base reconciliation followed by exact-head G3 revalidation,
+    with no action before exact G2 approval.
   required_sources: *id001
   status: VERIFIED
 execution_feasibility:
