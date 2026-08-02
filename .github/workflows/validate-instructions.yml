@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - codex/gwc-cross-platform-lf-sha-normalization-20260802
 
 permissions:
   contents: read
@@ -19,6 +20,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Diagnostic tree SHAs for bounded base-drift repair
+        if: github.event_name == 'push' && github.ref == 'refs/heads/codex/gwc-cross-platform-lf-sha-normalization-20260802'
+        run: |
+          git fetch origin main
+          echo "HEAD_COMMIT=$(git rev-parse HEAD)"
+          echo "HEAD_TREE=$(git rev-parse 'HEAD^{tree}')"
+          echo "MAIN_COMMIT=$(git rev-parse origin/main)"
+          echo "MAIN_TREE=$(git rev-parse 'origin/main^{tree}')"
 
       - name: Set up Python
         uses: actions/setup-python@v5
