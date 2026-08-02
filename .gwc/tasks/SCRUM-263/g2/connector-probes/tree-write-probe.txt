@@ -1,2 +1,0 @@
-SCRUM-263 connector probe for content API shape.
-This file is created on the approved SCRUM-263 branch only.
