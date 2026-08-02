@@ -1,0 +1,67 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-206
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+working_branch: g1-206-20260802-2328
+pull_request:
+  number: 189
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/189
+  state: draft
+  head_sha: 56db4e04864b2e29242c6fe78353250a2e33e33c
+head_sha: 56db4e04864b2e29242c6fe78353250a2e33e33c
+scope_hash: sha256:fe88b9bcc740b9bb629b14e4282be9b30b981b841f0becf1ce90c7ae7aeb5964
+changed_paths:
+  - tools/node_architect/lease_acquisition.py
+  - tests/test_lease_acquisition.py
+  - schemas/lease-acquisition-decision.schema.json
+  - .gwc/tasks/SCRUM-206/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-206/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-206/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-206/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-206/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-206/g2/execution-envelope.yaml
+  - releases/changelog.d/2026-08-02-scrum-206-lease-acquisition-m5.md
+validation:
+  unit_tests:
+    - command: python -m unittest tests.test_lease_acquisition -v
+      outcome: PASS
+      evidence: 19 tests passed
+  g01_validator:
+    - command: python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-206
+      outcome: PASS
+      evidence: "G0/G1 validation outcome: PASS"
+review:
+  implementer: Kilo
+  reviewer: Kilo
+  independence: fresh-context
+  lanes:
+    - requirement: PASS
+    - design: PASS
+    - code: PASS
+    - test: PASS
+    - governance: PASS
+    - delivery: PASS
+    - ci: PENDING
+  findings: []
+  decision: PASS
+  stale: false
+ci:
+  required_workflows:
+    - validate-instructions
+  exact_head_sha: 56db4e04864b2e29242c6fe78353250a2e33e33c
+  state: PENDING
+residual_risks:
+  - risk: Exact-head CI not yet complete
+    mitigation: M5 claim requires green CI for head_sha 56db4e04864b2e29242c6fe78353250a2e33e33c
+  - risk: Node maturity remains experimental in node-registry.json
+    mitigation: M5_REPLAY_SAFE is claimed in task artifacts; registry update is out of scope for this slice
+exclusions:
+  - merge_or_auto_merge
+  - deploy_release_publish_or_runtime_reload
+  - production_configuration_data_secret_credential_or_migration
+  - force_push_branch_delete_history_rewrite_or_pr_base_change
+  - scope_expansion_or_unrelated_cleanup
+outcome: PASS
