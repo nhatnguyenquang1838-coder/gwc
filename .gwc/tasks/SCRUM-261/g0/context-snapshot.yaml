@@ -1,0 +1,84 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-02T06:12:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: chatgpt
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+constraints:
+- Preserve current G0-G6 authority boundaries
+- Use a pure provider-neutral resolver with no external side effects
+- Bind to exact main SHA 0b05dcce1865cdce58e5fff22ee8784428735df0
+- Use one guarded branch after refreshed exact G2 authority
+- Repair intake-card baseline before implementing route binding
+- Normalize generated text before hashes and validators
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main@0b05dcce1865cdce58e5fff22ee8784428735df0
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main@0b05dcce1865cdce58e5fff22ee8784428735df0
+  source_sha: cc933fb641451a65d0deb82a5100c5e872c39fe23dfe4edf277792ee4be46043
+- id: NODE_RUNTIME_KERNEL
+  path: core/node-architect/RUNTIME_KERNEL_v0.1.md
+  ref: main@0b05dcce1865cdce58e5fff22ee8784428735df0
+  source_sha: 22b417a470e313eb8f7b3809490047a0800d4cc624d124d2c36dcfeeb238f80c
+- id: CROSS_PLATFORM_TEXT
+  path: core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md
+  ref: main@0b05dcce1865cdce58e5fff22ee8784428735df0
+  source_sha: ab00acc288cb58b37d793118520bf1d33565bfcc
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 599452be4c67b6295bc9eb55f6ea4fe96f3b1ad699fead60792c5773ef2c092d
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: core/node-architect/runtime-graph-registry.json
+  required: true
+  status: AVAILABLE
+  source_sha: fc69f1b34bd7207aea6eb8330621edd14444ba7ddc1589354166da0e9902b84c
+- path: core/node-architect/node-registry.json
+  required: true
+  status: AVAILABLE
+  source_sha: 5dc7cf22d4231b22f0dee93fe5cf3210ed1f74c25ea273f4d1a295e12d284261
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 7f45852998ece250a35e296b94de49e086fa5c46e6348046d3ea277638f214cb
+- path: tools/node_architect/intake_card_render.py
+  required: true
+  status: AVAILABLE
+  source_sha: 32415a2c2c23cbcee602f6237a4696125b021374
+- path: tests/test_intake_context_intake_card_render_m4.py
+  required: true
+  status: AVAILABLE
+  source_sha: d80457d92e25424ae5bb942f1f66892d243a701b
+status: READY
+blockers: []
