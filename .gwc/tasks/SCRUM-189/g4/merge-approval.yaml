@@ -25,6 +25,8 @@
   "g2_lineage_scope_hash": "sha256:372cbca3216575d8000000000000000000000000000000000000000000000000",
   "issued_at": "2026-08-02T09:53:15Z",
   "expires_at": "2026-08-03T09:53:15Z",
-  "authority_granted": false,
-  "scope_hash": "sha256:7019418b736b5ec054eae5f10c585bd286842995d649bf353804840797db18a7"
+  "authority_granted": true,
+  "scope_hash": "sha256:7019418b736b5ec054eae5f10c585bd286842995d649bf353804840797db18a7",
+  "approved_at": "2026-08-02T10:18:37Z",
+  "approved_by": "human_exact_token"
 }
