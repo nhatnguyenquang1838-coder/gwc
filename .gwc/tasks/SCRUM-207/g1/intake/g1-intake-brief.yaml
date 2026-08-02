@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+task_id: SCRUM-207
+summary: '[MAT-F4-N06] runtime_checkpoint.lease-renewal — M2 → M5'
+maturity_target: M5_REPLAY_SAFE
+node: runtime_checkpoint.lease-renewal
+purpose: Renew an active lease only when the same owner, task, scope, repository base, and fencing chain remain valid.
+required_contract:
+  - Renewal requires current owner identity, unexpired or policy-renewable lease, matching task_id, scope_hash, base SHA, and fencing token.
+  - Renewal must not hide base drift, approval expiry, scope drift, or stale worker state.
+  - Fencing token must remain monotonic; writes after renewal must carry the latest token.
+  - Failed renewal routes to reconciliation, not blind retry.
+family_gate: G2_EXECUTION
+dependencies: none
+claim_status: claimed_by_Hermes
