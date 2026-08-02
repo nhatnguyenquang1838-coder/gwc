@@ -1,0 +1,30 @@
+schemaVersion: "1.0"
+folderMode: per_task
+repositoryRoot: .
+knowledgeRoot: .ua
+outputRoot: .ua/generated/task-plans
+runtimeRoot: .task-me
+hostMode:
+  enabled: true
+  packageRoot: null
+  hostRoot: .
+inputs:
+  requirements: []
+  designs: []
+  systemGraphs: []
+  sourceRoots: []
+  testRoots: []
+output:
+  taskFolderPattern: "tasks/{task_id}-{slug}"
+  taskFiles:
+    - task.yaml
+    - README.md
+    - impact-analysis.md
+    - implementation-plan.md
+    - coding-guide.md
+    - test-plan.md
+    - evidence.json
+    - decisions.md
+notes:
+  - Consumer-owned host config for Task Me host mode on the gwc project.
+  - knowledgeRoot points at the UA graph refreshed by /understand.
