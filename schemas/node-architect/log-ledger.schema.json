@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.example.com/schemas/node-architect/log-ledger.schema.json",
+  "title": "Node Log Ledger",
+  "description": "Logs produced by Node Architect node execution",
+  "type": "object",
+  "required": [
+    "node_id",
+    "log_entries"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string"
+    },
+    "log_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "level", "type", "message"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "level": {
+            "type": "string",
+            "enum": ["debug", "info", "warn", "error"]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["event", "decision", "state"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "aggregation": {
+      "type": "object",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "entry_count": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

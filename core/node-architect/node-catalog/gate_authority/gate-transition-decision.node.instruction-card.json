@@ -1,0 +1,104 @@
+{
+  "node_id": "gate_authority.gate-transition-decision",
+  "gate": "G2_EXECUTION",
+  "purpose": "Determine next gate transition based on execution state and route profile",
+  "entry_conditions": {
+    "prerequisite_gate": "G2_EXECUTION",
+    "artifacts_required": [
+      ".gwc/tasks/<task-id>/g2/execution-record.yaml",
+      ".gwc/tasks/<task-id>/g2/write-evidence.yaml",
+      ".gwc/tasks/<task-id>/g2/diff-readback.yaml"
+    ],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/execution-record.yaml"
+      },
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/diff-readback.yaml"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "execution_record",
+        "type": "path",
+        "description": "Path to G2 execution record"
+      },
+      {
+        "name": "route_profile",
+        "type": "string",
+        "description": "Route profile identifier"
+      }
+    ],
+    "optional": [
+      {
+        "name": "validation_status",
+        "type": "string",
+        "description": "Validation result status",
+        "default": "pending"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "read_repository",
+    "resolve_route",
+    "create_checkpoint",
+    "emit_event"
+  ],
+  "forbidden_actions": [
+    "write_file",
+    "create_branch",
+    "create_commit",
+    "push_branch",
+    "merge",
+    "deploy"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g2/gate-transition-record.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g2/gate-transition-record.yaml"
+  },
+  "logs_required": {
+    "type": "decision",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": null,
+    "next_gate": "G3_PR",
+    "next_route": "full-flow-v3",
+    "route_resolution": "dynamic"
+  },
+  "retry": {
+    "max_attempts": 2,
+    "backoff": "fixed",
+    "exponential_base": 1.0,
+    "retryable_errors": [
+      "NODE_INPUTS_INCOMPLETE",
+      "NODE_NEXT_RESOLVE_FAILED"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "transition decision is invalid",
+    "action": "reset_state",
+    "conditions": [
+      "validation_status is failure",
+      "route profile is unavailable"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": false,
+    "grants_merge_authority": false
+  }
+}

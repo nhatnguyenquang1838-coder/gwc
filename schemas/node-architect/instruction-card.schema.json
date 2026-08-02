@@ -1,0 +1,304 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.example.com/schemas/node-architect/instruction-card.schema.json",
+  "title": "Node Instruction Card",
+  "description": "Complete instruction pack for a Node Architect runtime node",
+  "type": "object",
+  "required": [
+    "node_id",
+    "gate",
+    "purpose",
+    "entry_conditions",
+    "inputs",
+    "allowed_actions",
+    "forbidden_actions",
+    "outputs",
+    "evidence_required",
+    "logs_required",
+    "next",
+    "retry",
+    "rollback",
+    "authority_boundary"
+  ],
+  "properties": {
+    "node_id": {
+      "type": "string",
+      "description": "Unique identifier matching the node registry",
+      "pattern": "^[a-z_]+\\.[a-z0-9_-]+$"
+    },
+    "gate": {
+      "type": "string",
+      "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA", "NONE"],
+      "description": "The gate boundary this node executes within"
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concise description of what this node does"
+    },
+    "entry_conditions": {
+      "type": "object",
+      "required": ["prerequisite_gate", "artifacts_required", "conditions"],
+      "properties": {
+        "prerequisite_gate": {
+          "type": "string",
+          "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA", "NONE", "ANY"],
+          "description": "Which gate must be complete before this node runs"
+        },
+        "artifacts_required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of required gate artifacts"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "expression"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["script", "expression", "artifact_exists", "artifact_valid", "state_match"]
+              },
+              "expression": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["required", "optional"],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "description"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]*$"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["string", "integer", "boolean", "array", "object", "path", "sha", "branch", "task_id"]
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "description"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]*$"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["string", "integer", "boolean", "array", "object", "path", "sha", "branch", "task_id"]
+              },
+              "description": {
+                "type": "string"
+              },
+              "default": {
+                "description": "Default value if input is omitted"
+              }
+            }
+          }
+        }
+      }
+    },
+    "allowed_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "read_repository",
+          "write_file",
+          "create_branch",
+          "create_commit",
+          "push_branch",
+          "create_pr",
+          "update_pr",
+          "mark_pr_ready",
+          "create_checkpoint",
+          "persist_evidence",
+          "emit_event",
+          "resolve_route",
+          "read_gate_artifact",
+          "validate_schema",
+          "execute_validator",
+          "read_state",
+          "update_state"
+        ]
+      }
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "merge",
+          "auto_merge",
+          "deploy",
+          "redeploy",
+          "release",
+          "publish",
+          "production_config",
+          "credential_rotation",
+          "production_data",
+          "migration",
+          "secret_access",
+          "branch_delete",
+          "force_push",
+          "rewrite_history"
+        ]
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["required_artifacts", "evidence_contract", "logs_contract"],
+      "properties": {
+        "required_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_contract": {
+          "type": "string"
+        },
+        "logs_contract": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_required": {
+      "type": "object",
+      "required": ["type", "schema", "location"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["descriptor", "artifact", "emitted"]
+        },
+        "schema": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "logs_required": {
+      "type": "object",
+      "required": ["type", "format", "persistence"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["event", "decision", "state"]
+        },
+        "format": {
+          "type": "string",
+          "enum": ["json", "yaml", "text"]
+        },
+        "persistence": {
+          "type": "string",
+          "enum": ["local", "emitted", "checkpoint"]
+        }
+      }
+    },
+    "next": {
+      "type": "object",
+      "required": ["next_node", "next_gate", "next_route", "route_resolution"],
+      "properties": {
+        "next_node": {
+          "type": ["string", "null"]
+        },
+        "next_gate": {
+          "type": ["string", "null"]
+        },
+        "next_route": {
+          "type": "string"
+        },
+        "route_resolution": {
+          "type": "string",
+          "enum": ["static", "dynamic", "conditional"]
+        }
+      }
+    },
+    "retry": {
+      "type": "object",
+      "required": ["max_attempts", "backoff", "retryable_errors"],
+      "properties": {
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "backoff": {
+          "type": "string",
+          "enum": ["linear", "exponential", "fixed"]
+        },
+        "exponential_base": {
+          "type": "number",
+          "minimum": 1.0,
+          "default": 2.0
+        },
+        "retryable_errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "required": ["prerequisite", "action", "conditions"],
+      "properties": {
+        "prerequisite": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": ["delete_artifact", "reset_state", "restore_checkpoint", "notify_human"]
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "authority_boundary": {
+      "type": "object",
+      "required": ["grants_gate_authority", "grants_write_authority", "grants_merge_authority"],
+      "properties": {
+        "grants_gate_authority": {
+          "type": "boolean",
+          "const": false
+        },
+        "grants_write_authority": {
+          "type": "boolean"
+        },
+        "grants_merge_authority": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
