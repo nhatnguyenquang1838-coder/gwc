@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.example/schemas/evidence-quality-decision.schema.json",
+  "title": "Evidence Quality Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "node_id", "task_id", "repository", "branch", "base_sha", "head_sha", "scope_hash", "graph_revision", "idempotency_key", "pr_number", "status", "reason_codes", "input_digest", "quality_digest", "replayed", "merge_authority_granted", "deployment_authority_granted", "production_authority_granted"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "evidence-quality-decision"},
+    "node_id": {"const": "validation_quality.evidence-quality-check"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "minLength": 1},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "graph_revision": {"type": "string", "minLength": 1},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "pr_number": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["PASS", "BLOCKED"]},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["EVIDENCE_ACCEPTED", "EVIDENCE_INCOMPLETE", "EVIDENCE_STALE", "EVIDENCE_MALFORMED", "EVIDENCE_PROVENANCE_MISSING", "EVIDENCE_PROJECTION_ONLY", "EVIDENCE_HEAD_MISMATCH", "EVIDENCE_CONTRADICTORY"]}},
+    "input_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "quality_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "replayed": {"type": "boolean"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  }
+}
