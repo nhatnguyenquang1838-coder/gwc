@@ -1,0 +1,82 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-01T20:09:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-214
+  base_sha: c3fa858c1ff5d0ceb09a165f0df32825b219e257
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-01T20:07:00Z'
+  source: 'User instruction: refresh lại main head, tạo lại g2. This selects refresh/rebaseline only and is not G2 execution approval.'
+  explicit: true
+rationale: Refresh the unchanged bounded SCRUM-214 plan against current main and prepare a new r3 guarded-branch envelope.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:938e328bbdf9f9da91e7f7ac58b9f932bb8cec0a24e85f027f031f0e4c81dbdd
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Schema and decision utility
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Replay/checkpoint tests and implementation
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Client binding and integration validation
+    dependencies:
+    - SUB-TASK-2
+  - sub_task_id: SUB-TASK-4
+    description: Independent exact-head review
+    dependencies:
+    - SUB-TASK-3
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-g2
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: test-driven-development
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: gwc-g3
+    agent_type: validator
+  - sub_task_id: SUB-TASK-4
+    skill_id: code-review
+    agent_type: reviewer
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Sequential test-first delivery with fresh-context review.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-214
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: c3fa858c1ff5d0ceb09a165f0df32825b219e257
+  plan_root: .kiro/specs/fl-mat-f5-ci-evidence-capture-20260802/scrum-214
+  plan_revision: sha256:a7362f6247be76d57d5acf05ffaf09f29a08221b37f5759a7ca98dbee255703c
+  validation_evidence: validation/SCRUM-214-r3-plan-validation.json

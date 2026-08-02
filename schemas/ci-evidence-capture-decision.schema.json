@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/ci-evidence-capture-decision.schema.json",
+  "title": "CI Evidence Capture Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","artifact_type","node_id","task_id","run_id","repository","branch","base_sha","head_sha","scope_hash","graph_revision","idempotency_key","status","reason_code","detail_code","provider_observation","input_digest","checkpoint_required","checkpoint_key","replayed","evidence_digest","merge_authority_granted","deployment_authority_granted","production_authority_granted"],
+  "properties": {
+    "schema_version":{"const":"1.0"}, "artifact_type":{"const":"ci-evidence-capture-decision"}, "node_id":{"const":"validation_quality.ci-evidence-capture"},
+    "task_id":{"type":"string","minLength":1}, "run_id":{"type":"string","minLength":1}, "repository":{"type":"string","pattern":"^[^/\\s]+/[^/\\s]+$"}, "branch":{"type":"string","minLength":1},
+    "base_sha":{"type":"string","pattern":"^[0-9a-f]{40}$"}, "head_sha":{"type":"string","pattern":"^[0-9a-f]{40}$"}, "scope_hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}, "graph_revision":{"type":"string","minLength":1}, "idempotency_key":{"type":"string","minLength":1},
+    "status":{"enum":["PASS","BLOCKED","WAIT"]}, "reason_code":{"enum":["CI_SUCCESS","CI_FAILURE","CI_CANCELLED","CI_PENDING","CI_UNAVAILABLE_AT_CHECK","CI_TIMEOUT","STALE_HEAD","CI_SHA_MISMATCH"]},
+    "detail_code":{"type":["string","null"]}, "provider_observation":{"type":"object"}, "input_digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "checkpoint_required":{"type":"boolean"}, "checkpoint_key":{"type":["string","null"]}, "replayed":{"type":"boolean"}, "evidence_digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "merge_authority_granted":{"const":false}, "deployment_authority_granted":{"const":false}, "production_authority_granted":{"const":false}
+  },
+  "allOf": [
+    {"if":{"properties":{"status":{"const":"PASS"}}},"then":{"properties":{"reason_code":{"const":"CI_SUCCESS"},"checkpoint_required":{"const":false},"checkpoint_key":{"type":"null"}}}},
+    {"if":{"properties":{"status":{"const":"WAIT"}}},"then":{"properties":{"reason_code":{"enum":["CI_PENDING","CI_UNAVAILABLE_AT_CHECK","CI_TIMEOUT"]},"checkpoint_required":{"const":true},"checkpoint_key":{"type":"string"}}}}
+  ]
+}
