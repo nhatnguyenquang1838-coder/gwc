@@ -1,0 +1,80 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+gate: G2_EXECUTION
+task_id: SCRUM-204
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+working_branch: codex/scrum-204-deliver-e2e-20260802
+current_head_sha: 81d5c9a2b0be6239b5230630fa8974cf0615d848
+pull_request:
+  number: 186
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/186
+  current_state: open_draft
+scope_version: 2
+risk_class: R2
+status: ACTIVE
+approval_id: APPROVE_G2_EXECUTION_SCRUM-204_REFRESH_G2_G3_20260802
+approved_files:
+  - .gwc/tasks/SCRUM-204/**
+authorized_actions:
+  - create_fresh_isolated_worktree
+  - merge_origin_main_non_force
+  - run_sandboxed_validation
+  - commit_working_branch
+  - push_working_branch_non_force
+  - update_existing_draft_pr
+  - record_refreshed_g3_evidence
+  - mark_pr_ready_after_g3_pass
+excluded_actions:
+  - merge_pull_request
+  - auto_merge
+  - deploy
+  - release
+  - production_data_or_configuration
+  - credentials_or_secrets
+  - migration
+  - force_push
+  - branch_delete
+  - history_rewrite
+  - change_pr_base
+  - package_export_or_publish
+  - jira_as_gate_authority
+  - slack_or_notion_as_canonical_evidence
+scope_hash: sha256:2e06f4a7042099537a89a4c2e98aa566d09cdc1624e402e429bc5befda9248f0
+issued_at: '2026-08-02T16:42:07Z'
+expires_at: '2026-08-03T16:42:07Z'
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-204_REFRESH_G2_G3_20260802 2e06f4a704209953 2026-08-03T16:42:07Z
+g1_validation_evidence: g1/validation/g01-validator.json
+prerequisites:
+  - id: G0_CONTEXT
+    status: PASS
+    evidence: g0/context-snapshot.yaml
+  - id: G1_ALIGNMENT
+    status: PASS
+    evidence: g1/decision/g1-decision-record.yaml
+  - id: G1_VALIDATOR
+    status: PASS
+    evidence: g1/validation/g01-validator.json
+  - id: CLAIM_READBACK
+    status: PASS
+    evidence: Jira SCRUM-263 readback complete; Jira is projection-only and current status is Done.
+  - id: BASE_READBACK
+    status: LOCAL_ORIGIN_MAIN
+    evidence: main@d4e507aec14db4f62fd4f21f8f84436df08e6216; direct remote verification SKIPPED_OFFLINE.
+  - id: PR_READBACK
+    status: PASS
+    evidence: PR #186 open, Draft, head 81d5c9a2b0be6239b5230630fa8974cf0615d848.
+  - id: PRIOR_G4_INVALIDATION
+    status: PASS
+    evidence: Prior G4 approval bound stale base 65c93c5 and is not reusable.
+invalidation_conditions:
+  - protected main SHA changes
+  - scope hash changes
+  - current PR head changes before approval
+  - approval expires
+  - approval command mismatch
+  - merge conflict requires out-of-scope resolution
+  - any file outside approved task evidence or protected-main synchronization is required
+  - any authority scope expands to G4, G5, or G6
+warning: ACTIVE means exact G2 refresh approval was received; merge, deploy, release, and production authority remain excluded.

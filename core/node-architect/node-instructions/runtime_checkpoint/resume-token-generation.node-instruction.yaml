@@ -1,0 +1,121 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+node_id: runtime_checkpoint.resume-token-generation
+gate: [G2_EXECUTION]
+purpose: Generate a deterministic, expiry-bound resume token that binds the exact checkpoint, task, scope, repository state, lease/fencing context, and next G2 action without granting authority.
+entry_conditions:
+  - GWC boot completed
+  - agent task claim and readback completed
+  - G2 authority and approval receipt validated independently
+  - canonical checkpoint is loaded and has a state digest
+  - lease and fencing context are present
+inputs:
+  - task_id
+  - run_id
+  - node_id
+  - gate
+  - scope_hash
+  - base_sha
+  - head_sha
+  - checkpoint_id
+  - state_digest
+  - lease_token
+  - fencing_token
+  - approval_envelope_ref
+allowed_actions:
+  - validate_checkpoint_binding
+  - generate_deterministic_resume_token
+  - record_token_digest
+  - emit_next_route_decision
+forbidden_actions:
+  - grant_gate_authority
+  - grant_g2_authority
+  - grant_g3_authority
+  - merge
+  - auto_merge
+  - deploy
+  - redeploy
+  - release
+  - publish
+  - runtime_reload
+  - production_configuration
+  - production_data
+  - credential_change
+  - secret_change
+  - migration
+  - force_push
+  - branch_deletion
+  - history_rewrite
+  - pr_base_change
+outputs:
+  - resume_token
+  - token_digest
+  - replay_binding_readback
+  - next_route_decision
+evidence_required:
+  - node-start
+  - node-decision
+  - node-result
+  - node-readback
+  - checkpoint
+  - runtime-event
+  - next-route-decision
+logs_required:
+  - runtime-events.jsonl
+  - decision_digest
+  - state_digest
+  - event_digest
+next:
+  pass:
+    disposition: continue
+    reason: Validate the generated token against the canonical checkpoint before resuming.
+    next_node: null
+    next_action: validate_resume_token
+    next_gate: G2_EXECUTION
+  blocked:
+    disposition: stop
+    reason: Fail closed and preserve the checkpoint without issuing a usable token.
+    next_node: null
+    next_action: stop_and_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Persist a checkpoint and reconcile lease, fencing, or approval state before continuing.
+    next_node: null
+    next_action: persist_checkpoint_and_wait
+    next_gate: G2_EXECUTION
+  retry:
+    disposition: retry
+    reason: Replay only after idempotency and checkpoint readback reconciliation pass.
+    next_node: null
+    next_action: reconcile_then_retry
+    next_gate: G2_EXECUTION
+retry:
+  idempotency_key_fields: [task_id, run_id, node_id, checkpoint_id, scope_hash, state_digest]
+  replay_check: Read the canonical checkpoint and compare the complete binding before returning an existing token.
+  max_attempts: 1
+  pending_reconciliation: Unknown lease, fencing, approval, or checkpoint state must stop and reconcile; never issue a second token blindly.
+rollback:
+  reversible: true
+  strategy: Revoke only the task-scoped token reference and preserve the canonical checkpoint.
+  reconciliation: Record token invalidation and checkpoint readback in the node runtime ledger.
+  human_required_when: [scope drift, authority mismatch, unknown checkpoint state, irreversible effect]
+authority_boundary:
+  statement: A resume token permits only validated continuation and never grants G2, G3, G4, G5, or G6 authority.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes: [normal, fastlane, e2e, hotfix, rescue]
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: true
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true
