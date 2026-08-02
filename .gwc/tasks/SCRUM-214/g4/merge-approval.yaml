@@ -1,0 +1,53 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval-recovery-record
+gate: G4_MERGE
+task_id: SCRUM-214
+repository: nhatnguyenquang1838-coder/gwc
+status: MERGED_WITH_PRE_MERGE_HUMAN_AUTHORITY_RECEIPT_NOT_MATERIALIZED
+retrospective: true
+backdated: false
+recovery_mode: truthful_reconciliation
+approved_pr:
+  number: 169
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/169
+  approved_head_sha: ac47c060bf18f47f0989f195581ffcf676b7b2ab
+  merge_commit_sha: e1452a4f8a035f18569bc190030654a56d040f7e
+  merge_method: merge
+  merged: true
+human_authority_source:
+  provider: active_governed_chat_then_github_pr_comment
+  approval_id: APPROVE_G4_SCRUM-214_R3_20260802
+  command: APPROVE G4_MERGE APPROVE_G4_SCRUM-214_R3_20260802 0af8d2a448b8ff06 2026-08-03T00:53:49Z
+  source_comment_id: 5154342576
+  source_comment_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/169#issuecomment-5154342576
+  issued_before_merge: true
+  unexpired_at_merge: true
+  exact_head_match: true
+automated_receipt_readback:
+  expected_marker: gwc:g4-authority-receipt
+  observed: false
+  reason_code: G4_COMMAND_TOKEN_MISMATCH
+  detail: The workflow accepted APPROVE G4 but the governed command used APPROVE G4_MERGE.
+merge_proof_readback:
+  normal_event_chain_completed: false
+  reason_code: TRUSTED_G4_RECEIPT_MISSING_AT_MERGE_EVENT
+  historical_event_rewritten: false
+governance_position:
+  merge_action_completed: true
+  original_human_authority_preserved: true
+  normal_automated_receipt_chain_claimed: false
+  jira_done_projection_allowed: false
+  recovery_required: true
+  allowed_use: Truthful task-scoped recovery evidence and parser compatibility validation.
+  forbidden_use: Must not claim the normal G4 receipt workflow ran before merge.
+excluded_authority:
+  - manual_deploy
+  - release
+  - production_configuration
+  - production_data
+  - credentials
+  - secrets
+  - migration
+  - scrum_215_implementation
+  - scrum_219_implementation
+  - backdating
