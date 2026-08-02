@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,9 +27,15 @@ jobs:
 
       - name: Validate LF and UTF-8 normalization
         shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
         run: |
           set -o pipefail
-          python tools/validate_line_endings.py --root . --json 2>&1 | tee line-ending-validation.log
+          args=(--root . --json)
+          if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]]; then
+            args+=(--changed-since "$BASE_SHA")
+          fi
+          python tools/validate_line_endings.py "${args[@]}" 2>&1 | tee line-ending-validation.log
 
       - name: Calculate parity hashes
         shell: bash
