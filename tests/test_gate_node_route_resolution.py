@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -105,6 +106,12 @@ class TestGateNodeRouteResolution(unittest.TestCase):
         result = self.resolve(ctx)
         self.assertEqual(result["reason_code"], "NODE_CONTEXT_NOT_LOADED")
 
+    def test_empty_context_artifact_counts_as_loaded(self):
+        ctx = context()
+        ctx["context"]["approval_receipt"] = {}
+        result = self.resolve(ctx)
+        self.assertEqual(result["outcome"], "ROUTE_SELECTED")
+
     def test_missing_route_fails_closed(self):
         ctx = context("not-defined")
         self.assertEqual(self.resolve(ctx)["reason_code"], "NODE_ROUTE_MISSING")
@@ -143,6 +150,21 @@ class TestGateNodeRouteResolution(unittest.TestCase):
         profile = copy.deepcopy(self.profile)
         profile["routes"][1]["implementation"]["ref"] = "missing.py:run"
         self.assertEqual(self.resolve(profile=profile)["reason_code"], "NODE_IMPLEMENTATION_UNAVAILABLE")
+
+    def test_python_implementation_check_does_not_execute_module(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            implementation = root / "dangerous.py"
+            implementation.write_text(
+                'raise RuntimeError("must not execute")\n\ndef run():\n    return True\n',
+                encoding="utf-8",
+            )
+            available = self.mod._implementation_available(
+                root,
+                {"kind": "python", "ref": "dangerous.py:run"},
+                {},
+            )
+        self.assertTrue(available)
 
     def test_missing_contract_fails_closed(self):
         profile = copy.deepcopy(self.profile)
