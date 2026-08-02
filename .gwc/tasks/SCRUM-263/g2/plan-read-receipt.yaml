@@ -1,0 +1,13 @@
+canonical_task_uid: SCRUM-263
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+plan_revision: sha256:7f98fcdf5b6837c77ecf483f8828c6091a6fd5c99bc4352d1029d470b54727a7
+reader: ChatGPT
+read_at_utc: '2026-08-02T14:05:21Z'
+paths_read:
+  - .kiro/specs/scrum-263-node-instruction-evidence-ledger/requirements.md
+  - .kiro/specs/scrum-263-node-instruction-evidence-ledger/design.md
+  - .kiro/specs/scrum-263-node-instruction-evidence-ledger/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
