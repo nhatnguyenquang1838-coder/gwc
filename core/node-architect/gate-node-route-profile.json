@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "gate-node-route-profile",
+  "profile_id": "gwc-gate-node-runtime-binding",
+  "revision": "scrum-261-20260802-r1",
+  "bound_graph_revision": "scrum-104-20260726",
+  "bound_node_registry_revision": "scrum-104-20260726",
+  "routes": [
+    {
+      "route_id": "g2-resolve-execution-node",
+      "gate": "G2_EXECUTION",
+      "requested_action": "resolve_execution_node",
+      "current_node": "gate_authority.gate-state-resolution",
+      "node_descriptor_ref": "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "resolver", "ref": "tools/node_architect/resolve_gate_node_route.py:resolve_gate_node_route"},
+      "next_node": "repo_delivery.scoped-file-write",
+      "next_action": "repository_write",
+      "next_gate": null
+    },
+    {
+      "route_id": "g2-scoped-repository-write",
+      "gate": "G2_EXECUTION",
+      "requested_action": "repository_write",
+      "current_node": "repo_delivery.scoped-file-write",
+      "node_descriptor_ref": "core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "python", "ref": "tools/node_architect/scoped_file_write.py:decide_scoped_file_write"},
+      "next_node": "repo_delivery.diff-readback",
+      "next_action": "post_write_readback",
+      "next_gate": null
+    },
+    {
+      "route_id": "g2-post-write-diff-readback",
+      "gate": "G2_EXECUTION",
+      "requested_action": "post_write_readback",
+      "current_node": "repo_delivery.diff-readback",
+      "node_descriptor_ref": "core/node-architect/node-catalog/repo_delivery/diff-readback.node.json",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "write_result"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "connector", "ref": "GitHub.compare_commits"},
+      "next_node": "gate_authority.gate-transition-decision",
+      "next_action": "resolve_gate_transition",
+      "next_gate": null
+    },
+    {
+      "route_id": "g2-resolve-g3-boundary",
+      "gate": "G2_EXECUTION",
+      "requested_action": "resolve_gate_transition",
+      "current_node": "gate_authority.gate-transition-decision",
+      "node_descriptor_ref": "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "write_result", "diff_readback"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "resolver", "ref": "tools/node_architect/resolve_gate_node_route.py:resolve_gate_node_route"},
+      "next_node": null,
+      "next_action": null,
+      "next_gate": "G3_PR"
+    }
+  ]
+}

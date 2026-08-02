@@ -1,0 +1,14 @@
+schema_version: "1.0"
+artifact_type: g2-approval-receipt
+task_id: SCRUM-261
+gate: G2_EXECUTION
+approval_id: APPROVE_G2_EXECUTION_SCRUM-261_R2_20260802
+scope_hash: sha256:bb6e3c7a1304ab0890b1beb03aeec2188e09cad571a7d156cb794f36d410594f
+scope_hash_16: bb6e3c7a1304ab08
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+working_branch: hotfix/scrum-261-gate-node-binding-20260802
+received_at: "2026-08-02T06:17:00Z"
+expires_at: "2026-08-02T10:14:00Z"
+actor: human
+status: VALID

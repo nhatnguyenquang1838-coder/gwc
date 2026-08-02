@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/gate-node-route-profile.schema.json",
+  "title": "Gate Node Route Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "profile_id", "revision",
+    "bound_graph_revision", "bound_node_registry_revision", "routes"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-node-route-profile"},
+    "profile_id": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "bound_graph_revision": {"type": "string", "minLength": 1},
+    "bound_node_registry_revision": {"type": "string", "minLength": 1},
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route_id", "gate", "requested_action", "current_node",
+          "node_descriptor_ref", "required_context", "minimum_maturity",
+          "allow_proposed_with_implementation", "implementation",
+          "next_node", "next_action", "next_gate"
+        ],
+        "properties": {
+          "route_id": {"type": "string", "minLength": 1},
+          "gate": {"type": "string", "minLength": 1},
+          "requested_action": {"type": "string", "minLength": 1},
+          "current_node": {"type": "string", "minLength": 1},
+          "node_descriptor_ref": {"type": "string", "minLength": 1},
+          "required_context": {
+            "type": "array", "minItems": 1, "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "minimum_maturity": {"enum": ["experimental", "pilot", "stable"]},
+          "allow_proposed_with_implementation": {"type": "boolean"},
+          "implementation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "ref"],
+            "properties": {
+              "kind": {"enum": ["python", "connector", "resolver"]},
+              "ref": {"type": "string", "minLength": 1}
+            }
+          },
+          "next_node": {"type": ["string", "null"]},
+          "next_action": {"type": ["string", "null"]},
+          "next_gate": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}

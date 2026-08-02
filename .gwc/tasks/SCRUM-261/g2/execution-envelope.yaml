@@ -1,0 +1,138 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+approval_id: APPROVE_G2_EXECUTION_SCRUM-261_R2_20260802
+authority_gate: G2_EXECUTION
+task_id: SCRUM-261
+issued_at: '2026-08-02T06:14:00Z'
+expires_at: '2026-08-02T10:14:00Z'
+scope_version: 2
+risk_class: R3
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+working_branch: hotfix/scrum-261-gate-node-binding-20260802
+active_lane: SCRUM-256 — Client runtime binding and CI → G3 M5 vertical slice
+bounded_recovery_exception: 'PR #173 intake-card repair is admitted only to restore
+  protected-base validation; no broader intake-context lane work.'
+selected_option_id: OPT-1
+g1_scope_hash: sha256:a4317ae4491ec9c54fe3dfc563550158c1f68287a5d766638b115beeff5c9ed9
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-261
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+  plan_root: /mnt/data/gwc_sessions/20260802-1218-SCRUM-261-expanded/20260802-1218-SCRUM-261/plan
+  plan_revision: sha256:e21cc2421dcb542bdef413585336456b212b92b7e738e221145af7628247c92c
+  validation_evidence: /mnt/data/gwc_sessions/20260802-1218-SCRUM-261-expanded/20260802-1218-SCRUM-261/validation/plan-validation-expanded.json
+modules_or_files:
+- .kiro/specs/scrum-261-gate-node-runtime-binding-hotfix/requirements.md
+- .kiro/specs/scrum-261-gate-node-runtime-binding-hotfix/design.md
+- .kiro/specs/scrum-261-gate-node-runtime-binding-hotfix/tasks.md
+- tools/node_architect/intake_card_render.py
+- tests/test_intake_context_intake_card_render_m4.py
+- core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+- core/node-architect/gate-node-route-profile.json
+- schemas/node-architect/gate-node-route-profile.schema.json
+- schemas/node-architect/gate-node-route-decision.schema.json
+- tools/node_architect/resolve_gate_node_route.py
+- tests/test_gate_node_route_resolution.py
+- agents/chatgpt-agent/agent-instructions.md
+- releases/changelog.d/2026-08-02-gate-node-runtime-binding-hotfix.md
+- .gwc/tasks/SCRUM-261/**
+files_read:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/Agent_Operating_Runtime_Contract_v1.0.md
+- core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md
+- core/HOTFIX_AND_RESCUE_MODE_v1.0.md
+- core/node-architect/RUNTIME_KERNEL_v0.1.md
+- core/node-architect/node-registry.json
+- core/node-architect/runtime-graph-registry.json
+- core/node-architect/profile-registry.json
+- core/node-architect/scenario-registry.json
+- core/task-lifecycle/gate-transition-map.yaml
+- core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json
+- core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json
+- core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json
+- core/node-architect/node-catalog/repo_delivery/diff-readback.node.json
+- tools/node_architect/scoped_file_write.py
+- tools/node_architect/validate_runtime_registry.py
+- tools/node_architect/intake_card_render.py
+- tests/test_intake_context_intake_card_render_m4.py
+- schemas/intake-card.schema.json
+- agents/chatgpt-agent/agent-instructions.md
+- projects/gwc/project-profile.yaml
+- SCRUM-256 Jira issue
+- SCRUM-261 Jira issue and claim readback
+- 'PR #173 exact-head CI run 30734890661 and failure logs'
+authorized_actions:
+- create_guarded_branch_from_exact_base
+- create_or_update_approved_files
+- run_sandboxed_validation
+- create_task_scoped_commit
+- push_working_branch
+- perform_exact_diff_readback
+excluded_actions:
+- protected_branch_write
+- merge
+- auto_merge
+- mark_ready_for_review
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credentials
+- secrets
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+- f9_scale_control
+- scrum_258_recovery
+- broad_intake_context_maturity_work
+- broad_81_node_rollout
+- package_export
+- unrelated_cleanup
+- g4
+- g5_manual_action
+- g6
+required_validation:
+- python tools/validate_line_endings.py
+- python -m unittest tests/test_intake_context_intake_card_render_m4.py -v
+- python -m unittest tests/test_gate_node_route_resolution.py -v
+- python -m unittest discover -s tests -p test_*.py
+- JSON Schema Draft 2020-12 validation for route profile and decision schemas
+- python -m compileall -q tools/node_architect
+- python tools/node_architect/validate_runtime_registry.py
+- python tools/validate_instructions.py
+- exact G0/G1/G2 validator
+- complete diff, secret, deletion, generated-noise, and scope review
+- exact-head GitHub CI terminal readback
+artifact_hashes:
+  g0: sha256:68351b615125af847054023fb6fda491fb45781fedf4ad2416453ccc62a8a245
+  intake: sha256:41049b15e2c181cc035202664d1be6cf6d02edd8012f4fb9f835b0078039063a
+  preflight: sha256:94f7d8647fa189a9ae22c3ee2514d82378ddfe0a28d1a5032abc9e8430e187d8
+  options: sha256:65af9d7ba15416486f2ff51eac7d3971a93707b1dd748298fbe8af46a7be889c
+  decision: sha256:d4884505482d963d73f5b2e4f53ddf5716aea4d140dde0fdaee8d186a954be83
+  implementation_plan: sha256:e21cc2421dcb542bdef413585336456b212b92b7e738e221145af7628247c92c
+approval_required: true
+approval_command_format: APPROVE G2_EXECUTION <approval_id> <scope_hash_16> <expires_at_utc>
+source_instruction: MIXED
+execution_mode: chat_connector_only
+gates_excluded_after_g2:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+rollback: Stop before push if baseline repair, route validation, full governance regression,
+  exact diff, or scope review fails. Leave branch for audit; delete nothing.
+g4_g5_g6_authority_granted: false
+scope_hash: sha256:bb6e3c7a1304ab0890b1beb03aeec2188e09cad571a7d156cb794f36d410594f
+scope_hash_16: bb6e3c7a1304ab08
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-261_R2_20260802
+  bb6e3c7a1304ab08 2026-08-02T10:14:00Z

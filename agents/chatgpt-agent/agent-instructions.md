@@ -395,3 +395,22 @@ or grant unrelated authority. Never invent repository paths, task artifacts,
 validator output, CI state, connector identity, or DS Admin transitions. DS
 Admin transitions must be legal State Engine transitions and should be updated
 at each gate boundary; late reconciliation must be disclosed as late.
+
+## Mandatory Gate–Node runtime binding
+
+Before any G2 repository write, a ChatGPT-style agent must rehydrate the exact
+G0, G1, and G2 task artifacts and resolve the active execution node with
+`tools/node_architect/resolve_gate_node_route.py` against the canonical route
+profile. A valid gate artifact grants authority; the route decision only selects
+execution behavior and never creates authority.
+
+For a G2 repository mutation, the resolved current node must be
+`repo_delivery.scoped-file-write`. After a successful write, the agent must
+continue to `repo_delivery.diff-readback`, then resolve the next node or exact
+human gate without waiting for a generic continuation prompt.
+
+Missing context, route ambiguity, registry/profile drift, catalog-only nodes,
+missing implementation, or insufficient maturity must fail closed with the
+stable reason codes defined by
+`core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md`. No manual or
+conversation-only route fallback is allowed.

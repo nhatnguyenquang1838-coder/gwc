@@ -1,0 +1,52 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-02T06:12:15Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-261
+  base_sha: 0b05dcce1865cdce58e5fff22ee8784428735df0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Combined baseline recovery and gate-node binding hotfix
+  description: 'Repair only the PR #173 intake-card defects that make protected main
+    red, then implement the original bounded gate-node resolver slice on the same
+    guarded branch.'
+  benefits:
+  - Restores green prerequisite and fixes root runtime disconnect
+  - One auditable branch and validation chain
+  - Still bounded and fail-closed
+  tradeoffs:
+  - Larger blast radius than original slice
+  - Requires full governance regression before route work proceeds
+  risks:
+  - Cross-surface regression if sequencing or scope controls fail
+  constraint_fit: FIT
+- id: OPT-2
+  title: 'Repair PR #173 only'
+  description: Restore intake-card validation and defer gate-node binding.
+  benefits:
+  - Smallest immediate CI repair
+  tradeoffs:
+  - Original P0 gate-node defect remains blocked
+  risks:
+  - Requires another approval and branch for SCRUM-261 objective
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Proceed from red base without repair
+  description: Implement gate-node binding while accepting existing main validation
+    failures.
+  benefits:
+  - No additional repair work
+  tradeoffs:
+  - Cannot establish exact-head green evidence
+  risks:
+  - Masks regressions and violates fail-closed delivery
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the only option that restores the invalid protected-base
+  prerequisite and completes the active SCRUM-256 P0 objective without selecting unrelated
+  intake-context work.
+decision_required: true
+status: READY
