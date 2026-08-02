@@ -105,8 +105,67 @@
         "gate": {"type": "string", "minLength": 1},
         "action": {"type": "string", "minLength": 1},
         "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-        "event_id_or_idempotency_key": {"type": "string", "minLength": 1}
+        "event_id_or_idempotency_key": {"type": "string", "minLength": 1},
+        "g4_authority_receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "source",
+            "bot_login",
+            "marker",
+            "approval_id",
+            "pr_number",
+            "receipt_comment_id",
+            "source_comment_id",
+            "approved_head_sha",
+            "scope_hash_prefix",
+            "expires_at"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "present",
+                "missing",
+                "malformed",
+                "expired",
+                "head_mismatch",
+                "scope_mismatch",
+                "approval_mismatch",
+                "source_untrusted"
+              ]
+            },
+            "source": {"const": "github_actions_bot_comment"},
+            "bot_login": {"const": "github-actions[bot]"},
+            "marker": {"const": "gwc:g4-authority-receipt"},
+            "approval_id": {"type": "string", "minLength": 1},
+            "pr_number": {"type": "integer", "minimum": 1},
+            "receipt_comment_id": {"type": "integer", "minimum": 1},
+            "source_comment_id": {"type": "integer", "minimum": 1},
+            "approved_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+            "expires_at": {"type": "string", "format": "date-time"}
+          }
+        }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["gate", "action"],
+        "properties": {
+          "gate": {"const": "G4_MERGE"},
+          "action": {"const": "merge_approved_pr"}
+        }
+      },
+      "then": {
+        "properties": {
+          "evidence_readback": {
+            "required": ["g4_authority_receipt"]
+          }
+        }
+      }
+    }
+  ]
 }
