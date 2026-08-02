@@ -1,0 +1,100 @@
+{
+  "node_id": "repo_delivery.diff-readback",
+  "gate": "G2_EXECUTION",
+  "purpose": "Read and validate the diff of changes written during G2 execution",
+  "entry_conditions": {
+    "prerequisite_gate": "G2_EXECUTION",
+    "artifacts_required": [
+      ".gwc/tasks/<task-id>/g2/execution-record.yaml",
+      ".gwc/tasks/<task-id>/g2/write-evidence.yaml"
+    ],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/execution-record.yaml"
+      },
+      {
+        "type": "state_match",
+        "expression": "execution_record.branch == current_branch"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "execution_record",
+        "type": "path",
+        "description": "Path to G2 execution record"
+      },
+      {
+        "name": "expected_head_sha",
+        "type": "sha",
+        "description": "Expected branch head SHA after writes"
+      }
+    ],
+    "optional": [
+      {
+        "name": "base_sha",
+        "type": "sha",
+        "description": "Base SHA for diff calculation"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "read_repository",
+    "validate_schema",
+    "create_checkpoint"
+  ],
+  "forbidden_actions": [
+    "write_file",
+    "create_branch",
+    "create_commit",
+    "push_branch",
+    "merge",
+    "deploy"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g2/diff-readback.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g2/diff-readback.yaml"
+  },
+  "logs_required": {
+    "type": "event",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": "gate_authority.gate-transition-decision",
+    "next_gate": "G3_PR",
+    "next_route": "full-flow-v3",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 2,
+    "backoff": "linear",
+    "exponential_base": 1.5,
+    "retryable_errors": [
+      "NODE_INPUTS_INCOMPLETE"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "diff readback is invalid",
+    "action": "notify_human",
+    "conditions": [
+      "diff contains unexpected changes",
+      "schema validation failed"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": false,
+    "grants_merge_authority": false
+  }
+}
