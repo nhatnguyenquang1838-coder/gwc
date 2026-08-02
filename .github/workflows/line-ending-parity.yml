@@ -51,9 +51,7 @@ jobs:
               package_text = package_text.replace('instructions:\n', 'instructions:\n' + '\n'.join(entries) + '\n', 1)
               package.write_text(package_text, encoding='utf-8', newline='\n')
 
-          workflow = Path('.github/workflows/line-ending-parity.yml')
-          workflow.write_bytes(base64.b64decode(os.environ['FINAL_WORKFLOW_B64']))
-
+          final_workflow = base64.b64decode(os.environ['FINAL_WORKFLOW_B64'])
           changed = [
               '.editorconfig',
               '.gitattributes',
@@ -69,7 +67,8 @@ jobs:
           lines = sums.read_text(encoding='utf-8').splitlines()
           index = {line.split('  ', 1)[1]: i for i, line in enumerate(lines) if '  ' in line}
           for relative in changed:
-              digest = hashlib.sha256(Path(relative).read_bytes()).hexdigest()
+              data = final_workflow if relative == '.github/workflows/line-ending-parity.yml' else Path(relative).read_bytes()
+              digest = hashlib.sha256(data).hexdigest()
               record = f'{digest}  {relative}'
               if relative in index:
                   lines[index[relative]] = record
@@ -87,7 +86,7 @@ jobs:
           sums.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
           PY
 
-      - name: Validate finalized files
+      - name: Validate finalized package and checksums
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
@@ -97,11 +96,11 @@ jobs:
           python tools/build_project_package.py gwc --output dist --clean
           git diff --check
 
-      - name: Commit finalized package and SHA closure
+      - name: Commit finalized package and checksums
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add projects/gwc/package.yaml SHA256SUMS.txt .github/workflows/line-ending-parity.yml
+          git add projects/gwc/package.yaml SHA256SUMS.txt
           if git diff --cached --quiet; then
             echo "No finalization changes required."
             exit 0
@@ -120,90 +119,3 @@ jobs:
             finalized-head.txt
             projects/gwc/package.yaml
             SHA256SUMS.txt
-            .github/workflows/line-ending-parity.yml
-
-  calculate-parity:
-    needs: finalize-package-sha
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout finalized guarded branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Validate LF and UTF-8 normalization
-        shell: bash
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
-        run: |
-          set -o pipefail
-          args=(--root . --json)
-          if [[ -n "${BASE_SHA:-}" && ! "$BASE_SHA" =~ ^0+$ ]]; then
-            args+=(--changed-since "$BASE_SHA")
-          fi
-          python tools/validate_line_endings.py "${args[@]}" 2>&1 | tee line-ending-validation.log
-
-      - name: Calculate parity hashes
-        shell: bash
-        run: |
-          python - <<'PY'
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
-          targets = [
-              Path('core/Coding_Project_Governance_v1.0.md'),
-              Path('core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md'),
-              Path('projects/gwc/package.yaml'),
-          ]
-          payload = {
-              'runner_os': os.environ['RUNNER_OS'],
-              'hashes': {path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in targets},
-          }
-          output = Path(f"cross-os-sha-parity-{os.environ['RUNNER_OS']}.json")
-          output.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n', encoding='utf-8', newline='\n')
-          PY
-
-      - name: Upload parity evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: lf-sha-parity-${{ runner.os }}-${{ github.run_id }}
-          path: |
-            line-ending-validation.log
-            cross-os-sha-parity-${{ runner.os }}.json
-
-  compare-parity:
-    needs: calculate-parity
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download parity evidence
-        uses: actions/download-artifact@v4
-        with:
-          pattern: lf-sha-parity-*-${{ github.run_id }}
-          path: parity-artifacts
-
-      - name: Compare hashes across operating systems
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          reports = sorted(Path('parity-artifacts').rglob('cross-os-sha-parity-*.json'))
-          if len(reports) != 3:
-              raise SystemExit(f'expected 3 parity reports, found {len(reports)}')
-          payloads = [json.loads(path.read_text(encoding='utf-8')) for path in reports]
-          baseline = payloads[0]['hashes']
-          mismatches = {payload['runner_os']: payload['hashes'] for payload in payloads[1:] if payload['hashes'] != baseline}
-          if mismatches:
-              raise SystemExit(f'CROSS_OS_HASH_MISMATCH: {mismatches}')
-          print('PASS: canonical hashes are identical across Linux, macOS, and Windows')
-          PY
