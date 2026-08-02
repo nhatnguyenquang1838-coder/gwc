@@ -1,0 +1,74 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-02T13:55:31Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-263
+  base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat
+  decided_at: '2026-08-02T13:55:31Z'
+  source: 'chat: START TASK SCRUM-263 with explicit required design, tests, boundaries, and G0/G1-only instruction'
+  explicit: true
+rationale: Implement the instruction/evidence runtime layer as an additive extension to SCRUM-261, covering the current G2
+  executable vertical slice and failing closed for any route without a valid card.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+- AC-8
+- AC-9
+- AC-10
+scope_hash: sha256:a5807aeaa976988d4bee9db3eac9a38276a6b87d6381f5aa5ba1d80ba772f43e
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Contract, schemas, and four instruction cards.
+  - sub_task_id: SUB-TASK-2
+    description: Instruction validator, evidence ledger, and resolver integration.
+  - sub_task_id: SUB-TASK-3
+    description: Mode/authority tests, full regression, diff review, and G3 handoff.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: schema_and_contract_design
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-2
+    skill_id: python_runtime_engineering
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: governance_validation
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  summary: Sequential bounded execution; independent/fresh-context review remains a G3 requirement.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-263
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: aad17d28be539c88ecef4b9fbaf3eaa08f59461b
+  plan_root: .kiro/specs/scrum-263-node-instruction-evidence-ledger
+  plan_revision: sha256:7f98fcdf5b6837c77ecf483f8828c6091a6fd5c99bc4352d1029d470b54727a7
+  validation_evidence: /mnt/data/gwc_sessions/20260802-2045-SCRUM-263/validation/kiro-spec-validation.json
