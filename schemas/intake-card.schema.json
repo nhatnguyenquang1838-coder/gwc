@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/intake-card.schema.json",
   "title": "Intake Card",
-  "description": "A deterministic, immutable and redacted intake_card projection from verified upstream artifacts. Read-only G0_CONTEXT gate; no authority is granted.",
+  "description": "A deterministic, immutable and redacted read-only intake projection from verified upstream artifacts.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -39,207 +39,151 @@
     "production_authority_granted"
   ],
   "properties": {
-    "schema_version": {
-      "const": "1.0"
-    },
-    "artifact_type": {
-      "const": "intake-card"
-    },
-    "contract_revision": {
-      "const": "intake-context/v1"
-    },
-    "task_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "repository": {
-      "type": "string",
-      "pattern": "^[^/\\s]+/[^/\\s]+$"
-    },
-    "base_sha": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
-    },
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "intake-card"},
+    "contract_revision": {"const": "intake-context/v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "request": {
       "type": "object",
-      "description": "Normalized request intent, outcome, constraints and exclusions."
+      "additionalProperties": false,
+      "required": ["intent", "outcome", "constraints", "exclusions"],
+      "properties": {
+        "intent": {"type": "string"},
+        "outcome": {"type": "string"},
+        "constraints": {"$ref": "#/$defs/uniqueStringArray"},
+        "exclusions": {"$ref": "#/$defs/uniqueStringArray"}
+      }
     },
     "source_bindings": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "description": "Canonical source bindings and source mode.",
       "items": {
         "type": "object",
-        "required": ["source", "binding"],
+        "additionalProperties": false,
+        "required": ["source", "binding", "revision"],
         "properties": {
-          "source": {
-            "type": "string",
-            "minLength": 1
-          },
-          "binding": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "additionalProperties": false
+          "source": {"type": "string", "minLength": 1},
+          "binding": {"type": "string", "minLength": 1},
+          "revision": {"type": "string"},
+          "mode": {"type": "string", "minLength": 1}
+        }
       }
     },
     "repository_context": {
       "type": "object",
-      "description": "Repository identity, protected branch and exact protected-base SHA.",
-      "required": [
-        "repository",
-        "protected_branch",
-        "protected_base_sha"
-      ],
+      "additionalProperties": false,
+      "required": ["repository", "protected_branch", "protected_base_sha"],
       "properties": {
-        "repository": {
-          "type": "string",
-          "minLength": 1
-        },
-        "protected_branch": {
-          "type": "string",
-          "minLength": 1
-        },
-        "protected_base_sha": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{40}$"
-        }
-      },
-      "additionalProperties": false
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "protected_branch": {"type": "string", "minLength": 1},
+        "protected_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
     },
     "risk_projection": {
       "type": "object",
-      "description": "Risk outcome, risk level, flags, required gate, additional authority gates and digest."
+      "additionalProperties": false,
+      "required": ["outcome", "risk_level", "risk_flags", "required_gate", "additional_authority_gates", "risk_profile_digest"],
+      "properties": {
+        "outcome": {"type": "string", "minLength": 1},
+        "risk_level": {"type": ["string", "null"]},
+        "risk_flags": {"$ref": "#/$defs/uniqueStringArray"},
+        "required_gate": {"type": "string"},
+        "additional_authority_gates": {"$ref": "#/$defs/uniqueStringArray"},
+        "risk_profile_digest": {"$ref": "#/$defs/optionalHash"}
+      }
     },
     "read_scope_projection": {
       "type": "object",
-      "description": "Read-scope outcome, failure classification, include/exclude/missing paths and scope_hash."
+      "additionalProperties": false,
+      "required": ["outcome", "failure_classification", "files_read", "files_exclude", "files_missing", "read_scope_hash"],
+      "properties": {
+        "outcome": {"type": "string", "minLength": 1},
+        "failure_classification": {"type": ["string", "null"]},
+        "files_read": {"$ref": "#/$defs/uniqueStringArray"},
+        "files_exclude": {"$ref": "#/$defs/uniqueStringArray"},
+        "files_missing": {"$ref": "#/$defs/uniqueStringArray"},
+        "read_scope_hash": {"$ref": "#/$defs/optionalHash"}
+      }
     },
     "write_scope_projection": {
       "type": "object",
-      "description": "Write-scope outcome, candidate paths, exclusions, prohibited operations, branch-binding status and scope_hash."
+      "additionalProperties": false,
+      "required": ["outcome", "candidate_paths", "exclusions", "prohibited_operations", "branch_binding_status", "required_authority_gates", "write_scope_hash"],
+      "properties": {
+        "outcome": {"type": "string", "minLength": 1},
+        "candidate_paths": {"$ref": "#/$defs/uniqueStringArray"},
+        "exclusions": {"$ref": "#/$defs/uniqueStringArray"},
+        "prohibited_operations": {"$ref": "#/$defs/uniqueStringArray"},
+        "branch_binding_status": {"type": "string"},
+        "required_authority_gates": {"$ref": "#/$defs/uniqueStringArray"},
+        "write_scope_hash": {"$ref": "#/$defs/optionalHash"}
+      }
     },
     "upstream_artifacts": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "description": "Upstream artifact type/version/digest summary.",
       "items": {
         "type": "object",
-        "required": ["artifact_type", "schema_version"],
+        "additionalProperties": false,
+        "required": ["artifact_type", "schema_version", "digest"],
         "properties": {
-          "artifact_type": {
-            "type": "string",
-            "minLength": 1
-          },
-          "schema_version": {
-            "type": "string",
-            "minLength": 1
-          },
-          "digest": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "additionalProperties": false
+          "artifact_type": {"type": "string", "minLength": 1},
+          "schema_version": {"type": "string", "minLength": 1},
+          "digest": {"type": "string", "pattern": "^(?:sha256:)?[0-9a-f]{64}$"}
+        }
       }
     },
-    "context_status": {
-      "enum": ["READY", "BLOCKED"]
-    },
-    "outcome": {
-      "enum": ["READY", "BLOCKED"]
-    },
-    "next_required_action": {
-      "enum": ["CONTINUE_CONTEXT_EVALUATION", "ESCALATE_CONTEXT_GAP"]
-    },
-    "scope_hash": {
-      "type": "string",
-      "minLength": 1,
-      "description": "SHA-256 hex digest of the canonical scope payload."
-    },
-    "snapshot_hash": {
-      "type": "string",
-      "minLength": 1,
-      "description": "SHA-256 hex digest of the complete redacted card payload."
-    },
-    "redaction_status": {
-      "enum": ["NONE", "APPLIED", "BLOCKED"]
-    },
+    "context_status": {"enum": ["READY", "BLOCKED"]},
+    "outcome": {"enum": ["READY", "BLOCKED"]},
+    "next_required_action": {"enum": ["CONTINUE_CONTEXT_EVALUATION", "ESCALATE_CONTEXT_GAP"]},
+    "scope_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "snapshot_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "redaction_status": {"enum": ["NONE", "APPLIED", "BLOCKED"]},
     "redactions": {
       "type": "array",
       "uniqueItems": true,
-      "description": "Redaction records; never contains original values.",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": ["pointer", "classification", "replacement", "reason_code"],
         "properties": {
-          "pointer": {
-            "type": "string",
-            "minLength": 1
-          },
-          "classification": {
-            "enum": [
-              "SECRET",
-              "CREDENTIAL",
-              "TOKEN",
-              "PRIVATE_KEY",
-              "PERSONAL_SENSITIVE",
-              "POLICY_REDACTED"
-            ]
-          },
-          "replacement": {
-            "const": "[REDACTED]"
-          },
-          "reason_code": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "additionalProperties": false
+          "pointer": {"type": "string", "minLength": 1},
+          "classification": {"enum": ["SECRET", "CREDENTIAL", "TOKEN", "PRIVATE_KEY", "PERSONAL_SENSITIVE", "POLICY_REDACTED"]},
+          "replacement": {"const": "[REDACTED]"},
+          "reason_code": {"type": "string", "minLength": 1}
+        }
       }
     },
-    "reason_code": {
-      "type": "string",
-      "minLength": 1
-    },
+    "reason_code": {"type": "string", "minLength": 1},
     "reason_codes": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "items": {"type": "string", "minLength": 1}
     },
-    "created_at": {
-      "type": "string"
+    "created_at": {"type": "string"},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  },
+  "$defs": {
+    "uniqueStringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string"}
     },
-    "read_only_projection": {
-      "const": true
-    },
-    "write_authority_granted": {
-      "const": false
-    },
-    "commit_authority_granted": {
-      "const": false
-    },
-    "push_authority_granted": {
-      "const": false
-    },
-    "pr_authority_granted": {
-      "const": false
-    },
-    "merge_authority_granted": {
-      "const": false
-    },
-    "deployment_authority_granted": {
-      "const": false
-    },
-    "production_authority_granted": {
-      "const": false
+    "optionalHash": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{64})?$"
     }
   }
 }
