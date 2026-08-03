@@ -65,6 +65,7 @@ def empty_store() -> dict[str, Any]:
         "events": [],
         "checkpoints": {},
         "effects": {},
+        "lease_binding": None,
     }
 
 
@@ -81,6 +82,7 @@ def load_store(path: Path) -> dict[str, Any]:
     payload.setdefault("events", [])
     payload.setdefault("checkpoints", {})
     payload.setdefault("effects", {})
+    payload.setdefault("lease_binding", None)
     return payload
 
 
@@ -128,7 +130,56 @@ def _authoritative_store_binding(store: Mapping[str, Any], item: CheckpointInput
     return _item_binding(item), []
 
 
-def _prepare_cas_context(store: Mapping[str, Any], item: CheckpointInput) -> dict[str, Any] | None:
+
+def _requested_lease_binding(item: CheckpointInput, supplied: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "lease_owner": supplied.get("lease_owner"),
+        "lease_token": item.lease_id,
+        "fencing_token": item.fencing_token,
+        "lease_expires_at": supplied.get("lease_expires_at"),
+    }
+
+
+def _valid_lease_binding(binding: Mapping[str, Any]) -> bool:
+    return (
+        isinstance(binding.get("lease_owner"), str)
+        and bool(str(binding.get("lease_owner")).strip())
+        and isinstance(binding.get("lease_token"), str)
+        and bool(str(binding.get("lease_token")).strip())
+        and isinstance(binding.get("fencing_token"), int)
+        and not isinstance(binding.get("fencing_token"), bool)
+        and int(binding.get("fencing_token")) >= 0
+        and isinstance(binding.get("lease_expires_at"), str)
+        and bool(str(binding.get("lease_expires_at")).strip())
+    )
+
+
+def _authoritative_lease_binding(
+    store: Mapping[str, Any], item: CheckpointInput, supplied: Mapping[str, Any]
+) -> tuple[dict[str, Any], list[str]]:
+    """Resolve current lease authority from persisted state, bootstrapping only an empty store."""
+    requested = _requested_lease_binding(item, supplied)
+    binding = store.get("lease_binding")
+    if isinstance(binding, Mapping):
+        authoritative = dict(binding)
+        if not _valid_lease_binding(authoritative):
+            return requested, ["STORE_LEASE_BINDING_INVALID"]
+        return authoritative, []
+
+    has_runtime_state = (
+        int(store.get("revision", 0)) > 0
+        or bool(store.get("events"))
+        or bool(store.get("checkpoints"))
+        or bool(store.get("effects"))
+    )
+    if has_runtime_state:
+        return requested, ["STORE_LEASE_BINDING_MISSING"]
+    return requested, []
+
+
+def _prepare_cas_context(
+    store: Mapping[str, Any], item: CheckpointInput, *, evaluation_time: str | None = None
+) -> dict[str, Any] | None:
     if item.cas_context is None:
         return None
     if not isinstance(item.cas_context, Mapping):
@@ -171,10 +222,19 @@ def _prepare_cas_context(store: Mapping[str, Any], item: CheckpointInput) -> dic
             errors.append(f"CONTEXT_OBSERVED_BINDING_CONFLICT:{field}")
         context[field] = observed
 
+    lease_authority, lease_errors = _authoritative_lease_binding(store, item, supplied)
+    errors.extend(lease_errors)
+    context["observed_lease_owner"] = lease_authority.get("lease_owner")
+    context["observed_lease_token"] = lease_authority.get("lease_token")
+    context["observed_fencing_token"] = lease_authority.get("fencing_token")
+    context["lease_expires_at"] = lease_authority.get("lease_expires_at")
+    context["observed_at"] = evaluation_time or _now()
+
     context["observed_revision"] = int(store.get("revision", 0))
     context["latest_observed_state"] = {
         "revision": int(store.get("revision", 0)),
         "binding": authoritative,
+        "lease_binding": lease_authority,
         "checkpoints": store.get("checkpoints", {}),
         "store_digest": store.get("store_digest"),
     }
@@ -183,9 +243,11 @@ def _prepare_cas_context(store: Mapping[str, Any], item: CheckpointInput) -> dic
     return context
 
 
-def evaluate_checkpoint_guard(store: Mapping[str, Any], item: CheckpointInput) -> dict[str, Any] | None:
+def evaluate_checkpoint_guard(
+    store: Mapping[str, Any], item: CheckpointInput, *, evaluation_time: str | None = None
+) -> dict[str, Any] | None:
     """Evaluate strict CAS context, returning None for legacy callers."""
-    context = _prepare_cas_context(store, item)
+    context = _prepare_cas_context(store, item, evaluation_time=evaluation_time)
     return None if context is None else evaluate_cas_write(context)
 
 
@@ -202,14 +264,18 @@ def _effect_binding(item: CheckpointInput, context: Mapping[str, Any]) -> dict[s
         "lease_owner": context["lease_owner"],
         "lease_token": context["lease_token"],
         "fencing_token": context["fencing_token"],
+        "lease_expires_at": context["lease_expires_at"],
         "idempotency_key": context["idempotency_key"],
         "expected_revision": item.expected_revision,
     }
 
 
-def persist_checkpoint(store: dict[str, Any], item: CheckpointInput, *, committed_at: str | None = None) -> dict[str, Any]:
+def persist_checkpoint(
+    store: dict[str, Any], item: CheckpointInput, *,
+    committed_at: str | None = None, evaluation_time: str | None = None,
+) -> dict[str, Any]:
     current_revision = int(store.get("revision", 0))
-    context = _prepare_cas_context(store, item)
+    context = _prepare_cas_context(store, item, evaluation_time=evaluation_time)
     decision = None if context is None else evaluate_cas_write(context)
     if decision is not None:
         if decision["outcome"] == "DUPLICATE_EFFECT_REPLAYED":
@@ -253,6 +319,13 @@ def persist_checkpoint(store: dict[str, Any], item: CheckpointInput, *, committe
     store.setdefault("checkpoints", {})[key] = record
     if decision is not None and context is not None:
         store.setdefault("binding", _item_binding(item))
+        if not isinstance(store.get("lease_binding"), Mapping):
+            store["lease_binding"] = {
+                "lease_owner": context["observed_lease_owner"],
+                "lease_token": context["observed_lease_token"],
+                "fencing_token": context["observed_fencing_token"],
+                "lease_expires_at": context["lease_expires_at"],
+            }
         store.setdefault("effects", {})[decision["idempotency_key"]] = {
             "binding": _effect_binding(item, context),
             "checkpoint_key": key,
@@ -264,6 +337,7 @@ def persist_checkpoint(store: dict[str, Any], item: CheckpointInput, *, committe
     store["store_digest"] = digest_payload({
         "revision": store["revision"],
         "binding": store.get("binding"),
+        "lease_binding": store.get("lease_binding"),
         "events": store["events"],
         "checkpoints": store["checkpoints"],
         "effects": store.get("effects", {}),
@@ -271,9 +345,11 @@ def persist_checkpoint(store: dict[str, Any], item: CheckpointInput, *, committe
     return store
 
 
-def persist_to_file(path: Path, item: CheckpointInput) -> dict[str, Any]:
+def persist_to_file(
+    path: Path, item: CheckpointInput, *, evaluation_time: str | None = None
+) -> dict[str, Any]:
     store = load_store(path)
-    updated = persist_checkpoint(store, item)
+    updated = persist_checkpoint(store, item, evaluation_time=evaluation_time)
     write_store(path, updated)
     return updated
 
@@ -282,7 +358,7 @@ def replay_checkpoint(store: dict[str, Any], task_id: str, run_id: str, node_id:
     return store.get("checkpoints", {}).get(checkpoint_key(task_id, run_id, node_id))
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = int:
     parser = argparse.ArgumentParser(description="Persist a GWC runtime checkpoint JSON payload.")
     parser.add_argument("--store", type=Path, required=True)
     parser.add_argument("--payload", type=Path, required=True)

@@ -52,6 +52,7 @@ def effect_for(payload, **binding_overrides):
         "lease_owner": payload["lease_owner"],
         "lease_token": payload["lease_token"],
         "fencing_token": payload["fencing_token"],
+        "lease_expires_at": payload["lease_expires_at"],
         "idempotency_key": payload["idempotency_key"],
         "expected_revision": payload["expected_revision"],
     }
@@ -171,21 +172,24 @@ class CASWriteGuardTests(unittest.TestCase):
     def test_checkpoint_integration_is_idempotent_after_commit_before_response(self):
         store = load_store(Path("/tmp/nonexistent-scrum208-store.json"))
         item = strict_item()
-        first = persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z")
+        first = persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z", evaluation_time="2026-08-03T01:44:00Z")
         first_rendered = json.dumps(first, sort_keys=True)
-        replayed = persist_checkpoint(first, item, committed_at="2026-08-03T01:47:00Z")
+        replayed = persist_checkpoint(first, item, committed_at="2026-08-03T01:47:00Z", evaluation_time="2026-08-03T01:47:00Z")
         self.assertEqual(json.dumps(replayed, sort_keys=True), first_rendered)
         self.assertEqual(len(replayed["events"]), 1)
 
     def test_checkpoint_replay_tolerates_later_expiry_after_exact_effect_ownership(self):
         store = load_store(Path("/tmp/nonexistent-scrum208-store.json"))
-        first = persist_checkpoint(store, strict_item(), committed_at="2026-08-03T01:46:00Z")
-        replay_item = strict_item(
-            lease_expires_at="2026-08-03T01:45:00Z",
-            observed_at="2026-08-03T01:47:00Z",
+        item = strict_item(lease_expires_at="2026-08-03T01:45:00Z")
+        first = persist_checkpoint(
+            store, item, committed_at="2026-08-03T01:44:00Z",
+            evaluation_time="2026-08-03T01:44:00Z",
         )
         before = json.dumps(first, sort_keys=True)
-        replayed = persist_checkpoint(first, replay_item, committed_at="2026-08-03T01:47:00Z")
+        replayed = persist_checkpoint(
+            first, item, committed_at="2026-08-03T01:47:00Z",
+            evaluation_time="2026-08-03T01:47:00Z",
+        )
         self.assertEqual(json.dumps(replayed, sort_keys=True), before)
 
     def test_context_expected_identity_conflict_never_mutates_store(self):
@@ -193,7 +197,7 @@ class CASWriteGuardTests(unittest.TestCase):
         before = json.dumps(store, sort_keys=True)
         item = strict_item(task_id="SCRUM-999")
         with self.assertRaises(CheckpointConflict) as caught:
-            persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z")
+            persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z", evaluation_time="2026-08-03T01:44:00Z")
         self.assertEqual(caught.exception.decision["outcome"], "INVALID_INPUT")
         self.assertIn("CONTEXT_ITEM_CONFLICT:task_id", caught.exception.decision["reason_codes"])
         self.assertEqual(json.dumps(store, sort_keys=True), before)
@@ -203,7 +207,7 @@ class CASWriteGuardTests(unittest.TestCase):
         before = json.dumps(store, sort_keys=True)
         item = strict_item(observed_repository="evil/repo")
         with self.assertRaises(CheckpointConflict) as caught:
-            persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z")
+            persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z", evaluation_time="2026-08-03T01:44:00Z")
         self.assertEqual(caught.exception.decision["outcome"], "INVALID_INPUT")
         self.assertIn("CONTEXT_OBSERVED_BINDING_CONFLICT:observed_repository", caught.exception.decision["reason_codes"])
         self.assertEqual(json.dumps(store, sort_keys=True), before)
@@ -213,7 +217,7 @@ class CASWriteGuardTests(unittest.TestCase):
             with self.subTest(reason=reason):
                 store = load_store(Path("/tmp/nonexistent-scrum208-store.json"))
                 with self.assertRaises(CheckpointConflict) as caught:
-                    persist_checkpoint(store, strict_item(**override), committed_at="2026-08-03T01:46:00Z")
+                    persist_checkpoint(store, strict_item(**override), committed_at="2026-08-03T01:46:00Z", evaluation_time="2026-08-03T01:44:00Z")
                 self.assertIn(reason, caught.exception.decision["reason_codes"])
 
     def test_same_idempotency_key_cannot_cross_checkpoint_identity(self):
@@ -221,6 +225,7 @@ class CASWriteGuardTests(unittest.TestCase):
             load_store(Path("/tmp/nonexistent-scrum208-store.json")),
             strict_item(),
             committed_at="2026-08-03T01:46:00Z",
+            evaluation_time="2026-08-03T01:44:00Z",
         )
         other = strict_item(
             item_overrides={"run_id": "other-run"},
@@ -229,7 +234,7 @@ class CASWriteGuardTests(unittest.TestCase):
         )
         before = json.dumps(store, sort_keys=True)
         with self.assertRaises(CheckpointConflict) as caught:
-            persist_checkpoint(store, other, committed_at="2026-08-03T01:47:00Z")
+            persist_checkpoint(store, other, committed_at="2026-08-03T01:47:00Z", evaluation_time="2026-08-03T01:47:00Z")
         self.assertEqual(caught.exception.decision["outcome"], "SCOPE_MISMATCH")
         self.assertIn("COMMITTED_EFFECT_BINDING_MISMATCH:checkpoint_key", caught.exception.decision["reason_codes"])
         self.assertEqual(json.dumps(store, sort_keys=True), before)
@@ -239,18 +244,82 @@ class CASWriteGuardTests(unittest.TestCase):
             load_store(Path("/tmp/nonexistent-scrum208-store.json")),
             strict_item(),
             committed_at="2026-08-03T01:46:00Z",
+            evaluation_time="2026-08-03T01:44:00Z",
         )
-        stale = strict_item(observed_lease_token="stale-lease")
+        stale = strict_item(
+            item_overrides={"lease_id": "stale-lease"},
+            lease_token="stale-lease",
+            observed_lease_token="stale-lease",
+        )
         with self.assertRaises(CheckpointConflict) as caught:
-            persist_checkpoint(store, stale, committed_at="2026-08-03T01:47:00Z")
+            persist_checkpoint(
+                store, stale, committed_at="2026-08-03T01:47:00Z",
+                evaluation_time="2026-08-03T01:47:00Z",
+            )
         self.assertEqual(caught.exception.decision["outcome"], "LEASE_STALE")
+
+    def test_new_idempotency_key_cannot_self_assert_stale_lease_authority(self):
+        store = persist_checkpoint(
+            load_store(Path("/tmp/nonexistent-scrum208-store.json")),
+            strict_item(idempotency_key="effect-1"),
+            committed_at="2026-08-03T01:44:00Z",
+            evaluation_time="2026-08-03T01:44:00Z",
+        )
+        stale = strict_item(
+            item_overrides={"expected_revision": 1, "lease_id": "stale-lease", "fencing_token": 6},
+            expected_revision=1, idempotency_key="effect-2",
+            lease_owner="StaleAgent", observed_lease_owner="StaleAgent",
+            lease_token="stale-lease", observed_lease_token="stale-lease",
+            fencing_token=6, observed_fencing_token=6,
+        )
+        before = json.dumps(store, sort_keys=True)
+        with self.assertRaises(CheckpointConflict) as caught:
+            persist_checkpoint(
+                store, stale, committed_at="2026-08-03T01:45:00Z",
+                evaluation_time="2026-08-03T01:45:00Z",
+            )
+        self.assertEqual(caught.exception.decision["outcome"], "LEASE_OWNER_MISMATCH")
+        self.assertEqual(json.dumps(store, sort_keys=True), before)
+
+    def test_caller_cannot_extend_authoritative_lease_expiry(self):
+        store = persist_checkpoint(
+            load_store(Path("/tmp/nonexistent-scrum208-store.json")),
+            strict_item(idempotency_key="effect-1", lease_expires_at="2026-08-03T01:45:00Z"),
+            committed_at="2026-08-03T01:44:00Z",
+            evaluation_time="2026-08-03T01:44:00Z",
+        )
+        next_item = strict_item(
+            item_overrides={"expected_revision": 1},
+            expected_revision=1, idempotency_key="effect-2",
+            lease_expires_at="2026-08-03T18:50:00Z",
+            observed_at="2026-08-03T00:00:00Z",
+        )
+        with self.assertRaises(CheckpointConflict) as caught:
+            persist_checkpoint(
+                store, next_item, committed_at="2026-08-03T01:47:00Z",
+                evaluation_time="2026-08-03T01:47:00Z",
+            )
+        self.assertEqual(caught.exception.decision["outcome"], "LEASE_EXPIRED")
+
+    def test_nonempty_strict_store_without_lease_binding_fails_closed(self):
+        store = load_store(Path("/tmp/nonexistent-scrum208-store.json"))
+        store["revision"] = 1
+        store["checkpoints"] = {"legacy": {"task_id": "SCRUM-208"}}
+        with self.assertRaises(CheckpointConflict) as caught:
+            persist_checkpoint(
+                store, strict_item(item_overrides={"expected_revision": 1}, expected_revision=1),
+                committed_at="2026-08-03T01:44:00Z",
+                evaluation_time="2026-08-03T01:44:00Z",
+            )
+        self.assertEqual(caught.exception.decision["outcome"], "INVALID_INPUT")
+        self.assertIn("STORE_LEASE_BINDING_MISSING", caught.exception.decision["reason_codes"])
 
     def test_checkpoint_mismatch_never_mutates_store(self):
         store = load_store(Path("/tmp/nonexistent-scrum208-store.json"))
         item = strict_item(expected_revision=2)
         before = json.dumps(store, sort_keys=True)
         with self.assertRaises(CheckpointConflict) as caught:
-            persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z")
+            persist_checkpoint(store, item, committed_at="2026-08-03T01:46:00Z", evaluation_time="2026-08-03T01:44:00Z")
         self.assertEqual(caught.exception.decision["outcome"], "CAS_MISMATCH")
         self.assertEqual(json.dumps(store, sort_keys=True), before)
 
@@ -258,9 +327,9 @@ class CASWriteGuardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "store.json"
             item = strict_item()
-            persist_to_file(path, item)
+            persist_to_file(path, item, evaluation_time="2026-08-03T01:44:00Z")
             before = path.read_text(encoding="utf-8")
-            persist_to_file(path, item)
+            persist_to_file(path, item, evaluation_time="2026-08-03T01:47:00Z")
             self.assertEqual(path.read_text(encoding="utf-8"), before)
 
     def test_invalid_input_fails_closed(self):

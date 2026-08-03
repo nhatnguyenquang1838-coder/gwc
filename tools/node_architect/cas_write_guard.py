@@ -162,7 +162,7 @@ def _effect_binding_mismatch(
             "LEASE_STALE",
             "ABORT_STALE_WORKER",
             "abort_stale_worker_and_reconcile_lease",
-            ("lease_token",),
+            ("lease_token", "lease_expires_at"),
         ),
         (
             "FENCING_MISMATCH",

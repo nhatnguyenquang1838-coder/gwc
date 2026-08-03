@@ -1,0 +1,23 @@
+{
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_G3_REPAIR_R5_20260803",
+  "artifact_type": "g2-repair-approval-receipt",
+  "authority_gate": "G2_EXECUTION",
+  "commit_strategy": "one_non_force_child_commit",
+  "expected_head_sha": "380e9424b99de7efee78230e5765c17fa2915d0d",
+  "expires_at": "2026-08-03T16:30:00Z",
+  "parent_sha": "380e9424b99de7efee78230e5765c17fa2915d0d",
+  "protected_base_sha": "f9b04561437eaebd2c2711999b622029468c3551",
+  "pull_request": 193,
+  "received_at": "2026-08-03T04:49:00Z",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:3e4fb1d1e75f65c234aee9250380db2ebb2065341c118ab5aaa69c4feb443fcd",
+  "scope_prefix": "3e4fb1d1e75f65c2",
+  "source_findings": [
+    "REV-3"
+  ],
+  "source_review_id": 4840821461,
+  "status": "CONSUMED",
+  "task_id": "SCRUM-208",
+  "working_branch": "codex/scrum-208-cas-write-guard-m5-20260802"
+}
