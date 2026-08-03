@@ -15,6 +15,22 @@ SOURCE_TYPES = {"REPOSITORY", "GATE_ARTIFACT", "TASK_RECORD", "PULL_REQUEST", "C
 RELATIONS = {"SUPPORTS_FIELD", "DERIVED_FROM", "VALIDATED_BY", "READBACK_OF", "SUPERSEDES"}
 VERIFICATION_STATUSES = {"VERIFIED", "STALE", "BROKEN", "UNVERIFIED", "CONFLICT"}
 COVERAGE_RELATIONS = {"SUPPORTS_FIELD", "DERIVED_FROM"}
+
+SOURCE_AUTHORITY_FIELDS = {
+    "schema_version", "artifact_type", "task_id", "repository", "projection_target",
+    "source_bindings", "field_authority", "outcome", "authority_status", "reason_code",
+    "reason_codes", "observed_at", "read_only_projection", "write_authority_granted",
+    "approval_authority_granted", "merge_authority_granted",
+    "deployment_authority_granted", "production_authority_granted", "decision_digest",
+}
+SOURCE_BINDING_FIELDS = {
+    "source_type", "authority_class", "ref", "revision", "content_digest", "observed_at", "status",
+}
+FIELD_AUTHORITY_REQUIRED = {"field_path", "source_ref", "source_revision", "evidence_digest", "derivation"}
+FIELD_AUTHORITY_ALLOWED = FIELD_AUTHORITY_REQUIRED | {"derivation_rule_id"}
+AUTHORITY_CLASSES = {"CANONICAL", "PROJECTION", "ADVISORY"}
+SOURCE_STATUSES = {"VERIFIED", "STALE", "MISSING", "AMBIGUOUS", "CONFLICT"}
+DERIVATIONS = {"DIRECT", "DETERMINISTIC_DERIVATION"}
 REASON_PRECEDENCE = [
     "EVIDENCE_LINK_INPUT_INVALID",
     "EVIDENCE_LINK_SOURCE_AUTHORITY_INVALID",
@@ -72,12 +88,33 @@ def _primary(reasons: set[str]) -> str:
     return "EVIDENCE_LINK_INPUT_INVALID"
 
 
+
+def _source_authority_digest(decision: dict[str, object]) -> str:
+    semantic = {
+        key: value
+        for key, value in decision.items()
+        if key not in {"observed_at", "decision_digest"}
+    }
+    return _hash(semantic)
+
+
 def _authority_is_valid(
     decision: object, task_id: str, repository: str, projection_target: str
 ) -> tuple[bool, str, set[tuple[str, str, str]], set[tuple[str, str, str, str]]]:
-    if not isinstance(decision, dict):
+    if not isinstance(decision, dict) or set(decision) != SOURCE_AUTHORITY_FIELDS:
         return False, _ZERO_DIGEST, set(), set()
+
     digest = decision.get("decision_digest")
+    try:
+        _timestamp(decision.get("observed_at"))
+        digest_matches = (
+            isinstance(digest, str)
+            and bool(_DIGEST_RE.fullmatch(digest))
+            and digest == _source_authority_digest(decision)
+        )
+    except Exception:
+        digest_matches = False
+
     valid = (
         decision.get("schema_version") == "1.0"
         and decision.get("artifact_type") == "projection-source-authority-decision"
@@ -86,7 +123,9 @@ def _authority_is_valid(
         and decision.get("projection_target") == projection_target
         and decision.get("outcome") == "READY"
         and decision.get("authority_status") == "CONFIRMED"
-        and isinstance(digest, str) and bool(_DIGEST_RE.fullmatch(digest))
+        and decision.get("reason_code") == "PROJECTION_SOURCE_AUTHORITY_CONFIRMED"
+        and decision.get("reason_codes") == ["PROJECTION_SOURCE_AUTHORITY_CONFIRMED"]
+        and digest_matches
         and decision.get("read_only_projection") is True
         and all(decision.get(key) is False for key in (
             "write_authority_granted", "approval_authority_granted", "merge_authority_granted",
@@ -95,30 +134,60 @@ def _authority_is_valid(
         and isinstance(decision.get("source_bindings"), list)
         and isinstance(decision.get("field_authority"), list)
     )
+
     canonical: set[tuple[str, str, str]] = set()
     authorized_fields: set[tuple[str, str, str, str]] = set()
     if valid:
         for item in decision["source_bindings"]:
-            if not isinstance(item, dict):
+            if not isinstance(item, dict) or set(item) != SOURCE_BINDING_FIELDS:
+                valid = False
+                break
+            ref = item.get("ref")
+            revision = item.get("revision")
+            content_digest = item.get("content_digest")
+            try:
+                _timestamp(item.get("observed_at"))
+            except Exception:
+                valid = False
+                break
+            if (
+                item.get("source_type") not in SOURCE_TYPES
+                or item.get("authority_class") not in AUTHORITY_CLASSES
+                or item.get("status") not in SOURCE_STATUSES
+                or not isinstance(ref, str) or not ref or len(ref) > 512
+                or not isinstance(revision, str) or not _REVISION_RE.fullmatch(revision)
+                or not isinstance(content_digest, str) or not _DIGEST_RE.fullmatch(content_digest)
+            ):
                 valid = False
                 break
             if item.get("authority_class") == "CANONICAL" and item.get("status") == "VERIFIED":
-                ref, revision, content_digest = item.get("ref"), item.get("revision"), item.get("content_digest")
-                if isinstance(ref, str) and isinstance(revision, str) and isinstance(content_digest, str):
-                    canonical.add((ref, revision, content_digest))
+                canonical.add((ref, revision, content_digest))
         if not canonical:
             valid = False
+
+    if valid:
         for item in decision["field_authority"]:
-            if not isinstance(item, dict):
+            if (
+                not isinstance(item, dict)
+                or not FIELD_AUTHORITY_REQUIRED.issubset(item)
+                or set(item) - FIELD_AUTHORITY_ALLOWED
+            ):
                 valid = False
                 break
             field_path = item.get("field_path")
             ref = item.get("source_ref")
             revision = item.get("source_revision")
             evidence_digest = item.get("evidence_digest")
+            derivation = item.get("derivation")
+            rule_id = item.get("derivation_rule_id")
             if (
                 not isinstance(field_path, str) or not _FIELD_RE.fullmatch(field_path)
-                or not isinstance(ref, str) or not isinstance(revision, str) or not isinstance(evidence_digest, str)
+                or not isinstance(ref, str) or not ref
+                or not isinstance(revision, str) or not _REVISION_RE.fullmatch(revision)
+                or not isinstance(evidence_digest, str) or not _DIGEST_RE.fullmatch(evidence_digest)
+                or derivation not in DERIVATIONS
+                or (rule_id is not None and (not isinstance(rule_id, str) or not rule_id))
+                or (derivation == "DETERMINISTIC_DERIVATION" and not isinstance(rule_id, str))
                 or (ref, revision, evidence_digest) not in canonical
             ):
                 valid = False
@@ -126,6 +195,7 @@ def _authority_is_valid(
             authorized_fields.add((_normalize_field(field_path), ref, revision, evidence_digest))
         if not authorized_fields:
             valid = False
+
     return (
         valid,
         digest if isinstance(digest, str) and _DIGEST_RE.fullmatch(digest) else _ZERO_DIGEST,
