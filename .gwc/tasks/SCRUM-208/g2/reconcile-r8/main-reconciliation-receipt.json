@@ -1,0 +1,33 @@
+{
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_MAIN_RECONCILIATION_R8_20260803",
+  "artifact_type": "g2-main-reconciliation-receipt",
+  "authority_gate": "G2_EXECUTION",
+  "branch": "codex/scrum-208-cas-write-guard-m5-20260802",
+  "expires_at": "2026-08-03T12:30:00Z",
+  "main_bytes_preserved": {
+    ".github/workflows/validate-instructions.yml": "04a432783787e0f1aa03eefd00ddf322eed2fd38",
+    ".gwc/tasks/SCRUM-229/g2/g2-approval-certificate.yaml": "1078cf55f3ae5929fc86ad6a875f518fa21fdceb"
+  },
+  "parent_order": [
+    "5242aabd143e2a7ff43ec26f717517c41966bac2",
+    "d9a89a002aae4348359cd88810a9d03926199597"
+  ],
+  "pull_request": 193,
+  "received_at": "2026-08-03T10:10:00Z",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "resolution": {
+    "path": ".gwc/tasks/SCRUM-208/g3/delivery-record.yaml",
+    "rejected_equivalent_blob": "57a370ca607b41eb7fb47e474628eb5785578800",
+    "selected_blob": "a998f099f8261153d0ce96a8b1589d23fb1fb151",
+    "semantic_change": "NONE"
+  },
+  "schema_version": "1.0",
+  "scope_hash": "sha256:2196ac3928f7da4c8a3d96f069c9819b6e3f8233c97c1d13525abf01158dc88e",
+  "semantic_safety": {
+    "scrum_208_inherited_g3_record": "UNSAFE_AS_M5_OR_DEPENDENCY_EVIDENCE",
+    "scrum_229_done_state": "UNSAFE_AS_DEPENDENCY_EVIDENCE",
+    "scrum_229_mutated_by_r8": false
+  },
+  "status": "CONSUMED_PENDING_EXACT_HEAD_CI",
+  "task_id": "SCRUM-208"
+}

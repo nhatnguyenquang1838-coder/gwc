@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g1-options",
+  "generated_at": "2026-08-03T18:57:51Z",
+  "trace": {
+    "project_id": "gwc",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "task_id": "SCRUM-210",
+    "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "g0_snapshot": "../../g0/context-snapshot.yaml"
+  },
+  "options": [
+    {
+      "id": "OPT-1",
+      "title": "Clean-base TDD port with verified catalog prerequisite",
+      "description": "Port the #195 focused test first, observe the expected missing-module failure, then port the module, changelog, and fresh governance/plan evidence while verifying the catalog descriptor already present on the protected base.",
+      "benefits": [
+        "Preserves validated behavior",
+        "Does not reuse invalid history",
+        "Bounded reviewable diff",
+        "Records required discovery metadata accurately"
+      ],
+      "tradeoffs": [
+        "Requires fresh G2/G3 evidence"
+      ],
+      "risks": [
+        "Portability repair must remain test-only"
+      ],
+      "constraint_fit": "FIT",
+      "skills_distribution": [
+        {
+          "skill_id": "python-dev",
+          "description": "Port pure local module and test.",
+          "is_required": true
+        },
+        {
+          "skill_id": "governance-validation",
+          "description": "Validate fresh task packet and delivery evidence.",
+          "is_required": true
+        }
+      ]
+    },
+    {
+      "id": "OPT-2",
+      "title": "Broader runtime-orchestrator integration",
+      "description": "Wire cleanup into runtime scheduling or checkpoint persistence now.",
+      "benefits": [
+        "Potential immediate adoption"
+      ],
+      "tradeoffs": [
+        "Expands architecture and runtime blast radius"
+      ],
+      "risks": [
+        "Exceeds current task and historical candidate validation"
+      ],
+      "constraint_fit": "PARTIAL",
+      "skills_distribution": [
+        {
+          "skill_id": "runtime-architecture",
+          "description": "Design orchestration integration.",
+          "is_required": true
+        }
+      ]
+    },
+    {
+      "id": "OPT-3",
+      "title": "Abandon implementation and close historical PR only",
+      "description": "Do not port code.",
+      "benefits": [
+        "No new code"
+      ],
+      "tradeoffs": [
+        "Does not deliver SCRUM-210 outcome"
+      ],
+      "risks": [
+        "Task remains unresolved"
+      ],
+      "constraint_fit": "PARTIAL",
+      "skills_distribution": [
+        {
+          "skill_id": "governance-audit",
+          "description": "Record closure audit.",
+          "is_required": true
+        }
+      ]
+    }
+  ],
+  "recommended_option_id": "OPT-1",
+  "recommendation_rationale": "It follows the user instruction to reuse #195 code while avoiding retroactive authorization, verifies the required pre-existing catalog metadata, and contains the portability defect.",
+  "decision_required": true,
+  "status": "READY"
+}

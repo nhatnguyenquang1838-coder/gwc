@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-execution-evidence",
+  "task_id": "SCRUM-210",
+  "approval_id": "CP-20260803-210-G2R4",
+  "scope_hash_16": "1560b72da8c660ee",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+  "working_branch": "hermes/scrum-210-checkpoint-expiry-cleanup-r4-20260803",
+  "head_sha": "cf7a50454ba1738e640be655a4afcabec322ce3e",
+  "head_short": "cf7a504",
+  "approved_at": "2026-08-04T18:15:31Z",
+  "validated_at": "2026-08-04T18:52:00Z",
+  "validation": {
+    "g01": {"outcome": "PASS", "valid": true, "issues": []},
+    "focused_tests": {"total": 13, "passed": 13, "failed": 0, "errors": 0},
+    "discovery_tests": {"total": 13, "passed": 13, "failed": 0, "errors": 0},
+    "module_syntax": "OK",
+    "catalog_json": "OK",
+    "catalog_unchanged_from_base": true,
+    "catalog_metadata_only": true,
+    "changelog_validated": 1,
+    "full_suite_preexisting_failures": "10 failures + 65 errors (all pre-existing on base)"
+  },
+  "diff_review": {
+    "scoped_files_added": [
+      "tools/node_architect/checkpoint_expiry_cleanup.py",
+      "tests/test_checkpoint_expiry_cleanup.py",
+      "releases/changelog.d/2026-08-03-scrum-210-checkpoint-expiry-cleanup-m5.md",
+      ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/",
+      ".gwc/tasks/SCRUM-210/",
+      "proposal/"
+    ],
+    "scoped_files_modified": [],
+    "scoped_files_removed": [],
+    "non_scope_modified": ["skills/gwc-g1/SKILL.md"],
+    "catalog_descriptor": "verified present on base, not modified"
+  },
+  "g3_delivery": {
+    "status": "READY",
+    "draft_pr_required": true,
+    "merge_gate": "G4_MERGE",
+    "required_evidence": ["exact_head_sha", "fresh_review", "validation", "CI", "delivery_record"],
+    "notes": "R4 is a clean scoped port from PR #195 with fact-corrected catalog prerequisite (no catalog mutation). G3 requires a fresh Draft PR bound to head cf7a504."
+  }
+}

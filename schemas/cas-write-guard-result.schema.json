@@ -1,0 +1,190 @@
+{
+  "$id": "https://dw-super.local/schemas/cas-write-guard-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "may_write": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "next_revision": {
+            "type": "integer"
+          },
+          "outcome": {
+            "const": "ALLOW_WRITE"
+          },
+          "requires_reconciliation": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "DUPLICATE_EFFECT_REPLAYED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "committed_effect": {
+            "type": "object"
+          },
+          "may_write": {
+            "const": false
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "cas-write-guard-result"
+    },
+    "auto_retry_allowed": {
+      "const": false
+    },
+    "committed_effect": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "decision_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "deployment_authority_granted": {
+      "const": false
+    },
+    "expected_revision": {
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "idempotency_key": {
+      "type": "string"
+    },
+    "latest_observed_state": {
+      "type": "object"
+    },
+    "latest_observed_state_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "may_write": {
+      "type": "boolean"
+    },
+    "merge_authority_granted": {
+      "const": false
+    },
+    "next_action": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "next_node": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_revision": {
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "node_id": {
+      "const": "runtime_checkpoint.cas-write-guard"
+    },
+    "observed_revision": {
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "ALLOW_WRITE",
+        "CAS_MISMATCH",
+        "LEASE_STALE",
+        "LEASE_EXPIRED",
+        "LEASE_OWNER_MISMATCH",
+        "FENCING_MISMATCH",
+        "SCOPE_MISMATCH",
+        "BASE_DRIFT",
+        "DUPLICATE_EFFECT_REPLAYED",
+        "INVALID_INPUT"
+      ]
+    },
+    "production_authority_granted": {
+      "const": false
+    },
+    "reason_codes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "reconciliation_route": {
+      "enum": [
+        "RESUME",
+        "REPAIR",
+        "REAPPROVAL_REQUIRED",
+        "ABORT_STALE_WORKER",
+        "STOP_BLOCKED",
+        null
+      ],
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requires_reconciliation": {
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "1.0"
+    }
+  },
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "node_id",
+    "outcome",
+    "reason_codes",
+    "may_write",
+    "expected_revision",
+    "observed_revision",
+    "next_revision",
+    "latest_observed_state",
+    "latest_observed_state_digest",
+    "idempotency_key",
+    "committed_effect",
+    "requires_reconciliation",
+    "reconciliation_route",
+    "next_node",
+    "next_action",
+    "auto_retry_allowed",
+    "decision_digest",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted"
+  ],
+  "title": "GWC CAS Write Guard Result",
+  "type": "object"
+}

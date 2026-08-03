@@ -4,131 +4,204 @@ gate: G3_PR
 task_id: SCRUM-208
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
-base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
-working_branch: feature/SCRUM-208-g0g1-setup-20260802
+base_sha: d9a89a002aae4348359cd88810a9d03926199597
+working_branch: codex/scrum-208-cas-write-guard-m5-20260802
 pull_request:
-  number: 192
-  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/192
+  number: 193
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/193
   draft: true
-head_sha: 93968e49047d3a943264d57b289b0569881b4e31
-scope_hash: sha256:bfd6c0513db9dc9a92ae10a1765844474a7598b1571ddd29af599c09e3c24c4a
+head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
+scope_hash: sha256:8156af7d5b25fa59a89c21f35fe55de3f64d662cd1a7c9fbe08f0996e1c6a99c
 changed_paths:
-- .gwc/tasks/SCRUM-208/g0/context-snapshot.yaml
-- .gwc/tasks/SCRUM-208/g1/intake/g1-intake-brief.yaml
-- .gwc/tasks/SCRUM-208/g1/preflight/g1-preflight-report.yaml
-- .gwc/tasks/SCRUM-208/g1/brainstorming/g1-options.yaml
-- .gwc/tasks/SCRUM-208/g1/decision/g1-decision-record.yaml
-- .gwc/tasks/SCRUM-208/g2/execution-envelope.yaml
-- .gwc/tasks/SCRUM-208/g3/delivery-record.yaml
+- .gwc/tasks/SCRUM-208/g2/plan-read-receipt.yaml
+- .gwc/tasks/SCRUM-208/g2/reconcile-r8/main-reconciliation-receipt.json
+- .gwc/tasks/SCRUM-208/g2/reconcile-r9/tree-restoration-receipt.json
+- .gwc/tasks/SCRUM-208/g2/repair-r10/expected-revision-boundary-receipt.json
+- .gwc/tasks/SCRUM-208/g2/repair-r3/approval-receipt.json
+- .gwc/tasks/SCRUM-208/g2/repair-r3/repair-record.json
+- .gwc/tasks/SCRUM-208/g2/repair-r3/validation-manifest.json
+- .gwc/tasks/SCRUM-208/g2/repair-r4/syntax-repair-receipt.json
+- .gwc/tasks/SCRUM-208/g2/repair-r5/approval-receipt.json
+- .gwc/tasks/SCRUM-208/g2/repair-r5/repair-record.json
+- .gwc/tasks/SCRUM-208/g2/repair-r5/validation-manifest.json
+- .gwc/tasks/SCRUM-208/g2/repair-r7/materialization-fix-receipt.json
+- .kiro/specs/scrum-208-cas-write-guard-m5/design.md
+- .kiro/specs/scrum-208-cas-write-guard-m5/requirements.md
+- .kiro/specs/scrum-208-cas-write-guard-m5/tasks.md
+- releases/changelog.d/2026-08-02-scrum-208-cas-write-guard-m5.md
+- schemas/cas-write-guard-result.schema.json
+- tests/test_cas_write_guard.py
+- tools/node_architect/cas_write_guard.py
+- tools/node_architect/checkpoint_store.py
 validation:
-  head_sha: 93968e49047d3a943264d57b289b0569881b4e31
+  head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
   status: pass
   commands:
-  - command: python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-208
+  - command: Validate instructions
     result: pass
-    evidence: 'G0/G1 validation outcome: PASS'
+    evidence: GitHub Actions run 30812864267 completed SUCCESS for exact implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - command: Build instruction packages
+    result: pass
+    evidence: GitHub Actions run 30812864231 completed SUCCESS for exact implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - command: Cross-platform LF and SHA parity
+    result: pass
+    evidence: GitHub Actions run 30812864174 completed SUCCESS for exact implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - command: Full governance unit test suite
+    result: pass
+    evidence: Validate instructions exact-head job executed 874 tests successfully, including the REV-4 adversarial regression.
+  - command: Python compilation and runtime_checkpoint catalog validation
+    result: pass
+    evidence: Python compilation, runtime_checkpoint catalog validator, and focused catalog tests passed on the exact implementation
+      head.
+  - command: PR scope readback
+    result: pass
+    evidence: 'PR #193 contained exactly 20 authorized SCRUM-208 paths with zero unrelated SCRUM-206 or SCRUM-229 paths.'
 review:
-  implementer_id: kiro-ai-agent
-  reviewer_id: kiro-ai-agent
+  implementer_id: chatgpt-g2-executor
+  reviewer_id: chatgpt-fresh-context-g3-r10
   independence: fresh-context
   mode: read-only
-  reviewed_head_sha: 93968e49047d3a943264d57b289b0569881b4e31
-  reviewed_scope_hash: sha256:bfd6c0513db9dc9a92ae10a1765844474a7598b1571ddd29af599c09e3c24c4a
-  reviewed_at: '2026-08-02T16:00:00Z'
+  reviewed_head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
+  reviewed_scope_hash: sha256:8156af7d5b25fa59a89c21f35fe55de3f64d662cd1a7c9fbe08f0996e1c6a99c
+  reviewed_at: '2026-08-03T13:00:00Z'
   lanes:
   - name: requirement
     applicable: true
     status: pass
     evidence:
-    - G0/G1 artifacts created for SCRUM-208 task
-    - Scope bounded to task setup only
+    - EARS requirements and M5 replay-safe acceptance criteria are implemented and verified at the reviewed implementation
+      head.
   - name: design
     applicable: true
     status: pass
     evidence:
-    - Task-scoped workspace pattern followed
-    - G2 execution envelope generated with correct schema
+    - Canonical CheckpointInput binding, persisted lease authority, committed-effect ownership, and no-auto-retry ordering
+      match the reviewed design.
   - name: code
     applicable: true
     status: pass
     evidence:
-    - YAML files created with correct schema
-    - No implementation code changes
+    - REV-1 through REV-4 code paths fail closed before mutation and preserve legacy revision-only callers when cas_context
+      is absent.
   - name: test
     applicable: true
     status: pass
     evidence:
-    - G0/G1 validator (tools/validate_g01.py) returned PASS
+    - Exact-head suite passed 874 tests, including revision mismatch, stale lease/fencing, duplicate effect replay, restart
+      replay, no mutation, and missing item expected revision.
   - name: governance
     applicable: true
     status: pass
     evidence:
-    - GWC Gate Lifecycle Contract v1.0 followed
-    - Task-scoped workspace pattern used
-    - G2 execution envelope generated
+    - 'R11 replaces the stale PR #192 record with this task-scoped record bound to PR #193, the reviewed implementation head,
+      current protected base, and the 20-path scope.'
   - name: delivery
     applicable: true
     status: pass
     evidence:
-    - Working branch created: feature/SCRUM-208-g0g1-setup-20260802
-    - Branch pushed to origin
-    - Commit 93968e4 created
-    - Draft PR #192 created
+    - 'PR #193 is open and Draft against main; R11 is an evidence-only successor and grants no Ready, merge, deployment, or
+      release authority.'
   - name: ci
     applicable: true
     status: pass
     evidence:
-    - Commit passed G0/G1 validation
-    - Branch ready for PR creation
-  findings: []
+    - Required implementation-head runs 30812864267, 30812864231, and 30812864174 completed SUCCESS; successor-head CI remains
+      mandatory before G3 closure.
+  findings:
+  - id: REV-1
+    severity: BLOCKER
+    category: code
+    status: resolved
+    evidence: CheckpointInput/store canonical identity binding is authoritative and caller context conflicts fail closed.
+    recommendation: Keep canonical binding tests in exact-head CI.
+    resolution: Resolved before implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - id: REV-2
+    severity: BLOCKER
+    category: code
+    status: resolved
+    evidence: Committed effects require exact ownership binding before replay; unbound or mismatched effects fail closed.
+    recommendation: Preserve exact effect ownership checks.
+    resolution: Resolved before implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - id: REV-3
+    severity: BLOCKER
+    category: code
+    status: resolved
+    evidence: Persisted lease owner, token, fencing token, and expiry are authoritative after bootstrap.
+    recommendation: Keep lease rotation outside this node.
+    resolution: Resolved before implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - id: REV-4
+    severity: BLOCKER
+    category: test
+    status: resolved
+    evidence: Missing item-level expected revision now produces MISSING_ITEM_EXPECTED_REVISION and INVALID_INPUT before mutation;
+      exact-head regression passed.
+    recommendation: Retain adversarial context-substitution regression.
+    resolution: Resolved by R10 commit 4685fcfa548e95b72d4e6281a2a1167924abeb21.
+  - id: REV-5
+    severity: BLOCKER
+    category: governance
+    status: resolved
+    evidence: 'R11 replaces the stale PR #192/G0-G1 delivery record with this PR #193/R10 evidence record.'
+    recommendation: Run successor-head CI and a fresh G3 review before Ready transition.
+    resolution: Resolved by R11 evidence-only materialization; successor-head verification remains required.
   acceptance_criteria:
   - id: AC-1
     result: pass
     evidence:
-    - G0 context snapshot validated with status READY
+    - Revision match permits one monotonic write; revision mismatch rejects without mutation and routes to state reconciliation.
   - id: AC-2
     result: pass
     evidence:
-    - G1 intake brief validated
+    - Task, repository, branch, base SHA, scope, checkpoint, lease, fencing, and expected revision bindings fail closed on
+      mismatch.
   - id: AC-3
     result: pass
     evidence:
-    - G1 options contain OPT-1, OPT-2, OPT-3
+    - Stale lease owner/token/fencing and expired lease are rejected before mutation.
   - id: AC-4
     result: pass
     evidence:
-    - G1 decision record shows ACCEPTED status for OPT-1
+    - Exactly bound duplicate effects replay without a second event or state change; collision and unbound-effect cases reject.
   - id: AC-5
     result: pass
     evidence:
-    - G2 execution envelope generated with scope hash
+    - Crash-after-write and restart replay tests preserve byte-equivalent store state.
   - id: AC-6
     result: pass
     evidence:
-    - tools/validate_g01.py returned PASS
+    - Legacy callers without cas_context remain on the revision-only compatibility path.
   - id: AC-7
     result: pass
     evidence:
-    - PR #192 created with task metadata
+    - Exact implementation-head CI passed and PR scope readback is exactly 20 authorized SCRUM-208 paths.
   decision: pass
   stale: false
 ci:
   required: true
-  head_sha: 93968e49047d3a943264d57b289b0569881b4e31
+  head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
   checks:
-  - name: validate-instructions
+  - name: Validate instructions
     required: true
-    status: pending
-    evidence: GitHub Actions workflow running
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30835522196
+  - name: Build instruction packages
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30835522891
+  - name: Cross-platform LF and SHA parity
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30835522891
 residual_risks:
-- Jira task claim pending PR creation
-- CI checks pending for PR
+- This delivery record is an evidence-only successor after reviewed implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21;
+  the successor commit requires exact-head CI and a fresh G3 review before Ready transition.
+- 'Merged PR #192 G3 evidence remains unsafe for M5 or dependency use and is not rehabilitated by R11.'
+- 'SCRUM-229 Done remains unsafe as dependency evidence because condition descriptions were discarded by PR #197.'
 exclusions:
-- merge
-- auto_merge
-- deploy
-- release
-- production_data_write
-- production_config_change
-- credential_rotation
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+- PROTECTED_MAIN_WRITE
+- RELEASE_OR_PUBLICATION
+- FORCE_PUSH_OR_HISTORY_REWRITE
 outcome: pass

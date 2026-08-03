@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "change-plan",
+  "task_id": "SCRUM-210",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+  "title": "Replay-safe checkpoint expiry cleanup",
+  "nodes": [
+    {
+      "id": "registry",
+      "label": "Checkpoint registry",
+      "requirement": "R1-R3",
+      "overview_row": 1,
+      "detail_row": 1,
+      "detail_col": 1
+    },
+    {
+      "id": "policy",
+      "label": "Cleanup policy",
+      "requirement": "R1-R3",
+      "overview_row": 1,
+      "detail_row": 1,
+      "detail_col": 2
+    },
+    {
+      "id": "catalog",
+      "label": "Canonical node catalog",
+      "requirement": "R5",
+      "overview_row": 1,
+      "detail_row": 1,
+      "detail_col": 3
+    },
+    {
+      "id": "classify",
+      "label": "Deterministic classification",
+      "requirement": "R1",
+      "overview_row": 2,
+      "detail_row": 2,
+      "detail_col": 2
+    },
+    {
+      "id": "retain",
+      "label": "Retention safeguards",
+      "requirement": "R2-R3",
+      "overview_row": 2,
+      "detail_row": 2,
+      "detail_col": 3
+    },
+    {
+      "id": "tombstone",
+      "label": "Auditable tombstone",
+      "requirement": "R1-R2",
+      "overview_row": 3,
+      "detail_row": 3,
+      "detail_col": 2
+    },
+    {
+      "id": "result",
+      "label": "Replay-safe result",
+      "requirement": "R1-R4",
+      "overview_row": 3,
+      "detail_row": 3,
+      "detail_col": 3
+    }
+  ],
+  "relationships": [
+    {
+      "from": "registry",
+      "to": "classify",
+      "label": "entries"
+    },
+    {
+      "from": "policy",
+      "to": "classify",
+      "label": "time + resume"
+    },
+    {
+      "from": "catalog",
+      "to": "classify",
+      "label": "canonical discovery"
+    },
+    {
+      "from": "classify",
+      "to": "retain",
+      "label": "protected paths"
+    },
+    {
+      "from": "classify",
+      "to": "tombstone",
+      "label": "expired disposable"
+    },
+    {
+      "from": "retain",
+      "to": "result",
+      "label": "retained"
+    },
+    {
+      "from": "tombstone",
+      "to": "result",
+      "label": "marker + digest"
+    }
+  ],
+  "exclusions": [
+    "runtime orchestration",
+    "scheduler integration",
+    "migration",
+    "production service calls",
+    "merge/deploy"
+  ]
+}

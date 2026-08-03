@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-repair-reconciliation-record",
+  "task_id": "SCRUM-208",
+  "repair_id": "G2-REPAIR-R3",
+  "source_review": {
+    "review_id": 4840496693,
+    "reviewed_head_sha": "09bf4610030e155dc485e2e19f9be525a59f6412",
+    "decision": "changes_required",
+    "findings": ["REV-1", "REV-2"]
+  },
+  "reconciliation": {
+    "protected_base_sha": "f9b04561437eaebd2c2711999b622029468c3551",
+    "prior_branch_head": "09bf4610030e155dc485e2e19f9be525a59f6412",
+    "strategy": "non_force_two_parent_commit",
+    "preserved_paths": [
+      ".gwc/tasks/SCRUM-208/g0/**",
+      ".gwc/tasks/SCRUM-208/g1/**",
+      ".gwc/tasks/SCRUM-208/g2/execution-envelope.yaml",
+      ".gwc/tasks/SCRUM-208/g3/delivery-record.yaml"
+    ],
+    "merged_pr_192_g3_evidence": "UNSAFE_PASS_WITH_PENDING_CI_AND_NO_IMPLEMENTATION_DELIVERABLE"
+  },
+  "changes": [
+    "CheckpointInput and persisted store identity canonically bind strict CAS context.",
+    "Conflicting caller expected or observed identity fails closed before mutation.",
+    "Committed effects carry task/repository/branch/base/scope/checkpoint/lease/fencing/idempotency ownership.",
+    "Replay verifies current identity, owner, lease token, fencing token, and exact effect ownership before tolerating revision advance or later lease expiry.",
+    "Adversarial context substitution, collision, stale replay, and legacy-unbound effect tests were added."
+  ],
+  "validation": {
+    "focused_tests": {"status": "PASS", "count": 26},
+    "repository_overlay_tests": {"status": "PASS", "count": 59},
+    "runtime_checkpoint_catalog": "PASS",
+    "g0_g1_validator": "PASS",
+    "json_schema": "PASS",
+    "python_compile": "PASS",
+    "static_scope_lf_secret_noise": "PASS"
+  },
+  "status": "VALIDATED_READY_TO_RECONCILE"
+}
