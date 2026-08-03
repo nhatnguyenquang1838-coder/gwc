@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g1-preflight-report",
+  "generated_at": "2026-08-03T18:57:51Z",
+  "trace": {
+    "project_id": "gwc",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "task_id": "SCRUM-210",
+    "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "g0_snapshot": "../../g0/context-snapshot.yaml"
+  },
+  "repository_state": {
+    "base_ref": "main",
+    "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "profile_path": "projects/gwc/project-profile.yaml",
+    "connector": "GitHub"
+  },
+  "checks": [
+    {
+      "id": "REPO_IDENTITY",
+      "status": "PASS",
+      "code": "REPOSITORY_VERIFIED",
+      "message": "Repository and protected base were read from origin/main.",
+      "evidence": [
+        "origin/main=bce6f6f83c74a25a57259695adc44b46a8555c46",
+        "origin=github.com/nhatnguyenquang1838-coder/gwc.git"
+      ]
+    },
+    {
+      "id": "TASK_CLAIM",
+      "status": "PASS",
+      "code": "WORK_ITEM_CLAIM_VERIFIED",
+      "message": "SCRUM-210 is In Progress and claimed by Hermes.",
+      "evidence": [
+        "Atlassian Jira readback: AI Agent=Hermes",
+        "Atlassian Jira readback: Claimed At=2026-08-03T15:59:28.135+07:00"
+      ]
+    },
+    {
+      "id": "HISTORICAL_RECOVERY",
+      "status": "PASS",
+      "code": "PR195_CODE_ONLY",
+      "message": "PR #195 is used as read-only code source; its stale gate packet is excluded.",
+      "evidence": [
+        "PR #195 head=609d28877828770ba2046ebf3f5c23efacbbe065",
+        "PR #195 G2 status=G2_APPROVAL_PENDING; no g3 delivery record"
+      ]
+    },
+    {
+      "id": "PORTABILITY",
+      "status": "PASS",
+      "code": "FOCUSED_TEST_PORTABLE",
+      "message": "Candidate test passes after the bounded repository-tools import repair.",
+      "evidence": [
+        "uv run --python 3.11 python tests/test_checkpoint_expiry_cleanup.py -> 13 tests OK",
+        "uv run --python 3.11 python -m unittest discover -s tests -p 'test_checkpoint_expiry_cleanup.py' -> 13 tests OK"
+      ]
+    },
+    {
+      "id": "PLAN",
+      "status": "PASS",
+      "code": "KIRO_PLAN_VALIDATED",
+      "message": "Canonical three-file plan exists and required headings were checked.",
+      "evidence": [
+        "sha256:57048d9a549d3357bc38c5a079e7cb32efee7aaa265a10d2a34533eaafbd988c"
+      ]
+    }
+  ],
+  "process_readback": {
+    "process_id": "governed-repository-delivery",
+    "terminal_outcome": "Validated guarded branch with Draft PR at G3; merge remains G4-only.",
+    "required_sources": [
+      "AGENTS.md",
+      "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md"
+    ],
+    "status": "VERIFIED"
+  },
+  "execution_feasibility": {
+    "outcome": "EXECUTABLE",
+    "continuation_coverage": "COMPLETE",
+    "human_bypass_required": false,
+    "route_steps": [
+      {
+        "id": "STEP-01",
+        "name": "protected-base-readback",
+        "gate": "G0_CONTEXT",
+        "actor": "agent",
+        "action_class": "read",
+        "capability_required": "repository_read",
+        "capability_status": "VERIFIED",
+        "primary_route": "GitHub git readback",
+        "fallback_routes": [],
+        "continuation": "Stop and recompute if base changes.",
+        "expected_evidence": "Repository identity and protected base SHA",
+        "bypass_eligibility": "FORBIDDEN"
+      },
+      {
+        "id": "STEP-02",
+        "name": "jira-claim-readback",
+        "gate": "G0_CONTEXT",
+        "actor": "agent",
+        "action_class": "read",
+        "capability_required": "work_item_read",
+        "capability_status": "VERIFIED",
+        "primary_route": "Atlassian MCP Jira read",
+        "fallback_routes": [],
+        "continuation": "Stop if task ownership changes.",
+        "expected_evidence": "In Progress state and Hermes claim",
+        "bypass_eligibility": "FORBIDDEN"
+      },
+      {
+        "id": "STEP-03",
+        "name": "bounded-implementation",
+        "gate": "G2_EXECUTION",
+        "actor": "human_authorized_agent",
+        "action_class": "write",
+        "capability_required": "repository_write",
+        "capability_status": "SEPARATE_GATE",
+        "primary_route": "G2 approval then guarded branch",
+        "fallback_routes": [],
+        "continuation": "Wait for exact current-user G2 approval command.",
+        "expected_evidence": "Branch, commit, validation, and plan-read receipt",
+        "bypass_eligibility": "FORBIDDEN"
+      },
+      {
+        "id": "STEP-04",
+        "name": "draft-pr-delivery",
+        "gate": "G3_PR",
+        "actor": "human_authorized_agent",
+        "action_class": "remote_write",
+        "capability_required": "pull_request_write",
+        "capability_status": "SEPARATE_GATE",
+        "primary_route": "G3 scoped authority after G2 pass",
+        "fallback_routes": [],
+        "continuation": "Generate separate G3 approval after implementation/validation.",
+        "expected_evidence": "Draft PR and delivery record bound to exact head",
+        "bypass_eligibility": "FORBIDDEN"
+      },
+      {
+        "id": "STEP-05",
+        "name": "merge",
+        "gate": "G4_MERGE",
+        "actor": "human_authorized_agent",
+        "action_class": "remote_write",
+        "capability_required": "merge_write",
+        "capability_status": "SEPARATE_GATE",
+        "primary_route": "G4 explicit approval",
+        "fallback_routes": [],
+        "continuation": "Not in this scope.",
+        "expected_evidence": "Exact-head merge approval",
+        "bypass_eligibility": "FORBIDDEN"
+      }
+    ]
+  },
+  "implementation_plan": {
+    "applicability": "required",
+    "reason": "SCRUM-210 is a material, multi-step runtime behavior addition with deterministic safety and test design requirements.",
+    "source": "generated_kiro",
+    "task_me_applicable": true,
+    "task_me_available": false,
+    "task_me_invoked": false,
+    "task_me_fallback_reason": "No Task Me capability is configured in the active Hermes tool surface; generated canonical Kiro package directly.",
+    "canonical_task_uid": "SCRUM-210",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "protected_base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "plan_root": ".kiro/specs/scrum-210-checkpoint-expiry-cleanup",
+    "requirements_path": ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/requirements.md",
+    "design_path": ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/design.md",
+    "tasks_path": ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/tasks.md",
+    "plan_revision": "sha256:57048d9a549d3357bc38c5a079e7cb32efee7aaa265a10d2a34533eaafbd988c",
+    "validation_status": "PASS",
+    "validation_evidence": "Session snapshot heading validation passed for requirements.md, design.md, and tasks.md; candidate focused tests pass 13/13 direct and discovery under Python 3.11.",
+    "generated_by": "Hermes Agent",
+    "generated_at_utc": "2026-08-03T18:57:51Z"
+  },
+  "risk_class": "R1",
+  "required_gate": "G2_HUMAN_DIRECTION",
+  "blockers": [],
+  "outcome": "PASS"
+}

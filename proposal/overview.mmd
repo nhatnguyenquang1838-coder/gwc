@@ -1,0 +1,15 @@
+flowchart TD
+  A[Checkpoint registry
+R1-R3] --> C[Deterministic classification
+R1]
+  B[Cleanup policy
+R1-R3] --> C
+  G[Canonical node catalog
+R5] -. discovery .-> C
+  C --> D[Retention safeguards
+R2-R3]
+  C --> E[Auditable tombstone
+R1-R2]
+  D --> F[Replay-safe result
+R1-R4]
+  E --> F

@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g1-decision-record",
+  "generated_at": "2026-08-03T18:57:51Z",
+  "trace": {
+    "project_id": "gwc",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "task_id": "SCRUM-210",
+    "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "g0_snapshot": "../../g0/context-snapshot.yaml"
+  },
+  "options_ref": "../brainstorming/g1-options.yaml",
+  "preflight_ref": "../preflight/g1-preflight-report.yaml",
+  "status": "ACCEPTED",
+  "selected_option_id": "OPT-1",
+  "user_decision": {
+    "actor": "Nhat Nguyen Quang",
+    "decided_at": "2026-08-03T18:57:51Z",
+    "source": "chat: T\u1ea1o worktree s\u1ea1ch, l\u1ea5y code t\u1eeb PR 195, r\u1ed3i ti\u1ebfp t\u1ee5c t\u1eeb gate k\u1ebf ti\u1ebfp",
+    "explicit": true
+  },
+  "rationale": "The user explicitly requested a clean worktree recovery from PR #195. Port the test first, then the exact code, verify the pre-existing canonical catalog descriptor, bind all to the current base, and repair the tested local import boundary.",
+  "rejected_option_ids": [
+    "OPT-2",
+    "OPT-3"
+  ],
+  "acceptance_criteria_refs": [
+    "AC-1",
+    "AC-2",
+    "AC-3",
+    "AC-4",
+    "AC-5",
+    "AC-6",
+    "AC-7"
+  ],
+  "scope_hash": "sha256:b9094eef8b270d42d16b4077d91779f19043aae3fa9db148552fb3eda28aff82",
+  "g1_gate_outcome": "PASS",
+  "authority_boundaries": {
+    "grants": [],
+    "excluded": [
+      "G4_MERGE",
+      "G5_DEPLOY",
+      "G6_PRODUCTION"
+    ]
+  },
+  "subagent_distribution_plan": {
+    "task_decomposition": [
+      {
+        "sub_task_id": "SUB-TASK-1",
+        "description": "Port bounded cleanup module and focused tests."
+      },
+      {
+        "sub_task_id": "SUB-TASK-2",
+        "description": "Run validation and create G3 evidence after separate authority."
+      }
+    ],
+    "agent_allocation": [
+      {
+        "sub_task_id": "SUB-TASK-1",
+        "skill_id": "python-dev",
+        "agent_type": "primary"
+      },
+      {
+        "sub_task_id": "SUB-TASK-2",
+        "skill_id": "governance-validation",
+        "agent_type": "validator"
+      }
+    ],
+    "execution_order": [
+      "SUB-TASK-1",
+      "SUB-TASK-2"
+    ],
+    "summary": "Single bounded implementation lane plus a fresh-context G3 review lane."
+  },
+  "implementation_plan_ref": {
+    "applicability": "required",
+    "source": "generated_kiro",
+    "canonical_task_uid": "SCRUM-210",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "protected_base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "plan_root": ".kiro/specs/scrum-210-checkpoint-expiry-cleanup",
+    "plan_revision": "sha256:57048d9a549d3357bc38c5a079e7cb32efee7aaa265a10d2a34533eaafbd988c",
+    "validation_evidence": "Session snapshot heading validation passed for requirements.md, design.md, and tasks.md; candidate focused tests pass 13/13 direct and discovery under Python 3.11."
+  }
+}

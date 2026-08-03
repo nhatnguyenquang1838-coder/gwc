@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g1-intake-brief",
+  "generated_at": "2026-08-03T18:57:51Z",
+  "trace": {
+    "project_id": "gwc",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "task_id": "SCRUM-210",
+    "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "g0_snapshot": "../../g0/context-snapshot.yaml"
+  },
+  "problem": {
+    "statement": "Runtime checkpoints need deterministic expiry cleanup for disposable hints and interrupt frames without deleting governance, audit, or append-only evidence.",
+    "why_now": "PR #195 contains the intended implementation but has invalid gate provenance; recovery requires a fresh bounded delivery on the current protected base."
+  },
+  "desired_outcome": "A pure local Node Architect cleanup primitive with canonical discovery metadata, portable focused tests, and audit-safe tombstone evidence.",
+  "stakeholders": {
+    "requester": "Nhat Nguyen Quang",
+    "affected": [
+      "GWC runtime operators",
+      "GWC governance auditors",
+      "Node Architect maintainers"
+    ]
+  },
+  "scope": {
+    "in_scope": [
+      "Port the #195 cleanup module to a clean branch from the current base.",
+      "Port 13 focused behavior tests first and repair their local import boundary.",
+      "Verify the pre-existing canonical runtime-checkpoint node descriptor without modifying it or adding orchestration.",
+      "Add scoped changelog, Kiro plan, and G0/G1/G2/G3 evidence."
+    ],
+    "non_goals": [
+      "Runtime orchestrator integration",
+      "scheduler changes",
+      "data migration",
+      "production service calls",
+      "merge, release, deployment, or PR #195 retroactive authorization."
+    ]
+  },
+  "constraints": [
+    "Port only the bounded SCRUM-210 local cleanup module, focused test, changelog, Kiro plan, and task evidence; verify the pre-existing catalog descriptor without modifying it.",
+    "Do not reuse the invalid PR #195 gate packet; it is historical code evidence only.",
+    "No protected-branch write, force push, merge, deploy, release, migration, credential, production configuration, or production-data action.",
+    "Create no repository worktree or branch and make no repository write before exact G2 approval.",
+    "Before first G2 mutation, verify the accepted Kiro plan and record the required plan-read receipt."
+  ],
+  "assumptions": [
+    "The current `origin/main` contains compatible `checkpoint_store.py` and `lease_expiry_recovery.py` reuse patterns.",
+    "Jira SCRUM-210 remains claimed by Hermes while this approval is pending.",
+    "The historical #195 code is a candidate to port, not authority to apply its stale branch history."
+  ],
+  "risks": [
+    {
+      "id": "RISK-1",
+      "description": "A host-level tools package can shadow repository Node Architect imports.",
+      "impact": "medium",
+      "mitigation": "Insert the repository tools directory in the focused test before importing node_architect; validate direct and discovery commands."
+    },
+    {
+      "id": "RISK-2",
+      "description": "Expiry cleanup could accidentally affect audit/governance evidence.",
+      "impact": "high",
+      "mitigation": "Use classifier precedence and tests that preserve governance, audit, and runtime-event entries."
+    },
+    {
+      "id": "RISK-3",
+      "description": "A live protected-base change could invalidate this proposal.",
+      "impact": "medium",
+      "mitigation": "Re-read origin/main immediately before branch creation; stop/recompute if base changes."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "statement": "Expired disposable resume hints and interrupt frames are deterministically selected for tombstoning.",
+      "verifiable": true
+    },
+    {
+      "id": "AC-2",
+      "statement": "Governance, audit, and retained append-only entries are never tombstoned.",
+      "verifiable": true
+    },
+    {
+      "id": "AC-3",
+      "statement": "An unexpired active resume path is retained even when otherwise expired.",
+      "verifiable": true
+    },
+    {
+      "id": "AC-4",
+      "statement": "Cleanup output includes auditable tombstones and replay-equivalent deterministic results.",
+      "verifiable": true
+    },
+    {
+      "id": "AC-5",
+      "statement": "Focused tests pass as a direct file and with unittest discovery under Python 3.11.",
+      "verifiable": true
+    },
+    {
+      "id": "AC-6",
+      "statement": "No connector, runtime orchestration, migration, or production behavior is added.",
+      "verifiable": true
+    },
+    {
+      "id": "AC-7",
+      "statement": "The canonical runtime_checkpoint catalog descriptor is present and metadata-only.",
+      "verifiable": true
+    }
+  ],
+  "delivery_lifecycle": {
+    "authorized_actions": [
+      "create_guarded_branch_or_worktree",
+      "modify_approved_files",
+      "run_sandboxed_validation",
+      "stage",
+      "create_commit",
+      "push_working_branch"
+    ],
+    "downstream_non_goals": [
+      "G3 draft PR creation",
+      "G4 merge",
+      "G5 deploy",
+      "G6 production operations"
+    ],
+    "g3_metadata_completion": {
+      "ready_for_review_after_g3_pass": true,
+      "required_evidence": [
+        "exact head SHA",
+        "fresh review",
+        "validation",
+        "CI",
+        "non-stale delivery record"
+      ]
+    }
+  },
+  "unresolved_questions": [],
+  "status": "READY"
+}
