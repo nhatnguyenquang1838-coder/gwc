@@ -1,0 +1,201 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-230
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d9a89a002aae4348359cd88810a9d03926199597
+working_branch: hermes/scrum-230-entry-schema-validation-m4-20260803
+pull_request:
+  number: 198
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/198
+  draft: true
+head_sha: 5d4926889bd8ffee4471a7795efcc03c6fba6f79
+scope_hash: sha256:12f155aecd107825111c9ee18e929312f1a820cd41c2d2635a02db6c555a8b0f
+changed_paths:
+- schemas/node-architect/package-export/entry-schema-validation.schema.json
+- tools/node_architect/package_export/__init__.py
+- tools/node_architect/package_export/entry_schema_validation.py
+- tests/test_package_export_entry_schema_validation.py
+- tests/package_export/fixtures.py
+- tests/package_export/test_entry_schema_validation.py
+- .gwc/tasks/SCRUM-230/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-230/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-230/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-230/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-230/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-230/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-230/g3/delivery-record.yaml
+validation:
+  head_sha: 5d4926889bd8ffee4471a7795efcc03c6fba6f79
+  status: pass
+  commands:
+  - command: uv run --python 3.11 python tests/package_export/test_entry_schema_validation.py
+    result: pass
+    evidence: Ran 7 tests - OK (fixture matrix, duplicate-id inventory guard, determinism)
+  - command: uv run --python 3.11 --with jsonschema python tests/test_package_export_entry_schema_validation.py
+    result: pass
+    evidence: Ran 21 tests - OK (original SCRUM-230 evaluator suite)
+  - command: uv run --python 3.11 --with pyyaml --with jsonschema python tools/validate_instructions.py
+    result: pass
+    evidence: Instruction repository validation passed
+  - command: python -m unittest discover -s tests
+    result: pass
+    evidence: >-
+      Head Ran 501 failures=10 errors=64; base d9a89a002aae4348359cd88810a9d03926199597
+      Ran 480 failures=10 errors=64. Identical pre-existing counts, +21 new tests all
+      green, so this branch introduces no new discovery failures.
+review:
+  implementer_id: Hermes
+  reviewer_id: Hermes-G3-fresh-context
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 5d4926889bd8ffee4471a7795efcc03c6fba6f79
+  reviewed_scope_hash: sha256:12f155aecd107825111c9ee18e929312f1a820cd41c2d2635a02db6c555a8b0f
+  reviewed_at: '2026-08-03T20:20:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - AC-1..AC-6 mapped to executed tests in validation.commands
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Pure evaluator, closed schema, inventory indexed by entry index not entry_id
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - tools/node_architect/package_export/entry_schema_validation.py validate_entries uses per_entry_errors keyed by index
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - 7 new fixture-driven tests plus 21 original tests, all green
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G2 CP-20260803-230-G2R scope 45a5107c469909a3 on base d9a89a002aae4348359cd88810a9d03926199597
+    - tools/validate_instructions.py passed
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Branch is 0 commits behind origin/main at the approved base_sha
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - All 9 checks SUCCESS on head 5d4926889bd8ffee4471a7795efcc03c6fba6f79
+  findings:
+  - id: REV-1
+    severity: MAJOR
+    category: delivery
+    status: resolved
+    evidence: git rev-list --left-right --count origin/main...57de6acc returned 321 2
+    recommendation: Keep PR 198 as the container; it is 0 behind current main.
+    resolution: PR 199 superseded; no code merged from its diverged history.
+  - id: REV-2
+    severity: BLOCKER
+    category: governance
+    status: resolved
+    evidence: PR 199 G2 envelope lists runtime_implementation_code in excluded_actions while the PR adds the evaluator runtime.
+    recommendation: Do not carry the PR 199 envelope forward.
+    resolution: PR 198 G2 CP-20260803-230-G2R has no runtime_implementation_code exclusion.
+  - id: REV-3
+    severity: MAJOR
+    category: code
+    status: resolved
+    evidence: PR 199 evaluator stores per-entry errors in a dict keyed by entry_id, so a later duplicate overwrites the earlier record.
+    recommendation: Keep the PR 198 index-keyed evaluator and add an explicit regression guard.
+    resolution: DuplicateIdInventoryTest asserts two duplicate ids yield two inventory records and three yield three.
+  - id: REV-4
+    severity: MAJOR
+    category: delivery
+    status: resolved
+    evidence: PR 199 G3 record binds head 01ce11d2ac7f1747e180eb07a02e00744ac048c3 while the actual PR head is 57de6acc274218efff016272f028b9f346b5837b.
+    recommendation: Bind G3 evidence to the exact final head SHA.
+    resolution: This record binds head 5d4926889bd8ffee4471a7795efcc03c6fba6f79, verified against the live PR head.
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - Ordered deterministic errors with no silent pass - test_errors_are_ordered_canonically
+  - id: AC-2
+    result: pass
+    evidence:
+    - Eight fixture classes in tests/package_export/fixtures.py exercised by test_all_fixtures
+  - id: AC-3
+    result: pass
+    evidence:
+    - DeterminismTest.test_repeated_evaluation_is_identical plus test_same_input_same_digest_and_order
+  - id: AC-4
+    result: pass
+    evidence:
+    - test_no_filesystem_access proves the pure path performs no filesystem access
+  - id: AC-5
+    result: pass
+    evidence:
+    - test_inventory_covers_every_entry and the duplicate-id guard cover every entry
+  - id: AC-6
+    result: pass
+    evidence:
+    - Binding fields and closed reason-code vocabulary asserted by test_result_matches_closed_schema_fields
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 5d4926889bd8ffee4471a7795efcc03c6fba6f79
+  checks:
+  - name: validate
+    required: true
+    status: pass
+    evidence: gh pr view 198 statusCheckRollup - conclusion SUCCESS on head 5d49268
+  - name: build (gwc)
+    required: false
+    status: pass
+    evidence: conclusion SUCCESS on head 5d49268
+  - name: calculate-parity (ubuntu-latest)
+    required: false
+    status: pass
+    evidence: conclusion SUCCESS on head 5d49268
+  - name: calculate-parity (macos-latest)
+    required: false
+    status: pass
+    evidence: conclusion SUCCESS on head 5d49268
+  - name: calculate-parity (windows-latest)
+    required: false
+    status: pass
+    evidence: conclusion SUCCESS on head 5d49268
+  - name: compare-parity
+    required: false
+    status: pass
+    evidence: conclusion SUCCESS on head 5d49268
+residual_risks:
+- >-
+  Repo-wide unittest discovery has 10 pre-existing failures and 64 pre-existing
+  errors that also exist at base d9a89a002aae4348359cd88810a9d03926199597; they
+  are outside SCRUM-230 scope and untouched by this branch.
+- >-
+  head_sha binds 5d4926889bd8ffee4471a7795efcc03c6fba6f79, the commit carrying the
+  full delivered change set. The commit that adds this G3 record is a
+  metadata-only artifact commit on top of it and introduces no code, schema or
+  test change; a record cannot bind the SHA of the commit that contains it.
+- >-
+  PR 199 remains open until the user approves closing it as a duplicate; closing
+  a PR is not authorized by the G2 envelope.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+outcome: pass
