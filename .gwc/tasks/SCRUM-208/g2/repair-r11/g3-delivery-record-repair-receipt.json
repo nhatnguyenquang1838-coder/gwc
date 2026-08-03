@@ -1,0 +1,43 @@
+{
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_G3_DELIVERY_RECORD_R11_20260803",
+  "artifact_type": "g2-g3-delivery-record-repair-receipt",
+  "authority_gate": "G2_EXECUTION",
+  "authorized_paths": [
+    ".gwc/tasks/SCRUM-208/g3/delivery-record.yaml",
+    ".gwc/tasks/SCRUM-208/g2/repair-r11/g3-delivery-record-repair-receipt.json"
+  ],
+  "exclusions": [
+    "READY",
+    "MERGE",
+    "DEPLOY",
+    "RELEASE",
+    "SCRUM-209",
+    "OTHER_LANES"
+  ],
+  "expected_parent_sha": "9ec64cd6c54ffa4faf150e6927806be5d876caee",
+  "expires_at": "2026-08-03T17:30:00Z",
+  "implementation_blob_changes": 0,
+  "protected_base_sha": "d9a89a002aae4348359cd88810a9d03926199597",
+  "pull_request": 193,
+  "received_at": "2026-08-03T13:10:00Z",
+  "replacement_record": {
+    "delivery_scope_hash": "sha256:8156af7d5b25fa59a89c21f35fe55de3f64d662cd1a7c9fbe08f0996e1c6a99c",
+    "implementation_head_sha": "9ec64cd6c54ffa4faf150e6927806be5d876caee",
+    "path": ".gwc/tasks/SCRUM-208/g3/delivery-record.yaml"
+  },
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:69faca73b96213d52fd47c0718d362329fca5faa7933f3dc3906eaee88e0d931",
+  "source_delivery_record": {
+    "blob_sha": "a998f099f8261153d0ce96a8b1589d23fb1fb151",
+    "classification": "STALE_PR_192_G0_G1_RECORD"
+  },
+  "source_review": {
+    "decision": "FAIL_RETURN_TO_G2",
+    "finding": "REV-5",
+    "jira_comment_id": "10669",
+    "review_id": 4844245836
+  },
+  "status": "CONSUMED_PENDING_SUCCESSOR_HEAD_CI_AND_G3_REVIEW",
+  "task_id": "SCRUM-208"
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-expected-revision-boundary-repair-receipt",
+  "task_id": "SCRUM-208",
+  "authority_gate": "G2_EXECUTION",
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_EXPECTED_REVISION_BOUNDARY_R10_20260803",
+  "scope_hash": "sha256:cc7aa1653e67586658102b989355e5acaf675a0ea59bf243b394dc74c1f2d978",
+  "received_at": "2026-08-03T12:03:00Z",
+  "expires_at": "2026-08-03T15:30:00Z",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "pull_request": 193,
+  "protected_base_sha": "d9a89a002aae4348359cd88810a9d03926199597",
+  "expected_parent_sha": "5da4360f56bb84fe3cc2a1dd4bec4f97b72761a6",
+  "source_review": {
+    "review_id": 4843646014,
+    "finding": "REV-4",
+    "decision": "FAIL_RETURN_TO_G2"
+  },
+  "source_blobs": {
+    "tools/node_architect/checkpoint_store.py": "27ae7f5568e62dde39aa65a9f27af4e11ebd4bdc",
+    "tests/test_cas_write_guard.py": "857c978594149413af43da0835d951c4343a0172"
+  },
+  "replacement_blobs": {
+    "tools/node_architect/checkpoint_store.py": "af7b8e1f821577cb5a1a37af9e140a55a346544b",
+    "tests/test_cas_write_guard.py": "4066e1f416c81b271d1cf1c7533b2be94417da0a"
+  },
+  "repair_contract": {
+    "strict_missing_item_expected_revision": "FAIL_CLOSED",
+    "caller_context_substitution": "REJECTED",
+    "no_mutation_on_rejection": true,
+    "legacy_without_cas_context": "UNCHANGED"
+  },
+  "status": "CONSUMED_PENDING_EXACT_HEAD_CI"
+}

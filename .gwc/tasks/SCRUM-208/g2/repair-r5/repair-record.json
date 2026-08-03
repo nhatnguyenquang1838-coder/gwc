@@ -1,0 +1,39 @@
+{
+  "artifact_type": "g2-repair-record",
+  "changes": [
+    "Strict checkpoint stores persist authoritative lease owner, lease token, fencing token, and lease expiry after the first valid strict write.",
+    "Later strict writes derive observed lease and fencing evidence from persisted lease authority rather than caller-selected cas_context values.",
+    "Lease expiry checks use an integration-owned evaluation time; caller-selected observed_at and expiry extension cannot bypass the guard.",
+    "A non-empty strict store without valid lease authority fails closed and routes to reconciliation.",
+    "Committed effects bind lease expiry in addition to owner, token, and fencing lineage.",
+    "Adversarial regressions cover new-idempotency stale-agent writes, caller expiry extension, missing lease authority, exact replay after expiry, and legacy callers."
+  ],
+  "repair_id": "G2-REPAIR-R5",
+  "schema_version": "1.0",
+  "source_review": {
+    "decision": "FAIL_RETURN_TO_G2",
+    "findings": [
+      "REV-3"
+    ],
+    "review_id": 4840821461,
+    "reviewed_head_sha": "380e9424b99de7efee78230e5765c17fa2915d0d"
+  },
+  "status": "VALIDATED_READY_TO_COMMIT",
+  "task_id": "SCRUM-208",
+  "validation": {
+    "focused_and_legacy_tests": {
+      "count": 29,
+      "status": "PASS"
+    },
+    "g0_g1_validator": "PASS",
+    "json_schema": "PASS",
+    "python_compile": "PASS",
+    "repository_overlay_tests": {
+      "count": 62,
+      "status": "PASS"
+    },
+    "rev3_adversarial_proof": "PASS_REJECTED_WITHOUT_MUTATION",
+    "runtime_checkpoint_catalog": "PASS",
+    "static_scope_lf_secret_noise": "PASS"
+  }
+}

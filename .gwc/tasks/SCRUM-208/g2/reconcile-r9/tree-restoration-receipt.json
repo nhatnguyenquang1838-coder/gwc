@@ -1,0 +1,48 @@
+{
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_TREE_RESTORATION_R9_20260803",
+  "artifact_type": "g2-tree-restoration-receipt",
+  "authority_gate": "G2_EXECUTION",
+  "branch": "codex/scrum-208-cas-write-guard-m5-20260802",
+  "expected_parent_sha": "cbe465477f20ae93517daa0430bbf52c5f18ee20",
+  "expires_at": "2026-08-03T13:30:00Z",
+  "overlay_blob_map": {
+    ".gwc/tasks/SCRUM-208/g2/plan-read-receipt.yaml": "0dd4e16d5572fe5acf048fb83bb5a2d35134f272",
+    ".gwc/tasks/SCRUM-208/g2/reconcile-r8/main-reconciliation-receipt.json": "60a6ed21af613a35282ad9e04582481d2dbdd192",
+    ".gwc/tasks/SCRUM-208/g2/repair-r3/approval-receipt.json": "319754f5c1f94cbb871257a8991f4d6cb3a90533",
+    ".gwc/tasks/SCRUM-208/g2/repair-r3/repair-record.json": "41fbe5c323335b76d9e651e9e2c6ef9d16a58bef",
+    ".gwc/tasks/SCRUM-208/g2/repair-r3/validation-manifest.json": "962b84ba9cabbee41f8105b7285b027c83f6ca2d",
+    ".gwc/tasks/SCRUM-208/g2/repair-r4/syntax-repair-receipt.json": "009ed1d3634f4032d3928e1e69bf09c2c8decb02",
+    ".gwc/tasks/SCRUM-208/g2/repair-r5/approval-receipt.json": "45747e57c4bcfd2da1eefb5f2e3aa34166849f36",
+    ".gwc/tasks/SCRUM-208/g2/repair-r5/repair-record.json": "28d159db579db0e5314b5490cf606bd9a19e7baf",
+    ".gwc/tasks/SCRUM-208/g2/repair-r5/validation-manifest.json": "f68a0f8d762b7037298735e7013cbe8afcfe8c5f",
+    ".gwc/tasks/SCRUM-208/g2/repair-r7/materialization-fix-receipt.json": "11125dc53ca1bbe8793623f8838b2dd6ec5b1c95",
+    ".kiro/specs/scrum-208-cas-write-guard-m5/design.md": "f53cb7a2a96f4c2d98aed36cf7545ebad6539f11",
+    ".kiro/specs/scrum-208-cas-write-guard-m5/requirements.md": "a9c6c187c940217e34660d8ce0070bc18a4da26c",
+    ".kiro/specs/scrum-208-cas-write-guard-m5/tasks.md": "0793cbeb51476eea1cf942014188284ce95831ef",
+    "releases/changelog.d/2026-08-02-scrum-208-cas-write-guard-m5.md": "9d14b7b1bcdaa15486bc9a52561b4e966db96db0",
+    "schemas/cas-write-guard-result.schema.json": "2416c059b3d6b7e9d77de8ec0a10af3629f7e445",
+    "tests/test_cas_write_guard.py": "857c978594149413af43da0835d951c4343a0172",
+    "tools/node_architect/cas_write_guard.py": "f6ce8ed24a65760c821bd671050ffb342d306256",
+    "tools/node_architect/checkpoint_store.py": "27ae7f5568e62dde39aa65a9f27af4e11ebd4bdc"
+  },
+  "overlay_count": 18,
+  "protected_base_sha": "d9a89a002aae4348359cd88810a9d03926199597",
+  "pull_request": 193,
+  "received_at": "2026-08-03T10:38:00Z",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:1a4703b8d489bfdfbba931e0608f9215c315ae36ee2cd8386da395f6ba33b4b6",
+  "source_failure": {
+    "changed_files": 39,
+    "classification": "R8_MERGE_TREE_INCOMPLETE_MAIN_PRESERVATION",
+    "deletions": 4024,
+    "unsafe_head_sha": "cbe465477f20ae93517daa0430bbf52c5f18ee20"
+  },
+  "status": "CONSUMED_PENDING_EXACT_HEAD_CI",
+  "tree_contract": {
+    "base_tree": "main@d9a89a002aae4348359cd88810a9d03926199597",
+    "delivery_record": "USE_MAIN_BYTES_NO_DIFF",
+    "expected_final_changed_files": 19,
+    "scrum_206_and_scrum_229": "PRESERVE_MAIN_BYTES"
+  }
+}
