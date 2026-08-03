@@ -1,0 +1,136 @@
+schema_version: '1.0'
+artifact_type: 'g2-approval-certificate'
+task_id: 'SCRUM-229'
+task_title: '[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC'
+
+certificate_id: 'SCRUM-229-G2-APPROVAL-20260803-001'
+certificate_status: 'ISSUED'
+certificate_valid_from: '2026-08-03T00:51:00+0700'
+certificate_expires: '2026-08-04T00:51:00+0700'
+
+approval_authority:
+  authority_type: 'local_agent_g2_approval'
+  authority_level: 'GATE_AUTHORITY'
+  approver: 'GitHub Copilot'
+  approver_identity: 'copilot@github-ai-agent'
+  approval_decision: 'APPROVED'
+  approval_decision_timestamp: '2026-08-03T00:51:00+0700'
+
+prerequisites_verified:
+  - name: 'G0 Context Snapshot'
+    status: 'VERIFIED'
+    artifact: '.gwc/tasks/SCRUM-229/g0/context-snapshot.yaml'
+  - name: 'G1 Intake Brief'
+    status: 'VERIFIED'
+    artifact: '.gwc/tasks/SCRUM-229/g1/intake/g1-intake-brief.yaml'
+  - name: 'G1 Preflight Report'
+    status: 'VERIFIED'
+    artifact: '.gwc/tasks/SCRUM-229/g1/preflight/g1-preflight-report.yaml'
+    readiness: 'READY_FOR_G1_BRAINSTORMING'
+  - name: 'G1 Brainstorming Options'
+    status: 'VERIFIED'
+    artifact: '.gwc/tasks/SCRUM-229/g1/brainstorming/g1-options.yaml'
+  - name: 'G1 Decision Record'
+    status: 'VERIFIED'
+    artifact: '.gwc/tasks/SCRUM-229/g1/decision/g1-decision-record.yaml'
+    selected_approach: 'Pure Python Typed Loader with Pydantic + YAML'
+    effort_estimate: '5.5 days'
+  - name: 'G2 Execution Envelope'
+    status: 'VERIFIED'
+    artifact: '.gwc/tasks/SCRUM-229/g2/execution-envelope.yaml'
+  - name: 'Jira Issue Claim'
+    status: 'VERIFIED'
+    issue: 'SCRUM-229'
+    ai_agent_field: 'GitHub Copilot'
+    claimed_at: '2026-08-03T00:36:01+0700'
+  - name: 'Protected Base SHA'
+    status: 'VERIFIED'
+    base_sha: '848d0356bf003cf68f9f9c6a31b293914f2f7a00'
+    repository: 'nhatnguyenquang1838-coder/gwc'
+    branch: 'main'
+
+scope_authorization:
+  scope_id: 'SCRUM-229-M4_DETERMINISTIC-manifest-load'
+  scope_title: 'Node Architect package_export.package-manifest-load M2→M4_DETERMINISTIC'
+  change_type: 'node_implementation'
+  scope_status: 'AUTHORIZED_FOR_EXECUTION'
+
+authorized_file_operations:
+  operation_count: 23
+  operation_scope: 'scoped_file_create_and_update'
+  operations_allowed:
+    schemas: 2
+    implementation: 5
+    tests: 8
+    node_definitions: 2
+    evidence_ledger: 6
+  boundary_enforcement: 'STRICT'
+  excluded_operations:
+    - 'direct_main_push'
+    - 'merge'
+    - 'force_push'
+    - 'deploy'
+    - 'publish'
+
+decision_binding:
+  selected_implementation_approach: 'Pure Python Typed Loader with Pydantic + YAML'
+  implementation_phases: 5
+  total_effort: '5.5 days'
+  phase_breakdown:
+    phase_1_schema: '1 day'
+    phase_2_loader: '2 days'
+    phase_3_fixtures: '1 day'
+    phase_4_tests: '1 day'
+    phase_5_integration: '0.5 day'
+
+execution_authorization:
+  authorization_type: 'GATE_EXECUTION_AUTHORIZATION'
+  execution_mode: 'local_agent'
+  execution_context: 'G2_EXECUTION'
+  authorized_executor: 'GitHub Copilot'
+  execution_constraints:
+    worktree_strategy: 'isolated_from_main'
+    branch_naming: 'feature/scrum-229-package-manifest-load'
+    commit_strategy: 'atomic_scope'
+    validation_required: 'all_tests_must_pass'
+
+node_execution_binding:
+  route_id: 'g2-resolve-execution-node'
+  first_node: 'gate_authority.gate-state-resolution'
+  nodes_in_execution:
+    - 'gate_authority.gate-state-resolution'
+    - 'repo_delivery.scoped-file-write'
+    - 'repo_delivery.diff-readback'
+    - 'gate_authority.gate-transition-decision'
+  final_transition: 'G3_PR'
+
+approval_conditions:
+  condition_1: 'MET'
+  condition_2: 'MET'
+  condition_3: 'MET'
+  condition_4: 'MET'
+  condition_5: 'MET'
+  condition_6: 'MET'
+  condition_7: 'MET'
+  condition_8: 'MET'
+
+approval_semantics:
+  semantics: 'This certificate authorizes G2_EXECUTION gate to proceed with node implementation of package_export.package-manifest-load at M4_DETERMINISTIC maturity. The executor (GitHub Copilot in local_agent mode) may create and update all scoped files listed in the execution envelope. Authority escalation is blocked. All file operations must remain within approved scopes. Upon successful completion of 5 phases with passing tests and deterministic evidence, the gate-transition-decision node will prepare the next-route decision and transition to G3_PR.'
+
+next_action_authorization:
+  action: 'PROCEED_WITH_G2_EXECUTION'
+  action_description: 'Create isolated worktree from protected base, create feature branch, and proceed with implementation phases 1-5'
+  action_authorization_timestamp: '2026-08-03T00:51:00+0700'
+  action_authorization_expires: '2026-08-04T00:51:00+0700'
+  action_prerequisite: 'None additional — all prerequisites met'
+
+approval_signature:
+  approver_name: 'GitHub Copilot'
+  approver_authority: 'Gate Authority (G2_EXECUTION)'
+  signature_timestamp: '2026-08-03T00:51:00+0700'
+  signature_algorithm: 'GATE_AUTHORITY_SEMANTIC_CONTRACT_v1.0'
+  signature_context: 'Local agent approval for node implementation'
+
+certificate_issued_at: '2026-08-03T00:51:00+0700'
+certificate_issued_by: 'GitHub Copilot'
+certificate_authority: 'GWC Gate Authority'
