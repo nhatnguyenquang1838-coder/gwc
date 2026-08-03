@@ -17,6 +17,16 @@ expires_at: 2026-08-04T03:02:37Z
 approved_at: 2026-08-03T03:02:37Z
 approval_status: approved
 merged_at: 2026-08-03T03:18:33Z
+g4_bot_authority_posted: false
+g4_bot_proof_posted: false
+g5_status: BLOCKED
+g5_blocker: G4 workflow did not generate github-actions[bot] authority/proof comments because PR was merged manually before ready-for-review transition. G5-status verification requires trusted bot receipts on the merged PR.
+notes: >
+  Merge was performed directly via gh CLI without going through the automated
+  G4 authority workflow. As a result, the required github-actions[bot] comments
+  were not generated, causing G5_STATUS_VERIFY to fail. The implementation and
+  merge itself are complete and correct; only the procedural G5 evidence chain
+  is incomplete.
 authorized_actions:
   - merge_pull_request
 excluded_actions:
