@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g0-context-snapshot",
+  "generated_at": "2026-08-03T18:57:51Z",
+  "project": {
+    "id": "gwc",
+    "name": "GWC",
+    "profile_path": "projects/gwc/project-profile.yaml"
+  },
+  "repository": {
+    "full_name": "nhatnguyenquang1838-coder/gwc",
+    "base_ref": "main",
+    "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+    "protected_branches": [
+      "main"
+    ],
+    "connector": "GitHub",
+    "write_enabled": true
+  },
+  "constraints": [
+    "Port only the bounded SCRUM-210 local cleanup module, focused test, changelog, Kiro plan, and task evidence; verify the pre-existing catalog descriptor without modifying it.",
+    "Do not reuse the invalid PR #195 gate packet; it is historical code evidence only.",
+    "No protected-branch write, force push, merge, deploy, release, migration, credential, production configuration, or production-data action.",
+    "Create no repository worktree or branch and make no repository write before exact G2 approval.",
+    "Before first G2 mutation, verify the accepted Kiro plan and record the required plan-read receipt."
+  ],
+  "applicable_policies": [
+    {
+      "id": "GATE_LIFECYCLE",
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "ref": "origin/main",
+      "source_sha": "bd70a263b015994887db5cabf2a220e50c9977e4"
+    },
+    {
+      "id": "KIRO_SPEC",
+      "path": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+      "ref": "origin/main",
+      "source_sha": "51283934bde6df414248dded3ba960cdec5d2b25"
+    },
+    {
+      "id": "G01_RUNBOOK",
+      "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "ref": "origin/main",
+      "source_sha": "bc116f07b27ae08c2646a73a021e3cf2e06a0362"
+    },
+    {
+      "id": "LOCAL_AGENT",
+      "path": "AGENTS.md",
+      "ref": "origin/main",
+      "source_sha": "8a594c621341ae82334253dd5243cd1e9db3a9be"
+    }
+  ],
+  "sources": [
+    {
+      "path": "projects/gwc/project-profile.yaml",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "487bb5e227b20cd9cde85ad6a17305e8610177dc"
+    },
+    {
+      "path": "projects/gwc/project-instructions.md",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508"
+    },
+    {
+      "path": "AGENTS.md",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "8a594c621341ae82334253dd5243cd1e9db3a9be"
+    },
+    {
+      "path": "Jira:SCRUM-210",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": null
+    },
+    {
+      "path": "GitHub:PR-195@609d28877828770ba2046ebf3f5c23efacbbe065",
+      "required": true,
+      "status": "AVAILABLE",
+      "source_sha": "609d28877828770ba2046ebf3f5c23efacbbe065"
+    }
+  ],
+  "runtime_context": {
+    "agent_runtime_id": "Hermes Agent",
+    "execution_mode": "local_agent",
+    "selected_profile": {
+      "id": "gwc",
+      "path": "projects/gwc/project-profile.yaml"
+    },
+    "selected_connector": "GitHub",
+    "connector_priority": [
+      "GitHub",
+      "Atlassian MCP"
+    ],
+    "required_behavior_contracts": [
+      "Agent_Behavior_Semantic_Contract_v1.0.md",
+      "Agent_Response_Presentation_Contract_v1.0.md"
+    ]
+  },
+  "contextual_discovery": {
+    "historical_context": [
+      {
+        "id": "PR-195",
+        "description": "Historical implementation candidate only; its G2 is pending and base binding is stale.",
+        "link": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/195"
+      }
+    ],
+    "downstream_impact": [
+      {
+        "target": "runtime_checkpoint node consumers",
+        "impact_type": "NON_BREAKING",
+        "description": "Adds a standalone local cleanup primitive; no orchestration integration."
+      }
+    ],
+    "stakeholder_reach": [
+      {
+        "persona": "runtime operator",
+        "impact": "Can evaluate deterministic expiry cleanup locally."
+      },
+      {
+        "persona": "governance auditor",
+        "impact": "Retained evidence is protected and tombstones are auditable."
+      }
+    ]
+  },
+  "status": "READY",
+  "blockers": []
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "gate-scope-identity",
+  "task_id": "SCRUM-210",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+  "working_branch": "hermes/scrum-210-checkpoint-expiry-cleanup-r4-20260803",
+  "head_sha": null,
+  "risk_class": "R1",
+  "authorized_paths": [
+    "tools/node_architect/checkpoint_expiry_cleanup.py",
+    "tests/test_checkpoint_expiry_cleanup.py",
+    "releases/changelog.d/2026-08-03-scrum-210-checkpoint-expiry-cleanup-m5.md",
+    ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/**",
+    ".gwc/tasks/SCRUM-210/**"
+  ],
+  "authorized_actions": [
+    "create_commit",
+    "create_guarded_branch_or_worktree",
+    "modify_approved_files",
+    "push_working_branch",
+    "run_sandboxed_validation",
+    "stage"
+  ],
+  "excluded_actions": [
+    "credential_rotation",
+    "delete_branch",
+    "deploy_approved_release",
+    "force_push",
+    "mark_pr_ready_for_review",
+    "merge_approved_pr",
+    "migration",
+    "open_or_update_draft_pr",
+    "production_config_change",
+    "production_data_read",
+    "production_data_write",
+    "protected_branch_write",
+    "reload_approved_runtime",
+    "run_independent_review"
+  ],
+  "additional_bindings": [],
+  "outcome": "READY",
+  "reason_codes": [
+    "SCOPE_HASH_CALCULATED"
+  ],
+  "calculated_at": "2026-08-03T18:57:51Z",
+  "scope_hash": "sha256:b9094eef8b270d42d16b4077d91779f19043aae3fa9db148552fb3eda28aff82",
+  "approval_request_digest": null,
+  "authority_granted": false
+}
