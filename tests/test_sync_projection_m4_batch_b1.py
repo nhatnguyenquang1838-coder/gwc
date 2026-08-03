@@ -371,6 +371,17 @@ class ProjectionEvidenceLinkingTests(unittest.TestCase):
         self.assertEqual(len(first["links"]), 2)
         self.assertEqual(first["linkset_digest"], second["linkset_digest"])
 
+    def test_display_url_is_preserved_but_excluded_from_digest(self):
+        first = self.build()
+        task_link = next(link for link in first["links"] if link["evidence_id"] == "task-227")
+        self.assertEqual(task_link["display_url"], "https://example.invalid/SCRUM-227")
+        items = valid_evidence_items()
+        items[0]["display_url"] = "https://example.invalid/alternate"
+        second = self.build(evidence_items=items)
+        task_link = next(link for link in second["links"] if link["evidence_id"] == "task-227")
+        self.assertEqual(task_link["display_url"], "https://example.invalid/alternate")
+        self.assertEqual(first["linkset_digest"], second["linkset_digest"])
+
     def test_url_only_is_not_authority(self):
         item = {
             "evidence_id": "url-only",
