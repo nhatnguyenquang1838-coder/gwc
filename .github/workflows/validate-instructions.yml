@@ -50,6 +50,16 @@ jobs:
           set -o pipefail
           python tools/node_architect/validate_runtime_registry.py --root . 2>&1 | tee runtime-registry-validation.log
 
+      - name: Validate runtime_checkpoint node-catalog family
+        run: |
+          set -o pipefail
+          python tools/node_architect/validate_node_catalog_runtime_checkpoint.py 2>&1 | tee runtime-checkpoint-family-validation.log
+
+      - name: Run runtime_checkpoint node-catalog family tests
+        run: |
+          set -o pipefail
+          python -m unittest tests/test_node_catalog_runtime_checkpoint.py 2>&1 | tee runtime-checkpoint-family-tests.log
+
       - name: Run registry and v3 focused tests
         run: |
           set -o pipefail
@@ -74,7 +84,9 @@ jobs:
             line-ending-validation.log
             validate-instructions.log
             runtime-registry-validation.log
+            runtime-checkpoint-family-validation.log
             runtime-registry-tests.log
+            runtime-checkpoint-family-tests.log
             governance-unit-tests.log
             compile-python-tools.log
           if-no-files-found: warn
