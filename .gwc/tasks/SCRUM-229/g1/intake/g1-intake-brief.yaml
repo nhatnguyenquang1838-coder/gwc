@@ -1,0 +1,114 @@
+schema_version: "1.0"
+artifact_type: "g1-intake-brief"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+source_instructions:
+  - "AGENTS.md"
+  - "core/Agent_Operating_Runtime_Contract_v1.0.md"
+  - "core/GATE_LIFECYCLE_CONTRACT_v1.0.md"
+  - "core/Agent_Behavior_Semantic_Contract_v1.0.md"
+  - "core/Agent_Response_Presentation_Contract_v1.0.md"
+  - "core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md"
+  - "projects/gwc/project-profile.yaml"
+  - "projects/gwc/project-instructions.md"
+  - "projects/gwc/project-extension.md"
+  - "agents/chatgpt-agent/agent-instructions.md"
+
+execution_mode: "local_agent"
+
+request_type: "implementation"
+
+intake_card:
+  request_type: "implementation"
+  source_instruction: "REPO"
+  execution_mode: "local_agent"
+  executor_type: "agent"
+  work_item: "SCRUM-229"
+  agent_claim: "GitHub Copilot"
+  claim_readback: "PASS"
+  risk_flags:
+    - "schema"
+  required_reads:
+    - "AGENTS.md"
+    - "core/Agent_Operating_Runtime_Contract_v1.0.md"
+    - "core/GATE_LIFECYCLE_CONTRACT_v1.0.md"
+    - "core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md"
+    - "core/node-architect/gate-node-route-profile.json"
+    - "core/node-architect/node-registry.json"
+    - "core/task-lifecycle/gate-transition-map.yaml"
+    - "projects/gwc/project-profile.yaml"
+    - "projects/gwc/project-instructions.md"
+  files_read:
+    - "AGENTS.md"
+    - "core/Agent_Operating_Runtime_Contract_v1.0.md"
+    - "core/GATE_LIFECYCLE_CONTRACT_v1.0.md"
+    - "core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md"
+    - "core/node-architect/gate-node-route-profile.json"
+    - "core/node-architect/node-registry.json"
+    - "core/task-lifecycle/gate-transition-map.yaml"
+    - "projects/gwc/project-profile.yaml"
+    - "projects/gwc/project-instructions.md"
+  files_write:
+    - ".gwc/tasks/SCRUM-229/"
+  gate_required: "G1"
+  next_action: "brainstorming"
+
+task_understanding:
+  objective: "Implement next Node Architect maturity step for package_export.package-manifest-load node"
+  current_maturity: "M2"
+  target_maturity: "M4_DETERMINISTIC"
+  key_requirement: "Load one pinned project package manifest and produce a canonical entry inventory before any schema, path or export behavior runs"
+  required_capabilities:
+    - "Parse YAML into closed typed result"
+    - "Reject non-object manifests and unknown top-level fields"
+    - "Preserve declared instruction order for provenance"
+    - "Produce canonical semantic inventory sorted by stable entry identity"
+    - "Detect duplicate IDs, absent instruction lists, unsupported version, stale source binding"
+    - "Emit semantic digest excluding observational timestamps"
+    - "Support exact source SHA, package path, repository, and source ref bindings"
+
+acceptance_criteria:
+  - "Typed input/output bind task, repository, package path, source ref, exact source SHA, package version and semantic digest"
+  - "Fixtures cover valid manifest, malformed YAML, non-object root, missing instructions, duplicate ID, unsupported version, unknown field and source-SHA mismatch"
+  - "Same bytes and binding produce the same inventory/digest across reruns"
+  - "Missing, ambiguous or stale input returns BLOCKED/FAIL, never an empty successful inventory"
+  - "Descriptor remains canonical=delivery_evidence, authority_boundary=g2_required, with gates limited to G2_EXECUTION/G3_PR"
+  - "Focused tests and existing package validation pass"
+
+stable_reason_codes:
+  - "MANIFEST_LOADED"
+  - "MANIFEST_MISSING"
+  - "MANIFEST_PARSE_ERROR"
+  - "MANIFEST_SCHEMA_UNSUPPORTED"
+  - "MANIFEST_VERSION_UNSUPPORTED"
+  - "MANIFEST_STALE_SOURCE"
+  - "MANIFEST_DUPLICATE_ENTRY_ID"
+
+implementation_scope:
+  - "schemas/node-architect/package-export/ — schema definitions"
+  - "tools/node_architect/package_export/ — manifest loader, validator, digest generator"
+  - "tests/package_export/ — fixture-driven tests"
+
+read_only_inputs:
+  - "projects/gwc/package.yaml"
+  - "schemas/package-manifest.schema.json"
+
+boundaries:
+  - "No file copy"
+  - "No target creation"
+  - "No package publication"
+  - "No consumer mutation"
+  - "No package-version bump"
+
+next_dependency:
+  task: "SCRUM-230"
+  blocker_type: "evidence_reuse"
+
+definition_of_done:
+  - "All AC pass on the exact final head"
+  - "Canonical manifest-load evidence is deterministic and reusable by SCRUM-230"
+  - "No scope drift or unresolved blocker remains"
+
+created_at: "2026-08-03T00:51:00+0700"
+stage: "intake"

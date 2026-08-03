@@ -1,0 +1,146 @@
+schema_version: "1.0"
+artifact_type: "g1-brainstorming-options"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+problem_statement:
+  requirement: "Load one pinned project package manifest and produce a canonical entry inventory before any schema, path or export behavior runs"
+  constraints:
+    - "Deterministic output: same bytes and binding produce identical inventory and digest across reruns"
+    - "Closed schema validation: reject non-object manifests and unknown top-level fields"
+    - "Evidence binding: task, repository, package path, source ref, exact source SHA, package version, semantic digest"
+    - "Reusable by SCRUM-230: deterministic digest must be stable and consistent"
+    - "No scope drift: no file copy, target creation, package publication, or consumer mutation"
+
+design_options:
+  - option_id: "option_a"
+    name: "Pure Python Typed Loader with Pydantic + YAML"
+    description: |
+      Implement a Pydantic-based manifest model with custom YAML deserialization.
+      - Parse YAML using PyYAML with safe loader
+      - Validate against Pydantic model with strict field validation
+      - Serialize canonical form using JSON for deterministic digest
+      - Generate semantic inventory sorted by stable entry identity
+    implementation_path:
+      - "schemas/node-architect/package-export/package-manifest.schema.yaml"
+      - "tools/node_architect/package_export/pydantic_model.py"
+      - "tools/node_architect/package_export/yaml_loader.py"
+      - "tools/node_architect/package_export/manifest_loader.py"
+    advantages:
+      - "High type safety with Pydantic"
+      - "Native Python integration"
+      - "Clear error messages for validation failures"
+      - "Easy to extend with custom validators"
+    disadvantages:
+      - "Pydantic version lock required for deterministic output"
+      - "Python import order affects digest stability (mitigated by sorting)"
+    fixtures_required:
+      - "valid_manifest.yaml"
+      - "malformed_yaml.yaml (syntax error)"
+      - "non_object_root.yaml (array instead of object)"
+      - "missing_instructions.yaml (no instructions list)"
+      - "duplicate_entry_id.yaml (two entries with same ID)"
+      - "unsupported_version.yaml (version=99)"
+      - "unknown_field.yaml (top-level field not in schema)"
+      - "source_sha_mismatch.yaml (source ref SHA mismatches binding)"
+    risk_assessment: "LOW — standard approach, well-understood tools"
+    effort_estimate: "M (3-4 days)"
+
+  - option_id: "option_b"
+    name: "Lightweight Decorator Wrapper Around Existing Validators"
+    description: |
+      Wrap existing package validation logic (if available) with manifest-specific
+      binding and evidence recording.
+      - Reuse existing schema validators from projects/gwc/package.yaml context
+      - Add binding layer for task, repository, source refs
+      - Implement deterministic digest on validated output
+      - Record evidence to node ledger
+    implementation_path:
+      - "tools/node_architect/package_export/manifest_adapter.py"
+      - "tools/node_architect/package_export/evidence_recorder.py"
+    advantages:
+      - "Minimal new code"
+      - "Leverages existing validation infrastructure"
+      - "Faster implementation"
+      - "Lower maintenance surface"
+    disadvantages:
+      - "Requires discovery of existing validators"
+      - "May have hidden dependencies on package context"
+      - "Less explicit about manifest-load contract"
+    fixtures_required: "Same as option_a"
+    risk_assessment: "MEDIUM — depends on existing validator stability and discoverability"
+    effort_estimate: "S (1-2 days if validators exist and are stable)"
+
+  - option_id: "option_c"
+    name: "JSON Schema + Deterministic Serialization"
+    description: |
+      Define manifest format as JSON schema, convert YAML input to JSON,
+      validate against schema, then deterministically serialize for digest.
+      - Parse YAML, convert to dictionary
+      - Validate using jsonschema library against explicit JSON schema
+      - Implement deterministic JSON serialization (sorted keys, no whitespace)
+      - Generate semantic inventory and digest
+    implementation_path:
+      - "schemas/node-architect/package-export/package-manifest.schema.json"
+      - "tools/node_architect/package_export/json_validator.py"
+      - "tools/node_architect/package_export/deterministic_serializer.py"
+    advantages:
+      - "JSON schema is language-agnostic and widely understood"
+      - "Deterministic JSON serialization is easier to reason about"
+      - "Can be shared with non-Python consumers"
+      - "Clear separation between schema and validation logic"
+    disadvantages:
+      - "YAML to JSON conversion loses comments and formatting"
+      - "JSON schema validation can be verbose for complex structures"
+      - "Requires custom inventory sorting logic"
+    fixtures_required: "Same as option_a"
+    risk_assessment: "LOW — standard approach with deterministic guarantees"
+    effort_estimate: "M (3-4 days)"
+
+decision_criteria:
+  primary:
+    - "Determinism: Must produce identical digest for same manifest and binding"
+    - "Evidence binding: Must capture task, repo, path, ref, SHA, version, digest"
+    - "Reusability: Must serve as deterministic input for SCRUM-230"
+    - "Maintainability: Must be understandable and extensible"
+  secondary:
+    - "Implementation speed"
+    - "Existing tooling leverage"
+    - "Code clarity"
+    - "Error message quality"
+
+evaluation:
+  option_a:
+    determinism_score: "9/10 (Pydantic v2 with exact version lock)"
+    evidence_binding_score: "9/10 (Explicit model fields)"
+    reusability_score: "9/10 (Clear output contract)"
+    maintainability_score: "8/10 (Well-known patterns)"
+    speed_score: "6/10 (More implementation required)"
+  option_b:
+    determinism_score: "6/10 (Depends on existing validator stability)"
+    evidence_binding_score: "7/10 (May require adaptation)"
+    reusability_score: "7/10 (Output contract depends on existing code)"
+    maintainability_score: "6/10 (Implicit dependencies)"
+    speed_score: "9/10 (Minimal new code)"
+  option_c:
+    determinism_score: "10/10 (JSON serialization is deterministic)"
+    evidence_binding_score: "9/10 (Explicit JSON schema)"
+    reusability_score: "10/10 (Language-agnostic)"
+    maintainability_score: "9/10 (Standard tooling)"
+    speed_score: "7/10 (Schema + conversion logic)"
+
+recommended_option: "option_a"
+rationale: |
+  Option A (Pure Python Typed Loader with Pydantic) provides the best balance of:
+  - **Determinism**: With version pinning, Pydantic produces stable serialization
+  - **Evidence binding**: Explicit model fields align with evidence contract requirements
+  - **Reusability**: Clear output format for SCRUM-230 consumption
+  - **Maintainability**: Pydantic is widely used and well-documented
+  - **Speed**: Acceptable effort (3-4 days) for implementation, test fixtures, and integration
+
+  Option C is a close second for theoretical determinism guarantees but adds
+  JSON conversion complexity. Option B is viable only if we can verify existing
+  validators meet determinism requirements.
+
+created_at: "2026-08-03T00:51:00+0700"
+stage: "brainstorming"

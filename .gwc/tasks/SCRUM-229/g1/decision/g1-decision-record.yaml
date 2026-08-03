@@ -1,0 +1,156 @@
+schema_version: '1.0'
+artifact_type: 'g1-decision-record'
+task_id: 'SCRUM-229'
+task_title: '[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC'
+
+decision_summary:
+  title: 'Implement package_export.package-manifest-load using Pure Python Pydantic + YAML'
+  status: 'APPROVED_FOR_G2'
+  decision_date: '2026-08-03T00:51:00+0700'
+
+selected_approach: 'option_a'
+approach_name: 'Pure Python Typed Loader with Pydantic + YAML'
+
+decision_rationale:
+  primary_factors:
+    - 'Determinism: Pydantic v2 with exact version pinning ensures stable serialization across Python environments'
+    - 'Evidence binding: Model fields explicitly capture task, repository, package path, source ref, exact SHA, version, semantic digest'
+    - 'Reusability: Clear output contract suitable for SCRUM-230 consumption'
+    - 'Type safety: Full type annotations enable static analysis and IDE support'
+    - 'Maintainability: Pydantic is industry-standard, widely used, well-documented'
+
+  implementation_benefits:
+    - 'Native Python integration with PyYAML'
+    - 'Custom validators for business logic (duplicate ID detection, version compatibility, source binding verification)'
+    - 'Clear error messages for validation failures'
+    - 'Easy to extend for future package formats or entry types'
+
+  risk_mitigation:
+    - 'Version pinning: Pydantic version must be locked in requirements.txt'
+    - 'Serialization stability: Use json.dumps with sort_keys=True for digest generation'
+    - 'Python version compatibility: Test on Python 3.9+ to ensure consistency'
+    - 'Entry sorting: Implement deterministic sort key independent of dictionary order'
+
+alternatives_considered:
+  - option_b: 'Rejected — existing validator stability unverified; hidden dependencies risk'
+  - option_c: 'Not pursued — JSON schema adds conversion complexity; Pydantic sufficient'
+
+implementation_plan:
+
+  phase_1_schema_definition:
+    task: 'Define Pydantic models and JSON schema for manifest format'
+    output_files:
+      - 'schemas/node-architect/package-export/package-manifest.schema.yaml'
+      - 'schemas/node-architect/package-export/package-manifest.schema.json'
+    requirements:
+      - 'Root object schema with required version, id, entries fields'
+      - 'Version string matching semantic versioning'
+      - 'Entries list with mandatory id, name, type fields'
+      - 'Evidence binding fields: source_repo, source_ref, source_sha, task_id'
+      - 'Reject unknown top-level fields (forbid extra)'
+    effort: '1 day'
+
+  phase_2_loader_implementation:
+    task: 'Implement manifest loader, validator, and digest generator'
+    output_files:
+      - 'tools/node_architect/package_export/__init__.py'
+      - 'tools/node_architect/package_export/models.py'
+      - 'tools/node_architect/package_export/loader.py'
+      - 'tools/node_architect/package_export/validator.py'
+      - 'tools/node_architect/package_export/digest.py'
+    components:
+      - models.py: 'Pydantic model definitions with custom validators'
+      - loader.py: 'YAML parsing, Pydantic validation, inventory building'
+      - validator.py: 'Custom validation logic (duplicate ID, version compatibility, source binding)'
+      - digest.py: 'Deterministic digest generation using json.dumps(sort_keys=True)'
+    requirements:
+      - 'Preserve declared instruction order in provenance field'
+      - 'Produce canonical semantic inventory sorted by stable entry identity'
+      - 'Support exact source SHA, package path, repository, and source ref bindings'
+      - 'Emit stable reason codes (MANIFEST_LOADED, MANIFEST_MISSING, etc.)'
+    effort: '2 days'
+
+  phase_3_fixture_design:
+    task: 'Create test fixtures for all acceptance criteria'
+    output_files:
+      - 'tests/package_export/fixtures/'
+      - 'tests/package_export/conftest.py'
+    fixtures:
+      - 'fixtures/valid_manifest.yaml — well-formed manifest with multiple entries'
+      - 'fixtures/malformed_yaml.yaml — syntax error, cannot parse'
+      - 'fixtures/non_object_root.yaml — root is array, not object'
+      - 'fixtures/missing_instructions.yaml — no entries field'
+      - 'fixtures/duplicate_entry_id.yaml — two entries with id=identical'
+      - 'fixtures/unsupported_version.yaml — version field with unsupported value'
+      - 'fixtures/unknown_field.yaml — top-level field not in schema'
+      - 'fixtures/source_sha_mismatch.yaml — source_sha does not match binding'
+    expected_outcomes:
+      - 'valid_manifest: MANIFEST_LOADED with deterministic digest'
+      - 'malformed_yaml: MANIFEST_PARSE_ERROR'
+      - 'non_object_root: MANIFEST_SCHEMA_UNSUPPORTED'
+      - 'missing_instructions: MANIFEST_SCHEMA_UNSUPPORTED'
+      - 'duplicate_entry_id: MANIFEST_DUPLICATE_ENTRY_ID'
+      - 'unsupported_version: MANIFEST_VERSION_UNSUPPORTED'
+      - 'unknown_field: MANIFEST_SCHEMA_UNSUPPORTED'
+      - 'source_sha_mismatch: MANIFEST_STALE_SOURCE'
+    effort: '1 day'
+
+  phase_4_test_suite:
+    task: 'Implement comprehensive test coverage'
+    output_files:
+      - 'tests/package_export/test_manifest_load.py'
+      - 'tests/package_export/test_determinism.py'
+      - 'tests/package_export/test_evidence_binding.py'
+    test_categories:
+      - 'Happy path: valid manifest loads and produces correct inventory'
+      - 'Error handling: all reason codes triggered correctly'
+      - 'Determinism: same manifest/binding produces identical digest across runs'
+      - 'Evidence binding: task, repo, path, ref, SHA, version preserved in output'
+      - 'Entry sorting: semantic inventory sorted by stable ID'
+    effort: '1 day'
+
+  phase_5_integration:
+    task: 'Integrate manifest loader into node instruction and evidence ledger'
+    output_files:
+      - 'core/node-architect/node-catalog/package_export/package-manifest-load.node.json'
+      - 'core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml'
+      - '.gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-result.json'
+    requirements:
+      - 'Node descriptor binds manifest loader to G2_EXECUTION gate'
+      - 'Node instruction defines evidence contract and next-route decision'
+      - 'Node execution records start, decision, result, next-route in task ledger'
+      - 'Digest output ready for SCRUM-230 consumption'
+    effort: '0.5 day'
+
+total_effort_estimate: '5.5 days'
+
+acceptance_criteria_coverage:
+  ac_1_typed_binding: 'Phase 1-2: models.py with explicit fields for task, repo, path, ref, SHA, version, digest'
+  ac_2_fixture_coverage: 'Phase 3: 8 comprehensive fixtures covering all error modes'
+  ac_3_determinism: 'Phase 4: test_determinism.py verifies byte-for-byte consistency'
+  ac_4_blocked_fail_never_empty: 'Phase 2 validator rejects missing/ambiguous input before inventory generation'
+  ac_5_descriptor_and_gates: 'Phase 5: node descriptor and instruction define evidence boundaries'
+  ac_6_tests_pass: 'Phase 4: focused test suite validates all AC'
+
+definition_of_done:
+  - '[ ] All acceptance criteria tests pass on exact final head'
+  - '[ ] Manifest loader evidence deterministic and reusable by SCRUM-230'
+  - '[ ] Node descriptor and instruction integrated into registry'
+  - '[ ] Node-runtime evidence recorded in task ledger'
+  - '[ ] No scope drift confirmed'
+  - '[ ] Code review and CI validation passed'
+
+risks_and_mitigations:
+  risk_pydantic_version_lock: 'Mitigation: Pin pydantic version in requirements.txt with exact SHA; test across target Python versions'
+  risk_digest_stability: 'Mitigation: Use deterministic serialization (json.dumps sort_keys=True); document algorithm'
+  risk_scope_creep: 'Mitigation: Strict boundary enforcement; SCRUM-230 is separate task for consumer logic'
+  risk_evidence_binding_completeness: 'Mitigation: Phase 1-2 models explicitly capture all required fields'
+
+dependencies:
+  - 'SCRUM-230: package_export.entry-schema-validation depends on deterministic manifest-load output'
+  - 'External: Pydantic v2.x (must be pinned)'
+  - 'External: PyYAML (existing dependency)'
+
+created_at: '2026-08-03T00:51:00+0700'
+completed_at: '2026-08-03T00:51:00+0700'
+next_stage: 'G2_EXECUTION'

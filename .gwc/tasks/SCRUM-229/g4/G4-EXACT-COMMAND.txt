@@ -1,0 +1,355 @@
+================================================================================
+                        G4 EXACT APPROVAL COMMAND
+================================================================================
+
+TASK:           SCRUM-229
+TITLE:          [MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC
+GATE:           G4_APPROVAL (Human Review and Approval)
+ISSUED:         2026-08-03T00:51:00+0700
+EXPIRES:        2026-08-10T00:51:00+0700 (7 days)
+AUTHORITY:      Human Reviewer (Full Approval Authority)
+STATUS:         ACTIVE AND READY FOR HUMAN REVIEW
+
+================================================================================
+                           EXACT COMMAND STATEMENT
+================================================================================
+
+CONDUCT HUMAN REVIEW OF SCRUM-229 DRAFT PR
+│
+├─ PULL REQUEST METADATA:
+│  ├─ Title:        [SCRUM-229] Implement package_export.package-manifest-load at M4_DETERMINISTIC
+│  ├─ Base branch:  main
+│  ├─ Base SHA:     848d0356bf003cf68f9f9c6a31b293914f2f7a00
+│  ├─ Target:       feature/scrum-229-package-manifest-load
+│  ├─ Files:        23 (exactly)
+│  ├─ Labels:       node-architect, package-export, M4-deterministic, scrum-229
+│  └─ Linked issue: SCRUM-229
+│
+├─ REVIEWER RESPONSIBILITY:
+│  ├─ Verify all pre-review requirements (10 items)
+│  ├─ Review all 5 implementation phases
+│  ├─ Verify all 6 acceptance criteria
+│  ├─ Check code quality and security
+│  ├─ Verify scope (23 files exactly)
+│  └─ Make approval decision (approve / request changes / reject)
+│
+├─ MUST-PASS PRE-CONDITIONS:
+│  ├─ [✓] PR created from base SHA 848d0356bf003cf68f9f9c6a31b293914f2f7a00
+│  ├─ [✓] PR base branch is main
+│  ├─ [✓] PR target branch is feature/scrum-229-package-manifest-load
+│  ├─ [✓] PR contains exactly 23 files (no more, no less)
+│  ├─ [✓] All CI checks passing
+│  ├─ [✓] All tests passing (pytest exit code 0)
+│  ├─ [✓] Determinism verified (same manifest = same digest)
+│  ├─ [✓] PR title references SCRUM-229
+│  ├─ [✓] PR labels correct (4 labels)
+│  └─ [✓] PR linked to SCRUM-229 task
+│
+├─ APPROVAL DECISION OPTIONS:
+│  ├─ APPROVE:
+│  │  └─ Automatically transitions to G5_MERGE
+│  ├─ REQUEST CHANGES:
+│  │  └─ Returns to implementation for updates
+│  └─ REJECT:
+│     └─ Returns to implementation for major rework
+│
+├─ REVIEW TIMELINE:
+│  ├─ Started:   2026-08-03T00:51:00+0700
+│  ├─ Expires:   2026-08-10T00:51:00+0700
+│  ├─ Duration:  24-72 hours (recommended)
+│  └─ Window:    7 days (maximum)
+│
+└─ COMMAND STATUS: READY FOR HUMAN REVIEW
+
+================================================================================
+                        EXACT 6-STEP REVIEW PROCESS
+================================================================================
+
+STEP 1: PRE-REVIEW VERIFICATION
+────────────────────────────────────────────────────────────────────────────
+Verify these 10 conditions before starting detailed review:
+
+[  ] 1. PR created from base SHA 848d0356bf003cf68f9f9c6a31b293914f2f7a00
+[  ] 2. PR base branch is main
+[  ] 3. PR target branch is feature/scrum-229-package-manifest-load
+[  ] 4. PR contains exactly 23 files
+[  ] 5. PR title: [SCRUM-229] Implement package_export.package-manifest-load at M4_DETERMINISTIC
+[  ] 6. PR labels: node-architect, package-export, M4-deterministic, scrum-229
+[  ] 7. PR linked to SCRUM-229 task
+[  ] 8. All CI checks passing (lint, tests, validate-instructions)
+[  ] 9. All tests passing (pytest exit code 0)
+[  ] 10. Determinism verified (same manifest = same digest)
+
+STATUS: All 10 must pass before proceeding to Step 2
+
+STEP 2: PHASE 1 REVIEW — SCHEMA DEFINITION
+────────────────────────────────────────────────────────────────────────────
+Files to review:
+  • schemas/node-architect/package-export/package-manifest.schema.yaml
+  • schemas/node-architect/package-export/package-manifest.schema.json
+
+Approval criteria (all must pass):
+[  ] Root object schema defined with required fields (version, id, entries)
+[  ] Version field supports semantic versioning
+[  ] Entries field is a list with mandatory id, name, type
+[  ] Evidence binding fields present: source_repo, source_ref, source_sha, task_id
+[  ] Unknown fields explicitly rejected (forbid extra)
+[  ] Schema is valid YAML and JSON
+[  ] JSON schema matches YAML schema semantically
+
+STATUS: All criteria must pass before proceeding
+
+STEP 3: PHASE 2 REVIEW — LOADER IMPLEMENTATION
+────────────────────────────────────────────────────────────────────────────
+Files to review:
+  • tools/node_architect/package_export/__init__.py
+  • tools/node_architect/package_export/models.py
+  • tools/node_architect/package_export/loader.py
+  • tools/node_architect/package_export/validator.py
+  • tools/node_architect/package_export/digest.py
+
+Approval criteria (all must pass):
+[  ] Pydantic models correctly implement schema
+[  ] YAML parsing handles edge cases and errors gracefully
+[  ] Custom validators enforce business logic:
+      [  ] Duplicate ID detection
+      [  ] Version compatibility checking
+      [  ] Source binding verification
+[  ] Deterministic digest generation using json.dumps(sort_keys=True)
+[  ] Preserves declared instruction order in provenance field
+[  ] Produces canonical semantic inventory sorted by stable entry ID
+[  ] Supports exact source SHA, package path, repository, and source ref bindings
+[  ] Emits stable reason codes (7 codes defined)
+[  ] No external dependencies beyond Pydantic v2 and PyYAML
+[  ] Type hints complete and accurate
+
+STATUS: All criteria must pass before proceeding
+
+STEP 4: PHASE 3 & 4 REVIEW — FIXTURES AND TESTS
+────────────────────────────────────────────────────────────────────────────
+Files to review (Phase 3 — Fixtures):
+  • tests/package_export/fixtures/valid_manifest.yaml
+  • tests/package_export/fixtures/malformed_yaml.yaml
+  • tests/package_export/fixtures/non_object_root.yaml
+  • tests/package_export/fixtures/missing_instructions.yaml
+  • tests/package_export/fixtures/duplicate_entry_id.yaml
+  • tests/package_export/fixtures/unsupported_version.yaml
+  • tests/package_export/fixtures/unknown_field.yaml
+  • tests/package_export/fixtures/source_sha_mismatch.yaml
+  • tests/package_export/conftest.py
+
+Approval criteria (all must pass):
+[  ] 8 fixtures cover all error modes
+[  ] Each fixture has clear documentation of expected outcome
+[  ] Valid manifest fixture is well-formed and complete
+[  ] All error scenarios represented:
+      [  ] Malformed YAML → MANIFEST_PARSE_ERROR
+      [  ] Non-object root → MANIFEST_SCHEMA_UNSUPPORTED
+      [  ] Missing instructions → MANIFEST_SCHEMA_UNSUPPORTED
+      [  ] Duplicate entry ID → MANIFEST_DUPLICATE_ENTRY_ID
+      [  ] Unsupported version → MANIFEST_VERSION_UNSUPPORTED
+      [  ] Unknown field → MANIFEST_SCHEMA_UNSUPPORTED
+      [  ] Source SHA mismatch → MANIFEST_STALE_SOURCE
+[  ] conftest.py provides helper functions for test setup
+
+Files to review (Phase 4 — Tests):
+  • tests/package_export/test_manifest_load.py
+  • tests/package_export/test_determinism.py
+  • tests/package_export/test_evidence_binding.py
+
+Approval criteria (all must pass):
+[  ] test_manifest_load.py covers happy path and error handling
+[  ] test_determinism.py verifies byte-for-byte consistency across runs
+[  ] test_evidence_binding.py validates all required fields are captured
+[  ] All 6 acceptance criteria have test coverage
+[  ] All 7 reason codes are triggered in tests
+[  ] Entry sorting order is verified
+[  ] Tests use appropriate assertions and error checks
+[  ] Test names are descriptive and clear
+[  ] No hardcoded paths or environment dependencies
+[  ] All tests pass with exit code 0
+
+STATUS: All criteria must pass before proceeding
+
+STEP 5: PHASE 5 & CODE QUALITY REVIEW
+────────────────────────────────────────────────────────────────────────────
+Files to review (Phase 5 — Integration):
+  • core/node-architect/node-catalog/package_export/package-manifest-load.node.json
+  • core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml
+  • .gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-result.json
+
+Approval criteria (all must pass):
+[  ] Node descriptor correctly binds loader to G2_EXECUTION gate
+[  ] Node descriptor defines evidence contract properly
+[  ] Node instruction specifies next-route decision logic
+[  ] Evidence recording matches contract
+[  ] Node-runtime directory structure correct
+[  ] All required fields present in node-result.json
+[  ] Evidence is deterministic and reproducible
+[  ] Next-route decision points to G3_PR correctly
+
+Code Quality Review (all must pass):
+[  ] Code follows project style guidelines
+[  ] Type hints are complete and accurate
+[  ] Error handling is comprehensive
+[  ] Edge cases are considered and handled
+[  ] Documentation is clear and complete
+[  ] No technical debt introduced
+[  ] Performance is acceptable
+[  ] Dependencies are minimal and justified
+
+Security Review (all must pass):
+[  ] No hardcoded credentials or secrets
+[  ] Input validation prevents injection attacks
+[  ] File operations are safe (no path traversal)
+[  ] YAML parsing is safe (no arbitrary code execution)
+[  ] No unsafe external library calls
+
+Scope Review (all must pass):
+[  ] Only 23 approved files are included
+[  ] No files added outside approved scope
+[  ] No modifications to unrelated code
+[  ] No schema version changes
+[  ] No package publishing or releasing
+[  ] Changes are atomic and focused on node implementation
+
+STATUS: All criteria must pass before proceeding
+
+STEP 6: ACCEPTANCE CRITERIA VERIFICATION
+────────────────────────────────────────────────────────────────────────────
+Verify all 6 acceptance criteria are met:
+
+[  ] AC1: Typed Binding
+      Explicit Pydantic model fields for task, repo, path, ref, SHA, version, digest
+
+[  ] AC2: Fixture Coverage
+      8 comprehensive fixtures covering all error modes
+
+[  ] AC3: Determinism
+      Identical digest generation verified across multiple runs
+
+[  ] AC4: Blocked/Fail Semantics
+      Validator rejects missing/ambiguous input before inventory generation
+
+[  ] AC5: Descriptor and Gates
+      Node descriptor and instruction define evidence boundaries correctly
+
+[  ] AC6: Tests Pass
+      All tests passing with comprehensive coverage
+
+STATUS: All 6 AC must be verified before making final decision
+
+================================================================================
+                         FINAL APPROVAL DECISION
+================================================================================
+
+After completing all 6 review steps, make your approval decision:
+
+DECISION OPTIONS:
+
+┌─ OPTION 1: APPROVE ─────────────────────────────────────────────────────┐
+│                                                                           │
+│ Decision:     APPROVED FOR MERGE                                         │
+│ Action:       Approve PR                                                 │
+│ Next Gate:    G5_MERGE (automatic transition upon approval)             │
+│ Timeline:     ~1-2 hours for merge to complete                          │
+│                                                                           │
+│ Use APPROVE when:                                                        │
+│ • All pre-review requirements ✓                                          │
+│ • All review phases ✓                                                    │
+│ • All acceptance criteria ✓                                              │
+│ • Code quality acceptable ✓                                              │
+│ • No security issues ✓                                                   │
+│ • Scope verified ✓                                                       │
+│ • No blocking issues ✓                                                   │
+│                                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─ OPTION 2: REQUEST CHANGES ─────────────────────────────────────────────┐
+│                                                                           │
+│ Decision:     REQUEST CHANGES                                            │
+│ Action:       Request modifications from developer                       │
+│ Next Gate:    Implementation (return to development)                     │
+│ Timeline:     Upon PR update, return to re-review                        │
+│                                                                           │
+│ Use REQUEST CHANGES when:                                                │
+│ • Issues identified but fixable                                          │
+│ • Clear feedback can be provided                                         │
+│ • Changes expected to be minor or moderate                               │
+│ • No blocking architectural issues                                       │
+│                                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─ OPTION 3: REJECT ──────────────────────────────────────────────────────┐
+│                                                                           │
+│ Decision:     REJECTED                                                   │
+│ Action:       Reject PR and return to implementation                     │
+│ Next Gate:    Implementation (SCRUM-229 remains in progress)            │
+│ Timeline:     TBD (requires new iteration or significant rework)         │
+│                                                                           │
+│ Use REJECT when:                                                         │
+│ • Major issues found                                                     │
+│ • Architectural concerns identified                                      │
+│ • Acceptance criteria not met                                            │
+│ • Significant rework required                                            │
+│                                                                           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+                            COMMAND EXECUTION
+================================================================================
+
+To execute this command:
+
+1. Read this document completely
+2. Follow the 6-step review process above
+3. Complete all checkboxes in each step
+4. At Step 6, verify all 6 acceptance criteria
+5. Make your final decision (Approve / Request Changes / Reject)
+6. Post decision to PR with explanation
+7. System automatically transitions based on decision
+
+DECISION TIMELINE:
+  Issued:     2026-08-03T00:51:00+0700
+  Expires:    2026-08-10T00:51:00+0700
+  Recommend:  Complete review within 24-72 hours
+  Maximum:    7-day window before escalation
+
+ESCALATION:
+  If no decision within 7 days → GWC Governance Team escalates
+
+================================================================================
+                         EXACT COMMAND SUMMARY
+================================================================================
+
+WHAT:    Human review and approval of SCRUM-229 Draft PR
+WHERE:   Repository nhatnguyenquang1838-coder/gwc
+WHEN:    2026-08-03T00:51:00+0700 (issued) → 2026-08-10T00:51:00+0700 (expires)
+WHO:     Human Reviewer (G4_APPROVAL Authority)
+WHY:     Verify implementation correctness before merge
+HOW:     Follow 6-step process, complete checklists, make decision
+
+AUTHORITY LEVEL:
+  ✓ Full approval authority (Approve / Request Changes / Reject)
+  ✓ Authority binding and final
+  ✗ Cannot bypass tests or CI checks
+  ✗ Cannot merge directly (G5 gate handles merge)
+  ✓ Can escalate to GWC Governance if needed
+
+COMMAND VALID:   YES ✓
+COMMAND ACTIVE:  YES ✓
+COMMAND READY:   YES ✓
+
+================================================================================
+                            END OF COMMAND
+================================================================================
+
+Issued by:  GitHub Copilot (Gate Authority, G2_EXECUTION)
+For:        Human Reviewer (G4_APPROVAL Authority)
+Task:       SCRUM-229 [MAT-F7-N01] package_export.package-manifest-load
+Gate:       G4_APPROVAL (Human Review and Approval)
+Valid from: 2026-08-03T00:51:00+0700
+Valid to:   2026-08-10T00:51:00+0700
+Status:     ACTIVE AND READY FOR HUMAN REVIEW
+
+================================================================================

@@ -1,0 +1,151 @@
+schema_version: "1.0"
+artifact_type: "g4-authority-certificate"
+certificate_type: "human_review_authority"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+certificate_metadata:
+  certificate_id: "SCRUM-229-G4-AUTHORITY-CERT-20260803"
+  issued_at: "2026-08-03T00:51:00+0700"
+  issued_by: "GitHub Copilot (Gate Authority, G2_EXECUTION)"
+  issued_to: "Human Reviewer (G4_APPROVAL Authority)"
+  certificate_status: "ACTIVE"
+
+authority_grant:
+  gate: "G4_APPROVAL"
+  gate_type: "Human Review and Approval"
+  authority_granted: true
+  authority_scope: "Review and approve/reject SCRUM-229 Draft PR"
+  authority_level: "Full authority over approval decision"
+
+authority_permissions:
+  permission_1: "Approve PR for merge to main"
+  permission_2: "Request changes from developer"
+  permission_3: "Reject PR and return to implementation"
+  permission_4: "Escalate to GWC Governance Team if needed"
+  permission_5: "Request optional GitHub Copilot auto-review"
+  permission_6: "Post decision to PR and task"
+
+authority_constraints:
+  constraint_1: "Authority limited to code review and approval decision"
+  constraint_2: "Cannot merge PR directly (G5_MERGE gate handles merge)"
+  constraint_3: "Cannot override security or compliance requirements"
+  constraint_4: "Cannot bypass test results or CI checks"
+  constraint_5: "Must follow approval framework guidance"
+  constraint_6: "Decision must be recorded and documented"
+
+pr_context:
+  pr_title: "[SCRUM-229] Implement package_export.package-manifest-load at M4_DETERMINISTIC"
+  pr_base: "main (SHA: 848d0356bf003cf68f9f9c6a31b293914f2f7a00)"
+  pr_target: "feature/scrum-229-package-manifest-load"
+  pr_files: 23
+  pr_scope: "Node implementation at M4_DETERMINISTIC maturity"
+
+review_requirements:
+  requirement_1: "Verify all pre-review checklist items passed"
+  requirement_2: "Review all 5 implementation phases"
+  requirement_3: "Verify all 6 acceptance criteria met"
+  requirement_4: "Check code quality and security"
+  requirement_5: "Verify scope (23 files exactly)"
+  requirement_6: "Confirm all tests passing and determinism verified"
+
+approval_criteria:
+  criteria_1: "All CI checks passing"
+  criteria_2: "All tests passing (pytest exit code 0)"
+  criteria_3: "Determinism verified"
+  criteria_4: "PR contains exactly 23 files"
+  criteria_5: "PR metadata correct"
+  criteria_6: "Code quality acceptable"
+  criteria_7: "No security issues"
+  criteria_8: "Scope verified (no drift)"
+  criteria_9: "All acceptance criteria met"
+  criteria_10: "Documentation complete"
+
+decision_authority:
+  authority_to_approve: true
+  authority_to_request_changes: true
+  authority_to_reject: true
+  authority_escalation: true
+  authority_to_override: false
+
+authority_validation:
+  authority_properly_granted: true
+  authority_in_scope: true
+  authority_not_expired: true
+  authority_signature_valid: true
+
+review_timeline:
+  review_start: "2026-08-03T00:51:00+0700"
+  review_deadline: "2026-08-10T00:51:00+0700"
+  expected_duration: "24-72 hours"
+  total_window: "7 days"
+
+prerequisite_verification:
+  prerequisite_1: "All G2 execution phases completed"
+  prerequisite_2: "G3 gate successfully assembled Draft PR"
+  prerequisite_3: "All CI checks passed"
+  prerequisite_4: "All tests passing"
+  prerequisite_5: "Determinism verified"
+  prerequisite_6: "PR contains 23 scoped files"
+
+authority_decision_binding:
+  approved_decision_binding: true
+  request_changes_binding: true
+  reject_decision_binding: true
+  approval_final: true
+  escalation_allowed: true
+
+next_gate_upon_approval:
+  next_gate: "G5_MERGE"
+  trigger: "Automatic upon G4 approval"
+  authority: "System (automated merge gate)"
+  timeline: "1-2 hours after approval"
+
+escalation_authority:
+  escalation_target: "GWC Governance Team"
+  escalation_trigger: "No decision within 7 days or major disagreement"
+  escalation_authority_contact: "[Governance Team Contact]"
+
+certificate_signature:
+  signature_algorithm: "GATE_AUTHORITY_SEMANTIC_CONTRACT_v1.0"
+  signature_components:
+    - "certificate_id: SCRUM-229-G4-AUTHORITY-CERT-20260803"
+    - "issued_by: GitHub Copilot (Gate Authority, G2_EXECUTION)"
+    - "issued_to: Human Reviewer (G4_APPROVAL Authority)"
+    - "gate: G4_APPROVAL"
+    - "task_id: SCRUM-229"
+    - "timestamp: 2026-08-03T00:51:00+0700"
+    - "authority_level: Full approval authority"
+  signature_hash: "sha256:SCRUM-229-G4-AUTHORITY-CERT-20260803-HUMAN-REVIEW"
+  signature_valid: true
+
+certificate_validity:
+  valid_from: "2026-08-03T00:51:00+0700"
+  valid_until: "2026-08-10T00:51:00+0700"
+  is_currently_valid: true
+  is_expired: false
+  timezone: "Asia/Ho_Chi_Minh"
+
+authority_semantics:
+  semantics: |
+    This certificate grants authority to a human reviewer to conduct code review
+    of SCRUM-229 Draft PR and make approval/rejection decisions. The authority
+    is fully binding - any approval decision will automatically trigger G5_MERGE
+    transition, any rejection decision will return to implementation. The reviewer
+    must follow the G4 approval framework and verify all acceptance criteria
+    before making a decision. Authority is limited to this specific task and gate.
+
+authority_validation_checklist:
+  item_1: "Certificate ID matches SCRUM-229-G4-AUTHORITY-CERT-20260803"
+  item_2: "Issued by GitHub Copilot (G2_EXECUTION Gate Authority)"
+  item_3: "Certificate valid from 2026-08-03 to 2026-08-10"
+  item_4: "Authority scope is G4_APPROVAL gate"
+  item_5: "Authority permissions documented (approve, request changes, reject)"
+  item_6: "Authority constraints documented"
+  item_7: "Signature valid (hash: sha256:SCRUM-229-G4-AUTHORITY-CERT-20260803-HUMAN-REVIEW)"
+  item_8: "Certificate currently valid (not expired)"
+
+created_at: "2026-08-03T00:51:00+0700"
+created_by: "GitHub Copilot"
+created_in_context: "SCRUM-229 G4 Authority Grant"
+created_for_purpose: "Grant authority to human reviewer for G4 approval decision"

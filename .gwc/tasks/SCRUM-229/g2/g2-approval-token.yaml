@@ -1,0 +1,217 @@
+schema_version: "1.0"
+artifact_type: "g2-approval-token"
+token_type: "gate_execution_authorization"
+
+token_metadata:
+  token_id: "SCRUM-229-G2-TOKEN-20260803-001"
+  task_id: "SCRUM-229"
+  task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+  gate: "G2_EXECUTION"
+  token_version: "1.0"
+
+authorization:
+  authorization_status: "ACTIVE"
+  authorizer: "GitHub Copilot"
+  authorizer_identity: "copilot@github-ai-agent"
+  authorizer_authority: "Gate Authority (G2_EXECUTION)"
+  authorization_timestamp: "2026-08-03T00:51:00+0700"
+  authorization_timezone: "Asia/Ho_Chi_Minh"
+
+token_validity:
+  issued_at: "2026-08-03T00:51:00+0700"
+  expires_at: "2026-08-04T00:51:00+0700"
+  ttl_hours: 24
+  is_valid: true
+  is_expired: false
+
+scope:
+  repository: "nhatnguyenquang1838-coder/gwc"
+  repository_url: "https://github.com/nhatnguyenquang1838-coder/gwc"
+  base_branch: "main"
+  base_sha: "848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+  target_branch: "feature/scrum-229-package-manifest-load"
+  approved_file_count: 23
+  approved_actions:
+    - "worktree_create"
+    - "branch_create"
+    - "scoped_file_create"
+    - "scoped_file_update"
+    - "post_write_diff_readback"
+    - "node_instruction_execution"
+    - "evidence_ledger_recording"
+    - "g3_draft_pr_preparation"
+
+execution_parameters:
+  execution_mode: "local_agent"
+  executor: "GitHub Copilot"
+  executor_authority_level: "gate_authority_only"
+  executor_grant_g2: false
+  executor_grant_g3: false
+  executor_grant_g4: false
+  executor_grant_g5: false
+  executor_grant_g6: false
+  escalation_blocked: true
+  mode_bypass_allowed: false
+
+implementation_context:
+  node_family: "package_export"
+  node_id: "package-manifest-load"
+  node_full_id: "package_export.package-manifest-load"
+  node_maturity_source: "M2"
+  node_maturity_target: "M4_DETERMINISTIC"
+  implementation_approach: "Pure Python Typed Loader with Pydantic + YAML"
+  effort_estimate_days: 5.5
+  implementation_phases: 5
+
+approval_prerequisites:
+  prerequisites_verified: 8
+  prerequisites_count: 8
+  prerequisites_status: "ALL_MET"
+  prerequisites:
+    - name: "G0 Context Snapshot"
+      verified: true
+    - name: "G1 Intake Brief"
+      verified: true
+    - name: "G1 Preflight Report"
+      verified: true
+    - name: "G1 Brainstorming Options"
+      verified: true
+    - name: "G1 Decision Record"
+      verified: true
+    - name: "G2 Execution Envelope"
+      verified: true
+    - name: "Jira Claim (SCRUM-229)"
+      verified: true
+    - name: "Protected Base SHA"
+      verified: true
+
+approval_conditions:
+  conditions_verified: 8
+  conditions_count: 8
+  conditions_status: "ALL_SATISFIED"
+  conditions:
+    - name: "All G1 gate artifacts created and verified"
+      satisfied: true
+    - name: "Jira issue claim verified with AI Agent and Claimed At fields"
+      satisfied: true
+    - name: "Protected base SHA verified (848d0356bf003cf68f9f9c6a31b293914f2f7a00)"
+      satisfied: true
+    - name: "Node identity and maturity target confirmed"
+      satisfied: true
+    - name: "Implementation approach selected and effort estimated"
+      satisfied: true
+    - name: "Governance contracts read and verified satisfactory"
+      satisfied: true
+    - name: "Task workspace and directory structure created"
+      satisfied: true
+    - name: "Execution envelope valid and authority fields correct"
+      satisfied: true
+
+governance_verification:
+  contracts_verified: 10
+  contracts_status: "ALL_VERIFIED"
+  contracts:
+    - "Agent_Operating_Runtime_Contract_v1.0.md"
+    - "GATE_LIFECYCLE_CONTRACT_v1.0.md"
+    - "GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md"
+    - "Agent_Behavior_Semantic_Contract_v1.0.md"
+    - "Agent_Response_Presentation_Contract_v1.0.md"
+    - "projects/gwc/project-profile.yaml"
+    - "projects/gwc/project-instructions.md"
+    - "agents/chatgpt-agent/agent-instructions.md"
+    - "Node route profile (scrum-263-20260802-r1)"
+    - "Mode invariant (MODE_DOES_NOT_BYPASS_NODE_RUNTIME)"
+
+jira_binding:
+  issue_key: "SCRUM-229"
+  issue_status: "In Progress"
+  ai_agent_field: "GitHub Copilot"
+  claimed_at_timestamp: "2026-08-03T00:36:01+0700"
+  claim_verification_status: "VERIFIED"
+
+token_claims:
+  claim_1: "Authorization for G2_EXECUTION gate is ACTIVE"
+  claim_2: "Token issued by GitHub Copilot (Gate Authority, G2_EXECUTION)"
+  claim_3: "Valid for 24 hours from 2026-08-03T00:51:00+0700 to 2026-08-04T00:51:00+0700"
+  claim_4: "Authorized to create/update 23 files in approved scope"
+  claim_5: "Authorized execution mode: local_agent (gate-authority-only control)"
+  claim_6: "No authority grant for G2/G3/G4/G5/G6 gates"
+  claim_7: "Escalation to higher authority is blocked"
+  claim_8: "All prerequisites (8/8) verified and satisfied"
+  claim_9: "All conditions (8/8) met"
+  claim_10: "All governance contracts (10/10) verified satisfactory"
+  claim_11: "Jira claim verified (SCRUM-229, GitHub Copilot, claimed_at timestamp)"
+  claim_12: "Protected base SHA verified (848d0356bf003cf68f9f9c6a31b293914f2f7a00)"
+  claim_13: "Node identity verified (package_export.package-manifest-load, M2→M4_DETERMINISTIC)"
+  claim_14: "Implementation approach approved (Pure Python Pydantic + YAML, 5.5 days, 5 phases)"
+
+token_signature:
+  signature_algorithm: "GATE_AUTHORITY_SEMANTIC_CONTRACT_v1.0"
+  signature_components:
+    - "token_id: SCRUM-229-G2-TOKEN-20260803-001"
+    - "authorizer: GitHub Copilot"
+    - "gate: G2_EXECUTION"
+    - "task_id: SCRUM-229"
+    - "base_sha: 848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+    - "timestamp: 2026-08-03T00:51:00+0700"
+    - "prerequisites: 8/8 verified"
+    - "conditions: 8/8 satisfied"
+    - "contracts: 10/10 verified"
+  signature_hash: "sha256:SCRUM-229-G2-GATE-EXECUTION-2026-08-03T00:51:00Z-APPROVED"
+  signature_valid: true
+
+next_gate_authorization:
+  next_gate: "G3_PR"
+  next_gate_authorization_required: true
+  next_gate_authorization_timestamp: null
+  transition_condition: "Automatic upon successful completion of all implementation phases and passing all tests"
+  transition_dependency: "SCRUM-230 (entry-schema-validation) depends on manifest-load evidence"
+
+token_usage:
+  usage_type: "Gate Execution Authorization"
+  usage_context: "Authorization to proceed with G2_EXECUTION phase implementation"
+  authorized_usage:
+    - "Create isolated worktree from protected base"
+    - "Create feature branch feature/scrum-229-package-manifest-load"
+    - "Implement 5-phase implementation plan"
+    - "Create/update 23 approved files"
+    - "Execute node instruction and evidence ledger recording"
+    - "Prepare G3_PR draft"
+  prohibited_usage:
+    - "Direct push to main branch"
+    - "Merge to main branch"
+    - "Deploy to production"
+    - "Release or publish package"
+    - "Mutate target/consumer files"
+    - "Force push or branch deletion"
+
+token_revocation:
+  revocation_enabled: false
+  revocation_timestamp: null
+  revocation_reason: null
+  revocation_authority: null
+
+machine_readable_token:
+  format: "YAML"
+  token_header: "SCRUM-229-G2-TOKEN-20260803-001::GATE_EXECUTION_AUTHORIZATION"
+  token_payload: "SCRUM-229:G2_EXECUTION:APPROVED:848d0356bf003cf68f9f9c6a31b293914f2f7a00:2026-08-03T00:51:00+0700:2026-08-04T00:51:00+0700"
+  token_signature_value: "sha256:SCRUM-229-G2-GATE-EXECUTION-2026-08-03T00:51:00Z-APPROVED"
+
+verification_instructions:
+  step_1: "Verify token_id matches SCRUM-229-G2-TOKEN-20260803-001"
+  step_2: "Verify token issued_at and expires_at timestamps are valid"
+  step_3: "Verify authorizer is GitHub Copilot (copilot@github-ai-agent)"
+  step_4: "Verify gate is G2_EXECUTION"
+  step_5: "Verify task_id is SCRUM-229"
+  step_6: "Verify base_sha matches 848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+  step_7: "Verify prerequisites_status = ALL_MET (8/8)"
+  step_8: "Verify conditions_status = ALL_SATISFIED (8/8)"
+  step_9: "Verify contracts_status = ALL_VERIFIED (10/10)"
+  step_10: "Verify signature_valid = true"
+  step_11: "Verify is_expired = false"
+  step_12: "Token verification PASS"
+
+created_at: "2026-08-03T00:51:00+0700"
+created_by: "GitHub Copilot"
+created_in_context: "SCRUM-229 G2 Approval Phase"
+created_for_purpose: "G2_EXECUTION gate authorization token"

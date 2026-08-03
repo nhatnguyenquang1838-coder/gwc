@@ -1,0 +1,29 @@
+approval_id: G5_SCRUM-206_20260802
+authority_gate: G5_DEPLOY
+task_id: SCRUM-206
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+merge_commit_sha: 8e68a0c5f8b94b93c025384e671c17feb7d67098
+pr_number: 189
+ci_status: pass
+ci_run_id: 30780657813
+manual_action_authorized: false
+action_type: read_only_status_verification
+authorized_actions:
+  - verify_post_merge_ci
+  - verify_deployment_status
+excluded_actions:
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+issued_at: 2026-08-03T03:18:33Z
+expires_at: 2026-08-04T03:18:33Z
+g5_status: BLOCKED
+g5_blocker: G4 workflow did not generate github-actions[bot] authority/proof comments because PR was merged manually before ready-for-review transition. G5-status verification requires trusted bot receipts on the merged PR.
+notes: >
+  The implementation and merge are complete and correct. Only the procedural
+  G5 evidence chain is incomplete due to manual merge bypassing the automated
+  G4 authority workflow.
