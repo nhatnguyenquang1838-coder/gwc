@@ -77,3 +77,13 @@ Runtime contracts extend the thin descriptors without turning projection state i
 - unknown deterministic derivation rules.
 
 The output is a closed `schema_version: "1.0"` artifact with deterministic ordering and a `sha256:` decision digest. Output `observed_at` and `decision_digest` are excluded from digest input; evidence timestamps remain semantic. Every authority grant remains fixed to `false`, while `read_only_projection` remains fixed to `true`.
+
+### Projection evidence linkset
+
+`build_projection_evidence_linkset(...)` consumes a schema-valid `projection-source-authority-decision` from SCRUM-223 and emits an immutable, deterministic `projection-evidence-linkset`. Every supporting link carries an exact ref, revision and `sha256:` content digest; a display URL is navigation-only and can never substitute for immutable evidence.
+
+The evaluator canonicalizes field paths and link ordering, collapses semantic duplicates, preserves explicit supersession history, and fails closed for blocked or mismatched source authority, missing immutable references, broken/stale/unverified evidence, digest conflicts, uncovered fields and expected-digest drift. It performs no connector call, URL fetch, filesystem read, persistence, target projection, approval, merge, deployment or production operation.
+
+| Descriptor | Runtime artifact | Schema | Evaluator | Maturity |
+|---|---|---|---|---|
+| `projection-evidence-linking.node.json` | `projection-evidence-linkset` | `schemas/projection-evidence-linkset.schema.json` | `tools/node_architect/projection_evidence_linking.py` | M4 deterministic |
