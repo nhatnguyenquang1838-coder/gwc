@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.local/schemas/projection-source-authority-decision.schema.json",
+  "title": "Projection Source Authority Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "projection_target",
+    "source_bindings",
+    "field_authority",
+    "outcome",
+    "authority_status",
+    "reason_code",
+    "reason_codes",
+    "observed_at",
+    "read_only_projection",
+    "write_authority_granted",
+    "approval_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "projection-source-authority-decision"},
+    "task_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]+-[1-9][0-9]*$"},
+    "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+    "projection_target": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,127}$"},
+    "source_bindings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/source_binding"}
+    },
+    "field_authority": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/field_authority"}
+    },
+    "outcome": {"enum": ["READY", "BLOCKED"]},
+    "authority_status": {"enum": ["CONFIRMED", "REJECTED"]},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/reason_code"}
+    },
+    "observed_at": {"type": "string", "format": "date-time"},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "approval_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "revision": {"type": "string", "minLength": 7, "maxLength": 200, "pattern": "^[A-Za-z0-9._:/@+\\-]+$"},
+    "ref": {"type": "string", "minLength": 1, "maxLength": 512},
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_type", "authority_class", "ref", "revision", "content_digest", "observed_at", "status"],
+      "properties": {
+        "source_type": {"enum": ["REPOSITORY", "GATE_ARTIFACT", "TASK_RECORD", "PULL_REQUEST", "CI_RUN", "AUDIT_EVENT"]},
+        "authority_class": {"enum": ["CANONICAL", "PROJECTION", "ADVISORY"]},
+        "ref": {"$ref": "#/$defs/ref"},
+        "revision": {"$ref": "#/$defs/revision"},
+        "content_digest": {"$ref": "#/$defs/digest"},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "status": {"enum": ["VERIFIED", "STALE", "MISSING", "AMBIGUOUS", "CONFLICT"]}
+      }
+    },
+    "field_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field_path", "source_ref", "source_revision", "evidence_digest", "derivation"],
+      "properties": {
+        "field_path": {"type": "string", "minLength": 1, "maxLength": 256},
+        "source_ref": {"$ref": "#/$defs/ref"},
+        "source_revision": {"$ref": "#/$defs/revision"},
+        "evidence_digest": {"$ref": "#/$defs/digest"},
+        "derivation": {"enum": ["DIRECT", "DETERMINISTIC_DERIVATION"]},
+        "derivation_rule_id": {"type": "string", "minLength": 1, "maxLength": 128}
+      }
+    },
+    "reason_code": {
+      "enum": [
+        "PROJECTION_SOURCE_AUTHORITY_CONFIRMED",
+        "PROJECTION_SOURCE_INPUT_INVALID",
+        "PROJECTION_SOURCE_FIELDS_EMPTY",
+        "PROJECTION_SOURCE_CANONICAL_MISSING",
+        "PROJECTION_SOURCE_AUTHORITY_INVALID",
+        "PROJECTION_SOURCE_FIELD_UNBOUND",
+        "PROJECTION_SOURCE_CONFLICT",
+        "PROJECTION_SOURCE_DIGEST_MISMATCH",
+        "PROJECTION_SOURCE_REVISION_DRIFT",
+        "PROJECTION_SOURCE_STALE",
+        "PROJECTION_SOURCE_DERIVATION_UNVERIFIED",
+        "PROJECTION_SOURCE_INFERRED_STATUS_REJECTED"
+      ]
+    }
+  }
+}
