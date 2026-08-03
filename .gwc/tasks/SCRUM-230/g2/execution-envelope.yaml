@@ -1,0 +1,46 @@
+approval_id: CP-20260803-230-G2R
+authority_gate: G2_EXECUTION
+task_id: SCRUM-230
+subtasks: []
+issued_at: '2026-08-03T20:00:00Z'
+expires_at: '2026-08-04T20:00:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d9a89a002aae4348359cd88810a9d03926199597
+working_branch: hermes/scrum-230-entry-schema-validation-m4-20260803
+modules_or_files:
+- tools/node_architect/package_export
+- schemas/node-architect/package-export
+- tests/test_package_export_entry_schema_validation.py
+- tests/package_export
+- .gwc/tasks/SCRUM-230/**
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- merge_approved_pr
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+scope_hash: sha256:45a5107c469909a3c22fac18824dfa754a3c6a1c4b2b2a67ab72aadba3c520ae
+scope_hash_16: 45a5107c469909a3
+approval_command: APPROVE G2_EXECUTION CP-20260803-230-G2R 45a5107c469909a3 2026-08-04T20:00:00Z
+supersedes: CP-20260803-230-G2
+supersede_reason: >-
+  Scope extended to include tests/package_export fixture organization ported
+  from PR #199 (fixture layout only; the #199 evaluator and entry-schema-v1
+  vocabulary are intentionally NOT ported because the #198 evaluator already
+  emits one inventory record per duplicate entry id, which #199 regresses).
