@@ -1,297 +1,175 @@
 schema_version: '1.1'
 artifact_type: g1-preflight-report
-generated_at: '2026-08-03T01:46:00Z'
+generated_at: '2026-08-02T16:00:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-208
-  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
   profile_path: projects/gwc/project-profile.yaml
   connector: GitHub
 checks:
-- id: REPO_IDENTITY
+- id: G0_CONTEXT_READY
   status: PASS
-  code: REPOSITORY_VERIFIED
-  message: Repository identity and base evidence are verified.
+  code: G0_READY
+  message: G0 context snapshot is READY
   evidence:
-  - nhatnguyenquang1838-coder/gwc@c28d0956b36f2894e369a24dfc245601bc628340
+  - Schema validation passed
+  - status READY
+  - No blockers
+- id: G1_INTAKE_READY
+  status: PASS
+  code: G1_READY
+  message: G1 intake brief is READY
+  evidence:
+  - Schema validation passed
+  - scope.in_scope has entries
+  - scope.non_goals has entries
+  - acceptance_criteria has entries
+  - unresolved_questions empty
+- id: REQUIRED_SOURCES_AVAILABLE
+  status: PASS
+  code: SOURCES_OK
+  message: All required governance sources are available
+  evidence:
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
   - projects/gwc/project-profile.yaml
-- id: REQUIRED_SOURCES
+- id: RISK_CLASS_VALIDATED
   status: PASS
-  code: REQUIRED_SOURCES_AVAILABLE
-  message: All required sources are available.
+  code: RISK_R2
+  message: Risk class R2 validated
   evidence:
-  - AGENTS.md
-  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
-  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
-  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
-  - tools/node_architect/checkpoint_store.py
-  - tools/node_architect/lease_renewal.py
-- id: EXECUTION_MODE_COMPATIBILITY
+  - Task setup with no code implementation
+  - No repository mutation
+- id: HUMAN_DIRECTION_NOT_REQUIRED
   status: PASS
-  code: EXECUTION_MODE_SUPPORTED
-  message: The selected runtime profile supports the current execution mode.
+  code: HUMAN_OK
+  message: Human direction not required for bounded task setup
   evidence:
-  - governance/agent-runtime-profiles/chatgpt.yaml
-  - execution_mode=chat_connector_only
-- id: SELECTED_CONNECTOR
+  - No architecture change
+  - No security boundary change
+  - No production configuration
+  - No credentials or secrets
+  - No destructive or irreversible actions
+- id: NEXT_GATE_IDENTIFIED
   status: PASS
-  code: SELECTED_CONNECTOR_AVAILABLE
-  message: The selected connector has AVAILABLE evidence.
+  code: G2_REQUIRED
+  message: G2_EXECUTION is the required next gate
   evidence:
-  - GitHub
-- id: BOOTSTRAP_BEHAVIOR_CONTRACTS
-  status: PASS
-  code: BEHAVIOR_CONTRACTS_AVAILABLE
-  message: Required behavior and presentation contracts are available.
-  evidence: &id002
-  - core/node-architect/INSTRUCTION_CONTRACT_v1.0.md
-  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
-- id: DELIVERY_LIFECYCLE_SCOPE
-  status: PASS
-  code: NON_MERGE_DELIVERY_SCOPE_EXPLICIT
-  message: G1 anticipates guarded delivery through G3 without granting G4 authority.
-  evidence:
-  - create_guarded_branch
-  - modify_scoped_files
-  - run_sandboxed_validation
-  - push_working_branch
-  - open_or_update_draft_pr
-  - monitor_ci
-  - repair_repository_fixable_ci
-  - independent_g3_review
-  - mark_pr_ready_for_review_after_g3_pass
-- id: IMPLEMENTATION_PLAN_HANDOFF
-  status: PASS
-  code: IMPLEMENTATION_PLAN_VALIDATED
-  message: Implementation-plan routing and validation evidence are complete.
-  evidence:
-  - sha256:a7ab5d4bf84f873650a9883a171ff08a2f71ff629b72a955a19da0b810ce0330
-- id: TASK_TRACEABILITY
-  status: PASS
-  code: DS_ADMIN_TASK_CLAIMED
-  message: The bounded change has a claimed work-tracking task.
-  evidence:
-  - SCRUM-208
-- id: INTAKE_COMPLETENESS
-  status: PASS
-  code: G1_INTAKE_READY
-  message: Problem, scope, non-goals, and verifiable acceptance criteria are complete.
-  evidence:
-  - g1/intake/g1-intake-brief.yaml
-- id: RISK_GATE
-  status: PASS
-  code: HUMAN_DIRECTION_CONFIRMED
-  message: Required human direction is recorded for the high-risk class.
-  evidence:
-  - risk_class=R2
-- id: PROCESS_READBACK
-  status: PASS
-  code: PROCESS_READBACK_COMPLETE
-  message: The governing process and requested terminal outcome were read back.
-  evidence: &id001
-  - AGENTS.md
-  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
-  - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
-  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
-- id: EXECUTION_FEASIBILITY
-  status: PASS
-  code: END_TO_END_ROUTE_EXECUTABLE
-  message: Every mandatory route step is executable.
-  evidence:
-  - STEP-01
-  - STEP-02
-  - STEP-10
-  - STEP-03
-  - STEP-04
-  - STEP-05
-  - STEP-06
-  - STEP-07
-  - STEP-08
-  - STEP-09
+  - G2 envelope generation required
+  - G3 not applicable yet
 process_readback:
-  process_id: governed-repository-delivery
-  terminal_outcome: Deliver runtime_checkpoint.cas-write-guard at M5_REPLAY_SAFE on
-    a guarded branch with exact-head validation evidence.
-  required_sources: *id001
+  process_id: g01-validation
+  terminal_outcome: VALIDATION_COMPLETE
+  required_sources:
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - projects/gwc/project-profile.yaml
   status: VERIFIED
 execution_feasibility:
   outcome: EXECUTABLE
   route_steps:
-  - id: STEP-01
-    name: protected-base-and-process-readback
-    gate: G1_ALIGNMENT
+  - id: STEP-001
+    name: G0 Context Capture
+    gate: G0_CONTEXT
     actor: agent
-    action_class: read
+    action_class: read_only
     capability_required: repository_read
     capability_status: VERIFIED
-    primary_route: GitHub
-    fallback_routes:
-    - local_agent
-    continuation: immediate
-    expected_evidence: protected base SHA and required process sources
-    bypass_eligibility: FORBIDDEN
-  - id: STEP-02
-    name: formal-g01-artifact-generation-and-validation
-    gate: G1_ALIGNMENT
-    actor: agent
-    action_class: local_validation
-    capability_required: python_jsonschema_validator
-    capability_status: VERIFIED
-    primary_route: tools/generate_g01_runtime.py + tools/validate_g01.py
-    fallback_routes:
-    - trusted local agent
-    - repo CI
-    continuation: immediate
-    expected_evidence: schema validation and validate_g01 exit code
-    bypass_eligibility: FORBIDDEN
-  - id: STEP-10
-    name: implementation-plan-discovery-validation-and-handoff
-    gate: G1_ALIGNMENT
-    actor: agent
-    action_class: planning_and_validation
-    capability_required: task_me_or_kiro_plan
-    capability_status: VERIFIED
-    primary_route: generated_kiro
-    fallback_routes:
-    - existing Kiro plan
-    - Task Me
-    - generated Kiro plan
-    continuation: bind the exact plan revision and return to G1 on drift
-    expected_evidence: sha256:a7ab5d4bf84f873650a9883a171ff08a2f71ff629b72a955a19da0b810ce0330
-    bypass_eligibility: FORBIDDEN
-  - id: STEP-03
-    name: guarded-branch-creation
-    gate: G2_EXECUTION
-    actor: agent_or_human
-    action_class: repository_write
-    capability_required: guarded_branch_create
-    capability_status: VERIFIED
-    primary_route: GitHub
-    fallback_routes:
-    - human manual UI action
-    continuation: checkpoint before side effect and readback after
-    expected_evidence: branch ref equals approved base SHA
-    bypass_eligibility: OPERATIONAL_ONLY
-  - id: STEP-04
-    name: scoped-file-write-and-validation
-    gate: G2_EXECUTION
-    actor: agent
-    action_class: repository_write
-    capability_required: guarded_file_write_and_validation
-    capability_status: VERIFIED
-    primary_route: GitHub
-    fallback_routes:
-    - trusted local agent
-    continuation: checkpoint, exact diff readback, and validator run
-    expected_evidence: approved changed paths and validation results
-    bypass_eligibility: FORBIDDEN
-  - id: STEP-05
-    name: draft-pr-delivery
-    gate: G3_PR
-    actor: agent_or_human
-    action_class: repository_metadata_write
-    capability_required: draft_pr_create_or_update
-    capability_status: VERIFIED
-    primary_route: GitHub
-    fallback_routes:
-    - human manual UI action
-    continuation: checkpoint before human wait and readback after
-    expected_evidence: PR number URL and exact head SHA
-    bypass_eligibility: OPERATIONAL_ONLY
-  - id: STEP-06
-    name: exact-head-ci-continuation
-    gate: G3_PR
-    actor: agent_or_human
-    action_class: async_read_and_bounded_repair
-    capability_required: ci_status_and_continuation
-    capability_status: VERIFIED
-    primary_route: CI callback or scheduled continuation
-    fallback_routes:
-    - local poll
-    - manual checkpoint
-    continuation: required until terminal exact-head CI state
-    expected_evidence: required checks for current head and next continuation
-    bypass_eligibility: MANUAL_CHECKPOINT_ONLY
-  - id: STEP-07
-    name: independent-g3-review
-    gate: G3_PR
-    actor: agent
-    action_class: read_only_review
-    capability_required: independent_review_bundle
-    capability_status: VERIFIED
-    primary_route: Context7-compatible review bundle
-    fallback_routes:
-    - offline pinned G3 skill library
-    continuation: review exact current head and return required changes to G2
-    expected_evidence: seven review lanes and acceptance-criteria closure for exact
-      head
-    bypass_eligibility: FORBIDDEN
-  - id: STEP-08
-    name: ready-for-review-promotion
-    gate: G3_PR
-    actor: agent_or_human
-    action_class: repository_metadata_write
-    capability_required: mark_pr_ready_for_review
-    capability_status: VERIFIED
-    primary_route: GitHub
-    fallback_routes:
-    - human manual UI action
-    continuation: checkpoint before action and exact PR-state readback after
-    expected_evidence: PR is ready, head SHA unchanged, G3 PASS remains current
-    bypass_eligibility: OPERATIONAL_ONLY
-  - id: STEP-09
-    name: merge
-    gate: G4_MERGE
-    actor: human_authorized_agent
-    action_class: protected_action
-    capability_required: exact_g4_authority
-    capability_status: SEPARATE_GATE
-    primary_route: exact G4 approval then guarded merge
+    primary_route: Local agent with trusted checkout
     fallback_routes: []
-    continuation: stop at human authority boundary
-    expected_evidence: exact PR head and merge commit
+    continuation: g1_intake
+    expected_evidence: g0/context-snapshot.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-002
+    name: G1 Intake and Options
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_only
+    capability_required: g1_analysis
+    capability_status: VERIFIED
+    primary_route: Local agent with G1 artifacts
+    fallback_routes: []
+    continuation: g1_preflight
+    expected_evidence: g1/intake/g1-intake-brief.yaml, g1/brainstorming/g1-options.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-003
+    name: G1 Preflight Validation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_only
+    capability_required: g1_validation
+    capability_status: VERIFIED
+    primary_route: Local agent with validator
+    fallback_routes: []
+    continuation: g1_decision
+    expected_evidence: g1/preflight/g1-preflight-report.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-004
+    name: G1 Decision Capture
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_only
+    capability_required: g1_decision
+    capability_status: VERIFIED
+    primary_route: Local agent with decision record
+    fallback_routes: []
+    continuation: g2_envelope
+    expected_evidence: g1/decision/g1-decision-record.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-005
+    name: G2 Execution Envelope Generation
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: read_only
+    capability_required: g2_envelope
+    capability_status: SEPARATE_GATE
+    primary_route: Local agent with envelope template
+    fallback_routes: []
+    continuation: g2_approval
+    expected_evidence: g2/execution-envelope.yaml
     bypass_eligibility: FORBIDDEN
   continuation_coverage: COMPLETE
   human_bypass_required: false
+implementation_plan:
+  applicability: not_applicable
+  reason: G0/G1 task setup does not require full implementation plan
+  source: plan_not_applicable
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-208
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  plan_root: null
+  requirements_path: null
+  design_path: null
+  tasks_path: null
+  plan_revision: null
+  validation_status: NOT_APPLICABLE
+  validation_evidence: null
+  generated_by: kiro-ai-agent
+  generated_at_utc: '2026-08-02T16:00:00Z'
+risk_class: R2
+required_gate: G2_AUTOMATIC_BOUNDED
 runtime_context:
-  agent_runtime_id: chatgpt
-  execution_mode: chat_connector_only
+  agent_runtime_id: kiro-ai-agent
+  execution_mode: local_agent
   selected_profile:
-    id: chatgpt
-    path: governance/agent-runtime-profiles/chatgpt.yaml
+    id: gwc
+    path: projects/gwc/project-profile.yaml
   selected_connector: GitHub
   connector_priority:
   - GitHub
-  - local_agent
-  required_behavior_contracts: *id002
-risk_class: R2
-required_gate: G2_HUMAN_DIRECTION
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
 blockers: []
 outcome: PASS
-implementation_plan:
-  applicability: required
-  reason: SCRUM-208 changes runtime behavior and requires a validated Kiro implementation
-    plan.
-  source: generated_kiro
-  task_me_applicable: true
-  task_me_available: false
-  task_me_invoked: false
-  task_me_fallback_reason: Task Me connector is not available in this chat surface;
-    a task-scoped Kiro plan was generated and validated locally.
-  canonical_task_uid: SCRUM-208
-  repository: nhatnguyenquang1838-coder/gwc
-  protected_base_sha: c28d0956b36f2894e369a24dfc245601bc628340
-  plan_root: .kiro/specs/scrum-208-cas-write-guard-m5
-  requirements_path: .kiro/specs/scrum-208-cas-write-guard-m5/requirements.md
-  design_path: .kiro/specs/scrum-208-cas-write-guard-m5/design.md
-  tasks_path: .kiro/specs/scrum-208-cas-write-guard-m5/tasks.md
-  plan_revision: sha256:a7ab5d4bf84f873650a9883a171ff08a2f71ff629b72a955a19da0b810ce0330
-  validation_status: PASS
-  validation_evidence: validation/r4-execution/plan-validation.txt
-  generated_by: ChatGPT
-  generated_at_utc: '2026-08-03T01:46:00Z'

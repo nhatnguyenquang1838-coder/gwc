@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-repair-validation-manifest",
+  "task_id": "SCRUM-208",
+  "validated_patch_source": "g2-repair-r1/repo-overlay",
+  "validation_evidence": {
+    "focused_tests": "g2-repair-r1/validation/focused-tests.txt",
+    "repository_overlay_tests": "g2-repair-r1/validation/full-unittest.txt",
+    "runtime_checkpoint_catalog": "g2-repair-r1/validation/runtime-checkpoint-catalog.txt",
+    "g0_g1_validator": "g2-repair-r1/validation/g01.txt",
+    "compile_schema": "g2-repair-r1/validation/compile-schema.txt",
+    "adversarial_proof": "g2-repair-r1/validation/adversarial-proof.txt",
+    "static_readback": "g2-repair-r1/validation/static-readback.json"
+  },
+  "results": {
+    "focused": "PASS_26_OF_26",
+    "repository_overlay": "PASS_59_OF_59",
+    "catalog": "PASS",
+    "governance": "PASS",
+    "schema_compile": "PASS",
+    "adversarial_proof": "PASS_REJECTED_ORIGINAL_REV_1_EXPLOIT",
+    "static": "PASS_12_APPROVED_OVERLAY_PATHS"
+  },
+  "status": "PASS"
+}

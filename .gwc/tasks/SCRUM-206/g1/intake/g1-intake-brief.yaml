@@ -1,0 +1,79 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-02T23:28:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-206
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: runtime_checkpoint.lease-acquisition currently exists only as a node descriptor and registry slot. There is no deterministic implementation, no decision schema, and no tests for competing-agent lease acquisition. Without this node, the runtime checkpoint family cannot enforce bounded work leases or monotonic fencing tokens before guarded branch or checkpoint state mutation.
+  why_now: Sibling nodes checkpoint-capture and checkpoint-persist are already at M5; lease-acquisition is the remaining missing piece in the runtime_checkpoint family required for bounded G2 execution safety.
+desired_outcome: Deliver a deterministic lease-acquisition decision utility that evaluates competing-lease evidence, rejects stale or mismatched-scope leases, and emits a monotonic fencing token when acquisition is allowed.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+    - GWC runtime checkpoint family
+    - DWC bounded execution path
+    - failure_recovery lease-expiry-recovery node
+scope:
+  in_scope:
+    - tools/node_architect/lease_acquisition.py pure decision utility
+    - schemas/lease-acquisition-decision.schema.json
+    - tests/test_lease_acquisition.py
+    - .gwc/tasks/SCRUM-206 gate artifacts
+    - releases/changelog.d/2026-08-02-scrum-206-lease-acquisition-m5.md
+  non_goals:
+    - merge, auto_merge, deploy, release, runtime reload
+    - production data / configuration / credentials / secrets / migration
+    - runtime engine / scheduler / worker implementation
+    - new lease store or external connector implementation
+    - all-81 node catalog implementation
+constraints:
+  - deterministic digest for identical input
+  - fail-closed on missing/ambiguous binding or unknown gate
+  - no I/O side effects; pure decision function
+  - replay equivalence ignores observed_at
+assumptions:
+  - checkpoint_store.py remains the persistence layer for lease state
+  - observed lease evidence is supplied by the runtime gate-action router
+  - fencing tokens are monotonic integers scoped to task/run/node
+risks:
+  - id: RISK-1
+    description: Binding ambiguity could allow lease advancement under wrong task/scope.
+    impact: high
+    mitigation: Fail closed on any missing or malformed binding field and validate gate identity.
+  - id: RISK-2
+    description: Non-monotonic fencing tokens could allow stale worker advancement.
+    impact: high
+    mitigation: Emit observed_fencing_token + 1 for every ACQUIRED outcome; reject acquisition when actor token is stale.
+acceptance_criteria:
+  - id: AC-1
+    statement: Unit tests cover competing-agent acquisition, stale owner, expired lease, scope mismatch, crash during acquisition, and fencing monotonicity.
+    verifiable: true
+  - id: AC-2
+    statement: No production data, no deployment authority, no external scheduler implementation.
+    verifiable: true
+  - id: AC-3
+    statement: Exact-head CI is green before claiming M5.
+    verifiable: true
+unresolved_questions: []
+status: READY
+delivery_lifecycle:
+  authorized_actions:
+    - materialize_task_scoped_G0_G1_G2
+    - write_only_approved_modules
+    - run_scoped_validators_and_tests
+    - commit_and_push_guarded_branch
+    - open_or_update_draft_pr
+  downstream_non_goals:
+    - merge_or_auto_merge
+    - deploy_release_publish_or_runtime_reload
+    - production_configuration_data_secret_credential_or_migration
+    - force_push_branch_delete_history_rewrite_or_pr_base_change
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+      - g3/delivery-record.yaml
+      - required CI checks for exact head SHA

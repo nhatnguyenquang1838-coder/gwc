@@ -58,7 +58,14 @@ class CheckpointConflict(RuntimeError):
 
 
 def empty_store() -> dict[str, Any]:
-    return {"schema_version": "1.0", "artifact_type": "runtime-checkpoint-store", "revision": 0, "events": [], "checkpoints": {}, "effects": {}}
+    return {
+        "schema_version": "1.0",
+        "artifact_type": "runtime-checkpoint-store",
+        "revision": 0,
+        "events": [],
+        "checkpoints": {},
+        "effects": {},
+    }
 
 
 def load_store(path: Path) -> dict[str, Any]:
@@ -86,32 +93,124 @@ def checkpoint_key(task_id: str, run_id: str, node_id: str) -> str:
     return f"{task_id}:{run_id}:{node_id}"
 
 
-def evaluate_checkpoint_guard(store: Mapping[str, Any], item: CheckpointInput) -> dict[str, Any] | None:
-    """Evaluate strict CAS context, returning None for legacy callers."""
+def _item_binding(item: CheckpointInput) -> dict[str, Any]:
+    return {
+        "task_id": item.task_id,
+        "repository": item.repository,
+        "branch": item.branch,
+        "base_sha": item.base_sha,
+        "scope_hash": item.scope_hash,
+    }
+
+
+def _authoritative_store_binding(store: Mapping[str, Any], item: CheckpointInput) -> tuple[dict[str, Any], list[str]]:
+    binding = store.get("binding")
+    if isinstance(binding, Mapping):
+        return dict(binding), []
+
+    checkpoint_bindings: set[str] = set()
+    binding_payloads: dict[str, dict[str, Any]] = {}
+    checkpoints = store.get("checkpoints", {})
+    if isinstance(checkpoints, Mapping):
+        for record in checkpoints.values():
+            if not isinstance(record, Mapping):
+                continue
+            candidate = {field: record.get(field) for field in ("task_id", "repository", "branch", "base_sha", "scope_hash")}
+            if all(isinstance(value, str) and value for value in candidate.values()):
+                rendered = canonical_json(candidate)
+                checkpoint_bindings.add(rendered)
+                binding_payloads[rendered] = candidate
+    if len(checkpoint_bindings) == 1:
+        rendered = next(iter(checkpoint_bindings))
+        return binding_payloads[rendered], []
+    if len(checkpoint_bindings) > 1:
+        return _item_binding(item), ["STORE_BINDING_AMBIGUOUS"]
+    return _item_binding(item), []
+
+
+def _prepare_cas_context(store: Mapping[str, Any], item: CheckpointInput) -> dict[str, Any] | None:
     if item.cas_context is None:
         return None
     if not isinstance(item.cas_context, Mapping):
         raise CheckpointConflict("INVALID_INPUT cas_context must be an object")
-    context = dict(item.cas_context)
-    context.setdefault("task_id", item.task_id)
-    context.setdefault("repository", item.repository)
-    context.setdefault("branch", item.branch)
-    context.setdefault("base_sha", item.base_sha)
-    context.setdefault("scope_hash", item.scope_hash)
-    context.setdefault("expected_revision", item.expected_revision)
+
+    supplied = dict(item.cas_context)
+    context = dict(supplied)
+    errors: list[str] = []
+    canonical_expected = {
+        "task_id": item.task_id,
+        "repository": item.repository,
+        "branch": item.branch,
+        "base_sha": item.base_sha,
+        "scope_hash": item.scope_hash,
+        "expected_revision": item.expected_revision,
+        "lease_token": item.lease_id,
+        "fencing_token": item.fencing_token,
+        "checkpoint_key": checkpoint_key(item.task_id, item.run_id, item.node_id),
+        "run_id": item.run_id,
+        "checkpoint_node_id": item.node_id,
+    }
+    for field, expected in canonical_expected.items():
+        if expected is None:
+            continue
+        if field in supplied and supplied[field] != expected:
+            errors.append(f"CONTEXT_ITEM_CONFLICT:{field}")
+        context[field] = expected
+
+    authoritative, store_errors = _authoritative_store_binding(store, item)
+    errors.extend(store_errors)
+    observed_fields = {
+        "observed_task_id": authoritative["task_id"],
+        "observed_repository": authoritative["repository"],
+        "observed_branch": authoritative["branch"],
+        "observed_base_sha": authoritative["base_sha"],
+        "observed_scope_hash": authoritative["scope_hash"],
+    }
+    for field, observed in observed_fields.items():
+        if field in supplied and supplied[field] != observed:
+            errors.append(f"CONTEXT_OBSERVED_BINDING_CONFLICT:{field}")
+        context[field] = observed
+
     context["observed_revision"] = int(store.get("revision", 0))
     context["latest_observed_state"] = {
         "revision": int(store.get("revision", 0)),
+        "binding": authoritative,
         "checkpoints": store.get("checkpoints", {}),
         "store_digest": store.get("store_digest"),
     }
     context["committed_effects"] = store.get("effects", {})
-    return evaluate_cas_write(context)
+    context["precondition_errors"] = sorted(set(errors))
+    return context
+
+
+def evaluate_checkpoint_guard(store: Mapping[str, Any], item: CheckpointInput) -> dict[str, Any] | None:
+    """Evaluate strict CAS context, returning None for legacy callers."""
+    context = _prepare_cas_context(store, item)
+    return None if context is None else evaluate_cas_write(context)
+
+
+def _effect_binding(item: CheckpointInput, context: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "task_id": item.task_id,
+        "repository": item.repository,
+        "branch": item.branch,
+        "base_sha": item.base_sha,
+        "scope_hash": item.scope_hash,
+        "checkpoint_key": checkpoint_key(item.task_id, item.run_id, item.node_id),
+        "run_id": item.run_id,
+        "checkpoint_node_id": item.node_id,
+        "lease_owner": context["lease_owner"],
+        "lease_token": context["lease_token"],
+        "fencing_token": context["fencing_token"],
+        "idempotency_key": context["idempotency_key"],
+        "expected_revision": item.expected_revision,
+    }
 
 
 def persist_checkpoint(store: dict[str, Any], item: CheckpointInput, *, committed_at: str | None = None) -> dict[str, Any]:
     current_revision = int(store.get("revision", 0))
-    decision = evaluate_checkpoint_guard(store, item)
+    context = _prepare_cas_context(store, item)
+    decision = None if context is None else evaluate_cas_write(context)
     if decision is not None:
         if decision["outcome"] == "DUPLICATE_EFFECT_REPLAYED":
             return store
@@ -152,13 +251,23 @@ def persist_checkpoint(store: dict[str, Any], item: CheckpointInput, *, committe
     store["revision"] = next_revision
     store.setdefault("events", []).append(event)
     store.setdefault("checkpoints", {})[key] = record
-    if decision is not None:
+    if decision is not None and context is not None:
+        store.setdefault("binding", _item_binding(item))
         store.setdefault("effects", {})[decision["idempotency_key"]] = {
-            "checkpoint_key": key, "revision": next_revision,
-            "state_digest": state_digest, "cas_decision_digest": decision["decision_digest"],
+            "binding": _effect_binding(item, context),
+            "checkpoint_key": key,
+            "revision": next_revision,
+            "state_digest": state_digest,
+            "cas_decision_digest": decision["decision_digest"],
             "committed_at": committed_at,
         }
-    store["store_digest"] = digest_payload({"revision": store["revision"], "events": store["events"], "checkpoints": store["checkpoints"], "effects": store.get("effects", {})})
+    store["store_digest"] = digest_payload({
+        "revision": store["revision"],
+        "binding": store.get("binding"),
+        "events": store["events"],
+        "checkpoints": store["checkpoints"],
+        "effects": store.get("effects", {}),
+    })
     return store
 
 

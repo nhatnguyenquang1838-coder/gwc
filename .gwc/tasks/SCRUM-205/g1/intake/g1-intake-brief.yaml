@@ -1,0 +1,44 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-08-02T15:58:00Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-205
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  g0_snapshot: "../../g0/context-snapshot.yaml"
+problem:
+  statement: "Current resume-token-validation is thin metadata (M2). An interrupted worker with a stale or drifted resume token could resume execution with mismatched task, scope, base, head, or approval context, leading to unsafe advancement."
+  why_now: "To enable replay-safe operations and secure continuation of G2 execution after interruption or handoff."
+desired_outcome: "A secure, robust, and deterministic resume token validation implementation with full test coverage."
+stakeholders:
+  requester: "Nhat Nguyen Quang"
+  affected:
+    - "ChatGPT"
+    - "Hermes"
+    - "Kilo"
+scope:
+  in_scope:
+    - "Implement deterministic validate_resume_token function"
+    - "Ensure robust test coverage of drift, tamper, mismatch, and expiration checks"
+    - "Never grant G2/G3/G4/G5/G6 authority inside the node"
+  non_goals:
+    - "Full scheduler or worker implementation"
+    - "Production database writes"
+    - "Bypassing G4/G5/G6 approvals"
+constraints:
+  - "Must use stdlib-only validation logic"
+  - "Must always return authority_granted=false"
+assumptions:
+  - "Checkpoint data structure matches checkpoint.schema.json"
+risks:
+  - id: RISK-01
+    description: "Scope creep or drift during implementation"
+    impact: low
+    mitigation: "Strictly adhere to the authorized modules list"
+acceptance_criteria:
+  - id: AC-01
+    statement: "Tests cover valid resume, expiry, tamper, task/scope mismatch, base/head drift, missing checkpoint, and stale approval."
+    verifiable: true
+unresolved_questions: []
+status: READY

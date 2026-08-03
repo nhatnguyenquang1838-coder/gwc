@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-02T23:28:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-206
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Pure decision utility with fail-closed binding and monotonic fencing token
+    description: Implement lease_acquisition.py as a deterministic pure function that evaluates competing-lease evidence and returns a monotonic fencing token when acquisition is allowed.
+    benefits:
+      - Matches existing checkpoint family pattern
+      - Replay-safe and deterministic
+      - No external I/O or new connector surface
+    tradeoffs:
+      - Evaluation-only slice
+      - Callers must persist lease state through checkpoint_store.py
+    risks:
+      - Scope creep into persistence layer
+    constraint_fit: FIT
+  - id: OPT-2
+    title: Lease acquisition module that also mutates persistent lease store
+    description: Implement lease_acquisition.py with embedded lease store mutation and external connector support.
+    benefits:
+      - Self-contained acquisition and persistence
+    tradeoffs:
+      - Widens scope beyond G2 acquisition contract
+      - Introduces new store/connector surface
+    risks:
+      - Replay safety weakened
+      - Authority boundary expansion
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 preserves the bounded M5 slice, matches sibling node patterns, and keeps persistence responsibility with checkpoint_store.py.
+decision_required: true
+status: READY

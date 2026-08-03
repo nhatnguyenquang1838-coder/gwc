@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-repair-reconciliation-approval-receipt",
+  "task_id": "SCRUM-208",
+  "authority_gate": "G2_EXECUTION",
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_G3_REPAIR_R3_20260803",
+  "scope_hash": "sha256:634145af2c3d5207f8f3d8f4219ee9074add2c226921320957693cb0c140af9f",
+  "scope_prefix": "634145af2c3d5207",
+  "received_at": "2026-08-03T03:59:00Z",
+  "expires_at": "2026-08-03T13:30:00Z",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "protected_base_sha": "f9b04561437eaebd2c2711999b622029468c3551",
+  "working_branch": "codex/scrum-208-cas-write-guard-m5-20260802",
+  "expected_head_sha": "09bf4610030e155dc485e2e19f9be525a59f6412",
+  "pull_request": 193,
+  "source_review_id": 4840496693,
+  "source_findings": ["REV-1", "REV-2"],
+  "commit_strategy": "non_force_two_parent_reconciliation_commit",
+  "parent_order": [
+    "09bf4610030e155dc485e2e19f9be525a59f6412",
+    "f9b04561437eaebd2c2711999b622029468c3551"
+  ],
+  "status": "CONSUMED"
+}

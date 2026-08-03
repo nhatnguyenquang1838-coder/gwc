@@ -1,42 +1,69 @@
 schema_version: '1.0'
 artifact_type: g1-options
-generated_at: '2026-08-03T01:46:30Z'
+generated_at: '2026-08-02T16:00:00Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-208
-  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
-  title: Extend checkpoint_store with a pure typed CAS guard
-  description: Add a connector-free CAS evaluator and closed schema, then invoke it
-    from checkpoint_store only when strict cas_context is supplied, preserving legacy
-    behavior.
+  title: Create all G0/G1 artifacts with task-scoped workspace
+  description: Create complete G0/G1 evidence under .gwc/tasks/SCRUM-208/ with G2 execution envelope
   benefits:
-  - Reuses current checkpoint persistence and deterministic digest primitives.
-  - Preserves existing callers while introducing fail-closed M5 semantics.
-  - Produces explicit latest-state and reconciliation routing without blind retry.
+  - Complete governance evidence trail
+  - Reusable for future G0/G1 tasks
+  - Follows canonical workspace pattern
   tradeoffs:
-  - checkpoint_store gains an optional strict context and effect ledger.
-  - State reconciliation remains a separate downstream node.
-  risks:
-  - Integration mistakes could alter legacy replay behavior.
+  - More verbose than chat-only approach
+  - Requires G2 execution envelope generation
+  risks: []
   constraint_fit: FIT
+  skills_distribution:
+  - skill_id: dw-task-me
+    description: Impact analysis and implementation planning
+    is_required: false
+  - skill_id: dw-ua
+    description: Architecture and semantic analysis
+    is_required: false
 - id: OPT-2
-  title: Replace checkpoint_store with a new CAS persistence subsystem
-  description: Build a parallel persistence implementation and migrate callers to
-    it.
+  title: Use existing g2 directory with new envelope
+  description: Repurpose existing .gwc/g2/ directory for SCRUM-208 envelope
   benefits:
-  - Clean separation from legacy checkpoint code.
+  - Reuses existing directory structure
+  - Less directory creation
   tradeoffs:
-  - Duplicates persistence and digest behavior.
-  - Requires broader migration and write scope.
+  - Mixes task evidence in non-task-scoped location
+  - Requires migration later
+  - Confuses existing envelope for different task
   risks:
-  - High regression and scope-drift risk.
+  - Existing envelope may be overwritten
+  - Violates task-scoped workspace pattern
   constraint_fit: NOT_FIT
+  skills_distribution:
+  - skill_id: dw-task-me
+    description: Impact analysis and implementation planning
+    is_required: false
+- id: OPT-3
+  title: Chat-only G0/G1 with no repository artifacts
+  description: Complete G0/G1 in conversation only, no file writes
+  benefits:
+  - Fastest approach
+  - No repository pollution
+  tradeoffs:
+  - No evidence trail
+  - Cannot validate with tools/validate_g01.py
+  - Cannot generate valid G2 envelope
+  risks:
+  - Cannot proceed to G2 execution
+  - No audit trail for governance
+  constraint_fit: NOT_FIT
+  skills_distribution:
+  - skill_id: dw-task-me
+    description: Impact analysis and implementation planning
+    is_required: false
 recommended_option_id: OPT-1
-recommendation_rationale: OPT-1 is the smallest compatible change, directly satisfies
-  the Jira contract, and avoids a parallel persistence subsystem.
+recommendation_rationale: OPT-1 selected because it provides complete governance evidence, follows canonical task-scoped workspace pattern, and enables valid G2 execution envelope generation. The approach satisfies all acceptance criteria.
 decision_required: true
 status: READY

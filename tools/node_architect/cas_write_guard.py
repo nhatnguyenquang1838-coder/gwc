@@ -2,10 +2,10 @@
 """Typed, replay-safe compare-and-swap guard for GWC runtime writes.
 
 The evaluator is pure and connector-free. Callers provide the latest observed
-state plus task, repository, branch, protected-base, scope, lease, fencing,
-revision, and idempotency evidence. A rejection never authorizes automatic
-retry; it returns the latest state and an explicit SCRUM-209 reconciliation
-route.
+state plus task, repository, branch, protected-base, scope, checkpoint, lease,
+fencing, revision, and idempotency evidence. A rejection never authorizes
+automatic retry; it returns the latest state and an explicit SCRUM-209
+reconciliation route.
 """
 from __future__ import annotations
 
@@ -68,6 +68,19 @@ def _parse_timestamp(value: Any) -> datetime | None:
     return parsed if parsed.tzinfo is not None else None
 
 
+def _string_sequence(value: Any) -> list[str] | None:
+    if value is None:
+        return []
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        return None
+    result: list[str] = []
+    for item in value:
+        if not _non_empty(item):
+            return None
+        result.append(str(item))
+    return result
+
+
 def _decision(
     *, observation: Mapping[str, Any], outcome: str, reasons: list[str],
     may_write: bool, requires_reconciliation: bool,
@@ -109,14 +122,71 @@ def _decision(
     ))
 
 
+def _effect_binding_mismatch(
+    observation: Mapping[str, Any], effect: Mapping[str, Any]
+) -> tuple[str, list[str], str, str] | None:
+    """Return outcome/reasons/route/action when a committed effect is not owned by this request."""
+    binding = effect.get("binding")
+    if not isinstance(binding, Mapping):
+        return (
+            "INVALID_INPUT",
+            ["COMMITTED_EFFECT_BINDING_MISSING"],
+            "STOP_BLOCKED",
+            "stop_and_report_unbound_committed_effect",
+        )
+
+    groups = (
+        (
+            "SCOPE_MISMATCH",
+            "REAPPROVAL_REQUIRED",
+            "reconcile_effect_scope_and_request_reapproval",
+            (
+                "task_id", "repository", "branch", "scope_hash",
+                "checkpoint_key", "run_id", "checkpoint_node_id",
+                "idempotency_key", "expected_revision",
+            ),
+        ),
+        (
+            "BASE_DRIFT",
+            "REAPPROVAL_REQUIRED",
+            "refresh_base_and_request_reapproval",
+            ("base_sha",),
+        ),
+        (
+            "LEASE_OWNER_MISMATCH",
+            "ABORT_STALE_WORKER",
+            "abort_stale_worker_and_reconcile_owner",
+            ("lease_owner",),
+        ),
+        (
+            "LEASE_STALE",
+            "ABORT_STALE_WORKER",
+            "abort_stale_worker_and_reconcile_lease",
+            ("lease_token",),
+        ),
+        (
+            "FENCING_MISMATCH",
+            "ABORT_STALE_WORKER",
+            "abort_stale_worker_and_reconcile_fencing",
+            ("fencing_token",),
+        ),
+    )
+    for outcome, route, action, fields in groups:
+        mismatch = [f"COMMITTED_EFFECT_BINDING_MISMATCH:{field}" for field in fields if binding.get(field) != observation.get(field)]
+        if mismatch:
+            return outcome, mismatch, route, action
+    return None
+
+
 def evaluate_cas_write(observation: Mapping[str, Any]) -> dict[str, Any]:
     """Return a deterministic allow/reject decision without mutating state."""
     required_strings = (
         "task_id", "observed_task_id", "repository", "observed_repository",
         "branch", "observed_branch", "base_sha", "observed_base_sha",
-        "scope_hash", "observed_scope_hash", "lease_owner",
-        "observed_lease_owner", "lease_token", "observed_lease_token",
-        "lease_expires_at", "observed_at", "idempotency_key",
+        "scope_hash", "observed_scope_hash", "checkpoint_key", "run_id",
+        "checkpoint_node_id", "lease_owner", "observed_lease_owner",
+        "lease_token", "observed_lease_token", "lease_expires_at",
+        "observed_at", "idempotency_key",
     )
     reasons: list[str] = []
     for field in required_strings:
@@ -136,6 +206,12 @@ def evaluate_cas_write(observation: Mapping[str, Any]) -> dict[str, Any]:
         reasons.append("INVALID_COMMITTED_EFFECTS")
         committed_effects = {}
 
+    precondition_errors = _string_sequence(observation.get("precondition_errors"))
+    if precondition_errors is None:
+        reasons.append("INVALID_PRECONDITION_ERRORS")
+    else:
+        reasons.extend(precondition_errors)
+
     lease_expiry = _parse_timestamp(observation.get("lease_expires_at"))
     observed_at = _parse_timestamp(observation.get("observed_at"))
     if lease_expiry is None:
@@ -149,17 +225,6 @@ def evaluate_cas_write(observation: Mapping[str, Any]) -> dict[str, Any]:
             may_write=False, requires_reconciliation=True,
             reconciliation_route="STOP_BLOCKED", next_node="runtime_checkpoint.state-reconciliation",
             next_action="stop_and_report_invalid_cas_input",
-        )
-
-    idempotency_key = str(observation["idempotency_key"])
-    committed_effect = committed_effects.get(idempotency_key)
-    if isinstance(committed_effect, Mapping):
-        return _decision(
-            observation=observation, outcome="DUPLICATE_EFFECT_REPLAYED",
-            reasons=["IDEMPOTENT_EFFECT_ALREADY_COMMITTED"], may_write=False,
-            requires_reconciliation=False, reconciliation_route="RESUME",
-            next_node=None, next_action="return_committed_effect_readback",
-            committed_effect=committed_effect,
         )
 
     identity_pairs = (
@@ -202,15 +267,6 @@ def evaluate_cas_write(observation: Mapping[str, Any]) -> dict[str, Any]:
             next_action="abort_stale_worker_and_reconcile_lease",
         )
 
-    assert lease_expiry is not None and observed_at is not None
-    if observed_at >= lease_expiry:
-        return _decision(
-            observation=observation, outcome="LEASE_EXPIRED", reasons=["LEASE_EXPIRED_AT_WRITE"],
-            may_write=False, requires_reconciliation=True,
-            reconciliation_route="REAPPROVAL_REQUIRED", next_node="runtime_checkpoint.state-reconciliation",
-            next_action="renew_lease_or_request_reapproval",
-        )
-
     if observation["fencing_token"] != observation["observed_fencing_token"]:
         return _decision(
             observation=observation, outcome="FENCING_MISMATCH",
@@ -218,6 +274,35 @@ def evaluate_cas_write(observation: Mapping[str, Any]) -> dict[str, Any]:
             requires_reconciliation=True, reconciliation_route="ABORT_STALE_WORKER",
             next_node="runtime_checkpoint.state-reconciliation",
             next_action="abort_stale_worker_and_reconcile_fencing",
+        )
+
+    idempotency_key = str(observation["idempotency_key"])
+    committed_effect = committed_effects.get(idempotency_key)
+    if isinstance(committed_effect, Mapping):
+        effect_mismatch = _effect_binding_mismatch(observation, committed_effect)
+        if effect_mismatch is not None:
+            outcome, mismatch, route, action = effect_mismatch
+            return _decision(
+                observation=observation, outcome=outcome, reasons=mismatch,
+                may_write=False, requires_reconciliation=True,
+                reconciliation_route=route, next_node="runtime_checkpoint.state-reconciliation",
+                next_action=action,
+            )
+        return _decision(
+            observation=observation, outcome="DUPLICATE_EFFECT_REPLAYED",
+            reasons=["IDEMPOTENT_EFFECT_ALREADY_COMMITTED_AND_BOUND"], may_write=False,
+            requires_reconciliation=False, reconciliation_route="RESUME",
+            next_node=None, next_action="return_committed_effect_readback",
+            committed_effect=committed_effect,
+        )
+
+    assert lease_expiry is not None and observed_at is not None
+    if observed_at >= lease_expiry:
+        return _decision(
+            observation=observation, outcome="LEASE_EXPIRED", reasons=["LEASE_EXPIRED_AT_WRITE"],
+            may_write=False, requires_reconciliation=True,
+            reconciliation_route="REAPPROVAL_REQUIRED", next_node="runtime_checkpoint.state-reconciliation",
+            next_action="renew_lease_or_request_reapproval",
         )
 
     if observation["expected_revision"] != observation["observed_revision"]:

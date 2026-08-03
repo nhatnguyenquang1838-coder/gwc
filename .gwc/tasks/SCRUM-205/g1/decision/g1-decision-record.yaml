@@ -1,0 +1,51 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+generated_at: "2026-08-02T15:58:00Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-205
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  g0_snapshot: "../../g0/context-snapshot.yaml"
+options_ref: "../brainstorming/g1-options.yaml"
+preflight_ref: "../preflight/g1-preflight-report.yaml"
+status: ACCEPTED
+selected_option_id: OPT-01
+user_decision:
+  actor: "Nhat Nguyen Quang"
+  decided_at: "2026-08-02T15:58:00Z"
+  source: "chat"
+  explicit: true
+rationale: |
+  Option OPT-01 is chosen because a single-function validator with a RouteDecision dataclass
+  is simple, deterministic, auditable, and matches the sibling M5 pattern (SCRUM-202).
+  It covers all requirements in ordered checks and is highly testable.
+rejected_option_ids:
+  - OPT-02
+acceptance_criteria_refs:
+  - AC-01
+scope_hash: "sha256:f2064073432936ec86eb434be05063b924c0aed0084c945902810a3f426fa686"
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-01
+      description: "Implement resume token validation logic and route decision"
+    - sub_task_id: SUB-TASK-02
+      description: "Add robust unit tests for all validation binding checks"
+  agent_allocation:
+    - sub_task_id: SUB-TASK-01
+      skill_id: "gwc-resume-token-validator"
+      agent_type: "primary"
+    - sub_task_id: SUB-TASK-02
+      skill_id: "gwc-tester"
+      agent_type: "validator"
+  execution_order:
+    - SUB-TASK-01
+    - SUB-TASK-02
+  summary: "Primary agent implements logic, validator agent verifies via tests."

@@ -1,7 +1,7 @@
 # SCRUM-208 Requirements — CAS Write Guard M5
 
 ## Objective
-Advance `runtime_checkpoint.cas-write-guard` from M2 to `M5_REPLAY_SAFE` on `c28d0956b36f2894e369a24dfc245601bc628340`.
+Advance `runtime_checkpoint.cas-write-guard` from M2 to `M5_REPLAY_SAFE`. The implementation originated from `c28d0956b36f2894e369a24dfc245601bc628340` and is reconciled without history rewrite onto protected base `f9b04561437eaebd2c2711999b622029468c3551`.
 
 ## EARS requirements
 1. **When** a guarded write is attempted, **the node shall** compare expected and observed revisions before mutation.

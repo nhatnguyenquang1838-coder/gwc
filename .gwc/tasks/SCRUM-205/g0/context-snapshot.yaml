@@ -1,0 +1,103 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-08-02T15:58:00Z"
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - Never write directly to protected main.
+  - G4 merge, G5 deploy, and G6 production remain separate human gates.
+  - No credentials, secrets, production data, production configuration, migration, release, or runtime reload.
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - id: GATE-LIFECYCLE-CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - id: E2E-DRAFT-PR-DELIVERY
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: main
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: agents/dwc/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: schemas/node-architect/resume-token.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  - path: schemas/node-architect/checkpoint.schema.json
+    required: true
+    status: AVAILABLE
+    source_sha: 520aa1968a0809001e8994192278e52a59c86c61
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: chatgpt-local-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - GWC_GATE_LIFECYCLE_v1.0
+contextual_discovery:
+  historical_context:
+    - id: SCRUM-263-MERGED
+      description: SCRUM-263 merged as PR #184 with merge commit 520aa1968a0809001e8994192278e52a59c86c61.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/184
+    - id: SCRUM-202-MERGED
+      description: SCRUM-202 advanced runtime_checkpoint.checkpoint-capture to M5_REPLAY_SAFE.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/issues/202
+  downstream_impact:
+    - target: runtime_checkpoint.resume-token-generation
+      impact_type: NON_BREAKING
+      description: Resume token generation feeds tokens into this validation node.
+  stakeholder_reach:
+    - persona: Jira-assignee
+      impact: SCRUM-205 is assigned to Nhat Nguyen Quang. AI Agent=ChatGPT claimed at 2026-08-02T22:50:00+0700.

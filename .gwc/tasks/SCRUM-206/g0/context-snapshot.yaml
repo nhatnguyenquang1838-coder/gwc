@@ -1,0 +1,97 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-02T23:28:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - Bounded to SCRUM-206 node implementation and artifacts only
+  - No merge, deploy, production data, or runtime-engine authority
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - id: GATE-LIFECYCLE
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - id: AGENT-RUNTIME
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    ref: main
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: core/Coding_Project_Governance_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: core/task-lifecycle/gate-transition-map.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: core/node-architect/node-registry.json
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: agents/dwc/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: Kilo
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/Agent_Operating_Runtime_Contract_v1.0.md

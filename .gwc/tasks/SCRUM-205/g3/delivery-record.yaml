@@ -1,0 +1,100 @@
+schema_version: "1.0"
+artifact_type: "g3-delivery-record"
+gate: "G3_PR"
+task_id: "SCRUM-205"
+repository: "nhatnguyenquang1838-coder/gwc"
+base_ref: "main"
+base_sha: "520aa1968a0809001e8994192278e52a59c86c61"
+working_branch: "chatgpt/scrum-205-resume-token-validation-m5-20260802"
+pull_request:
+  number: 191
+  url: "https://github.com/nhatnguyenquang1838-coder/gwc/pull/191"
+  draft: true
+head_sha: "0c5929ba26a6a4f6c07fb61796392bbc741db8a8"
+scope_hash: "sha256:6ff3e26be4f55e898a8613f7226a56c845ad82d789a7f661ae81d19b85c659cb"
+changed_paths:
+  - ".gwc/tasks/SCRUM-205/g0/context-snapshot.yaml"
+  - ".gwc/tasks/SCRUM-205/g1/brainstorming/g1-options.yaml"
+  - ".gwc/tasks/SCRUM-205/g1/decision/g1-decision-record.yaml"
+  - ".gwc/tasks/SCRUM-205/g1/intake/g1-intake-brief.yaml"
+  - ".gwc/tasks/SCRUM-205/g1/preflight/g1-preflight-report.yaml"
+  - ".gwc/tasks/SCRUM-205/g2/execution-envelope.yaml"
+  - "core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json"
+  - "releases/changelog.d/2026-08-02-scrum-205-resume-token-validation-m5.md"
+  - "tests/test_resume_token_validation.py"
+  - "tools/node_architect/resume_token_validation.py"
+validation:
+  head_sha: "0c5929ba26a6a4f6c07fb61796392bbc741db8a8"
+  status: "pass"
+  commands:
+    - command: "python3 -m unittest tests.test_resume_token_validation"
+      result: "pass"
+      evidence: "Ran 16 tests in 0.001s OK"
+    - command: "python3 -m unittest tests.test_node_catalog_runtime_checkpoint"
+      result: "pass"
+      evidence: "Ran 5 tests in 0.010s OK"
+    - command: "python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-205"
+      result: "pass"
+      evidence: "G0/G1 validation outcome: PASS"
+review:
+  implementer_id: "ChatGPT"
+  reviewer_id: "Nhat Nguyen Quang"
+  independence: "independent"
+  mode: "read-only"
+  reviewed_head_sha: "0c5929ba26a6a4f6c07fb61796392bbc741db8a8"
+  reviewed_scope_hash: "sha256:f2064073432936ec86eb434be05063b924c0aed0084c945902810a3f426fa686"
+  reviewed_at: "2026-08-02T17:15:00Z"
+  lanes:
+    - name: "requirement"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "G1 brief matched"
+    - name: "design"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "RouteDecision pattern followed"
+    - name: "code"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "Implementation complete"
+    - name: "test"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "16 tests passing"
+    - name: "governance"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "G0/G1 pass"
+    - name: "delivery"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "Draft PR #191"
+    - name: "ci"
+      applicable: true
+      status: "pass"
+      evidence:
+        - "Local validation pass"
+  findings: []
+  acceptance_criteria:
+    - id: "AC-01"
+      result: "pass"
+      evidence:
+        - "test_resume_token_validation.py covers all cases"
+  decision: "pass"
+  stale: false
+ci:
+  required: true
+  head_sha: "0c5929ba26a6a4f6c07fb61796392bbc741db8a8"
+  checks: []
+residual_risks: []
+exclusions:
+  - "G4_MERGE"
+  - "G5_DEPLOY"
+  - "G6_PRODUCTION"
+outcome: "pass"

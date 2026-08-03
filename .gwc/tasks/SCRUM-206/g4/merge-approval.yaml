@@ -1,0 +1,29 @@
+approval_id: G4_SCRUM-206_20260802
+authority_gate: G4_MERGE
+task_id: SCRUM-206
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+head_sha: 8af8201113e07d98db5315d61c29df5b73f06b59
+merge_commit_sha: null
+pr_number: 189
+pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/189
+ci_status: pass
+ci_run_id: 30780657813
+ci_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30780657813
+scope_hash: sha256:860aa4149eb4e8ef4f944d37c18a175f774ca84d0700070103395fc8f9ebfb74
+scope_hash_16: 860aa4149eb4e8ef
+issued_at: 2026-08-03T03:02:37Z
+expires_at: 2026-08-04T03:02:37Z
+approved_at: 2026-08-03T03:02:37Z
+approval_status: pending
+authorized_actions:
+  - merge_pull_request
+excluded_actions:
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+approval_command_format: APPROVE G4 <approval_id> <scope_hash_16> <expires_at_utc>
+exact_approval_command: APPROVE G4 G4_SCRUM-206_20260802 860aa4149eb4e8ef 2026-08-04T03:02:37Z
