@@ -1,0 +1,167 @@
+schema_version: "1.0"
+artifact_type: "g2-execution-envelope"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+gate: "G2_EXECUTION"
+gate_state: "open"
+required_approval: "required"
+
+approval_receipt:
+  approver: "GitHub Copilot"
+  approval_type: "agent_g2_approval"
+  approval_timestamp: "2026-08-03T00:51:00+0700"
+  approval_scope_hash: "sha256:SCRUM-229-M4_DETERMINISTIC-manifest-load-2026-08-03"
+  expiry: "2026-08-04T00:51:00+0700"
+  approval_evidence:
+    - "G0 context snapshot created"
+    - "G1 intake brief created"
+    - "G1 preflight report completed"
+    - "G1 brainstorming options analyzed"
+    - "G1 decision record finalized"
+
+repository:
+  owner: "nhatnguyenquang1838-coder"
+  name: "gwc"
+  url: "https://github.com/nhatnguyenquang1838-coder/gwc"
+
+base_branch: "main"
+base_sha: "848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+base_sha_verified: true
+base_sha_timestamp: "2026-08-03T00:51:00+0700"
+
+working_context:
+  mode: "local_agent"
+  executor: "GitHub Copilot"
+  claim_status: "VERIFIED"
+  claim_issue: "SCRUM-229"
+
+scope:
+  title: "Node Architect maturity — package_export.package-manifest-load M2→M4_DETERMINISTIC"
+  description: |
+    Implement package_export.package-manifest-load node at M4_DETERMINISTIC maturity.
+    Load one pinned project package manifest and produce canonical entry inventory
+    with deterministic evidence for reuse by SCRUM-230.
+  change_type: "node_implementation"
+
+authorized_actions:
+  - "worktree_create"
+  - "branch_create"
+  - "scoped_file_create"
+  - "scoped_file_update"
+  - "post_write_diff_readback"
+  - "node_instruction_execution"
+  - "evidence_ledger_recording"
+  - "g3_draft_pr_preparation"
+
+excluded_actions:
+  - "direct_main_push"
+  - "merge"
+  - "deploy"
+  - "release"
+  - "package_publish"
+  - "target_file_mutation"
+  - "schema_version_bump"
+  - "production_data_change"
+  - "force_push"
+  - "branch_deletion"
+
+files_read_approved:
+  governance:
+    - "AGENTS.md"
+    - "core/Agent_Operating_Runtime_Contract_v1.0.md"
+    - "core/GATE_LIFECYCLE_CONTRACT_v1.0.md"
+    - "core/Agent_Behavior_Semantic_Contract_v1.0.md"
+    - "core/Agent_Response_Presentation_Contract_v1.0.md"
+    - "core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md"
+    - "core/node-architect/gate-node-route-profile.json"
+    - "core/node-architect/node-registry.json"
+    - "core/task-lifecycle/gate-transition-map.yaml"
+    - "projects/gwc/project-profile.yaml"
+    - "projects/gwc/project-instructions.md"
+    - "projects/gwc/project-extension.md"
+    - "agents/chatgpt-agent/agent-instructions.md"
+    - "agents/dwc/agent-instructions.md"
+  context:
+    - ".gwc/tasks/SCRUM-229/g0/context-snapshot.yaml"
+    - ".gwc/tasks/SCRUM-229/g1/intake/g1-intake-brief.yaml"
+    - ".gwc/tasks/SCRUM-229/g1/preflight/g1-preflight-report.yaml"
+    - ".gwc/tasks/SCRUM-229/g1/brainstorming/g1-options.yaml"
+    - ".gwc/tasks/SCRUM-229/g1/decision/g1-decision-record.yaml"
+  inputs_readonly:
+    - "projects/gwc/package.yaml"
+    - "schemas/package-manifest.schema.json"
+
+files_write_approved:
+  schemas:
+    - "schemas/node-architect/package-export/package-manifest.schema.yaml"
+    - "schemas/node-architect/package-export/package-manifest.schema.json"
+  implementation:
+    - "tools/node_architect/package_export/__init__.py"
+    - "tools/node_architect/package_export/models.py"
+    - "tools/node_architect/package_export/loader.py"
+    - "tools/node_architect/package_export/validator.py"
+    - "tools/node_architect/package_export/digest.py"
+  tests:
+    - "tests/package_export/__init__.py"
+    - "tests/package_export/conftest.py"
+    - "tests/package_export/test_manifest_load.py"
+    - "tests/package_export/test_determinism.py"
+    - "tests/package_export/test_evidence_binding.py"
+    - "tests/package_export/fixtures/valid_manifest.yaml"
+    - "tests/package_export/fixtures/malformed_yaml.yaml"
+    - "tests/package_export/fixtures/non_object_root.yaml"
+    - "tests/package_export/fixtures/missing_instructions.yaml"
+    - "tests/package_export/fixtures/duplicate_entry_id.yaml"
+    - "tests/package_export/fixtures/unsupported_version.yaml"
+    - "tests/package_export/fixtures/unknown_field.yaml"
+    - "tests/package_export/fixtures/source_sha_mismatch.yaml"
+  node_definitions:
+    - "core/node-architect/node-catalog/package_export/package-manifest-load.node.json"
+    - "core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml"
+  evidence:
+    - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-start.json"
+    - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-decision.json"
+    - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-result.json"
+    - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-readback.json"
+    - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/next-route-decision.json"
+    - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/runtime-events.jsonl"
+
+execution_constraints:
+  worktree_strategy: "create_isolated_from_main"
+  branch_naming: "feature/scrum-229-package-manifest-load"
+  commit_strategy: "atomic_scope"
+  validation_required: "all_tests_must_pass"
+  ci_checks_required:
+    - "validate-instructions"
+    - "linting"
+    - "tests"
+
+node_execution_route:
+  route_id: "g2-resolve-execution-node"
+  gate: "G2_EXECUTION"
+  first_node: "gate_authority.gate-state-resolution"
+  nodes_in_route:
+    - "gate_authority.gate-state-resolution"
+    - "repo_delivery.scoped-file-write"
+    - "repo_delivery.diff-readback"
+    - "gate_authority.gate-transition-decision"
+  final_next_gate: "G3_PR"
+
+authority_fields:
+  author_grant_g2: false
+  author_grant_g3: false
+  author_grant_g4: false
+  author_grant_g5: false
+  author_grant_g6: false
+  node_authority_escalation_blocked: true
+  mode_bypass_check: "PASS"
+
+validity:
+  expires_at: "2026-08-04T00:51:00+0700"
+  timezone: "Asia/Ho_Chi_Minh"
+  is_expired: false
+
+created_at: "2026-08-03T00:51:00+0700"
+created_by: "GitHub Copilot"
+status: "OPEN_FOR_G2_EXECUTION"

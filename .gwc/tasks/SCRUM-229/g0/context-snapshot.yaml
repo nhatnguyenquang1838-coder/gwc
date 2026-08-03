@@ -1,0 +1,53 @@
+schema_version: "1.0"
+artifact_type: "g0-context-snapshot"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4"
+repository:
+  owner: "nhatnguyenquang1838-coder"
+  name: "gwc"
+  url: "https://github.com/nhatnguyenquang1838-coder/gwc"
+  default_branch: "main"
+protected_base:
+  sha: "848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+  ref: "origin/main"
+  timestamp: "2026-08-03T00:51:00+0700"
+task_baseline:
+  sha: "78d596242a9e042d62d6174afc40aa4976eb3285"
+  context: "Dependency: Foundation node; no internal F7 blocker"
+agent:
+  name: "GitHub Copilot"
+  executor_type: "local_agent"
+  claimed_at: "2026-08-03T00:36:01+0700"
+  jira_claim_status: "PASS"
+target_maturity:
+  from: "M2"
+  to: "M4_DETERMINISTIC"
+node:
+  family: "package_export"
+  id: "package_export.package-manifest-load"
+  descriptor_path: "core/node-architect/node-catalog/package_export/package-manifest-load.node.json"
+  instruction_path: "core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml"
+  minimum_maturity: "experimental"
+implementation_surfaces:
+  - "schemas/node-architect/package-export/"
+  - "tools/node_architect/package_export/"
+  - "tests/package_export/"
+read_only_inputs:
+  - "projects/gwc/package.yaml"
+  - "schemas/package-manifest.schema.json"
+scope:
+  title: "Node Architect maturity — package_export.package-manifest-load M2→M4_DETERMINISTIC"
+  boundaries:
+    - "No file copy"
+    - "No target creation"
+    - "No package publication"
+    - "No consumer mutation"
+    - "No package-version bump"
+  next_task_dependency: "SCRUM-230"
+gates:
+  current: "G0_CONTEXT"
+  required_next: "G1_ALIGNMENT"
+  final_gate: "G3_PR"
+  skip_gates: []
+created_at: "2026-08-03T00:51:00+0700"
+snapshot_version: "1.0"

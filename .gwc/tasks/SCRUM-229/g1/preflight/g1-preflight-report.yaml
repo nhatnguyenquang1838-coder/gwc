@@ -1,0 +1,101 @@
+schema_version: "1.0"
+artifact_type: "g1-preflight-report"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+preflight_checks:
+  gating_contracts:
+    status: "PASS"
+    evidence:
+      - "Agent_Operating_Runtime_Contract_v1.0 verified"
+      - "GATE_LIFECYCLE_CONTRACT_v1.0 verified"
+      - "GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0 verified"
+      - "MODE_DOES_NOT_BYPASS_NODE_RUNTIME invariant confirmed"
+
+  node_descriptor:
+    status: "READY"
+    notes: "Node descriptor expected at core/node-architect/node-catalog/package_export/package-manifest-load.node.json"
+    maturity: "experimental"
+    authority_boundary: "g2_required"
+    gates_limited_to:
+      - "G2_EXECUTION"
+      - "G3_PR"
+
+  node_instruction:
+    status: "READY"
+    notes: "Node instruction expected at core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml"
+    required_sections:
+      - "evidence_contract"
+      - "log_contract"
+      - "next_route_decision"
+      - "authority_fields (all false)"
+
+  node_registry_binding:
+    status: "PENDING"
+    notes: "Node must be registered in node-registry.json before execution"
+    minimum_maturity_required: "experimental"
+
+  route_resolution:
+    status: "CONFIGURED"
+    route_id: "g2-resolve-execution-node"
+    gate: "G2_EXECUTION"
+    current_node: "gate_authority.gate-state-resolution"
+    next_node: "repo_delivery.scoped-file-write"
+    bound_graph_revision: "scrum-104-20260726"
+    bound_registry_revision: "scrum-104-20260726"
+
+  task_scoped_workspace:
+    status: "CREATED"
+    path: ".gwc/tasks/SCRUM-229/"
+    artifacts_created:
+      - "g0/context-snapshot.yaml"
+      - "g1/intake/g1-intake-brief.yaml"
+      - "g1/preflight/g1-preflight-report.yaml"
+    artifacts_pending:
+      - "g1/brainstorming/g1-options.yaml"
+      - "g1/decision/g1-decision-record.yaml"
+      - "g2/execution-envelope.yaml"
+
+  jira_claim_verification:
+    status: "VERIFIED"
+    issue_key: "SCRUM-229"
+    claimed_by: "GitHub Copilot"
+    claimed_at: "2026-08-03T00:36:01+0700"
+    current_status: "In Progress"
+    readback: "PASS"
+
+  schema_risk_assessment:
+    status: "LOW"
+    schema_dependencies:
+      - "package-manifest.schema.json"
+      - "node-architect/package-export/ (new)"
+    breaking_changes: "none"
+    version_conflicts: "none"
+    compatibility_notes: "Existing projects/gwc/package.yaml is read-only input"
+
+  protected_base_verification:
+    status: "VERIFIED"
+    base_sha: "848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+    ref: "origin/main"
+    ci_status: "not_checked (N/A for G1)"
+
+critical_blockers: []
+
+warnings:
+  - "Node descriptor and instruction files do not yet exist in repository; must be created during G2 execution"
+  - "Node must be registered in node-registry.json before G2 route execution"
+  - "SCRUM-230 depends on deterministic manifest-load evidence; ensure digest stability"
+
+recommendations:
+  - "Proceed to G1 brainstorming with focus on fixture design"
+  - "Plan Python implementation with type hints for determinism"
+  - "Coordinate with SCRUM-230 on evidence format expectations"
+  - "Consider semantic digest algorithm stability across Python versions"
+
+readiness_assessment:
+  overall_status: "READY_FOR_G1_BRAINSTORMING"
+  blocker_count: 0
+  warning_count: 3
+
+created_at: "2026-08-03T00:51:00+0700"
+completed_at: "2026-08-03T00:51:00+0700"
