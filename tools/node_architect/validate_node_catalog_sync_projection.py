@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the sync_projection controlled node catalog family."""
+"""Validate the sync_projection controlled node catalog family and M4 runtime bindings."""
 
 from __future__ import annotations
 
@@ -21,11 +21,68 @@ REQUIRED_SEMANTICS = {
     "projection-evidence-linking",
     "projection-privacy-boundary-check",
 }
+RUNTIME_BINDINGS = {
+    "projection-source-authority-check": {
+        "schema": "schemas/projection-source-authority-decision.schema.json",
+        "evaluator": "tools/node_architect/projection_source_authority_check.py",
+        "function": "decide_projection_source_authority",
+        "artifact_type": "projection-source-authority-decision",
+        "gates": ["G2_EXECUTION"],
+    }
+}
 
 
-def validate_family(family_dir: Path) -> None:
+def _repository_root(family_dir: Path) -> Path:
+    resolved = family_dir.resolve()
+    if len(resolved.parents) < 4:
+        raise AssertionError(f"cannot resolve repository root from {family_dir}")
+    return resolved.parents[3]
+
+
+def _validate_runtime_binding(root: Path, family_dir: Path, stem: str, binding: dict[str, object]) -> None:
+    descriptor_path = family_dir / f"{stem}.node.json"
+    descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    if descriptor["gates"] != binding["gates"]:
+        raise AssertionError(f"{descriptor_path}: runtime-bound gates must be exactly {binding['gates']}")
+    if descriptor["authority_boundary"] != "read_only":
+        raise AssertionError(f"{descriptor_path}: runtime binding must remain read_only")
+
+    schema_path = root / str(binding["schema"])
+    evaluator_path = root / str(binding["evaluator"])
+    if not schema_path.is_file():
+        raise AssertionError(f"missing runtime schema: {schema_path}")
+    if not evaluator_path.is_file():
+        raise AssertionError(f"missing runtime evaluator: {evaluator_path}")
+
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    if schema.get("type") != "object" or schema.get("additionalProperties") is not False:
+        raise AssertionError(f"{schema_path}: runtime schema must be a closed object")
+    properties = schema.get("properties", {})
+    if properties.get("schema_version", {}).get("const") != "1.0":
+        raise AssertionError(f"{schema_path}: schema_version must be fixed to 1.0")
+    if properties.get("artifact_type", {}).get("const") != binding["artifact_type"]:
+        raise AssertionError(f"{schema_path}: artifact_type mismatch")
+    for authority_field, expected in {
+        "read_only_projection": True,
+        "write_authority_granted": False,
+        "approval_authority_granted": False,
+        "merge_authority_granted": False,
+        "deployment_authority_granted": False,
+        "production_authority_granted": False,
+    }.items():
+        if properties.get(authority_field, {}).get("const") is not expected:
+            raise AssertionError(f"{schema_path}: {authority_field} must be const {expected}")
+
+    evaluator_source = evaluator_path.read_text(encoding="utf-8")
+    function_marker = f"def {binding['function']}("
+    if function_marker not in evaluator_source:
+        raise AssertionError(f"{evaluator_path}: missing {binding['function']}")
+
+
+def validate_family(family_dir: Path, root: Path | None = None) -> None:
     if not family_dir.exists():
         raise AssertionError(f"missing family dir: {family_dir}")
+    root = root or _repository_root(family_dir)
 
     node_files = sorted(family_dir.glob("*.node.json"))
     if len(node_files) != REQUIRED_COUNT:
@@ -67,17 +124,23 @@ def validate_family(family_dir: Path) -> None:
     if missing_semantics:
         raise AssertionError(f"missing required projection semantics: {sorted(missing_semantics)}")
 
+    for stem, binding in RUNTIME_BINDINGS.items():
+        if stem not in stems:
+            raise AssertionError(f"runtime binding descriptor missing: {stem}")
+        _validate_runtime_binding(root, family_dir, stem, binding)
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--family-dir", type=Path, default=Path("core/node-architect/node-catalog/sync_projection"))
+    parser.add_argument("--root", type=Path, default=None)
     args = parser.parse_args(argv)
     try:
-        validate_family(args.family_dir)
+        validate_family(args.family_dir, root=args.root)
     except Exception as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
-    print("PASS: sync_projection node catalog family is valid")
+    print("PASS: sync_projection node catalog family and runtime bindings are valid")
     return 0
 
 
