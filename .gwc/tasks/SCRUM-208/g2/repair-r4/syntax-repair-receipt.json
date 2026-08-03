@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-ci-syntax-repair-receipt",
+  "gate": "G2_EXECUTION",
+  "task_id": "SCRUM-208",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_G3_CI_SYNTAX_REPAIR_R4_20260803",
+  "scope_hash": "sha256:86826bd231b8d8f648bc67a87af06b70450ae5898b92a4137868a7d38beb8214",
+  "base_ref": "main",
+  "base_sha": "f9b04561437eaebd2c2711999b622029468c3551",
+  "working_branch": "codex/scrum-208-cas-write-guard-m5-20260802",
+  "prior_head_sha": "c48585915e45eb61ba3a26edb7aa9a954b973d99",
+  "source": {
+    "path": ".gwc/tasks/SCRUM-208/g3/delivery-record.yaml",
+    "blob_sha": "19528585d9dde21c161832abc3559e7955973f48",
+    "failure": "YAML_PARSE_ERROR_MAPPING_VALUES_NOT_ALLOWED",
+    "line": 29,
+    "column": 39
+  },
+  "replacement": {
+    "from": "    evidence: G0/G1 validation outcome: PASS",
+    "to": "    evidence: \"G0/G1 validation outcome: PASS\"",
+    "occurrences": 1,
+    "semantic_change": false
+  },
+  "validation": {
+    "yaml_parse": "PASS",
+    "exact_replacement_count": 1,
+    "other_line_changes": 0,
+    "exact_head_ci": "PENDING"
+  },
+  "unsafe_evidence_classification": "PR_192_G3_REMAINS_UNSAFE_PASS_WITH_PENDING_CI_AND_NO_IMPLEMENTATION_DELIVERABLE",
+  "authority_boundaries": {
+    "ready_for_review": false,
+    "merge": false,
+    "deploy": false,
+    "release": false,
+    "production": false,
+    "scrum_209": false,
+    "g4": false,
+    "g5": false,
+    "g6": false
+  },
+  "recorded_at": "2026-08-03T04:16:00Z",
+  "status": "APPLIED_PENDING_EXACT_HEAD_CI"
+}
