@@ -44,6 +44,19 @@ class SyncProjectionNodeCatalogTest(unittest.TestCase):
     def test_validator_accepts_real_family(self):
         validate_family(FAMILY_DIR)
 
+    def test_source_authority_runtime_binding_exists(self):
+        schema = Path("schemas/projection-source-authority-decision.schema.json")
+        evaluator = Path("tools/node_architect/projection_source_authority_check.py")
+        self.assertTrue(schema.is_file())
+        self.assertTrue(evaluator.is_file())
+        payload = json.loads(schema.read_text(encoding="utf-8"))
+        self.assertEqual(payload["properties"]["artifact_type"]["const"], "projection-source-authority-decision")
+        self.assertFalse(payload["properties"]["write_authority_granted"]["const"])
+
+    def test_source_authority_descriptor_gate_is_exact_g2(self):
+        payload = json.loads((FAMILY_DIR / "projection-source-authority-check.node.json").read_text(encoding="utf-8"))
+        self.assertEqual(payload["gates"], ["G2_EXECUTION"])
+
     def test_validator_rejects_canonical_authority_drift(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_dir = Path(tmp)
