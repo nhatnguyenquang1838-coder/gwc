@@ -212,6 +212,22 @@ class CASWriteGuardTests(unittest.TestCase):
         self.assertIn("CONTEXT_OBSERVED_BINDING_CONFLICT:observed_repository", caught.exception.decision["reason_codes"])
         self.assertEqual(json.dumps(store, sort_keys=True), before)
 
+    def test_strict_missing_item_expected_revision_fails_closed_without_mutation(self):
+        store = load_store(Path("/tmp/nonexistent-scrum208-store.json"))
+        before = json.dumps(store, sort_keys=True)
+        item = strict_item(item_overrides={"expected_revision": None})
+        assert item.cas_context is not None
+        item.cas_context["expected_revision"] = 0
+        with self.assertRaises(CheckpointConflict) as caught:
+            persist_checkpoint(
+                store, item,
+                committed_at="2026-08-03T01:46:00Z",
+                evaluation_time="2026-08-03T01:44:00Z",
+            )
+        self.assertEqual(caught.exception.decision["outcome"], "INVALID_INPUT")
+        self.assertIn("MISSING_ITEM_EXPECTED_REVISION", caught.exception.decision["reason_codes"])
+        self.assertEqual(json.dumps(store, sort_keys=True), before)
+
     def test_item_lease_and_fencing_conflicts_fail_closed(self):
         for override, reason in (({"lease_token": "other-lease"}, "CONTEXT_ITEM_CONFLICT:lease_token"), ({"fencing_token": 8}, "CONTEXT_ITEM_CONFLICT:fencing_token")):
             with self.subTest(reason=reason):

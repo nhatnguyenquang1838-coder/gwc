@@ -130,7 +130,6 @@ def _authoritative_store_binding(store: Mapping[str, Any], item: CheckpointInput
     return _item_binding(item), []
 
 
-
 def _requested_lease_binding(item: CheckpointInput, supplied: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "lease_owner": supplied.get("lease_owner"),
@@ -201,6 +200,9 @@ def _prepare_cas_context(
         "run_id": item.run_id,
         "checkpoint_node_id": item.node_id,
     }
+    if item.expected_revision is None:
+        errors.append("MISSING_ITEM_EXPECTED_REVISION")
+    context["expected_revision"] = item.expected_revision
     for field, expected in canonical_expected.items():
         if expected is None:
             continue
