@@ -26,7 +26,7 @@ validation:
   commands:
   - command: python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-208
     result: pass
-    evidence: G0/G1 validation outcome: PASS
+    evidence: 'G0/G1 validation outcome: PASS'
 review:
   implementer_id: kiro-ai-agent
   reviewer_id: kiro-ai-agent
