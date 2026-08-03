@@ -358,7 +358,7 @@ def replay_checkpoint(store: dict[str, Any], task_id: str, run_id: str, node_id:
     return store.get("checkpoints", {}).get(checkpoint_key(task_id, run_id, node_id))
 
 
-def main(argv: list[str] | None = int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Persist a GWC runtime checkpoint JSON payload.")
     parser.add_argument("--store", type=Path, required=True)
     parser.add_argument("--payload", type=Path, required=True)

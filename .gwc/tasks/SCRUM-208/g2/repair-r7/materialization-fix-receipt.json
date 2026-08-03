@@ -1,0 +1,67 @@
+{
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-208_R5_MATERIALIZATION_FIX_R7_20260803",
+  "artifact_type": "g2-materialization-fix-receipt",
+  "authority_boundaries": {
+    "deploy": false,
+    "design_change": false,
+    "g3_artifact_change": false,
+    "g4": false,
+    "g5": false,
+    "g6": false,
+    "logic_change": false,
+    "merge": false,
+    "ready_for_review": false,
+    "release": false,
+    "schema_change": false,
+    "scrum_209": false,
+    "test_change": false
+  },
+  "base_drift": {
+    "changed_path_roots": [
+      ".gwc/tasks/SCRUM-206/**",
+      ".gwc/tasks/SCRUM-229/**"
+    ],
+    "classification": "UNRELATED_DISJOINT_BASE_ADVANCE",
+    "current_base_sha": "43d40a1512c10b07a5a799d0d2c8f5101e303113",
+    "overlap_with_write_scope": false,
+    "prior_base_sha": "f9b04561437eaebd2c2711999b622029468c3551"
+  },
+  "gate": "G2_EXECUTION",
+  "parent_sha": "2666876718f058048fd9c457e7533ac43b3c10d9",
+  "protected_base_sha": "43d40a1512c10b07a5a799d0d2c8f5101e303113",
+  "pull_request": 193,
+  "recorded_at": "2026-08-03T07:32:07Z",
+  "repair_id": "R7",
+  "replacement": {
+    "from": "def main(argv: list[str] | None = int:",
+    "occurrences": 1,
+    "other_byte_changes": 0,
+    "semantic_change": false,
+    "to": "def main(argv: list[str] | None = None) -> int:",
+    "validated_blob_sha": "27ae7f5568e62dde39aa65a9f27af4e11ebd4bdc"
+  },
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:c036fd37bb65321456184214bf262097f769d5bcd1f10498b4667ea08ce98eaf",
+  "scope_prefix": "c036fd37bb653214",
+  "source": {
+    "blob_sha": "47e6c42902e6d1ba8747f35e9fde09ecc462acfd",
+    "failure": "PYTHON_SYNTAX_ERROR_INVALID_FUNCTION_SIGNATURE",
+    "job_id": 91603277268,
+    "line": 361,
+    "path": "tools/node_architect/checkpoint_store.py",
+    "workflow_run_id": 30787309944
+  },
+  "status": "APPLIED_PENDING_EXACT_HEAD_CI",
+  "task_id": "SCRUM-208",
+  "validation": {
+    "exact_head_ci": "PENDING",
+    "prevalidated_identical_blob": {
+      "focused_and_legacy_tests": "29/29 PASS",
+      "g0_g1_validator": "PASS",
+      "local_compile": "PASS",
+      "repository_overlay_tests": "62/62 PASS"
+    }
+  },
+  "working_branch": "codex/scrum-208-cas-write-guard-m5-20260802"
+}
