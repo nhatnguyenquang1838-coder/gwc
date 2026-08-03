@@ -36,7 +36,7 @@ prohibited_actions:
 issued_at: '2026-08-02T23:28:00Z'
 expires_at: '2026-08-03T23:28:00Z'
 approval_command: APPROVE G2_EXECUTION CP-20260802-206-G2-R1 fe88b9bcc740b9bb 2026-08-03T23:28:00Z
-status: G2_APPROVAL_PENDING
+status: g2_approved
 draft_pr_allowed: true
 merge_allowed: false
 production_allowed: false
