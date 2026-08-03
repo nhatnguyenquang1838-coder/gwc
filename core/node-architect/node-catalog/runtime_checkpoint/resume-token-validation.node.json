@@ -2,7 +2,7 @@
   "node_id": "runtime_checkpoint.resume-token-validation",
   "node_type": "gate",
   "title": "Resume Token Validation",
-  "description": "Validate resume tokens and current resume conditions before allowing interrupted G2 execution to continue. Returns explicit route: RESUME, REAPPROVAL_REQUIRED, RECONCILE_REQUIRED, or STOP_FAIL_CLOSED. Never converts token validity into gate PASS or merge/deploy authority.",
+  "description": "Validate resume tokens before continuing interrupted G2 execution.",
   "canonical": "canonical",
   "authority_boundary": "g2_required",
   "gates": [
