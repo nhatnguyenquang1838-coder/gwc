@@ -1,0 +1,66 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-03T17:20:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-230
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-03T17:40:00Z'
+  source: APPROVE G2_EXECUTION CP-20260803-230-G2 424a0d4867489330 2026-08-04T17:40:00Z
+  explicit: true
+rationale: >-
+  Build the isolated pure evaluator module, closed schema and fixture suite as
+  named in the issue; respects scope and boundaries, minimal blast radius.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:424a0d4867489330974a934fd46d051abb1eb32dc2909bde377d041dcf7ab18e
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Closed schema schemas/node-architect/package-export/entry-schema-v1.json
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Pure evaluator tools/node_architect/package_export/entry_schema_validation.py
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Focused fixture + unit suite tests/package_export/
+    dependencies:
+    - SUB-TASK-2
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: schema-author
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: evaluator-author
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: test-author
+    agent_type: primary
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  summary: One guarded branch, three ordered sub-tasks delivering the evaluator.

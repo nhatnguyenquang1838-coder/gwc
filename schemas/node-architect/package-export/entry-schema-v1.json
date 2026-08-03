@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/package-export/entry-schema-v1.json",
+  "title": "package_export_entry",
+  "description": "Closed canonical schema for one package_export instruction entry. Validated before path evaluation or export. Schema validation is intentionally isolated from filesystem existence and path-root checks.",
+  "type": "object",
+  "schema_version": "entry-schema-v1",
+  "additionalProperties": false,
+  "required": ["id", "path", "target", "required"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.\\-]{0,127}$",
+      "minLength": 1,
+      "maxLength": 128,
+      "description": "Stable semantic identity of the entry. Must be unique across the manifest."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Source path of the instruction entry."
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Resolved target of the instruction entry."
+    },
+    "required": {
+      "type": "boolean",
+      "description": "Whether the entry is mandatory for the package to be valid."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Supported optional metadata. Closed: unknown keys are rejected.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Optional semantic version of the entry payload."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional human-readable description."
+        }
+      }
+    }
+  }
+}
