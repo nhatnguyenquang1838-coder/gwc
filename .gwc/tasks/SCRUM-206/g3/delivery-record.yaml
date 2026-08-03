@@ -1,67 +1,27 @@
 schema_version: '1.0'
-artifact_type: g3-delivery-record
-gate: G3_PR
 task_id: SCRUM-206
+gate: G3_PR
+status: DRAFT_PENDING_PR
 repository: nhatnguyenquang1838-coder/gwc
-base_ref: main
 base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
-working_branch: g1-206-20260802-2328
-pull_request:
+branch: g1-206-20260802-2328
+scope_hash: sha256:fe88b9bcc740b9bb629b14e4282be9b30b981b841f0becf1ce90c7ae7aeb5964
+node: runtime_checkpoint.lease-acquisition
+validation:
+  scoped_unit_tests: pass_14_tests
+  compileall: pending
+  schema_validation: pending
+  full_ci: pending_pr_creation
+pr:
   number: 189
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/189
-  state: draft
-  head_sha: a61635608b9ed2ad62b003b26f2a735ac77a8561
-head_sha: a61635608b9ed2ad62b003b26f2a735ac77a8561
-scope_hash: sha256:49a38d3ca6e6586062cc29285748c7dcd3f6bb5b765be4036c4f1423bf3c9daa
-changed_paths:
-  - tools/node_architect/lease_acquisition.py
-  - tests/test_lease_acquisition.py
-  - schemas/lease-acquisition-decision.schema.json
-  - .gwc/tasks/SCRUM-206/g0/context-snapshot.yaml
-  - .gwc/tasks/SCRUM-206/g1/intake/g1-intake-brief.yaml
-  - .gwc/tasks/SCRUM-206/g1/preflight/g1-preflight-report.yaml
-  - .gwc/tasks/SCRUM-206/g1/brainstorming/g1-options.yaml
-  - .gwc/tasks/SCRUM-206/g1/decision/g1-decision-record.yaml
-  - .gwc/tasks/SCRUM-206/g2/execution-envelope.yaml
-  - releases/changelog.d/2026-08-02-scrum-206-lease-acquisition-m5.md
-validation:
-  unit_tests:
-    - command: python -m unittest tests.test_lease_acquisition -v
-      outcome: PASS
-      evidence: 19 tests passed
-  g01_validator:
-    - command: python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-206
-      outcome: PASS
-      evidence: "G0/G1 validation outcome: PASS"
+  head_sha: 80fc67f03ba02d9a83a538d8c11f548b1edc1490
 review:
-  implementer: Kilo
-  reviewer: Kilo
-  independence: fresh-context
-  lanes:
-    - requirement: PASS
-    - design: PASS
-    - code: PASS
-    - test: PASS
-    - governance: PASS
-    - delivery: PASS
-    - ci: PENDING
-  findings: []
-  decision: PASS
-  stale: false
-ci:
-  required_workflows:
-    - validate-instructions
-  exact_head_sha: a61635608b9ed2ad62b003b26f2a735ac77a8561
-  state: SUCCESS
-residual_risks:
-  - risk: Exact-head CI not yet complete
-    mitigation: M5 claim requires green CI for head_sha a61635608b9ed2ad62b003b26f2a735ac77a8561
-  - risk: Node maturity remains experimental in node-registry.json
-    mitigation: M5_REPLAY_SAFE is claimed in task artifacts; registry update is out of scope for this slice
+  status: pending
+  independence: fresh_context_required
 exclusions:
-  - merge_or_auto_merge
-  - deploy_release_publish_or_runtime_reload
-  - production_configuration_data_secret_credential_or_migration
-  - force_push_branch_delete_history_rewrite_or_pr_base_change
-  - scope_expansion_or_unrelated_cleanup
-outcome: PASS
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  audit_completion_authority: not_granted
+  scale_authority: not_granted
