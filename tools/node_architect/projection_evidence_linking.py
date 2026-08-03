@@ -88,7 +88,6 @@ def _primary(reasons: set[str]) -> str:
     return "EVIDENCE_LINK_INPUT_INVALID"
 
 
-
 def _source_authority_digest(decision: dict[str, object]) -> str:
     semantic = {
         key: value
@@ -204,11 +203,8 @@ def _authority_is_valid(
     )
 
 
-def _digest_payload(*, task_id: str, repository: str, projection_target: str, source_authority_digest: str,
-                    links: list[dict[str, Any]], covered_fields: list[str], uncovered_fields: list[str]) -> dict[str, Any]:
-    semantic_links = []
-    for link in links:
-        semantic_links.append({key: value for key, value in link.items() if key != "display_url"})
+def _linkset_payload(*, task_id: str, repository: str, projection_target: str, source_authority_digest: str,
+                     links: list[dict[str, Any]], covered_fields: list[str], uncovered_fields: list[str]) -> dict[str, Any]:
     return {
         "schema_version": SCHEMA_VERSION,
         "artifact_type": ARTIFACT_TYPE,
@@ -216,7 +212,7 @@ def _digest_payload(*, task_id: str, repository: str, projection_target: str, so
         "repository": repository,
         "projection_target": projection_target,
         "source_authority_digest": source_authority_digest,
-        "links": semantic_links,
+        "links": links,
         "covered_fields": covered_fields,
         "uncovered_fields": uncovered_fields,
         "read_only_projection": True,
@@ -226,6 +222,15 @@ def _digest_payload(*, task_id: str, repository: str, projection_target: str, so
         "deployment_authority_granted": False,
         "production_authority_granted": False,
     }
+
+
+def _linkset_digest(payload: dict[str, Any]) -> str:
+    semantic = dict(payload)
+    semantic["links"] = [
+        {key: value for key, value in link.items() if key != "display_url"}
+        for link in payload["links"]
+    ]
+    return _hash(semantic)
 
 
 def build_projection_evidence_linkset(
@@ -398,7 +403,7 @@ def build_projection_evidence_linkset(
     if uncovered:
         reasons.add("EVIDENCE_LINK_FIELD_UNBOUND")
 
-    digest_payload = _digest_payload(
+    output_payload = _linkset_payload(
         task_id=safe_task_id,
         repository=safe_repository,
         projection_target=safe_target,
@@ -407,7 +412,7 @@ def build_projection_evidence_linkset(
         covered_fields=covered_fields,
         uncovered_fields=uncovered,
     )
-    linkset_digest = _hash(digest_payload)
+    linkset_digest = _linkset_digest(output_payload)
     if expected_linkset_digest is not None:
         if not isinstance(expected_linkset_digest, str) or not _DIGEST_RE.fullmatch(expected_linkset_digest):
             reasons.add("EVIDENCE_LINK_INPUT_INVALID")
@@ -419,7 +424,7 @@ def build_projection_evidence_linkset(
     primary = _primary(reasons)
     ready = reasons == {"EVIDENCE_LINKSET_READY"}
     return {
-        **digest_payload,
+        **output_payload,
         "link_status": "VERIFIED" if ready else "BLOCKED",
         "outcome": "READY" if ready else "BLOCKED",
         "reason_code": primary,
