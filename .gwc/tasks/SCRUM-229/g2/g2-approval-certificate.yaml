@@ -105,21 +105,29 @@ node_execution_binding:
   final_transition: 'G3_PR'
 
 approval_conditions:
-  condition_1: 'All G1 gate artifacts created and verified'
+  condition_1:
+    description: 'All G1 gate artifacts created and verified'
     status: 'MET'
-  condition_2: 'Jira issue claim verified with AI Agent and Claimed At fields'
+  condition_2:
+    description: 'Jira issue claim verified with AI Agent and Claimed At fields'
     status: 'MET'
-  condition_3: 'Protected base SHA verified (848d0356bf003cf68f9f9c6a31b293914f2f7a00)'
+  condition_3:
+    description: 'Protected base SHA verified (848d0356bf003cf68f9f9c6a31b293914f2f7a00)'
     status: 'MET'
-  condition_4: 'Node identity and maturity target confirmed'
+  condition_4:
+    description: 'Node identity and maturity target confirmed'
     status: 'MET'
-  condition_5: 'Implementation approach selected and effort estimated'
+  condition_5:
+    description: 'Implementation approach selected and effort estimated'
     status: 'MET'
-  condition_6: 'Governance contracts read and verified satisfactory'
+  condition_6:
+    description: 'Governance contracts read and verified satisfactory'
     status: 'MET'
-  condition_7: 'Task workspace and directory structure created'
+  condition_7:
+    description: 'Task workspace and directory structure created'
     status: 'MET'
-  condition_8: 'Execution envelope valid and authority fields correct'
+  condition_8:
+    description: 'Execution envelope valid and authority fields correct'
     status: 'MET'
 
 approval_semantics:

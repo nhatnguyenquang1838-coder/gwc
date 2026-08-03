@@ -1,0 +1,37 @@
+{
+  "approval_id": "APPROVE_G2_EXECUTION_SCRUM-229_BASE_YAML_RESTORE_R1_20260803",
+  "artifact_type": "yaml-base-restoration-receipt",
+  "created_at": "2026-08-03T09:01:28Z",
+  "dependency": {
+    "purpose": "restore repository-wide validation required by active SCRUM-208 F4 lane",
+    "scrum_208_head_sha": "5242aabd143e2a7ff43ec26f717517c41966bac2",
+    "scrum_208_pr": 193
+  },
+  "protected_base_sha": "43d40a1512c10b07a5a799d0d2c8f5101e303113",
+  "replacement": {
+    "blob_sha": "6af6fefbc5f01ad0f62fa8ff63f4df4e5213eb37",
+    "condition_count": 8,
+    "condition_status": "MET",
+    "semantic_change": "NONE",
+    "transformation": "condition_1..condition_8 converted to mappings with exactly description and status fields"
+  },
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "schema_version": "1.0",
+  "scope_hash": "sha256:52b195bf59bdf1db209a6208f30c1de8a77e0318f50eb02f8fdd93a5a807cc0a",
+  "scope_hash_method": "sha256(canonical-json(scope))",
+  "source": {
+    "blob_sha": "1cb273ff89326974ab508e8b0a54325104d0bd5c",
+    "failure": "invalid YAML mapping in approval_conditions",
+    "path": ".gwc/tasks/SCRUM-229/g2/g2-approval-certificate.yaml"
+  },
+  "task_id": "SCRUM-229",
+  "validation": {
+    "authorized_block_only": "PASS",
+    "condition_status_preserved": "PASS",
+    "condition_text_preserved": "PASS",
+    "lf_utf8": "PASS",
+    "protected_semantic_fields_preserved": "PASS",
+    "yaml_parse": "PASS"
+  },
+  "working_branch": "hotfix/scrum-229-g2-certificate-yaml-restore-20260803"
+}
