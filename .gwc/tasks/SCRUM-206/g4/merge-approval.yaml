@@ -1,33 +1,29 @@
-schema_version: '1.0'
-artifact_type: g4-merge-approval
-gate: G4_MERGE
+approval_id: G4_SCRUM-206_20260802
+authority_gate: G4_MERGE
 task_id: SCRUM-206
 repository: nhatnguyenquang1838-coder/gwc
-base_branch: main
 base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+head_sha: 8af8201113e07d98db5315d61c29df5b73f06b59
+merge_commit_sha: null
 pr_number: 189
-pr_head_sha: 20848ee94797e9e6a58c79d1c7bddc24ad5f4806
-working_branch: g1-206-20260802-2328
-scope_hash: sha256:ee02b1bfaca2513f65afbad58a84650a7160af7659a5b11e5df1f924b47aede2
-scope_hash_16: ee02b1bfaca2513f
-approval_id: CP-20260802-206-G4-R1
-approved_files:
-  - .gwc/tasks/SCRUM-206/**
-  - tools/node_architect/lease_acquisition.py
-  - tests/test_lease_acquisition.py
-  - schemas/lease-acquisition-decision.schema.json
-  - core/node-architect/node-catalog/runtime_checkpoint/lease-acquisition.node.json
-  - releases/changelog.d/2026-08-02-scrum-206-lease-acquisition-m5.md
+pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/189
+ci_status: pass
+ci_run_id: 30780657813
+ci_url: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30780657813
+scope_hash: sha256:860aa4149eb4e8ef4f944d37c18a175f774ca84d0700070103395fc8f9ebfb74
+scope_hash_16: 860aa4149eb4e8ef
+issued_at: 2026-08-03T03:02:37Z
+expires_at: 2026-08-04T03:02:37Z
+approved_at: 2026-08-03T03:02:37Z
+approval_status: pending
 authorized_actions:
-  - merge_approved_pr
+  - merge_pull_request
 excluded_actions:
-  - force_push
-  - delete_branch
-  - change_pr_base
-  - deploy_release_publish_or_runtime_reload
-  - production_configuration_data_secret_credential_or_migration
-  - scope_expansion_or_unrelated_cleanup
-issued_at: '2026-08-03T00:13:00Z'
-expires_at: '2026-08-03T16:50:00Z'
-approval_command: APPROVE G4_MERGE CP-20260802-206-G4-R1 ee02b1bfaca2513f 2026-08-03T16:50:00Z
-status: G4_APPROVAL_PENDING
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+approval_command_format: APPROVE G4 <approval_id> <scope_hash_16> <expires_at_utc>
+exact_approval_command: APPROVE G4 G4_SCRUM-206_20260802 860aa4149eb4e8ef 2026-08-04T03:02:37Z
