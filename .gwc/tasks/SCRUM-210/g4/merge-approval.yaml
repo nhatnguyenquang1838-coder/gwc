@@ -1,0 +1,32 @@
+{
+  "approval_id": "CP-20260803-210-G4R1",
+  "authority_gate": "G4_MERGE",
+  "task_id": "SCRUM-210",
+  "issued_at": "2026-08-03T19:48:08Z",
+  "expires_at": "2026-08-04T19:18:08Z",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+  "pr_number": 203,
+  "head_sha": "b454ddd468aad3d89f383b3db4fec29bb2d8121e",
+  "risk_class": "R1",
+  "authorized_actions": [
+    "merge_approved_pr"
+  ],
+  "excluded_actions": [
+    "force_push",
+    "delete_branch",
+    "protected_branch_write",
+    "deploy",
+    "production_data_write",
+    "production_config_change",
+    "credential_rotation",
+    "migration"
+  ],
+  "scope_hash": "sha256:b9094eef8b270d42d16b4077d91779f19043aae3fa9db148552fb3eda28aff82",
+  "scope_hash_16": "b9094eef8b270d42",
+  "approval_command": "APPROVE G4_MERGE CP-20260803-210-G4R1 b9094eef8b270d42 2026-08-04T19:18:08Z",
+  "g2_approval_id": "CP-20260803-210-G2R4",
+  "g3_approval_id": "CP-20260803-210-G3R1",
+  "merge_strategy": "squash"
+}
