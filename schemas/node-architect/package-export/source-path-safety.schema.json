@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.dev/schemas/node-architect/package-export/source-path-safety-v1.json",
+  "title": "package_export.source-path-safety-check result",
+  "description": "Closed result contract for the SCRUM-231 source path safety evaluator. A valid result is execution-plane evidence only and never grants repository, PR, merge, deploy or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "outcome",
+    "repository",
+    "source_base_sha",
+    "input_digest",
+    "verdicts",
+    "authority_granted"
+  ],
+  "properties": {
+    "schema_id": { "const": "gwc.package_export.source_path_safety" },
+    "schema_version": { "const": "0.1" },
+    "outcome": { "enum": ["PASS", "FAIL"] },
+    "repository": { "type": ["string", "null"] },
+    "source_base_sha": { "type": ["string", "null"] },
+    "input_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "authority_granted": { "const": false },
+    "verdicts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/verdict" }
+    }
+  },
+  "$defs": {
+    "reason_code": {
+      "enum": [
+        "SOURCE_PATH_SAFE",
+        "SOURCE_PATH_EMPTY",
+        "SOURCE_PATH_ABSOLUTE",
+        "SOURCE_PATH_TRAVERSAL",
+        "SOURCE_PATH_BACKSLASH",
+        "SOURCE_PATH_ESCAPES_ROOT",
+        "SOURCE_SYMLINK_ESCAPE",
+        "SOURCE_REQUIRED_MISSING",
+        "SOURCE_OPTIONAL_MISSING",
+        "SOURCE_NOT_REGULAR_FILE",
+        "SOURCE_READBACK_FAILED"
+      ]
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_path", "source_sha256", "byte_count"],
+      "properties": {
+        "canonical_path": { "type": "string", "minLength": 1 },
+        "source_sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "byte_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_index",
+        "entry_id",
+        "declared_path",
+        "required",
+        "disposition",
+        "reason_code",
+        "detail",
+        "binding"
+      ],
+      "properties": {
+        "entry_index": { "type": "integer", "minimum": 0 },
+        "entry_id": { "type": "string", "minLength": 1 },
+        "declared_path": { "type": "string" },
+        "required": { "type": "boolean" },
+        "disposition": { "enum": ["ACCEPTED", "SKIPPED", "BLOCKED"] },
+        "reason_code": { "$ref": "#/$defs/reason_code" },
+        "detail": { "type": "string" },
+        "binding": {
+          "oneOf": [{ "$ref": "#/$defs/binding" }, { "type": "null" }]
+        }
+      }
+    }
+  }
+}
