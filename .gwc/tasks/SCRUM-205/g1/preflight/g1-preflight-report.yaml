@@ -1,0 +1,57 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+generated_at: "2026-08-02T15:58:00Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-205
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  g0_snapshot: "../../g0/context-snapshot.yaml"
+repository_state:
+  base_ref: main
+  base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+  profile_path: "projects/gwc/project-profile.yaml"
+  connector: GitHub
+checks:
+  - id: CHECK-01
+    status: PASS
+    code: REPO_CLEAN
+    message: "Working tree is clean and checked out to isolated worktree."
+    evidence:
+      - "git status exit code 0"
+  - id: CHECK-02
+    status: PASS
+    code: BASE_MATCH
+    message: "Base SHA matches expected upstream main."
+    evidence:
+      - "520aa1968a0809001e8994192278e52a59c86c61"
+process_readback:
+  process_id: "proc-scrum-205-preflight"
+  terminal_outcome: "SUCCESS"
+  required_sources:
+    - "core/node-architect/node-catalog/runtime_checkpoint/resume-token-validation.node.json"
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+    - id: STEP-01
+      name: "Validate token"
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: "read_validate"
+      capability_required: "gwc-resume-token-validator"
+      capability_status: VERIFIED
+      primary_route: "RESUME"
+      fallback_routes:
+        - "REAPPROVAL_REQUIRED"
+        - "RECONCILE_REQUIRED"
+        - "STOP_FAIL_CLOSED"
+      continuation: "resume_scoped_file_write"
+      expected_evidence: "RouteDecision json log"
+      bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+risk_class: R2
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS
