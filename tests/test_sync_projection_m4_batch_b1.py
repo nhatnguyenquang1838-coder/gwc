@@ -1,4 +1,5 @@
 import copy
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -232,8 +233,18 @@ class ProjectionSourceAuthorityTests(unittest.TestCase):
         self.assertNotEqual(first["decision_digest"], second["decision_digest"])
 
 
+def _source_authority_digest(decision):
+    semantic = {
+        key: value
+        for key, value in decision.items()
+        if key not in {"observed_at", "decision_digest"}
+    }
+    payload = json.dumps(semantic, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def valid_authority_decision():
-    return {
+    decision = {
         "schema_version": "1.0",
         "artifact_type": "projection-source-authority-decision",
         "task_id": "SCRUM-227",
@@ -286,8 +297,9 @@ def valid_authority_decision():
         "merge_authority_granted": False,
         "deployment_authority_granted": False,
         "production_authority_granted": False,
-        "decision_digest": DIGEST_C,
     }
+    decision["decision_digest"] = _source_authority_digest(decision)
+    return decision
 
 
 def valid_evidence_items():
@@ -386,6 +398,29 @@ class ProjectionEvidenceLinkingTests(unittest.TestCase):
             "EVIDENCE_LINK_SOURCE_AUTHORITY_INVALID",
         )
 
+    def test_malformed_or_tampered_source_authority_is_rejected(self):
+        malformed = valid_authority_decision()
+        malformed.pop("reason_code")
+        self.assertEqual(
+            self.build(source_authority_decision=malformed)["reason_code"],
+            "EVIDENCE_LINK_SOURCE_AUTHORITY_INVALID",
+        )
+
+        extra_field = valid_authority_decision()
+        extra_field["unexpected"] = True
+        extra_field["decision_digest"] = _source_authority_digest(extra_field)
+        self.assertEqual(
+            self.build(source_authority_decision=extra_field)["reason_code"],
+            "EVIDENCE_LINK_SOURCE_AUTHORITY_INVALID",
+        )
+
+        tampered = valid_authority_decision()
+        tampered["field_authority"][0]["field_path"] = "/task/assignee"
+        self.assertEqual(
+            self.build(source_authority_decision=tampered)["reason_code"],
+            "EVIDENCE_LINK_SOURCE_AUTHORITY_INVALID",
+        )
+
     def test_broken_stale_and_unverified_links_fail_closed(self):
         expected = {
             "BROKEN": "EVIDENCE_LINK_BROKEN",
@@ -416,6 +451,7 @@ class ProjectionEvidenceLinkingTests(unittest.TestCase):
     def test_field_not_confirmed_by_source_authority_is_unbound(self):
         decision = valid_authority_decision()
         decision["field_authority"] = decision["field_authority"][:1]
+        decision["decision_digest"] = _source_authority_digest(decision)
         result = self.build(source_authority_decision=decision)
         self.assertEqual(result["reason_code"], "EVIDENCE_LINK_FIELD_UNBOUND")
         self.assertEqual(result["uncovered_fields"], ["/repository/head"])
