@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/package-export/entry-schema-validation.schema.json",
+  "title": "package_export.entry-schema-validation runtime result",
+  "description": "Closed, versioned runtime contract for the entry schema validation evaluator (SCRUM-230, M4_DETERMINISTIC). The typed result is the only PASS signal; it never grants repository, PR, merge, deploy or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "outcome",
+    "manifest_digest",
+    "schema_digest",
+    "source_sha",
+    "inventory",
+    "errors",
+    "authority_granted"
+  ],
+  "properties": {
+    "schema_id": { "const": "gwc.package_export.entry_schema_validation" },
+    "schema_version": { "type": "string", "enum": ["0.1"] },
+    "outcome": { "type": "string", "enum": ["PASS", "FAIL"] },
+    "manifest_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "schema_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "source_sha": {
+      "anyOf": [
+        { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        { "type": "null" }
+      ]
+    },
+    "authority_granted": { "const": false },
+    "inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entry_index", "entry_id", "accepted", "reason_code"],
+        "properties": {
+          "entry_index": { "type": "integer", "minimum": 0 },
+          "entry_id": { "type": "string", "minLength": 1 },
+          "accepted": { "type": "boolean" },
+          "reason_code": { "$ref": "#/definitions/reasonCode" }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entry_index",
+          "entry_id",
+          "json_path",
+          "keyword",
+          "reason_code",
+          "detail"
+        ],
+        "properties": {
+          "entry_index": { "type": "integer", "minimum": -1 },
+          "entry_id": { "type": "string", "minLength": 1 },
+          "json_path": { "type": "string", "minLength": 1 },
+          "keyword": {
+            "type": "string",
+            "enum": [
+              "type",
+              "required",
+              "additionalProperties",
+              "pattern",
+              "enum",
+              "minLength",
+              "uniqueItems"
+            ]
+          },
+          "reason_code": { "$ref": "#/definitions/reasonCode" },
+          "detail": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "reasonCode": {
+      "type": "string",
+      "enum": [
+        "ENTRY_SCHEMA_VALID",
+        "ENTRY_SCHEMA_INVALID",
+        "ENTRY_REQUIRED_FIELD_MISSING",
+        "ENTRY_TYPE_INVALID",
+        "ENTRY_ID_INVALID",
+        "ENTRY_UNKNOWN_FIELD",
+        "ENTRY_VERSION_UNSUPPORTED",
+        "ENTRY_DUPLICATE_ID"
+      ]
+    }
+  }
+}

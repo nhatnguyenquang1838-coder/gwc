@@ -1,0 +1,39 @@
+approval_id: CP-20260803-230-G2
+authority_gate: G2_EXECUTION
+task_id: SCRUM-230
+subtasks: []
+issued_at: '2026-08-03T17:40:00Z'
+expires_at: '2026-08-04T17:40:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d9a89a002aae4348359cd88810a9d03926199597
+working_branch: hermes/scrum-230-entry-schema-validation-m4-20260803
+modules_or_files:
+- tools/node_architect/package_export
+- schemas/node-architect/package-export
+- tests/test_package_export_entry_schema_validation.py
+- .gwc/tasks/SCRUM-230/**
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- merge_approved_pr
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+scope_hash: sha256:18e8b756f1491bcbf9309a0e036dde48bfc5214b7deca26beb6b3be66f5ddb7f
+scope_hash_16: 18e8b756f1491bcb
+approval_command: APPROVE G2_EXECUTION CP-20260803-230-G2 18e8b756f1491bcb 2026-08-04T17:40:00Z
