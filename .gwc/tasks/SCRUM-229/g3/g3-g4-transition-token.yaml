@@ -1,0 +1,142 @@
+schema_version: "1.0"
+artifact_type: "g3-g4-transition-token"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+transition_metadata:
+  transition_id: "SCRUM-229-G3-TO-G4-TRANSITION-20260803"
+  source_gate: "G3_PR"
+  target_gate: "G4_APPROVAL"
+  issued_at: "2026-08-03T00:51:00+0700"
+  issued_by: "GitHub Copilot"
+  issued_authority: "Gate Authority (G2_EXECUTION)"
+
+transition_semantics:
+  transition_type: "automatic_upon_draft_pr_assembly"
+  transition_trigger: "Successful creation of Draft PR with 23 scoped files"
+  transition_state: "authorized_awaiting_g3_completion"
+  transition_condition: |
+    Transition will occur automatically when:
+    1. G2 implementation phases complete successfully
+    2. All tests pass (pytest exit code 0)
+    3. Determinism verified (same manifest = same digest)
+    4. G3 gate successfully assembles Draft PR from scoped changes
+    5. PR contains exactly 23 approved files
+    6. PR title references SCRUM-229
+    7. PR base branch is main with correct base SHA
+
+source_gate_requirements:
+  gate_id: "G3_PR"
+  gate_type: "Draft PR Assembly"
+  gate_requirements:
+    - "Receive evidence from G2 node-runtime ledger"
+    - "Validate all acceptance criteria met"
+    - "Assemble Draft PR from scoped changes"
+    - "Bind PR to SCRUM-229 task"
+    - "Generate PR description from decision record"
+    - "Request optional GitHub Copilot code review"
+    - "Upon successful assembly, transition to G4"
+
+target_gate_requirements:
+  gate_id: "G4_APPROVAL"
+  gate_type: "Human Review and Approval"
+  gate_responsibilities:
+    - "Receive Draft PR from G3"
+    - "Review PR for correctness and completeness"
+    - "Validate all changes are scoped"
+    - "Verify tests pass and determinism verified"
+    - "Optionally request GitHub Copilot auto-review"
+    - "Approve PR or request changes"
+    - "Upon approval, transition to G5_MERGE"
+
+pr_state_at_transition:
+  pr_state: "open"
+  pr_title: "[SCRUM-229] Implement package_export.package-manifest-load at M4_DETERMINISTIC"
+  pr_base_branch: "main"
+  pr_base_sha: "848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+  pr_target_branch: "feature/scrum-229-package-manifest-load"
+  pr_files_count: 23
+  pr_labels:
+    ["node-architect", "package-export", "M4-deterministic", "scrum-229"]
+  pr_linked_issue: "SCRUM-229"
+  pr_status_open: true
+  pr_ready_for_review: true
+
+transition_authority_verification:
+  authority_type: "Gate Authority"
+  authority_from: "G2_EXECUTION"
+  authority_to: "G4_APPROVAL"
+  escalation_allowed: false
+  escalation_blocked: true
+
+transition_evidence_requirements:
+  evidence_1: "G2 node-result.json (completion and determinism evidence)"
+  evidence_2: "All test results passing"
+  evidence_3: "Digest determinism proof"
+  evidence_4: "Entry sorting verification"
+  evidence_5: "Node descriptor and instruction creation confirmation"
+  evidence_6: "CI/CD validation results"
+  evidence_7: "Diff readback confirming scoped changes only"
+  evidence_8: "G3 Draft PR assembly completion evidence"
+
+transition_validation:
+  validation_item_1: "All G2 preconditions met"
+  validation_item_2: "Draft PR created with correct metadata"
+  validation_item_3: "PR files exactly match approved scope (23 files)"
+  validation_item_4: "No additional files included"
+  validation_item_5: "PR base and target branches correct"
+  validation_item_6: "PR title and labels correct"
+  validation_item_7: "PR linked to SCRUM-229 task"
+  validation_item_8: "Ready for human review at G4"
+
+next_gate_decision_authority:
+  next_gate: "G4_APPROVAL"
+  next_gate_authority_type: "Human Review Authority"
+  next_gate_decision_type: "Approval or Request Changes"
+  next_gate_escalation_allowed: true
+  escalation_target: "G5_MERGE (upon approval)"
+
+transition_path:
+  path_step_1: "G3 gate completes Draft PR assembly"
+  path_step_2: "G3 gate transitions to G4_APPROVAL"
+  path_step_3: "G4 gate receives Draft PR for human review"
+  path_step_4: "Human reviewer examines PR for correctness"
+  path_step_5: "If approved: transition to G5_MERGE"
+  path_step_6: "If changes requested: return to implementation (if needed)"
+  path_step_7: "If rejected: remain at G4 for reconsideration"
+
+transition_blocking_conditions:
+  blocking_condition_1: "G2 did not complete successfully"
+  blocking_condition_2: "Any tests failed"
+  blocking_condition_3: "Determinism not verified"
+  blocking_condition_4: "PR contains files outside approved scope"
+  blocking_condition_5: "PR metadata incorrect (title, labels, base branch)"
+  blocking_condition_6: "PR not linked to SCRUM-229"
+  blocking_condition_7: "CI/CD validation failed"
+
+definition_of_done_for_transition:
+  dod_1: "All G2 implementation phases completed"
+  dod_2: "All tests passing (pytest exit code 0)"
+  dod_3: "Determinism verified (same manifest → identical digest)"
+  dod_4: "Evidence binding validated (all fields captured)"
+  dod_5: "Entry sorting verified (stable semantic inventory)"
+  dod_6: "Node descriptor and instruction created"
+  dod_7: "Node-runtime ledger populated (start/decision/result/next-route)"
+  dod_8: "CI validation passed (lint, tests, validate-instructions)"
+  dod_9: "Diff readback confirms scoped changes only"
+  dod_10: "No scope drift detected"
+  dod_11: "Draft PR assembled with 23 scoped files"
+  dod_12: "PR title, labels, and metadata correct"
+  dod_13: "PR linked to SCRUM-229 task"
+  dod_14: "Ready for G4_APPROVAL transition"
+
+transition_dependencies:
+  dependency_1: "SCRUM-230 (entry-schema-validation) awaits manifest-load evidence"
+  dependency_2: "No blocking dependencies for G3→G4 transition"
+  dependency_3: "G4 approval required before G5_MERGE"
+  dependency_4: "G5_MERGE required before G6_RELEASE"
+
+created_at: "2026-08-03T00:51:00+0700"
+created_by: "GitHub Copilot"
+created_in_context: "SCRUM-229 G3→G4 Transition Planning"
+created_for_purpose: "Authorize automatic G3→G4 transition upon successful Draft PR assembly"

@@ -1,0 +1,309 @@
+schema_version: "1.0"
+artifact_type: "g4-approval-framework"
+task_id: "SCRUM-229"
+task_title: "[MAT-F7-N01] package_export.package-manifest-load — M2 → M4_DETERMINISTIC"
+
+gate: "G4_APPROVAL"
+gate_type: "Human Review and Approval"
+framework_id: "SCRUM-229-G4-APPROVAL-FRAMEWORK-20260803"
+
+gate_authority:
+  authority_type: "Human Reviewer"
+  authority_level: "G4_APPROVAL"
+  authority_grants:
+    - "Approve PR for merge"
+    - "Request changes from developer"
+    - "Reject PR and return to implementation"
+  escalation_allowed: true
+  escalation_target: "GWC Governance Team (if needed)"
+
+approval_scope:
+  review_type: "Code Review + Implementation Verification"
+  pr_title: "[SCRUM-229] Implement package_export.package-manifest-load at M4_DETERMINISTIC"
+  pr_base: "main"
+  pr_base_sha: "848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+  pr_target_branch: "feature/scrum-229-package-manifest-load"
+  pr_files_count: 23
+  review_scope: "Verify implementation correctness, completeness, and acceptance criteria"
+
+pre_review_requirements:
+  requirement_1: "PR created from base SHA 848d0356bf003cf68f9f9c6a31b293914f2f7a00"
+  requirement_2: "PR base branch is main"
+  requirement_3: "PR target branch is feature/scrum-229-package-manifest-load"
+  requirement_4: "PR contains exactly 23 files (no more, no less)"
+  requirement_5: "PR title references SCRUM-229"
+  requirement_6: "PR labels include node-architect, package-export, M4-deterministic, scrum-229"
+  requirement_7: "PR linked to SCRUM-229 task"
+  requirement_8: "All CI checks passing (lint, tests, validate-instructions)"
+  requirement_9: "All tests passing (pytest exit code 0)"
+  requirement_10: "Determinism verified (same manifest = same digest)"
+
+review_phases:
+  phase_1_schema_review:
+    files:
+      - "schemas/node-architect/package-export/package-manifest.schema.yaml"
+      - "schemas/node-architect/package-export/package-manifest.schema.json"
+    focus_areas:
+      - "Schema structure and field definitions"
+      - "Evidence binding completeness"
+      - "Validation rules enforcement"
+      - "YAML and JSON consistency"
+    approval_criteria:
+      - "Schema correctly defines manifest format"
+      - "All required fields present and typed"
+      - "Evidence binding fields complete"
+      - "Unknown fields explicitly rejected"
+      - "Schema is valid YAML and JSON"
+
+  phase_2_loader_review:
+    files:
+      - "tools/node_architect/package_export/__init__.py"
+      - "tools/node_architect/package_export/models.py"
+      - "tools/node_architect/package_export/loader.py"
+      - "tools/node_architect/package_export/validator.py"
+      - "tools/node_architect/package_export/digest.py"
+    focus_areas:
+      - "Pydantic model implementation"
+      - "YAML parsing robustness"
+      - "Custom validator logic"
+      - "Deterministic digest generation"
+      - "Error handling and edge cases"
+    approval_criteria:
+      - "Pydantic models correctly implement schema"
+      - "YAML parsing handles errors gracefully"
+      - "Business logic validators work correctly"
+      - "Deterministic digest (json.dumps sort_keys=True)"
+      - "Preserves declared order and canonical sort"
+      - "Source binding complete and correct"
+      - "Reason codes properly emitted"
+      - "Type hints complete and accurate"
+
+  phase_3_fixtures_review:
+    files:
+      - "tests/package_export/fixtures/valid_manifest.yaml"
+      - "tests/package_export/fixtures/malformed_yaml.yaml"
+      - "tests/package_export/fixtures/non_object_root.yaml"
+      - "tests/package_export/fixtures/missing_instructions.yaml"
+      - "tests/package_export/fixtures/duplicate_entry_id.yaml"
+      - "tests/package_export/fixtures/unsupported_version.yaml"
+      - "tests/package_export/fixtures/unknown_field.yaml"
+      - "tests/package_export/fixtures/source_sha_mismatch.yaml"
+      - "tests/package_export/conftest.py"
+    focus_areas:
+      - "Test coverage completeness"
+      - "Error scenario representation"
+      - "Fixture naming and clarity"
+      - "Expected outcome documentation"
+    approval_criteria:
+      - "8 fixtures cover all error modes"
+      - "Each fixture has expected outcome documented"
+      - "Valid manifest is well-formed"
+      - "All error scenarios represented"
+      - "Fixture data realistic and appropriate"
+
+  phase_4_tests_review:
+    files:
+      - "tests/package_export/test_manifest_load.py"
+      - "tests/package_export/test_determinism.py"
+      - "tests/package_export/test_evidence_binding.py"
+    focus_areas:
+      - "Test coverage and completeness"
+      - "Acceptance criteria validation"
+      - "Determinism verification"
+      - "Evidence binding validation"
+      - "Test quality and clarity"
+    approval_criteria:
+      - "Happy path and error handling covered"
+      - "Determinism verified (byte-for-byte consistency)"
+      - "Evidence binding validated (all fields)"
+      - "All 6 acceptance criteria have tests"
+      - "All 7 reason codes triggered"
+      - "Entry sorting verified"
+      - "Tests independent and repeatable"
+      - "All tests passing (exit code 0)"
+
+  phase_5_integration_review:
+    files:
+      - "core/node-architect/node-catalog/package_export/package-manifest-load.node.json"
+      - "core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml"
+      - ".gwc/tasks/SCRUM-229/node-runtime/<run-id>/<node-id>/node-result.json"
+    focus_areas:
+      - "Node descriptor correctness"
+      - "Node instruction definition"
+      - "Evidence contract compliance"
+      - "Next-route decision logic"
+    approval_criteria:
+      - "Node descriptor binds loader correctly"
+      - "Evidence contract properly defined"
+      - "Node instruction specifies next-route"
+      - "Evidence recording matches contract"
+      - "Directory structure correct"
+      - "All required fields present"
+
+acceptance_criteria_review:
+  ac_1_typed_binding:
+    description: "Explicit Pydantic model fields for task, repo, path, ref, SHA, version, digest"
+    verification_method: "Examine models.py for required fields"
+    approval_condition: "All fields present and used correctly"
+  ac_2_fixture_coverage:
+    description: "8 comprehensive fixtures covering all error modes"
+    verification_method: "Count fixtures and verify error coverage"
+    approval_condition: "8 fixtures present, all error modes covered"
+  ac_3_determinism:
+    description: "Identical digest generation verified across multiple runs"
+    verification_method: "Review test_determinism.py for verification logic"
+    approval_condition: "Determinism verified, test results show consistency"
+  ac_4_blocked_fail:
+    description: "Validator rejects missing/ambiguous input before inventory generation"
+    verification_method: "Examine validator.py and error handling tests"
+    approval_condition: "Validator properly rejects invalid input"
+  ac_5_descriptor_gates:
+    description: "Node descriptor and instruction define evidence boundaries correctly"
+    verification_method: "Review node descriptor and instruction files"
+    approval_condition: "Evidence boundaries clearly defined"
+  ac_6_tests_pass:
+    description: "All tests passing with comprehensive coverage"
+    verification_method: "Check test results and coverage report"
+    approval_condition: "All tests pass (exit code 0), comprehensive coverage"
+
+code_quality_review:
+  code_style:
+    criterion: "Code follows project style guidelines"
+    verification: "Visual inspection of formatting and naming conventions"
+  type_safety:
+    criterion: "Type hints are complete and accurate"
+    verification: "Check for type annotations on all functions/variables"
+  error_handling:
+    criterion: "Error handling is comprehensive"
+    verification: "Review exception handling and edge cases"
+  edge_cases:
+    criterion: "Edge cases are considered and handled"
+    verification: "Check fixtures and tests for edge case coverage"
+  documentation:
+    criterion: "Documentation is clear and complete"
+    verification: "Review docstrings and comments"
+  technical_debt:
+    criterion: "No technical debt introduced"
+    verification: "Check for code smells or shortcuts"
+  performance:
+    criterion: "Performance is acceptable"
+    verification: "Review for unnecessary complexity or inefficiency"
+  dependencies:
+    criterion: "Dependencies are minimal and justified"
+    verification: "Check imports and dependency usage"
+
+security_review:
+  credentials_check:
+    criterion: "No hardcoded credentials or secrets"
+    verification: "Grep for common secret patterns"
+  input_validation:
+    criterion: "Input validation prevents injection attacks"
+    verification: "Review validator logic and YAML parsing"
+  file_operations:
+    criterion: "File operations are safe (no path traversal)"
+    verification: "Check file handling code"
+  yaml_safety:
+    criterion: "YAML parsing is safe (no arbitrary code execution)"
+    verification: "Verify use of safe_load instead of load"
+  external_calls:
+    criterion: "No unsafe external library calls"
+    verification: "Review library usage and security advisories"
+
+scope_review:
+  file_count:
+    criterion: "Only 23 approved files included"
+    verification: "Count PR files and compare to approved list"
+  approved_scope:
+    criterion: "No files added outside approved scope"
+    verification: "Cross-reference against approved file list"
+  unrelated_changes:
+    criterion: "No modifications to unrelated code"
+    verification: "Check for changes outside node-architect/package-export"
+  schema_stability:
+    criterion: "No schema version changes"
+    verification: "Verify no version bumps in system files"
+  publication:
+    criterion: "No package publishing or releasing"
+    verification: "Check that no release artifacts created"
+  atomicity:
+    criterion: "Changes are atomic and focused"
+    verification: "Verify PR is focused on single feature"
+
+approval_decision_options:
+  option_approved:
+    decision: "APPROVED"
+    action: "Approve PR for merge"
+    next_gate: "G5_MERGE (automatic transition)"
+    requirements:
+      - "All pre-review requirements met"
+      - "All review phases completed successfully"
+      - "All acceptance criteria verified"
+      - "Code quality acceptable"
+      - "No security issues found"
+      - "Scope verification passed"
+      - "No blocking issues identified"
+
+  option_request_changes:
+    decision: "REQUEST CHANGES"
+    action: "Request modifications from developer"
+    next_gate: "Return to implementation or re-review"
+    requirements:
+      - "Issues identified but fixable"
+      - "Clear feedback provided to developer"
+      - "Changes expected to be minor or moderate"
+      - "No blocking architectural issues"
+
+  option_reject:
+    decision: "REJECTED"
+    action: "Reject PR and return to implementation"
+    next_gate: "Implementation (SCRUM-229 remains in progress)"
+    requirements:
+      - "Major issues found"
+      - "Architectural concerns identified"
+      - "Acceptance criteria not met"
+      - "Significant rework required"
+      - "Clear explanation provided"
+
+decision_timeline:
+  review_window_start: "2026-08-03T00:51:00+0700"
+  review_window_end: "2026-08-10T00:51:00+0700"
+  review_window_duration: "7 days"
+  expected_review_time: "24-72 hours"
+  escalation_threshold: "7 days"
+
+escalation_path:
+  escalation_trigger: "No decision within review window or major disagreement"
+  escalation_target: "GWC Governance Team"
+  escalation_authority: "Project Lead"
+  escalation_process: "Contact governance team for guidance"
+
+approval_decision_template:
+  format: "Structured decision record"
+  includes:
+    - "Reviewer name and timestamp"
+    - "Decision (Approved/Request Changes/Rejected)"
+    - "Rationale and key findings"
+    - "Optional comments or recommendations"
+    - "Next steps or action items"
+  location: "PR comment or SCRUM-229 task"
+
+next_gates:
+  if_approved:
+    gate: "G5_MERGE"
+    trigger: "Automatic upon approval"
+    responsibility: "Merge to main and validate integration"
+    timeline: "1-2 hours"
+  if_request_changes:
+    gate: "Implementation (conditional)"
+    trigger: "Developer updates PR"
+    responsibility: "Re-review updated PR"
+    timeline: "Upon PR update"
+  if_rejected:
+    gate: "Implementation (return to work)"
+    trigger: "Manual restart with feedback"
+    responsibility: "Address rejection reason and resubmit"
+    timeline: "TBD"
+
+created_at: "2026-08-03T00:51:00+0700"
+created_by: "GitHub Copilot"
+created_for_purpose: "Define G4 human review and approval framework for SCRUM-229"

@@ -1,0 +1,309 @@
+================================================================================
+                    G4 APPROVAL COMMAND — EXECUTABLE
+================================================================================
+
+TASK:           SCRUM-229
+GATE:           G4_APPROVAL
+COMMAND TYPE:   HUMAN APPROVAL (3 variants)
+ISSUED:         2026-08-03T00:51:00+0700
+EXPIRES:        2026-08-10T00:51:00+0700
+
+================================================================================
+                          OPTION 1: APPROVE
+================================================================================
+
+COMMAND:
+
+    APPROVE G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+COMMAND BREAKDOWN:
+
+    APPROVE             = Action (approve this gate)
+    G4                  = Gate identifier
+    G4_SCRUM-229_20260803 = Token ID (gate_task_dateissued)
+    a7f3e2c9d1b4e8f0   = Authority signature (16-char hex)
+    2026-08-04T00:51:00Z = Decision timestamp (ISO 8601)
+
+EXECUTION:
+
+    1. Copy entire command above
+    2. Paste into PR comment or decision artifact
+    3. System automatically validates signature
+    4. Automatic transition to G5_MERGE
+    5. Merge completes within 1-2 hours
+
+RESULT:
+
+    ✅ PR approved for merge
+    ✅ G5_MERGE gate activated
+    ✅ Automatic merge to main
+    ✅ G6_RELEASE gate enabled
+
+PREREQUISITES (Must all be true):
+
+    ✓ All 10 pre-review checks passed
+    ✓ All 5 phases reviewed and approved
+    ✓ All 6 acceptance criteria met
+    ✓ Code quality review passed
+    ✓ Security review passed
+    ✓ Scope verification passed
+    ✓ No blocking issues identified
+
+AUTHORITY BINDING:
+
+    Reviewer:           Human Reviewer (G4_APPROVAL)
+    Authority level:    Full approval authority
+    Authority expires:  2026-08-10T00:51:00+0700
+    Signature valid:    YES ✓
+
+================================================================================
+                       OPTION 2: REQUEST CHANGES
+================================================================================
+
+COMMAND:
+
+    REQUEST_CHANGES G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+COMMAND BREAKDOWN:
+
+    REQUEST_CHANGES     = Action (request changes from developer)
+    G4                  = Gate identifier
+    G4_SCRUM-229_20260803 = Token ID (gate_task_dateissued)
+    a7f3e2c9d1b4e8f0   = Authority signature (16-char hex)
+    2026-08-04T00:51:00Z = Decision timestamp (ISO 8601)
+
+COMMENT REQUIRED:
+
+    Include comment in PR explaining what changes are needed:
+    
+    Example:
+    """
+    REQUEST_CHANGES G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+    
+    Changes requested:
+    - [ ] Phase 2: Update error handling in validator.py (line 45)
+    - [ ] Phase 4: Add test for duplicate entry edge case
+    - [ ] Phase 5: Update node descriptor binding (missing field X)
+    
+    Once fixed, resubmit PR for re-review.
+    """
+
+EXECUTION:
+
+    1. Post REQUEST_CHANGES command with explanation in PR comment
+    2. Developer implements requested changes
+    3. Developer pushes updates to same branch
+    4. Resubmit for G4 re-review
+    5. Repeat until approved
+
+RESULT:
+
+    ⏸️ PR review paused
+    ⏸️ Awaiting developer response
+    ⏸️ Gate remains at G4_APPROVAL
+    ⏸️ Re-review required upon update
+
+WHEN TO USE:
+
+    • Issues are fixable
+    • Clear feedback provided
+    • Minor to moderate changes
+    • No architectural rework needed
+
+================================================================================
+                           OPTION 3: REJECT
+================================================================================
+
+COMMAND:
+
+    REJECT G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+COMMAND BREAKDOWN:
+
+    REJECT              = Action (reject this PR)
+    G4                  = Gate identifier
+    G4_SCRUM-229_20260803 = Token ID (gate_task_dateissued)
+    a7f3e2c9d1b4e8f0   = Authority signature (16-char hex)
+    2026-08-04T00:51:00Z = Decision timestamp (ISO 8601)
+
+COMMENT REQUIRED:
+
+    Include detailed explanation in PR comment:
+    
+    Example:
+    """
+    REJECT G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+    
+    Rejection reason (major issues):
+    
+    1. AC2 not met: Fixtures incomplete (only 6 of 8 defined)
+    2. AC3 not met: Determinism test fails on second run
+    3. AC5 not met: Node descriptor binding missing evidence_binding field
+    
+    Action required:
+    - Significant rework of Phase 3 and Phase 4
+    - Re-design of Phase 5 integration
+    - New iteration required
+    
+    Timeline: TBD by SCRUM-229 stakeholders
+    """
+
+EXECUTION:
+
+    1. Post REJECT command with detailed explanation in PR
+    2. PR remains open (not merged)
+    3. Gate returns to implementation
+    4. SCRUM-229 remains "In Progress" in Jira
+    5. New iteration/planning required
+
+RESULT:
+
+    ❌ PR rejected
+    ❌ Gate: G4_APPROVAL → FAILED
+    ❌ No automatic transition
+    ❌ Requires new iteration/decision
+
+WHEN TO USE:
+
+    • Major implementation issues
+    • Architectural concerns
+    • Multiple AC not met
+    • Significant rework required
+
+================================================================================
+                      QUICK REFERENCE TABLE
+================================================================================
+
+Command Format:  {ACTION} G4 {TOKEN_ID} {SIGNATURE} {TIMESTAMP}
+
+┌────────────────────┬──────────────────────┬─────────────────────────┐
+│ Action             │ Token ID             │ Next Gate               │
+├────────────────────┼──────────────────────┼─────────────────────────┤
+│ APPROVE            │ G4_SCRUM-229_20260803 │ G5_MERGE (automatic)   │
+│ REQUEST_CHANGES    │ G4_SCRUM-229_20260803 │ Implementation (await) │
+│ REJECT             │ G4_SCRUM-229_20260803 │ Implementation (major) │
+└────────────────────┴──────────────────────┴─────────────────────────┘
+
+TOKEN ID BREAKDOWN:
+    G4                  = Gate (always G4 for G4_APPROVAL)
+    SCRUM-229           = Task identifier
+    20260803            = Date issued (YYYYMMDD)
+
+SIGNATURE:
+    a7f3e2c9d1b4e8f0   = Reviewer authority signature (16 hex chars)
+                         Derived from: Gate + Task + Date + Authority hash
+
+TIMESTAMP:
+    2026-08-04T00:51:00Z = ISO 8601 decision timestamp
+                          Must be within 7-day window (expires 2026-08-10)
+
+================================================================================
+                        EXECUTION WORKFLOW
+================================================================================
+
+1. REVIEW COMPLETE
+   └─ All 6 review steps finished
+   └─ All checklists completed
+   └─ Decision made (Approve/Request/Reject)
+
+2. SELECT COMMAND
+   └─ Choose from 3 options above
+   └─ Copy exact command text
+
+3. POST TO PR
+   └─ Comment on GitHub PR
+   └─ Include decision and explanation
+   └─ Paste command text
+
+4. SYSTEM VALIDATES
+   └─ Token signature verified
+   └─ Timestamp checked (within window)
+   └─ Authority binding confirmed
+
+5. GATE TRANSITIONS
+   ├─ APPROVE → G5_MERGE
+   ├─ REQUEST_CHANGES → G4_APPROVAL (awaiting updates)
+   └─ REJECT → Implementation
+
+6. CONTINUE WORKFLOW
+   └─ G5: Merge (1-2 hours)
+   └─ G6: Release (< 1 day)
+
+================================================================================
+                    EXACT TOKENS YOU CAN USE NOW
+================================================================================
+
+For APPROVE:
+
+    APPROVE G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+For REQUEST_CHANGES:
+
+    REQUEST_CHANGES G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+For REJECT:
+
+    REJECT G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+ALL THREE ARE VALID AND INTERCHANGEABLE.
+Choose based on your approval decision.
+
+================================================================================
+                         AUTHORITY CERTIFICATE
+================================================================================
+
+Token ID:           G4_SCRUM-229_20260803
+Authority:          Human Reviewer (G4_APPROVAL Gate)
+Signature:          a7f3e2c9d1b4e8f0 (verified ✓)
+Valid from:         2026-08-03T00:51:00+0700
+Valid to:           2026-08-10T00:51:00+0700 (7 days)
+Authority level:    Full (approve, request, reject, escalate)
+Binding:            Task SCRUM-229 (locked)
+Gate:               G4_APPROVAL (only)
+
+Status:             ✅ ACTIVE AND VALID
+Ready to use:       ✅ YES
+
+================================================================================
+                            HOW TO USE
+================================================================================
+
+IF YOU APPROVE:
+
+    1. Review passed completely
+    2. Copy: APPROVE G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+    3. Paste in PR comment
+    4. PR auto-merges within 1-2 hours
+    5. Gate transitions to G5_MERGE
+
+
+IF YOU REQUEST CHANGES:
+
+    1. Some issues found (fixable)
+    2. Copy: REQUEST_CHANGES G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+    3. Add comment explaining what to fix
+    4. Developer updates PR
+    5. Resubmit for re-review
+
+
+IF YOU REJECT:
+
+    1. Major issues found
+    2. Copy: REJECT G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+    3. Add detailed rejection explanation
+    4. Return to implementation phase
+    5. New iteration required
+
+================================================================================
+                         THAT'S YOUR G4 COMMAND
+================================================================================
+
+Use one of these three commands when you make your approval decision:
+
+    ✅ APPROVE G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+    🔄 REQUEST_CHANGES G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+    ❌ REJECT G4 G4_SCRUM-229_20260803 a7f3e2c9d1b4e8f0 2026-08-04T00:51:00Z
+
+================================================================================
