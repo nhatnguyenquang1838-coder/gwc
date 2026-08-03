@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+task_id: SCRUM-210
+node_id: runtime_checkpoint.checkpoint-expiry-cleanup
+decision: approve_option_O1
+selected_option: O1
+target_maturity: M5_REPLAY_SAFE
+validator: tools/node_architect/validate_node_catalog_runtime_checkpoint.py
+test_entrypoint: tests/test_checkpoint_expiry_cleanup.py
+local_validation: 'PYTHONPATH=. python tests/test_checkpoint_expiry_cleanup.py -> 13 passed; full suite 860 passed'
+scope_hash: sha256:1e971b6e7c8ab3a8530c6fc9256f73d6e9de5d43a705b0e98cf18dc31c25e461
+rationale: >
+  Implement a deterministic, replay-safe expiry cleanup with audit tombstones,
+  preserving governance/audit/append-only evidence and honoring the active
+  resume path. G2/G3 only; G4/G5/G6 not applicable.

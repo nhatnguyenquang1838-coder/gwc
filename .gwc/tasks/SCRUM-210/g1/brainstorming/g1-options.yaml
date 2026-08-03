@@ -1,0 +1,21 @@
+schema_version: '1.0'
+artifact_type: g1-options
+task_id: SCRUM-210
+node_id: runtime_checkpoint.checkpoint-expiry-cleanup
+options:
+  - id: O1
+    title: In-memory declarative registry + CleanupPolicy model
+    detail: >
+      Model disposable entries with retention_class + expires_at_epoch_ms. A
+      declarative CleanupPolicy carries now_epoch_ms, retention_window_ms, and
+      an optional active_resume binding. Cleanup classifies each entry and
+      tombstones expired disposable ones.
+    chosen: true
+  - id: O2
+    title: Hard-delete expired hints
+    detail: 'Rejected: deletion violates the no-governance-evidence-deletion contract; tombstone is required.'
+    chosen: false
+rationale: >
+  O1 keeps cleanup deterministic and replay-safe, matches sibling node
+  implementations (checkpoint_store, lease_expiry_recovery), and satisfies
+  every EARS requirement without touching retained evidence.

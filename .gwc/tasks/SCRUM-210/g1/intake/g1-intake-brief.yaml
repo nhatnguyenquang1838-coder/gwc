@@ -1,0 +1,34 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+task_id: SCRUM-210
+node_id: runtime_checkpoint.checkpoint-expiry-cleanup
+target_maturity: M5_REPLAY_SAFE
+intake_summary: >
+  Implement the checkpoint-expiry-cleanup node (MAT-F4-N09) at M5_REPLAY_SAFE.
+  The node catalogs expired disposable checkpoint hints and interrupt frames and
+  tombstones them without deleting governance/audit evidence or append-only
+  runtime events. The active resume path wins over cleanup while its resume
+  token is still valid. Cleanup is deterministic and replay-equivalent.
+source_issue: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-210
+ears_requirements:
+  - 'EARS #1: identify only expired disposable checkpoint hints and interrupt frames'
+  - 'EARS #2: retain append-only evidence and governance/audit-linked artifacts'
+  - 'EARS #3: do not delete the active resume path when its token is still valid'
+  - 'EARS #4: emit auditable cleanup evidence (tombstone marker + digest) on removal'
+acceptance_criteria:
+  - expired hint cleanup
+  - active token preservation
+  - append-only / governance evidence retention
+  - audit tombstone
+  - concurrent resume race
+  - replay after cleanup
+  - exact-head CI required before claiming M5
+gates_applicable:
+  - G0_CONTEXT
+  - G1_ALIGNMENT
+  - G2_EXECUTION
+  - G3_PR
+gates_not_applicable:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA

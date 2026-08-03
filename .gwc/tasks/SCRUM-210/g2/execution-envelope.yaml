@@ -1,0 +1,41 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+gate: G2_EXECUTION
+task_id: SCRUM-210
+node_id: runtime_checkpoint.checkpoint-expiry-cleanup
+catalog_node_id: runtime-checkpoint-checkpoint-expiry-cleanup
+target_maturity: M5_REPLAY_SAFE
+approval_id: CP-20260803-210-G2-R1
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 43d40a1512c10b07a5a799d0d2c8f5101e303113
+working_branch: hermes/scrum-210-checkpoint-expiry-cleanup-m5-20260803
+risk_class: R2
+scope_hash: sha256:1e971b6e7c8ab3a8530c6fc9256f73d6e9de5d43a705b0e98cf18dc31c25e461
+scope_hash_16: 1e971b6e7c8ab3a8
+approved_modules:
+  - .gwc/tasks/SCRUM-210/**
+  - tools/node_architect/checkpoint_expiry_cleanup.py
+  - tests/test_checkpoint_expiry_cleanup.py
+  - core/node-architect/node-catalog/runtime_checkpoint/checkpoint-expiry-cleanup.node.json
+  - releases/changelog.d/2026-08-03-scrum-210-checkpoint-expiry-cleanup-m5.md
+authorized_actions:
+  - materialize_task_scoped_G0_G1_G2
+  - write_only_approved_modules
+  - run_scoped_validators_and_tests
+  - commit_and_push_guarded_branch
+  - open_or_update_draft_pr
+prohibited_actions:
+  - write_to_main
+  - merge_or_auto_merge
+  - deploy_release_publish_or_runtime_reload
+  - production_configuration_data_secret_credential_or_migration
+  - force_push_branch_delete_history_rewrite_or_pr_base_change
+  - scope_expansion_or_unrelated_cleanup
+issued_at: '2026-08-03T12:05:00Z'
+expires_at: '2026-08-04T12:05:00Z'
+approval_command: APPROVE G2_EXECUTION CP-20260803-210-G2-R1 1e971b6e7c8ab3a8 2026-08-04T12:05:00Z
+status: G2_APPROVAL_PENDING
+draft_pr_allowed: true
+merge_allowed: false
+production_allowed: false

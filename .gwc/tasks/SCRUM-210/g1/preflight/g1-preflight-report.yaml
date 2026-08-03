@@ -1,0 +1,22 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+task_id: SCRUM-210
+node_id: runtime_checkpoint.checkpoint-expiry-cleanup
+status: PASS
+checks:
+  - name: core_sha_verified
+    detail: 'Coding_Project_Governance_v1.0.md = ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48'
+    result: PASS
+  - name: local_main_ff_to_origin_main
+    detail: 'fast-forwarded local main to 43d40a1512c10b07a5a799d0d2c8f5101e303113'
+    result: PASS
+  - name: claim_state
+    detail: 'AI Agent=Hermes, status=In Progress, no double-claim'
+    result: PASS
+  - name: family_catalog_intact
+    detail: 'validate_node_catalog_runtime_checkpoint reports 9 nodes, no extra file added'
+    result: PASS
+  - name: implementation_skeleton_exists
+    detail: 'tools/node_architect/checkpoint_expiry_cleanup.py implemented; tests/test_checkpoint_expiry_cleanup.py added'
+    result: PASS
+blockers: []
