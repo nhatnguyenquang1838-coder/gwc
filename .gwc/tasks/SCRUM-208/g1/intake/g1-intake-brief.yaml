@@ -1,0 +1,99 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-03T01:46:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-208
+  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Existing checkpoint persistence only enforces revision equality and lacks
+    a typed CAS decision across task, scope, base, owner, lease, and fencing evidence.
+  why_now: SCRUM-208 is the next active F4 runtime_checkpoint node and is required
+    before deterministic state reconciliation in SCRUM-209.
+desired_outcome: Deliver runtime_checkpoint.cas-write-guard at M5_REPLAY_SAFE on a
+  guarded branch with exact-head validation evidence.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - runtime_checkpoint.checkpoint-persist
+  - runtime_checkpoint.cas-write-guard
+  - runtime_checkpoint.state-reconciliation
+scope:
+  in_scope:
+  - Add a deterministic connector-free CAS evaluator and closed result schema.
+  - Integrate strict CAS context into checkpoint_store while preserving legacy callers.
+  - Add replay, mismatch, lease, fencing, ownership, scope, base-drift, and idempotency
+    tests.
+  - Persist task-scoped G0/G1/G2 and Kiro plan artifacts.
+  non_goals:
+  - Create or update a pull request.
+  - Merge to main.
+  - Deploy, release, reload runtime, or access production data.
+  - Implement SCRUM-209 state reconciliation.
+constraints:
+- Consume only exact R4 G2 authority.
+- Never auto-retry a rejected CAS write.
+- Return latest observed state on rejection.
+- Keep evaluation pure and connector-free.
+- Preserve backward compatibility for legacy checkpoint callers.
+assumptions:
+- Callers supply canonical observed state and validated lease/fencing evidence.
+- Current protected base and target blobs remain exact at commit time.
+risks:
+- id: RISK-1
+  description: A stale worker could overwrite newer checkpoint state.
+  impact: high
+  mitigation: Fail closed on revision, owner, lease, fencing, scope, and base mismatch
+    before mutation.
+- id: RISK-2
+  description: Crash-after-write replay could duplicate an already committed effect.
+  impact: high
+  mitigation: Persist and read back a deterministic idempotency effect ledger.
+acceptance_criteria:
+- id: AC-1
+  statement: A matching revision and valid bindings allow exactly one monotonic checkpoint
+    write.
+  verifiable: true
+- id: AC-2
+  statement: Revision, owner, lease, fencing, scope, or base mismatch rejects without
+    mutating stored state and returns an explicit reconciliation route.
+  verifiable: true
+- id: AC-3
+  statement: Replaying an already committed idempotency key returns committed readback
+    without a duplicate event or revision advance.
+  verifiable: true
+- id: AC-4
+  statement: Focused and legacy checkpoint tests pass and exact branch-head CI is
+    read back before maturity completion.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

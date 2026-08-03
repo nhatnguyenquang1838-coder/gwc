@@ -1,0 +1,74 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-03T01:46:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: chatgpt
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - local_agent
+  required_behavior_contracts:
+  - core/node-architect/INSTRUCTION_CONTRACT_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+constraints:
+- Consume only exact R4 G2 authority.
+- Never auto-retry a rejected CAS write.
+- Return latest observed state on rejection.
+- Keep evaluation pure and connector-free.
+- Preserve backward compatibility for legacy checkpoint callers.
+applicable_policies:
+- id: agents-routing
+  path: AGENTS.md
+  ref: main
+  source_sha: c28d0956b36f2894e369a24dfc245601bc628340
+- id: gate-lifecycle
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main
+  source_sha: c28d0956b36f2894e369a24dfc245601bc628340
+- id: node-instruction
+  path: core/node-architect/INSTRUCTION_CONTRACT_v1.0.md
+  ref: main
+  source_sha: bde79400a20ce4e383e084b8866de8e1beea0de8
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: c28d0956b36f2894e369a24dfc245601bc628340
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: c28d0956b36f2894e369a24dfc245601bc628340
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: c28d0956b36f2894e369a24dfc245601bc628340
+- path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: c28d0956b36f2894e369a24dfc245601bc628340
+- path: tools/node_architect/checkpoint_store.py
+  required: true
+  status: AVAILABLE
+  source_sha: 9f19095c104f59734618905c3aa06dfec3bcec38
+- path: tools/node_architect/lease_renewal.py
+  required: true
+  status: AVAILABLE
+  source_sha: 53cb7e818cbd1f5d48bb8984b9509afbfe552cd9
+status: READY
+blockers: []

@@ -1,0 +1,49 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-03T01:46:30Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-208
+  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-03T01:46:00Z'
+  source: exact R4 G2 approval in active chat
+  explicit: true
+rationale: The user explicitly approved the R4 execution envelope after G1 selected
+  the narrow extension approach.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+scope_hash: sha256:7fbfbb51da1aa2569968fe6322c3be73652a6c1ab707ea36801a17b0fc8d1d06
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-208
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  plan_root: .kiro/specs/scrum-208-cas-write-guard-m5
+  plan_revision: sha256:a7ab5d4bf84f873650a9883a171ff08a2f71ff629b72a955a19da0b810ce0330
+  validation_evidence: validation/r4-execution/plan-validation.txt

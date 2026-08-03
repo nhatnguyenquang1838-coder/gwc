@@ -1,0 +1,185 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+approval_id: APPROVE_G2_EXECUTION_SCRUM-208_FASTLANE_R4_20260803
+authority_gate: G2_EXECUTION
+task_id: SCRUM-208
+issued_at: '2026-08-02T18:50:00Z'
+expires_at: '2026-08-03T18:50:00Z'
+scope_version: 4
+risk_class: R3
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+working_branch: codex/scrum-208-cas-write-guard-m5-20260802
+active_lane: SCRUM-169 — F4 runtime_checkpoint / FL-MAT-F4-CAS-RECONCILIATION-20260802
+selected_option_id: OPT-1
+g1_scope_hash: sha256:9d6ca445c993a1c4aec8108a8ed1e2318030aaf168574ee9c910bf2477278fce
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-208
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  plan_root: .kiro/specs/scrum-208-cas-write-guard-m5
+  plan_revision: sha256:a7ab5d4bf84f873650a9883a171ff08a2f71ff629b72a955a19da0b810ce0330
+  validation_evidence: /mnt/data/dw_super_sessions/20260803-0008-SCRUM-208/validation/g2-readiness-r3.json
+modules_or_files:
+- .kiro/specs/scrum-208-cas-write-guard-m5/requirements.md
+- .kiro/specs/scrum-208-cas-write-guard-m5/design.md
+- .kiro/specs/scrum-208-cas-write-guard-m5/tasks.md
+- schemas/cas-write-guard-result.schema.json
+- tools/node_architect/cas_write_guard.py
+- tools/node_architect/checkpoint_store.py
+- tests/test_cas_write_guard.py
+- tests/test_checkpoint_persist_replay.py
+- releases/changelog.d/2026-08-02-scrum-208-cas-write-guard-m5.md
+- .gwc/tasks/SCRUM-208/**
+files_read:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- agents/chatgpt-agent/agent-instructions.md
+- core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+- core/Agent_Operating_Runtime_Contract_v1.0.md
+- core/Agent_Behavior_Semantic_Contract_v1.0.md
+- core/Agent_Response_Presentation_Contract_v1.0.md
+- core/node-architect/node-catalog/runtime_checkpoint/README.md
+- core/node-architect/node-catalog/runtime_checkpoint/cas-write-guard.node.json
+- core/node-architect/node-catalog/runtime_checkpoint/state-reconciliation.node.json
+- tools/node_architect/checkpoint_store.py
+- tests/test_checkpoint_persist_replay.py
+- tools/validate_g01.py
+- schemas/g0-context-snapshot.schema.json
+- schemas/g1-intake-brief.schema.json
+- schemas/g1-preflight-report.schema.json
+- schemas/g1-options.schema.json
+- schemas/g1-decision-record.schema.json
+- Jira SCRUM-208 claim readback
+- Jira SCRUM-169 family state
+- 'PR #187 exact-main CI/G5 readback'
+- tools/node_architect/lease_renewal.py
+- tests/test_lease_renewal.py
+- 'PR #188 exact-main CI/readback'
+- core/node-architect/gate-node-route-profile.json
+- 'PR #186 exact-main CI/G5 readback'
+- SCRUM-204 route addition impact assessment
+- 'PR #190 exact-main merge/CI readback'
+- 'PR #190 changed-path overlap assessment'
+- tools/node_architect/checkpoint_store.py@c28d0956
+- tests/test_checkpoint_persist_replay.py@c28d0956
+- tools/validate_g01.py@c28d0956
+authorized_actions:
+- fast_forward_guarded_branch_to_exact_base
+- create_guarded_branch_from_exact_base
+- create_isolated_worktree
+- create_or_update_approved_files
+- run_sandboxed_validation
+- create_task_scoped_commit
+- push_working_branch
+- perform_exact_diff_readback
+- record_task_scoped_node_runtime_evidence
+excluded_actions:
+- protected_branch_write
+- create_or_update_pull_request
+- mark_ready_for_review
+- merge
+- auto_merge
+- deploy
+- release
+- runtime_reload
+- production_configuration
+- production_data
+- credentials
+- secrets
+- migration
+- package_export
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+- f5_validation_quality
+- f9_scale_control
+- scrum_258_recovery
+- broad_81_node_rollout
+- unrelated_cleanup
+- manual_g5_action
+- g6
+required_validation:
+- python tools/validate_g01.py --root <exact-validator-root> --workspace <task-workspace>
+  --json
+- python -m unittest tests/test_cas_write_guard.py -v
+- python -m unittest tests/test_checkpoint_persist_replay.py -v
+- python -m unittest discover -s tests -p test_*.py
+- python -m compileall -q tools/node_architect
+- python tools/node_architect/validate_node_catalog_runtime_checkpoint.py
+- python tools/validate_instructions.py
+- python tools/validate_line_endings.py
+- complete diff, secret, deletion, generated-noise, and scope review
+- exact PR-head CI terminal readback at G3
+artifact_hashes:
+  g0: sha256:2bf5d482e9072905ab135dc0ff5b1597989d4c6ef4abe1b6500dc8a99fe32bb3
+  intake: sha256:3bab215773a1a7f5d2f59ae45e095b4c122f3d29b8fe28c435f4d415ac48ccff
+  preflight: sha256:4c6b87eb38993177ad763914d5118979ba86eceae6c290b9665fb20db31fc005
+  options: sha256:bd78a5099ef19023c5d302a3a96a428fa15b2a1fd8a58cf30782ef9a42f3b0ec
+  decision: sha256:2003e90238d54cb4729148d12c68ae37fe458727a3a7545456766542e89f5958
+  implementation_plan: sha256:a7ab5d4bf84f873650a9883a171ff08a2f71ff629b72a955a19da0b810ce0330
+  base_drift_revalidation: sha256:51f8a36b24e88a56cbdae7eef7abf37bff7a9db55acb23f565b9e07f86a4cd50
+  prior_r3_candidate: sha256:b50f18def929f45d289d36579ddae238f2f608d6e150ad58bcb7dffb7f82ac7f
+approval_required: true
+approval_command_format: APPROVE G2_EXECUTION <approval_id> <scope_hash_16> <expires_at_utc>
+source_instruction: REPO
+execution_mode: chat_connector_only
+gates_excluded_after_g2:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+rollback: Stop before any branch or file mutation if main or branch head differs from
+  this exact R4 binding. Preserve local evidence; do not force-update; issue fresh
+  authority.
+g4_g5_g6_authority_granted: false
+prior_approval_status: R3_INVALIDATED_BY_BASE_DRIFT
+prior_base_sha: 848d0356bf003cf68f9f9c6a31b293914f2f7a00
+base_drift_revalidation:
+  artifact: evidence/base-drift-revalidation-r4.json
+  sha256: sha256:51f8a36b24e88a56cbdae7eef7abf37bff7a9db55acb23f565b9e07f86a4cd50
+  drift_pr: 190
+  classification: NON_BREAKING_NO_TARGET_PATH_OVERLAP
+  changed_paths:
+  - core/node-architect/node-catalog/intake_context/README.md
+  - schemas/context-gap-decision.schema.json
+  - tests/test_intake_context_context_gap_escalation_m4.py
+  - tests/test_intake_context_m4_batch_b2.py
+  - tests/test_node_catalog_intake_context.py
+  - tools/node_architect/context_gap_escalation.py
+  - tools/node_architect/validate_node_catalog_intake_context.py
+  target_blob_shas:
+    tools/node_architect/checkpoint_store.py: 9f19095c104f59734618905c3aa06dfec3bcec38
+    tests/test_checkpoint_persist_replay.py: 67d7d62f1a93551f5fa7e36b846f3585d1f45a7b
+    tools/validate_g01.py: 4fbc4fc57657ce0df1fde308743646a996156721
+  exact_main_ci:
+    validate_instructions: 30760913385
+    build_instruction_packages: 30760913426
+    status: SUCCESS
+branch_observed_head_sha: 3bb3b703e137393a7dc9308cea559738aae3dc2c
+branch_relation_to_observed_head: IDENTICAL_EMPTY_TASK_BRANCH
+required_first_action: non-force fast-forward branch from observed empty head to exact
+  approved base
+validation_readback:
+  prior_r3_g01: PASS
+  prior_r3_g2_readiness: PASS
+  prior_r3_focused_tests: 16/16 PASS
+  prior_r3_broader_regression: 49 PASS
+  r4_base_drift_revalidation: PASS
+  r4_target_blob_identity: PASS
+  r4_remote_branch_empty: PASS
+  exact_current_main_ci: SUCCESS
+  note: 'R4 reuses prior validated implementation patch because PR #190 changed only
+    intake_context paths and all SCRUM-208 target/validator blobs are byte-identical.'
+scope_hash: sha256:2b17eb4df4dbbc64d0eefb10d61ebe5896defd0a47d3a6704f41275fb2d30a29
+scope_hash_16: 2b17eb4df4dbbc64
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-208_FASTLANE_R4_20260803
+  2b17eb4df4dbbc64 2026-08-03T18:50:00Z

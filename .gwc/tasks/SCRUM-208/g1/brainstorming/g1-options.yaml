@@ -1,0 +1,42 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-03T01:46:30Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-208
+  base_sha: c28d0956b36f2894e369a24dfc245601bc628340
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Extend checkpoint_store with a pure typed CAS guard
+  description: Add a connector-free CAS evaluator and closed schema, then invoke it
+    from checkpoint_store only when strict cas_context is supplied, preserving legacy
+    behavior.
+  benefits:
+  - Reuses current checkpoint persistence and deterministic digest primitives.
+  - Preserves existing callers while introducing fail-closed M5 semantics.
+  - Produces explicit latest-state and reconciliation routing without blind retry.
+  tradeoffs:
+  - checkpoint_store gains an optional strict context and effect ledger.
+  - State reconciliation remains a separate downstream node.
+  risks:
+  - Integration mistakes could alter legacy replay behavior.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Replace checkpoint_store with a new CAS persistence subsystem
+  description: Build a parallel persistence implementation and migrate callers to
+    it.
+  benefits:
+  - Clean separation from legacy checkpoint code.
+  tradeoffs:
+  - Duplicates persistence and digest behavior.
+  - Requires broader migration and write scope.
+  risks:
+  - High regression and scope-drift risk.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest compatible change, directly satisfies
+  the Jira contract, and avoids a parallel persistence subsystem.
+decision_required: true
+status: READY
