@@ -10,7 +10,7 @@ pull_request:
   number: 193
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/193
   draft: true
-head_sha: 9ec64cd6c54ffa4faf150e6927806be5d876caee
+head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
 scope_hash: sha256:8156af7d5b25fa59a89c21f35fe55de3f64d662cd1a7c9fbe08f0996e1c6a99c
 changed_paths:
 - .gwc/tasks/SCRUM-208/g2/plan-read-receipt.yaml
@@ -34,18 +34,18 @@ changed_paths:
 - tools/node_architect/cas_write_guard.py
 - tools/node_architect/checkpoint_store.py
 validation:
-  head_sha: 9ec64cd6c54ffa4faf150e6927806be5d876caee
+  head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
   status: pass
   commands:
   - command: Validate instructions
     result: pass
-    evidence: GitHub Actions run 30812864267 completed SUCCESS for exact implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    evidence: GitHub Actions run 30812864267 completed SUCCESS for exact implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - command: Build instruction packages
     result: pass
-    evidence: GitHub Actions run 30812864231 completed SUCCESS for exact implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    evidence: GitHub Actions run 30812864231 completed SUCCESS for exact implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - command: Cross-platform LF and SHA parity
     result: pass
-    evidence: GitHub Actions run 30812864174 completed SUCCESS for exact implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    evidence: GitHub Actions run 30812864174 completed SUCCESS for exact implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - command: Full governance unit test suite
     result: pass
     evidence: Validate instructions exact-head job executed 874 tests successfully, including the REV-4 adversarial regression.
@@ -61,7 +61,7 @@ review:
   reviewer_id: chatgpt-fresh-context-g3-r10
   independence: fresh-context
   mode: read-only
-  reviewed_head_sha: 9ec64cd6c54ffa4faf150e6927806be5d876caee
+  reviewed_head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
   reviewed_scope_hash: sha256:8156af7d5b25fa59a89c21f35fe55de3f64d662cd1a7c9fbe08f0996e1c6a99c
   reviewed_at: '2026-08-03T13:00:00Z'
   lanes:
@@ -114,21 +114,21 @@ review:
     status: resolved
     evidence: CheckpointInput/store canonical identity binding is authoritative and caller context conflicts fail closed.
     recommendation: Keep canonical binding tests in exact-head CI.
-    resolution: Resolved before implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    resolution: Resolved before implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - id: REV-2
     severity: BLOCKER
     category: code
     status: resolved
     evidence: Committed effects require exact ownership binding before replay; unbound or mismatched effects fail closed.
     recommendation: Preserve exact effect ownership checks.
-    resolution: Resolved before implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    resolution: Resolved before implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - id: REV-3
     severity: BLOCKER
     category: code
     status: resolved
     evidence: Persisted lease owner, token, fencing token, and expiry are authoritative after bootstrap.
     recommendation: Keep lease rotation outside this node.
-    resolution: Resolved before implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    resolution: Resolved before implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - id: REV-4
     severity: BLOCKER
     category: test
@@ -136,7 +136,7 @@ review:
     evidence: Missing item-level expected revision now produces MISSING_ITEM_EXPECTED_REVISION and INVALID_INPUT before mutation;
       exact-head regression passed.
     recommendation: Retain adversarial context-substitution regression.
-    resolution: Resolved by R10 commit 9ec64cd6c54ffa4faf150e6927806be5d876caee.
+    resolution: Resolved by R10 commit 4685fcfa548e95b72d4e6281a2a1167924abeb21.
   - id: REV-5
     severity: BLOCKER
     category: governance
@@ -178,22 +178,22 @@ review:
   stale: false
 ci:
   required: true
-  head_sha: 9ec64cd6c54ffa4faf150e6927806be5d876caee
+  head_sha: 4685fcfa548e95b72d4e6281a2a1167924abeb21
   checks:
   - name: Validate instructions
     required: true
     status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30812864267
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30835522196
   - name: Build instruction packages
     required: true
     status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30812864231
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30835522891
   - name: Cross-platform LF and SHA parity
     required: true
     status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30812864174
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30835522891
 residual_risks:
-- This delivery record is an evidence-only successor after reviewed implementation head 9ec64cd6c54ffa4faf150e6927806be5d876caee;
+- This delivery record is an evidence-only successor after reviewed implementation head 4685fcfa548e95b72d4e6281a2a1167924abeb21;
   the successor commit requires exact-head CI and a fresh G3 review before Ready transition.
 - 'Merged PR #192 G3 evidence remains unsafe for M5 or dependency use and is not rehabilitated by R11.'
 - 'SCRUM-229 Done remains unsafe as dependency evidence because condition descriptions were discarded by PR #197.'
