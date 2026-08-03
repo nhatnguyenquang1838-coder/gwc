@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g3-delivery-record",
+  "generated_at": "2026-08-03T19:15:49Z",
+  "gate": "G3_PR",
+  "task_id": "SCRUM-210",
+  "authority_gate": "G3_PR",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "bce6f6f83c74a25a57259695adc44b46a8555c46",
+  "working_branch": "hermes/scrum-210-checkpoint-expiry-cleanup-r4-20260803",
+  "head_sha": "c0fcb8fee328f4167fd7ade25faff65108378fba",
+  "pr_number": 203,
+  "pr_url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/203",
+  "pr_state": "draft",
+  "risk_class": "R1",
+  "scope_hash": "sha256:b9094eef8b270d42d16b4077d91779f19043aae3fa9db148552fb3eda28aff82",
+  "scope_hash_16": "b9094eef8b270d42",
+  "g2_approval_id": "CP-20260803-210-G2R4",
+  "g2_scope_hash": "sha256:b9094eef8b270d42d16b4077d91779f19043aae3fa9db148552fb3eda28aff82",
+  "g3_approval_id": "CP-20260803-210-G3R1",
+  "changed_files": [
+    "tools/node_architect/checkpoint_expiry_cleanup.py",
+    "tests/test_checkpoint_expiry_cleanup.py",
+    "releases/changelog.d/2026-08-03-scrum-210-checkpoint-expiry-cleanup-m5.md",
+    ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/requirements.md",
+    ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/design.md",
+    ".kiro/specs/scrum-210-checkpoint-expiry-cleanup/tasks.md",
+    ".gwc/tasks/SCRUM-210/g0/context-snapshot.yaml",
+    ".gwc/tasks/SCRUM-210/g1/intake/g1-intake-brief.yaml",
+    ".gwc/tasks/SCRUM-210/g1/preflight/g1-preflight-report.yaml",
+    ".gwc/tasks/SCRUM-210/g1/brainstorming/g1-options.yaml",
+    ".gwc/tasks/SCRUM-210/g1/decision/g1-decision-record.yaml",
+    ".gwc/tasks/SCRUM-210/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-210/g2/execution-evidence.yaml",
+    ".gwc/tasks/SCRUM-210/g3/approval-envelope.yaml",
+    "proposal/change-plan.yaml",
+    "proposal/detail.svg",
+    "proposal/detail.png",
+    "proposal/overview.mmd",
+    "proposal/scope-identity.json"
+  ],
+  "validation": {
+    "g01": {
+      "outcome": "PASS",
+      "valid": true,
+      "issues": []
+    },
+    "focused_tests": {
+      "command": "uv run --python 3.11 python tests/test_checkpoint_expiry_cleanup.py",
+      "result": "13 passed"
+    },
+    "discovery_tests": {
+      "command": "uv run --python 3.11 python -m unittest discover -s tests -p test_checkpoint_expiry_cleanup.py",
+      "result": "13 passed"
+    },
+    "catalog_verified": "present on base, byte-identical, metadata-only (not mutated)",
+    "diff_review": "scoped additions only; no non-scope mutation",
+    "full_suite_preexisting": "10 failures + 65 errors on base, not introduced by this change",
+    "ci_required_checks": [
+      "validate-instructions",
+      "ci-run-capture",
+      "g5-ci-verification"
+    ],
+    "ci_status": "pass (9/9 checks on exact head c0fcb8f)"
+  },
+  "acceptance_criteria_map": {
+    "AC-1": "verified_by_tests (expired disposable selected for tombstone)",
+    "AC-2": "verified_by_tests (governance/audit/append-only retained)",
+    "AC-3": "verified_by_tests (active resume retained when expired)",
+    "AC-4": "verified_by_tests (auditable tombstone + replay-equivalent result)",
+    "AC-5": "verified_by_tests (13/13 direct + discovery)",
+    "AC-6": "verified_by_diff (no orchestration/scheduler/migration/production)",
+    "AC-7": "verified_by_catalog_check (descriptor present, metadata-only)"
+  },
+  "review": {
+    "independence": "fresh-context",
+    "reviewer": "Hermes (G1/G2 author; G3 fresh-context review only)",
+    "lanes": {
+      "requirement": "PASS",
+      "design": "PASS",
+      "code": "PASS",
+      "test": "PASS",
+      "governance": "PASS",
+      "delivery": "PASS",
+      "ci": "PASS"
+    },
+    "findings": [],
+    "decision": "PASS",
+    "stale": false
+  },
+  "exclusions": [
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION",
+    "production_data_write",
+    "production_config_change",
+    "credential_rotation",
+    "migration",
+    "force_push",
+    "delete_branch",
+    "protected_branch_write"
+  ],
+  "outcome": "PASS",
+  "next_gate": "G4_MERGE",
+  "next_gate_applicability": "not_applicable_until_user_merge_approval"
+}
