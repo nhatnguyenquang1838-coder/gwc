@@ -55,3 +55,25 @@ Forbidden:
 ❌ no runtime or connector implementation
 ❌ no package version change
 ```
+
+## M4 runtime contracts
+
+Runtime contracts extend the thin descriptors without turning projection state into authority. The evaluator layer is pure: it performs no connector call, network request, filesystem mutation, Jira transition, branch/PR action, approval, merge, deployment, release, or production operation.
+
+| Descriptor | Runtime artifact | Schema | Evaluator | Maturity |
+|---|---|---|---|---|
+| `projection-source-authority-check.node.json` | `projection-source-authority-decision` | `schemas/projection-source-authority-decision.schema.json` | `tools/node_architect/projection_source_authority_check.py` | M4 deterministic |
+
+### Projection source authority decision
+
+`decide_projection_source_authority(...)` fails closed unless every requested projected field is bound to exact, current, canonical evidence. It rejects:
+
+- missing canonical sources;
+- projection/advisory-only authority;
+- unbound or inferred fields;
+- ambiguous or conflicting bindings;
+- revision or digest mismatch;
+- stale source or readback evidence;
+- unknown deterministic derivation rules.
+
+The output is a closed `schema_version: "1.0"` artifact with deterministic ordering and a `sha256:` decision digest. Output `observed_at` and `decision_digest` are excluded from digest input; evidence timestamps remain semantic. Every authority grant remains fixed to `false`, while `read_only_projection` remains fixed to `true`.
