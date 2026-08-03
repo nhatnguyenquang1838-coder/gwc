@@ -32,12 +32,8 @@ class SyncProjectionNodeCatalogTest(unittest.TestCase):
     def test_required_projection_semantics_exist(self):
         stems = {path.name.removesuffix(".node.json") for path in FAMILY_DIR.glob("*.node.json")}
         required = {
-            "projection-source-authority-check",
-            "projection-drift-detection",
-            "projection-reconcile-readback",
-            "projection-failure-routing",
-            "projection-evidence-linking",
-            "projection-privacy-boundary-check",
+            "projection-source-authority-check", "projection-drift-detection", "projection-reconcile-readback",
+            "projection-failure-routing", "projection-evidence-linking", "projection-privacy-boundary-check",
         }
         self.assertTrue(required.issubset(stems))
 
@@ -56,6 +52,20 @@ class SyncProjectionNodeCatalogTest(unittest.TestCase):
     def test_source_authority_descriptor_gate_is_exact_g2(self):
         payload = json.loads((FAMILY_DIR / "projection-source-authority-check.node.json").read_text(encoding="utf-8"))
         self.assertEqual(payload["gates"], ["G2_EXECUTION"])
+
+    def test_evidence_linking_runtime_binding_exists(self):
+        schema = Path("schemas/projection-evidence-linkset.schema.json")
+        evaluator = Path("tools/node_architect/projection_evidence_linking.py")
+        self.assertTrue(schema.is_file())
+        self.assertTrue(evaluator.is_file())
+        payload = json.loads(schema.read_text(encoding="utf-8"))
+        self.assertEqual(payload["properties"]["artifact_type"]["const"], "projection-evidence-linkset")
+        self.assertTrue(payload["properties"]["read_only_projection"]["const"])
+        self.assertFalse(payload["properties"]["write_authority_granted"]["const"])
+
+    def test_evidence_linking_descriptor_gates_are_exact(self):
+        payload = json.loads((FAMILY_DIR / "projection-evidence-linking.node.json").read_text(encoding="utf-8"))
+        self.assertEqual(payload["gates"], ["G2_EXECUTION", "G3_PR"])
 
     def test_validator_rejects_canonical_authority_drift(self):
         with tempfile.TemporaryDirectory() as tmp:
