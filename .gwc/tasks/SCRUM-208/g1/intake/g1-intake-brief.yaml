@@ -1,0 +1,96 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-02T16:00:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-208
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: "Create SCRUM-208 task setup with G0/G1 alignment and G2 execution envelope for GWC repository governance task."
+  why_now: "SCRUM-208 is a new task that requires proper gate evidence collection and approval workflow before any repository changes."
+desired_outcome: "Establish formal G0/G1 evidence for SCRUM-208 task, including context snapshot, intake, options, preflight, and decision artifacts, with a valid G2 execution envelope ready for human approval."
+stakeholders:
+  requester: Kiro Agent
+  affected:
+  - nhatnguyenquang1838-coder
+scope:
+  in_scope:
+  - Create SCRUM-208 task directory structure
+  - Generate G0 context snapshot with repository verification
+  - Generate G1 alignment artifacts (intake, preflight, options, decision)
+  - Generate G2 execution envelope with scope hash
+  - Claim Jira SCRUM-208 task (fill AI Agent, Claimed At, add comment)
+  non_goals:
+  - No code implementation
+  - No repository file modification
+  - No branch creation
+  - No commit or push
+  - No merge, deploy, or release
+constraints:
+- Must follow GWC Gate Lifecycle Contract v1.0
+- Must use task-scoped workspace under .gwc/tasks/SCRUM-208/
+- Must generate exact G2 approval command
+- No G4, G5, G6 authority
+- No production configuration, credentials, or data access
+assumptions:
+- SCRUM-208 task exists in Jira SCRUM project
+- Jira MCP connector is available for task claim
+- Repository state remains stable at current base SHA
+- GWC gate artifacts schema is valid
+risks:
+- id: RISK-1
+  description: Jira task may not exist
+  impact: medium
+  mitigation: Graceful fallback to planning-only mode
+- id: RISK-2
+  description: Jira claim may fail
+  impact: medium
+  mitigation: Record blocker, continue in read-only mode
+acceptance_criteria:
+- id: AC-1
+  statement: "G0 context snapshot is schema-valid with status: READY"
+  verifiable: true
+- id: AC-2
+  statement: "G1 intake brief is schema-valid with non-empty scope"
+  verifiable: true
+- id: AC-3
+  statement: "G1 options contain at least two viable options"
+  verifiable: true
+- id: AC-4
+  statement: "G1 decision record has explicit accepted option"
+  verifiable: true
+- id: AC-5
+  statement: "G2 execution envelope is schema-valid with scope hash"
+  verifiable: true
+- id: AC-6
+  statement: "G1 validator (tools/validate_g01.py) returns PASS"
+  verifiable: true
+- id: AC-7
+  statement: "Jira task claim is recorded (AI Agent, Claimed At fields)"
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - Draft PR exists
+    - Latest head SHA matches
+    - Required CI is green
+    - Review closure evidence
+    - G3 delivery record
+unresolved_questions: []
+status: READY

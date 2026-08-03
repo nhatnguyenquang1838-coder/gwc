@@ -1,0 +1,175 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-02T16:00:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-208
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: G0_CONTEXT_READY
+  status: PASS
+  code: G0_READY
+  message: G0 context snapshot is READY
+  evidence:
+  - Schema validation passed
+  - status READY
+  - No blockers
+- id: G1_INTAKE_READY
+  status: PASS
+  code: G1_READY
+  message: G1 intake brief is READY
+  evidence:
+  - Schema validation passed
+  - scope.in_scope has entries
+  - scope.non_goals has entries
+  - acceptance_criteria has entries
+  - unresolved_questions empty
+- id: REQUIRED_SOURCES_AVAILABLE
+  status: PASS
+  code: SOURCES_OK
+  message: All required governance sources are available
+  evidence:
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - projects/gwc/project-profile.yaml
+- id: RISK_CLASS_VALIDATED
+  status: PASS
+  code: RISK_R2
+  message: Risk class R2 validated
+  evidence:
+  - Task setup with no code implementation
+  - No repository mutation
+- id: HUMAN_DIRECTION_NOT_REQUIRED
+  status: PASS
+  code: HUMAN_OK
+  message: Human direction not required for bounded task setup
+  evidence:
+  - No architecture change
+  - No security boundary change
+  - No production configuration
+  - No credentials or secrets
+  - No destructive or irreversible actions
+- id: NEXT_GATE_IDENTIFIED
+  status: PASS
+  code: G2_REQUIRED
+  message: G2_EXECUTION is the required next gate
+  evidence:
+  - G2 envelope generation required
+  - G3 not applicable yet
+process_readback:
+  process_id: g01-validation
+  terminal_outcome: VALIDATION_COMPLETE
+  required_sources:
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - projects/gwc/project-profile.yaml
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-001
+    name: G0 Context Capture
+    gate: G0_CONTEXT
+    actor: agent
+    action_class: read_only
+    capability_required: repository_read
+    capability_status: VERIFIED
+    primary_route: Local agent with trusted checkout
+    fallback_routes: []
+    continuation: g1_intake
+    expected_evidence: g0/context-snapshot.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-002
+    name: G1 Intake and Options
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_only
+    capability_required: g1_analysis
+    capability_status: VERIFIED
+    primary_route: Local agent with G1 artifacts
+    fallback_routes: []
+    continuation: g1_preflight
+    expected_evidence: g1/intake/g1-intake-brief.yaml, g1/brainstorming/g1-options.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-003
+    name: G1 Preflight Validation
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_only
+    capability_required: g1_validation
+    capability_status: VERIFIED
+    primary_route: Local agent with validator
+    fallback_routes: []
+    continuation: g1_decision
+    expected_evidence: g1/preflight/g1-preflight-report.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-004
+    name: G1 Decision Capture
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: read_only
+    capability_required: g1_decision
+    capability_status: VERIFIED
+    primary_route: Local agent with decision record
+    fallback_routes: []
+    continuation: g2_envelope
+    expected_evidence: g1/decision/g1-decision-record.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-005
+    name: G2 Execution Envelope Generation
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: read_only
+    capability_required: g2_envelope
+    capability_status: SEPARATE_GATE
+    primary_route: Local agent with envelope template
+    fallback_routes: []
+    continuation: g2_approval
+    expected_evidence: g2/execution-envelope.yaml
+    bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+implementation_plan:
+  applicability: not_applicable
+  reason: G0/G1 task setup does not require full implementation plan
+  source: plan_not_applicable
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-208
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  plan_root: null
+  requirements_path: null
+  design_path: null
+  tasks_path: null
+  plan_revision: null
+  validation_status: NOT_APPLICABLE
+  validation_evidence: null
+  generated_by: kiro-ai-agent
+  generated_at_utc: '2026-08-02T16:00:00Z'
+risk_class: R2
+required_gate: G2_AUTOMATIC_BOUNDED
+runtime_context:
+  agent_runtime_id: kiro-ai-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+blockers: []
+outcome: PASS
