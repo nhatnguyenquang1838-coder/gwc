@@ -1,0 +1,69 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-02T23:28:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-206
+  base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Kilo
+  decided_at: '2026-08-02T23:28:00Z'
+  source: "Current chat request: implement SCRUM-206"
+  explicit: true
+rationale: OPT-1 is selected because it bounds the M5 slice to a pure decision utility, matches the existing checkpoint family pattern, and delegates persistence to checkpoint_store.py.
+rejected_option_ids:
+  - OPT-2
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+scope_hash: sha256:fe88b9bcc740b9bb629b14e4282be9b30b981b841f0becf1ce90c7ae7aeb5964
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Implement lease_acquisition.py pure decision utility
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Add lease-acquisition-decision schema
+      dependencies: []
+    - sub_task_id: SUB-TASK-3
+      description: Add unit tests for lease acquisition outcomes
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-4
+      description: Materialize G0/G1/G2 gate artifacts
+      dependencies:
+        - SUB-TASK-1
+        - SUB-TASK-2
+        - SUB-TASK-3
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: file-writer
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: file-writer
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: test-runner
+      agent_type: validator
+    - sub_task_id: SUB-TASK-4
+      skill_id: file-writer
+      agent_type: primary
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+    - SUB-TASK-4

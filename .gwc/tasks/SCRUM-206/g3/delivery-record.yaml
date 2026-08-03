@@ -1,0 +1,27 @@
+schema_version: '1.0'
+task_id: SCRUM-206
+gate: G3_PR
+status: DRAFT_PENDING_PR
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: d4e507aec14db4f62fd4f21f8f84436df08e6216
+branch: g1-206-20260802-2328
+scope_hash: sha256:fe88b9bcc740b9bb629b14e4282be9b30b981b841f0becf1ce90c7ae7aeb5964
+node: runtime_checkpoint.lease-acquisition
+validation:
+  scoped_unit_tests: pass_14_tests
+  compileall: pending
+  schema_validation: pending
+  full_ci: pending_pr_creation
+pr:
+  number: 189
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/189
+  head_sha: 80fc67f03ba02d9a83a538d8c11f548b1edc1490
+review:
+  status: pending
+  independence: fresh_context_required
+exclusions:
+  g4_merge: requires_explicit_approval
+  g5_deploy: not_applicable_unless_manual_action_requested
+  g6_production_data: not_applicable
+  audit_completion_authority: not_granted
+  scale_authority: not_granted
