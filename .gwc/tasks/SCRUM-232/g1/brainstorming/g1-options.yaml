@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-04T00:00:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-232
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Pure evaluator module + closed schema + fixture suite
+  description: >-
+    Build tools/node_architect/package_export/target_path_safety_check.py as a
+    filesystem-free deterministic evaluator, schemas/node-architect/
+    package-export/entry-schema-v1.json closed schema, and a focused
+    tests/package_export/ suite covering all required fixtures. Aligns to the
+    issue's "Expected implementation surfaces — confirm in formal G1".
+  benefits:
+  - Matches the issue's stated target surfaces exactly
+  - Isolated new module -> minimal blast radius
+  - Deterministic, digest-bound, no IO
+  tradeoffs:
+  - Requires new schema file + evaluator + fixtures (more artifacts)
+  risks:
+  - Schema-version drift if not pinned (mitigated by digest binding)
+  constraint_fit: FIT
+- id: OPT-2
+  title: Extend the existing node-catalog validator
+  description: >-
+    Add entry validation into validate_node_catalog_package_export.py instead
+    of a new module.
+  benefits:
+  - Fewer new files
+  tradeoffs:
+  - The existing validator validates the node *family* metadata, not entry
+    payloads; overloading it conflates concerns and widens blast radius
+  risks:
+  - Violates the issue boundary "schema validation separate from ... path-root
+    checks" and the fresh-module intent
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  The issue names the isolated module paths explicitly and forbids reusing the
+  family-metadata validator; OPT-1 respects both the scope and the boundaries.
+decision_required: true
+status: READY

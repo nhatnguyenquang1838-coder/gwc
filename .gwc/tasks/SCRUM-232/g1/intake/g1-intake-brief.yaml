@@ -1,0 +1,103 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-04T00:00:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-232
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    SCRUM-232 requires a pure, deterministic target-path-safety-check evaluator
+    for the package_export node family. Loaded package instruction entries must
+    be validated against one canonical closed schema before path evaluation or
+    export.
+  why_now: >-
+    SCRUM-229 (package_manifest_load) is Done, unblocking entry validation as
+    the next deterministic-input stage feeding SCRUM-231 and SCRUM-232.
+desired_outcome: >-
+  A pure evaluator that accepts/rejects every entry with ordered deterministic
+  errors, binds results to manifest/schema digest + exact source SHA, and
+  performs zero filesystem read/copy/mutation.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - SCRUM-231 / SCRUM-232 consumers
+scope:
+  in_scope:
+  - tools/node_architect/package_export
+  - schemas/node-architect/package-export
+  - tests/package_export
+  - .gwc/tasks/SCRUM-232/**
+  non_goals:
+  - path normalization
+  - source existence check / file copy
+  - package publication
+  - package-version change
+  - merge
+  - deploy
+  - release
+  - production data/config
+  - credentials
+  - force-push
+  - branch deletion
+  - PR base change
+constraints:
+- target maturity M2 to M4_DETERMINISTIC
+- closed schema with explicit schema version
+- errors canonicalized by entry ID / JSON path / keyword / stable reason code
+- schema validation separated from filesystem existence and path-root checks
+- results bound to manifest digest, schema digest/version, exact source SHA
+- no filesystem mutation in the evaluator
+assumptions:
+- base remains gwc/main@78d596242a9e042d62d6174afc40aa4976eb3285
+- Jira is projection only; the node spec target-path-safety-check.node.json is the
+  authority boundary marker (authority_boundary=g2_required)
+risks:
+- id: RISK-1
+  description: Schema-version drift between the evaluator and a later consumer
+    could desync entry acceptance.
+  impact: medium
+  mitigation: Pin schema digest/version in the result binding; fixtures cover
+    schema-version drift explicitly.
+- id: RISK-2
+  description: Five-agent board collision on the same task family.
+  impact: medium
+  mitigation: Pre-push collision check (gh pr list / git fetch origin) before
+    any push; dedicated branch hermes/scrum-230-...-20260803.
+acceptance_criteria:
+- id: AC-1
+  statement: >-
+    Result inventory identifies every entry as accepted or rejected with ordered
+    deterministic errors (no silent pass on invalid typed result).
+  verifiable: true
+- id: AC-2
+  statement: >-
+    Fixtures cover valid entry, missing field, extra field, wrong boolean/type,
+    invalid ID, empty path/target, duplicate ID and schema-version drift.
+  verifiable: true
+- id: AC-3
+  statement: >-
+    Same manifest/schema bytes produce the same ordered result and digest.
+  verifiable: true
+- id: AC-4
+  statement: >-
+    No filesystem read, copy or target mutation occurs in the evaluator
+    (verified by isolated pure-function tests with no IO).
+  verifiable: true
+- id: AC-5
+  statement: >-
+    Existing project-package schema tests and instruction validation remain
+    green (test_node_catalog_package_export, test_package_export_smoke,
+    test_consumer_package_export).
+  verifiable: true
+- id: AC-6
+  statement: >-
+    Result binding carries manifest digest, schema digest/version and exact
+    source SHA; reason codes are the canonical set from the contract.
+  verifiable: true
+unresolved_questions: []
+status: READY

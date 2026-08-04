@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-04T00:00:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-232
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from GitHub connector and verified ancestor of origin/main.
+  evidence:
+  - 78d596242a9e042d62d6174afc40aa4976eb3285
+- id: BLOCKER-229-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-229 (dependency) is Done.
+  evidence:
+  - SCRUM-229
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    Target paths tools/node_architect/package_export, schemas/node-architect/
+    package-export and tests/package_export do not exist on main; this is a
+    fresh build, not a mutation of shared code.
+  evidence:
+  - tools/node_architect/package_export
+  - schemas/node-architect/package-export
+  - tests/package_export
+- id: IMPACT-GROUNDED
+  status: PASS
+  code: IMPACT_DATA_BACKED
+  message: >-
+    Blast radius grounded in repo grep + scope_hash computation; no shared
+    validator/schema coupling found for the new isolated module.
+  evidence:
+  - repo grep for package_export/target-path-safety-check
+  - calculate_gate_scope_identity READY
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
