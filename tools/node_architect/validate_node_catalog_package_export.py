@@ -10,7 +10,7 @@ from pathlib import Path
 
 REQUIRED_COUNT = 9
 FAMILY_PREFIX = "package-export-"
-ALLOWED_FIELDS = {"node_id", "node_type", "title", "canonical", "authority_boundary", "gates", "description"}
+ALLOWED_FIELDS = {"node_id", "node_type", "title", "canonical", "authority_boundary", "gates", "description", "provenance"}
 REQUIRED_FIELDS = {"node_id", "node_type", "title", "canonical", "authority_boundary", "gates"}
 ALLOWED_GATES = {"G2_EXECUTION", "G3_PR"}
 REQUIRED_SEMANTICS = {
