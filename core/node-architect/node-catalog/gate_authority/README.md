@@ -64,16 +64,3 @@ runtime_engine
 scheduler_worker
 all_81_node_catalog
 ```
-
-## G4 merge authority note
-
-This family resolves and validates G4 approval *envelopes and tokens* (scope hash, expiry, head binding) only. It does **not** perform the merge and must not emit `merge`/`auto_merge` connector calls. The actual G4 merge execution is a separate human-triggered action governed by `core/GATE_LIFECYCLE_CONTRACT_v1.0.md` (G4_MERGE section).
-
-When a valid `APPROVE G4_MERGE <approval_id> <scope_hash_16> <expires_at_utc>` token is verified, the merge MUST be executed through the repository `g4-g5-evidence.yml` workflow chain, not a bare `gh pr merge`:
-
-1. Post the verified token as a **PR comment** so the `g4-authority` job publishes the `<!-- gwc:g4-authority-receipt ... -->` receipt.
-2. Confirm the receipt comment exists and its marker fields match the token.
-3. Merge via the GitHub UI or `gh api` merge endpoint so `pull_request.closed` fires `g4-merge-proof` (`<!-- gwc:g4-merge-proof ... -->`).
-4. Poll `g5-status` for `classification: success`.
-
-A direct `gh pr merge` bypasses this chain: the merge succeeds and CI passes, but the `g4-authority-receipt` is never created, so `g4-merge-proof` and `g5-status` fail, and `g5-recovery` cannot backfill it (the merge-commit message lacks the original G4 `approval_id`/`head_sha` provenance). Do not fabricate receipts.
