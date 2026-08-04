@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "gwc.package_export.governance_tree_build",
+  "title": "Governance Tree Build Completion Evidence",
+  "version": "0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "task_id",
+    "source_sha",
+    "package_version",
+    "plan_digest",
+    "idempotency_key",
+    "tree_digest",
+    "entry_inventory",
+    "outcome",
+    "reason"
+  ],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "const": "gwc.package_export.governance_tree_build"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Governed task identity that produced this tree."
+    },
+    "source_sha": {
+      "type": "string",
+      "description": "Source snapshot commit SHA the tree was built from."
+    },
+    "package_version": {
+      "type": "string",
+      "description": "Consumer package version identity."
+    },
+    "plan_digest": {
+      "type": "string",
+      "description": "Canonical semantic digest of the accepted source/target plan.",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Replay identity. Same key + same plan_digest is an idempotent replay."
+    },
+    "tree_digest": {
+      "type": "string",
+      "description": "Deterministic semantic digest of the produced output tree.",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "entry_inventory": {
+      "type": "array",
+      "description": "Complete immutable entry inventory consumed downstream (SCRUM-234).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "source", "source_digest", "target_digest", "byte_count"],
+        "properties": {
+          "target": { "type": "string" },
+          "source": { "type": "string" },
+          "source_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+          "target_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+          "byte_count": { "type": ["integer", "null"], "minimum": 0 }
+        }
+      }
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "TREE_BUILD_COMPLETE",
+        "TREE_BUILD_STAGED",
+        "TREE_REQUIRED_SOURCE_MISSING",
+        "TREE_COPY_MISMATCH",
+        "TREE_TARGET_COLLISION",
+        "TREE_PARTIAL_OUTPUT",
+        "TREE_READBACK_MISMATCH",
+        "TREE_STALE_SOURCE",
+        "TREE_IDEMPOTENT_REPLAY",
+        "TREE_REPLAY_CONFLICT"
+      ]
+    }
+  }
+}

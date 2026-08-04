@@ -1,0 +1,64 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+status: PENDING_HUMAN_APPROVAL
+approval_id: APPROVE_G4_MERGE_233_20260804
+task_id: SCRUM-233
+issued_at: '2026-08-04T09:45:00Z'
+expires_at: '2026-08-05T09:45:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 33568398ab12644e20ae893625a9c08e0d5a34c1
+working_branch: fastlane/scrum-233-governance-tree-build-m5-20260804
+head_sha: 0f66130ebb697f20879f4af7775170de5b7785cf
+pull_request:
+  number: 209
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/209
+  draft: true
+  mergeable: MERGEABLE
+merge_method: squash
+additional_bindings:
+- key: pr_number
+  value: '209'
+predecessor_gate:
+  gate: G3_PR
+  approval_id: APPROVE_G3_PR_233_20260804
+  scope_hash_16: 75bef33cf3f4b12f
+  outcome: pass
+modules_or_files:
+- tools/node_architect/package_export/governance_tree_build.py
+- schemas/node-architect/package-export/governance-tree-build.schema.json
+- tests/package_export/test_governance_tree_build.py
+- .gwc/tasks/SCRUM-233/**
+authorized_actions:
+- mark_pr_ready_for_review
+- merge_approved_pr
+excluded_actions:
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+preconditions:
+- id: PRE-1
+  requirement: All required CI checks SUCCESS on head 0f66130ebb697f20879f4af7775170de5b7785cf
+  status: pass
+  evidence: gh pr checks 209 - 9/9 pass (validate, build x4, calculate-parity x3, compare-parity)
+- id: PRE-2
+  requirement: PR 209 base is main and head equals the approval-bound head_sha
+  status: pass
+- id: PRE-3
+  requirement: PR marked ready for review before merge (draft cannot be merged)
+  status: pending
+scope_hash: sha256:4f45ff4a874dd456927e74b52071daf64ea8a65c151bd0aa02bf58160e019b5c
+scope_hash_16: 4f45ff4a874dd456
+approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_233_20260804 4f45ff4a874dd456 2026-08-05T09:45:00Z'
+exclusions:
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pending_human_approval
