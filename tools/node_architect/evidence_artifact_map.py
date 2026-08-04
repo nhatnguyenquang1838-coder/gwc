@@ -93,132 +93,239 @@ def build_gate_evidence_artifact_map(
     base_sha: str,
     evidence_candidates: list[dict[str, object]],
     policy_revision: str,
+    head_sha: str | None = None,
     mapped_at: str | None = None,
 ) -> dict[str, object]:
-    """Build the canonical gate evidence artifact map for a task.
+    """Build a deterministic, fail-closed canonical gate evidence map.
 
-    Returns a ``gate-evidence-artifact-map`` artifact. ``outcome`` is ``READY``
-    only when every required canonical evidence binds with no projection-only,
-    missing, or stale conflict; otherwise ``BLOCKED`` with reason codes.
-    ``authority_granted`` is always ``False``.
+    ``head_sha`` is optional for backwards-compatible base-only contexts. When
+    present, G3+ evidence must bind that exact head; G0-G2 evidence remains
+    bound to ``base_sha``. The function identifies evidence only and never
+    grants gate authority.
     """
     reasons: list[str] = []
 
-    # --- Rule 1: invalid candidate shape / binding -----------------------
+    def valid_sha(value: object) -> bool:
+        return (
+            isinstance(value, str)
+            and len(value) == 40
+            and all(char in "0123456789abcdef" for char in value)
+        )
+
+    def valid_digest(value: object) -> bool:
+        return (
+            isinstance(value, str)
+            and value.startswith("sha256:")
+            and len(value) == 71
+            and all(char in "0123456789abcdef" for char in value[7:])
+        )
+
     if not isinstance(task_id, str) or not task_id.strip():
         reasons.append("EVIDENCE_INPUT_INVALID")
     if not isinstance(repository, str) or "/" not in repository.strip().lstrip():
         reasons.append("EVIDENCE_INPUT_INVALID")
-    if not isinstance(base_sha, str) or len(base_sha) != 40 or not all(c in "0123456789abcdef" for c in base_sha):
+    if not valid_sha(base_sha):
+        reasons.append("EVIDENCE_INPUT_INVALID")
+    if head_sha is not None and not valid_sha(head_sha):
         reasons.append("EVIDENCE_INPUT_INVALID")
     if not isinstance(policy_revision, str) or not policy_revision.strip():
         reasons.append("EVIDENCE_INPUT_INVALID")
     if not isinstance(evidence_candidates, list):
         reasons.append("EVIDENCE_INPUT_INVALID")
 
-    # Normalize candidates; reject malformed shapes.
+    requirements: list[dict[str, object]] = []
+    requirement_policy: dict[str, dict[str, object]] = {}
+    for requirement in _GATE_REQUIREMENTS:
+        target = requirement["target"].replace("<task-id>", task_id or "<task-id>")
+        public_requirement = {
+            "gate": requirement["gate"],
+            "artifact_role": requirement["artifact_role"],
+            "target": target,
+            "required": requirement.get("required", "true") == "true",
+        }
+        requirements.append(public_requirement)
+        requirement_policy[target] = {
+            **public_requirement,
+            "classification": requirement["class_"],
+        }
+
     norm_candidates: list[dict[str, Any]] = []
     if isinstance(evidence_candidates, list):
-        for c in evidence_candidates:
-            if not isinstance(c, dict) or "evidence_key" not in c or "gate" not in c:
+        for candidate in evidence_candidates:
+            if not isinstance(candidate, dict):
                 reasons.append("EVIDENCE_INPUT_INVALID")
                 continue
-            norm_candidates.append(c)
+            norm_candidates.append(candidate)
 
-    # --- Build canonical per-gate requirements (task-id bound) -----------
-    requirements = []
-    for req in _GATE_REQUIREMENTS:
-        requirements.append({
-            "gate": req["gate"],
-            "artifact_role": req["artifact_role"],
-            "target": req["target"].replace("<task-id>", task_id or "<task-id>"),
-            "required": req.get("required", "true") == "true",
-        })
-
-    # G6 is required only when explicitly applicable; flag NOT_APPLICABLE when
-    # no G6 candidate exists (rule 7). This is informational, not a block.
     has_g6_candidate = any(
-        c.get("gate") == "G6_PRODUCTION_DATA" for c in norm_candidates
+        candidate.get("gate") == "G6_PRODUCTION_DATA"
+        for candidate in norm_candidates
     )
     if not has_g6_candidate:
         reasons.append("EVIDENCE_G6_NOT_APPLICABLE")
 
-    # --- Rule 2/8: conflict detection on duplicate evidence keys ----------
     seen_digests: dict[str, str] = {}
-    for c in norm_candidates:
-        key = c.get("evidence_key")
-        dig = c.get("digest")
-        if key in seen_digests and seen_digests[key] != dig:
+    for candidate in norm_candidates:
+        key = candidate.get("evidence_key")
+        digest = candidate.get("digest")
+        if not isinstance(key, str) or not key:
+            reasons.append("EVIDENCE_INPUT_INVALID")
+            continue
+        if key in seen_digests and seen_digests[key] != digest:
             reasons.append("EVIDENCE_CONFLICT")
-        if key is not None:
-            seen_digests[key] = dig if dig is not None else ""
+        seen_digests[key] = digest if isinstance(digest, str) else ""
 
-    # --- Build entries from candidates -----------------------------------
     entries: list[dict[str, Any]] = []
     matched_targets: set[str] = set()
-    for c in norm_candidates:
-        gate = c.get("gate")
-        cls = c.get("classification")
-        src = c.get("source_type")
-        target = c.get("target")
-        # Rule 3: projection-only used as canonical.
-        is_projection_src = src in PROJECTION_SOURCE_TYPES
-        is_canonical_class = cls in ("CANONICAL_AUTHORITY", "CANONICAL_GATE_EVIDENCE", "DELIVERY_EVIDENCE")
+    for candidate in norm_candidates:
+        gate = candidate.get("gate")
+        classification = candidate.get("classification")
+        source_type = candidate.get("source_type")
+        target = candidate.get("target")
+        reference = candidate.get("ref")
+        evidence_key = candidate.get("evidence_key")
+        revision = candidate.get("revision")
+        digest = candidate.get("digest")  # candidate-local; never reuse another entry's digest
+        artifact_role = candidate.get("artifact_role")
+        artifact_type = candidate.get("artifact_type")
+        required = candidate.get("required")
+        materialization = candidate.get("materialization_status", "UNOBSERVED")
+        freshness = candidate.get("freshness_status", "UNOBSERVED")
+        binding = candidate.get("binding_status", "UNOBSERVED")
+        source_of_truth = bool(candidate.get("source_of_truth", False))
+
         entry_reasons: list[str] = []
-        material = c.get("materialization_status", "UNOBSERVED")
-        fresh = c.get("freshness_status", "UNOBSERVED")
-        binding = c.get("binding_status", "UNOBSERVED")
-        if is_projection_src and is_canonical_class:
+        is_projection_source = source_type in PROJECTION_SOURCE_TYPES
+        is_canonical_class = classification in {
+            "CANONICAL_AUTHORITY",
+            "CANONICAL_GATE_EVIDENCE",
+            "DELIVERY_EVIDENCE",
+        }
+
+        required_strings = (
+            evidence_key,
+            gate,
+            artifact_role,
+            artifact_type,
+            classification,
+            source_type,
+            target,
+            reference,
+            revision,
+            digest,
+        )
+        structural_invalid = (
+            any(not isinstance(value, str) or not value for value in required_strings)
+            or not isinstance(required, bool)
+            or classification not in EVIDENCE_CLASSES
+            or not valid_sha(revision)
+            or not valid_digest(digest)
+            or binding not in {"BOUND", "MISMATCHED", "UNOBSERVED", "NOT_APPLICABLE"}
+            or freshness not in {"FRESH", "STALE", "UNOBSERVED"}
+            or materialization not in {"MATERIALIZED", "MISSING", "UNOBSERVED"}
+        )
+        if structural_invalid:
+            reasons.append("EVIDENCE_INPUT_INVALID")
+            continue
+
+        if is_projection_source and is_canonical_class:
             entry_reasons.append("EVIDENCE_PROJECTION_ONLY")
         if binding == "MISMATCHED":
             entry_reasons.append("EVIDENCE_BINDING_MISMATCH")
-        if fresh == "STALE":
+        if freshness == "STALE":
             entry_reasons.append("EVIDENCE_STALE")
-        if material == "MISSING":
+        if materialization == "MISSING":
             entry_reasons.append("EVIDENCE_REQUIRED_MISSING")
-        if material == "UNOBSERVED" or fresh == "UNOBSERVED" or binding == "UNOBSERVED":
+        if (
+            materialization == "UNOBSERVED"
+            or freshness == "UNOBSERVED"
+            or binding == "UNOBSERVED"
+        ):
             entry_reasons.append("EVIDENCE_OBSERVABILITY_INCOMPLETE")
-        if gate in ("G4_MERGE", "G5_DEPLOY") and binding == "MISMATCHED" and c.get("revision") != base_sha:
-            entry_reasons.append("EVIDENCE_CI_BINDING_MISMATCH")
-        # Propagate every entry-level reason code to the top-level reasons so
-        # the map outcome reflects per-evidence failures (binding mismatch,
-        # stale, projection-only, observability incomplete, CI mismatch).
-        reasons.extend(entry_reasons)
-        entries.append({
-            "evidence_key": c.get("evidence_key"),
-            "gate": gate,
-            "artifact_role": c.get("artifact_role"),
-            "artifact_type": c.get("artifact_type"),
-            "classification": cls,
-            "required": bool(c.get("required", False)),
-            "source_type": src,
-            "target": target,
-            "ref": c.get("ref"),
-            "revision": c.get("revision"),
-            "digest": dig,
-            "binding_status": binding,
-            "freshness_status": fresh,
-            "materialization_status": material,
-            "source_of_truth": bool(c.get("source_of_truth", False)) and not is_projection_src,
-            "reason_codes": entry_reasons,
-        })
-        if target and material == "MATERIALIZED" and not entry_reasons:
-            matched_targets.add(target)
 
-    # --- Derive missing / stale / projection-only sets --------------------
-    missing_required: list[str] = []
-    stale_required: list[str] = []
-    projection_only: list[str] = []
-    for req in requirements:
-        tgt = req["target"]
-        if req["required"] and tgt not in matched_targets:
-            missing_required.append(tgt)
-    for e in entries:
-        if e["freshness_status"] == "STALE":
-            if e.get("target"):
-                stale_required.append(e["target"])
-        if "EVIDENCE_PROJECTION_ONLY" in e["reason_codes"] and e.get("target"):
-            projection_only.append(e["target"])
+        policy = requirement_policy.get(target) if isinstance(target, str) else None
+        if policy is not None:
+            expected_revision = (
+                head_sha
+                if head_sha is not None and gate in {
+                    "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"
+                }
+                else base_sha
+            )
+            if (
+                gate != policy["gate"]
+                or artifact_role != policy["artifact_role"]
+                or classification != policy["classification"]
+                or required is not policy["required"]
+                or evidence_key != target
+                or reference != target
+                or revision != expected_revision
+            ):
+                entry_reasons.append("EVIDENCE_BINDING_MISMATCH")
+        else:
+            is_g5_status = (
+                gate == "G5_DEPLOY"
+                and artifact_role == "status-verification"
+                and classification == "DELIVERY_EVIDENCE"
+                and required is False
+                and source_type == "github_actions"
+                and evidence_key == target == reference
+                and revision == (head_sha or base_sha)
+            )
+            if not is_g5_status:
+                entry_reasons.append("EVIDENCE_BINDING_MISMATCH")
+
+        if gate in {"G4_MERGE", "G5_DEPLOY"} and revision != (head_sha or base_sha):
+            entry_reasons.append("EVIDENCE_CI_BINDING_MISMATCH")
+
+        entry_reasons = sorted(set(entry_reasons), key=lambda code: (
+            _REASON_PRECEDENCE.index(code)
+            if code in _REASON_PRECEDENCE
+            else len(_REASON_PRECEDENCE)
+        ))
+        reasons.extend(entry_reasons)
+        entry = {
+            "evidence_key": evidence_key,
+            "gate": gate,
+            "artifact_role": artifact_role,
+            "artifact_type": artifact_type,
+            "classification": classification,
+            "required": bool(required) if isinstance(required, bool) else False,
+            "source_type": source_type,
+            "target": target,
+            "ref": reference,
+            "revision": revision,
+            "digest": digest,
+            "binding_status": binding,
+            "freshness_status": freshness,
+            "materialization_status": materialization,
+            "source_of_truth": source_of_truth and not is_projection_source,
+            "reason_codes": entry_reasons,
+        }
+        entries.append(entry)
+        if (
+            policy is not None
+            and materialization == "MATERIALIZED"
+            and source_of_truth
+            and not entry_reasons
+        ):
+            matched_targets.add(str(target))
+
+    missing_required = sorted({
+        str(requirement["target"])
+        for requirement in requirements
+        if requirement["required"] and requirement["target"] not in matched_targets
+    })
+    stale_required = sorted({
+        str(entry["target"])
+        for entry in entries
+        if entry.get("target") and entry.get("freshness_status") == "STALE"
+    })
+    projection_only = sorted({
+        str(entry["target"])
+        for entry in entries
+        if entry.get("target") and "EVIDENCE_PROJECTION_ONLY" in entry["reason_codes"]
+    })
 
     if missing_required:
         reasons.append("EVIDENCE_REQUIRED_MISSING")
@@ -229,29 +336,36 @@ def build_gate_evidence_artifact_map(
 
     sorted_reasons = sorted(
         set(reasons),
-        key=lambda r: _REASON_PRECEDENCE.index(r) if r in _REASON_PRECEDENCE else len(_REASON_PRECEDENCE),
+        key=lambda reason: (
+            _REASON_PRECEDENCE.index(reason)
+            if reason in _REASON_PRECEDENCE
+            else len(_REASON_PRECEDENCE)
+        ),
     )
-    # EVIDENCE_G6_NOT_APPLICABLE is informational; it must not flip a complete
-    # map to BLOCKED. Outcome is BLOCKED only when a blocking reason is present.
-    blocking = [r for r in sorted_reasons if r != "EVIDENCE_G6_NOT_APPLICABLE"]
-    if not blocking:
-        blocking = ["EVIDENCE_MAP_READY"]
-    outcome = "BLOCKED" if blocking != ["EVIDENCE_MAP_READY"] else "READY"
-    # Surface the resolved outcome reason in the reported reason_codes.
-    reported_reasons = [r for r in sorted_reasons if r != "EVIDENCE_G6_NOT_APPLICABLE"] or ["EVIDENCE_MAP_READY"]
+    blocking_reasons = [
+        reason for reason in sorted_reasons
+        if reason != "EVIDENCE_G6_NOT_APPLICABLE"
+    ]
+    outcome = "BLOCKED" if blocking_reasons else "READY"
+    reported_reasons = blocking_reasons or ["EVIDENCE_MAP_READY"]
     if "EVIDENCE_G6_NOT_APPLICABLE" in sorted_reasons:
         reported_reasons.append("EVIDENCE_G6_NOT_APPLICABLE")
 
+    sorted_entries = sorted(
+        entries,
+        key=lambda entry: (str(entry.get("gate")), str(entry.get("evidence_key"))),
+    )
     map_model = {
         "task_id": task_id,
         "repository": repository,
         "base_sha": base_sha,
+        "head_sha": head_sha,
         "policy_revision": policy_revision,
         "requirements": requirements,
-        "entries": sorted(entries, key=lambda e: (str(e.get("gate")), str(e.get("evidence_key")))),
-        "missing_required": sorted(set(missing_required)),
-        "stale_required": sorted(set(stale_required)),
-        "projection_only": sorted(set(projection_only)),
+        "entries": sorted_entries,
+        "missing_required": missing_required,
+        "stale_required": stale_required,
+        "projection_only": projection_only,
     }
     map_digest = "sha256:" + hashlib.sha256(_canonical_json_bytes(map_model)).hexdigest()
 
@@ -261,16 +375,16 @@ def build_gate_evidence_artifact_map(
         "task_id": task_id,
         "repository": repository,
         "base_sha": base_sha,
-        "head_sha": None,
+        "head_sha": head_sha,
         "policy_revision": policy_revision,
         "mapped_at": mapped_at,
         "outcome": outcome,
         "reason_codes": reported_reasons,
-        "entries": entries,
+        "entries": sorted_entries,
         "requirements": requirements,
-        "missing_required": sorted(set(missing_required)),
-        "stale_required": sorted(set(stale_required)),
-        "projection_only": sorted(set(projection_only)),
+        "missing_required": missing_required,
+        "stale_required": stale_required,
+        "projection_only": projection_only,
         "map_digest": map_digest,
         "authority_granted": False,
     }
