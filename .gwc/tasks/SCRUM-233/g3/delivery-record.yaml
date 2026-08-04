@@ -1,0 +1,98 @@
+schema_version: '1.0'
+artifact_type: g3-pr-request
+gate: G3_PR
+status: PENDING_HUMAN_APPROVAL
+approval_id: APPROVE_G3_PR_233_20260804
+task_id: SCRUM-233
+issued_at: '2026-08-04T09:30:00Z'
+expires_at: '2026-08-05T09:30:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 33568398ab12644e20ae893625a9c08e0d5a34c1
+working_branch: fastlane/scrum-233-governance-tree-build-m5-20260804
+head_sha: 0f66130ebb697f20879f4af7775170de5b7785cf
+predecessor_gate:
+  gate: G2_EXECUTION
+  approval_id: APPROVE_G2_EXECUTION_233_20260804_R2
+  scope_hash_16: fa42b7a6224ba058
+  outcome: pass
+modules_or_files:
+- tools/node_architect/package_export/governance_tree_build.py
+- schemas/node-architect/package-export/governance-tree-build.schema.json
+- tests/package_export/test_governance_tree_build.py
+- .gwc/tasks/SCRUM-233/**
+authorized_actions:
+- open_or_update_draft_pr
+excluded_actions:
+- merge_approved_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+validation:
+  head_sha: 0f66130ebb697f20879f4af7775170de5b7785cf
+  status: pass
+  commands:
+  - command: PYTHONPATH=tools python3 tests/package_export/test_governance_tree_build.py
+    result: pass
+    evidence: Ran 22 tests - OK (clean build, optional skip, required-missing, stale
+      source, target collision, partial staging, missing completion marker, identical
+      replay, conflicting replay, determinism)
+  - command: python3 -m unittest discover -s tests
+    result: pass
+    evidence: >-
+      Head 0f66130 Ran 925 errors=12; base 33568398ab12644e20ae893625a9c08e0d5a34c1
+      Ran 925 errors=12. Identical pre-existing error set (line-ending policy +
+      loader errors), so this branch introduces no new discovery failures.
+acceptance_criteria:
+- id: AC-1
+  result: pass
+  evidence:
+  - Fixtures cover clean build, optional skip, required-source disappearance after
+    planning, copy-byte mismatch reason reachability, crash after partial staging,
+    crash before completion marker, identical replay, conflicting replay
+- id: AC-2
+  result: pass
+  evidence:
+  - completion evidence binds task_id, source_sha, package_version, plan_digest,
+    idempotency_key, entry_inventory, tree_digest (test_completion_evidence_binds_identity)
+- id: AC-3
+  result: pass
+  evidence:
+  - Final readback of every promoted file before the completion marker is written;
+    mismatch removes the tree and returns TREE_READBACK_MISMATCH
+- id: AC-4
+  result: pass
+  evidence:
+  - Failed/partial staging is discarded (test_failed_build_leaves_no_staging_tree,
+    test_crash_after_partial_staging_is_not_promoted)
+- id: AC-5
+  result: pass
+  evidence:
+  - test_determinism_same_plan_same_tree_digest and test_plan_digest_order_independent
+- id: AC-6
+  result: pass
+  evidence:
+  - New module only; no existing exporter behavior modified. Repo suite unchanged
+    vs base.
+scope_hash: sha256:75bef33cf3f4b12f658ec55cfb96861d00df72d100ea7f5b23c9c26b0e68df62
+scope_hash_16: 75bef33cf3f4b12f
+approval_command: 'APPROVE G3_PR APPROVE_G3_PR_233_20260804 75bef33cf3f4b12f 2026-08-05T09:30:00Z'
+residual_risks:
+- Repo-wide unittest discovery has 12 pre-existing errors that also exist at base
+  33568398ab12644e20ae893625a9c08e0d5a34c1; outside SCRUM-233 scope and untouched.
+- head_sha binds 0f66130ebb697f20879f4af7775170de5b7785cf, the commit carrying the
+  full delivered change set. Any later metadata-only artifact commit does not change
+  the delivered code, schema or tests.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pending_human_approval
