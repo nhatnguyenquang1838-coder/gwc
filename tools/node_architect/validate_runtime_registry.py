@@ -62,6 +62,15 @@ def source_hash(repo_root: Path, relative: str) -> str | None:
         return None
     # Normalize line endings so provenance hashes stay stable across Windows and Linux checkouts.
     data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    # Strip the provenance block before hashing so the SHA is self-consistent
+    # (the provenance SHA must match the hash of the file without provenance).
+    try:
+        parsed = json.loads(data)
+        if isinstance(parsed, dict) and "provenance" in parsed:
+            without_provenance = {k: v for k, v in parsed.items() if k != "provenance"}
+            data = (json.dumps(without_provenance, indent=2, sort_keys=True) + "\n").encode()
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        pass
     return hashlib.sha256(data).hexdigest()
 
 
