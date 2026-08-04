@@ -1,0 +1,80 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-04T06:10:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G2 scope is the SCRUM-233 governance-tree-build evaluator, its closed result schema and focused tests only
+- fresh isolated module under tools/node_architect/package_export; shared exporter tools/export_project_package.py is not mutated
+- no archive publication, consumer repository write, package-version bump or deletion outside run-scoped staging
+- no merge/deploy/release/production/credential work
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- id: VALIDATE_G01
+  path: tools/validate_g01.py
+  ref: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  source_sha: 4fbc4fc57657ce0df1fde308743646a996156721
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 4fbc4fc57657ce0df1fde308743646a996156721
+- path: tools/node_architect/package_export/source_path_safety.py
+  required: false
+  status: AVAILABLE
+  source_sha: 8641f98655984aaec450edb135a82fc53f61e36b
+- path: tools/node_architect/package_export/target_path_safety_check.py
+  required: false
+  status: AVAILABLE
+  source_sha: 02900ca28d8cc8c51a994e9635ba0f82947edba5
+status: READY
+blockers: []

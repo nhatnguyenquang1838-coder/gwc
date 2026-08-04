@@ -1,0 +1,73 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-04T06:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-233
+  base_sha: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main and matches the PR #202 merge commit.
+  evidence:
+  - a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+- id: BLOCKER-231-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-231 delivered via PR #202, merged into main; Jira status Done.
+  evidence:
+  - SCRUM-231
+  - PR-202
+- id: BLOCKER-232-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-232 (target-path-safety-check) is Done and its module exists on the base.
+  evidence:
+  - SCRUM-232
+  - tools/node_architect/package_export/target_path_safety_check.py
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    governance_tree_build.py, governance-tree-build.schema.json and
+    test_governance_tree_build.py are absent from origin/main; this is a fresh
+    isolated module build, verified with git ls-tree on the protected base.
+  evidence:
+  - git ls-tree origin/main tools/node_architect/package_export/
+  - git ls-tree origin/main schemas/node-architect/package-export/
+  - git ls-tree origin/main tests/package_export/
+- id: SHARED-EXPORTER-UNTOUCHED
+  status: PASS
+  code: SHARED_SURFACE_EXCLUDED
+  message: tools/export_project_package.py stays out of the mutation scope; serialization risk against downstream F7 tasks avoided.
+  evidence:
+  - tools/export_project_package.py
+- id: IMPACT-GROUNDED
+  status: PASS
+  code: IMPACT_DATA_BACKED
+  message: >-
+    Blast radius grounded in a protected-base tree listing plus the sibling
+    package_export modules already merged; no shared validator/schema coupling
+    is introduced by the new isolated module.
+  evidence:
+  - git ls-tree on the protected base for all three target directories
+  - sibling modules source_path_safety.py and target_path_safety_check.py
+- id: AGENT-CLAIM
+  status: PASS
+  code: CLAIM_OK
+  message: AI Agent field was empty and is now Hermes; assignee unchanged (Nhat Nguyen Quang); no foreign branch or PR for SCRUM-233.
+  evidence:
+  - customfield_10046=Hermes
+  - git ls-remote origin showed no scrum-233 ref
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

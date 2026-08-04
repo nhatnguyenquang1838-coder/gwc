@@ -1,0 +1,49 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-04T06:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-233
+  base_sha: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Isolated staging/promote tree builder + closed result schema + replay fixture suite
+  description: >-
+    Build tools/node_architect/package_export/governance_tree_build.py as an
+    isolated module implementing run-scoped staging, byte-exact ordered copy,
+    full readback, atomic promotion and idempotency-key replay; add the closed
+    result schema schemas/node-architect/package-export/governance-tree-build.schema.json
+    and the focused suite tests/package_export/test_governance_tree_build.py
+    covering all eight required fixtures. Matches the issue's stated surfaces
+    and leaves the shared exporter untouched.
+  benefits:
+  - Matches the issue's named surfaces and boundaries exactly
+  - Isolated new module keeps blast radius minimal and avoids exporter serialization conflicts
+  - Deterministic, digest-bound, replay-safe by construction
+  tradeoffs:
+  - Some copy logic is conceptually adjacent to the existing exporter
+  risks:
+  - Behavioral drift versus the exporter if the latter is later refactored (mitigated by the shared plan digest contract)
+  constraint_fit: FIT
+- id: OPT-2
+  title: Extend tools/export_project_package.py in place
+  description: >-
+    Add staging, readback and replay semantics directly into the shared exporter
+    script instead of building an isolated module.
+  benefits:
+  - Single code path for package export
+  tradeoffs:
+  - Mutates a shared surface that downstream F7 tasks (SCRUM-234..237) also touch, requiring serialization
+  - Much larger blast radius; regression risk to existing export consumers
+  risks:
+  - Violates the issue's own guidance that the shared exporter be touched "only if required" and that writes be serialized
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  The issue names the isolated surfaces and explicitly warns that shared exporter
+  writes must be serialized against downstream F7 tasks; OPT-1 delivers the full
+  M5_REPLAY_SAFE contract with the smallest governed blast radius.
+decision_required: true
+status: READY

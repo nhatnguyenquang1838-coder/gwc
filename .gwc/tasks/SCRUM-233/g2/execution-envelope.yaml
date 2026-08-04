@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: execution-envelope
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_EXECUTION_233_20260804_R2
+task_id: SCRUM-233
+issued_at: '2026-08-04T14:40:00Z'
+expires_at: '2026-08-05T14:40:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 33568398ab12644e20ae893625a9c08e0d5a34c1
+working_branch: fastlane/scrum-233-governance-tree-build-m5-20260804
+head_sha: null
+modules_or_files:
+- tools/node_architect/package_export/governance_tree_build.py
+- schemas/node-architect/package-export/governance-tree-build.schema.json
+- tests/package_export/test_governance_tree_build.py
+- .gwc/tasks/SCRUM-233/**
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- merge_approved_pr
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+scope_hash: sha256:fa42b7a6224ba0588f3074548e61b89cdb9cbcdadaa711eaa52e56b3450b5575
+scope_hash_16: fa42b7a6224ba058
+approval_command: 'APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_233_20260804_R2 fa42b7a6224ba058 2026-08-05T14:40:00Z'
+supersedes: APPROVE_G2_EXECUTION_233_20260804
+supersede_reason: base_sha drift — main advanced a674d93 -> 3356839; scope_hash recomputed against live base

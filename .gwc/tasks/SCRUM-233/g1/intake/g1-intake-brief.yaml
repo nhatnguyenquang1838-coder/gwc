@@ -1,0 +1,95 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-04T06:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-233
+  base_sha: a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    SCRUM-233 requires a deterministic, replay-safe governance-tree builder for
+    the package_export node family. The generated .governance/ tree must be
+    produced from an accepted source/target plan through run-scoped staging,
+    byte-exact copy, full readback and idempotency-key replay semantics.
+  why_now: >-
+    SCRUM-231 (source-path-safety-check, PR #202 merged into main@a674d93) and
+    SCRUM-232 (target-path-safety-check) are Done, so the accepted source/target
+    plan that this builder consumes now exists.
+desired_outcome: >-
+  A deterministic tree builder that stages before exposing output, records
+  source/target digests and byte counts in canonical entry order, fails closed on
+  partial/divergent/stale state, and returns an equivalent tree on identical
+  replay while failing REPLAY_CONFLICT on a divergent plan digest.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - SCRUM-234 (entry inventory consumer)
+scope:
+  in_scope:
+  - tools/node_architect/package_export/governance_tree_build.py
+  - schemas/node-architect/package-export/governance-tree-build.schema.json
+  - tests/package_export/test_governance_tree_build.py
+  - .gwc/tasks/SCRUM-233/**
+  non_goals:
+  - archive publication
+  - consumer repository write
+  - package-version bump
+  - deletion outside run-scoped staging
+  - mutation of tools/export_project_package.py
+  - merge
+  - deploy
+  - release
+  - production data/config
+  - credentials
+  - force-push
+  - branch deletion
+  - PR base change
+constraints:
+- target maturity M2 to M5_REPLAY_SAFE
+- staging tree created before any completed output tree is exposed
+- byte-exact copy in canonical entry order with source/target digest and byte count
+- optional missing entries only per the accepted source decision; required missing aborts
+- restart readback by idempotency key and semantic plan digest
+- same key + same digest returns equivalent tree; same key + different digest fails REPLAY_CONFLICT
+- no final-complete result until every copied file is read back and matches
+assumptions:
+- base remains gwc/main@a674d93f0086b0ae5ff2da2f62a2dcabd25e17a0
+- Jira is projection only; the node spec is the authority boundary marker
+risks:
+- id: RISK-1
+  description: Shared exporter serialization - concurrent F7 tasks writing the same exporter surface.
+  impact: medium
+  mitigation: Build an isolated module; do not mutate tools/export_project_package.py in this task.
+- id: RISK-2
+  description: Five-agent board collision on the same task family.
+  impact: medium
+  mitigation: Pre-push collision check (git fetch origin / gh pr list); dedicated branch fastlane/scrum-233-governance-tree-build-m5-20260804.
+- id: RISK-3
+  description: Non-deterministic tree digest from filesystem ordering.
+  impact: medium
+  mitigation: Canonical entry ordering and explicit semantic digest computation with fixtures asserting stability.
+acceptance_criteria:
+- id: AC-1
+  statement: Fixtures cover clean build, optional skip, required-source disappearance after planning, copy-byte mismatch, crash after partial staging, crash before completion marker, identical replay and conflicting replay.
+  verifiable: true
+- id: AC-2
+  statement: Completion evidence binds task, source SHA, package version, plan digest, idempotency key, entry inventory and output-tree digest.
+  verifiable: true
+- id: AC-3
+  statement: No final-complete result exists until every copied file is read back and matches expected bytes.
+  verifiable: true
+- id: AC-4
+  statement: Failed or partial staging is isolated and cannot masquerade as a valid package.
+  verifiable: true
+- id: AC-5
+  statement: Same canonical plan and source snapshot produce the same semantic tree digest.
+  verifiable: true
+- id: AC-6
+  statement: Existing package export and instruction-validation regressions remain green.
+  verifiable: true
+unresolved_questions: []
+status: READY
