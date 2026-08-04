@@ -1,0 +1,40 @@
+approval_id: G2_SCRUM-232_20260804
+authority_gate: G2_EXECUTION
+task_id: SCRUM-232
+subtasks: []
+issued_at: '2026-08-04T02:00:00Z'
+expires_at: '2026-08-05T02:00:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 4a83ece9f5d52b83a394d8491c401741782e3dd7
+working_branch: hermes/scrum-232-path-safety-m4-20260804
+modules_or_files:
+- tools/node_architect/package_export
+- schemas/node-architect/package-export
+- tests/package_export
+- .gwc/tasks/SCRUM-232/**
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- merge_approved_pr
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+- runtime_implementation_code
+scope_hash: sha256:e9eefe46a35bdaefcf9c4c3b7c895aefa77675280c7491cfff0228701077f3df
+scope_hash_16: e9eefe46a35bdaef
+approval_command: APPROVE G2_EXECUTION G2_SCRUM-232_20260804 e9eefe46a35bdaef 2026-08-05T02:00:00Z

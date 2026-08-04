@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "gwc.package_export.target_path_safety_check",
+  "title": "Target Path Safety Check Decision",
+  "version": "0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "target", "normalized", "output_root", "outcome", "reason"],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "const": "gwc.package_export.target_path_safety_check"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "0.1"
+    },
+    "target": {
+      "type": "string",
+      "description": "Original requested target path."
+    },
+    "normalized": {
+      "type": "string",
+      "description": "Normalized POSIX relative path under the approved prefix."
+    },
+    "output_root": {
+      "type": "string",
+      "description": "Consumer-package output root identity."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "TARGET_PATH_SAFE",
+        "TARGET_PATH_EMPTY",
+        "TARGET_PATH_ABSOLUTE",
+        "TARGET_PATH_TRAVERSAL",
+        "TARGET_PATH_BACKSLASH",
+        "TARGET_PATH_ESCAPES_ROOT",
+        "TARGET_SYMLINK_ESCAPE",
+        "TARGET_PREFIX_FORBIDDEN",
+        "TARGET_DUPLICATE",
+        "TARGET_CASE_COLLISION",
+        "TARGET_OVERWRITE_FORBIDDEN",
+        "TARGET_IDEMPOTENT_EXISTING"
+      ]
+    },
+    "overwrite_decision": {
+      "type": ["string", "null"],
+      "enum": ["idempotent_identical", "blocked_divergent", "blocked_unknown_readback", null]
+    },
+    "semantic_digest": {
+      "type": ["string", "null"]
+    },
+    "detail": {
+      "type": "string"
+    }
+  }
+}
