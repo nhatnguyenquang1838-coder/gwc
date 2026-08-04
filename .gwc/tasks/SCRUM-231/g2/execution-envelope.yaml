@@ -1,0 +1,41 @@
+schema_version: "1.0"
+artifact_type: execution-envelope
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_EXECUTION_231_20260804
+task_id: SCRUM-231
+issued_at: "2026-08-04T00:50:00Z"
+expires_at: "2026-08-04T12:50:00Z"
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: bce6f6f83c74a25a57259695adc44b46a8555c46
+working_branch: fastlane/scrum-231-source-path-safety-check-m4-20260804
+head_sha: null
+modules_or_files:
+  - tools/node_architect/package_export/source_path_safety.py
+  - schemas/node-architect/package-export/source-path-safety.schema.json
+  - tests/package_export/test_source_path_safety.py
+  - .gwc/tasks/SCRUM-231/**
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - merge_approved_pr
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - deploy_approved_release
+  - reload_approved_runtime
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - migration
+  - force_push
+  - delete_branch
+  - protected_branch_write
+scope_hash: "sha256:0d9dec864ed8d6cc4f777fbf80bbe71e2d26d8b2b26a27d6f93ec469df7ca5f5"
+scope_hash_16: 0d9dec864ed8d6cc
+approval_command: "APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_231_20260804 0d9dec864ed8d6cc 2026-08-04T12:50:00Z"
