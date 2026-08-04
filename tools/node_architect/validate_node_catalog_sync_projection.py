@@ -28,7 +28,14 @@ RUNTIME_BINDINGS = {
         "function": "decide_projection_source_authority",
         "artifact_type": "projection-source-authority-decision",
         "gates": ["G2_EXECUTION"],
-    }
+    },
+    "projection-evidence-linking": {
+        "schema": "schemas/projection-evidence-linkset.schema.json",
+        "evaluator": "tools/node_architect/projection_evidence_linking.py",
+        "function": "build_projection_evidence_linkset",
+        "artifact_type": "projection-evidence-linkset",
+        "gates": ["G2_EXECUTION", "G3_PR"],
+    },
 }
 
 
