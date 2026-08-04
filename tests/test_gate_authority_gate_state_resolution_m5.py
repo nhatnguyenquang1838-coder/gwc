@@ -192,29 +192,66 @@ class GateStateResolutionTests(unittest.TestCase):
 
     def test_blocked_required_entry_field_fails_input_closed(self):
         model = evidence_map()
-        target = f".gwc/tasks/{TASK}/g2/execution-envelope.yaml"
-        for entry in model["entries"]:  # type: ignore[union-attr]
-            if entry["target"] == target:
-                entry["reason_codes"] = ["EVIDENCE_BINDING_MISMATCH"]
+        model["entries"][5]["status"] = "BLOCKED"  # type: ignore[index]
         _recompute_map_digest(model)
         out = resolve(evidence_map=model)
-        self.assertEqual(out["current_gate"], "G2_EXECUTION")
-        self.assertEqual(out["gate_status"], "FAILED")
-        self.assertEqual(out["primary_reason_code"], "GATE_STATE_GATE_FAILED")
-
-    def test_blocked_map_outcome_is_input_invalid(self):
-        model = evidence_map()
-        model["outcome"] = "BLOCKED"
-        model["reason_codes"] = ["EVIDENCE_REQUIRED_MISSING"]
-        out = resolve(evidence_map=model)
         self.assertEqual(out["primary_reason_code"], "GATE_STATE_INPUT_INVALID")
+        self.assertEqual(out["gate_status"], "BLOCKED")
 
-    def test_map_missing_gate_requirement_is_input_invalid(self):
+    def test_missing_g0_blocks_earliest_gate(self):
+        candidates = [item for item in evidence_candidates() if item["gate"] != "G0_CONTEXT"]
+        out = resolve(evidence_map=evidence_map(candidates=candidates))
+        self.assertEqual(out["current_gate"], "G0_CONTEXT")
+        self.assertEqual(out["gate_status"], "BLOCKED")
+        self.assertEqual(out["primary_reason_code"], "GATE_STATE_REQUIRED_EVIDENCE_MISSING")
+        self.assertIn("GATE_STATE_LATER_GATE_INHERITANCE_REJECTED", out["reason_codes"])
+
+    def test_missing_g2_blocks_after_g1(self):
+        candidates = [item for item in evidence_candidates() if item["gate"] != "G2_EXECUTION"]
+        out = resolve(evidence_map=evidence_map(candidates=candidates))
+        self.assertEqual(out["last_passed_gate"], "G1_ALIGNMENT")
+        self.assertEqual(out["current_gate"], "G2_EXECUTION")
+
+    def test_stale_evidence_precedes_missing(self):
+        candidates = evidence_candidates()
+        target = f".gwc/tasks/{TASK}/g2/execution-envelope.yaml"
+        next(item for item in candidates if item["target"] == target)["freshness_status"] = "STALE"
+        out = resolve(evidence_map=evidence_map(candidates=candidates))
+        self.assertEqual(out["primary_reason_code"], "GATE_STATE_EVIDENCE_STALE")
+        self.assertIn(target, out["stale_evidence"])
+
+    def test_conflicting_evidence_precedes_drift(self):
+        candidates = evidence_candidates()
+        duplicate = copy.deepcopy(candidates[0])
+        duplicate["digest"] = "sha256:" + "b" * 64
+        candidates.append(duplicate)
+        out = resolve(evidence_map=evidence_map(candidates=candidates), current_base_sha="1" * 40)
+        self.assertEqual(out["primary_reason_code"], "GATE_STATE_EVIDENCE_CONFLICT")
+
+    def test_binding_mismatch_precedes_missing(self):
+        candidates = evidence_candidates()
+        candidates[0]["binding_status"] = "MISMATCHED"
+        out = resolve(evidence_map=evidence_map(candidates=candidates))
+        self.assertEqual(out["primary_reason_code"], "GATE_STATE_BINDING_MISMATCH")
+
+    def test_repository_binding_mismatch(self):
+        out = resolve(evidence_map=evidence_map(repository="other/repo"))
+        self.assertEqual(out["primary_reason_code"], "GATE_STATE_BINDING_MISMATCH")
+
+    def test_base_drift_requires_reapproval(self):
+        out = resolve(current_base_sha="1" * 40)
+        self.assertEqual(out["primary_reason_code"], "GATE_STATE_DRIFT")
+        self.assertEqual(out["current_gate"], "G0_CONTEXT")
+        self.assertIsNone(out["last_passed_gate"])
+        self.assertEqual(out["drift_decision"]["status"], "REAPPROVE")  # type: ignore[index]
+
+    def test_requirement_omission_is_input_invalid_even_with_new_digest(self):
         model = evidence_map()
-        model["requirements"] = [  # type: ignore[arg-type]
-            requirement for requirement in model["requirements"]
-            if requirement["gate"] != "G0_CONTEXT"
+        model["requirements"] = [
+            item for item in model["requirements"]  # type: ignore[assignment]
+            if item["gate"] != "G0_CONTEXT"
         ]
+        _recompute_map_digest(model)
         out = resolve(evidence_map=model)
         self.assertEqual(out["primary_reason_code"], "GATE_STATE_INPUT_INVALID")
 
@@ -289,7 +326,7 @@ class GateStateResolutionTests(unittest.TestCase):
             authorized_paths=["production/operation-envelope.json"],
             authorized_actions=["production_data_write"],
             additional_bindings=[],
-       )
+        )
         out = resolve(scope_identity=scope, evidence_map=evidence_map(include_g6=True))
         self.assertEqual(out["gate_status"], "PASS")
         self.assertEqual(out["last_passed_gate"], "G6_PRODUCTION_DATA")
