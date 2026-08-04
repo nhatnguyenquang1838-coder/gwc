@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-04T10:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-268
+  base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-04T10:35:00Z'
+  source: slack-clarify-review
+  explicit: true
+rationale: Proceed with repository-side enforcement and document, rather than automate,
+  the two admin-only follow-ups.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:94501613451dfed3a647a70d12fdf4ced53c50f04b2b004a982f04ff3ec795f3
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.

@@ -1,0 +1,66 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-04T10:25:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+  protected_branches:
+  - main
+  connector: DWC
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+  selected_connector: DWC
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+constraints:
+- Controls must live in the repository as source of truth, not in an agent skill
+- No weakening of any existing fail-closed behaviour
+- Gap 4 may require Atlassian admin action outside the repository; record the manual
+  step rather than attempting it
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: main
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- path: .github/workflows/g4-g5-evidence.yml
+  required: true
+  status: AVAILABLE
+  source_sha: 0844985e342b70d12708deef3153f7315161e9ea
+- path: tools/node_architect/scope_hash_calculation.py
+  required: true
+  status: AVAILABLE
+  source_sha: f288b172de892b7345d054161d27837dd186e92b
+status: READY
+blockers: []

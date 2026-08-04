@@ -1,0 +1,139 @@
+schema_version: '1.0'
+artifact_type: g01-runtime-input
+generated_at: '2026-08-04T10:25:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+  protected_branches: [main]
+  connector: DWC
+  write_enabled: true
+  verified: true
+runtime:
+  agent_runtime_id: dwc
+  execution_mode: local_agent
+  selected_profile:
+    id: dwc
+    path: governance/agent-runtime-profiles/dwc.yaml
+    status: active
+    source_sha: d06ab5631a7888fd09ee44839de48840c8131eb5
+    supported_execution_modes: [chat_connector_only, local_agent, repo_ci]
+  connector_priority: [GitHub, DWC, DW1]
+  selected_connector: DWC
+  connector_fallback_evidence:
+    - connector: GitHub
+      role: primary
+      status: AVAILABLE
+      evidence: gh CLI authenticated against nhatnguyenquang1838-coder/gwc; used for PR and workflow reads.
+    - connector: DWC
+      role: fallback
+      status: AVAILABLE
+      evidence: Trusted local checkout with isolated worktree at ~/prj/gwc-wt-SCRUM-268 and validator runner available.
+  required_behavior_contracts:
+    - path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: 1234567890abcdef1234567890abcdef12345678
+    - path: core/Agent_Response_Presentation_Contract_v1.0.md
+      required: true
+      status: AVAILABLE
+      source_sha: abcdef1234567890abcdef1234567890abcdef12
+task:
+  id: SCRUM-268
+  claimed: true
+request:
+  requester: DW
+  problem:
+    statement: Four fail-open gaps in the G4/G5 evidence chain, scope-hash tooling, and agent attribution are mitigated only by agent-side skill knowledge, not by any repository-side control.
+    why_now: SCRUM-233 preserved its evidence chain only because the executing agent happened to carry the correct runbook; five agents share this board and any agent without it will silently break G5 with no recovery path.
+  desired_outcome: Repository-side controls that make a governed merge without a published g4-authority-receipt impossible or loudly failing, remove the structural rebind loop, close the fail-open scope-hash payload, and record a durable agent-attribution decision.
+  affected: [GWC maintainers, all five AI coding agents, GWC evidence chain consumers]
+  in_scope:
+    - Diagnosis of the four gaps with reproducible evidence
+    - G4 authority receipt enforcement surface
+    - Gate artifact versus hashed-head ordering contract
+    - Fail-closed payload behaviour of calculate_gate_scope_identity
+    - Agent attribution decision recorded in the projection contract
+  non_goals:
+    - Changing gate semantics or the gate sequence itself
+    - Enabling or modifying GitHub branch protection in this task
+    - Rewriting merged history
+    - Fabricating retroactive receipts for past merges
+    - Programmatic creation of Atlassian accounts
+  constraints:
+    - Controls must live in the repository as source of truth, not in an agent skill
+    - No weakening of any existing fail-closed behaviour
+    - Gap 4 may require Atlassian admin action outside the repository; record the manual step rather than attempting it
+  assumptions:
+    - The four gaps reproduce on base_sha b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+    - Branch protection changes require repository admin and are outside agent authority
+  risks:
+    - id: RISK-1
+      description: This task modifies the very workflow that supervises agent merges, so a defective change could disable gate enforcement entirely.
+      impact: high
+      mitigation: Fail-closed by construction, no reduction of existing checks, and human approval required before any workflow write.
+    - id: RISK-2
+      description: Making the g4-authority receipt a required check could block all merges if the receipt publication path is wrong.
+      impact: high
+      mitigation: Validate the enforcement on a scratch PR before proposing branch protection changes; keep the enabling step manual and human-performed.
+    - id: RISK-3
+      description: Tightening calculate_gate_scope_identity could break existing callers that read scope_hash without checking outcome.
+      impact: medium
+      mitigation: Enumerate all callers in the repository and update them in the same change; keep reason codes stable.
+  acceptance_criteria:
+    - id: AC-1
+      statement: An agent with no prior runbook knowledge cannot merge a governed PR without a published gwc:g4-authority-receipt without a loud failure before the merge.
+      verifiable: true
+    - id: AC-2
+      statement: The g4-authority job reports a non-success conclusion when matched is false on a governed PR, instead of silently succeeding.
+      verifiable: true
+    - id: AC-3
+      statement: The gate artifact versus hashed-head ordering is documented and deterministic, so a task no longer requires an ad hoc rebind cycle.
+      verifiable: true
+    - id: AC-4
+      statement: calculate_gate_scope_identity does not return a usable scope_hash when outcome is not READY, and the accepted additional_bindings shape is documented and validated.
+      verifiable: true
+    - id: AC-5
+      statement: The agent attribution decision is recorded in the projection contract, stating explicitly that Jira is projection-only and non-attributive unless a per-agent identity is provisioned.
+      verifiable: true
+    - id: AC-6
+      statement: Existing tests and CI checks remain green with no reduction in enforcement.
+      verifiable: true
+  unresolved_questions: []
+policies:
+  - id: GWC_CORE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: bd70a263b015994887db5cabf2a220e50c9977e4
+  - path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+    status: AVAILABLE
+    source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+  - path: .github/workflows/g4-g5-evidence.yml
+    required: true
+    status: AVAILABLE
+    source_sha: 0844985e342b70d12708deef3153f7315161e9ea
+  - path: tools/node_architect/scope_hash_calculation.py
+    required: true
+    status: AVAILABLE
+    source_sha: f288b172de892b7345d054161d27837dd186e92b
+risk:
+  class: R3
+  human_direction_confirmed: true

@@ -1,0 +1,45 @@
+schema_version: '1.0'
+artifact_type: execution-envelope
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_EXECUTION_268_20260804
+task_id: SCRUM-268
+issued_at: '2026-08-04T10:40:00Z'
+expires_at: '2026-08-05T10:40:00Z'
+risk_class: R3
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+working_branch: fastlane/scrum-268-governance-hardening-20260804
+head_sha: null
+modules_or_files:
+- .github/workflows/g4-g5-evidence.yml
+- tools/node_architect/scope_hash_calculation.py
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- projects/gwc/project-profile.yaml
+- .gwc/tasks/SCRUM-268/**
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- merge_approved_pr
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+scope_hash: sha256:9a72ca5797604ae3aa5045bffc7ff339347a6605a42db7f42f89d24b7a9c86e5
+scope_hash_16: 9a72ca5797604ae3
+approval_command: 'APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_268_20260804 9a72ca5797604ae3 2026-08-05T10:40:00Z'
+supersedes: null
+supersede_reason: null
