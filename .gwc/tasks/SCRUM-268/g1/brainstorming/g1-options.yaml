@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-04T10:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-268
+  base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Repository-side fail-loud controls plus explicit manual follow-ups
+  description: Make g4-authority non-success when no receipt matches; close scope_hash
+    on BLOCKED; document deterministic late-bind ordering; record per-agent service-account
+    provisioning as an admin follow-up.
+  benefits:
+  - Fail-closed
+  - Minimal semantic change
+  - Auditable
+  tradeoffs:
+  - Branch protection still needs manual enablement
+  - Atlassian admin work remains
+  risks:
+  - A workflow defect could block governed merges
+  constraint_fit: FIT
+- id: OPT-2
+  title: Full automation including branch protection and identity provisioning
+  description: Apply required checks and provision per-agent Atlassian identities
+    programmatically.
+  benefits:
+  - Maximum automation
+  tradeoffs:
+  - Requires admin privileges
+  - Larger blast radius
+  - External side effects
+  risks:
+  - Unauthorized or irreversible account/policy changes
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Documentation-only remediation
+  description: Update skills and runbooks without repository enforcement.
+  benefits:
+  - Low code risk
+  tradeoffs:
+  - Relies on agent memory
+  risks:
+  - Does not close any fail-open path
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Repository-side fail-loud controls address the structural
+  failures while respecting the explicit boundary that branch protection and Atlassian
+  account provisioning are manual admin actions.
+decision_required: true
+status: READY

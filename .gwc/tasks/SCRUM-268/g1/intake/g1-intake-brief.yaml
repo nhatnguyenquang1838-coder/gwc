@@ -1,0 +1,121 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-04T10:25:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-268
+  base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Four fail-open gaps in the G4/G5 evidence chain, scope-hash tooling,
+    and agent attribution are mitigated only by agent-side skill knowledge, not by
+    any repository-side control.
+  why_now: SCRUM-233 preserved its evidence chain only because the executing agent
+    happened to carry the correct runbook; five agents share this board and any agent
+    without it will silently break G5 with no recovery path.
+desired_outcome: Repository-side controls that make a governed merge without a published
+  g4-authority-receipt impossible or loudly failing, remove the structural rebind
+  loop, close the fail-open scope-hash payload, and record a durable agent-attribution
+  decision.
+stakeholders:
+  requester: DW
+  affected:
+  - GWC maintainers
+  - all five AI coding agents
+  - GWC evidence chain consumers
+scope:
+  in_scope:
+  - Diagnosis of the four gaps with reproducible evidence
+  - G4 authority receipt enforcement surface
+  - Gate artifact versus hashed-head ordering contract
+  - Fail-closed payload behaviour of calculate_gate_scope_identity
+  - Agent attribution decision recorded in the projection contract
+  non_goals:
+  - Changing gate semantics or the gate sequence itself
+  - Enabling or modifying GitHub branch protection in this task
+  - Rewriting merged history
+  - Fabricating retroactive receipts for past merges
+  - Programmatic creation of Atlassian accounts
+constraints:
+- Controls must live in the repository as source of truth, not in an agent skill
+- No weakening of any existing fail-closed behaviour
+- Gap 4 may require Atlassian admin action outside the repository; record the manual
+  step rather than attempting it
+assumptions:
+- The four gaps reproduce on base_sha b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+- Branch protection changes require repository admin and are outside agent authority
+risks:
+- id: RISK-1
+  description: This task modifies the very workflow that supervises agent merges,
+    so a defective change could disable gate enforcement entirely.
+  impact: high
+  mitigation: Fail-closed by construction, no reduction of existing checks, and human
+    approval required before any workflow write.
+- id: RISK-2
+  description: Making the g4-authority receipt a required check could block all merges
+    if the receipt publication path is wrong.
+  impact: high
+  mitigation: Validate the enforcement on a scratch PR before proposing branch protection
+    changes; keep the enabling step manual and human-performed.
+- id: RISK-3
+  description: Tightening calculate_gate_scope_identity could break existing callers
+    that read scope_hash without checking outcome.
+  impact: medium
+  mitigation: Enumerate all callers in the repository and update them in the same
+    change; keep reason codes stable.
+acceptance_criteria:
+- id: AC-1
+  statement: An agent with no prior runbook knowledge cannot merge a governed PR without
+    a published gwc:g4-authority-receipt without a loud failure before the merge.
+  verifiable: true
+- id: AC-2
+  statement: The g4-authority job reports a non-success conclusion when matched is
+    false on a governed PR, instead of silently succeeding.
+  verifiable: true
+- id: AC-3
+  statement: The gate artifact versus hashed-head ordering is documented and deterministic,
+    so a task no longer requires an ad hoc rebind cycle.
+  verifiable: true
+- id: AC-4
+  statement: calculate_gate_scope_identity does not return a usable scope_hash when
+    outcome is not READY, and the accepted additional_bindings shape is documented
+    and validated.
+  verifiable: true
+- id: AC-5
+  statement: The agent attribution decision is recorded in the projection contract,
+    stating explicitly that Jira is projection-only and non-attributive unless a per-agent
+    identity is provisioned.
+  verifiable: true
+- id: AC-6
+  statement: Existing tests and CI checks remain green with no reduction in enforcement.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

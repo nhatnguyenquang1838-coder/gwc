@@ -1,0 +1,87 @@
+schema_version: '1.0'
+artifact_type: g3-pr-request
+gate: G3_PR
+status: PENDING_HUMAN_APPROVAL
+approval_id: APPROVE_G3_PR_268_20260804
+task_id: SCRUM-268
+issued_at: '2026-08-04T11:00:00Z'
+expires_at: '2026-08-05T11:00:00Z'
+risk_class: R3
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: b0155ea3ca4e95de1dd140ce47cdc2e4d8937ad2
+working_branch: fastlane/scrum-268-governance-hardening-20260804
+head_sha: ae4aa4e02a9c14437cf1c86624372e87121f3875
+predecessor_gate:
+  gate: G2_EXECUTION
+  approval_id: APPROVE_G2_EXECUTION_268_20260804
+  scope_hash_16: 9a72ca5797604ae3
+  outcome: pass
+modules_or_files:
+- .github/workflows/g4-g5-evidence.yml
+- tools/node_architect/scope_hash_calculation.py
+- tests/test_gate_authority_scope_hash_calculation_m4.py
+- projects/gwc/project-extension.md
+- .gwc/tasks/SCRUM-268/**
+authorized_actions:
+- open_or_update_draft_pr
+- readback_branch_pr_diff_ci
+excluded_actions:
+- merge_approved_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+validation:
+  head_sha: ae4aa4e02a9c14437cf1c86624372e87121f3875
+  status: pass
+  commands:
+  - command: PYTHONPATH=. python3 -m unittest tests.test_gate_authority_scope_hash_calculation_m4 -v
+    result: pass
+    evidence: Ran 19 tests - OK, including BLOCKED scope_hash null and malformed additional_bindings regression.
+  - command: python3 workflow YAML parse and structural assertions
+    result: pass
+    evidence: g4-receipt-required job exists, pull_request lifecycle trigger exists, missing receipt fails before merge.
+  - command: PYTHONPATH=tools python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-268
+    result: pass
+    evidence: G0/G1 validation outcome PASS.
+  - command: python3 -m unittest discover -s tests
+    result: known_pre_existing_errors
+    evidence: 927 tests, 12 errors from Python 3.9 StrEnum incompatibility and existing Path.write_text(newline=) tests; focused suite is green.
+acceptance_criteria:
+- id: AC-1
+  result: pass
+  evidence: g4-receipt-required fails when no trusted receipt marker exists; branch-protection enablement is documented as manual follow-up.
+- id: AC-2
+  result: pass
+  evidence: issue_comment authority path now fails loudly when no valid approval command matches.
+- id: AC-3
+  result: pass
+  evidence: project-extension records deterministic late-bind/rebind ordering and stale-token prohibition.
+- id: AC-4
+  result: pass
+  evidence: BLOCKED scope evaluation returns scope_hash null; focused regression test passes.
+- id: AC-5
+  result: pass
+  evidence: project-extension records Jira as non-attributive pending per-agent service-account provisioning.
+- id: AC-6
+  result: pass
+  evidence: focused tests and workflow structural validation pass; full-suite failures are pre-existing/environmental.
+scope_hash: sha256:1b1732ec8581acb730a7661d61f2933d8cc563ec268443b357f0f0a93f88793d
+scope_hash_16: 1b1732ec8581acb7
+approval_command: 'APPROVE G3_PR APPROVE_G3_PR_268_20260804 1b1732ec8581acb7 2026-08-05T11:00:00Z'
+residual_risks:
+- Branch protection required-check enablement remains a manual repository-admin action and is not performed by this task.
+- Per-agent Atlassian service-account provisioning and connector migration remain manual admin actions.
+- Full unittest discovery has 12 pre-existing errors under the host Python 3.9 runtime.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pending_human_approval

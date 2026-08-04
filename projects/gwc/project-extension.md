@@ -101,3 +101,26 @@ escalating instruction fails closed before implementation.
 
 Jira, Slack, and Notion remain projection-only. Node instructions and route
 decisions never grant G2, G3, G4, G5, or G6 authority.
+
+## Governance hardening (SCRUM-268)
+
+- The `g4-receipt-required` GitHub check is the repository-side enforcement
+  surface for G4. It must fail until a trusted `gwc:g4-authority-receipt`
+  exists. Enabling it as a required branch-protection check is a manual
+  repository-admin follow-up; the workflow itself must never treat a missing
+  receipt as success.
+- Gate artifacts under `.gwc/tasks/<task-id>/` are evidence projections and
+  must not silently invalidate the implementation binding. The deterministic
+  ordering is: finish implementation and validation at the approved base/head;
+  calculate and approve the implementation scope; write gate artifacts only as
+  task evidence; if an artifact commit changes the bound head, invalidate the
+  prior approval and rebind before any PR authority action. No stale token may
+  be reused.
+- `calculate_gate_scope_identity` exposes `scope_hash` only when
+  `outcome: READY`; a `BLOCKED` result has `scope_hash: null` and is never
+  eligible for an approval command.
+- Jira is non-attributive unless authenticated per-agent Atlassian identities
+  are provisioned. The selected target is one service account per agent,
+  requiring manual Atlassian-admin provisioning and connector migration. Until
+  then, GitHub identity and signed repository evidence are authoritative for
+  agent attribution; Jira fields/comments are projections only.

@@ -10,6 +10,7 @@ Run: python -m unittest tests.test_gate_authority_scope_hash_calculation_m4 -v
 """
 
 import unittest
+from typing import Any, cast
 
 from tools.node_architect.scope_hash_calculation import calculate_gate_scope_identity
 
@@ -82,10 +83,25 @@ class ScopeHashCalculationTests(unittest.TestCase):
         self.assertEqual(out["outcome"], "BLOCKED")
         self.assertIn("SCOPE_INPUT_INVALID", out["reason_codes"])
 
+    def test_malformed_sha_blocks_without_usable_hash(self):
+        out = calculate_gate_scope_identity(**_ok_kwargs(base_sha="zzz"))
+        self.assertEqual(out["outcome"], "BLOCKED")
+        self.assertIn("SCOPE_INPUT_INVALID", out["reason_codes"])
+        self.assertIsNone(out["scope_hash"])
+
     def test_bad_repo_blocks(self):
         out = calculate_gate_scope_identity(**_ok_kwargs(repository="not-a-repo"))
         self.assertEqual(out["outcome"], "BLOCKED")
         self.assertIn("SCOPE_INPUT_INVALID", out["reason_codes"])
+
+    def test_unknown_binding_blocks_without_usable_hash(self):
+        malformed = cast(Any, [{"pr_number": "209"}])
+        out = calculate_gate_scope_identity(
+            **_ok_kwargs(additional_bindings=malformed)
+        )
+        self.assertEqual(out["outcome"], "BLOCKED")
+        self.assertIn("SCOPE_UNKNOWN_SEMANTIC", out["reason_codes"])
+        self.assertIsNone(out["scope_hash"])
 
     def test_path_traversal_blocks(self):
         out = calculate_gate_scope_identity(**_ok_kwargs(authorized_paths=["../secrets"]))

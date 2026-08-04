@@ -281,7 +281,10 @@ def calculate_gate_scope_identity(
         "outcome": outcome,
         "reason_codes": sorted_reasons,
         "calculated_at": calculated_at,
-        "scope_hash": scope_hash,
+        # Fail closed at the payload boundary: callers must not be able to
+        # mistake a BLOCKED evaluation's diagnostic digest for an approval
+        # binding.  The digest is an implementation detail only when READY.
+        "scope_hash": scope_hash if outcome == "READY" else None,
         "approval_request_digest": None,
         "authority_granted": False,
     }
