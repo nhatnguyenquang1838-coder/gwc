@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/package-export/export-manifest-generation.schema.json",
+  "title": "Export Manifest Generation result",
+  "description": "Closed, versioned runtime contract for the export manifest generation evidence generator (SCRUM-234, M5_EVIDENCE). The typed result is the only PASS signal; it never grants repository, PR, merge, deploy or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "task_id",
+    "source_sha",
+    "package_version",
+    "idempotency_key",
+    "plan_digest",
+    "manifest_digest",
+    "entry_inventory",
+    "outcome",
+    "reason"
+  ],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "const": "gwc.package_export.export_manifest_generation"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["0.1"]
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Governed task identity that produced this manifest."
+    },
+    "source_sha": {
+      "type": "string",
+      "description": "Source snapshot commit SHA the manifest was generated from.",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "package_version": {
+      "type": "string",
+      "description": "Consumer package version identity."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Replay identity. Same key + same plan_digest is an idempotent replay."
+    },
+    "plan_digest": {
+      "type": "string",
+      "description": "Canonical semantic digest of the accepted plan.",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifest_digest": {
+      "type": "string",
+      "description": "Deterministic SHA-256 of the manifest content (excludes this field).",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "entry_inventory": {
+      "type": "array",
+      "description": "Complete per-entry export evidence consumed/recorded downstream.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "target",
+          "entry_status",
+          "source_digest",
+          "target_digest",
+          "byte_count",
+          "reason",
+          "detail"
+        ],
+        "properties": {
+          "source": { "type": "string" },
+          "target": { "type": "string" },
+          "entry_status": {
+            "type": "string",
+            "enum": ["ACCEPTED", "MISSING", "REJECTED"]
+          },
+          "source_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+          "target_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+          "byte_count": { "type": ["integer", "null"], "minimum": 0 },
+          "reason": { "$ref": "#/definitions/reasonCode" },
+          "detail": { "type": "string" }
+        }
+      }
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "MANIFEST_GENERATED",
+        "MANIFEST_SOURCE_MISSING",
+        "MANIFEST_ENTRY_INVALID",
+        "MANIFEST_DIGEST_MISMATCH",
+        "MANIFEST_IDEMPOTENT_REPLAY"
+      ]
+    }
+  },
+  "definitions": {
+    "reasonCode": {
+      "type": "string",
+      "enum": [
+        "MANIFEST_GENERATED",
+        "MANIFEST_SOURCE_MISSING",
+        "MANIFEST_ENTRY_INVALID",
+        "MANIFEST_DIGEST_MISMATCH",
+        "MANIFEST_IDEMPOTENT_REPLAY"
+      ]
+    }
+  }
+}

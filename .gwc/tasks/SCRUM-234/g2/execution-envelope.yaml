@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: execution-envelope
+authority_gate: G2_EXECUTION
+approval_id: APPROVE_G2_EXECUTION_234_20260805_R1
+task_id: SCRUM-234
+issued_at: '2026-08-05T00:45:00Z'
+expires_at: '2026-08-06T00:45:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+working_branch: hermes/scrum-234-export-manifest-generation-m5-20260805
+head_sha: null
+modules_or_files:
+- tools/node_architect/package_export/export_manifest_generation.py
+- schemas/node-architect/package-export/export-manifest-generation.schema.json
+- tests/package_export/test_export_manifest_generation.py
+- .gwc/tasks/SCRUM-234/**
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- merge_approved_pr
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+scope_hash: sha256:8bf7585775c683f46f9b78c06197642b75a486a641bc2af0864300f1a447efeb
+scope_hash_16: 8bf7585775c683f4
+approval_command: 'APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_234_20260805_R1 8bf7585775c683f4 2026-08-06T00:45:00Z'
+note: >-
+  Worktree hermes/scrum-234 created from exact issue baseline 78d596242…;
+  package_export family is empty at this baseline (tools/node_architect/package_export/),
+  so SCRUM-234 creates the export-manifest-generation implementation fresh,
+  following SCRUM-233 (governance-tree-build) precedent. fastlane/ pre-creation
+  branch left intact, not pruned.
