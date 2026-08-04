@@ -11,7 +11,7 @@ repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
 base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
 working_branch: hermes/scrum-234-export-manifest-generation-m5-20260805
-head_sha: 3d6d438be7c3e05ce9462c121f82d9fa2918a02a
+head_sha: a2c346948673c39e450950abc2f308eb932266fd
 pull_request:
   number: 212
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/212
@@ -46,7 +46,7 @@ excluded_actions:
 - protected_branch_write
 preconditions:
 - id: PRE-1
-  requirement: All required CI checks SUCCESS on head 3d6d438be7c3e05ce9462c121f82d9fa2918a02a
+  requirement: All required CI checks SUCCESS on head a2c346948673c39e450950abc2f308eb932266fd
   status: pass
   evidence: gh pr checks 212 - validate, build x4, calculate-parity x3, compare-parity all SUCCESS
 - id: PRE-2
@@ -55,9 +55,9 @@ preconditions:
 - id: PRE-3
   requirement: PR marked ready for review before merge (draft cannot be merged)
   status: pending
-scope_hash: sha256:f7b8f437cfe4498067bc80abda9f6c38fb34c4d3210e568fb82b879f63b98c04
-scope_hash_16: f7b8f437cfe44980
-approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_234_20260805 f7b8f437cfe44980 2026-08-06T01:35:00Z'
+scope_hash: sha256:a73e51974ebfd8bb5bbd125de83dff4a06cb4bd5ae96948040e56d6f37a4d7ed
+scope_hash_16: a73e51974ebfd8bb
+approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_234_20260805 a73e51974ebfd8bb 2026-08-06T01:35:00Z'
 exclusions:
 - G5_DEPLOY
 - G6_PRODUCTION_DATA
