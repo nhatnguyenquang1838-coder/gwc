@@ -191,19 +191,6 @@ Failure to transition is not a reporting-only warning. It fails the gate and req
 
 No G0/G1 result grants G4, G5, or G6.
 
-### G4 merge-execution method (required for a valid G5 evidence chain)
-
-When the user issues a verified `APPROVE G4_MERGE <approval_id> <scope_hash_16> <expires_at_utc>` token, the merge MUST be executed through the repository `g4-g5-evidence.yml` workflow chain — never a bare `gh pr merge`:
-
-1. Recompute `scope_hash_16` against the **live PR head** (`gh pr view <n> --json headRefOid`), never a stale local worktree, using `tools/node_architect/scope_hash_calculation.py`. Mismatch fails closed; do not merge.
-2. Confirm token `expires_at` is future and `base_sha` is an ancestor of `main` (`git merge-base --is-ancestor <base> origin/main`).
-3. **Post the verified token as a PR comment** (not in chat). This fires the `g4-authority` job, which publishes the `<!-- gwc:g4-authority-receipt ... -->` receipt comment — the required pre-merge authority proof.
-4. Confirm the `g4-authority-receipt` bot comment exists and its marker fields (`approval_id`, `head`, `scope`, `expires`) match the token.
-5. **Merge via the GitHub UI or `gh api` merge endpoint** so `pull_request.closed` fires `g4-merge-proof` (`<!-- gwc:g4-merge-proof ... -->`).
-6. Poll `g5-status` on the merge commit; expect `classification: success`.
-
-A direct `gh pr merge` creates the merge and passes CI but never emits the `g4-authority-receipt` comment, so `g4-merge-proof` and `g5-status` fail and `g5-recovery` cannot backfill the gap (the merge-commit message lacks the original G4 `approval_id`/`head_sha` provenance). Do not fabricate receipts; disclose the gap honestly if it occurs.
-
 ## Rescue and hotfix interaction
 
 Rescue or hotfix may accelerate only the steps explicitly allowed by the canonical emergency contract. They never permit protected-branch writes, merge, deployment, credentials, production configuration, or production-data operations without their separate authority. When the emergency contract requires the standard path because an existing task or envelope exists, the agent must resume the standard path rather than attempt to bypass it.

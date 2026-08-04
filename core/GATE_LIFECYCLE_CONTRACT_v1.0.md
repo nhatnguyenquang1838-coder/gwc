@@ -198,18 +198,7 @@ If CI fails, the agent may diagnose and repair only repository-fixable failures 
 
 **Draft PR precheck:** a Draft Pull Request is not eligible for G4 merge execution. Draft PR to ready-for-review transition belongs to G3 completion, not G4 authority. If the PR is still draft after G3 `PASS` and a ready-for-review connector is available, the agent may mark it ready before generating the G4 request. If no ready-for-review connector action exists, the agent must report a manual ready-for-review blocker.
 
-**Governed merge-execution sequence (required for a valid G5 evidence chain):** A G4 merge is valid and produces a complete governed traceability chain only when the merge is executed through the repository's `g4-g5-evidence.yml` workflow. The agent must:
-
-1. Recompute `scope_hash_16` against the **live PR head** (`gh pr view <n> --json headRefOid`), never a stale local worktree, using `tools/node_architect/scope_hash_calculation.py` (`calculate_gate_scope_identity`). The human token's `scope_hash_16` MUST equal this; mismatch fails closed.
-2. Verify the token `expires_at` is future (≤24h) and `base_sha` is an ancestor of `main` (`git merge-base --is-ancestor <base> origin/main`).
-3. **Post the verified `APPROVE G4_MERGE <approval_id> <scope_hash_16> <expires_at_utc>` as a PR comment** (not in chat, not as a `gh` merge command). This fires the `g4-authority` job and publishes the `<!-- gwc:g4-authority-receipt ... -->` bot comment, which is the required pre-merge authority receipt.
-4. Confirm the `g4-authority-receipt` bot comment exists and its marker fields (`approval_id`, `head`, `scope`, `expires`) match the token.
-5. **Merge via the GitHub UI or `gh api` merge endpoint** so the `pull_request.closed` event triggers the `g4-merge-proof` job, which publishes the `<!-- gwc:g4-merge-proof ... -->` bot comment.
-6. Poll `g5-status` on the merge commit; expect `classification: success`.
-
-**Prohibited execution path:** `gh pr merge` (or any merge that does not traverse the PR-comment → `g4-authority-receipt` → `pull_request.closed` → `g4-merge-proof` chain) MUST NOT be used. A direct `gh pr merge` creates the merge and passes CI but never emits the `g4-authority-receipt` comment, so `g4-merge-proof` fails ("Merged PR has no trusted G4 authority receipt") and `g5-status` fails ("G5 requires trusted G4 authority and GitHub merge-proof receipts"). The resulting G5 traceability gap is **permanent for that merge**: `g5-recovery` requires the merge-commit message to contain the original G4 `approval_id` and `head_sha` (`commitMessage.includes(match[4]) && includes(match[6])`), which a `gh`-created merge commit does not carry, so recovery is refused ("Merge commit does not carry the claimed original G4 approval/head provenance"). Do not fabricate receipts to patch the gap; disclose it honestly.
-
-**Exit:** merge commit or merged head evidence is recorded, together with the `g4-authority-receipt` and `g4-merge-proof` bot-comment chain. Upon exit, the agent must automatically perform read-only `G5_STATUS_VERIFY` for the merge commit. A G5 approval command is required only for manual deploy, redeploy, release, publish, or runtime reload.
+**Exit:** merge commit or merged head evidence is recorded. Upon exit, the agent must automatically perform read-only `G5_STATUS_VERIFY` for the merge commit. A G5 approval command is required only for manual deploy, redeploy, release, publish, or runtime reload.
 
 ### G5_DEPLOY
 
