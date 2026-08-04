@@ -1,0 +1,56 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T00:45:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-234
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main and matches the issue baseline merge commit.
+  evidence:
+  - 78d596242a9e042d62d6174afc40aa4976eb3285
+- id: BLOCKER-233-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-233 (governance-tree-build) is Done and merged (PR #209); its entry inventory is the upstream input to this node.
+  evidence:
+  - SCRUM-233
+  - PR-209
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    export_manifest_generation.py, export-manifest-generation.schema.json and
+    test_export_manifest_generation.py are brand-new files under the
+    package_export family; the family is empty at the issue baseline so no
+    existing module is mutated.
+  evidence:
+  - tools/node_architect/package_export (empty at 78d5962)
+- id: OWNERSHIP-CLAIM
+  status: PASS
+  code: CLAIM_CONSISTENT
+  message: >-
+    Jira SCRUM-234 AI Agent = Hermes; a pre-creation fastlane branch existed but
+    was left intact per user decision (not pruned). This Hermes worktree owns
+    the task.
+  evidence:
+  - hermes/scrum-234-export-manifest-generation-m5-20260805
+- id: SCOPE-HASH
+  status: PASS
+  code: SCOPE_HASH_DERIVED
+  message: >-
+    scope_hash derived from the G2 envelope fields via
+    tools/node_architect/scope_hash_calculation.calculate_gate_scope_identity
+    (outcome READY), not guessed.
+  evidence:
+  - sha256:8bf7585775c683f46f9b78c06197642b75a486a641bc2af0864300f1a447efeb

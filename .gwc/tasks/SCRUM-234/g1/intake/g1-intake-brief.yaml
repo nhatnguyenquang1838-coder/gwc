@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T00:45:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-234
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    SCRUM-234 requires a deterministic export-manifest-generation evidence
+    generator for the package_export node family. It records, for every accepted
+    package entry, source identity, entry status, byte counts and SHA-256 values
+    (source + target where available), producing a stable, byte-deterministic
+    manifest digest.
+  why_now: >-
+    SCRUM-233 (governance-tree-build, PR #209 merged) is Done, so the accepted
+    source/target plan inventory that this manifest generator consumes now
+    exists. The package_export family is empty at the issue baseline 78d5962,
+    so SCRUM-234 creates this node fresh following the SCRUM-233 convention.
+desired_outcome: >-
+  A pure evidence generator that reads source bytes, records per-entry digests
+  and byte counts, optionally cross-checks against the upstream tree-build
+  evidence, supports idempotent replay, and never grants merge/PR/deploy
+  authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - SCRUM-235..237 (manifest consumers)
+scope:
+  in_scope:
+  - tools/node_architect/package_export/export_manifest_generation.py
+  - schemas/node-architect/package-export/export-manifest-generation.schema.json
+  - tests/package_export/test_export_manifest_generation.py
+  - .gwc/tasks/SCRUM-234/**
+  non_goals:
+  - archive publication
+  - consumer repository write
+  - package-version bump
+  - tree build / content copy (owned by SCRUM-233)

@@ -1,0 +1,26 @@
+schema_version: '1.0'
+artifact_type: delivery-record
+authority_gate: G3_PR
+task_id: SCRUM-234
+issued_at: '2026-08-05T01:10:00Z'
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+working_branch: hermes/scrum-234-export-manifest-generation-m5-20260805
+scope_hash: sha256:8bf7585775c683f46f9b78c06197642b75a486a641bc2af0864300f1a447efeb
+scope_hash_16: 8bf7585775c683f4
+g2_approval_id: APPROVE_G2_EXECUTION_234_20260805_R1
+implementation_summary: >-
+  Added the export-manifest-generation node implementation (M5_EVIDENCE) for
+  the package_export family. Deterministic evidence generator records per-entry
+  source identity, status, byte counts and SHA-256 digests; supports optional
+  upstream tree-build cross-check and idempotent replay. Never grants authority.
+files_changed:
+- tools/node_architect/package_export/export_manifest_generation.py
+- schemas/node-architect/package-export/export-manifest-generation.schema.json
+- tests/package_export/test_export_manifest_generation.py
+validation:
+- command: python3 -m unittest tests/package_export/test_export_manifest_generation.py
+  result: 11 passed
+- command: python3 -m tools.node_architect.validate_node_catalog_package_export
+  result: PASS
+next_gate: G3_PR
+pr_required: true

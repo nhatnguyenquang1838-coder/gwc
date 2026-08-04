@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T00:45:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-234
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-05T00:45:00Z'
+  source: 'G2_EXECUTION approval token APPROVE_G2_EXECUTION_234_20260805_R1 presented in thread; G0/G1 materialized retroactively per governance requirement.'
+  explicit: true
+rationale: >-
+  Build the isolated evidence generator, closed result schema and focused fixture
+  suite named in the issue. This preserves the shared exporter boundary and
+  keeps the blast radius narrow, matching the SCRUM-233 family convention.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+scope_hash: sha256:8bf7585775c683f46f9b78c06197642b75a486a641bc2af0864300f1a447efeb
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
