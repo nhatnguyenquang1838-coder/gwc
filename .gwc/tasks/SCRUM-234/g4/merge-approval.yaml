@@ -1,0 +1,23 @@
+schema_version: '1.0'
+artifact_type: merge-approval
+authority_gate: G4_MERGE
+task_id: SCRUM-234
+issued_at: '2026-08-05T01:20:00Z'
+status: not_applicable_for_this_agent
+reason: >-
+  The G2_EXECUTION envelope for SCRUM-234 (APPROVE_G2_EXECUTION_234_20260805_R1)
+  lists merge_approved_pr under excluded_actions, and the node gate set is
+  limited to G2_EXECUTION and G3_PR. Merge authority therefore resides with the
+  human approver / fastlane merge flow, not Hermes. G4_MERGE is recorded as
+  not_applicable for this agent and must not be self-approved.
+g3_delivery:
+  pr_number: 212
+  pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/212
+  head_sha: 0a8c16b0d62927ce7b3130a6979c91d6a69e3965
+  ci:
+    validate: SUCCESS
+    build_gwc: SUCCESS
+    calculate_parity: SUCCESS
+    compare_parity: SUCCESS
+next_gate: G4_MERGE (human / fastlane authority)
+merge_approval_required: true
