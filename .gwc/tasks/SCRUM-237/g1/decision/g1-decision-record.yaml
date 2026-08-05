@@ -33,7 +33,7 @@ acceptance_criteria_refs:
 - AC-6
 - AC-7
 - AC-8
-scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
+scope_hash: sha256:c774d935b950bde659ccd533f55f92ed94e4e609530ae572325843cb8beda32
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -41,3 +41,15 @@ authority_boundaries:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Create export_failure_routing.py with closed reason-code taxonomy, RouteResult/RouteDecision dataclasses, and deterministic route() function.
+  - sub_task_id: SUB-TASK-2
+    description: Author the closed result schema export-failure-routing.schema.json.
+  - sub_task_id: SUB-TASK-3
+    description: Author the focused fixture suite test_export_failure_routing.py (23 scenarios) and confirm the existing smoke verifier and family regression stay green.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-governance
+    agent_type: primary

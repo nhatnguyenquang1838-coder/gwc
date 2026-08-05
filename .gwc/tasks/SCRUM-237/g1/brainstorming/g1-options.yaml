@@ -4,8 +4,8 @@ generated_at: '2026-08-05T13:30:00Z'
 task_id: SCRUM-237
 options:
   - id: OPT-1
-    label: Isolated module with closed reason-code taxonomy
-    desc: >-
+    title: Isolated module with closed reason-code taxonomy
+    description: >-
       Create export_failure_routing.py as a fresh isolated module
       under tools/node_architect/package_export/. Define a closed
       set of 11 reason codes, a RouteResult dataclass, and a
@@ -13,43 +13,54 @@ options:
       has_checkpoint) to bounded action. Mirrors the export_manifest_generation
       module pattern from SCRUM-234. No shared imports from the
       exporter or smoke verifier.
-    pros:
+    benefits:
     - Narrow blast radius; no mutation of shared exporter
     - Reuses same family conventions (schema_id pattern, frozen dataclasses, deterministic idempotency key)
     - Independently testable; no external side effects
-    cons:
+    tradeoffs:
     - New module needs its own schema and test file
     - Must manually keep reason-code list in sync with node descriptor
     - No integration with the existing smoke verifier (by design)
+    risks:
+    - Behavioral drift versus the exporter if the latter is later refactored (mitigated by the shared manifest-digest contract)
+    constraint_fit: FIT
   - id: OPT-2
-    label: Extend export_manifest_generation.py with failure routing
-    desc: >-
+    title: Extend export_manifest_generation.py with failure routing
+    description: >-
       Add failure-routing as a sub-function inside the existing
       export_manifest_generation.py module, sharing its imports
       and schema infrastructure.
-    pros:
+    benefits:
     - Reuses existing schema_id prefix and module structure
     - Fewer new files
-    cons:
+    tradeoffs:
     - Violates the narrow-scope convention: manifest generation and failure routing are distinct responsibilities
     - Mutates a module that already has a G2 envelope (SCRUM-234)
     - Harder to test failure routing in isolation
     - Breaks the one-node-one-module family convention
+    risks:
+    - Violates family guardrail (shared module extended, not replaced, per issue boundary)
+    constraint_fit: NOT_FIT
   - id: OPT-3
-    label: Skip implementation; only update the node descriptor
-    desc: >-
+    title: Skip implementation; only update the node descriptor
+    description: >-
       Mark the export-failure-routing node as M5_REPLAY_SAFE in
       the catalog but do not implement the routing module.
-    pros:
+    benefits:
     - Zero code risk
     - Fastest path
-    cons:
+    tradeoffs:
     - Does not satisfy the issue ACs (AC-1 through AC-8 all require implementation)
     - Leaves M5 incomplete; blocks downstream family integration
     - Fails validate_node_catalog_package_export.py (module missing)
+    risks:
+    - No implementation means no M5 delivery; blocks the F7 maturity gate
+    constraint_fit: NOT_FIT
 selected_option_id: OPT-1
-rationale: >-
+recommendation_rationale: >-
   OPT-1 follows the SCRUM-234 family convention of one isolated
   module per node, keeps the blast radius narrow, and satisfies
   all eight acceptance criteria. OPT-2 mutates a module with an
   existing G2 envelope; OPT-3 fails the ACs.
+decision_required: true
+status: READY
