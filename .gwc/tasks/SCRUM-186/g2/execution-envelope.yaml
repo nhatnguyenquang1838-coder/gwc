@@ -1,0 +1,54 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-186_OPT1_20260805
+authority_gate: G2_EXECUTION
+task_id: SCRUM-186
+issued_at: '2026-08-05T13:10:00Z'
+expires_at: '2026-08-06T13:10:00Z'
+scope_version: 7
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+prior_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+working_branch: hermes/scrum-186-approval-validation-20260805
+prior_head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+modules_or_files:
+  - .gwc/tasks/SCRUM-186/**
+  - schemas/gate-approval-validation.schema.json
+  - tools/node_architect/approval_command_validation.py
+  - tests/test_gate_authority_approval_command_validation_m5.py
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - modify_files_outside_approved_scope
+  - repair_unrelated_baseline_governance_tests
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - branch_deletion
+  - protected_branch_write
+  - pr_base_change
+scope_hash: sha256:c3aeacd2a68f9ad6da45a657cf21f21740262f0a063f654c99cc4fb8babda5b1
+scope_hash_16: c3aeacd2a68f9ad6
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-186_OPT1_20260805 c3aeacd2a68f9ad6 2026-08-06T13:10:00Z
+work_item:
+  provider: Jira via Atlassian Rovo
+  id: SCRUM-186
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: To Do
+  review_state: G2 execution approved for OPT-1 (approval-command-validation). Implement closed schema, pure replay-safe validator and focused M5 tests on a guarded working branch; retain v1 gate-action-authority. No PR/merge/deploy.
