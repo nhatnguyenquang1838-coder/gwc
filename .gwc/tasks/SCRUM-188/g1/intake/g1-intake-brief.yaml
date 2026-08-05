@@ -41,9 +41,9 @@ risks:
     impact: high
     mitigation: Keep the evaluator pure, fail closed, add explicit tests for every precedence rule, and run existing gate-authority regressions.
   - id: RISK-2
-    description: Remote GitHub ref verification is unavailable in this session.
+    description: Remote GitHub ref verification was unavailable during initial intake and was refreshed successfully before G2.
     impact: medium
-    mitigation: Bind all work to the locally observed origin/main SHA and re-check base drift before every write.
+    mitigation: Treat the refreshed protected-base verification in G1 preflight as authoritative, bind all work to the exact origin/main SHA, and re-check base drift before every write.
 acceptance_criteria:
   - id: AC-1
     statement: The authority-boundary-decision schema validates the complete decision shape and rejects missing or invalid bindings.

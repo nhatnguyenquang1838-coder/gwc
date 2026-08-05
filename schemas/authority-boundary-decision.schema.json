@@ -28,6 +28,7 @@
     },
     "scope_identity": {
       "type": "object",
+      "description": "Compact binding projection for this decision artifact. It requires the task, repository, base/head, scope, and action bindings; optional fields mirror canonical gate-scope-identity metadata when present but do not replace the standalone canonical artifact.",
       "additionalProperties": false,
       "required": [
         "task_id", "repository", "base_sha", "head_sha", "scope_hash",

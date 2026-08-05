@@ -153,12 +153,11 @@ def _valid_scope_hash(value: Any) -> bool:
 
 
 def _valid_string_list(value: Any, *, minimum: int = 0) -> bool:
-    return (
-        isinstance(value, list)
-        and len(value) >= minimum
-        and len(value) == len(set(value))
-        and all(isinstance(item, str) and item for item in value)
-    )
+    if not isinstance(value, list) or len(value) < minimum:
+        return False
+    if any(not isinstance(item, str) or not item for item in value):
+        return False
+    return len(value) == len(set(value))
 
 
 def _valid_risk_class(value: Any) -> bool:
