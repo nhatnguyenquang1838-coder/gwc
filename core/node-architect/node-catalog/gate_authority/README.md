@@ -1,66 +1,23 @@
-# Gate Authority Node Family
+# Gate Authority Node Catalog (MAT-F2)
 
-```text
-Task: REVAMP-GWC-017
-Batch: batch-02-gate-authority
-Family: gate_authority
-Planned nodes: 9
-Authority boundary: G1_ALIGNMENT_G2_EXECUTION
-```
-
-## Purpose
-
-This family models the gate authority layer used by GWC agents before any repository-changing action.
-
-It keeps approval, scope, evidence, and boundary decisions explicit so agents can continue safe preparation work but stop at exact human approval boundaries.
+Final integration owner for the `gate_authority` node family.
 
 ## Nodes
+| Node | Module | Public entry |
+|------|--------|--------------|
+| SCRUM-185 | tools/node_architect/approval_token_generation.py | generate_gate_approval_token |
+| SCRUM-186 | tools/node_architect/approval_command_validation.py | validate_gate_approval_command |
+| SCRUM-190 | tools/node_architect/gate_transition_decision.py | decide_gate_transition |
+| SCRUM-191 | tools/node_architect/g2_execution_envelope_render.py | render_g2_execution_envelope |
+| SCRUM-192 | tools/node_architect/blocked_action_escalation.py | escalate_blocked_action |
 
-| Node | Type | Purpose |
-|---|---|---|
-| `gate_authority.gate-state-resolution` | gate | Resolve current gate from artifacts and task state. |
-| `gate_authority.approval-token-generation` | workflow | Generate exact approval commands. |
-| `gate_authority.approval-command-validation` | gate | Validate exact approval commands. |
-| `gate_authority.scope-hash-calculation` | tool | Calculate deterministic scope hash inputs. |
-| `gate_authority.authority-boundary-check` | gate | Block authority crossing without the right gate. |
-| `gate_authority.evidence-artifact-map` | schema | Map gate evidence to canonical artifacts. |
-| `gate_authority.gate-transition-decision` | state | Decide pass/block/continue/fail-closed. |
-| `gate_authority.g2-execution-envelope-render` | workflow | Render bounded G2 execution envelopes. |
-| `gate_authority.blocked-action-escalation` | workflow | Generate the next required approval/remediation command. |
+## Contract
+- Each node is pure and offline; no execution authority is granted.
+- Each node ships a closed JSON schema + focused M5 tests.
+- Shared owner: `tools/node_architect/validate_node_catalog_gate_authority.py`.
 
-## Guardrails
-
-```text
-✅ exactly 9 nodes
-✅ all nodes use authority_boundary=g2_required
-✅ all nodes are limited to G1_ALIGNMENT and/or G2_EXECUTION
-✅ no merge/deploy/production authority
-✅ no runtime engine implementation
-✅ no all-81 catalog implementation
-```
-
-## Admission criteria
-
-This batch is valid only after:
-
-```text
-batch-01-intake-context merged to main
-exact post-merge CI for batch-01 is available or latest main is verified
-runtime node schema validation passes
-family validator passes
-governance unit tests pass
-```
-
-## Explicit exclusions
-
-```text
-merge
-auto_merge
-deploy_release
-production_config_data
-secrets_credentials
-migration
-runtime_engine
-scheduler_worker
-all_81_node_catalog
+## Run
+```bash
+PYTHONPATH=. python3 -m unittest tests.test_gate_authority_m5_family_flow
+PYTHONPATH=. python3 -m unittest tests.test_node_catalog_gate_authority
 ```

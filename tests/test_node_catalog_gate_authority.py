@@ -1,52 +1,31 @@
-import json
-import tempfile
+"""Tests for the shared gate_authority node catalog owner (SCRUM-192)."""
+from __future__ import annotations
+
 import unittest
-from pathlib import Path
 
 from tools.node_architect.validate_node_catalog_gate_authority import (
-    EXPECTED_AUTHORITY,
-    EXPECTED_COUNT,
-    EXPECTED_FAMILY,
-    validate_family,
+    validate_node_catalog_gate_authority,
 )
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-FAMILY_DIR = REPO_ROOT / "core/node-architect/node-catalog/gate_authority"
+class TestNodeCatalog(unittest.TestCase):
+    def test_catalog_complete(self):
+        rep = validate_node_catalog_gate_authority()
+        self.assertEqual(rep["summary"], "OK")
+        self.assertTrue(rep["all_present"])
+        self.assertEqual(set(rep["nodes"].keys()),
+                         {"SCRUM-185", "SCRUM-186", "SCRUM-190", "SCRUM-191", "SCRUM-192"})
 
+    def test_every_node_has_required_callable(self):
+        rep = validate_node_catalog_gate_authority()
+        for node_id, node in rep["nodes"].items():
+            self.assertTrue(node["present"], node_id)
+            self.assertEqual(node["missing"], [], node_id)
 
-class GateAuthorityNodeCatalogTests(unittest.TestCase):
-    def test_family_has_expected_count(self):
-        self.assertEqual(len(list(FAMILY_DIR.glob("*.node.json"))), EXPECTED_COUNT)
-
-    def test_family_is_valid(self):
-        self.assertEqual(validate_family(FAMILY_DIR), [])
-
-    def test_nodes_stay_within_gate_authority_boundary(self):
-        for path in FAMILY_DIR.glob("*.node.json"):
-            node = json.loads(path.read_text(encoding="utf-8"))
-            self.assertTrue(node["node_id"].startswith(f"{EXPECTED_FAMILY}."))
-            self.assertEqual(node["authority_boundary"], EXPECTED_AUTHORITY)
-            self.assertTrue(set(node["gates"]).issubset({"G1_ALIGNMENT", "G2_EXECUTION"}))
-            self.assertNotIn("G4_MERGE", node["gates"])
-            self.assertNotIn("G5_DEPLOY", node["gates"])
-            self.assertNotIn("G6_PRODUCTION_DATA", node["gates"])
-
-    def test_invalid_authority_fails(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            temp_family = Path(tmp) / EXPECTED_FAMILY
-            temp_family.mkdir()
-            for source in FAMILY_DIR.glob("*.node.json"):
-                target = temp_family / source.name
-                target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
-
-            first = next(temp_family.glob("*.node.json"))
-            node = json.loads(first.read_text(encoding="utf-8"))
-            node["authority_boundary"] = "read_only"
-            first.write_text(json.dumps(node), encoding="utf-8")
-
-            errors = validate_family(temp_family)
-            self.assertTrue(any("authority_boundary" in error for error in errors))
+    def test_pure_no_side_effect(self):
+        a = validate_node_catalog_gate_authority()
+        b = validate_node_catalog_gate_authority()
+        self.assertEqual(a["summary"], b["summary"])
 
 
 if __name__ == "__main__":

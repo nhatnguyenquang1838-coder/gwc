@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/blocked-action-escalation.schema.json",
+  "title": "GWC Blocked Action Escalation",
+  "description": "Replay-safe escalation decision for a blocked action. Enforces checkpoint-before-wait and minimal exact remediation; never performs the action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "blocked_action",
+    "decision",
+    "checkpoint_required",
+    "execution_performed",
+    "reason_code",
+    "escalation_digest"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+    "artifact_type": { "const": "blocked-action-escalation" },
+    "task_id": { "type": "string", "pattern": "^SCRUM-[0-9]+$" },
+    "repository": { "type": "string", "minLength": 1 },
+    "blocked_action": { "type": "string", "minLength": 1 },
+    "decision": {
+      "type": "string",
+      "enum": ["ESCALATE", "WAIT", "RESOLVE_MINIMAL"]
+    },
+    "checkpoint_required": { "type": "boolean" },
+    "remediation_scope": {
+      "type": ["string", "null"],
+      "description": "Minimal exact remediation, or null when not applicable."
+    },
+    "execution_performed": { "const": false },
+    "reason_code": { "type": "string", "pattern": "^ESCALATION_[A-Z_]+$" },
+    "replay_status": { "type": "string", "enum": ["IDEMPOTENT", "CONFLICT"] },
+    "escalation_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}
