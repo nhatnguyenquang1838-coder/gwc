@@ -25,6 +25,58 @@
     "sha": {
       "type": ["string", "null"],
       "pattern": "^[0-9a-f]{40}$"
+    },
+    "scope_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id", "repository", "base_sha", "head_sha", "scope_hash",
+        "authorized_actions", "excluded_actions"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "artifact_type": {"const": "gate-scope-identity"},
+        "task_id": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "base_ref": {"type": "string", "minLength": 1},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "working_branch": {"type": ["string", "null"], "minLength": 1},
+        "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+        "authorized_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "authorized_actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "excluded_actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "additional_bindings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["key", "value"],
+            "properties": {
+              "key": {"type": "string", "minLength": 1},
+              "value": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "outcome": {"enum": ["READY", "BLOCKED"]},
+        "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "authority_granted": {"const": false}
+      }
     }
   },
   "properties": {
@@ -44,7 +96,7 @@
     "next_authorized_preparation": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "primary_reason_code": {"type": "string", "minLength": 1},
-    "scope_identity": {"type": "object"},
+    "scope_identity": {"$ref": "#/$defs/scope_identity"},
     "scope_hash": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
     "current_base_sha": {"$ref": "#/$defs/sha"},
     "head_sha": {"$ref": "#/$defs/sha"},

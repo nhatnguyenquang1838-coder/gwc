@@ -43,10 +43,12 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
         current_gate: str = "G2_EXECUTION",
         current_status: str = "PASS",
         scope: dict[str, object] | None = None,
-        production_scope_applicable: bool = False,
-        manual_g5_action: bool = False,
+        production_scope_applicable: object = False,
+        manual_g5_action: object = False,
+        risk_class: object = "R2",
+        policy: dict[str, object] | None = None,
         prior_decision: dict[str, object] | None = None,
-        evaluated_at: str | None = "2026-08-05T06:30:00Z",
+        evaluated_at: object = "2026-08-05T06:30:00Z",
     ) -> dict[str, object]:
         resolved_scope = scope or self.scope(action)
         state = {
@@ -64,8 +66,8 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
             requested_action=action,
             gate_state_resolution=state,
             scope_identity=resolved_scope,
-            gate_policy={"action_map": ACTION_TO_MINIMUM_GATE},
-            risk_class="R2",
+            gate_policy=policy or {"action_map": ACTION_TO_MINIMUM_GATE},
+            risk_class=risk_class,
             production_scope_applicable=production_scope_applicable,
             manual_g5_action=manual_g5_action,
             event_id_or_idempotency_key="event-scrum-188-001",
@@ -88,6 +90,33 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
         self.assertEqual(list(Draft202012Validator(schema).iter_errors(decision)), [])
         self.assertEqual(decision["artifact_type"], "authority-boundary-decision")
         self.assert_safe_flags(decision)
+
+    def test_schema_requires_complete_scope_identity_bindings(self) -> None:
+        decision = self.call("file")
+        decision["scope_identity"].pop("head_sha")
+        schema = json.loads((ROOT / "schemas/authority-boundary-decision.schema.json").read_text())
+        errors = list(Draft202012Validator(schema).iter_errors(decision))
+        self.assertTrue(errors)
+
+        malformed_scope = self.scope("file")
+        malformed_scope.pop("base_sha")
+        result = self.call("file", scope=malformed_scope)
+        self.assertEqual(result["primary_reason_code"], "AUTHORITY_INPUT_INVALID")
+        self.assertEqual(list(Draft202012Validator(schema).iter_errors(result)), [])
+
+    def test_malformed_inputs_return_schema_valid_fail_closed_decision(self) -> None:
+        result = self.call(
+            "file",
+            risk_class="R9",
+            production_scope_applicable="yes",
+            manual_g5_action=1,
+            evaluated_at=123,
+        )
+        schema = json.loads((ROOT / "schemas/authority-boundary-decision.schema.json").read_text())
+        self.assertEqual(result["primary_reason_code"], "AUTHORITY_INPUT_INVALID")
+        self.assertEqual(result["decision"], "BLOCK")
+        self.assert_safe_flags(result)
+        self.assertEqual(list(Draft202012Validator(schema).iter_errors(result)), [])
 
     def test_canonical_action_mapping(self) -> None:
         expected = {
@@ -149,6 +178,14 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
         self.assertEqual((excluded["decision"], excluded["prohibited"]), ("BLOCK", True))
         mismatch = self.call("file", scope=self.scope("file", task_id="OTHER-1"))
         self.assertEqual(mismatch["primary_reason_code"], "AUTHORITY_SCOPE_MISMATCH")
+
+    def test_policy_cannot_remap_canonical_minimum_gate(self) -> None:
+        remapped = dict(ACTION_TO_MINIMUM_GATE)
+        remapped["file"] = "G0_CONTEXT"
+        decision = self.call("file", policy={"action_map": remapped})
+        self.assertEqual(decision["decision"], "BLOCK")
+        self.assertEqual(decision["minimum_gate"], "G2_EXECUTION")
+        self.assertEqual(decision["primary_reason_code"], "AUTHORITY_POLICY_MISMATCH")
 
     def test_prohibited_history_actions_are_never_authorized(self) -> None:
         decision = self.call("force_push", scope=self.scope("force_push"))

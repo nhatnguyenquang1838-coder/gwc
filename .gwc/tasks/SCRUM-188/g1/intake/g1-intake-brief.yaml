@@ -25,7 +25,7 @@ scope:
     - Modify the existing node descriptor or registry outside the three implementation files
     - Approval generation or validation
     - Any connector call from the implemented node
-    - Branch push, Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+    - Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
 constraints:
   - Preserve fail-closed gate mappings and replay semantics from the Jira contract.
   - The node must be pure and must never perform the requested action.
@@ -61,8 +61,8 @@ acceptance_criteria:
     statement: The focused M5 test module passes and the complete diff remains within the approved scope.
     verifiable: true
 delivery_lifecycle:
-  authorized_actions: [modify_approved_files, run_sandboxed_validation]
-  downstream_non_goals: [push_working_branch, open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+  downstream_non_goals: [open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
   g3_metadata_completion:
     ready_for_review_after_g3_pass: false
     required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]

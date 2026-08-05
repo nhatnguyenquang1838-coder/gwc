@@ -15,8 +15,9 @@ repository:
 constraints:
   - GWC gate authority remains separate from Jira and Slack projections.
   - No direct write to protected main; implementation is isolated in a dedicated worktree.
-  - No push, Draft PR, merge, deploy, release, credentials, secrets, migration, or production data in this G2 scope.
-  - Remote ref verification is SKIPPED_OFFLINE because github.com DNS resolution failed; local origin/main is the observed protected-base evidence.
+  - The initial implementation scope excluded push; the current G2 repair envelope permits only a non-force push of the guarded working branch after validation.
+  - Draft PR promotion, merge, deploy, release, credentials, secrets, migration, and production data remain excluded.
+  - Remote main and PR head were verified through GitHub at the exact bound SHAs before this repair envelope.
 applicable_policies:
   - id: CODING_PROJECT_GOVERNANCE
     path: core/Coding_Project_Governance_v1.0.md

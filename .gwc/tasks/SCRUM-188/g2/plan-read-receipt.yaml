@@ -1,10 +1,11 @@
 artifact_type: g2-plan-read-receipt
 schema_version: '1.0'
-approval_id: APPROVE_G2_EXECUTION_SCRUM-188_BASE_REFRESH_R1_20260805
+approval_id: APPROVE_G2_EXECUTION_SCRUM-188_REPAIR_R2_20260805
 task_id: SCRUM-188
 repository: nhatnguyenquang1838-coder/gwc
 branch: codex/scrum-188-authority-boundary-m5-20260805
 base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+head_sha: 8368ccb9a88a43993c303e2864bb37b614139c3c
 canonical_task_uid: SCRUM-188
 plan_revision: sha256:e217b5b1f749eedbbb7b0832dcb4b213031994fae2da532539910fe5cc3bac90
 paths_read:
@@ -14,5 +15,5 @@ paths_read:
 scope_consistency: MATCH
 repository_state: MATCH
 status: VERIFIED
-read_at: '2026-08-05T08:15:44Z'
+read_at: '2026-08-05T08:44:03Z'
 actor: Codex-GPT

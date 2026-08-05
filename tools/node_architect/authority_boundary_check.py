@@ -25,6 +25,15 @@ GATE_ORDER = (
 GATE_INDEX = {gate: index for index, gate in enumerate(GATE_ORDER)}
 VALID_RISK_CLASSES = {"R0", "R1", "R2", "R3"}
 GATE_STATUSES = {"READY", "RUNNING", "PASS", "BLOCKED", "FAILED", "NOT_APPLICABLE"}
+REPOSITORY_PATTERN = re.compile(r"^[^/\s]+/[^/\s]+$")
+SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+SCOPE_HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
+SCOPE_IDENTITY_KEYS = {
+    "schema_version", "artifact_type", "task_id", "repository", "base_ref",
+    "base_sha", "working_branch", "head_sha", "risk_class", "authorized_paths",
+    "authorized_actions", "excluded_actions", "additional_bindings", "outcome",
+    "scope_hash", "authority_granted",
+}
 
 
 def _normalize_action(value: Any) -> str:
@@ -135,6 +144,120 @@ def _as_string(value: Any) -> str | None:
     return value if isinstance(value, str) and value else None
 
 
+def _valid_sha(value: Any) -> bool:
+    return isinstance(value, str) and SHA_PATTERN.fullmatch(value) is not None
+
+
+def _valid_scope_hash(value: Any) -> bool:
+    return isinstance(value, str) and SCOPE_HASH_PATTERN.fullmatch(value) is not None
+
+
+def _valid_string_list(value: Any, *, minimum: int = 0) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) >= minimum
+        and len(value) == len(set(value))
+        and all(isinstance(item, str) and item for item in value)
+    )
+
+
+def _valid_scope_identity(value: Any) -> bool:
+    if not isinstance(value, dict) or set(value) - SCOPE_IDENTITY_KEYS:
+        return False
+    required = {"task_id", "repository", "base_sha", "head_sha", "scope_hash", "authorized_actions", "excluded_actions"}
+    if not required.issubset(value):
+        return False
+    if not isinstance(value["task_id"], str) or not value["task_id"]:
+        return False
+    if not isinstance(value["repository"], str) or REPOSITORY_PATTERN.fullmatch(value["repository"]) is None:
+        return False
+    if not _valid_sha(value["base_sha"]) or not _valid_sha(value["head_sha"]):
+        return False
+    if not _valid_scope_hash(value["scope_hash"]):
+        return False
+    if not _valid_string_list(value["authorized_actions"], minimum=1):
+        return False
+    if not _valid_string_list(value["excluded_actions"]):
+        return False
+    if "schema_version" in value and value["schema_version"] != "1.0":
+        return False
+    if "artifact_type" in value and value["artifact_type"] != "gate-scope-identity":
+        return False
+    if "base_ref" in value and (not isinstance(value["base_ref"], str) or not value["base_ref"]):
+        return False
+    if "working_branch" in value and value["working_branch"] is not None and (
+        not isinstance(value["working_branch"], str) or not value["working_branch"]
+    ):
+        return False
+    if "risk_class" in value and value["risk_class"] not in VALID_RISK_CLASSES:
+        return False
+    if "authorized_paths" in value and not _valid_string_list(value["authorized_paths"], minimum=1):
+        return False
+    if "additional_bindings" in value:
+        bindings = value["additional_bindings"]
+        if not isinstance(bindings, list) or any(
+            not isinstance(item, dict)
+            or set(item) != {"key", "value"}
+            or not isinstance(item["key"], str)
+            or not item["key"]
+            or not isinstance(item["value"], str)
+            or not item["value"]
+            for item in bindings
+        ):
+            return False
+    if "outcome" in value and value["outcome"] not in {"READY", "BLOCKED"}:
+        return False
+    if "authority_granted" in value and value["authority_granted"] is not False:
+        return False
+    return True
+
+
+def _safe_text(value: Any, fallback: str) -> str:
+    return value.strip() if isinstance(value, str) and value.strip() else fallback
+
+
+def _safe_repository(value: Any) -> str:
+    return value if isinstance(value, str) and REPOSITORY_PATTERN.fullmatch(value) else "invalid/invalid"
+
+
+def _safe_scope_identity(value: Any, *, task_id: str, repository: str) -> dict[str, Any]:
+    raw = value if isinstance(value, Mapping) else {}
+    safe: dict[str, Any] = {
+        "task_id": _safe_text(raw.get("task_id"), task_id),
+        "repository": _safe_repository(raw.get("repository")) if raw.get("repository") is not None else repository,
+        "base_sha": raw.get("base_sha") if _valid_sha(raw.get("base_sha")) else "0" * 40,
+        "head_sha": raw.get("head_sha") if _valid_sha(raw.get("head_sha")) else "0" * 40,
+        "scope_hash": raw.get("scope_hash") if _valid_scope_hash(raw.get("scope_hash")) else "sha256:" + "0" * 64,
+        "authorized_actions": raw.get("authorized_actions") if _valid_string_list(raw.get("authorized_actions"), minimum=1) else ["invalid_action"],
+        "excluded_actions": raw.get("excluded_actions") if _valid_string_list(raw.get("excluded_actions")) else [],
+    }
+    optional = {
+        "schema_version": lambda item: item == "1.0",
+        "artifact_type": lambda item: item == "gate-scope-identity",
+        "base_ref": lambda item: isinstance(item, str) and bool(item),
+        "working_branch": lambda item: item is None or (isinstance(item, str) and bool(item)),
+        "risk_class": lambda item: item in VALID_RISK_CLASSES,
+        "authorized_paths": lambda item: _valid_string_list(item, minimum=1),
+        "outcome": lambda item: item in {"READY", "BLOCKED"},
+        "authority_granted": lambda item: item is False,
+    }
+    for key, predicate in optional.items():
+        if key in raw and predicate(raw[key]):
+            safe[key] = raw[key]
+    bindings = raw.get("additional_bindings")
+    if isinstance(bindings, list) and all(
+        isinstance(item, dict)
+        and set(item) == {"key", "value"}
+        and isinstance(item["key"], str)
+        and item["key"]
+        and isinstance(item["value"], str)
+        and item["value"]
+        for item in bindings
+    ):
+        safe["additional_bindings"] = bindings
+    return safe
+
+
 def _normalize_list(value: Any) -> list[str] | None:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         return None
@@ -198,16 +321,20 @@ def _scope_mismatch(
     return False
 
 
-def _policy_gate(action: str, policy: Mapping[str, Any], default: str) -> str:
+def _policy_gate(action: str, policy: Mapping[str, Any], default: str) -> str | None:
     candidate = policy.get("action_map", policy.get("action_to_minimum_gate"))
     if not isinstance(candidate, Mapping):
         candidate = policy.get("actions")
     if isinstance(candidate, Mapping):
-        value = candidate.get(action)
+        missing = object()
+        value = candidate.get(action, missing)
+        if value is missing:
+            return default
         if isinstance(value, Mapping):
             value = value.get("minimum_gate", value.get("gate"))
-        if isinstance(value, str) and value in GATE_INDEX:
-            return value
+        if not isinstance(value, str) or value not in GATE_INDEX or value != default:
+            return None
+        return default
     return default
 
 
@@ -331,6 +458,15 @@ def check_authority_boundary(
     scope = scope_identity if isinstance(scope_identity, Mapping) else {}
     policy = gate_policy if isinstance(gate_policy, Mapping) else {}
     action = _normalize_action(requested_action)
+    safe_task_id = _safe_text(task_id, "invalid-task")
+    safe_repository = _safe_repository(repository)
+    safe_requested_action = _safe_text(requested_action, "invalid-action")
+    safe_scope = _safe_scope_identity(scope, task_id=safe_task_id, repository=safe_repository)
+    safe_risk_class = risk_class if risk_class in VALID_RISK_CLASSES else "R0"
+    safe_production_scope = production_scope_applicable if isinstance(production_scope_applicable, bool) else False
+    safe_manual_g5 = manual_g5_action if isinstance(manual_g5_action, bool) else False
+    safe_event_id = _safe_text(event_id_or_idempotency_key, "invalid-event")
+    safe_evaluated_at = evaluated_at if isinstance(evaluated_at, str) else None
     minimum_gate = ACTION_TO_MINIMUM_GATE.get(action)
     if minimum_gate is None and action in PROHIBITED_ACTIONS:
         # Prohibited history operations are known actions at the execution
@@ -346,15 +482,15 @@ def check_authority_boundary(
         manual_g5_action=manual_g5_action,
     )
     output = _base_output(
-        task_id=task_id, repository=repository, requested_action=requested_action,
+        task_id=safe_task_id, repository=safe_repository, requested_action=safe_requested_action,
         canonical_action=action or None, minimum_gate=minimum_gate,
         current_gate=current_gate, current_gate_status=current_status,
-        scope_identity=scope, gate_state=state, risk_class=risk_class,
-        production_scope_applicable=production_scope_applicable,
-        manual_g5_action=manual_g5_action,
-        event_id_or_idempotency_key=event_id_or_idempotency_key,
+        scope_identity=safe_scope, gate_state=state, risk_class=safe_risk_class,
+        production_scope_applicable=safe_production_scope,
+        manual_g5_action=safe_manual_g5,
+        event_id_or_idempotency_key=safe_event_id,
         replay_status="FIRST_SEEN", request_fingerprint=fingerprint,
-        evaluated_at=evaluated_at,
+        evaluated_at=safe_evaluated_at,
     )
 
     invalid = [
@@ -362,7 +498,7 @@ def check_authority_boundary(
         not isinstance(repository, str) or not repository,
         not isinstance(requested_action, str) or not requested_action,
         not isinstance(gate_state_resolution, dict),
-        not isinstance(scope_identity, dict),
+        not _valid_scope_identity(scope_identity),
         not isinstance(gate_policy, dict),
         risk_class not in VALID_RISK_CLASSES,
         not isinstance(production_scope_applicable, bool),
@@ -373,7 +509,12 @@ def check_authority_boundary(
     if any(invalid) or not current_gate or not current_status or current_status not in GATE_STATUSES:
         return _finish(output, ["AUTHORITY_INPUT_INVALID"])
 
-    minimum_gate = _policy_gate(action, policy, minimum_gate) if minimum_gate else None
+    if minimum_gate:
+        policy_gate = _policy_gate(action, policy, minimum_gate)
+        if policy_gate is None:
+            output["minimum_gate"] = minimum_gate
+            return _finish(output, ["AUTHORITY_POLICY_MISMATCH"])
+        minimum_gate = policy_gate
     output["minimum_gate"] = minimum_gate
     output["request_fingerprint"] = _request_fingerprint(
         task_id=task_id, repository=repository, action=action,
