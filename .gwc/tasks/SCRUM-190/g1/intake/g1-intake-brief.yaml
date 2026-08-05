@@ -1,0 +1,76 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T10:20:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-190
+  base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement the replay-safe gate_authority.gate-transition-decision node for SCRUM-190.
+  why_now: SCRUM-184, SCRUM-186, SCRUM-188, SCRUM-189, and SCRUM-191 are merged at the protected base, so the F2 authority inputs required to decide a gate transition now exist and the target node remains descriptor-only.
+desired_outcome: Add the decision JSON schema, a pure replay-safe decision evaluator that identifies the next lifecycle node, and focused M5 tests that never perform a transition or grant later-gate authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, gate-authority node consumers, downstream batch-f2 lifecycle nodes]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-190/** task-scoped GWC evidence
+    - schemas/gate-transition-decision.schema.json
+    - tools/node_architect/gate_transition_decision.py
+    - tests/test_gate_authority_gate_transition_decision_m5.py
+    - Focused unit validation and complete local diff review
+  non_goals:
+    - Modify the existing node descriptor or registry outside the three implementation files
+    - Perform, apply, or persist a gate transition or lifecycle state change
+    - Approval generation or approval token issuance
+    - Any connector call from the implemented node
+    - Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+constraints:
+  - The evaluator must be pure and replay-safe; identical inputs must produce an identical decision.
+  - The decision outcome set is exactly PASS, BLOCK, CONTINUE, AWAITING_APPROVAL, and NOT_APPLICABLE.
+  - The node identifies the next lifecycle node but never performs the transition.
+  - The canonical transition topology is read from core/task-lifecycle/gate-transition-map.yaml and never inferred.
+  - G2 approval is required before branch/worktree or repository implementation writes.
+  - G3, G4, G5, and G6 remain separate gates.
+assumptions:
+  - origin/main at f6ef9a1ef30b40d110b4db9d34dddddb12b19c59 is the refreshed protected-base evidence.
+  - SCRUM-184, SCRUM-186, SCRUM-188, SCRUM-189, and SCRUM-191 are the declared prerequisites and are satisfied at the protected base.
+  - The implementation can use the repository's existing Python standard-library, PyYAML, and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: A permissive transition decision could imply authority to advance a gate that was not actually satisfied.
+    impact: high
+    mitigation: Fail closed to BLOCK on any missing, invalid, or drifted evidence and test every outcome precedence rule explicitly.
+  - id: RISK-2
+    description: Divergence between the evaluator and core/task-lifecycle/gate-transition-map.yaml would produce an incorrect next node.
+    impact: medium
+    mitigation: Bind the evaluator to the map file as the single source of topology and test map-driven next-node resolution.
+acceptance_criteria:
+  - id: AC-1
+    statement: The gate-transition-decision schema validates the complete decision shape and rejects unknown or missing fields.
+    verifiable: true
+  - id: AC-2
+    statement: The evaluator returns only PASS, BLOCK, CONTINUE, AWAITING_APPROVAL, or NOT_APPLICABLE and always identifies the resolved next node or null with a reason.
+    verifiable: true
+  - id: AC-3
+    statement: The next node is resolved exclusively from core/task-lifecycle/gate-transition-map.yaml with no inferred topology.
+    verifiable: true
+  - id: AC-4
+    statement: The node never performs a transition and emits no field granting merge, deploy, or production authority.
+    verifiable: true
+  - id: AC-5
+    statement: Re-evaluating the same inputs reproduces an identical decision and replay digest for checkpoint and resume.
+    verifiable: true
+  - id: AC-6
+    statement: The focused M5 test module passes and the complete diff remains within the approved scope.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+  downstream_non_goals: [open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]
+unresolved_questions: []
+status: READY

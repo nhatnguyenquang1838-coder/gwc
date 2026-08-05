@@ -1,0 +1,64 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T10:20:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-190
+  base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  profile_path: projects/gwc/project-profile.yaml
+  connector: Git
+checks:
+  - id: BASE_BINDING
+    status: PASS
+    code: BASE_SHA_VERIFIED
+    message: The local checkout and origin/main match the protected-base SHA.
+    evidence: [git rev-parse HEAD, git rev-parse origin/main]
+  - id: TARGET_SCOPE
+    status: PASS
+    code: TARGET_FILES_MATCH
+    message: Jira create-files and approved OPT-1 scope are identical.
+    evidence: [Jira SCRUM-190 live description, G1 intake scope]
+  - id: DEPENDENCIES
+    status: PASS
+    code: DEPENDENCIES_SATISFIED
+    message: SCRUM-184, SCRUM-186, SCRUM-188, SCRUM-189, and SCRUM-191 prerequisites are satisfied and merged at the protected base.
+    evidence: [Jira SCRUM-186 projection, Jira SCRUM-191 projection, git log origin/main]
+  - id: REMOTE_CONNECTIVITY
+    status: PASS
+    code: REMOTE_BASE_VERIFIED
+    message: 'GitHub remote `origin/main` was verified at protected-base `f6ef9a1ef30b40d110b4db9d34dddddb12b19c59` via `git fetch origin main` and `git rev-parse origin/main` readback.'
+    evidence: [git fetch origin main, git rev-parse origin/main]
+  - id: PLAN_BINDING
+    status: PASS
+    code: TASK_ME_PLAN_VALIDATED
+    message: The Task Me plan is bound to SCRUM-190, the exact base SHA, and OPT-1.
+    evidence: [g1/plan/requirements.md, g1/plan/design.md, g1/plan/tasks.md, sha256:1be283731b4732241e10b75075d03168def746ad7753d9fb10f4d5d730f83be1]
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+implementation_plan:
+  applicability: required
+  reason: SCRUM-190 requests implementation and validation planning; the GWC G1 hook requires Task Me decomposition.
+  source: task_me
+  task_me_applicable: true
+  task_me_available: true
+  task_me_invoked: true
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-190
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  plan_root: .gwc/tasks/SCRUM-190/g1/plan
+  requirements_path: .gwc/tasks/SCRUM-190/g1/plan/requirements.md
+  design_path: .gwc/tasks/SCRUM-190/g1/plan/design.md
+  tasks_path: .gwc/tasks/SCRUM-190/g1/plan/tasks.md
+  plan_revision: sha256:1be283731b4732241e10b75075d03168def746ad7753d9fb10f4d5d730f83be1
+  validation_status: PASS
+  validation_evidence: Task Me hook review against Jira SCRUM-190 contract and OPT-1 scope; plan revision sha256:1be283731b4732241e10b75075d03168def746ad7753d9fb10f4d5d730f83be1.
+  generated_by: Hermes-PC via dw-task-me
+  generated_at_utc: '2026-08-05T10:20:00Z'
+blockers: []
+outcome: PASS

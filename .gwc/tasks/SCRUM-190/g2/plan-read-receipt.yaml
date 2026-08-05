@@ -1,0 +1,10 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-190_OPT1_20260805
+authority_gate: G2_EXECUTION
+task_id: SCRUM-190
+read_at: '2026-08-05T23:20:00Z'
+reader: Hermes-PC
+readback_source: Jira via Atlassian Rovo
+expected_command: 'APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-190_OPT1_20260805 2375eded583121ec 2026-08-06T23:20:00Z'
+readback_match: true
+drift: none
+notes: Exact human approval command matches the generated request; scope_hash_16 2375eded583121ec and expiry within bounds. No execution authority is granted by this approval.

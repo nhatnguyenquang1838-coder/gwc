@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-transition-decision.schema.json",
+  "title": "GWC Gate Transition Decision",
+  "description": "Replay-safe gate transition decision. The evaluator never performs the transition; it only decides PASS/BLOCK/CONTINUE/AWAITING_APPROVAL/NOT_APPLICABLE and identifies the next permitted node.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "current_gate",
+    "current_state",
+    "decision",
+    "transition",
+    "expected_state",
+    "readback_required",
+    "next_gate",
+    "next_node",
+    "requires_human_approval",
+    "checkpoint_required",
+    "reason_code",
+    "decision_digest",
+    "execution_performed"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+    "artifact_type": { "const": "gate-transition-decision" },
+    "task_id": { "type": "string", "pattern": "^SCRUM-[0-9]+$" },
+    "repository": { "type": "string", "minLength": 1 },
+    "current_gate": { "type": "string", "minLength": 1 },
+    "current_state": { "type": "string", "minLength": 1 },
+    "decision": {
+      "type": "string",
+      "enum": ["PASS", "BLOCK", "CONTINUE", "AWAITING_APPROVAL", "NOT_APPLICABLE"]
+    },
+    "transition": { "type": ["string", "null"] },
+    "expected_state": { "type": ["string", "null"] },
+    "readback_required": { "type": "boolean" },
+    "next_gate": { "type": ["string", "null"] },
+    "next_node": { "type": ["string", "null"] },
+    "requires_human_approval": { "type": "boolean" },
+    "checkpoint_required": { "type": "boolean" },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "reason_code": { "type": "string", "pattern": "^TRANSITION_[A-Z_]+$" },
+    "replay_status": { "type": "string", "enum": ["IDEMPOTENT", "CONFLICT"] },
+    "decision_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "execution_performed": { "const": false }
+  }
+}
