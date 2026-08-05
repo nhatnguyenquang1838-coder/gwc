@@ -1,0 +1,76 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T06:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-237
+  base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-05T06:35:00Z'
+  source: 'G2_EXECUTION approval requested in thread for SCRUM-237; G0/G1 materialized per governance requirement (user elected Run formal G1).'
+  explicit: true
+rationale: >-
+  OPT-1 matches the issue's named surfaces and boundaries, provides one auditable
+  decision table mapping every upstream reason code to exactly one route, and uses
+  additive family changes (ninth node + README/runtime mapping + integration tests)
+  that keep the blast radius contained. OPT-2 scatters routing across nine verifiers,
+  breaks the single-source-of-truth guarantee and violates the recommend-only contract.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+scope_hash: sha256:84d03a0b321819921fc440671708a8162b6be32e2ea5a0605739b23cc5d0ca1c
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Build the isolated recommend-only export_failure_routing.py decision-table router with the stable 11-reason-code contract and replay-stable binding.
+  - sub_task_id: SUB-TASK-2
+    description: Author the closed routing schema export-failure-routing.schema.json.
+  - sub_task_id: SUB-TASK-3
+    description: Author the fixture suite test_export_failure_routing.py (every upstream reason namespace + family golden flows).
+  - sub_task_id: SUB-TASK-4
+    description: Add the ninth node export-failure-routing.node.json and README/runtime mapping so the nine-node family validator passes.
+  - sub_task_id: SUB-TASK-5
+    description: Author family integration tests and confirm existing exporter/manifest/smoke tests remain green.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-governance
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: gwc-governance
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: gwc-governance
+    agent_type: validator
+  - sub_task_id: SUB-TASK-4
+    skill_id: gwc-governance
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-5
+    skill_id: gwc-governance
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  - SUB-TASK-5

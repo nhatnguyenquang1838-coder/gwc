@@ -1,0 +1,52 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T06:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-237
+  base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Centralized decision-table router + closed routing schema + family integration
+  description: >-
+    Build tools/node_architect/package_export/export_failure_routing.py as an
+    isolated pure module that maps every upstream reason code (enumerated from
+    SCRUM-229-236) to exactly one of six routes via a single decision table,
+    persists a route-decision digest with idempotency key, bounded retry
+    count/deadline and prohibited actions, and is replay-safe. Add the closed
+    routing schema, the fixture suite (every upstream reason namespace + family
+    golden flows), the ninth node definition export-failure-routing.node.json,
+    README/runtime mapping and family integration tests. The router is
+    recommend-only; it never repairs, rebuilds, retries, publishes or merges.
+  benefits:
+  - Matches the issue's named surfaces and boundaries exactly
+  - One decision table makes every routing decision auditable and deterministic
+  - Additive family changes keep blast radius contained to the ninth node + docs
+  tradeoffs:
+  - Larger surface than a single isolated verifier (family integration owner)
+  risks:
+  - Family-integration ownership widens blast radius (mitigated by additive changes + full test run)
+  constraint_fit: FIT
+- id: OPT-2
+  title: Inline routing inside each existing verifier
+  description: >-
+    Add routing logic into each upstream verifier instead of a centralized module.
+  benefits:
+  - Routing co-located with each failure source
+  tradeoffs:
+  - No single source of truth; hard to prove completeness/exhaustiveness across nine nodes
+  - Mutates every existing verifier, requiring serialization across SCRUM-229-236
+  risks:
+  - Violates the family-integration-owner boundary and the issue's "recommend-only" contract
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  Build the centralized decision-table router plus closed schema, fixtures, the
+  ninth node, README/runtime mapping and family integration tests named in the
+  issue. One decision table makes the routing contract auditable and complete;
+  additive family changes keep the blast radius contained while satisfying the
+  nine-node validator and the recommend-only boundary.
+decision_required: true
+status: READY

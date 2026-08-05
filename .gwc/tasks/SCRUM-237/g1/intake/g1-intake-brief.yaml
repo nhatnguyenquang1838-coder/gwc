@@ -1,0 +1,95 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T06:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-237
+  base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    SCRUM-237 builds the package_export.export-failure-routing evaluator for the
+    F7 family (node package-export-export-failure-routing). It routes manifest,
+    schema, path, build, hash and smoke failures to exactly one deterministic
+    bounded next action without publishing an invalid package or repeating an
+    unknown effect, and owns the final family integration of all nine nodes.
+  why_now: >-
+    SCRUM-236 (smoke-verification) is Done and merged (PR #216), unblocking the
+    final F7 node. The family validator (tools/node_architect/validate_node_catalog_package_export.py)
+    already requires exactly nine semantics including export-failure-routing, but
+    no routing evaluator, node definition, README/runtime mapping or integration
+    tests exist yet for this node.
+desired_outcome: >-
+  A pure recommend-only routing evaluator that consumes typed upstream outcomes
+  and reason codes, returns exactly one of six routes (REPAIR_INPUT,
+  REBUILD_STAGING, REVERIFY_READBACK, BOUNDED_RETRY, HUMAN_REQUIRED,
+  FAIL_CLOSED), persists a route-decision digest with idempotency key, bounded
+  retry count/deadline and prohibited actions, and is replay-safe. Plus the
+  ninth node definition, README/runtime mapping and family integration tests so
+  the nine-node family validator passes without implying any publish/merge/deploy
+  authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - SCRUM-172 (GWC-MATURITY-F7 epic)
+scope:
+  in_scope:
+  - tools/node_architect/package_export/export_failure_routing.py
+  - schemas/node-architect/package-export/export-failure-routing.schema.json
+  - tests/package_export/test_export_failure_routing.py
+  - core/node-architect/node-catalog/package_export/export-failure-routing.node.json
+  - core/node-architect/node-catalog/package_export/README.md (append routing)
+  - family integration tests (tests/package_export/test_family_integration.py)
+  - tools/node_architect/validate_node_catalog_package_export.py (unchanged except node add)
+  - .gwc/tasks/SCRUM-237/**
+  non_goals:
+  - repair, rebuild, retry, publish or release (recommend-only)
+  - consumer repository write
+  - merge, deploy or production operations
+  - mutation of existing verifier internals beyond shared-validator integration
+constraints:
+- router recommends and records a route only; never performs the action
+- never routes unsafe path, schema incompatibility, replay conflict, content/hash contradiction or authority-boundary violation to automatic success/retry without changed approved evidence
+- timeout/interruption/unknown require checkpoint/readback reconciliation before retry
+- same canonical failure evidence produces the same route and digest with no duplicate external/filesystem effect
+- bounded retry by count/deadline with an explicitly retryable reason plus reconciled zero/known effect
+- family validator must cover exactly nine nodes preserving canonical=delivery_evidence and authority_boundary=g2_required
+assumptions:
+- upstream reason-code namespaces from SCRUM-229-236 are stable and enumerated in the existing verifiers
+- SHA-256 and the closed reason-code contract govern determinism
+risks:
+- id: RISK-1
+  description: Family-integration ownership widens blast radius to shared validator/README/integration tests.
+  impact: medium
+  mitigation: Changes are additive (ninth node + doc/integration updates); full package_export suite and family validator run before completion.
+- id: RISK-2
+  description: Exhaustive mapping of every upstream reason across nine nodes is large.
+  impact: medium
+  mitigation: A centralized decision table maps each upstream reason code to one route; fixtures assert the table for every namespace.
+acceptance_criteria:
+- id: AC-1
+  statement: Decision-table fixtures cover every upstream reason namespace from SCRUM-229-236 (malformed manifest, unsafe source/target, optional skip, missing required source, partial tree, stale source, manifest conflict, hash mismatch, smoke timeout, unknown outcome).
+  verifiable: true
+- id: AC-2
+  statement: Unsafe, contradictory, stale or unmapped conditions never route to automatic success or publication.
+  verifiable: true
+- id: AC-3
+  statement: Retry is bounded by count/deadline and requires an explicitly retryable reason plus reconciled zero/known effect.
+  verifiable: true
+- id: AC-4
+  statement: Same canonical failure evidence produces the same route/digest with no duplicate external or filesystem effect.
+  verifiable: true
+- id: AC-5
+  statement: Family golden flows cover clean success chain, repairable input failure, partial-build reconciliation, identical replay, conflicting replay and terminal fail-closed.
+  verifiable: true
+- id: AC-6
+  statement: The nine-node family validator, README/runtime mapping and family integration tests cover exactly nine nodes preserving canonical=delivery_evidence, g2_required and G2/G3-only applicability.
+  verifiable: true
+- id: AC-7
+  statement: Existing exporter, manifest schema, instruction validation and smoke tests remain green.
+  verifiable: true
+unresolved_questions: []
+status: READY
