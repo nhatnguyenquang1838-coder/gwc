@@ -1,0 +1,74 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T14:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-228
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main and matches the refreshed current main tip after git fetch; ancestor relationship confirmed.
+  evidence:
+  - 731ae09280f4fdf3afc841db6de78b7876f09f4e
+- id: BLOCKER-223-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-223 (projection-source-authority-check) is Done and merged; its source-authority decision is the required upstream input to this evaluator.
+  evidence:
+  - SCRUM-223
+- id: CONFLICT-SCRUM-227-MERGED
+  status: PASS
+  code: INTEGRATION_CONFLICT_CLEARED
+  message: >-
+    SCRUM-227 (projection-evidence-linking) is Done and merged (PR #201, merge
+    SHA 4a83ece9f5d52b83a394d8491c401741782e3dd7 in origin/main). The shared B1
+    test, family validator, catalogue tests and README it touched are now stable,
+    so SCRUM-228's earlier parallel-implementation hold is cleared.
+  evidence:
+  - SCRUM-227
+  - 4a83ece9f5d52b83a394d8491c401741782e3dd7
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    projection_privacy_boundary_check.py and projection-privacy-decision.schema.json
+    are brand-new files; the existing node descriptor and family validator are
+    extended, not mutated. Blast radius is narrow.
+  evidence:
+  - tools/node_architect/projection_privacy_boundary_check.py (absent at 731ae09)
+  - schemas/projection-privacy-decision.schema.json (absent at 731ae09)
+- id: NODE-PRESENT
+  status: PASS
+  code: NODE_EXISTS
+  message: The privacy-boundary-check node descriptor already exists at core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json as thin read_only metadata.
+  evidence:
+  - core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json
+- id: BASELINE-REFRESH
+  status: PASS
+  code: BASELINE_REFRESHED
+  message: >-
+    Staged G0/G1 previously bound to main@bce6f6f (45 commits stale). This refresh
+    rebinds all trace/base_sha to current origin/main 731ae09 per the ticket's
+    post-SCRUM-227 integration plan.
+  evidence:
+  - bce6f6f83c74a25a57259695adc44b46a8555c46 (prior stale base)
+  - 731ae09280f4fdf3afc841db6de78b7876f09f4e (current base)
+- id: SCOPE-HASH
+  status: PASS
+  code: SCOPE_HASH_DERIVED
+  message: scope_hash derived from the canonical sorted scope string via sha256sum, not guessed.
+  evidence:
+  - sha256:20ba9ca985715f51420198982753eb6a21d3e1f1afaa0352d5fdb8729f5d5312
+risk_class: R1
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS

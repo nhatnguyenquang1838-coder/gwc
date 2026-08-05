@@ -1,0 +1,72 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-05T14:30:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G2 scope is the SCRUM-228 projection-privacy-boundary-check evaluator, its closed result schema and focused fixtures only
+- fresh isolated pure module tools/node_architect/projection_privacy_boundary_check.py plus schemas/projection-privacy-decision.schema.json only; shared node descriptor and existing family validator are extended, not mutated
+- no secret retrieval, decryption, storage, connector call, target write, policy mutation or DLP service
+- no merge/deploy/release/production/credential work (merge is human G4 authority per G2 envelope excluded_actions)
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  source_sha: a9ca4939b26d50b18ef9ce346f000a65de391c00e294309e16d4362d9d2111b9
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  source_sha: b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+sources:
+- path: core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json
+  required: true
+  status: AVAILABLE
+  source_sha: 52b9596930a4e25673e30f1936bcc39469881d4a1d19e30a1072bd6640baf343
+- path: tools/node_architect/validate_node_catalog_sync_projection.py
+  required: true
+  status: AVAILABLE
+  source_sha: 622e07e1ea5f8a2fb63e783b5ad43438612102f4b36d200a296453f7384de91e
+- path: tests/test_sync_projection_m4_batch_b1.py
+  required: true
+  status: AVAILABLE
+  source_sha: ac7cdc675fcbe399ce3bf0c88ea715e62cb1171067e1f8ff1487c86913bd7e5d
+- path: schemas/projection-evidence-linkset.schema.json
+  required: false
+  status: AVAILABLE
+  source_sha: e5c16a7d90d7d95dc29e288b797d7f2be355f77a7dd302c04d72b39aa9da9b18
+- path: tools/node_architect/projection_evidence_linking.py
+  required: false
+  status: AVAILABLE
+  source_sha: 2cbc21468e24008914784646b02431887dd4e65186d9c1f38a9eef66e2ab600a
+- path: schemas/projection-privacy-decision.schema.json
+  required: false
+  status: MISSING
+  source_sha: null
+- path: tools/node_architect/projection_privacy_boundary_check.py
+  required: false
+  status: MISSING
+  source_sha: null
+status: READY
+blockers: []

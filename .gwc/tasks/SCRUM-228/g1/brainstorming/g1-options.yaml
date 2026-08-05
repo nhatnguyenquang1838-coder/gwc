@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T14:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-228
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Isolated read-only sanitizer/evaluator + closed decision schema + fixture suite
+  description: >-
+    Build tools/node_architect/projection_privacy_boundary_check.py as an isolated
+    pure module implementing the 11-step decision precedence, closed 12-class
+    classification validation, recursive mandatory protected-key detection, target-policy
+    evaluation, safe redaction/removal, residual leakage scan and order-independent
+    sanitized/decision digest attachment; add the closed result schema
+    schemas/projection-privacy-decision.schema.json and the focused suite inside
+    tests/test_sync_projection_m4_batch_b1.py; extend the shared node descriptor,
+    family validator, catalogue tests and README with the static runtime mapping
+    and B1 golden flow (source-authority READY -> evidence eligible -> privacy
+    APPROVED/REDACTED). Matches the issue's stated surfaces and boundaries; the
+    shared node descriptor stays thin read_only metadata.
+  benefits:
+  - Matches the issue's named surfaces and boundaries exactly
+  - Isolated new module keeps blast radius minimal
+  - Deterministic, digest-bound, fail-closed by construction
+  tradeoffs:
+  - Some evaluation logic is conceptually adjacent to the SCRUM-227 evidence-linkset
+  risks:
+  - Behavioral drift versus the shared B1 test contract if later refactored (mitigated by the closed classification/policy contract)
+  constraint_fit: FIT
+- id: OPT-2
+  title: Extend the SCRUM-227 evidence-linking module in place
+  description: >-
+    Add privacy-boundary evaluation directly into projection_evidence_linking.py
+    instead of building an isolated module.
+  benefits:
+  - Single code path for sync_projection runtime contracts
+  tradeoffs:
+  - Mutates a shared surface that downstream SCRUM-220/221/222 also depend on, requiring serialization
+  - Larger blast radius; conflates privacy sanitization with evidence linking
+  risks:
+  - Violates the issue's explicit split between the static catalogue descriptor and the separate runtime boundary
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  Build the isolated read-only privacy sanitizer/evaluator, closed decision schema
+  and focused fixture suite named in the issue. This preserves the thin read_only
+  node-descriptor boundary and keeps the blast radius narrow, matching the
+  SCRUM-227 family convention and the ticket's stated design decision.
+decision_required: true
+status: READY

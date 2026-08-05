@@ -1,0 +1,74 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-08-05T05:51:27Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-236
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../g0/context-snapshot.yaml
+g1_refs:
+  intake: ../g1/intake/g1-intake-brief.yaml
+  preflight: ../g1/preflight/g1-preflight-report.yaml
+  options: ../g1/brainstorming/g1-options.yaml
+  decision: ../g1/decision/g1-decision-record.yaml
+approval:
+  command: 'APPROVE G2_EXECUTION SCRUM-236 ba32cddad9663e37 2026-08-06T05:51:27Z'
+  issued_at: '2026-08-05T05:51:27Z'
+  expires_at: '2026-08-06T05:51:27Z'
+  scope_hash: sha256:ba32cddad9663e372824adda6fcf1d551ca77522e6f3027f573ad44f9c1d9d63
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  working_branch: hermes/scrum-236-smoke-verification-m5-20260805
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+task:
+  id: SCRUM-236
+  summary: '[MAT-F7-N08] package_export.smoke-verification — M2 -> M5_REPLAY_SAFE'
+  type: Subtask
+risk_class: R1
+required_gate_entered: G2_EXECUTION
+authorized_actions:
+- create_branch: hermes/scrum-236-smoke-verification-m5-20260805
+- write_package_files:
+  - tools/node_architect/package_export/smoke_verification.py
+  - schemas/node-architect/package-export/smoke-verification.schema.json
+  - tests/package_export/test_smoke_verification.py
+- run_tests: tests/package_export/test_smoke_verification.py
+- run_smoke: tools/verify_package_export_smoke.py (must stay green and unmodified — wrap, do not replace)
+- open_draft_pr: G3_PR
+scope_hash: sha256:ba32cddad9663e372824adda6fcf1d551ca77522e6f3027f573ad44f9c1d9d63
+file_scope:
+- tools/node_architect/package_export/smoke_verification.py
+- schemas/node-architect/package-export/smoke-verification.schema.json
+- tests/package_export/test_smoke_verification.py
+- .gwc/tasks/SCRUM-236/**
+excluded_actions:
+- merge_to_main
+- deploy
+- release
+- publish
+- consumer_repo_write
+- package_version_bump
+- credential_or_secret_change
+- production_data_operation
+- modify_tools/verify_package_export_smoke.py
+- network_access
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+g2_outcome: PASS
+g2_evidence:
+  head_sha: 1dd7726785e08025fdbf076bc4462dbe46f3dce0
+  test_suite: tests/package_export/test_smoke_verification.py
+  test_result: 12 passed
+  full_package_export_dir: 95 passed, 36 subtests passed
+  pre_existing_unrelated_failures: tests/package_export/test_target_path_safety_check.py (6, fail on clean main, out of scope)
+  existing_smoke_verifier: ok (262 entries, unchanged)
+  wrapped_tool_modified: false

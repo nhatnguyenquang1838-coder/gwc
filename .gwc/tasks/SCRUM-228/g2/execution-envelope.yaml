@@ -1,0 +1,70 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-08-05T14:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-228
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../g0/context-snapshot.yaml
+g1_refs:
+  intake: ../g1/intake/g1-intake-brief.yaml
+  preflight: ../g1/preflight/g1-preflight-report.yaml
+  options: ../g1/brainstorming/g1-options.yaml
+  decision: ../g1/decision/g1-decision-record.yaml
+approval:
+  command: 'APPROVE G2_EXECUTION SCRUM-228 20ba9ca9 2026-08-06T14:30:00Z'
+  issued_at: '2026-08-05T14:30:00Z'
+  expires_at: '2026-08-06T14:30:00Z'
+  scope_hash: sha256:20ba9ca985715f51420198982753eb6a21d3e1f1afaa0352d5fdb8729f5d5312
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  working_branch: hermes/scrum-228-projection-privacy-boundary-check-m4-20260805
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+task:
+  id: SCRUM-228
+  summary: '[MAT-F6-N09] sync_projection.projection-privacy-boundary-check — M1 -> M4'
+  type: Subtask
+risk_class: R1
+required_gate_entered: G2_EXECUTION
+authorized_actions:
+- create_branch: hermes/scrum-228-projection-privacy-boundary-check-m4-20260805
+- write_package_files:
+  - tools/node_architect/projection_privacy_boundary_check.py
+  - schemas/projection-privacy-decision.schema.json
+  - tests/test_sync_projection_m4_batch_b1.py
+  - core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json
+  - tools/node_architect/validate_node_catalog_sync_projection.py
+- run_tests: tests.test_sync_projection_m4_batch_b1.ProjectionPrivacyBoundaryTests
+- run_family_regression: tests.test_node_catalog_sync_projection
+- run_family_validator: tools/node_architect/validate_node_catalog_sync_projection.py
+- open_draft_pr: G3_PR
+scope_hash: sha256:20ba9ca985715f51420198982753eb6a21d3e1f1afaa0352d5fdb8729f5d5312
+file_scope:
+- tools/node_architect/projection_privacy_boundary_check.py
+- schemas/projection-privacy-decision.schema.json
+- tests/test_sync_projection_m4_batch_b1.py
+- core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json
+- tools/node_architect/validate_node_catalog_sync_projection.py
+- .gwc/tasks/SCRUM-228/**
+excluded_actions:
+- merge_to_main
+- deploy
+- release
+- publish
+- consumer_repo_write
+- package_version_bump
+- credential_or_secret_change
+- production_data_operation
+- branch_delete
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+g2_outcome: PASS

@@ -1,0 +1,120 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-236
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+working_branch: hermes/scrum-236-smoke-verification-m5-20260805
+pull_request:
+  number: 216
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/216
+  draft: true
+head_sha: 1dd7726785e08025fdbf076bc4462dbe46f3dce0
+scope_hash: sha256:ba32cddad9663e372824adda6fcf1d551ca77522e6f3027f573ad44f9c1d9d63
+changed_paths:
+- tools/node_architect/package_export/smoke_verification.py
+- schemas/node-architect/package-export/smoke-verification.schema.json
+- tests/package_export/test_smoke_verification.py
+validation:
+  head_sha: 1dd7726785e08025fdbf076bc4462dbe46f3dce0
+  status: pass
+  commands:
+  - command: tools/validate_g01.py --root . --workspace .gwc/tasks/SCRUM-236 --json
+    result: pass
+    evidence: '{"outcome":"PASS","valid":true,"issues":[]}'
+  - command: pytest tests/package_export/test_smoke_verification.py -q
+    result: pass
+    evidence: 12 passed
+  - command: python3 tools/verify_package_export_smoke.py --root . --package projects/gwc/package.yaml --source-ref main --source-base-sha 78d596242a9e042d62d6174afc40aa4976eb3285
+    result: pass
+    evidence: '{"ok":true,"copied_entries":262}'
+review:
+  implementer_id: Hermes
+  reviewer_id: Hermes
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 1dd7726785e08025fdbf076bc4462dbe46f3dce0
+  reviewed_scope_hash: sha256:ba32cddad9663e372824adda6fcf1d551ca77522e6f3027f573ad44f9c1d9d63
+  reviewed_at: '2026-08-05T06:30:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - AC-1..AC-5 mapped from SCRUM-236; scope matches in_scope surfaces only
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Isolated offline verifier wraps (never modifies) verify_package_export_smoke.py; reuses SCRUM-235 hash primitives
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - smoke_verification.py binds identity via targeted source/target digest + byte count; os.walk includes hidden .governance targets; checkpoint readback reconciliation
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - 11 fixtures (clean success, missing/corrupt target, malformed manifest, clean-dir violation, extraction failure, timeout, interrupted reconciliation, unknown result, identical + conflicting replay)
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G0 READY, G1 validate_g01.py PASS, G2 PASS on guarded branch, no main write, artifacts under .gwc/tasks/SCRUM-236
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Draft PR #216 on guarded branch; head 1dd7726 matches record
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - GitHub Actions 'validate' job passed on PR #216; g4-receipt-required is a G4 merge gate outside G3 scope
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - 11-scenario fixture suite in tests/package_export/test_smoke_verification.py
+  - id: AC-2
+    result: pass
+    evidence:
+    - PASS requires full required target set + exact package identity; subset cannot claim validity
+  - id: AC-3
+    result: pass
+    evidence:
+    - verify_smoke is read-only/offline; interrupted/unknown route to checkpoint reconciliation and never infer PASS
+  - id: AC-4
+    result: pass
+    evidence:
+    - existing verify_package_export_smoke.py remains green (262 entries) and is byte-identical (wrapped, not modified)
+  - id: AC-5
+    result: pass
+    evidence:
+    - identical package identity + idempotency key returns same result digest (test_identical_replay)
+  decision: pass
+  stale: false
+ci:
+  required: false
+  head_sha: 1dd7726785e08025fdbf076bc4462dbe46f3dce0
+  checks:
+  - name: validate
+    required: true
+    status: pass
+    evidence: GitHub Actions 'validate' job passed on PR #216
+  - name: g4-receipt-required
+    required: false
+    status: skipped
+    evidence: G4 merge gate; intentionally not satisfied at G3 (no G4 authority receipt yet)
+residual_risks:
+- The 6 pre-existing failures in tests/package_export/test_target_path_safety_check.py are unrelated to this change (fail identically on clean main) and remain out of this task's scope.
+- Independent human review of the exact PR head is still required before G4 merge.
+- Serialization with SCRUM-237 is moot because verify_package_export_smoke.py is wrapped, not modified.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pass
