@@ -11,7 +11,7 @@ repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
 base_sha: 520aa1968a0809001e8994192278e52a59c86c61
 working_branch: fastlane/SCRUM-260-hermes
-head_sha: fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+head_sha: 03b138e7f19488b4e826b296ed20987de2a1e4b9
 pull_request:
   number: null
   url: null
@@ -21,7 +21,7 @@ merge_method: squash
 predecessor_gate:
   gate: G3_PR
   approval_id: APPROVE_G2_EXECUTION_260_20260805_R1
-  scope_hash_16: 025cf9dd61864099
+  scope_hash_16: 5b2a8cc25a930ad5
   outcome: pending_review
 modules_or_files:
 - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
@@ -53,9 +53,9 @@ preconditions:
 - id: PRE-3
   requirement: PR marked ready for review before merge (draft cannot be merged)
   status: pending_pr
-scope_hash: sha256:025cf9dd6186409973c6197882b89c47f86710b38bfbfb73896b564745c5c3a1
-scope_hash_16: 025cf9dd61864099
-approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_260_20260805 025cf9dd61864099 2026-08-06T10:05:00Z'
+scope_hash: sha256:5b2a8cc25a930ad50684d2df5afd2a991ea4aec5ea26f7098ca1ff0b0fe2eea5
+scope_hash_16: 5b2a8cc25a930ad5
+approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_260_20260805 5b2a8cc25a930ad5 2026-08-06T11:30:00Z'
 exclusions:
 - G5_DEPLOY
 - G6_PRODUCTION_DATA
