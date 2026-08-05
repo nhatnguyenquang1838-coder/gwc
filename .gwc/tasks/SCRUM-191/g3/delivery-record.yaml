@@ -7,8 +7,8 @@ base_ref: main
 base_sha: 54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337
 working_branch: hermes/scrum-191-g2-envelope-render-20260805
 pull_request:
-  number: null
-  url: null
+  number: 223
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/223
   draft: true
 head_sha: 41e8e89c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
 scope_hash: sha256:c236c4fa8e1f344ad098c00fc91bcd6b93d68f06b905ee01f36ec979c327769f
