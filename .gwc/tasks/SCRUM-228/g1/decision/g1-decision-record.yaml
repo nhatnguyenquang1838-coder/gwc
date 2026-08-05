@@ -1,0 +1,68 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T14:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-228
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-05T14:30:00Z'
+  source: 'G2_EXECUTION approval requested in thread for SCRUM-228 (Slack C0BNF9CFXC0); refreshed G0/G1 materialized per governance requirement after SCRUM-227 merge.'
+  explicit: true
+rationale: >-
+  Build the isolated read-only projection-privacy-boundary-check evaluator, closed
+  decision schema and focused fixture suite named in the issue. This preserves the
+  thin read_only node-descriptor boundary and keeps the blast radius narrow,
+  matching the SCRUM-227 family convention and the ticket's stated design decision.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:20ba9ca985715f51420198982753eb6a21d3e1f1afaa0352d5fdb8729f5d5312
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Author schemas/projection-privacy-decision.schema.json with the closed result contract, 12 classification classes, 16 reason codes and authority-false invariants; add RED-first tests to tests/test_sync_projection_m4_batch_b1.py (clean metadata, safe redaction, unclassified protected key, each prohibited class, policy denial, invalid directive, size/depth limits, recursive key detection, leak rejection, digest stability/drift, authority constants).
+  - sub_task_id: SUB-TASK-2
+    description: Build tools/node_architect/projection_privacy_boundary_check.py as the isolated pure sanitizer/evaluator (11-step precedence, recursive protected-key detection, target-policy evaluation, safe redaction/removal, leakage scan, order-independent sanitized/decision digests).
+  - sub_task_id: SUB-TASK-3
+    description: Extend the shared node descriptor, family validator, catalogue tests and README with the static-to-runtime mapping and B1 golden flow (source-authority READY -> evidence eligible -> privacy APPROVED/REDACTED); confirm blocked source authority or prohibited data never reaches a target projection.
+  - sub_task_id: SUB-TASK-4
+    description: Run the exact-head regression and CI set (ProjectionPrivacyBoundaryTests, full sync_projection_m4_batch_b1, node_catalog_sync_projection, validate_node_catalog_sync_projection.py) and require exact PR-head validation plus build CI success.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-governance
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-2
+    skill_id: gwc-governance
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: gwc-governance
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-4
+    skill_id: gwc-governance
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
