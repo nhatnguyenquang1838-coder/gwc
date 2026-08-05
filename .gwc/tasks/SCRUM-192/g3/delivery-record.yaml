@@ -7,8 +7,8 @@ base_ref: main
 base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
 working_branch: hermes/scrum-192-blocked-action-escalation-20260805
 pull_request:
-  number: null
-  url: null
+  number: 225
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/225
   draft: true
 head_sha: 5aa4d1bc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
 scope_hash: sha256:596db76fca909a8803e3409866b3dc4309b916136e5cb2889bd8210e1fff8833
