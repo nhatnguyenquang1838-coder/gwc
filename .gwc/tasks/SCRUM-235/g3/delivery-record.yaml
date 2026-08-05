@@ -1,45 +1,115 @@
 schema_version: '1.0'
 artifact_type: g3-delivery-record
-generated_at: '2026-08-05T03:10:00Z'
-trace:
-  project_id: gwc
-  repository: nhatnguyenquang1838-coder/gwc
-  task_id: SCRUM-235
-  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
-  g0_snapshot: ../g0/context-snapshot.yaml
-g2_ref: ../g2/execution-envelope.yaml
-approval:
-  g2_command: 'APPROVE G2_EXECUTION SCRUM-235 a56c11ca 2026-08-06T02:33:08Z'
-  scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
-repository:
-  full_name: nhatnguyenquang1838-coder/gwc
-  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
-  head_sha: ad6435fc3b003be7bd8d41b8c90d78c6637503f5
-  working_branch: hermes/scrum-235-deterministic-hash-verification-m5-20260805
-  protected_branches:
-  - main
+gate: G3_PR
+task_id: SCRUM-235
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+working_branch: hermes/scrum-235-deterministic-hash-verification-m5-20260805
 pull_request:
   number: 213
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/213
   draft: true
-  base: main
-  head: hermes/scrum-235-deterministic-hash-verification-m5-20260805
-delivery_outcome: PASS
-validation:
-  g1_validator: PASS
-  new_test_suite: 13 passed
-  smoke_verifier: ok (262 entries, unchanged)
-  pre_existing_unrelated_failures: tests/package_export/test_target_path_safety_check.py (6, fail on clean main, out of scope)
-changed_files:
+head_sha: ad6435fc3b003be7bd8d41b8c90d78c6637503f5
+scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+changed_paths:
 - tools/node_architect/package_export/deterministic_hash_verification.py
 - schemas/node-architect/package-export/deterministic-hash-verification.schema.json
 - tests/package_export/test_deterministic_hash_verification.py
-scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
-next_gate: G4_MERGE
-authority_boundaries:
-  grants: []
-  excluded:
-  - G4_MERGE
-  - G5_DEPLOY
-  - G6_PRODUCTION
-g3_outcome: PASS
+validation:
+  head_sha: ad6435fc3b003be7bd8d41b8c90d78c6637503f5
+  status: pass
+  commands:
+  - command: tools/validate_g01.py --root . --workspace .gwc/tasks/SCRUM-235 --json
+    result: pass
+    evidence: '{"outcome":"PASS","valid":true,"issues":[]}'
+  - command: pytest tests/package_export/test_deterministic_hash_verification.py -q
+    result: pass
+    evidence: 13 passed
+  - command: python3 tools/verify_package_export_smoke.py --root . --package projects/gwc/package.yaml --source-ref HEAD --source-base-sha 78d596242a9e042d62d6174afc40aa4976eb3285
+    result: pass
+    evidence: '{"ok":true,"copied_entries":262,"entries":262,"skipped_optional_entries":0}'
+review:
+  implementer_id: Hermes
+  reviewer_id: Hermes
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: ad6435fc3b003be7bd8d41b8c90d78c6637503f5
+  reviewed_scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+  reviewed_at: '2026-08-05T03:10:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - AC-1..AC-4 mapped from SCRUM-235 description; scope matches in_scope surfaces
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Isolated read-only verifier + closed 0.1 result schema; mirrors SCRUM-234 F7 family convention
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - deterministic_hash_verification.py recomputes exact-byte SHA-256/byte_count; no shared exporter mutated
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - 11 fixtures (exact match, changed source/target, missing/extra target, wrong byte count, wrong manifest digest, unstable order, changed gen time, skipped optional, identical + conflicting replay)
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G0 READY, G1 validate_g01.py PASS, G2 envelope approved, artifacts under .gwc/tasks/SCRUM-235
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Draft PR #213 on guarded branch; no main write; head ad6435f matches record
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - GitHub Actions 'validate' job (validate-instructions.yml) passed on PR #213; g4-receipt-required is a G4 merge gate outside G3 scope
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - 11-scenario fixture suite in tests/package_export/test_deterministic_hash_verification.py
+  - id: AC-2
+    result: pass
+    evidence:
+    - verify_deterministic_hash requires every copied entry AND complete output inventory; subset cannot PASS
+  - id: AC-3
+    result: pass
+    evidence:
+    - read-only (no writes); identical evidence yields identical digest (test_changed_generation_time, test_identical_replay)
+  - id: AC-4
+    result: pass
+    evidence:
+    - existing verify_package_export_smoke.py remains green (262 entries, ok=true)
+  decision: pass
+  stale: false
+ci:
+  required: false
+  head_sha: ad6435fc3b003be7bd8d41b8c90d78c6637503f5
+  checks:
+  - name: validate
+    required: true
+    status: pass
+    evidence: GitHub Actions 'validate' job passed on PR #213 (run 30970903451)
+  - name: g4-receipt-required
+    required: false
+    status: skipped
+    evidence: G4 merge gate; intentionally not satisfied at G3 (no G4 authority receipt yet)
+residual_risks:
+- The 6 pre-existing failures in tests/package_export/test_target_path_safety_check.py are unrelated to this change (fail identically on clean main) and remain out of this task's scope.
+- Independent human review of the exact PR head is still required before G4 merge.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pass
