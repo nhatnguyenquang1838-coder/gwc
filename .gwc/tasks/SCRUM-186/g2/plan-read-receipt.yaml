@@ -1,0 +1,20 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-186_OPT1_20260805
+authority_gate: G2_EXECUTION
+task_id: SCRUM-186
+read_at: '2026-08-05T13:10:00Z'
+reader: Hermes-PC
+readback_source: Jira via Atlassian Rovo
+expected_repository: nhatnguyenquang1838-coder/gwc
+matched_repository: nhatnguyenquang1838-coder/gwc
+expected_base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+readback_base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+base_sha_match: true
+expected_task_id: SCRUM-186
+readback_task_id: SCRUM-186
+task_id_match: true
+expected_approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-186_OPT1_20260805 c3aeacd2a68f9ad6 2026-08-06T13:10:00Z
+received_approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-186_OPT1_20260805 c3aeacd2a68f9ad6 2026-08-06T13:10:00Z
+approval_command_match: true
+scope_hash_16: c3aeacd2a68f9ad6
+within_validity_window: true
+receipt_status: G2_APPROVED

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-approval-request.schema.json",
+  "title": "GWC Gate Approval Request",
+  "description": "Deterministic, non-secret human approval request for one separately gated action. Generation creates a request for authority; it never grants authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "approval_request_id", "task_id",
+    "repository", "gate", "action", "bindings", "scope_hash",
+    "actor_target", "issued_at", "expires_at", "approval_token",
+    "approval_command", "request_digest", "reason_codes",
+    "primary_reason_code", "authority_granted", "consumed"
+  ],
+  "$defs": {
+    "gate_short": {
+      "type": "string",
+      "enum": ["G2", "G4", "G5", "G6"]
+    },
+    "sha40": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "token64": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-approval-request"},
+    "approval_request_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "gate": {"type": "string", "enum": ["G2_EXECUTION", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "action": {"type": "string", "minLength": 1},
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_sha", "head_sha", "branch", "scope_hash"],
+      "properties": {
+        "base_sha": {"$ref": "#/$defs/sha40"},
+        "head_sha": {"$ref": "#/$defs/sha40"},
+        "branch": {"type": ["string", "null"], "minLength": 1},
+        "pr_number": {"type": ["integer", "null"], "minimum": 1},
+        "environment": {"type": ["string", "null"], "minLength": 1},
+        "scope_hash": {"$ref": "#/$defs/scope_hash"}
+      }
+    },
+    "scope_hash": {"$ref": "#/$defs/scope_hash"},
+    "actor_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"type": "string", "enum": ["user", "agent", "system"]},
+        "id": {"type": "string", "minLength": 1},
+        "display_name": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "approval_token": {"$ref": "#/$defs/token64"},
+    "approval_command": {"type": "string", "minLength": 1},
+    "request_digest": {"$ref": "#/$defs/scope_hash"},
+    "reason_codes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+      "minItems": 1
+    },
+    "primary_reason_code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+    "authority_granted": {"const": false},
+    "consumed": {"const": false}
+  }
+}

@@ -1,0 +1,49 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T09:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-186
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-08-05T09:30:00.000Z'
+  source: 'current chat user message: prepare formal G0/G1 gate artifacts for SCRUM-186 and validate to PASS'
+  explicit: true
+rationale: 'OPT-1 is the smallest compatible implementation of the live Jira contract: a new schema, a pure replay-safe approval-command validation module, and a focused M5 test module. It retains the v1 gate-action-authority schema and validator byte-identical, avoids a serialization window against sibling tasks, and keeps every later-gate action separate.'
+rejected_option_ids: [OPT-2, OPT-3]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6]
+scope_hash: sha256:c3aeacd2a68f9ad6da45a657cf21f21740262f0a063f654c99cc4fb8babda5b1
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Define schemas/gate-approval-validation.schema.json and the canonical approval-validation result contract.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Implement the pure replay-safe approval command validator with exact command, readback binding, expiry, drift, and single-consumption handling.
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: Add the focused M5 test module and confirm the retained v1 action-authority regression suite stays green.
+      dependencies: [SUB-TASK-2]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: dw-task-me
+      agent_type: validator
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3]
+  summary: One atomic OPT-1 implementation lane; no v1 removal, registry, connector, approval issuance, PR, merge, deploy, or production work.

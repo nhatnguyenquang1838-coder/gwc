@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-approval-validation.schema.json",
+  "title": "GWC Gate Approval Validation",
+  "description": "Replay-safe validation of an exact human approval response against the generated request and current readback. The validator never performs the action or grants authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "approval_request_ref", "outcome",
+    "approval_valid", "consumption_key", "reason_codes", "primary_reason_code",
+    "replay_status", "validation_digest", "validated_at"
+  ],
+  "$defs": {
+    "sha40": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "token64": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-approval-validation"},
+    "approval_request_ref": {"type": "string", "minLength": 1},
+    "outcome": {"type": "string", "enum": ["VALID", "INVALID", "BLOCKED"]},
+    "approval_valid": {"type": "boolean"},
+    "consumption_key": {"type": ["string", "null"], "minLength": 1},
+    "reason_codes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+      "minItems": 1
+    },
+    "primary_reason_code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+    "replay_status": {"type": "string", "enum": ["FIRST_SEEN", "IDEMPOTENT_REPLAY", "REPLAY_CONFLICT"]},
+    "validation_digest": {"$ref": "#/$defs/scope_hash"},
+    "validated_at": {"type": "string", "format": "date-time"},
+    "execution_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  }
+}
