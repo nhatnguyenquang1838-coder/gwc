@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T09:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-186
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  profile_path: projects/gwc/project-profile.yaml
+  connector: Git
+checks:
+  - id: BASE_BINDING
+    status: PASS
+    code: BASE_SHA_VERIFIED
+    message: The local checkout and origin/main match the protected-base SHA 7269a5219750b7c4fa7c5229eb95df395fd4712d.
+    evidence: [git rev-parse origin/main, git fetch origin]
+  - id: BASELINE_REANCHORED
+    status: PASS
+    code: BASELINE_DISCREPANCY_RESOLVED
+    message: 'The Jira-quoted baseline predates the SCRUM-188 merge; the snapshot is re-anchored to the observed origin/main head and all policy hashes were recomputed at that head.'
+    evidence: [git rev-parse origin/main, recomputed content sha256 of applicable_policies]
+  - id: TARGET_SCOPE
+    status: PASS
+    code: TARGET_FILES_MATCH
+    message: The Jira create-files list and the recommended OPT-1 scope are identical.
+    evidence: [Jira SCRUM-186 description, G1 intake scope]
+  - id: DEPENDENCIES
+    status: PASS
+    code: DEPENDENCIES_SATISFIED
+    message: SCRUM-185 and SCRUM-188 are the declared prerequisites and are complete; SCRUM-188 is merged into the current base.
+    evidence: [git log origin/main, .gwc/tasks/SCRUM-188/g3/delivery-record.yaml]
+  - id: V1_SURFACE_RETENTION
+    status: PASS
+    code: V1_SURFACE_PRESENT
+    message: The v1 surfaces schemas/gate-action-authority.schema.json and tools/validate_gate_action.py exist at base and are retained by scope.
+    evidence: [git show base:schemas/gate-action-authority.schema.json, git show base:tools/validate_gate_action.py]
+  - id: AUTHORITY_BOUNDARY
+    status: PASS
+    code: NO_EXECUTION_AUTHORITY
+    message: The task grants no execution authority; G4_MERGE, G5_DEPLOY, and G6_PRODUCTION remain excluded.
+    evidence: [G1 decision authority_boundaries, core/GATE_LIFECYCLE_CONTRACT_v1.0.md]
+  - id: TOOLCHAIN
+    status: WARN
+    code: ISOLATED_VALIDATOR_VENV_REQUIRED
+    message: 'The default session interpreter cannot load the repository Draft2020-12 schemas; validation is run from an isolated venv with jsonschema==4.17.3.'
+    evidence: [C:/gwcval186 isolated venv, tools/validate_g01.py run output]
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

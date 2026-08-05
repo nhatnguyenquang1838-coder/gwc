@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T09:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-186
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Isolated pure validation module plus explicit schema and focused M5 tests
+    description: 'Add schemas/gate-approval-validation.schema.json, tools/node_architect/approval_command_validation.py, and tests/test_gate_authority_approval_command_validation_m5.py as a new isolated surface that wraps the retained v1 action-authority contract without rewriting it.'
+    benefits: [Smallest compatible change, v1 surfaces stay byte-identical, replay and single-consumption semantics are directly testable, no serialization window against sibling tasks]
+    tradeoffs: [Final wiring into tools/validate_gate_action.py stays a minimal last-resort edit]
+    risks: [Requires careful expiry, drift, and replay test coverage at a security-sensitive boundary]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Extend the v1 validate_gate_action module in place
+    description: Add approval-command validation directly inside tools/validate_gate_action.py and the v1 schema instead of a new module.
+    benefits: [Single entry point for all gate-action validation]
+    tradeoffs: [Mutates a shared, already-green governance surface and forces a serialization window]
+    risks: [Regression of the v1 action-authority contract and scope drift beyond the Jira create-files list]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Documentation-only contract note
+    description: Describe the approval-command validation rules without adding executable behavior or tests.
+    benefits: [Lowest code risk]
+    tradeoffs: [Does not satisfy the requested runtime files or acceptance criteria]
+    risks: [Leaves approval replay and drift unenforced]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract, keeps the retained v1 action-authority surface untouched, and confines replay-safety logic to a new pure module with focused M5 coverage.
+decision_required: true
+status: READY
