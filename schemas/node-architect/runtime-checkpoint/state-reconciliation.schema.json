@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.local/schemas/node-architect/runtime-checkpoint/state-reconciliation.schema.json",
+  "title": "GWC Runtime Checkpoint State Reconciliation Result",
+  "description": "Authority-free reconciliation evidence for node runtime_checkpoint.state-reconciliation (SCRUM-209). Deterministic route matrix (first match wins): LEASE_DRIFT->ABORT_STALE_WORKER; UNKNOWN_WRITE->STOP_BLOCKED; EVIDENCE_MISSING->STOP_BLOCKED; APPROVAL_DRIFT->REAPPROVAL_REQUIRED; CAS_DRIFT->REPAIR; BASE_DRIFT/HEAD_DRIFT/SCOPE_DRIFT->REPAIR; COMMITTED_BEFORE_RESPONSE->RESUME (idempotent replay); NONE->RESUME. Exact-head CI verification is an external gate recorded via exact_head_ci_verified; this node never grants merge, deploy, or production authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "task_id",
+    "idempotency_key",
+    "route",
+    "drift_classification",
+    "outcome",
+    "reason",
+    "result_digest"
+  ],
+  "properties": {
+    "schema_id": {
+      "const": "gwc.runtime_checkpoint.state_reconciliation"
+    },
+    "schema_version": {
+      "enum": ["0.1"]
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "route": {
+      "$ref": "#/definitions/route"
+    },
+    "drift_classification": {
+      "$ref": "#/definitions/driftClassification"
+    },
+    "outcome": {
+      "enum": ["PASS", "FAIL"]
+    },
+    "reason": {
+      "$ref": "#/definitions/reasonCode"
+    },
+    "exact_head_ci_verified": {
+      "type": "boolean",
+      "description": "True only when external CI evidence exists for the exact current head SHA. Never synthesised by the node."
+    },
+    "authority_granted": {
+      "const": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "result_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Deterministic digest over the result content excluding observational fields (timestamps, run ids, worker id)."
+    }
+  },
+  "definitions": {
+    "route": {
+      "enum": [
+        "RESUME",
+        "REPAIR",
+        "REAPPROVAL_REQUIRED",
+        "ABORT_STALE_WORKER",
+        "STOP_BLOCKED"
+      ]
+    },
+    "reasonCode": {
+      "description": "Closed reason-code taxonomy. Extending it requires a schema_version bump.",
+      "enum": [
+        "RECONCILED_RESUME",
+        "RECONCILED_REPAIR",
+        "RECONCILED_REAPPROVAL_REQUIRED",
+        "ABORT_STALE_WORKER",
+        "STOP_BLOCKED",
+        "EVIDENCE_UNAVAILABLE",
+        "DRIFT_DETECTED",
+        "IDEMPOTENT_REPLAY"
+      ]
+    },
+    "driftClassification": {
+      "enum": [
+        "NONE",
+        "BASE_DRIFT",
+        "HEAD_DRIFT",
+        "SCOPE_DRIFT",
+        "APPROVAL_DRIFT",
+        "LEASE_DRIFT",
+        "CAS_DRIFT",
+        "UNKNOWN_WRITE",
+        "COMMITTED_BEFORE_RESPONSE",
+        "EVIDENCE_MISSING"
+      ]
+    }
+  }
+}

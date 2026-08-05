@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: delivery-record
+authority_gate: G3_PR
+task_id: SCRUM-209
+issued_at: '2026-08-05T10:00:00Z'
+base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+working_branch: fastlane/SCRUM-209-hermes
+head_sha: 5d1cbb746c6e77ef993560233f4d8e169b98f224
+scope_hash: sha256:f693b7593425834e4a52cb446ed2d1a11abe1e21edc201d0e0de4b51279a8d76
+scope_hash_16: f693b7593425834e
+g2_approval_id: APPROVE_G2_EXECUTION_209_20260805_R1
+implementation_summary: >-
+  Added the runtime_checkpoint.state-reconciliation node implementation
+  (M2 -> M5_REPLAY_SAFE) for the runtime_checkpoint family. Pure, authority-free
+  evidence generator reads task, repo, branch/PR, checkpoint, runtime event, lease,
+  CAS revision, approval envelope, and CI/status evidence; classifies drift; and
+  routes deterministically to RESUME / REPAIR / REAPPROVAL_REQUIRED /
+  ABORT_STALE_WORKER / STOP_BLOCKED. Never grants merge/deploy/production authority.
+  Deterministic result digest; idempotent replay; closed reason-code taxonomy.
+files_changed:
+- tools/node_architect/runtime_checkpoint/state_reconciliation.py
+- schemas/node-architect/runtime-checkpoint/state-reconciliation.schema.json
+- tests/runtime_checkpoint/test_state_reconciliation.py
+validation:
+- command: python3 -m unittest discover -s tests/runtime_checkpoint -p 'test_*.py'
+  result: 16 passed
+- command: python3 tools/node_architect/validate_node_catalog_runtime_checkpoint.py
+  result: PASS (runtime_checkpoint node catalog)
+next_gate: G3_PR
+pr_required: true
+review_status: PENDING_INDEPENDENT_REVIEW
+# NOTE: full G3 validation (validate_g3_delivery.py) requires an independent
+# reviewer_id, per-lane findings with pass decisions, and CI checks bound to a
+# Draft PR head_sha. Those inputs do not exist yet (no PR, no CI run, no
+# independent reviewer). This delivery-record is the implementation summary only;
+# outcome is intentionally left pending_review and must not be asserted as pass.
+outcome: pending_review

@@ -251,9 +251,108 @@ The user retains sole authority to grant or deny the next gate. The agent's proa
 | Manually deploy, redeploy, publish, release, or reload runtime | G5_DEPLOY with explicit manual action scope |
 | Read/write production data, production config, migration, credential rotation, or secret operation | G6_PRODUCTION_DATA |
 
+## Lane integrity and evidence readback
+
+This section is normative for every governed agent before a repository write and
+after a G4 approval. It exists to prevent lane drift, foreign working-tree
+contamination, missing trusted receipts, and status claims bound to stale or
+adjacent CI.
+
+### Pre-write lane assertion
+
+Before the first repository write of a session, and again after any change of
+task, branch, worktree, or base SHA, the agent MUST emit a compact lane
+assertion and MUST NOT write until it is emitted and self-consistent:
+
+```text
+LANE ASSERTION
+task:        <task-id>
+branch:      <working-branch>            # never a protected branch
+worktree:    <absolute-checkout-path>
+base_sha:    <exact-base-sha>
+deliverable: <one-line scope of this lane>
+```
+
+Blocking conditions:
+
+- the resolved branch is `main` or another protected branch -> the write is
+  refused with `GATE_ACTION_NOT_AUTHORIZED`;
+- the worktree path does not match the task lane -> `LANE_DRIFT_DETECTED`;
+- the assertion is absent -> `LANE_ASSERTION_MISSING`.
+
+### Foreign dirty state
+
+Before staging, the agent MUST list the working-tree changes and classify every
+path as either in-lane (produced by the current task) or FOREIGN DIRTY STATE
+(pre-existing modifications belonging to another task family, another agent
+run, or generated runtime output).
+
+Rules:
+
+1. report foreign paths explicitly under the label `FOREIGN DIRTY STATE`, with a
+   count and representative paths;
+2. never `git add -A`, `git add .`, or `git commit -a` when foreign dirty state
+   exists;
+3. stage only explicit in-lane paths;
+4. do not revert, clean, or otherwise mutate foreign paths — preservation is the
+   default; removal requires a separate authorized change;
+5. when foreign paths cannot be classified with confidence, fail closed with
+   `FOREIGN_DIRTY_STATE_DETECTED` and ask the operator.
+
+### Post-approval readback
+
+After an exact human G4 approval comment is posted, the chain is NOT healthy
+until BOTH of the following are read back and reported:
+
+1. the `issue_comment` workflow run triggered by that comment — exact run ID,
+   status, and conclusion;
+2. the trusted bot receipt comment `gwc:g4-authority-receipt` — posted by the
+   trusted bot identity, bound to the same approval ID, approved head SHA, and
+   scope hash.
+
+If either is missing, the state is `G4_RECEIPT_MISSING` and merge must not be
+treated as authorized on the strength of the human comment alone.
+
+### Fail-closed recovery path
+
+If a trusted G4 receipt is missing after merge, the agent MUST fail closed and
+MUST NOT infer authority from adjacent evidence. It reports
+`G4_RECEIPT_MISSING` and directs the operator to the bootstrap recovery
+command rather than leaving diagnosis implicit:
+
+```text
+APPROVE G5 RECOVERY <recovery_id> <repo> <pr> <approval_id> <scope> <head> <merge> <validate_run> <build_run> <source_digest> <expires>
+```
+
+Any recovered evidence MUST bind:
+
+- `<head>`: the exact approved head SHA (not the branch tip at read time);
+- `<merge>`: the exact merge commit SHA;
+- `<validate_run>` and `<build_run>`: run IDs of successful `push`-to-`main`
+  runs whose `head_sha` equals `<merge>` exactly;
+- `<source_digest>`: provenance binding for the recovered evidence payload;
+- `<expires>`: an unexpired UTC timestamp at use time.
+
+A recovery that cannot satisfy every binding is `RECOVERY_EVIDENCE_UNBOUND` and
+must not be reported as recovered.
+
+### Exact-binding status reporting
+
+Final governed status for merge and recovery lanes MUST bind each claim to
+exact SHAs and exact workflow run IDs. Prohibited: "CI is green", latest-run
+lookups, branch-tip lookups, PR-filtered results without exact `head_sha`
+match, and runs from adjacent or superseded commits. A status that cannot cite
+the exact merge SHA and the exact run IDs is reported as
+`CONNECTOR_OBSERVABILITY_INCOMPLETE` or `SHA_MISMATCH`, never as `success`.
+
 ## Failure codes
 
 ```text
+LANE_ASSERTION_MISSING
+LANE_DRIFT_DETECTED
+FOREIGN_DIRTY_STATE_DETECTED
+G4_RECEIPT_MISSING
+RECOVERY_EVIDENCE_UNBOUND
 GATE_ARTIFACT_MISSING
 GATE_ARTIFACT_INVALID
 GATE_SEQUENCE_INVALID
