@@ -1,0 +1,54 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-185_OPT1_20260805
+authority_gate: G2_EXECUTION
+task_id: SCRUM-185
+issued_at: '2026-08-05T13:05:00Z'
+expires_at: '2026-08-06T13:05:00Z'
+scope_version: 7
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+prior_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+working_branch: hermes/scrum-185-approval-token-20260805
+prior_head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+modules_or_files:
+  - .gwc/tasks/SCRUM-185/**
+  - schemas/gate-approval-request.schema.json
+  - tools/node_architect/approval_token_generation.py
+  - tests/test_gate_authority_approval_token_generation_m4.py
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - modify_files_outside_approved_scope
+  - repair_unrelated_baseline_governance_tests
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - branch_deletion
+  - protected_branch_write
+  - pr_base_change
+scope_hash: sha256:9f3c1de6b0aa4d5eb2c78f0a1d64e3b5c8971a2e40db6f8c5a3b1e7d29c04f68
+scope_hash_16: 9f3c1de6b0aa4d5e
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-185_OPT1_20260805 9f3c1de6b0aa4d5e 2026-08-06T13:05:00Z
+work_item:
+  provider: Jira via Atlassian Rovo
+  id: SCRUM-185
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: To Do
+  review_state: G2 execution approved for OPT-1 (approval-token-generation). Implement closed schema, pure deterministic generator and focused M4 tests on a guarded working branch; no PR/merge/deploy. Reclaimed from unclaimed by Hermes-PC.
