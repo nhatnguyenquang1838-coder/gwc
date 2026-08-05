@@ -1,0 +1,70 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T13:30:00Z'
+task_id: SCRUM-237
+title: '[MAT-F7-N09] package_export.export-failure-routing — M1 → M5_REPLAY_SAFE'
+parent: SCRUM-172
+status: To Do
+summary: >-
+  Route manifest, schema, path, build, hash and smoke failures to one
+  deterministic bounded next action without publishing an invalid package
+  or repeating an unknown effect.
+source:
+  type: jira
+  url: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-237
+  baseline_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+upstream_dependencies:
+- SCRUM-236 (done on main; smoke contract verified)
+- SCRUM-235 (deterministic-hash-verification)
+- SCRUM-234 (export-manifest-generation)
+- SCRUM-233 (governance-tree-build)
+- SCRUM-232 (source-path-safety)
+- SCRUM-231 (target-path-safety)
+- SCRUM-230 (entry-schema-validation)
+- SCRUM-229 (deterministic-hash-verification)
+reason_codes_required:
+- EXPORT_REPAIR_INPUT
+- EXPORT_REBUILD_STAGING
+- EXPORT_REVERIFY_READBACK
+- EXPORT_BOUNDED_RETRY
+- EXPORT_HUMAN_REQUIRED
+- EXPORT_FAIL_CLOSED
+- EXPORT_RETRY_EXHAUSTED
+- EXPORT_UNKNOWN_OUTCOME
+- EXPORT_REPLAY_CONFLICT
+- EXPORT_AUTHORITY_VIOLATION
+- EXPORT_FAILURE_UNMAPPED
+acceptance_criteria:
+- id: AC-1
+  desc: >-
+    Decision-table fixtures cover every upstream reason namespace from
+    SCRUM-229-236, including malformed manifest, unsafe source/target,
+    optional skip, missing required source, partial tree, stale source,
+    manifest conflict, hash mismatch, smoke timeout and unknown outcome.
+- id: AC-2
+  desc: >-
+    Unsafe, contradictory, stale or unmapped conditions never route to
+    automatic success or publication.
+- id: AC-3
+  desc: >-
+    Retry is bounded by count/deadline and requires an explicitly
+    retryable reason plus reconciled zero/known effect.
+- id: AC-4
+  desc: >-
+    Same canonical failure evidence produces the same route/digest with
+    no duplicate external or filesystem effect.
+- id: AC-5
+  desc: >-
+    Family golden flows cover: clean success chain, repairable input
+    failure, partial-build reconciliation, identical replay, conflicting
+    replay and terminal fail-closed.
+- id: AC-6
+  desc: >-
+    validate_node_catalog_package_export.py, family README/runtime
+    mappings and final integration tests cover exactly nine nodes while
+    preserving canonical=delivery_evidence, g2_required and G2/G3-only
+    applicability.
+- id: AC-7
+  desc: Existing exporter, manifest schema, instruction validation and smoke tests remain green.
+- id: AC-8
+  desc: Exact PR-head CI and independent G3 review have no unresolved blocker/major finding.

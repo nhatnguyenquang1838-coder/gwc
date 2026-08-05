@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/package-export/export-failure-routing.schema.json",
+  "title": "Export Failure Routing result",
+  "description": "Closed, versioned runtime contract for the export failure routing evaluator (SCRUM-237, M5_REPLAY_SAFE). The typed result is the only PASS signal; it never grants repository, PR, merge, deploy or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "task_id",
+    "source_sha",
+    "package_version",
+    "idempotency_key",
+    "decision_digest",
+    "outcome",
+    "route",
+    "reason_code"
+  ],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "const": "gwc.package_export.export_failure_routing"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["0.1"]
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Governed task identity that produced this routing result."
+    },
+    "source_sha": {
+      "type": "string",
+      "description": "Source snapshot commit SHA the routing decision was produced from.",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "package_version": {
+      "type": "string",
+      "description": "Consumer package version identity."
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Replay identity. Same key + same decision_digest is an idempotent replay."
+    },
+    "decision_digest": {
+      "type": "string",
+      "description": "Canonical semantic digest of the routing input.",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["ROUTED", "FAIL"]
+    },
+    "route": {
+      "type": "string",
+      "enum": [
+        "REPAIR_INPUT",
+        "REBUILD_STAGING",
+        "REVERIFY_READBACK",
+        "BOUNDED_RETRY",
+        "HUMAN_REQUIRED",
+        "FAIL_CLOSED"
+      ]
+    },
+    "reason_code": {
+      "type": "string",
+      "enum": [
+        "EXPORT_REPAIR_INPUT",
+        "EXPORT_REBUILD_STAGING",
+        "EXPORT_REVERIFY_READBACK",
+        "EXPORT_BOUNDED_RETRY",
+        "EXPORT_HUMAN_REQUIRED",
+        "EXPORT_FAIL_CLOSED",
+        "EXPORT_RETRY_EXHAUSTED",
+        "EXPORT_UNKNOWN_OUTCOME",
+        "EXPORT_REPLAY_CONFLICT",
+        "EXPORT_AUTHORITY_VIOLATION",
+        "EXPORT_FAILURE_UNMAPPED"
+      ]
+    },
+    "retry_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many retries have already been attempted for this evidence key."
+    },
+    "retry_deadline_seconds": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "Maximum seconds a bounded retry may span. Null when route is not BOUNDED_RETRY."
+    },
+    "prohibited_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["publish", "release", "merge", "deploy", "consumer_mutation", "later_gate_authority"]
+      },
+      "description": "Actions explicitly prohibited by this route decision."
+    },
+    "detail": {
+      "type": "string",
+      "description": "Human-readable explanation of the routing decision."
+    }
+  }
+}

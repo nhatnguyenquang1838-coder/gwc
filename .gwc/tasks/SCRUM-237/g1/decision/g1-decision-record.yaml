@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T13:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-237
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-05T13:30:00Z'
+  source: 'G2_EXECUTION approval requested in thread for SCRUM-237; G0/G1 materialized per governance requirement (user elected Run formal G1).'
+  explicit: true
+rationale: >-
+  Build the isolated export failure routing module with closed
+  reason-code taxonomy, deterministic idempotency key, and
+  bounded retry. Follows the SCRUM-234 family convention and
+  keeps the blast radius narrow.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+- AC-8
+scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION

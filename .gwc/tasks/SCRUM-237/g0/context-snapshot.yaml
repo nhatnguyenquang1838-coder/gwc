@@ -1,0 +1,58 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-05T13:30:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G2 scope is the export-failure-routing evaluator, its closed result schema and focused fixtures only
+- fresh isolated module under tools/node_architect/package_export; shared exporter and existing smoke verifier are not mutated
+- no archive publication, consumer repository write, package-version bump or deletion
+- no merge/deploy/release/production/credential work (merge is human/fastlane authority per G2 envelope excluded_actions)
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: ff344ce265df0747a3a0f5dfa184f619485283f95263d920d58e39adbc5a7678
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: 6cbc94ff73d9f9e6e1650cb57c8be4f5a678eff8c615eef77c2a24a5964b85fa
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: e45a706654915b1e02c0ce895420495f9299f9d62422509fa5453f812c874af
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+sources:
+- path: core/node-architect/node-catalog/package_export/export-failure-routing.node.json
+  required: true
+  status: AVAILABLE
+  source_sha: 41e4bdd74cceff5e66cfa69856dff11f6aafe814
+- path: tools/node_architect/package_export/export_manifest_generation.py
+  required: true
+  status: AVAILABLE
+  source_sha: 9e7a8164b1d13b3149003e709782744c6a0a74a3
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  required: true
+  status: AVAILABLE
+  source_sha: 02900ca28d8cc8c51a994e9635ba0f82947edba5
+- path: tools/verify_package_export_smoke.py
+  required: true
+  status: AVAILABLE
+  source_sha: bab48e639a97edc07b9452cf4fdd07101992eb29de4e13e17713b3f495f2a5aa

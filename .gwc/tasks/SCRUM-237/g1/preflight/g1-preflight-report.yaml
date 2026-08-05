@@ -1,0 +1,57 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T13:30:00Z'
+task_id: SCRUM-237
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+working_branch: hermes/scrum-237-export-failure-routing-20260805
+risk_class: G2_HUMAN_DIRECTION
+required_gate: G2_HUMAN_DIRECTION
+applicable_policies:
+- AGENTS.md (v1.0, sha ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48)
+- core/Coding_Project_Governance_v1.0.md (v1.0)
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md (v1.0)
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md (v1.0)
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- agents/chatgpt-agent/agent-instructions.md
+- agents/dwc/agent-instructions.md
+- core/GATE_APPROVAL_BEHAVIOR_RESCUE_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+preexisting_scope_check:
+  result: PREEXISTING_SCOPE_NOOP
+  note: >-
+    export-failure-routing.node.json descriptor is already on
+    origin/main (SCRUM-236 merged). The node definition is
+    metadata-only (node_id, canonical, authority_boundary, gates)
+    and does NOT list the files the implementation may touch.
+    Authorized paths are derived from the SCRUM-234 precedent
+    (export_manifest_generation) in the same package_export node family.
+implementation_plan:
+  - path: tools/node_architect/package_export/export_failure_routing.py
+    action: create
+    desc: >-
+      Fresh isolated module under package_export. Routes typed
+      upstream outcomes to one of six bounded actions: REPAIR_INPUT,
+      REBUILD_STAGING, REVERIFY_READBACK, BOUNDED_RETRY,
+      HUMAN_REQUIRED, FAIL_CLOSED. Closed reason-code taxonomy;
+      deterministic idempotency key; no publish/merge/deploy authority.
+  - path: schemas/node-architect/package-export/export-failure-routing.schema.json
+    action: create
+    desc: >-
+      Closed result schema mirroring the export-manifest-generation
+      schema pattern. schema_id = gwc.package_export.export_failure_routing.
+  - path: tests/package_export/test_export_failure_routing.py
+    action: create
+    desc: >-
+      Focused fixture suite covering: clean success, repairable
+      input, partial-build reconciliation, identical replay,
+      conflicting replay, terminal fail-closed, and all 11 reason
+      codes.
+  - path: tools/node_architect/validate_node_catalog_package_export.py
+    action: verify-as-prerequisite
+    desc: Already on main; run before push to confirm nine nodes.
+validation:
+  - PYTHONPATH=tools python -m unittest tests.package_export.test_export_failure_routing -v
+  - PYTHONPATH=tools python tools/node_architect/validate_node_catalog_package_export.py --root .
+  - PYTHONPATH=tools python -m unittest tests.package_export -v (family regression)
+  - PYTHONPATH=tools python -m unittest tests.test_package_export_smoke -v (smoke contract)
