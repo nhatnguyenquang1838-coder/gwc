@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: delivery-record
+authority_gate: G3_PR
+task_id: SCRUM-260
+issued_at: '2026-08-05T10:00:00Z'
+base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+working_branch: fastlane/SCRUM-260-hermes
+head_sha: fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+scope_hash: sha256:025cf9dd6186409973c6197882b89c47f86710b38bfbfb73896b564745c5c3a1
+scope_hash_16: 025cf9dd61864099
+g2_approval_id: APPROVE_G2_EXECUTION_260_20260805_R1
+implementation_summary: >-
+  Hardened governance against lane drift, missing receipts, and stale foreign
+  state. Added a normative "Lane integrity and evidence readback" section to
+  core/GATE_LIFECYCLE_CONTRACT_v1.0.md with 5 new failure codes
+  (LANE_ASSERTION_MISSING, LANE_DRIFT_DETECTED, FOREIGN_DIRTY_STATE_DETECTED,
+  G4_RECEIPT_MISSING, RECOVERY_EVIDENCE_UNBOUND). Added enforceable agent-side
+  checklists (pre-write lane assertion, foreign-dirty-state detection/report,
+  post-G4 receipt readback, fail-closed -> recovery) to all three agent
+  instruction files. Added tests/test_g4_g5_evidence_structure.py asserting the
+  g4-g5-evidence workflow has no duplicate top-level jobs and the expected 4 jobs.
+  The workflow YAML itself was already correct and left unchanged.
+files_changed:
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- agents/chatgpt-agent/agent-instructions.md
+- agents/dwc/agent-instructions.md
+- agents/instructionops-agent/agent-instructions.md
+- tests/test_g4_g5_evidence_structure.py
+validation:
+- command: python3 -m unittest tests.test_g4_g5_evidence_structure
+  result: 7 passed
+- command: python3 -m unittest discover -s tests -p 'test_*.py'
+  result: 782 ran, 12 errors — identical to pre-existing baseline (verified on untouched SCRUM-209 base); NOT introduced by this change
+next_gate: G3_PR
+pr_required: true
+review_status: PENDING_INDEPENDENT_REVIEW
+# NOTE: same as SCRUM-209 — full G3 validation (validate_g3_delivery.py) requires
+# independent review, per-lane findings, and CI checks bound to a Draft PR. Not
+# yet satisfied. This is the implementation summary only; outcome is pending_review.
+outcome: pending_review

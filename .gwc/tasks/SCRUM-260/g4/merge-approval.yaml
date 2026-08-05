@@ -1,0 +1,62 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+status: PENDING_HUMAN_APPROVAL
+approval_id: APPROVE_G4_MERGE_260_20260805
+task_id: SCRUM-260
+issued_at: '2026-08-05T10:05:00Z'
+expires_at: '2026-08-06T10:05:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+working_branch: fastlane/SCRUM-260-hermes
+head_sha: 03b138e7f19488b4e826b296ed20987de2a1e4b9
+pull_request:
+  number: null
+  url: null
+  draft: true
+  mergeable: PENDING_PR
+merge_method: squash
+predecessor_gate:
+  gate: G3_PR
+  approval_id: APPROVE_G2_EXECUTION_260_20260805_R1
+  scope_hash_16: 5b2a8cc25a930ad5
+  outcome: pending_review
+modules_or_files:
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- agents/chatgpt-agent/agent-instructions.md
+- agents/dwc/agent-instructions.md
+- agents/instructionops-agent/agent-instructions.md
+- tests/test_g4_g5_evidence_structure.py
+- .gwc/tasks/SCRUM-260/**
+authorized_actions:
+- mark_pr_ready_for_review
+- merge_approved_pr
+excluded_actions:
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+preconditions:
+- id: PRE-1
+  requirement: All required CI checks SUCCESS on head fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+  status: pending_pr_and_ci
+- id: PRE-2
+  requirement: PR base is main and head equals the approval-bound head_sha
+  status: pending_pr
+- id: PRE-3
+  requirement: PR marked ready for review before merge (draft cannot be merged)
+  status: pending_pr
+scope_hash: sha256:5b2a8cc25a930ad50684d2df5afd2a991ea4aec5ea26f7098ca1ff0b0fe2eea5
+scope_hash_16: 5b2a8cc25a930ad5
+approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_260_20260805 5b2a8cc25a930ad5 2026-08-06T11:30:00Z'
+exclusions:
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pending_human_approval
