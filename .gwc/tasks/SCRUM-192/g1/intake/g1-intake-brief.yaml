@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T23:52:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-192
+  base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement the replay-safe gate_authority.blocked-action-escalation decision contract for SCRUM-192 (final node of batch-f2-b4).
+  why_now: The live Jira task is claimed by canonical agent value Codex for runtime identity Codex-GPT, and the target node remains descriptor-only at the protected base.
+desired_outcome: Add the JSON schema, pure Python escalation evaluator, focused M5 tests, M5 family flow integration, and the shared catalog owner without invoking actions or granting later-gate authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, gate-authority node consumers, batch-f2-b4 deliverables]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-192/** task-scoped GWC evidence
+    - schemas/blocked-action-escalation.schema.json
+    - tools/node_architect/blocked_action_escalation.py
+    - tests/test_gate_authority_blocked_action_escalation_m5.py
+    - tests/test_gate_authority_m5_family_flow.py
+    - tools/node_architect/validate_node_catalog_gate_authority.py
+    - tests/test_node_catalog_gate_authority.py
+    - core/node-architect/node-catalog/gate_authority/README.md
+  non_goals:
+    - Approval generation or validation
+    - Any connector call from the implemented node
+    - Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+constraints:
+  - Preserve fail-closed gate mappings and replay semantics from the Jira contract.
+  - The node must be pure and must never perform the requested action.
+  - G2 approval is required before branch/worktree or repository implementation writes.
+  - G3, G4, G5, and G6 remain separate gates.
+assumptions:
+  - origin/main at 794b55186d9b97b81db8fe99a2def5a99b866754 is the refreshed protected-base evidence.
+  - SCRUM-184..191 are the declared prerequisites and all are Done/merged to main.
+  - The implementation can use the repository's existing Python standard-library and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: The change defines a new escalation schema and behavior contract at a governance boundary.
+    impact: high
+    mitigation: Keep the evaluator pure, fail closed, add explicit tests for every rule, and run existing gate-authority regressions.
+  - id: RISK-2
+    description: Scope creep risk in escalation remediation.
+    impact: medium
+    mitigation: Constrain to checkpoint-before-wait and minimal exact remediation.
+acceptance_criteria:
+  - id: AC-1
+    statement: The escalation schema validates the complete envelope and rejects missing or invalid bindings.
+    verifiable: true
+  - id: AC-2
+    statement: The evaluator enforces checkpoint-before-wait and minimal exact remediation.
+    verifiable: true
+  - id: AC-3
+    statement: The evaluator blocks unauthorized continuation and cannot auto-promote blocked actions.
+    verifiable: true
+  - id: AC-4
+    statement: No output field grants execution, merge, deploy, or production authority, and the node performs no action.
+    verifiable: true
+  - id: AC-5
+    statement: The M5 family flow integration passes across 185/186/190/191/192.
+    verifiable: true
+  - id: AC-6
+    statement: The focused M5 test module and full suite pass at exact head; G2 validator PASS.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+  downstream_non_goals: [open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]
+unresolved_questions: []
+status: READY

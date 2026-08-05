@@ -1,0 +1,64 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T23:54:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-192
+  base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  profile_path: projects/gwc/project-profile.yaml
+  connector: Git
+checks:
+  - id: BASE_BINDING
+    status: PASS
+    code: BASE_SHA_VERIFIED
+    message: The isolated worktree and local origin/main match the protected-base SHA.
+    evidence: [git rev-parse HEAD, git rev-parse origin/main]
+  - id: TARGET_SCOPE
+    status: PASS
+    code: TARGET_FILES_MATCH
+    message: Jira create-files and approved OPT-1 scope are identical.
+    evidence: [Jira SCRUM-192 live description, G1 intake scope]
+  - id: DEPENDENCIES
+    status: PASS
+    code: DEPENDENCIES_SATISFIED
+    message: SCRUM-184..191 are merged to main (projection evidence).
+    evidence: [PRs 219/221/222/223/224]
+  - id: REMOTE_CONNECTIVITY
+    status: PASS
+    code: REMOTE_BASE_VERIFIED
+    message: GitHub remote `origin/main` verified at protected-base `794b55186d9b97b81db8fe99a2def5a99b866754` via `git fetch origin main`.
+    evidence: [GitHub compare readback, git fetch origin main]
+  - id: PLAN_BINDING
+    status: PASS
+    code: TASK_ME_PLAN_VALIDATED
+    message: The implementation plan is bound to SCRUM-192, the exact base SHA, and OPT-1.
+    evidence: [g1/plan/requirements.md, g1/plan/design.md, g1/plan/tasks.md]
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+implementation_plan:
+  applicability: required
+  reason: SCRUM-192 requests implementation and validation planning; the GWC G1 hook requires decomposition.
+  source: task_me
+  task_me_applicable: true
+  task_me_available: true
+  task_me_invoked: true
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-192
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  plan_root: .gwc/tasks/SCRUM-192/g1/plan
+  requirements_path: .gwc/tasks/SCRUM-192/g1/plan/requirements.md
+  design_path: .gwc/tasks/SCRUM-192/g1/plan/design.md
+  tasks_path: .gwc/tasks/SCRUM-192/g1/plan/tasks.md
+  plan_revision: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  validation_status: PASS
+  validation_evidence: Manual plan review against Jira SCRUM-192 contract and OPT-1 scope.
+  generated_by: Hermes-PC
+  generated_at_utc: '2026-08-05T23:54:00Z'
+blockers: []
+outcome: PASS

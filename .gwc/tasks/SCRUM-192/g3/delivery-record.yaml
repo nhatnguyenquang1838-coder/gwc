@@ -1,0 +1,147 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-192
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+working_branch: hermes/scrum-192-blocked-action-escalation-20260805
+pull_request:
+  number: null
+  url: null
+  draft: true
+head_sha: 5aa4d1bc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+scope_hash: sha256:596db76fca909a8803e3409866b3dc4309b916136e5cb2889bd8210e1fff8833
+changed_paths:
+  - .gwc/tasks/SCRUM-192/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-192/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-192/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-192/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-192/g1/plan/design.md
+  - .gwc/tasks/SCRUM-192/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-192/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-192/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-192/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-192/g2/plan-read-receipt.yaml
+  - .gwc/tasks/SCRUM-192/g3/delivery-record.yaml
+  - schemas/blocked-action-escalation.schema.json
+  - tests/test_gate_authority_blocked_action_escalation_m5.py
+  - tests/test_gate_authority_m5_family_flow.py
+  - tests/test_node_catalog_gate_authority.py
+  - tools/node_architect/blocked_action_escalation.py
+  - tools/node_architect/validate_node_catalog_gate_authority.py
+  - core/node-architect/node-catalog/gate_authority/README.md
+validation:
+  head_sha: 5aa4d1bc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_gate_authority_blocked_action_escalation_m5 -q
+      result: pass
+      evidence: 10 tests passed at exact local head 5aa4d1b
+    - command: python3 -m unittest tests.test_gate_authority_m5_family_flow -q
+      result: pass
+      evidence: 5 integration tests passed at exact local head 5aa4d1b
+    - command: python3 -m unittest tests.test_node_catalog_gate_authority -q
+      result: pass
+      evidence: 3 catalog tests passed at exact local head 5aa4d1b
+    - command: python3 -m unittest discover -s tests -q
+      result: pass
+      evidence: full suite passed at exact local head 5aa4d1b
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-192 --gate G2_EXECUTION --json
+      result: pass
+      evidence: validator outcome PASS and valid true with no issues
+review:
+  implementer_id: Hermes-PC
+  reviewer_id: hermes-pc-g3-independent-20260805
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 5aa4d1bc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+  reviewed_scope_hash: sha256:596db76fca909a8803e3409866b3dc4309b916136e5cb2889bd8210e1fff8833
+  reviewed_at: "2026-08-06T00:30:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Replay-safe escalation with checkpoint-before-wait and minimal exact remediation per Jira contract.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Pure evaluator; no execution authority granted.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - escalation_digest deterministic; execution_performed const false.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 10 focused M5 + 5 family flow + 3 catalog tests pass; full suite OK.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope APPROVE_G2_EXECUTION_SCRUM-192_OPT1_20260805 binds exact head 8b71fe5 (rebind 5aa4d1b) and scope_hash_16 596db76fca909a88.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Delivery record includes itself in changed_paths; bound to exact head; no PR mutation performed.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Exact-head readback pending PR creation; Build/Validate instructions will run on Draft PR.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Closed escalation schema validates
+    - id: AC-2
+      result: pass
+      evidence:
+        - Checkpoint-before-wait enforced; minimal exact remediation
+    - id: AC-3
+      result: pass
+      evidence:
+        - No unauthorized continuation; blocked actions cannot auto-promote
+    - id: AC-4
+      result: pass
+      evidence:
+        - M5 family flow integration passes across 185/186/190/191/192
+    - id: AC-5
+      result: pass
+      evidence:
+        - Shared catalog owner validates all 5 nodes
+    - id: AC-6
+      result: pass
+      evidence:
+        - Focused + family + catalog + full suite pass at exact head 5aa4d1b; G2 validator PASS
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 5aa4d1bc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pending
+      evidence: runs on Draft PR
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pending
+      evidence: runs on Draft PR
+    - name: Validate instructions
+      required: true
+      status: pending
+      evidence: runs on Draft PR
+residual_risks:
+  - G4/G5 workflow remains downstream and is not a G3 required check.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass
