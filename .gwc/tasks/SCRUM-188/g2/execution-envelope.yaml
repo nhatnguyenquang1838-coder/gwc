@@ -1,0 +1,47 @@
+approval_id: CP-20260805-188
+authority_gate: G2_EXECUTION
+task_id: SCRUM-188
+issued_at: '2026-08-05T06:20:19Z'
+expires_at: '2026-08-06T06:20:19Z'
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+working_branch: codex/scrum-188-authority-boundary-m5-20260805
+modules_or_files:
+  - .gwc/tasks/SCRUM-188/**
+  - schemas/authority-boundary-decision.schema.json
+  - tools/node_architect/authority_boundary_check.py
+  - tests/test_gate_authority_authority_boundary_check_m5.py
+authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+excluded_actions:
+  - push_working_branch
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - destructive_migration
+  - force_push
+  - branch_deletion
+  - protected_branch_write
+  - pr_base_change
+scope_hash: sha256:6e7a35683be7b9025d1c18349a7f048c8153105823b782d9f1200a919ab65146
+scope_hash_16: 6e7a35683be7b902
+approval_command: APPROVE G2_EXECUTION CP-20260805-188 6e7a35683be7b902 2026-08-06T06:20:19Z
+work_item:
+  provider: Jira via Atlassian Rovo
+  id: SCRUM-188
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: In Progress
+  review_state: G2 approved

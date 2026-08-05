@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/authority-boundary-decision.schema.json",
+  "title": "GWC Authority Boundary Decision",
+  "description": "Pure, replay-safe gate-boundary evaluation. This artifact never grants executable authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "task_id", "repository", "requested_action",
+    "canonical_action", "minimum_gate", "current_gate", "current_gate_status",
+    "decision", "approval_required", "required_approval_gate", "prohibited",
+    "next_authorized_preparation", "reason_codes", "primary_reason_code",
+    "scope_identity", "scope_hash", "current_base_sha", "head_sha", "risk_class",
+    "production_scope_applicable", "manual_g5_action", "event_id_or_idempotency_key",
+    "replay_status", "request_fingerprint", "evaluated_at", "decision_digest",
+    "authority_granted", "execution_authority_granted", "write_authority_granted",
+    "pr_authority_granted", "merge_authority_granted", "deployment_authority_granted",
+    "production_authority_granted"
+  ],
+  "$defs": {
+    "gate": {
+      "type": ["string", "null"],
+      "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA", null]
+    },
+    "sha": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{40}$"
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "authority-boundary-decision"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "requested_action": {"type": "string", "minLength": 1},
+    "canonical_action": {"type": ["string", "null"]},
+    "minimum_gate": {"$ref": "#/$defs/gate"},
+    "current_gate": {"$ref": "#/$defs/gate"},
+    "current_gate_status": {"type": ["string", "null"]},
+    "decision": {"enum": ["ALLOW_PREPARATION", "REQUIRE_APPROVAL", "BLOCK", "NOT_APPLICABLE"]},
+    "approval_required": {"type": "boolean"},
+    "required_approval_gate": {"$ref": "#/$defs/gate"},
+    "prohibited": {"type": "boolean"},
+    "next_authorized_preparation": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "primary_reason_code": {"type": "string", "minLength": 1},
+    "scope_identity": {"type": "object"},
+    "scope_hash": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+    "current_base_sha": {"$ref": "#/$defs/sha"},
+    "head_sha": {"$ref": "#/$defs/sha"},
+    "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+    "production_scope_applicable": {"type": "boolean"},
+    "manual_g5_action": {"type": "boolean"},
+    "event_id_or_idempotency_key": {"type": "string", "minLength": 1},
+    "replay_status": {"enum": ["FIRST_SEEN", "IDEMPOTENT_REPLAY", "REPLAY_CONFLICT"]},
+    "request_fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "evaluated_at": {"type": ["string", "null"], "format": "date-time"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authority_granted": {"const": false},
+    "execution_authority_granted": {"const": false},
+    "write_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  }
+}

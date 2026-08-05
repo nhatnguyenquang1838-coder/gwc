@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T06:21:12Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-188
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Pure evaluator plus explicit schema and focused tests
+    description: Implement the Jira-specified pure decision function, JSON schema, and focused M5 regression module only.
+    benefits: [Smallest compatible change, directly testable, preserves existing registry surface, fail-closed behavior is explicit]
+    tradeoffs: [Registry/descriptor wiring remains a separate follow-up if later required]
+    risks: [Requires careful precedence and replay-digest test coverage]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Broaden implementation into registry and node instruction wiring
+    description: Add evaluator plus descriptor, registry, instruction-card, and runtime route changes in the same task.
+    benefits: [More integrated runtime exposure]
+    tradeoffs: [Larger blast radius and additional contracts]
+    risks: [Scope drift and unapproved public runtime behavior]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Documentation-only contract note
+    description: Document the intended decision mapping without adding executable behavior.
+    benefits: [Lowest code risk]
+    tradeoffs: [Does not satisfy requested runtime files or acceptance criteria]
+    risks: [Leaves the authority boundary unenforced]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract and keeps registry, connector, approval, and runtime route changes out of scope.
+decision_required: true
+status: READY

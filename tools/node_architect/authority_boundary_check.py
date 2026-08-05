@@ -1,0 +1,451 @@
+"""Pure, replay-safe evaluation of one requested GWC authority boundary.
+
+The evaluator describes the minimum gate and the next safe preparation only. It
+never invokes a connector, changes state, or grants execution authority.
+"""
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from datetime import datetime
+import hashlib
+import json
+import re
+from typing import Any
+
+
+GATE_ORDER = (
+    "G0_CONTEXT",
+    "G1_ALIGNMENT",
+    "G2_EXECUTION",
+    "G3_PR",
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION_DATA",
+)
+GATE_INDEX = {gate: index for index, gate in enumerate(GATE_ORDER)}
+VALID_RISK_CLASSES = {"R0", "R1", "R2", "R3"}
+GATE_STATUSES = {"READY", "RUNNING", "PASS", "BLOCKED", "FAILED", "NOT_APPLICABLE"}
+
+
+def _normalize_action(value: Any) -> str:
+    if not isinstance(value, str):
+        return ""
+    return re.sub(r"[^a-z0-9]+", "_", value.strip().lower()).strip("_")
+
+
+def _make_action_map() -> dict[str, str]:
+    groups = {
+        "G0_CONTEXT": {
+            "read", "search", "fetch", "read_repository", "inspect_repository",
+            "inspect_task", "inspect_connector", "read_only_read", "read_only_inspection",
+            "read_search_fetch",
+        },
+        "G1_ALIGNMENT": {
+            "g1_artifact_preparation", "g1_read_only_validation", "materialize_g1_artifacts",
+            "run_read_only_validation", "run_independent_review", "validation",
+            "g1_artifact_read_only_validation",
+        },
+        "G2_EXECUTION": {
+            "branch", "worktree", "file", "files", "modify_file", "modify_approved_files",
+            "commit", "push", "branch_creation", "worktree_creation", "repository_write",
+            "branch_worktree_file_commit_push",
+        },
+        "G3_PR": {
+            "draft_pr", "create_draft_pr", "open_or_update_draft_pr", "ready_for_review",
+            "mark_pr_ready_for_review", "ready_for_review_metadata", "draft_pr_ready_for_review_metadata",
+        },
+        "G4_MERGE": {"merge", "auto_merge", "merge_approved_pr", "enable_auto_merge"},
+        "G5_DEPLOY": {
+            "post_merge_status", "postmerge_status", "verify_post_merge_ci",
+            "read_only_post_merge_status", "g5_status_verify", "status_verification",
+            "deploy", "redeploy", "publish", "release", "runtime_reload",
+            "deploy_approved_release", "manual_deploy", "manual_release",
+        },
+        "G6_PRODUCTION_DATA": {
+            "production_data_read", "production_data_write", "production_data",
+            "production_configuration", "production_config_change", "production_config",
+            "migration", "credential", "credential_rotation", "secret", "secret_operation",
+            "production_secret_operation", "production_data_configuration_migration_credential_secret",
+        },
+    }
+    return {action: gate for gate, actions in groups.items() for action in actions}
+
+
+ACTION_TO_MINIMUM_GATE = _make_action_map()
+READ_ONLY_ACTIONS = {
+    action for action, gate in ACTION_TO_MINIMUM_GATE.items()
+    if gate in {"G0_CONTEXT", "G1_ALIGNMENT"}
+}
+G5_STATUS_ACTIONS = {
+    "post_merge_status", "postmerge_status", "verify_post_merge_ci",
+    "read_only_post_merge_status", "g5_status_verify", "status_verification",
+}
+MANUAL_G5_ACTIONS = {
+    "deploy", "redeploy", "publish", "release", "runtime_reload",
+    "deploy_approved_release", "manual_deploy", "manual_release",
+}
+PRODUCTION_ACTIONS = {
+    action for action, gate in ACTION_TO_MINIMUM_GATE.items()
+    if gate == "G6_PRODUCTION_DATA"
+}
+PROHIBITED_ACTIONS = {
+    "force_push", "shared_history_rewrite", "rewrite_shared_history",
+    "unauthorized_branch_deletion", "delete_branch", "branch_deletion",
+}
+
+# A scope commonly names the operation rather than the low-level action. Keep
+# both forms equivalent without weakening the explicit excluded-actions check.
+SCOPE_ACTION_ALIASES: dict[str, set[str]] = {
+    "read": {"read", "read_repository", "inspect_repository"},
+    "search": {"search", "read_repository"},
+    "fetch": {"fetch", "read_repository"},
+    "read_search_fetch": {"read_search_fetch", "read_repository"},
+    "g1_artifact_read_only_validation": {"g1_artifact_read_only_validation", "run_read_only_validation"},
+    "branch": {"branch", "branch_creation", "modify_approved_files"},
+    "worktree": {"worktree", "worktree_creation", "modify_approved_files"},
+    "file": {"file", "files", "modify_file", "modify_approved_files", "repository_write"},
+    "files": {"file", "files", "modify_file", "modify_approved_files", "repository_write"},
+    "commit": {"commit", "modify_approved_files"},
+    "push": {"push", "push_working_branch"},
+    "draft_pr": {"draft_pr", "create_draft_pr", "open_or_update_draft_pr"},
+    "create_draft_pr": {"draft_pr", "create_draft_pr", "open_or_update_draft_pr"},
+    "ready_for_review": {"ready_for_review", "mark_pr_ready_for_review"},
+    "merge": {"merge", "merge_approved_pr"},
+    "auto_merge": {"auto_merge", "enable_auto_merge", "merge_approved_pr"},
+    "deploy": {"deploy", "deploy_approved_release"},
+    "redeploy": {"redeploy", "deploy_approved_release"},
+    "publish": {"publish", "deploy_approved_release"},
+    "release": {"release", "deploy_approved_release"},
+    "runtime_reload": {"runtime_reload", "deploy_approved_release"},
+    "production_configuration": {"production_configuration", "production_config_change"},
+    "production_config_change": {"production_configuration", "production_config_change"},
+    "production_data": {"production_data", "production_data_read", "production_data_write"},
+}
+
+
+def _canonical_json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _digest(value: Any) -> str:
+    return "sha256:" + hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def _as_string(value: Any) -> str | None:
+    return value if isinstance(value, str) and value else None
+
+
+def _normalize_list(value: Any) -> list[str] | None:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        return None
+    if any(not isinstance(item, str) or not item for item in value):
+        return None
+    return [_normalize_action(item) for item in value]
+
+
+def _get_gate(state: Mapping[str, Any]) -> str | None:
+    value = state.get("current_gate", state.get("gate"))
+    return value if isinstance(value, str) and value in GATE_INDEX else None
+
+
+def _get_status(state: Mapping[str, Any]) -> str | None:
+    value = state.get("gate_status", state.get("status", "PASS"))
+    if value is None:
+        return None
+    return value if isinstance(value, str) else None
+
+
+def _scope_action_allowed(action: str, scope: Mapping[str, Any]) -> tuple[bool, bool]:
+    authorized = _normalize_list(scope.get("authorized_actions"))
+    excluded = _normalize_list(scope.get("excluded_actions", []))
+    if authorized is None or not authorized or excluded is None:
+        return False, False
+    aliases = SCOPE_ACTION_ALIASES.get(action, {action})
+    is_excluded = action in excluded or bool(aliases & set(excluded))
+    is_authorized = action in authorized or bool(aliases & set(authorized))
+    return is_authorized, is_excluded
+
+
+def _scope_mismatch(
+    *, task_id: str, repository: str, scope: Mapping[str, Any], state: Mapping[str, Any]
+) -> bool:
+    for key, expected in (("task_id", task_id), ("repository", repository)):
+        left = scope.get(key)
+        right = state.get(key)
+        if left is not None and left != expected:
+            return True
+        if right is not None and right != expected:
+            return True
+        if left is not None and right is not None and left != right:
+            return True
+    for scope_key, state_keys in (
+        ("scope_hash", ("scope_hash",)),
+        ("base_sha", ("base_sha", "current_base_sha")),
+        ("head_sha", ("head_sha",)),
+    ):
+        left = scope.get(scope_key)
+        right = next((state.get(key) for key in state_keys if state.get(key) is not None), None)
+        if left is not None and right is not None and left != right:
+            return True
+    drift = state.get("drift_decision", state.get("drift"))
+    if isinstance(drift, Mapping):
+        if drift.get("status") in {"REVALIDATE", "REAPPROVE", "STOP", "DRIFT"}:
+            return True
+        if drift.get("has_drift") is True:
+            return True
+    if drift is True or state.get("scope_drift") is True or state.get("base_drift") is True or state.get("head_drift") is True:
+        return True
+    return False
+
+
+def _policy_gate(action: str, policy: Mapping[str, Any], default: str) -> str:
+    candidate = policy.get("action_map", policy.get("action_to_minimum_gate"))
+    if not isinstance(candidate, Mapping):
+        candidate = policy.get("actions")
+    if isinstance(candidate, Mapping):
+        value = candidate.get(action)
+        if isinstance(value, Mapping):
+            value = value.get("minimum_gate", value.get("gate"))
+        if isinstance(value, str) and value in GATE_INDEX:
+            return value
+    return default
+
+
+def _request_fingerprint(
+    *, task_id: str, repository: str, action: str | None, minimum_gate: str | None,
+    current_gate: str | None, scope: Mapping[str, Any], state: Mapping[str, Any],
+    risk_class: str, production_scope_applicable: bool, manual_g5_action: bool,
+) -> str:
+    payload = {
+        "task_id": task_id,
+        "repository": repository,
+        "action": action,
+        "minimum_gate": minimum_gate,
+        "current_gate": current_gate,
+        "scope_hash": scope.get("scope_hash"),
+        "base_sha": scope.get("base_sha", state.get("current_base_sha", state.get("base_sha"))),
+        "head_sha": scope.get("head_sha", state.get("head_sha")),
+        "risk_class": risk_class,
+        "production_scope_applicable": production_scope_applicable,
+        "manual_g5_action": manual_g5_action,
+    }
+    return _digest(payload)
+
+
+def _dedupe(codes: Sequence[str]) -> list[str]:
+    return list(dict.fromkeys(code for code in codes if code))
+
+
+def _decision_digest(output: Mapping[str, Any]) -> str:
+    stable = {
+        key: value for key, value in output.items()
+        if key not in {"decision_digest", "evaluated_at", "replay_status"}
+    }
+    return _digest(stable)
+
+
+def _base_output(
+    *, task_id: str, repository: str, requested_action: str, canonical_action: str | None,
+    minimum_gate: str | None, current_gate: str | None, current_gate_status: str | None,
+    scope_identity: Mapping[str, Any], gate_state: Mapping[str, Any], risk_class: str,
+    production_scope_applicable: bool, manual_g5_action: bool,
+    event_id_or_idempotency_key: str, replay_status: str, request_fingerprint: str,
+    evaluated_at: str | None,
+) -> dict[str, Any]:
+    scope_hash = scope_identity.get("scope_hash", gate_state.get("scope_hash"))
+    base_sha = scope_identity.get("base_sha", gate_state.get("current_base_sha", gate_state.get("base_sha")))
+    head_sha = scope_identity.get("head_sha", gate_state.get("head_sha"))
+    return {
+        "schema_version": "1.0",
+        "artifact_type": "authority-boundary-decision",
+        "task_id": task_id,
+        "repository": repository,
+        "requested_action": requested_action,
+        "canonical_action": canonical_action,
+        "minimum_gate": minimum_gate,
+        "current_gate": current_gate,
+        "current_gate_status": current_gate_status,
+        "decision": "BLOCK",
+        "approval_required": False,
+        "required_approval_gate": None,
+        "prohibited": False,
+        "next_authorized_preparation": [],
+        "reason_codes": ["AUTHORITY_INPUT_INVALID"],
+        "primary_reason_code": "AUTHORITY_INPUT_INVALID",
+        "scope_identity": dict(scope_identity),
+        "scope_hash": scope_hash,
+        "current_base_sha": base_sha,
+        "head_sha": head_sha,
+        "risk_class": risk_class,
+        "production_scope_applicable": production_scope_applicable,
+        "manual_g5_action": manual_g5_action,
+        "event_id_or_idempotency_key": event_id_or_idempotency_key,
+        "replay_status": replay_status,
+        "request_fingerprint": request_fingerprint,
+        "evaluated_at": evaluated_at,
+        "decision_digest": "",
+        "authority_granted": False,
+        "execution_authority_granted": False,
+        "write_authority_granted": False,
+        "pr_authority_granted": False,
+        "merge_authority_granted": False,
+        "deployment_authority_granted": False,
+        "production_authority_granted": False,
+    }
+
+
+def _finish(output: dict[str, Any], reasons: Sequence[str]) -> dict[str, Any]:
+    output["reason_codes"] = _dedupe(reasons)
+    output["primary_reason_code"] = output["reason_codes"][0]
+    output["decision_digest"] = _decision_digest(output)
+    return output
+
+
+def _prior_conflicts(prior: Mapping[str, Any], fingerprint: str, output: Mapping[str, Any]) -> bool:
+    for key in ("task_id", "repository", "requested_action", "canonical_action", "minimum_gate", "current_gate", "scope_hash"):
+        if key in prior and prior.get(key) != output.get(key):
+            return True
+    previous_fingerprint = prior.get("request_fingerprint")
+    if isinstance(previous_fingerprint, str):
+        return previous_fingerprint != fingerprint
+    return False
+
+
+def check_authority_boundary(
+    *,
+    task_id: str,
+    repository: str,
+    requested_action: str,
+    gate_state_resolution: dict[str, object],
+    scope_identity: dict[str, object],
+    gate_policy: dict[str, object],
+    risk_class: str,
+    production_scope_applicable: bool,
+    manual_g5_action: bool,
+    event_id_or_idempotency_key: str,
+    prior_decision: dict[str, object] | None = None,
+    evaluated_at: str | None = None,
+) -> dict[str, object]:
+    """Evaluate one action without performing it or granting authority."""
+    state = gate_state_resolution if isinstance(gate_state_resolution, Mapping) else {}
+    scope = scope_identity if isinstance(scope_identity, Mapping) else {}
+    policy = gate_policy if isinstance(gate_policy, Mapping) else {}
+    action = _normalize_action(requested_action)
+    minimum_gate = ACTION_TO_MINIMUM_GATE.get(action)
+    if minimum_gate is None and action in PROHIBITED_ACTIONS:
+        # Prohibited history operations are known actions at the execution
+        # boundary; they must report PROHIBITED rather than UNKNOWN.
+        minimum_gate = "G2_EXECUTION"
+    current_gate = _get_gate(state)
+    current_status = _get_status(state)
+    fingerprint = _request_fingerprint(
+        task_id=task_id, repository=repository, action=action or None,
+        minimum_gate=minimum_gate, current_gate=current_gate, scope=scope,
+        state=state, risk_class=risk_class,
+        production_scope_applicable=production_scope_applicable,
+        manual_g5_action=manual_g5_action,
+    )
+    output = _base_output(
+        task_id=task_id, repository=repository, requested_action=requested_action,
+        canonical_action=action or None, minimum_gate=minimum_gate,
+        current_gate=current_gate, current_gate_status=current_status,
+        scope_identity=scope, gate_state=state, risk_class=risk_class,
+        production_scope_applicable=production_scope_applicable,
+        manual_g5_action=manual_g5_action,
+        event_id_or_idempotency_key=event_id_or_idempotency_key,
+        replay_status="FIRST_SEEN", request_fingerprint=fingerprint,
+        evaluated_at=evaluated_at,
+    )
+
+    invalid = [
+        not isinstance(task_id, str) or not task_id,
+        not isinstance(repository, str) or not repository,
+        not isinstance(requested_action, str) or not requested_action,
+        not isinstance(gate_state_resolution, dict),
+        not isinstance(scope_identity, dict),
+        not isinstance(gate_policy, dict),
+        risk_class not in VALID_RISK_CLASSES,
+        not isinstance(production_scope_applicable, bool),
+        not isinstance(manual_g5_action, bool),
+        not isinstance(event_id_or_idempotency_key, str) or not event_id_or_idempotency_key,
+        evaluated_at is not None and not isinstance(evaluated_at, str),
+    ]
+    if any(invalid) or not current_gate or not current_status or current_status not in GATE_STATUSES:
+        return _finish(output, ["AUTHORITY_INPUT_INVALID"])
+
+    minimum_gate = _policy_gate(action, policy, minimum_gate) if minimum_gate else None
+    output["minimum_gate"] = minimum_gate
+    output["request_fingerprint"] = _request_fingerprint(
+        task_id=task_id, repository=repository, action=action,
+        minimum_gate=minimum_gate, current_gate=current_gate, scope=scope,
+        state=state, risk_class=risk_class,
+        production_scope_applicable=production_scope_applicable,
+        manual_g5_action=manual_g5_action,
+    )
+    fingerprint = output["request_fingerprint"]
+
+    if minimum_gate is None:
+        return _finish(output, ["AUTHORITY_ACTION_UNKNOWN"])
+
+    if prior_decision and isinstance(prior_decision, Mapping):
+        if prior_decision.get("event_id_or_idempotency_key") == event_id_or_idempotency_key:
+            if _prior_conflicts(prior_decision, fingerprint, output):
+                output["replay_status"] = "REPLAY_CONFLICT"
+                output["decision"] = "BLOCK"
+                return _finish(output, ["AUTHORITY_REPLAY_CONFLICT"])
+            output["replay_status"] = "IDEMPOTENT_REPLAY"
+
+    state_replay = state.get("replay_status")
+    if state_replay == "REPLAY_CONFLICT":
+        output["replay_status"] = "REPLAY_CONFLICT"
+        return _finish(output, ["AUTHORITY_REPLAY_CONFLICT"])
+
+    if _scope_mismatch(task_id=task_id, repository=repository, scope=scope, state=state):
+        return _finish(output, ["AUTHORITY_SCOPE_MISMATCH"])
+
+    authorized, excluded = _scope_action_allowed(action, scope)
+    if action in PROHIBITED_ACTIONS or excluded:
+        output["prohibited"] = True
+        return _finish(output, ["AUTHORITY_ACTION_PROHIBITED"])
+    if not authorized:
+        return _finish(output, ["AUTHORITY_SCOPE_MISMATCH"])
+
+    if action in PRODUCTION_ACTIONS and not production_scope_applicable:
+        output["decision"] = "NOT_APPLICABLE"
+        return _finish(output, ["AUTHORITY_G6_NOT_APPLICABLE"])
+
+    if current_status in {"BLOCKED", "FAILED"}:
+        return _finish(output, ["AUTHORITY_GATE_INSUFFICIENT"])
+
+    current_index = GATE_INDEX[current_gate]
+    minimum_index = GATE_INDEX[minimum_gate]
+    is_g5_status = action in G5_STATUS_ACTIONS and not manual_g5_action
+    if is_g5_status and current_index >= GATE_INDEX["G4_MERGE"]:
+        output["decision"] = "ALLOW_PREPARATION"
+        output["next_authorized_preparation"] = ["run_read_only_post_merge_status_verification"]
+        return _finish(output, ["AUTHORITY_PREPARATION_ALLOWED"])
+
+    if action in READ_ONLY_ACTIONS:
+        if current_index < minimum_index:
+            return _finish(output, ["AUTHORITY_GATE_INSUFFICIENT"])
+        output["decision"] = "ALLOW_PREPARATION"
+        output["next_authorized_preparation"] = [f"run_read_only_{action}"]
+        return _finish(output, ["AUTHORITY_PREPARATION_ALLOWED"])
+
+    output["decision"] = "REQUIRE_APPROVAL"
+    output["approval_required"] = True
+    output["required_approval_gate"] = minimum_gate
+    output["next_authorized_preparation"] = [f"prepare_{action}_approval"]
+    reasons: list[str] = []
+    if current_index < minimum_index:
+        reasons.append("AUTHORITY_GATE_INSUFFICIENT")
+        if current_index >= GATE_INDEX["G3_PR"] and minimum_index > current_index:
+            reasons.append("AUTHORITY_LATER_GATE_INHERITANCE_REJECTED")
+    else:
+        reasons.append("AUTHORITY_APPROVAL_REQUIRED")
+    if action in MANUAL_G5_ACTIONS or manual_g5_action:
+        reasons.insert(0, "AUTHORITY_G5_MANUAL_APPROVAL_REQUIRED")
+    return _finish(output, reasons)
+
+
+__all__ = ["ACTION_TO_MINIMUM_GATE", "check_authority_boundary"]

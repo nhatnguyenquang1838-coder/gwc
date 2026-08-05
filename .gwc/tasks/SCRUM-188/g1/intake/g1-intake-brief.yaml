@@ -1,0 +1,70 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T06:21:12Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-188
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement the replay-safe gate_authority.authority-boundary-check decision contract for SCRUM-188.
+  why_now: The live Jira task is claimed by canonical agent value Codex for runtime identity Codex-GPT, and the target node remains descriptor-only at the protected base.
+desired_outcome: Add the JSON schema, pure Python decision evaluator, and focused M5 tests without invoking actions or granting later-gate authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, gate-authority node consumers, future SCRUM-185 approval-token work]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-188/** task-scoped GWC evidence
+    - schemas/authority-boundary-decision.schema.json
+    - tools/node_architect/authority_boundary_check.py
+    - tests/test_gate_authority_authority_boundary_check_m5.py
+    - Focused unit validation and complete local diff review
+  non_goals:
+    - Modify the existing node descriptor or registry outside the three implementation files
+    - Approval generation or validation
+    - Any connector call from the implemented node
+    - Branch push, Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+constraints:
+  - Preserve fail-closed gate mappings and replay semantics from the Jira contract.
+  - The node must be pure and must never perform the requested action.
+  - G2 approval is required before branch/worktree or repository implementation writes.
+  - G3, G4, G5, and G6 remain separate gates.
+assumptions:
+  - origin/main at 731ae09280f4fdf3afc841db6de78b7876f09f4e is the available protected-base evidence.
+  - SCRUM-184 and SCRUM-187 are the declared prerequisites and both are Done in live Jira.
+  - The implementation can use the repository's existing Python standard-library and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: The change defines a new decision schema and behavior contract at a security-sensitive governance boundary.
+    impact: high
+    mitigation: Keep the evaluator pure, fail closed, add explicit tests for every precedence rule, and run existing gate-authority regressions.
+  - id: RISK-2
+    description: Remote GitHub ref verification is unavailable in this session.
+    impact: medium
+    mitigation: Bind all work to the locally observed origin/main SHA and re-check base drift before every write.
+acceptance_criteria:
+  - id: AC-1
+    statement: The authority-boundary-decision schema validates the complete decision shape and rejects missing or invalid bindings.
+    verifiable: true
+  - id: AC-2
+    statement: The evaluator maps canonical actions to their minimum gates and returns only ALLOW_PREPARATION, REQUIRE_APPROVAL, BLOCK, or NOT_APPLICABLE.
+    verifiable: true
+  - id: AC-3
+    statement: The evaluator fails closed for unknown actions, replay conflicts, scope drift, prohibited actions, insufficient gates, and invalid production applicability.
+    verifiable: true
+  - id: AC-4
+    statement: No output field grants execution, merge, deploy, or production authority, and the node performs no action.
+    verifiable: true
+  - id: AC-5
+    statement: The focused M5 test module passes and the complete diff remains within the approved scope.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation]
+  downstream_non_goals: [push_working_branch, open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]
+unresolved_questions: []
+status: READY
