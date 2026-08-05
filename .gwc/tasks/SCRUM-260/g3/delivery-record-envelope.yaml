@@ -1,0 +1,79 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-260
+issued_at: '2026-08-05T10:10:00Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+working_branch: fastlane/SCRUM-260-hermes
+head_sha: fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+scope_hash: sha256:025cf9dd6186409973c6197882b89c47f86710b38bfbfb73896b564745c5c3a1
+scope_hash_16: 025cf9dd61864099
+pull_request:
+  number: null
+  url: null
+  draft: true
+  mergeable: PENDING_PR
+changed_paths:
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- agents/chatgpt-agent/agent-instructions.md
+- agents/dwc/agent-instructions.md
+- agents/instructionops-agent/agent-instructions.md
+- tests/test_g4_g5_evidence_structure.py
+validation:
+  head_sha: fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+  status: pass
+  commands:
+  - python3 -m unittest tests.test_g4_g5_evidence_structure
+  - python3 -m unittest discover -s tests -p 'test_*..py'
+ci:
+  head_sha: fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+  required: true
+  checks: []
+review:
+  mode: read-only
+  independence: pending
+  reviewer_id: PENDING_INDEPENDENT_REVIEWER
+  implementer_id: hermes
+  reviewed_head_sha: fa4aa2f1d9b4c414e69e94f1d89dac8e8d657783
+  reviewed_scope_hash: sha256:025cf9dd6186409973c6197882b89c47f86710b38bfbfb73896b564745c5c3a1
+  stale: false
+  decision: pending
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pending
+  - name: design
+    applicable: true
+    status: pending
+  - name: code
+    applicable: true
+    status: pending
+  - name: test
+    applicable: true
+    status: pending
+  - name: governance
+    applicable: true
+    status: pending
+  - name: delivery
+    applicable: true
+    status: pending
+  - name: ci
+    applicable: true
+    status: pending
+  findings: []
+  acceptance_criteria: []
+residual_risks:
+- id: RR-1
+  description: Full test suite shows 12 pre-existing errors (verified identical on untouched base). Not introduced by this change, but CI must still run to confirm on PR head.
+  status: accepted_as_preexisting
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: inconclusive
+# HONEST STATE: envelope prepared but NOT passed. Same as SCRUM-209 — requires an
+# independent reviewer and CI checks bound to a Draft PR before outcome=pass.
+# Also note: GATE_LIFECYCLE_CONTRACT_v1.0.md is not SHA-pinned like Coding_Project_Governance,
+# so this edit does not break boot verification, but SHA256SUMS.txt would need regen.
