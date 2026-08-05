@@ -129,14 +129,23 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
         self.assertEqual(duplicate_result["primary_reason_code"], "AUTHORITY_INPUT_INVALID")
         self.assertEqual(list(Draft202012Validator(schema).iter_errors(duplicate_result)), [])
 
+        # Nested/non-string elements must all fail closed. Covers both the
+        # nested-list case and dict-shaped elements (G3 review REV-2).
+        malformed_shapes = [
+            [[]],            # nested empty list
+            [["nested"]],    # nested non-empty list
+            [{}],            # empty dict
+            [{"k": "v"}],    # non-empty dict
+        ]
         for field in ("authorized_actions", "excluded_actions", "authorized_paths"):
-            malformed_scope = self.scope("file")
-            malformed_scope[field] = [[]]
-            malformed_result = self.call("file", scope=malformed_scope)
-            with self.subTest(field=field):
-                self.assertEqual(malformed_result["primary_reason_code"], "AUTHORITY_INPUT_INVALID")
-                self.assertEqual(malformed_result["decision"], "BLOCK")
-                self.assertEqual(list(Draft202012Validator(schema).iter_errors(malformed_result)), [])
+            for shape in malformed_shapes:
+                malformed_scope = self.scope("file")
+                malformed_scope[field] = shape
+                malformed_result = self.call("file", scope=malformed_scope)
+                with self.subTest(field=field, shape=shape):
+                    self.assertEqual(malformed_result["primary_reason_code"], "AUTHORITY_INPUT_INVALID")
+                    self.assertEqual(malformed_result["decision"], "BLOCK")
+                    self.assertEqual(list(Draft202012Validator(schema).iter_errors(malformed_result)), [])
 
     def test_canonical_action_mapping(self) -> None:
         expected = {

@@ -6,7 +6,6 @@ never invokes a connector, changes state, or grants execution authority.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from datetime import datetime
 import hashlib
 import json
 import re

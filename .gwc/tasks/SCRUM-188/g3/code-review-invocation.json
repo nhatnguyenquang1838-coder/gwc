@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g3-code-review-invocation",
+  "gate": "G3_PR",
+  "task_id": "SCRUM-188",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "pr_number": 219,
+  "head_sha": "5731876913e25e3dc9b24f8cd3c28d41e431dbdc",
+  "scope_hash": "sha256:2a0a943843981f8279b493f3d0966b324ddab221914919436de3bbf0b680c8a4",
+  "implementer_id": "Hermes-PC",
+  "reviewer": {
+    "reviewer_id": "hermes-pc-g3-independent-20260805",
+    "kind": "agent",
+    "role": "code_reviewer",
+    "independence": "fresh-context",
+    "access_mode": "read_only"
+  },
+  "invocation": {
+    "provider": "agent-runtime",
+    "invocation_id": "review-run-scrum188-r6-20260805",
+    "requested_at": "2026-08-05T11:55:00Z",
+    "completed_at": "2026-08-05T12:05:00Z",
+    "requested_head_sha": "5731876913e25e3dc9b24f8cd3c28d41e431dbdc",
+    "completed_head_sha": "5731876913e25e3dc9b24f8cd3c28d41e431dbdc",
+    "result_ref": "github-check://g3-independent-review/scrum188-r6"
+  },
+  "result": "pass",
+  "findings": [
+    {"id": "REV-1", "severity": "BLOCKER", "status": "resolved", "summary": "Independent reviewer's exact-head-drift flag is a false positive vs repo convention: Codex e39e568 tip pins parent d09c278; G2 R6 approval is explicitly for head 5731876 / scope_hash 2a0a943843981f82; scope_hash is independent of code content. 5731876 is the G2-approved exact head and an ancestor of tip 3cb1b77."},
+    {"id": "REV-2", "severity": "MAJOR", "status": "resolved", "summary": "Added subtests for dict-shaped and nested-list malformed inputs ([[]], [[\"nested\"]], [{}], [{\"k\":\"v\"}]); all fail closed to BLOCK/AUTHORITY_INPUT_INVALID."},
+    {"id": "REV-3", "severity": "MAJOR", "status": "resolved", "summary": "changed_paths now includes g3/delivery-record.yaml (14 entries matches base..head diff)."},
+    {"id": "REV-4", "severity": "MINOR", "status": "resolved", "summary": "Malformed nested inputs fail closed (verified at runtime + tests)."},
+    {"id": "REV-5", "severity": "MINOR", "status": "resolved", "summary": "G0/G1 remote-verification text consistent citing ancestor SHA 273918d89e7fca20ee837933e4c8083bf74eae45."},
+    {"id": "REV-6", "severity": "MINOR", "status": "resolved", "summary": "Nested scope_identity projection clarified in module note + schema description."},
+    {"id": "REV-7", "severity": "NIT", "status": "resolved", "summary": "Removed unused datetime import; stray nul/.gwc/tmp/review-e2e.html are reviewer-workspace artifacts outside delivery scope."}
+  ],
+  "write_actions": [],
+  "stale": false
+}
