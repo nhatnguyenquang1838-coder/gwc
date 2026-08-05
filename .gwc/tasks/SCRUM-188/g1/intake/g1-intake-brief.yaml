@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-188
-  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
   g0_snapshot: ../../g0/context-snapshot.yaml
 problem:
   statement: Implement the replay-safe gate_authority.authority-boundary-check decision contract for SCRUM-188.
@@ -32,7 +32,7 @@ constraints:
   - G2 approval is required before branch/worktree or repository implementation writes.
   - G3, G4, G5, and G6 remain separate gates.
 assumptions:
-  - origin/main at 731ae09280f4fdf3afc841db6de78b7876f09f4e is the available protected-base evidence.
+  - origin/main at 273918d89e7fca20ee837933e4c8083bf74eae45 is the refreshed protected-base evidence.
   - SCRUM-184 and SCRUM-187 are the declared prerequisites and both are Done in live Jira.
   - The implementation can use the repository's existing Python standard-library and jsonschema patterns without dependency changes.
 risks:

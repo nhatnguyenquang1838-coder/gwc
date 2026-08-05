@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-188
-  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
   g0_snapshot: ../../g0/context-snapshot.yaml
 options_ref: ../brainstorming/g1-options.yaml
 preflight_ref: ../preflight/g1-preflight-report.yaml
@@ -52,7 +52,7 @@ implementation_plan_ref:
   source: task_me
   canonical_task_uid: SCRUM-188
   repository: nhatnguyenquang1838-coder/gwc
-  protected_base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  protected_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
   plan_root: .gwc/tasks/SCRUM-188/g1/plan
   plan_revision: sha256:e217b5b1f749eedbbb7b0832dcb4b213031994fae2da532539910fe5cc3bac90
   validation_evidence: Task Me hook review against Jira SCRUM-188 contract and OPT-1 scope; plan revision sha256:e217b5b1f749eedbbb7b0832dcb4b213031994fae2da532539910fe5cc3bac90.

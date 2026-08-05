@@ -5,11 +5,11 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-188
-  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
   base_ref: main
-  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
   profile_path: projects/gwc/project-profile.yaml
   connector: Git
 checks:
@@ -29,10 +29,10 @@ checks:
     message: SCRUM-184 and SCRUM-187 are Done in Jira projection evidence.
     evidence: [Atlassian Rovo SCRUM-184, Atlassian Rovo SCRUM-187]
   - id: REMOTE_CONNECTIVITY
-    status: WARN
-    code: REMOTE_VERIFICATION_SKIPPED_OFFLINE
-    message: GitHub DNS was unavailable; no online remote claim is made.
-    evidence: ['git ls-remote origin HEAD refs/heads/main: Could not resolve host github.com']
+    status: PASS
+    code: REMOTE_BASE_VERIFIED
+    message: GitHub remote main was verified at the refreshed protected-base SHA.
+    evidence: [GitHub compare readback, git fetch origin main]
   - id: PLAN_BINDING
     status: PASS
     code: TASK_ME_PLAN_VALIDATED
@@ -50,7 +50,7 @@ implementation_plan:
   task_me_fallback_reason: null
   canonical_task_uid: SCRUM-188
   repository: nhatnguyenquang1838-coder/gwc
-  protected_base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  protected_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
   plan_root: .gwc/tasks/SCRUM-188/g1/plan
   requirements_path: .gwc/tasks/SCRUM-188/g1/plan/requirements.md
   design_path: .gwc/tasks/SCRUM-188/g1/plan/design.md
