@@ -1,0 +1,68 @@
+{
+  "title": "Package Export Failure Routing",
+  "description": "Closed 0.1 result contract for package_export.export-failure-routing (M5_REPLAY_SAFE). Deterministic, recommend-only routing of upstream failures to exactly one bounded action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "idempotency_key",
+    "verifier_version",
+    "route",
+    "reason_code",
+    "decision_digest",
+    "evidence_hash",
+    "retry_count",
+    "requires_readback",
+    "readback_reconciled",
+    "prohibited_actions",
+    "authority_authorized",
+    "detail"
+  ],
+  "properties": {
+    "schema_id": { "const": "gwc.package_export.export_failure_routing" },
+    "schema_version": { "const": "0.1" },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "verifier_version": { "type": "string", "minLength": 1 },
+    "route": {
+      "type": "string",
+      "enum": [
+        "EXPORT_REPAIR_INPUT",
+        "EXPORT_REBUILD_STAGING",
+        "EXPORT_REVERIFY_READBACK",
+        "EXPORT_BOUNDED_RETRY",
+        "EXPORT_HUMAN_REQUIRED",
+        "EXPORT_FAIL_CLOSED"
+      ]
+    },
+    "reason_code": {
+      "type": "string",
+      "enum": [
+        "EXPORT_REPAIR_INPUT",
+        "EXPORT_REBUILD_STAGING",
+        "EXPORT_REVERIFY_READBACK",
+        "EXPORT_BOUNDED_RETRY",
+        "EXPORT_HUMAN_REQUIRED",
+        "EXPORT_FAIL_CLOSED",
+        "EXPORT_RETRY_EXHAUSTED",
+        "EXPORT_UNKNOWN_OUTCOME",
+        "EXPORT_REPLAY_CONFLICT",
+        "EXPORT_AUTHORITY_VIOLATION",
+        "EXPORT_FAILURE_UNMAPPED"
+      ]
+    },
+    "decision_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "evidence_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "retry_count": { "type": "integer", "minimum": 0 },
+    "retry_deadline": { "type": ["number", "null"] },
+    "requires_readback": { "type": "boolean" },
+    "readback_reconciled": { "type": "boolean" },
+    "prohibited_actions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "authority_authorized": { "const": false },
+    "detail": { "type": "string" }
+  }
+}
