@@ -107,7 +107,7 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
     def test_malformed_inputs_return_schema_valid_fail_closed_decision(self) -> None:
         result = self.call(
             "file",
-            risk_class="R9",
+            risk_class=[],
             production_scope_applicable="yes",
             manual_g5_action=1,
             evaluated_at=123,
@@ -117,6 +117,17 @@ class AuthorityBoundaryDecisionTests(unittest.TestCase):
         self.assertEqual(result["decision"], "BLOCK")
         self.assert_safe_flags(result)
         self.assertEqual(list(Draft202012Validator(schema).iter_errors(result)), [])
+
+        duplicate_bindings = self.scope(
+            "file",
+            additional_bindings=[
+                {"key": "pr_number", "value": "219"},
+                {"key": "pr_number", "value": "219"},
+            ],
+        )
+        duplicate_result = self.call("file", scope=duplicate_bindings)
+        self.assertEqual(duplicate_result["primary_reason_code"], "AUTHORITY_INPUT_INVALID")
+        self.assertEqual(list(Draft202012Validator(schema).iter_errors(duplicate_result)), [])
 
     def test_canonical_action_mapping(self) -> None:
         expected = {

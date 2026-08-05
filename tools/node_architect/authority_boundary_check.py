@@ -161,6 +161,28 @@ def _valid_string_list(value: Any, *, minimum: int = 0) -> bool:
     )
 
 
+def _valid_risk_class(value: Any) -> bool:
+    return isinstance(value, str) and value in VALID_RISK_CLASSES
+
+
+def _valid_bindings(value: Any) -> bool:
+    if not isinstance(value, list):
+        return False
+    keys: list[str] = []
+    for item in value:
+        if (
+            not isinstance(item, dict)
+            or set(item) != {"key", "value"}
+            or not isinstance(item["key"], str)
+            or not item["key"]
+            or not isinstance(item["value"], str)
+            or not item["value"]
+        ):
+            return False
+        keys.append(item["key"])
+    return len(keys) == len(set(keys))
+
+
 def _valid_scope_identity(value: Any) -> bool:
     if not isinstance(value, dict) or set(value) - SCOPE_IDENTITY_KEYS:
         return False
@@ -189,21 +211,12 @@ def _valid_scope_identity(value: Any) -> bool:
         not isinstance(value["working_branch"], str) or not value["working_branch"]
     ):
         return False
-    if "risk_class" in value and value["risk_class"] not in VALID_RISK_CLASSES:
+    if "risk_class" in value and not _valid_risk_class(value["risk_class"]):
         return False
     if "authorized_paths" in value and not _valid_string_list(value["authorized_paths"], minimum=1):
         return False
     if "additional_bindings" in value:
-        bindings = value["additional_bindings"]
-        if not isinstance(bindings, list) or any(
-            not isinstance(item, dict)
-            or set(item) != {"key", "value"}
-            or not isinstance(item["key"], str)
-            or not item["key"]
-            or not isinstance(item["value"], str)
-            or not item["value"]
-            for item in bindings
-        ):
+        if not _valid_bindings(value["additional_bindings"]):
             return False
     if "outcome" in value and value["outcome"] not in {"READY", "BLOCKED"}:
         return False
@@ -236,7 +249,7 @@ def _safe_scope_identity(value: Any, *, task_id: str, repository: str) -> dict[s
         "artifact_type": lambda item: item == "gate-scope-identity",
         "base_ref": lambda item: isinstance(item, str) and bool(item),
         "working_branch": lambda item: item is None or (isinstance(item, str) and bool(item)),
-        "risk_class": lambda item: item in VALID_RISK_CLASSES,
+        "risk_class": _valid_risk_class,
         "authorized_paths": lambda item: _valid_string_list(item, minimum=1),
         "outcome": lambda item: item in {"READY", "BLOCKED"},
         "authority_granted": lambda item: item is False,
@@ -245,15 +258,7 @@ def _safe_scope_identity(value: Any, *, task_id: str, repository: str) -> dict[s
         if key in raw and predicate(raw[key]):
             safe[key] = raw[key]
     bindings = raw.get("additional_bindings")
-    if isinstance(bindings, list) and all(
-        isinstance(item, dict)
-        and set(item) == {"key", "value"}
-        and isinstance(item["key"], str)
-        and item["key"]
-        and isinstance(item["value"], str)
-        and item["value"]
-        for item in bindings
-    ):
+    if _valid_bindings(bindings):
         safe["additional_bindings"] = bindings
     return safe
 
@@ -462,7 +467,7 @@ def check_authority_boundary(
     safe_repository = _safe_repository(repository)
     safe_requested_action = _safe_text(requested_action, "invalid-action")
     safe_scope = _safe_scope_identity(scope, task_id=safe_task_id, repository=safe_repository)
-    safe_risk_class = risk_class if risk_class in VALID_RISK_CLASSES else "R0"
+    safe_risk_class = risk_class if _valid_risk_class(risk_class) else "R0"
     safe_production_scope = production_scope_applicable if isinstance(production_scope_applicable, bool) else False
     safe_manual_g5 = manual_g5_action if isinstance(manual_g5_action, bool) else False
     safe_event_id = _safe_text(event_id_or_idempotency_key, "invalid-event")
@@ -500,7 +505,7 @@ def check_authority_boundary(
         not isinstance(gate_state_resolution, dict),
         not _valid_scope_identity(scope_identity),
         not isinstance(gate_policy, dict),
-        risk_class not in VALID_RISK_CLASSES,
+        not _valid_risk_class(risk_class),
         not isinstance(production_scope_applicable, bool),
         not isinstance(manual_g5_action, bool),
         not isinstance(event_id_or_idempotency_key, str) or not event_id_or_idempotency_key,
