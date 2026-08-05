@@ -1,0 +1,62 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T02:33:08Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-235
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main and matches the issue baseline merge commit; ancestor of origin/main confirmed after git fetch.
+  evidence:
+  - 78d596242a9e042d62d6174afc40aa4976eb3285
+- id: BLOCKER-234-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-234 (export-manifest-generation) is Done and merged; its manifest is the upstream input to this verifier.
+  evidence:
+  - SCRUM-234
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    deterministic_hash_verification.py, deterministic-hash-verification.schema.json
+    and test_deterministic_hash_verification.py are brand-new files under the
+    package_export family; no existing shared exporter or smoke verifier is mutated.
+  evidence:
+  - tools/node_architect/package_export (no hash-verification module at 78d5962)
+- id: NODE-PRESENT
+  status: PASS
+  code: NODE_EXISTS
+  message: The F7 hash-verification node already exists at core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json (authority_boundary g2_required).
+  evidence:
+  - core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json
+- id: OWNERSHIP-CLAIM
+  status: PASS
+  code: CLAIM_CONSISTENT
+  message: >-
+    Jira SCRUM-235 AI Agent = Hermes; claimed via Atlassian MCP (Claimed At
+    2026-08-05T02:33:08Z), transitioned to In Progress, claim comment posted.
+    This Hermes worktree owns the task.
+  evidence:
+  - hermes/scrum-235-deterministic-hash-verification-m5-20260805
+- id: SCOPE-HASH
+  status: PASS
+  code: SCOPE_HASH_DERIVED
+  message: >-
+    scope_hash derived from the canonical scope string via sha256sum, not guessed.
+  evidence:
+  - sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+risk_class: R1
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS

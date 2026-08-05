@@ -1,0 +1,60 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T02:33:08Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-235
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-05T02:33:08Z'
+  source: 'G2_EXECUTION approval requested in thread for SCRUM-235; G0/G1 materialized per governance requirement (user elected Run formal G1).'
+  explicit: true
+rationale: >-
+  Build the isolated read-only hash-verification evaluator, closed result schema
+  and focused fixture suite named in the issue. This preserves the shared exporter
+  and smoke-verifier boundary and keeps the blast radius narrow, matching the
+  SCRUM-234 family convention.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Build the isolated read-only deterministic_hash_verification.py evaluator with the stable reason-code contract and replay-stable binding.
+  - sub_task_id: SUB-TASK-2
+    description: Author the closed result schema deterministic-hash-verification.schema.json.
+  - sub_task_id: SUB-TASK-3
+    description: Author the focused fixture suite test_deterministic_hash_verification.py (11 scenarios) and confirm the existing smoke verifier stays green.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-governance
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: gwc-governance
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: gwc-governance
+    agent_type: validator
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3

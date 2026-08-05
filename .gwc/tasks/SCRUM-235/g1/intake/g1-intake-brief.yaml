@@ -1,0 +1,79 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T02:33:08Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-235
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    SCRUM-235 requires a deterministic hash-verification evidence evaluator for
+    the package_export family (F7 node package-export-deterministic-hash-verification).
+    It recomputes SHA-256 and byte counts from exact source and target bytes for
+    every copied entry, reconciles the manifest entry inventory, copied/skipped
+    status, file count and tree digest with readback, and rejects any mismatch,
+    binding the result to exact source SHA, manifest digest, output-tree digest,
+    verifier version and idempotency key with replay-stable semantics.
+  why_now: >-
+    SCRUM-234 (export-manifest-generation, Done, PR merged) produces the manifest
+    this verifier consumes; the F7 hash-verification node already exists at
+    core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json.
+    The family has no verification evaluator yet, so SCRUM-235 builds it fresh
+    following the SCRUM-234 family convention.
+desired_outcome: >-
+  A pure read-only evidence evaluator that recomputes digests from exact bytes,
+  enforces the stable reason-code contract, supports idempotent replay, and never
+  grants merge/PR/deploy authority. Existing smoke verifier SHA checks remain
+  green and are extended rather than replaced.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - SCRUM-236 (smoke-verification consumer)
+scope:
+  in_scope:
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - schemas/node-architect/package-export/deterministic-hash-verification.schema.json
+  - tests/package_export/test_deterministic_hash_verification.py
+  - .gwc/tasks/SCRUM-235/**
+  non_goals:
+  - archive publication
+  - consumer repository write
+  - package-version bump
+  - rebuild / repair / content copy (read-only verification only)
+  - manifest generation (owned by SCRUM-234)
+constraints:
+- read-only verification; never repairs, rewrites or deletes output
+- replay-stable; identical evidence produces the same ordered result and digest
+- optional skipped entries remain explicit and require no target/file hash
+- existing smoke verifier SHA checks remain green (extend, do not replace)
+assumptions:
+- SCUM-234 manifest generation output is the upstream input contract for this verifier
+- SHA-256 is the required algorithm; version field guards future algorithm change
+risks:
+- id: RISK-1
+  description: Behavioral drift versus the exporter if the latter is later refactored.
+  impact: medium
+  mitigation: Shared manifest-digest contract and explicit reason codes keep the verifier independent of exporter internals.
+- id: RISK-2
+  description: Replay equivalence is hard to prove exhaustively across all fixtures.
+  impact: low
+  mitigation: Focused fixture suite (11 scenarios) exercises identical and conflicting replay explicitly.
+acceptance_criteria:
+- id: AC-1
+  statement: Fixtures cover exact match, changed source after export, changed target, missing target, extra target, wrong byte count, wrong manifest digest, unstable entry order, changed generation time, identical replay and conflicting replay.
+  verifiable: true
+- id: AC-2
+  statement: PASS requires every copied entry and complete output inventory to match; subset verification cannot claim package validity.
+  verifiable: true
+- id: AC-3
+  statement: Verification is read-only and never repairs, rewrites or deletes output; same accepted evidence produces the same ordered result and digest.
+  verifiable: true
+- id: AC-4
+  statement: Existing smoke verifier SHA checks remain green and are extended rather than replaced by a competing algorithm.
+  verifiable: true
+unresolved_questions: []
+status: READY

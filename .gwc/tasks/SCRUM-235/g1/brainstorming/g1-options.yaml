@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T02:33:08Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-235
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Isolated read-only verifier + closed result schema + fixture suite
+  description: >-
+    Build tools/node_architect/package_export/deterministic_hash_verification.py as
+    an isolated pure module that recomputes SHA-256 and byte counts from exact
+    source and target bytes for every copied entry, reconciles manifest inventory,
+    status, file count and tree digest with readback, enforces the stable reason-code
+    contract, and supports idempotent replay; add the closed result schema
+    schemas/node-architect/package-export/deterministic-hash-verification.schema.json
+    and the focused suite tests/package_export/test_deterministic_hash_verification.py.
+    Matches the issue's stated surfaces and boundaries; leaves the shared exporter
+    and smoke verifier untouched.
+  benefits:
+  - Matches the issue's named surfaces and boundaries exactly
+  - Isolated new module keeps blast radius minimal
+  - Deterministic, digest-bound, replay-safe by construction
+  tradeoffs:
+  - Some verification logic is conceptually adjacent to the exporter
+  risks:
+  - Behavioral drift versus the exporter if the latter is later refactored (mitigated by the shared manifest-digest contract)
+  constraint_fit: FIT
+- id: OPT-2
+  title: Extend tools/verify_package_export_smoke.py in place
+  description: >-
+    Add hash-verification evidence directly into the existing smoke verifier
+    instead of building an isolated module.
+  benefits:
+  - Single code path for package export verification
+  tradeoffs:
+  - Mutates a shared surface that downstream F7 tasks also touch, requiring serialization
+  - Larger blast radius; regression risk to existing smoke consumers
+  risks:
+  - Violates family guardrail (smoke verifier extended, not replaced, per issue Boundary)
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  Build the isolated read-only verifier, closed result schema and focused fixture
+  suite named in the issue. This preserves the shared exporter/smoke-verifier
+  boundary and keeps the blast radius narrow, matching the SCRUM-234 family convention.
+decision_required: true
+status: READY
