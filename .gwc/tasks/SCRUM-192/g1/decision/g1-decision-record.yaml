@@ -1,0 +1,58 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T23:58:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-192
+  base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-08-05T23:50:00.000Z'
+  source: 'current chat user message: 1 (tự viết G0/G1 cho SCRUM-192)'
+  explicit: true
+rationale: 'OPT-1 is the smallest compatible implementation of the live Jira contract: replay-safe escalation with checkpoint-before-wait, minimal exact remediation, closed schema, focused M5 tests, M5 family flow integration, and a shared catalog owner — all without execution authority.'
+rejected_option_ids: [OPT-2, OPT-3]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6]
+scope_hash: sha256:596db76fca909a8803e3409866b3dc4309b916136e5cb2889bd8210e1fff8833
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Define the schema and escalation contract.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Implement the pure evaluator and replay-safe precedence.
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: Add focused M5 tests + family flow + catalog owner, run validation.
+      dependencies: [SUB-TASK-2]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: dw-task-me
+      agent_type: validator
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3]
+  summary: One atomic OPT-1 implementation lane for the final node; no registry, connector, approval, PR, merge, deploy, or production work.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-192
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  plan_root: .gwc/tasks/SCRUM-192/g1/plan
+  plan_revision: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  validation_evidence: Manual plan review against Jira SCRUM-192 contract and OPT-1 scope.

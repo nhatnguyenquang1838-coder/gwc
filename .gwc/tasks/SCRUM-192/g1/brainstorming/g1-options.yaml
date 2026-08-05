@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T23:56:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-192
+  base_sha: 794b55186d9b97b81db8fe99a2def5a99b866754
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Minimal replay-safe escalation + shared catalog owner
+    description: Pure deterministic blocked_action_escalation evaluator with checkpoint-before-wait and minimal exact remediation; closed schema; focused M5 tests; M5 family flow integration; shared tools/node_architect/validate_node_catalog_gate_authority.py as the final integration owner; README package/checksum only.
+    benefits: [Smallest compatible change, directly testable, preserves gate separation, fail-closed behavior explicit]
+    tradeoffs: [Adds one shared owner module beyond the single-node pattern]
+    risks: [Requires careful checkpoint/replay-digest test coverage]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Escalation with optional notify channel
+    description: Adds a notification hook (Slack/email) on escalation.
+    benefits: [Richer operator feedback]
+    tradeoffs: [Introduces external side effect]
+    risks: [Violates no-execution-authority boundary]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Escalation with auto-retry
+    description: Auto-retries the blocked action after checkpoint.
+    benefits: [Less manual intervention]
+    tradeoffs: [Unauthorized continuation]
+    risks: [Violates GWC boundary]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract and keeps execution authority, approval, and runtime route changes out of scope.
+decision_required: true
+status: READY
