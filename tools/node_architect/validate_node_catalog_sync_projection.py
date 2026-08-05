@@ -36,6 +36,13 @@ RUNTIME_BINDINGS = {
         "artifact_type": "projection-evidence-linkset",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
+    "projection-privacy-boundary-check": {
+        "schema": "schemas/projection-privacy-decision.schema.json",
+        "evaluator": "tools/node_architect/projection_privacy_boundary_check.py",
+        "function": "decide_projection_privacy",
+        "artifact_type": "projection-privacy-decision",
+        "gates": ["G2_EXECUTION", "G3_PR"],
+    },
 }
 
 
