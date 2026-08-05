@@ -1,0 +1,41 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-05T00:45:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G2 scope is the SCRUM-234 export-manifest-generation evaluator, its closed result schema and focused tests only
+- fresh isolated module under tools/node_architect/package_export; shared exporter tools/export_project_package.py is not mutated
+- no archive publication, consumer repository write, package-version bump or deletion
+- no merge/deploy/release/production/credential work (merge is human/fastlane authority per G2 envelope excluded_actions)
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: b55193a7e5cae6727335670823d7900c30589f34
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: d88bcb8b551436f250f3ffed88357f4877cdfa58
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
