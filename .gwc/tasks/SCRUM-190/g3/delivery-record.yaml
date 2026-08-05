@@ -1,0 +1,137 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-190
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+working_branch: hermes/scrum-190-gate-transition-decision-20260805
+pull_request:
+  number: null
+  url: null
+  draft: true
+head_sha: e59ddfec1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+scope_hash: sha256:2375eded583121ecc8fb332d3ae15d98298c28707a3b66167408e12a52295b80
+changed_paths:
+  - .gwc/tasks/SCRUM-190/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-190/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-190/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-190/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-190/g1/plan/design.md
+  - .gwc/tasks/SCRUM-190/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-190/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-190/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-190/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-190/g2/plan-read-receipt.yaml
+  - .gwc/tasks/SCRUM-190/g3/delivery-record.yaml
+  - schemas/gate-transition-decision.schema.json
+  - tests/test_gate_authority_gate_transition_decision_m5.py
+  - tools/node_architect/gate_transition_decision.py
+validation:
+  head_sha: e59ddfec1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_gate_authority_gate_transition_decision_m5 -q
+      result: pass
+      evidence: 10 tests passed at exact local head e59ddfe
+    - command: python3 -m unittest discover -s tests -q
+      result: pass
+      evidence: full suite passed at exact local head e59ddfe
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-190 --gate G2_EXECUTION --json
+      result: pass
+      evidence: validator outcome PASS and valid true with no issues
+review:
+  implementer_id: Hermes-PC
+  reviewer_id: hermes-pc-g3-independent-20260805
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: e59ddfec1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+  reviewed_scope_hash: sha256:2375eded583121ecc8fb332d3ae15d98298c28707a3b66167408e12a52295b80
+  reviewed_at: "2026-08-05T23:40:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Deterministic PASS/BLOCK/CONTINUE/AWAITING/NA decisions per Jira contract.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Pure evaluator bound to canonical transition map; no transition performed.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - decision_digest deterministic; execution_performed const false; no authority grant.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 10 focused M5 tests pass (pass/awaiting/continue/block/mismatch/replay/g6); full suite OK.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope APPROVE_G2_EXECUTION_SCRUM-190_OPT1_20260805 binds exact head 2216108 (rebind e59ddfe) and scope_hash_16 2375eded583121ec.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Delivery record includes itself in changed_paths; bound to exact head; no PR mutation performed.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Exact-head readback pending PR creation; Build/Validate instructions will run on Draft PR.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Deterministic transitions follow the canonical map
+    - id: AC-2
+      result: pass
+      evidence:
+        - Readback required before PASS
+    - id: AC-3
+      result: pass
+      evidence:
+        - Gate separation preserved; never mutates task state
+    - id: AC-4
+      result: pass
+      evidence:
+        - Missing/invalid approval yields AWAITING/BLOCK tested
+    - id: AC-5
+      result: pass
+      evidence:
+        - Inactive G2 envelope blocks tested
+    - id: AC-6
+      result: pass
+      evidence:
+        - Focused 10 + full suite pass at exact head e59ddfe; G2 validator PASS
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: e59ddfec1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pending
+      evidence: runs on Draft PR
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pending
+      evidence: runs on Draft PR
+    - name: Validate instructions
+      required: true
+      status: pending
+      evidence: runs on Draft PR
+residual_risks:
+  - G4/G5 workflow remains downstream and is not a G3 required check.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass

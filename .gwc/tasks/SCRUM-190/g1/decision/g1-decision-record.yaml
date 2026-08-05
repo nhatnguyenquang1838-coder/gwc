@@ -1,0 +1,58 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T10:20:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-190
+  base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-08-05T10:15:00.000Z'
+  source: 'current chat user message: tiếp tục batch-f2, thực hiện SCRUM-190 theo OPT-1'
+  explicit: true
+rationale: 'OPT-1 is the smallest compatible implementation of the live Jira contract: decision schema, pure replay-safe evaluator bound to the canonical transition map, and focused tests only. It preserves the existing descriptor and registry surface and keeps transition application and all later-gate actions separate.'
+rejected_option_ids: [OPT-2, OPT-3]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6]
+scope_hash: sha256:2375eded583121ecc8fb332d3ae15d98298c28707a3b66167408e12a52295b80
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Define the closed gate-transition-decision schema and outcome contract.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Implement the pure replay-safe evaluator with map-driven next-node resolution and fail-closed refusals.
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: Add focused M5 tests and run validation.
+      dependencies: [SUB-TASK-2]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: dw-task-me
+      agent_type: validator
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3]
+  summary: One atomic OPT-1 implementation lane; no registry, connector, approval-generation, transition application, PR, merge, deploy, or production work.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-190
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  plan_root: .gwc/tasks/SCRUM-190/g1/plan
+  plan_revision: sha256:1be283731b4732241e10b75075d03168def746ad7753d9fb10f4d5d730f83be1
+  validation_evidence: Task Me hook review against Jira SCRUM-190 contract and OPT-1 scope; plan revision sha256:1be283731b4732241e10b75075d03168def746ad7753d9fb10f4d5d730f83be1.

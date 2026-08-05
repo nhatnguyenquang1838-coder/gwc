@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T10:20:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-190
+  base_sha: f6ef9a1ef30b40d110b4db9d34dddddb12b19c59
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Decision schema plus pure replay-safe evaluator and focused tests
+    description: Implement the Jira-specified decision JSON schema, a pure replay-safe gate_transition_decision function driven by the canonical transition map, and the focused M5 regression module only.
+    benefits: [Smallest compatible change, directly testable, preserves existing registry surface, no transition authority is introduced]
+    tradeoffs: [Registry/descriptor wiring remains a separate follow-up if later required]
+    risks: [Requires careful outcome precedence and replay-digest test coverage]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Evaluator plus transition application and lifecycle state writes
+    description: Add the decision evaluator together with code that applies the transition and persists the new lifecycle state.
+    benefits: [More integrated runtime behavior]
+    tradeoffs: [Introduces transition authority the node must not hold]
+    risks: [Violates the never-performs-transition boundary and enlarges blast radius]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Documentation-only transition contract note
+    description: Document the intended decision outcomes and next-node resolution without adding executable behavior.
+    benefits: [Lowest code risk]
+    tradeoffs: [Does not satisfy requested runtime files or acceptance criteria]
+    risks: [Leaves the gate transition boundary unenforced]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract and keeps transition application, registry, connector, and approval-generation changes out of scope.
+decision_required: true
+status: READY
