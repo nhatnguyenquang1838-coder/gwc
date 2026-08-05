@@ -1,0 +1,56 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-05T02:33:08Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G2 scope is the SCRUM-235 deterministic-hash-verification evaluator, its closed result schema and focused fixtures only
+- fresh isolated module under tools/node_architect/package_export; shared exporter and existing smoke verifier are not mutated
+- no archive publication, consumer repository write, package-version bump or deletion
+- no merge/deploy/release/production/credential work (merge is human/fastlane authority per G2 envelope excluded_actions)
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: ff344ce265df0747a3a0f5dfa184f619485283f95263d920d58e39adbc5a7678
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: 6cbc94ff73d9f9e6e1650cb57c8be4f5a678eff8c615eef77c2a24a5964b85fa
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 78d596242a9e042d62d6174afc40aa4976eb3285
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+sources:
+- path: core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json
+  required: true
+  status: AVAILABLE
+  source_sha: e8b62a437e58f1b6f64eccc46ecdf90c4b207da17fd77da8ba11bd57516dd7d2
+- path: tools/verify_package_export_smoke.py
+  required: true
+  status: AVAILABLE
+  source_sha: bab48e639a97edc07b9452cf4fdd07101992eb29de4e13e17713b3f495f2a5aa
+- path: schemas/package-export-manifest.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 58eeb85692c90c94e02152173bdf72ff4ec5d51b309330c90c992a14301b25a3
+status: READY
+blockers: []

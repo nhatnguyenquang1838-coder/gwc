@@ -1,0 +1,64 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-08-05T02:33:08Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-235
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  g0_snapshot: ../g0/context-snapshot.yaml
+g1_refs:
+  intake: ../g1/intake/g1-intake-brief.yaml
+  preflight: ../g1/preflight/g1-preflight-report.yaml
+  options: ../g1/brainstorming/g1-options.yaml
+  decision: ../g1/decision/g1-decision-record.yaml
+approval:
+  command: 'APPROVE G2_EXECUTION SCRUM-235 a56c11ca 2026-08-06T02:33:08Z'
+  issued_at: '2026-08-05T02:33:08Z'
+  expires_at: '2026-08-06T02:33:08Z'
+  scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  working_branch: hermes/scrum-235-deterministic-hash-verification-m5-20260805
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+task:
+  id: SCRUM-235
+  summary: '[MAT-F7-N07] package_export.deterministic-hash-verification — M2 -> M5'
+  type: Subtask
+risk_class: R1
+required_gate_entered: G2_EXECUTION
+authorized_actions:
+- create_branch: hermes/scrum-235-deterministic-hash-verification-m5-20260805
+- write_package_files:
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - schemas/node-architect/package-export/deterministic-hash-verification.schema.json
+  - tests/package_export/test_deterministic_hash_verification.py
+- run_tests: tests/package_export/test_deterministic_hash_verification.py
+- run_smoke: tools/verify_package_export_smoke.py (must stay green — extend, do not break)
+- open_draft_pr: G3_PR
+scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+file_scope:
+- tools/node_architect/package_export/deterministic_hash_verification.py
+- schemas/node-architect/package-export/deterministic-hash-verification.schema.json
+- tests/package_export/test_deterministic_hash_verification.py
+- .gwc/tasks/SCRUM-235/**
+excluded_actions:
+- merge_to_main
+- deploy
+- release
+- publish
+- consumer_repo_write
+- package_version_bump
+- credential_or_secret_change
+- production_data_operation
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+g2_outcome: PASS

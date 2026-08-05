@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/package-export/deterministic-hash-verification.schema.json",
+  "title": "Deterministic Hash Verification result",
+  "description": "Closed, versioned runtime contract for the deterministic hash-verification evidence evaluator (SCRUM-235, M5_REPLAY_SAFE). The typed result is the only PASS signal; it never grants repository, PR, merge, deploy or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "task_id",
+    "source_sha",
+    "manifest_digest",
+    "output_tree_digest",
+    "idempotency_key",
+    "verifier_version",
+    "entries_verified",
+    "entries_rejected",
+    "outcome",
+    "reason",
+    "authority_granted"
+  ],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "const": "gwc.package_export.deterministic_hash_verification"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["0.1"]
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Governed task identity that produced/verified the package."
+    },
+    "source_sha": {
+      "type": "string",
+      "description": "Source snapshot commit SHA the package was built from.",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "manifest_digest": {
+      "type": "string",
+      "description": "Canonical semantic digest of the verified manifest (excludes observational fields).",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "output_tree_digest": {
+      "type": "string",
+      "description": "Deterministic digest of the complete output inventory (paths + target digests, sorted).",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Replay identity. Same accepted evidence + same key yields identical result and digest."
+    },
+    "verifier_version": {
+      "type": "string",
+      "description": "Version of this evaluator; guards algorithm/version drift."
+    },
+    "entries_verified": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "entries_rejected": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"]
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "HASH_VERIFICATION_PASS",
+        "HASH_SOURCE_MISMATCH",
+        "HASH_TARGET_MISMATCH",
+        "HASH_BYTE_COUNT_MISMATCH",
+        "HASH_MANIFEST_DIGEST_MISMATCH",
+        "HASH_TREE_DIGEST_MISMATCH",
+        "HASH_TARGET_MISSING",
+        "HASH_UNMANIFESTED_TARGET",
+        "HASH_ALGORITHM_UNSUPPORTED",
+        "HASH_IDEMPOTENT_REPLAY",
+        "HASH_REPLAY_CONFLICT"
+      ]
+    },
+    "authority_granted": {
+      "const": false
+    },
+    "reject_detail": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "reason", "detail"],
+        "properties": {
+          "target": { "type": "string" },
+          "source": { "type": ["string", "null"] },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "HASH_SOURCE_MISMATCH",
+              "HASH_TARGET_MISMATCH",
+              "HASH_BYTE_COUNT_MISMATCH",
+              "HASH_MANIFEST_DIGEST_MISMATCH",
+              "HASH_TREE_DIGEST_MISMATCH",
+              "HASH_TARGET_MISSING",
+              "HASH_UNMANIFESTED_TARGET",
+              "HASH_ALGORITHM_UNSUPPORTED",
+              "HASH_REPLAY_CONFLICT"
+            ]
+          },
+          "detail": { "type": "string" }
+        }
+      }
+    }
+  }
+}
