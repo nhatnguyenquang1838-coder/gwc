@@ -1,0 +1,84 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T12:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-185
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: 'Implement the deterministic gate_authority.approval-token-generation node for SCRUM-185 (MAT-F2-N02, M2 to M4).'
+  why_now: 'SCRUM-187, SCRUM-184, and SCRUM-188 are Done, so the gate-authority family now needs an exact, reproducible human approval request and command generator for a single separately gated action.'
+desired_outcome: Add the approval-request JSON schema, a pure deterministic generator module, and focused M4 tests that prove exact command grammar, non-secret token semantics, binding, and drift sensitivity without granting any execution authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, gate-authority node consumers, human approvers issuing gate approval commands]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-185/** task-scoped GWC evidence
+    - schemas/gate-approval-request.schema.json
+    - tools/node_architect/approval_token_generation.py
+    - tests/test_gate_authority_approval_token_generation_m4.py
+    - Focused unit validation and complete local diff review
+  non_goals:
+    - Approval validation, consumption, expiry recovery, or authority granting
+    - Modify the existing node descriptor or registry outside the three implementation files
+    - Any connector call from the implemented node
+    - Emission of secret, credential, or bearer material
+    - Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+constraints:
+  - 'The generator must be pure and deterministic: identical inputs produce an identical approval request and command.'
+  - The node must never perform, approve, or authorize the gated action it describes.
+  - 'The approval token is a non-secret 64-hex request identifier bound to gate, task, scope, expiry, and head; it must not act as a bearer secret.'
+  - 'The emitted command grammar must be exactly: APPROVE <GATE_SHORT> <TASK_ID> <APPROVAL_TOKEN_64HEX> <EXPIRES_AT_UTC>.'
+  - G2 approval is required before branch/worktree or repository implementation writes.
+  - G3, G4, G5, and G6 remain separate gates.
+assumptions:
+  - origin/main at 7269a5219750b7c4fa7c5229eb95df395fd4712d is the current protected-base evidence.
+  - SCRUM-187, SCRUM-184, and SCRUM-188 are the declared prerequisites and all are Done in live Jira.
+  - SCRUM-167 remains the parent epic-level task and is not modified by this subtask.
+  - The implementation can use the repository's existing Python standard-library and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: A token generator at a governance authority boundary could be mistaken for an authority grant or a secret-bearing credential.
+    impact: high
+    mitigation: Keep the node pure, document and test non-secret semantics explicitly, and assert in tests that no output field grants or implies execution authority.
+  - id: RISK-2
+    description: Non-deterministic or weakly bound token derivation would break replay safety and drift detection.
+    impact: high
+    mitigation: Derive the token deterministically from the canonical binding tuple and add drift-sensitivity tests over gate, task, scope, expiry, and head inputs.
+  - id: RISK-3
+    description: Command-grammar drift would silently break downstream human approval parsing.
+    impact: medium
+    mitigation: Pin the exact five-token grammar in the schema and assert the rendered string byte-for-byte in the M4 tests.
+acceptance_criteria:
+  - id: AC-1
+    statement: The gate-approval-request schema is closed and validates the complete request shape, rejecting unknown, missing, or invalid fields.
+    verifiable: true
+  - id: AC-2
+    statement: 'The generator emits the exact command grammar APPROVE <GATE_SHORT> <TASK_ID> <APPROVAL_TOKEN_64HEX> <EXPIRES_AT_UTC> with no additional or reordered tokens.'
+    verifiable: true
+  - id: AC-3
+    statement: The approval token is a non-secret 64-hex identifier derived deterministically from the canonical binding tuple and is documented and tested as non-secret.
+    verifiable: true
+  - id: AC-4
+    statement: Every request is bound to expiry, scope, and head, and the generator fails closed on missing or malformed bindings.
+    verifiable: true
+  - id: AC-5
+    statement: Drift in gate, task, scope, expiry, or head changes the generated token, and identical inputs reproduce an identical token.
+    verifiable: true
+  - id: AC-6
+    statement: No output field grants execution, merge, deploy, or production authority, and the node performs no action.
+    verifiable: true
+  - id: AC-7
+    statement: The focused M4 test module passes and the complete diff remains within the approved scope.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+  downstream_non_goals: [open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]
+unresolved_questions: []
+status: READY
