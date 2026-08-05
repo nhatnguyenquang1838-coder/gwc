@@ -1,0 +1,162 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-188
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+working_branch: codex/scrum-188-authority-boundary-m5-20260805
+pull_request:
+  number: 219
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/219
+  draft: true
+head_sha: d09c27820e19af039aa8ca5738d27e251a16ee74
+scope_hash: sha256:80c2b3d670936a793dba8e0d398a74b76d13a6dfa18cae3c47b96cf42e0aace0
+changed_paths:
+  - .gwc/tasks/SCRUM-188/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-188/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-188/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-188/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-188/g1/plan/design.md
+  - .gwc/tasks/SCRUM-188/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-188/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-188/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-188/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-188/g2/plan-read-receipt.yaml
+  - schemas/authority-boundary-decision.schema.json
+  - tests/test_gate_authority_authority_boundary_check_m5.py
+  - tools/node_architect/authority_boundary_check.py
+validation:
+  head_sha: d09c27820e19af039aa8ca5738d27e251a16ee74
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_gate_authority_authority_boundary_check_m5 -q
+      result: pass
+      evidence: 14 tests passed at exact local head d09c27820e19af039aa8ca5738d27e251a16ee74
+    - command: python3 -m unittest tests.test_gate_authority_authority_boundary_check_m5 tests.test_gate_authority_gate_state_resolution_m5 tests.test_gate_authority_scope_hash_calculation_m4 tests.test_node_catalog_gate_authority tests.test_gate_node_route_resolution -q
+      result: pass
+      evidence: 73 tests passed at exact local head d09c27820e19af039aa8ca5738d27e251a16ee74
+    - command: python3 -m unittest discover -s tests -q
+      result: pass
+      evidence: 998 tests passed at exact local head d09c27820e19af039aa8ca5738d27e251a16ee74
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-188 --gate G2_EXECUTION --json
+      result: pass
+      evidence: validator outcome PASS and valid true with no issues
+    - command: git diff --check -- approved SCRUM-188 paths
+      result: pass
+      evidence: no whitespace errors
+review:
+  implementer_id: Codex-GPT
+  reviewer_id: codex-gwc-g3-r5-readonly-20260805
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: d09c27820e19af039aa8ca5738d27e251a16ee74
+  reviewed_scope_hash: sha256:80c2b3d670936a793dba8e0d398a74b76d13a6dfa18cae3c47b96cf42e0aace0
+  reviewed_at: "2026-08-05T09:34:19Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - R5 receipt reports AC-1 through AC-4 pass and no prior implementation blocker remains
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - compact scope_identity projection is explicitly documented in the decision schema
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - authority_boundary_check.py validates string-list element types before deduplication
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - focused, related regression, and full local suites pass at the exact head
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 R5 refresh now binds the envelope and plan-read receipt to d09c278...
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Formal G3 delivery record exists locally; no G3 approval or Ready-for-Review transition exists
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - GitHub connector exact-head readback confirms required workflows pass for d09c278; gh CLI was unavailable to the independent reviewer
+  findings:
+    - id: REV-1
+      severity: BLOCKER
+      category: governance
+      status: open
+      evidence: G2 execution-envelope.yaml:15 and g2/plan-read-receipt.yaml:8 bind d4c7ebbc... rather than current G3 head d09c278...
+      recommendation: Obtain a new exact-head G2 evidence refresh approval before changing G2 bindings; then rerun G3 review.
+    - id: REV-2
+      severity: BLOCKER
+      category: delivery
+      status: resolved
+      evidence: .gwc/tasks/SCRUM-188/g3/delivery-record.yaml now exists locally for the exact current head.
+      recommendation: Keep the record bound to the exact head and validate it before any G3 PR metadata action.
+      resolution: Formal G3 delivery record materialized in the task-scoped artifact root; no PR mutation was performed.
+    - id: REV-3
+      severity: BLOCKER
+      category: delivery
+      status: open
+      evidence: The R5 independent review completed before the G2 R5 evidence refresh and therefore is stale for the refreshed scope binding.
+      recommendation: Obtain a fresh independent G3 review after the refreshed evidence is committed and the exact head is read back.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - schema and complete core scope bindings validate; malformed nested inputs fail closed
+    - id: AC-2
+      result: pass
+      evidence:
+        - canonical action mapping and policy-remap prevention pass focused tests
+    - id: AC-3
+      result: pass
+      evidence:
+        - unknown, replay, scope, prohibited, gate, applicability, and malformed-input cases pass
+    - id: AC-4
+      result: pass
+      evidence:
+        - authority flags remain false and evaluator performs no action
+    - id: AC-5
+      result: not_verified
+      evidence:
+        - local validation passes, but exact-head G2/G3 evidence refresh and G3 approval remain outstanding
+  decision: changes_required
+  stale: true
+ci:
+  required: true
+  head_sha: d09c27820e19af039aa8ca5738d27e251a16ee74
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478481
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478475
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478457
+    - name: G4 G5 evidence
+      required: false
+      status: fail
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478470; downstream failure due missing trusted G4 receipt
+residual_risks:
+  - G2 evidence refresh must be separately approved and bound to the exact head before G3 closure.
+  - G4/G5 workflow remains downstream and is not a G3 required check.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: fail
