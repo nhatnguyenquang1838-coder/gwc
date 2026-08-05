@@ -1,0 +1,137 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-228
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+working_branch: hermes/scrum-228-projection-privacy-boundary-check-m4-20260805
+pull_request:
+  number: 218
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/218
+  draft: true
+head_sha: ac08997287962f4e5991640a7d5ebba9e8d5d8c7
+scope_hash: sha256:20ba9ca985715f51420198982753eb6a21d3e1f1afaa0352d5fdb8729f5d5312
+changed_paths:
+- schemas/projection-privacy-decision.schema.json
+- tools/node_architect/projection_privacy_boundary_check.py
+- tools/node_architect/validate_node_catalog_sync_projection.py
+- tests/test_sync_projection_m4_batch_b1.py
+- core/node-architect/node-catalog/sync_projection/README.md
+- .gwc/tasks/SCRUM-228/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-228/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-228/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-228/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-228/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-228/g2/execution-envelope.yaml
+validation:
+  head_sha: ac08997287962f4e5991640a7d5ebba9e8d5d8c7
+  status: pass
+  commands:
+  - command: python3 tools/validate_g01.py --root . --workspace .gwc/tasks/SCRUM-228 --json
+    result: pass
+    evidence: '{"outcome":"PASS","valid":true,"issues":[]}'
+  - command: python3 -m unittest tests.test_sync_projection_m4_batch_b1.ProjectionPrivacyBoundaryTests
+    result: pass
+    evidence: '15 tests, all pass (clean metadata, safe redaction, unclassified protected key, each prohibited class, target-policy denial, invalid directive, payload size limit, recursive key detection, leak rejection, digest stability/drift, authority constants)'
+  - command: python3 -m unittest tests.test_sync_projection_m4_batch_b1
+    result: pass
+    evidence: '47 tests pass (15 new privacy + 32 source-authority/evidence-linking)'
+  - command: python3 -m unittest tests.test_node_catalog_sync_projection
+    result: pass
+    evidence: '12 family regression tests pass'
+  - command: python3 tools/node_architect/validate_node_catalog_sync_projection.py
+    result: pass
+    evidence: 'PASS: sync_projection node catalog family and runtime bindings are valid'
+review:
+  implementer_id: Nhat Nguyen Quang
+  reviewer_id: Hermes-PC
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: ac08997287962f4e5991640a7d5ebba9e8d5d8c7
+  reviewed_scope_hash: sha256:20ba9ca985715f51420198982753eb6a21d3e1f1afaa0352d5fdb8729f5d5312
+  reviewed_at: '2026-08-05T15:30:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - Issue SCRUM-228 acceptance criteria 1-6 mapped to AC-1..AC-6 in g1-intake-brief
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Closed 12-class model, mandatory protected-key list, 11-step precedence, order-independent digests per issue design
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - Pure evaluator, no I/O/mutation/authority; schema + evaluator + family binding authored
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - 15 RED-first ProjectionPrivacyBoundaryTests; 47 B1 tests; 12 family regression
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - validate_g01 PASS; G2 envelope APPROVE G2_EXECUTION SCRUM-228 20ba9ca9 2026-08-06T14:30:00Z
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Guarded branch pushed; draft PR #218 opened; no merge/main write performed
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - Exact-head validation commands reproduce locally (validate_g01, unittest x2, node catalog validator)
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - Prohibited classes rejected; raw values absent from sanitized payload and hashes (test_each_prohibited_class_rejected, test_safe_redaction_records_no_originals)
+  - id: AC-2
+    result: pass
+    evidence:
+    - Redaction deterministic; redactions exclude originals (test_safe_redaction_records_no_originals)
+  - id: AC-3
+    result: pass
+    evidence:
+    - Missing classification / policy denial / invalid redaction / leak fail closed (test_unclassified_protected_key_fails_closed, test_target_policy_denial_fails_closed, test_invalid_redaction_directive_fails_closed, test_residual_leak_detected)
+  - id: AC-4
+    result: pass
+    evidence:
+    - Digests order-independent and drift-sensitive (test_digest_stability_across_ordering, test_digest_drift_on_policy_change)
+  - id: AC-5
+    result: pass
+    evidence:
+    - No authority field true in any variant (test_no_authority_field_can_be_true)
+  - id: AC-6
+    result: pass
+    evidence:
+    - Focused tests, B1 integration, family regression pass (47 + 12)
+  decision: pass
+  stale: false
+ci:
+  required: false
+  head_sha: ac08997287962f4e5991640a7d5ebba9e8d5d8c7
+  checks:
+  - name: validate
+    required: false
+    status: pass
+    evidence: 'Local exact-head validation suite passes (validate_g01, unittest x2, node catalog validator)'
+  - name: g4-receipt-required
+    required: false
+    status: skipped
+    evidence: 'G4 merge gate; intentionally red on this draft PR per gwc CI reality; not a G3 requirement'
+residual_risks:
+- G4 merge remains human authority; this draft PR is not G4-eligible until a G4 approval command is issued as a PR comment.
+- Downstream SCRUM-220/221/222 consume the privacy decision; their gating depends on this artifact reaching main.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pass
