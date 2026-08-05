@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T12:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-185
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Pure deterministic generator plus closed schema and focused M4 tests
+    description: Implement the Jira-specified pure approval-request generator, a closed JSON schema, and a focused M4 regression module only, leaving descriptor and registry surfaces untouched.
+    benefits: [Smallest compatible change, directly testable, preserves existing registry surface, non-secret and no-authority semantics are explicit]
+    tradeoffs: [Registry/descriptor wiring remains a separate follow-up if later required]
+    risks: [Requires careful determinism, binding, and drift-sensitivity test coverage]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Broaden implementation into registry, descriptor, and runtime route wiring
+    description: Add the generator plus descriptor, registry, instruction-card, and runtime route changes in the same task.
+    benefits: [More integrated runtime exposure]
+    tradeoffs: [Larger blast radius and additional contracts]
+    risks: [Scope drift and unapproved public runtime behavior at an authority boundary]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Reuse a signed-secret token scheme
+    description: Generate approval tokens as HMAC-signed bearer secrets managed through repository credentials.
+    benefits: [Cryptographic unforgeability]
+    tradeoffs: [Introduces secret material and credential handling into a governance-preparation node]
+    risks: [Violates the non-secret token requirement and the no-credentials constraint]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract and keeps registry, connector, approval-validation, secret material, and runtime route changes out of scope.
+decision_required: true
+status: READY

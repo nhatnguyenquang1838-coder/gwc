@@ -1,0 +1,136 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T12:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-185
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  profile_path: projects/gwc/project-profile.yaml
+  connector: Git
+checks:
+  - id: BASE_BINDING
+    status: PASS
+    code: BASE_SHA_VERIFIED
+    message: The local checkout and origin/main match the protected-base SHA used by every SCRUM-185 artifact.
+    evidence: [git rev-parse origin/main, g0/context-snapshot.yaml repository.base_sha]
+  - id: TARGET_SCOPE
+    status: PASS
+    code: TARGET_FILES_MATCH
+    message: Jira create-files and the recommended OPT-1 scope are identical.
+    evidence: [Jira SCRUM-185 description, G1 intake scope]
+  - id: DEPENDENCIES
+    status: PASS
+    code: DEPENDENCIES_SATISFIED
+    message: SCRUM-187, SCRUM-184, and SCRUM-188 are Done and their artifacts exist in the repository.
+    evidence: [.gwc/tasks/SCRUM-188/g3/delivery-record.yaml, Jira SCRUM-184, Jira SCRUM-187]
+  - id: POLICY_HASHES
+    status: PASS
+    code: POLICY_CONTENT_SHA_VERIFIED
+    message: 'Every applicable policy and required source carries a content SHA-256 recomputed at the protected base via `git show <base_sha>:<path> | sha256sum`.'
+    evidence: [g0/context-snapshot.yaml applicable_policies, g0/context-snapshot.yaml sources]
+  - id: AUTHORITY_BOUNDARY
+    status: PASS
+    code: NO_AUTHORITY_GRANTED
+    message: SCRUM-185 prepares an approval request only; it grants no execution, merge, deploy, or production authority.
+    evidence: [G1 intake non_goals, G1 decision authority_boundaries]
+  - id: PLAN_BINDING
+    status: PASS
+    code: TASK_ME_PLAN_VALIDATED
+    message: The Task Me plan is bound to SCRUM-185, the exact base SHA, and OPT-1.
+    evidence: [g1/plan/requirements.md, g1/plan/design.md, g1/plan/tasks.md, sha256:5eb5b015c5182cfbf0af233e9c33f63999c7df4d8c829330cd6ed3a1b8cd5e41]
+  - id: REMOTE_CONNECTIVITY
+    status: WARN
+    code: REMOTE_READBACK_LOCAL_ONLY
+    message: 'Remote verification used the local `origin/main` ref readback; no GitHub API compare was performed in this read-only preparation session.'
+    evidence: [git rev-parse origin/main]
+process_readback:
+  process_id: GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0
+  terminal_outcome: Validated G0/G1 evidence for SCRUM-185 ready for a separate human G2_EXECUTION approval.
+  required_sources:
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    - projects/gwc/project-profile.yaml
+    - AGENTS.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+  route_steps:
+    - id: STEP-1
+      name: Produce and validate G0/G1 evidence
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: local_artifact_write
+      capability_required: Trusted local checkout, filesystem write, and validator runner
+      capability_status: VERIFIED
+      primary_route: 'Write .gwc/tasks/SCRUM-185/** and run tools/validate_g01.py in an isolated venv'
+      fallback_routes: []
+      continuation: On BLOCKED, repair the reported artifact fields and re-run the validator until PASS.
+      expected_evidence: 'validate_g01.py JSON report with outcome PASS'
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-2
+      name: Human G2_EXECUTION approval
+      gate: G2_EXECUTION
+      actor: human
+      action_class: gate_approval
+      capability_required: Human approver issuing the exact approval command
+      capability_status: SEPARATE_GATE
+      primary_route: 'Present the APPROVE G2_EXECUTION command and wait for the human response'
+      fallback_routes: []
+      continuation: Hold all repository writes until the explicit approval is received; no timeout auto-proceed.
+      expected_evidence: Human-issued approval command bound to the SCRUM-185 scope hash
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-3
+      name: Implement OPT-1 on a guarded working branch
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: repository_write
+      capability_required: Git branch creation, edit, commit, and test execution in the trusted checkout
+      capability_status: VERIFIED
+      primary_route: 'Create hermes/scrum-185-* branch, add the schema, generator, and M4 tests, then run the focused tests'
+      fallback_routes: []
+      continuation: On test failure, fix within the approved three-file scope and re-run before any push.
+      expected_evidence: Focused M4 test run output and complete local diff review
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-4
+      name: G3 Draft PR delivery
+      gate: G3_PR
+      actor: human_authorized_agent
+      action_class: pull_request_create
+      capability_required: Separate G3 approval and Draft PR delivery evidence
+      capability_status: SEPARATE_GATE
+      primary_route: 'Write g3/delivery-record.yaml and open a Draft PR only after a separate G3 approval'
+      fallback_routes: []
+      continuation: Remain at G2 completion until G3 is separately approved; never auto-promote to ready for review.
+      expected_evidence: 'g3/delivery-record.yaml validated by tools/validate_g3_delivery.py'
+      bypass_eligibility: FORBIDDEN
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+implementation_plan:
+  applicability: required
+  reason: SCRUM-185 requests implementation and validation planning; the GWC G1 hook requires Task Me decomposition.
+  source: task_me
+  task_me_applicable: true
+  task_me_available: true
+  task_me_invoked: true
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-185
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  plan_root: .gwc/tasks/SCRUM-185/g1/plan
+  requirements_path: .gwc/tasks/SCRUM-185/g1/plan/requirements.md
+  design_path: .gwc/tasks/SCRUM-185/g1/plan/design.md
+  tasks_path: .gwc/tasks/SCRUM-185/g1/plan/tasks.md
+  plan_revision: sha256:5eb5b015c5182cfbf0af233e9c33f63999c7df4d8c829330cd6ed3a1b8cd5e41
+  validation_status: PASS
+  validation_evidence: Task Me hook review against the Jira SCRUM-185 contract and OPT-1 scope; plan revision sha256:5eb5b015c5182cfbf0af233e9c33f63999c7df4d8c829330cd6ed3a1b8cd5e41.
+  generated_by: Hermes-PC via dw-task-me
+  generated_at_utc: '2026-08-05T12:40:00Z'
+blockers: []
+outcome: PASS

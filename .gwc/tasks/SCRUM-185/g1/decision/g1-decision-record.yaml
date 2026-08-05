@@ -1,0 +1,58 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-05T12:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-185
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-08-05T12:35:00.000Z'
+  source: 'current chat user message: create formal G0/G1 gate artifacts for SCRUM-185 and validate them to PASS; implementer is Hermes-PC, OPT-1 scope'
+  explicit: true
+rationale: 'OPT-1 is the smallest compatible implementation of the live Jira contract: a closed approval-request schema, a pure deterministic generator, and focused M4 tests only. It preserves the existing descriptor and registry surface, keeps secret material out of the node, and leaves every later-gate action to its own gate.'
+rejected_option_ids: [OPT-2, OPT-3]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7]
+scope_hash: sha256:9f3c1de6b0aa4d5eb2c78f0a1d64e3b5c8971a2e40db6f8c5a3b1e7d29c04f68
+g1_gate_outcome: PASS
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Define the closed gate-approval-request schema and canonical request contract.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Implement the pure deterministic token and command generator with fail-closed binding checks.
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: Add focused M4 tests for grammar, non-secret semantics, binding, drift, and no-authority, then run validation.
+      dependencies: [SUB-TASK-2]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: dw-task-me
+      agent_type: validator
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3]
+  summary: One atomic OPT-1 implementation lane; no registry, connector, approval-validation, PR, merge, deploy, or production work.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-185
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  plan_root: .gwc/tasks/SCRUM-185/g1/plan
+  plan_revision: sha256:5eb5b015c5182cfbf0af233e9c33f63999c7df4d8c829330cd6ed3a1b8cd5e41
+  validation_evidence: Task Me hook review against the Jira SCRUM-185 contract and OPT-1 scope; plan revision sha256:5eb5b015c5182cfbf0af233e9c33f63999c7df4d8c829330cd6ed3a1b8cd5e41.
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]

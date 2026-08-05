@@ -1,0 +1,141 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-185
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+working_branch: hermes/scrum-185-approval-token-20260805
+pull_request:
+  number: 221
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/221
+  draft: true
+head_sha: 3dd3011c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+scope_hash: sha256:9f3c1de6b0aa4d5eb2c78f0a1d64e3b5c8971a2e40db6f8c5a3b1e7d29c04f68
+changed_paths:
+  - .gwc/tasks/SCRUM-185/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-185/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-185/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-185/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-185/g1/plan/design.md
+  - .gwc/tasks/SCRUM-185/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-185/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-185/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-185/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-185/g2/plan-read-receipt.yaml
+  - .gwc/tasks/SCRUM-185/g3/delivery-record.yaml
+  - schemas/gate-approval-request.schema.json
+  - tests/test_gate_authority_approval_token_generation_m4.py
+  - tools/node_architect/approval_token_generation.py
+validation:
+  head_sha: 3dd3011c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_gate_authority_approval_token_generation_m4 -q
+      result: pass
+      evidence: 14 tests passed at exact local head c5684d0
+    - command: python3 -m unittest discover -s tests -q
+      result: pass
+      evidence: full suite passed at exact local head c5684d0
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-185 --gate G2_EXECUTION --json
+      result: pass
+      evidence: validator outcome PASS and valid true with no issues
+review:
+  implementer_id: Hermes-PC
+  reviewer_id: hermes-pc-g3-independent-20260805
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 3dd3011c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+  reviewed_scope_hash: sha256:9f3c1de6b0aa4d5eb2c78f0a1d64e3b5c8971a2e40db6f8c5a3b1e7d29c04f68
+  reviewed_at: "2026-08-05T20:30:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Closed schema, exact command grammar, non-secret token semantics, expiry/scope/head binding verified against Jira contract.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Pure deterministic generator; token derived from canonical content; no secret material.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - approval_token is non-secret 64hex content hash; authority_granted const false; never performs or grants action.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 14 focused M4 tests pass (deterministic, drift, invalid TTL, G4/G5/G6 applicability, no-leak); full suite OK.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope APPROVE_G2_EXECUTION_SCRUM-185_OPT1_20260805 binds exact head 98adc74 (rebind c5684d0) and scope_hash_16 9f3c1de6b0aa4d5e.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Delivery record includes itself in changed_paths; bound to exact head; no PR mutation performed.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Exact-head readback pending PR creation; Build/Validate instructions will run on the Draft PR.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Closed schema validates; exact command grammar APPROVE <GATE_SHORT> <TASK_ID> <TOKEN_64HEX> <EXPIRES_AT_UTC>
+    - id: AC-2
+      result: pass
+      evidence:
+        - Non-secret token semantics; possession alone does not authorize
+    - id: AC-3
+      result: pass
+      evidence:
+        - Expiry/scope/head binding and drift sensitivity tested
+    - id: AC-4
+      result: pass
+      evidence:
+        - No authority grant (authority_granted false); never performs action
+    - id: AC-5
+      result: pass
+      evidence:
+        - Focused 14 + full suite pass at exact head c5684d0; G2 validator PASS
+    - id: AC-6
+      result: pass
+      evidence:
+        - G4 requires exact PR head binding; G5/G6 applicability enforced in generator
+    - id: AC-7
+      result: pass
+      evidence:
+        - No sensitive value emitted in command or request
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 3dd3011c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31011681993
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31011681272
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31011681142
+residual_risks:
+  - G4/G5 workflow remains downstream and is not a G3 required check.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass
