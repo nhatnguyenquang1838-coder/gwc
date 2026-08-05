@@ -99,3 +99,28 @@ The output is a closed `schema_version: "1.0"` artifact with deterministic order
 | Descriptor | Runtime artifact | Schema | Evaluator | Maturity |
 |---|---|---|---|---|
 | `projection-privacy-boundary-check.node.json` | `projection-privacy-decision` | `schemas/projection-privacy-decision.schema.json` | `tools/node_architect/projection_privacy_boundary_check.py` | M4 deterministic |
+
+## B2 target projection runtime bindings (SCRUM-220/221/222)
+
+B2 raises the three target-projection nodes (`ds-admin-state-projection`,
+`task-center-sync`, `external-audit-event-projection`) from catalogue metadata to
+`M4_VALIDATED`. Each consumes the shared closed `schemas/sync-projection-envelope.schema.json`
+plus the B1 source-authority decision, evidence linkset and privacy-boundary
+decision, then renders an approved, read-only projection. All renderers are pure:
+no connector call, network request, filesystem mutation, Jira transition, branch/
+PR/approval/merge/deploy/production operation. Every runtime artifact fixes
+`read_only_projection: true` and every authority field to `false`.
+
+| Descriptor | Runtime artifact | Schema | Evaluator | Function |
+|---|---|---|---|---|
+| `ds-admin-state-projection.node.json` | `ds-admin-state-projection` | `schemas/ds-admin-state-projection.schema.json` | `tools/node_architect/ds_admin_state_projection.py` | `project_ds_admin_state` |
+| `task-center-sync.node.json` | `task-center-sync-projection` | `schemas/task-center-sync-projection.schema.json` | `tools/node_architect/task_center_sync.py` | `project_task_center_sync` |
+| `external-audit-event-projection.node.json` | `external-audit-event-projection` | `schemas/external-audit-event-projection.schema.json` | `tools/node_architect/external_audit_event_projection.py` | `project_external_audit_event` |
+
+Each renderer fails closed (in deterministic precedence) for: invalid input;
+missing/blocked/mismatched source authority; invalid evidence linkset; invalid
+privacy boundary; prior binding to another task; revision regression (Task
+Center); or prior readback mismatch. A valid fresh projection yields
+`outcome: READY, reason_code: *_PROJECTION_READY` (or `*_SYNC_READY` /
+`*_EVENT_READY`); a valid projection matching an existing prior readback yields
+`*_CURRENT` (NOOP). The canonical-state digest is order-independent.

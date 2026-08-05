@@ -2,9 +2,8 @@ import copy
 import hashlib
 import json
 import unittest
-from typing import Any
-
 from pathlib import Path
+from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
 
