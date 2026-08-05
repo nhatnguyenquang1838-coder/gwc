@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/g2-execution-envelope.schema.json",
+  "title": "GWC G2 Execution Envelope",
+  "description": "Closed, bounded G2 execution envelope rendered from approved F1 scope artifacts and F2 authority decisions. The renderer may produce DRAFT/AWAITING_APPROVAL/ACTIVE but never executes the envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "activation_state",
+    "task_id",
+    "repository",
+    "base_ref",
+    "base_sha",
+    "working_branch",
+    "risk_class",
+    "risk_digest",
+    "authorized_actions",
+    "excluded_actions",
+    "scope_hash",
+    "f1_artifact_digests",
+    "f2_digests",
+    "approval_request_ref",
+    "checkpoint_id",
+    "issued_at",
+    "expires_at",
+    "reason_code",
+    "envelope_digest",
+    "exclusions",
+    "execution_started"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+    "artifact_type": { "const": "g2-execution-envelope" },
+    "activation_state": {
+      "type": "string",
+      "enum": ["DRAFT", "AWAITING_APPROVAL", "ACTIVE", "BLOCKED", "EXPIRED", "SUPERSEDED"]
+    },
+    "task_id": { "type": "string", "pattern": "^SCRUM-[0-9]+$" },
+    "repository": { "type": "string", "minLength": 1 },
+    "base_ref": { "type": "string", "minLength": 1 },
+    "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "working_branch": { "type": "string", "minLength": 1 },
+    "risk_class": { "type": "string", "pattern": "^R[0-9]$" },
+    "risk_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "bounded_read_scope": { "type": "array", "items": { "type": "string" } },
+    "bounded_write_scope": { "type": "array", "items": { "type": "string" } },
+    "authorized_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "create_working_branch",
+          "add_files",
+          "run_sandboxed_validation",
+          "stage_commit_push"
+        ]
+      }
+    },
+    "excluded_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "open_draft_pr",
+          "mark_pr_ready",
+          "merge",
+          "auto_merge",
+          "force_push",
+          "branch_deletion",
+          "protected_branch_write",
+          "deploy",
+          "release",
+          "production_data_change",
+          "production_config_change",
+          "g3_pr_promotion",
+          "g4_merge",
+          "g5_deploy",
+          "g6_production"
+        ]
+      }
+    },
+    "scope_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "f1_artifact_digests": { "type": "object" },
+    "f2_digests": { "type": "object" },
+    "approval_request_ref": { "type": ["object", "null"] },
+    "approval_validation_ref": { "type": ["object", "null"] },
+    "checkpoint_id": { "type": "string", "minLength": 1 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "reason_code": { "type": "string", "pattern": "^G2_ENVELOPE_[A-Z_]+$" },
+    "envelope_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "exclusions": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION"] }
+    },
+    "execution_started": { "const": false }
+  }
+}

@@ -1,0 +1,52 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-191_OPT1_20260805
+authority_gate: G2_EXECUTION
+task_id: SCRUM-191
+issued_at: '2026-08-05T22:40:00Z'
+expires_at: '2026-08-06T22:40:00Z'
+scope_version: 7
+risk_class: R2
+prior_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+base_sha: 54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337
+repository: nhatnguyenquang1838-coder/gwc
+working_branch: hermes/scrum-191-g2-envelope-render-20260805
+prior_head_sha: 54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337
+head_sha: 51e956bc1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f60
+scope_hash_16: c236c4fa8e1f344a
+approval_command: 'APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-191_OPT1_20260805 c236c4fa8e1f344a 2026-08-06T22:40:00Z'
+authorized_actions:
+  - create_working_branch
+  - add_files
+  - run_sandboxed_validation
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - open_draft_pr
+  - mark_pr_ready
+  - merge
+  - auto_merge
+  - force_push
+  - branch_deletion
+  - protected_branch_write
+  - deploy
+  - release
+  - production_data_change
+  - production_config_change
+  - g3_pr_promotion
+  - g4_merge
+  - g5_deploy
+  - g6_production
+modules_or_files:
+  - .gwc/tasks/SCRUM-191/**
+  - schemas/g2-execution-envelope.schema.json
+  - tools/node_architect/g2_execution_envelope_render.py
+  - tests/test_gate_authority_g2_execution_envelope_render_m5.py
+execution_policy:
+  replay_safe: true
+  exact_head_required: true
+  scope_hash_required: true
+  authority_grant_prohibited: true
+  execution_authority_prohibited: true
+governance:
+  gwc_compliant: true
+  human_approved: true
+status: approved

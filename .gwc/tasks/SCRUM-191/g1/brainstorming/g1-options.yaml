@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-05T09:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-191
+  base_sha: 54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Closed schema plus pure deterministic renderer and focused tests
+    description: Implement the Jira-specified closed envelope JSON schema, a pure deterministic rendering function with replay digest, and the focused M5 regression module only.
+    benefits: [Smallest compatible change, directly testable, preserves existing registry surface, closed-set authority is explicit]
+    tradeoffs: [Registry/descriptor wiring remains a separate follow-up if later required]
+    risks: [Requires careful determinism and lifecycle-state test coverage]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Renderer plus envelope activation and dispatch wiring
+    description: Add the renderer together with runtime activation, registry routing, and envelope dispatch in the same task.
+    benefits: [More integrated runtime exposure]
+    tradeoffs: [Introduces execution authority the node must not hold]
+    risks: [Violates the no-execution boundary and enlarges blast radius]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Documentation-only envelope contract note
+    description: Document the intended envelope shape and lifecycle without adding executable behavior.
+    benefits: [Lowest code risk]
+    tradeoffs: [Does not satisfy requested runtime files or acceptance criteria]
+    risks: [Leaves the G2 envelope boundary unenforced]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract and keeps activation, dispatch, registry, connector, and approval-generation changes out of scope.
+decision_required: true
+status: READY

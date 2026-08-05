@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T09:10:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-191
+  base_sha: 54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement the deterministic gate_authority.g2-execution-envelope-render node for SCRUM-191.
+  why_now: SCRUM-185 and SCRUM-186 are merged at the protected base, so the F2 authority inputs required to render a bounded G2 execution envelope now exist and the node remains descriptor-only.
+desired_outcome: Add the closed envelope JSON schema, a pure deterministic renderer, and focused M5 tests that never execute the envelope or grant later-gate authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, gate-authority node consumers, downstream batch-f2-b4 nodes]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-191/** task-scoped GWC evidence
+    - schemas/g2-execution-envelope.schema.json
+    - tools/node_architect/g2_execution_envelope_render.py
+    - tests/test_gate_authority_g2_execution_envelope_render_m5.py
+    - Focused unit validation and complete local diff review
+  non_goals:
+    - Modify the existing node descriptor or registry outside the three implementation files
+    - Execute, dispatch, or activate a rendered envelope
+    - Approval generation or approval token issuance
+    - Any connector call from the implemented node
+    - Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+constraints:
+  - The renderer must be pure and deterministic; identical inputs must produce an identical envelope.
+  - The rendered envelope must be a closed set with no implicit or wildcard authority.
+  - An envelope must never be ACTIVE before a validated approval from the SCRUM-186 contract is bound.
+  - G2 approval is required before branch/worktree or repository implementation writes.
+  - G3, G4, G5, and G6 remain separate gates.
+assumptions:
+  - origin/main at 54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337 is the refreshed protected-base evidence.
+  - SCRUM-184 through SCRUM-189 are the declared prerequisites, with SCRUM-186 approval validation supplying the validated approval input.
+  - The implementation can use the repository's existing Python standard-library and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: An under-constrained envelope schema could leak implicit execution authority into G2.
+    impact: high
+    mitigation: Keep the schema fully closed, enumerate every scope and action set, and test later-gate exclusion invariants explicitly.
+  - id: RISK-2
+    description: Non-deterministic serialization would break checkpoint and replay comparison.
+    impact: medium
+    mitigation: Use canonical sorted-key serialization, stable collection ordering, and a replay-digest equality test.
+acceptance_criteria:
+  - id: AC-1
+    statement: The g2-execution-envelope schema is closed and validates the complete envelope shape while rejecting unknown or missing fields.
+    verifiable: true
+  - id: AC-2
+    statement: The renderer binds exactly to the approved F1 scope artifacts and F2 authority decisions with no substituted or inferred bindings.
+    verifiable: true
+  - id: AC-3
+    statement: A rendered envelope is DRAFT or AWAITING_APPROVAL and never ACTIVE until a validated approval record is bound.
+    verifiable: true
+  - id: AC-4
+    statement: Every rendered envelope excludes G3_PR, G4_MERGE, G5_DEPLOY, and G6_PRODUCTION, and the node performs no execution.
+    verifiable: true
+  - id: AC-5
+    statement: Re-rendering the same inputs reproduces an identical envelope and replay digest for checkpoint and resume.
+    verifiable: true
+  - id: AC-6
+    statement: The focused M5 test module passes and the complete diff remains within the approved scope.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+  downstream_non_goals: [open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]
+unresolved_questions: []
+status: READY
