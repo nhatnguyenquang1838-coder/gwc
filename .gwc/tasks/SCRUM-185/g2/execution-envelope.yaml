@@ -12,7 +12,7 @@ base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
 prior_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
 working_branch: hermes/scrum-185-approval-token-20260805
 prior_head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
-head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+head_sha: 98adc74c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
 modules_or_files:
   - .gwc/tasks/SCRUM-185/**
   - schemas/gate-approval-request.schema.json
