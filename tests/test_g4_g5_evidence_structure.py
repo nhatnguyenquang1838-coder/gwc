@@ -27,7 +27,7 @@ INSTRUCTION_SURFACES = (
     ROOT / "agents" / "instructionops-agent" / "agent-instructions.md",
 )
 
-EXPECTED_JOBS = {"g4-authority", "g4-merge-proof", "g5-status", "g5-recovery"}
+EXPECTED_JOBS = {"g4-authority", "g4-receipt-required", "g4-merge-proof", "g5-status", "g5-recovery"}
 
 LANE_MARKERS = (
     "LANE ASSERTION",
