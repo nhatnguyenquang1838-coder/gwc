@@ -1,0 +1,50 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+task_id: SCRUM-235
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+head_sha: 6c0f8b01a89b109d651f940defa8e34175c4ca6c
+working_branch: hermes/scrum-235-deterministic-hash-verification-m5-20260805
+pull_request:
+  number: 213
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/213
+  draft: false
+  state: merged
+merge_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+merged_at: '2026-08-05T05:44:13Z'
+merged_by: nhatnguyenquang1838-coder
+g4_receipt_comment_id: 5188008072
+g4_receipt_source_comment_id: 5188005685
+g5_status_classification: success
+scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+scope_hash_prefix: a56c11caf1a5be25
+approval_id: SCRUM-235
+action: merge_approved_pr
+authorized_action: merge_approved_pr
+expiry: '2026-08-06T03:41:17Z'
+authority_model: human_pr_comment
+required_receipt: gwc:g4-authority-receipt
+merge_ready: true
+merge_ready_note: >
+  G4 merge authority was granted: github-actions[bot] published
+  'gwc:g4-authority-receipt' (comment 5188008072) bound to head 6c0f8b01...
+  and scope a56c11caf1a5be25 from source approval comment 5188005685.
+  g4-receipt-required check turned green. PR #213 squash-merged to main
+  (merge commit 731ae09280f4fdf3afc841db6de78b7876f09f4e) on 2026-08-05T05:44:13Z
+  by nhatnguyenquang1838-coder. gwc:g4-merge-proof and gwc:g5-status receipts
+  published; G5 workflow_run 30979057025 succeeded.
+approval_command: 'APPROVE G4_MERGE SCRUM-235 a56c11caf1a5be25 2026-08-06T03:41:17Z'
+bindings:
+  task_id: SCRUM-235
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+  head_sha: 6c0f8b01a89b109d651f940defa8e34175c4ca6c
+  scope_hash: sha256:a56c11caf1a5be250f16f220324f1695217bef29cd2e0b5853a2fe8660161420
+  approval_id: SCRUM-235
+exclusions:
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+g5_automatic: true
+g5_note: Read-only G5_STATUS_VERIFY starts automatically after the merge commit; no manual G5 command required unless a manual deploy/release/publish is later in scope.
