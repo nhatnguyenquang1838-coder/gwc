@@ -122,16 +122,16 @@ ci:
   checks:
     - name: Build instruction packages
       required: true
-      status: pending
-      evidence: runs on Draft PR
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31011681993
     - name: Cross-platform LF and SHA parity
       required: true
-      status: pending
-      evidence: runs on Draft PR
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31011681272
     - name: Validate instructions
       required: true
-      status: pending
-      evidence: runs on Draft PR
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31011681142
 residual_risks:
   - G4/G5 workflow remains downstream and is not a G3 required check.
 exclusions:
