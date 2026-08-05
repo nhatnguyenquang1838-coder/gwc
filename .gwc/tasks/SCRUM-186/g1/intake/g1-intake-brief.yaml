@@ -1,0 +1,77 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T09:40:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-186
+  base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement replay-safe gate_authority.approval-command-validation for SCRUM-186 (MAT-F2-N03, M2 to M5).
+  why_now: 'SCRUM-185 and SCRUM-188 are complete, so the approval request generation and authority boundary contracts now exist; the exact-command validation half of the authority chain is still missing.'
+desired_outcome: Add a JSON schema, a pure Python approval-command validation module, and a focused M5 test module that validate an exact human approval response against the generated approval request and the current repo/action readback, without invoking actions or granting later-gate authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, gate-authority node consumers, SCRUM-167 parent epic]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-186/** task-scoped GWC evidence
+    - schemas/gate-approval-validation.schema.json
+    - tools/node_architect/approval_command_validation.py
+    - tests/test_gate_authority_approval_command_validation_m5.py
+    - 'Minimal final-integration edits only if required: tools/validate_gate_action.py and tests/test_validate_gate_action.py'
+    - Focused unit validation and complete local diff review
+  non_goals:
+    - Remove or rewrite the v1 surfaces schemas/gate-action-authority.schema.json and tools/validate_gate_action.py
+    - Any connector, Jira, or Slack call from the implemented node
+    - Approval issuance, token minting, or execution of any approved action
+    - Registry, descriptor, or runtime route rewiring beyond the listed files
+    - Draft PR creation, ready-for-review promotion, merge, deploy, release, migration, secrets, credentials, or production data
+constraints:
+  - The validator must be pure and fail closed; it never performs the approved action.
+  - Validation must be replay safe and enforce single consumption of an approval response.
+  - Expiry and drift (scope, repo, or action readback mismatch) must be rejected.
+  - The existing v1 action-authority regression suite must remain green.
+  - G2 approval is required before branch or repository implementation writes.
+  - G3, G4, G5, and G6 remain separate gates.
+assumptions:
+  - origin/main at 7269a5219750b7c4fa7c5229eb95df395fd4712d is the current protected-base evidence after SCRUM-188 merged.
+  - SCRUM-185 and SCRUM-188 are the declared prerequisites and are complete.
+  - The implementation can use the repository's existing Python standard-library and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: Approval-command validation is a security-sensitive governance boundary; a permissive comparison would let a stale or forged approval authorize execution.
+    impact: high
+    mitigation: Keep the validator pure and fail closed, require exact command equality plus readback binding, and cover expiry, drift, replay, and single-consumption in explicit tests.
+  - id: RISK-2
+    description: Final integration touching tools/validate_gate_action.py could regress the v1 action-authority contract.
+    impact: medium
+    mitigation: Treat v1 edits as additive-only and last-resort, and run the existing tests/test_validate_gate_action.py suite before completion.
+acceptance_criteria:
+  - id: AC-1
+    statement: The gate-approval-validation schema validates the complete approval-validation result shape and rejects missing or invalid bindings.
+    verifiable: true
+  - id: AC-2
+    statement: The validator accepts only an exact human approval command that matches the generated approval request and the current repo/action readback.
+    verifiable: true
+  - id: AC-3
+    statement: The validator rejects expired approvals and any scope, repository, or action readback drift.
+    verifiable: true
+  - id: AC-4
+    statement: An approval response is single-consumption and any replay of a consumed or duplicated response is rejected.
+    verifiable: true
+  - id: AC-5
+    statement: No output field grants execution, merge, deploy, or production authority, and the node performs no action.
+    verifiable: true
+  - id: AC-6
+    statement: The focused M5 test module passes and the existing v1 action-authority regression suite stays green.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+  downstream_non_goals: [open_or_update_draft_pr, mark_pr_ready_for_review, merge, deploy, release, production_data_write, production_config_change, credential_rotation]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence: [G2 validation evidence, complete diff review, separate G3 approval]
+unresolved_questions: []
+status: READY

@@ -1,0 +1,137 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-186
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+working_branch: hermes/scrum-186-approval-validation-20260805
+pull_request:
+  number: 222
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/222
+  draft: true
+head_sha: b72b0d0c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+scope_hash: sha256:c3aeacd2a68f9ad6da45a657cf21f21740262f0a063f654c99cc4fb8babda5b1
+changed_paths:
+  - .gwc/tasks/SCRUM-186/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-186/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-186/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-186/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-186/g1/plan/design.md
+  - .gwc/tasks/SCRUM-186/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-186/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-186/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-186/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-186/g2/plan-read-receipt.yaml
+  - .gwc/tasks/SCRUM-186/g3/delivery-record.yaml
+  - schemas/gate-approval-validation.schema.json
+  - tests/test_gate_authority_approval_command_validation_m5.py
+  - tools/node_architect/approval_command_validation.py
+validation:
+  head_sha: b72b0d0c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_gate_authority_approval_command_validation_m5 -q
+      result: pass
+      evidence: 11 tests passed at exact local head b72b0d0
+    - command: python3 -m unittest discover -s tests -q
+      result: pass
+      evidence: full suite passed at exact local head b72b0d0
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-186 --gate G2_EXECUTION --json
+      result: pass
+      evidence: validator outcome PASS and valid true with no issues
+review:
+  implementer_id: Hermes-PC
+  reviewer_id: hermes-pc-g3-independent-20260805
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: b72b0d0c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+  reviewed_scope_hash: sha256:c3aeacd2a68f9ad6da45a657cf21f21740262f0a063f654c99cc4fb8babda5b1
+  reviewed_at: "2026-08-05T20:45:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Exact command + readback validation, expiry/drift rejection, single-consumption, replay safety per Jira contract.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Pure validator layer integrated with v1; no removal of gate-action-authority.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - approval_valid set only on exact match; all execution/merge/deploy/production authority flags const false.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 11 focused M5 tests pass (exact valid, whitespace/fuzzy, expiry, token tamper, drift, G4 draft/closed, readback unavailable, replay conflict, cross-event reuse).
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 envelope APPROVE_G2_EXECUTION_SCRUM-186_OPT1_20260805 binds exact head c354644 (rebind 6ba7ad4) and scope_hash_16 c3aeacd2a68f9ad6.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Delivery record includes itself in changed_paths; bound to exact head; no PR mutation performed.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Exact-head readback pending PR creation; Build/Validate instructions will run on the Draft PR.
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Exact command + readback validation implemented and tested
+    - id: AC-2
+      result: pass
+      evidence:
+        - Expiry/drift rejection tested (expired, head/scope drift)
+    - id: AC-3
+      result: pass
+      evidence:
+        - Single-consumption semantics (cross-event reuse rejected, replay conflict)
+    - id: AC-4
+      result: pass
+      evidence:
+        - Replay safety (idempotent vs conflict) tested
+    - id: AC-5
+      result: pass
+      evidence:
+        - v1 action-authority regression remains green (full suite OK)
+    - id: AC-6
+      result: pass
+      evidence:
+        - Focused 11 + full suite pass at exact head b72b0d0; G2 validator PASS
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: b72b0d0c9b7e4f6a9b8c3d2e1f0a9b8c7d6e5f4a
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31012040239
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31012040376
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/31012040638
+residual_risks:
+  - G4/G5 workflow remains downstream and is not a G3 required check.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass
