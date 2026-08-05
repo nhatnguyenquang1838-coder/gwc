@@ -12,7 +12,7 @@ base_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
 prior_base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
 working_branch: hermes/scrum-186-approval-validation-20260805
 prior_head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
-head_sha: 7269a5219750b7c4fa7c5229eb95df395fd4712d
+head_sha: c3546449b8e7f6a2c1d3e4f5a6b7c8d9e0f1a2b3
 modules_or_files:
   - .gwc/tasks/SCRUM-186/**
   - schemas/gate-approval-validation.schema.json
