@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+generated_at: '2026-08-05T13:30:00Z'
+task_id: SCRUM-237
+run_id: g1-SCRUM-237-20260805-1330
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 78d596242a9e042d62d6174afc40aa4976eb3285
+base_ref: main
+working_branch: hermes/scrum-237-export-failure-routing-20260805
+head_sha: null
+scope_hash: sha256:c774d935b950bde659ccd533f55f92ed94e4e609530ae572325843cb8beda32
+scope_hash_16: c774d935b950bde6
+risk_class: G2_HUMAN_DIRECTION
+required_gate: G2_HUMAN_DIRECTION
+authority_gate: G2_EXECUTION
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+excluded_actions:
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- merge_approved_pr
+modules_or_files:
+- tools/node_architect/package_export/export_failure_routing.py
+- schemas/node-architect/package-export/export-failure-routing.schema.json
+- tests/package_export/test_export_failure_routing.py
+authorized_paths:
+- tools/node_architect/package_export/export_failure_routing.py
+- schemas/node-architect/package-export/export-failure-routing.schema.json
+- tests/package_export/test_export_failure_routing.py
+required_ci:
+- validate
+- build (gwc/ds-mcp/rental-home/pm-skills)
+- calculate-parity (ubuntu/macos/windows)
+- compare-parity
+validation_strategy:
+- PYTHONPATH=tools python -m unittest tests.package_export.test_export_failure_routing -v
+- PYTHONPATH=tools python tools/node_architect/validate_node_catalog_package_export.py
+- PYTHONPATH=tools python -m unittest discover -s tests/package_export -v
+- PYTHONPATH=tools python -m unittest tests.test_package_export_smoke -v
+gates:
+  G0_CONTEXT: READY
+  G1_ALIGNMENT: PASS
+  G2_EXECUTION: PENDING_APPROVAL
+  G3_PR: not_applicable
+  G4_MERGE: not_applicable
+  G5_DEPLOY: not_applicable
+  G6_PRODUCTION_DATA: not_applicable
+issued_at: '2026-08-05T13:30:00Z'
+expires_at: '2026-08-06T13:30:00Z'
