@@ -1,0 +1,92 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-05T06:21:12Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+  protected_branches: [main]
+  connector: Git
+  write_enabled: true
+constraints:
+  - GWC gate authority remains separate from Jira and Slack projections.
+  - No direct write to protected main; implementation is isolated in a dedicated worktree.
+  - The initial implementation scope excluded push; the current G2 repair envelope permits only a non-force push of the guarded working branch after validation.
+  - Draft PR promotion, merge, deploy, release, credentials, secrets, migration, and production data remain excluded.
+  - Remote `origin/main` was verified at protected-base `273918d89e7fca20ee837933e4c8083bf74eae45` (an ancestor of origin/main) via `git fetch origin main` and GitHub compare readback; the active working-branch head is read back from CI for exact-head evidence.
+applicable_policies:
+  - id: CODING_PROJECT_GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: origin/main
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE_LIFECYCLE_CONTRACT
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: origin/main
+    source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+  - id: AGENT_OPERATING_RUNTIME
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    ref: origin/main
+    source_sha: efc6411ae816b0f54d0efc9ac943811a709993d2
+  - id: AGENT_BEHAVIOR_SEMANTIC
+    path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+    ref: origin/main
+    source_sha: 956e557fedee58bc7d6eb2d53c2615524db8b16f
+  - id: AGENT_RESPONSE_PRESENTATION
+    path: core/Agent_Response_Presentation_Contract_v1.0.md
+    ref: origin/main
+    source_sha: 244ba257d995971f5026a86e5668bc8ede8767e2
+  - id: E2E_DRAFT_PR_DELIVERY_RULE
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: origin/main
+    source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: a1378c8f7a0a3acbc12d015063a57e033efeb6f1
+  - path: agents/chatgpt-agent/agent-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: 3e67acd023b818cb20c7faae5b1870f94eb7c282
+  - path: tools/validate_g01.py
+    required: true
+    status: AVAILABLE
+    source_sha: 4fbc4fc57657ce0df1fde308743646a996156721
+  - path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: bc116f07b27ae08c2646a73a021e3cf2e06a0362
+  - path: Jira:SCRUM-188
+    required: true
+    status: AVAILABLE
+    source_sha: null
+runtime_context:
+  agent_runtime_id: codex-gpt-local-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: Git
+  connector_priority: [GitHub, DWC, DW1]
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+status: READY
+blockers: []

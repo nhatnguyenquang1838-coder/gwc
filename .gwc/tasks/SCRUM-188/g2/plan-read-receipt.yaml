@@ -1,0 +1,19 @@
+artifact_type: g2-plan-read-receipt
+schema_version: '1.0'
+approval_id: APPROVE_G2_EXECUTION_SCRUM-188_EVIDENCE_REFRESH_R6_20260805
+task_id: SCRUM-188
+repository: nhatnguyenquang1838-coder/gwc
+branch: codex/scrum-188-authority-boundary-m5-20260805
+base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+head_sha: 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+canonical_task_uid: SCRUM-188
+plan_revision: sha256:e217b5b1f749eedbbb7b0832dcb4b213031994fae2da532539910fe5cc3bac90
+paths_read:
+  - .gwc/tasks/SCRUM-188/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-188/g1/plan/design.md
+  - .gwc/tasks/SCRUM-188/g1/plan/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+read_at: '2026-08-05T11:46:13Z'
+actor: Hermes-PC

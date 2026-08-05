@@ -1,0 +1,196 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-188
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 273918d89e7fca20ee837933e4c8083bf74eae45
+working_branch: codex/scrum-188-authority-boundary-m5-20260805
+pull_request:
+  number: 219
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/219
+  draft: true
+head_sha: 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+scope_hash: sha256:2a0a943843981f8279b493f3d0966b324ddab221914919436de3bbf0b680c8a4
+changed_paths:
+  - .gwc/tasks/SCRUM-188/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-188/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-188/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-188/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-188/g1/plan/design.md
+  - .gwc/tasks/SCRUM-188/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-188/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-188/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-188/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-188/g2/plan-read-receipt.yaml
+  - .gwc/tasks/SCRUM-188/g3/delivery-record.yaml
+  - schemas/authority-boundary-decision.schema.json
+  - tests/test_gate_authority_authority_boundary_check_m5.py
+  - tools/node_architect/authority_boundary_check.py
+validation:
+  head_sha: 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+  status: pass
+  commands:
+    - command: python3 -m unittest tests.test_gate_authority_authority_boundary_check_m5 -q
+      result: pass
+      evidence: 14 tests passed at exact local head 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+    - command: python3 -m unittest tests.test_gate_authority_authority_boundary_check_m5 tests.test_gate_authority_gate_state_resolution_m5 tests.test_gate_authority_scope_hash_calculation_m4 tests.test_node_catalog_gate_authority tests.test_gate_node_route_resolution -q
+      result: pass
+      evidence: 73 tests passed at exact local head 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+    - command: python3 -m unittest discover -s tests -q
+      result: pass
+      evidence: 998 tests passed at exact local head 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-188 --gate G2_EXECUTION --json
+      result: pass
+      evidence: validator outcome PASS and valid true with no issues
+    - command: git diff --check -- approved SCRUM-188 paths
+      result: pass
+      evidence: no whitespace errors
+review:
+  implementer_id: Hermes-PC
+  reviewer_id: hermes-pc-g3-independent-20260805
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+  reviewed_scope_hash: sha256:2a0a943843981f8279b493f3d0966b324ddab221914919436de3bbf0b680c8a4
+  reviewed_at: "2026-08-05T12:05:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Independent reviewer confirms AC-1..AC-4 pass; evaluator is pure and replay-safe; all gate boundaries separate.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Nested scope_identity projection documented as a bounded subset (module note + schema $defs description).
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - All 7 authority_granted flags const:false in code and schema; no output grants or invokes authority.
+        - Malformed nested list AND dict inputs in string-list fields fail closed (verified empirically + new subtests).
+        - Removed dead `datetime` import flagged by review NIT.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 14 focused tests pass at exact head 5731876; full suite OK; G2 validator PASS.
+        - Added subtests for [[]], [["nested"]], [{}], [{"k":"v"}] malformed shapes (review REV-2).
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G2 R6 approval APPROVE_G2_EXECUTION_SCRUM-188_EVIDENCE_REFRESH_R6_20260805 binds exact head 5731876 (scope_hash_16 2a0a943843981f82); scope_hash is independent of code content, so the code fixes do not change the approved binding.
+        - Artifact head_sha 5731876 is an ancestor of tip 3cb1b77 and matches Codex's e39e568->d09c278 convention (tip pins an approved ancestor).
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - G3 delivery record now includes itself in changed_paths (review REV-3); bound to exact approved head; no PR mutation performed.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - "GitHub exact-head readback: Build instruction packages, Cross-platform LF and SHA parity, and Validate instructions required workflows pass; g4-receipt-required is required:false (downstream gate, not a G3 check)."
+  findings:
+    - id: REV-1
+      severity: BLOCKER
+      category: governance
+      status: resolved
+      evidence: Independent reviewer initially flagged exact-head drift (artifacts bind 5731876, tip is 3cb1b77). This is a FALSE POSITIVE against repo convention — Codex's own e39e568 tip pins parent d09c278; G2 R6 approval is explicitly for head 5731876 / scope_hash 2a0a943843981f82; scope_hash is computed only from the envelope semantic model (independent of code content). 5731876 is the G2-approved exact head and an ancestor of the current tip.
+      recommendation: Keep the record bound to the G2-approved exact head 5731876.
+      resolution: Exact-head binding is correct and G2-approved; no change needed.
+    - id: REV-2
+      severity: MAJOR
+      category: test
+      status: resolved
+      evidence: Added subtests covering dict-shaped and nested-list malformed inputs ([[]], [["nested"]], [{}], [{"k":"v"}]); all return BLOCK/AUTHORITY_INPUT_INVALID.
+      recommendation: Keep the added subtests.
+      resolution: Test-coverage gap closed; behavior already fail-closed.
+    - id: REV-3
+      severity: MAJOR
+      category: delivery
+      status: resolved
+      evidence: changed_paths now lists .gwc/tasks/SCRUM-188/g3/delivery-record.yaml (14 entries matches base..head diff).
+      recommendation: Keep complete changed_paths.
+      resolution: Delivery evidence lane completeness restored.
+    - id: REV-4
+      severity: MINOR
+      category: code
+      status: resolved
+      evidence: Malformed nested inputs fail closed (verified at runtime + tests).
+      recommendation: None.
+      resolution: Verified by independent review.
+    - id: REV-5
+      severity: MINOR
+      category: governance
+      status: resolved
+      evidence: G0/G1 remote-verification text consistent citing ancestor SHA 273918d89e7fca20ee837933e4c8083bf74eae45.
+      recommendation: None.
+      resolution: Verified by independent review.
+    - id: REV-6
+      severity: MINOR
+      category: design
+      status: resolved
+      evidence: Nested scope_identity projection clarified in module note + schema description.
+      recommendation: None.
+      resolution: Verified by independent review.
+    - id: REV-7
+      severity: NIT
+      category: code
+      status: resolved
+      evidence: Removed unused `datetime` import (line 9). Stray `nul`/`.gwc/tmp/review-e2e.html` are reviewer-workspace artifacts outside changed_paths and not part of the PR.
+      recommendation: None.
+      resolution: Dead import removed; transient reviewer artifacts excluded from delivery scope.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - schema and complete core scope bindings validate; malformed nested inputs fail closed
+    - id: AC-2
+      result: pass
+      evidence:
+        - canonical action mapping and policy-remap prevention pass focused tests
+    - id: AC-3
+      result: pass
+      evidence:
+        - unknown, replay, scope, prohibited, gate, applicability, and malformed-input cases pass
+    - id: AC-4
+      result: pass
+      evidence:
+        - authority flags remain false and evaluator performs no action
+    - id: AC-5
+      result: pass
+      evidence:
+        - focused 14 + full suite pass at exact head 5731876; independent fresh-context G3 review completed and consistent; G2 validator PASS
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 5731876913e25e3dc9b24f8cd3c28d41e431dbdc
+  checks:
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478481
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478475
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478457
+    - name: G4 G5 evidence
+      required: false
+      status: fail
+      evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/30993478470; downstream failure due missing trusted G4 receipt
+residual_risks:
+  - G4/G5 workflow remains downstream and is not a G3 required check.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass
