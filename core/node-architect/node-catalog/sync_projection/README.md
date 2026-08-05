@@ -87,3 +87,15 @@ The evaluator canonicalizes field paths and link ordering, collapses semantic du
 | Descriptor | Runtime artifact | Schema | Evaluator | Maturity |
 |---|---|---|---|---|
 | `projection-evidence-linking.node.json` | `projection-evidence-linkset` | `schemas/projection-evidence-linkset.schema.json` | `tools/node_architect/projection_evidence_linking.py` | M4 deterministic |
+
+### Projection privacy boundary check
+
+`decide_projection_privacy(...)` consumes a schema-valid, `READY` `projection-source-authority-decision` from SCRUM-223 (bound to the same task/repository/target) and a bounded candidate payload, then sanitizes it before any DS Admin, Task Center or external audit projection. It enforces a closed 12-class classification model and a mandatory protected-key detection list (`password`, `secret`, `token`, `access_token`, `refresh_token`, `authorization`, `credential`, `private_key`, `client_secret`, `cookie`, `session`, `connection_string`, `production_record`, `chain_of_thought`).
+
+The evaluator fails closed (in deterministic precedence) for: invalid input; missing/blocked/mismatched source authority; an unclassified protected key; any `SECRET`/`CREDENTIAL`/`TOKEN`/`PRIVATE_KEY`/`PRODUCTION_DATA`/`HIDDEN_REASONING` value; a target policy that does not allow a classified field; an invalid redaction directive; payload size/depth limits; and any residual protected value surviving sanitization. Approved `PERSONAL_SENSITIVE`/`CONFIDENTIAL_METADATA`/`POLICY_REDACTED` fields are redacted (replaced with `[REDACTED]`) or removed per the explicit per-target policy; redaction records carry only field path, classification, action, replacement token and reason code — never the original value.
+
+The output is a closed `schema_version: "1.0"` artifact with deterministic ordering and order-independent `sanitized_digest` (over the sanitized payload + non-sensitive semantic metadata) and `decision_digest`. Raw candidate values, timestamps and navigation URLs are excluded from the hash; any safe-value, policy-revision or redaction drift changes the applicable digest. Every authority grant remains fixed to `false`, while `read_only_projection` remains fixed to `true`.
+
+| Descriptor | Runtime artifact | Schema | Evaluator | Maturity |
+|---|---|---|---|---|
+| `projection-privacy-boundary-check.node.json` | `projection-privacy-decision` | `schemas/projection-privacy-decision.schema.json` | `tools/node_architect/projection_privacy_boundary_check.py` | M4 deterministic |

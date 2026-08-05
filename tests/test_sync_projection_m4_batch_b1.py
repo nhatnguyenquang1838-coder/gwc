@@ -8,11 +8,18 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 from tools.node_architect.projection_source_authority_check import decide_projection_source_authority
 from tools.node_architect.projection_evidence_linking import build_projection_evidence_linkset
+from tools.node_architect.projection_privacy_boundary_check import decide_projection_privacy
 
 SCHEMA = json.loads(Path("schemas/projection-source-authority-decision.schema.json").read_text(encoding="utf-8"))
 VALIDATOR = Draft202012Validator(SCHEMA, format_checker=FormatChecker())
 LINK_SCHEMA = json.loads(Path("schemas/projection-evidence-linkset.schema.json").read_text(encoding="utf-8"))
 LINK_VALIDATOR = Draft202012Validator(LINK_SCHEMA, format_checker=FormatChecker())
+PRIVACY_SCHEMA = json.loads(Path("schemas/projection-privacy-decision.schema.json").read_text(encoding="utf-8"))
+PRIVACY_VALIDATOR = Draft202012Validator(PRIVACY_SCHEMA, format_checker=FormatChecker())
+
+
+def canonical_json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 DIGEST_A = "sha256:" + "a" * 64
 DIGEST_B = "sha256:" + "b" * 64
 DIGEST_C = "sha256:" + "c" * 64
@@ -497,6 +504,253 @@ class ProjectionEvidenceLinkingTests(unittest.TestCase):
         items[1]["relation"] = "SUPPORTS_FIELD"
         second = self.build(evidence_items=items)
         self.assertNotEqual(first["linkset_digest"], second["linkset_digest"])
+
+
+def _source_authority_digest_for_privacy(decision):
+    semantic = {
+        key: value
+        for key, value in decision.items()
+        if key not in {"reason_codes", "decision_digest"}
+    }
+    payload = json.dumps(semantic, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def valid_privacy_authority_decision():
+    decision = {
+        "schema_version": "1.0",
+        "artifact_type": "projection-source-authority-decision",
+        "task_id": "SCRUM-228",
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "projection_target": "ds-admin",
+        "source_bindings": [
+            {
+                "source_type": "TASK_RECORD",
+                "authority_class": "CANONICAL",
+                "ref": "jira:SCRUM-228",
+                "revision": REVISION_A,
+                "content_digest": DIGEST_A,
+                "observed_at": "2026-08-04T17:00:00Z",
+                "status": "VERIFIED",
+            }
+        ],
+        "field_authority": [
+            {
+                "field_path": "/task/status",
+                "source_ref": "jira:SCRUM-228",
+                "source_revision": REVISION_A,
+                "evidence_digest": DIGEST_A,
+                "derivation": "DIRECT",
+            }
+        ],
+        "outcome": "READY",
+        "authority_status": "CONFIRMED",
+        "reason_code": "PROJECTION_SOURCE_AUTHORITY_CONFIRMED",
+        "reason_codes": ["PROJECTION_SOURCE_AUTHORITY_CONFIRMED"],
+        "observed_at": "2026-08-04T17:05:00Z",
+        "read_only_projection": True,
+        "write_authority_granted": False,
+        "approval_authority_granted": False,
+        "merge_authority_granted": False,
+        "deployment_authority_granted": False,
+        "production_authority_granted": False,
+    }
+    decision["decision_digest"] = _source_authority_digest_for_privacy(decision)
+    return decision
+
+
+def clean_policy():
+    return {
+        "policy_revision": "privacy-v1",
+        "allowed_classes": ["PUBLIC_METADATA", "INTERNAL_METADATA", "CONFIDENTIAL_METADATA", "PERSONAL_SENSITIVE", "POLICY_REDACTED"],
+        "redact_fields": ["owner_email"],
+        "remove_fields": ["owner_ssn"],
+        "max_string_length": 4096,
+        "max_list_length": 1024,
+        "max_object_depth": 16,
+        "allow_stable_pseudonymous_actor_ids": True,
+    }
+
+
+class ProjectionPrivacyBoundaryTests(unittest.TestCase):
+    def decide(self, **overrides):
+        payload = {
+            "task_id": "SCRUM-228",
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "projection_target": "ds-admin",
+            "source_authority_decision": valid_privacy_authority_decision(),
+            "candidate_payload": {
+                "id": "task-1",
+                "status": "open",
+                "owner_email": "alice@example.com",
+                "owner_ssn": "123-45-6789",
+            },
+            "field_classifications": [
+                {"field_path": "owner_email", "classification": "PERSONAL_SENSITIVE"},
+                {"field_path": "owner_ssn", "classification": "PERSONAL_SENSITIVE"},
+            ],
+            "redaction_policy": clean_policy(),
+            "evaluated_at": "2026-08-04T17:10:00Z",
+        }
+        payload.update(overrides)
+        result = decide_projection_privacy(**payload)
+        errors = sorted(PRIVACY_VALIDATOR.iter_errors(result), key=lambda error: list(error.path))
+        self.assertEqual(errors, [], [error.message for error in errors])
+        return result
+
+    def test_clean_metadata_approved(self):
+        result = self.decide(
+            candidate_payload={"id": "task-1", "status": "open"},
+            field_classifications=[],
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"]},
+        )
+        self.assertEqual(result["outcome"], "READY")
+        self.assertEqual(result["reason_code"], "PRIVACY_APPROVED")
+        self.assertEqual(result["privacy_status"], "APPROVED")
+        self.assertEqual(result["sanitized_payload"], {"id": "task-1", "status": "open"})
+        self.assertEqual(result["redactions"], [])
+
+    def test_safe_redaction_records_no_originals(self):
+        result = self.decide()
+        self.assertEqual(result["outcome"], "READY")
+        self.assertEqual(result["reason_code"], "PRIVACY_APPROVED_REDACTED")
+        self.assertEqual(result["privacy_status"], "REDACTED")
+        # originals never appear
+        self.assertNotIn("alice@example.com", canonical_json(result["sanitized_payload"]))
+        self.assertNotIn("123-45-6789", canonical_json(result["sanitized_payload"]))
+        self.assertEqual(result["sanitized_payload"].get("owner_email"), "[REDACTED]")
+        self.assertNotIn("owner_ssn", result["sanitized_payload"])
+        for redaction in result["redactions"]:
+            self.assertNotIn("alice@example.com", canonical_json(redaction))
+            self.assertNotIn("123-45-6789", canonical_json(redaction))
+
+    def test_unclassified_protected_key_fails_closed(self):
+        result = self.decide(
+            candidate_payload={"password": "hunter2"},
+            field_classifications=[],
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"]},
+        )
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertEqual(result["reason_code"], "PRIVACY_CLASSIFICATION_MISSING")
+
+    def test_each_prohibited_class_rejected(self):
+        cases = {
+            "secret": "PRIVACY_SECRET_REJECTED",
+            "credential": "PRIVACY_CREDENTIAL_REJECTED",
+            "token": "PRIVACY_TOKEN_REJECTED",
+            "private_key": "PRIVACY_PRIVATE_KEY_REJECTED",
+            "production_data": "PRIVACY_PRODUCTION_DATA_REJECTED",
+            "hidden_reasoning": "PRIVACY_HIDDEN_REASONING_REJECTED",
+        }
+        for cls, reason in cases.items():
+            with self.subTest(cls=cls):
+                result = self.decide(
+                    candidate_payload={"v": "x"},
+                    field_classifications=[{"field_path": "v", "classification": cls.upper()}],
+                    redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": [cls.upper()]},
+                )
+                self.assertEqual(result["reason_code"], reason)
+
+    def test_nested_prohibited_key_detected_recursively(self):
+        result = self.decide(
+            candidate_payload={"a": {"b": {"access_token": "leaky"}}},
+            field_classifications=[],
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"]},
+        )
+        self.assertEqual(result["reason_code"], "PRIVACY_CLASSIFICATION_MISSING")
+        self.assertIn("PRIVACY_CLASSIFICATION_MISSING", result["reason_codes"])
+
+    def test_target_policy_denial_fails_closed(self):
+        result = self.decide(
+            candidate_payload={"note": "confidential"},
+            field_classifications=[{"field_path": "note", "classification": "CONFIDENTIAL_METADATA"}],
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"]},
+        )
+        self.assertEqual(result["reason_code"], "PRIVACY_TARGET_POLICY_DENIED")
+        self.assertNotIn("note", result["sanitized_payload"])
+
+    def test_invalid_redaction_directive_fails_closed(self):
+        result = self.decide(
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"], "redact_fields": "owner_email"},
+        )
+        self.assertEqual(result["reason_code"], "PRIVACY_REDACTION_DIRECTIVE_INVALID")
+
+    def test_payload_size_limit_exceeded(self):
+        big = {"blob": "x" * (1024 * 1024 + 1)}
+        result = self.decide(
+            candidate_payload=big,
+            field_classifications=[],
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"]},
+        )
+        self.assertEqual(result["reason_code"], "PRIVACY_PAYLOAD_LIMIT_EXCEEDED")
+
+    def test_blocked_source_authority_rejected(self):
+        blocked = valid_privacy_authority_decision()
+        blocked["outcome"] = "BLOCKED"
+        result = self.decide(source_authority_decision=blocked)
+        self.assertEqual(result["reason_code"], "PRIVACY_SOURCE_AUTHORITY_INVALID")
+
+    def test_mismatched_source_authority_rejected(self):
+        mismatched = valid_privacy_authority_decision()
+        mismatched["projection_target"] = "task-center"
+        result = self.decide(source_authority_decision=mismatched)
+        self.assertEqual(result["reason_code"], "PRIVACY_SOURCE_AUTHORITY_INVALID")
+
+    def test_residual_leak_detected(self):
+        # Policy permits the class but a raw protected value still survives -> leak scan.
+        leaked = valid_privacy_authority_decision()
+        leaked["decision_digest"] = _source_authority_digest_for_privacy(leaked)
+        # Force a payload whose sanitized copy still embeds a raw token-like string.
+        result = self.decide(
+            source_authority_decision=leaked,
+            candidate_payload={"exposed": "this contains a raw password inside"},
+            field_classifications=[],
+            redaction_policy={"policy_revision": "privacy-v1", "allowed_classes": ["PUBLIC_METADATA"]},
+        )
+        self.assertEqual(result["reason_code"], "PRIVACY_LEAK_DETECTED")
+
+    def test_digest_stability_across_ordering(self):
+        first = self.decide()
+        reordered = self.decide(
+            field_classifications=[
+                {"field_path": "owner_ssn", "classification": "PERSONAL_SENSITIVE"},
+                {"field_path": "owner_email", "classification": "PERSONAL_SENSITIVE"},
+            ],
+        )
+        self.assertEqual(first["sanitized_digest"], reordered["sanitized_digest"])
+        self.assertEqual(first["decision_digest"], reordered["decision_digest"])
+
+    def test_digest_drift_on_policy_change(self):
+        first = self.decide()
+        second = self.decide(
+            redaction_policy={**clean_policy(), "policy_revision": "privacy-v2"},
+        )
+        self.assertNotEqual(first["sanitized_digest"], second["sanitized_digest"])
+
+    def test_expected_digest_mismatch_fails_closed(self):
+        result = self.decide(expected_sanitized_digest="sha256:" + "f" * 64)
+        self.assertEqual(result["reason_code"], "PRIVACY_DIGEST_MISMATCH")
+
+    def test_no_authority_field_can_be_true(self):
+        result = self.decide()
+        for key in (
+            "read_only_projection",
+            "write_authority_granted",
+            "approval_authority_granted",
+            "merge_authority_granted",
+            "deployment_authority_granted",
+            "production_authority_granted",
+        ):
+            self.assertIn(key, result)
+        self.assertTrue(result["read_only_projection"])
+        for key in (
+            "write_authority_granted",
+            "approval_authority_granted",
+            "merge_authority_granted",
+            "deployment_authority_granted",
+            "production_authority_granted",
+        ):
+            self.assertFalse(result[key])
 
 
 if __name__ == "__main__":

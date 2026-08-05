@@ -1,0 +1,92 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-05T14:30:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-228
+  base_sha: 731ae09280f4fdf3afc841db6de78b7876f09f4e
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    SCRUM-228 requires a deterministic, fail-closed projection_privacy_decision
+    that sanitizes an already-bounded projection payload before it can be rendered
+    for DS Admin, Task Center or an external audit surface. Raw secrets,
+    credentials, tokens, private keys, production data and hidden reasoning are
+    rejected; approved sensitive metadata is redacted per explicit policy; raw
+    protected values must never appear in output, diagnostics, redaction metadata
+    or hashes.
+  why_now: >-
+    SCRUM-223 (source-authority-check, Done, PR #200 merged) provides the bound,
+    schema-valid source-authority decision this evaluator must consume; SCRUM-227
+    (evidence-linking, Done, PR #201 merged) just landed the shared family B1
+    test, family validator and README, removing the integration-conflict that
+    earlier held SCRUM-228's G2. SCRUM-228 now proceeds against the refreshed
+    current main so its G0/G1 base bindings are exact.
+desired_outcome: >-
+  A pure read-only sanitizer/evaluator that validates closed classification,
+  recursively detects mandatory protected keys, evaluates target policy, performs
+  safe redaction/removal, scans for residual leakage and attaches order-independent
+  sanitized/decision digests, never granting merge/PR/deploy authority. The shared
+  node descriptor stays thin read_only metadata; the family validator/tests/README
+  are extended with the static runtime mapping.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - SCRUM-220 (ds-admin-state-projection)
+  - SCRUM-221 (task-center-sync)
+  - SCRUM-222 (external-audit-event-projection)
+scope:
+  in_scope:
+  - tools/node_architect/projection_privacy_boundary_check.py
+  - schemas/projection-privacy-decision.schema.json
+  - tests/test_sync_projection_m4_batch_b1.py
+  - core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json
+  - tools/node_architect/validate_node_catalog_sync_projection.py
+  non_goals:
+  - live DLP or secret scanner
+  - connector or production-data query
+  - external storage or source mutation
+  - target projection or rendering
+  - branch/repository/Jira write, approval, PR, merge, deploy, release
+  - credential rotation or migration
+constraints:
+- read-only evaluation; no secret retrieval, decryption, storage, connector call, target write or policy mutation
+- "fail-closed: any prohibited class, missing classification, policy denial, invalid redaction or residual leak yields a schema-valid BLOCKED artifact"
+- order-independent sanitized and decision digests; any safe value/policy/revision drift changes the applicable digest
+- no authority field may become true
+assumptions:
+- SCRUM-223 source-authority decision is schema-valid, READY and bound to the same task/repository/target at G2 execution time
+- SHA-256 is the required digest algorithm for sanitized and decision digests
+risks:
+- id: RISK-1
+  description: Behavioral drift versus the SCRUM-227 evidence-linkset if the shared B1 test contract is later refactored.
+  impact: medium
+  mitigation: Closed classification/policy contract and explicit reason codes keep the evaluator independent of sibling internals; B1 integration added in G2 Task 3.
+- id: RISK-2
+  description: Recursive protected-key detection across deeply nested payloads is hard to prove exhaustively.
+  impact: low
+  mitigation: Focused fixtures exercise nested and alias-key detection explicitly in G2 Task 1.
+acceptance_criteria:
+- id: AC-1
+  statement: Prohibited secret/credential/token/private-key/production-data/hidden-reasoning content cannot appear in projection output or hashes.
+  verifiable: true
+- id: AC-2
+  statement: Approved redaction is deterministic and records no original values; redaction records carry only path, classification, action, replacement token and reason code.
+  verifiable: true
+- id: AC-3
+  statement: Missing classifications, policy denial, invalid redaction directive and residual leakage fail closed with the correct reason code.
+  verifiable: true
+- id: AC-4
+  statement: Sanitized and decision digests are order-independent and drift-sensitive; identical sanitized results yield identical digests regardless of input ordering.
+  verifiable: true
+- id: AC-5
+  statement: No authority field (write/approval/merge/deploy/production) can become true in any decision variant.
+  verifiable: true
+- id: AC-6
+  statement: Focused tests, B1 integration, family regression and exact-head CI pass.
+  verifiable: true
+unresolved_questions: []
+status: READY
