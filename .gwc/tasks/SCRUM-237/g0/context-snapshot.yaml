@@ -1,0 +1,64 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-05T06:35:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G2 scope is the SCRUM-237 export-failure-routing evaluator, its closed routing schema, fixtures, the ninth family node, README/runtime mapping and family integration tests only
+- router is recommend-only; it never repairs, rebuilds, retries, publishes, updates consumers, merges, deploys or performs production operations
+- additive family changes keep the blast radius contained to the ninth node + docs
+- baseline note - issue cites 78d5962 which is a confirmed ancestor of observed head 63726f5 (advanced via SCRUM-234/235/236 merges)
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  source_sha: a9ca4939b26d50b18ef9ce346f000a65de391c00e294309e16d4362d9d2111b9
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  source_sha: b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+sources:
+- path: core/node-architect/node-catalog/package_export/smoke-verification.node.json
+  required: true
+  status: AVAILABLE
+  source_sha: 5dba6a112bd8c08300c43de44abe12954fd6c66e2f9176c415fd80a06bc9dbf9
+- path: tools/verify_package_export_smoke.py
+  required: true
+  status: AVAILABLE
+  source_sha: bab48e639a97edc07b9452cf4fdd07101992eb29de4e13e17713b3f495f2a5aa
+- path: schemas/package-export-manifest.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 58eeb85692c90c94e02152173bdf72ff4ec5d51b309330c90c992a14301b25a3
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  required: true
+  status: AVAILABLE
+  source_sha: fa0c52f5004675951d4b2e63e6c86f4ae5dc3f8b0b1b565f789db132dde677ac
+- path: Jira SCRUM-237
+  required: false
+  status: AVAILABLE
+  source_sha: null
+status: READY
+blockers: []

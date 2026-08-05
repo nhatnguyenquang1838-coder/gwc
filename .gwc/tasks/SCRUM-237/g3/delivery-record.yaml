@@ -1,0 +1,133 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-237
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+working_branch: hermes/scrum-237-export-failure-routing-m5-20260805
+pull_request:
+  number: 217
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/217
+  draft: true
+head_sha: 9ae3ff9e24be7bd1d88bd32bbefc5323f3fd281a
+scope_hash: sha256:84d03a0b321819921fc440671708a8162b6be32e2ea5a0605739b23cc5d0ca1c
+changed_paths:
+- tools/node_architect/package_export/export_failure_routing.py
+- schemas/node-architect/package-export/export-failure-routing.schema.json
+- tests/package_export/test_export_failure_routing.py
+- tests/package_export/test_family_integration.py
+- core/node-architect/node-catalog/package_export/README.md
+validation:
+  head_sha: 9ae3ff9e24be7bd1d88bd32bbefc5323f3fd281a
+  status: pass
+  commands:
+  - command: tools/validate_g01.py --root . --workspace .gwc/tasks/SCRUM-237 --json
+    result: pass
+    evidence: '{"outcome":"PASS","valid":true,"issues":[]}'
+  - command: pytest tests/package_export/test_export_failure_routing.py tests/package_export/test_family_integration.py -q
+    result: pass
+    evidence: 21 passed (17 routing + 4 family, 117 subtests)
+  - command: python3 tools/verify_package_export_smoke.py --root . --package projects/gwc/package.yaml --source-ref main --source-base-sha 78d596242a9e042d62d6174afc40aa4976eb3285
+    result: pass
+    evidence: '{"ok":true,"copied_entries":262}'
+  - command: python3 tools/node_architect/validate_node_catalog_package_export.py
+    result: pass
+    evidence: 9-node family validator PASS
+review:
+  implementer_id: Hermes
+  reviewer_id: Hermes
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 9ae3ff9e24be7bd1d88bd32bbefc5323f3fd281a
+  reviewed_scope_hash: sha256:84d03a0b321819921fc440671708a8162b6be32e2ea5a0605739b23cc5d0ca1c
+  reviewed_at: '2026-08-05T07:10:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - AC-1..AC-7 mapped from SCRUM-237; scope matches in_scope surfaces only
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Single decision table; router is recommend-only and grants no authority
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - export_failure_routing.py maps every upstream reason to one route; bounded retry requires reconciled readback
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - 17 routing fixtures + 4 family-integration; 9-node validator PASS
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G0 READY, G1 validate_g01.py PASS, G2 PASS on guarded branch, no main write, artifacts under .gwc/tasks/SCRUM-237
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Draft PR #217 on guarded branch; head 9ae3ff9 matches record
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - GitHub Actions 'validate' job passed on PR #217; g4-receipt-required is a G4 merge gate outside G3 scope
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - Decision table covers every upstream reason namespace 229-236
+  - id: AC-2
+    result: pass
+    evidence:
+    - Unsafe/path/replay/hash-contradiction reasons route to HUMAN_REQUIRED/FAIL_CLOSED, never auto success
+  - id: AC-3
+    result: pass
+    evidence:
+    - BOUNDED_RETRY requires reconciled readback + retry count/deadline budget
+  - id: AC-4
+    result: pass
+    evidence:
+    - Same canonical evidence + key yields identical route/digest (test_identical_evidence_same_digest)
+  - id: AC-5
+    result: pass
+    evidence:
+    - Family golden flows covered (clean success, repairable input, partial-build, replay, conflict, fail-closed)
+  - id: AC-6
+    result: pass
+    evidence:
+    - 9-node family validator PASS; README routing rules documented
+  - id: AC-7
+    result: pass
+    evidence:
+    - Existing exporter/manifest/smoke tests green (262 entries); shared verifiers unchanged
+  decision: pass
+  stale: false
+ci:
+  required: false
+  head_sha: 9ae3ff9e24be7bd1d88bd32bbefc5323f3fd281a
+  checks:
+  - name: validate
+    required: true
+    status: pass
+    evidence: GitHub Actions 'validate' job passed on PR #217
+  - name: g4-receipt-required
+    required: false
+    status: skipped
+    evidence: G4 merge gate; intentionally not satisfied at G3 (no G4 authority receipt yet)
+residual_risks:
+- The 6 pre-existing failures in tests/package_export/test_target_path_safety_check.py are unrelated to this change (fail identically on clean main) and remain out of this task's scope.
+- Independent human review of the exact PR head is still required before G4 merge.
+- SCRUM-237 is the final F7 node; completing it closes the full package_export maturity chain (SCRUM-172 epic).
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pass

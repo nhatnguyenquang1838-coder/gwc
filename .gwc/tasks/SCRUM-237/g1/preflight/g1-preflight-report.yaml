@@ -1,0 +1,72 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-05T06:35:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-237
+  base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 63726f5616d8467e9ba9b97653a37e4dd75239c9
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main at observed head 63726f5; the issue baseline 78d5962 is a confirmed ancestor.
+  evidence:
+  - 63726f5616d8467e9ba9b97653a37e4dd75239c9
+- id: BLOCKER-236-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-236 (smoke-verification) is Done and merged (PR #216); it blocks SCRUM-237 and is now resolved.
+  evidence:
+  - SCRUM-236
+- id: FAMILY-VALIDATOR-EXPECTS-9
+  status: PASS
+  code: FAMILY_CONTRACT_PRESENT
+  message: >-
+    tools/node_architect/validate_node_catalog_package_export.py already requires
+    exactly nine semantics including export-failure-routing; the ninth node file
+    does not exist yet, so the validator currently fails until this task adds it.
+  evidence:
+  - tools/node_architect/validate_node_catalog_package_export.py
+- id: EXISTING-REASON-NAMESPACES
+  status: PASS
+  code: UPSTREAM_CODES_ENUMERATED
+  message: >-
+    All upstream reason-code namespaces (entry-schema, source/target-path-safety,
+    governance-tree-build, export-manifest-generation, deterministic-hash,
+    smoke-verification) are present in the existing verifiers and were enumerated
+    for the routing decision table.
+  evidence:
+  - tools/node_architect/package_export/*.py
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    export_failure_routing.py and its schema/test are brand-new files; the router
+    reads upstream outcomes but never mutates the existing verifiers' logic.
+  evidence:
+  - tools/node_architect/package_export (no export_failure_routing module yet)
+- id: OWNERSHIP-CLAIM
+  status: PASS
+  code: CLAIM_CONSISTENT
+  message: >-
+    Jira SCRUM-237 AI Agent = Hermes; claimed via Atlassian MCP (Claimed At
+    2026-08-05T06:35:00Z). The human assignee (Nhat Nguyen Quang) is unchanged.
+  evidence:
+  - SCRUM-237
+- id: SCOPE-HASH
+  status: PASS
+  code: SCOPE_HASH_DERIVED
+  message: scope_hash derived from the canonical scope string via sha256sum, not guessed (see g2/execution-envelope.yaml).
+  evidence:
+  - sha256:pending-g2
+risk_class: R2
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS

@@ -53,3 +53,26 @@ Forbidden:
 ❌ no package publish or consumer mutation
 ❌ no G4/G5/G6 authority
 ```
+
+## Routing rules (package-export-export-failure-routing)
+
+The router is **recommend-only**: it records exactly one bounded next action and
+grants no repair/rebuild/retry/publish/merge/deploy authority. Every upstream
+failure reason (namespaces from package-manifest-load, entry-schema-validation,
+source/target-path-safety-check, governance-tree-build, export-manifest-generation,
+deterministic-hash-verification, smoke-verification) maps to exactly one route:
+
+| Route | Triggers (examples) |
+|---|---|
+| `EXPORT_REPAIR_INPUT` | malformed/invalid manifest, schema-invalid entry, required source missing, target missing, extraction/load failure |
+| `EXPORT_REBUILD_STAGING` | partial tree, readback/copy mismatch, stale source, target collision, tree-digest mismatch, unmanifested target |
+| `EXPORT_REVERIFY_READBACK` | idempotent replay, existing reconciled target, optional-missing source, passing outcome |
+| `EXPORT_BOUNDED_RETRY` | smoke timeout / unknown outcome **only if** checkpoint readback is reconciled and retry budget/deadline remain |
+| `EXPORT_HUMAN_REQUIRED` | unsafe path traversal/escape/symlink, absolute/backslash/empty path, replay conflict, hash/source/target contradiction, algorithm unsupported |
+| `EXPORT_FAIL_CLOSED` | authority-boundary violation, unmapped reason, retry exhausted, unreconciled unknown/interrupted |
+
+Never routes unsafe path, schema incompatibility, replay conflict, content/hash
+contradiction or authority-boundary violation to automatic success or retry
+without changed approved evidence. Same canonical evidence + idempotency key
+yields the same route and decision digest (replay-safe); changed evidence under
+the same key is a replay conflict.
