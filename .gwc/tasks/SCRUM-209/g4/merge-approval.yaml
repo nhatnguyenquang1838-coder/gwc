@@ -1,0 +1,60 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+status: PENDING_HUMAN_APPROVAL
+approval_id: APPROVE_G4_MERGE_209_20260805
+task_id: SCRUM-209
+issued_at: '2026-08-05T10:05:00Z'
+expires_at: '2026-08-06T10:05:00Z'
+risk_class: R2
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+working_branch: fastlane/SCRUM-209-hermes
+head_sha: 5d1cbb746c6e77ef993560233f4d8e169b98f224
+pull_request:
+  number: null
+  url: null
+  draft: true
+  mergeable: PENDING_PR
+merge_method: squash
+predecessor_gate:
+  gate: G3_PR
+  approval_id: APPROVE_G2_EXECUTION_209_20260805_R1
+  scope_hash_16: f693b7593425834e
+  outcome: pending_review
+modules_or_files:
+- tools/node_architect/runtime_checkpoint/state_reconciliation.py
+- schemas/node-architect/runtime-checkpoint/state-reconciliation.schema.json
+- tests/runtime_checkpoint/test_state_reconciliation.py
+- .gwc/tasks/SCRUM-209/**
+authorized_actions:
+- mark_pr_ready_for_review
+- merge_approved_pr
+excluded_actions:
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- force_push
+- delete_branch
+- protected_branch_write
+preconditions:
+- id: PRE-1
+  requirement: All required CI checks SUCCESS on head 5d1cbb746c6e77ef993560233f4d8e169b98f224
+  status: pending_pr_and_ci
+- id: PRE-2
+  requirement: PR base is main and head equals the approval-bound head_sha
+  status: pending_pr
+- id: PRE-3
+  requirement: PR marked ready for review before merge (draft cannot be merged)
+  status: pending_pr
+scope_hash: sha256:f693b7593425834e4a52cb446ed2d1a11abe1e21edc201d0e0de4b51279a8d76
+scope_hash_16: f693b7593425834e
+approval_command: 'APPROVE G4_MERGE APPROVE_G4_MERGE_209_20260805 f693b7593425834e 2026-08-06T10:05:00Z'
+exclusions:
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pending_human_approval

@@ -1,0 +1,78 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-209
+issued_at: '2026-08-05T10:10:00Z'
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 520aa1968a0809001e8994192278e52a59c86c61
+working_branch: fastlane/SCRUM-209-hermes
+head_sha: 5d1cbb746c6e77ef993560233f4d8e169b98f224
+scope_hash: sha256:f693b7593425834e4a52cb446ed2d1a11abe1e21edc201d0e0de4b51279a8d76
+scope_hash_16: f693b7593425834e
+pull_request:
+  number: null
+  url: null
+  draft: true
+  mergeable: PENDING_PR
+changed_paths:
+- tools/node_architect/runtime_checkpoint/state_reconciliation.py
+- schemas/node-architect/runtime-checkpoint/state-reconciliation.schema.json
+- tests/runtime_checkpoint/test_state_reconciliation.py
+validation:
+  head_sha: 5d1cbb746c6e77ef993560233f4d8e169b98f224
+  status: pass
+  commands:
+  - python3 -m unittest discover -s tests/runtime_checkpoint -p 'test_*.py'
+  - python3 tools/node_architect/validate_node_catalog_runtime_checkpoint.py
+ci:
+  head_sha: 5d1cbb746c6e77ef993560233f4d8e169b98f224
+  required: true
+  checks: []
+review:
+  mode: read-only
+  independence: pending
+  reviewer_id: PENDING_INDEPENDENT_REVIEWER
+  implementer_id: hermes
+  reviewed_head_sha: 5d1cbb746c6e77ef993560233f4d8e169b98f224
+  reviewed_scope_hash: sha256:f693b7593425834e4a52cb446ed2d1a11abe1e21edc201d0e0de4b51279a8d76
+  stale: false
+  decision: pending
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pending
+  - name: design
+    applicable: true
+    status: pending
+  - name: code
+    applicable: true
+    status: pending
+  - name: test
+    applicable: true
+    status: pending
+  - name: governance
+    applicable: true
+    status: pending
+  - name: delivery
+    applicable: true
+    status: pending
+  - name: ci
+    applicable: true
+    status: pending
+  findings: []
+  acceptance_criteria: []
+residual_risks:
+- id: RR-1
+  description: Exact-head CI (Validate instructions + Build instruction packages on push:main) not yet run; required by M5 gating.
+  status: open
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: inconclusive
+# HONEST STATE: envelope prepared but NOT passed. validate_g3_delivery.py requires
+# an independent reviewer (review.independence=independent, reviewer_id != hermes),
+# per-lane pass decisions, and CI checks bound to a Draft PR head_sha. Those inputs
+# require opening the Draft PR and an independent human/agent review. Do not assert
+# outcome=pass until those exist.
