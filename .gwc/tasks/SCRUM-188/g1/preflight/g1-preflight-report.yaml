@@ -31,7 +31,7 @@ checks:
   - id: REMOTE_CONNECTIVITY
     status: PASS
     code: REMOTE_BASE_VERIFIED
-    message: GitHub remote main was verified at the refreshed protected-base SHA.
+    message: GitHub remote `origin/main` was verified at protected-base `273918d89e7fca20ee837933e4c8083bf74eae45` (an ancestor of origin/main) via `git fetch origin main` and GitHub compare readback.
     evidence: [GitHub compare readback, git fetch origin main]
   - id: PLAN_BINDING
     status: PASS

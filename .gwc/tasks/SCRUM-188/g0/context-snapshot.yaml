@@ -17,7 +17,7 @@ constraints:
   - No direct write to protected main; implementation is isolated in a dedicated worktree.
   - The initial implementation scope excluded push; the current G2 repair envelope permits only a non-force push of the guarded working branch after validation.
   - Draft PR promotion, merge, deploy, release, credentials, secrets, migration, and production data remain excluded.
-  - Remote main and PR head were verified through GitHub at the exact bound SHAs before this repair envelope.
+  - Remote `origin/main` was verified at protected-base `273918d89e7fca20ee837933e4c8083bf74eae45` (an ancestor of origin/main) via `git fetch origin main` and GitHub compare readback; the active working-branch head is read back from CI for exact-head evidence.
 applicable_policies:
   - id: CODING_PROJECT_GOVERNANCE
     path: core/Coding_Project_Governance_v1.0.md

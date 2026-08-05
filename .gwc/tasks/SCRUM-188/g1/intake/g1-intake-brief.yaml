@@ -43,7 +43,7 @@ risks:
   - id: RISK-2
     description: Remote GitHub ref verification was unavailable during initial intake and was refreshed successfully before G2.
     impact: medium
-    mitigation: Treat the refreshed protected-base verification in G1 preflight as authoritative, bind all work to the exact origin/main SHA, and re-check base drift before every write.
+    mitigation: Treat the refreshed protected-base verification in G1 preflight as authoritative — `origin/main` verified at `273918d89e7fca20ee837933e4c8083bf74eae45` (ancestor of origin/main) via `git fetch origin main` and GitHub compare readback — bind all work to the exact origin/main SHA, and re-check base drift before every write.
 acceptance_criteria:
   - id: AC-1
     statement: The authority-boundary-decision schema validates the complete decision shape and rejects missing or invalid bindings.

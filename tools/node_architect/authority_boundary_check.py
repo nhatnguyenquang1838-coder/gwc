@@ -13,6 +13,29 @@ import re
 from typing import Any
 
 
+# NOTE on the nested `scope_identity` projection (MINOR#4 clarification)
+# --------------------------------------------------------------------------
+# Each emitted `authority-boundary-decision` embeds a *compact* `scope_identity`
+# projection (see `_base_output` / `schema $defs.scope_identity`). It is a
+# deliberately bounded subset of the canonical `gate-scope-identity` artifact
+# produced by `scope_hash_calculation.calculate_gate_scope_identity` (SCRUM-187):
+#   - It reuses the SAME key set and value constraints as the canonical schema
+#     (`task_id`, `repository`, `base_sha`, `head_sha`, `scope_hash`,
+#     `authorized_actions`, `excluded_actions`, plus optional `schema_version`,
+#     `artifact_type`, `base_ref`, `working_branch`, `risk_class`,
+#     `authorized_paths`, `additional_bindings`, `outcome`, `authority_granted`).
+#   - It is bound to the live decision's scope_hash/base_sha/head_sha for
+#     replay-key stability and drift detection; it does NOT itself recompute or
+#     re-authorize the canonical semantic scope_hash.
+#   - It MUST NOT be treated as a standalone scope-identity approval: the
+#     authoritative, hash-independent canonical artifact lives in
+#     `.gwc/tasks/<task>/g2/execution-envelope.yaml` (G2) and the canonical
+#     `gate-scope-identity` node. The nested projection only mirrors those
+#     bindings for traceability inside the decision payload.
+# This intentional asymmetry (bounded projection vs full canonical identity) is
+# by design; the schema's own description states the projection "does not
+# replace the standalone canonical artifact."
+
 GATE_ORDER = (
     "G0_CONTEXT",
     "G1_ALIGNMENT",
@@ -383,6 +406,9 @@ def _base_output(
     event_id_or_idempotency_key: str, replay_status: str, request_fingerprint: str,
     evaluated_at: str | None,
 ) -> dict[str, Any]:
+    # Nested `scope_identity` is the compact projection described in the module
+    # note (MINOR#4): it mirrors the canonical gate-scope-identity bindings for
+    # this decision and must not be read as a standalone approval artifact.
     scope_hash = scope_identity.get("scope_hash", gate_state.get("scope_hash"))
     base_sha = scope_identity.get("base_sha", gate_state.get("current_base_sha", gate_state.get("base_sha")))
     head_sha = scope_identity.get("head_sha", gate_state.get("head_sha"))
