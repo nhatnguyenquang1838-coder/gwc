@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/gate-story.schema.json",
+  "title": "GWC G0 to G6 Gate Story",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "run_id", "task_id", "repository", "head_sha", "graph_digest", "gates", "terminal_summary", "story_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-story"},
+    "run_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "gates": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gate", "purpose", "status", "participating_nodes", "narrative", "evidence_refs", "authority_not_granted"],
+        "properties": {
+          "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+          "purpose": {"type": "string", "minLength": 1},
+          "status": {"enum": ["passed", "executed", "blocked", "not_executed", "not_applicable"]},
+          "participating_nodes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "narrative": {"type": "string", "minLength": 1},
+          "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "authority_not_granted": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "terminal_summary": {"type": "string", "minLength": 1},
+    "story_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
