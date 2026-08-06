@@ -1,0 +1,43 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-06T19:39:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-271
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-06T19:39:00Z'
+  source: chat-fastlane-command
+  explicit: true
+rationale: The user explicitly instructed Fastlane 271 after approving the Epic and
+  the first task scope.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:be148988456aa7b03f6bb00e5bf52961019ba1cf16a50308b00b9c3d3bb02758
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.
