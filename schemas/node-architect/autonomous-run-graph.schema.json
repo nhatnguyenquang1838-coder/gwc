@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/autonomous-run-graph.schema.json",
+  "title": "GWC Autonomous Run Graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "run_id", "task_id", "repository", "base_ref", "base_sha", "head_ref", "head_sha", "graph_revision", "nodes", "edges", "terminal_status", "graph_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "autonomous-run-graph"},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "task_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9]+-[1-9][0-9]*$"},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_ref": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_ref": {"type": "string", "minLength": 1},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "graph_revision": {"type": "string", "minLength": 1},
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["instance_id", "canonical_id", "participant_type", "gate", "sequence", "purpose", "status", "entry_evidence", "action", "outcome", "output_evidence", "next_route"],
+        "properties": {
+          "instance_id": {"type": "string", "minLength": 1},
+          "canonical_id": {"type": "string", "minLength": 1},
+          "participant_type": {"enum": ["runtime_node", "gate_action"]},
+          "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+          "sequence": {"type": "integer", "minimum": 0},
+          "purpose": {"type": "string", "minLength": 1},
+          "status": {"enum": ["executed", "passed", "blocked", "not_executed", "not_applicable"]},
+          "entry_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "action": {"type": "string", "minLength": 1},
+          "outcome": {"type": "string", "minLength": 1},
+          "output_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "next_route": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["edge_id", "source", "target", "edge_type", "runtime_executable", "provenance", "sequence"],
+        "properties": {
+          "edge_id": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "minLength": 1},
+          "target": {"type": "string", "minLength": 1},
+          "edge_type": {"enum": ["runtime", "recovery", "authority", "visualization"]},
+          "runtime_executable": {"type": "boolean"},
+          "provenance": {"type": "string", "minLength": 1},
+          "sequence": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "terminal_status": {"enum": ["PASS", "BLOCKED", "INCOMPLETE"]},
+    "graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
