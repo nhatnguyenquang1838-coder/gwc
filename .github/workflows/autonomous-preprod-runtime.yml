@@ -233,14 +233,29 @@ jobs:
             }
             const digest = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
             const receipt = {
-              schema_version: '1.0', artifact_type: 'g4-pr-evidence-receipt', generated_at: new Date().toISOString(),
-              repository: `${owner}/${repo}`, gate: 'G4_MERGE', pr_number: prNumber,
-              approval_id: match[1], scope_hash_prefix: match[2], approved_head_sha: pr.head.sha,
-              run_id: metadata[1], task_id: metadata[2], run_graph_digest: metadata[4], gate_story_digest: metadata[5], evidence_digest: metadata[6],
-              managed_block_digest: digest(managed), pr_body_digest: digest(prBody), source_comment_id: context.payload.comment.id,
+              schema_version: '1.0',
+              artifact_type: 'g4-pr-evidence-receipt',
+              generated_at: new Date().toISOString(),
+              repository: `${owner}/${repo}`,
+              gate: 'G4_MERGE',
+              pr_number: prNumber,
+              approval_id: match[1],
+              scope_hash_prefix: match[2],
+              approved_head_sha: pr.head.sha,
+              run_id: metadata[1],
+              task_id: metadata[2],
+              run_graph_digest: metadata[4],
+              gate_story_digest: metadata[5],
+              evidence_digest: metadata[6],
+              managed_block_digest: digest(managed),
+              pr_body_digest: digest(prBody),
+              source_comment_id: context.payload.comment.id,
               approver: { login: context.payload.comment.user.login, permission: permission.permission },
-              issued_at: context.payload.comment.created_at, expires_at: match[3],
-              authorized_action: 'bind_current_pr_evidence_for_g4', merge_authority_granted: false, manual_g5_action_authorized: false,
+              issued_at: context.payload.comment.created_at,
+              expires_at: match[3],
+              authorized_action: 'bind_current_pr_evidence_for_g4',
+              merge_authority_granted: false,
+              manual_g5_action_authorized: false,
             };
             fs.writeFileSync('g4-pr-evidence-receipt.json', JSON.stringify(receipt, null, 2));
             const marker = `<!-- gwc:g4-pr-evidence-receipt approval_id=${receipt.approval_id} head=${receipt.approved_head_sha} scope=${receipt.scope_hash_prefix} pr_body=${receipt.pr_body_digest} managed=${receipt.managed_block_digest} graph=${receipt.run_graph_digest} story=${receipt.gate_story_digest} evidence=${receipt.evidence_digest} source_comment_id=${receipt.source_comment_id} expires=${receipt.expires_at} -->`;
@@ -263,7 +278,18 @@ jobs:
             const existing = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(`gwc:g4-pr-evidence-receipt approval_id=${receipt.approval_id} `));
             if (existing) await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: receiptBody });
             else await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body: receiptBody });
-            await github.rest.checks.create({ owner, repo, name: 'autonomous-g4-evidence-bound', head_sha: pr.head.sha, status: 'completed', conclusion: 'success', output: { title: 'Autonomous G4 evidence is current', summary: `PR body, graph, story, and evidence digests are bound to ${pr.head.sha}.` } });
+            await github.rest.checks.create({
+              owner,
+              repo,
+              name: 'autonomous-g4-evidence-bound',
+              head_sha: pr.head.sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Autonomous G4 evidence is current',
+                summary: `PR body, graph, story, and evidence digests are bound to ${pr.head.sha}.`,
+              },
+            });
             core.setOutput('head_sha', receipt.approved_head_sha);
 
       - name: Upload G4 PR evidence receipt
@@ -305,7 +331,16 @@ jobs:
                 const prBodyDigest = digest(prBody);
                 const managedDigest = digest(managed);
                 const receipts = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-pr-evidence-receipt '));
-                const exact = receipts.find((item) => item.body.includes(`head=${pr.head.sha} `) && item.body.includes(`pr_body=${prBodyDigest} `) && item.body.includes(`managed=${managedDigest} `) && item.body.includes(`graph=${meta[4]} `) && item.body.includes(`story=${meta[5]} `) && item.body.includes(`evidence=${meta[6]} `));
+                const exact = receipts.filter((item) => {
+                  if (!item.body.includes(`head=${pr.head.sha} `) ||
+                      !item.body.includes(`pr_body=${prBodyDigest} `) ||
+                      !item.body.includes(`managed=${managedDigest} `) ||
+                      !item.body.includes(`graph=${meta[4]} `) ||
+                      !item.body.includes(`story=${meta[5]} `) ||
+                      !item.body.includes(`evidence=${meta[6]} `)) return false;
+                  const expiry = item.body.match(/ expires=([^ ]+) -->/);
+                  return expiry && Number.isFinite(new Date(expiry[1]).getTime()) && new Date(expiry[1]) > new Date();
+                }).at(-1);
                 if (exact) {
                   conclusion = 'success';
                   title = 'Autonomous G4 evidence is current';
