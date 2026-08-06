@@ -43,11 +43,11 @@ RUNTIME_BINDINGS = {
         "artifact_type": "projection-privacy-decision",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
-    "ds-admin-state-projection": {
-        "schema": "schemas/ds-admin-state-projection.schema.json",
-        "evaluator": "tools/node_architect/ds_admin_state_projection.py",
-        "function": "project_ds_admin_state",
-        "artifact_type": "ds-admin-state-projection",
+    "task-center-sync": {
+        "schema": "schemas/task-center-sync-projection.schema.json",
+        "evaluator": "tools/node_architect/task_center_sync.py",
+        "function": "project_task_center_sync",
+        "artifact_type": "task-center-sync-projection",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
 }
