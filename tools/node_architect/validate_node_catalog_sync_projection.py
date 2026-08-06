@@ -43,11 +43,11 @@ RUNTIME_BINDINGS = {
         "artifact_type": "projection-privacy-decision",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
-    "task-center-sync": {
-        "schema": "schemas/task-center-sync-projection.schema.json",
-        "evaluator": "tools/node_architect/task_center_sync.py",
-        "function": "project_task_center_sync",
-        "artifact_type": "task-center-sync-projection",
+    "external-audit-event-projection": {
+        "schema": "schemas/external-audit-event-projection.schema.json",
+        "evaluator": "tools/node_architect/external_audit_event_projection.py",
+        "function": "project_external_audit_event",
+        "artifact_type": "external-audit-event-projection",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
 }
