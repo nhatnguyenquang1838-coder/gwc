@@ -116,6 +116,7 @@ PR/approval/merge/deploy/production operation. Every runtime artifact fixes
 | `ds-admin-state-projection.node.json` | `ds-admin-state-projection` | `schemas/ds-admin-state-projection.schema.json` | `tools/node_architect/ds_admin_state_projection.py` | `project_ds_admin_state` |
 | `task-center-sync.node.json` | `task-center-sync-projection` | `schemas/task-center-sync-projection.schema.json` | `tools/node_architect/task_center_sync.py` | `project_task_center_sync` |
 | `external-audit-event-projection.node.json` | `external-audit-event-projection` | `schemas/external-audit-event-projection.schema.json` | `tools/node_architect/external_audit_event_projection.py` | `project_external_audit_event` |
+| `projection-drift-detection.node.json` | `projection-drift-detection` | `schemas/projection-drift-decision.schema.json` | `tools/node_architect/projection_drift_detection.py` | `detect_projection_drift` |
 
 Each renderer fails closed (in deterministic precedence) for: invalid input;
 missing/blocked/mismatched source authority; invalid evidence linkset; invalid
@@ -124,3 +125,12 @@ Center); or prior readback mismatch. A valid fresh projection yields
 `outcome: READY, reason_code: *_PROJECTION_READY` (or `*_SYNC_READY` /
 `*_EVENT_READY`); a valid projection matching an existing prior readback yields
 `*_CURRENT` (NOOP). The canonical-state digest is order-independent.
+
+The drift-detection runtime (`detect_projection_drift`) is read-only. It consumes
+the shared closed envelope, the three B1 decisions, a B2-rendered external
+projection, and a canonical state snapshot, then compares the projection's
+`canonical_state` against the snapshot field-by-field. Field divergence produces
+`outcome: BLOCKED, reason_code: DRIFT_DETECTED` with a sorted `drift_fields`
+list and an order-independent `canonical_state_digest`. A clean comparison
+produces `outcome: READY, reason_code: PROJECTION_DRIFT_NONE`. Every authority
+field is fixed to `false`; `read_only_projection` is fixed to `true`.

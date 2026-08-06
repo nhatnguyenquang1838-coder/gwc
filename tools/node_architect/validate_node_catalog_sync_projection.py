@@ -50,6 +50,13 @@ RUNTIME_BINDINGS = {
         "artifact_type": "external-audit-event-projection",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
+    "projection-drift-detection": {
+        "schema": "schemas/projection-drift-decision.schema.json",
+        "evaluator": "tools/node_architect/projection_drift_detection.py",
+        "function": "detect_projection_drift",
+        "artifact_type": "projection-drift-decision",
+        "gates": ["G2_EXECUTION", "G3_PR"],
+    },
 }
 
 
