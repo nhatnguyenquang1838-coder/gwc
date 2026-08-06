@@ -59,54 +59,45 @@ def packet() -> dict:
     return value
 
 
-def g4_authority_receipt(*, head_sha: str = HEAD_SHA, status: str = "present", expires_at: str = "2026-08-07T19:44:00Z") -> dict:
+def g4_authority_receipt(
+    *, head_sha: str = HEAD_SHA, status: str = "present",
+    approval_id: str = G4_APPROVAL_ID, scope_prefix: str = G4_SCOPE_PREFIX,
+    expires_at: str = "2026-08-07T19:44:00Z",
+) -> dict:
     return {
-        "status": status,
-        "source": "github_actions_bot_comment",
-        "bot_login": "github-actions[bot]",
-        "marker": "gwc:g4-authority-receipt",
-        "approval_id": G4_APPROVAL_ID,
-        "pr_number": 271,
-        "receipt_comment_id": 271001,
-        "source_comment_id": 271000,
-        "approved_head_sha": head_sha,
-        "scope_hash_prefix": G4_SCOPE_PREFIX,
-        "expires_at": expires_at,
+        "status": status, "source": "github_actions_bot_comment",
+        "bot_login": "github-actions[bot]", "marker": "gwc:g4-authority-receipt",
+        "approval_id": approval_id, "pr_number": 271, "receipt_comment_id": 271001,
+        "source_comment_id": 271000, "approved_head_sha": head_sha,
+        "scope_hash_prefix": scope_prefix, "expires_at": expires_at,
     }
 
 
 def g4_pr_evidence_receipt(
-    *,
-    head_sha: str = HEAD_SHA,
-    status: str = "present",
-    pr_body_digest: str = DIGEST_A,
-    graph_digest: str = DIGEST_C,
-    task_id: str = "SCRUM-271",
+    *, head_sha: str = HEAD_SHA, status: str = "present",
+    approval_id: str = G4_APPROVAL_ID, scope_prefix: str = G4_SCOPE_PREFIX,
+    pr_body_digest: str = DIGEST_A, managed_digest: str = DIGEST_B,
+    graph_digest: str = DIGEST_C, story_digest: str = DIGEST_D,
+    evidence_digest: str = DIGEST_E, task_id: str = "SCRUM-271",
     expires_at: str = "2026-08-07T19:44:00Z",
 ) -> dict:
     return {
-        "status": status,
-        "source": "github_actions_bot_comment",
-        "bot_login": "github-actions[bot]",
-        "marker": "gwc:g4-pr-evidence-receipt",
-        "approval_id": G4_APPROVAL_ID,
-        "pr_number": 271,
-        "receipt_comment_id": 271101,
-        "source_comment_id": 271000,
-        "approved_head_sha": head_sha,
-        "scope_hash_prefix": G4_SCOPE_PREFIX,
-        "expires_at": expires_at,
-        "run_id": "run-scrum-271-fixture-1",
-        "task_id": task_id,
-        "pr_body_digest": pr_body_digest,
-        "managed_block_digest": DIGEST_B,
-        "run_graph_digest": graph_digest,
-        "gate_story_digest": DIGEST_D,
-        "evidence_digest": DIGEST_E,
+        "status": status, "source": "github_actions_bot_comment",
+        "bot_login": "github-actions[bot]", "marker": "gwc:g4-pr-evidence-receipt",
+        "approval_id": approval_id, "pr_number": 271, "receipt_comment_id": 271101,
+        "source_comment_id": 271000, "approved_head_sha": head_sha,
+        "scope_hash_prefix": scope_prefix, "expires_at": expires_at,
+        "run_id": "run-scrum-271-fixture-1", "task_id": task_id,
+        "pr_body_digest": pr_body_digest, "managed_block_digest": managed_digest,
+        "run_graph_digest": graph_digest, "gate_story_digest": story_digest,
+        "evidence_digest": evidence_digest,
     }
 
 
-def g4_merge_packet(*, include_authority: bool = True, include_evidence: bool = True, evidence: dict | None = None) -> dict:
+def g4_merge_packet(
+    *, include_authority: bool = True, include_evidence: bool = True,
+    authority: dict | None = None, evidence: dict | None = None,
+) -> dict:
     value = packet()
     value["gate"] = "G4_MERGE"
     value["action"] = "merge_approved_pr"
@@ -116,15 +107,12 @@ def g4_merge_packet(*, include_authority: bool = True, include_evidence: bool = 
         "excluded_actions": ["deploy", "release", "production_data_write"],
         "risk_class": "R3",
     }
-    value["evidence_readback"].update(
-        {
-            "gate": value["gate"],
-            "action": value["action"],
-            "event_id_or_idempotency_key": "evt-scrum-271-g4-1",
-        }
-    )
+    value["evidence_readback"].update({
+        "gate": value["gate"], "action": value["action"],
+        "event_id_or_idempotency_key": "evt-scrum-271-g4-1",
+    })
     if include_authority:
-        value["evidence_readback"]["g4_authority_receipt"] = g4_authority_receipt()
+        value["evidence_readback"]["g4_authority_receipt"] = authority or g4_authority_receipt()
     if include_evidence:
         value["evidence_readback"]["g4_pr_evidence_receipt"] = evidence or g4_pr_evidence_receipt()
     value["scope_hash"] = canonical_scope_hash(value)
@@ -133,120 +121,100 @@ def g4_merge_packet(*, include_authority: bool = True, include_evidence: bool = 
 
 
 class GateActionAuthorityTests(unittest.TestCase):
-    def test_valid_g2_packet_passes(self):
-        errors = validate(
-            packet(),
+    def validate_g4(self, value: dict, **kwargs) -> list[str]:
+        defaults = dict(
             schema_path=ROOT / "schemas/gate-action-authority.schema.json",
             now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_base_sha=BASE_SHA,
-            expected_head_sha=HEAD_SHA,
+            expected_head_sha=HEAD_SHA, observed_pr_state="open",
         )
-        self.assertEqual([], errors)
+        defaults.update(kwargs)
+        return validate(value, **defaults)
+
+    def test_valid_g2_packet_passes(self):
+        self.assertEqual([], validate(
+            packet(), schema_path=ROOT / "schemas/gate-action-authority.schema.json",
+            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
+            expected_base_sha=BASE_SHA, expected_head_sha=HEAD_SHA,
+        ))
 
     def test_scope_tampering_fails_closed(self):
-        value = packet()
-        value["scope"]["authorized_paths"].append("core/unsafe.md")
-        errors = validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")
-        self.assertTrue(any("scope_hash" in error for error in errors))
+        value = packet(); value["scope"]["authorized_paths"].append("core/unsafe.md")
+        self.assertTrue(any("scope_hash" in e for e in validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")))
+
+    def test_expiry_fails_closed(self):
+        errors = validate(packet(), schema_path=ROOT / "schemas/gate-action-authority.schema.json", now=datetime(2026, 8, 8, tzinfo=timezone.utc))
+        self.assertTrue(any("expired" in e for e in errors))
+
+    def test_readback_identity_mismatch_fails_closed(self):
+        value = copy.deepcopy(packet()); value["evidence_readback"]["head_sha"] = BASE_SHA
+        self.assertTrue(any("head_sha" in e for e in validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")))
 
     def test_gate_action_mapping_rejects_merge_at_g2(self):
-        value = packet()
-        value["action"] = "merge_approved_pr"
-        value["scope"]["authorized_actions"].append("merge_approved_pr")
-        value["scope_hash"] = canonical_scope_hash(value)
-        value["evidence_readback"]["action"] = value["action"]
-        value["evidence_readback"]["scope_hash"] = value["scope_hash"]
-        errors = validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")
-        self.assertTrue(any("not valid for G2_EXECUTION" in error for error in errors))
+        value = packet(); value["action"] = "merge_approved_pr"; value["scope"]["authorized_actions"].append("merge_approved_pr")
+        value["scope_hash"] = canonical_scope_hash(value); value["evidence_readback"]["action"] = value["action"]; value["evidence_readback"]["scope_hash"] = value["scope_hash"]
+        self.assertTrue(any("not valid for G2_EXECUTION" in e for e in validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")))
 
     def test_g4_merge_passes_only_with_both_current_receipts(self):
-        errors = validate(
-            g4_merge_packet(),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-            expected_g4_approval_id=G4_APPROVAL_ID,
+        self.assertEqual([], self.validate_g4(
+            g4_merge_packet(), expected_g4_approval_id=G4_APPROVAL_ID,
             expected_g4_scope_prefix=G4_SCOPE_PREFIX,
-            expected_pr_body_digest=DIGEST_A,
-            expected_managed_block_digest=DIGEST_B,
-            expected_run_graph_digest=DIGEST_C,
-            expected_gate_story_digest=DIGEST_D,
+            expected_pr_body_digest=DIGEST_A, expected_managed_block_digest=DIGEST_B,
+            expected_run_graph_digest=DIGEST_C, expected_gate_story_digest=DIGEST_D,
             expected_evidence_digest=DIGEST_E,
-        )
-        self.assertEqual([], errors)
+        ))
+
+    def test_g4_merge_requires_runtime_current_head(self):
+        errors = validate(g4_merge_packet(), schema_path=ROOT / "schemas/gate-action-authority.schema.json", now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc), observed_pr_state="open")
+        self.assertTrue(any("expected current PR head SHA" in e for e in errors))
 
     def test_g4_merge_requires_existing_authority_receipt(self):
-        errors = validate(
-            g4_merge_packet(include_authority=False),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-        )
-        self.assertTrue(any("g4_authority_receipt" in error for error in errors))
+        self.assertTrue(any("g4_authority_receipt" in e for e in self.validate_g4(g4_merge_packet(include_authority=False))))
 
     def test_g4_merge_requires_pr_evidence_receipt(self):
-        errors = validate(
-            g4_merge_packet(include_evidence=False),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-        )
-        self.assertTrue(any("g4_pr_evidence_receipt" in error for error in errors))
+        self.assertTrue(any("g4_pr_evidence_receipt" in e for e in self.validate_g4(g4_merge_packet(include_evidence=False))))
 
-    def test_g4_merge_rejects_stale_pr_body_digest(self):
-        errors = validate(
-            g4_merge_packet(),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-            expected_pr_body_digest="sha256:" + "f" * 64,
-        )
-        self.assertTrue(any("pr_body_digest" in error for error in errors))
+    def test_g4_merge_rejects_untrusted_authority_status(self):
+        self.assertTrue(any("G4_AUTHORITY_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(g4_merge_packet(authority=g4_authority_receipt(status="missing")))))
+
+    def test_g4_merge_rejects_untrusted_evidence_status(self):
+        self.assertTrue(any("G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(g4_merge_packet(evidence=g4_pr_evidence_receipt(status="missing")))))
+
+    def test_g4_merge_rejects_stale_authority_head(self):
+        self.assertTrue(any("head" in e for e in self.validate_g4(g4_merge_packet(authority=g4_authority_receipt(head_sha=DRIFTED_HEAD_SHA)))))
+
+    def test_g4_merge_rejects_stale_evidence_head(self):
+        self.assertTrue(any("G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(g4_merge_packet(evidence=g4_pr_evidence_receipt(head_sha=DRIFTED_HEAD_SHA)))))
+
+    def test_g4_merge_rejects_closed_or_merged_pr(self):
+        for state in ("closed", "merged"):
+            self.assertTrue(any("observed PR state 'open'" in e for e in self.validate_g4(g4_merge_packet(), observed_pr_state=state)))
+
+    def test_g4_merge_rejects_authority_scope_mismatch(self):
+        self.assertTrue(any("scope hash prefix" in e for e in self.validate_g4(g4_merge_packet(), expected_g4_scope_prefix="f" * 16)))
+
+    def test_g4_merge_rejects_expired_authority_receipt(self):
+        self.assertTrue(any("expired" in e for e in self.validate_g4(g4_merge_packet(authority=g4_authority_receipt(expires_at="2026-08-06T20:30:00Z")))))
+
+    def test_g4_merge_rejects_expired_evidence_receipt(self):
+        self.assertTrue(any("expired" in e for e in self.validate_g4(g4_merge_packet(evidence=g4_pr_evidence_receipt(expires_at="2026-08-06T20:30:00Z")))))
+
+    def test_g4_merge_rejects_pr_body_drift(self):
+        self.assertTrue(any("pr_body_digest" in e for e in self.validate_g4(g4_merge_packet(), expected_pr_body_digest="sha256:" + "f" * 64)))
+
+    def test_g4_merge_rejects_managed_block_drift(self):
+        self.assertTrue(any("managed_block_digest" in e for e in self.validate_g4(g4_merge_packet(), expected_managed_block_digest="sha256:" + "f" * 64)))
 
     def test_g4_merge_rejects_graph_drift(self):
-        errors = validate(
-            g4_merge_packet(),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-            expected_run_graph_digest="sha256:" + "f" * 64,
-        )
-        self.assertTrue(any("run_graph_digest" in error for error in errors))
+        self.assertTrue(any("run_graph_digest" in e for e in self.validate_g4(g4_merge_packet(), expected_run_graph_digest="sha256:" + "f" * 64)))
 
-    def test_g4_merge_rejects_head_drift_in_evidence_receipt(self):
-        errors = validate(
-            g4_merge_packet(evidence=g4_pr_evidence_receipt(head_sha=DRIFTED_HEAD_SHA)),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-        )
-        self.assertTrue(any("G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE" in error for error in errors))
+    def test_g4_merge_rejects_story_drift(self):
+        self.assertTrue(any("gate_story_digest" in e for e in self.validate_g4(g4_merge_packet(), expected_gate_story_digest="sha256:" + "f" * 64)))
+
+    def test_g4_merge_rejects_evidence_digest_drift(self):
+        self.assertTrue(any("evidence_digest" in e for e in self.validate_g4(g4_merge_packet(), expected_evidence_digest="sha256:" + "f" * 64)))
 
     def test_g4_merge_rejects_task_mismatch(self):
-        errors = validate(
-            g4_merge_packet(evidence=g4_pr_evidence_receipt(task_id="SCRUM-999")),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="open",
-        )
-        self.assertTrue(any("task_id does not match" in error for error in errors))
-
-    def test_g4_merge_rejects_closed_pr(self):
-        errors = validate(
-            g4_merge_packet(),
-            schema_path=ROOT / "schemas/gate-action-authority.schema.json",
-            now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc),
-            expected_head_sha=HEAD_SHA,
-            observed_pr_state="closed",
-        )
-        self.assertTrue(any("observed PR state 'open'" in error for error in errors))
+        self.assertTrue(any("task_id does not match" in e for e in self.validate_g4(g4_merge_packet(evidence=g4_pr_evidence_receipt(task_id="SCRUM-999")))))
 
 
 if __name__ == "__main__":
