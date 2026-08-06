@@ -1,0 +1,134 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-06T19:39:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-271
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: GWC has a bounded Client Runtime and PR-native G4 receipt, but lacks
+    an autonomous pre-prod workflow skeleton, run-scoped G0-to-G6 story, and exact
+    runtime graph rendered into the PR description before G4 readiness.
+  why_now: SCRUM-270 requires an MVP control-plane and evidence presentation foundation
+    before standing policy, AI execution, Jira continuation, and governed pre-prod
+    merge can be implemented.
+desired_outcome: Add an additive workflow skeleton and deterministic renderers that
+  generate exact-head-bound run graph and gate story artifacts, update only a managed
+  PR description block, and fail closed on stale evidence or a main-target PR.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - Node Architect runtime consumers
+  - GitHub PR reviewers
+scope:
+  in_scope:
+  - Add .github/workflows/autonomous-preprod-runtime.yml with workflow_dispatch fixture/canary
+    support.
+  - Add the autonomous pre-prod runtime contract and schema-valid run graph and gate
+    story artifacts.
+  - Add deterministic graph, storyteller, and managed PR evidence renderers.
+  - Update G4 preparation interfaces so current evidence, graph, story, and PR body
+    digests are available for later authority validation.
+  - Add focused fail-closed, idempotency, drift, and regression tests.
+  - Record task-scoped G0/G1/G2/G3 evidence and changelog/package references required
+    by repository validation.
+  non_goals:
+  - Implement standing-policy G4 issuance or real merge into pre-prod.
+  - Implement arbitrary Jira task execution or AI provider invocation.
+  - Implement Jira continuation across multiple tasks.
+  - Merge or auto-merge into main.
+  - Deploy, release, reload runtime, access production data, change production configuration,
+    credentials, secrets, or migrations.
+  - Claim that all 81 Node Architect nodes participated.
+constraints:
+- Reuse and extend existing Client Runtime, gate-node route profile, runtime registry,
+  G3/G4 evidence workflow, and gate validators.
+- Canonical graph output is JSON; Mermaid and Markdown are deterministic projections.
+- PR update owns only the GWC managed block and preserves human-authored text outside
+  it.
+- Gate actions are not invented as catalogue nodes.
+- Updating PR description is evidence preparation only and grants no G4 authority.
+- Any PR base of main fails before a merge-capable route.
+- Work remains bounded to a guarded SCRUM-271 branch after exact G2 approval.
+assumptions:
+- Current main SHA remains 773baa601492dabf6ad8e835b62e48a68b0c1b55 until G2 entry;
+  drift requires rebaseline.
+- Existing Python, PyYAML, jsonschema, unittest, and GitHub Actions mechanisms remain
+  available.
+- A deterministic fixture can prove the workflow and renderer contracts before later
+  tasks add live task execution.
+risks:
+- id: RISK-1
+  description: Workflow and G4 evidence changes alter a repository authority/control-plane
+    surface.
+  impact: high
+  mitigation: Classify R3, require exact G2 direction, preserve existing G4 regressions,
+    and prohibit any merge implementation in this task.
+- id: RISK-2
+  description: A generated story could overstate gates or nodes that did not execute.
+  impact: high
+  mitigation: Generate only from canonical events/artifacts and require not_executed
+    or not_applicable states.
+- id: RISK-3
+  description: PR body or graph drift could leave stale G4 readiness evidence.
+  impact: high
+  mitigation: Bind evidence, graph, story, PR body, task, scope, and exact head digests
+    and fail closed on mismatch.
+acceptance_criteria:
+- id: AC-1
+  statement: A deterministic fixture run produces schema-valid graph JSON and gate-story
+    JSON bound to the same run ID, task, scope, and exact head SHA.
+  verifiable: true
+- id: AC-2
+  statement: Managed PR description rendering is idempotent, preserves all content
+    outside its markers, and readback confirms current evidence, graph, story, and
+    body digests.
+  verifiable: true
+- id: AC-3
+  statement: Mermaid and storyteller outputs list only actual gate actions and participating
+    canonical node IDs, with not_executed or not_applicable for absent execution.
+  verifiable: true
+- id: AC-4
+  statement: Missing events/artifacts, malformed markers, unknown outcomes, scope/head/graph/story/body
+    drift, and PR base main fail closed with stable reason codes.
+  verifiable: true
+- id: AC-5
+  statement: Updating PR evidence does not grant G4, and existing G3/G4 validation
+    and receipt regression tests remain green.
+  verifiable: true
+- id: AC-6
+  statement: Focused tests, instruction validation, and project package build pass
+    for the exact final PR head before G3 PASS.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY
