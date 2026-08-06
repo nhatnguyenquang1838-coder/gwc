@@ -64,6 +64,13 @@ RUNTIME_BINDINGS = {
         "artifact_type": "projection-reconcile-readback",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
+    "projection-failure-routing": {
+        "schema": "schemas/projection-failure-routing.schema.json",
+        "evaluator": "tools/node_architect/projection_failure_routing.py",
+        "function": "route_projection_failure",
+        "artifact_type": "projection-failure-routing",
+        "gates": ["G2_EXECUTION", "G3_PR"],
+    },
 }
 
 

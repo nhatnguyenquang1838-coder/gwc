@@ -118,6 +118,7 @@ PR/approval/merge/deploy/production operation. Every runtime artifact fixes
 | `external-audit-event-projection.node.json` | `external-audit-event-projection` | `schemas/external-audit-event-projection.schema.json` | `tools/node_architect/external_audit_event_projection.py` | `project_external_audit_event` |
 | `projection-drift-detection.node.json` | `projection-drift-detection` | `schemas/projection-drift-decision.schema.json` | `tools/node_architect/projection_drift_detection.py` | `detect_projection_drift` |
 | `projection-reconcile-readback.node.json` | `projection-reconcile-readback` | `schemas/projection-reconcile-readback.schema.json` | `tools/node_architect/projection_reconcile_readback.py` | `reconcile_projection_readback` |
+| `projection-failure-routing.node.json` | `projection-failure-routing` | `schemas/projection-failure-routing.schema.json` | `tools/node_architect/projection_failure_routing.py` | `route_projection_failure` |
 
 Each renderer fails closed (in deterministic precedence) for: invalid input;
 missing/blocked/mismatched source authority; invalid evidence linkset; invalid
@@ -142,4 +143,9 @@ and a prior projection readback. An identical readback yields
 prior state, blocked drift, or invalid input yields `BLOCKED` with stable reason
 codes and `divergence_fields`; its digest is order-independent and all authority
 fields remain false.
+The failure-routing runtime (`route_projection_failure`) consumes the shared
+envelope, B1 decisions, the 224 drift decision, and the 225 reconcile decision,
+then classifies the projection outcome into RETRYABLE, HARD_DENIED, STALE_EVIDENCE,
+or AUTHORITY_CONFLICT. Routing is pure classification; all authority fields remain
+false and `read_only_projection` is fixed to `true`.
 
