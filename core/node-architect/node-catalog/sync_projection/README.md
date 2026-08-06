@@ -117,6 +117,7 @@ PR/approval/merge/deploy/production operation. Every runtime artifact fixes
 | `task-center-sync.node.json` | `task-center-sync-projection` | `schemas/task-center-sync-projection.schema.json` | `tools/node_architect/task_center_sync.py` | `project_task_center_sync` |
 | `external-audit-event-projection.node.json` | `external-audit-event-projection` | `schemas/external-audit-event-projection.schema.json` | `tools/node_architect/external_audit_event_projection.py` | `project_external_audit_event` |
 | `projection-drift-detection.node.json` | `projection-drift-detection` | `schemas/projection-drift-decision.schema.json` | `tools/node_architect/projection_drift_detection.py` | `detect_projection_drift` |
+| `projection-reconcile-readback.node.json` | `projection-reconcile-readback` | `schemas/projection-reconcile-readback.schema.json` | `tools/node_architect/projection_reconcile_readback.py` | `reconcile_projection_readback` |
 
 Each renderer fails closed (in deterministic precedence) for: invalid input;
 missing/blocked/mismatched source authority; invalid evidence linkset; invalid
@@ -134,3 +135,11 @@ projection, and a canonical state snapshot, then compares the projection's
 list and an order-independent `canonical_state_digest`. A clean comparison
 produces `outcome: READY, reason_code: PROJECTION_DRIFT_NONE`. Every authority
 field is fixed to `false`; `read_only_projection` is fixed to `true`.
+The reconcile-readback runtime (`reconcile_projection_readback`) consumes the
+shared envelope, B1 decisions, the 224 drift decision, a B2 external projection,
+and a prior projection readback. An identical readback yields
+`outcome: READY, reason_code: PROJECTION_CURRENT` (NOOP). Divergence, missing
+prior state, blocked drift, or invalid input yields `BLOCKED` with stable reason
+codes and `divergence_fields`; its digest is order-independent and all authority
+fields remain false.
+

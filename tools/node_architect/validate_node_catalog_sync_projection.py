@@ -57,6 +57,13 @@ RUNTIME_BINDINGS = {
         "artifact_type": "projection-drift-decision",
         "gates": ["G2_EXECUTION", "G3_PR"],
     },
+    "projection-reconcile-readback": {
+        "schema": "schemas/projection-reconcile-readback.schema.json",
+        "evaluator": "tools/node_architect/projection_reconcile_readback.py",
+        "function": "reconcile_projection_readback",
+        "artifact_type": "projection-reconcile-readback",
+        "gates": ["G2_EXECUTION", "G3_PR"],
+    },
 }
 
 
