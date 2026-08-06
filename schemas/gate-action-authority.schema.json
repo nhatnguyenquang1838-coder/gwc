@@ -4,24 +4,7 @@
   "title": "GWC Gate Action Authority",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "artifact_type",
-    "task_id",
-    "repository",
-    "base_ref",
-    "base_sha",
-    "head_sha",
-    "working_branch",
-    "gate",
-    "action",
-    "scope",
-    "scope_hash",
-    "issued_at",
-    "expires_at",
-    "actor",
-    "evidence_readback"
-  ],
+  "required": ["schema_version", "artifact_type", "task_id", "repository", "base_ref", "base_sha", "head_sha", "working_branch", "gate", "action", "scope", "scope_hash", "issued_at", "expires_at", "actor", "evidence_readback"],
   "properties": {
     "schema_version": {"const": "1.0"},
     "artifact_type": {"const": "gate-action-authority"},
@@ -31,40 +14,16 @@
     "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "working_branch": {"type": "string", "minLength": 1},
-    "gate": {
-      "enum": [
-        "G0_CONTEXT",
-        "G1_ALIGNMENT",
-        "G2_EXECUTION",
-        "G3_PR",
-        "G4_MERGE",
-        "G5_DEPLOY",
-        "G6_PRODUCTION_DATA"
-      ]
-    },
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
     "action": {"type": "string", "minLength": 1},
     "scope": {
       "type": "object",
       "additionalProperties": false,
       "required": ["authorized_paths", "authorized_actions", "excluded_actions", "risk_class"],
       "properties": {
-        "authorized_paths": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
-        "authorized_actions": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
-        "excluded_actions": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
+        "authorized_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "authorized_actions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "excluded_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
         "risk_class": {"enum": ["R0", "R1", "R2", "R3"]}
       }
     },
@@ -83,18 +42,7 @@
     "evidence_readback": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "status",
-        "observed_at",
-        "task_id",
-        "repository",
-        "base_sha",
-        "head_sha",
-        "gate",
-        "action",
-        "scope_hash",
-        "event_id_or_idempotency_key"
-      ],
+      "required": ["status", "observed_at", "task_id", "repository", "base_sha", "head_sha", "gate", "action", "scope_hash", "event_id_or_idempotency_key"],
       "properties": {
         "status": {"enum": ["observed", "confirmed", "not_applicable"]},
         "observed_at": {"type": "string", "format": "date-time"},
@@ -109,32 +57,9 @@
         "g4_authority_receipt": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "status",
-            "source",
-            "bot_login",
-            "marker",
-            "approval_id",
-            "pr_number",
-            "receipt_comment_id",
-            "source_comment_id",
-            "approved_head_sha",
-            "scope_hash_prefix",
-            "expires_at"
-          ],
+          "required": ["status", "source", "bot_login", "marker", "approval_id", "pr_number", "receipt_comment_id", "source_comment_id", "approved_head_sha", "scope_hash_prefix", "expires_at"],
           "properties": {
-            "status": {
-              "enum": [
-                "present",
-                "missing",
-                "malformed",
-                "expired",
-                "head_mismatch",
-                "scope_mismatch",
-                "approval_mismatch",
-                "source_untrusted"
-              ]
-            },
+            "status": {"enum": ["present", "missing", "malformed", "expired", "head_mismatch", "scope_mismatch", "approval_mismatch", "source_untrusted"]},
             "source": {"const": "github_actions_bot_comment"},
             "bot_login": {"const": "github-actions[bot]"},
             "marker": {"const": "gwc:g4-authority-receipt"},
@@ -146,26 +71,39 @@
             "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
             "expires_at": {"type": "string", "format": "date-time"}
           }
+        },
+        "g4_pr_evidence_receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "source", "bot_login", "marker", "approval_id", "pr_number", "receipt_comment_id", "source_comment_id", "approved_head_sha", "scope_hash_prefix", "expires_at", "run_id", "task_id", "pr_body_digest", "managed_block_digest", "run_graph_digest", "gate_story_digest", "evidence_digest"],
+          "properties": {
+            "status": {"enum": ["present", "missing", "malformed", "expired", "head_mismatch", "scope_mismatch", "approval_mismatch", "source_untrusted", "body_mismatch", "graph_mismatch", "story_mismatch", "evidence_mismatch"]},
+            "source": {"const": "github_actions_bot_comment"},
+            "bot_login": {"const": "github-actions[bot]"},
+            "marker": {"const": "gwc:g4-pr-evidence-receipt"},
+            "approval_id": {"type": "string", "minLength": 1},
+            "pr_number": {"type": "integer", "minimum": 1},
+            "receipt_comment_id": {"type": "integer", "minimum": 1},
+            "source_comment_id": {"type": "integer", "minimum": 1},
+            "approved_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+            "expires_at": {"type": "string", "format": "date-time"},
+            "run_id": {"type": "string", "minLength": 1},
+            "task_id": {"type": "string", "minLength": 1},
+            "pr_body_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "managed_block_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "run_graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "gate_story_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "evidence_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
         }
       }
     }
   },
   "allOf": [
     {
-      "if": {
-        "required": ["gate", "action"],
-        "properties": {
-          "gate": {"const": "G4_MERGE"},
-          "action": {"const": "merge_approved_pr"}
-        }
-      },
-      "then": {
-        "properties": {
-          "evidence_readback": {
-            "required": ["g4_authority_receipt"]
-          }
-        }
-      }
+      "if": {"required": ["gate", "action"], "properties": {"gate": {"const": "G4_MERGE"}, "action": {"const": "merge_approved_pr"}}},
+      "then": {"properties": {"evidence_readback": {"required": ["g4_authority_receipt", "g4_pr_evidence_receipt"]}}}
     }
   ]
 }
