@@ -4,24 +4,26 @@
 This is a data-only, fail-closed validator. It does not call Jira, GitHub, or a
 deployment system and never grants authority.
 
-For G4 merge actions, the packet must include a trusted PR-native
-``gwc:g4-authority-receipt`` readback from a ``github-actions[bot]`` PR comment
-bound to the current PR head. Chat-only G4 approval is not merge-ready evidence
-until that bot receipt exists.
-"""
+For G4 merge actions, the packet must include both:
 
+* a trusted PR-native ``gwc:g4-authority-receipt`` readback; and
+* a trusted ``gwc:g4-pr-evidence-receipt`` binding the current PR body, run
+  graph, G0→G6 story, and managed-evidence digest to the current PR head.
+
+Chat-only approval or a stale PR-description receipt is never merge-ready.
+"""
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
-
 
 GATE_MINIMUM_ACTIONS = {
     "G0_CONTEXT": {"read_repository", "inspect_connector", "inspect_task"},
@@ -50,9 +52,12 @@ G4_MERGE_GATE = "G4_MERGE"
 G4_MERGE_ACTION = "merge_approved_pr"
 OPEN_PR_STATE = "open"
 G4_RECEIPT_MARKER = "gwc:g4-authority-receipt"
+G4_PR_EVIDENCE_MARKER = "gwc:g4-pr-evidence-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
 GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
 G4_RECEIPT_FAILURE = "G4_AUTHORITY_RECEIPT_MISSING_OR_STALE"
+G4_PR_EVIDENCE_FAILURE = "G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE"
+DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 def load(path: Path) -> Any:
@@ -88,6 +93,47 @@ def schema_errors(packet: Any, schema_path: Path) -> list[str]:
     ]
 
 
+def _trusted_receipt_common_errors(
+    receipt: dict[str, Any],
+    *,
+    marker: str,
+    failure_code: str,
+    packet: dict[str, Any],
+    now: datetime,
+    expected_head_sha: str | None,
+    expected_g4_approval_id: str | None,
+    expected_g4_scope_prefix: str | None,
+) -> list[str]:
+    errors: list[str] = []
+    if receipt.get("status") != "present":
+        errors.append(f"{failure_code}: receipt status must be 'present'")
+    if receipt.get("source") != GITHUB_ACTIONS_BOT_COMMENT:
+        errors.append(f"{failure_code}: receipt must come from a GitHub Actions bot comment")
+    if receipt.get("bot_login") != GITHUB_ACTIONS_BOT:
+        errors.append(f"{failure_code}: receipt must be authored by github-actions[bot]")
+    if receipt.get("marker") != marker:
+        errors.append(f"{failure_code}: trusted marker is missing or mismatched")
+    approved_head = receipt.get("approved_head_sha")
+    if approved_head != packet.get("head_sha"):
+        errors.append(f"{failure_code}: receipt head does not match packet head SHA")
+    if expected_head_sha and approved_head != expected_head_sha:
+        errors.append(f"{failure_code}: receipt head does not match current PR head SHA")
+    if expected_g4_approval_id and receipt.get("approval_id") != expected_g4_approval_id:
+        errors.append(f"{failure_code}: approval_id does not match expected G4 approval ID")
+    if expected_g4_scope_prefix and receipt.get("scope_hash_prefix") != expected_g4_scope_prefix:
+        errors.append(f"{failure_code}: scope hash prefix does not match expected scope prefix")
+    try:
+        if parse_utc(receipt["expires_at"], f"{marker}.expires_at") <= now:
+            errors.append(f"{failure_code}: receipt is expired")
+    except (KeyError, TypeError, ValueError) as exc:
+        errors.append(str(exc))
+    for field in ("pr_number", "receipt_comment_id", "source_comment_id"):
+        value = receipt.get(field)
+        if not isinstance(value, int) or value < 1:
+            errors.append(f"{failure_code}: {field} must be a positive integer")
+    return errors
+
+
 def _g4_receipt_errors(
     packet: dict[str, Any],
     *,
@@ -99,37 +145,63 @@ def _g4_receipt_errors(
     receipt = packet.get("evidence_readback", {}).get("g4_authority_receipt")
     if not isinstance(receipt, dict):
         return [f"{G4_RECEIPT_FAILURE}: G4 merge requires trusted PR-native G4 authority receipt"]
+    return _trusted_receipt_common_errors(
+        receipt,
+        marker=G4_RECEIPT_MARKER,
+        failure_code=G4_RECEIPT_FAILURE,
+        packet=packet,
+        now=now,
+        expected_head_sha=expected_head_sha,
+        expected_g4_approval_id=expected_g4_approval_id,
+        expected_g4_scope_prefix=expected_g4_scope_prefix,
+    )
 
-    errors: list[str] = []
-    if receipt.get("status") != "present":
-        errors.append(f"{G4_RECEIPT_FAILURE}: receipt status must be 'present'")
-    if receipt.get("source") != GITHUB_ACTIONS_BOT_COMMENT:
-        errors.append("G4 authority receipt must come from a GitHub Actions bot comment")
-    if receipt.get("bot_login") != GITHUB_ACTIONS_BOT:
-        errors.append("G4 authority receipt must be authored by github-actions[bot]")
-    if receipt.get("marker") != G4_RECEIPT_MARKER:
-        errors.append("G4 authority receipt marker is missing or not trusted")
 
-    approved_head = receipt.get("approved_head_sha")
-    if approved_head != packet.get("head_sha"):
-        errors.append(f"{G4_RECEIPT_FAILURE}: authority receipt head does not match packet head SHA")
-    if expected_head_sha and approved_head != expected_head_sha:
-        errors.append(f"{G4_RECEIPT_FAILURE}: authority receipt head does not match current PR head SHA")
-    if expected_g4_approval_id and receipt.get("approval_id") != expected_g4_approval_id:
-        errors.append("G4 authority receipt approval_id does not match expected G4 approval ID")
-    if expected_g4_scope_prefix and receipt.get("scope_hash_prefix") != expected_g4_scope_prefix:
-        errors.append("G4 authority receipt scope hash prefix does not match expected scope prefix")
-
-    try:
-        if parse_utc(receipt["expires_at"], "evidence_readback.g4_authority_receipt.expires_at") <= now:
-            errors.append(f"{G4_RECEIPT_FAILURE}: authority receipt is expired")
-    except (KeyError, TypeError, ValueError) as exc:
-        errors.append(str(exc))
-
-    for field in ("pr_number", "receipt_comment_id", "source_comment_id"):
+def _g4_pr_evidence_errors(
+    packet: dict[str, Any],
+    *,
+    now: datetime,
+    expected_head_sha: str | None,
+    expected_g4_approval_id: str | None,
+    expected_g4_scope_prefix: str | None,
+    expected_pr_body_digest: str | None,
+    expected_managed_block_digest: str | None,
+    expected_run_graph_digest: str | None,
+    expected_gate_story_digest: str | None,
+    expected_evidence_digest: str | None,
+) -> list[str]:
+    receipt = packet.get("evidence_readback", {}).get("g4_pr_evidence_receipt")
+    if not isinstance(receipt, dict):
+        return [f"{G4_PR_EVIDENCE_FAILURE}: G4 merge requires trusted current PR evidence receipt"]
+    errors = _trusted_receipt_common_errors(
+        receipt,
+        marker=G4_PR_EVIDENCE_MARKER,
+        failure_code=G4_PR_EVIDENCE_FAILURE,
+        packet=packet,
+        now=now,
+        expected_head_sha=expected_head_sha,
+        expected_g4_approval_id=expected_g4_approval_id,
+        expected_g4_scope_prefix=expected_g4_scope_prefix,
+    )
+    digest_expectations = {
+        "pr_body_digest": expected_pr_body_digest,
+        "managed_block_digest": expected_managed_block_digest,
+        "run_graph_digest": expected_run_graph_digest,
+        "gate_story_digest": expected_gate_story_digest,
+        "evidence_digest": expected_evidence_digest,
+    }
+    for field, expected in digest_expectations.items():
         value = receipt.get(field)
-        if not isinstance(value, int) or value < 1:
-            errors.append(f"G4 authority receipt {field} must be a positive integer")
+        if not isinstance(value, str) or not DIGEST_RE.fullmatch(value):
+            errors.append(f"{G4_PR_EVIDENCE_FAILURE}: {field} must be a sha256 digest")
+        elif expected and value != expected:
+            errors.append(f"{G4_PR_EVIDENCE_FAILURE}: {field} does not match current PR evidence")
+    for field in ("run_id", "task_id"):
+        value = receipt.get(field)
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"{G4_PR_EVIDENCE_FAILURE}: {field} must be present")
+    if receipt.get("task_id") != packet.get("task_id"):
+        errors.append(f"{G4_PR_EVIDENCE_FAILURE}: task_id does not match packet task")
     return errors
 
 
@@ -143,10 +215,14 @@ def semantic_errors(
     observed_pr_state: str | None = None,
     expected_g4_approval_id: str | None = None,
     expected_g4_scope_prefix: str | None = None,
+    expected_pr_body_digest: str | None = None,
+    expected_managed_block_digest: str | None = None,
+    expected_run_graph_digest: str | None = None,
+    expected_gate_story_digest: str | None = None,
+    expected_evidence_digest: str | None = None,
 ) -> list[str]:
     errors: list[str] = []
     now = now or datetime.now(timezone.utc)
-
     try:
         issued = parse_utc(packet["issued_at"], "issued_at")
         expires = parse_utc(packet["expires_at"], "expires_at")
@@ -195,6 +271,20 @@ def semantic_errors(
                 expected_g4_scope_prefix=expected_g4_scope_prefix,
             )
         )
+        errors.extend(
+            _g4_pr_evidence_errors(
+                packet,
+                now=now,
+                expected_head_sha=expected_head_sha,
+                expected_g4_approval_id=expected_g4_approval_id,
+                expected_g4_scope_prefix=expected_g4_scope_prefix,
+                expected_pr_body_digest=expected_pr_body_digest,
+                expected_managed_block_digest=expected_managed_block_digest,
+                expected_run_graph_digest=expected_run_graph_digest,
+                expected_gate_story_digest=expected_gate_story_digest,
+                expected_evidence_digest=expected_evidence_digest,
+            )
+        )
 
     readback = packet.get("evidence_readback", {})
     for field in ("task_id", "repository", "base_sha", "head_sha", "gate", "action", "scope_hash"):
@@ -216,6 +306,11 @@ def validate(
     observed_pr_state: str | None = None,
     expected_g4_approval_id: str | None = None,
     expected_g4_scope_prefix: str | None = None,
+    expected_pr_body_digest: str | None = None,
+    expected_managed_block_digest: str | None = None,
+    expected_run_graph_digest: str | None = None,
+    expected_gate_story_digest: str | None = None,
+    expected_evidence_digest: str | None = None,
 ) -> list[str]:
     errors = schema_errors(packet, schema_path)
     if not errors:
@@ -229,6 +324,11 @@ def validate(
                 observed_pr_state=observed_pr_state,
                 expected_g4_approval_id=expected_g4_approval_id,
                 expected_g4_scope_prefix=expected_g4_scope_prefix,
+                expected_pr_body_digest=expected_pr_body_digest,
+                expected_managed_block_digest=expected_managed_block_digest,
+                expected_run_graph_digest=expected_run_graph_digest,
+                expected_gate_story_digest=expected_gate_story_digest,
+                expected_evidence_digest=expected_evidence_digest,
             )
         )
     return errors
@@ -244,9 +344,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-scope-hash")
     parser.add_argument("--expected-g4-approval-id")
     parser.add_argument("--expected-g4-scope-prefix")
+    parser.add_argument("--expected-pr-body-digest")
+    parser.add_argument("--expected-managed-block-digest")
+    parser.add_argument("--expected-run-graph-digest")
+    parser.add_argument("--expected-gate-story-digest")
+    parser.add_argument("--expected-evidence-digest")
     parser.add_argument("--observed-pr-state", choices=["open", "closed", "merged"])
     args = parser.parse_args(argv)
-
     try:
         packet = load(args.packet)
         if not isinstance(packet, dict):
@@ -261,10 +365,14 @@ def main(argv: list[str] | None = None) -> int:
             observed_pr_state=args.observed_pr_state,
             expected_g4_approval_id=args.expected_g4_approval_id,
             expected_g4_scope_prefix=args.expected_g4_scope_prefix,
+            expected_pr_body_digest=args.expected_pr_body_digest,
+            expected_managed_block_digest=args.expected_managed_block_digest,
+            expected_run_graph_digest=args.expected_run_graph_digest,
+            expected_gate_story_digest=args.expected_gate_story_digest,
+            expected_evidence_digest=args.expected_evidence_digest,
         )
     except (OSError, ValueError, TypeError, yaml.YAMLError, json.JSONDecodeError) as exc:
         errors = [str(exc)]
-
     if errors:
         print("GATE ACTION AUTHORITY VALIDATION FAILED")
         for error in errors:
