@@ -26,9 +26,10 @@ This task defines the policy, schemas and pure deterministic derivation layer. I
 8. The parent authority receipt binds approval ID, source comment, bot receipt comment, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, scope prefix and expiry.
 9. Standing G4 binds one PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
 10. Any drift in policy, manifest approval scope, parent authority, task scope, base/head, PR body, graph, story or evidence invalidates the decision.
-11. A child autonomous task may not modify either autonomous control plane: the standing policy/manifest/receipt contracts and validator/deriver, or the SCRUM-271 evidence runtime contract, graph/story schemas, runtime/build/render tools and workflows. G4/G5 workflow, gate-action validator/schema and gate lifecycle contract are also protected.
-12. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
-13. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
+11. A child autonomous task may not modify either autonomous control plane: the standing policy/manifest/receipt contracts and validator/deriver, or the SCRUM-271 evidence runtime contract, graph/story schemas, runtime/build/render tools and workflows. All repository workflows, repo-level agent/project instructions, G4/G5 workflow, gate-action validator/schema and gate lifecycle contract are protected.
+12. The minimum protected control-plane set is enforced by validator code and is not policy-configurable. A policy may add protected paths but cannot remove mandatory entries and remain valid.
+13. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
+14. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
 
 ## Parent run approval trust model
 
