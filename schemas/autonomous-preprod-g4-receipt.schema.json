@@ -42,7 +42,7 @@
     "decision": {"const": "ALLOW"},
     "source": {"const": "autonomous_preprod_standing_policy"},
     "trust_state": {"const": "requires_trusted_repo_ci_projection"},
-    "policy_id": {"type": "string", "minLength": 1},
+    "policy_id": {"const": "AUTONOMOUS_PREPROD_INTEGRATION_POLICY"},
     "policy_revision": {"type": "string", "minLength": 1},
     "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "manifest_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
