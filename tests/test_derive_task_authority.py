@@ -34,7 +34,11 @@ def g4_context(m: dict | None = None) -> dict:
     m = m or manifest(policy())
     return {
         "task_id": "SCRUM-900",
+        "repository": m["repository"],
+        "approved_base_ref": m["approved_base_ref"],
+        "approved_base_sha": m["approved_base_sha"],
         "target_branch": "pre-prod",
+        "authorized_action": "merge_approved_pr",
         "pr_number": 900,
         "approved_head_sha": HEAD_SHA,
         "task_scope_hash": m["allowed_tasks"][0]["scope_hash"],
@@ -80,11 +84,23 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual("DENY", result["decision"])
         self.assertEqual("AUTONOMOUS_SCOPE_DRIFT", result["reason_code"])
 
+    def test_malformed_requested_paths_fail_closed_without_exception(self):
+        p = policy(); m = manifest(p); request = g2_request(); request["requested_paths"] = [["src/feature.py"]]
+        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
+        self.assertEqual("DENY", result["decision"])
+        self.assertEqual("AUTONOMOUS_SCOPE_DRIFT", result["reason_code"])
+
+    def test_duplicate_requested_actions_fail_closed(self):
+        p = policy(); m = manifest(p); request = g2_request(); request["requested_actions"] = ["stage", "stage"]
+        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
+        self.assertEqual("DENY", result["decision"])
+        self.assertEqual("AUTONOMOUS_ACTION_FORBIDDEN", result["reason_code"])
+
     def test_untrusted_parent_run_cannot_derive_g2(self):
         p = policy(); m = manifest(p); m["authority_receipt"]["manifest_scope_digest"] = "sha256:" + "f" * 64
         self.assertEqual("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", derive_g2_authority(p, m, g2_request(), root=ROOT, now=NOW)["reason_code"])
 
-    def test_valid_g4_receipt_is_exact_head_deterministic_and_contract_only(self):
+    def test_valid_g4_receipt_is_exact_head_base_repo_deterministic_and_contract_only(self):
         p = policy(); m = manifest(p); context = g4_context(m)
         first = derive_g4_receipt(p, m, context, root=ROOT, now=NOW)
         second = derive_g4_receipt(copy.deepcopy(p), copy.deepcopy(m), copy.deepcopy(context), root=ROOT, now=NOW)
@@ -93,6 +109,9 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual("merge_approved_pr", first["authorized_action"])
         self.assertEqual("requires_trusted_repo_ci_projection", first["trust_state"])
         self.assertEqual(HEAD_SHA, first["approved_head_sha"])
+        self.assertEqual(m["approved_base_ref"], first["approved_base_ref"])
+        self.assertEqual(m["approved_base_sha"], first["approved_base_sha"])
+        self.assertEqual(m["repository"], first["repository"])
         self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
         self.assertEqual(m["expires_at"], first["expires_at"])
         self.assertEqual(first["decision_digest"], second["decision_digest"])
@@ -101,11 +120,35 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         p = policy(); m = manifest(p); context = g4_context(m); context["target_branch"] = "main"
         self.assertEqual("AUTONOMOUS_MAIN_TARGET_FORBIDDEN", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
 
+    def test_g4_repository_drift_is_denied(self):
+        p = policy(); m = manifest(p); context = g4_context(m); context["repository"] = "other/repo"
+        self.assertEqual("AUTONOMOUS_SCOPE_DRIFT", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
+
+    def test_g4_base_drift_is_denied(self):
+        p = policy(); m = manifest(p); context = g4_context(m); context["approved_base_sha"] = "f" * 40
+        self.assertEqual("AUTONOMOUS_BASE_SHA_MISMATCH", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
+
+    def test_g4_wrong_action_is_denied(self):
+        p = policy(); m = manifest(p); context = g4_context(m); context["authorized_action"] = "deploy_approved_release"
+        self.assertEqual("AUTONOMOUS_ACTION_FORBIDDEN", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
+
     def test_receipt_head_drift_is_invalid(self):
         p = policy(); m = manifest(p); current = g4_context(m)
         receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
         drifted = dict(current); drifted["approved_head_sha"] = "c" * 40
         self.assertIn("AUTONOMOUS_HEAD_DRIFT", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_receipt_current_repository_drift_is_invalid(self):
+        p = policy(); m = manifest(p); current = g4_context(m)
+        receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
+        drifted = dict(current); drifted["repository"] = "other/repo"
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_receipt_current_base_drift_is_invalid(self):
+        p = policy(); m = manifest(p); current = g4_context(m)
+        receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
+        drifted = dict(current); drifted["approved_base_sha"] = "c" * 40
+        self.assertIn("AUTONOMOUS_BASE_SHA_MISMATCH", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
 
     def test_receipt_body_graph_and_evidence_drift_are_invalid(self):
         p = policy(); m = manifest(p); current = g4_context(m)
