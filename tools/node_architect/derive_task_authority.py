@@ -2,8 +2,9 @@
 """Derive deterministic task-scoped G2 and standing G4 decisions from an approved run manifest.
 
 Pure functions only: this module does not call GitHub/Jira, mutate branches, or
-perform merge/deploy operations. Standing G4 output is contract-only and must be
-projected/attested by trusted repository CI before any live gate can consume it.
+perform merge/deploy operations. Child G2 and standing G4 ALLOW outputs are
+contract decisions and must be projected/attested by trusted repository CI before
+any live gate can consume them.
 """
 from __future__ import annotations
 
@@ -114,6 +115,7 @@ def derive_g2_authority(
         "decision": "ALLOW",
         "gate": "G2_EXECUTION",
         "reason_code": "AUTONOMOUS_CHILD_G2_AUTHORIZED",
+        "trust_state": "requires_trusted_repo_ci_projection",
         "policy_id": policy["policy_id"],
         "policy_revision": policy["policy_revision"],
         "policy_digest": validation["policy_digest"],
