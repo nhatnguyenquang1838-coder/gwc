@@ -120,6 +120,12 @@ def g4_merge_packet(
     return value
 
 
+def rehash(value: dict) -> dict:
+    value["scope_hash"] = canonical_scope_hash(value)
+    value["evidence_readback"]["scope_hash"] = value["scope_hash"]
+    return value
+
+
 class GateActionAuthorityTests(unittest.TestCase):
     def validate_g4(self, value: dict, **kwargs) -> list[str]:
         defaults = dict(
@@ -154,7 +160,23 @@ class GateActionAuthorityTests(unittest.TestCase):
         value["scope_hash"] = canonical_scope_hash(value); value["evidence_readback"]["action"] = value["action"]; value["evidence_readback"]["scope_hash"] = value["scope_hash"]
         self.assertTrue(any("not valid for G2_EXECUTION" in e for e in validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")))
 
-    def test_g4_merge_passes_only_with_both_current_receipts(self):
+    def test_legacy_g4_merge_passes_with_authority_receipt_only(self):
+        self.assertEqual([], self.validate_g4(g4_merge_packet(include_evidence=False)))
+
+    def test_autonomous_g4_merge_requires_pr_evidence_receipt(self):
+        value = g4_merge_packet(include_evidence=False)
+        value["working_branch"] = "auto/run-scrum-271/SCRUM-271"
+        rehash(value)
+        self.assertTrue(any("G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(value)))
+
+    def test_expected_autonomous_digests_require_pr_evidence_receipt(self):
+        value = g4_merge_packet(include_evidence=False)
+        self.assertTrue(any(
+            "G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE" in e
+            for e in self.validate_g4(value, expected_pr_body_digest=DIGEST_A)
+        ))
+
+    def test_g4_merge_passes_with_both_current_receipts(self):
         self.assertEqual([], self.validate_g4(
             g4_merge_packet(), expected_g4_approval_id=G4_APPROVAL_ID,
             expected_g4_scope_prefix=G4_SCOPE_PREFIX,
@@ -169,9 +191,6 @@ class GateActionAuthorityTests(unittest.TestCase):
 
     def test_g4_merge_requires_existing_authority_receipt(self):
         self.assertTrue(any("g4_authority_receipt" in e for e in self.validate_g4(g4_merge_packet(include_authority=False))))
-
-    def test_g4_merge_requires_pr_evidence_receipt(self):
-        self.assertTrue(any("g4_pr_evidence_receipt" in e for e in self.validate_g4(g4_merge_packet(include_evidence=False))))
 
     def test_g4_merge_rejects_untrusted_authority_status(self):
         self.assertTrue(any("G4_AUTHORITY_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(g4_merge_packet(authority=g4_authority_receipt(status="missing")))))
