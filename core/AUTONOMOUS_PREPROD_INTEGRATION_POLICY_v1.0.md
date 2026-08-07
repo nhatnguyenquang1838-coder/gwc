@@ -21,7 +21,7 @@ This task defines the policy, schemas and pure deterministic derivation layer. I
 3. The only autonomous G4 target is `pre-prod`.
 4. A child task risk above `R2` is denied.
 5. A task outside the approved parent run manifest is denied.
-6. Child G2 authority is bounded to one task, one working branch, one exact approved base SHA, declared paths/actions, risk and expiry.
+6. Child G2 authority is bounded to one task, one working branch, one exact approved base SHA, declared paths/actions, the exact approved task risk, and expiry. A child request may not downgrade or upgrade its manifest-approved risk classification.
 7. A parent run manifest is not trusted merely because its hashes are self-consistent. It must contain a trusted `github-actions[bot]` authority-receipt projection of the explicit parent approval.
 8. The parent authority receipt binds approval ID, source comment, bot receipt comment, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, scope prefix and expiry.
 9. Standing G4 binds one PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
@@ -82,7 +82,7 @@ create_commit
 push_working_branch
 ```
 
-Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching `auto/` working branch, risk at or below the ceiling, requested paths/actions contained by the task allowlist, and no protected control-plane overlap.
+Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching `auto/` working branch, **request risk exactly equal to the manifest-approved task risk**, requested paths/actions contained by the task allowlist, and no protected control-plane overlap. Any attempted risk downgrade or upgrade is `AUTONOMOUS_SCOPE_DRIFT` and fails closed.
 
 The output carries `parent_approval_id`, `parent_scope_hash_prefix` and `parent_authority_digest`. It explicitly sets `g4_g5_g6_authority_granted: false`.
 
