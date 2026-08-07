@@ -14,11 +14,13 @@ Define the first executable vertical slice for an AI-managed workflow that can
 materialize one run-scoped Node Architect graph, tell the factual G0→G6 story,
 and place exact-head evidence into a bounded Pull Request description section.
 
-This version is evidence/control-plane only. It does **not** implement arbitrary
-Jira task selection, AI implementation-agent execution, standing-policy G4
-authority, `pre-prod` branch creation, PR creation, merge, deploy, release,
-runtime reload, production configuration, credential/secret work, migration,
-or production-data access.
+This runtime remains evidence/control-plane only. It does **not** implement
+arbitrary Jira task selection, AI implementation-agent execution, `pre-prod`
+branch creation/protection, PR creation, merge, deploy, release, runtime reload,
+production configuration, credential/secret work, migration, or production-data
+access. Standing pre-prod authority, when present, is supplied by the separate
+`AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0` contract; this runtime does not mint
+or broaden that authority by itself.
 
 ## Invariants
 
@@ -40,6 +42,8 @@ or production-data access.
     may never override a blocked or absent execution state.
 13. The additional PR-evidence receipt applies only to autonomous-run G4 flows;
     normal/legacy G4 delivery retains its existing authority-receipt contract.
+14. Standing policy can replace only the per-task human G4 authority source for
+    an eligible autonomous `pre-prod` task. It never replaces current PR evidence.
 
 ## Canonical inputs
 
@@ -70,6 +74,10 @@ The caller must independently provide the expected repository and exact checked-
 out base SHA. A manifest mismatch is terminal and produces no graph, story, or PR
 body artifact.
 
+The parent standing-policy run manifest is a separate closed artifact defined by
+`schemas/autonomous-preprod-run-manifest.schema.json`. It is not interchangeable
+with this evidence-runtime event manifest.
+
 ## Canonical outputs
 
 ```text
@@ -98,13 +106,20 @@ requested update.
 
 ## G4 evidence binding
 
-For autonomous-run PRs, a valid G4 path requires both:
+For autonomous-run PRs, a valid G4 path requires:
 
-1. the existing trusted `gwc:g4-authority-receipt`; and
+1. exactly one eligible authority source:
+   - the trusted human `gwc:g4-authority-receipt`; or
+   - a valid `autonomous-preprod-g4-receipt` derived from the current standing
+     policy and parent run manifest for an allowlisted `pre-prod` task; and
 2. a trusted `gwc:g4-pr-evidence-receipt` generated after readback of the current
    PR body and current PR head.
 
-The second receipt binds:
+This is an **OR authority / AND evidence** contract. A standing receipt never
+bypasses current PR-body, graph, story, evidence, task-scope, head, expiry, or
+policy/manifest checks.
+
+The PR-evidence receipt binds:
 
 ```text
 pr_number
@@ -118,12 +133,17 @@ source_comment_id
 expiry
 ```
 
-A new commit or PR-body edit makes the prior receipt stale. The workflow must
-re-read current state rather than selecting any historical matching comment.
+The standing receipt additionally binds policy id/revision/digest, parent
+manifest digest, run ID, task ID, task scope hash and the only authorized action
+`merge_approved_pr` into `pre-prod`.
+
+A new commit, PR-body edit, graph/story/evidence change, policy/manifest change,
+or expiry makes the relevant prior receipt stale. The runtime must re-read
+current state rather than selecting any historical matching receipt.
 
 Normal/legacy PRs that are not autonomous-run deliveries continue to require the
-existing trusted G4 authority receipt only. The autonomous workflow must skip its
-additional receipt path without failing those PRs.
+existing trusted human G4 authority receipt only. Standing-policy support must
+not change that compatibility path.
 
 ## Fail-closed reason codes
 
@@ -144,6 +164,7 @@ AUTONOMOUS_PR_EVIDENCE_MARKER_INVALID
 AUTONOMOUS_PR_HEAD_DRIFT
 AUTONOMOUS_PR_EVIDENCE_DRIFT
 G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE
+AUTONOMOUS_STANDING_G4_RECEIPT_MISSING_OR_STALE
 ```
 
 ## Acceptance boundary for v0.1
@@ -151,5 +172,6 @@ G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE
 A deterministic fixture must produce schema-valid graph/story artifacts,
 idempotently update a PR body, render only actual participants, explain G0→G6,
 and block `main`, repository/base mismatch, contradictory gate status, malformed
-markers, missing events, unknown route targets, and stale G4 evidence. No external
-side effect is required to demonstrate this contract.
+markers, missing events, unknown route targets, and stale G4 evidence. Standing
+policy integration may supply an authority receipt to later G4 validation, but
+this runtime still performs no merge or other external side effect by itself.
