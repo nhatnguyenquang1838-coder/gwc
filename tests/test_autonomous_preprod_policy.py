@@ -161,6 +161,18 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         p = policy(); m = manifest(p, tasks=[task(paths=["tools/node_architect/autonomous_preprod_runtime.py"])])
         self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
 
+    def test_path_traversal_cannot_bypass_control_plane_protection(self):
+        p = policy(); m = manifest(p, tasks=[task(paths=["tools/node_architect/../node_architect/autonomous_preprod_runtime.py"])])
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
+
+    def test_repository_root_scope_is_blocked(self):
+        p = policy(); m = manifest(p, tasks=[task(paths=["."])])
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
+
     def test_active_policy_protects_autonomous_runtime_control_plane(self):
         active = yaml.safe_load((ROOT / "governance/autonomous-preprod-policy.yaml").read_text(encoding="utf-8"))
         self.assertTrue(RUNTIME_CONTROL_PLANE.issubset(set(active["control_plane_protected_paths"])))
