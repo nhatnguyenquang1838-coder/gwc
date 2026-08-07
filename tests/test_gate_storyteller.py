@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 from tools.node_architect.build_run_graph import build_run_graph
-from tools.node_architect.render_gate_story import build_gate_story
+from tools.node_architect.render_gate_story import GateStoryError, build_gate_story
 from tests.test_run_graph_builder import manifest
 
 
@@ -36,6 +36,20 @@ class GateStoryTests(unittest.TestCase):
         self.assertIn("resolve_execution_node", g2["narrative"])
         self.assertIn("route:g2-resolve-execution-node", g2["evidence_refs"])
         self.assertIn("merge", g2["authority_not_granted"])
+
+    def test_explicit_status_cannot_override_blocked_event(self):
+        value = manifest()
+        value["events"][0]["status"] = "blocked"
+        graph = build_run_graph(value)
+        with self.assertRaises(GateStoryError) as raised:
+            build_gate_story(graph, gate_statuses={"G0_CONTEXT": "passed"})
+        self.assertEqual("AUTONOMOUS_GATE_STATUS_CONFLICT", raised.exception.reason_code)
+
+    def test_gate_without_events_cannot_be_declared_passed(self):
+        graph = build_run_graph(manifest())
+        with self.assertRaises(GateStoryError) as raised:
+            build_gate_story(graph, gate_statuses={"G4_MERGE": "passed"})
+        self.assertEqual("AUTONOMOUS_GATE_STATUS_CONFLICT", raised.exception.reason_code)
 
 
 if __name__ == "__main__":
