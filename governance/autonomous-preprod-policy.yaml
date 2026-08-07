@@ -32,24 +32,20 @@ denied_actions:
   - history_rewrite
   - pr_base_change
 control_plane_protected_paths:
+  - AGENTS.md
+  - project-instructions.md
+  - .github/workflows
   - core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
-  - core/node-architect/AUTONOMOUS_PREPROD_RUNTIME_CONTRACT_v0.1.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/G5_STANDING_AUTOMATION_POLICY_v1.0.md
+  - core/node-architect
   - governance/autonomous-preprod-policy.yaml
   - schemas/autonomous-preprod-run-policy.schema.json
   - schemas/autonomous-preprod-run-manifest.schema.json
   - schemas/autonomous-preprod-g4-receipt.schema.json
-  - schemas/node-architect/autonomous-run-graph.schema.json
-  - schemas/node-architect/gate-story.schema.json
-  - tools/node_architect/validate_autonomous_preprod_policy.py
-  - tools/node_architect/derive_task_authority.py
-  - tools/node_architect/autonomous_preprod_runtime.py
-  - tools/node_architect/build_run_graph.py
-  - tools/node_architect/render_gate_story.py
-  - tools/node_architect/render_pr_run_evidence.py
-  - .github/workflows/autonomous-preprod-runtime.yml
-  - .github/workflows/g4-g5-evidence.yml
   - schemas/gate-action-authority.schema.json
+  - schemas/node-architect
+  - tools/node_architect
   - tools/validate_gate_action.py
-  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
 issued_at: '2026-08-07T00:00:00Z'
 expires_at: '2026-11-05T00:00:00Z'
