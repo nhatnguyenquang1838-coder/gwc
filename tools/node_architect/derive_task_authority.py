@@ -245,6 +245,7 @@ def validate_g4_receipt(
             "repository": manifest.get("repository"),
             "target_branch": "pre-prod",
             "trust_state": "requires_trusted_repo_ci_projection",
+            "expires_at": manifest.get("expires_at"),
         }
         for field, expected in expected_identity.items():
             if receipt.get(field) != expected:
