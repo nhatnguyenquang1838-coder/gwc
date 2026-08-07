@@ -5,11 +5,17 @@ from pathlib import Path
 
 import yaml
 
-from tools.node_architect.autonomous_preprod_runtime import MAIN_TARGET_FORBIDDEN, execute_fixture_run
-from tests.test_run_graph_builder import manifest
+from tools.node_architect.autonomous_preprod_runtime import (
+    BASE_SHA_MISMATCH,
+    MAIN_TARGET_FORBIDDEN,
+    REPOSITORY_BINDING_MISMATCH,
+    execute_fixture_run,
+)
+from tests.test_run_graph_builder import BASE_SHA, manifest
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/autonomous-preprod-runtime.yml"
+REPOSITORY = "nhatnguyenquang1838-coder/gwc"
 
 
 class AutonomousPreprodWorkflowContractTests(unittest.TestCase):
@@ -18,9 +24,14 @@ class AutonomousPreprodWorkflowContractTests(unittest.TestCase):
         self.assertIn("workflow_dispatch", text)
         self.assertIn("expected_base_sha", text)
         self.assertIn("git rev-parse HEAD", text)
+        self.assertIn('--expected-repository "${{ github.repository }}"', text)
+        self.assertIn('--expected-base-sha "${{ inputs.expected_base_sha }}"', text)
         self.assertIn("AUTONOMOUS_MAIN_TARGET_FORBIDDEN", text)
+        self.assertIn("AUTONOMOUS_PR_HEAD_DRIFT", text)
         self.assertIn("autonomous-g4-evidence-bound", text)
         self.assertIn("gwc:g4-pr-evidence-receipt", text)
+        self.assertIn("legacy G4 authority remains handled by the existing workflow", text)
+        self.assertIn("steps.evidence.outputs.eligible == 'true'", text)
         self.assertNotIn("pull_request_target", text)
         parsed = yaml.load(text, Loader=yaml.BaseLoader)
         self.assertIn("workflow_dispatch", parsed["on"])
@@ -30,9 +41,43 @@ class AutonomousPreprodWorkflowContractTests(unittest.TestCase):
     def test_runtime_blocks_main_before_any_side_effect(self):
         value = manifest()
         value.update({"pr_base": "main", "gate_statuses": {}, "validation": {}, "g4_readiness": {}})
-        result, graph, story, body, block = execute_fixture_run(value)
+        result, graph, story, body, block = execute_fixture_run(
+            value,
+            expected_repository=REPOSITORY,
+            expected_base_sha=BASE_SHA,
+        )
         self.assertEqual("BLOCKED", result["status"])
         self.assertEqual(MAIN_TARGET_FORBIDDEN, result["terminal_code"])
+        self.assertFalse(result["side_effects_performed"])
+        self.assertIsNone(graph)
+        self.assertIsNone(story)
+        self.assertIsNone(body)
+        self.assertIsNone(block)
+
+    def test_runtime_rejects_repository_binding_mismatch(self):
+        value = manifest()
+        value["pr_base"] = "pre-prod"
+        result, graph, story, body, block = execute_fixture_run(
+            value,
+            expected_repository="other/repository",
+            expected_base_sha=BASE_SHA,
+        )
+        self.assertEqual(REPOSITORY_BINDING_MISMATCH, result["terminal_code"])
+        self.assertFalse(result["side_effects_performed"])
+        self.assertIsNone(graph)
+        self.assertIsNone(story)
+        self.assertIsNone(body)
+        self.assertIsNone(block)
+
+    def test_runtime_rejects_checked_out_base_mismatch(self):
+        value = manifest()
+        value["pr_base"] = "pre-prod"
+        result, graph, story, body, block = execute_fixture_run(
+            value,
+            expected_repository=REPOSITORY,
+            expected_base_sha="f" * 40,
+        )
+        self.assertEqual(BASE_SHA_MISMATCH, result["terminal_code"])
         self.assertFalse(result["side_effects_performed"])
         self.assertIsNone(graph)
         self.assertIsNone(story)
@@ -49,7 +94,12 @@ class AutonomousPreprodWorkflowContractTests(unittest.TestCase):
                 "g4_readiness": {"state": "not_ready"},
             }
         )
-        result, graph, story, body, block = execute_fixture_run(value, existing_pr_body="# Human\n")
+        result, graph, story, body, block = execute_fixture_run(
+            value,
+            existing_pr_body="# Human\n",
+            expected_repository=REPOSITORY,
+            expected_base_sha=BASE_SHA,
+        )
         self.assertEqual("PASS", result["status"])
         self.assertFalse(result["merge_authority_granted"])
         self.assertEqual(graph["graph_digest"], result["graph_digest"])
