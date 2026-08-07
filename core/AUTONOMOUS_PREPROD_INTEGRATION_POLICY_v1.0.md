@@ -24,8 +24,8 @@ This task defines the policy, schemas and pure deterministic derivation layer. I
 6. Child G2 authority is bounded to one task, one canonical `auto/` working branch, one exact approved base SHA, declared paths/actions, the exact approved task risk, and expiry. A child request may not downgrade or upgrade its manifest-approved risk classification.
 7. A parent run manifest is not trusted merely because its hashes are self-consistent. It must contain a trusted `github-actions[bot]` authority-receipt projection of the explicit parent approval.
 8. The parent authority receipt binds approval ID, distinct source/receipt comments, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, the exact first-16 scope prefix and expiry.
-9. Standing G4 binds one repository, approved base ref/SHA, `pre-prod` target, `merge_approved_pr` action, PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
-10. Any drift in policy, manifest approval scope, parent authority, task scope, repository, base/head, target/action, PR body, graph, story or evidence invalidates the decision.
+9. Standing G4 binds one repository, approved base ref/SHA, exact approved child working branch, `pre-prod` target, `merge_approved_pr` action, PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
+10. Any drift in policy, manifest approval scope, parent authority, task scope, repository, base, working branch, head, target/action, PR body, graph, story or evidence invalidates the decision.
 11. A child autonomous task may not modify either autonomous control plane or the governance/instruction surfaces that define its authority. Protected surfaces include all repository workflows, ChatGPT agent instructions, the GWC project profile/instructions, instruction-source registry/runtime profiles, core governance/gate contracts, G0/G1 and gate-action validators, Node Architect runtime contracts/schemas/tools, standing-policy schemas/tools and G4/G5 controls.
 12. The minimum protected control-plane set is enforced by validator code and is not policy-configurable. A policy may add protected paths but cannot remove mandatory entries and remain valid.
 13. Policy, manifest and parent authority timestamps are activation boundaries, not metadata only: future-issued policy/manifest/receipt objects fail closed; manifest issue time cannot precede policy issue time; parent receipt cannot precede manifest issue time or be issued after manifest expiry; parent authority cannot outlive the policy.
@@ -117,6 +117,7 @@ task scope hash
 repository
 approved base ref
 approved base SHA
+approved child working branch
 pre-prod target
 merge_approved_pr action
 PR number
@@ -130,7 +131,7 @@ expiry
 decision digest
 ```
 
-Derivation and replay validation both require the current repository, approved base ref/SHA, target and action to match the approved manifest/receipt. A receipt cannot be replayed in another repository, against another approved base, against `main`, or for a non-merge action merely because its self-computed digest remains internally consistent.
+Derivation and replay validation both require the current repository, approved base ref/SHA, child working branch, target and action to match the approved manifest/task/receipt. A receipt cannot be replayed in another repository, against another approved base, from another working branch, against `main`, or for a non-merge action merely because its self-computed digest remains internally consistent.
 
 The receipt includes:
 
