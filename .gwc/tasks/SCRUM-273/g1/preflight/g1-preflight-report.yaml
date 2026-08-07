@@ -1,0 +1,181 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-07T21:43:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-273
+  base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main after fetch (PR #315 SCRUM-272 merged 2026-08-07T03:59Z) and matches the live main HEAD.
+  evidence:
+  - f002859c5ea65850aa2b5449e1a2013d294ea3c9
+- id: BLOCKER-271-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-271 (workflow/run graph contracts) is Done and merged on the base; its graph/evidence schemas exist.
+  evidence:
+  - SCRUM-271
+  - schemas/node-architect/autonomous-run-graph.schema.json
+- id: BLOCKER-272-DONE
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: SCRUM-272 (standing pre-prod authority policy + run-manifest envelope) is Done and merged (PR #315); policy, manifest schema and derive_task_authority exist on the base.
+  evidence:
+  - SCRUM-272
+  - governance/autonomous-preprod-policy.yaml
+  - schemas/autonomous-preprod-run-manifest.schema.json
+  - tools/node_architect/derive_task_authority.py
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: >-
+    All six named surfaces (2 schemas, 3 tools, 1 test) are absent from origin/main;
+    this is a fresh isolated module build, verified with git ls-tree on the protected base.
+  evidence:
+  - git ls-tree origin/main schemas/node-architect/ai-task-execution-request.schema.json
+  - git ls-tree origin/main schemas/node-architect/ai-task-execution-result.schema.json
+  - git ls-tree origin/main tools/node_architect/ai_agent_adapter.py
+  - git ls-tree origin/main tools/node_architect/build_node_instruction_pack.py
+  - git ls-tree origin/main tools/node_architect/validate_ai_agent_result.py
+  - git ls-tree origin/main tests/test_ai_agent_adapter.py
+- id: SHARED-SURFACES-UNTOUCHED
+  status: PASS
+  code: SHARED_SURFACE_EXCLUDED
+  message: >-
+    client_runtime.py, checkpoint engine, SCRUM-272 policy/validators and the node catalog
+    stay out of the mutation scope; the adapter only imports the manifest schema fields,
+    preserving AC-6 (no checkpoint/runtime regression).
+  evidence:
+  - tools/node_architect/client_runtime.py
+  - tools/node_architect/derive_task_authority.py
+- id: IMPACT-GROUNDED
+  status: PASS
+  code: IMPACT_DATA_BACKED
+  message: >-
+    Blast radius grounded in a protected-base tree listing plus the dependency surfaces
+    already merged; the new isolated node introduces no shared validator/schema coupling.
+  evidence:
+  - git ls-tree on the protected base for schemas/node-architect/ and tools/node_architect/
+- id: AGENT-CLAIM
+  status: PASS
+  code: CLAIM_OK
+  message: AI Agent field set to Hermes-PC (idempotent re-claim, no overwrite); assignee unchanged (Nhat Nguyen Quang); no foreign branch or PR for SCRUM-273.
+  evidence:
+  - customfield_10046=Hermes-PC
+  - git ls-remote origin showed no scrum-273 ref
+implementation_plan:
+  applicability: required
+  reason: >-
+    SCRUM-273 is a multi-surface isolated build that consumes the SCRUM-272 standing
+    policy envelope; a written plan (requirements/design/tasks) is required to bound the
+    scope, provider-neutral contract, fail-closed enforcement and AC coverage.
+  source: generated_kiro
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: Task Me agent not available in this enforcement environment; plan authored directly from the issue and dependency contracts.
+  canonical_task_uid: SCRUM-273
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  plan_root: .gwc/tasks/SCRUM-273/g1/plan
+  requirements_path: .gwc/tasks/SCRUM-273/g1/plan/requirements.md
+  design_path: .gwc/tasks/SCRUM-273/g1/plan/design.md
+  tasks_path: .gwc/tasks/SCRUM-273/g1/plan/tasks.md
+  plan_revision: sha256:c94be3a89a77182bbcf5f7f64d3e580ee95fd3094fc01d000466bb52d124978d
+  validation_status: PASS
+  validation_evidence: >-
+    Plan authored from issue SCRUM-273 plus the merged SCRUM-272/SCRUM-271 dependency
+    surfaces; scope_hash and plan_revision are computed over the three plan markdown
+    files and are consistent between the preflight implementation_plan and the decision
+    implementation_plan_ref.
+  generated_by: Hermes-PC
+  generated_at_utc: '2026-08-07T21:43:00Z'
+process_readback:
+  status: VERIFIED
+  process_id: gwc-g1-preflight-scrum-273
+  terminal_outcome: G1_PREFLIGHT_PASS
+  required_sources:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - governance/autonomous-preprod-policy.yaml
+  - schemas/autonomous-preprod-run-manifest.schema.json
+  - tools/node_architect/derive_task_authority.py
+execution_feasibility:
+  outcome: EXECUTABLE
+  human_bypass_required: false
+  continuation_coverage: COMPLETE
+  route_steps:
+  - id: STEP-1
+    name: Author request + result schemas
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: create_files
+    capability_required: trusted_local_checkout_and_validator
+    capability_status: VERIFIED
+    primary_route: write schemas under schemas/node-architect/ and run validate_g01
+    fallback_routes: []
+    continuation: Proceed to SUB-TASK-2 after schema lint.
+    expected_evidence: schema files present and parse
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-2
+    name: Implement adapter + pack builder + validator
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: create_files
+    capability_required: trusted_local_checkout_and_validator
+    capability_status: VERIFIED
+    primary_route: write tools/node_architect/{ai_agent_adapter,build_node_instruction_pack,validate_ai_agent_result}.py
+    fallback_routes: []
+    continuation: Proceed to SUB-TASK-5 after unit import.
+    expected_evidence: modules import and pass internal checks
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-3
+    name: Implement tests + run red->green
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: run_sandboxed_validation
+    capability_required: trusted_local_checkout_and_validator
+    capability_status: VERIFIED
+    primary_route: 'PYTHONPATH=. python3 -m unittest tests.test_ai_agent_adapter'
+    fallback_routes: []
+    continuation: Proceed to G3 after green.
+    expected_evidence: unittest exit 0
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-4
+    name: Draft PR + CI + G3
+    gate: G3_PR
+    actor: human
+    action_class: open_draft_pr
+    capability_required: github_pr_authority
+    capability_status: SEPARATE_GATE
+    primary_route: gh pr create --draft then wait CI
+    fallback_routes: []
+    continuation: Present G3 approval then gh pr ready.
+    expected_evidence: draft PR number + green CI
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-5
+    name: G4 merge
+    gate: G4_MERGE
+    actor: human
+    action_class: merge_approved_pr
+    capability_required: github_merge_authority
+    capability_status: SEPARATE_GATE
+    primary_route: gh pr comment APPROVE G4_MERGE then rerun evidence then squash merge
+    fallback_routes: []
+    continuation: Done after merge.
+    expected_evidence: squash merge commit on main
+    bypass_eligibility: FORBIDDEN
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-07T21:43:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-273
+  base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Isolated provider-neutral ai-task-execution node with fail-closed adapter + deterministic fake
+  description: >-
+    Build the six named surfaces (two request/result schemas, three tools, one
+    test module) as a fresh isolated node under tools/node_architect/. The adapter
+    accepts an envelope-shaped request, builds a typed instruction pack, dispatches
+    to a pluggable provider protocol (initially a custom/self-hosted runner; Hermes,
+    Codex or another agent plug in via the same interface), enforces allowed_paths /
+    prohibited_paths / authorized_actions / control-plane protected paths, and emits a
+    schema-valid result. A deterministic fake provider satisfies AC-1..AC-5; AC-6 is
+    preserved by not touching client_runtime.py or the checkpoint engine. Idempotency
+    and replay conflict are handled by digest-keyed result caching.
+  benefits:
+  - Matches the issue's named surfaces and boundaries exactly
+  - Isolated new module keeps blast radius minimal and leaves SCRUM-272 policy/validators untouched
+  - Deterministic fake provider makes every AC reproducible in CI
+  - Provider-neutral contract lets Hermes/Codex plug in without graph changes
+  tradeoffs:
+  - Slightly more boilerplate than a single-file adapter
+  risks:
+  - Scope/provider contract drift vs the SCRUM-272 envelope (mitigated by importing the manifest schema fields directly)
+  constraint_fit: FIT
+- id: OPT-2
+  title: Extend client_runtime.py in place with inline agent execution
+  description: >-
+    Add agent execution directly into the existing client runtime vertical slice
+    rather than a dedicated isolated node.
+  benefits:
+  - Single code path for client runtime
+  tradeoffs:
+  - Mutates a shared surface and risks regressions against the SCRUM-256 exact-G3 slice (AC-6)
+  - Much larger blast radius; harder to keep the provider-neutral contract clean
+  risks:
+  - Violates the issue's own isolation guidance and AC-6 checkpoint/runtime regression safety
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  The issue names the six isolated surfaces and explicitly requires a
+  provider-neutral contract with no shared-surface mutation (AC-6). OPT-1 delivers
+  the full fail-closed adapter with the smallest governed blast radius and a
+  reproducible fake provider; OPT-2 risks the exact-G3 client runtime and checkpoint
+  regressions.
+decision_required: true
+status: READY

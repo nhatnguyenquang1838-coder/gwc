@@ -1,0 +1,29 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-273_OPT1_20260807
+authority_gate: G2_EXECUTION
+task_id: SCRUM-273
+issued_at: '2026-08-07T21:43:00Z'
+expires_at: '2026-08-08T21:43:00Z'
+scope_version: 1
+risk_class: R2
+base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+working_branch: hermes/scrum-273-ai-agent-adapter-20260807
+prior_head_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+head_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+scope_hash_16: f002859c5ea65850
+approval_command: 'APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-273_OPT1_20260807 f002859c5ea65850 2026-08-08T21:43:00Z'
+authorized_actions: [create_working_branch, add_files, run_sandboxed_validation, create_commit, push_working_branch]
+excluded_actions: [open_draft_pr, mark_pr_ready, merge, auto_merge, force_push, branch_deletion, protected_branch_write, deploy, release, production_data_change, production_config_change, g3_pr_promotion, g4_merge, g5_deploy, g6_production]
+implementation_plan:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-273
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  plan_root: .gwc/tasks/SCRUM-273/g1/plan
+  plan_revision: sha256:c94be3a89a77182bbcf5f7f64d3e580ee95fd3094fc01d000466bb52d124978d
+  validation_status: PASS
+  validation_evidence: >-
+    Plan authored from issue SCRUM-273 plus the merged SCRUM-272/SCRUM-271 dependency
+    surfaces; scope_hash and plan_revision are computed over the three plan markdown
+    files and are consistent between the preflight implementation_plan and the decision
+    implementation_plan_ref.

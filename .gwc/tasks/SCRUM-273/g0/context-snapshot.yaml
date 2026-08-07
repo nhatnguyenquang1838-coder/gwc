@@ -1,0 +1,127 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-07T21:43:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- "G2 scope is the SCRUM-273 AI implementation-agent adapter node only, covering these six surfaces: schemas/node-architect/ai-task-execution-request.schema.json, schemas/node-architect/ai-task-execution-result.schema.json, tools/node_architect/ai_agent_adapter.py, tools/node_architect/build_node_instruction_pack.py, tools/node_architect/validate_ai_agent_result.py, tests/test_ai_agent_adapter.py"
+- Fresh isolated module; does not mutate shared tools/node_architect/client_runtime.py, checkpoint engine, or the SCRUM-272 policy/validator surfaces.
+- No merge/deploy/release/production/credential/secret/migration work; the adapter never grants G3/G4/G5 authority (fail closed).
+- Consumes authority envelope from SCRUM-272 (autonomous-preprod run-manifest schema + standing policy + derive_task_authority) and graph/evidence contracts from SCRUM-271 (both Done/merged).
+- Fail closed on out-of-scope path/action, malformed provider output, provider timeout, duplicate request (replay) and unknown write.
+- Bounded repair rounds only; each repair changes head SHA and invalidates prior CI/review/G4 readiness evidence.
+- Scratch implementation is produced by a deterministic fake agent in an isolated workspace; no hidden manual fallback.
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: a9ca4939b26d50b18ef9ce346f000a65de391c00e294309e16d4362d9d2111b9
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- id: VALIDATE_G01
+  path: tools/validate_g01.py
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+- id: AUTONOMOUS_PREPROD_INTEGRATION_POLICY
+  path: core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: 41042210f099984e28fe3dab995386b92964930ec3d126376aaa94fc98c741d4
+- id: AUTONOMOUS_PREPROD_STANDING_POLICY
+  path: governance/autonomous-preprod-policy.yaml
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: 5447d04dce4f6a1e98b515170dca5ac9949607f588c0ea91f9db5fb7b7696575
+- id: AUTONOMOUS_PREPROD_RUN_MANIFEST_SCHEMA
+  path: schemas/autonomous-preprod-run-manifest.schema.json
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: 258000c610e8b753a1c700dd8d57193daffa64ba5aeec05795ccad6541a14a8d
+- id: AUTONOMOUS_PREPROD_RUN_POLICY_SCHEMA
+  path: schemas/autonomous-preprod-run-policy.schema.json
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: 1fb7bc52ffa7a8593b902e629afd74511c24f90c362a947acd8baae65be56f06
+- id: DERIVE_TASK_AUTHORITY
+  path: tools/node_architect/derive_task_authority.py
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: c7cb22aeb91966998a86d02c39468a9df31fdb2e40b903fee20b1e942f9633d3
+- id: VALIDATE_AUTONOMOUS_PREPROD_POLICY
+  path: tools/node_architect/validate_autonomous_preprod_policy.py
+  ref: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  source_sha: ba44f530548e6f91667a9bcf2dd73c9daca9b4341dca7c7864bd5f5155e65152
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: a9ca4939b26d50b18ef9ce346f000a65de391c00e294309e16d4362d9d2111b9
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/GATE_LIFECYCLE/contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+- path: core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 41042210f099984e28fe3dab995386b92964930ec3d126376aaa94fc98c741d4
+- path: governance/autonomous-preprod-policy.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 5447d04dce4f6a1e98b515170dca5ac9949607f588c0ea91f9db5fb7b7696575
+- path: schemas/autonomous-preprod-run-manifest.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 258000c610e8b753a1c700dd8d57193daffa64ba5aeec05795ccad6541a14a8d
+- path: schemas/autonomous-preprod-run-policy.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 1fb7bc52ffa7a8593b902e629afd74511c24f90c362a947acd8baae65be56f06
+- path: tools/node_architect/derive_task_authority.py
+  required: true
+  status: AVAILABLE
+  source_sha: c7cb22aeb91966998a86d02c39468a9df31fdb2e40b903fee20b1e942f9633d3
+- path: tools/node_architect/validate_autonomous_preprod_policy.py
+  required: true
+  status: AVAILABLE
+  source_sha: ba44f530548e6f91667a9bcf2dd73c9daca9b4341dca7c7864bd5f5155e65152
+- path: tools/node_architect/client_runtime.py
+  required: false
+  status: AVAILABLE
+  source_sha: 3d9a7728529d271699bb7a80d4f0520bd42e65917e9eb7d0708ea08aa66de547
+status: READY
+blockers: []
