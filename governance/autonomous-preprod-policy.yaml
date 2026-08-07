@@ -1,0 +1,45 @@
+schema_version: '1.0'
+artifact_type: autonomous-preprod-run-policy
+policy_id: AUTONOMOUS_PREPROD_INTEGRATION_POLICY
+policy_revision: v1.0-20260807
+repository: nhatnguyenquang1838-coder/gwc
+target_branch: pre-prod
+allowed_branch_prefix: auto/
+max_child_risk: R2
+allowed_g2_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - push_working_branch
+allowed_g4_actions:
+  - merge_approved_pr
+denied_actions:
+  - direct_write_to_main
+  - direct_write_to_pre_prod
+  - create_or_protect_pre_prod_branch
+  - deploy_approved_release
+  - runtime_reload
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - secret_operation
+  - migration
+  - force_push
+  - branch_deletion
+  - history_rewrite
+  - pr_base_change
+control_plane_protected_paths:
+  - core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  - governance/autonomous-preprod-policy.yaml
+  - schemas/autonomous-preprod-run-policy.schema.json
+  - schemas/autonomous-preprod-run-manifest.schema.json
+  - schemas/autonomous-preprod-g4-receipt.schema.json
+  - tools/node_architect/validate_autonomous_preprod_policy.py
+  - tools/node_architect/derive_task_authority.py
+  - .github/workflows/autonomous-preprod-runtime.yml
+  - .github/workflows/g4-g5-evidence.yml
+  - schemas/gate-action-authority.schema.json
+  - tools/validate_gate_action.py
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+issued_at: '2026-08-07T00:00:00Z'
+expires_at: '2026-11-05T00:00:00Z'
