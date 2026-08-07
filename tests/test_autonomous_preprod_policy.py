@@ -54,11 +54,11 @@ def policy() -> dict:
     }
 
 
-def task(*, risk: str = "R2", paths: list[str] | None = None) -> dict:
+def task(*, risk: str = "R2", paths: list[str] | None = None, branch: str = "auto/run-1/SCRUM-900") -> dict:
     value = {
         "task_id": "SCRUM-900",
         "risk_class": risk,
-        "working_branch": "auto/run-1/SCRUM-900",
+        "working_branch": branch,
         "authorized_paths": paths or ["src/feature.py", "tests/test_feature.py"],
         "authorized_g2_actions": list(G2_ACTIONS),
     }
@@ -125,6 +125,12 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         p = policy(); p["expires_at"] = "2026-08-07T02:00:00Z"
         self.assertIn("AUTONOMOUS_POLICY_EXPIRED", validate_policy(p, root=ROOT, now=NOW)["reason_codes"])
 
+    def test_future_policy_is_not_yet_valid(self):
+        p = policy(); p["issued_at"] = "2026-08-07T04:00:00Z"
+        result = validate_policy(p, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_POLICY_INVALID", result["reason_codes"])
+
     def test_policy_digest_drift_invalidates_manifest(self):
         p = policy(); m = manifest(p); p["policy_revision"] = "test-v2"
         result = validate_manifest(p, m, root=ROOT, now=NOW)
@@ -132,12 +138,39 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         self.assertIn("AUTONOMOUS_POLICY_DIGEST_DRIFT", result["reason_codes"])
         self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
 
+    def test_future_manifest_is_not_yet_valid(self):
+        p = policy(); m = manifest(p); m["issued_at"] = "2026-08-07T04:00:00Z"
+        scope_digest = manifest_approval_scope_digest(m)
+        m["authority_receipt"]["manifest_scope_digest"] = scope_digest
+        m["authority_receipt"]["scope_hash_prefix"] = scope_digest.removeprefix("sha256:")[:16]
+        m["authority_receipt"]["issued_at"] = "2026-08-07T04:05:00Z"
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_RUN_MANIFEST_INVALID", result["reason_codes"])
+
+    def test_manifest_cannot_predate_policy(self):
+        p = policy(); p["issued_at"] = "2026-08-07T01:30:00Z"; m = manifest(p)
+        m["issued_at"] = "2026-08-07T01:00:00Z"
+        scope_digest = manifest_approval_scope_digest(m)
+        m["authority_receipt"]["manifest_scope_digest"] = scope_digest
+        m["authority_receipt"]["scope_hash_prefix"] = scope_digest.removeprefix("sha256:")[:16]
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertIn("AUTONOMOUS_RUN_MANIFEST_INVALID", result["reason_codes"])
+
     def test_r3_child_is_blocked(self):
         p = policy(); m = manifest(p, tasks=[task(risk="R3")])
         self.assertIn("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
 
     def test_control_plane_self_modification_is_blocked(self):
         p = policy(); m = manifest(p, tasks=[task(paths=["tools/node_architect/autonomous_preprod_runtime.py"])])
+        self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_project_instruction_self_modification_is_blocked(self):
+        p = policy(); m = manifest(p, tasks=[task(paths=["projects/gwc/project-instructions.md"])])
+        self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_agent_instruction_self_modification_is_blocked(self):
+        p = policy(); m = manifest(p, tasks=[task(paths=["agents/chatgpt-agent/agent-instructions.md"])])
         self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
 
     def test_path_traversal_cannot_bypass_control_plane_protection(self):
@@ -152,9 +185,30 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         self.assertEqual("BLOCKED", result["outcome"])
         self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
 
+    def test_control_character_path_is_blocked(self):
+        p = policy(); m = manifest(p, tasks=[task(paths=["src/unsafe\nfile.py"])])
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
+
+    def test_invalid_git_branch_ref_is_blocked(self):
+        p = policy(); m = manifest(p, tasks=[task(branch="auto/run-1/../main")])
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
+
     def test_active_policy_preserves_mandatory_control_plane(self):
         active = yaml.safe_load((ROOT / "governance/autonomous-preprod-policy.yaml").read_text(encoding="utf-8"))
         self.assertTrue(MANDATORY_CONTROL_PLANE_PROTECTED_PATHS.issubset(set(active["control_plane_protected_paths"])))
+
+    def test_mandatory_control_plane_includes_real_instruction_surfaces(self):
+        required = {
+            "agents/chatgpt-agent",
+            "projects/gwc",
+            "governance/instruction-source-registry.yaml",
+            "governance/agent-runtime-profiles",
+            "tools/validate_g01.py",
+        }
+        self.assertTrue(required.issubset(MANDATORY_CONTROL_PLANE_PROTECTED_PATHS))
 
     def test_policy_cannot_drop_mandatory_control_plane(self):
         p = policy(); p["control_plane_protected_paths"].remove(".github/workflows")
@@ -184,6 +238,21 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         p = policy(); m = manifest(p); m["authority_receipt"]["scope_hash_prefix"] = "f" * 16
         result = validate_manifest(p, m, root=ROOT, now=NOW)
         self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
+
+    def test_future_parent_authority_is_blocked(self):
+        p = policy(); m = manifest(p); m["authority_receipt"]["issued_at"] = "2026-08-07T04:00:00Z"
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
+
+    def test_parent_authority_comment_ids_must_be_distinct(self):
+        p = policy(); m = manifest(p); m["authority_receipt"]["receipt_comment_id"] = m["authority_receipt"]["source_comment_id"]
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
+
+    def test_parent_authority_cannot_outlive_policy(self):
+        p = policy(); m = manifest(p); m["authority_receipt"]["expires_at"] = "2026-08-08T00:30:00Z"
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
         self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
 
     def test_manifest_edit_after_approval_invalidates_parent_receipt(self):
