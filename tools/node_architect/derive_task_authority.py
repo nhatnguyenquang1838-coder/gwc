@@ -182,6 +182,8 @@ def derive_g4_receipt(
         return _deny("G4_MERGE", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
     if context.get("approved_base_sha") != manifest.get("approved_base_sha"):
         return _deny("G4_MERGE", "AUTONOMOUS_BASE_SHA_MISMATCH", run_id=run_id, task_id=task_id)
+    if context.get("working_branch") != task.get("working_branch"):
+        return _deny("G4_MERGE", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
     if context.get("authorized_action") != "merge_approved_pr":
         return _deny("G4_MERGE", "AUTONOMOUS_ACTION_FORBIDDEN", run_id=run_id, task_id=task_id)
     if context.get("task_scope_hash") != task.get("scope_hash"):
@@ -218,6 +220,7 @@ def derive_g4_receipt(
         "repository": manifest["repository"],
         "approved_base_ref": manifest["approved_base_ref"],
         "approved_base_sha": manifest["approved_base_sha"],
+        "working_branch": task["working_branch"],
         "target_branch": "pre-prod",
         "pr_number": pr_number,
         "approved_head_sha": head,
@@ -288,8 +291,13 @@ def validate_g4_receipt(
         task = _task(manifest, str(receipt.get("task_id", "")))
         if task is None:
             reasons.append("AUTONOMOUS_TASK_NOT_ALLOWLISTED")
-        elif receipt.get("task_scope_hash") != task.get("scope_hash"):
-            reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+        else:
+            if receipt.get("task_scope_hash") != task.get("scope_hash"):
+                reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+                details.append("receipt task_scope_hash mismatch")
+            if receipt.get("working_branch") != task.get("working_branch"):
+                reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+                details.append("receipt working_branch mismatch")
 
         if current.get("target_branch") == "main":
             reasons.append("AUTONOMOUS_MAIN_TARGET_FORBIDDEN")
@@ -306,6 +314,9 @@ def validate_g4_receipt(
         if current.get("approved_base_sha") != manifest.get("approved_base_sha"):
             reasons.append("AUTONOMOUS_BASE_SHA_MISMATCH")
             details.append("current approved_base_sha does not match manifest")
+        if task is not None and current.get("working_branch") != task.get("working_branch"):
+            reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+            details.append("current working_branch does not match task")
         if current.get("authorized_action") != "merge_approved_pr":
             reasons.append("AUTONOMOUS_ACTION_FORBIDDEN")
             details.append("current authorized_action must be merge_approved_pr")
@@ -314,6 +325,7 @@ def validate_g4_receipt(
             ("repository", "AUTONOMOUS_SCOPE_DRIFT"),
             ("approved_base_ref", "AUTONOMOUS_SCOPE_DRIFT"),
             ("approved_base_sha", "AUTONOMOUS_BASE_SHA_MISMATCH"),
+            ("working_branch", "AUTONOMOUS_SCOPE_DRIFT"),
             ("target_branch", "AUTONOMOUS_PREPROD_TARGET_REQUIRED"),
             ("authorized_action", "AUTONOMOUS_ACTION_FORBIDDEN"),
             ("approved_head_sha", "AUTONOMOUS_HEAD_DRIFT"),
