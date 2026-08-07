@@ -9,6 +9,7 @@
 - Fail closed on malformed/nested/duplicate G2 request arrays instead of allowing runtime exceptions.
 - Require canonical repository-relative POSIX scope paths and canonical Git working refs before control-plane overlap checks; reject whitespace/control characters, absolute/root aliases, dot traversal, backslashes, glob metacharacters and malformed Git ref sequences.
 - Make the minimum autonomous control-plane protection set validator-enforced and non-configurable, including all GitHub workflows, ChatGPT/project instruction surfaces, instruction registry/runtime profiles, core governance/gate contracts, G0/G1 and gate-action validators, Node Architect runtime contracts/schemas/tools, standing-policy surfaces and G4/G5 controls.
+- Protect the executable/dependency inputs used by trusted validation/package CI: `requirements.txt`, `tools/validate_instructions.py`, `tools/validate_line_endings.py`, and `tools/build_project_package.py`; immutable workflow YAML alone is not treated as sufficient control-plane protection.
 - Bind standing G4 explicitly to repository, approved base ref/SHA, exact approved child working branch, `pre-prod`, `merge_approved_pr`, PR number, exact head and current evidence digests; cross-repository, base, branch, target or action replay fails closed.
 - Keep live `gate-action-authority` validation byte-compatible with `main`; standing G4 decisions do not replace the existing trusted human G4 receipt in this task.
 - Preserve the SCRUM-271 runtime contract verbatim and append only the SCRUM-272 standing-policy extension boundary.
