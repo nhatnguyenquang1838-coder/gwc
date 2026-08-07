@@ -181,6 +181,10 @@ def _standing_g4_receipt_errors(
         errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: receipt does not authorize merge_approved_pr")
     if receipt.get("task_id") != packet.get("task_id") or receipt.get("repository") != packet.get("repository"):
         errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: task/repository does not match packet")
+    if packet.get("scope", {}).get("risk_class") not in {"R0", "R1", "R2"}:
+        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: standing policy cannot authorize R3 risk")
+    if not str(packet.get("working_branch", "")).startswith("auto/"):
+        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: standing policy requires an auto/ working branch")
     approved_head = receipt.get("approved_head_sha")
     if approved_head != packet.get("head_sha") or (expected_head_sha and approved_head != expected_head_sha):
         errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: receipt head is stale")
