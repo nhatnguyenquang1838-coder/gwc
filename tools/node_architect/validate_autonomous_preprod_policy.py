@@ -216,8 +216,12 @@ def _run_authority_errors(
         errors.append("authority receipt policy_revision mismatch")
     if receipt.get("approved_policy_digest") != policy_digest:
         errors.append("authority receipt policy_digest mismatch")
-    if receipt.get("manifest_scope_digest") != manifest_approval_scope_digest(manifest):
+    expected_scope_digest = manifest_approval_scope_digest(manifest)
+    if receipt.get("manifest_scope_digest") != expected_scope_digest:
         errors.append("authority receipt manifest_scope_digest mismatch")
+    expected_scope_prefix = expected_scope_digest.removeprefix("sha256:")[:16]
+    if receipt.get("scope_hash_prefix") != expected_scope_prefix:
+        errors.append("authority receipt scope_hash_prefix mismatch")
     for field in ("receipt_comment_id", "source_comment_id"):
         if not isinstance(receipt.get(field), int) or receipt.get(field, 0) < 1:
             errors.append(f"authority receipt {field} must be a positive integer")
