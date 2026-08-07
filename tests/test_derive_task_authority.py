@@ -46,12 +46,13 @@ def g4_context(m: dict | None = None) -> dict:
 
 
 class TaskAuthorityDerivationTests(unittest.TestCase):
-    def test_valid_g2_is_task_scoped_deterministic_and_parent_bound(self):
+    def test_valid_g2_is_task_scoped_deterministic_parent_bound_and_contract_only(self):
         p = policy(); m = manifest(p); request = g2_request()
         first = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
         second = derive_g2_authority(copy.deepcopy(p), copy.deepcopy(m), copy.deepcopy(request), root=ROOT, now=NOW)
         self.assertEqual("ALLOW", first["decision"])
         self.assertEqual("G2_EXECUTION", first["gate"])
+        self.assertEqual("requires_trusted_repo_ci_projection", first["trust_state"])
         self.assertFalse(first["g4_g5_g6_authority_granted"])
         self.assertEqual(first["decision_digest"], second["decision_digest"])
         self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
