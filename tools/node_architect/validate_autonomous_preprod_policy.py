@@ -55,15 +55,19 @@ MANDATORY_CONTROL_PLANE_PROTECTED_PATHS = {
     "governance/autonomous-preprod-policy.yaml",
     "governance/instruction-source-registry.yaml",
     "projects/gwc",
+    "requirements.txt",
     "schemas/approval-envelope.schema.json",
     "schemas/autonomous-preprod-run-policy.schema.json",
     "schemas/autonomous-preprod-run-manifest.schema.json",
     "schemas/autonomous-preprod-g4-receipt.schema.json",
     "schemas/gate-action-authority.schema.json",
     "schemas/node-architect",
+    "tools/build_project_package.py",
     "tools/node_architect",
     "tools/validate_g01.py",
     "tools/validate_gate_action.py",
+    "tools/validate_instructions.py",
+    "tools/validate_line_endings.py",
 }
 RUN_AUTHORITY_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
