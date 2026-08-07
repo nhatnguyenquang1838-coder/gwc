@@ -4,11 +4,11 @@
 This is a data-only, fail-closed validator. It does not call Jira, GitHub, or a
 deployment system and never grants authority.
 
-Every G4 merge requires either the legacy trusted PR-native human authority
-receipt or a deterministic autonomous pre-prod standing-policy receipt.
-Autonomous pre-prod merges additionally require the trusted current
+Every G4 merge requires a trusted PR-native ``gwc:g4-authority-receipt``.
+Autonomous pre-prod merges additionally require a trusted
 ``gwc:g4-pr-evidence-receipt`` binding the current PR body, run graph, G0→G6
-story, and managed-evidence digest to the current PR head.
+story, and managed-evidence digest to the current PR head. Legacy/normal G4
+packets remain compatible unless autonomous evidence is explicitly expected.
 """
 from __future__ import annotations
 
@@ -22,8 +22,6 @@ from typing import Any
 
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
-
-from tools.node_architect.validate_autonomous_preprod_policy import canonical_digest
 
 GATE_MINIMUM_ACTIONS = {
     "G0_CONTEXT": {"read_repository", "inspect_connector", "inspect_task"},
@@ -56,7 +54,6 @@ G4_PR_EVIDENCE_MARKER = "gwc:g4-pr-evidence-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
 GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
 G4_RECEIPT_FAILURE = "G4_AUTHORITY_RECEIPT_MISSING_OR_STALE"
-G4_STANDING_RECEIPT_FAILURE = "AUTONOMOUS_STANDING_G4_RECEIPT_MISSING_OR_STALE"
 G4_PR_EVIDENCE_FAILURE = "G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE"
 DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -158,64 +155,6 @@ def _g4_receipt_errors(
     )
 
 
-def _standing_g4_receipt_errors(
-    packet: dict[str, Any],
-    *,
-    now: datetime,
-    expected_head_sha: str | None,
-    expected_pr_body_digest: str | None,
-    expected_managed_block_digest: str | None,
-    expected_run_graph_digest: str | None,
-    expected_gate_story_digest: str | None,
-    expected_evidence_digest: str | None,
-) -> list[str]:
-    receipt = packet.get("evidence_readback", {}).get("autonomous_preprod_g4_receipt")
-    if not isinstance(receipt, dict):
-        return [f"{G4_STANDING_RECEIPT_FAILURE}: standing pre-prod receipt is missing"]
-    errors: list[str] = []
-    if receipt.get("decision") != "ALLOW" or receipt.get("source") != "autonomous_preprod_standing_policy":
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: receipt decision/source is invalid")
-    if receipt.get("target_branch") != "pre-prod":
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: target must be pre-prod")
-    if receipt.get("authorized_action") != "merge_approved_pr":
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: receipt does not authorize merge_approved_pr")
-    if receipt.get("task_id") != packet.get("task_id") or receipt.get("repository") != packet.get("repository"):
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: task/repository does not match packet")
-    if packet.get("scope", {}).get("risk_class") not in {"R0", "R1", "R2"}:
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: standing policy cannot authorize R3 risk")
-    if not str(packet.get("working_branch", "")).startswith("auto/"):
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: standing policy requires an auto/ working branch")
-    approved_head = receipt.get("approved_head_sha")
-    if approved_head != packet.get("head_sha") or (expected_head_sha and approved_head != expected_head_sha):
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: receipt head is stale")
-    if receipt.get("decision_digest") != canonical_digest(receipt, omit=("decision_digest",)):
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: decision_digest mismatch")
-    try:
-        if parse_utc(receipt["expires_at"], "autonomous_preprod_g4_receipt.expires_at") <= now:
-            errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: receipt is expired")
-    except (KeyError, TypeError, ValueError) as exc:
-        errors.append(str(exc))
-    if not isinstance(receipt.get("pr_number"), int) or receipt.get("pr_number", 0) < 1:
-        errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: pr_number must be positive")
-    expectations = {
-        "pr_body_digest": expected_pr_body_digest,
-        "managed_block_digest": expected_managed_block_digest,
-        "run_graph_digest": expected_run_graph_digest,
-        "gate_story_digest": expected_gate_story_digest,
-        "evidence_digest": expected_evidence_digest,
-    }
-    for field, expected in expectations.items():
-        value = receipt.get(field)
-        if not isinstance(value, str) or not DIGEST_RE.fullmatch(value):
-            errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: {field} must be a sha256 digest")
-        elif expected and value != expected:
-            errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: {field} does not match current evidence")
-    for field in ("policy_digest", "manifest_digest", "task_scope_hash"):
-        if not isinstance(receipt.get(field), str) or not DIGEST_RE.fullmatch(receipt[field]):
-            errors.append(f"{G4_STANDING_RECEIPT_FAILURE}: {field} must be a sha256 digest")
-    return errors
-
-
 def _g4_pr_evidence_errors(
     packet: dict[str, Any],
     *,
@@ -273,9 +212,7 @@ def _requires_g4_pr_evidence(
     expected_gate_story_digest: str | None,
     expected_evidence_digest: str | None,
 ) -> bool:
-    readback = packet.get("evidence_readback", {})
-    receipt = readback.get("g4_pr_evidence_receipt")
-    standing = readback.get("autonomous_preprod_g4_receipt")
+    receipt = packet.get("evidence_readback", {}).get("g4_pr_evidence_receipt")
     expected = (
         expected_pr_body_digest,
         expected_managed_block_digest,
@@ -285,7 +222,6 @@ def _requires_g4_pr_evidence(
     )
     return (
         str(packet.get("working_branch", "")).startswith("auto/")
-        or isinstance(standing, dict)
         or isinstance(receipt, dict)
         or any(value is not None for value in expected)
     )
@@ -348,30 +284,15 @@ def semantic_errors(
             errors.append("G4 merge requires observed PR state before merge")
         elif observed_pr_state != OPEN_PR_STATE:
             errors.append("G4 merge requires observed PR state 'open' before merge")
-        readback = packet.get("evidence_readback", {})
-        if isinstance(readback.get("autonomous_preprod_g4_receipt"), dict):
-            errors.extend(
-                _standing_g4_receipt_errors(
-                    packet,
-                    now=now,
-                    expected_head_sha=expected_head_sha,
-                    expected_pr_body_digest=expected_pr_body_digest,
-                    expected_managed_block_digest=expected_managed_block_digest,
-                    expected_run_graph_digest=expected_run_graph_digest,
-                    expected_gate_story_digest=expected_gate_story_digest,
-                    expected_evidence_digest=expected_evidence_digest,
-                )
+        errors.extend(
+            _g4_receipt_errors(
+                packet,
+                now=now,
+                expected_head_sha=expected_head_sha,
+                expected_g4_approval_id=expected_g4_approval_id,
+                expected_g4_scope_prefix=expected_g4_scope_prefix,
             )
-        else:
-            errors.extend(
-                _g4_receipt_errors(
-                    packet,
-                    now=now,
-                    expected_head_sha=expected_head_sha,
-                    expected_g4_approval_id=expected_g4_approval_id,
-                    expected_g4_scope_prefix=expected_g4_scope_prefix,
-                )
-            )
+        )
         if _requires_g4_pr_evidence(
             packet,
             expected_pr_body_digest=expected_pr_body_digest,
