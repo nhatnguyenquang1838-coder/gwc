@@ -1,0 +1,58 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-06T19:39:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-271
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Additive autonomous workflow and canonical evidence renderers
+  description: Add a new workflow skeleton and extend existing runtime and G4 preparation
+    surfaces with canonical run graph, gate story, and managed PR evidence rendering.
+  benefits:
+  - Preserves existing G3/G4 mechanisms while establishing the MVP control plane.
+  - Produces auditable exact-head evidence and clear G0-to-G6 storytelling.
+  - Keeps later standing policy, AI adapter, Jira loop, and merge tasks independently
+    bounded.
+  tradeoffs:
+  - Requires new schemas, tools, workflow fixture, and several focused test suites.
+  - Existing G4 workflow interfaces need careful compatibility updates.
+  risks:
+  - Control-plane regression could block legitimate G4 flows.
+  - Story or graph could overstate execution if canonical provenance is not enforced.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Extend only the existing G4 G5 evidence workflow
+  description: Put graph and story generation directly inside g4-g5-evidence.yml without
+    a separate autonomous workflow or canonical renderer modules.
+  benefits:
+  - Fewer new files.
+  - Faster initial workflow patch.
+  tradeoffs:
+  - Couples presentation, authority, and orchestration logic.
+  - Harder to test, replay, reuse, and extend in SCRUM-272 through SCRUM-276.
+  risks:
+  - High regression and maintenance risk in a security-sensitive workflow.
+  constraint_fit: PARTIAL
+- id: OPT-3
+  title: Documentation and PR template only
+  description: Document the intended graph/story format and add a static PR template
+    without executable workflow or renderer behavior.
+  benefits:
+  - Lowest implementation risk.
+  - Useful as a design reference.
+  tradeoffs:
+  - Does not deliver an executable MVP foundation.
+  - Cannot prove idempotent readback, drift invalidation, or exact-head binding.
+  risks:
+  - Creates false confidence from presentation without runtime evidence.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest architecture-compatible implementation
+  that satisfies SCRUM-271 while preserving gate separation and enabling later Epic
+  tasks without embedding authority logic into presentation code.
+decision_required: true
+status: READY

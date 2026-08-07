@@ -1,0 +1,83 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-06T19:39:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: chatgpt
+  execution_mode: chat_connector_only
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+constraints:
+- Reuse and extend existing Client Runtime, gate-node route profile, runtime registry,
+  G3/G4 evidence workflow, and gate validators.
+- Canonical graph output is JSON; Mermaid and Markdown are deterministic projections.
+- PR update owns only the GWC managed block and preserves human-authored text outside
+  it.
+- Gate actions are not invented as catalogue nodes.
+- Updating PR description is evidence preparation only and grants no G4 authority.
+- Any PR base of main fails before a merge-capable route.
+- Work remains bounded to a guarded SCRUM-271 branch after exact G2 approval.
+applicable_policies:
+- id: GWC_CORE
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GWC_GATE_LIFECYCLE
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: a1378c8f7a0a3acbc12d015063a57e033efeb6f1
+- path: .github/workflows/g4-g5-evidence.yml
+  required: true
+  status: AVAILABLE
+  source_sha: 93e482e71e365799a642db0104d57d9ba52d1328
+- path: core/node-architect/runtime-graph-registry.json
+  required: true
+  status: AVAILABLE
+  source_sha: 96caf476709f73c125c5eefb8cfca67029915ee5
+- path: core/node-architect/gate-node-route-profile.json
+  required: true
+  status: AVAILABLE
+  source_sha: 4659318cbfceb6fd83a2fb318bcb32ecf36df3b4
+- path: tools/node_architect/client_runtime.py
+  required: true
+  status: AVAILABLE
+  source_sha: 9454767e89cc3f6beb29679b926abe5b8ad92822
+status: READY
+blockers: []

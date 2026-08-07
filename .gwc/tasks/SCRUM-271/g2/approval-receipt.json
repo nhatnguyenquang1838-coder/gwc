@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "gate-approval-receipt",
+  "task_id": "SCRUM-271",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "gate": "G2_EXECUTION",
+  "envelope_approval_id": "CP-20260807-271",
+  "command_approval_id": "APPROVE_G2_EXECUTION_271_20260807",
+  "scope_hash": "sha256:2d667fd5306ab46af2fe033df434a48c949cccdc420022e63c2a7d97012736b1",
+  "scope_hash_prefix": "2d667fd5306ab46a",
+  "base_sha": "773baa601492dabf6ad8e835b62e48a68b0c1b55",
+  "working_branch": "chatgpt/scrum-271-autonomous-preprod-runtime-r1-20260807",
+  "approved_at": "2026-08-06T19:53:00Z",
+  "expires_at": "2026-08-07T19:44:00Z",
+  "source": {
+    "provider": "chat",
+    "actor": "user",
+    "full_command_persisted": false
+  },
+  "authorized_actions": [
+    "renew_work_item_lease",
+    "update_work_item_status",
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "push_working_branch"
+  ],
+  "merge_authority_granted": false,
+  "deployment_authority_granted": false,
+  "production_authority_granted": false
+}

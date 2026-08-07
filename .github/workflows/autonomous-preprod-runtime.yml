@@ -1,0 +1,563 @@
+name: Autonomous pre-prod runtime evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_base_sha:
+        description: Exact approved source SHA to checkout
+        required: true
+        type: string
+      run_manifest_json:
+        description: Closed JSON manifest containing canonical runtime events
+        required: true
+        type: string
+      pr_number:
+        description: Existing PR to update; zero keeps the run artifact-only
+        required: false
+        default: "0"
+        type: string
+      update_pr_description:
+        description: Update and read back the bounded managed PR evidence block
+        required: false
+        default: false
+        type: boolean
+  issue_comment:
+    types: [created, edited]
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+
+permissions:
+  actions: read
+  checks: write
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  evidence-runtime:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact approved source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_base_sha }}
+
+      - name: Verify exact checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_base_sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Materialize run manifest
+        env:
+          RUN_MANIFEST_JSON: ${{ inputs.run_manifest_json }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(os.environ["RUN_MANIFEST_JSON"])
+          Path("autonomous-run-manifest.json").write_text(
+              json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Execute evidence-only runtime
+        run: |
+          python -m tools.node_architect.autonomous_preprod_runtime \
+            autonomous-run-manifest.json \
+            --output-dir autonomous-runtime-output \
+            --expected-repository "${{ github.repository }}" \
+            --expected-base-sha "${{ inputs.expected_base_sha }}"
+
+      - name: Validate canonical graph and story schemas
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator, FormatChecker
+
+          pairs = [
+              ("schemas/node-architect/autonomous-run-graph.schema.json", "autonomous-runtime-output/runtime-graph.json"),
+              ("schemas/node-architect/gate-story.schema.json", "autonomous-runtime-output/gate-story.json"),
+          ]
+          for schema_path, artifact_path in pairs:
+              schema = json.loads(Path(schema_path).read_text(encoding="utf-8"))
+              artifact = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+              Draft202012Validator.check_schema(schema)
+              errors = list(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(artifact))
+              if errors:
+                  raise SystemExit("\n".join(error.message for error in errors))
+          PY
+
+      - name: Run focused runtime tests
+        run: |
+          python -m unittest \
+            tests.test_run_graph_builder \
+            tests.test_gate_storyteller \
+            tests.test_pr_run_evidence_renderer \
+            tests.test_autonomous_preprod_workflow_contract \
+            tests.test_validate_gate_action
+
+      - name: Update and read back managed PR evidence block
+        if: inputs.update_pr_description && inputs.pr_number != '0'
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const pull_number = Number(process.env.PR_NUMBER);
+            if (!Number.isInteger(pull_number) || pull_number < 1) {
+              core.setFailed('pr_number must be a positive integer when update_pr_description=true.');
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            if (pr.base.ref === 'main') {
+              core.setFailed('AUTONOMOUS_MAIN_TARGET_FORBIDDEN: managed autonomous PR evidence cannot be applied to a PR targeting main.');
+              return;
+            }
+            const begin = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
+            const end = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:END -->';
+            const block = fs.readFileSync('autonomous-runtime-output/pr-run-evidence.md', 'utf8').trim();
+            const metadata = block.match(/<!-- gwc:autonomous-run-evidence run_id=([^ ]+) task=([^ ]+) head=([0-9a-f]{40}) graph=(sha256:[0-9a-f]{64}) story=(sha256:[0-9a-f]{64}) evidence=(sha256:[0-9a-f]{64}) -->/);
+            if (!metadata) {
+              core.setFailed('AUTONOMOUS_PR_EVIDENCE_MARKER_INVALID: rendered managed block marker is missing or malformed.');
+              return;
+            }
+            if (metadata[3] !== pr.head.sha) {
+              core.setFailed(`AUTONOMOUS_PR_HEAD_DRIFT: rendered evidence head ${metadata[3]} does not match current PR head ${pr.head.sha}.`);
+              return;
+            }
+            let body = pr.body || '';
+            const begins = body.split(begin).length - 1;
+            const ends = body.split(end).length - 1;
+            if (begins !== ends || begins > 1) {
+              core.setFailed('AUTONOMOUS_PR_MARKER_MALFORMED: PR body has unbalanced or duplicate managed markers.');
+              return;
+            }
+            if (begins === 0) {
+              body = body.trimEnd();
+              body = `${body}${body ? '\n\n' : ''}${block}\n`;
+            } else {
+              const start = body.indexOf(begin);
+              const finish = body.indexOf(end, start) + end.length;
+              body = `${body.slice(0, start)}${block}${body.slice(finish)}`;
+              if (!body.endsWith('\n')) body += '\n';
+            }
+            await github.rest.pulls.update({ owner, repo, pull_number, body });
+            const { data: readback } = await github.rest.pulls.get({ owner, repo, pull_number });
+            if ((readback.body || '') !== body || readback.head.sha !== pr.head.sha) {
+              core.setFailed('AUTONOMOUS_PR_READBACK_MISMATCH: PR body/head readback does not match the requested update.');
+              return;
+            }
+            core.info(`Managed evidence block updated for PR ${pull_number} at head ${readback.head.sha}.`);
+
+      - name: Upload canonical runtime artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-runtime-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            autonomous-run-manifest.json
+            autonomous-runtime-output/runtime-result.json
+            autonomous-runtime-output/runtime-graph.json
+            autonomous-runtime-output/gate-story.json
+            autonomous-runtime-output/pr-run-evidence.md
+            autonomous-runtime-output/updated-pr-body.md
+          if-no-files-found: error
+
+  contract-canary:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify exact PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Materialize deterministic canary manifest
+        env:
+          REPOSITORY: ${{ github.repository }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          events = [
+              {
+                  "event_id": "canary-g0",
+                  "sequence": 0,
+                  "gate": "G0_CONTEXT",
+                  "participant_type": "runtime_node",
+                  "participant_id": "intake_context.context-snapshot",
+                  "purpose": "bind deterministic canary context",
+                  "status": "passed",
+                  "entry_evidence": [f"git:{os.environ['BASE_SHA']}"],
+                  "action": "read_context",
+                  "outcome": "CONTEXT_READY",
+                  "evidence_refs": ["fixture:g0-context"],
+                  "next_event_id": "canary-g1",
+                  "edge_type": "runtime",
+                  "route_provenance": "fixture:g0-to-g1",
+              },
+              {
+                  "event_id": "canary-g1",
+                  "sequence": 1,
+                  "gate": "G1_ALIGNMENT",
+                  "participant_type": "gate_action",
+                  "participant_id": "g1-alignment-decision",
+                  "purpose": "record deterministic canary scope",
+                  "status": "passed",
+                  "entry_evidence": ["fixture:g0-context"],
+                  "action": "select_option",
+                  "outcome": "FIXTURE_SCOPE_SELECTED",
+                  "evidence_refs": ["fixture:g1-decision"],
+                  "next_event_id": "canary-g2",
+                  "edge_type": "authority",
+                  "route_provenance": "fixture:option-1",
+              },
+              {
+                  "event_id": "canary-g2",
+                  "sequence": 2,
+                  "gate": "G2_EXECUTION",
+                  "participant_type": "runtime_node",
+                  "participant_id": "gate_authority.gate-state-resolution",
+                  "purpose": "render evidence without external side effects",
+                  "status": "passed",
+                  "entry_evidence": ["fixture:g1-decision"],
+                  "action": "render_fixture_evidence",
+                  "outcome": "FIXTURE_EVIDENCE_RENDERED",
+                  "evidence_refs": ["fixture:runtime-result"],
+                  "next_event_id": None,
+                  "edge_type": "runtime",
+                  "route_provenance": "fixture:g2-terminal",
+              },
+          ]
+          manifest = {
+              "run_id": f"ci-canary-{os.environ['HEAD_SHA'][:12]}",
+              "task_id": "SCRUM-271",
+              "repository": os.environ["REPOSITORY"],
+              "base_ref": os.environ["BASE_REF"],
+              "base_sha": os.environ["BASE_SHA"],
+              "head_ref": os.environ["HEAD_REF"],
+              "head_sha": os.environ["HEAD_SHA"],
+              "pr_base": "pre-prod",
+              "graph_revision": "scrum-271-v0.1-canary",
+              "events": events,
+              "gate_statuses": {
+                  "G3_PR": "not_executed",
+                  "G4_MERGE": "not_executed",
+                  "G5_DEPLOY": "not_executed",
+                  "G6_PRODUCTION_DATA": "not_applicable",
+              },
+              "validation": {"source": "pull_request_contract_canary"},
+              "g4_readiness": {"state": "not_ready", "reason": "fixture_only"},
+          }
+          Path("canary-manifest.json").write_text(
+              json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          Path("fixture-pr-body.md").write_text("# Fixture PR body\n", encoding="utf-8")
+          PY
+
+      - name: Execute deterministic evidence canary
+        run: |
+          python -m tools.node_architect.autonomous_preprod_runtime \
+            canary-manifest.json \
+            --output-dir canary-output \
+            --pr-body-in fixture-pr-body.md \
+            --expected-repository "${{ github.repository }}" \
+            --expected-base-sha "${{ github.event.pull_request.base.sha }}"
+
+      - name: Validate canary artifacts and managed-body readback
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator, FormatChecker
+
+          pairs = [
+              ("schemas/node-architect/autonomous-run-graph.schema.json", "canary-output/runtime-graph.json"),
+              ("schemas/node-architect/gate-story.schema.json", "canary-output/gate-story.json"),
+          ]
+          for schema_path, artifact_path in pairs:
+              schema = json.loads(Path(schema_path).read_text(encoding="utf-8"))
+              artifact = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+              errors = list(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(artifact))
+              if errors:
+                  raise SystemExit("\n".join(error.message for error in errors))
+          result = json.loads(Path("canary-output/runtime-result.json").read_text(encoding="utf-8"))
+          body = Path("canary-output/updated-pr-body.md").read_text(encoding="utf-8")
+          if result["status"] != "PASS" or not body.startswith("# Fixture PR body"):
+              raise SystemExit("canary result/body readback mismatch")
+          if body.count("<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->") != 1:
+              raise SystemExit("managed evidence block was not rendered exactly once")
+          PY
+
+      - name: Verify main-target denial before artifacts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("canary-manifest.json").read_text(encoding="utf-8"))
+          manifest["pr_base"] = "main"
+          Path("main-deny-manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+          PY
+          if python -m tools.node_architect.autonomous_preprod_runtime \
+            main-deny-manifest.json \
+            --output-dir main-deny-output \
+            --expected-repository "${{ github.repository }}" \
+            --expected-base-sha "${{ github.event.pull_request.base.sha }}"; then
+            echo "main-target fixture unexpectedly passed"
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("main-deny-output/runtime-result.json").read_text(encoding="utf-8"))
+          if result["terminal_code"] != "AUTONOMOUS_MAIN_TARGET_FORBIDDEN":
+              raise SystemExit("main-target denial reason mismatch")
+          for name in ("runtime-graph.json", "gate-story.json", "pr-run-evidence.md", "updated-pr-body.md"):
+              if (Path("main-deny-output") / name).exists():
+                  raise SystemExit(f"forbidden artifact created: {name}")
+          PY
+
+      - name: Run focused runtime tests
+        run: |
+          python -m unittest \
+            tests.test_run_graph_builder \
+            tests.test_gate_storyteller \
+            tests.test_pr_run_evidence_renderer \
+            tests.test_autonomous_preprod_workflow_contract \
+            tests.test_validate_gate_action
+
+      - name: Upload exact-head canary artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-contract-canary-${{ github.event.pull_request.head.sha }}
+          path: |
+            canary-manifest.json
+            fixture-pr-body.md
+            canary-output/runtime-result.json
+            canary-output/runtime-graph.json
+            canary-output/gate-story.json
+            canary-output/pr-run-evidence.md
+            canary-output/updated-pr-body.md
+            main-deny-output/runtime-result.json
+          if-no-files-found: error
+
+  g4-pr-evidence-authority:
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, 'APPROVE G4')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate current autonomous PR evidence and publish receipt
+        id: evidence
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const crypto = require('crypto');
+            const fs = require('fs');
+            const body = (context.payload.comment.body || '').trim();
+            const command = /^APPROVE (?:G4_MERGE|G4) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
+            const match = body.match(command);
+            if (!match) {
+              core.setFailed('No exact G4 approval command matched; no autonomous PR evidence receipt was issued.');
+              return;
+            }
+            const { owner, repo } = context.repo;
+            const prNumber = context.payload.issue.number;
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            const managedMarker = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
+            const eligible = pr.head.ref.startsWith('auto/') || (pr.body || '').includes(managedMarker);
+            core.setOutput('eligible', eligible ? 'true' : 'false');
+            if (!eligible) {
+              core.info('PR is not an autonomous-run delivery; legacy G4 authority remains handled by the existing workflow.');
+              return;
+            }
+            if (pr.state !== 'open' || pr.draft) {
+              core.setFailed('G4 PR evidence requires an open PR that is Ready for Review.');
+              return;
+            }
+            if (pr.base.ref === 'main') {
+              core.setFailed('AUTONOMOUS_MAIN_TARGET_FORBIDDEN: autonomous G4 evidence cannot authorize a PR targeting main.');
+              return;
+            }
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({ owner, repo, username: context.payload.comment.user.login });
+            if (!['admin', 'maintain', 'write'].includes(permission.permission)) {
+              core.setFailed(`Approver lacks write authority: ${permission.permission}`);
+              return;
+            }
+            const expiresAt = new Date(match[3]);
+            if (!Number.isFinite(expiresAt.getTime()) || expiresAt <= new Date()) {
+              core.setFailed('G4 approval expiry is invalid or expired.');
+              return;
+            }
+            const prBody = pr.body || '';
+            const begin = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
+            const end = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:END -->';
+            const begins = prBody.split(begin).length - 1;
+            const ends = prBody.split(end).length - 1;
+            if (begins !== 1 || ends !== 1) {
+              core.setFailed('G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE: exactly one managed PR evidence block is required.');
+              return;
+            }
+            const start = prBody.indexOf(begin);
+            const finish = prBody.indexOf(end, start) + end.length;
+            const managed = prBody.slice(start, finish);
+            const metadata = managed.match(/<!-- gwc:autonomous-run-evidence run_id=([^ ]+) task=([^ ]+) head=([0-9a-f]{40}) graph=(sha256:[0-9a-f]{64}) story=(sha256:[0-9a-f]{64}) evidence=(sha256:[0-9a-f]{64}) -->/);
+            if (!metadata) {
+              core.setFailed('G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE: managed evidence marker is missing or malformed.');
+              return;
+            }
+            if (metadata[3] !== pr.head.sha) {
+              core.setFailed(`AUTONOMOUS_PR_HEAD_DRIFT: managed evidence head ${metadata[3]} does not match current head ${pr.head.sha}.`);
+              return;
+            }
+            const digest = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
+            const receipt = {
+              schema_version: '1.0',
+              artifact_type: 'g4-pr-evidence-receipt',
+              generated_at: new Date().toISOString(),
+              repository: `${owner}/${repo}`,
+              gate: 'G4_MERGE',
+              pr_number: prNumber,
+              approval_id: match[1],
+              scope_hash_prefix: match[2],
+              approved_head_sha: pr.head.sha,
+              run_id: metadata[1],
+              task_id: metadata[2],
+              run_graph_digest: metadata[4],
+              gate_story_digest: metadata[5],
+              evidence_digest: metadata[6],
+              managed_block_digest: digest(managed),
+              pr_body_digest: digest(prBody),
+              source_comment_id: context.payload.comment.id,
+              approver: { login: context.payload.comment.user.login, permission: permission.permission },
+              issued_at: context.payload.comment.created_at,
+              expires_at: match[3],
+              authorized_action: 'bind_current_pr_evidence_for_g4',
+              merge_authority_granted: false,
+              manual_g5_action_authorized: false,
+            };
+            fs.writeFileSync('g4-pr-evidence-receipt.json', JSON.stringify(receipt, null, 2));
+            const marker = `<!-- gwc:g4-pr-evidence-receipt approval_id=${receipt.approval_id} head=${receipt.approved_head_sha} scope=${receipt.scope_hash_prefix} pr_body=${receipt.pr_body_digest} managed=${receipt.managed_block_digest} graph=${receipt.run_graph_digest} story=${receipt.gate_story_digest} evidence=${receipt.evidence_digest} source_comment_id=${receipt.source_comment_id} expires=${receipt.expires_at} -->`;
+            const receiptBody = `${marker}\n## G4 PR Evidence Receipt\n\n| Field | Value |\n|---|---|\n| Approval ID | \`${receipt.approval_id}\` |\n| Approved head | \`${receipt.approved_head_sha}\` |\n| PR body digest | \`${receipt.pr_body_digest}\` |\n| Managed block digest | \`${receipt.managed_block_digest}\` |\n| Run graph digest | \`${receipt.run_graph_digest}\` |\n| Gate story digest | \`${receipt.gate_story_digest}\` |\n| Evidence digest | \`${receipt.evidence_digest}\` |\n| Authorized action | Evidence binding only; merge authority is separate |\n\nAny commit or PR-body edit makes this receipt stale.`;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: prNumber, per_page: 100 });
+            const existing = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(`gwc:g4-pr-evidence-receipt approval_id=${receipt.approval_id} `));
+            if (existing) await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: receiptBody });
+            else await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body: receiptBody });
+            await github.rest.checks.create({
+              owner,
+              repo,
+              name: 'autonomous-g4-evidence-bound',
+              head_sha: pr.head.sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Autonomous G4 evidence is current',
+                summary: `PR body, graph, story, and evidence digests are bound to ${pr.head.sha}.`,
+              },
+            });
+            core.setOutput('head_sha', receipt.approved_head_sha);
+
+      - name: Upload G4 PR evidence receipt
+        if: steps.evidence.outputs.eligible == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: g4-pr-evidence-pr-${{ github.event.issue.number }}-head-${{ steps.evidence.outputs.head_sha }}
+          path: g4-pr-evidence-receipt.json
+          if-no-files-found: error
+
+  autonomous-g4-evidence-required:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      (startsWith(github.event.pull_request.head.ref, 'auto/') ||
+       contains(github.event.pull_request.body || '', '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require current autonomous G4 evidence binding
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const crypto = require('crypto');
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const prBody = pr.body || '';
+            const digest = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
+            const begin = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
+            const end = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:END -->';
+            let conclusion = 'failure';
+            let title = 'Autonomous G4 evidence is missing or stale';
+            let summary = 'Post the exact G4 approval command after the managed PR evidence block is current.';
+            if (pr.base.ref === 'main') {
+              summary = 'AUTONOMOUS_MAIN_TARGET_FORBIDDEN: autonomous-run PRs cannot target main.';
+            } else {
+              const start = prBody.indexOf(begin);
+              const finish = start >= 0 ? prBody.indexOf(end, start) + end.length : -1;
+              if (start >= 0 && finish >= end.length) {
+                const managed = prBody.slice(start, finish);
+                const meta = managed.match(/<!-- gwc:autonomous-run-evidence run_id=([^ ]+) task=([^ ]+) head=([0-9a-f]{40}) graph=(sha256:[0-9a-f]{64}) story=(sha256:[0-9a-f]{64}) evidence=(sha256:[0-9a-f]{64}) -->/);
+                if (meta && meta[3] === pr.head.sha) {
+                  const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
+                  const prBodyDigest = digest(prBody);
+                  const managedDigest = digest(managed);
+                  const exact = comments.filter((item) => {
+                    if (item.user?.login !== 'github-actions[bot]' || !item.body?.includes('<!-- gwc:g4-pr-evidence-receipt ')) return false;
+                    if (!item.body.includes(`head=${pr.head.sha} `) ||
+                        !item.body.includes(`pr_body=${prBodyDigest} `) ||
+                        !item.body.includes(`managed=${managedDigest} `) ||
+                        !item.body.includes(`graph=${meta[4]} `) ||
+                        !item.body.includes(`story=${meta[5]} `) ||
+                        !item.body.includes(`evidence=${meta[6]} `)) return false;
+                    const expiry = item.body.match(/ expires=([^ ]+) -->/);
+                    return expiry && Number.isFinite(new Date(expiry[1]).getTime()) && new Date(expiry[1]) > new Date();
+                  }).at(-1);
+                  if (exact) {
+                    conclusion = 'success';
+                    title = 'Autonomous G4 evidence is current';
+                    summary = `Trusted receipt comment ${exact.id} binds the current PR body and head.`;
+                  }
+                }
+              }
+            }
+            await github.rest.checks.create({ owner, repo, name: 'autonomous-g4-evidence-bound', head_sha: pr.head.sha, status: 'completed', conclusion, output: { title, summary } });
+            if (conclusion !== 'success') core.setFailed(summary);

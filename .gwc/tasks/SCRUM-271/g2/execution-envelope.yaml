@@ -1,0 +1,76 @@
+approval_id: CP-20260807-271
+authority_gate: G2_EXECUTION
+task_id: SCRUM-271
+issued_at: '2026-08-06T19:44:00Z'
+expires_at: '2026-08-07T19:44:00Z'
+scope_version: 1
+risk_class: R3
+project_profile: gwc
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+working_branch: chatgpt/scrum-271-autonomous-preprod-runtime-r1-20260807
+modules_or_files:
+- .github/workflows/autonomous-preprod-runtime.yml
+- .github/workflows/g4-g5-evidence.yml
+- core/node-architect/AUTONOMOUS_PREPROD_RUNTIME_CONTRACT_v0.1.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- schemas/node-architect/autonomous-run-graph.schema.json
+- schemas/node-architect/gate-story.schema.json
+- schemas/gate-action-authority.schema.json
+- tools/node_architect/autonomous_preprod_runtime.py
+- tools/node_architect/build_run_graph.py
+- tools/node_architect/render_pr_run_evidence.py
+- tools/node_architect/render_gate_story.py
+- tools/validate_gate_action.py
+- tests/test_autonomous_preprod_workflow_contract.py
+- tests/test_run_graph_builder.py
+- tests/test_pr_run_evidence_renderer.py
+- tests/test_gate_storyteller.py
+- tests/test_validate_gate_action.py
+- skills/gwc-g3/SKILL.md
+- projects/gwc/package.yaml
+- distribution/power-package.yaml
+- releases/changelog.d/2026-08-07-scrum-271-autonomous-preprod-runtime.md
+- .gwc/tasks/SCRUM-271/**
+authorized_actions:
+- renew_work_item_lease
+- update_work_item_status
+- modify_approved_files
+- run_sandboxed_validation
+- push_working_branch
+excluded_actions:
+- direct_write_to_main
+- direct_write_to_pre_prod
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- merge_or_auto_merge
+- create_or_protect_pre_prod_branch
+- standing_policy_g4_authority_issuance
+- arbitrary_jira_task_execution
+- ai_implementation_agent_adapter
+- deployment_or_release
+- runtime_reload
+- production_configuration
+- credential_or_secret_operation
+- migration
+- production_data_read_or_write
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+- unrelated_cleanup
+work_item:
+  provider: jira-mcp
+  id: SCRUM-271
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  expected_owner: ChatGPT
+  initial_state: In Progress
+  review_state: In Review
+artifact_hashes:
+  change_plan: sha256:f06cf56c603b27a3f7211cbeb5f54cf9454b6f77c9805b827b1d41bbd875dc0b
+  mermaid: sha256:6891c37b6b3ebdcb954d433d48f6a17d4d9494611df84e761388c8dea101675e
+  png: sha256:2bc31cd08917e2521e66d154659e404e8a4abbc11ed88676db834d9af4fc8e09
+  svg: sha256:0d20b619d94966b877a78a952a47e4b06735fc24e7e466b125d6ed0fe0fc883f
+scope_hash: sha256:2d667fd5306ab46af2fe033df434a48c949cccdc420022e63c2a7d97012736b1
