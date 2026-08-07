@@ -38,6 +38,17 @@ class AutonomousPreprodWorkflowContractTests(unittest.TestCase):
         self.assertEqual("write", parsed["permissions"]["checks"])
         self.assertEqual("read", parsed["permissions"]["contents"])
 
+    def test_pull_request_contract_canary_is_exact_head_and_side_effect_free(self):
+        text = WORKFLOW.read_text(encoding="utf-8")
+        parsed = yaml.load(text, Loader=yaml.BaseLoader)
+        self.assertIn("contract-canary", parsed["jobs"])
+        self.assertIn("github.event.pull_request.head.sha", text)
+        self.assertIn("Materialize deterministic canary manifest", text)
+        self.assertIn("fixture-pr-body.md", text)
+        self.assertIn("Verify main-target denial before artifacts", text)
+        self.assertIn("autonomous-contract-canary-${{ github.event.pull_request.head.sha }}", text)
+        self.assertNotIn("pulls.update", text[text.index("contract-canary:"):text.index("g4-pr-evidence-authority:")])
+
     def test_runtime_blocks_main_before_any_side_effect(self):
         value = manifest()
         value.update({"pr_base": "main", "gate_statuses": {}, "validation": {}, "g4_readiness": {}})
