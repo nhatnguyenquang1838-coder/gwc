@@ -37,6 +37,7 @@ def g4_context(m: dict | None = None) -> dict:
         "repository": m["repository"],
         "approved_base_ref": m["approved_base_ref"],
         "approved_base_sha": m["approved_base_sha"],
+        "working_branch": m["allowed_tasks"][0]["working_branch"],
         "target_branch": "pre-prod",
         "authorized_action": "merge_approved_pr",
         "pr_number": 900,
@@ -111,6 +112,7 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual(HEAD_SHA, first["approved_head_sha"])
         self.assertEqual(m["approved_base_ref"], first["approved_base_ref"])
         self.assertEqual(m["approved_base_sha"], first["approved_base_sha"])
+        self.assertEqual(m["allowed_tasks"][0]["working_branch"], first["working_branch"])
         self.assertEqual(m["repository"], first["repository"])
         self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
         self.assertEqual(m["expires_at"], first["expires_at"])
@@ -127,6 +129,10 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
     def test_g4_base_drift_is_denied(self):
         p = policy(); m = manifest(p); context = g4_context(m); context["approved_base_sha"] = "f" * 40
         self.assertEqual("AUTONOMOUS_BASE_SHA_MISMATCH", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
+
+    def test_g4_working_branch_drift_is_denied(self):
+        p = policy(); m = manifest(p); context = g4_context(m); context["working_branch"] = "auto/run-1/OTHER"
+        self.assertEqual("AUTONOMOUS_SCOPE_DRIFT", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
 
     def test_g4_wrong_action_is_denied(self):
         p = policy(); m = manifest(p); context = g4_context(m); context["authorized_action"] = "deploy_approved_release"
@@ -149,6 +155,12 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
         drifted = dict(current); drifted["approved_base_sha"] = "c" * 40
         self.assertIn("AUTONOMOUS_BASE_SHA_MISMATCH", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_receipt_current_working_branch_drift_is_invalid(self):
+        p = policy(); m = manifest(p); current = g4_context(m)
+        receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
+        drifted = dict(current); drifted["working_branch"] = "auto/run-1/OTHER"
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
 
     def test_receipt_body_graph_and_evidence_drift_are_invalid(self):
         p = policy(); m = manifest(p); current = g4_context(m)
