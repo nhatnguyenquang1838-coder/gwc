@@ -5,6 +5,8 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
+import yaml
+
 from tools.node_architect.validate_autonomous_preprod_policy import (
     authority_receipt_digest,
     canonical_digest,
@@ -25,6 +27,16 @@ G2_ACTIONS = [
     "create_commit",
     "push_working_branch",
 ]
+RUNTIME_CONTROL_PLANE = {
+    "core/node-architect/AUTONOMOUS_PREPROD_RUNTIME_CONTRACT_v0.1.md",
+    "schemas/node-architect/autonomous-run-graph.schema.json",
+    "schemas/node-architect/gate-story.schema.json",
+    "tools/node_architect/autonomous_preprod_runtime.py",
+    "tools/node_architect/build_run_graph.py",
+    "tools/node_architect/render_gate_story.py",
+    "tools/node_architect/render_pr_run_evidence.py",
+    ".github/workflows/autonomous-preprod-runtime.yml",
+}
 
 
 def policy() -> dict:
@@ -46,13 +58,18 @@ def policy() -> dict:
             "branch_deletion", "history_rewrite", "pr_base_change",
         ],
         "control_plane_protected_paths": [
+            "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
+            *sorted(RUNTIME_CONTROL_PLANE),
             "governance/autonomous-preprod-policy.yaml",
             "schemas/autonomous-preprod-run-policy.schema.json",
             "schemas/autonomous-preprod-run-manifest.schema.json",
             "schemas/autonomous-preprod-g4-receipt.schema.json",
             "tools/node_architect/validate_autonomous_preprod_policy.py",
             "tools/node_architect/derive_task_authority.py",
+            ".github/workflows/g4-g5-evidence.yml",
+            "schemas/gate-action-authority.schema.json",
             "tools/validate_gate_action.py",
+            "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
         ],
         "issued_at": "2026-08-07T00:00:00Z",
         "expires_at": "2026-08-08T00:00:00Z",
@@ -141,8 +158,12 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         self.assertIn("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
 
     def test_control_plane_self_modification_is_blocked(self):
-        p = policy(); m = manifest(p, tasks=[task(paths=["tools/validate_gate_action.py"])])
+        p = policy(); m = manifest(p, tasks=[task(paths=["tools/node_architect/autonomous_preprod_runtime.py"])])
         self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_active_policy_protects_autonomous_runtime_control_plane(self):
+        active = yaml.safe_load((ROOT / "governance/autonomous-preprod-policy.yaml").read_text(encoding="utf-8"))
+        self.assertTrue(RUNTIME_CONTROL_PLANE.issubset(set(active["control_plane_protected_paths"])))
 
     def test_scope_hash_tampering_is_blocked(self):
         p = policy(); m = manifest(p); m["allowed_tasks"][0]["authorized_paths"].append("src/extra.py")
