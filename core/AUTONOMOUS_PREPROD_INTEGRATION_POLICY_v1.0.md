@@ -26,7 +26,7 @@ This task defines the policy, schemas and pure deterministic derivation layer. I
 8. The parent authority receipt binds approval ID, source comment, bot receipt comment, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, scope prefix and expiry.
 9. Standing G4 binds one PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
 10. Any drift in policy, manifest approval scope, parent authority, task scope, base/head, PR body, graph, story or evidence invalidates the decision.
-11. A child autonomous task may not modify the standing policy, its schemas, validator/deriver, G4/G5 workflows, gate-action validator or gate lifecycle contract.
+11. A child autonomous task may not modify either autonomous control plane: the standing policy/manifest/receipt contracts and validator/deriver, or the SCRUM-271 evidence runtime contract, graph/story schemas, runtime/build/render tools and workflows. G4/G5 workflow, gate-action validator/schema and gate lifecycle contract are also protected.
 12. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
 13. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
 
