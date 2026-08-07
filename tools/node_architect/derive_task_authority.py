@@ -81,7 +81,12 @@ def derive_g2_authority(
         return _deny("G2_EXECUTION", "AUTONOMOUS_TASK_NOT_ALLOWLISTED", run_id=run_id, task_id=task_id)
 
     risk = str(request.get("risk_class", ""))
-    if risk not in RISK_ORDER or RISK_ORDER[risk] > RISK_ORDER[str(policy["max_child_risk"])] or RISK_ORDER[risk] > RISK_ORDER[str(task["risk_class"])]:
+    approved_risk = str(task.get("risk_class", ""))
+    if risk not in RISK_ORDER or approved_risk not in RISK_ORDER:
+        return _deny("G2_EXECUTION", "AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", run_id=run_id, task_id=task_id)
+    if risk != approved_risk:
+        return _deny("G2_EXECUTION", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
+    if RISK_ORDER[risk] > RISK_ORDER[str(policy["max_child_risk"])]:
         return _deny("G2_EXECUTION", "AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", run_id=run_id, task_id=task_id)
     if request.get("observed_base_sha") != manifest.get("approved_base_sha"):
         return _deny("G2_EXECUTION", "AUTONOMOUS_BASE_SHA_MISMATCH", run_id=run_id, task_id=task_id)
