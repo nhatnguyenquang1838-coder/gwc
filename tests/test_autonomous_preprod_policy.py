@@ -84,6 +84,7 @@ def manifest(p: dict | None = None, *, tasks: list[dict] | None = None) -> dict:
         "expires_at": "2026-08-07T23:00:00Z",
         "idempotency_key": "run-test-1-idempotency",
     }
+    scope_digest = manifest_approval_scope_digest(value)
     value["authority_receipt"] = {
         "status": "present",
         "source": "github_actions_bot_comment",
@@ -96,8 +97,8 @@ def manifest(p: dict | None = None, *, tasks: list[dict] | None = None) -> dict:
         "approved_policy_id": value["policy_id"],
         "approved_policy_revision": value["policy_revision"],
         "approved_policy_digest": value["policy_digest"],
-        "manifest_scope_digest": manifest_approval_scope_digest(value),
-        "scope_hash_prefix": "0123456789abcdef",
+        "manifest_scope_digest": scope_digest,
+        "scope_hash_prefix": scope_digest.removeprefix("sha256:")[:16],
         "issued_at": "2026-08-07T01:05:00Z",
         "expires_at": "2026-08-07T23:30:00Z",
     }
@@ -178,6 +179,12 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
     def test_forged_parent_authority_source_is_blocked(self):
         p = policy(); m = manifest(p); m["authority_receipt"]["source"] = "caller_supplied"
         self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_parent_scope_prefix_must_match_manifest_scope_digest(self):
+        p = policy(); m = manifest(p); m["authority_receipt"]["scope_hash_prefix"] = "f" * 16
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
 
     def test_manifest_edit_after_approval_invalidates_parent_receipt(self):
         p = policy(); m = manifest(p); m["idempotency_key"] = "tampered-after-approval"
