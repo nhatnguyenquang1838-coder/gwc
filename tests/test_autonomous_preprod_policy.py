@@ -213,6 +213,8 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         required = {
             "agents/chatgpt-agent", "projects/gwc", "governance/instruction-source-registry.yaml",
             "governance/agent-runtime-profiles", "tools/validate_g01.py",
+            "requirements.txt", "tools/validate_instructions.py", "tools/validate_line_endings.py",
+            "tools/build_project_package.py",
         }
         self.assertTrue(required.issubset(MANDATORY_CONTROL_PLANE_PROTECTED_PATHS))
 
