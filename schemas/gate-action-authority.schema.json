@@ -72,6 +72,36 @@
             "expires_at": {"type": "string", "format": "date-time"}
           }
         },
+        "autonomous_preprod_g4_receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "artifact_type", "decision", "source", "policy_id", "policy_revision", "policy_digest", "manifest_digest", "run_id", "task_id", "repository", "target_branch", "pr_number", "approved_head_sha", "task_scope_hash", "pr_body_digest", "managed_block_digest", "run_graph_digest", "gate_story_digest", "evidence_digest", "authorized_action", "expires_at", "decision_digest"],
+          "properties": {
+            "schema_version": {"const": "1.0"},
+            "artifact_type": {"const": "autonomous-preprod-g4-receipt"},
+            "decision": {"const": "ALLOW"},
+            "source": {"const": "autonomous_preprod_standing_policy"},
+            "policy_id": {"type": "string", "minLength": 1},
+            "policy_revision": {"type": "string", "minLength": 1},
+            "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "manifest_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "run_id": {"type": "string", "minLength": 1},
+            "task_id": {"type": "string", "minLength": 1},
+            "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+            "target_branch": {"const": "pre-prod"},
+            "pr_number": {"type": "integer", "minimum": 1},
+            "approved_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "task_scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "pr_body_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "managed_block_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "run_graph_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "gate_story_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "evidence_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "authorized_action": {"const": "merge_approved_pr"},
+            "expires_at": {"type": "string", "format": "date-time"},
+            "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        },
         "g4_pr_evidence_receipt": {
           "type": "object",
           "additionalProperties": false,
@@ -103,7 +133,16 @@
   "allOf": [
     {
       "if": {"required": ["gate", "action"], "properties": {"gate": {"const": "G4_MERGE"}, "action": {"const": "merge_approved_pr"}}},
-      "then": {"properties": {"evidence_readback": {"required": ["g4_authority_receipt"]}}}
+      "then": {
+        "properties": {
+          "evidence_readback": {
+            "anyOf": [
+              {"required": ["g4_authority_receipt"]},
+              {"required": ["autonomous_preprod_g4_receipt"]}
+            ]
+          }
+        }
+      }
     }
   ]
 }
