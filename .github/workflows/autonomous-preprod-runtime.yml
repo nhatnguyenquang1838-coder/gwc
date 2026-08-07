@@ -78,7 +78,9 @@ jobs:
         run: |
           python -m tools.node_architect.autonomous_preprod_runtime \
             autonomous-run-manifest.json \
-            --output-dir autonomous-runtime-output
+            --output-dir autonomous-runtime-output \
+            --expected-repository "${{ github.repository }}" \
+            --expected-base-sha "${{ inputs.expected_base_sha }}"
 
       - name: Validate canonical graph and story schemas
         run: |
@@ -131,6 +133,15 @@ jobs:
             const begin = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
             const end = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:END -->';
             const block = fs.readFileSync('autonomous-runtime-output/pr-run-evidence.md', 'utf8').trim();
+            const metadata = block.match(/<!-- gwc:autonomous-run-evidence run_id=([^ ]+) task=([^ ]+) head=([0-9a-f]{40}) graph=(sha256:[0-9a-f]{64}) story=(sha256:[0-9a-f]{64}) evidence=(sha256:[0-9a-f]{64}) -->/);
+            if (!metadata) {
+              core.setFailed('AUTONOMOUS_PR_EVIDENCE_MARKER_INVALID: rendered managed block marker is missing or malformed.');
+              return;
+            }
+            if (metadata[3] !== pr.head.sha) {
+              core.setFailed(`AUTONOMOUS_PR_HEAD_DRIFT: rendered evidence head ${metadata[3]} does not match current PR head ${pr.head.sha}.`);
+              return;
+            }
             let body = pr.body || '';
             const begins = body.split(begin).length - 1;
             const ends = body.split(end).length - 1;
@@ -192,6 +203,13 @@ jobs:
             const { owner, repo } = context.repo;
             const prNumber = context.payload.issue.number;
             const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            const managedMarker = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
+            const eligible = pr.head.ref.startsWith('auto/') || (pr.body || '').includes(managedMarker);
+            core.setOutput('eligible', eligible ? 'true' : 'false');
+            if (!eligible) {
+              core.info('PR is not an autonomous-run delivery; legacy G4 authority remains handled by the existing workflow.');
+              return;
+            }
             if (pr.state !== 'open' || pr.draft) {
               core.setFailed('G4 PR evidence requires an open PR that is Ready for Review.');
               return;
@@ -293,6 +311,7 @@ jobs:
             core.setOutput('head_sha', receipt.approved_head_sha);
 
       - name: Upload G4 PR evidence receipt
+        if: steps.evidence.outputs.eligible == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: g4-pr-evidence-pr-${{ github.event.issue.number }}-head-${{ steps.evidence.outputs.head_sha }}
