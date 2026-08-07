@@ -57,6 +57,7 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
         self.assertEqual(m["authority_receipt"]["scope_hash_prefix"], first["parent_scope_hash_prefix"])
         self.assertTrue(first["parent_authority_digest"].startswith("sha256:"))
+        self.assertEqual(m["allowed_tasks"][0]["risk_class"], first["risk_class"])
         self.assertIn("create_commit", first["authorized_actions"])
 
     def test_unknown_task_is_denied(self):
@@ -70,6 +71,12 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
     def test_unallowlisted_action_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["requested_actions"] = ["merge_approved_pr"]
         self.assertEqual("AUTONOMOUS_ACTION_FORBIDDEN", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
+
+    def test_risk_downgrade_is_scope_drift(self):
+        p = policy(); m = manifest(p); request = g2_request(); request["risk_class"] = "R0"
+        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
+        self.assertEqual("DENY", result["decision"])
+        self.assertEqual("AUTONOMOUS_SCOPE_DRIFT", result["reason_code"])
 
     def test_untrusted_parent_run_cannot_derive_g2(self):
         p = policy(); m = manifest(p); m["authority_receipt"]["manifest_scope_digest"] = "sha256:" + "f" * 64
