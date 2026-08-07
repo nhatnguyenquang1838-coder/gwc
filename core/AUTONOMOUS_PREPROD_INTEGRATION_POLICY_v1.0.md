@@ -21,15 +21,17 @@ This task defines the policy, schemas and pure deterministic derivation layer. I
 3. The only autonomous G4 target is `pre-prod`.
 4. A child task risk above `R2` is denied.
 5. A task outside the approved parent run manifest is denied.
-6. Child G2 authority is bounded to one task, one working branch, one exact approved base SHA, declared paths/actions, the exact approved task risk, and expiry. A child request may not downgrade or upgrade its manifest-approved risk classification.
+6. Child G2 authority is bounded to one task, one canonical `auto/` working branch, one exact approved base SHA, declared paths/actions, the exact approved task risk, and expiry. A child request may not downgrade or upgrade its manifest-approved risk classification.
 7. A parent run manifest is not trusted merely because its hashes are self-consistent. It must contain a trusted `github-actions[bot]` authority-receipt projection of the explicit parent approval.
-8. The parent authority receipt binds approval ID, source comment, bot receipt comment, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, scope prefix and expiry.
-9. Standing G4 binds one PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
-10. Any drift in policy, manifest approval scope, parent authority, task scope, base/head, PR body, graph, story or evidence invalidates the decision.
-11. A child autonomous task may not modify either autonomous control plane: the standing policy/manifest/receipt contracts and validator/deriver, or the SCRUM-271 evidence runtime contract, graph/story schemas, runtime/build/render tools and workflows. All repository workflows, repo-level agent/project instructions, G4/G5 workflow, gate-action validator/schema and gate lifecycle contract are protected.
+8. The parent authority receipt binds approval ID, distinct source/receipt comments, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, the exact first-16 scope prefix and expiry.
+9. Standing G4 binds one repository, approved base ref/SHA, `pre-prod` target, `merge_approved_pr` action, PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
+10. Any drift in policy, manifest approval scope, parent authority, task scope, repository, base/head, target/action, PR body, graph, story or evidence invalidates the decision.
+11. A child autonomous task may not modify either autonomous control plane or the governance/instruction surfaces that define its authority. Protected surfaces include all repository workflows, ChatGPT agent instructions, the GWC project profile/instructions, instruction-source registry/runtime profiles, core governance/gate contracts, G0/G1 and gate-action validators, Node Architect runtime contracts/schemas/tools, standing-policy schemas/tools and G4/G5 controls.
 12. The minimum protected control-plane set is enforced by validator code and is not policy-configurable. A policy may add protected paths but cannot remove mandatory entries and remain valid.
-13. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
-14. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
+13. Policy, manifest and parent authority timestamps are activation boundaries, not metadata only: future-issued policy/manifest/receipt objects fail closed; manifest issue time cannot precede policy issue time; parent receipt cannot precede manifest issue time or be issued after manifest expiry; parent authority cannot outlive the policy.
+14. Repository paths and working branch refs are canonicalized by validation rules. Traversal/root aliases, control characters, backslashes/globs and malformed Git ref sequences fail closed before scope checks.
+15. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
+16. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
 
 ## Parent run approval trust model
 
@@ -53,9 +55,9 @@ issued_at
 expires_at
 ```
 
-`manifest_scope_digest` is SHA-256 over canonical manifest JSON with `authority_receipt` removed. This avoids a circular digest and makes any post-approval change to task allowlists, base, target, policy binding, expiry or idempotency key invalidate the parent receipt.
+`manifest_scope_digest` is SHA-256 over canonical manifest JSON with `authority_receipt` removed. This avoids a circular digest and makes any post-approval change to task allowlists, base, target, policy binding, expiry or idempotency key invalidate the parent receipt. `scope_hash_prefix` must equal the first 16 hexadecimal characters of that digest. The source approval comment and bot receipt comment must be distinct.
 
-The pure validator models and validates this trusted readback shape. A later live issuer must obtain the receipt from repository/GitHub evidence; an agent-authored object that merely copies the field names is not sufficient operational evidence.
+The pure validator models and validates this trusted readback shape and its chronology. A later live issuer must obtain the receipt from repository/GitHub evidence; an agent-authored object that merely copies the field names is not sufficient operational evidence.
 
 ## Canonical digest rules
 
@@ -83,9 +85,13 @@ create_commit
 push_working_branch
 ```
 
-Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching `auto/` working branch, **request risk exactly equal to the manifest-approved task risk**, requested paths/actions contained by the task allowlist, and no protected control-plane overlap. Any attempted risk downgrade or upgrade is `AUTONOMOUS_SCOPE_DRIFT` and fails closed.
+Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching canonical `auto/` working branch, **request risk exactly equal to the manifest-approved task risk**, requested paths/actions contained by the task allowlist, and no protected control-plane overlap. Any attempted risk downgrade or upgrade is `AUTONOMOUS_SCOPE_DRIFT` and fails closed.
 
-All policy-protected and task-authorized paths must be canonical repository-relative POSIX paths. Absolute paths, backslashes, empty path segments, `.`/`..` segments and glob metacharacters are forbidden. This rule is applied before protected-path overlap checks so path traversal or repository-root aliases cannot bypass self-modification controls.
+Requested path/action arrays must be non-empty, unique string arrays. Malformed/nested/duplicate request arrays fail closed rather than raising an exception.
+
+All policy-protected and task-authorized paths must be canonical repository-relative POSIX paths. Absolute paths, leading/trailing whitespace, control characters, backslashes, empty path segments, `.`/`..` segments and glob metacharacters are forbidden. This rule is applied before protected-path overlap checks so path traversal or repository-root aliases cannot bypass self-modification controls.
+
+Working branch refs must be canonical Git refs under `auto/`: protected/special refs, `..`, `@{`, repeated separators, control/whitespace characters, forbidden Git ref characters, dot-prefixed components and `.lock` components fail closed.
 
 The output carries `parent_approval_id`, `parent_scope_hash_prefix` and `parent_authority_digest`, explicitly sets `g4_g5_g6_authority_granted: false`, and includes:
 
@@ -97,7 +103,7 @@ This is deliberate: in SCRUM-272 the child G2 ALLOW object is a deterministic co
 
 ## Standing G4 decision receipt
 
-The pure deriver may produce `autonomous-preprod-g4-receipt` only for an approved allowlisted task and exact `pre-prod` context. It binds:
+The pure deriver may produce `autonomous-preprod-g4-receipt` only for an approved allowlisted task and exact current context. It binds:
 
 ```text
 policy id/revision/digest
@@ -109,7 +115,10 @@ run id
 task id
 task scope hash
 repository
+approved base ref
+approved base SHA
 pre-prod target
+merge_approved_pr action
 PR number
 current head SHA
 PR body digest
@@ -117,10 +126,11 @@ managed block digest
 run graph digest
 gate story digest
 evidence digest
-merge_approved_pr
 expiry
 decision digest
 ```
+
+Derivation and replay validation both require the current repository, approved base ref/SHA, target and action to match the approved manifest/receipt. A receipt cannot be replayed in another repository, against another approved base, against `main`, or for a non-merge action merely because its self-computed digest remains internally consistent.
 
 The receipt includes:
 
