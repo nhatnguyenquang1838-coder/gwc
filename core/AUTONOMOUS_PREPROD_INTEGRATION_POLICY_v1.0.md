@@ -12,7 +12,7 @@
 
 Define bounded standing authority for one explicitly approved autonomous pre-production run. The contract can derive task-scoped G2 decisions and an exact-head standing G4 decision receipt without turning the parent approval into a reusable bearer token.
 
-This task defines the policy, schemas and pure deterministic derivation layer. It does **not** activate a new live merge authority source. Existing live G4 gate-action validation remains on the trusted human receipt path until a later runtime task adds trusted repo-CI projection/readback for standing authority.
+This task defines the policy, schemas and pure deterministic derivation layer. It does **not** activate child G2 or standing G4 decisions as new live authority sources. A later runtime integration must independently project/attest them from trusted repository evidence before a live gate can consume them. Existing live G4 gate-action validation remains on the trusted human receipt path.
 
 ## Non-bypass invariants
 
@@ -84,7 +84,13 @@ push_working_branch
 
 Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching `auto/` working branch, **request risk exactly equal to the manifest-approved task risk**, requested paths/actions contained by the task allowlist, and no protected control-plane overlap. Any attempted risk downgrade or upgrade is `AUTONOMOUS_SCOPE_DRIFT` and fails closed.
 
-The output carries `parent_approval_id`, `parent_scope_hash_prefix` and `parent_authority_digest`. It explicitly sets `g4_g5_g6_authority_granted: false`.
+The output carries `parent_approval_id`, `parent_scope_hash_prefix` and `parent_authority_digest`, explicitly sets `g4_g5_g6_authority_granted: false`, and includes:
+
+```text
+trust_state = requires_trusted_repo_ci_projection
+```
+
+This is deliberate: in SCRUM-272 the child G2 ALLOW object is a deterministic contract decision, not a live execution credential. A later runtime must independently read trusted parent approval evidence and project/attest the child decision through trusted repository CI before it can satisfy a live G2 authority boundary.
 
 ## Standing G4 decision receipt
 
@@ -153,4 +159,4 @@ AUTONOMOUS_STANDING_G4_RECEIPT_INVALID
 
 ## Explicit exclusions
 
-This contract does not create/protect `pre-prod`, choose arbitrary Jira work, invoke an AI coding adapter, create a trusted parent authority receipt by itself, project standing authority into the live G4 gate, merge a PR, deploy, release, reload runtime, mutate production configuration/data, rotate credentials, handle secrets or run migrations.
+This contract does not create/protect `pre-prod`, choose arbitrary Jira work, invoke an AI coding adapter, create a trusted parent authority receipt by itself, project child G2 or standing G4 authority into live gates, merge a PR, deploy, release, reload runtime, mutate production configuration/data, rotate credentials, handle secrets or run migrations.
