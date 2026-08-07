@@ -7,6 +7,7 @@ from pathlib import Path
 
 from tests.test_autonomous_preprod_policy import BASE_SHA, G2_ACTIONS, manifest, policy
 from tools.node_architect.derive_task_authority import derive_g2_authority, derive_g4_receipt, validate_g4_receipt
+from tools.node_architect.validate_autonomous_preprod_policy import canonical_digest
 
 ROOT = Path(__file__).resolve().parents[1]
 NOW = datetime(2026, 8, 7, 3, 0, tzinfo=timezone.utc)
@@ -93,6 +94,7 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual("requires_trusted_repo_ci_projection", first["trust_state"])
         self.assertEqual(HEAD_SHA, first["approved_head_sha"])
         self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
+        self.assertEqual(m["expires_at"], first["expires_at"])
         self.assertEqual(first["decision_digest"], second["decision_digest"])
 
     def test_main_target_is_denied(self):
@@ -117,6 +119,15 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertIn("AUTONOMOUS_GRAPH_DRIFT", result["reason_codes"])
         self.assertIn("AUTONOMOUS_EVIDENCE_DRIFT", result["reason_codes"])
 
+    def test_receipt_expiry_drift_is_invalid_even_with_recomputed_digest(self):
+        p = policy(); m = manifest(p); current = g4_context(m)
+        receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
+        receipt["expires_at"] = "2026-08-08T00:00:00Z"
+        receipt["decision_digest"] = canonical_digest(receipt, omit=("decision_digest",))
+        result = validate_g4_receipt(receipt, p, m, current, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
+
     def test_parent_provenance_drift_invalidates_g4_receipt(self):
         p = policy(); m = manifest(p); current = g4_context(m)
         receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
@@ -129,6 +140,7 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         from tools.node_architect.validate_autonomous_preprod_policy import manifest_approval_scope_digest, task_scope_hash
         m["allowed_tasks"][0]["scope_hash"] = task_scope_hash(m["allowed_tasks"][0])
         m["authority_receipt"]["manifest_scope_digest"] = manifest_approval_scope_digest(m)
+        m["authority_receipt"]["scope_hash_prefix"] = m["authority_receipt"]["manifest_scope_digest"].removeprefix("sha256:")[:16]
         self.assertEqual("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", derive_g4_receipt(p, m, g4_context(m), root=ROOT, now=NOW)["reason_code"])
 
 
