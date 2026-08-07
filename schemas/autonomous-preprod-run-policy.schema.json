@@ -23,11 +23,11 @@
   "properties": {
     "schema_version": {"const": "1.0"},
     "artifact_type": {"const": "autonomous-preprod-run-policy"},
-    "policy_id": {"type": "string", "minLength": 1},
+    "policy_id": {"const": "AUTONOMOUS_PREPROD_INTEGRATION_POLICY"},
     "policy_revision": {"type": "string", "minLength": 1},
     "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
     "target_branch": {"const": "pre-prod"},
-    "allowed_branch_prefix": {"type": "string", "pattern": "^auto/"},
+    "allowed_branch_prefix": {"const": "auto/"},
     "max_child_risk": {"enum": ["R0", "R1", "R2"]},
     "allowed_g2_actions": {
       "type": "array",
