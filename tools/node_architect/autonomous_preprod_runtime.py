@@ -5,7 +5,8 @@ SCRUM-271 intentionally stops before arbitrary Jira task execution, AI coding,
 standing-policy authority issuance, branch creation, PR creation, merge, deploy,
 or production operations. The runtime consumes canonical events, produces the
 run graph, G0→G6 story, and bounded PR-description evidence, and fails closed
-when the requested PR base is ``main``.
+when the requested PR base is ``main`` or the manifest identity does not match
+the exact repository/base selected by the caller.
 """
 from __future__ import annotations
 
@@ -19,6 +20,8 @@ from .render_gate_story import build_gate_story
 from .render_pr_run_evidence import build_managed_block, upsert_managed_block
 
 MAIN_TARGET_FORBIDDEN = "AUTONOMOUS_MAIN_TARGET_FORBIDDEN"
+REPOSITORY_BINDING_MISMATCH = "AUTONOMOUS_REPOSITORY_BINDING_MISMATCH"
+BASE_SHA_MISMATCH = "AUTONOMOUS_BASE_SHA_MISMATCH"
 PASS = "PASS"
 BLOCKED = "BLOCKED"
 
@@ -53,10 +56,26 @@ def execute_fixture_run(
     manifest: Mapping[str, Any],
     *,
     existing_pr_body: str | None = None,
+    expected_repository: str | None = None,
+    expected_base_sha: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any] | None, str | None, str | None]:
     """Execute the evidence-only vertical slice and return typed artifacts."""
     if not isinstance(manifest, Mapping):
         result = _blocked_result({}, "AUTONOMOUS_MANIFEST_INVALID", "manifest must be an object")
+        return result, None, None, None, None
+    if expected_repository is not None and manifest.get("repository") != expected_repository:
+        result = _blocked_result(
+            manifest,
+            REPOSITORY_BINDING_MISMATCH,
+            "manifest repository does not match the exact repository selected by the caller",
+        )
+        return result, None, None, None, None
+    if expected_base_sha is not None and manifest.get("base_sha") != expected_base_sha:
+        result = _blocked_result(
+            manifest,
+            BASE_SHA_MISMATCH,
+            "manifest base_sha does not match the exact checked-out source SHA",
+        )
         return result, None, None, None, None
     pr_base = str(manifest.get("pr_base", "")).strip()
     if pr_base == "main":
@@ -108,11 +127,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--pr-body-in", type=Path)
     parser.add_argument("--pr-body-out", type=Path)
+    parser.add_argument("--expected-repository")
+    parser.add_argument("--expected-base-sha")
     args = parser.parse_args(argv)
 
     manifest = _load_json(args.manifest)
     existing_body = args.pr_body_in.read_text(encoding="utf-8") if args.pr_body_in else None
-    result, graph, story, updated_body, block = execute_fixture_run(manifest, existing_pr_body=existing_body)
+    result, graph, story, updated_body, block = execute_fixture_run(
+        manifest,
+        existing_pr_body=existing_body,
+        expected_repository=args.expected_repository,
+        expected_base_sha=args.expected_base_sha,
+    )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(args.output_dir / "runtime-result.json", result)
     if graph is not None and story is not None and updated_body is not None and block is not None:
