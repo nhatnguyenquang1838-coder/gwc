@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Validate bounded autonomous pre-prod standing policy and approved run manifests.
 
-The validator is data-only and deterministic. It never grants merge authority or
-calls GitHub/Jira. Parent run authority is accepted only when the manifest carries
-a closed trusted-bot receipt that binds the immutable manifest approval scope.
+The validator is data-only and deterministic. It never grants live gate authority or
+calls GitHub/Jira. Parent run authority is accepted only as a contract projection
+when the manifest carries a closed trusted-bot receipt bound to immutable scope.
 """
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ RUN_AUTHORITY_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
 GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
 GLOB_META = "*?[]"
-BRANCH_FORBIDDEN_CHARS = set(" ~^:?*[\\")
+GIT_REF_FORBIDDEN = set(" ~^:?*[\\")
 
 
 def load_document(path: Path) -> Any:
@@ -80,7 +80,10 @@ def load_document(path: Path) -> Any:
 def parse_utc(value: str, field: str) -> datetime:
     if not isinstance(value, str) or not value.endswith("Z"):
         raise ValueError(f"{field} must be an ISO-8601 UTC timestamp ending in Z")
-    return datetime.fromisoformat(value[:-1] + "+00:00")
+    parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+    if parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+        raise ValueError(f"{field} must be UTC")
+    return parsed
 
 
 def canonical_digest(value: Mapping[str, Any], *, omit: tuple[str, ...] = ()) -> str:
@@ -96,7 +99,6 @@ def task_scope_hash(task: Mapping[str, Any]) -> str:
 
 
 def manifest_approval_scope_digest(manifest: Mapping[str, Any]) -> str:
-    """Digest the human-approved manifest payload without its projected receipt."""
     return canonical_digest(manifest, omit=("authority_receipt",))
 
 
@@ -131,22 +133,18 @@ def _repo_path_error(value: Any) -> str | None:
     return None
 
 
-def _branch_ref_error(value: Any, *, required_prefix: str) -> str | None:
+def _branch_name_error(value: Any) -> str | None:
     if not isinstance(value, str) or not value:
-        return "working branch must be a non-empty string"
-    if value in {"main", "pre-prod", "@"}:
-        return "working branch must not be a protected/special ref"
-    if not value.startswith(required_prefix):
-        return f"working branch must start with {required_prefix!r}"
-    if value.startswith("/") or value.endswith("/") or value.endswith("."):
-        return "working branch has an invalid leading/trailing delimiter"
-    if "//" in value or ".." in value or "@{" in value:
-        return "working branch contains a forbidden ref sequence"
-    if any(ord(char) < 32 or ord(char) == 127 or char in BRANCH_FORBIDDEN_CHARS for char in value):
-        return "working branch contains a forbidden ref character"
-    for segment in value.split("/"):
-        if not segment or segment.startswith(".") or segment.endswith(".lock"):
-            return "working branch contains a forbidden ref component"
+        return "branch must be a non-empty string"
+    if value == "@" or value.startswith("/") or value.endswith("/") or value.endswith("."):
+        return "branch is not a canonical Git ref name"
+    if ".." in value or "@{" in value or "//" in value:
+        return "branch contains a forbidden Git ref sequence"
+    if any(ord(char) < 32 or ord(char) == 127 or char in GIT_REF_FORBIDDEN for char in value):
+        return "branch contains a forbidden Git ref character"
+    parts = value.split("/")
+    if any(part in {"", ".", ".."} or part.startswith(".") or part.endswith(".lock") for part in parts):
+        return "branch contains a forbidden Git ref component"
     return None
 
 
@@ -179,6 +177,9 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
         reasons.append("AUTONOMOUS_POLICY_INVALID")
         details.extend(errors)
     else:
+        if policy.get("allowed_branch_prefix") != "auto/":
+            reasons.append("AUTONOMOUS_POLICY_INVALID")
+            details.append("allowed_branch_prefix must be exactly auto/")
         if RISK_ORDER.get(str(policy.get("max_child_risk")), 99) > RISK_ORDER["R2"]:
             reasons.append("AUTONOMOUS_POLICY_INVALID")
             details.append("max_child_risk must not exceed R2")
@@ -207,7 +208,7 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
             expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
             if issued > now:
                 reasons.append("AUTONOMOUS_POLICY_INVALID")
-                details.append("policy issued_at is in the future")
+                details.append("policy is not yet valid")
             if expires <= issued:
                 reasons.append("AUTONOMOUS_POLICY_INVALID")
                 details.append("policy expires_at must be later than issued_at")
@@ -217,19 +218,20 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
             reasons.append("AUTONOMOUS_POLICY_INVALID")
             details.append(str(exc))
     reasons = _dedupe(reasons)
-    return {
-        "outcome": "PASS" if not reasons else "BLOCKED",
-        "reason_codes": reasons,
-        "details": details,
-        "policy_digest": canonical_digest(policy),
-    }
+    try:
+        digest = canonical_digest(policy)
+    except (TypeError, ValueError) as exc:
+        reasons = _dedupe(reasons + ["AUTONOMOUS_POLICY_INVALID"])
+        details.append(f"policy canonicalization failed: {exc}")
+        digest = None
+    return {"outcome": "PASS" if not reasons else "BLOCKED", "reason_codes": reasons, "details": details, "policy_digest": digest}
 
 
 def _run_authority_errors(
     policy: Mapping[str, Any],
     manifest: Mapping[str, Any],
     *,
-    policy_digest: str,
+    policy_digest: str | None,
     now: datetime,
 ) -> tuple[list[str], list[str], str | None]:
     code = "AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED"
@@ -253,29 +255,36 @@ def _run_authority_errors(
         errors.append("authority receipt policy_revision mismatch")
     if receipt.get("approved_policy_digest") != policy_digest:
         errors.append("authority receipt policy_digest mismatch")
-    expected_scope_digest = manifest_approval_scope_digest(manifest)
-    if receipt.get("manifest_scope_digest") != expected_scope_digest:
-        errors.append("authority receipt manifest_scope_digest mismatch")
-    expected_scope_prefix = expected_scope_digest.removeprefix("sha256:")[:16]
-    if receipt.get("scope_hash_prefix") != expected_scope_prefix:
-        errors.append("authority receipt scope_hash_prefix mismatch")
+    try:
+        expected_scope_digest = manifest_approval_scope_digest(manifest)
+        if receipt.get("manifest_scope_digest") != expected_scope_digest:
+            errors.append("authority receipt manifest_scope_digest mismatch")
+        expected_scope_prefix = expected_scope_digest.removeprefix("sha256:")[:16]
+        if receipt.get("scope_hash_prefix") != expected_scope_prefix:
+            errors.append("authority receipt scope_hash_prefix mismatch")
+    except (TypeError, ValueError) as exc:
+        errors.append(f"manifest approval scope canonicalization failed: {exc}")
     for field in ("receipt_comment_id", "source_comment_id"):
-        if not isinstance(receipt.get(field), int) or receipt.get(field, 0) < 1:
+        value = receipt.get(field)
+        if type(value) is not int or value < 1:
             errors.append(f"authority receipt {field} must be a positive integer")
     if receipt.get("receipt_comment_id") == receipt.get("source_comment_id"):
         errors.append("authority receipt comment id must differ from source approval comment id")
     if not isinstance(receipt.get("approval_id"), str) or not receipt.get("approval_id"):
         errors.append("authority receipt approval_id is required")
     try:
+        policy_issued = parse_utc(str(policy["issued_at"]), "policy.issued_at")
         policy_expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
         manifest_issued = parse_utc(str(manifest["issued_at"]), "manifest.issued_at")
         manifest_expires = parse_utc(str(manifest["expires_at"]), "manifest.expires_at")
         receipt_issued = parse_utc(str(receipt["issued_at"]), "authority_receipt.issued_at")
         receipt_expires = parse_utc(str(receipt["expires_at"]), "authority_receipt.expires_at")
+        if manifest_issued < policy_issued:
+            errors.append("manifest cannot precede policy issue time")
         if receipt_issued < manifest_issued:
             errors.append("authority receipt cannot precede manifest issue time")
         if receipt_issued > now:
-            errors.append("authority receipt issued_at is in the future")
+            errors.append("authority receipt is not yet valid")
         if receipt_issued >= manifest_expires:
             errors.append("authority receipt must be issued before manifest expiry")
         if receipt_expires <= receipt_issued or receipt_expires <= now:
@@ -286,7 +295,11 @@ def _run_authority_errors(
             errors.append("parent authority expiry exceeds policy expiry")
     except (KeyError, ValueError) as exc:
         errors.append(str(exc))
-    digest = authority_receipt_digest(receipt)
+    try:
+        digest = authority_receipt_digest(receipt)
+    except (TypeError, ValueError) as exc:
+        errors.append(f"authority receipt canonicalization failed: {exc}")
+        digest = None
     return ([code] if errors else []), errors, digest
 
 
@@ -313,10 +326,7 @@ def validate_manifest(
         details.extend(schema_errors)
 
     authority_reasons, authority_details, authority_digest = _run_authority_errors(
-        policy,
-        manifest,
-        policy_digest=str(policy_result.get("policy_digest")),
-        now=now,
+        policy, manifest, policy_digest=policy_result.get("policy_digest"), now=now
     )
     reasons.extend(authority_reasons)
     details.extend(authority_details)
@@ -332,17 +342,20 @@ def validate_manifest(
             reasons.append("AUTONOMOUS_POLICY_REVISION_DRIFT")
         if manifest.get("policy_digest") != policy_result.get("policy_digest"):
             reasons.append("AUTONOMOUS_POLICY_DIGEST_DRIFT")
+        if _branch_name_error(manifest.get("approved_base_ref")):
+            reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
+            details.append("approved_base_ref is not a canonical Git ref name")
         try:
             policy_issued = parse_utc(str(policy["issued_at"]), "policy.issued_at")
-            policy_expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
             issued = parse_utc(str(manifest["issued_at"]), "manifest.issued_at")
             expires = parse_utc(str(manifest["expires_at"]), "manifest.expires_at")
+            policy_expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
             if issued < policy_issued:
                 reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
-                details.append("manifest issued_at cannot precede policy issued_at")
+                details.append("manifest cannot precede policy issue time")
             if issued > now:
                 reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
-                details.append("manifest issued_at is in the future")
+                details.append("manifest is not yet valid")
             if expires <= issued or expires > policy_expires:
                 reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
                 details.append("manifest expiry must follow issue time and must not exceed policy expiry")
@@ -367,11 +380,11 @@ def validate_manifest(
             if RISK_ORDER.get(str(task.get("risk_class")), 99) > ceiling:
                 reasons.append("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING")
                 details.append(f"{task_id}: risk exceeds policy ceiling")
-            branch = str(task.get("working_branch", ""))
-            branch_error = _branch_ref_error(branch, required_prefix=prefix)
-            if branch_error:
+            branch = task.get("working_branch")
+            branch_error = _branch_name_error(branch)
+            if branch_error or branch in {"main", "pre-prod"} or not isinstance(branch, str) or not branch.startswith(prefix):
                 reasons.append("AUTONOMOUS_SCOPE_DRIFT")
-                details.append(f"{task_id}: invalid working branch {branch!r}: {branch_error}")
+                details.append(f"{task_id}: working branch violates canonical/prefix/protected-branch rule")
             actions = set(task.get("authorized_g2_actions", []))
             if not actions.issubset(allowed_actions) or actions & denied_actions:
                 reasons.append("AUTONOMOUS_ACTION_FORBIDDEN")
@@ -386,17 +399,31 @@ def validate_manifest(
                 if any(_path_overlaps(path_text, denied_path) for denied_path in protected):
                     reasons.append("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN")
                     details.append(f"{task_id}: protected control-plane path in child scope: {path_text}")
-            if task.get("scope_hash") != task_scope_hash(task):
+            try:
+                expected_scope = task_scope_hash(task)
+            except (TypeError, ValueError) as exc:
                 reasons.append("AUTONOMOUS_SCOPE_DRIFT")
-                details.append(f"{task_id}: scope_hash mismatch")
+                details.append(f"{task_id}: scope_hash canonicalization failed: {exc}")
+            else:
+                if task.get("scope_hash") != expected_scope:
+                    reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+                    details.append(f"{task_id}: scope_hash mismatch")
     reasons = _dedupe(reasons)
+    try:
+        manifest_digest = canonical_digest(manifest)
+        approval_scope_digest = manifest_approval_scope_digest(manifest)
+    except (TypeError, ValueError) as exc:
+        reasons = _dedupe(reasons + ["AUTONOMOUS_RUN_MANIFEST_INVALID"])
+        details.append(f"manifest canonicalization failed: {exc}")
+        manifest_digest = None
+        approval_scope_digest = None
     return {
         "outcome": "PASS" if not reasons else "BLOCKED",
         "reason_codes": reasons,
         "details": details,
         "policy_digest": policy_result.get("policy_digest"),
-        "manifest_digest": canonical_digest(manifest),
-        "manifest_approval_scope_digest": manifest_approval_scope_digest(manifest),
+        "manifest_digest": manifest_digest,
+        "manifest_approval_scope_digest": approval_scope_digest,
         "authority_receipt_digest": authority_digest,
     }
 
