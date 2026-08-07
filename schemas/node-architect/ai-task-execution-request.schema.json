@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/ai-task-execution-request.schema.json",
+  "title": "AI Task Execution Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "task_id",
+    "repository",
+    "preprod_base_sha",
+    "working_branch",
+    "scope_hash",
+    "graph_revision",
+    "policy_revision",
+    "allowed_paths",
+    "prohibited_paths",
+    "authorized_actions",
+    "validation_commands",
+    "idempotency_key"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "preprod_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "working_branch": {"type": "string", "minLength": 1},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "graph_revision": {"type": "string", "minLength": 1},
+    "policy_revision": {"type": "string", "minLength": 1},
+    "allowed_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "prohibited_paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "authorized_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "validation_commands": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "idempotency_key": {"type": "string", "minLength": 1}
+  }
+}

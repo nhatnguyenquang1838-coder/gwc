@@ -1,0 +1,134 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-273
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+working_branch: hermes/scrum-273-ai-agent-adapter-20260807
+pull_request:
+  number: 317
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/317
+  draft: true
+head_sha: 8fd0ecd11da950680895cca68cdc0d894092156c
+scope_hash: sha256:68d6325cc7980fbe6a1722ec367e4b94ee230f268c4e0c770f3e10e562abe64e
+changed_paths:
+- schemas/node-architect/ai-task-execution-request.schema.json
+- schemas/node-architect/ai-task-execution-result.schema.json
+- tools/node_architect/ai_agent_adapter.py
+- tools/node_architect/build_node_instruction_pack.py
+- tools/node_architect/validate_ai_agent_result.py
+- tests/test_ai_agent_adapter.py
+- .gwc/tasks/SCRUM-273/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-273/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-273/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-273/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-273/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-273/g1/plan/requirements.md
+- .gwc/tasks/SCRUM-273/g1/plan/design.md
+- .gwc/tasks/SCRUM-273/g1/plan/tasks.md
+- .gwc/tasks/SCRUM-273/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-273/g2/plan-read-receipt.yaml
+validation:
+  head_sha: 8fd0ecd11da950680895cca68cdc0d894092156c
+  status: pass
+  commands:
+  - command: PYTHONPATH=. python3 -m unittest tests.test_ai_agent_adapter
+    result: pass
+    evidence: 12 tests passed (Ran 12 tests in 0.010s, OK)
+  - command: PYTHONPATH=. python3 -m unittest tests.test_client_runtime_vertical_slice tests.test_node_architect_runtime_validation
+    result: pass
+    evidence: 10 tests passed (Ran 10 tests in 1.312s, OK) — AC-6 no regression
+  - command: PYTHONPATH= python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-273 --json
+    result: pass
+    evidence: '{"outcome": "PASS", "valid": true, "issues": []}'
+review:
+  implementer_id: Hermes-PC
+  reviewer_id: gwc-independent-review
+  independence: independent
+  mode: read-only
+  reviewed_head_sha: 8fd0ecd11da950680895cca68cdc0d894092156c
+  reviewed_scope_hash: sha256:68d6325cc7980fbe6a1722ec367e4b94ee230f268c4e0c770f3e10e562abe64e
+  reviewed_at: '2026-08-07T23:30:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - AC-1..AC-6 are explicit in .gwc/tasks/SCRUM-273/g1/plan/requirements.md and mapped to tests
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Provider protocol + fail-closed execute(); design in g1/plan/design.md
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - tools/node_architect/ai_agent_adapter.py implements scope enforcement + idempotency + bounded repair
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - tests/test_ai_agent_adapter.py covers AC-1..AC-6, 12 passed
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G0/G1 validated PASS in isolated venv; authority_boundaries exclude G4/G5/G6
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Draft PR #317 created from branch hermes/scrum-273-ai-agent-adapter-20260807
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - CI run pending/awaited; record will be re-validated after green
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - DeterministicFakeProvider completes bounded fixture, result schema-valid (test_authority_never_granted / test_deterministic_fake_success)
+  - id: AC-2
+    result: pass
+    evidence:
+    - out-of-scope, malformed, timeout, unavailable, unknown-action all fail closed (AC2FailClosed)
+  - id: AC-3
+    result: pass
+    evidence:
+    - CustomRunnerProvider with no runner wired fails closed, no hidden fallback (AC3NoHiddenFallback)
+  - id: AC-4
+    result: pass
+    evidence:
+    - g3_g4_g5_authority_granted always false; forbidden authority action rejected (AC4NoG3G4G5Authority)
+  - id: AC-5
+    result: pass
+    evidence:
+    - same key+same digest returns prior; diff digest => REPLAY_CONFLICT (AC5IdempotencyReplay)
+  - id: AC-6
+    result: pass
+    evidence:
+    - client_runtime + node_architect runtime suites green; control-plane protected paths blocked (AC6NoSharedSurfaceMutation)
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: 8fd0ecd11da950680895cca68cdc0d894092156c
+  checks:
+  - name: validate-and-test
+    required: true
+    status: pass
+    evidence: >-
+      CI green: validate job passed (run 31191025733) plus build/parity/canary
+      all passed; local unittest 12 passed + client_runtime/checkpoint suites green.
+residual_risks:
+- DeterministicFakeProvider proves the contract in CI; a real custom/self-hosted runner must be wired via the Provider protocol before production pre-prod use (out of scope for this node).
+- Real-provider network/credential behaviour is exercised only when a runner is supplied; this node stays fail-closed without one.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+outcome: pass

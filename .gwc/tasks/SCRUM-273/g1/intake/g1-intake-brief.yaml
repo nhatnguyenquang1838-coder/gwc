@@ -1,0 +1,80 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-07T21:43:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-273
+  base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: >-
+    The autonomous pre-prod runtime (SCRUM-270/271/272) can derive a bounded G2
+    envelope per task, but has no provider-neutral node to actually invoke an AI
+    implementation agent for one Jira task inside that exact envelope.
+  why_now: >-
+    SCRUM-271 (graph/evidence) and SCRUM-272 (standing authority + run-manifest
+    envelope) are Done/merged, so SCRUM-273 is now unblocked and is the next slice
+    of the Autonomous Pre-Prod Runtime MVP.
+desired_outcome: >-
+  A fail-closed, provider-neutral ai-task-execution node that builds a typed
+  instruction pack, dispatches to a pluggable provider, enforces the scope envelope,
+  returns a schema-valid result, and never grants G3/G4/G5 authority.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - Hermes-PC
+  - autonomous pre-prod runtime
+  - downstream SCRUM-274/275 (task selector + branch/PR/merge nodes)
+scope:
+  in_scope:
+  - schemas/node-architect/ai-task-execution-request.schema.json
+  - schemas/node-architect/ai-task-execution-result.schema.json
+  - tools/node_architect/ai_agent_adapter.py
+  - tools/node_architect/build_node_instruction_pack.py
+  - tools/node_architect/validate_ai_agent_result.py
+  - tests/test_ai_agent_adapter.py
+  non_goals:
+  - no merge/deploy/release/production/credential/secret/migration work
+  - no modification of SCRUM-272 standing policy / run-manifest schema / derive_task_authority
+  - no change to client_runtime.py, checkpoint engine, or existing node catalog handlers
+  - no real provider credentials, network calls, or hidden manual fallback
+constraints:
+- isolated new module; does not mutate shared surfaces
+- consumes SCRUM-272 envelope (run-manifest fields + control-plane protected paths)
+- fail closed on out-of-scope path/action, malformed output, provider timeout, duplicate/replay, unknown write
+- bounded repair rounds only; each repair changes head SHA and invalidates prior evidence
+assumptions:
+- the SCRUM-272 manifest envelope is the binding authority source for allowed_paths / prohibited_paths / authorized_actions
+- a deterministic fake provider is sufficient to prove the contract in CI (AC-1..AC-5)
+- Hermes / Codex plug in later via the same Provider protocol without graph changes
+risks:
+- id: RISK-1
+  description: scope/provider contract drift vs the SCRUM-272 envelope
+  impact: medium
+  mitigation: import the manifest schema field names directly and assert membership at runtime
+- id: RISK-2
+  description: regressions in client runtime / checkpoint recovery (AC-6)
+  impact: medium
+  mitigation: keep the new code in a separate module; do not touch client_runtime.py or checkpoint engine
+acceptance_criteria:
+- id: AC-1
+  statement: A deterministic fake agent completes a bounded code fixture and produces a schema-valid result.
+  verifiable: true
+- id: AC-2
+  statement: Out-of-scope path/action, malformed output, provider timeout, duplicate request and unknown write fail closed or reconcile safely.
+  verifiable: true
+- id: AC-3
+  statement: No hidden manual fallback is used.
+  verifiable: true
+- id: AC-4
+  statement: Agent execution never grants G3/G4/G5 authority.
+  verifiable: true
+- id: AC-5
+  statement: Same idempotency key plus same digest returns the prior result; a different digest fails as replay conflict.
+  verifiable: true
+- id: AC-6
+  statement: Existing client runtime and checkpoint/recovery regressions remain green.
+  verifiable: true
+unresolved_questions: []
+status: READY

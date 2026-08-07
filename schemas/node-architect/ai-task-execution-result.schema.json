@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/ai-task-execution-result.schema.json",
+  "title": "AI Task Execution Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "task_id",
+    "repository",
+    "scope_hash",
+    "idempotency_key",
+    "final_head_sha",
+    "changed_paths",
+    "changed_path_digest",
+    "validation_digest",
+    "terminal_outcome",
+    "provider",
+    "findings",
+    "checkpoints",
+    "next_action",
+    "g3_g4_g5_authority_granted"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "final_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "changed_paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "changed_path_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "validation_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "terminal_outcome": {
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "FAIL_CLOSED",
+        "REPLAY_CONFLICT",
+        "TIMEOUT",
+        "MALFORMED_OUTPUT",
+        "OUT_OF_SCOPE",
+        "RECONCILED"
+      ]
+    },
+    "provider": {"type": "string", "minLength": 1},
+    "findings": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "minLength": 1},
+          "detail": {"type": "string"}
+        }
+      }
+    },
+    "next_action": {"type": "string", "minLength": 1},
+    "recorded_actions": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "g3_g4_g5_authority_granted": {"type": "boolean"}
+  }
+}

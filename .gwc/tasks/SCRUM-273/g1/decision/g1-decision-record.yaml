@@ -1,0 +1,98 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-07T21:43:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-273
+  base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-08-07T21:43:00Z'
+  source: 'Slack thread / claim SCRUM-273 GWC — confirmed Hermes-PC claim, chose OPT-1 (isolated provider-neutral ai-task-execution node with fail-closed adapter + deterministic fake).'
+  explicit: true
+rationale: >-
+  Build the six named isolated surfaces as a fresh provider-neutral node consuming the
+  SCRUM-272 standing-policy envelope. OPT-1 matches the issue's surfaces and boundaries
+  exactly, keeps the blast radius minimal (no shared-surface mutation, preserving AC-6),
+  and makes every acceptance criterion reproducible in CI via a deterministic fake provider.
+rejected_option_ids:
+- OPT-2
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+scope_hash: sha256:68d6325cc7980fbe6a1722ec367e4b94ee230f268c4e0c770f3e10e562abe64e
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-273
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+  plan_root: .gwc/tasks/SCRUM-273/g1/plan
+  plan_revision: sha256:c94be3a89a77182bbcf5f7f64d3e580ee95fd3094fc01d000466bb52d124978d
+  validation_evidence: >-
+    Plan authored from issue SCRUM-273 plus the merged SCRUM-272/SCRUM-271 dependency
+    surfaces; scope_hash and plan_revision are computed over the three plan markdown
+    files and are consistent between the preflight implementation_plan and the decision
+    implementation_plan_ref.
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Author schemas/node-architect/ai-task-execution-request.schema.json and ai-task-execution-result.schema.json binding the exact request/result fields (additionalProperties false, version 1.0).
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Implement tools/node_architect/build_node_instruction_pack.py composing the typed pack from task/repo/G0-G1/scope/route/validation plan (provider-neutral).
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-3
+    description: Implement tools/node_architect/ai_agent_adapter.py (Provider protocol, CustomRunnerProvider, DeterministicFakeProvider, execute() with scope enforcement, idempotency/replay, bounded repair, fail-closed, g3_g4_g5_authority_granted false, no manual fallback).
+    dependencies:
+    - SUB-TASK-2
+  - sub_task_id: SUB-TASK-4
+    description: Implement tools/node_architect/validate_ai_agent_result.py (schema + scope-envelope validation).
+    dependencies:
+    - SUB-TASK-1
+  - sub_task_id: SUB-TASK-5
+    description: Implement tests/test_ai_agent_adapter.py covering AC-1..AC-6 (fake fixture, out-of-scope, malformed, timeout, duplicate/replay, no-fallback, no-G3/G4/G5).
+    dependencies:
+    - SUB-TASK-3
+    - SUB-TASK-4
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: schema-author
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: builder-author
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: builder-author
+    agent_type: primary
+  - sub_task_id: SUB-TASK-4
+    skill_id: builder-author
+    agent_type: primary
+  - sub_task_id: SUB-TASK-5
+    skill_id: test-author
+    agent_type: primary
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  - SUB-TASK-5
+  summary: One guarded branch, five ordered sub-tasks delivering the provider-neutral ai-task-execution node with a deterministic fake provider.

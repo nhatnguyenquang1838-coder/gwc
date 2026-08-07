@@ -1,0 +1,11 @@
+canonical_task_uid: SCRUM-273
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: f002859c5ea65850aa2b5449e1a2013d294ea3c9
+plan_revision: sha256:c94be3a89a77182bbcf5f7f64d3e580ee95fd3094fc01d000466bb52d124978d
+paths_read:
+- .gwc/tasks/SCRUM-273/g1/plan/requirements.md
+- .gwc/tasks/SCRUM-273/g1/plan/design.md
+- .gwc/tasks/SCRUM-273/g1/plan/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
