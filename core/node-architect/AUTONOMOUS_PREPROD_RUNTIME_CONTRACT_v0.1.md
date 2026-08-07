@@ -34,6 +34,12 @@ or production-data access.
    prior G4 readiness.
 9. Updating a PR description is evidence assembly; it never grants G4 authority.
 10. G5 and G6 authority remain separate. G6 is `not_applicable` for this slice.
+11. The manifest repository and `base_sha` must match the exact repository and
+    source SHA selected by the workflow before any artifact is accepted.
+12. Explicit gate-status metadata may only restate canonical event outcomes; it
+    may never override a blocked or absent execution state.
+13. The additional PR-evidence receipt applies only to autonomous-run G4 flows;
+    normal/legacy G4 delivery retains its existing authority-receipt contract.
 
 ## Canonical inputs
 
@@ -60,6 +66,10 @@ participant type (`runtime_node` or `gate_action`), canonical participant ID,
 purpose, entry evidence, action, outcome, output evidence, route provenance, and
 optional next event.
 
+The caller must independently provide the expected repository and exact checked-
+out base SHA. A manifest mismatch is terminal and produces no graph, story, or PR
+body artifact.
+
 ## Canonical outputs
 
 ```text
@@ -81,6 +91,10 @@ The graph and story are closed-schema artifacts. The PR evidence block uses:
 
 Human-authored PR content outside this block must be preserved byte-for-byte
 except for the newline required to append the first managed block.
+
+Before updating a PR, the rendered machine marker head must equal the current PR
+head SHA. Readback must confirm both the body and head remain unchanged from the
+requested update.
 
 ## G4 evidence binding
 
@@ -107,15 +121,23 @@ expiry
 A new commit or PR-body edit makes the prior receipt stale. The workflow must
 re-read current state rather than selecting any historical matching comment.
 
+Normal/legacy PRs that are not autonomous-run deliveries continue to require the
+existing trusted G4 authority receipt only. The autonomous workflow must skip its
+additional receipt path without failing those PRs.
+
 ## Fail-closed reason codes
 
 ```text
 AUTONOMOUS_MAIN_TARGET_FORBIDDEN
 AUTONOMOUS_MANIFEST_INVALID
+AUTONOMOUS_REPOSITORY_BINDING_MISMATCH
+AUTONOMOUS_BASE_SHA_MISMATCH
 AUTONOMOUS_GRAPH_INPUT_INVALID
 AUTONOMOUS_GRAPH_EVENT_MISSING
 AUTONOMOUS_GRAPH_EVENT_DUPLICATE
 AUTONOMOUS_GRAPH_ROUTE_TARGET_MISSING
+AUTONOMOUS_GATE_STATUS_INVALID
+AUTONOMOUS_GATE_STATUS_CONFLICT
 AUTONOMOUS_PR_MARKER_MALFORMED
 AUTONOMOUS_PR_EVIDENCE_MISSING_OR_MALFORMED
 AUTONOMOUS_PR_EVIDENCE_MARKER_INVALID
@@ -128,6 +150,6 @@ G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE
 
 A deterministic fixture must produce schema-valid graph/story artifacts,
 idempotently update a PR body, render only actual participants, explain G0→G6,
-and block `main`, malformed markers, missing events, unknown route targets, and
-stale G4 evidence. No external side effect is required to demonstrate this
-contract.
+and block `main`, repository/base mismatch, contradictory gate status, malformed
+markers, missing events, unknown route targets, and stale G4 evidence. No external
+side effect is required to demonstrate this contract.
