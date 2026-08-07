@@ -35,17 +35,29 @@ control_plane_protected_paths:
   - AGENTS.md
   - project-instructions.md
   - .github/workflows
+  - agents/chatgpt-agent
   - core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
   - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
   - core/G5_STANDING_AUTOMATION_POLICY_v1.0.md
   - core/node-architect
+  - docs/project-consumer-agent-instructions.md
+  - governance/agent-runtime-profiles
   - governance/autonomous-preprod-policy.yaml
+  - governance/instruction-source-registry.yaml
+  - projects/gwc
+  - schemas/approval-envelope.schema.json
   - schemas/autonomous-preprod-run-policy.schema.json
   - schemas/autonomous-preprod-run-manifest.schema.json
   - schemas/autonomous-preprod-g4-receipt.schema.json
   - schemas/gate-action-authority.schema.json
   - schemas/node-architect
   - tools/node_architect
+  - tools/validate_g01.py
   - tools/validate_gate_action.py
 issued_at: '2026-08-07T00:00:00Z'
 expires_at: '2026-11-05T00:00:00Z'
