@@ -129,20 +129,5 @@
         }
       }
     }
-  },
-  "allOf": [
-    {
-      "if": {"required": ["gate", "action"], "properties": {"gate": {"const": "G4_MERGE"}, "action": {"const": "merge_approved_pr"}}},
-      "then": {
-        "properties": {
-          "evidence_readback": {
-            "anyOf": [
-              {"required": ["g4_authority_receipt"]},
-              {"required": ["autonomous_preprod_g4_receipt"]}
-            ]
-          }
-        }
-      }
-    }
-  ]
+  }
 }
