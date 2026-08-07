@@ -28,6 +28,15 @@ AUTHORITY_NOT_GRANTED = {
 }
 
 
+class GateStoryError(ValueError):
+    """Fail-closed storyteller error with a stable reason code."""
+
+    def __init__(self, reason_code: str, message: str):
+        super().__init__(f"{reason_code}: {message}")
+        self.reason_code = reason_code
+        self.message = message
+
+
 def _digest(value: Mapping[str, Any]) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -37,8 +46,39 @@ def _normalize_gate_status(value: Any) -> str | None:
     if value is None:
         return None
     if value not in {"passed", "executed", "blocked", "not_executed", "not_applicable"}:
-        raise ValueError(f"unsupported gate status: {value}")
+        raise GateStoryError("AUTONOMOUS_GATE_STATUS_INVALID", f"unsupported gate status: {value}")
     return str(value)
+
+
+def _derive_gate_status(participants: list[Mapping[str, Any]]) -> str:
+    if not participants:
+        return "not_executed"
+    if any(node.get("status") == "blocked" for node in participants):
+        return "blocked"
+    if all(node.get("status") == "not_applicable" for node in participants):
+        return "not_applicable"
+    if all(node.get("status") in {"passed", "executed"} for node in participants):
+        return "passed"
+    return "executed"
+
+
+def _resolve_gate_status(gate: str, participants: list[Mapping[str, Any]], explicit: str | None) -> str:
+    derived = _derive_gate_status(participants)
+    if explicit is None:
+        return derived
+    if participants:
+        if explicit != derived:
+            raise GateStoryError(
+                "AUTONOMOUS_GATE_STATUS_CONFLICT",
+                f"{gate} explicit status {explicit!r} conflicts with canonical event status {derived!r}",
+            )
+        return explicit
+    if explicit not in {"not_executed", "not_applicable"}:
+        raise GateStoryError(
+            "AUTONOMOUS_GATE_STATUS_CONFLICT",
+            f"{gate} has no runtime events and cannot be declared {explicit!r}",
+        )
+    return explicit
 
 
 def build_gate_story(graph: Mapping[str, Any], *, gate_statuses: Mapping[str, str] | None = None) -> dict[str, Any]:
@@ -46,24 +86,13 @@ def build_gate_story(graph: Mapping[str, Any], *, gate_statuses: Mapping[str, st
     statuses = dict(gate_statuses or {})
     unknown = sorted(set(statuses) - set(GATES))
     if unknown:
-        raise ValueError(f"unknown gate status keys: {', '.join(unknown)}")
+        raise GateStoryError("AUTONOMOUS_GATE_STATUS_INVALID", f"unknown gate status keys: {', '.join(unknown)}")
     gates: list[dict[str, Any]] = []
     all_nodes = list(graph.get("nodes", []))
     for gate in GATES:
         participants = [node for node in all_nodes if node.get("gate") == gate]
         explicit = _normalize_gate_status(statuses.get(gate))
-        if explicit:
-            status = explicit
-        elif any(node.get("status") == "blocked" for node in participants):
-            status = "blocked"
-        elif participants and all(node.get("status") == "not_applicable" for node in participants):
-            status = "not_applicable"
-        elif participants and all(node.get("status") in {"passed", "executed"} for node in participants):
-            status = "passed"
-        elif participants:
-            status = "executed"
-        else:
-            status = "not_executed"
+        status = _resolve_gate_status(gate, participants, explicit)
         node_ids: list[str] = []
         evidence: set[str] = set()
         descriptions: list[str] = []
@@ -107,4 +136,4 @@ def build_gate_story(graph: Mapping[str, Any], *, gate_statuses: Mapping[str, st
     return story
 
 
-__all__ = ["build_gate_story"]
+__all__ = ["GateStoryError", "build_gate_story"]
