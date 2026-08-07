@@ -1,0 +1,17 @@
+# SCRUM-272 — Standing autonomous pre-prod authority policy
+
+- Add the bounded `AUTONOMOUS_PREPROD_INTEGRATION_POLICY` contract and active policy profile.
+- Add closed schemas for parent run policy, approved run manifest, and exact-head standing G4 decision receipts; canonical policy identity and `auto/` branch-prefix contract are closed by schema.
+- Require a trusted `github-actions[bot]` parent-run authority receipt that binds approval ID, immutable manifest approval-scope digest, its exact first-16 scope prefix, distinct source/receipt comments, policy revision/digest and bounded expiry.
+- Enforce temporal activation: future-issued policy/manifest/parent receipts fail closed, manifest issue cannot precede policy issue, parent receipt must be issued before manifest expiry, and parent authority cannot outlive policy expiry.
+- Add deterministic child G2 and standing G4 derivation with parent-approval provenance and replay-stable digests; both ALLOW outputs are explicitly contract-only with `trust_state=requires_trusted_repo_ci_projection` until a later trusted runtime integration projects them from repository evidence.
+- Cover the complete bounded G2 lifecycle action set: guarded branch/worktree, approved edits, sandbox validation, stage, commit and branch push; child request risk must exactly match the manifest-approved task risk.
+- Fail closed on malformed/nested/duplicate G2 request arrays instead of allowing runtime exceptions.
+- Require canonical repository-relative POSIX scope paths and canonical Git working refs before control-plane overlap checks; reject whitespace/control characters, absolute/root aliases, dot traversal, backslashes, glob metacharacters and malformed Git ref sequences.
+- Make the minimum autonomous control-plane protection set validator-enforced and non-configurable, including all GitHub workflows, ChatGPT/project instruction surfaces, instruction registry/runtime profiles, core governance/gate contracts, G0/G1 and gate-action validators, Node Architect runtime contracts/schemas/tools, standing-policy surfaces and G4/G5 controls.
+- Protect the executable/dependency inputs used by trusted validation/package CI: `requirements.txt`, `tools/validate_instructions.py`, `tools/validate_line_endings.py`, and `tools/build_project_package.py`; immutable workflow YAML alone is not treated as sufficient control-plane protection.
+- Bind standing G4 explicitly to repository, approved base ref/SHA, exact approved child working branch, `pre-prod`, `merge_approved_pr`, PR number, exact head and current evidence digests; cross-repository, base, branch, target or action replay fails closed.
+- Keep live `gate-action-authority` validation byte-compatible with `main`; standing G4 decisions do not replace the existing trusted human G4 receipt in this task.
+- Preserve the SCRUM-271 runtime contract verbatim and append only the SCRUM-272 standing-policy extension boundary.
+- Fail closed on `main`, R3 child scope, risk downgrade/upgrade, unallowlisted tasks/actions, forged/stale parent authority, protected control-plane self-modification, stale repository/base/branch/head/body/graph/story/evidence, expiry and policy/manifest drift.
+- No merge, deploy, release, runtime reload, production data/configuration, credential, secret, migration, branch-protection, or live standing-authority issuance is introduced by this change.

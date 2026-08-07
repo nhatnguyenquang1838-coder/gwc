@@ -153,3 +153,20 @@ idempotently update a PR body, render only actual participants, explain G0→G6,
 and block `main`, repository/base mismatch, contradictory gate status, malformed
 markers, missing events, unknown route targets, and stale G4 evidence. No external
 side effect is required to demonstrate this contract.
+
+## SCRUM-272 standing-policy extension boundary
+
+`SCRUM-272` defines a separate `AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0`
+contract and closed manifest/receipt schemas. It does not change or weaken any
+invariant, binding rule, preservation guarantee, fail-closed reason code, or
+acceptance condition above.
+
+Standing G4 output from the pure deriver is a deterministic contract decision
+with `trust_state=requires_trusted_repo_ci_projection`; it is not accepted by the
+current live `gate-action-authority` schema/validator and cannot replace the
+trusted human `gwc:g4-authority-receipt` in this task.
+
+A later runtime integration must independently read trusted parent approval
+evidence and current PR evidence, then project/attest standing authority through
+trusted repository CI before a live merge gate can consume it. Until then,
+caller-computable digests are never sufficient merge authority.

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/autonomous-preprod-run-policy.schema.json",
+  "title": "Autonomous Pre-Prod Run Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "policy_id",
+    "policy_revision",
+    "repository",
+    "target_branch",
+    "allowed_branch_prefix",
+    "max_child_risk",
+    "allowed_g2_actions",
+    "allowed_g4_actions",
+    "denied_actions",
+    "control_plane_protected_paths",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "autonomous-preprod-run-policy"},
+    "policy_id": {"const": "AUTONOMOUS_PREPROD_INTEGRATION_POLICY"},
+    "policy_revision": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "target_branch": {"const": "pre-prod"},
+    "allowed_branch_prefix": {"const": "auto/"},
+    "max_child_risk": {"enum": ["R0", "R1", "R2"]},
+    "allowed_g2_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "create_guarded_branch_or_worktree",
+          "modify_approved_files",
+          "run_sandboxed_validation",
+          "stage",
+          "create_commit",
+          "push_working_branch"
+        ]
+      }
+    },
+    "allowed_g4_actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "uniqueItems": true,
+      "items": {"const": "merge_approved_pr"}
+    },
+    "denied_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "control_plane_protected_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"}
+  }
+}
