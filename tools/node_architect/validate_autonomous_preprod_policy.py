@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Validate bounded autonomous pre-prod standing policy and run manifests.
+"""Validate bounded autonomous pre-prod standing policy and approved run manifests.
 
-The validator is data-only and deterministic. It never grants authority or calls
-GitHub/Jira. It returns stable reason codes and canonical SHA-256 digests.
+The validator is data-only and deterministic. It never grants merge authority or
+calls GitHub/Jira. Parent run authority is accepted only when the manifest carries
+a closed trusted-bot receipt that binds the immutable manifest approval scope.
 """
 from __future__ import annotations
 
@@ -19,6 +20,9 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 RISK_ORDER = {"R0": 0, "R1": 1, "R2": 2, "R3": 3}
 PROHIBITED_ACTIONS = {
+    "direct_write_to_main",
+    "direct_write_to_pre_prod",
+    "create_or_protect_pre_prod_branch",
     "deploy_approved_release",
     "runtime_reload",
     "production_data_read",
@@ -32,13 +36,14 @@ PROHIBITED_ACTIONS = {
     "history_rewrite",
     "pr_base_change",
 }
+RUN_AUTHORITY_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
+GITHUB_ACTIONS_BOT = "github-actions[bot]"
+GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
 
 
 def load_document(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as handle:
-        if path.suffix.lower() == ".json":
-            return json.load(handle)
-        return yaml.safe_load(handle)
+        return json.load(handle) if path.suffix.lower() == ".json" else yaml.safe_load(handle)
 
 
 def parse_utc(value: str, field: str) -> datetime:
@@ -57,6 +62,15 @@ def canonical_digest(value: Mapping[str, Any], *, omit: tuple[str, ...] = ()) ->
 
 def task_scope_hash(task: Mapping[str, Any]) -> str:
     return canonical_digest(task, omit=("scope_hash",))
+
+
+def manifest_approval_scope_digest(manifest: Mapping[str, Any]) -> str:
+    """Digest the human-approved manifest payload without its projected receipt."""
+    return canonical_digest(manifest, omit=("authority_receipt",))
+
+
+def authority_receipt_digest(receipt: Mapping[str, Any]) -> str:
+    return canonical_digest(receipt)
 
 
 def _schema_errors(instance: Any, schema_path: Path) -> list[str]:
@@ -87,17 +101,11 @@ def _target_reasons(target: Any) -> tuple[list[str], list[str]]:
     return [], []
 
 
-def validate_policy(
-    policy: Mapping[str, Any],
-    *,
-    root: Path,
-    now: datetime | None = None,
-) -> dict[str, Any]:
+def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | None = None) -> dict[str, Any]:
     now = now or datetime.now(timezone.utc)
     reasons, details = _target_reasons(policy.get("target_branch"))
-    schema_path = root / "schemas/autonomous-preprod-run-policy.schema.json"
     try:
-        errors = _schema_errors(policy, schema_path)
+        errors = _schema_errors(policy, root / "schemas/autonomous-preprod-run-policy.schema.json")
     except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
         errors = [str(exc)]
     if errors:
@@ -128,14 +136,65 @@ def validate_policy(
         except (KeyError, ValueError) as exc:
             reasons.append("AUTONOMOUS_POLICY_INVALID")
             details.append(str(exc))
-    digest = canonical_digest(policy) if isinstance(policy, Mapping) else None
     reasons = _dedupe(reasons)
     return {
         "outcome": "PASS" if not reasons else "BLOCKED",
         "reason_codes": reasons,
         "details": details,
-        "policy_digest": digest,
+        "policy_digest": canonical_digest(policy),
     }
+
+
+def _run_authority_errors(
+    policy: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+    *,
+    policy_digest: str,
+    now: datetime,
+) -> tuple[list[str], list[str], str | None]:
+    code = "AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED"
+    receipt = manifest.get("authority_receipt")
+    if not isinstance(receipt, Mapping):
+        return [code], ["trusted parent run authority receipt is missing"], None
+    errors: list[str] = []
+    if receipt.get("status") != "present":
+        errors.append("authority receipt status must be present")
+    if receipt.get("source") != GITHUB_ACTIONS_BOT_COMMENT:
+        errors.append("authority receipt source must be github_actions_bot_comment")
+    if receipt.get("bot_login") != GITHUB_ACTIONS_BOT:
+        errors.append("authority receipt bot_login must be github-actions[bot]")
+    if receipt.get("marker") != RUN_AUTHORITY_MARKER:
+        errors.append("authority receipt marker mismatch")
+    if receipt.get("approved_run_id") != manifest.get("run_id"):
+        errors.append("authority receipt run_id mismatch")
+    if receipt.get("approved_policy_id") != policy.get("policy_id"):
+        errors.append("authority receipt policy_id mismatch")
+    if receipt.get("approved_policy_revision") != policy.get("policy_revision"):
+        errors.append("authority receipt policy_revision mismatch")
+    if receipt.get("approved_policy_digest") != policy_digest:
+        errors.append("authority receipt policy_digest mismatch")
+    if receipt.get("manifest_scope_digest") != manifest_approval_scope_digest(manifest):
+        errors.append("authority receipt manifest_scope_digest mismatch")
+    for field in ("receipt_comment_id", "source_comment_id"):
+        if not isinstance(receipt.get(field), int) or receipt.get(field, 0) < 1:
+            errors.append(f"authority receipt {field} must be a positive integer")
+    if not isinstance(receipt.get("approval_id"), str) or not receipt.get("approval_id"):
+        errors.append("authority receipt approval_id is required")
+    try:
+        manifest_issued = parse_utc(str(manifest["issued_at"]), "manifest.issued_at")
+        manifest_expires = parse_utc(str(manifest["expires_at"]), "manifest.expires_at")
+        receipt_issued = parse_utc(str(receipt["issued_at"]), "authority_receipt.issued_at")
+        receipt_expires = parse_utc(str(receipt["expires_at"]), "authority_receipt.expires_at")
+        if receipt_issued < manifest_issued:
+            errors.append("authority receipt cannot precede manifest issue time")
+        if receipt_expires <= receipt_issued or receipt_expires <= now:
+            errors.append("authority receipt is expired or has invalid expiry")
+        if manifest_expires > receipt_expires:
+            errors.append("manifest expiry exceeds parent authority expiry")
+    except (KeyError, ValueError) as exc:
+        errors.append(str(exc))
+    digest = authority_receipt_digest(receipt)
+    return ([code] if errors else []), errors, digest
 
 
 def validate_manifest(
@@ -152,15 +211,24 @@ def validate_manifest(
     target_reasons, target_details = _target_reasons(manifest.get("target_branch"))
     reasons.extend(target_reasons)
     details.extend(target_details)
-    schema_path = root / "schemas/autonomous-preprod-run-manifest.schema.json"
     try:
-        schema_errors = _schema_errors(manifest, schema_path)
+        schema_errors = _schema_errors(manifest, root / "schemas/autonomous-preprod-run-manifest.schema.json")
     except (OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
         schema_errors = [str(exc)]
     if schema_errors:
         reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
         details.extend(schema_errors)
-    else:
+
+    authority_reasons, authority_details, authority_digest = _run_authority_errors(
+        policy,
+        manifest,
+        policy_digest=str(policy_result.get("policy_digest")),
+        now=now,
+    )
+    reasons.extend(authority_reasons)
+    details.extend(authority_details)
+
+    if not schema_errors:
         if manifest.get("repository") != policy.get("repository"):
             reasons.append("AUTONOMOUS_SCOPE_DRIFT")
             details.append("manifest repository does not match policy repository")
@@ -220,7 +288,9 @@ def validate_manifest(
         "reason_codes": reasons,
         "details": details,
         "policy_digest": policy_result.get("policy_digest"),
-        "manifest_digest": canonical_digest(manifest) if isinstance(manifest, Mapping) else None,
+        "manifest_digest": canonical_digest(manifest),
+        "manifest_approval_scope_digest": manifest_approval_scope_digest(manifest),
+        "authority_receipt_digest": authority_digest,
     }
 
 

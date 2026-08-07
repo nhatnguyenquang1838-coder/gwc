@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Derive deterministic task-scoped G2 and standing G4 authority from a run manifest.
+"""Derive deterministic task-scoped G2 and standing G4 decisions from an approved run manifest.
 
 Pure functions only: this module does not call GitHub/Jira, mutate branches, or
-perform merge/deploy operations.
+perform merge/deploy operations. Standing G4 output is contract-only and must be
+projected/attested by trusted repository CI before any live gate can consume it.
 """
 from __future__ import annotations
 
@@ -48,6 +49,15 @@ def _deny(gate: str, code: str, *, run_id: str | None = None, task_id: str | Non
 
 def _task(manifest: Mapping[str, Any], task_id: str) -> Mapping[str, Any] | None:
     return next((item for item in manifest.get("allowed_tasks", []) if item.get("task_id") == task_id), None)
+
+
+def _parent_provenance(manifest: Mapping[str, Any], validation: Mapping[str, Any]) -> dict[str, Any]:
+    receipt = manifest["authority_receipt"]
+    return {
+        "parent_approval_id": receipt["approval_id"],
+        "parent_scope_hash_prefix": receipt["scope_hash_prefix"],
+        "parent_authority_digest": validation["authority_receipt_digest"],
+    }
 
 
 def derive_g2_authority(
@@ -103,6 +113,7 @@ def derive_g2_authority(
         "policy_revision": policy["policy_revision"],
         "policy_digest": validation["policy_digest"],
         "manifest_digest": validation["manifest_digest"],
+        **_parent_provenance(manifest, validation),
         "run_id": manifest["run_id"],
         "task_id": task_id,
         "repository": manifest["repository"],
@@ -164,10 +175,12 @@ def derive_g4_receipt(
         "artifact_type": "autonomous-preprod-g4-receipt",
         "decision": "ALLOW",
         "source": "autonomous_preprod_standing_policy",
+        "trust_state": "requires_trusted_repo_ci_projection",
         "policy_id": policy["policy_id"],
         "policy_revision": policy["policy_revision"],
         "policy_digest": validation["policy_digest"],
         "manifest_digest": validation["manifest_digest"],
+        **_parent_provenance(manifest, validation),
         "run_id": manifest["run_id"],
         "task_id": task_id,
         "repository": manifest["repository"],
@@ -218,13 +231,17 @@ def validate_g4_receipt(
             "policy_revision": policy.get("policy_revision"),
             "policy_digest": validation.get("policy_digest"),
             "manifest_digest": validation.get("manifest_digest"),
+            "parent_approval_id": manifest.get("authority_receipt", {}).get("approval_id"),
+            "parent_scope_hash_prefix": manifest.get("authority_receipt", {}).get("scope_hash_prefix"),
+            "parent_authority_digest": validation.get("authority_receipt_digest"),
             "run_id": manifest.get("run_id"),
             "repository": manifest.get("repository"),
             "target_branch": "pre-prod",
+            "trust_state": "requires_trusted_repo_ci_projection",
         }
         for field, expected in expected_identity.items():
             if receipt.get(field) != expected:
-                reasons.append("AUTONOMOUS_POLICY_REVISION_DRIFT" if field in {"policy_id", "policy_revision", "policy_digest"} else "AUTONOMOUS_SCOPE_DRIFT")
+                reasons.append("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED" if field.startswith("parent_") else "AUTONOMOUS_SCOPE_DRIFT")
                 details.append(f"receipt {field} mismatch")
         task = _task(manifest, str(receipt.get("task_id", "")))
         if task is None:

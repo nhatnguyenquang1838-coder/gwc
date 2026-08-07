@@ -6,13 +6,13 @@
 - Version: `1.0`
 - Task: `SCRUM-272`
 - Repository: `nhatnguyenquang1838-coder/gwc`
-- Target integration branch: `pre-prod`
+- Autonomous integration target: `pre-prod`
 
 ## Purpose
 
-This contract defines bounded standing authority for one already-approved autonomous pre-production run. It allows the run to derive task-scoped G2 execution authority and an exact-head G4 merge authority receipt without asking for a new human command between every allowlisted task.
+Define bounded standing authority for one explicitly approved autonomous pre-production run. The contract can derive task-scoped G2 decisions and an exact-head standing G4 decision receipt without turning the parent approval into a reusable bearer token.
 
-The parent run is not a bearer token. Every child decision is recomputed from the current policy, parent manifest, task allowlist, exact base/head and current evidence.
+This task defines the policy, schemas and pure deterministic derivation layer. It does **not** activate a new live merge authority source. Existing live G4 gate-action validation remains on the trusted human receipt path until a later runtime task adds trusted repo-CI projection/readback for standing authority.
 
 ## Non-bypass invariants
 
@@ -20,82 +20,108 @@ The parent run is not a bearer token. Every child decision is recomputed from th
 2. `main` is never an autonomous integration target.
 3. The only autonomous G4 target is `pre-prod`.
 4. A child task risk above `R2` is denied.
-5. A task outside the parent manifest allowlist is denied.
-6. Child G2 authority is bounded to one task, one working branch, one exact protected-base SHA, declared paths/actions, risk and expiry.
-7. Standing G4 authority binds one PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, policy revision and expiry.
-8. Any drift in policy, manifest, task scope, base/head, PR body, graph, story or evidence invalidates the prior decision or receipt.
-9. The runtime may not modify the policy, its schemas, validator/deriver, G4/G5 workflows, gate-action validator or gate lifecycle contract inside a child autonomous task scope.
-10. G5 is read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
-11. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
+5. A task outside the approved parent run manifest is denied.
+6. Child G2 authority is bounded to one task, one working branch, one exact approved base SHA, declared paths/actions, risk and expiry.
+7. A parent run manifest is not trusted merely because its hashes are self-consistent. It must contain a trusted `github-actions[bot]` authority-receipt projection of the explicit parent approval.
+8. The parent authority receipt binds approval ID, source comment, bot receipt comment, run ID, policy ID/revision/digest, immutable manifest approval-scope digest, scope prefix and expiry.
+9. Standing G4 binds one PR number, current head SHA, task scope hash, PR-body digest, managed-block digest, graph digest, gate-story digest, evidence digest, parent authority digest and expiry.
+10. Any drift in policy, manifest approval scope, parent authority, task scope, base/head, PR body, graph, story or evidence invalidates the decision.
+11. A child autonomous task may not modify the standing policy, its schemas, validator/deriver, G4/G5 workflows, gate-action validator or gate lifecycle contract.
+12. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
+13. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
 
-## Canonical artifacts
+## Parent run approval trust model
+
+The closed parent run manifest contains `authority_receipt` with this trusted projection identity:
 
 ```text
-governance/autonomous-preprod-policy.yaml
-schemas/autonomous-preprod-run-policy.schema.json
-schemas/autonomous-preprod-run-manifest.schema.json
-schemas/autonomous-preprod-g4-receipt.schema.json
+status = present
+source = github_actions_bot_comment
+bot_login = github-actions[bot]
+marker = gwc:autonomous-preprod-run-authority-receipt
+approval_id
+receipt_comment_id
+source_comment_id
+approved_run_id
+approved_policy_id
+approved_policy_revision
+approved_policy_digest
+manifest_scope_digest
+scope_hash_prefix
+issued_at
+expires_at
 ```
 
-The policy and manifest are closed-schema documents. Unknown fields fail validation.
+`manifest_scope_digest` is SHA-256 over canonical manifest JSON with `authority_receipt` removed. This avoids a circular digest and makes any post-approval change to task allowlists, base, target, policy binding, expiry or idempotency key invalidate the parent receipt.
+
+The pure validator models and validates this trusted readback shape. A later live issuer must obtain the receipt from repository/GitHub evidence; an agent-authored object that merely copies the field names is not sufficient operational evidence.
 
 ## Canonical digest rules
 
-All deterministic digests use:
+All deterministic digests use UTF-8 JSON, lexicographically sorted object keys, preserved array order, no insignificant whitespace and SHA-256.
 
-```text
-UTF-8 JSON
-keys sorted lexicographically
-array order preserved
-no insignificant whitespace
-SHA-256
-```
+- `policy_digest`: complete policy document.
+- `manifest_approval_scope_digest`: run manifest with `authority_receipt` removed.
+- `authority_receipt_digest`: complete parent authority receipt.
+- `manifest_digest`: complete approved manifest including authority receipt.
+- task `scope_hash`: task object with `scope_hash` removed.
+- decision `decision_digest`: decision object with `decision_digest` removed.
 
-- `policy_digest` is computed over the complete policy document.
-- `manifest_digest` is computed over the complete run manifest.
-- each task `scope_hash` is computed over that task object with `scope_hash` removed;
-- each derived decision or receipt `decision_digest` is computed over the output object with `decision_digest` removed.
-
-Unchanged inputs therefore replay to the same digest.
+Unchanged inputs replay to identical digests.
 
 ## Child G2 derivation
 
-A child G2 request is eligible only when all of the following are current and valid:
+An allowlisted child G2 request may derive only these lifecycle actions when present in the approved task scope:
 
-- policy and run manifest schemas pass;
-- policy and run manifest are unexpired;
-- manifest policy id/revision/digest match the active policy;
-- repository and target branch match;
-- exact observed base SHA equals the parent approved base SHA;
-- task is allowlisted;
-- task risk is within the policy ceiling;
-- requested working branch matches the manifest and policy prefix;
-- requested paths/actions are within the allowlisted task scope;
-- no requested path overlaps the protected control plane;
-- no denied action is requested.
+```text
+create_guarded_branch_or_worktree
+modify_approved_files
+run_sandboxed_validation
+stage
+create_commit
+push_working_branch
+```
 
-The derived child authority never contains G4, G5 or G6 authority.
+Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching `auto/` working branch, risk at or below the ceiling, requested paths/actions contained by the task allowlist, and no protected control-plane overlap.
 
-## Standing G4 receipt
+The output carries `parent_approval_id`, `parent_scope_hash_prefix` and `parent_authority_digest`. It explicitly sets `g4_g5_g6_authority_granted: false`.
 
-Standing G4 replaces only the per-task human G4 authority receipt for eligible autonomous `pre-prod` tasks. It does not replace SCRUM-271 current PR-evidence binding.
+## Standing G4 decision receipt
 
-An autonomous merge therefore still requires the current `g4-pr-evidence-receipt` plus a valid `autonomous-preprod-g4-receipt`.
+The pure deriver may produce `autonomous-preprod-g4-receipt` only for an approved allowlisted task and exact `pre-prod` context. It binds:
 
-The standing receipt is `ALLOW` only when:
+```text
+policy id/revision/digest
+manifest digest
+parent approval id
+parent scope hash prefix
+parent authority digest
+run id
+task id
+task scope hash
+repository
+pre-prod target
+PR number
+current head SHA
+PR body digest
+managed block digest
+run graph digest
+gate story digest
+evidence digest
+merge_approved_pr
+expiry
+decision digest
+```
 
-- current PR base is exactly `pre-prod`;
-- task is allowlisted and within risk ceiling;
-- current head SHA is supplied;
-- task scope hash matches the parent manifest;
-- PR body, managed block, graph, story and evidence digests are supplied in canonical SHA-256 form;
-- policy and manifest remain current and unexpired.
+The receipt includes:
 
-A receipt does not authorize any other PR, task, branch, head or action.
+```text
+trust_state = requires_trusted_repo_ci_projection
+```
 
-## Compatibility
+That state is deliberate. In SCRUM-272 the receipt is a deterministic **contract decision**, not a live merge credential. The existing `gate-action-authority` schema, validator and regression tests remain byte-compatible with `main`; they do not accept this standing receipt as a replacement for the trusted human G4 receipt.
 
-Normal/legacy delivery keeps the existing human `gwc:g4-authority-receipt` path. The gate-action validator accepts standing policy only as an alternative authority source for an autonomous pre-prod merge; existing human G4 packets remain valid without a standing-policy artifact.
+A later runtime integration must independently read the approved parent receipt and current PR evidence, then project/attest standing authority through trusted repository CI before a live merge gate can consume it.
 
 ## Fail-closed reason codes
 
@@ -108,6 +134,7 @@ AUTONOMOUS_POLICY_REVISION_DRIFT
 AUTONOMOUS_POLICY_DIGEST_DRIFT
 AUTONOMOUS_RUN_MANIFEST_INVALID
 AUTONOMOUS_RUN_MANIFEST_EXPIRED
+AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED
 AUTONOMOUS_TASK_NOT_ALLOWLISTED
 AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING
 AUTONOMOUS_MAIN_TARGET_FORBIDDEN
@@ -126,4 +153,4 @@ AUTONOMOUS_STANDING_G4_RECEIPT_INVALID
 
 ## Explicit exclusions
 
-This v1.0 contract does not create or protect `pre-prod`, choose arbitrary Jira work, invoke an AI coding adapter, merge a live PR by itself, deploy, release, reload runtime, mutate production configuration/data, rotate credentials, handle secrets or run migrations.
+This contract does not create/protect `pre-prod`, choose arbitrary Jira work, invoke an AI coding adapter, create a trusted parent authority receipt by itself, project standing authority into the live G4 gate, merge a PR, deploy, release, reload runtime, mutate production configuration/data, rotate credentials, handle secrets or run migrations.

@@ -7,8 +7,11 @@ target_branch: pre-prod
 allowed_branch_prefix: auto/
 max_child_risk: R2
 allowed_g2_actions:
+  - create_guarded_branch_or_worktree
   - modify_approved_files
   - run_sandboxed_validation
+  - stage
+  - create_commit
   - push_working_branch
 allowed_g4_actions:
   - merge_approved_pr

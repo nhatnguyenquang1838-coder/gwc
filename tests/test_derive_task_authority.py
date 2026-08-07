@@ -5,12 +5,8 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
-from tests.test_autonomous_preprod_policy import BASE_SHA, manifest, policy
-from tools.node_architect.derive_task_authority import (
-    derive_g2_authority,
-    derive_g4_receipt,
-    validate_g4_receipt,
-)
+from tests.test_autonomous_preprod_policy import BASE_SHA, G2_ACTIONS, manifest, policy
+from tools.node_architect.derive_task_authority import derive_g2_authority, derive_g4_receipt, validate_g4_receipt
 
 ROOT = Path(__file__).resolve().parents[1]
 NOW = datetime(2026, 8, 7, 3, 0, tzinfo=timezone.utc)
@@ -29,7 +25,7 @@ def g2_request() -> dict:
         "working_branch": "auto/run-1/SCRUM-900",
         "risk_class": "R2",
         "requested_paths": ["src/feature.py", "tests/test_feature.py"],
-        "requested_actions": ["modify_approved_files", "run_sandboxed_validation", "push_working_branch"],
+        "requested_actions": list(G2_ACTIONS),
     }
 
 
@@ -50,7 +46,7 @@ def g4_context(m: dict | None = None) -> dict:
 
 
 class TaskAuthorityDerivationTests(unittest.TestCase):
-    def test_valid_g2_is_task_scoped_and_deterministic(self):
+    def test_valid_g2_is_task_scoped_deterministic_and_parent_bound(self):
         p = policy(); m = manifest(p); request = g2_request()
         first = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
         second = derive_g2_authority(copy.deepcopy(p), copy.deepcopy(m), copy.deepcopy(request), root=ROOT, now=NOW)
@@ -58,44 +54,48 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual("G2_EXECUTION", first["gate"])
         self.assertFalse(first["g4_g5_g6_authority_granted"])
         self.assertEqual(first["decision_digest"], second["decision_digest"])
-        self.assertEqual(["src/feature.py", "tests/test_feature.py"], first["authorized_paths"])
+        self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
+        self.assertEqual(m["authority_receipt"]["scope_hash_prefix"], first["parent_scope_hash_prefix"])
+        self.assertTrue(first["parent_authority_digest"].startswith("sha256:"))
+        self.assertIn("create_commit", first["authorized_actions"])
 
     def test_unknown_task_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["task_id"] = "SCRUM-999"
-        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
-        self.assertEqual("AUTONOMOUS_TASK_NOT_ALLOWLISTED", result["reason_code"])
+        self.assertEqual("AUTONOMOUS_TASK_NOT_ALLOWLISTED", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
 
     def test_base_drift_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["observed_base_sha"] = "f" * 40
-        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
-        self.assertEqual("AUTONOMOUS_BASE_SHA_MISMATCH", result["reason_code"])
+        self.assertEqual("AUTONOMOUS_BASE_SHA_MISMATCH", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
 
     def test_unallowlisted_action_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["requested_actions"] = ["merge_approved_pr"]
-        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
-        self.assertEqual("AUTONOMOUS_ACTION_FORBIDDEN", result["reason_code"])
+        self.assertEqual("AUTONOMOUS_ACTION_FORBIDDEN", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
 
-    def test_valid_g4_receipt_is_exact_head_and_deterministic(self):
+    def test_untrusted_parent_run_cannot_derive_g2(self):
+        p = policy(); m = manifest(p); m["authority_receipt"]["manifest_scope_digest"] = "sha256:" + "f" * 64
+        self.assertEqual("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", derive_g2_authority(p, m, g2_request(), root=ROOT, now=NOW)["reason_code"])
+
+    def test_valid_g4_receipt_is_exact_head_deterministic_and_contract_only(self):
         p = policy(); m = manifest(p); context = g4_context(m)
         first = derive_g4_receipt(p, m, context, root=ROOT, now=NOW)
         second = derive_g4_receipt(copy.deepcopy(p), copy.deepcopy(m), copy.deepcopy(context), root=ROOT, now=NOW)
         self.assertEqual("ALLOW", first["decision"])
         self.assertEqual("pre-prod", first["target_branch"])
         self.assertEqual("merge_approved_pr", first["authorized_action"])
+        self.assertEqual("requires_trusted_repo_ci_projection", first["trust_state"])
         self.assertEqual(HEAD_SHA, first["approved_head_sha"])
+        self.assertEqual(m["authority_receipt"]["approval_id"], first["parent_approval_id"])
         self.assertEqual(first["decision_digest"], second["decision_digest"])
 
     def test_main_target_is_denied(self):
         p = policy(); m = manifest(p); context = g4_context(m); context["target_branch"] = "main"
-        result = derive_g4_receipt(p, m, context, root=ROOT, now=NOW)
-        self.assertEqual("AUTONOMOUS_MAIN_TARGET_FORBIDDEN", result["reason_code"])
+        self.assertEqual("AUTONOMOUS_MAIN_TARGET_FORBIDDEN", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
 
     def test_receipt_head_drift_is_invalid(self):
         p = policy(); m = manifest(p); current = g4_context(m)
         receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
         drifted = dict(current); drifted["approved_head_sha"] = "c" * 40
-        result = validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)
-        self.assertIn("AUTONOMOUS_HEAD_DRIFT", result["reason_codes"])
+        self.assertIn("AUTONOMOUS_HEAD_DRIFT", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
 
     def test_receipt_body_graph_and_evidence_drift_are_invalid(self):
         p = policy(); m = manifest(p); current = g4_context(m)
@@ -109,12 +109,19 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertIn("AUTONOMOUS_GRAPH_DRIFT", result["reason_codes"])
         self.assertIn("AUTONOMOUS_EVIDENCE_DRIFT", result["reason_codes"])
 
+    def test_parent_provenance_drift_invalidates_g4_receipt(self):
+        p = policy(); m = manifest(p); current = g4_context(m)
+        receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
+        receipt["parent_approval_id"] = "FORGED"
+        result = validate_g4_receipt(receipt, p, m, current, root=ROOT, now=NOW)
+        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
+
     def test_r3_manifest_cannot_derive_g4(self):
         p = policy(); m = manifest(p); m["allowed_tasks"][0]["risk_class"] = "R3"
-        from tools.node_architect.validate_autonomous_preprod_policy import task_scope_hash
+        from tools.node_architect.validate_autonomous_preprod_policy import manifest_approval_scope_digest, task_scope_hash
         m["allowed_tasks"][0]["scope_hash"] = task_scope_hash(m["allowed_tasks"][0])
-        result = derive_g4_receipt(p, m, g4_context(m), root=ROOT, now=NOW)
-        self.assertEqual("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", result["reason_code"])
+        m["authority_receipt"]["manifest_scope_digest"] = manifest_approval_scope_digest(m)
+        self.assertEqual("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", derive_g4_receipt(p, m, g4_context(m), root=ROOT, now=NOW)["reason_code"])
 
 
 if __name__ == "__main__":

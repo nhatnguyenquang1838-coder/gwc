@@ -18,7 +18,8 @@
     "allowed_tasks",
     "issued_at",
     "expires_at",
-    "idempotency_key"
+    "idempotency_key",
+    "authority_receipt"
   ],
   "properties": {
     "schema_version": {"const": "1.0"},
@@ -67,6 +68,44 @@
     },
     "issued_at": {"type": "string", "format": "date-time"},
     "expires_at": {"type": "string", "format": "date-time"},
-    "idempotency_key": {"type": "string", "minLength": 1}
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "authority_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source",
+        "bot_login",
+        "marker",
+        "approval_id",
+        "receipt_comment_id",
+        "source_comment_id",
+        "approved_run_id",
+        "approved_policy_id",
+        "approved_policy_revision",
+        "approved_policy_digest",
+        "manifest_scope_digest",
+        "scope_hash_prefix",
+        "issued_at",
+        "expires_at"
+      ],
+      "properties": {
+        "status": {"const": "present"},
+        "source": {"const": "github_actions_bot_comment"},
+        "bot_login": {"const": "github-actions[bot]"},
+        "marker": {"const": "gwc:autonomous-preprod-run-authority-receipt"},
+        "approval_id": {"type": "string", "minLength": 1},
+        "receipt_comment_id": {"type": "integer", "minimum": 1},
+        "source_comment_id": {"type": "integer", "minimum": 1},
+        "approved_run_id": {"type": "string", "minLength": 1},
+        "approved_policy_id": {"type": "string", "minLength": 1},
+        "approved_policy_revision": {"type": "string", "minLength": 1},
+        "approved_policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "manifest_scope_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    }
   }
 }

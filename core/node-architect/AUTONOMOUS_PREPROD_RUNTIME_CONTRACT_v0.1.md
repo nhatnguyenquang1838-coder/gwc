@@ -4,23 +4,18 @@
 
 - Contract ID: `autonomous-preprod-runtime`
 - Version: `0.1`
-- Task: `SCRUM-271`
+- Origin task: `SCRUM-271`
+- Standing-policy extension: `SCRUM-272`
 - Lifecycle: `experimental`
 - Repository: `nhatnguyenquang1838-coder/gwc`
 
 ## Purpose
 
-Define the first executable vertical slice for an AI-managed workflow that can
-materialize one run-scoped Node Architect graph, tell the factual G0→G6 story,
-and place exact-head evidence into a bounded Pull Request description section.
+Define the evidence/control-plane vertical slice that materializes one run-scoped Node Architect graph, tells the factual G0→G6 story, and places exact-head evidence into a bounded Pull Request description section.
 
-This runtime remains evidence/control-plane only. It does **not** implement
-arbitrary Jira task selection, AI implementation-agent execution, `pre-prod`
-branch creation/protection, PR creation, merge, deploy, release, runtime reload,
-production configuration, credential/secret work, migration, or production-data
-access. Standing pre-prod authority, when present, is supplied by the separate
-`AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0` contract; this runtime does not mint
-or broaden that authority by itself.
+This runtime does **not** implement arbitrary Jira task selection, AI implementation-agent execution, `pre-prod` branch creation/protection, PR creation, merge, deploy, release, runtime reload, production configuration, credential/secret work, migration, or production-data access.
+
+`SCRUM-272` adds a separate `AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0` contract. That policy can derive task-scoped standing decisions, but this evidence runtime does not mint or broaden live merge authority.
 
 ## Invariants
 
@@ -30,24 +25,18 @@ or broaden that authority by itself.
 4. Only canonical runtime events may create graph participants.
 5. Gate actions are rendered as `gate_action`, never as invented catalogue nodes.
 6. `not_executed` and `not_applicable` are explicit states and never implicit PASS.
-7. G4 evidence must bind current PR head, PR-body digest, graph digest, story
-   digest, and managed-evidence digest.
-8. Any head, body, graph, story, scope, policy, or evidence drift invalidates
-   prior G4 readiness.
+7. G4 evidence binds current PR head, PR-body digest, graph digest, story digest and managed-evidence digest.
+8. Any head, body, graph, story, scope, policy or evidence drift invalidates prior G4 readiness.
 9. Updating a PR description is evidence assembly; it never grants G4 authority.
 10. G5 and G6 authority remain separate. G6 is `not_applicable` for this slice.
-11. The manifest repository and `base_sha` must match the exact repository and
-    source SHA selected by the workflow before any artifact is accepted.
-12. Explicit gate-status metadata may only restate canonical event outcomes; it
-    may never override a blocked or absent execution state.
-13. The additional PR-evidence receipt applies only to autonomous-run G4 flows;
-    normal/legacy G4 delivery retains its existing authority-receipt contract.
-14. Standing policy can replace only the per-task human G4 authority source for
-    an eligible autonomous `pre-prod` task. It never replaces current PR evidence.
+11. Manifest repository and `base_sha` must match the exact repository and source SHA selected by the workflow before artifacts are accepted.
+12. Explicit gate-status metadata may only restate canonical event outcomes; it may never override a blocked or absent execution state.
+13. The additional PR-evidence receipt applies only to autonomous-run G4 flows; normal/legacy G4 delivery retains its existing authority-receipt contract.
+14. A standing-policy decision is not a live authority receipt until trusted repository CI independently projects/attests it from an approved parent-run receipt and current PR evidence.
 
-## Canonical inputs
+## Evidence-runtime input
 
-The evidence-only runtime consumes a JSON manifest containing:
+The SCRUM-271 evidence runtime consumes a JSON manifest containing:
 
 ```text
 run_id
@@ -65,20 +54,11 @@ validation
 g4_readiness
 ```
 
-Each event must carry a unique `event_id` and `sequence`, one canonical gate,
-participant type (`runtime_node` or `gate_action`), canonical participant ID,
-purpose, entry evidence, action, outcome, output evidence, route provenance, and
-optional next event.
+Each event carries a unique `event_id` and `sequence`, canonical gate, participant type (`runtime_node` or `gate_action`), canonical participant ID, purpose, entry evidence, action, outcome, output evidence, route provenance and optional next event.
 
-The caller must independently provide the expected repository and exact checked-
-out base SHA. A manifest mismatch is terminal and produces no graph, story, or PR
-body artifact.
+The parent standing-policy run manifest is a separate closed artifact defined by `schemas/autonomous-preprod-run-manifest.schema.json`; it is not interchangeable with this event manifest.
 
-The parent standing-policy run manifest is a separate closed artifact defined by
-`schemas/autonomous-preprod-run-manifest.schema.json`. It is not interchangeable
-with this evidence-runtime event manifest.
-
-## Canonical outputs
+## Canonical evidence outputs
 
 ```text
 runtime-result.json
@@ -88,7 +68,7 @@ pr-run-evidence.md
 updated-pr-body.md
 ```
 
-The graph and story are closed-schema artifacts. The PR evidence block uses:
+The managed PR evidence block uses:
 
 ```markdown
 <!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->
@@ -97,27 +77,14 @@ The graph and story are closed-schema artifacts. The PR evidence block uses:
 <!-- GWC:AUTONOMOUS-RUN:EVIDENCE:END -->
 ```
 
-Human-authored PR content outside this block must be preserved byte-for-byte
-except for the newline required to append the first managed block.
+Human-authored PR content outside this block is preserved. Before update, the rendered marker head must equal the current PR head; readback confirms both body and head.
 
-Before updating a PR, the rendered machine marker head must equal the current PR
-head SHA. Readback must confirm both the body and head remain unchanged from the
-requested update.
+## Current live G4 evidence binding
 
-## G4 evidence binding
+For an autonomous-run PR on the currently active live gate path, G4 requires:
 
-For autonomous-run PRs, a valid G4 path requires:
-
-1. exactly one eligible authority source:
-   - the trusted human `gwc:g4-authority-receipt`; or
-   - a valid `autonomous-preprod-g4-receipt` derived from the current standing
-     policy and parent run manifest for an allowlisted `pre-prod` task; and
-2. a trusted `gwc:g4-pr-evidence-receipt` generated after readback of the current
-   PR body and current PR head.
-
-This is an **OR authority / AND evidence** contract. A standing receipt never
-bypasses current PR-body, graph, story, evidence, task-scope, head, expiry, or
-policy/manifest checks.
+1. the existing trusted PR-native human `gwc:g4-authority-receipt`; and
+2. the trusted current `gwc:g4-pr-evidence-receipt` generated after readback of the current PR body and head.
 
 The PR-evidence receipt binds:
 
@@ -133,17 +100,24 @@ source_comment_id
 expiry
 ```
 
-The standing receipt additionally binds policy id/revision/digest, parent
-manifest digest, run ID, task ID, task scope hash and the only authorized action
-`merge_approved_pr` into `pre-prod`.
+A new commit or PR-body edit makes prior evidence stale.
 
-A new commit, PR-body edit, graph/story/evidence change, policy/manifest change,
-or expiry makes the relevant prior receipt stale. The runtime must re-read
-current state rather than selecting any historical matching receipt.
+Normal/legacy PRs continue to require the existing trusted human G4 authority receipt only.
 
-Normal/legacy PRs that are not autonomous-run deliveries continue to require the
-existing trusted human G4 authority receipt only. Standing-policy support must
-not change that compatibility path.
+## Standing-policy extension boundary
+
+`SCRUM-272` defines a deterministic standing G4 **decision receipt** bound to an approved parent run and current PR evidence. It carries `trust_state=requires_trusted_repo_ci_projection`.
+
+It intentionally does not alter the live `gate-action-authority` schema or validator. A later runtime task may replace the per-task human G4 authority source only after it provides an independently trusted repo-CI projection/readback of:
+
+- the parent human approval receipt;
+- immutable manifest approval-scope digest;
+- policy revision/digest;
+- task scope;
+- exact PR/head/body/graph/story/evidence state; and
+- receipt expiry.
+
+Until that integration exists, a caller-computable standing decision digest is never sufficient merge authority.
 
 ## Fail-closed reason codes
 
@@ -164,14 +138,10 @@ AUTONOMOUS_PR_EVIDENCE_MARKER_INVALID
 AUTONOMOUS_PR_HEAD_DRIFT
 AUTONOMOUS_PR_EVIDENCE_DRIFT
 G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE
-AUTONOMOUS_STANDING_G4_RECEIPT_MISSING_OR_STALE
+AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED
+AUTONOMOUS_STANDING_G4_RECEIPT_INVALID
 ```
 
-## Acceptance boundary for v0.1
+## Acceptance boundary
 
-A deterministic fixture must produce schema-valid graph/story artifacts,
-idempotently update a PR body, render only actual participants, explain G0→G6,
-and block `main`, repository/base mismatch, contradictory gate status, malformed
-markers, missing events, unknown route targets, and stale G4 evidence. Standing
-policy integration may supply an authority receipt to later G4 validation, but
-this runtime still performs no merge or other external side effect by itself.
+The evidence runtime must remain deterministic and side-effect bounded. The standing-policy extension must preserve the existing live human G4 trust boundary while defining a closed, replayable, parent-approved decision contract for later trusted runtime integration.
