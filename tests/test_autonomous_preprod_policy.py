@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from tools.node_architect.validate_autonomous_preprod_policy import (
+    MANDATORY_CONTROL_PLANE_PROTECTED_PATHS,
     authority_receipt_digest,
     canonical_digest,
     manifest_approval_scope_digest,
@@ -27,16 +28,6 @@ G2_ACTIONS = [
     "create_commit",
     "push_working_branch",
 ]
-RUNTIME_CONTROL_PLANE = {
-    "core/node-architect/AUTONOMOUS_PREPROD_RUNTIME_CONTRACT_v0.1.md",
-    "schemas/node-architect/autonomous-run-graph.schema.json",
-    "schemas/node-architect/gate-story.schema.json",
-    "tools/node_architect/autonomous_preprod_runtime.py",
-    "tools/node_architect/build_run_graph.py",
-    "tools/node_architect/render_gate_story.py",
-    "tools/node_architect/render_pr_run_evidence.py",
-    ".github/workflows/autonomous-preprod-runtime.yml",
-}
 
 
 def policy() -> dict:
@@ -57,20 +48,7 @@ def policy() -> dict:
             "production_config_change", "credential_rotation", "secret_operation", "migration", "force_push",
             "branch_deletion", "history_rewrite", "pr_base_change",
         ],
-        "control_plane_protected_paths": [
-            "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
-            *sorted(RUNTIME_CONTROL_PLANE),
-            "governance/autonomous-preprod-policy.yaml",
-            "schemas/autonomous-preprod-run-policy.schema.json",
-            "schemas/autonomous-preprod-run-manifest.schema.json",
-            "schemas/autonomous-preprod-g4-receipt.schema.json",
-            "tools/node_architect/validate_autonomous_preprod_policy.py",
-            "tools/node_architect/derive_task_authority.py",
-            ".github/workflows/g4-g5-evidence.yml",
-            "schemas/gate-action-authority.schema.json",
-            "tools/validate_gate_action.py",
-            "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
-        ],
+        "control_plane_protected_paths": sorted(MANDATORY_CONTROL_PLANE_PROTECTED_PATHS),
         "issued_at": "2026-08-07T00:00:00Z",
         "expires_at": "2026-08-08T00:00:00Z",
     }
@@ -173,9 +151,15 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         self.assertEqual("BLOCKED", result["outcome"])
         self.assertIn("AUTONOMOUS_SCOPE_DRIFT", result["reason_codes"])
 
-    def test_active_policy_protects_autonomous_runtime_control_plane(self):
+    def test_active_policy_preserves_mandatory_control_plane(self):
         active = yaml.safe_load((ROOT / "governance/autonomous-preprod-policy.yaml").read_text(encoding="utf-8"))
-        self.assertTrue(RUNTIME_CONTROL_PLANE.issubset(set(active["control_plane_protected_paths"])))
+        self.assertTrue(MANDATORY_CONTROL_PLANE_PROTECTED_PATHS.issubset(set(active["control_plane_protected_paths"])))
+
+    def test_policy_cannot_drop_mandatory_control_plane(self):
+        p = policy(); p["control_plane_protected_paths"].remove(".github/workflows")
+        result = validate_policy(p, root=ROOT, now=NOW)
+        self.assertEqual("BLOCKED", result["outcome"])
+        self.assertIn("AUTONOMOUS_POLICY_INVALID", result["reason_codes"])
 
     def test_scope_hash_tampering_is_blocked(self):
         p = policy(); m = manifest(p); m["allowed_tasks"][0]["authorized_paths"].append("src/extra.py")
