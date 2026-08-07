@@ -39,6 +39,7 @@ PROHIBITED_ACTIONS = {
 RUN_AUTHORITY_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
 GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
+GLOB_META = "*?[]"
 
 
 def load_document(path: Path) -> Any:
@@ -83,6 +84,21 @@ def _schema_errors(instance: Any, schema_path: Path) -> list[str]:
     ]
 
 
+def _repo_path_error(value: Any) -> str | None:
+    if not isinstance(value, str) or not value:
+        return "path must be a non-empty string"
+    if value.startswith("/"):
+        return "absolute paths are forbidden"
+    if "\\" in value:
+        return "backslash path separators are forbidden"
+    if any(char in value for char in GLOB_META):
+        return "glob metacharacters are forbidden"
+    segments = value.split("/")
+    if any(segment in {"", ".", ".."} for segment in segments):
+        return "path must be canonical and must not contain empty, '.' or '..' segments"
+    return None
+
+
 def _path_overlaps(path: str, protected: str) -> bool:
     left = path.rstrip("/")
     right = protected.rstrip("/")
@@ -125,6 +141,11 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
         if missing_denies:
             reasons.append("AUTONOMOUS_POLICY_INVALID")
             details.append("policy denied_actions missing: " + ", ".join(missing_denies))
+        for protected_path in policy.get("control_plane_protected_paths", []):
+            path_error = _repo_path_error(protected_path)
+            if path_error:
+                reasons.append("AUTONOMOUS_POLICY_INVALID")
+                details.append(f"invalid protected path {protected_path!r}: {path_error}")
         try:
             issued = parse_utc(str(policy["issued_at"]), "policy.issued_at")
             expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
@@ -276,9 +297,15 @@ def validate_manifest(
                 reasons.append("AUTONOMOUS_ACTION_FORBIDDEN")
                 details.append(f"{task_id}: G2 action is outside policy")
             for path in task.get("authorized_paths", []):
-                if any(_path_overlaps(str(path), denied_path) for denied_path in protected):
+                path_text = str(path)
+                path_error = _repo_path_error(path_text)
+                if path_error:
+                    reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+                    details.append(f"{task_id}: invalid authorized path {path_text!r}: {path_error}")
+                    continue
+                if any(_path_overlaps(path_text, denied_path) for denied_path in protected):
                     reasons.append("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN")
-                    details.append(f"{task_id}: protected control-plane path in child scope: {path}")
+                    details.append(f"{task_id}: protected control-plane path in child scope: {path_text}")
             if task.get("scope_hash") != task_scope_hash(task):
                 reasons.append("AUTONOMOUS_SCOPE_DRIFT")
                 details.append(f"{task_id}: scope_hash mismatch")
