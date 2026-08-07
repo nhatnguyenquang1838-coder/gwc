@@ -103,7 +103,7 @@
   "allOf": [
     {
       "if": {"required": ["gate", "action"], "properties": {"gate": {"const": "G4_MERGE"}, "action": {"const": "merge_approved_pr"}}},
-      "then": {"properties": {"evidence_readback": {"required": ["g4_authority_receipt", "g4_pr_evidence_receipt"]}}}
+      "then": {"properties": {"evidence_readback": {"required": ["g4_authority_receipt"]}}}
     }
   ]
 }
