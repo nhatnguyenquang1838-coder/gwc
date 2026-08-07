@@ -40,23 +40,36 @@ MANDATORY_CONTROL_PLANE_PROTECTED_PATHS = {
     "AGENTS.md",
     "project-instructions.md",
     ".github/workflows",
+    "agents/chatgpt-agent",
     "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
+    "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+    "core/Agent_Operating_Runtime_Contract_v1.0.md",
+    "core/Agent_Response_Presentation_Contract_v1.0.md",
+    "core/Coding_Project_Governance_v1.0.md",
+    "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
     "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
     "core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
     "core/node-architect",
+    "docs/project-consumer-agent-instructions.md",
+    "governance/agent-runtime-profiles",
     "governance/autonomous-preprod-policy.yaml",
+    "governance/instruction-source-registry.yaml",
+    "projects/gwc",
+    "schemas/approval-envelope.schema.json",
     "schemas/autonomous-preprod-run-policy.schema.json",
     "schemas/autonomous-preprod-run-manifest.schema.json",
     "schemas/autonomous-preprod-g4-receipt.schema.json",
     "schemas/gate-action-authority.schema.json",
     "schemas/node-architect",
     "tools/node_architect",
+    "tools/validate_g01.py",
     "tools/validate_gate_action.py",
 }
 RUN_AUTHORITY_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
 GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
 GLOB_META = "*?[]"
+BRANCH_FORBIDDEN_CHARS = set(" ~^:?*[\\")
 
 
 def load_document(path: Path) -> Any:
@@ -104,6 +117,8 @@ def _schema_errors(instance: Any, schema_path: Path) -> list[str]:
 def _repo_path_error(value: Any) -> str | None:
     if not isinstance(value, str) or not value:
         return "path must be a non-empty string"
+    if value != value.strip() or any(ord(char) < 32 or ord(char) == 127 for char in value):
+        return "leading/trailing whitespace and control characters are forbidden"
     if value.startswith("/"):
         return "absolute paths are forbidden"
     if "\\" in value:
@@ -113,6 +128,25 @@ def _repo_path_error(value: Any) -> str | None:
     segments = value.split("/")
     if any(segment in {"", ".", ".."} for segment in segments):
         return "path must be canonical and must not contain empty, '.' or '..' segments"
+    return None
+
+
+def _branch_ref_error(value: Any, *, required_prefix: str) -> str | None:
+    if not isinstance(value, str) or not value:
+        return "working branch must be a non-empty string"
+    if value in {"main", "pre-prod", "@"}:
+        return "working branch must not be a protected/special ref"
+    if not value.startswith(required_prefix):
+        return f"working branch must start with {required_prefix!r}"
+    if value.startswith("/") or value.endswith("/") or value.endswith("."):
+        return "working branch has an invalid leading/trailing delimiter"
+    if "//" in value or ".." in value or "@{" in value:
+        return "working branch contains a forbidden ref sequence"
+    if any(ord(char) < 32 or ord(char) == 127 or char in BRANCH_FORBIDDEN_CHARS for char in value):
+        return "working branch contains a forbidden ref character"
+    for segment in value.split("/"):
+        if not segment or segment.startswith(".") or segment.endswith(".lock"):
+            return "working branch contains a forbidden ref component"
     return None
 
 
@@ -171,6 +205,9 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
         try:
             issued = parse_utc(str(policy["issued_at"]), "policy.issued_at")
             expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
+            if issued > now:
+                reasons.append("AUTONOMOUS_POLICY_INVALID")
+                details.append("policy issued_at is in the future")
             if expires <= issued:
                 reasons.append("AUTONOMOUS_POLICY_INVALID")
                 details.append("policy expires_at must be later than issued_at")
@@ -225,19 +262,28 @@ def _run_authority_errors(
     for field in ("receipt_comment_id", "source_comment_id"):
         if not isinstance(receipt.get(field), int) or receipt.get(field, 0) < 1:
             errors.append(f"authority receipt {field} must be a positive integer")
+    if receipt.get("receipt_comment_id") == receipt.get("source_comment_id"):
+        errors.append("authority receipt comment id must differ from source approval comment id")
     if not isinstance(receipt.get("approval_id"), str) or not receipt.get("approval_id"):
         errors.append("authority receipt approval_id is required")
     try:
+        policy_expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
         manifest_issued = parse_utc(str(manifest["issued_at"]), "manifest.issued_at")
         manifest_expires = parse_utc(str(manifest["expires_at"]), "manifest.expires_at")
         receipt_issued = parse_utc(str(receipt["issued_at"]), "authority_receipt.issued_at")
         receipt_expires = parse_utc(str(receipt["expires_at"]), "authority_receipt.expires_at")
         if receipt_issued < manifest_issued:
             errors.append("authority receipt cannot precede manifest issue time")
+        if receipt_issued > now:
+            errors.append("authority receipt issued_at is in the future")
+        if receipt_issued >= manifest_expires:
+            errors.append("authority receipt must be issued before manifest expiry")
         if receipt_expires <= receipt_issued or receipt_expires <= now:
             errors.append("authority receipt is expired or has invalid expiry")
         if manifest_expires > receipt_expires:
             errors.append("manifest expiry exceeds parent authority expiry")
+        if receipt_expires > policy_expires:
+            errors.append("parent authority expiry exceeds policy expiry")
     except (KeyError, ValueError) as exc:
         errors.append(str(exc))
     digest = authority_receipt_digest(receipt)
@@ -287,9 +333,16 @@ def validate_manifest(
         if manifest.get("policy_digest") != policy_result.get("policy_digest"):
             reasons.append("AUTONOMOUS_POLICY_DIGEST_DRIFT")
         try:
+            policy_issued = parse_utc(str(policy["issued_at"]), "policy.issued_at")
+            policy_expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
             issued = parse_utc(str(manifest["issued_at"]), "manifest.issued_at")
             expires = parse_utc(str(manifest["expires_at"]), "manifest.expires_at")
-            policy_expires = parse_utc(str(policy["expires_at"]), "policy.expires_at")
+            if issued < policy_issued:
+                reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
+                details.append("manifest issued_at cannot precede policy issued_at")
+            if issued > now:
+                reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
+                details.append("manifest issued_at is in the future")
             if expires <= issued or expires > policy_expires:
                 reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
                 details.append("manifest expiry must follow issue time and must not exceed policy expiry")
@@ -315,9 +368,10 @@ def validate_manifest(
                 reasons.append("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING")
                 details.append(f"{task_id}: risk exceeds policy ceiling")
             branch = str(task.get("working_branch", ""))
-            if branch in {"main", "pre-prod"} or not branch.startswith(prefix):
+            branch_error = _branch_ref_error(branch, required_prefix=prefix)
+            if branch_error:
                 reasons.append("AUTONOMOUS_SCOPE_DRIFT")
-                details.append(f"{task_id}: working branch violates policy prefix/protected-branch rule")
+                details.append(f"{task_id}: invalid working branch {branch!r}: {branch_error}")
             actions = set(task.get("authorized_g2_actions", []))
             if not actions.issubset(allowed_actions) or actions & denied_actions:
                 reasons.append("AUTONOMOUS_ACTION_FORBIDDEN")
