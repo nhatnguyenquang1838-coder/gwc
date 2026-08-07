@@ -4,13 +4,11 @@
 This is a data-only, fail-closed validator. It does not call Jira, GitHub, or a
 deployment system and never grants authority.
 
-For G4 merge actions, the packet must include both:
-
-* a trusted PR-native ``gwc:g4-authority-receipt`` readback; and
-* a trusted ``gwc:g4-pr-evidence-receipt`` binding the current PR body, run
-  graph, G0→G6 story, and managed-evidence digest to the current PR head.
-
-Chat-only approval or a stale PR-description receipt is never merge-ready.
+Every G4 merge requires a trusted PR-native ``gwc:g4-authority-receipt``.
+Autonomous pre-prod merges additionally require a trusted
+``gwc:g4-pr-evidence-receipt`` binding the current PR body, run graph, G0→G6
+story, and managed-evidence digest to the current PR head. Legacy/normal G4
+packets remain compatible unless autonomous evidence is explicitly expected.
 """
 from __future__ import annotations
 
@@ -205,6 +203,30 @@ def _g4_pr_evidence_errors(
     return errors
 
 
+def _requires_g4_pr_evidence(
+    packet: dict[str, Any],
+    *,
+    expected_pr_body_digest: str | None,
+    expected_managed_block_digest: str | None,
+    expected_run_graph_digest: str | None,
+    expected_gate_story_digest: str | None,
+    expected_evidence_digest: str | None,
+) -> bool:
+    receipt = packet.get("evidence_readback", {}).get("g4_pr_evidence_receipt")
+    expected = (
+        expected_pr_body_digest,
+        expected_managed_block_digest,
+        expected_run_graph_digest,
+        expected_gate_story_digest,
+        expected_evidence_digest,
+    )
+    return (
+        str(packet.get("working_branch", "")).startswith("auto/")
+        or isinstance(receipt, dict)
+        or any(value is not None for value in expected)
+    )
+
+
 def semantic_errors(
     packet: dict[str, Any],
     *,
@@ -271,20 +293,28 @@ def semantic_errors(
                 expected_g4_scope_prefix=expected_g4_scope_prefix,
             )
         )
-        errors.extend(
-            _g4_pr_evidence_errors(
-                packet,
-                now=now,
-                expected_head_sha=expected_head_sha,
-                expected_g4_approval_id=expected_g4_approval_id,
-                expected_g4_scope_prefix=expected_g4_scope_prefix,
-                expected_pr_body_digest=expected_pr_body_digest,
-                expected_managed_block_digest=expected_managed_block_digest,
-                expected_run_graph_digest=expected_run_graph_digest,
-                expected_gate_story_digest=expected_gate_story_digest,
-                expected_evidence_digest=expected_evidence_digest,
+        if _requires_g4_pr_evidence(
+            packet,
+            expected_pr_body_digest=expected_pr_body_digest,
+            expected_managed_block_digest=expected_managed_block_digest,
+            expected_run_graph_digest=expected_run_graph_digest,
+            expected_gate_story_digest=expected_gate_story_digest,
+            expected_evidence_digest=expected_evidence_digest,
+        ):
+            errors.extend(
+                _g4_pr_evidence_errors(
+                    packet,
+                    now=now,
+                    expected_head_sha=expected_head_sha,
+                    expected_g4_approval_id=expected_g4_approval_id,
+                    expected_g4_scope_prefix=expected_g4_scope_prefix,
+                    expected_pr_body_digest=expected_pr_body_digest,
+                    expected_managed_block_digest=expected_managed_block_digest,
+                    expected_run_graph_digest=expected_run_graph_digest,
+                    expected_gate_story_digest=expected_gate_story_digest,
+                    expected_evidence_digest=expected_evidence_digest,
+                )
             )
-        )
 
     readback = packet.get("evidence_readback", {})
     for field in ("task_id", "repository", "base_sha", "head_sha", "gate", "action", "scope_hash"):
