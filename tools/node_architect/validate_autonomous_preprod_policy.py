@@ -79,6 +79,14 @@ def _dedupe(values: list[str]) -> list[str]:
     return list(dict.fromkeys(values))
 
 
+def _target_reasons(target: Any) -> tuple[list[str], list[str]]:
+    if target == "main":
+        return ["AUTONOMOUS_MAIN_TARGET_FORBIDDEN"], ["autonomous target branch must never be main"]
+    if target is not None and target != "pre-prod":
+        return ["AUTONOMOUS_PREPROD_TARGET_REQUIRED"], ["autonomous integration target must be pre-prod"]
+    return [], []
+
+
 def validate_policy(
     policy: Mapping[str, Any],
     *,
@@ -86,8 +94,7 @@ def validate_policy(
     now: datetime | None = None,
 ) -> dict[str, Any]:
     now = now or datetime.now(timezone.utc)
-    reasons: list[str] = []
-    details: list[str] = []
+    reasons, details = _target_reasons(policy.get("target_branch"))
     schema_path = root / "schemas/autonomous-preprod-run-policy.schema.json"
     try:
         errors = _schema_errors(policy, schema_path)
@@ -97,10 +104,6 @@ def validate_policy(
         reasons.append("AUTONOMOUS_POLICY_INVALID")
         details.extend(errors)
     else:
-        if policy.get("target_branch") == "main":
-            reasons.append("AUTONOMOUS_MAIN_TARGET_FORBIDDEN")
-        elif policy.get("target_branch") != "pre-prod":
-            reasons.append("AUTONOMOUS_PREPROD_TARGET_REQUIRED")
         if RISK_ORDER.get(str(policy.get("max_child_risk")), 99) > RISK_ORDER["R2"]:
             reasons.append("AUTONOMOUS_POLICY_INVALID")
             details.append("max_child_risk must not exceed R2")
@@ -146,6 +149,9 @@ def validate_manifest(
     policy_result = validate_policy(policy, root=root, now=now)
     reasons = list(policy_result["reason_codes"])
     details = list(policy_result["details"])
+    target_reasons, target_details = _target_reasons(manifest.get("target_branch"))
+    reasons.extend(target_reasons)
+    details.extend(target_details)
     schema_path = root / "schemas/autonomous-preprod-run-manifest.schema.json"
     try:
         schema_errors = _schema_errors(manifest, schema_path)
@@ -158,10 +164,9 @@ def validate_manifest(
         if manifest.get("repository") != policy.get("repository"):
             reasons.append("AUTONOMOUS_SCOPE_DRIFT")
             details.append("manifest repository does not match policy repository")
-        if manifest.get("target_branch") == "main":
-            reasons.append("AUTONOMOUS_MAIN_TARGET_FORBIDDEN")
-        elif manifest.get("target_branch") != "pre-prod" or manifest.get("target_branch") != policy.get("target_branch"):
-            reasons.append("AUTONOMOUS_PREPROD_TARGET_REQUIRED")
+        if manifest.get("target_branch") != policy.get("target_branch"):
+            reasons.append("AUTONOMOUS_SCOPE_DRIFT")
+            details.append("manifest target branch does not match policy target branch")
         if manifest.get("policy_id") != policy.get("policy_id") or manifest.get("policy_revision") != policy.get("policy_revision"):
             reasons.append("AUTONOMOUS_POLICY_REVISION_DRIFT")
         if manifest.get("policy_digest") != policy_result.get("policy_digest"):
