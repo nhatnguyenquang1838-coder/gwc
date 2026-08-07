@@ -84,6 +84,8 @@ push_working_branch
 
 Eligibility requires current policy + approved parent manifest, trusted parent authority receipt, exact approved base SHA, matching `auto/` working branch, **request risk exactly equal to the manifest-approved task risk**, requested paths/actions contained by the task allowlist, and no protected control-plane overlap. Any attempted risk downgrade or upgrade is `AUTONOMOUS_SCOPE_DRIFT` and fails closed.
 
+All policy-protected and task-authorized paths must be canonical repository-relative POSIX paths. Absolute paths, backslashes, empty path segments, `.`/`..` segments and glob metacharacters are forbidden. This rule is applied before protected-path overlap checks so path traversal or repository-root aliases cannot bypass self-modification controls.
+
 The output carries `parent_approval_id`, `parent_scope_hash_prefix` and `parent_authority_digest`, explicitly sets `g4_g5_g6_authority_granted: false`, and includes:
 
 ```text
