@@ -36,6 +36,23 @@ PROHIBITED_ACTIONS = {
     "history_rewrite",
     "pr_base_change",
 }
+MANDATORY_CONTROL_PLANE_PROTECTED_PATHS = {
+    "AGENTS.md",
+    "project-instructions.md",
+    ".github/workflows",
+    "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
+    "core/node-architect",
+    "governance/autonomous-preprod-policy.yaml",
+    "schemas/autonomous-preprod-run-policy.schema.json",
+    "schemas/autonomous-preprod-run-manifest.schema.json",
+    "schemas/autonomous-preprod-g4-receipt.schema.json",
+    "schemas/gate-action-authority.schema.json",
+    "schemas/node-architect",
+    "tools/node_architect",
+    "tools/validate_gate_action.py",
+}
 RUN_AUTHORITY_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
 GITHUB_ACTIONS_BOT = "github-actions[bot]"
 GITHUB_ACTIONS_BOT_COMMENT = "github_actions_bot_comment"
@@ -141,7 +158,12 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
         if missing_denies:
             reasons.append("AUTONOMOUS_POLICY_INVALID")
             details.append("policy denied_actions missing: " + ", ".join(missing_denies))
-        for protected_path in policy.get("control_plane_protected_paths", []):
+        protected_paths = set(policy.get("control_plane_protected_paths", []))
+        missing_protected = sorted(MANDATORY_CONTROL_PLANE_PROTECTED_PATHS - protected_paths)
+        if missing_protected:
+            reasons.append("AUTONOMOUS_POLICY_INVALID")
+            details.append("policy control_plane_protected_paths missing mandatory entries: " + ", ".join(missing_protected))
+        for protected_path in protected_paths:
             path_error = _repo_path_error(protected_path)
             if path_error:
                 reasons.append("AUTONOMOUS_POLICY_INVALID")
