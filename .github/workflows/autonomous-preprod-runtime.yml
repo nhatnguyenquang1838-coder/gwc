@@ -179,6 +179,208 @@ jobs:
             autonomous-runtime-output/updated-pr-body.md
           if-no-files-found: error
 
+  contract-canary:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify exact PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Materialize deterministic canary manifest
+        env:
+          REPOSITORY: ${{ github.repository }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          events = [
+              {
+                  "event_id": "canary-g0",
+                  "sequence": 0,
+                  "gate": "G0_CONTEXT",
+                  "participant_type": "runtime_node",
+                  "participant_id": "intake_context.context-snapshot",
+                  "purpose": "bind deterministic canary context",
+                  "status": "passed",
+                  "entry_evidence": [f"git:{os.environ['BASE_SHA']}"],
+                  "action": "read_context",
+                  "outcome": "CONTEXT_READY",
+                  "evidence_refs": ["fixture:g0-context"],
+                  "next_event_id": "canary-g1",
+                  "edge_type": "runtime",
+                  "route_provenance": "fixture:g0-to-g1",
+              },
+              {
+                  "event_id": "canary-g1",
+                  "sequence": 1,
+                  "gate": "G1_ALIGNMENT",
+                  "participant_type": "gate_action",
+                  "participant_id": "g1-alignment-decision",
+                  "purpose": "record deterministic canary scope",
+                  "status": "passed",
+                  "entry_evidence": ["fixture:g0-context"],
+                  "action": "select_option",
+                  "outcome": "FIXTURE_SCOPE_SELECTED",
+                  "evidence_refs": ["fixture:g1-decision"],
+                  "next_event_id": "canary-g2",
+                  "edge_type": "authority",
+                  "route_provenance": "fixture:option-1",
+              },
+              {
+                  "event_id": "canary-g2",
+                  "sequence": 2,
+                  "gate": "G2_EXECUTION",
+                  "participant_type": "runtime_node",
+                  "participant_id": "gate_authority.gate-state-resolution",
+                  "purpose": "render evidence without external side effects",
+                  "status": "passed",
+                  "entry_evidence": ["fixture:g1-decision"],
+                  "action": "render_fixture_evidence",
+                  "outcome": "FIXTURE_EVIDENCE_RENDERED",
+                  "evidence_refs": ["fixture:runtime-result"],
+                  "next_event_id": None,
+                  "edge_type": "runtime",
+                  "route_provenance": "fixture:g2-terminal",
+              },
+          ]
+          manifest = {
+              "run_id": f"ci-canary-{os.environ['HEAD_SHA'][:12]}",
+              "task_id": "SCRUM-271",
+              "repository": os.environ["REPOSITORY"],
+              "base_ref": os.environ["BASE_REF"],
+              "base_sha": os.environ["BASE_SHA"],
+              "head_ref": os.environ["HEAD_REF"],
+              "head_sha": os.environ["HEAD_SHA"],
+              "pr_base": "pre-prod",
+              "graph_revision": "scrum-271-v0.1-canary",
+              "events": events,
+              "gate_statuses": {
+                  "G3_PR": "not_executed",
+                  "G4_MERGE": "not_executed",
+                  "G5_DEPLOY": "not_executed",
+                  "G6_PRODUCTION_DATA": "not_applicable",
+              },
+              "validation": {"source": "pull_request_contract_canary"},
+              "g4_readiness": {"state": "not_ready", "reason": "fixture_only"},
+          }
+          Path("canary-manifest.json").write_text(
+              json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+              encoding="utf-8",
+          )
+          Path("fixture-pr-body.md").write_text("# Fixture PR body\n", encoding="utf-8")
+          PY
+
+      - name: Execute deterministic evidence canary
+        run: |
+          python -m tools.node_architect.autonomous_preprod_runtime \
+            canary-manifest.json \
+            --output-dir canary-output \
+            --pr-body-in fixture-pr-body.md \
+            --expected-repository "${{ github.repository }}" \
+            --expected-base-sha "${{ github.event.pull_request.base.sha }}"
+
+      - name: Validate canary artifacts and managed-body readback
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from jsonschema import Draft202012Validator, FormatChecker
+
+          pairs = [
+              ("schemas/node-architect/autonomous-run-graph.schema.json", "canary-output/runtime-graph.json"),
+              ("schemas/node-architect/gate-story.schema.json", "canary-output/gate-story.json"),
+          ]
+          for schema_path, artifact_path in pairs:
+              schema = json.loads(Path(schema_path).read_text(encoding="utf-8"))
+              artifact = json.loads(Path(artifact_path).read_text(encoding="utf-8"))
+              errors = list(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(artifact))
+              if errors:
+                  raise SystemExit("\n".join(error.message for error in errors))
+          result = json.loads(Path("canary-output/runtime-result.json").read_text(encoding="utf-8"))
+          body = Path("canary-output/updated-pr-body.md").read_text(encoding="utf-8")
+          if result["status"] != "PASS" or not body.startswith("# Fixture PR body"):
+              raise SystemExit("canary result/body readback mismatch")
+          if body.count("<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->") != 1:
+              raise SystemExit("managed evidence block was not rendered exactly once")
+          PY
+
+      - name: Verify main-target denial before artifacts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("canary-manifest.json").read_text(encoding="utf-8"))
+          manifest["pr_base"] = "main"
+          Path("main-deny-manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+          PY
+          if python -m tools.node_architect.autonomous_preprod_runtime \
+            main-deny-manifest.json \
+            --output-dir main-deny-output \
+            --expected-repository "${{ github.repository }}" \
+            --expected-base-sha "${{ github.event.pull_request.base.sha }}"; then
+            echo "main-target fixture unexpectedly passed"
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("main-deny-output/runtime-result.json").read_text(encoding="utf-8"))
+          if result["terminal_code"] != "AUTONOMOUS_MAIN_TARGET_FORBIDDEN":
+              raise SystemExit("main-target denial reason mismatch")
+          for name in ("runtime-graph.json", "gate-story.json", "pr-run-evidence.md", "updated-pr-body.md"):
+              if (Path("main-deny-output") / name).exists():
+                  raise SystemExit(f"forbidden artifact created: {name}")
+          PY
+
+      - name: Run focused runtime tests
+        run: |
+          python -m unittest \
+            tests.test_run_graph_builder \
+            tests.test_gate_storyteller \
+            tests.test_pr_run_evidence_renderer \
+            tests.test_autonomous_preprod_workflow_contract \
+            tests.test_validate_gate_action
+
+      - name: Upload exact-head canary artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-contract-canary-${{ github.event.pull_request.head.sha }}
+          path: |
+            canary-manifest.json
+            fixture-pr-body.md
+            canary-output/runtime-result.json
+            canary-output/runtime-graph.json
+            canary-output/gate-story.json
+            canary-output/pr-run-evidence.md
+            canary-output/updated-pr-body.md
+            main-deny-output/runtime-result.json
+          if-no-files-found: error
+
   g4-pr-evidence-authority:
     if: >-
       github.event_name == 'issue_comment' &&
@@ -277,21 +479,7 @@ jobs:
             };
             fs.writeFileSync('g4-pr-evidence-receipt.json', JSON.stringify(receipt, null, 2));
             const marker = `<!-- gwc:g4-pr-evidence-receipt approval_id=${receipt.approval_id} head=${receipt.approved_head_sha} scope=${receipt.scope_hash_prefix} pr_body=${receipt.pr_body_digest} managed=${receipt.managed_block_digest} graph=${receipt.run_graph_digest} story=${receipt.gate_story_digest} evidence=${receipt.evidence_digest} source_comment_id=${receipt.source_comment_id} expires=${receipt.expires_at} -->`;
-            const receiptBody = `${marker}
-            ## G4 PR Evidence Receipt
-
-            | Field | Value |
-            |---|---|
-            | Approval ID | \`${receipt.approval_id}\` |
-            | Approved head | \`${receipt.approved_head_sha}\` |
-            | PR body digest | \`${receipt.pr_body_digest}\` |
-            | Managed block digest | \`${receipt.managed_block_digest}\` |
-            | Run graph digest | \`${receipt.run_graph_digest}\` |
-            | Gate story digest | \`${receipt.gate_story_digest}\` |
-            | Evidence digest | \`${receipt.evidence_digest}\` |
-            | Authorized action | Evidence binding only; merge authority is separate |
-
-            Any commit or PR-body edit makes this receipt stale.`;
+            const receiptBody = `${marker}\n## G4 PR Evidence Receipt\n\n| Field | Value |\n|---|---|\n| Approval ID | \`${receipt.approval_id}\` |\n| Approved head | \`${receipt.approved_head_sha}\` |\n| PR body digest | \`${receipt.pr_body_digest}\` |\n| Managed block digest | \`${receipt.managed_block_digest}\` |\n| Run graph digest | \`${receipt.run_graph_digest}\` |\n| Gate story digest | \`${receipt.gate_story_digest}\` |\n| Evidence digest | \`${receipt.evidence_digest}\` |\n| Authorized action | Evidence binding only; merge authority is separate |\n\nAny commit or PR-body edit makes this receipt stale.`;
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: prNumber, per_page: 100 });
             const existing = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(`gwc:g4-pr-evidence-receipt approval_id=${receipt.approval_id} `));
             if (existing) await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body: receiptBody });
@@ -326,7 +514,7 @@ jobs:
        contains(github.event.pull_request.body || '', '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->'))
     runs-on: ubuntu-latest
     steps:
-      - name: Mark current head blocked until exact G4 evidence is re-bound
+      - name: Require current autonomous G4 evidence binding
         uses: actions/github-script@v7
         with:
           script: |
@@ -337,33 +525,37 @@ jobs:
             const digest = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
             const begin = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->';
             const end = '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:END -->';
-            const start = prBody.indexOf(begin);
-            const finish = start >= 0 ? prBody.indexOf(end, start) + end.length : -1;
             let conclusion = 'failure';
             let title = 'Autonomous G4 evidence is missing or stale';
             let summary = 'Post the exact G4 approval command after the managed PR evidence block is current.';
-            if (start >= 0 && finish >= end.length) {
-              const managed = prBody.slice(start, finish);
-              const meta = managed.match(/<!-- gwc:autonomous-run-evidence run_id=([^ ]+) task=([^ ]+) head=([0-9a-f]{40}) graph=(sha256:[0-9a-f]{64}) story=(sha256:[0-9a-f]{64}) evidence=(sha256:[0-9a-f]{64}) -->/);
-              if (meta && meta[3] === pr.head.sha) {
-                const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
-                const prBodyDigest = digest(prBody);
-                const managedDigest = digest(managed);
-                const receipts = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-pr-evidence-receipt '));
-                const exact = receipts.filter((item) => {
-                  if (!item.body.includes(`head=${pr.head.sha} `) ||
-                      !item.body.includes(`pr_body=${prBodyDigest} `) ||
-                      !item.body.includes(`managed=${managedDigest} `) ||
-                      !item.body.includes(`graph=${meta[4]} `) ||
-                      !item.body.includes(`story=${meta[5]} `) ||
-                      !item.body.includes(`evidence=${meta[6]} `)) return false;
-                  const expiry = item.body.match(/ expires=([^ ]+) -->/);
-                  return expiry && Number.isFinite(new Date(expiry[1]).getTime()) && new Date(expiry[1]) > new Date();
-                }).at(-1);
-                if (exact) {
-                  conclusion = 'success';
-                  title = 'Autonomous G4 evidence is current';
-                  summary = `Trusted receipt comment ${exact.id} binds the current PR body and head.`;
+            if (pr.base.ref === 'main') {
+              summary = 'AUTONOMOUS_MAIN_TARGET_FORBIDDEN: autonomous-run PRs cannot target main.';
+            } else {
+              const start = prBody.indexOf(begin);
+              const finish = start >= 0 ? prBody.indexOf(end, start) + end.length : -1;
+              if (start >= 0 && finish >= end.length) {
+                const managed = prBody.slice(start, finish);
+                const meta = managed.match(/<!-- gwc:autonomous-run-evidence run_id=([^ ]+) task=([^ ]+) head=([0-9a-f]{40}) graph=(sha256:[0-9a-f]{64}) story=(sha256:[0-9a-f]{64}) evidence=(sha256:[0-9a-f]{64}) -->/);
+                if (meta && meta[3] === pr.head.sha) {
+                  const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
+                  const prBodyDigest = digest(prBody);
+                  const managedDigest = digest(managed);
+                  const exact = comments.filter((item) => {
+                    if (item.user?.login !== 'github-actions[bot]' || !item.body?.includes('<!-- gwc:g4-pr-evidence-receipt ')) return false;
+                    if (!item.body.includes(`head=${pr.head.sha} `) ||
+                        !item.body.includes(`pr_body=${prBodyDigest} `) ||
+                        !item.body.includes(`managed=${managedDigest} `) ||
+                        !item.body.includes(`graph=${meta[4]} `) ||
+                        !item.body.includes(`story=${meta[5]} `) ||
+                        !item.body.includes(`evidence=${meta[6]} `)) return false;
+                    const expiry = item.body.match(/ expires=([^ ]+) -->/);
+                    return expiry && Number.isFinite(new Date(expiry[1]).getTime()) && new Date(expiry[1]) > new Date();
+                  }).at(-1);
+                  if (exact) {
+                    conclusion = 'success';
+                    title = 'Autonomous G4 evidence is current';
+                    summary = `Trusted receipt comment ${exact.id} binds the current PR body and head.`;
+                  }
                 }
               }
             }
