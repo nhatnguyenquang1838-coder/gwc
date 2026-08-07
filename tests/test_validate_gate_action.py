@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tools.node_architect.validate_autonomous_preprod_policy import canonical_digest
 from tools.validate_gate_action import canonical_scope_hash, validate
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,6 +74,40 @@ def g4_authority_receipt(
     }
 
 
+def standing_g4_receipt(
+    *, head_sha: str = HEAD_SHA, expires_at: str = "2026-08-07T19:44:00Z",
+    pr_body_digest: str = DIGEST_A, managed_digest: str = DIGEST_B,
+    graph_digest: str = DIGEST_C, story_digest: str = DIGEST_D,
+    evidence_digest: str = DIGEST_E,
+) -> dict:
+    value = {
+        "schema_version": "1.0",
+        "artifact_type": "autonomous-preprod-g4-receipt",
+        "decision": "ALLOW",
+        "source": "autonomous_preprod_standing_policy",
+        "policy_id": "AUTONOMOUS_PREPROD_INTEGRATION_POLICY",
+        "policy_revision": "test-v1",
+        "policy_digest": DIGEST_A,
+        "manifest_digest": DIGEST_B,
+        "run_id": "run-scrum-271-fixture-1",
+        "task_id": "SCRUM-271",
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "target_branch": "pre-prod",
+        "pr_number": 271,
+        "approved_head_sha": head_sha,
+        "task_scope_hash": DIGEST_C,
+        "pr_body_digest": pr_body_digest,
+        "managed_block_digest": managed_digest,
+        "run_graph_digest": graph_digest,
+        "gate_story_digest": story_digest,
+        "evidence_digest": evidence_digest,
+        "authorized_action": "merge_approved_pr",
+        "expires_at": expires_at,
+    }
+    value["decision_digest"] = canonical_digest(value)
+    return value
+
+
 def g4_pr_evidence_receipt(
     *, head_sha: str = HEAD_SHA, status: str = "present",
     approval_id: str = G4_APPROVAL_ID, scope_prefix: str = G4_SCOPE_PREFIX,
@@ -97,6 +132,7 @@ def g4_pr_evidence_receipt(
 def g4_merge_packet(
     *, include_authority: bool = True, include_evidence: bool = True,
     authority: dict | None = None, evidence: dict | None = None,
+    standing: dict | None = None,
 ) -> dict:
     value = packet()
     value["gate"] = "G4_MERGE"
@@ -113,6 +149,8 @@ def g4_merge_packet(
     })
     if include_authority:
         value["evidence_readback"]["g4_authority_receipt"] = authority or g4_authority_receipt()
+    if standing is not None:
+        value["evidence_readback"]["autonomous_preprod_g4_receipt"] = standing
     if include_evidence:
         value["evidence_readback"]["g4_pr_evidence_receipt"] = evidence or g4_pr_evidence_receipt()
     value["scope_hash"] = canonical_scope_hash(value)
@@ -185,12 +223,46 @@ class GateActionAuthorityTests(unittest.TestCase):
             expected_evidence_digest=DIGEST_E,
         ))
 
+    def test_standing_g4_replaces_human_authority_but_keeps_pr_evidence(self):
+        value = g4_merge_packet(include_authority=False, standing=standing_g4_receipt())
+        value["working_branch"] = "auto/run-scrum-271/SCRUM-271"
+        value["scope"]["risk_class"] = "R2"
+        rehash(value)
+        self.assertEqual([], self.validate_g4(
+            value,
+            expected_pr_body_digest=DIGEST_A, expected_managed_block_digest=DIGEST_B,
+            expected_run_graph_digest=DIGEST_C, expected_gate_story_digest=DIGEST_D,
+            expected_evidence_digest=DIGEST_E,
+        ))
+
+    def test_standing_g4_without_pr_evidence_fails_closed(self):
+        value = g4_merge_packet(include_authority=False, include_evidence=False, standing=standing_g4_receipt())
+        value["working_branch"] = "auto/run-scrum-271/SCRUM-271"
+        value["scope"]["risk_class"] = "R2"
+        rehash(value)
+        self.assertTrue(any("G4_PR_EVIDENCE_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(value)))
+
+    def test_standing_g4_rejects_stale_head(self):
+        value = g4_merge_packet(include_authority=False, standing=standing_g4_receipt(head_sha=DRIFTED_HEAD_SHA))
+        value["working_branch"] = "auto/run-scrum-271/SCRUM-271"
+        value["scope"]["risk_class"] = "R2"
+        rehash(value)
+        self.assertTrue(any("AUTONOMOUS_STANDING_G4_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(value)))
+
+    def test_standing_g4_rejects_decision_digest_tampering(self):
+        receipt = standing_g4_receipt(); receipt["policy_revision"] = "tampered"
+        value = g4_merge_packet(include_authority=False, standing=receipt)
+        value["working_branch"] = "auto/run-scrum-271/SCRUM-271"
+        value["scope"]["risk_class"] = "R2"
+        rehash(value)
+        self.assertTrue(any("decision_digest" in e for e in self.validate_g4(value)))
+
     def test_g4_merge_requires_runtime_current_head(self):
         errors = validate(g4_merge_packet(), schema_path=ROOT / "schemas/gate-action-authority.schema.json", now=datetime(2026, 8, 6, 21, 0, tzinfo=timezone.utc), observed_pr_state="open")
         self.assertTrue(any("expected current PR head SHA" in e for e in errors))
 
     def test_g4_merge_requires_existing_authority_receipt(self):
-        self.assertTrue(any("g4_authority_receipt" in e for e in self.validate_g4(g4_merge_packet(include_authority=False))))
+        self.assertTrue(any("G4 merge requires" in e for e in self.validate_g4(g4_merge_packet(include_authority=False))))
 
     def test_g4_merge_rejects_untrusted_authority_status(self):
         self.assertTrue(any("G4_AUTHORITY_RECEIPT_MISSING_OR_STALE" in e for e in self.validate_g4(g4_merge_packet(authority=g4_authority_receipt(status="missing")))))
