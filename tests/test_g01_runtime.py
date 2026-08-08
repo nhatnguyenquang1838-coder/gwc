@@ -141,6 +141,106 @@ class G01RuntimeGenerationTests(unittest.TestCase):
             self.assertEqual("PASS", preflight["outcome"])
             self.assertEqual("G2_AUTOMATIC_BOUNDED", preflight["required_gate"])
 
+
+    def test_local_agent_requires_source_baseline_evidence(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["execution_mode"] = "local_agent"
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("BLOCKED", outcome)
+        self.assertIn(
+            "SOURCE_BASELINE_EVIDENCE_REQUIRED",
+            {item["code"] for item in artifacts["preflight"]["blockers"]},
+        )
+
+    def test_local_agent_clean_matching_source_is_eligible(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["execution_mode"] = "local_agent"
+        payload["repository"]["source_baseline"] = {
+            "authority": "REMOTE_PROTECTED_BASE",
+            "provider": "GitHub",
+            "observed_ref": payload["repository"]["base_ref"],
+            "observed_sha": payload["repository"]["base_sha"],
+            "observed_at_utc": "2026-08-08T14:00:00Z",
+            "local_state": {
+                "ref": payload["repository"]["base_ref"],
+                "head_sha": payload["repository"]["base_sha"],
+                "dirty": False,
+                "equivalence": "MATCH",
+                "analysis_eligible": True,
+            },
+        }
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("PASS", outcome)
+        source_check = next(item for item in artifacts["preflight"]["checks"] if item["id"] == "SOURCE_BASELINE")
+        self.assertEqual("SOURCE_BASELINE_VERIFIED", source_check["code"])
+
+    def test_stale_local_state_isolated_while_remote_baseline_remains_valid(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["execution_mode"] = "local_agent"
+        payload["repository"]["source_baseline"] = {
+            "authority": "REMOTE_PROTECTED_BASE",
+            "provider": "GitHub",
+            "observed_ref": payload["repository"]["base_ref"],
+            "observed_sha": payload["repository"]["base_sha"],
+            "observed_at_utc": "2026-08-08T14:00:00Z",
+            "local_state": {
+                "ref": "main",
+                "head_sha": "1111111111111111111111111111111111111111",
+                "dirty": False,
+                "equivalence": "MISMATCH",
+                "analysis_eligible": False,
+            },
+        }
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("PASS", outcome)
+        source_check = next(item for item in artifacts["preflight"]["checks"] if item["id"] == "SOURCE_BASELINE")
+        self.assertEqual("LOCAL_ANALYSIS_SOURCE_ISOLATED", source_check["code"])
+
+    def test_dirty_local_state_cannot_be_marked_analysis_eligible(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["execution_mode"] = "local_agent"
+        payload["repository"]["source_baseline"] = {
+            "authority": "REMOTE_PROTECTED_BASE",
+            "provider": "GitHub",
+            "observed_ref": payload["repository"]["base_ref"],
+            "observed_sha": payload["repository"]["base_sha"],
+            "observed_at_utc": "2026-08-08T14:00:00Z",
+            "local_state": {
+                "ref": payload["repository"]["base_ref"],
+                "head_sha": payload["repository"]["base_sha"],
+                "dirty": True,
+                "equivalence": "MATCH",
+                "analysis_eligible": True,
+            },
+        }
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("BLOCKED", outcome)
+        self.assertIn(
+            "LOCAL_ANALYSIS_SOURCE_INELIGIBLE",
+            {item["code"] for item in artifacts["preflight"]["blockers"]},
+        )
+
+    def test_source_baseline_sha_must_match_repository_base(self) -> None:
+        payload = copy.deepcopy(self.valid_input)
+        payload["runtime"]["execution_mode"] = "local_agent"
+        payload["repository"]["source_baseline"] = {
+            "authority": "EXPLICIT_TASK_REF",
+            "provider": "GitHub",
+            "observed_ref": "refs/heads/example",
+            "observed_sha": "2222222222222222222222222222222222222222",
+            "observed_at_utc": "2026-08-08T14:00:00Z",
+            "local_state": {
+                "ref": None, "head_sha": None, "dirty": None,
+                "equivalence": "NOT_APPLICABLE", "analysis_eligible": False,
+            },
+        }
+        artifacts, outcome = self.module.generate_artifacts(payload)
+        self.assertEqual("BLOCKED", outcome)
+        self.assertIn(
+            "SOURCE_BASELINE_SHA_MISMATCH",
+            {item["code"] for item in artifacts["preflight"]["blockers"]},
+        )
+
     def test_invalid_input_exits_two_without_partial_artifacts(self) -> None:
         payload = copy.deepcopy(self.valid_input)
         payload["repository"]["base_sha"] = "not-a-sha"
