@@ -1,0 +1,87 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-08T18:39:12+0700'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-275
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Implement the real repository-delivery path for one autonomous task from the protected pre-prod SHA through exact-head G3 evidence and standing-policy G4 merge into pre-prod only.
+  why_now: SCRUM-271/272/273 are Done; the protected pre-prod branch and its governed delivery tooling do not yet exist. ChatGPT claimed this task but only reached AGENT_PREPARATION_BLOCKED with no artifacts. Hermes-PC reclaimed the AI-agent claim and must deliver the working path.
+desired_outcome: A guardrail-enforced delivery tool chain (branch, Draft PR, exact-head G3 readiness, standing-policy G4 receipt, governed squash merge into pre-prod) plus a runtime workflow and tests, with canonical merge proof.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected: [GWC runtime maintainers, autonomous pre-prod runtime consumers, SCRUM-276 continuation loop]
+scope:
+  in_scope:
+    - .gwc/tasks/SCRUM-275/** task-scoped GWC evidence
+    - tools/node_architect/create_autonomous_task_branch.py
+    - tools/node_architect/assemble_autonomous_preprod_pr.py
+    - tools/node_architect/validate_autonomous_g3_readiness.py
+    - tools/node_architect/materialize_autonomous_g4_receipt.py
+    - tools/node_architect/merge_autonomous_preprod_pr.py
+    - .github/workflows/autonomous-preprod-runtime.yml
+    - tests/test_autonomous_preprod_delivery.py
+    - tests/test_autonomous_preprod_g4_merge.py
+    - Bootstrap of the protected pre-prod branch from an approved main SHA
+  non_goals:
+    - Modify protected main or merge into main
+    - Any deploy, release, or production-data operation
+    - Direct push to pre-prod or autonomous branch deletion in MVP
+    - Changes to the SCRUM-271 graph renderer or SCRUM-272 policy loader beyond wrapping
+constraints:
+  - "allowed base: pre-prod; forbidden base: main"
+  - "allowed head: auto/<run-id>/<task-id>; merge method: squash (MVP)"
+  - "force push forbidden; PR base change forbidden; branch deletion by autonomous runtime forbidden in MVP"
+  - Draft PR cannot merge; Ready-for-Review requires exact current-head G3 PASS
+  - "head/base/scope/CI/review/PR-body/graph/story/policy drift blocks merge"
+  - "latest matching G4 receipt required; an old receipt elsewhere is insufficient"
+  - No deploy, release, or production authority is inferred from merge success
+assumptions:
+  - origin/main at 2e20badf04b4d84bf8a2e88d6e1e88d540745d35 is the current protected-base evidence (verified via git fetch origin main).
+  - SCRUM-271, SCRUM-272, SCRUM-273 are Done in live Jira and provide the graph/story renderer, the standing-policy loader, and the bounded task execution adapter.
+  - The implementation can reuse the repository's existing Python standard-library and jsonschema patterns without dependency changes.
+risks:
+  - id: RISK-1
+    description: The delivery path sits at a security-sensitive governance boundary (branch guardrails, G4 merge authority).
+    impact: high
+    mitigation: Keep each tool pure/fail-closed, wrap (not modify) existing nodes, add explicit guardrail tests, and run existing G3/G4 regressions.
+  - id: RISK-2
+    description: pre-prod does not yet exist; bootstrap must be idempotent and never target main.
+    impact: medium
+    mitigation: bootstrap_preprod is guarded and rejects main; re-check base drift before every write.
+acceptance_criteria:
+  - id: AC-1
+    statement: A canary Draft PR targets pre-prod and never main; base-change and force-push are rejected by the tool chain.
+    verifiable: true
+  - id: AC-2
+    statement: Draft PR cannot merge; a Ready-for-Review transition requires exact current-head G3 PASS with no drift.
+    verifiable: true
+  - id: AC-3
+    statement: Head, base, scope, CI, review, PR body, graph, story, or policy drift blocks merge (detected by the readiness/merge tools).
+    verifiable: true
+  - id: AC-4
+    statement: The latest matching standing-policy G4 receipt is required and validated; an old receipt elsewhere in the PR timeline is rejected.
+    verifiable: true
+  - id: AC-5
+    statement: Merge proof binds the approved head and the resulting pre-prod merge SHA; merge occurs into pre-prod only via squash.
+    verifiable: true
+  - id: AC-6
+    statement: A failed or unknown merge result is reconciled by PR/base readback before retry.
+    verifiable: true
+  - id: AC-7
+    statement: No deploy, release, or production authority is inferred from merge success.
+    verifiable: true
+  - id: AC-8
+    statement: Existing G3/G4 regression suites remain green after the new tests run.
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch, bootstrap_preprod_branch, create_draft_pr, mark_pr_ready_for_review, merge_into_preprod]
+  downstream_non_goals: [merge_into_main, deploy, release, production_data_write, production_config_change, credential_rotation, autonomous_branch_deletion]
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence: [G2 validation evidence, complete diff review, exact-head readback, independent review receipt, separate G4 approval]
+unresolved_questions: []
+status: READY

@@ -1,0 +1,82 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-08T18:39:12+0700'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-275
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: user
+  decided_at: '2026-08-08T18:39:12+0700'
+  source: 'current chat user message: gwc claim SCRUM-275 from ChatGPT and continue (reclaim AI-agent claim, deliver the task end-to-end through G4)'
+  explicit: true
+rationale: 'OPT-1 is the smallest compatible implementation of the live Jira contract: five fail-closed node_architect tools wrapping validated building blocks, a runtime workflow, and two test modules. It preserves existing nodes and keeps all later-gate authority (G4 merge, G5 deploy, G6 production) separate.'
+rejected_option_ids: [OPT-2, OPT-3]
+acceptance_criteria_refs: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8]
+scope_hash: sha256:10246501c24d699d78601e85824e4741d06bf151004094b9b8885132fe03d394
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded: [G4_MERGE, G5_DEPLOY, G6_PRODUCTION]
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: Pre-prod bootstrap plus task-branch creation tool.
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: Draft PR assembly with graph/story body, pre-prod base enforcement.
+      dependencies: [SUB-TASK-1]
+    - sub_task_id: SUB-TASK-3
+      description: Exact-head G3 readiness validator with drift detection.
+      dependencies: [SUB-TASK-2]
+    - sub_task_id: SUB-TASK-4
+      description: Standing-policy G4 receipt materializer.
+      dependencies: [SUB-TASK-3]
+    - sub_task_id: SUB-TASK-5
+      description: Governed pre-prod squash merge plus merge proof.
+      dependencies: [SUB-TASK-4]
+    - sub_task_id: SUB-TASK-6
+      description: Runtime workflow wiring the tools.
+      dependencies: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3, SUB-TASK-4, SUB-TASK-5]
+    - sub_task_id: SUB-TASK-7
+      description: Tests and regression run.
+      dependencies: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3, SUB-TASK-4, SUB-TASK-5, SUB-TASK-6]
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-4
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-5
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-6
+      skill_id: dw-task-me
+      agent_type: primary
+    - sub_task_id: SUB-TASK-7
+      skill_id: dw-task-me
+      agent_type: validator
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3, SUB-TASK-4, SUB-TASK-5, SUB-TASK-6, SUB-TASK-7]
+  summary: One atomic OPT-1 delivery lane; existing nodes are wrapped, not modified; no registry, connector, approval, PR base-change, deploy, or production work.
+implementation_plan_ref:
+  applicability: required
+  source: task_me
+  canonical_task_uid: SCRUM-275
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  plan_root: .gwc/tasks/SCRUM-275/g1/plan
+  plan_revision: sha256:f9fd424341f323aaaaf50632911756235510f49c78eeb2d743f75d62142b036c
+  validation_evidence: Task Me hook review against Jira SCRUM-275 contract and OPT-1 scope; plan revision sha256:f9fd424341f323aaaaf50632911756235510f49c78eeb2d743f75d62142b036c.
