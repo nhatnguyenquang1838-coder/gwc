@@ -1,1 +1,131 @@
-{"artifact_type":"profile-registry","profiles":[{"artifact_type":"flow-profile","graph_registry_ref":"gwc-runtime-graph-registry","green_targets":["runtime_checkpoint.checkpoint-persist","validation_quality.ci-evidence-capture","failure_recovery.timeout-recovery"],"id":"full-flow-v3","node_registry_ref":"gwc-runtime-node-registry","pilot_nodes":["repo_delivery.ci-run-capture","runtime_checkpoint.checkpoint-persist","validation_quality.ci-evidence-capture"],"provenance":{"source_path":"core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md","source_sha":"7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"},"revision":"scrum-104-20260726","routes":[{"human_boundary":false,"kind":"happy_path","nodes":["repo_delivery.ci-run-capture","runtime_checkpoint.checkpoint-persist","validation_quality.ci-evidence-capture"],"outcome":"GREEN","route_id":"happy-path-ci-evidence"},{"human_boundary":false,"kind":"history","nodes":["repo_delivery.ci-run-capture","runtime_checkpoint.checkpoint-persist"],"outcome":"GREEN","route_id":"history-missing-run"},{"human_boundary":true,"kind":"human_authority","nodes":["repo_delivery.ci-run-capture","failure_recovery.timeout-recovery"],"outcome":"HUMAN_REQUIRED","route_id":"human-sha-review"},{"human_boundary":false,"kind":"conditional","nodes":["runtime_checkpoint.checkpoint-persist","validation_quality.ci-evidence-capture"],"outcome":"CONDITIONAL","route_id":"conditional-ci-pending"}],"scenario_registry_ref":"gwc-runtime-scenario-registry","schema_version":"1.0.0","version":"1.0.0","visibility":{"inactive_node_class":"inactive","retain_inactive_nodes":true}},{"artifact_type":"flow-profile","graph_registry_ref":"gwc-runtime-graph-registry","green_targets":["validation_quality.ci-evidence-capture"],"id":"research-execution-v1","node_registry_ref":"gwc-runtime-node-registry","pilot_nodes":["gate_authority.research-review-to-execution","repo_delivery.ci-run-capture","validation_quality.ci-evidence-capture"],"provenance":{"source_path":"core/node-architect/POST_81_RUNTIME_NODE_EXTENSION_RULE_v0.1.md","source_sha":"f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"},"revision":"scrum-284-20260808","routes":[{"human_boundary":false,"kind":"happy_path","nodes":["gate_authority.research-review-to-execution","repo_delivery.ci-run-capture","runtime_checkpoint.checkpoint-persist","validation_quality.ci-evidence-capture"],"outcome":"GREEN","route_id":"research-approved-to-g3"},{"human_boundary":true,"kind":"human_authority","nodes":["gate_authority.research-review-to-execution","repo_delivery.ci-run-capture","validation_quality.ci-evidence-capture"],"outcome":"HUMAN_REQUIRED","route_id":"g4-merge-boundary"}],"scenario_registry_ref":"gwc-runtime-scenario-registry","schema_version":"1.0.0","version":"1.0.0","visibility":{"inactive_node_class":"inactive","retain_inactive_nodes":true}}],"provenance":"core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md","registry_id":"gwc-runtime-profile-registry","revision":"scrum-284-20260808","schema_version":"1.0.0"}
+{
+  "artifact_type": "profile-registry",
+  "profiles": [
+    {
+      "artifact_type": "flow-profile",
+      "graph_registry_ref": "gwc-runtime-graph-registry",
+      "green_targets": [
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture",
+        "failure_recovery.timeout-recovery"
+      ],
+      "id": "full-flow-v3",
+      "node_registry_ref": "gwc-runtime-node-registry",
+      "pilot_nodes": [
+        "repo_delivery.ci-run-capture",
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture"
+      ],
+      "provenance": {
+        "source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+        "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"
+      },
+      "revision": "scrum-104-20260726",
+      "routes": [
+        {
+          "human_boundary": false,
+          "kind": "happy_path",
+          "nodes": [
+            "repo_delivery.ci-run-capture",
+            "runtime_checkpoint.checkpoint-persist",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "outcome": "GREEN",
+          "route_id": "happy-path-ci-evidence"
+        },
+        {
+          "human_boundary": false,
+          "kind": "history",
+          "nodes": [
+            "repo_delivery.ci-run-capture",
+            "runtime_checkpoint.checkpoint-persist"
+          ],
+          "outcome": "GREEN",
+          "route_id": "history-missing-run"
+        },
+        {
+          "human_boundary": true,
+          "kind": "human_authority",
+          "nodes": [
+            "repo_delivery.ci-run-capture",
+            "failure_recovery.timeout-recovery"
+          ],
+          "outcome": "HUMAN_REQUIRED",
+          "route_id": "human-sha-review"
+        },
+        {
+          "human_boundary": false,
+          "kind": "conditional",
+          "nodes": [
+            "runtime_checkpoint.checkpoint-persist",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "outcome": "CONDITIONAL",
+          "route_id": "conditional-ci-pending"
+        }
+      ],
+      "scenario_registry_ref": "gwc-runtime-scenario-registry",
+      "schema_version": "1.0.0",
+      "version": "1.0.0",
+      "visibility": {
+        "inactive_node_class": "inactive",
+        "retain_inactive_nodes": true
+      }
+    },
+    {
+      "artifact_type": "flow-profile",
+      "graph_registry_ref": "gwc-runtime-graph-registry",
+      "green_targets": [
+        "validation_quality.ci-evidence-capture"
+      ],
+      "id": "research-execution-v1",
+      "node_registry_ref": "gwc-runtime-node-registry",
+      "pilot_nodes": [
+        "gate_authority.research-review-to-execution",
+        "repo_delivery.ci-run-capture",
+        "validation_quality.ci-evidence-capture"
+      ],
+      "provenance": {
+        "source_path": "core/node-architect/POST_81_RUNTIME_NODE_EXTENSION_RULE_v0.1.md",
+        "source_sha": "f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"
+      },
+      "revision": "scrum-284-20260808",
+      "routes": [
+        {
+          "human_boundary": false,
+          "kind": "happy_path",
+          "nodes": [
+            "gate_authority.research-review-to-execution",
+            "repo_delivery.ci-run-capture",
+            "runtime_checkpoint.checkpoint-persist",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "outcome": "GREEN",
+          "route_id": "research-approved-to-g3"
+        },
+        {
+          "human_boundary": true,
+          "kind": "human_authority",
+          "nodes": [
+            "gate_authority.research-review-to-execution",
+            "repo_delivery.ci-run-capture",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "outcome": "HUMAN_REQUIRED",
+          "route_id": "g4-merge-boundary"
+        }
+      ],
+      "scenario_registry_ref": "gwc-runtime-scenario-registry",
+      "schema_version": "1.0.0",
+      "version": "1.0.0",
+      "visibility": {
+        "inactive_node_class": "inactive",
+        "retain_inactive_nodes": true
+      }
+    }
+  ],
+  "provenance": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+  "registry_id": "gwc-runtime-profile-registry",
+  "revision": "scrum-284-20260808",
+  "schema_version": "1.0.0"
+}

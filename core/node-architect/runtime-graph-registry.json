@@ -1,1 +1,184 @@
-{"artifact_type":"runtime-graph","edges":[{"edge_type":"runtime","provenance":"scenario-registry:source-backed-route","runtime_executable":true,"source":"repo_delivery.ci-run-capture","target":"runtime_checkpoint.checkpoint-persist"},{"edge_type":"runtime","provenance":"scenario-registry:source-backed-route","runtime_executable":true,"source":"runtime_checkpoint.checkpoint-persist","target":"validation_quality.ci-evidence-capture"},{"edge_type":"runtime","provenance":"scenario-registry:source-backed-route","runtime_executable":true,"source":"repo_delivery.ci-run-capture","target":"failure_recovery.timeout-recovery"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"failure_recovery.approval-expiry-recovery","target":"gate_authority.approval-command-validation"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"gate_authority.approval-command-validation","target":"intake_context.context-gap-escalation"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"intake_context.context-gap-escalation","target":"package_export.deterministic-hash-verification"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"package_export.deterministic-hash-verification","target":"repo_delivery.base-drift-check"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"repo_delivery.base-drift-check","target":"runtime_checkpoint.cas-write-guard"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"runtime_checkpoint.cas-write-guard","target":"scale_control.batch-admission-check"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"scale_control.batch-admission-check","target":"sync_projection.ds-admin-state-projection"},{"edge_type":"visualization","provenance":"family scaffold for v3 grouping","runtime_executable":false,"source":"sync_projection.ds-admin-state-projection","target":"validation_quality.blocker-severity-classification"},{"edge_type":"runtime","provenance":"SCRUM-284:research-execution-handoff","runtime_executable":true,"source":"gate_authority.research-review-to-execution","target":"repo_delivery.ci-run-capture"}],"graph_id":"gwc-runtime-graph-registry","nodes":["failure_recovery.approval-expiry-recovery","failure_recovery.cas-mismatch-recovery","failure_recovery.crash-checkpoint-recovery","failure_recovery.duplicate-agent-fencing","failure_recovery.lease-expiry-recovery","failure_recovery.stale-session-reconciliation","failure_recovery.timeout-recovery","failure_recovery.unknown-write-reconciliation","failure_recovery.version-drift-rollback-routing","gate_authority.approval-command-validation","gate_authority.approval-token-generation","gate_authority.authority-boundary-check","gate_authority.blocked-action-escalation","gate_authority.evidence-artifact-map","gate_authority.g2-execution-envelope-render","gate_authority.gate-state-resolution","gate_authority.gate-transition-decision","gate_authority.scope-hash-calculation","intake_context.context-gap-escalation","intake_context.files-read-scope","intake_context.files-write-scope","intake_context.intake-card-render","intake_context.protected-base-capture","intake_context.repo-identity-check","intake_context.request-intake","intake_context.risk-classification","intake_context.source-resolution","package_export.deterministic-hash-verification","package_export.entry-schema-validation","package_export.export-failure-routing","package_export.export-manifest-generation","package_export.governance-tree-build","package_export.package-manifest-load","package_export.smoke-verification","package_export.source-path-safety-check","package_export.target-path-safety-check","repo_delivery.base-drift-check","repo_delivery.branch-creation","repo_delivery.ci-failure-repair","repo_delivery.ci-run-capture","repo_delivery.diff-readback","repo_delivery.draft-pr-creation","repo_delivery.pr-blocker-check","repo_delivery.ready-for-review-promotion","repo_delivery.scoped-file-write","runtime_checkpoint.cas-write-guard","runtime_checkpoint.checkpoint-capture","runtime_checkpoint.checkpoint-expiry-cleanup","runtime_checkpoint.checkpoint-persist","runtime_checkpoint.lease-acquisition","runtime_checkpoint.lease-renewal","runtime_checkpoint.resume-token-generation","runtime_checkpoint.resume-token-validation","runtime_checkpoint.state-reconciliation","scale_control.batch-admission-check","scale_control.batch-size-limit-check","scale_control.catalog-cardinality-readiness","scale_control.exact-head-readiness-check","scale_control.execution-throttle-control","scale_control.independent-audit-handoff","scale_control.previous-batch-g5-verification","scale_control.rollout-progress-projection","scale_control.workflow-run-observability","sync_projection.ds-admin-state-projection","sync_projection.external-audit-event-projection","sync_projection.projection-drift-detection","sync_projection.projection-evidence-linking","sync_projection.projection-failure-routing","sync_projection.projection-privacy-boundary-check","sync_projection.projection-reconcile-readback","sync_projection.projection-source-authority-check","sync_projection.task-center-sync","validation_quality.blocker-severity-classification","validation_quality.ci-evidence-capture","validation_quality.evidence-quality-check","validation_quality.g3-pass-decision","validation_quality.reproducibility-check","validation_quality.schema-validation","validation_quality.side-effect-check","validation_quality.unit-test-mapping","validation_quality.validator-execution","gate_authority.research-review-to-execution"],"provenance":{"source_path":"core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md","source_sha":"7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"},"revision":{"revision_id":"scrum-284-20260808","parent_revision_id":"scrum-104-20260726","source_sha":"f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"},"schema_version":"1.0.0"}
+{
+  "artifact_type": "runtime-graph",
+  "edges": [
+    {
+      "edge_type": "runtime",
+      "provenance": "scenario-registry:source-backed-route",
+      "runtime_executable": true,
+      "source": "repo_delivery.ci-run-capture",
+      "target": "runtime_checkpoint.checkpoint-persist"
+    },
+    {
+      "edge_type": "runtime",
+      "provenance": "scenario-registry:source-backed-route",
+      "runtime_executable": true,
+      "source": "runtime_checkpoint.checkpoint-persist",
+      "target": "validation_quality.ci-evidence-capture"
+    },
+    {
+      "edge_type": "runtime",
+      "provenance": "scenario-registry:source-backed-route",
+      "runtime_executable": true,
+      "source": "repo_delivery.ci-run-capture",
+      "target": "failure_recovery.timeout-recovery"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "failure_recovery.approval-expiry-recovery",
+      "target": "gate_authority.approval-command-validation"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "gate_authority.approval-command-validation",
+      "target": "intake_context.context-gap-escalation"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "intake_context.context-gap-escalation",
+      "target": "package_export.deterministic-hash-verification"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "package_export.deterministic-hash-verification",
+      "target": "repo_delivery.base-drift-check"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "repo_delivery.base-drift-check",
+      "target": "runtime_checkpoint.cas-write-guard"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "runtime_checkpoint.cas-write-guard",
+      "target": "scale_control.batch-admission-check"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "scale_control.batch-admission-check",
+      "target": "sync_projection.ds-admin-state-projection"
+    },
+    {
+      "edge_type": "visualization",
+      "provenance": "family scaffold for v3 grouping",
+      "runtime_executable": false,
+      "source": "sync_projection.ds-admin-state-projection",
+      "target": "validation_quality.blocker-severity-classification"
+    },
+    {
+      "edge_type": "runtime",
+      "provenance": "SCRUM-284:research-execution-handoff",
+      "runtime_executable": true,
+      "source": "gate_authority.research-review-to-execution",
+      "target": "repo_delivery.ci-run-capture"
+    }
+  ],
+  "graph_id": "gwc-runtime-graph-registry",
+  "nodes": [
+    "failure_recovery.approval-expiry-recovery",
+    "failure_recovery.cas-mismatch-recovery",
+    "failure_recovery.crash-checkpoint-recovery",
+    "failure_recovery.duplicate-agent-fencing",
+    "failure_recovery.lease-expiry-recovery",
+    "failure_recovery.stale-session-reconciliation",
+    "failure_recovery.timeout-recovery",
+    "failure_recovery.unknown-write-reconciliation",
+    "failure_recovery.version-drift-rollback-routing",
+    "gate_authority.approval-command-validation",
+    "gate_authority.approval-token-generation",
+    "gate_authority.authority-boundary-check",
+    "gate_authority.blocked-action-escalation",
+    "gate_authority.evidence-artifact-map",
+    "gate_authority.g2-execution-envelope-render",
+    "gate_authority.gate-state-resolution",
+    "gate_authority.gate-transition-decision",
+    "gate_authority.scope-hash-calculation",
+    "intake_context.context-gap-escalation",
+    "intake_context.files-read-scope",
+    "intake_context.files-write-scope",
+    "intake_context.intake-card-render",
+    "intake_context.protected-base-capture",
+    "intake_context.repo-identity-check",
+    "intake_context.request-intake",
+    "intake_context.risk-classification",
+    "intake_context.source-resolution",
+    "package_export.deterministic-hash-verification",
+    "package_export.entry-schema-validation",
+    "package_export.export-failure-routing",
+    "package_export.export-manifest-generation",
+    "package_export.governance-tree-build",
+    "package_export.package-manifest-load",
+    "package_export.smoke-verification",
+    "package_export.source-path-safety-check",
+    "package_export.target-path-safety-check",
+    "repo_delivery.base-drift-check",
+    "repo_delivery.branch-creation",
+    "repo_delivery.ci-failure-repair",
+    "repo_delivery.ci-run-capture",
+    "repo_delivery.diff-readback",
+    "repo_delivery.draft-pr-creation",
+    "repo_delivery.pr-blocker-check",
+    "repo_delivery.ready-for-review-promotion",
+    "repo_delivery.scoped-file-write",
+    "runtime_checkpoint.cas-write-guard",
+    "runtime_checkpoint.checkpoint-capture",
+    "runtime_checkpoint.checkpoint-expiry-cleanup",
+    "runtime_checkpoint.checkpoint-persist",
+    "runtime_checkpoint.lease-acquisition",
+    "runtime_checkpoint.lease-renewal",
+    "runtime_checkpoint.resume-token-generation",
+    "runtime_checkpoint.resume-token-validation",
+    "runtime_checkpoint.state-reconciliation",
+    "scale_control.batch-admission-check",
+    "scale_control.batch-size-limit-check",
+    "scale_control.catalog-cardinality-readiness",
+    "scale_control.exact-head-readiness-check",
+    "scale_control.execution-throttle-control",
+    "scale_control.independent-audit-handoff",
+    "scale_control.previous-batch-g5-verification",
+    "scale_control.rollout-progress-projection",
+    "scale_control.workflow-run-observability",
+    "sync_projection.ds-admin-state-projection",
+    "sync_projection.external-audit-event-projection",
+    "sync_projection.projection-drift-detection",
+    "sync_projection.projection-evidence-linking",
+    "sync_projection.projection-failure-routing",
+    "sync_projection.projection-privacy-boundary-check",
+    "sync_projection.projection-reconcile-readback",
+    "sync_projection.projection-source-authority-check",
+    "sync_projection.task-center-sync",
+    "validation_quality.blocker-severity-classification",
+    "validation_quality.ci-evidence-capture",
+    "validation_quality.evidence-quality-check",
+    "validation_quality.g3-pass-decision",
+    "validation_quality.reproducibility-check",
+    "validation_quality.schema-validation",
+    "validation_quality.side-effect-check",
+    "validation_quality.unit-test-mapping",
+    "validation_quality.validator-execution",
+    "gate_authority.research-review-to-execution"
+  ],
+  "provenance": {
+    "source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+    "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"
+  },
+  "revision": {
+    "revision_id": "scrum-284-20260808",
+    "parent_revision_id": "scrum-104-20260726",
+    "source_sha": "f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"
+  },
+  "schema_version": "1.0.0"
+}
