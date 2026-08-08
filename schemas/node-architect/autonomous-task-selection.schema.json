@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/autonomous-task-selection.schema.json",
+  "title": "Autonomous Jira Task Selection Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "run_id",
+    "active_lane",
+    "excluded_lanes",
+    "selected_task",
+    "selection_reason",
+    "dependency_evidence",
+    "unsafe_done_dependencies",
+    "next_eligible_tasks",
+    "candidate_count",
+    "eligible_count",
+    "parallel_execution_allowed",
+    "authority_granted",
+    "selection_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "autonomous-task-selection"},
+    "run_id": {"type": "string", "minLength": 1},
+    "active_lane": {"type": "string", "minLength": 1},
+    "excluded_lanes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "selected_task": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"}
+      ]
+    },
+    "selection_reason": {"type": "string", "minLength": 1},
+    "dependency_evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/dependencyEvidence"}
+    },
+    "unsafe_done_dependencies": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/unsafeDone"}
+    },
+    "next_eligible_tasks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "candidate_count": {"type": "integer", "minimum": 0},
+    "eligible_count": {"type": "integer", "minimum": 0},
+    "parallel_execution_allowed": {"const": false},
+    "authority_granted": {"const": false},
+    "selection_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "dependencyEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_task", "dependency_task", "jira_status", "safe", "reasons", "evidence_refs"],
+      "properties": {
+        "candidate_task": {"type": "string", "minLength": 1},
+        "dependency_task": {"type": "string", "minLength": 1},
+        "jira_status": {"type": "string", "minLength": 1},
+        "safe": {"type": "boolean"},
+        "reasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "unsafeDone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "reasons", "evidence_refs"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
