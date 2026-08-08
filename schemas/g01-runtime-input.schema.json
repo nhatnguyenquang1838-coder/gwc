@@ -440,6 +440,98 @@
         },
         "verified": {
           "type": "boolean"
+        },
+        "source_baseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "authority",
+            "provider",
+            "observed_ref",
+            "observed_sha",
+            "observed_at_utc",
+            "local_state"
+          ],
+          "properties": {
+            "authority": {
+              "enum": [
+                "REMOTE_PROTECTED_BASE",
+                "EXPLICIT_TASK_REF"
+              ]
+            },
+            "provider": {
+              "type": "string",
+              "minLength": 1
+            },
+            "observed_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "observed_sha": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            "observed_at_utc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "local_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ref",
+                "head_sha",
+                "dirty",
+                "equivalence",
+                "analysis_eligible"
+              ],
+              "properties": {
+                "ref": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "head_sha": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{40}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "dirty": {
+                  "oneOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "equivalence": {
+                  "enum": [
+                    "MATCH",
+                    "MISMATCH",
+                    "UNVERIFIED",
+                    "NOT_APPLICABLE"
+                  ]
+                },
+                "analysis_eligible": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
         }
       }
     },
