@@ -1,5 +1,7 @@
 import hashlib
 import json
+from pathlib import Path
+import tempfile
 import unittest
 from datetime import datetime, timezone
 
@@ -88,6 +90,13 @@ def dep_ok():
 
 
 class FlowTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.store_path = str(Path(self.tmp.name) / "research-flow-checkpoint.json")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
     def base(self, trigger="immediate_after_approval"):
         r, a = research_and_approval()
         return r, a, {
@@ -99,13 +108,41 @@ class FlowTests(unittest.TestCase):
             "research_records": [r],
             "approvals": [a],
             "dependency_evidence": {"SCRUM-274": dep_ok()},
+            "checkpoint_store": {
+                "path": self.store_path,
+                "controller_task_id": "SCRUM-284",
+                "repository": r["repository"],
+                "branch": "chatgpt/test-research-flow",
+                "base_sha": a["base_sha"],
+                "head_sha": "f" * 40,
+                "scope_hash": a["scope_hash"],
+            },
         }
+
+    def projections(self, key):
+        gh = {"id": "325", "materialization_key": key, "origin_research_ref": "SCRUM-279"}
+        jr = {"id": "SCRUM-285", "materialization_key": key, "origin_research_ref": "SCRUM-279"}
+        return gh, jr
 
     def test_immediate_and_scheduled_selection_identical(self):
         r, a, p = self.base()
-        i = select_approved_research({k: v for k, v in p.items() if k not in {"dispatch_id"}}, now=NOW)
+        i = select_approved_research(
+            {
+                k: v
+                for k, v in p.items()
+                if k not in {"dispatch_id", "checkpoint_store"}
+            },
+            now=NOW,
+        )
         p["trigger_mode"] = "scheduled_poll"
-        s = select_approved_research({k: v for k, v in p.items() if k not in {"dispatch_id"}}, now=NOW)
+        s = select_approved_research(
+            {
+                k: v
+                for k, v in p.items()
+                if k not in {"dispatch_id", "checkpoint_store"}
+            },
+            now=NOW,
+        )
         self.assertEqual(i["selected_research"], s["selected_research"])
 
     def test_unsafe_done_dependency_rejected(self):
@@ -127,17 +164,28 @@ class FlowTests(unittest.TestCase):
         p["approvals"] = [a]
         out = run_research_execution_flow(p)
         self.assertEqual(out["outcome"], "STOPPED")
-        self.assertEqual(out["reason_code"], "CHILD_G2_RISK_EXCEEDS_PARENT_CEILING")
+        self.assertEqual(
+            out["reason_code"], "CHILD_G2_RISK_EXCEEDS_PARENT_CEILING"
+        )
         self.assertEqual(out["checkpoint"]["stop_reason"], out["reason_code"])
+        self.assertTrue(out["checkpoint_persisted"])
+
+    def test_external_effect_requires_durable_checkpoint_store(self):
+        r, a, p = self.base()
+        p.pop("checkpoint_store")
+        out = run_research_execution_flow(p)
+        self.assertEqual(out["outcome"], "STOPPED")
+        self.assertEqual(out["reason_code"], "DURABLE_CHECKPOINT_STORE_REQUIRED")
+        self.assertNotIn("external_actions", out)
 
     def test_full_external_sequence_stops_at_g4(self):
         r, a, p = self.base()
         one = run_research_execution_flow(p)
         self.assertEqual(one["outcome"], "ACTION_REQUIRED")
+        self.assertTrue(one["checkpoint_persisted"])
         cp = one["checkpoint"]
         key = cp["materialization_key"]
-        gh = {"id": "325", "materialization_key": key, "origin_research_ref": "SCRUM-279"}
-        jr = {"id": "SCRUM-285", "materialization_key": key, "origin_research_ref": "SCRUM-279"}
+        gh, jr = self.projections(key)
         p2 = {
             **p,
             "dispatch_id": "dispatch-2",
@@ -146,6 +194,8 @@ class FlowTests(unittest.TestCase):
         }
         two = run_research_execution_flow(p2)
         self.assertEqual(two["reason_code"], "EXECUTION_TASK_CLAIM_REQUIRED")
+        self.assertIn("claim", two["checkpoint"]["effects_started"])
+        self.assertTrue(two["checkpoint_persisted"])
         cp2 = two["checkpoint"]
         claim = {
             "status": "CLAIMED",
@@ -162,6 +212,7 @@ class FlowTests(unittest.TestCase):
         three = run_research_execution_flow(p3)
         self.assertEqual(three["outcome"], "HANDOFF")
         self.assertEqual(three["gwc_handoff"]["stop_before"], "G4_MERGE")
+        self.assertIn("gwc_handoff", three["checkpoint"]["effects_started"])
         cp3 = three["checkpoint"]
         runtime = {
             "status": "G3_PASS",
@@ -189,6 +240,78 @@ class FlowTests(unittest.TestCase):
         p2 = {**p, "checkpoint": one["checkpoint"]}
         two = run_research_execution_flow(p2)
         self.assertEqual(two["outcome"], "FENCED")
+
+    def test_new_dispatch_without_claim_readback_does_not_reemit_claim(self):
+        r, a, p = self.base()
+        one = run_research_execution_flow(p)
+        key = one["checkpoint"]["materialization_key"]
+        gh, jr = self.projections(key)
+        two = run_research_execution_flow(
+            {
+                **p,
+                "dispatch_id": "dispatch-2",
+                "checkpoint": one["checkpoint"],
+                "projection_readbacks": {"github": [gh], "jira": [jr]},
+            }
+        )
+        self.assertEqual(two["outcome"], "ACTION_REQUIRED")
+        self.assertEqual(two["reason_code"], "EXECUTION_TASK_CLAIM_REQUIRED")
+        three = run_research_execution_flow(
+            {
+                **p,
+                "dispatch_id": "dispatch-3",
+                "checkpoint": two["checkpoint"],
+                "projection_readbacks": {"github": [gh], "jira": [jr]},
+            }
+        )
+        self.assertEqual(three["outcome"], "WAITING")
+        self.assertEqual(
+            three["reason_code"], "EXECUTION_TASK_CLAIM_RECONCILIATION_REQUIRED"
+        )
+        self.assertNotIn("external_actions", three)
+
+    def test_new_dispatch_without_runtime_readback_does_not_reemit_handoff(self):
+        r, a, p = self.base()
+        one = run_research_execution_flow(p)
+        key = one["checkpoint"]["materialization_key"]
+        gh, jr = self.projections(key)
+        two = run_research_execution_flow(
+            {
+                **p,
+                "dispatch_id": "dispatch-2",
+                "checkpoint": one["checkpoint"],
+                "projection_readbacks": {"github": [gh], "jira": [jr]},
+            }
+        )
+        claim = {
+            "status": "CLAIMED",
+            "materialization_key": key,
+            "execution_task_ids": {"github": "325", "jira": "SCRUM-285"},
+        }
+        three = run_research_execution_flow(
+            {
+                **p,
+                "dispatch_id": "dispatch-3",
+                "checkpoint": two["checkpoint"],
+                "projection_readbacks": {"github": [gh], "jira": [jr]},
+                "claim_readback": claim,
+            }
+        )
+        self.assertEqual(three["outcome"], "HANDOFF")
+        four = run_research_execution_flow(
+            {
+                **p,
+                "dispatch_id": "dispatch-4",
+                "checkpoint": three["checkpoint"],
+                "projection_readbacks": {"github": [gh], "jira": [jr]},
+                "claim_readback": claim,
+            }
+        )
+        self.assertEqual(four["outcome"], "WAITING")
+        self.assertEqual(
+            four["reason_code"], "GWC_RUNTIME_HANDOFF_RECONCILIATION_REQUIRED"
+        )
+        self.assertNotIn("external_actions", four)
 
 
 if __name__ == "__main__":
