@@ -132,6 +132,15 @@ class MaterializationTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertEqual(reason, "CHILD_G2_RISK_EXCEEDS_PARENT_CEILING")
 
+    def test_unknown_g2_action_fails_closed_even_with_matching_hash(self):
+        r, a = research_and_approval()
+        a = copy.deepcopy(a)
+        a["delegated_g2_actions"].append("delete_repository")
+        a["scope_hash"] = approval_scope_hash(a)
+        ok, reason = validate_research_approval(r, a, now=NOW)
+        self.assertFalse(ok)
+        self.assertEqual(reason, "CHILD_G2_ACTION_FORBIDDEN")
+
     def test_authority_escalation_blocks(self):
         r, a = research_and_approval()
         a = copy.deepcopy(a)
