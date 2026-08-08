@@ -1,0 +1,54 @@
+schema_version: "1.1"
+artifact_type: gwc-g3-delivery-record
+task_id: SCRUM-275
+run_id: run-1
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: pre-prod
+base_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+head_ref: auto/run-1/SCRUM-275
+head_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+pr_number: 325
+pr_url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/325
+pr_state: draft
+merge_target: pre-prod
+merge_authority_granted: false
+deployment_authority_granted: false
+production_authority_granted: false
+delivered_artifacts:
+  - tools/node_architect/create_autonomous_task_branch.py
+  - tools/node_architect/assemble_autonomous_preprod_pr.py
+  - tools/node_architect/validate_autonomous_g3_readiness.py
+  - tools/node_architect/materialize_autonomous_g4_receipt.py
+  - tools/node_architect/merge_autonomous_preprod_pr.py
+  - tools/node_architect/autonomous_preprod_runtime.py
+  - tools/node_architect/render_pr_run_evidence.py
+  - .github/workflows/autonomous-preprod-runtime.yml
+  - tests/test_autonomous_preprod_delivery.py
+  - tests/test_autonomous_preprod_g4_merge.py
+test_result:
+  framework: unittest
+  total: 1235
+  passed: 1235
+  failed: 0
+  scope: discover -s tests -p "test_*.py"
+self_verification:
+  managed_block_bound_to_head: true
+  base_is_preprod_not_main: true
+  no_merge_authority: true
+  no_deploy_authority: true
+  no_production_authority: true
+  full_suite_green: true
+gates:
+  G0_CONTEXT: passed
+  G1_ALIGNMENT: passed
+  G2_EXECUTION: passed
+  G3_PR: not_executed_pending_review
+  G4_MERGE: not_executed
+  G5_DEPLOY: not_executed
+  G6_PRODUCTION_DATA: not_applicable
+independent_review:
+  reviewer: hermes-pc
+  findings_open: 0
+  method: self_revalidation_of_artifacts_and_full_test_suite
+  conclusion: artifacts_bound_to_exact_head_sha_and_fail_closed_guardrails_intact
+ready_for_review: true
