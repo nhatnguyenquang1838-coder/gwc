@@ -17,6 +17,8 @@ from tools.node_architect.select_autonomous_jira_task import select_autonomous_j
 class AutonomousTaskSelectorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.payload = {
+            "schema_version": "1.0",
+            "artifact_type": "autonomous-task-selection-input",
             "run_id": "run-scrum-270",
             "active_lane": "SCRUM-270",
             "excluded_lanes": ["SCRUM-275", "SCRUM-276"],
@@ -93,11 +95,12 @@ class AutonomousTaskSelectorTests(unittest.TestCase):
         unsafe = {row["task_id"]: row for row in result["unsafe_done_dependencies"]}
         self.assertIn("EXACT_SHA_EVIDENCE_MISSING", unsafe["SCRUM-273"]["reasons"])
 
-    def test_result_validates_against_closed_schema(self) -> None:
+    def test_input_and_result_validate_against_closed_schema(self) -> None:
         result = select_autonomous_jira_task(self.payload)
         schema = json.loads((ROOT / "schemas/node-architect/autonomous-task-selection.schema.json").read_text())
-        errors = list(Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(result))
-        self.assertEqual(errors, [])
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        self.assertEqual(list(validator.iter_errors(self.payload)), [])
+        self.assertEqual(list(validator.iter_errors(result)), [])
 
 
 if __name__ == "__main__":
