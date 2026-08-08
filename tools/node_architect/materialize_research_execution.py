@@ -8,6 +8,14 @@ from datetime import datetime, timezone
 from typing import Any
 
 RISK_ORDER = {"R0": 0, "R1": 1, "R2": 2, "R3": 3}
+ALLOWED_G2 = {
+    "create_guarded_branch_or_worktree",
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "stage",
+    "create_commit",
+    "push_working_branch",
+}
 FORBIDDEN_CHILD_ACTIONS = {"merge", "auto_merge", "deploy", "release", "runtime_reload", "production_data_read", "production_data_write", "production_config_change", "credential_rotation", "migration"}
 ALLOWED_G3 = {"open_or_update_draft_pr", "monitor_exact_head_ci", "repair_within_approved_scope", "run_independent_read_only_review", "mark_pr_ready_for_review"}
 
@@ -92,6 +100,8 @@ def validate_research_approval(research: Mapping[str, Any], approval: Mapping[st
         return False, "CHILD_G2_SCOPE_EXPANSION_REJECTED"
     if not isinstance(g3, Sequence) or isinstance(g3, (str, bytes)):
         return False, "CHILD_G3_SCOPE_EXPANSION_REJECTED"
+    if not set(g2) <= ALLOWED_G2:
+        return False, "CHILD_G2_ACTION_FORBIDDEN"
     if set(g2) & FORBIDDEN_CHILD_ACTIONS or set(g3) & FORBIDDEN_CHILD_ACTIONS or not set(g3) <= ALLOWED_G3:
         return False, "RESEARCH_APPROVAL_AUTHORITY_ESCALATION"
 
