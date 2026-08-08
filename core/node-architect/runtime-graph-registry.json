@@ -77,13 +77,6 @@
       "runtime_executable": false,
       "source": "sync_projection.ds-admin-state-projection",
       "target": "validation_quality.blocker-severity-classification"
-    },
-    {
-      "edge_type": "runtime",
-      "provenance": "SCRUM-284:research-execution-handoff",
-      "runtime_executable": true,
-      "source": "gate_authority.research-review-to-execution",
-      "target": "repo_delivery.ci-run-capture"
     }
   ],
   "graph_id": "gwc-runtime-graph-registry",
@@ -168,17 +161,16 @@
     "validation_quality.schema-validation",
     "validation_quality.side-effect-check",
     "validation_quality.unit-test-mapping",
-    "validation_quality.validator-execution",
-    "gate_authority.research-review-to-execution"
+    "validation_quality.validator-execution"
   ],
   "provenance": {
     "source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
     "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"
   },
   "revision": {
-    "revision_id": "scrum-284-20260808",
-    "parent_revision_id": "scrum-104-20260726",
-    "source_sha": "f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"
+    "parent_revision_id": null,
+    "revision_id": "scrum-104-20260726",
+    "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"
   },
   "schema_version": "1.0.0"
 }
