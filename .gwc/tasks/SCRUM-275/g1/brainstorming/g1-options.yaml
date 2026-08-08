@@ -1,0 +1,39 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-08T18:39:12+0700'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-275
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Fail-closed delivery tool chain wrapping existing nodes
+    description: Implement the five node_architect tools, the runtime workflow, and the two test modules by wrapping (not modifying) the SCRUM-271 graph/story renderer, SCRUM-272 policy loader, and existing draft/CI/readiness nodes.
+    benefits: [Smallest blast radius, reuses validated building blocks, guardrails explicit and testable, keeps main untouched]
+    tradeoffs: [Requires careful exact-head drift wiring across tools]
+    risks: [Cross-tool head-binding consistency must be tested thoroughly]
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dw-task-me
+        description: Validation planning and task decomposition
+        is_required: true
+  - id: OPT-2
+    title: Rewrite delivery path inside existing CI nodes
+    description: Fold the pre-prod delivery behavior into the existing draft_pr_creation / merge nodes instead of a dedicated tool chain.
+    benefits: [Fewer new files]
+    tradeoffs: [Larger blast radius, modifies shared nodes used by other SCRUMs, harder to isolate guardrails]
+    risks: [Scope drift and regression risk to existing G3/G4 suites]
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Documentation-only contract note
+    description: Document the intended pre-prod delivery contract without adding executable tooling.
+    benefits: [Lowest code risk]
+    tradeoffs: [Does not satisfy the requested runtime files or acceptance criteria]
+    risks: [Leaves the autonomous delivery path unenforced]
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest implementation that satisfies the live Jira contract, keeps existing nodes untouched, and makes every guardrail explicit and testable.
+decision_required: true
+status: READY
