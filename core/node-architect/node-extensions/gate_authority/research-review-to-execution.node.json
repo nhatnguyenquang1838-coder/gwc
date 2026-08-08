@@ -1,0 +1,12 @@
+{
+  "node_id": "gate_authority.research-review-to-execution",
+  "node_type": "workflow",
+  "title": "Research Review To Execution",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION"
+  ],
+  "description": "Validates exact Human research-execution approval, compiles one deterministic execution task, reconciles GitHub/Jira projections, and projects only explicitly delegated bounded G2/G3 authority before handing off to the existing GWC runtime. G4/G5/G6 are never granted."
+}

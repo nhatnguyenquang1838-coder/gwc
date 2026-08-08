@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-08T14:12:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-284
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Governed Node Architect research-to-execution flow
+  description: Add a deterministic gate_authority.research-review-to-execution node
+    with bounded Human research approval, ExecutionTaskSpec, idempotent GitHub/Jira
+    materialization, controlled post-81 registry extension, bounded child G2 plus
+    optional bounded G3 Draft-PR authority, and reuse of existing GWC delivery through
+    the Human G4 boundary.
+  benefits:
+  - Replay-safe and auditable across immediate and scheduled triggers
+  - Prevents duplicate GitHub/Jira execution tasks after crash or retry
+  - Preserves gate separation while allowing autonomous delivery to the Human G4 boundary
+  - Reuses existing SCRUM-272 through SCRUM-274 authority selector checkpoint and
+    continuation mechanisms
+  - Preserves the completed 81-node catalog as an immutable baseline while making
+    post-baseline growth explicit and validator-governed
+  tradeoffs:
+  - Requires new schemas selector materializer flow integration and recovery tests
+  - Adds explicit approval and reconciliation artifacts to Node Architect
+  - Requires a narrow registry/schema/graph/profile migration because current runtime
+    validation hard-codes exactly 81 nodes
+  risks:
+  - Incorrect parent-child authority logic could broaden execution scope if not tested
+    fail-closed
+  - Projection reconciliation must handle partial external effects carefully
+  - Incorrect registry migration could weaken the 81-node baseline or leave graph/profile
+    drift undetected
+  constraint_fit: FIT
+- id: OPT-2
+  title: Prompt-only research handoff
+  description: Encode instructions in a prompt that asks the Agent to find approved
+    research create Jira and GitHub execution tasks and continue delivery.
+  benefits:
+  - Low initial implementation effort
+  - Easy to experiment with manually
+  tradeoffs:
+  - No canonical durable materialization identity or reconciliation contract
+  - Retry and crash behavior depends on model interpretation
+  - Harder to prove lane preservation and authority boundaries
+  risks:
+  - Duplicate execution tasks
+  - Research prose may accidentally be promoted to authority
+  - Scheduled and immediate runs can diverge
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Separate external research orchestration service
+  description: Build a new scheduler/service outside the current Node Architect continuation
+    runtime to manage approval polling task creation and delivery dispatch.
+  benefits:
+  - Strong operational separation
+  - Could later support many controller providers
+  tradeoffs:
+  - Duplicates existing GWC continuation and evidence mechanisms
+  - Expands scope into infrastructure and generic orchestration
+  risks:
+  - Creates a parallel authority plane and state model
+  - Increases integration and recovery complexity
+  constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 remains selected. The exact Human research-execution
+  approval becomes the parent authority for materialization/claim plus bounded child
+  G2 and, when explicitly delegated, bounded G3 Draft-PR/CI/review actions. G4/G5/G6
+  remain separate Human authority boundaries. The revised implementation also preserves
+  the historical 81-node baseline through one explicit post-baseline extension.
+decision_required: true
+status: READY

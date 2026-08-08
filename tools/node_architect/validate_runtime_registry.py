@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate canonical runtime registries and their cross-references."""
+"""Validate canonical runtime registries and admitted post-baseline extensions."""
 from __future__ import annotations
 
 import argparse
@@ -36,6 +36,7 @@ VISUAL_EDGE_TYPES = {
 }
 RUNTIME_EDGE_TYPES = {"runtime", "dependency"}
 GUARD_TYPES = {"exists", "equals", "in", "gte", "lte"}
+SCRUM_284_SCOPE_HASH = "sha256:deaef48e37fcae790dbeab40eee78fa275f833fee6675fa790d2e32f1051df73"
 
 
 def load(path: Path) -> Any:
@@ -60,10 +61,7 @@ def source_hash(repo_root: Path, relative: str) -> str | None:
     path = repo_root / relative
     if not path.is_file():
         return None
-    # Normalize line endings so provenance hashes stay stable across Windows and Linux checkouts.
     data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
-    # Strip the provenance block before hashing so the SHA is self-consistent
-    # (the provenance SHA must match the hash of the file without provenance).
     try:
         parsed = json.loads(data)
         if isinstance(parsed, dict) and "provenance" in parsed:
@@ -72,6 +70,108 @@ def source_hash(repo_root: Path, relative: str) -> str | None:
     except (json.JSONDecodeError, UnicodeDecodeError):
         pass
     return hashlib.sha256(data).hexdigest()
+
+
+def _validate_extension_registry(
+    *,
+    root: Path,
+    extensions_payload: dict[str, Any],
+    baseline_node_set: set[str],
+    issues: list[str],
+) -> tuple[list[str], int]:
+    extensions = extensions_payload.get("extensions", [])
+    if not isinstance(extensions, list):
+        issues.append("extension registry extensions must be a list")
+        return [], 0
+
+    extension_nodes = [item.get("node", {}) for item in extensions if isinstance(item, dict)]
+    extension_ids = [node.get("id") for node in extension_nodes if isinstance(node, dict)]
+    effective_node_set = baseline_node_set | set(extension_ids)
+
+    baseline_digest = "sha256:" + hashlib.sha256(
+        json.dumps(sorted(baseline_node_set), separators=(",", ":")).encode()
+    ).hexdigest()
+    if extensions_payload.get("baseline_registry_ref") != "gwc-runtime-node-registry":
+        issues.append("extension registry baseline_registry_ref mismatch")
+    if extensions_payload.get("baseline_declared_slot_count") != 81:
+        issues.append("extension registry must bind immutable baseline slot count 81")
+    if extensions_payload.get("baseline_node_ids_digest") != baseline_digest:
+        issues.append("extension registry baseline_node_ids_digest mismatch")
+    if extensions_payload.get("admitted_extension_count") != len(extensions):
+        issues.append("extension registry admitted_extension_count mismatch")
+    if len(extension_ids) != len(set(extension_ids)):
+        issues.append("extension registry contains duplicate node IDs")
+    if set(extension_ids) & baseline_node_set:
+        issues.append("extension node ID collides with immutable baseline")
+
+    slots = [item.get("extension_slot") for item in extensions if isinstance(item, dict)]
+    if len(slots) != len(set(slots)) or any(type(slot) is not int or slot < 82 for slot in slots):
+        issues.append("extension slots must be unique integers starting at 82")
+
+    extension_edge_count = 0
+    for item, node in zip(extensions, extension_nodes):
+        node_id = node.get("id")
+        if item.get("decision_task_id") != "SCRUM-284":
+            issues.append(f"extension {node_id} is not admitted by SCRUM-284")
+        if item.get("decision_scope_hash") != SCRUM_284_SCOPE_HASH:
+            issues.append(f"extension {node_id} decision scope hash drift")
+        if node.get("family") not in FAMILIES:
+            issues.append(f"extension node {node_id} has unknown family {node.get('family')}")
+        if node.get("source_status") != "canonical_explicit":
+            issues.append(f"extension node {node_id} must be canonical_explicit")
+
+        provenance = node.get("provenance", {})
+        actual = source_hash(root, provenance.get("source_path", ""))
+        if actual is None:
+            issues.append(f"extension node {node_id} provenance source is missing")
+        elif actual != provenance.get("source_sha"):
+            issues.append(f"extension node {node_id} provenance SHA does not match source")
+
+        for ref in node.get("implementation_refs", []):
+            path_ref = ref.split(":", 1)[0]
+            if path_ref.startswith("GitHub."):
+                continue
+            if not (root / path_ref).exists():
+                issues.append(f"extension node {node_id} implementation ref missing: {path_ref}")
+
+        route = item.get("route", {})
+        route_nodes = route.get("nodes", [])
+        route_node_set = set(route_nodes) if isinstance(route_nodes, list) else set()
+        if not route_nodes or route_nodes[0] != node_id:
+            issues.append(f"extension node {node_id} route must start at the extension node")
+        if not route_node_set <= effective_node_set:
+            issues.append(f"extension node {node_id} route references unknown node")
+        if route.get("terminal_gate") != "G4_MERGE" or route.get("outcome") != "HUMAN_REQUIRED":
+            issues.append(f"extension node {node_id} must terminate at Human G4 authority")
+
+        edges = route.get("edges", [])
+        if not isinstance(edges, list) or not edges:
+            issues.append(f"extension node {node_id} route requires at least one edge")
+            continue
+        extension_edge_count += len(edges)
+        for edge in edges:
+            if not isinstance(edge, dict):
+                issues.append(f"extension node {node_id} route edge must be an object")
+                continue
+            source = edge.get("source")
+            target = edge.get("target")
+            if source not in route_node_set or target not in route_node_set:
+                issues.append(f"extension node {node_id} route edge leaves declared route")
+            if source not in effective_node_set or target not in effective_node_set:
+                issues.append(f"extension node {node_id} route edge references unknown node")
+            if edge.get("edge_type") not in RUNTIME_EDGE_TYPES or edge.get("runtime_executable") is not True:
+                issues.append(f"extension node {node_id} route edge must be executable runtime/dependency")
+            if node_id not in {source, target}:
+                issues.append(f"extension node {node_id} route edge must bind the extension to baseline runtime")
+
+    extension_provenance = extensions_payload.get("provenance", {})
+    ext_source = source_hash(root, extension_provenance.get("source_path", ""))
+    if ext_source is None:
+        issues.append("extension registry provenance source is missing")
+    elif ext_source != extension_provenance.get("source_sha"):
+        issues.append("extension registry provenance SHA does not match source")
+
+    return extension_ids, extension_edge_count
 
 
 def validate_registry(root: Path) -> dict[str, Any]:
@@ -83,6 +183,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "profiles": registry_root / "profile-registry.json",
         "rules": registry_root / "decision-rule-registry.json",
         "graph": registry_root / "runtime-graph-registry.json",
+        "extensions": registry_root / "runtime-node-extension-registry.json",
     }
     payloads = {name: load(path) for name, path in paths.items()}
     issues: list[str] = []
@@ -93,6 +194,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "profiles": "profile-registry.schema.json",
         "rules": "decision-rule-registry.schema.json",
         "graph": "runtime-graph.schema.json",
+        "extensions": "runtime-node-extension-registry.schema.json",
     }
     for name, schema_name in schema_map.items():
         issues.extend(
@@ -107,6 +209,16 @@ def validate_registry(root: Path) -> dict[str, Any]:
         issues.append(f"node registry must materialize exactly 81 slots, got {len(nodes)}")
     if len(node_set) != len(node_ids):
         issues.append("node registry contains duplicate stable IDs")
+    if payloads["nodes"].get("declared_slot_count") != 81:
+        issues.append("node registry declared_slot_count must remain 81")
+
+    extension_ids, extension_edge_count = _validate_extension_registry(
+        root=root,
+        extensions_payload=payloads["extensions"],
+        baseline_node_set=node_set,
+        issues=issues,
+    )
+    effective_node_set = node_set | set(extension_ids)
 
     families = {family: 0 for family in FAMILIES}
     for node in nodes:
@@ -216,7 +328,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
     graph = payloads["graph"]
     graph_nodes = set(graph.get("nodes", []))
     if graph_nodes != node_set:
-        issues.append("runtime graph node set must equal the canonical node registry")
+        issues.append("runtime graph node set must equal the immutable 81-node baseline registry")
     for edge in graph.get("edges", []):
         if edge.get("source") not in graph_nodes or edge.get("target") not in graph_nodes:
             issues.append("runtime graph contains an unresolved edge endpoint")
@@ -257,6 +369,10 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "issues": issues,
         "counts": {
             "nodes": len(nodes),
+            "baseline_nodes": len(nodes),
+            "extension_nodes": len(extension_ids),
+            "effective_nodes": len(effective_node_set),
+            "extension_edges": extension_edge_count,
             "proposed_nodes": sum(
                 node.get("source_status") == "proposed_registry_slot" for node in nodes
             ),
@@ -269,6 +385,8 @@ def validate_registry(root: Path) -> dict[str, Any]:
             "profiles": len(profiles),
         },
         "registry_ids": sorted(registry_ids),
+        "extension_registry_id": payloads["extensions"].get("registry_id"),
+        "extension_node_ids": sorted(extension_ids),
         "scenario_ids": sorted(scenario_ids),
     }
 

@@ -1,0 +1,13 @@
+canonical_task_uid: SCRUM-284
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+plan_revision: sha256:42cd1a3af28673b0188e82943ad6df3b0502dae6a6079f463473b709e4116330
+paths_read:
+- .gwc/tasks/SCRUM-284/g1/plan/requirements.md
+- .gwc/tasks/SCRUM-284/g1/plan/design.md
+- .gwc/tasks/SCRUM-284/g1/plan/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+read_at: '2026-08-08T14:14:36Z'
+reader: ChatGPT
