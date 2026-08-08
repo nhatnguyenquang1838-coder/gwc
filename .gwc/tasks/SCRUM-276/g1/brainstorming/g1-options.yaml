@@ -1,0 +1,54 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-08T16:44:07Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-276
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Isolated autonomous pre-prod modules + closed schemas + focused recovery/canary tests
+    description: Build four new node_architect modules and two schemas under isolated paths, with fixture-driven tests for recovery scenarios, exact-SHA G5 verification, and a two-task serial canary harness.
+    benefits:
+      - Matches the issue's named surfaces exactly
+      - Isolated modules keep blast radius minimal
+      - Deterministic schema/test boundaries align with replay-safe recovery
+    tradeoffs:
+      - Requires new runtime wiring into existing runner/dispatcher surfaces
+    risks:
+      - Minor coupling risk if runner conventions shift downstream
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: node-architect-checkpoint-runtime
+        description: Implement checkpoint schema and durable run evidence persistence
+        is_required: true
+      - skill_id: node-architect-g5-verification
+        description: Implement exact-SHA verification and artifact digest checks
+        is_required: true
+      - skill_id: node-architect-recovery-reconciliation
+        description: Implement duplicate/unknown outcome reconciliation and readback guards
+        is_required: true
+      - skill_id: node-architect-canary-runner
+        description: Implement serial multi-task canary from approved run manifest
+        is_required: true
+  - id: OPT-2
+    title: Patch existing runner/dispatcher in place
+    description: Modify existing shared runtime modules directly instead of isolated node modules.
+    benefits:
+      - Single code path
+    tradeoffs:
+      - Mutates shared surfaces used by other tasks and runtimes
+      - Regression risk across unrelated paths
+    risks:
+      - Violates isolated-module guardrail and increases blast radius
+    constraint_fit: NOT_FIT
+    skills_distribution:
+      - skill_id: existing-runtime-patch
+        description: Patch shared runner/dispatcher code directly
+        is_required: false
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 satisfies all acceptance criteria while preserving module boundaries and minimizing blast radius. OPT-2 violates the isolated-module constraint and increases regression risk.
+decision_required: true
+status: READY

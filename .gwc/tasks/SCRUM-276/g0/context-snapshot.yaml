@@ -1,0 +1,108 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-08T16:44:07Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - No write to protected main branch
+  - Agent-only claim intake required before write-capable action
+  - Jira AI Agent / Claimed At fields must be set and read back
+  - Replay-safe recovery must avoid duplicate branch/commit/PR/comment/merge
+  - G5 verification binds exact merge SHA and required checks
+applicable_policies:
+  - id: AGENTS
+    path: AGENTS.md
+    ref: main
+    source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+  - id: CODING_PROJECT_GOVERNANCE_v1.0
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GATE_LIFECYCLE_CONTRACT_v1.0
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+  - id: E2E_DRAFT_PR_DELIVERY_RULE
+    path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    ref: main
+    source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+  - id: PROJECT_PROFILE
+    path: projects/gwc/project-profile.yaml
+    ref: main
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 8a594c621341ae82334253dd5243cd1e9db3a9be
+  - path: core/Coding_Project_Governance_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+  - path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+    required: true
+    status: AVAILABLE
+    source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+  - path: projects/gwc/project-instructions.md
+    required: true
+    status: AVAILABLE
+    source_sha: null
+  - path: projects/gwc/project-extension.md
+    required: true
+    status: AVAILABLE
+    source_sha: null
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: hermes
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+contextual_discovery:
+  historical_context:
+    - id: SCRUM-270
+      description: Parent epic for Autonomous Pre-Prod Runtime MVP
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-270
+    - id: SCRUM-274
+      description: Prior task in same epic; Done
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-274
+    - id: SCRUM-275
+      description: Prior task in same epic; Done
+      link: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-275
+  downstream_impact:
+    - target: autonomous pre-prod runtime
+      impact_type: NON_BREAKING
+      description: Adds replay-safe checkpoint, G5 verification, and canary runner to the node-catalog runtime.
+  stakeholder_reach:
+    - persona: GWC maintainers
+      impact: New schemas and tools for autonomous pre-prod execution
+    - persona: Future governed agents
+      impact: Must respect replay-safe checkpoint and exact-SHA G5 rules
