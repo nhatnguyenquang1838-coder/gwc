@@ -1,0 +1,64 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-08T18:39:12+0700'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-275
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  profile_path: projects/gwc/project-profile.yaml
+  connector: Git
+checks:
+  - id: BASE_BINDING
+    status: PASS
+    code: BASE_SHA_VERIFIED
+    message: Local origin/main matches the protected-base SHA 2e20badf04b4d84bf8a2e88d6e1e88d540745d35.
+    evidence: [git rev-parse HEAD, git rev-parse origin/main]
+  - id: TARGET_SCOPE
+    status: PASS
+    code: TARGET_FILES_MATCH
+    message: Jira expected surfaces and approved OPT-1 scope are identical.
+    evidence: [Jira SCRUM-275 live description, G1 intake scope]
+  - id: DEPENDENCIES
+    status: PASS
+    code: DEPENDENCIES_SATISFIED
+    message: SCRUM-271, SCRUM-272, SCRUM-273 are Done in Jira projection evidence.
+    evidence: [Atlassian Jira SCRUM-271, SCRUM-272, SCRUM-273]
+  - id: REMOTE_CONNECTIVITY
+    status: PASS
+    code: REMOTE_BASE_VERIFIED
+    message: GitHub remote origin/main verified at 2e20badf04b4d84bf8a2e88d6e1e88d540745d35 via git fetch origin main.
+    evidence: [git fetch origin main, git rev-parse origin/main]
+  - id: PLAN_BINDING
+    status: PASS
+    code: TASK_ME_PLAN_VALIDATED
+    message: The Task Me plan is bound to SCRUM-275, the exact base SHA, and OPT-1.
+    evidence: [g1/plan/requirements.md, g1/plan/design.md, g1/plan/tasks.md, sha256:f9fd424341f323aaaaf50632911756235510f49c78eeb2d743f75d62142b036c]
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+implementation_plan:
+  applicability: required
+  reason: SCRUM-275 requests implementation and validation planning; the GWC G1 hook requires Task Me decomposition.
+  source: task_me
+  task_me_applicable: true
+  task_me_available: true
+  task_me_invoked: true
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-275
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  plan_root: .gwc/tasks/SCRUM-275/g1/plan
+  requirements_path: .gwc/tasks/SCRUM-275/g1/plan/requirements.md
+  design_path: .gwc/tasks/SCRUM-275/g1/plan/design.md
+  tasks_path: .gwc/tasks/SCRUM-275/g1/plan/tasks.md
+  plan_revision: sha256:f9fd424341f323aaaaf50632911756235510f49c78eeb2d743f75d62142b036c
+  validation_status: PASS
+  validation_evidence: Task Me hook review against Jira SCRUM-275 contract and OPT-1 scope; plan revision sha256:f9fd424341f323aaaaf50632911756235510f49c78eeb2d743f75d62142b036c.
+  generated_by: Hermes-PC via dw-task-me
+  generated_at_utc: '2026-08-08T18:39:12+0700'
+blockers: []
+outcome: PASS

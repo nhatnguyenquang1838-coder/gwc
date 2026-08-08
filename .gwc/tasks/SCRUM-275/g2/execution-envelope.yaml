@@ -1,0 +1,59 @@
+approval_id: APPROVE_G2_EXECUTION_SCRUM-275_AUTONOMOUS_PREPROD_20260808
+authority_gate: G2_EXECUTION
+task_id: SCRUM-275
+issued_at: '2026-08-08T11:39:12Z'
+expires_at: '2026-08-09T18:39:12Z'
+scope_version: 1
+risk_class: R2
+project_profile: projects/gwc/project-profile.yaml
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+prior_base_sha: 63210d7bb58b9b1043a1f34766062533e6744d06
+working_branch: hermes/scrum-275-autonomous-preprod-20260808
+prior_head_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+head_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+modules_or_files:
+  - .gwc/tasks/SCRUM-275/**
+  - tools/node_architect/create_autonomous_task_branch.py
+  - tools/node_architect/assemble_autonomous_preprod_pr.py
+  - tools/node_architect/validate_autonomous_g3_readiness.py
+  - tools/node_architect/materialize_autonomous_g4_receipt.py
+  - tools/node_architect/merge_autonomous_preprod_pr.py
+  - .github/workflows/autonomous-preprod-runtime.yml
+  - tests/test_autonomous_preprod_delivery.py
+  - tests/test_autonomous_preprod_g4_merge.py
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - run_independent_review
+excluded_actions:
+  - deploy_approved_release
+  - reload_approved_runtime
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - migration
+  - merge_approved_pr
+  - modify_files_outside_approved_scope
+  - force_push
+  - branch_deletion
+  - protected_branch_write
+  - pr_base_change
+scope_hash: sha256:eeb2ee2221650ff187931c4a69dce07c33a06022ae714dd5783ac184b713e3f0
+scope_hash_16: eeb2ee2221650ff1
+approval_command: APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_SCRUM-275_AUTONOMOUS_PREPROD_20260808 eeb2ee2221650ff1 2026-08-09T18:39:12Z
+work_item:
+  provider: Jira via Atlassian Rovo
+  id: SCRUM-275
+  claim_required: true
+  expected_repository: nhatnguyenquang1838-coder/gwc
+  initial_state: In Progress
+  review_state: G2 execution approved for SCRUM-275 OPT-1. Implement the five node_architect autonomous pre-prod delivery tools, the runtime workflow, and the two test modules; bootstrap the protected pre-prod branch from an approved main SHA; open a Draft PR targeting pre-prod only. Reclaimed from ChatGPT by Hermes-PC. Excludes merge_approved_pr (G4) and all deploy/release/production authority.

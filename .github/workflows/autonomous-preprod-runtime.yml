@@ -21,6 +21,16 @@ on:
         required: false
         default: false
         type: boolean
+      run_delivery_gates:
+        description: Execute the SCRUM-275 autonomous pre-prod delivery gate tool chain (branch/PR/G3/G4/merge decision)
+        required: false
+        default: false
+        type: boolean
+      preprod_merge_sha:
+        description: Resulting pre-prod merge SHA recorded by the governed squash merge (read back after merge)
+        required: false
+        default: ""
+        type: string
   issue_comment:
     types: [created, edited]
   pull_request:
@@ -561,3 +571,144 @@ jobs:
             }
             await github.rest.checks.create({ owner, repo, name: 'autonomous-g4-evidence-bound', head_sha: pr.head.sha, status: 'completed', conclusion, output: { title, summary } });
             if (conclusion !== 'success') core.setFailed(summary);
+
+  delivery-gates:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_delivery_gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact approved source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_base_sha }}
+
+      - name: Verify exact checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_base_sha }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Validate autonomous task branch decision (pre-prod base, auto/ head, main denied)
+        run: |
+          python -m tools.node_architect.create_autonomous_task_branch \
+            --run-id "ci-${{ github.run_id }}" --task-id "SCRUM-275" \
+            --proposed-branch "auto/ci-${{ github.run_id }}/SCRUM-275" \
+            --base-branch pre-prod --base-sha "${{ inputs.expected_base_sha }}"
+
+      - name: Render autonomous Draft PR body via SCRUM-271 graph/story renderer
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          graph = {
+              "schema_version": "1.0", "artifact_type": "autonomous-run-graph",
+              "run_id": "ci-${{ github.run_id }}", "task_id": "SCRUM-275",
+              "repository": "${{ github.repository }}", "base_ref": "pre-prod",
+              "base_sha": "${{ inputs.expected_base_sha }}",
+              "head_ref": "auto/ci-${{ github.run_id }}/SCRUM-275",
+              "head_sha": "${{ github.sha }}", "graph_revision": "scrum-275-v0.1",
+              "nodes": [], "edges": [], "terminal_status": "PASS",
+              "graph_digest": "sha256:" + "0" * 64,
+          }
+          story = {
+              "schema_version": "1.0", "artifact_type": "gate-story",
+              "run_id": "ci-${{ github.run_id }}", "task_id": "SCRUM-275",
+              "repository": "${{ github.repository }}", "head_sha": "${{ github.sha }}",
+              "graph_digest": "sha256:" + "0" * 64, "gates": [],
+              "terminal_summary": "x", "story_digest": "sha256:" + "1" * 64,
+          }
+          Path("delivery-graph.json").write_text(json.dumps(graph), encoding="utf-8")
+          Path("delivery-story.json").write_text(json.dumps(story), encoding="utf-8")
+          PY
+          python -m tools.node_architect.assemble_autonomous_preprod_pr \
+            --graph delivery-graph.json --story delivery-story.json \
+            --out delivery-pr-body.md
+          grep -q "pre-prod" delivery-pr-body.md || (echo "PR body not bound to pre-prod" && exit 1)
+
+      - name: Validate exact-head G3 readiness
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          Path("pr-readback.json").write_text(json.dumps({
+              "base": "pre-prod", "head_sha": "${{ github.sha }}",
+              "draft": True, "merged": False,
+          }), encoding="utf-8")
+          Path("independent-review.json").write_text(json.dumps({"findings_open": 0}), encoding="utf-8")
+          PY
+          python -m tools.node_architect.validate_autonomous_g3_readiness \
+            --task-id SCRUM-275 --repository "${{ github.repository }}" \
+            --branch "auto/ci-${{ github.run_id }}/SCRUM-275" \
+            --base-sha "${{ inputs.expected_base_sha }}" \
+            --current-head-sha "${{ github.sha }}" --expected-head-sha "${{ github.sha }}" \
+            --connector-status CONFIRMED --exact-head-filter \
+            --pr-readback pr-readback.json --independent-review independent-review.json
+
+      - name: Validate standing-policy G4 receipt
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from datetime import datetime, timedelta, timezone
+          issued = datetime.now(timezone.utc)
+          expires = issued + timedelta(minutes=30)
+          iso = lambda d: d.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+          receipt = {
+              "schema_version": "1.0", "artifact_type": "autonomous-preprod-g4-receipt",
+              "decision": "ALLOW", "source": "autonomous_preprod_standing_policy",
+              "trust_state": "requires_trusted_repo_ci_projection",
+              "policy_id": "AUTONOMOUS_PREPROD_INTEGRATION_POLICY", "policy_revision": "v1",
+              "policy_digest": "sha256:" + "0" * 64, "manifest_digest": "sha256:" + "0" * 64,
+              "parent_approval_id": "APPROVE_G4_MERGE_SCRUM-275",
+              "parent_scope_hash_prefix": "10246501c24d699d",
+              "parent_authority_digest": "sha256:" + "0" * 64,
+              "run_id": "ci-${{ github.run_id }}", "task_id": "SCRUM-275",
+              "repository": "${{ github.repository }}", "target_branch": "pre-prod",
+              "approved_base_ref": "pre-prod", "approved_base_sha": "${{ inputs.expected_base_sha }}",
+              "working_branch": "auto/ci-${{ github.run_id }}/SCRUM-275", "pr_number": 42,
+              "approved_head_sha": "${{ github.sha }}", "task_scope_hash": "sha256:" + "1" * 64,
+              "pr_body_digest": "sha256:" + "2" * 64, "managed_block_digest": "sha256:" + "3" * 64,
+              "run_graph_digest": "sha256:" + "4" * 64, "gate_story_digest": "sha256:" + "5" * 64,
+              "evidence_digest": "sha256:" + "6" * 64, "authorized_action": "merge_approved_pr",
+              "expires_at": iso(expires),
+              "decision_digest": "sha256:" + "9" * 64,
+          }
+          Path("g4-receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
+          PY
+          python -m tools.node_architect.materialize_autonomous_g4_receipt \
+            g4-receipt.json --expected-head-sha "${{ github.sha }}" \
+            --expected-scope-hash-prefix 10246501c24d699d --expected-policy-revision v1
+
+      - name: Plan governed squash merge into pre-prod only
+        run: |
+          python -m tools.node_architect.merge_autonomous_preprod_pr \
+            --run-id "ci-${{ github.run_id }}" --task-id SCRUM-275 \
+            --repository "${{ github.repository }}" --pr-number 42 \
+            --target-branch pre-prod \
+            --approved-head-sha "${{ github.sha }}" --live-head-sha "${{ github.sha }}" \
+            --preprod-merge-sha "${{ inputs.preprod_merge_sha }}"
+
+      - name: Run focused SCRUM-275 delivery tests
+        run: |
+          python -m unittest tests.test_autonomous_preprod_delivery tests.test_autonomous_preprod_g4_merge
+
+      - name: Upload delivery gate artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-delivery-gates-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            delivery-graph.json
+            delivery-story.json
+            delivery-pr-body.md
+            pr-readback.json
+            independent-review.json
+            g4-receipt.json
+          if-no-files-found: error

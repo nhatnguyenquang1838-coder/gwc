@@ -1,0 +1,19 @@
+artifact_type: g2-plan-read-receipt
+schema_version: '1.0'
+approval_id: APPROVE_G2_EXECUTION_SCRUM-275_AUTONOMOUS_PREPROD_20260808
+task_id: SCRUM-275
+repository: nhatnguyenquang1838-coder/gwc
+branch: hermes/scrum-275-autonomous-preprod-20260808
+base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+head_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+canonical_task_uid: SCRUM-275
+plan_revision: sha256:f9fd424341f323aaaaf50632911756235510f49c78eeb2d743f75d62142b036c
+paths_read:
+  - .gwc/tasks/SCRUM-275/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-275/g1/plan/design.md
+  - .gwc/tasks/SCRUM-275/g1/plan/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+read_at: '2026-08-08T11:39:12Z'
+actor: Hermes-PC
