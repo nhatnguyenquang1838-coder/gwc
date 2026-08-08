@@ -14,7 +14,9 @@ Pure and fail-closed. Returns a ``g3_pass`` verdict; it never merges.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 from typing import Any, Mapping
 
 from .exact_head_readiness import decide_exact_head_readiness
@@ -158,6 +160,48 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(f"{result['outcome']}: {', '.join(result['reason_codes'])}")
     return 0 if result["g3_pass"] else 1
+
+
+# ---------------------------------------------------------------------------
+# Evidence-binding digest helpers.
+#
+# Cherry-picked (additive, no change to the public G3 API above) from the
+# superseded PR #323. They expose a deterministic SHA-256 projection that binds
+# a G3 evidence record to the exact head, independent of the keyword-arg
+# `validate_g3_readiness` contract used by the #326 implementation.
+# ---------------------------------------------------------------------------
+
+SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+REQUIRED_EVIDENCE_FIELDS = (
+    "task_id",
+    "run_id",
+    "repository",
+    "pr_number",
+    "base_branch",
+    "base_sha",
+    "head_sha",
+    "changed_path_digest",
+    "ci_conclusions",
+    "review_receipt",
+    "pr_body_digest",
+    "runtime_graph_digest",
+    "gate_story_digest",
+)
+
+
+def canonical_digest(payload: Any) -> str:
+    """Stable SHA-256 over a canonical JSON projection.
+
+    Keys are sorted and separators are stripped so the digest is independent of
+    dict insertion order or human formatting.
+    """
+    blob = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def evidence_binding_digest(evidence: Mapping[str, Any]) -> str:
+    """Digest binding the full G3 evidence chain to the exact head."""
+    return canonical_digest({field: evidence.get(field) for field in REQUIRED_EVIDENCE_FIELDS})
 
 
 if __name__ == "__main__":

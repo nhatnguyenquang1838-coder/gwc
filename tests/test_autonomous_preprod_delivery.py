@@ -205,5 +205,55 @@ class AutonomousPreprodMergeTests(unittest.TestCase):
         self.assertIn("AUTONOMOUS_MERGE_HEAD_DRIFT", d["reason_codes"])
 
 
+class G3DigestHelperTests(unittest.TestCase):
+    """Coverage for the evidence-binding digest helpers cherry-picked from #323."""
+
+    def test_canonical_digest_is_order_independent(self):
+        from tools.node_architect.validate_autonomous_g3_readiness import canonical_digest
+
+        a = canonical_digest({"x": 1, "y": 2})
+        b = canonical_digest({"y": 2, "x": 1})
+        self.assertEqual(a, b)
+        self.assertEqual(len(a), 64)
+
+    def test_canonical_digest_changes_with_payload(self):
+        from tools.node_architect.validate_autonomous_g3_readiness import canonical_digest
+
+        self.assertNotEqual(canonical_digest({"x": 1}), canonical_digest({"x": 2}))
+
+    def test_evidence_binding_digest_binds_only_required_fields(self):
+        from tools.node_architect.validate_autonomous_g3_readiness import (
+            evidence_binding_digest,
+        )
+
+        evidence = {
+            "task_id": TASK_ID,
+            "run_id": RUN_ID,
+            "repository": REPO,
+            "pr_number": 42,
+            "base_branch": "pre-prod",
+            "base_sha": PREPROD_SHA,
+            "head_sha": HEAD_SHA,
+            "changed_path_digest": "sha256:" + "0" * 64,
+            "ci_conclusions": [],
+            "review_receipt": {},
+            "pr_body_digest": "sha256:" + "1" * 64,
+            "runtime_graph_digest": "sha256:" + "2" * 64,
+            "gate_story_digest": "sha256:" + "3" * 64,
+            # ignored extra fields
+            "note": "should not affect the digest",
+        }
+        digest = evidence_binding_digest(evidence)
+        self.assertEqual(len(digest), 64)
+
+        # Adding an unrelated field must not change the binding digest.
+        evidence["note"] = "changed note"
+        self.assertEqual(evidence_binding_digest(evidence), digest)
+
+        # Changing a bound field must change the binding digest.
+        evidence["head_sha"] = "d" * 40
+        self.assertNotEqual(evidence_binding_digest(evidence), digest)
+
+
 if __name__ == "__main__":
     unittest.main()
