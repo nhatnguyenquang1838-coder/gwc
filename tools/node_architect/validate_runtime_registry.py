@@ -60,10 +60,7 @@ def source_hash(repo_root: Path, relative: str) -> str | None:
     path = repo_root / relative
     if not path.is_file():
         return None
-    # Normalize line endings so provenance hashes stay stable across Windows and Linux checkouts.
     data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
-    # Strip the provenance block before hashing so the SHA is self-consistent
-    # (the provenance SHA must match the hash of the file without provenance).
     try:
         parsed = json.loads(data)
         if isinstance(parsed, dict) and "provenance" in parsed:
@@ -83,6 +80,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "profiles": registry_root / "profile-registry.json",
         "rules": registry_root / "decision-rule-registry.json",
         "graph": registry_root / "runtime-graph-registry.json",
+        "extensions": registry_root / "runtime-node-extension-registry.json",
     }
     payloads = {name: load(path) for name, path in paths.items()}
     issues: list[str] = []
@@ -93,6 +91,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "profiles": "profile-registry.schema.json",
         "rules": "decision-rule-registry.schema.json",
         "graph": "runtime-graph.schema.json",
+        "extensions": "runtime-node-extension-registry.schema.json",
     }
     for name, schema_name in schema_map.items():
         issues.extend(
@@ -103,10 +102,48 @@ def validate_registry(root: Path) -> dict[str, Any]:
     nodes = payloads["nodes"].get("nodes", [])
     node_ids = [node.get("id") for node in nodes]
     node_set = set(node_ids)
+    baseline_node_set = set(node_set)
+    extensions = payloads["extensions"].get("extensions", [])
+    extension_nodes = [item.get("node", {}) for item in extensions if isinstance(item, dict)]
+    extension_ids = [node.get("id") for node in extension_nodes if isinstance(node, dict)]
+    effective_node_set = baseline_node_set | set(extension_ids)
     if len(nodes) != 81:
         issues.append(f"node registry must materialize exactly 81 slots, got {len(nodes)}")
     if len(node_set) != len(node_ids):
         issues.append("node registry contains duplicate stable IDs")
+    if payloads["nodes"].get("declared_slot_count") != 81:
+        issues.append("baseline node registry declared_slot_count must remain 81")
+    baseline_digest = "sha256:" + hashlib.sha256(json.dumps(sorted(baseline_node_set), sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    if payloads["extensions"].get("baseline_node_ids_digest") != baseline_digest:
+        issues.append("extension registry baseline_node_ids_digest mismatch")
+    if payloads["extensions"].get("baseline_declared_slot_count") != 81:
+        issues.append("extension registry must bind baseline slot count 81")
+    if payloads["extensions"].get("admitted_extension_count") != len(extensions):
+        issues.append("extension registry admitted_extension_count mismatch")
+    if len(extension_ids) != len(set(extension_ids)):
+        issues.append("extension registry contains duplicate node IDs")
+    if set(extension_ids) & baseline_node_set:
+        issues.append("extension node ID collides with immutable baseline")
+    slots = [item.get("extension_slot") for item in extensions if isinstance(item, dict)]
+    if len(slots) != len(set(slots)) or any(type(slot) is not int or slot < 82 for slot in slots):
+        issues.append("extension slots must be unique integers starting at 82")
+    for item, node in zip(extensions, extension_nodes):
+        if item.get("decision_task_id") != "SCRUM-284":
+            issues.append(f"extension {node.get('id')} is not admitted by SCRUM-284")
+        if item.get("decision_scope_hash") != "sha256:deaef48e37fcae790dbeab40eee78fa275f833fee6675fa790d2e32f1051df73":
+            issues.append(f"extension {node.get('id')} decision scope hash drift")
+        if node.get("family") not in FAMILIES:
+            issues.append(f"extension node {node.get('id')} has unknown family {node.get('family')}")
+        if node.get("source_status") != "canonical_explicit":
+            issues.append(f"extension node {node.get('id')} must be canonical_explicit")
+        provenance = node.get("provenance", {})
+        actual = source_hash(root, provenance.get("source_path", ""))
+        if actual is None or actual != provenance.get("source_sha"):
+            issues.append(f"extension node {node.get('id')} provenance SHA does not match source")
+    extension_provenance = payloads["extensions"].get("provenance", {})
+    ext_source = source_hash(root, extension_provenance.get("source_path", ""))
+    if ext_source is None or ext_source != extension_provenance.get("source_sha"):
+        issues.append("extension registry provenance SHA does not match source")
 
     families = {family: 0 for family in FAMILIES}
     for node in nodes:
@@ -156,7 +193,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         if missing_rules:
             issues.append(f"scenario {scenario_id} has unresolved rules {sorted(missing_rules)}")
         route_nodes = set(scenario.get("route_nodes", []))
-        missing_nodes = route_nodes - node_set
+        missing_nodes = route_nodes - effective_node_set
         if missing_nodes:
             issues.append(f"scenario {scenario_id} has unresolved route nodes {sorted(missing_nodes)}")
 
@@ -189,9 +226,9 @@ def validate_registry(root: Path) -> dict[str, Any]:
         policy = scenario.get("route_policy", {})
         start = policy.get("start_node")
         targets = set(policy.get("green_targets", []))
-        if start not in node_set or start not in route_nodes:
+        if start not in effective_node_set or start not in route_nodes:
             issues.append(f"scenario {scenario_id} has unresolved route-policy start node")
-        if not targets or not targets <= node_set or not targets <= route_nodes:
+        if not targets or not targets <= effective_node_set or not targets <= route_nodes:
             issues.append(f"scenario {scenario_id} has unresolved route-policy green target")
         if targets != set(scenario.get("green_targets", [])):
             issues.append(f"scenario {scenario_id} route-policy green targets drift from scenario targets")
@@ -215,8 +252,8 @@ def validate_registry(root: Path) -> dict[str, Any]:
 
     graph = payloads["graph"]
     graph_nodes = set(graph.get("nodes", []))
-    if graph_nodes != node_set:
-        issues.append("runtime graph node set must equal the canonical node registry")
+    if graph_nodes != effective_node_set:
+        issues.append("runtime graph node set must equal baseline plus admitted extensions")
     for edge in graph.get("edges", []):
         if edge.get("source") not in graph_nodes or edge.get("target") not in graph_nodes:
             issues.append("runtime graph contains an unresolved edge endpoint")
@@ -232,6 +269,7 @@ def validate_registry(root: Path) -> dict[str, Any]:
         payloads["nodes"].get("registry_id"),
         payloads["scenarios"].get("registry_id"),
         payloads["graph"].get("graph_id"),
+        payloads["extensions"].get("registry_id"),
     }
     for profile in profiles:
         refs = {
@@ -239,14 +277,14 @@ def validate_registry(root: Path) -> dict[str, Any]:
             profile.get("scenario_registry_ref"),
             profile.get("graph_registry_ref"),
         }
-        if not refs.issubset(registry_ids):
+        if not refs.issubset(registry_ids - {payloads["extensions"].get("registry_id")}):
             issues.append(f"profile {profile.get('id')} has unresolved registry reference")
         if len(profile.get("pilot_nodes", [])) != 3:
             issues.append(f"profile {profile.get('id')} must expose exactly three pilot nodes")
-        if not set(profile.get("green_targets", [])) <= node_set:
+        if not set(profile.get("green_targets", [])) <= effective_node_set:
             issues.append(f"profile {profile.get('id')} has unresolved green target")
         for route in profile.get("routes", []):
-            if not set(route.get("nodes", [])) <= node_set:
+            if not set(route.get("nodes", [])) <= effective_node_set:
                 issues.append(
                     f"profile {profile.get('id')} route {route.get('route_id')} has unresolved node"
                 )
@@ -257,6 +295,9 @@ def validate_registry(root: Path) -> dict[str, Any]:
         "issues": issues,
         "counts": {
             "nodes": len(nodes),
+            "baseline_nodes": len(nodes),
+            "extension_nodes": len(extension_ids),
+            "effective_nodes": len(effective_node_set),
             "proposed_nodes": sum(
                 node.get("source_status") == "proposed_registry_slot" for node in nodes
             ),
