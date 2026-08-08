@@ -41,6 +41,27 @@ Stop with `INSTRUCTION_PACKAGE_INVALID`, `POLICY_BOOT_FAILED`, or
 `PROJECT_PROFILE_INVALID` when any required instruction, hash, profile, or
 repository identity is missing, altered, conflicting, or unverified.
 
+
+## Source baseline precedence before trusted analysis
+
+Before code analysis, impact analysis, dependency reasoning, solution design, or
+implementation planning is accepted as trusted G0/G1 evidence, resolve source
+authority in this order:
+
+1. a valid task-bound exact ref/SHA when governance permits it;
+2. otherwise the current authoritative remote protected/default branch and exact SHA;
+3. an ambient local checkout only after equivalence to that selected SHA is proven.
+
+`local main` is never the default authority merely because it exists. In
+`local_agent`, record claim-time source-baseline evidence in the G01 runtime
+input. A local checkout is eligible for trusted analysis only when its head SHA
+matches the selected authoritative SHA and the checkout is clean. Stale, dirty,
+detached, task-mutated, or unverified local state must be isolated from trusted
+analysis; materialize or inspect the selected authoritative source instead.
+
+In `chat_connector_only`, the selected repository connector remains source of
+truth. A temporary local filesystem used for validation is not a trusted checkout.
+
 ## Mandatory lifecycle
 
 The agent must not create a branch, worktree, commit, repository file change,
