@@ -1,1 +1,82 @@
-{"schema_version":"1.0.0","artifact_type":"runtime-node-extension-registry","registry_id":"gwc-runtime-node-extension-registry","revision":"scrum-284-20260808","baseline_registry_ref":"gwc-runtime-node-registry","baseline_declared_slot_count":81,"baseline_node_ids_digest":"sha256:21afecdd0d7742445d8a6a94d8734e50f5f24e78f407293d1b0ef54368d8ac9c","admitted_extension_count":1,"extensions":[{"extension_slot":82,"decision_task_id":"SCRUM-284","decision_scope_hash":"sha256:deaef48e37fcae790dbeab40eee78fa275f833fee6675fa790d2e32f1051df73","node":{"schema_version":"1.0.0","artifact_type":"runtime-node","id":"gate_authority.research-review-to-execution","version":"1.0.0","family":"gate_authority","maturity":"candidate","source_status":"canonical_explicit","effect_class":"external_write","authority_class":"delegated","reversibility":"compensatable","idempotency":"key_required","suspension":{"suspendable":true,"resume_metadata":["run_id","dispatch_id","research_ref","materialization_key","projection_readbacks","claim_readback"]},"determinism":"external_state_dependent","evidence_contract":"research-execution-materialization","implementation_refs":["core/node-architect/node-catalog/gate_authority/research-review-to-execution.node.json","tools/node_architect/select_approved_research.py","tools/node_architect/materialize_research_execution.py","tools/node_architect/run_research_execution_flow.py"],"provenance":{"source_path":"core/node-architect/node-catalog/gate_authority/research-review-to-execution.node.json","source_sha":"ff89ab2879c0284b8068bf213853228f919a9d088e42096c9ad51a0aec1ef7f6","discovery_basis":"SCRUM-284 G1 approved post-81 extension"},"slot_review":{"decision":"keep","rationale":"New post-baseline capability has distinct research-to-execution semantics and must not repurpose an unrelated historical slot."}}}],"provenance":{"source_path":"core/node-architect/POST_81_RUNTIME_NODE_EXTENSION_RULE_v0.1.md","source_sha":"f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"}}
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "runtime-node-extension-registry",
+  "registry_id": "gwc-runtime-node-extension-registry",
+  "revision": "scrum-284-20260808-r2",
+  "baseline_registry_ref": "gwc-runtime-node-registry",
+  "baseline_declared_slot_count": 81,
+  "baseline_node_ids_digest": "sha256:21afecdd0d7742445d8a6a94d8734e50f5f24e78f407293d1b0ef54368d8ac9c",
+  "admitted_extension_count": 1,
+  "extensions": [
+    {
+      "extension_slot": 82,
+      "decision_task_id": "SCRUM-284",
+      "decision_scope_hash": "sha256:deaef48e37fcae790dbeab40eee78fa275f833fee6675fa790d2e32f1051df73",
+      "node": {
+        "schema_version": "1.0.0",
+        "artifact_type": "runtime-node",
+        "id": "gate_authority.research-review-to-execution",
+        "version": "1.0.0",
+        "family": "gate_authority",
+        "maturity": "candidate",
+        "source_status": "canonical_explicit",
+        "effect_class": "external_write",
+        "authority_class": "delegated",
+        "reversibility": "compensatable",
+        "idempotency": "key_required",
+        "suspension": {
+          "suspendable": true,
+          "resume_metadata": [
+            "run_id",
+            "dispatch_id",
+            "research_ref",
+            "materialization_key",
+            "projection_readbacks",
+            "claim_readback"
+          ]
+        },
+        "determinism": "external_state_dependent",
+        "evidence_contract": "research-execution-materialization",
+        "implementation_refs": [
+          "core/node-architect/node-extensions/gate_authority/research-review-to-execution.node.json",
+          "tools/node_architect/select_approved_research.py",
+          "tools/node_architect/materialize_research_execution.py",
+          "tools/node_architect/run_research_execution_flow.py"
+        ],
+        "provenance": {
+          "source_path": "core/node-architect/node-extensions/gate_authority/research-review-to-execution.node.json",
+          "source_sha": "ff89ab2879c0284b8068bf213853228f919a9d088e42096c9ad51a0aec1ef7f6",
+          "discovery_basis": "SCRUM-284 G1 approved post-81 extension"
+        },
+        "slot_review": {
+          "decision": "keep",
+          "rationale": "New post-baseline capability has distinct research-to-execution semantics and must not repurpose an unrelated historical slot."
+        }
+      },
+      "route": {
+        "route_id": "research-approved-to-g4-boundary",
+        "nodes": [
+          "gate_authority.research-review-to-execution",
+          "repo_delivery.ci-run-capture",
+          "runtime_checkpoint.checkpoint-persist",
+          "validation_quality.ci-evidence-capture"
+        ],
+        "edges": [
+          {
+            "source": "gate_authority.research-review-to-execution",
+            "target": "repo_delivery.ci-run-capture",
+            "edge_type": "runtime",
+            "runtime_executable": true,
+            "provenance": "SCRUM-284:research-execution-handoff"
+          }
+        ],
+        "terminal_gate": "G4_MERGE",
+        "outcome": "HUMAN_REQUIRED"
+      }
+    }
+  ],
+  "provenance": {
+    "source_path": "core/node-architect/POST_81_RUNTIME_NODE_EXTENSION_RULE_v0.1.md",
+    "source_sha": "f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92"
+  }
+}
