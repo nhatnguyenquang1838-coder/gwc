@@ -120,6 +120,16 @@ class FlowTests(unittest.TestCase):
         out = run_research_execution_flow(p)
         self.assertEqual(out["outcome"], "IDLE")
 
+    def test_invalid_approval_stops_with_durable_reason(self):
+        r, a, p = self.base()
+        a["risk_ceiling"] = "R1"
+        a["scope_hash"] = approval_scope_hash(a)
+        p["approvals"] = [a]
+        out = run_research_execution_flow(p)
+        self.assertEqual(out["outcome"], "STOPPED")
+        self.assertEqual(out["reason_code"], "CHILD_G2_RISK_EXCEEDS_PARENT_CEILING")
+        self.assertEqual(out["checkpoint"]["stop_reason"], out["reason_code"])
+
     def test_full_external_sequence_stops_at_g4(self):
         r, a, p = self.base()
         one = run_research_execution_flow(p)
