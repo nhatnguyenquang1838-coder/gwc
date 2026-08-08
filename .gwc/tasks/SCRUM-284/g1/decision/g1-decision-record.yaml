@@ -1,0 +1,65 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-08-08T14:12:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-284
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat
+  decided_at: '2026-08-08T13:45:00Z'
+  source: chat-user-direction
+  explicit: true
+rationale: User requested automation from Human research approval through E2E delivery
+  until waiting at the Human merge boundary. The selected option therefore explicitly
+  supports bounded child G2 and bounded G3 delegation from the same Human research
+  approval, while preserving a hard G4 stop and the post-81 extension constraint.
+rejected_option_ids:
+- OPT-2
+- OPT-3
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+- AC-8
+- AC-9
+- AC-10
+- AC-11
+- AC-12
+- AC-13
+- AC-14
+- AC-15
+- AC-16
+- AC-17
+scope_hash: sha256:deaef48e37fcae790dbeab40eee78fa275f833fee6675fa790d2e32f1051df73
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition: []
+  agent_allocation: []
+  execution_order: []
+  summary: No subagent distribution required for this G1 decision capture.
+implementation_plan_ref:
+  applicability: required
+  source: generated_kiro
+  canonical_task_uid: SCRUM-284
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  plan_root: .gwc/tasks/SCRUM-284/g1/plan
+  plan_revision: sha256:42cd1a3af28673b0188e82943ad6df3b0502dae6a6079f463473b709e4116330
+  validation_evidence: /mnt/data/dw_super_sessions/20260808-2054-SCRUM-284/evidence/kiro-plan-validation.txt
