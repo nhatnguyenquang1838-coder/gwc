@@ -1,63 +1,156 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/node-architect/autonomous-task-selection.schema.json",
-  "title": "Autonomous Jira Task Selection Result",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "artifact_type",
-    "run_id",
-    "active_lane",
-    "excluded_lanes",
-    "selected_task",
-    "selection_reason",
-    "dependency_evidence",
-    "unsafe_done_dependencies",
-    "next_eligible_tasks",
-    "candidate_count",
-    "eligible_count",
-    "parallel_execution_allowed",
-    "authority_granted",
-    "selection_digest"
+  "title": "Autonomous Jira Task Selection and Continuation Evidence",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/selectionInput"
+    },
+    {
+      "$ref": "#/$defs/selectionResult"
+    },
+    {
+      "$ref": "#/$defs/continuationCheckpoint"
+    },
+    {
+      "$ref": "#/$defs/jiraReconciliation"
+    }
   ],
-  "properties": {
-    "schema_version": {"const": "1.0"},
-    "artifact_type": {"const": "autonomous-task-selection"},
-    "run_id": {"type": "string", "minLength": 1},
-    "active_lane": {"type": "string", "minLength": 1},
-    "excluded_lanes": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {"type": "string", "minLength": 1}
-    },
-    "selected_task": {
-      "oneOf": [
-        {"type": "string", "minLength": 1},
-        {"type": "null"}
-      ]
-    },
-    "selection_reason": {"type": "string", "minLength": 1},
-    "dependency_evidence": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/dependencyEvidence"}
-    },
-    "unsafe_done_dependencies": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/unsafeDone"}
-    },
-    "next_eligible_tasks": {
-      "type": "array",
-      "uniqueItems": true,
-      "items": {"type": "string", "minLength": 1}
-    },
-    "candidate_count": {"type": "integer", "minimum": 0},
-    "eligible_count": {"type": "integer", "minimum": 0},
-    "parallel_execution_allowed": {"const": false},
-    "authority_granted": {"const": false},
-    "selection_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
-  },
   "$defs": {
+    "selectionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "run_id", "active_lane", "excluded_lanes", "manifest", "jira_tasks", "dependency_evidence"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "artifact_type": {"const": "autonomous-task-selection-input"},
+        "run_id": {"type": "string", "minLength": 1},
+        "active_lane": {"type": "string", "minLength": 1},
+        "excluded_lanes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "manifest": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["allowed_tasks"],
+          "properties": {
+            "allowed_tasks": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "oneOf": [
+                  {"type": "string", "minLength": 1},
+                  {"type": "object", "additionalProperties": true, "required": ["task_id"], "properties": {"task_id": {"type": "string", "minLength": 1}}}
+                ]
+              }
+            }
+          }
+        },
+        "jira_tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["task_id", "lane", "status", "dependencies"],
+            "properties": {
+              "task_id": {"type": "string", "minLength": 1},
+              "lane": {"type": "string", "minLength": 1},
+              "status": {"type": "string", "minLength": 1},
+              "priority": {},
+              "dependencies": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+            }
+          }
+        },
+        "dependency_evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["jira_status"],
+            "properties": {
+              "jira_status": {"type": "string", "minLength": 1},
+              "semantic_state": {"type": "string"},
+              "repository_implementation": {"type": "boolean"},
+              "exact_sha_verified": {"type": "boolean"},
+              "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+            }
+          }
+        }
+      }
+    },
+    "selectionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "run_id", "active_lane", "excluded_lanes", "selected_task", "selection_reason", "dependency_evidence", "unsafe_done_dependencies", "next_eligible_tasks", "candidate_count", "eligible_count", "parallel_execution_allowed", "authority_granted", "selection_digest"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "artifact_type": {"const": "autonomous-task-selection"},
+        "run_id": {"type": "string", "minLength": 1},
+        "active_lane": {"type": "string", "minLength": 1},
+        "excluded_lanes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "selected_task": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "selection_reason": {"type": "string", "minLength": 1},
+        "dependency_evidence": {"type": "array", "items": {"$ref": "#/$defs/dependencyEvidence"}},
+        "unsafe_done_dependencies": {"type": "array", "items": {"$ref": "#/$defs/unsafeDone"}},
+        "next_eligible_tasks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "candidate_count": {"type": "integer", "minimum": 0},
+        "eligible_count": {"type": "integer", "minimum": 0},
+        "parallel_execution_allowed": {"const": false},
+        "authority_granted": {"const": false},
+        "selection_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "continuationCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "run_id", "revision", "active_task", "active_dispatch_id", "active_task_merge_sha", "completed_tasks", "last_selection_digest", "jira_projection_state", "last_exact_g5", "stop_reason"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "artifact_type": {"const": "autonomous-continuation-checkpoint"},
+        "run_id": {"type": "string", "minLength": 1},
+        "revision": {"type": "integer", "minimum": 0},
+        "active_task": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "active_dispatch_id": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "active_task_merge_sha": {"oneOf": [{"type": "string", "pattern": "^[0-9a-f]{40}$"}, {"type": "null"}]},
+        "completed_tasks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "last_selection_digest": {"oneOf": [{"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}, {"type": "null"}]},
+        "jira_projection_state": {"oneOf": [{"type": "object"}, {"type": "null"}]},
+        "last_exact_g5": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["task_id", "merge_sha", "status", "exact_sha_verified"],
+              "properties": {
+                "task_id": {"type": "string", "minLength": 1},
+                "merge_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+                "status": {"const": "PASS"},
+                "exact_sha_verified": {"const": true}
+              }
+            },
+            {"type": "null"}
+          ]
+        },
+        "stop_reason": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "null"}]}
+      }
+    },
+    "jiraReconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "artifact_type", "task_id", "dispatch_id", "canonical_execution_status", "jira_status_before", "jira_status_intended", "jira_status_readback", "projection_status", "reason_code", "canonical_execution_truth_preserved", "authority_granted"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "artifact_type": {"const": "autonomous-jira-reconciliation"},
+        "task_id": {"type": "string", "minLength": 1},
+        "dispatch_id": {"type": "string", "minLength": 1},
+        "canonical_execution_status": {"type": "string", "minLength": 1},
+        "jira_status_before": {"type": "string", "minLength": 1},
+        "jira_status_intended": {"type": "string", "minLength": 1},
+        "jira_status_readback": {"oneOf": [{"type": "string"}, {"type": "null"}]},
+        "projection_status": {"enum": ["SYNCHRONIZED", "LATE_RECONCILIATION_REQUIRED", "BLOCKED"]},
+        "reason_code": {"type": "string", "minLength": 1},
+        "canonical_execution_truth_preserved": {"const": true},
+        "authority_granted": {"const": false}
+      }
+    },
     "dependencyEvidence": {
       "type": "object",
       "additionalProperties": false,
@@ -67,16 +160,8 @@
         "dependency_task": {"type": "string", "minLength": 1},
         "jira_status": {"type": "string", "minLength": 1},
         "safe": {"type": "boolean"},
-        "reasons": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
-        "evidence_refs": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        }
+        "reasons": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
       }
     },
     "unsafeDone": {
@@ -85,17 +170,8 @@
       "required": ["task_id", "reasons", "evidence_refs"],
       "properties": {
         "task_id": {"type": "string", "minLength": 1},
-        "reasons": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        },
-        "evidence_refs": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
-        }
+        "reasons": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
       }
     }
   }
