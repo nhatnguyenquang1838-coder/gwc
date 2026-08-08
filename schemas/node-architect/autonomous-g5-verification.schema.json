@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/autonomous-g5-verification.schema.json",
+  "title": "Autonomous G5 Verification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "merge_sha",
+    "g5_status",
+    "exact_head_bound",
+    "readiness_outcome",
+    "readiness_reason",
+    "authority_granted",
+    "result_digest"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "autonomous-g5-verification" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "repository": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
+    "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "merge_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "g5_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "CI_PENDING",
+        "CONNECTOR_OBSERVABILITY_INCOMPLETE"
+      ]
+    },
+    "exact_head_bound": { "type": "boolean" },
+    "readiness_outcome": { "type": "string", "minLength": 1 },
+    "readiness_reason": { "type": "string", "minLength": 1 },
+    "required_checks": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "successful_checks": { "type": "array", "items": { "type": "string" } },
+    "failed_checks": { "type": "array", "items": { "type": "string" } },
+    "pending_checks": { "type": "array", "items": { "type": "string" } },
+    "missing_checks": { "type": "array", "items": { "type": "string" } },
+    "authority_granted": { "const": false },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "result_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "g5_status": { "const": "PASS" } } },
+      "then": { "properties": { "exact_head_bound": { "const": true } } }
+    }
+  ]
+}

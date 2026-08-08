@@ -1,0 +1,105 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-08T16:44:07Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-276
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: BASE-SHA
+    status: PASS
+    code: BASE_VERIFIED
+    message: Protected base resolved from origin/main and matches the issue baseline.
+    evidence:
+      - 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  - id: UPSTREAM-DONE-274
+    status: PASS
+    code: BLOCKER_RESOLVED
+    message: SCRUM-274 is Done; its task selector and continuation loop are stable upstream inputs.
+    evidence:
+      - SCRUM-274
+  - id: UPSTREAM-DONE-275
+    status: PASS
+    code: BLOCKER_RESOLVED
+    message: SCRUM-275 is Done; pre-prod branch/PR/CI/governed merge behavior is a stable upstream input.
+    evidence:
+      - SCRUM-275
+  - id: NEW-MODULE-SCOPE
+    status: PASS
+    code: FRESH_ISOLATED_MODULE
+    message: Target modules under tools/node_architect and schemas/node-architect are new for this MVP; no existing shared exporter is mutated.
+    evidence:
+      - tools/node_architect/autonomous_run_checkpoint.py
+      - tools/node_architect/verify_preprod_merge_sha.py
+      - tools/node_architect/reconcile_autonomous_run.py
+      - tools/node_architect/run_autonomous_preprod_canary.py
+      - schemas/node-architect/autonomous-run-checkpoint.schema.json
+      - schemas/node-architect/autonomous-g5-verification.schema.json
+  - id: SCOPE-HASH
+    status: PASS
+    code: SCOPE_HASH_DERIVED
+    message: scope_hash derived via calculate_gate_scope_identity (outcome READY), not guessed.
+    evidence:
+      - sha256:f944f4848794f226708eee0b002b5de314981b48a23027857ed7364d05344787
+process_readback:
+  process_id: g1-preflight-SCRUM-276
+  terminal_outcome: PASS
+  required_sources:
+    - AGENTS.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - projects/gwc/project-profile.yaml
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+    - id: STEP-1
+      name: G0_CONTEXT
+      gate: G0_CONTEXT
+      actor: agent
+      action_class: read_only_inspection
+      capability_required: local_agent
+      capability_status: VERIFIED
+      primary_route: materialize_g0_g1_g2_artifacts
+      fallback_routes:
+        - chat_only_preparation
+      continuation: G1_ALIGNMENT
+      expected_evidence: g0/context-snapshot.yaml
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-2
+      name: G1_ALIGNMENT
+      gate: G1_ALIGNMENT
+      actor: agent
+      action_class: read_only_decision_capture
+      capability_required: local_agent
+      capability_status: VERIFIED
+      primary_route: materialize_g0_g1_g2_artifacts
+      fallback_routes:
+        - chat_only_preparation
+      continuation: G2_EXECUTION
+      expected_evidence: g1/{intake,preflight,brainstorming,decision}/*.yaml
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-3
+      name: G2_EXECUTION
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: bounded_branch_writes
+      capability_required: local_agent
+      capability_status: VERIFIED
+      primary_route: modify_approved_files
+      fallback_routes: []
+      continuation: G3_PR
+      expected_evidence: g2/execution-envelope.yaml
+      bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+risk_class: R0
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

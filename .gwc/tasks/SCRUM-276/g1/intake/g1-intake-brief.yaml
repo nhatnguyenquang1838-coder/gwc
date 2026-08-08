@@ -1,0 +1,95 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-08T16:44:07Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-276
+  base_sha: 773baa601492dabf6ad8e835b62e48a68b0c1b55
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Complete the autonomous pre-prod runtime MVP with replay-safe recovery, exact merge-SHA G5 verification, and a serial multi-task canary proving unattended continuation.
+  why_now: 'SCRUM-274 and SCRUM-275 are Done. The epic [APR-MVP-06] is the remaining capability gap: durable checkpointing, reconciliation, exact-SHA verification, and canary execution.'
+desired_outcome: Deterministic run evidence, deterministic recovery, exact-SHA-bound G5 status, and a two-task serial canary with complete G0-G5 artifacts per task.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+    - GWC maintainers
+    - future governed agents
+    - pre-prod runtime operators
+scope:
+  in_scope:
+    - tools/node_architect/autonomous_run_checkpoint.py
+    - tools/node_architect/verify_preprod_merge_sha.py
+    - tools/node_architect/reconcile_autonomous_run.py
+    - tools/node_architect/run_autonomous_preprod_canary.py
+    - schemas/node-architect/autonomous-run-checkpoint.schema.json
+    - schemas/node-architect/autonomous-g5-verification.schema.json
+    - tests/test_autonomous_run_recovery.py
+    - tests/test_autonomous_preprod_g5.py
+    - tests/test_autonomous_two_task_canary.py
+    - .gwc/tasks/SCRUM-276/**
+  non_goals:
+    - publish or deploy to production
+    - mutate shared exporter tools
+    - rewrite main branch history
+constraints:
+  - No write to protected main branch
+  - Agent-only claim intake required before write-capable action
+  - Replay-safe recovery must avoid duplicate branch/commit/PR/comment/merge
+  - G5 verification binds exact merge SHA and required checks
+assumptions:
+  - SCRUM-274 and SCRUM-275 deliverables are stable inputs available on origin/main
+  - GitHub Actions workflow runs are queryable for exact merge SHA evidence
+  - The canonical scope-identity tool exists on the main checkout and is importable for hash derivation
+risks:
+  - id: RISK-1
+    description: Duplicate dispatch or replay may create spurious branches/PRs if idempotency keys are not deterministic.
+    impact: medium
+    mitigation: Enforce deterministic checkpoint keys and pre-write duplicate-agent fencing.
+  - id: RISK-2
+    description: Exact-SHA G5 verification may yield CONNECTOR_OBSERVABILITY_INCOMPLETE if the GitHub Actions connector cannot filter by push/main.
+    impact: medium
+    mitigation: Fall back to run_id and jobs/artifacts lookup; record limitation honestly.
+acceptance_criteria:
+  - id: AC-1
+    statement: Same manifest/evidence replay creates no duplicate branch, commit, PR, comment, or merge effect.
+    verifiable: true
+  - id: AC-2
+    statement: Conflicting replay fails closed.
+    verifiable: true
+  - id: AC-3
+    statement: Interrupted runs resume from the latest valid checkpoint without skipping a gate or node.
+    verifiable: true
+  - id: AC-4
+    statement: Unknown external outcomes perform canonical readback before retry.
+    verifiable: true
+  - id: AC-5
+    statement: G5 PASS is bound to the exact pre-prod merge SHA and required checks.
+    verifiable: true
+  - id: AC-6
+    statement: Two allowlisted tasks complete serially without human interaction between them.
+    verifiable: true
+unresolved_questions: []
+status: READY
+delivery_lifecycle:
+  authorized_actions:
+    - materialize_g0_g1_g2_artifacts
+    - modify_approved_files
+    - run_sandboxed_validation
+    - push_working_branch
+    - open_or_update_draft_pr
+  downstream_non_goals:
+    - merge
+    - deploy
+    - release
+    - production_data_write
+    - production_config_change
+    - credential_rotation
+    - destructive_migration
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+      - Draft PR matches exact head SHA
+      - CI green for exact head SHA
+      - Independent read-only review bound to exact head SHA and scope hash

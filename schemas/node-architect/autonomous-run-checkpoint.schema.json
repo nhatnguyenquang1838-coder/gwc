@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/autonomous-run-checkpoint.schema.json",
+  "title": "Autonomous Run Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "run_id",
+    "repository",
+    "base_sha",
+    "head_sha",
+    "scope_hash",
+    "manifest_digest",
+    "checkpoint_key",
+    "state_digest",
+    "completed_node_ids",
+    "next_node_id",
+    "captured_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "autonomous-run-checkpoint" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "repository": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
+    "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "head_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "scope_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "manifest_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "checkpoint_key": { "type": "string", "minLength": 1 },
+    "state_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "completed_node_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "next_node_id": { "type": ["string", "null"] },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "result_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "next_node_id": { "type": "string" } } },
+      "then": { "properties": { "next_node_id": { "minLength": 1 } } }
+    }
+  ]
+}
