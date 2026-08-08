@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/research-execution-approval.schema.json",
+  "title": "Research Execution Approval Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "approval_id",
+    "issued_at",
+    "expires_at",
+    "authority_revision",
+    "research_ref",
+    "research_digest",
+    "repository",
+    "base_ref",
+    "base_sha",
+    "active_lane",
+    "risk_ceiling",
+    "approved_scope",
+    "delegated_g2_actions",
+    "delegated_g3_actions",
+    "scope_hash",
+    "human_approval",
+    "g4_g5_g6_authority_granted"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "research-execution-approval"},
+    "approval_id": {"type": "string", "minLength": 1},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "authority_revision": {"type": "string", "minLength": 1},
+    "research_ref": {"type": "string", "minLength": 1},
+    "research_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_ref": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "active_lane": {"type": "string", "minLength": 1},
+    "risk_ceiling": {"enum": ["R0", "R1", "R2", "R3"]},
+    "approved_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_id",
+        "scope_digest",
+        "objective",
+        "implementation_guidance",
+        "acceptance_criteria",
+        "dependencies",
+        "risk_class",
+        "authorized_paths",
+        "excluded_actions"
+      ],
+      "properties": {
+        "scope_id": {"type": "string", "minLength": 1},
+        "scope_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "objective": {"type": "string", "minLength": 1},
+        "implementation_guidance": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "dependencies": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
+        "authorized_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "excluded_actions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "delegated_g2_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["create_guarded_branch_or_worktree", "modify_approved_files", "run_sandboxed_validation", "stage", "create_commit", "push_working_branch"]}
+    },
+    "delegated_g3_actions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["open_or_update_draft_pr", "monitor_exact_head_ci", "repair_within_approved_scope", "run_independent_read_only_review", "mark_pr_ready_for_review"]}
+    },
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "human_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "exact_command_digest", "trusted_readback"],
+      "properties": {
+        "source": {"const": "human_exact_command"},
+        "exact_command_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "trusted_readback": {"const": true}
+      }
+    },
+    "g4_g5_g6_authority_granted": {"const": false}
+  }
+}

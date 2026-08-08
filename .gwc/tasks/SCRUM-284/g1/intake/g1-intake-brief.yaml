@@ -1,0 +1,201 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-08T14:12:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-284
+  base_sha: 2e20badf04b4d84bf8a2e88d6e1e88d540745d35
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Human-approved Node Research has no canonical governed bridge to deterministically
+    upsert and claim a separate execution task and continue autonomous GWC delivery.
+  why_now: Node Research tasks are already reaching In Review and require manual follow-up;
+    the autonomous pre-prod selector/continuation runtime now exists on SCRUM-274
+    and can be extended safely.
+desired_outcome: Add a replay-safe gate_authority.research-review-to-execution node
+  and flow that turns exact Human-approved research scope into one paired execution
+  task, projects bounded task-scoped G2 and optional bounded G3 Draft-PR authority
+  from that same approval, reuses normal GWC E2E delivery through G3, and stops for
+  exact Human G4 merge authority.
+stakeholders:
+  requester: Nhat
+  affected:
+  - GWC Node Architect autonomous runtime
+  - Research workflow
+  - Jira execution projections
+  - GitHub execution issue projections
+  - G0-G3 autonomous delivery continuation
+scope:
+  in_scope:
+  - Versioned research execution approval contract
+  - Deterministic approved-research selection preserving active and excluded lanes
+  - ExecutionTaskSpec compilation and deterministic materialization identity
+  - Idempotent GitHub/Jira execution-task reconciliation and cross-linking
+  - Durable checkpoint and crash/replay protection
+  - Bounded child-G2 and child-G3 authority projection from exact approved research
+    scope
+  - research.review-to-execution node and route integration
+  - Immediate-after-approval and scheduled-poll trigger parity
+  - Existing GWC G0/G1/G2/G3 handoff, exact-head CI, bounded repair and G3 review
+  - Tests for drift, duplicate suppression, conflicts, recovery and G4 stop boundary
+  - Controlled post-81 runtime node extension contract preserving the historical 81-node
+    baseline
+  - Runtime node registry schema validator graph and flow-profile migration for exactly
+    one declared extension node
+  non_goals:
+  - Automatic merge or standing G4 authority
+  - G5 manual deploy release publish or runtime reload
+  - G6 production configuration data credential secret or migration operation
+  - Generic Jira GitHub Linear custom-controller abstraction
+  - Parallel execution of multiple research-derived tasks
+  - Implementing the research recommendations in SCRUM-279 SCRUM-280 SCRUM-281 or
+    SCRUM-282
+constraints:
+- Reuse existing SCRUM-274 selector continuation checkpoint and unsafe-Done semantics
+  instead of creating a parallel orchestration engine
+- Reuse SCRUM-272 bounded parent-child authority model
+- GitHub is repository technical truth; Jira and GitHub issues are tracking projections
+  only
+- Preserve MODE_DOES_NOT_BYPASS_NODE_RUNTIME and gate-node instruction/evidence semantics
+- Same materialization key must never create duplicate logical execution tasks
+- Any exact-head change invalidates prior CI and G3 review evidence
+- Stop at Human G4 authority on successful G3
+- Preserve REVAMP-GWC-015 81-node expansion plan as historical baseline and do not
+  repurpose a semantically unrelated planned slot
+- Admit exactly one SCRUM-284 post-baseline node under the existing gate_authority
+  family and fail closed on undeclared node growth
+- Contract-only autonomous child authority decisions are not live authority; task-scoped
+  G2/G3 receipts must be bounded projections of exact Human research-execution approval
+assumptions:
+- SCRUM-274 implementation on exact protected base is safe dependency evidence
+- Current Jira simplified workflow maps active GWC preparation/execution to In Progress
+- Scheduler/cron invocation supplies canonical snapshots but never grants authority
+- Existing Node Architect checkpoint and evidence primitives remain reusable
+risks:
+- id: RISK-1
+  description: Research approval could accidentally be interpreted as merge or broader
+    execution authority.
+  impact: high
+  mitigation: Encode strict parent-child subset derivation and negative G4/G5/G6 authority
+    tests.
+- id: RISK-2
+  description: Crash or retry between GitHub and Jira projection effects could create
+    duplicate execution tasks.
+  impact: high
+  mitigation: Use deterministic materialization key, reconciliation-first ensure semantics,
+    durable checkpoints and conflict fencing.
+- id: RISK-3
+  description: Scheduled trigger could select a different lane or stale research state
+    from an immediate trigger.
+  impact: medium
+  mitigation: Use the same pure selector over canonical snapshots with active/excluded
+    lane bindings and exact research digest validation.
+- id: RISK-4
+  description: New orchestration code could bypass existing Node Architect gate runtime
+    or duplicate continuation logic.
+  impact: high
+  mitigation: Keep the new runner thin and explicitly reuse current G0-G3, checkpoint,
+    evidence, AI execution and continuation primitives.
+- id: RISK-5
+  description: The new executable node would exceed the historical 81-node registry
+    and could break hard-coded registry/schema/graph invariants.
+  impact: high
+  mitigation: Preserve the 81-node baseline, add a versioned post-81 extension admission
+    contract, evolve validators explicitly, and add migration/fail-closed tests.
+acceptance_criteria:
+- id: AC-1
+  statement: Valid approved research produces exactly one deterministic ExecutionTaskSpec.
+  verifiable: true
+- id: AC-2
+  statement: Replay of identical approved inputs produces the same materialization
+    key and no duplicate GitHub or Jira execution record.
+  verifiable: true
+- id: AC-3
+  statement: Partial projection creation reconciles and creates only the missing paired
+    projection.
+  verifiable: true
+- id: AC-4
+  statement: Conflicting projection identities for one materialization key fail closed
+    without creating a third record.
+  verifiable: true
+- id: AC-5
+  statement: Research digest scope or expiry drift after approval blocks materialization
+    or execution.
+  verifiable: true
+- id: AC-6
+  statement: Derived child G2/G3 authority cannot broaden repository paths actions
+    risk approved scope expiry or gate capabilities beyond the parent research authority.
+  verifiable: true
+- id: AC-7
+  statement: Research execution approval cannot grant G4 G5 or G6 authority.
+  verifiable: true
+- id: AC-8
+  statement: Immediate and scheduled triggers select and materialize identically from
+    the same canonical snapshot.
+  verifiable: true
+- id: AC-9
+  statement: Out-of-lane research and unsafe Done dependency evidence are rejected.
+  verifiable: true
+- id: AC-10
+  statement: After claim the flow reuses normal GWC gate node checkpoint evidence
+    and continuation primitives.
+  verifiable: true
+- id: AC-11
+  statement: Exact-head CI and independent G3 review are required and stale evidence
+    is invalidated after repair.
+  verifiable: true
+- id: AC-12
+  statement: Successful G3 ends at HUMAN_AUTHORITY_REQUIRED for exact G4 and never
+    auto-merges.
+  verifiable: true
+- id: AC-13
+  statement: GitHub and Jira execution projections remain cross-linked and legally
+    reconcilable.
+  verifiable: true
+- id: AC-14
+  statement: Durable restart does not duplicate task creation claim or external effects.
+  verifiable: true
+- id: AC-15
+  statement: Focused tests cover approval drift duplicate dispatch partial failure
+    conflict restart no eligible research out-of-lane unsafe dependency and G4 stop.
+  verifiable: true
+- id: AC-16
+  statement: The historical 81-node baseline remains intact while exactly one explicitly
+    G1-approved post-baseline node is admitted; undeclared node growth and graph/profile
+    drift fail closed.
+  verifiable: true
+- id: AC-17
+  statement: When the Human research-execution approval explicitly delegates bounded
+    G3, the derived execution can proceed through Draft PR exact-head CI review and
+    ready-for-review without another Human command, then stops at G4.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY
