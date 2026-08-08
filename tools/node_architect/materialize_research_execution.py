@@ -32,6 +32,27 @@ def _scope_digest(scope: Mapping[str, Any]) -> str:
     return _digest(semantic)
 
 
+def approval_scope_hash(approval: Mapping[str, Any]) -> str:
+    """Canonical hash of every field that can change delegated execution authority."""
+    payload = {
+        "approval_id": approval.get("approval_id"),
+        "issued_at": approval.get("issued_at"),
+        "expires_at": approval.get("expires_at"),
+        "authority_revision": approval.get("authority_revision"),
+        "research_ref": approval.get("research_ref"),
+        "research_digest": approval.get("research_digest"),
+        "repository": approval.get("repository"),
+        "base_ref": approval.get("base_ref"),
+        "base_sha": approval.get("base_sha"),
+        "active_lane": approval.get("active_lane"),
+        "risk_ceiling": approval.get("risk_ceiling"),
+        "approved_scope": approval.get("approved_scope"),
+        "delegated_g2_actions": approval.get("delegated_g2_actions"),
+        "delegated_g3_actions": approval.get("delegated_g3_actions"),
+    }
+    return _digest(payload)
+
+
 def validate_research_approval(research: Mapping[str, Any], approval: Mapping[str, Any], *, now: datetime | None = None) -> tuple[bool, str]:
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     if approval.get("g4_g5_g6_authority_granted") is not False:
@@ -57,6 +78,14 @@ def validate_research_approval(research: Mapping[str, Any], approval: Mapping[st
         return False, "RESEARCH_SCOPE_DRIFT"
     if scope.get("scope_digest") != _scope_digest(observed) or scope.get("scope_digest") != _scope_digest(scope):
         return False, "RESEARCH_SCOPE_DRIFT"
+
+    ceiling = approval.get("risk_ceiling")
+    risk = scope.get("risk_class")
+    if ceiling not in RISK_ORDER or risk not in RISK_ORDER:
+        return False, "RESEARCH_RISK_CEILING_INVALID"
+    if RISK_ORDER[str(risk)] > RISK_ORDER[str(ceiling)]:
+        return False, "CHILD_G2_RISK_EXCEEDS_PARENT_CEILING"
+
     g2 = approval.get("delegated_g2_actions", [])
     g3 = approval.get("delegated_g3_actions", [])
     if not isinstance(g2, Sequence) or isinstance(g2, (str, bytes)) or not g2:
@@ -65,6 +94,10 @@ def validate_research_approval(research: Mapping[str, Any], approval: Mapping[st
         return False, "CHILD_G3_SCOPE_EXPANSION_REJECTED"
     if set(g2) & FORBIDDEN_CHILD_ACTIONS or set(g3) & FORBIDDEN_CHILD_ACTIONS or not set(g3) <= ALLOWED_G3:
         return False, "RESEARCH_APPROVAL_AUTHORITY_ESCALATION"
+
+    expected_scope_hash = approval_scope_hash(approval)
+    if approval.get("scope_hash") != expected_scope_hash:
+        return False, "RESEARCH_APPROVAL_SCOPE_HASH_MISMATCH"
     return True, "RESEARCH_APPROVAL_VALID"
 
 
@@ -74,7 +107,8 @@ def _child_authority(approval: Mapping[str, Any], materialization_key: str) -> d
         "source": "human_research_execution_approval", "parent_approval_id": approval["approval_id"],
         "parent_scope_hash": approval["scope_hash"], "materialization_key": materialization_key,
         "repository": approval["repository"], "base_ref": approval["base_ref"], "base_sha": approval["base_sha"],
-        "risk_class": scope["risk_class"], "expires_at": approval["expires_at"], "g4_g5_g6_authority_granted": False,
+        "risk_class": scope["risk_class"], "risk_ceiling": approval["risk_ceiling"],
+        "expires_at": approval["expires_at"], "g4_g5_g6_authority_granted": False,
     }
     g2 = {**common, "gate": "G2_EXECUTION", "authorized_paths": list(scope["authorized_paths"]), "authorized_actions": list(approval["delegated_g2_actions"]), "authority_granted": True}
     g3_actions = list(approval.get("delegated_g3_actions", []))
