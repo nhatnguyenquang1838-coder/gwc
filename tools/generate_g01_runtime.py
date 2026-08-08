@@ -103,6 +103,105 @@ def _selected_connector_available(runtime: dict[str, Any]) -> bool:
     return any(item.get("status") == "AVAILABLE" for item in matching)
 
 
+def _source_baseline_blockers(
+    repository: dict[str, Any],
+    runtime: dict[str, Any],
+) -> list[dict[str, str]]:
+    """Validate claim-time source authority and local-checkout eligibility.
+
+    The generator consumes already-observed evidence; it does not fetch remotes.
+    Local mismatch or dirtiness is not a total blocker when authoritative remote
+    source is available, but such local state can never be marked eligible for
+    trusted analysis.
+    """
+    baseline = repository.get("source_baseline")
+    if baseline is None:
+        if runtime.get("execution_mode") == "local_agent":
+            return [_blocker(
+                "SOURCE_BASELINE_EVIDENCE_REQUIRED",
+                "local_agent G0/G1 requires claim-time source-baseline evidence before trusted analysis.",
+            )]
+        return []
+
+    blockers: list[dict[str, str]] = []
+    if baseline.get("observed_sha") != repository.get("base_sha"):
+        blockers.append(_blocker(
+            "SOURCE_BASELINE_SHA_MISMATCH",
+            "Observed authoritative source SHA must match repository.base_sha.",
+        ))
+
+    authority = baseline.get("authority")
+    if authority == "REMOTE_PROTECTED_BASE" and baseline.get("observed_ref") != repository.get("base_ref"):
+        blockers.append(_blocker(
+            "SOURCE_BASELINE_REF_MISMATCH",
+            "Remote protected-base evidence must match repository.base_ref.",
+        ))
+
+    local = baseline.get("local_state", {})
+    equivalence = local.get("equivalence")
+    eligible = local.get("analysis_eligible") is True
+    if eligible and not (
+        equivalence == "MATCH"
+        and local.get("dirty") is False
+        and local.get("head_sha") == baseline.get("observed_sha")
+    ):
+        blockers.append(_blocker(
+            "LOCAL_ANALYSIS_SOURCE_INELIGIBLE",
+            "Local state may be eligible for trusted analysis only when clean and exactly equivalent to the authoritative source SHA.",
+        ))
+    if equivalence == "MATCH" and local.get("head_sha") != baseline.get("observed_sha"):
+        blockers.append(_blocker(
+            "LOCAL_SOURCE_EQUIVALENCE_INVALID",
+            "MATCH local equivalence requires local head SHA to equal the authoritative source SHA.",
+        ))
+    return blockers
+
+
+def _source_baseline_check(
+    repository: dict[str, Any],
+    runtime: dict[str, Any],
+    blockers: list[dict[str, str]],
+) -> dict[str, Any]:
+    baseline = repository.get("source_baseline")
+    if baseline is None:
+        if runtime.get("execution_mode") == "local_agent":
+            return _check(
+                "SOURCE_BASELINE", "FAIL", "SOURCE_BASELINE_EVIDENCE_REQUIRED",
+                "Claim-time source-baseline evidence is missing for local_agent.",
+                [f"execution_mode={runtime.get('execution_mode')}"],
+            )
+        return _check(
+            "SOURCE_BASELINE", "PASS", "CONNECTOR_SOURCE_AUTHORITY",
+            "Connector/CI source authority is used; no ambient local checkout is trusted.",
+            [runtime.get("selected_connector", "unknown"), repository.get("base_sha", "unknown")],
+        )
+
+    evidence = [
+        f"authority={baseline.get('authority')}",
+        f"provider={baseline.get('provider')}",
+        f"ref={baseline.get('observed_ref')}",
+        f"sha={baseline.get('observed_sha')}",
+        f"local_equivalence={baseline.get('local_state', {}).get('equivalence')}",
+        f"local_analysis_eligible={baseline.get('local_state', {}).get('analysis_eligible')}",
+    ]
+    if blockers:
+        return _check(
+            "SOURCE_BASELINE", "FAIL", blockers[0]["code"], blockers[0]["message"], evidence
+        )
+    local = baseline.get("local_state", {})
+    if local.get("analysis_eligible") is False and local.get("equivalence") in {"MISMATCH", "UNVERIFIED"}:
+        return _check(
+            "SOURCE_BASELINE", "PASS", "LOCAL_ANALYSIS_SOURCE_ISOLATED",
+            "Authoritative source is verified and ambient local state is explicitly excluded from trusted analysis.",
+            evidence,
+        )
+    return _check(
+        "SOURCE_BASELINE", "PASS", "SOURCE_BASELINE_VERIFIED",
+        "Claim-time source authority and local analysis eligibility are internally consistent.",
+        evidence,
+    )
+
+
 def _implementation_plan_blockers(
     implementation_plan: dict[str, Any] | None,
     repository: dict[str, Any],
@@ -280,6 +379,8 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
     connector_available = _selected_connector_available(runtime)
 
     g0_blockers: list[dict[str, str]] = []
+    source_baseline_blockers = _source_baseline_blockers(repository, runtime)
+    g0_blockers.extend(source_baseline_blockers)
     if repository["verified"] is not True:
         g0_blockers.append(_blocker("REPOSITORY_NOT_VERIFIED", "Repository identity must be verified before G1 can pass."))
     if unavailable_required:
@@ -316,6 +417,7 @@ def generate_artifacts(runtime_input: dict[str, Any]) -> tuple[dict[str, Any], s
     implementation_plan_blockers = _implementation_plan_blockers(implementation_plan, repository)
     blockers.extend(implementation_plan_blockers)
     checks: list[dict[str, Any]] = [
+        _source_baseline_check(repository, runtime, source_baseline_blockers),
         _check("REPO_IDENTITY", "PASS" if repository["verified"] else "FAIL", "REPOSITORY_VERIFIED" if repository["verified"] else "REPOSITORY_NOT_VERIFIED", "Repository identity and base evidence are verified." if repository["verified"] else "Repository identity is not verified.", [f'{repository["full_name"]}@{repository["base_sha"]}', project["profile_path"]]),
         _check("REQUIRED_SOURCES", "FAIL" if unavailable_required else "PASS", "REQUIRED_SOURCE_UNAVAILABLE" if unavailable_required else "REQUIRED_SOURCES_AVAILABLE", "One or more required sources are unavailable." if unavailable_required else "All required sources are available.", sorted(unavailable_required) if unavailable_required else [item["path"] for item in sources if item["required"]]),
         _check("EXECUTION_MODE_COMPATIBILITY", "PASS" if execution_supported else "FAIL", "EXECUTION_MODE_SUPPORTED" if execution_supported else "EXECUTION_MODE_UNSUPPORTED", "The selected runtime profile supports the current execution mode." if execution_supported else "The selected runtime profile does not support the current execution mode.", [runtime["selected_profile"]["path"], f'execution_mode={runtime["execution_mode"]}']),
