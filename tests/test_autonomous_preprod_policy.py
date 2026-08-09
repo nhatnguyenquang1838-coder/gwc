@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from tools.node_architect.validate_autonomous_preprod_policy import (
+    DEFAULT_IMMUTABLE_AUTHORITY_PATHS,
     MANDATORY_CONTROL_PLANE_PROTECTED_PATHS,
     authority_receipt_digest,
     canonical_digest,
@@ -54,11 +55,12 @@ def policy() -> dict:
     }
 
 
-def task(*, risk: str = "R2", paths: list[str] | None = None, branch: str = "auto/run-1/SCRUM-900") -> dict:
+def task(*, task_id: str = "SCRUM-900", risk: str = "R2", paths: list[str] | None = None,
+         branch: str | None = None) -> dict:
     value = {
-        "task_id": "SCRUM-900",
+        "task_id": task_id,
         "risk_class": risk,
-        "working_branch": branch,
+        "working_branch": branch or f"auto/run-1/{task_id}",
         "authorized_paths": paths or ["src/feature.py", "tests/test_feature.py"],
         "authorized_g2_actions": list(G2_ACTIONS),
     }
@@ -66,7 +68,8 @@ def task(*, risk: str = "R2", paths: list[str] | None = None, branch: str = "aut
     return value
 
 
-def manifest(p: dict | None = None, *, tasks: list[dict] | None = None) -> dict:
+def manifest(p: dict | None = None, *, tasks: list[dict] | None = None,
+             immutable_paths: list[str] | None = None) -> dict:
     p = p or policy()
     value = {
         "schema_version": "1.0",
@@ -84,6 +87,8 @@ def manifest(p: dict | None = None, *, tasks: list[dict] | None = None) -> dict:
         "expires_at": "2026-08-07T23:00:00Z",
         "idempotency_key": "run-test-1-idempotency",
     }
+    if immutable_paths is not None:
+        value["immutable_authority_paths"] = immutable_paths
     scope_digest = manifest_approval_scope_digest(value)
     value["authority_receipt"] = {
         "status": "present",
@@ -175,17 +180,40 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         p = policy(); m = manifest(p, tasks=[task(risk="R3")])
         self.assertIn("AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
 
-    def test_control_plane_self_modification_is_blocked(self):
-        p = policy(); m = manifest(p, tasks=[task(paths=["tools/node_architect/autonomous_preprod_runtime.py"])])
-        self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+    def test_scrum_300_node_architect_implementation_is_allowed(self):
+        path = "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json"
+        p = policy(); m = manifest(p, tasks=[task(task_id="SCRUM-300", paths=[path])])
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("PASS", result["outcome"])
+        self.assertNotIn("AUTONOMOUS_ACTIVE_AUTHORITY_SELF_MODIFICATION_FORBIDDEN", result["reason_codes"])
 
-    def test_project_instruction_self_modification_is_blocked(self):
-        p = policy(); m = manifest(p, tasks=[task(paths=["projects/gwc/project-instructions.md"])])
-        self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+    def test_control_plane_self_modification_is_blocked_when_active(self):
+        path = "tools/node_architect/autonomous_preprod_runtime.py"
+        p = policy(); m = manifest(p, tasks=[task(paths=[path])], immutable_paths=[path]); rebind_parent_receipt(m)
+        self.assertIn("AUTONOMOUS_ACTIVE_AUTHORITY_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
 
-    def test_agent_instruction_self_modification_is_blocked(self):
-        p = policy(); m = manifest(p, tasks=[task(paths=["agents/chatgpt-agent/agent-instructions.md"])])
-        self.assertIn("AUTONOMOUS_CONTROL_PLANE_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+    def test_project_instruction_self_modification_is_blocked_when_active(self):
+        path = "projects/gwc/project-instructions.md"
+        p = policy(); m = manifest(p, tasks=[task(paths=[path])], immutable_paths=[path]); rebind_parent_receipt(m)
+        self.assertIn("AUTONOMOUS_ACTIVE_AUTHORITY_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_agent_instruction_self_modification_is_blocked_when_active(self):
+        path = "agents/chatgpt-agent/agent-instructions.md"
+        p = policy(); m = manifest(p, tasks=[task(paths=[path])], immutable_paths=[path]); rebind_parent_receipt(m)
+        self.assertIn("AUTONOMOUS_ACTIVE_AUTHORITY_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_explicit_validator_self_modification_is_blocked(self):
+        path = "tools/node_architect/validate_autonomous_preprod_policy.py"
+        p = policy(); m = manifest(p, tasks=[task(paths=[path])], immutable_paths=[path]); rebind_parent_receipt(m)
+        self.assertIn("AUTONOMOUS_ACTIVE_AUTHORITY_SELF_MODIFICATION_FORBIDDEN", validate_manifest(p, m, root=ROOT, now=NOW)["reason_codes"])
+
+    def test_legacy_manifest_uses_exact_default_authority_files_not_directories(self):
+        path = "tools/node_architect/repo_identity.py"
+        p = policy(); m = manifest(p, tasks=[task(paths=[path])])
+        result = validate_manifest(p, m, root=ROOT, now=NOW)
+        self.assertEqual("PASS", result["outcome"])
+        self.assertIn("tools/node_architect/validate_autonomous_preprod_policy.py", DEFAULT_IMMUTABLE_AUTHORITY_PATHS)
+        self.assertNotIn("tools/node_architect", DEFAULT_IMMUTABLE_AUTHORITY_PATHS)
 
     def test_path_traversal_cannot_bypass_control_plane_protection(self):
         p = policy(); m = manifest(p, tasks=[task(paths=["tools/node_architect/../node_architect/autonomous_preprod_runtime.py"])])
