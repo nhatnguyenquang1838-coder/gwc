@@ -18,6 +18,7 @@ RUNTIME_CONTRACTS={
  "intake_context.context-gap-escalation":{"schema":"schemas/context-gap-decision.schema.json","evaluator":"tools/node_architect/context_gap_escalation.py","entrypoint":"decide_context_gap_escalation","artifact_type":"context-gap-decision"},
  "intake_context.request-intake":{"schema":"schemas/intake-request.schema.json","evaluator":"tools/node_architect/request_intake.py","entrypoint":"render_request_intake","artifact_type":"intake-request"},
  "intake_context.source-resolution":{"schema":"schemas/source-resolution.schema.json","evaluator":"tools/node_architect/source_resolution.py","entrypoint":"render_source_resolution","artifact_type":"source-resolution"},
+ "intake_context.protected-base-capture":{"schema":"schemas/protected-base-capture.schema.json","evaluator":"tools/node_architect/protected_base_capture.py","entrypoint":"render_protected_base_capture","artifact_type":"protected-base-capture"},
 }
 TYPED={
  "intake_context.request-intake":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes","source_resolution"},
