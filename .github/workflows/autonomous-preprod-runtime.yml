@@ -31,6 +31,26 @@ on:
         required: false
         default: ""
         type: string
+      materialize_parent_authority:
+        description: Materialize one trusted parent autonomous-run authority on the source GitHub issue
+        required: false
+        default: false
+        type: boolean
+      authority_source_issue_number:
+        description: GitHub issue containing the Human APPROVE AUTONOMOUS_RUN source comment
+        required: false
+        default: "0"
+        type: string
+      authority_source_comment_id:
+        description: Exact Human source comment id for parent authority
+        required: false
+        default: "0"
+        type: string
+      authority_manifest_json:
+        description: Canonical autonomous-preprod-run-manifest JSON without a trusted authority_receipt
+        required: false
+        default: "{}"
+        type: string
   issue_comment:
     types: [created, edited]
   pull_request:
@@ -44,8 +64,205 @@ permissions:
   pull-requests: write
 
 jobs:
+  parent-run-authority-materializer:
+    if: github.event_name == 'workflow_dispatch' && inputs.materialize_parent_authority
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact workflow ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Materialize trusted Human-to-bot parent authority
+        id: authority
+        uses: actions/github-script@v7
+        env:
+          AUTHORITY_SOURCE_ISSUE_NUMBER: ${{ inputs.authority_source_issue_number }}
+          AUTHORITY_SOURCE_COMMENT_ID: ${{ inputs.authority_source_comment_id }}
+          AUTHORITY_MANIFEST_JSON: ${{ inputs.authority_manifest_json }}
+        with:
+          script: |
+            const crypto = require('crypto');
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const issueNumber = Number(process.env.AUTHORITY_SOURCE_ISSUE_NUMBER || '0');
+            const sourceCommentId = Number(process.env.AUTHORITY_SOURCE_COMMENT_ID || '0');
+            if (!Number.isInteger(issueNumber) || issueNumber < 1 || !Number.isInteger(sourceCommentId) || sourceCommentId < 1) {
+              core.setFailed('AUTONOMOUS_RUN_AUTHORITY_SOURCE_INVALID: source issue/comment ids must be positive integers.');
+              return;
+            }
+
+            let manifest;
+            try {
+              manifest = JSON.parse(process.env.AUTHORITY_MANIFEST_JSON || '{}');
+            } catch (error) {
+              core.setFailed(`AUTONOMOUS_RUN_MANIFEST_INVALID: ${error.message}`);
+              return;
+            }
+            const required = ['run_id','repository','policy_id','policy_revision','policy_digest','approved_base_ref','approved_base_sha','target_branch','allowed_tasks','issued_at','expires_at','idempotency_key'];
+            if (!required.every((key) => Object.prototype.hasOwnProperty.call(manifest, key))) {
+              core.setFailed('AUTONOMOUS_RUN_MANIFEST_INVALID: required manifest fields are missing.');
+              return;
+            }
+            if (manifest.repository !== `${owner}/${repo}` || manifest.policy_id !== 'AUTONOMOUS_PREPROD_INTEGRATION_POLICY' || manifest.approved_base_ref !== 'pre-prod' || manifest.target_branch !== 'pre-prod') {
+              core.setFailed('AUTONOMOUS_RUN_MANIFEST_INVALID: repository/policy/pre-prod bindings do not match.');
+              return;
+            }
+            if (!/^[0-9a-f]{40}$/.test(manifest.approved_base_sha || '') || !/^sha256:[0-9a-f]{64}$/.test(manifest.policy_digest || '')) {
+              core.setFailed('AUTONOMOUS_RUN_MANIFEST_INVALID: base SHA or policy digest is malformed.');
+              return;
+            }
+            if (!Array.isArray(manifest.allowed_tasks) || manifest.allowed_tasks.length === 0) {
+              core.setFailed('AUTONOMOUS_RUN_MANIFEST_INVALID: allowed_tasks must be non-empty.');
+              return;
+            }
+            const allowedTaskIds = manifest.allowed_tasks.map((item) => String(item?.task_id || '')).filter(Boolean);
+            if (allowedTaskIds.length !== manifest.allowed_tasks.length || new Set(allowedTaskIds).size !== allowedTaskIds.length) {
+              core.setFailed('AUTONOMOUS_RUN_MANIFEST_INVALID: every allowed task requires a unique task_id.');
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: issueNumber, per_page: 100 });
+            const sourceComment = comments.find((item) => item.id === sourceCommentId);
+            if (!sourceComment || sourceComment.user?.login === 'github-actions[bot]') {
+              core.setFailed('AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED: Human source comment not found.');
+              return;
+            }
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({ owner, repo, username: sourceComment.user.login });
+            if (!['admin', 'maintain', 'write'].includes(permission.permission)) {
+              core.setFailed(`AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED: source actor permission is ${permission.permission}.`);
+              return;
+            }
+
+            const command = /^APPROVE AUTONOMOUS_RUN ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
+            const match = (sourceComment.body || '').trim().match(command);
+            if (!match) {
+              core.setFailed('AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED: source comment does not match exact APPROVE AUTONOMOUS_RUN syntax.');
+              return;
+            }
+            const approvalId = match[1];
+            const requestedScopePrefix = match[2];
+            const requestedExpiry = match[3];
+            const expiresAt = Date.parse(requestedExpiry);
+            if (!Number.isFinite(expiresAt) || expiresAt <= Date.now() || manifest.expires_at !== requestedExpiry) {
+              core.setFailed('AUTONOMOUS_RUN_MANIFEST_EXPIRED: approval/manifest expiry is invalid, mismatched, or expired.');
+              return;
+            }
+
+            const canonicalize = (value) => {
+              if (Array.isArray(value)) return value.map(canonicalize);
+              if (value && typeof value === 'object') {
+                return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalize(value[key])]));
+              }
+              return value;
+            };
+            const scopeManifest = { ...manifest };
+            delete scopeManifest.authority_receipt;
+            const scopeJson = JSON.stringify(canonicalize(scopeManifest));
+            const manifestScopeDigest = `sha256:${crypto.createHash('sha256').update(scopeJson, 'utf8').digest('hex')}`;
+            const scopeHashPrefix = manifestScopeDigest.slice(7, 23);
+            if (scopeHashPrefix !== requestedScopePrefix) {
+              core.setFailed(`AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED: approval scope ${requestedScopePrefix} does not match manifest ${scopeHashPrefix}.`);
+              return;
+            }
+
+            const manifestMarkerPrefix = `<!-- gwc:autonomous-preprod-run-manifest approval_id=${approvalId} run_id=${manifest.run_id} `;
+            const receiptMarkerPrefix = `<!-- gwc:autonomous-preprod-run-authority-receipt approval_id=${approvalId} `;
+            let manifestComment = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(manifestMarkerPrefix)).at(-1);
+            let receiptComment = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(receiptMarkerPrefix)).at(-1);
+            if (!manifestComment) {
+              const created = await github.rest.issues.createComment({ owner, repo, issue_number: issueNumber, body: `${manifestMarkerPrefix}pending=true -->\nParent authority manifest is being materialized.` });
+              manifestComment = created.data;
+            }
+            if (!receiptComment) {
+              const created = await github.rest.issues.createComment({ owner, repo, issue_number: issueNumber, body: `${receiptMarkerPrefix}pending=true -->\nParent authority receipt is being materialized.` });
+              receiptComment = created.data;
+            }
+
+            const issuedAt = new Date().toISOString();
+            const receipt = {
+              status: 'present',
+              source: 'github_actions_bot_comment',
+              bot_login: 'github-actions[bot]',
+              marker: 'gwc:autonomous-preprod-run-authority-receipt',
+              approval_id: approvalId,
+              receipt_comment_id: receiptComment.id,
+              source_comment_id: sourceCommentId,
+              approved_run_id: manifest.run_id,
+              approved_policy_id: manifest.policy_id,
+              approved_policy_revision: manifest.policy_revision,
+              approved_policy_digest: manifest.policy_digest,
+              manifest_scope_digest: manifestScopeDigest,
+              scope_hash_prefix: scopeHashPrefix,
+              issued_at: issuedAt,
+              expires_at: requestedExpiry,
+            };
+            const materializedManifest = { ...scopeManifest, authority_receipt: receipt };
+            const manifestBody = `${manifestMarkerPrefix}scope=${manifestScopeDigest} source_comment_id=${sourceCommentId} expires=${requestedExpiry} -->\n## Autonomous Parent Run Manifest\n\n<!-- gwc:autonomous-parent-authority issue=${issueNumber} run_id=${manifest.run_id} -->\n\n\`\`\`json\n${JSON.stringify(materializedManifest, null, 2)}\n\`\`\``;
+            const receiptMarker = `<!-- gwc:autonomous-preprod-run-authority-receipt status=present source=github_actions_bot_comment bot_login=github-actions[bot] marker=gwc:autonomous-preprod-run-authority-receipt approval_id=${approvalId} receipt_comment_id=${receiptComment.id} source_comment_id=${sourceCommentId} manifest_comment_id=${manifestComment.id} approved_run_id=${manifest.run_id} approved_policy_id=${manifest.policy_id} approved_policy_revision=${manifest.policy_revision} approved_policy_digest=${manifest.policy_digest} manifest_scope_digest=${manifestScopeDigest} scope_hash_prefix=${scopeHashPrefix} issued_at=${issuedAt} expires_at=${requestedExpiry} allowed_tasks=${allowedTaskIds.join(',')} -->`;
+            const receiptBody = `${receiptMarker}\n## Autonomous Parent Run Authority Receipt\n\nHuman source comment: ${sourceCommentId}\nManifest comment: ${manifestComment.id}\nAllowed tasks: ${allowedTaskIds.join(', ')}\n\n${allowedTaskIds.map((taskId) => `- ${taskId}`).join('\n')}`;
+
+            await github.rest.issues.updateComment({ owner, repo, comment_id: manifestComment.id, body: manifestBody });
+            await github.rest.issues.updateComment({ owner, repo, comment_id: receiptComment.id, body: receiptBody });
+            const readback = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: issueNumber, per_page: 100 });
+            const manifestReadback = readback.find((item) => item.id === manifestComment.id);
+            const receiptReadback = readback.find((item) => item.id === receiptComment.id);
+            if (manifestReadback?.body !== manifestBody || receiptReadback?.body !== receiptBody || manifestReadback?.user?.login !== 'github-actions[bot]' || receiptReadback?.user?.login !== 'github-actions[bot]') {
+              core.setFailed('AUTONOMOUS_RUN_AUTHORITY_READBACK_MISMATCH: bot comments were not read back exactly.');
+              return;
+            }
+
+            fs.writeFileSync('parent-run-manifest.json', JSON.stringify(materializedManifest, null, 2));
+            fs.writeFileSync('parent-run-receipt.json', JSON.stringify(receipt, null, 2));
+            await github.rest.checks.create({
+              owner,
+              repo,
+              name: 'autonomous-parent-authority-materialized',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Trusted autonomous parent authority materialized',
+                summary: `Issue #${issueNumber}; run ${manifest.run_id}; scope ${scopeHashPrefix}; ${allowedTaskIds.length} allowlisted task(s).`,
+              },
+            });
+            core.setOutput('issue_number', String(issueNumber));
+            core.setOutput('run_id', String(manifest.run_id));
+            core.setOutput('scope_hash_prefix', scopeHashPrefix);
+
+      - name: Validate materialized parent authority with canonical runtime validator
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tools.node_architect.materialize_autonomous_preprod_run_authority import validate_parent_run_authority
+
+          manifest = json.loads(Path('parent-run-manifest.json').read_text(encoding='utf-8'))
+          receipt = json.loads(Path('parent-run-receipt.json').read_text(encoding='utf-8'))
+          for task in manifest['allowed_tasks']:
+              result = validate_parent_run_authority(
+                  manifest=manifest,
+                  receipt=receipt,
+                  observed_comment_login='github-actions[bot]',
+                  expected_repository=manifest['repository'],
+                  expected_task_id=task['task_id'],
+                  expected_base_sha=manifest['approved_base_sha'],
+              )
+              if result['outcome'] != 'PASS' or result['state'] != 'AUTHORIZED_READY':
+                  raise SystemExit(json.dumps(result, sort_keys=True))
+          PY
+
+      - name: Upload parent authority evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-parent-authority-${{ steps.authority.outputs.run_id }}-${{ steps.authority.outputs.scope_hash_prefix }}
+          path: |
+            parent-run-manifest.json
+            parent-run-receipt.json
+          if-no-files-found: error
+
   evidence-runtime:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && !inputs.materialize_parent_authority
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact approved source
@@ -552,53 +769,58 @@ jobs:
             };
             let parentAuthorityIssue = null;
             if (pr.base.ref === 'main') {
-              // Definition PR (workflow/tool enablement) ships to main; the
-              // autonomous-run *execution* contract only binds pre-prod targets
-              // with an auto/* head. Skip enforcement for main-targeting PRs.
               conclusion = 'success';
               title = 'Autonomous G4 evidence not required (main-targeting definition PR)';
               summary = 'PR targets main and is not an autonomous-run execution delivery; G4 evidence binding is out of scope.';
             } else if (standingPreprod) {
-              const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
-              const parentReceiptComment = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(parentReceiptMarker)).at(-1);
-              const parentReceipt = parentReceiptComment ? parentReceiptFields(parentReceiptComment.body) : null;
-              const taskMatch = prBody.match(/\bSCRUM-\d+\b/);
-              const taskId = taskMatch?.[0] || null;
-              if (!parentReceipt || parentReceiptComment.user?.login !== 'github-actions[bot]') {
+              const authorityRef = prBody.match(/<!-- gwc:autonomous-parent-authority issue=(\d+) run_id=([^ ]+) -->/);
+              const authorityIssueNumber = authorityRef ? Number(authorityRef[1]) : 0;
+              const expectedRunId = authorityRef ? authorityRef[2] : null;
+              if (!Number.isInteger(authorityIssueNumber) || authorityIssueNumber < 1 || !expectedRunId) {
                 parentAuthorityIssue = 'AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED';
               } else {
-                const receiptCommentId = Number(parentReceipt.receipt_comment_id);
-                const sourceCommentId = Number(parentReceipt.source_comment_id);
-                const manifestCommentId = Number(parentReceipt.manifest_comment_id);
-                const sourceApproval = comments.find((item) => item.id === sourceCommentId);
-                const manifestComment = comments.find((item) => item.id === manifestCommentId);
-                const allowedTaskIds = (parentReceipt.allowed_tasks || parentReceipt.allowed_task_ids || parentReceipt.task_id || '')
-                  .split(',').map((value) => value.trim()).filter(Boolean);
-                const receiptTaskIds = (parentReceiptComment.body.match(/\bSCRUM-\d+\b/g) || []);
-                const expiresAt = Date.parse(parentReceipt.expires_at || '');
-                const issuedAt = Date.parse(parentReceipt.issued_at || '');
-                const validSource = sourceApproval && sourceApproval.user?.login !== 'github-actions[bot]' && /APPROVE AUTONOMOUS_RUN\b/.test(sourceApproval.body || '');
-                const validManifest = manifestComment && manifestComment.user?.login === 'github-actions[bot]' && manifestComment.id !== receiptCommentId;
-                const validScope = /^sha256:[0-9a-f]{64}$/.test(parentReceipt.manifest_scope_digest || '') &&
-                  /^[0-9a-f]{16}$/.test(parentReceipt.scope_hash_prefix || '') &&
-                  parentReceipt.scope_hash_prefix === parentReceipt.manifest_scope_digest.slice(7, 23);
-                const validReceipt = parentReceipt.status === 'present' &&
-                  parentReceipt.source === 'github_actions_bot_comment' &&
-                  parentReceipt.bot_login === 'github-actions[bot]' &&
-                  parentReceipt.marker === parentReceiptMarker &&
-                  parentReceipt.approved_run_id && parentReceipt.approved_policy_id &&
-                  Number.isInteger(receiptCommentId) && receiptCommentId === parentReceiptComment.id &&
-                  Number.isInteger(sourceCommentId) && sourceCommentId > 0 && sourceCommentId !== receiptCommentId &&
-                  Number.isInteger(manifestCommentId) && manifestCommentId > 0 && validSource && validManifest &&
-                  validScope && Number.isFinite(issuedAt) && issuedAt <= Date.now() &&
-                  Number.isFinite(expiresAt) && expiresAt > Date.now();
-                if (!validReceipt) parentAuthorityIssue = 'AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED';
-                else if (!taskId || (!allowedTaskIds.includes(taskId) && !receiptTaskIds.includes(taskId))) parentAuthorityIssue = 'AUTONOMOUS_TASK_NOT_ALLOWLISTED';
+                const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: authorityIssueNumber, per_page: 100 });
+                const parentReceiptComment = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(parentReceiptMarker) && item.body?.includes(`approved_run_id=${expectedRunId} `)).at(-1);
+                const parentReceipt = parentReceiptComment ? parentReceiptFields(parentReceiptComment.body) : null;
+                const taskMatch = prBody.match(/\bSCRUM-\d+\b/);
+                const taskId = taskMatch?.[0] || null;
+                if (!parentReceipt || parentReceiptComment.user?.login !== 'github-actions[bot]') {
+                  parentAuthorityIssue = 'AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED';
+                } else {
+                  const receiptCommentId = Number(parentReceipt.receipt_comment_id);
+                  const sourceCommentId = Number(parentReceipt.source_comment_id);
+                  const manifestCommentId = Number(parentReceipt.manifest_comment_id);
+                  const sourceApproval = comments.find((item) => item.id === sourceCommentId);
+                  const manifestComment = comments.find((item) => item.id === manifestCommentId);
+                  const allowedTaskIds = (parentReceipt.allowed_tasks || parentReceipt.allowed_task_ids || parentReceipt.task_id || '')
+                    .split(',').map((value) => value.trim()).filter(Boolean);
+                  const receiptTaskIds = (parentReceiptComment.body.match(/\bSCRUM-\d+\b/g) || []);
+                  const expiresAt = Date.parse(parentReceipt.expires_at || '');
+                  const issuedAt = Date.parse(parentReceipt.issued_at || '');
+                  const validSource = sourceApproval && sourceApproval.user?.login !== 'github-actions[bot]' && /APPROVE AUTONOMOUS_RUN\b/.test(sourceApproval.body || '');
+                  const validManifest = manifestComment && manifestComment.user?.login === 'github-actions[bot]' && manifestComment.id !== receiptCommentId && manifestComment.body?.includes('gwc:autonomous-preprod-run-manifest');
+                  const validScope = /^sha256:[0-9a-f]{64}$/.test(parentReceipt.manifest_scope_digest || '') &&
+                    /^[0-9a-f]{16}$/.test(parentReceipt.scope_hash_prefix || '') &&
+                    parentReceipt.scope_hash_prefix === parentReceipt.manifest_scope_digest.slice(7, 23);
+                  const validReceipt = parentReceipt.status === 'present' &&
+                    parentReceipt.source === 'github_actions_bot_comment' &&
+                    parentReceipt.bot_login === 'github-actions[bot]' &&
+                    parentReceipt.marker === parentReceiptMarker &&
+                    parentReceipt.approved_run_id === expectedRunId &&
+                    parentReceipt.approved_policy_id === 'AUTONOMOUS_PREPROD_INTEGRATION_POLICY' &&
+                    Number.isInteger(receiptCommentId) && receiptCommentId === parentReceiptComment.id &&
+                    Number.isInteger(sourceCommentId) && sourceCommentId > 0 && sourceCommentId !== receiptCommentId &&
+                    Number.isInteger(manifestCommentId) && manifestCommentId > 0 && validSource && validManifest &&
+                    validScope && Number.isFinite(issuedAt) && issuedAt <= Date.now() &&
+                    Number.isFinite(expiresAt) && expiresAt > Date.now();
+                  if (!validReceipt) parentAuthorityIssue = 'AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED';
+                  else if (!taskId || (!allowedTaskIds.includes(taskId) && !receiptTaskIds.includes(taskId))) parentAuthorityIssue = 'AUTONOMOUS_TASK_NOT_ALLOWLISTED';
+                }
               }
               if (parentAuthorityIssue) {
                 conclusion = 'failure';
                 title = 'Autonomous pre-prod parent authority is not trusted';
-                summary = `${parentAuthorityIssue}: standing policy marker alone is insufficient; require Human source approval, trusted github-actions[bot] receipt, manifest comment, scope digest, expiry, and allowlisted task.`;
+                summary = `${parentAuthorityIssue}: standing policy marker alone is insufficient; require Human source approval, trusted github-actions[bot] receipt, manifest comment, scope digest, expiry, allowlisted task, and an explicit parent authority issue/run reference.`;
               } else {
                 conclusion = 'success';
                 title = 'Autonomous pre-prod standing authority applies';
@@ -637,7 +859,7 @@ jobs:
             if (conclusion !== 'success') core.setFailed(summary);
 
   delivery-gates:
-    if: github.event_name == 'workflow_dispatch' && inputs.run_delivery_gates
+    if: github.event_name == 'workflow_dispatch' && inputs.run_delivery_gates && !inputs.materialize_parent_authority
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact approved source
