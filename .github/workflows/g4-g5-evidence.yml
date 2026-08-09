@@ -145,7 +145,16 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            const issue_number = context.payload.pull_request.number;
+            const pr = context.payload.pull_request;
+            const issue_number = pr.number;
+            const autonomousPreprod =
+              pr.base.ref === 'pre-prod' &&
+              pr.head.ref.startsWith('auto/') &&
+              (pr.body || '').includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');
+            if (autonomousPreprod) {
+              core.info('Standing pre-prod authority applies: human G4 receipt is not required for auto/* -> pre-prod. Human G4 remains mandatory for promotion to main.');
+              return;
+            }
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
             const receipt = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-authority-receipt '));
             if (!receipt) {
@@ -155,7 +164,13 @@ jobs:
             core.info(`Trusted G4 authority receipt found in comment ${receipt.id}.`);
 
   g4-merge-proof:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      !(github.event.pull_request.base.ref == 'pre-prod' &&
+        startsWith(github.event.pull_request.head.ref, 'auto/') &&
+        contains(github.event.pull_request.body || '', 'AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN'))
     runs-on: ubuntu-latest
     steps:
       - name: Materialize GitHub merge-event proof
