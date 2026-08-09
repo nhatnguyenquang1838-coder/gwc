@@ -1,0 +1,51 @@
+name: Direct G4 stage-aware hotfix
+
+on:
+  push:
+    branches:
+      - fix/g4-g5-stage-aware-20260810
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/g4-g5-stage-aware-20260810
+          fetch-depth: 0
+      - name: Patch workflow and add regression test
+        shell: python
+        run: |
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/g4-g5-evidence.yml')
+          text = workflow.read_text(encoding='utf-8')
+          text = text.replace(
+              'types: [opened, reopened, synchronize, closed]',
+              'types: [opened, reopened, synchronize, ready_for_review, converted_to_draft, closed]',
+              1,
+          )
+
+          old = '''  g4-receipt-required:\n    # This check is intended to be required by branch protection. It runs on\n    # every PR update and fails before merge until the trusted receipt exists.\n    if: github.event_name == 'pull_request' && github.event.action != 'closed'\n    runs-on: ubuntu-latest\n    steps:\n      - name: Require trusted G4 authority receipt\n        uses: actions/github-script@v7\n        with:\n          script: |\n            const { owner, repo } = context.repo;\n            const pr = context.payload.pull_request;\n            const issue_number = pr.number;\n            const autonomousPreprod =\n              pr.base.ref === 'pre-prod' &&\n              pr.head.ref.startsWith('auto/') &&\n              (pr.body || '').includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');\n            if (autonomousPreprod) {\n              core.info('Standing pre-prod authority applies: human G4 receipt is not required for auto/* -> pre-prod. Human G4 remains mandatory for promotion to main.');\n              return;\n            }\n            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });\n            const receipt = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-authority-receipt '));\n            if (!receipt) {\n              core.setFailed('G4 merge is blocked: no trusted gwc:g4-authority-receipt has been published for this PR. Post the exact human approval as a PR comment and wait for the receipt workflow.');\n              return;\n            }\n            core.info(`Trusted G4 authority receipt found in comment ${receipt.id}.`);\n'''
+
+          new = '''  g4-receipt-required:\n    # Required by branch protection, but G4 is not active while a PR is Draft.\n    # Draft G2/G3 work must stay green. Once Ready for Review, merge authority\n    # is active and an exact-head, unexpired trusted receipt is mandatory.\n    if: github.event_name == 'pull_request' && github.event.action != 'closed'\n    runs-on: ubuntu-latest\n    steps:\n      - name: Require trusted G4 authority receipt when G4 is active\n        uses: actions/github-script@v7\n        with:\n          script: |\n            const { owner, repo } = context.repo;\n            const pr = context.payload.pull_request;\n            const issue_number = pr.number;\n            const autonomousPreprod =\n              pr.base.ref === 'pre-prod' &&\n              pr.head.ref.startsWith('auto/') &&\n              (pr.body || '').includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');\n            if (autonomousPreprod) {\n              core.info('Standing pre-prod authority applies: human G4 receipt is not required for auto/* -> pre-prod. Human G4 remains mandatory for promotion to main.');\n              return;\n            }\n            if (pr.draft) {\n              core.info('G4 is not active while the PR is Draft; G2/G3 CI remains non-blocking.');\n              return;\n            }\n            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });\n            const receipts = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-authority-receipt '));\n            const receipt = receipts.at(-1);\n            if (!receipt) {\n              core.setFailed('G4 merge is blocked: this PR is Ready for Review but no trusted gwc:g4-authority-receipt has been published.');\n              return;\n            }\n            const parsed = receipt.body.match(/approval_id=([^ ]+) head=([0-9a-f]{40}) scope=([0-9a-f]{16}) expires=([^ ]+) source_comment_id=(\\d+)/);\n            if (!parsed) {\n              core.setFailed('G4 merge is blocked: trusted receipt marker is malformed.');\n              return;\n            }\n            if (parsed[2] !== pr.head.sha) {\n              core.setFailed(`G4 merge is blocked: receipt head ${parsed[2]} is stale; current head is ${pr.head.sha}.`);\n              return;\n            }\n            const expiresAt = new Date(parsed[4]);\n            if (!Number.isFinite(expiresAt.getTime()) || expiresAt <= new Date()) {\n              core.setFailed('G4 merge is blocked: trusted receipt is expired or invalid.');\n              return;\n            }\n            core.info(`Trusted exact-head G4 authority receipt found in comment ${receipt.id}.`);\n'''
+
+          if old not in text:
+              raise SystemExit('Expected legacy g4-receipt-required block not found')
+          workflow.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          test = Path('tests/test_g4_stage_aware_semantics.py')
+          test.write_text('''from pathlib import Path\n\nWORKFLOW = Path(\".github/workflows/g4-g5-evidence.yml\").read_text(encoding=\"utf-8\")\n\n\ndef test_draft_pr_does_not_require_g4_receipt():\n    assert \"if (pr.draft)\" in WORKFLOW\n    assert \"G4 is not active while the PR is Draft\" in WORKFLOW\n\n\ndef test_ready_transition_rechecks_g4_gate():\n    assert \"ready_for_review\" in WORKFLOW\n    assert \"converted_to_draft\" in WORKFLOW\n\n\ndef test_ready_pr_without_receipt_fails_closed():\n    assert \"this PR is Ready for Review but no trusted gwc:g4-authority-receipt\" in WORKFLOW\n\n\ndef test_receipt_is_bound_to_exact_current_head():\n    assert \"parsed[2] !== pr.head.sha\" in WORKFLOW\n    assert \"receipt head ${parsed[2]} is stale\" in WORKFLOW\n\n\ndef test_expired_receipt_fails_closed():\n    assert \"expiresAt <= new Date()\" in WORKFLOW\n\n\ndef test_autonomous_preprod_standing_authority_is_preserved():\n    assert \"AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN\" in WORKFLOW\n    assert \"Standing pre-prod authority applies\" in WORKFLOW\n''', encoding='utf-8')
+      - name: Remove one-time patch workflow
+        run: git rm .github/workflows/direct-g4-stage-aware-hotfix.yml
+      - name: Commit direct hotfix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows/g4-g5-evidence.yml tests/test_g4_stage_aware_semantics.py
+          git commit -m "fix(ci): make G4 receipt gate stage-aware"
+          git push origin HEAD:fix/g4-g5-stage-aware-20260810
