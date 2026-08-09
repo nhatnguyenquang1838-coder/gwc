@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/repo-identity.schema.json",
+  "title": "GWC Repository Identity Check",
+  "description": "Deterministic verification of repository identity, default branch, protected branch, and execution mode against verified source evidence. Read-only G0_CONTEXT node: it records provenance only and never grants execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "observed_identity",
+    "verified_source",
+    "identity_match",
+    "reason_code",
+    "reason_codes",
+    "observed_at",
+    "read_only_projection",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "repo-identity"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "observed_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "name", "default_branch", "protected_branch", "execution_mode"],
+      "properties": {
+        "owner": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "default_branch": {"type": "string", "minLength": 1},
+        "protected_branch": {"type": "string", "minLength": 1},
+        "execution_mode": {"enum": ["MAIN_GOVERNANCE", "PREPROD_AUTONOMOUS", "UNKNOWN"]}
+      }
+    },
+    "verified_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "name", "default_branch", "protected_branch", "execution_mode"],
+      "properties": {
+        "owner": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "default_branch": {"type": "string", "minLength": 1},
+        "protected_branch": {"type": "string", "minLength": 1},
+        "execution_mode": {"enum": ["MAIN_GOVERNANCE", "PREPROD_AUTONOMOUS", "UNKNOWN"]}
+      }
+    },
+    "identity_match": {"type": "boolean"},
+    "outcome": {"enum": ["ACCEPTED", "BLOCKED", "HUMAN_REQUIRED"]},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reason_code"},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "missing_fields": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "remediation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["route", "next_action", "stop_condition"],
+      "properties": {
+        "route": {"enum": ["RETRY_DISCOVERY", "REQUEST_HUMAN_INPUT", "BLOCK_G1_REVIEW", "ROUTE_TO_ALLOWED_F1_NODE"]},
+        "next_action": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "observed_at": {"type": ["string", "null"]},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "reason_code": {
+      "enum": [
+        "ACCEPTED",
+        "REPO_MISMATCH",
+        "DEFAULT_BRANCH_MISMATCH",
+        "PROTECTED_BRANCH_MISMATCH",
+        "EXECUTION_MODE_MISMATCH",
+        "EVIDENCE_GAP",
+        "MALFORMED_INPUT"
+      ]
+    }
+  }
+}
