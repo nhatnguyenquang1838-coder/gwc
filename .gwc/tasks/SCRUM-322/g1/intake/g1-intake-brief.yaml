@@ -1,0 +1,66 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-09T19:24:43Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-322
+  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
+  g0_snapshot: '../../g0/context-snapshot.yaml'
+problem:
+  statement: 'repo_delivery.ci-failure-repair node exists in pre-prod history but is not tracked in the current detached checkout; SCRUM-322 requires the node, deterministic classification tests, and catalog metadata to be committed on a guarded branch.'
+  why_now: 'DAG lane SCRUM-288 selected SCRUM-322 as the next READY task after verifying no open PR/branch and no concurrent agent claim.'
+desired_outcome: 'A PR base=pre-prod containing ci_failure_repair.py, tests, and catalog entry, with passing CI and no authority expansion.'
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - Hermes cron lane SCRUM-288
+  - repo_delivery validator chain
+scope:
+  in_scope:
+  - tools/node_architect/ci_failure_repair.py
+  - tests/test_ci_failure_repair.py
+  - tests/test_ci_failure_repair_family_integration.py
+  - core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json
+  non_goals:
+  - merge to main
+  - deploy/release/production configuration
+  - credential or secret operations
+constraints:
+- deterministic CI failure classification
+- bounded repair scope only
+- no implicit merge authority
+assumptions:
+- pre-prod is the authoritative protected base
+- CI tests are the primary validation gate
+risks:
+- id: RISK-1
+  description: Concurrent agent may claim SCRUM-322 after live status check window
+  impact: medium
+  mitigation: Claim and transition immediately after selection; verified before writing
+acceptance_criteria:
+- id: AC-1
+  statement: ci_failure_repair.py classifies failures as REPAIR_REPOSITORY, EXTERNAL_BLOCKED, or EVIDENCE_INVALID
+  verifiable: true
+- id: AC-2
+  statement: tests/test_ci_failure_repair.py and family integration tests pass
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_branch
+  - write_scoped_files
+  - push_branch
+  - create_draft_pr
+  - merge_to_preprod
+  downstream_non_goals:
+  - merge_to_main
+  - manual_deploy
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - exact-head CI green
+    - diff review clean
+    - no scope drift
+unresolved_questions: []
+status: READY
