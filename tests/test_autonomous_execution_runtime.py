@@ -1,7 +1,7 @@
 import unittest
 
 from tools.node_architect.autonomous_execution_runtime import (
-    child_delivery_decision, claim_task, resolve_ready_nodes, validate_task_scope,
+    child_delivery_decision, claim_task, drive_closed_loop, resolve_ready_nodes, validate_task_scope,
 )
 
 SHA = "a" * 40
@@ -50,6 +50,18 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
                                          ci_conclusion="success", review_conclusion="pass", standing_g4_valid=True)
         self.assertTrue(result["merge_allowed"])
         self.assertFalse(result["main_merge_allowed"])
+
+    def test_closed_loop_wires_g5_back_to_dag_refresh(self):
+        result = drive_closed_loop({"phase": "G5_VERIFIED", "task_id": "X"})
+        self.assertEqual(result["adapter_action"], "MARK_COMPLETE_REQUERY_DAG_AND_PROMOTIONS")
+
+    def test_closed_loop_never_routes_child_to_main(self):
+        result = drive_closed_loop({
+            "phase": "G3_READY", "task_id": "X", "target_branch": "main", "head_sha": SHA,
+            "ci_conclusion": "success", "review_conclusion": "pass", "standing_g4_valid": True,
+        })
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertIsNone(result["adapter_action"])
 
 
 if __name__ == "__main__":
