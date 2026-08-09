@@ -15,6 +15,7 @@ def iso(dt):
 class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2026, 8, 9, 13, 30, tzinfo=timezone.utc)
+        self.anchor = "e4ebb448647e314a9bd48eac18460c1d408d1e68"
         self.manifest = {
             "schema_version": "1.0",
             "artifact_type": "autonomous-preprod-run-manifest",
@@ -24,21 +25,31 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
             "policy_revision": "v1",
             "policy_digest": "sha256:" + "1" * 64,
             "approved_base_ref": "pre-prod",
-            "approved_base_sha": "e4ebb448647e314a9bd48eac18460c1d408d1e68",
+            "approved_base_sha": self.anchor,
             "target_branch": "pre-prod",
             "immutable_authority_paths": [
                 ".github/workflows/autonomous-preprod-runtime.yml",
                 ".github/workflows/g4-g5-evidence.yml",
                 "tools/node_architect/materialize_autonomous_preprod_run_authority.py",
             ],
-            "allowed_tasks": [{
-                "task_id": "SCRUM-302",
-                "risk_class": "R2",
-                "working_branch": "auto/SCRUM-302-risk-classification-20260809",
-                "authorized_paths": ["tools/node_architect/risk_classification.py"],
-                "authorized_g2_actions": ["modify_approved_files", "push_working_branch"],
-                "scope_hash": "sha256:" + "2" * 64,
-            }],
+            "allowed_tasks": [
+                {
+                    "task_id": "SCRUM-302",
+                    "risk_class": "R2",
+                    "working_branch": "auto/SCRUM-302-risk-classification-20260809",
+                    "authorized_paths": ["tools/node_architect/risk_classification.py"],
+                    "authorized_g2_actions": ["modify_approved_files", "push_working_branch"],
+                    "scope_hash": "sha256:" + "2" * 64,
+                },
+                {
+                    "task_id": "SCRUM-303",
+                    "risk_class": "R2",
+                    "working_branch": "auto/SCRUM-303-files-read-scope-20260809",
+                    "authorized_paths": ["tools/node_architect/files_read_scope.py"],
+                    "authorized_g2_actions": ["modify_approved_files", "push_working_branch"],
+                    "scope_hash": "sha256:" + "3" * 64,
+                },
+            ],
             "issued_at": iso(self.now - timedelta(minutes=5)),
             "expires_at": iso(self.now + timedelta(hours=6)),
             "idempotency_key": "na81-scrum-288-20260809-v1",
@@ -73,7 +84,8 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
             observed_comment_login="github-actions[bot]",
             expected_repository="nhatnguyenquang1838-coder/gwc",
             expected_task_id="SCRUM-302",
-            expected_base_sha="e4ebb448647e314a9bd48eac18460c1d408d1e68",
+            expected_base_sha=self.anchor,
+            base_lineage_steps=[],
             now=self.now,
         )
         args.update(overrides)
@@ -85,6 +97,27 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
         self.assertEqual("AUTHORIZED_READY", result["state"])
         self.assertTrue(result["standing_g4_valid"])
 
+    def test_trusted_descendant_base_preserves_parent_authority(self):
+        current = "b" * 40
+        step = {
+            "run_id": self.manifest["run_id"],
+            "repository": self.manifest["repository"],
+            "task_id": "SCRUM-302",
+            "previous_base_sha": self.anchor,
+            "merged_head_sha": "a" * 40,
+            "merge_commit_sha": current,
+            "g5_classification": "success",
+            "trusted_merge_proof": True,
+            "trusted_g5_evidence": True,
+        }
+        result = self.check(
+            expected_task_id="SCRUM-303",
+            expected_base_sha=current,
+            base_lineage_steps=[step],
+        )
+        self.assertEqual("AUTHORIZED_READY", result["state"])
+        self.assertEqual(current, result["base_lineage_proof"]["current_base_sha"])
+
     def test_route_marker_without_receipt_fails_closed(self):
         result = self.check(receipt=None)
         self.assertEqual("READY_FOR_AUTHORITY", result["state"])
@@ -95,7 +128,7 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
         self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
 
     def test_task_must_be_allowlisted(self):
-        result = self.check(expected_task_id="SCRUM-303")
+        result = self.check(expected_task_id="SCRUM-999")
         self.assertIn("AUTONOMOUS_TASK_NOT_ALLOWLISTED", result["reason_codes"])
 
     def test_scope_digest_drift_is_rejected(self):
@@ -110,9 +143,9 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
         result = self.check(receipt=receipt)
         self.assertIn("AUTONOMOUS_RUN_MANIFEST_EXPIRED", result["reason_codes"])
 
-    def test_base_drift_is_rejected(self):
+    def test_unproven_base_drift_is_rejected(self):
         result = self.check(expected_base_sha="0" * 40)
-        self.assertIn("AUTONOMOUS_BASE_SHA_MISMATCH", result["reason_codes"])
+        self.assertIn("AUTONOMOUS_BASE_LINEAGE_UNTRUSTED", result["reason_codes"])
 
 
 if __name__ == "__main__":
