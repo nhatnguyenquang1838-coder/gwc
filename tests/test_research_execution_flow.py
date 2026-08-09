@@ -6,10 +6,16 @@ import unittest
 from datetime import datetime, timezone
 
 from tools.node_architect.materialize_research_execution import approval_scope_hash
-from tools.node_architect.run_research_execution_flow import run_research_execution_flow
+from tools.node_architect.run_research_execution_flow import (
+    run_research_execution_flow as _run_research_execution_flow
+)
 from tools.node_architect.select_approved_research import select_approved_research
 
 NOW = datetime(2026, 8, 8, 14, 0, tzinfo=timezone.utc)
+
+
+def run_research_execution_flow(payload):
+    return _run_research_execution_flow(payload, now=NOW)
 
 
 def digest(value):
