@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/intake-request.schema.json",
+  "title": "GWC Intake Request",
+  "description": "Deterministic, bounded normalization of a user/assigned-work request into a typed intake record. Read-only G0_CONTEXT node: it creates no execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "request",
+    "normalized_intake",
+    "outcome",
+    "reason_code",
+    "reason_codes",
+    "observed_at",
+    "read_only_projection",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "intake-request"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["raw_text", "source"],
+      "properties": {
+        "raw_text": {"type": "string"},
+        "source": {"enum": ["USER", "ASSIGNED_WORK", "AUTONOMOUS_NODE", "UNKNOWN"]},
+        "task_binding": {"type": ["string", "null"]},
+        "repository_intent": {"type": ["string", "null"]},
+        "requested_outcome": {"type": ["string", "null"]},
+        "provenance": {"type": ["object", "null"]}
+      }
+    },
+    "normalized_intake": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["actor", "intent", "task", "repository_intent", "requested_outcome", "constraints", "exclusions", "entry_guards", "reason_codes"],
+      "properties": {
+        "actor": {"type": "string", "minLength": 1},
+        "intent": {"type": "string", "minLength": 1},
+        "task": {"type": ["string", "null"]},
+        "repository_intent": {"type": ["string", "null"]},
+        "requested_outcome": {"type": ["string", "null"]},
+        "constraints": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "exclusions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "entry_guards": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "reason_codes": {"type": "object"}
+      }
+    },
+    "intent_authority_signals": {
+      "type": "array",
+      "items": {"enum": [
+        "MERGE_AUTHORITY",
+        "DEPLOY_AUTHORITY",
+        "PRODUCTION_AUTHORITY",
+        "RELEASE_AUTHORITY",
+        "CREDENTIAL_AUTHORITY"
+      ]},
+      "uniqueItems": true
+    },
+    "outcome": {"enum": ["ACCEPTED", "BLOCKED", "HUMAN_REQUIRED"]},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reason_code"},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "missing_fields": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "remediation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["route", "next_action", "stop_condition"],
+      "properties": {
+        "route": {"enum": ["RETRY_INTAKE", "REQUEST_HUMAN_INPUT", "BLOCK_G1_REVIEW", "ROUTE_TO_ALLOWED_F1_NODE"]},
+        "next_action": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "next_allowed_nodes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^intake_context\\."},
+      "uniqueItems": true
+    },
+    "observed_at": {"type": ["string", "null"]},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "reason_code": {
+      "enum": [
+        "INTAKE_ACCEPTED",
+        "INTAKE_MALFORMED_INPUT",
+        "INTAKE_AMBIGUOUS_INTENT",
+        "INTAKE_SCOPE_DRIFT",
+        "INTAKE_MISSING_IDENTITY",
+        "INTAKE_MISSING_TASK_BINDING",
+        "INTAKE_MISSING_REPOSITORY_INTENT",
+        "INTAKE_MISSING_REQUESTED_OUTCOME",
+        "INTAKE_AUTHORITY_INTENT_DETECTED",
+        "INTAKE_REPLAY_IDEMPOTENT",
+        "INTAKE_HUMAN_REQUIRED"
+      ]
+    }
+  }
+}
