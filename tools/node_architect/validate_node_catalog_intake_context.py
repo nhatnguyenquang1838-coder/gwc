@@ -20,6 +20,7 @@ RUNTIME_CONTRACTS={
  "intake_context.source-resolution":{"schema":"schemas/source-resolution.schema.json","evaluator":"tools/node_architect/source_resolution.py","entrypoint":"render_source_resolution","artifact_type":"source-resolution"},
  "intake_context.protected-base-capture":{"schema":"schemas/protected-base-capture.schema.json","evaluator":"tools/node_architect/protected_base_capture.py","entrypoint":"render_protected_base_capture","artifact_type":"protected-base-capture"},
  "intake_context.repo-identity-check":{"schema":"schemas/repo-identity.schema.json","evaluator":"tools/node_architect/repo_identity_check.py","entrypoint":"render_repo_identity_check","artifact_type":"repo-identity"},
+ "intake_context.risk-classification":{"schema":"schemas/risk-classification.schema.json","evaluator":"tools/node_architect/risk_classification.py","entrypoint":"render_risk_classification","artifact_type":"risk-profile"},
 }
 TYPED={
  "intake_context.request-intake":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes","source_resolution"},

@@ -1,0 +1,93 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-09T17:18:16Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-302
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-302 has only a descriptive risk-classification catalog descriptor; the typed deterministic runtime evaluator and closed schema are missing from pre-prod.
+  why_now: The NA81-F1 intake_context DAG requires risk classification before downstream gate routing, and the user selected standard local_agent execution from protected pre-prod without autonomous merge; the protected base was refreshed after pre-prod drift.
+desired_outcome: Add the minimal typed risk-profile evaluator, closed schema, runtime binding, and regression coverage while preserving read-only G0 authority boundaries.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC intake_context node runtime
+  - SCRUM-303 downstream gate-routing consumer
+  - SCRUM-304 downstream scope consumer
+  - GWC reviewers and CI validators
+scope:
+  in_scope:
+  - tools/node_architect/risk_classification.py
+  - schemas/risk-classification.schema.json
+  - tools/node_architect/validate_node_catalog_intake_context.py runtime binding
+  - tests/test_intake_context_risk_classification.py
+  - Task-scoped G0/G1/G2 evidence under .gwc/tasks/SCRUM-302
+  non_goals:
+  - Editing the autonomous-preprod authority mechanism or parent manifest
+  - Editing the existing risk-classification descriptor unless validation proves it necessary
+  - Direct writes to pre-prod or main
+  - Merge, auto-merge, deployment, release, credential, secret, migration, or production-data operations
+constraints:
+- Protected execution base is pre-prod@7f1d26e4fb0d4d09c49e9952994220a2f47a3824.
+- The evaluator is read-only and must never grant authority.
+- Unknown, stale, missing, ambiguous, or conflicting evidence must fail closed.
+- The output schema must be closed and digestable.
+- Exact G2 approval is required before repository mutation.
+assumptions:
+- The current pre-prod descriptor and adjacent intake_context evaluators are the canonical local API patterns.
+- The task's historical GitHub #237 reference is evidence only and is not a live PR target.
+- A focused implementation can reuse existing digest conventions without refactoring unrelated nodes.
+risks:
+- id: RISK-1
+  description: Risk classification could fail open when a signal or policy field is unknown.
+  impact: high
+  mitigation: Validate every required input, use a closed vocabulary, and add negative tests for unknown and malformed states.
+- id: RISK-2
+  description: Policy/version drift could leave a previously accepted profile stale.
+  impact: high
+  mitigation: Bind policy version/digest into the decision digest and require recomputation on mismatch.
+- id: RISK-3
+  description: The runtime binding could drift from the catalog descriptor or schema artifact type.
+  impact: medium
+  mitigation: Extend the family validator and run focused plus family-level validation.
+- id: RISK-4
+  description: Autonomous authority surfaces could be changed accidentally while implementing a standard route.
+  impact: high
+  mitigation: Exclude authority workflows and manifests from the write scope and review the complete diff.
+acceptance_criteria:
+- id: AC-1
+  statement: Complete verified inputs classify deterministically into a typed R0-R3 risk profile with stable reasons, controls, provenance, and digest.
+  verifiable: true
+- id: AC-2
+  statement: Missing, unknown, stale, ambiguous, conflicting, or malformed inputs return BLOCKED or HUMAN_REQUIRED and never an accepted low-risk result.
+  verifiable: true
+- id: AC-3
+  statement: Policy/version changes invalidate prior classification and require recomputation.
+  verifiable: true
+- id: AC-4
+  statement: Higher risk tightens required controls without setting write, merge, deployment, or production authority true.
+  verifiable: true
+- id: AC-5
+  statement: JSON Schema, focused tests, neighbor tests, and the intake_context family validator pass at the exact branch head.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - Prepare and validate task-scoped G0/G1 artifacts.
+  - After exact G2 approval, create an isolated branch/worktree from pre-prod.
+  - Modify only the approved implementation, schema, validator binding, tests, and task evidence files.
+  - Commit, push the guarded branch, and create or update a Draft PR targeting pre-prod after G3 evidence.
+  downstream_non_goals:
+  - G4 merge or auto-merge.
+  - G5 deployment, release, or runtime reload.
+  - G6 production data/configuration/credential operations.
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - Exact base and head SHA.
+    - Focused, neighbor, family, schema, diff, and secret validation.
+    - Draft PR bound to the exact head and base pre-prod.
+unresolved_questions: []
+status: READY
