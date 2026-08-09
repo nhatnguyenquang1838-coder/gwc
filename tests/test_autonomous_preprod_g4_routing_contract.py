@@ -37,6 +37,22 @@ class AutonomousPreprodG4RoutingContractTests(unittest.TestCase):
         self.assertIn("manifest_comment_id", AUTO)
         self.assertIn("manifest_scope_digest", AUTO)
 
+    def test_parent_authority_is_materialized_before_child_claim(self):
+        self.assertIn("parent-run-authority-materializer:", AUTO)
+        self.assertIn("materialize_parent_authority:", AUTO)
+        self.assertIn("authority_source_issue_number:", AUTO)
+        self.assertIn("authority_source_comment_id:", AUTO)
+        self.assertIn("authority_manifest_json:", AUTO)
+        self.assertIn("autonomous-parent-authority-materialized", AUTO)
+        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_READBACK_MISMATCH", AUTO)
+        self.assertIn("!inputs.materialize_parent_authority", AUTO)
+
+    def test_parent_authority_consumer_can_follow_explicit_parent_issue(self):
+        self.assertIn("gwc:autonomous-parent-authority issue=", AUTO)
+        self.assertIn("authorityIssueNumber", AUTO)
+        self.assertIn("expectedRunId", AUTO)
+        self.assertIn("parentReceipt.approved_run_id === expectedRunId", AUTO)
+
     def test_human_g4_boundary_for_main_is_preserved(self):
         self.assertIn("gwc:g4-authority-receipt", G4)
         self.assertIn("Human G4 remains mandatory for promotion to main", G4)
