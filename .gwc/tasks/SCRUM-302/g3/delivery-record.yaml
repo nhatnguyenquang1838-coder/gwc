@@ -10,8 +10,8 @@ pull_request:
   number: 354
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/354
   draft: true
-head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
-scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+head_sha: 8e46e26a799b11ad3e767cbbfc527afd1aadc4ae
+scope_hash: sha256:5fd526b4f036e80eb41b84842ca8b3e487f1ad9773c170190e75200946d2eeec
 changed_paths:
   - tools/node_architect/risk_classification.py
   - schemas/risk-classification.schema.json
@@ -29,7 +29,7 @@ changed_paths:
   - .gwc/tasks/SCRUM-302/g2/plan-read-receipt.yaml
   - .gwc/tasks/SCRUM-302/g3/delivery-record.yaml
 validation:
-  head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
+  head_sha: 8e46e26a799b11ad3e767cbbfc527afd1aadc4ae
   status: pass
   commands:
     - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-302 --gate G2_EXECUTION --json
@@ -49,9 +49,9 @@ review:
   reviewer_id: g3-independent-readonly-reviewer
   independence: independent
   mode: read-only
-  reviewed_head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
-  reviewed_scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
-  reviewed_at: "2026-08-09T18:18:30Z"
+  reviewed_head_sha: 8e46e26a799b11ad3e767cbbfc527afd1aadc4ae
+  reviewed_scope_hash: sha256:5fd526b4f036e80eb41b84842ca8b3e487f1ad9773c170190e75200946d2eeec
+  reviewed_at: "2026-08-09T18:22:56Z"
   lanes:
     - name: requirement
       applicable: true
@@ -77,12 +77,12 @@ review:
       applicable: true
       status: pass
       evidence:
-        - G0/G1 PASS and exact G2 approval are bound to the protected pre-prod base and bounded reconciliation scope.
+        - G0/G1 PASS and fresh exact G2 approval are bound to the protected pre-prod base and current head rebind scope.
     - name: delivery
       applicable: true
       status: pass
       evidence:
-        - GitHub readback confirms Draft PR #354 targets pre-prod and current head 5b2fa779e11124d465e6607ecb352d866f901d23.
+        - GitHub readback confirms Draft PR #354 targets pre-prod and current head 8e46e26a799b11ad3e767cbbfc527afd1aadc4ae.
     - name: ci
       applicable: true
       status: pass
@@ -115,7 +115,7 @@ review:
   stale: false
 ci:
   required: true
-  head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
+  head_sha: 8e46e26a799b11ad3e767cbbfc527afd1aadc4ae
   checks:
     - name: Cross-platform LF and SHA parity
       required: true
