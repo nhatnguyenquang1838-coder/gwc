@@ -1,0 +1,30 @@
+schema_version: "1.0"
+artifact_type: na81-canonical-dag
+direction: blocker_to_blocked
+node_range:
+  prefix: SCRUM-
+  first: 298
+  last: 378
+  count: 81
+edge_contract:
+  from: blocker_or_predecessor
+  to: blocked_or_successor
+jira_projection:
+  link_type: Blocks
+  current_issue_normalization:
+    outwardIssue: "outwardIssue.key -> currentIssue.key"
+    inwardIssue: "currentIssue.key -> inwardIssue.key"
+  mismatch_code: DAG_PROJECTION_DRIFT
+authority:
+  descriptions_are_dag_authority: false
+  raw_jira_links_are_dag_authority: false
+  normalized_edges_required: true
+regressions:
+  - id: SCRUM-313
+    expected_edges:
+      - {from: SCRUM-311, to: SCRUM-313}
+      - {from: SCRUM-312, to: SCRUM-313}
+# Canonical production edges are materialized from the approved NA81 DAG source,
+# then Jira readback MUST equal that set exactly. This foundation patch locks
+# direction semantics first; it does not invent or reverse dependency edges.
+edges: []
