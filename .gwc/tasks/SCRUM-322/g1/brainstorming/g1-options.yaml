@@ -1,30 +1,45 @@
-schema_version: '1.0'
-artifact_type: g1-options
-generated_at: '2026-08-09T19:24:43Z'
+schema_version: "1.0"
+artifact_type: "g1-options"
+generated_at: "2026-08-10T02:25:00Z"
 trace:
-  project_id: gwc
-  repository: nhatnguyenquang1838-coder/gwc
-  task_id: SCRUM-322
-  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
-  g0_snapshot: '../../g0/context-snapshot.yaml'
+  project_id: "gwc"
+  repository: "nhatnguyenquang1838-coder/gwc"
+  task_id: "SCRUM-322"
+  base_sha: "7174b8657b540d64d150044f70ba0418292e60a0"
+  g0_snapshot: "../../g0/context-snapshot.yaml"
 options:
-- id: OPT-01
-  title: implement-ci-failure-repair-node
-  description: 'Create ci_failure_repair.py deterministic classification module and M5 tests on guarded branch base=pre-prod, deliver via Draft PR.'
-  benefits:
-  - fulfills SCRUM-322 implementation requirement
-  - deterministic CI repair classification bounded by approved file scope
-  - family integration tests confirm no authority expansion
-  tradeoffs:
-  - only one deliverable option; no alternative path
-  risks:
-  - concurrent Hermes agent may race if claim window reopens
-  constraint_fit: FIT
-  skills_distribution:
-  - skill_id: jira-mcp
-    description: Claim and transition Jira task
-    is_required: true
-recommended_option_id: 'OPT-01'
-recommendation_rationale: 'Single bounded option; node and tests already validated locally; no authority expansion.'
+  - id: "OPT-1"
+    title: "Implement bounded CI failure classifier with conservative pattern matching"
+    description: "Pure side-effect-free classifier + schema + tests. Repo-fixable pattern precedence; external/unknown fail closed."
+    benefits:
+      - "Delivers missing node in 9-node repo_delivery family"
+      - "No authority expansion"
+      - "Tests green and reversible"
+    tradeoffs:
+      - "Pattern-based classification requires future enrichment"
+    risks:
+      - "RISK-OPT-1: New patterns may emerge outside the current regex set; mitigated by fail-closed."
+    constraint_fit: FIT
+  - id: "OPT-2"
+    title: "Defer and mark BLOCKED"
+    description: "Skip implementation and leave the catalog stub."
+    benefits:
+      - "No code change"
+    tradeoffs:
+      - "Leaves an explicit family requirement unfulfilled"
+    risks: []
+    constraint_fit: NOT_FIT
+  - id: "OPT-3"
+    title: "Broad repair automation with side effects"
+    description: "Auto-push fixes based on classifier output."
+    benefits:
+      - "Faster visible delivery"
+    tradeoffs:
+      - "Expands scope and authority beyond G2 boundary"
+    risks:
+      - "RISK-OPT-3: Expands scope beyond G2 boundary; not acceptable."
+    constraint_fit: NOT_FIT
+recommended_option_id: "OPT-1"
+recommendation_rationale: "OPT-1 matches the approved EARS, preserves authority boundaries, and mirrors the sibling blocked-action-escalation implementation pattern."
 decision_required: true
 status: READY

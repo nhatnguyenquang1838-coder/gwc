@@ -1,78 +1,81 @@
-schema_version: '1.0'
-artifact_type: g1-preflight-report
-generated_at: '2026-08-09T19:24:43Z'
+schema_version: "1.1"
+artifact_type: "g1-preflight-report"
+generated_at: "2026-08-10T02:25:00Z"
 trace:
-  project_id: gwc
-  repository: nhatnguyenquang1838-coder/gwc
-  task_id: SCRUM-322
-  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
-  g0_snapshot: '../../g0/context-snapshot.yaml'
+  project_id: "gwc"
+  repository: "nhatnguyenquang1838-coder/gwc"
+  task_id: "SCRUM-322"
+  base_sha: "7174b8657b540d64d150044f70ba0418292e60a0"
+  g0_snapshot: "../../g0/context-snapshot.yaml"
 repository_state:
-  base_ref: pre-prod
-  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
-  profile_path: projects/gwc/project-profile.yaml
-  connector: GitHub
+  base_ref: "pre-prod"
+  base_sha: "7174b8657b540d64d150044f70ba0418292e60a0"
+  profile_path: "projects/gwc/project-profile.yaml"
+  connector: "jira-mcp"
+checks:
+  - id: "CHECK_IMPLEMENTATION_STATE"
+    status: PASS
+    code: "IMPLEMENTATION_CLEAN"
+    message: "No existing ci_failure_repair.py in tools/node_architect; clean implementation."
+    evidence:
+      - "git ls-files tools/node_architect/ci_failure_repair.py -> empty"
+  - id: "CHECK_TEST_COVERAGE"
+    status: PASS
+    code: "TESTS_GREEN"
+    message: "31 unit tests pass under PYTHONPATH=tools."
+    evidence:
+      - "PYTHONPATH=tools python3 -m unittest tests.test_ci_failure_repair tests.test_ci_failure_repair_family_integration"
+  - id: "CHECK_AUTHORITY_BOUNDARY"
+    status: PASS
+    code: "NO_MERGE_AUTHORITY"
+    message: "Classifier returns decisions only; execution_performed always False."
+    evidence:
+      - "tools/node_architect/ci_failure_repair.py"
 process_readback:
-  process_id: G1_ALIGNMENT
-  terminal_outcome: 'Jira claim confirmed (AI Agent=Hermes, status=In Progress), repository base verified (pre-prod 7174b86)'
+  process_id: "python3 -m unittest"
+  terminal_outcome: "OK"
   required_sources:
-  - AGENTS.md
-  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
-  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
-  - tools/validate_g01.py
+    - "tools/node_architect/ci_failure_repair.py"
+    - "tests/test_ci_failure_repair.py"
   status: VERIFIED
 execution_feasibility:
   outcome: EXECUTABLE
   route_steps:
-  - id: STEP-01
-    name: protected-base-and-process-readback
-    gate: G1_ALIGNMENT
-    actor: agent
-    action_class: read
-    capability_required: repository_read
-    capability_status: VERIFIED
-    primary_route: GitHub connector
-    fallback_routes: []
-    continuation: immediate
-    expected_evidence: protected base SHA and required process sources
-    bypass_eligibility: FORBIDDEN
-  - id: STEP-02
-    name: jira-claim-verification
-    gate: G1_ALIGNMENT
-    actor: agent
-    action_class: read
-    capability_required: jira_read
-    capability_status: VERIFIED
-    primary_route: Jira MCP
-    fallback_routes: []
-    continuation: immediate
-    expected_evidence: AI Agent = Hermes, status = In Progress
-    bypass_eligibility: FORBIDDEN
-  continuation_coverage: COMPLETE
+    - id: "STEP-1"
+      name: "G2 bounded write"
+      gate: "G2_EXECUTION"
+      actor: "agent"
+      action_class: "scoped-write"
+      capability_required: "local_agent"
+      capability_status: "VERIFIED"
+      primary_route: "guarded-branch + isolated-worktree"
+      fallback_routes: []
+      continuation: "G3_PR"
+      expected_evidence: "exact-head tests green"
+      bypass_eligibility: "FORBIDDEN"
+  continuation_coverage: "COMPLETE"
   human_bypass_required: false
-checks:
-- id: STEP-01
-  status: PASS
-  code: REPOSITORY_READ
-  message: 'Repository base ref and SHA verified against origin/pre-prod (7174b86).'
-  evidence:
-  - 'git rev-parse origin/pre-prod = 7174b8657b540d64d150044f70ba0418292e60a0'
-- id: STEP-02
-  status: PASS
-  code: JIRA_CLAIM_VERIFIED
-  message: 'SCRUM-322 claimed by Hermes, status In Progress.'
-  evidence:
-  - 'customfield_10046 = Hermes'
-  - 'customfield_10047 = 2026-08-09T19:24:43.150Z'
-  - 'status = In Progress'
-- id: STEP-03
-  status: PASS
-  code: NO_CONCURRENT_CLAIM
-  message: 'No open PR or branch for SCRUM-322 from another agent.'
-  evidence:
-  - 'gh pr list --state open returned no 322 PR'
-  - 'git branch -a | grep auto/SCRUM-322 returned empty'
-risk_class: R0
-required_gate: G2_AUTOMATIC_BOUNDED
+risk_class: "R0"
+required_gate: "G2_AUTOMATIC_BOUNDED"
 blockers: []
 outcome: PASS
+implementation_plan:
+  applicability: "required"
+  reason: "Fresh implementation for a previously empty node slot."
+  source: "generated_kiro"
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: "Task Me not required for bounded node implementation with existing tests."
+  canonical_task_uid: "SCRUM-322"
+  repository: "nhatnguyenquang1838-coder/gwc"
+  protected_base_sha: "7174b8657b540d64d150044f70ba0418292e60a0"
+  plan_root: ".gwc/tasks/SCRUM-322"
+  requirements_path: "github:nhatnguyenquang1838-coder/gwc#SCRUM-322"
+  design_path: "core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json"
+  tasks_path: "tests/test_ci_failure_repair.py"
+  plan_revision: "7174b8657b540d64d150044f70ba0418292e60a0"
+  validation_status: "PASS"
+  validation_evidence: "31/31 tests PASS"
+  generated_by: "hermes-cron-scrum288"
+  generated_at_utc: "2026-08-10T02:25:00Z"

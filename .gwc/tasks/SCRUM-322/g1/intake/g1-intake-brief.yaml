@@ -1,66 +1,72 @@
-schema_version: '1.0'
-artifact_type: g1-intake-brief
-generated_at: '2026-08-09T19:24:43Z'
+schema_version: "1.0"
+artifact_type: "g1-intake-brief"
+generated_at: "2026-08-10T02:25:00Z"
 trace:
-  project_id: gwc
-  repository: nhatnguyenquang1838-coder/gwc
-  task_id: SCRUM-322
-  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
-  g0_snapshot: '../../g0/context-snapshot.yaml'
+  project_id: "gwc"
+  repository: "nhatnguyenquang1838-coder/gwc"
+  task_id: "SCRUM-322"
+  base_sha: "7174b8657b540d64d150044f70ba0418292e60a0"
+  g0_snapshot: "../../g0/context-snapshot.yaml"
 problem:
-  statement: 'repo_delivery.ci-failure-repair node exists in pre-prod history but is not tracked in the current detached checkout; SCRUM-322 requires the node, deterministic classification tests, and catalog metadata to be committed on a guarded branch.'
-  why_now: 'DAG lane SCRUM-288 selected SCRUM-322 as the next READY task after verifying no open PR/branch and no concurrent agent claim.'
-desired_outcome: 'A PR base=pre-prod containing ci_failure_repair.py, tests, and catalog entry, with passing CI and no authority expansion.'
+  statement: "The repository delivery layer lacks a deterministic classifier for exact-head CI failures, leaving the agent without a bounded, fail-closed decision surface."
+  why_now: "SCRUM-322 is READY; repo_delivery family README lists ci-failure-repair as required; current catalog contains only a stub node JSON."
+desired_outcome: "Introduce a side-effect-free CI failure classifier that authorizes bounded repair only for repo-fixable failures inside the active PR scope, and routes external/unknown failures to typed blockers."
 stakeholders:
-  requester: Nhat Nguyen Quang
+  requester: "gwc-autonomous-lane"
   affected:
-  - Hermes cron lane SCRUM-288
-  - repo_delivery validator chain
+    - "gwc-autonomous-preprod"
+    - "gwc-family-validator"
 scope:
   in_scope:
-  - tools/node_architect/ci_failure_repair.py
-  - tests/test_ci_failure_repair.py
-  - tests/test_ci_failure_repair_family_integration.py
-  - core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json
+    - "tools/node_architect/ci_failure_repair.py"
+    - "schemas/ci-failure-repair.schema.json"
+    - "tests/test_ci_failure_repair.py"
+    - "tests/test_ci_failure_repair_family_integration.py"
   non_goals:
-  - merge to main
-  - deploy/release/production configuration
-  - credential or secret operations
+    - "merge authority"
+    - "deploy or release operations"
+    - "production data or configuration"
+    - "broader repo_delivery nodes"
 constraints:
-- deterministic CI failure classification
-- bounded repair scope only
-- no implicit merge authority
+  - "fail-closed on unknown/external/out-of-scope evidence"
+  - "no side effects in classifier output"
+  - "exact-head evidence invalidated on repair decision"
 assumptions:
-- pre-prod is the authoritative protected base
-- CI tests are the primary validation gate
+  - "origin/pre-prod is the authoritative base branch"
+  - "GitHub Actions is the CI provider"
+  - "failure_text is available from the CI run payload"
 risks:
-- id: RISK-1
-  description: Concurrent agent may claim SCRUM-322 after live status check window
-  impact: medium
-  mitigation: Claim and transition immediately after selection; verified before writing
+  - id: "RISK-1"
+    description: "Pattern-based classification may mislabel infrastructure noise as repo-fixable."
+    impact: "medium"
+    mitigation: "External patterns take precedence when explicitly matched; unknown text fails closed."
 acceptance_criteria:
-- id: AC-1
-  statement: ci_failure_repair.py classifies failures as REPAIR_REPOSITORY, EXTERNAL_BLOCKED, or EVIDENCE_INVALID
-  verifiable: true
-- id: AC-2
-  statement: tests/test_ci_failure_repair.py and family integration tests pass
-  verifiable: true
-delivery_lifecycle:
-  authorized_actions:
-  - create_branch
-  - write_scoped_files
-  - push_branch
-  - create_draft_pr
-  - merge_to_preprod
-  downstream_non_goals:
-  - merge_to_main
-  - manual_deploy
-  - production_data_access
-  g3_metadata_completion:
-    ready_for_review_after_g3_pass: true
-    required_evidence:
-    - exact-head CI green
-    - diff review clean
-    - no scope drift
+  - id: "AC-1"
+    statement: "classify_ci_failure returns REPAIR_REPOSITORY for recognized repo-fixable patterns with approved file scope."
+    verifiable: true
+  - id: "AC-2"
+    statement: "classify_ci_failure returns EXTERNAL_BLOCKED for recognized infrastructure failures."
+    verifiable: true
+  - id: "AC-3"
+    statement: "classify_ci_failure returns EVIDENCE_INVALID for unknown or scope-missing inputs."
+    verifiable: true
+  - id: "AC-4"
+    statement: "31 unit tests pass under PYTHONPATH=tools."
+    verifiable: true
 unresolved_questions: []
 status: READY
+delivery_lifecycle:
+  authorized_actions:
+    - "create-branch"
+    - "write-scoped-files"
+    - "create-draft-pr"
+  downstream_non_goals:
+    - "merge-to-main"
+    - "deploy"
+    - "production-config"
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+      - "exact-head CI PASS"
+      - "no scope drift"
+      - "validator PASS"

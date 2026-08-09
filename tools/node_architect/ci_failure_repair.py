@@ -23,6 +23,7 @@ from typing import Any
 
 _REASON_RE = re.compile(r"^CI_[A-Z_]+$")
 
+
 # Patterns that, when present in a single job step, indicate the failure
 # originates inside the repository and is therefore within bounded-repair
 # authority. Patterns are matched case-insensitively against the lower-cased
@@ -156,28 +157,29 @@ def classify_ci_failure(
     task_id:
         GWC task identifier (e.g. ``SCRUM-322``).
     repository:
-        owner/repo string.
+        Canonical repository identifier (``owner/repo``).
     pr_number:
-        Pull request number.
+        Pull request number that produced the failing head.
     head_sha:
-        40-hex SHA-1 of the exact head that failed.
+        Exact commit SHA that the failing CI run targeted.
     run_id:
-        CI provider run identifier.
+        CI provider run identifier (GitHub Actions run ID, etc.).
     workflow_name:
         Name of the workflow that failed.
     failure_text:
-        Plain-text or ADF-extracted failure summary.
+        Plain-text or ADF-extracted failure summary from the CI run.
     failure_type:
-        Optional normalized type hint.
+        Optional normalized type hint (e.g. ``test_failure``).
     job_name:
-        Optional CI job name.
+        Optional CI job name that failed.
     step_name:
-        Optional CI step name.
+        Optional CI step name that failed.
     approved_file_scope:
         Explicit file/glob scope allowed for repair under the active G2
         envelope. Must be present for a repair decision; absent => blocked.
     prior_escalation:
-        Optional prior escalation record for replay conflict detection.
+        Optional prior escalation record for the same event key; used for
+        replay conflict detection.
     event_id_or_idempotency_key:
         Stable key for replay/idempotency verification.
     decided_at:
@@ -198,7 +200,7 @@ def classify_ci_failure(
     event_id_or_idempotency_key = str(event_id_or_idempotency_key)
 
     if not re.fullmatch(r"^SCRUM-\d+$", str(task_id)):
-        raise ValueError(f"task_id must match ^SCRUM-\d+$, got {task_id!r}")
+        raise ValueError(f"task_id must match ^SCRUM-\\d+$, got {task_id!r}")
 
     if not re.fullmatch(r"^[\w.-]+/[\w.-]+$", str(repository)):
         raise ValueError(

@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ci-failure-repair",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "pr_number",
+    "head_sha",
+    "run_id",
+    "workflow_name",
+    "failure_text",
+    "decision",
+    "reason_code",
+    "is_repo_fixable",
+    "invalidate_prior_head_evidence",
+    "execution_performed",
+    "replay_status",
+    "escalation_digest",
+    "event_id_or_idempotency_key"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "artifact_type": {"type": "string", "const": "ci-failure-repair"},
+    "task_id": {
+      "type": "string",
+      "pattern": "^SCRUM-\\d+$"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[\\w.-]+/[\\w.-]+$"
+    },
+    "pr_number": {"type": "integer", "minimum": 1},
+    "head_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "run_id": {"type": "string", "minLength": 1},
+    "workflow_name": {"type": "string", "minLength": 1},
+    "failure_text": {"type": "string", "minLength": 1},
+    "failure_type": {"type": ["string", "null"]},
+    "job_name": {"type": ["string", "null"]},
+    "step_name": {"type": ["string", "null"]},
+    "decision": {
+      "type": "string",
+      "enum": [
+        "REPAIR_REPOSITORY",
+        "EXTERNAL_BLOCKED",
+        "EVIDENCE_INVALID"
+      ]
+    },
+    "reason_code": {"type": "string", "pattern": "^CI_[A-Z_]+$"},
+    "is_repo_fixable": {"type": "boolean"},
+    "approved_file_scope": {
+      "type": ["array", "null"],
+      "items": {"type": "string", "minLength": 1}
+    },
+    "invalidate_prior_head_evidence": {"type": "boolean"},
+    "prior_head_sha": {"type": ["string", "null"]},
+    "remediation_scope": {"type": ["string", "null"]},
+    "execution_performed": {"type": "boolean", "const": false},
+    "replay_status": {
+      "type": "string",
+      "enum": ["IDEMPOTENT", "CONFLICT"]
+    },
+    "escalation_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "event_id_or_idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decided_at": {"type": ["string", "null"]}
+  }
+}
