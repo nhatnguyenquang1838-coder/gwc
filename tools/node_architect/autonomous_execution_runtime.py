@@ -130,7 +130,83 @@ def next_runtime_action(*, dag: Mapping[str, Any], claims: Mapping[str, Mapping[
     return {"outcome": "IDLE", "reason_code": "AUTONOMOUS_NO_UNCLAIMED_READY_TASK"}
 
 
+def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
+    """Map one observed autonomous state to exactly one next side-effect intent.
+
+    This is the scheduler/adapter boundary: the function never performs external writes.
+    The caller must execute the returned adapter_action, read back authoritative state,
+    and invoke the runtime again with the new exact evidence.
+    """
+    phase = str(observation.get("phase", "DISCOVER")).upper()
+    if phase == "DISCOVER":
+        dag = resolve_ready_nodes(observation.get("tasks", []))
+        nxt = next_runtime_action(dag=dag, claims=observation.get("claims", {}))
+        if nxt.get("outcome") != "READY":
+            return {**nxt, "adapter_action": None, "dag": dag}
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_READY_TASK_SELECTED",
+            "task_id": nxt["task_id"],
+            "adapter_action": "JIRA_GITHUB_CAS_CLAIM",
+            "dag": dag,
+        }
+    if phase == "CLAIMED":
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_AGENT_EXECUTION_REQUIRED",
+            "task_id": observation.get("task_id"),
+            "adapter_action": "INVOKE_AGENT_E2E",
+        }
+    if phase == "IMPLEMENTED":
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_PREPROD_PR_REQUIRED",
+            "task_id": observation.get("task_id"),
+            "target_branch": "pre-prod",
+            "adapter_action": "CREATE_OR_UPDATE_PREPROD_PR",
+        }
+    if phase == "G3_READY":
+        decision = child_delivery_decision(
+            task_id=str(observation.get("task_id", "")),
+            target_branch=str(observation.get("target_branch", "")),
+            head_sha=str(observation.get("head_sha", "")),
+            ci_conclusion=str(observation.get("ci_conclusion", "")),
+            review_conclusion=str(observation.get("review_conclusion", "")),
+            standing_g4_valid=bool(observation.get("standing_g4_valid")),
+        )
+        if decision.get("outcome") != "ALLOW":
+            return {**decision, "adapter_action": None}
+        return {**decision, "adapter_action": "MERGE_PREPROD_EXACT_HEAD"}
+    if phase == "PREPROD_MERGED":
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_G5_EXACT_SHA_REQUIRED",
+            "task_id": observation.get("task_id"),
+            "merge_sha": observation.get("merge_sha"),
+            "adapter_action": "VERIFY_PREPROD_G5_EXACT_SHA",
+        }
+    if phase == "G5_VERIFIED":
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_DAG_REFRESH_REQUIRED",
+            "adapter_action": "MARK_COMPLETE_REQUERY_DAG_AND_PROMOTIONS",
+        }
+    if phase == "PROMOTION_READY":
+        from .promotion_controller import evaluate_promotion
+        decision = evaluate_promotion(
+            promotion_id=str(observation.get("promotion_id", "")),
+            required_nodes=observation.get("required_nodes", []),
+            completed_nodes=observation.get("completed_nodes", []),
+            base_main_sha=str(observation.get("base_main_sha", "")),
+            preprod_cut_sha=str(observation.get("preprod_cut_sha", "")),
+            integration_conclusion=str(observation.get("integration_conclusion", "")),
+            existing_promotion=observation.get("existing_promotion"),
+        )
+        return {**decision, "adapter_action": decision.get("action") if decision.get("outcome") == "ALLOW" else None}
+    return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_RUNTIME_PHASE_INVALID", "adapter_action": None}
+
+
 __all__ = [
     "canonical_digest", "resolve_ready_nodes", "claim_task", "validate_task_scope",
-    "child_delivery_decision", "next_runtime_action",
+    "child_delivery_decision", "next_runtime_action", "drive_closed_loop",
 ]
