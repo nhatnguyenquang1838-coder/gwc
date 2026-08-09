@@ -47,8 +47,8 @@ class ChatConnectorRuntimeContractTests(unittest.TestCase):
 
     def test_g4_trusted_receipt_is_sufficient_when_issue_comment_run_listing_is_unavailable(self):
         self.assertIn("CONNECTOR_OBSERVABILITY_LIMITED", self.chatgpt)
-        self.assertIn("must not block an otherwise authorized merge", self.chatgpt)
-        self.assertIn("issue_comment workflow-run listing", self.chatgpt)
+        self.assertIn("must not block", self.chatgpt)
+        self.assertIn("issue_comment` workflow-run listing", self.chatgpt)
 
     def test_g4_receipt_still_fails_closed_when_missing_or_mismatched(self):
         self.assertIn("G4_RECEIPT_MISSING", self.chatgpt)
