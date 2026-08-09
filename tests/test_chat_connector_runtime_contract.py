@@ -19,14 +19,12 @@ class ChatConnectorRuntimeContractTests(unittest.TestCase):
         self.assertIn("Connector-only does not mean validator-unavailable", self.runbook)
 
     def test_connector_content_plus_writable_workspace_is_materialization_capable(self):
-        self.assertIn(
-            "A connector that returns exact file content/text/blob data plus a writable\nisolated filesystem is sufficient for materialization",
-            self.agents,
-        )
+        self.assertIn("Connector content/text/blob plus writable isolated storage is sufficient for", self.agents)
+        self.assertIn("a mounted connector file is not required", self.agents)
         self.assertIn("mounted connector file is\n   not required", self.runtime)
 
     def test_connector_only_can_write_after_valid_gate_authority(self):
-        self.assertIn("use an authorized repository write connector for guarded-branch creation", self.agents)
+        self.assertIn("GitHub/repository connector may create the guarded branch and perform scoped", self.agents)
         self.assertIn("A trusted checkout is NOT required to use an authorized repository write connector", self.runtime)
         self.assertIn("Persisting those artifacts to the repository remains a G2 write", self.chatgpt)
 
@@ -38,7 +36,8 @@ class ChatConnectorRuntimeContractTests(unittest.TestCase):
         self.assertIn("Standing authority never authorizes merge to `main`", self.agents)
 
     def test_route_execution_base_overrides_generic_default_branch(self):
-        self.assertIn("route-specific execution base `pre-prod` overrides a generic default-branch", self.agents)
+        self.assertIn("The route-specific execution base is `pre-prod`", self.agents)
+        self.assertIn("default branch is `main`", self.agents)
         self.assertIn("`pre-prod` is the autonomous child execution/integration base", self.runtime)
         self.assertIn("`main` remains governance/release/promotion context", self.runtime)
 
