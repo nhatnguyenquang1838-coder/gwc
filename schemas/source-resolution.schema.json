@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/source-resolution.schema.json",
+  "title": "GWC Source Resolution",
+  "description": "Deterministic resolution of the authoritative instruction/source set for a task. Read-only G0_CONTEXT node: it binds every selected source to repository/ref/SHA/provenance and creates no execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "source_mode",
+    "authoritative_source",
+    "selected_sources",
+    "rejected_alternatives",
+    "invalidated_evidence",
+    "source_set_digest",
+    "outcome",
+    "reason_code",
+    "reason_codes",
+    "observed_at",
+    "read_only_projection",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "source-resolution"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "declared_mode": {"type": ["string", "null"]},
+    "source_mode": {
+      "oneOf": [
+        {"enum": ["REPO", "PACKAGE", "MIXED"]},
+        {"type": "null"}
+      ]
+    },
+    "authoritative_source": {
+      "oneOf": [
+        {"$ref": "#/$defs/binding"},
+        {"type": "null"}
+      ]
+    },
+    "selected_sources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/binding"}
+    },
+    "rejected_alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "source_class", "rejection_reason"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "source_class": {"type": "string"},
+          "rejection_reason": {"$ref": "#/$defs/rejection_reason"},
+          "detail": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "invalidated_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "prior_sha", "current_sha"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "prior_sha": {"type": "string"},
+          "current_sha": {"type": "string"}
+        }
+      },
+      "uniqueItems": true
+    },
+    "source_set_digest": {
+      "oneOf": [
+        {"$ref": "#/$defs/sha256"},
+        {"type": "null"}
+      ]
+    },
+    "outcome": {"enum": ["ACCEPTED", "BLOCKED", "PENDING", "HUMAN_REQUIRED"]},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reason_code"},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "remediation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["route", "next_action", "stop_condition"],
+      "properties": {
+        "route": {"enum": ["RETRY_RESOLUTION", "REQUEST_HUMAN_INPUT", "BLOCK_G1_REVIEW", "REFRESH_SOURCE"]},
+        "next_action": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "next_allowed_nodes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^intake_context\\."},
+      "uniqueItems": true
+    },
+    "observed_at": {"type": ["string", "null"]},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "source_class", "domain", "precedence", "path", "ref", "sha", "provenance_origin"],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 1},
+        "source_class": {"$ref": "#/$defs/source_class"},
+        "domain": {"enum": ["REPO", "PACKAGE"]},
+        "precedence": {"type": "integer", "minimum": 0},
+        "path": {"type": "string", "minLength": 1},
+        "ref": {"type": "string", "minLength": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "provenance_origin": {"type": "string", "minLength": 1}
+      }
+    },
+    "source_class": {
+      "enum": [
+        "REPO_INSTRUCTION",
+        "REPO_CORE_CONTRACT",
+        "REPO_NODE_DESCRIPTOR",
+        "PACKAGE_MANIFEST",
+        "PACKAGE_CORE_CONTRACT",
+        "PACKAGE_RUNBOOK"
+      ]
+    },
+    "rejection_reason": {
+      "enum": [
+        "LOWER_PRECEDENCE",
+        "DUPLICATE_IDENTICAL_BINDING",
+        "CONFLICTING_BINDING",
+        "UNVERIFIED_PROVENANCE",
+        "UNAVAILABLE",
+        "UNBOUND_REF",
+        "MALFORMED_CANDIDATE"
+      ]
+    },
+    "reason_code": {
+      "enum": [
+        "SOURCE_ACCEPTED",
+        "SOURCE_MALFORMED_INPUT",
+        "SOURCE_AMBIGUOUS_AUTHORITY",
+        "SOURCE_MISSING_MANDATORY",
+        "SOURCE_MISSING_EVIDENCE",
+        "SOURCE_INVALID_MODE",
+        "SOURCE_UNBOUND_REF",
+        "SOURCE_UNAVAILABLE",
+        "SOURCE_STALE_DRIFT",
+        "SOURCE_REPLAY_IDEMPOTENT",
+        "SOURCE_HUMAN_REQUIRED"
+      ]
+    }
+  }
+}
