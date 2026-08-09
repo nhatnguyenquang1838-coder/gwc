@@ -196,6 +196,7 @@ def _materialize_or_stop(
     approval: Mapping[str, Any],
     *,
     effects_started: list[str] | None = None,
+    now: datetime | None = None,
 ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
     try:
         materialization = materialize_research_execution(
@@ -203,6 +204,7 @@ def _materialize_or_stop(
             approval,
             payload.get("projection_readbacks", {}),
             effects_started=effects_started,
+            now=now,
         )
     except (ValueError, TypeError, KeyError) as exc:
         reason = str(exc).strip() or "RESEARCH_APPROVAL_INVALID"
@@ -340,6 +342,7 @@ def run_research_execution_flow(
             research,
             approval,
             effects_started=list(cp.get("effects_started", [])),
+            now=now,
         )
         if stopped is not None:
             return stopped
@@ -455,6 +458,7 @@ def run_research_execution_flow(
                 research,
                 approval,
                 effects_started=list(cp.get("effects_started", [])),
+            now=now,
             )
             if stopped is not None:
                 return stopped
@@ -537,6 +541,7 @@ def run_research_execution_flow(
             research,
             approval,
             effects_started=list(cp.get("effects_started", [])),
+            now=now,
         )
         if stopped is not None:
             return stopped
