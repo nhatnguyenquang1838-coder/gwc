@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/autonomous-promotion.schema.json",
+  "title": "Autonomous Promotion Decision",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["outcome", "reason_code"],
+  "properties": {
+    "outcome": {"enum": ["ALLOW", "BLOCKED", "PENDING"]},
+    "reason_code": {"type": "string", "minLength": 1},
+    "promotion_id": {"type": "string", "minLength": 1},
+    "required_nodes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "base_branch": {"const": "main"},
+    "base_main_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "preprod_cut_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "draft": {"const": true},
+    "mark_ready_allowed": {"const": false},
+    "main_merge_allowed": {"const": false},
+    "evidence_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotency_key": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
