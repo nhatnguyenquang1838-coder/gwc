@@ -37,3 +37,10 @@ def test_push_comment_resolution_is_target_branch_aware():
         assert "['refs/heads/main', 'refs/heads/pre-prod']" in producer
         assert "event_label: `push:${targetBranch}`" in producer
         assert "context.ref === 'refs/heads/main'" not in producer
+
+
+def test_partial_exact_sha_observation_is_pending_not_incomplete():
+    assert "const pendingStatuses = ['queued', 'waiting', 'requested', 'in_progress']" in WORKFLOW
+    assert "? 'CI_PENDING'" in WORKFLOW
+    assert "checkpoint_required: classification === 'CI_PENDING'" in WORKFLOW
+    assert "next required workflow_run completion" in WORKFLOW
