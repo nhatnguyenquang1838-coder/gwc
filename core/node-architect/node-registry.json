@@ -766,7 +766,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
-        "source_sha": "d94e00a01f790d9c8455cc341ec25da4accad8d22e3c004adc17c194d2976f53"
+        "source_sha": "530acb5c0626fe59b7d704e7009ee60099f42ec8"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
