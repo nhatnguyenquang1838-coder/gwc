@@ -538,6 +538,10 @@ jobs:
             let conclusion = 'failure';
             let title = 'Autonomous G4 evidence is missing or stale';
             let summary = 'Post the exact G4 approval command after the managed PR evidence block is current.';
+            const standingPreprod =
+              pr.base.ref === 'pre-prod' &&
+              pr.head.ref.startsWith('auto/') &&
+              prBody.includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');
             if (pr.base.ref === 'main') {
               // Definition PR (workflow/tool enablement) ships to main; the
               // autonomous-run *execution* contract only binds pre-prod targets
@@ -545,6 +549,10 @@ jobs:
               conclusion = 'success';
               title = 'Autonomous G4 evidence not required (main-targeting definition PR)';
               summary = 'PR targets main and is not an autonomous-run execution delivery; G4 evidence binding is out of scope.';
+            } else if (standingPreprod) {
+              conclusion = 'success';
+              title = 'Autonomous pre-prod standing authority applies';
+              summary = 'auto/* -> pre-prod is authorized by AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN standing policy; human G4 is reserved for promotion to main.';
             } else {
               const start = prBody.indexOf(begin);
               const finish = start >= 0 ? prBody.indexOf(end, start) + end.length : -1;
