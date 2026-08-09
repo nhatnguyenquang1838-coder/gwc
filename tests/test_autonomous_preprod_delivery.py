@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import unittest
 
-from tools.node_architect.assemble_autonomous_preprod_pr import assemble_pr_body
+from tools.node_architect.assemble_autonomous_preprod_pr import ROUTE_ID, assemble_pr_body
 from tools.node_architect.create_autonomous_task_branch import decide_branch
 from tools.node_architect.merge_autonomous_preprod_pr import plan_merge
 from tools.node_architect.validate_autonomous_g3_readiness import validate_g3_readiness
@@ -105,6 +105,17 @@ class AutonomousPrBodyTests(unittest.TestCase):
         self.assertEqual("PR_BODY_READY", r["outcome"])
         self.assertIn("c" * 40, r["pr_body"])
         self.assertEqual("sha256:" + "0" * 64, r["managed_block_digest"])
+        self.assertEqual(ROUTE_ID, r["route_id"])
+        self.assertIn(f"route={ROUTE_ID} base=pre-prod head={HEAD_SHA}", r["pr_body"])
+
+    def test_route_marker_is_rebound_idempotently_to_new_head(self):
+        first = assemble_pr_body(graph=_graph(), story=_story())
+        new_head = "d" * 40
+        second = assemble_pr_body(graph=_graph(new_head), story=_story(new_head), existing_body=first["pr_body"])
+        self.assertEqual("PR_BODY_READY", second["outcome"])
+        self.assertEqual(1, second["pr_body"].count("gwc:autonomous-preprod-route"))
+        self.assertIn(f"head={new_head}", second["pr_body"])
+        self.assertNotIn(f"head={HEAD_SHA} -->", second["pr_body"])
 
     def test_main_base_body_rejected(self):
         g = _graph()
@@ -178,31 +189,47 @@ class AutonomousG3ReadinessTests(unittest.TestCase):
 
 
 class AutonomousPreprodMergeTests(unittest.TestCase):
-    def test_merge_into_preprod_ok(self):
-        d = plan_merge(
+    def _merge(self, **overrides):
+        kwargs = dict(
             run_id=RUN_ID, task_id=TASK_ID, repository=REPO, pr_number=42,
             target_branch="pre-prod", approved_head_sha=HEAD_SHA, live_head_sha=HEAD_SHA,
+            g3_pass=True, required_checks_terminal_success=True,
+            managed_evidence_current=True, standing_g4_valid=True,
         )
+        kwargs.update(overrides)
+        return plan_merge(**kwargs)
+
+    def test_merge_into_preprod_ok(self):
+        d = self._merge()
         self.assertEqual("MERGE_INTO_PREPROD", d["outcome"])
         self.assertEqual("gh pr merge 42 --squash --branch pre-prod", d["merge_command"])
         self.assertTrue(d["merge_proof"]["merge_proof_digest"].startswith("sha256:"))
         self.assertFalse(d["merge_authority_granted"])
 
     def test_merge_into_main_rejected(self):
-        d = plan_merge(
-            run_id=RUN_ID, task_id=TASK_ID, repository=REPO, pr_number=42,
-            target_branch="main", approved_head_sha=HEAD_SHA, live_head_sha=HEAD_SHA,
-        )
+        d = self._merge(target_branch="main")
         self.assertEqual("REJECTED", d["outcome"])
         self.assertIn("AUTONOMOUS_MERGE_MAIN_TARGET_FORBIDDEN", d["reason_codes"])
 
     def test_merge_head_drift_rejected(self):
-        d = plan_merge(
-            run_id=RUN_ID, task_id=TASK_ID, repository=REPO, pr_number=42,
-            target_branch="pre-prod", approved_head_sha=HEAD_SHA, live_head_sha="d" * 40,
-        )
+        d = self._merge(live_head_sha="d" * 40)
         self.assertEqual("REJECTED", d["outcome"])
         self.assertIn("AUTONOMOUS_MERGE_HEAD_DRIFT", d["reason_codes"])
+
+    def test_merge_rejected_when_required_checks_not_terminal_success(self):
+        d = self._merge(required_checks_terminal_success=False)
+        self.assertEqual("REJECTED", d["outcome"])
+        self.assertIn("AUTONOMOUS_MERGE_REQUIRED_CHECKS_NOT_TERMINAL_SUCCESS", d["reason_codes"])
+
+    def test_merge_rejected_when_managed_evidence_is_stale_or_missing(self):
+        d = self._merge(managed_evidence_current=False)
+        self.assertEqual("REJECTED", d["outcome"])
+        self.assertIn("AUTONOMOUS_MERGE_MANAGED_EVIDENCE_NOT_CURRENT", d["reason_codes"])
+
+    def test_merge_rejected_without_standing_g4(self):
+        d = self._merge(standing_g4_valid=False)
+        self.assertEqual("REJECTED", d["outcome"])
+        self.assertIn("AUTONOMOUS_MERGE_STANDING_G4_INVALID", d["reason_codes"])
 
 
 if __name__ == "__main__":
