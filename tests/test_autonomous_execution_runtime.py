@@ -2,7 +2,8 @@ import unittest
 
 from tools.node_architect.autonomous_execution_runtime import (
     AUTONOMOUS_ROUTE_ID,
-    child_delivery_decision, claim_task, drive_closed_loop, resolve_ready_nodes, validate_task_scope,
+    child_delivery_decision, claim_task, drive_closed_loop, resolve_authorized_ready_nodes,
+    resolve_ready_nodes, validate_task_scope,
 )
 
 SHA = "a" * 40
@@ -19,6 +20,28 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(result["ready_task_ids"], ["B"])
         self.assertEqual(result["blocked_dependencies"]["C"], ["B"])
 
+    def test_scrum_301_cannot_dispatch_while_scrum_300_incomplete(self):
+        tasks = [
+            {"task_id": "SCRUM-300", "status": "IN_PROGRESS", "dependencies": []},
+            {"task_id": "SCRUM-301", "status": "TO_DO", "dependencies": ["SCRUM-300"]},
+        ]
+        result = resolve_ready_nodes(tasks)
+        self.assertNotIn("SCRUM-301", result["ready_task_ids"])
+        self.assertEqual(result["blocked_dependencies"]["SCRUM-301"], ["SCRUM-300"])
+
+    def test_ready_task_requires_authority_before_claim(self):
+        dag = resolve_ready_nodes([{"task_id": "SCRUM-300", "status": "TO_DO", "dependencies": []}])
+        result = resolve_authorized_ready_nodes(dag=dag, manifest=None, authority_valid=False)
+        self.assertEqual(result["state"], "READY_FOR_AUTHORITY")
+        self.assertEqual(result["reason_code"], "AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED")
+
+    def test_allowlisted_ready_task_becomes_authorized_ready(self):
+        dag = resolve_ready_nodes([{"task_id": "SCRUM-300", "status": "TO_DO", "dependencies": []}])
+        manifest = {"allowed_tasks": [{"task_id": "SCRUM-300"}]}
+        result = resolve_authorized_ready_nodes(dag=dag, manifest=manifest, authority_valid=True)
+        self.assertEqual(result["state"], "AUTHORIZED_READY")
+        self.assertEqual(result["ready_task_ids"], ["SCRUM-300"])
+
     def test_duplicate_claim_is_replay_safe(self):
         first = claim_task(task_id="B", ready_task_ids=["B"], claimant="agent-1", lease_id="lease-1")
         replay = claim_task(task_id="B", ready_task_ids=["B"], claimant="agent-1", lease_id="lease-1", existing_claim=first)
@@ -27,11 +50,11 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(conflict["reason_code"], "AUTONOMOUS_CLAIM_CONFLICT")
 
     def test_node_architect_implementation_allowed_when_not_active_authority(self):
-        task = {"task_id": "SCRUM-298", "risk": "R2"}
-        manifest = {"task_id": "SCRUM-298", "risk": "R2", "allowed_paths": ["core/node-architect/node-catalog/intake_context/request-intake.node.json"]}
+        task = {"task_id": "SCRUM-300", "risk": "R2"}
+        manifest = {"task_id": "SCRUM-300", "risk": "R2", "allowed_paths": ["core/node-architect/node-catalog/intake_context/repo-identity-check.node.json"]}
         result = validate_task_scope(task=task, manifest_task=manifest,
             requested_paths=manifest["allowed_paths"],
-            immutable_authority_paths=["core/node-architect/AUTONOMOUS_PREPROD_RUNTIME_CONTRACT_v0.1.md", "tools/node_architect/validate_autonomous_preprod_policy.py"])
+            immutable_authority_paths=["core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md", "tools/node_architect/validate_autonomous_preprod_policy.py"])
         self.assertEqual(result["outcome"], "ALLOW")
 
     def test_active_authority_self_modification_is_blocked(self):
@@ -69,6 +92,25 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         result = self._child(managed_evidence_current=False)
         self.assertEqual(result["outcome"], "BLOCKED")
         self.assertEqual(result["reason_code"], "AUTONOMOUS_PR_MANAGED_EVIDENCE_NOT_CURRENT")
+
+    def test_discover_resolves_authority_before_claim(self):
+        result = drive_closed_loop({
+            "phase": "DISCOVER",
+            "tasks": [{"task_id": "SCRUM-300", "status": "TO_DO", "dependencies": []}],
+            "authority_valid": False,
+        })
+        self.assertEqual(result["adapter_action"], "RESOLVE_RUN_AUTHORITY")
+        self.assertEqual(result["state"], "READY_FOR_AUTHORITY")
+
+    def test_discover_claims_only_authorized_ready_task(self):
+        result = drive_closed_loop({
+            "phase": "DISCOVER",
+            "tasks": [{"task_id": "SCRUM-300", "status": "TO_DO", "dependencies": []}],
+            "authority_valid": True,
+            "manifest": {"allowed_tasks": [{"task_id": "SCRUM-300"}]},
+        })
+        self.assertEqual(result["adapter_action"], "JIRA_GITHUB_CAS_CLAIM")
+        self.assertEqual(result["state"], "AUTHORIZED_READY")
 
     def test_implemented_phase_forces_pr_contract_builder(self):
         result = drive_closed_loop({"phase": "IMPLEMENTED", "task_id": "X"})
