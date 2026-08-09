@@ -1,10 +1,12 @@
 import importlib.util
+import sys
 from pathlib import Path
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "na81_dag.py"
 SPEC = importlib.util.spec_from_file_location("na81_dag", MODULE_PATH)
 assert SPEC and SPEC.loader
 na81_dag = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = na81_dag
 SPEC.loader.exec_module(na81_dag)
 
 Edge = na81_dag.Edge
