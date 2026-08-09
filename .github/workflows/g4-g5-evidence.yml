@@ -19,7 +19,11 @@ permissions:
 
 jobs:
   g4-authority:
-    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      (startsWith(github.event.comment.body, 'APPROVE G4 ') ||
+       startsWith(github.event.comment.body, 'APPROVE G4_MERGE '))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout protected base
@@ -85,12 +89,6 @@ jobs:
             core.setOutput('scope', receipt.scope_hash_prefix);
             core.setOutput('expires_at', receipt.expires_at);
             core.setOutput('source_comment_id', String(receipt.source_comment.comment_id));
-
-      - name: Fail loudly when a PR comment is not a valid G4 approval
-        if: steps.authority.outputs.matched != 'true'
-        run: |
-          echo 'No valid G4 approval command matched this PR comment; no authority receipt was published.'
-          exit 1
 
       - name: Validate G4 authority receipt
         if: steps.authority.outputs.matched == 'true'
@@ -164,13 +162,15 @@ jobs:
             core.info(`Trusted G4 authority receipt found in comment ${receipt.id}.`);
 
   g4-merge-proof:
+    # Post-merge evidence is observational. Missing G4 evidence after a merge
+    # must never retroactively turn an already-completed merge into CI failure.
+    # Authority enforcement belongs before merge in g4-receipt-required (or the
+    # route-specific merge controller). If a receipt exists, however, it must
+    # still validate exactly or this evidence job fails closed.
     if: >-
       github.event_name == 'pull_request' &&
       github.event.action == 'closed' &&
-      github.event.pull_request.merged == true &&
-      !(github.event.pull_request.base.ref == 'pre-prod' &&
-        startsWith(github.event.pull_request.head.ref, 'auto/') &&
-        contains(github.event.pull_request.body || '', 'AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN'))
+      github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Materialize GitHub merge-event proof
@@ -185,7 +185,12 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
             const receipts = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body && item.body.includes('<!-- gwc:g4-authority-receipt '));
             const latest = receipts.at(-1);
-            if (!latest) { core.setFailed('Merged PR has no trusted G4 authority receipt.'); return; }
+            if (!latest) {
+              core.notice('No trusted G4 authority receipt exists for this merged PR. Post-merge evidence is not an enforcement gate; no G4 merge proof will be emitted.');
+              core.setOutput('available', 'false');
+              core.setOutput('merge_sha', pr.merge_commit_sha || '');
+              return;
+            }
             const parsed = latest.body.match(/approval_id=([^ ]+) head=([0-9a-f]{40}) scope=([0-9a-f]{16}) expires=([^ ]+) source_comment_id=(\d+)/);
             if (!parsed) { core.setFailed('G4 authority receipt marker is malformed.'); return; }
             const sourceCommentId = Number(parsed[5]);
@@ -201,9 +206,11 @@ jobs:
             if (new Date(parsed[4]) < new Date(pr.merged_at)) { core.setFailed('G4 authority expired before the merge event.'); return; }
             const proof = { schema_version: '1.0', artifact_type: 'g4-merge-proof', repository: `${owner}/${repo}`, gate: 'G4_MERGE', approval_id: parsed[1], scope_hash_prefix: parsed[3], source_comment_id: sourceCommentId, pr_number: pr.number, approved_head_sha: parsed[2], merged_head_sha: pr.head.sha, merge_commit_sha: pr.merge_commit_sha, merge_event: 'pull_request.closed', merged_at: pr.merged_at, merged_by: pr.merged_by.login, exact_head_match: true };
             fs.writeFileSync('g4-merge-proof.json', JSON.stringify(proof, null, 2));
+            core.setOutput('available', 'true');
             core.setOutput('approval_id', proof.approval_id); core.setOutput('head_sha', proof.merged_head_sha); core.setOutput('merge_sha', proof.merge_commit_sha);
 
       - name: Upload canonical G4 merge proof
+        if: steps.proof.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: g4-merge-proof-pr-${{ github.event.pull_request.number }}-merge-${{ steps.proof.outputs.merge_sha }}
@@ -211,6 +218,7 @@ jobs:
           if-no-files-found: error
 
       - name: Publish merge-proof trace
+        if: steps.proof.outputs.available == 'true'
         uses: actions/github-script@v7
         env:
           APPROVAL_ID: ${{ steps.proof.outputs.approval_id }}
