@@ -15,6 +15,7 @@ TERMINAL_COMPLETE = {"COMPLETED", "G5_VERIFIED"}
 EXECUTABLE_STATUSES = {"TO_DO", "READY", "RETRYABLE"}
 MAX_AUTONOMOUS_RISK = 2
 RISK_ORDER = {"R0": 0, "R1": 1, "R2": 2, "R3": 3}
+AUTONOMOUS_ROUTE_ID = "AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN"
 
 
 def canonical_digest(value: Any) -> str:
@@ -96,8 +97,16 @@ def validate_task_scope(*, task: Mapping[str, Any], manifest_task: Mapping[str, 
 
 def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
                             ci_conclusion: str, review_conclusion: str,
-                            standing_g4_valid: bool) -> dict[str, Any]:
-    """Decide whether an exact-head child PR may merge autonomously to pre-prod."""
+                            standing_g4_valid: bool,
+                            managed_evidence_current: bool = False,
+                            required_checks_terminal_success: bool = False) -> dict[str, Any]:
+    """Decide whether an exact-head child PR may merge autonomously to pre-prod.
+
+    A coarse CI summary is not sufficient. The adapter must separately prove that
+    all required checks are terminal-success and that the managed PR evidence is
+    current for the exact head. This prevents a connector-side merge from racing
+    or bypassing a failing G4/CI check.
+    """
     if target_branch == "main":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_CHILD_MAIN_TARGET_FORBIDDEN"}
     if target_branch != "pre-prod":
@@ -107,14 +116,27 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
     if ci_conclusion != "success":
         return {"outcome": "PENDING" if ci_conclusion in {"queued", "in_progress", "pending"} else "BLOCKED",
                 "reason_code": "AUTONOMOUS_EXACT_HEAD_CI_NOT_GREEN"}
+    if not required_checks_terminal_success:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_REQUIRED_CHECKS_NOT_TERMINAL_SUCCESS"}
+    if not managed_evidence_current:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_PR_MANAGED_EVIDENCE_NOT_CURRENT"}
     if review_conclusion != "pass":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G3_REVIEW_NOT_PASS"}
     if not standing_g4_valid:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_STANDING_G4_AUTHORITY_INVALID"}
-    evidence = {"task_id": task_id, "target_branch": target_branch, "head_sha": head_sha}
+    evidence = {
+        "task_id": task_id,
+        "target_branch": target_branch,
+        "head_sha": head_sha,
+        "route_id": AUTONOMOUS_ROUTE_ID,
+        "required_checks_terminal_success": True,
+        "managed_evidence_current": True,
+        "standing_g4_valid": True,
+    }
     return {
         "outcome": "ALLOW",
         "reason_code": "AUTONOMOUS_PREPROD_MERGE_ALLOWED",
+        "route_id": AUTONOMOUS_ROUTE_ID,
         "merge_allowed": True,
         "main_merge_allowed": False,
         "evidence_digest": canonical_digest(evidence),
@@ -163,7 +185,10 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             "reason_code": "AUTONOMOUS_PREPROD_PR_REQUIRED",
             "task_id": observation.get("task_id"),
             "target_branch": "pre-prod",
-            "adapter_action": "CREATE_OR_UPDATE_PREPROD_PR",
+            "route_id": AUTONOMOUS_ROUTE_ID,
+            "pr_contract_builder": "tools.node_architect.assemble_autonomous_preprod_pr",
+            "managed_evidence_required": True,
+            "adapter_action": "ASSEMBLE_AND_CREATE_OR_UPDATE_PREPROD_PR",
         }
     if phase == "G3_READY":
         decision = child_delivery_decision(
@@ -173,6 +198,8 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             ci_conclusion=str(observation.get("ci_conclusion", "")),
             review_conclusion=str(observation.get("review_conclusion", "")),
             standing_g4_valid=bool(observation.get("standing_g4_valid")),
+            managed_evidence_current=bool(observation.get("managed_evidence_current")),
+            required_checks_terminal_success=bool(observation.get("required_checks_terminal_success")),
         )
         if decision.get("outcome") != "ALLOW":
             return {**decision, "adapter_action": None}

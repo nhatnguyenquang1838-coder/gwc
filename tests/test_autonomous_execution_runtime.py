@@ -1,6 +1,7 @@
 import unittest
 
 from tools.node_architect.autonomous_execution_runtime import (
+    AUTONOMOUS_ROUTE_ID,
     child_delivery_decision, claim_task, drive_closed_loop, resolve_ready_nodes, validate_task_scope,
 )
 
@@ -40,16 +41,40 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
             requested_paths=[path], immutable_authority_paths=[path])
         self.assertEqual(result["reason_code"], "AUTONOMOUS_ACTIVE_AUTHORITY_SELF_MODIFICATION_FORBIDDEN")
 
+    def _child(self, **overrides):
+        kwargs = dict(
+            task_id="X", target_branch="pre-prod", head_sha=SHA,
+            ci_conclusion="success", review_conclusion="pass", standing_g4_valid=True,
+            managed_evidence_current=True, required_checks_terminal_success=True,
+        )
+        kwargs.update(overrides)
+        return child_delivery_decision(**kwargs)
+
     def test_child_main_target_forbidden(self):
-        result = child_delivery_decision(task_id="X", target_branch="main", head_sha=SHA,
-                                         ci_conclusion="success", review_conclusion="pass", standing_g4_valid=True)
+        result = self._child(target_branch="main")
         self.assertEqual(result["reason_code"], "AUTONOMOUS_CHILD_MAIN_TARGET_FORBIDDEN")
 
     def test_preprod_exact_head_can_merge(self):
-        result = child_delivery_decision(task_id="X", target_branch="pre-prod", head_sha=SHA,
-                                         ci_conclusion="success", review_conclusion="pass", standing_g4_valid=True)
+        result = self._child()
         self.assertTrue(result["merge_allowed"])
         self.assertFalse(result["main_merge_allowed"])
+        self.assertEqual(AUTONOMOUS_ROUTE_ID, result["route_id"])
+
+    def test_preprod_merge_blocks_without_terminal_required_checks(self):
+        result = self._child(required_checks_terminal_success=False)
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertEqual(result["reason_code"], "AUTONOMOUS_REQUIRED_CHECKS_NOT_TERMINAL_SUCCESS")
+
+    def test_preprod_merge_blocks_without_current_managed_evidence(self):
+        result = self._child(managed_evidence_current=False)
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertEqual(result["reason_code"], "AUTONOMOUS_PR_MANAGED_EVIDENCE_NOT_CURRENT")
+
+    def test_implemented_phase_forces_pr_contract_builder(self):
+        result = drive_closed_loop({"phase": "IMPLEMENTED", "task_id": "X"})
+        self.assertEqual(result["adapter_action"], "ASSEMBLE_AND_CREATE_OR_UPDATE_PREPROD_PR")
+        self.assertEqual(result["route_id"], AUTONOMOUS_ROUTE_ID)
+        self.assertTrue(result["managed_evidence_required"])
 
     def test_closed_loop_wires_g5_back_to_dag_refresh(self):
         result = drive_closed_loop({"phase": "G5_VERIFIED", "task_id": "X"})
@@ -59,6 +84,16 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         result = drive_closed_loop({
             "phase": "G3_READY", "task_id": "X", "target_branch": "main", "head_sha": SHA,
             "ci_conclusion": "success", "review_conclusion": "pass", "standing_g4_valid": True,
+            "managed_evidence_current": True, "required_checks_terminal_success": True,
+        })
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertIsNone(result["adapter_action"])
+
+    def test_closed_loop_does_not_emit_merge_action_without_current_evidence(self):
+        result = drive_closed_loop({
+            "phase": "G3_READY", "task_id": "X", "target_branch": "pre-prod", "head_sha": SHA,
+            "ci_conclusion": "success", "review_conclusion": "pass", "standing_g4_valid": True,
+            "managed_evidence_current": False, "required_checks_terminal_success": True,
         })
         self.assertEqual(result["outcome"], "BLOCKED")
         self.assertIsNone(result["adapter_action"])
