@@ -45,6 +45,16 @@ class ChatConnectorRuntimeContractTests(unittest.TestCase):
         self.assertIn("Missing one capability blocks only actions that require that capability", self.runtime)
         self.assertIn("Do not collapse capability absence into a generic execution-mode blocker", self.runtime)
 
+    def test_g4_trusted_receipt_is_sufficient_when_issue_comment_run_listing_is_unavailable(self):
+        self.assertIn("CONNECTOR_OBSERVABILITY_LIMITED", self.chatgpt)
+        self.assertIn("must not block an otherwise authorized merge", self.chatgpt)
+        self.assertIn("issue_comment workflow-run listing", self.chatgpt)
+
+    def test_g4_receipt_still_fails_closed_when_missing_or_mismatched(self):
+        self.assertIn("G4_RECEIPT_MISSING", self.chatgpt)
+        self.assertIn("approval ID, approved head SHA, scope hash, expiry, source comment", self.chatgpt)
+        self.assertIn("trusted GitHub Actions bot identity", self.chatgpt)
+
 
 if __name__ == "__main__":
     unittest.main()
