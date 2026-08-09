@@ -6,7 +6,15 @@ Allow the agent to complete an approved coding task end-to-end and deliver a val
 
 The user reviews the final result through the Pull Request.
 
-This mode never authorizes merge, deployment, production configuration, credential changes, migrations, or production-data operations.
+This mode by itself does not grant merge, deployment, production configuration,
+credential, migration, or production-data authority. E2E defines delivery
+mechanics; the active canonical route and gate authority resolver define the
+authority source for later actions.
+
+`ROUTE_RESOLUTION_PRECEDES_GENERIC_WORKFLOW` is mandatory. When a canonical
+route supplies separately validated bounded standing authority, E2E mechanics
+must hand off to that route instead of replacing it with generic Human-G4
+wording.
 
 ## Activation
 
@@ -16,7 +24,33 @@ This mode is activated only when the user explicitly states:
 
 The activation phrase alone is not execution approval.
 
-The agent must still perform policy boot, read-only inspection, proposal generation, visual review, approval-envelope generation, and exact approval-token validation.
+The agent must still perform policy boot, read-only inspection, proposal generation, visual review, approval-envelope generation, and exact approval-token validation unless the active canonical route supplies the exact required authority through a separately validated standing/derived decision.
+
+## Route and authority resolution
+
+Before applying any generic E2E stop, approval, or merge wording, resolve the
+active route from canonical route evidence.
+
+Generic E2E uses Human authority at Human-authority boundaries. A canonical
+route-specific policy may instead supply bounded authority for an exact action.
+The route decision must bind the repository, task/run, target branch, base/head
+SHA, action, scope/evidence digests, and expiry required by that policy.
+
+For `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`:
+
+```text
+G0 -> G1 -> G2 -> G3
+-> resolve exact-head standing G4
+-> auto/* -> pre-prod merge when standing G4 is valid
+-> exact merge-SHA G5 verification
+-> pre-prod -> main requires Human G4
+```
+
+A valid standing G4 for `auto/* -> pre-prod` must not be replaced by a redundant
+Human G4 request. A missing, stale, drifted, or invalid autonomous authority
+fails closed under the autonomous policy; generic Human G4 must not be used as a
+silent repair for the same autonomous child action. Autonomous standing
+authority never authorizes merge or promotion to `main`.
 
 ## End-to-end workflow
 
@@ -24,23 +58,24 @@ When `DELIVER_E2E_PR` is active, the agent must execute this workflow:
 
 ```text
 Policy boot
-→ Read-only inspection
-→ Proposal and visual package
-→ Exact scoped approval
-→ Dedicated branch/worktree
-→ Implementation
-→ Local validation
-→ Full diff review
-→ Push approved branch
-→ Create or update Draft PR
-→ Run independent read-only review
-→ Monitor CI
-→ Repair repository-fixable CI failures
-→ Re-review the exact repaired head SHA
-→ Close review evidence
-→ Mark Draft PR ready for review when supported and G3 evidence passes
-→ Deliver final PR report
-→ STOP
+-> Read-only inspection
+-> Proposal and visual package
+-> Exact scoped G2 authority
+-> Dedicated branch/worktree
+-> Implementation
+-> Local validation
+-> Full diff review
+-> Push approved branch
+-> Create or update Draft PR
+-> Run independent read-only review
+-> Monitor CI
+-> Repair repository-fixable CI failures
+-> Re-review the exact repaired head SHA
+-> Close review evidence
+-> Mark Draft PR ready for review when supported and G3 evidence passes
+-> Resolve active route and G4 authority source
+-> Generic E2E route: deliver final PR report and STOP
+-> Route-specific continuation: execute only actions separately authorized by the canonical route
 ```
 
 ## Single approval envelope
@@ -67,6 +102,10 @@ excluded_actions:
   - destructive_migration
 ```
 
+The G2 exclusions above mean that the G2/E2E envelope itself does not authorize
+merge. They do not invalidate a later, separately validated G4 authority source
+selected by the canonical route.
+
 The exact approval format remains:
 
 `APPROVE <approval_id> <first-16-characters-of-scope_hash>`
@@ -92,7 +131,9 @@ The approval envelope must bind the work to:
 - Expiry time.
 - Canonical scope hash.
 
-The agent must not begin implementation until the exact token is received.
+The agent must not begin implementation until the exact G2 authority is valid.
+That authority may be the generic Human token or a canonical route-specific
+derived G2 decision when the route explicitly defines one.
 
 ## Task-scoped gate artifact enforcement
 
@@ -102,20 +143,22 @@ applicable artifact before each write-capable action:
 
 - G2: g2/execution-envelope.yaml
 - G3: g3/delivery-record.yaml
-- G4: g4/merge-approval.yaml
+- G4: g4/merge-approval.yaml or the canonical route-specific G4 authority/receipt required by the active route
 - G5: g5/deployment-approval.yaml for manual deployment scope
 - G6: g6/production-approval.yaml for production-operation scope
 
-Each artifact must bind to the task ID, repository, protected-base SHA, working
-branch, risk class, and scope hash. Missing, invalid, stale, or cross-task
-evidence fails closed. Conditional G4/G5/G6 artifacts are omitted only when the
-gate is explicitly recorded as not_applicable.
+Each artifact/decision must bind to the task ID, repository, protected-base SHA,
+working branch, risk class, scope hash, and exact action as required by its
+contract. Missing, invalid, stale, or cross-task evidence fails closed.
+Conditional G4/G5/G6 artifacts are omitted only when the gate is explicitly
+recorded as not_applicable or the canonical route uses a different validated
+authority evidence type for that exact gate/action.
 
 ## Autonomous execution boundary
 
-After valid approval, the agent may proceed without requesting confirmation for every normal implementation step, provided all actions remain within the approved envelope.
+After valid G2 authority, the agent may proceed without requesting confirmation for every normal implementation step, provided all actions remain within the approved envelope.
 
-Allowed autonomous actions:
+Allowed autonomous actions inside the G2/E2E boundary:
 
 - Create the approved dedicated branch or worktree.
 - Modify only approved files or modules.
@@ -132,11 +175,16 @@ Allowed autonomous actions:
 - Push repaired commits.
 - Repeat the bounded CI loop.
 
+After G3, only actions authorized by the separately resolved canonical route/gate
+authority may continue. For the autonomous pre-prod route, merge is not an E2E
+G2 action; it is a separate G4 action authorized only by a valid exact-head
+standing G4 receipt.
+
 The agent must provide concise progress updates but does not need additional approval for each permitted action.
 
 ## Mandatory stop conditions
 
-The agent must stop and request a new approval envelope when any of the following occurs:
+The agent must stop and request/re-resolve authority when any of the following occurs:
 
 - Protected-base drift is evaluated before continuation. `SAFE_CONTINUE` does
   not require a new envelope when changed files are unrelated to the approved
@@ -153,11 +201,14 @@ The agent must stop and request a new approval envelope when any of the followin
 - Production-data access or mutation becomes necessary.
 - The fix requires touching an excluded component.
 - Visual artifacts no longer represent the implementation scope.
-- The approval expires.
+- The approval or route authority expires.
 - The CI repair budget is exhausted.
 - The repository identity or active profile becomes inconsistent.
+- Canonical route, parent authority, standing G4, target, head SHA, or route evidence drifts.
 
-The agent must produce a scope delta, regenerate the approval artifacts, and request a new exact approval token.
+The agent must produce a scope delta and regenerate/re-resolve the authority
+evidence required by the active route. It must not downgrade a failed autonomous
+standing-authority check into a generic Human G4 child merge.
 
 ## Branch and commit rules
 
@@ -169,10 +220,14 @@ The agent must:
 - Never rewrite shared history.
 - Never delete branches.
 - Never change the PR base.
-- Never enable auto-merge.
+- Never enable auto-merge merely from E2E/G2 authority.
 - Verify repository, branch, expected head SHA, and target file state before every write.
 - Keep commits bounded to the approved task.
 - Exclude unrelated cleanup, dependency upgrades, formatting sweeps, and opportunistic refactors.
+
+A later G4 merge action is evaluated separately. A canonical autonomous standing
+G4 may authorize only the exact `auto/* -> pre-prod` merge defined by its policy;
+these branch rules do not grant that authority themselves.
 
 ## Validation requirements
 
@@ -199,7 +254,8 @@ A failed or skipped validation must be reported honestly.
 The agent must create a Draft PR containing:
 
 - Objective.
-- Approval ID and scope-hash prefix.
+- Approval/authority ID and scope-hash prefix when applicable.
+- Active route when route-specific continuation is applicable.
 - Base SHA and current PR head SHA.
 - Approved scope.
 - Files and modules changed.
@@ -211,7 +267,9 @@ The agent must create a Draft PR containing:
 - Known risks.
 - Rollback approach.
 - Explicit exclusions.
-- Statement that merge, deployment, and production operations are not authorized.
+- Statement of the authority boundary: E2E/G2 does not itself authorize merge,
+  deployment, or production operations; any later action requires its separately
+  resolved gate/route authority.
 
 ## Independent review
 
@@ -236,7 +294,7 @@ Finding policy:
 - `MINOR` findings must be resolved or deferred to a traceable follow-up;
 - `NIT` findings are non-blocking but remain recorded.
 
-A G3 review decision does not authorize merge. After G3 `PASS`, the agent may mark the Draft PR ready for review when a supported connector action exists and the latest head SHA, CI, review closure, G3 evidence, and scope checks are valid. G4 remains a separate human decision for the exact PR head SHA. If the PR later enters G4, it must be ready for review before a merge-ready G4 approval request is issued or a merge connector is invoked; Draft PR state is a G4 blocker.
+A G3 review decision does not authorize merge. After G3 `PASS`, the agent may mark the Draft PR ready for review when a supported connector action exists and the latest head SHA, CI, review closure, G3 evidence, and scope checks are valid. G4 remains a separate authority decision for the exact PR head SHA. Human G4 is the default authority source; a canonical route-specific policy may supply a bounded standing G4 for the exact target/action. If the PR later enters G4, it must be ready for review before a merge connector is invoked; Draft PR state is a G4 blocker.
 
 ## CI monitoring
 
@@ -265,7 +323,7 @@ For a ChatGPT chat connector thread sleep:
 
 - Record the repository, PR number, expected head SHA when available, allowed actions, excluded actions, and a two-minute wake time.
 - Sleep the current thread for exactly two minutes; do not create a scheduler task or automation.
-- On wake, check and report status only unless a separate active approval covers repository mutation.
+- On wake, check and report status only unless a separate active approval/route authority covers repository mutation.
 - If the runtime cannot sleep and wake the current thread, record a manual checkpoint rather than create a scheduler task or automation.
 
 For other platform schedulers:
@@ -273,7 +331,7 @@ For other platform schedulers:
 - The task prompt must include repository, PR number, expected head SHA when available, allowed actions, excluded actions, and the next check time.
 - The task is not active unless a concrete next run is visible or recorded.
 - If the UI or scheduler reports no next run, including `Chưa lên lịch`, treat the task as not scheduled and use another legal mechanism or a manual checkpoint.
-- A scheduled CI task may check and report status only unless a separate active approval covers repository mutation.
+- A scheduled CI task may check and report status only unless a separate active approval/route authority covers repository mutation.
 
 For repository-fixable failures:
 
@@ -294,7 +352,7 @@ After the repair budget is exhausted, stop and report the blocker.
 
 ## Completion condition
 
-The task is complete only when:
+For the generic E2E Draft-PR route, the task is complete at the delivery boundary only when:
 
 - The Draft PR exists.
 - PR head SHA matches the latest pushed commit.
@@ -306,17 +364,33 @@ The task is complete only when:
 - Applicable review lanes and acceptance criteria have evidence.
 - Documentation is current.
 - No material scope drift occurred.
-- No excluded authority was exercised.
+- No excluded E2E/G2 authority was exercised.
+
+For a canonical route that continues beyond G3, this generic Draft-PR completion
+condition is an intermediate delivery boundary, not a forced workflow STOP. The
+route continues only under separately validated later-gate authority.
 
 ## Post-E2E G4/G5/G6 scoping
 
-This E2E rule stops at a validated Draft PR. If the user later approves G4 and
-the PR is merged, G5 is interpreted as status/deployment verification unless a
-manual deploy, redeploy, release, or runtime reload is explicitly in scope.
+Generic E2E stops at a validated Draft PR. A canonical route may override only
+that stop/authority-source behavior for actions explicitly defined by the route;
+it does not make E2E itself a merge authority.
+
+For `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`, after G3 `PASS` the runtime resolves
+the exact-head standing G4 defined by
+`core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md`. When valid, the child PR may
+be merged only from its approved `auto/*` branch to `pre-prod`, followed by
+exact merge-SHA G5 readback. Human G4 remains mandatory for `pre-prod -> main`.
+No autonomous route decision may mark a promotion PR to `main` ready or merge it
+to `main` unless a separate policy explicitly changes that invariant.
+
+For generic E2E, if the user later provides the required Human G4 and the PR is
+merged, G5 is interpreted as status/deployment verification unless a manual
+deploy, redeploy, release, or runtime reload is explicitly in scope.
 When Vercel or another deployment provider is integrated into GitHub Actions,
-Read-only `G5_STATUS_VERIFY` runs automatically after G4 merge and checks those
+read-only `G5_STATUS_VERIFY` runs automatically after G4 merge and checks those
 workflow/deployment statuses for the exact approved commit. G5 must first attempt
-exact post-merge lookup using `event=push`, `branch=main`, and
+exact post-merge lookup using `event=push`, the actual target branch, and
 `head_sha=<merge_sha>` or equivalent connector parameters, and must fall back to
 known `run_id` and direct jobs/artifacts lookup when the connector surface does
 not support those filters or returns empty results. Empty PR-filtered results
@@ -324,8 +398,8 @@ without run-id/artifact fallback evidence must be classified
 `CONNECTOR_OBSERVABILITY_INCOMPLETE`, not `CI_PENDING`. G5 checks those
 workflow/deployment statuses as read-only evidence and does not perform a
 separate deploy action. When a human confirms post-merge CI success from the
-GitHub UI because the connector cannot query push/main Actions, the agent may
-record `HUMAN_OBSERVED_CI_SUCCESS` with `connector_status:
+GitHub UI because the connector cannot query the required Actions run, the agent
+may record `HUMAN_OBSERVED_CI_SUCCESS` with `connector_status:
 CONNECTOR_OBSERVABILITY_INCOMPLETE`; this is accepted G5 status evidence, not
 connector-confirmed `PASS`, and the limitation must remain visible in the final
 report. G5 approval is required only for manual deploy, redeploy, release,
@@ -344,7 +418,7 @@ Jira through the Atlassian connector declared by the project profile.
 The projection is traceability only. Jira, DS Admin, task-center, Confluence, or
 any external tool state never grants repository write, PR, merge, deploy,
 release, production, credential, secret, migration, or production-data authority.
-GWC gate artifacts and exact approvals remain the authority source.
+GWC gate artifacts and exact validated route/gate authority remain the authority source.
 
 The projection must attempt, in order:
 
@@ -352,8 +426,8 @@ The projection must attempt, in order:
    merge SHA, G5 run or deployment evidence, gate outcomes, explicit exclusions,
    and, when applicable, `evidence_source: human_observed_github_ui`,
    `connector_status: CONNECTOR_OBSERVABILITY_INCOMPLETE`, required workflow
-   names, and the explicit limitation that the connector could not query
-   push/main Actions runs.
+   names, and the explicit limitation that the connector could not query the
+   required Actions runs.
 2. Apply the legal provider transition that matches the final state, such as
    `Done` when the scope is complete, `In Review` when project review remains,
    or `In Progress` when downstream authorized work remains.
@@ -369,7 +443,7 @@ invent, or silently skip task-state evidence.
 
 ## Final response
 
-The final response must lead with:
+For the generic E2E Draft-PR route, the final response must lead with:
 
 ```text
 E2E PR DELIVERY COMPLETE
@@ -381,7 +455,8 @@ Then report:
 - Repository.
 - Branch.
 - Draft PR URL and number.
-- Approval ID and scope-hash prefix.
+- Approval/authority ID and scope-hash prefix.
+- Active route.
 - Base SHA.
 - Final head SHA.
 - Files changed.
@@ -394,22 +469,27 @@ Then report:
 - Residual risks.
 - Recommended user review focus.
 
-End with:
+Generic E2E ends with:
 
 `Not merged. Not deployed. No production-data operation performed.`
 
-After delivering the final report, stop and wait for the user to review the Pull Request.
+For a canonical route that separately authorizes continuation beyond G3, report
+the actual later-gate outcome instead of falsely asserting `Not merged`, and stop
+only at the route's next real authority boundary or terminal condition.
 
 ## Prohibited behavior
 
 Even in E2E mode, the agent must never:
 
-- Merge or enable auto-merge.
+- Treat E2E/G2 authority itself as merge or auto-merge authority.
+- Merge without a separately validated G4 authority source selected by the active canonical route.
+- Use autonomous standing G4 for any target other than the exact bounded `auto/* -> pre-prod` action it authorizes.
+- Autonomously merge or promote to `main`; `pre-prod -> main` remains Human G4 under `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`.
 - Manually deploy, redeploy, publish a release, or reload runtime without explicit G5 manual-action scope.
 - Modify production configuration.
 - Rotate credentials.
 - Run production migrations.
 - Read or write production data.
 - Expand scope silently.
-- Use stale CI evidence.
+- Use stale CI or route-authority evidence.
 - Claim success without matching evidence.
