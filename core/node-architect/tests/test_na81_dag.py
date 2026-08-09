@@ -1,4 +1,16 @@
-from core.node_architect.tools.na81_dag import Edge, compare_projection, normalize_jira_blocks, validate_graph
+import importlib.util
+from pathlib import Path
+
+MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "na81_dag.py"
+SPEC = importlib.util.spec_from_file_location("na81_dag", MODULE_PATH)
+assert SPEC and SPEC.loader
+na81_dag = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(na81_dag)
+
+Edge = na81_dag.Edge
+compare_projection = na81_dag.compare_projection
+normalize_jira_blocks = na81_dag.normalize_jira_blocks
+validate_graph = na81_dag.validate_graph
 
 
 def _blocks(*, outward=None, inward=None):
@@ -19,9 +31,7 @@ def test_scrum_313_regression_outward_is_predecessor():
 
 
 def test_inward_is_successor():
-    assert normalize_jira_blocks("SCRUM-311", [_blocks(inward="SCRUM-313")]) == {
-        Edge("SCRUM-311", "SCRUM-313")
-    }
+    assert normalize_jira_blocks("SCRUM-311", [_blocks(inward="SCRUM-313")]) == {Edge("SCRUM-311", "SCRUM-313")}
 
 
 def test_projection_drift_is_exact_set_difference():
