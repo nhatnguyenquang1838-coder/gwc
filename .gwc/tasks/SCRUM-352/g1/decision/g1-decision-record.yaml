@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-09T18:28:14Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-352
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g1_snapshot: ../../g1/brainstorming/g1-options.yaml
+decision:
+  selected_option_id: OPT-1
+  rationale: Pure standalone module preserves family structure, keeps loader behavior unit-testable, and matches the existing node registry contract.
+  rollback_path: Remove package_manifest_load.py and tests; no registry mutation outside new module.
+status: READY
+blockers: []

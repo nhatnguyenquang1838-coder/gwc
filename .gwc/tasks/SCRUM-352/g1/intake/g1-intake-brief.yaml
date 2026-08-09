@@ -1,0 +1,51 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-09T18:28:14Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-352
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The package_export package-manifest-load node (SCRUM-352) lacks a Python implementation, leaving a gap in the package export family contract.
+  why_now: The family validator and downstream entry-schema-validation node require a stable, digest-verified manifest load step before export.
+  desired_outcome: Implement a replay-safe package manifest loader with deterministic digest and tests.
+stakeholders:
+  requester: Hermes
+  affected:
+  - package_export family
+  - GWC autonomous pre-prod lane
+scope:
+  in_scope:
+  - Implement package_export.package-manifest-load pure evaluator
+  - Write branch / negative / drift / replay tests
+  - Add G0/G1 artifacts
+  - Push Draft PR base pre-prod
+  non_goals:
+  - Merge to main
+  - Deploy or release
+  - Production configuration or data access
+constraints:
+  - Preserve pre-prod as execution base
+  - No protected-branch direct push
+assumptions:
+  - origin/pre-prod is current and fetched
+  - package_manifest_load.py will follow the package_export family pure-evaluator contract
+risks:
+  - id: RISK-1
+    description: Loader interface may diverge from downstream entry-schema-validation expectations.
+    impact: low
+    mitigation: Reuse family conventions from export_failure_routing.py and validate against existing entry_schema_validation.py expectations.
+acceptance_criteria:
+  - id: AC-1
+    statement: package_manifest_load.py exists and exports load_manifest and authority_granted.
+    verifiable: true
+  - id: AC-2
+    statement: Tests covering branch, negative, drift, replay, and authority boundary pass.
+    verifiable: true
+  - id: AC-3
+    statement: Draft PR base pre-prod opens with CI PASS.
+    verifiable: true
+unresolved_questions: []
+status: READY

@@ -1,0 +1,32 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-09T18:28:14Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-352
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g0_snapshot: ../../g0/context-snapshot.yaml
+  g1_snapshot: ../../g1/intake/g1-intake-brief.yaml
+preflight:
+  repository:
+    - check: origin/pre-prod reachable
+      status: PASS
+      evidence: git fetch completed; HEAD at 7f1d26e
+    - check: worktree clean on base
+      status: PASS
+      evidence: isolated worktree created from origin/pre-prod with no uncommitted files beyond new artifacts
+  runtime:
+    - check: Python runtime available
+      status: PASS
+      evidence: system python3 resolves in worktree
+  authority:
+    - check: protected branches not targeted
+      status: PASS
+      evidence: branch target is pre-prod, main remains protected
+  connectors:
+    - check: GitHub connector available for push
+      status: PASS
+      evidence: gh authenticated and reachable
+status: READY
+blockers: []
