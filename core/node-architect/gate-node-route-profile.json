@@ -2,9 +2,9 @@
   "schema_version": "1.1",
   "artifact_type": "gate-node-route-profile",
   "profile_id": "gwc-gate-node-runtime-binding",
-  "revision": "scrum-263-20260802-r1",
+  "revision": "scrum-288-entry-schema-validation-20260809-r1",
   "bound_graph_revision": "scrum-104-20260726",
-  "bound_node_registry_revision": "scrum-104-20260726",
+  "bound_node_registry_revision": "scrum-288-entry-schema-validation-20260809-r1",
   "routes": [
     {
       "route_id": "g2-resolve-execution-node",
@@ -13,10 +13,20 @@
       "current_node": "gate_authority.gate-state-resolution",
       "node_descriptor_ref": "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json",
       "node_instruction_ref": "core/node-architect/node-instructions/gate_authority/gate-state-resolution.node-instruction.yaml",
-      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback"],
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback"
+      ],
       "minimum_maturity": "experimental",
       "allow_proposed_with_implementation": true,
-      "implementation": {"kind": "resolver", "ref": "tools/node_architect/resolve_gate_node_route.py:resolve_gate_node_route"},
+      "implementation": {
+        "kind": "resolver",
+        "ref": "tools/node_architect/resolve_gate_node_route.py:resolve_gate_node_route"
+      },
       "next_node": "repo_delivery.scoped-file-write",
       "next_action": "repository_write",
       "next_gate": null
@@ -28,10 +38,20 @@
       "current_node": "repo_delivery.scoped-file-write",
       "node_descriptor_ref": "core/node-architect/node-catalog/repo_delivery/scoped-file-write.node.json",
       "node_instruction_ref": "core/node-architect/node-instructions/repo_delivery/scoped-file-write.node-instruction.yaml",
-      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback"],
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback"
+      ],
       "minimum_maturity": "experimental",
       "allow_proposed_with_implementation": true,
-      "implementation": {"kind": "python", "ref": "tools/node_architect/scoped_file_write.py:decide_scoped_file_write"},
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/scoped_file_write.py:decide_scoped_file_write"
+      },
       "next_node": "repo_delivery.diff-readback",
       "next_action": "post_write_readback",
       "next_gate": null
@@ -43,10 +63,21 @@
       "current_node": "repo_delivery.diff-readback",
       "node_descriptor_ref": "core/node-architect/node-catalog/repo_delivery/diff-readback.node.json",
       "node_instruction_ref": "core/node-architect/node-instructions/repo_delivery/diff-readback.node-instruction.yaml",
-      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "write_result"],
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback",
+        "write_result"
+      ],
       "minimum_maturity": "experimental",
       "allow_proposed_with_implementation": true,
-      "implementation": {"kind": "connector", "ref": "GitHub.compare_commits"},
+      "implementation": {
+        "kind": "connector",
+        "ref": "GitHub.compare_commits"
+      },
       "next_node": "gate_authority.gate-transition-decision",
       "next_action": "resolve_gate_transition",
       "next_gate": null
@@ -58,12 +89,50 @@
       "current_node": "gate_authority.gate-transition-decision",
       "node_descriptor_ref": "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json",
       "node_instruction_ref": "core/node-architect/node-instructions/gate_authority/gate-transition-decision.node-instruction.yaml",
-      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "write_result", "diff_readback"],
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback",
+        "write_result",
+        "diff_readback"
+      ],
       "minimum_maturity": "experimental",
       "allow_proposed_with_implementation": true,
-      "implementation": {"kind": "resolver", "ref": "tools/node_architect/resolve_gate_node_route.py:resolve_gate_node_route"},
+      "implementation": {
+        "kind": "resolver",
+        "ref": "tools/node_architect/resolve_gate_node_route.py:resolve_gate_node_route"
+      },
       "next_node": null,
       "next_action": null,
+      "next_gate": "G3_PR"
+    },
+    {
+      "route_id": "g2-validate-entry-schema",
+      "gate": "G2_EXECUTION",
+      "requested_action": "validate_entry_schema",
+      "current_node": "package_export.entry-schema-validation",
+      "node_descriptor_ref": "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/package_export/entry-schema-validation.node-instruction.yaml",
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback",
+        "manifest_loaded"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/package_export/entry_schema_validation.py:validate_entries"
+      },
+      "next_node": "package_export.target-path-safety-check",
+      "next_action": "proceed_to_path_safety_check",
       "next_gate": "G3_PR"
     },
     {
@@ -73,10 +142,21 @@
       "current_node": "runtime_checkpoint.resume-token-generation",
       "node_descriptor_ref": "core/node-architect/node-catalog/runtime_checkpoint/resume-token-generation.node.json",
       "node_instruction_ref": "core/node-architect/node-instructions/runtime_checkpoint/resume-token-generation.node-instruction.yaml",
-      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "checkpoint"],
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback",
+        "checkpoint"
+      ],
       "minimum_maturity": "experimental",
       "allow_proposed_with_implementation": true,
-      "implementation": {"kind": "python", "ref": "tools/node_architect/generate_resume_token.py:generate_resume_token"},
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/generate_resume_token.py:generate_resume_token"
+      },
       "next_node": null,
       "next_action": "validate_resume_token",
       "next_gate": "G2_EXECUTION"
