@@ -31,14 +31,11 @@ A response that primarily explains governance, status, next action, blockers, or
 - Other agents must read their applicable instructions and capability
   declaration under `agents/`.
 - Select execution mode from verified capabilities, not agent product, name, or
-  conversation surface. A ChatGPT-style agent uses `local_agent` only when a
-  trusted full checkout with verified Git metadata/base SHA is available. When
-  repository connectors remain the repository source of truth, use
-  `chat_connector_only` even if `/mnt`, a filesystem, Python/shell command
-  execution, and protected-base validators are available.
-- Validator availability does not determine execution mode. `chat_connector_only`
-  MAY materialize connector-fetched content into an isolated workspace and run
-  validators there without becoming `local_agent`.
+  conversation surface. A ChatGPT-style agent with a trusted checkout, shell,
+  filesystem, Git, isolated worktree support, and validator runner uses
+  `local_agent`; without a trusted checkout it uses `chat_connector_only`, even
+  when `/mnt`, a command runner, and GWC validator execution are available.
+- Validator availability does not determine execution mode.
 - Connector availability determines the verified connector route. It does not
   change execution mode when a trusted local checkout is already available.
 
@@ -161,64 +158,34 @@ The agent must declare exactly one execution mode before gate reporting.
 
 ### `chat_connector_only`
 
-Use this mode when repository connectors are the source of truth and no trusted
-full repository checkout with verified Git metadata/base SHA is available.
-Absence of a trusted checkout does NOT imply absence of local preparation or
-validator capability.
-
-Treat these capabilities independently:
-
-```text
-repository_read_capability
-local_materialization_capability
-validator_execution_capability
-repository_write_connector_capability
-```
-
-A connector that returns exact file content/text/blob data plus a writable
-isolated filesystem is sufficient for materialization. A connector does not need
-to mount a repository file object. When a command runner is also available, the
-agent MUST fetch the exact protected-base validator/schemas/sources, materialize
-them under the task workspace, and run the validator before declaring validator
-unavailability.
+Use this mode when the agent can read repositories and call connectors but has
+no trusted local repository checkout. A missing trusted checkout does not imply
+that `/mnt`, a command runner, or GWC validator execution is unavailable.
 
 Allowed:
 
 - read repository, task, PR, CI, and governance context;
-- materialize exact connector-fetched content into an isolated `/mnt` workspace;
-- run protected-base validators against that materialized workspace when a
-  command runner exists;
-- produce and validate formal G0/G1/G2 preparation artifacts locally;
-- after valid gate artifacts/validator evidence and exact applicable authority,
-  use an authorized repository write connector for guarded-branch creation,
-  scoped file mutation, commit/push-equivalent writes, and later Draft PR actions
-  at their required gates;
-- draft a proposed patch plan or PR body.
+- produce a conversation-local G0/G1 gate packet;
+- materialize exact connector-fetched content into an isolated workspace when a
+  writable filesystem is available;
+- run protected-base validators against materialized task artifacts when a
+  command runner is available;
+- identify missing artifacts, validators, and blockers;
+- draft a proposed patch plan or PR body;
+- create repository changes through an authorized repository write connector
+  when valid gate artifacts, validator evidence, scope, claim, and exact
+  authority exist.
 
 Not allowed:
 
 - claim `G1_ALIGNMENT: PASS` without validator evidence;
-- treat `/mnt` as repository source of truth when it is not a verified checkout;
 - create a branch or mutate repository files merely from chat reasoning;
-- perform a repository connector write before the matching gate artifacts,
-  validation, scope, claim, and authority are valid;
-- backfill G0/G1 authority after product/code writes.
+- backfill G0/G1 artifacts after connector writes.
 
-For connector-only execution, canonical ordering is:
-
-```text
-CONNECTOR READBACK + EXACT SHA
-→ LOCAL/MNT MATERIALIZATION
-→ G0/G1 VALIDATION
-→ EXACT G2 OR ROUTE-SPECIFIC STANDING AUTHORITY
-→ GUARDED BRANCH
-→ PERSIST/VERIFY REQUIRED GATE BUNDLE WHEN APPLICABLE
-→ SCOPED REPOSITORY WRITES
-```
-
-If validator execution is genuinely unavailable only after exact-source recovery
-has been attempted and no trusted external evidence exists, report a preparation
-blocker. Do not use `chat_connector_only` itself as the blocker reason.
+If validator evidence is unavailable, first attempt exact-source recovery and
+materialized validation when connector reads, writable isolated storage, and a
+command runner are available. Only after that recovery is impossible may the
+agent report validator unavailability.
 
 ### `local_agent`
 
@@ -239,29 +206,36 @@ gate artifacts and repository policy after a branch or PR exists. CI is a second
 boundary; CI success does not retroactively authorize pre-write actions and does
 not grant merge, deployment, or production authority.
 
-## Route-specific authority precedence
+## Chat connector capability and route precedence
 
-Generic gate language defines the default authority path. A canonical
-route-specific policy MAY replace a generic human approval step with bounded
-standing/derived authority only for the exact action, repository, base, branch,
-scope, risk, target, head SHA, evidence and expiry that policy validates.
-
-For `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`:
+In `chat_connector_only`, resolve these capabilities independently rather than
+collapsing them into the execution-mode label:
 
 ```text
-DAG READY
-→ trusted/current parent run authority
-→ AUTHORIZED_READY
-→ derived child G2 for exact auto/* task scope
-→ exact-head standing G4 for auto/* → pre-prod
-→ Human G4 for pre-prod → main promotion
+repository_read_capability
+local_materialization_capability
+validator_execution_capability
+repository_write_connector_capability
 ```
 
-The route-specific execution base `pre-prod` overrides a generic default-branch
-assumption for autonomous child execution. `main` remains governance/release and
-promotion context. Generic prose MUST NOT cause an agent to ask for Human G2 or
-Human G4 for a normal allowlisted `auto/* → pre-prod` child action when current
-trusted standing authority already satisfies the canonical autonomous policy.
+Connector content/text/blob plus writable isolated storage is sufficient for
+materialization; a mounted connector file is not required. Missing one
+capability blocks only actions that require that capability.
+
+After trusted G0/G1 validation and exact applicable G2 authority, an authorized
+GitHub/repository connector may create the guarded branch and perform scoped
+repository writes. Local Git remains non-authoritative and is not required for
+that connector action.
+
+Generic gate wording defines the default authority path. Canonical
+route-specific authority supplies the gate authority source when it validates
+the exact action and bindings. For
+`AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`, a trusted/current parent authority plus a
+valid derived child G2 satisfies bounded `auto/*` child execution, and a valid
+exact-head standing G4 satisfies the bounded `auto/* → pre-prod` child merge.
+Do not request redundant Human G2/G4 for those exact authorized child actions.
+The route-specific execution base is `pre-prod`, even though the repository
+default branch is `main`. Human G4 remains mandatory for `pre-prod → main`.
 Standing authority never authorizes merge to `main`.
 
 ## Mandatory gate sequence
@@ -312,10 +286,11 @@ A conversational agreement, a user request such as “apply fix”, or an agent'
 own recommendation does not replace a G1 `PASS`.
 
 **Proactive transition:** Upon G1 `PASS`, the agent must immediately generate
-the G2 execution envelope and present the approval command to the user unless a
-canonical route-specific trusted standing/derived authority source already
-satisfies that exact G2 action. The agent must not manufacture or request a
-redundant Human G2 token when standing authority is already valid.
+the G2 execution envelope and present the approval command to the user. The
+agent must not wait for the user to ask for the next step. When canonical
+route-specific trusted standing/derived authority already satisfies the exact
+G2 action, resolve and use that authority instead of requesting a redundant
+Human G2 token.
 
 ### G2_EXECUTION — guarded branch only
 
@@ -323,19 +298,19 @@ G2 requires:
 
 - G0 `READY`;
 - G1 validator `PASS`;
-- a valid task-scoped execution/approval envelope or canonical route-specific
-  derived G2 decision backed by trusted current authority;
+- a valid task-scoped execution/approval envelope or a canonical route-specific
+  derived G2 authority decision;
 - repository, base SHA, working branch, scope hash, risk, file/module scope, and
   authorized actions matching the intended connector call;
 - a valid work-item claim when the profile requires one.
 
-Only actions explicitly listed in the active envelope/derived authority are
-allowed. G2 never allows protected-branch writes, merge, deployment, release,
-credential changes, production configuration, or production-data operations.
+Only actions explicitly listed in the active envelope/authority are allowed. G2
+never allows protected-branch writes, merge, deployment, release, credential
+changes, production configuration, or production-data operations.
 
 **Proactive transition:** Upon G2 exit, the agent must immediately generate the
-G3 delivery record and present the approval command to the user when a human
-approval is actually required by the active route.
+G3 delivery record and present the approval command to the user when human
+authority is required by the active route.
 
 ### G3_PR — Draft PR only
 
@@ -343,27 +318,25 @@ G3 requires completed G2 evidence, applicable validation, complete diff review,
 no scope drift, and a delivery record for the exact head SHA. G3 may create or
 update a Draft Pull Request only.
 
-**Proactive transition:** Upon G3 `PASS`, the agent must resolve the active
-route's G4 authority source. Generate a Human G4 request only when the route
-requires Human G4 for that exact target/action. A trusted standing G4 for an
-autonomous child `auto/* → pre-prod` action is not replaced by a redundant human
-request.
+**Proactive transition:** Upon G3 `PASS`, resolve the active route's G4 authority
+source. Generate a Human G4 request only when the route requires human authority
+for that exact target/action. A valid standing G4 for bounded `auto/* → pre-prod`
+is not replaced by a redundant human request.
 
 ### G4_MERGE, G5_DEPLOY, G6_PRODUCTION_DATA
 
-These are separate authority gates. Human authority is the default unless a
-canonical route-specific policy explicitly defines and validates a bounded
-standing authority source for the exact action. Approval/authority for one gate
-never grants another gate. Human G4 remains mandatory for every merge/promotion
-to `main`.
+These are separate authority gates. Human authority is the default; a canonical
+route-specific policy may supply bounded standing authority for an exact action.
+Authority for one gate never grants another gate. Human G4 remains mandatory for
+merge/promotion to `main`.
 
 G4 requires the Pull Request to be ready for review before the agent issues a
-merge-ready Human G4 approval request or invokes a merge connector. A Draft PR
-is a G4 blocker at merge time. After G3 `PASS`, the agent may automatically mark
-the Draft PR ready for review when a connector action exists and the latest head
-SHA, required CI, review closure, G3 evidence, and scope-drift checks are
-satisfied. This ready-for-review transition is G3 metadata completion; it is not
-G4 approval and never authorizes merge.
+merge-ready G4 approval request or invokes a merge connector. A Draft PR is a
+G4 blocker at merge time. After G3 `PASS`, the agent may automatically mark the
+Draft PR ready for review when a connector action exists and the latest head SHA,
+required CI, review closure, G3 evidence, and scope-drift checks are satisfied.
+This ready-for-review transition is G3 metadata completion; it is not G4 approval
+and never authorizes merge.
 
 G5 is a status/deployment verification gate. Read-only `G5_STATUS_VERIFY` runs
 automatically after G4 merge for the approved commit. It may check post-merge
@@ -418,8 +391,8 @@ backfill artifacts.
 When a platform cannot technically execute the validator after exact-source
 materialization/recovery attempts, the agent remains in verified read-only mode
 unless trusted external validator evidence is already available. Tool
-availability never grants authority; conversely, lack of a trusted checkout does
-not revoke a separately available authorized repository write connector.
+availability never grants authority; lack of a trusted checkout does not revoke
+a separately available authorized repository write connector.
 
 ## Required user-visible gate reporting
 
