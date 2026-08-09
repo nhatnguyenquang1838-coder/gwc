@@ -11,5 +11,10 @@ paths_read:
 scope_consistency: MATCH
 repository_state: MATCH
 status: VERIFIED
-read_at_utc: '2026-08-09T17:18:16Z'
+approval_id: APPROVE_G2_SCRUM-302_20260810
+approval_command: 'APPROVE G2 APPROVE_G2_SCRUM-302_20260810 4310af5588b3e135 2026-08-10T18:07:54Z'
+scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+scope_hash_16: 4310af5588b3e135
+approval_command_match: true
+read_at_utc: '2026-08-09T18:11:30Z'
 read_by: Codex-GPT

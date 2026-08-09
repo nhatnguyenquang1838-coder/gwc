@@ -1,0 +1,153 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-302
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: pre-prod
+base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+working_branch: codex/scrum-302-risk-classification-20260810-r2
+pull_request:
+  number: 354
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/354
+  draft: true
+head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+changed_paths:
+  - tools/node_architect/risk_classification.py
+  - schemas/risk-classification.schema.json
+  - tools/node_architect/validate_node_catalog_intake_context.py
+  - tests/test_intake_context_risk_classification.py
+  - .gwc/tasks/SCRUM-302/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-302/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-302/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-302/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-302/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-302/g1/plan/requirements.md
+  - .gwc/tasks/SCRUM-302/g1/plan/design.md
+  - .gwc/tasks/SCRUM-302/g1/plan/tasks.md
+  - .gwc/tasks/SCRUM-302/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-302/g2/plan-read-receipt.yaml
+  - .gwc/tasks/SCRUM-302/g3/delivery-record.yaml
+validation:
+  head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+  status: pass
+  commands:
+    - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-302 --gate G2_EXECUTION --json
+      result: pass
+      evidence: G2 envelope schema and G0/G1 bindings passed before execution.
+    - command: python3 -m unittest tests.test_intake_context_risk_classification -q
+      result: pass
+      evidence: Focused risk-classification tests passed 9/9.
+    - command: python3 tools/node_architect/validate_node_catalog_intake_context.py
+      result: pass
+      evidence: Intake-context catalog binding validator passed.
+    - command: git diff --check
+      result: pass
+      evidence: Existing implementation diff had no whitespace errors.
+review:
+  implementer_id: Codex-GPT
+  reviewer_id: g3-independent-readonly-reviewer
+  independence: independent
+  mode: read-only
+  reviewed_head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+  reviewed_scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+  reviewed_at: "2026-08-09T18:11:30Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - SCRUM-302 acceptance criteria are represented by the typed risk contract and fail-closed cases.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Implementation preserves policy provenance, deterministic classification and later-gate exclusion.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Exact pre-reconciliation head contains only the approved implementation and task artifacts.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Focused and related intake-context validation evidence is recorded above.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G0/G1 PASS and exact G2 approval are bound to the protected pre-prod base and bounded reconciliation scope.
+    - name: delivery
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - G2 reconciliation will add this record and change the PR head; exact-head delivery review must be refreshed afterward.
+    - name: ci
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - Existing exact-head CI evidence must be rerun/read back after the reconciliation commit.
+  findings:
+    - id: REV-1
+      severity: BLOCKER
+      category: delivery
+      status: open
+      evidence: This G3 record is prepared against the pre-reconciliation head; committing it changes the PR head.
+      recommendation: Refresh the delivery record, independent review and exact-head CI evidence after the G2 reconciliation push.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Typed deterministic risk classification implementation is present at the reviewed head.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Missing, unknown, malformed, stale and conflicting evidence paths fail closed.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Policy provenance and digest are emitted by the implementation.
+    - id: AC-4
+      result: not_verified
+      evidence:
+        - Final exact-head verification is deferred until after the reconciliation commit.
+    - id: AC-5
+      result: not_verified
+      evidence:
+        - Final PR/CI evidence is deferred until after the reconciliation commit.
+  decision: blocked
+  stale: true
+ci:
+  required: true
+  head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+  checks:
+    - name: Cross-platform LF and SHA parity
+      required: true
+      status: pass
+      evidence: GitHub Actions run 31326878275 succeeded for the reviewed head.
+    - name: Validate instructions
+      required: true
+      status: pass
+      evidence: GitHub Actions run 31326878232 succeeded for the reviewed head.
+    - name: Autonomous pre-prod runtime evidence
+      required: true
+      status: pass
+      evidence: GitHub Actions run 31326878253 succeeded for the reviewed head.
+    - name: Build instruction packages
+      required: true
+      status: pass
+      evidence: GitHub Actions run 31326878241 succeeded for the reviewed head.
+    - name: G4 G5 evidence
+      required: false
+      status: fail
+      evidence: Run 31326878233 stopped at g4-receipt-required because the PR is Draft; this is not G2 authority.
+residual_risks:
+  - G3 exact-head review and CI evidence are stale after the upcoming reconciliation commit.
+  - PR #354 remains Draft and no Ready-for-review, G4, merge, G5 or G6 action is authorized.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - JIRA_STATUS_TRANSITION
+outcome: inconclusive
