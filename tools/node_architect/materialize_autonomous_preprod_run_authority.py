@@ -4,13 +4,19 @@
 This module is pure and fail-closed. It does not grant authority and does not
 perform GitHub/Jira writes. Live adapters must read the authority projection
 from trusted GitHub evidence and pass the observed bot identity explicitly.
+
+The parent manifest binds an immutable anchor base. Later pre-prod bases are
+accepted only through a trusted same-run descendant lineage proven by exact-SHA
+merge/G5 evidence for allowlisted tasks.
 """
 from __future__ import annotations
 
 import hashlib
 import json
 from datetime import datetime, timezone
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
+
+from tools.node_architect.materialize_autonomous_preprod_base_lineage import validate_base_lineage
 
 TRUSTED_BOT = "github-actions[bot]"
 RECEIPT_MARKER = "gwc:autonomous-preprod-run-authority-receipt"
@@ -39,9 +45,10 @@ def validate_parent_run_authority(
     expected_repository: str,
     expected_task_id: str,
     expected_base_sha: str,
+    base_lineage_steps: Sequence[Mapping[str, Any]] = (),
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Return AUTHORIZED_READY only for a current trusted receipt + allowlisted task."""
+    """Return AUTHORIZED_READY only for current parent authority and trusted base lineage."""
     now = now or datetime.now(timezone.utc)
     reasons: list[str] = []
     if not isinstance(manifest, Mapping):
@@ -62,8 +69,6 @@ def validate_parent_run_authority(
         reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID")
     if manifest.get("target_branch") != "pre-prod" or manifest.get("approved_base_ref") != "pre-prod":
         reasons.append("AUTONOMOUS_PREPROD_TARGET_REQUIRED")
-    if manifest.get("approved_base_sha") != expected_base_sha:
-        reasons.append("AUTONOMOUS_BASE_SHA_MISMATCH")
     if manifest.get("policy_id") != POLICY_ID or receipt.get("approved_policy_id") != POLICY_ID:
         reasons.append("AUTONOMOUS_POLICY_INVALID")
     if receipt.get("approved_run_id") != manifest.get("run_id"):
@@ -100,12 +105,31 @@ def validate_parent_run_authority(
     if expected_task_id not in allowed:
         reasons.append("AUTONOMOUS_TASK_NOT_ALLOWLISTED")
 
-    return _result(reasons, manifest=manifest, receipt=receipt, task_id=expected_task_id)
+    anchor = str(manifest.get("approved_base_sha") or "")
+    lineage = validate_base_lineage(
+        run_id=str(manifest.get("run_id") or ""),
+        repository=expected_repository,
+        anchor_base_sha=anchor,
+        current_base_sha=expected_base_sha,
+        allowed_task_ids=sorted(allowed),
+        steps=base_lineage_steps,
+    )
+    if lineage["outcome"] != "PASS":
+        reasons.extend(lineage["reason_codes"])
+
+    return _result(
+        reasons,
+        manifest=manifest,
+        receipt=receipt,
+        task_id=expected_task_id,
+        base_lineage_proof=lineage["proof"],
+    )
 
 
 def _result(
     reasons: list[str], *, manifest: Mapping[str, Any] | None = None,
     receipt: Mapping[str, Any] | None = None, task_id: str | None = None,
+    base_lineage_proof: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if reasons:
         return {
@@ -119,10 +143,11 @@ def _result(
     return {
         "outcome": "PASS",
         "state": "AUTHORIZED_READY",
-        "reason_codes": ["AUTONOMOUS_RUN_AUTHORITY_CURRENT"],
+        "reason_codes": ["AUTONOMOUS_RUN_AUTHORITY_CURRENT", "AUTONOMOUS_BASE_LINEAGE_TRUSTED"],
         "task_id": task_id,
         "run_id": manifest.get("run_id"),
         "parent_authority_digest": authority_digest,
+        "base_lineage_proof": dict(base_lineage_proof or {}),
         "standing_g4_valid": True,
     }
 
