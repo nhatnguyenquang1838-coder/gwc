@@ -52,6 +52,45 @@ def resolve_ready_nodes(tasks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
+def resolve_authorized_ready_nodes(*, dag: Mapping[str, Any], manifest: Mapping[str, Any] | None,
+                                   authority_valid: bool) -> dict[str, Any]:
+    """Gate DAG-ready tasks through trusted parent authority before any claim intent.
+
+    READY is only dependency eligibility. AUTHORIZED_READY additionally requires a
+    trusted/current run authority and explicit task membership in the manifest.
+    """
+    ready = [str(x) for x in dag.get("ready_task_ids", [])]
+    if not ready:
+        return {"outcome": "IDLE", "reason_code": "AUTONOMOUS_NO_READY_TASK"}
+    if not authority_valid or not isinstance(manifest, Mapping):
+        return {
+            "outcome": "PENDING",
+            "reason_code": "AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED",
+            "state": "READY_FOR_AUTHORITY",
+            "ready_task_ids": ready,
+        }
+    allowed_tasks = manifest.get("allowed_tasks", [])
+    allowlisted = {
+        str(item.get("task_id"))
+        for item in allowed_tasks
+        if isinstance(item, Mapping) and item.get("task_id")
+    }
+    authorized = [task_id for task_id in ready if task_id in allowlisted]
+    if not authorized:
+        return {
+            "outcome": "BLOCKED",
+            "reason_code": "AUTONOMOUS_TASK_NOT_ALLOWLISTED",
+            "state": "BLOCKED",
+            "ready_task_ids": ready,
+        }
+    return {
+        "outcome": "PASS",
+        "reason_code": "AUTONOMOUS_AUTHORIZED_READY",
+        "state": "AUTHORIZED_READY",
+        "ready_task_ids": authorized,
+    }
+
+
 def claim_task(*, task_id: str, ready_task_ids: Sequence[str], claimant: str, lease_id: str,
                existing_claim: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """Produce replay-safe atomic-claim intent; adapter must CAS this against Jira/GitHub."""
@@ -69,13 +108,13 @@ def claim_task(*, task_id: str, ready_task_ids: Sequence[str], claimant: str, le
 
 def validate_task_scope(*, task: Mapping[str, Any], manifest_task: Mapping[str, Any],
                         requested_paths: Sequence[str], immutable_authority_paths: Sequence[str]) -> dict[str, Any]:
-    """Allow control-plane implementation only when it cannot rewrite this run's authority plane."""
+    """Allow Node Architect implementation when it cannot rewrite this run's authority plane."""
     if task.get("task_id") != manifest_task.get("task_id"):
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_TASK_NOT_ALLOWLISTED"}
-    risk = str(task.get("risk", manifest_task.get("risk", "R3")))
+    risk = str(task.get("risk", manifest_task.get("risk", manifest_task.get("risk_class", "R3"))))
     if RISK_ORDER.get(risk, 99) > MAX_AUTONOMOUS_RISK:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_TASK_RISK_EXCEEDS_CEILING"}
-    allowed = set(str(p) for p in manifest_task.get("allowed_paths", []))
+    allowed = set(str(p) for p in manifest_task.get("allowed_paths", manifest_task.get("authorized_paths", [])))
     requested = [str(p) for p in requested_paths]
     if not requested or any(p not in allowed for p in requested):
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_SCOPE_DRIFT"}
@@ -100,13 +139,7 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
                             standing_g4_valid: bool,
                             managed_evidence_current: bool = False,
                             required_checks_terminal_success: bool = False) -> dict[str, Any]:
-    """Decide whether an exact-head child PR may merge autonomously to pre-prod.
-
-    A coarse CI summary is not sufficient. The adapter must separately prove that
-    all required checks are terminal-success and that the managed PR evidence is
-    current for the exact head. This prevents a connector-side merge from racing
-    or bypassing a failing G4/CI check.
-    """
+    """Decide whether an exact-head child PR may merge autonomously to pre-prod."""
     if target_branch == "main":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_CHILD_MAIN_TARGET_FORBIDDEN"}
     if target_branch != "pre-prod":
@@ -144,7 +177,6 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
 
 
 def next_runtime_action(*, dag: Mapping[str, Any], claims: Mapping[str, Mapping[str, Any]] | None = None) -> dict[str, Any]:
-    """Select the next unclaimed READY node deterministically; parallel adapters may shard externally."""
     claims = claims or {}
     for task_id in dag.get("ready_task_ids", []):
         if task_id not in claims:
@@ -153,24 +185,35 @@ def next_runtime_action(*, dag: Mapping[str, Any], claims: Mapping[str, Mapping[
 
 
 def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
-    """Map one observed autonomous state to exactly one next side-effect intent.
-
-    This is the scheduler/adapter boundary: the function never performs external writes.
-    The caller must execute the returned adapter_action, read back authoritative state,
-    and invoke the runtime again with the new exact evidence.
-    """
+    """Map one observed autonomous state to exactly one next side-effect intent."""
     phase = str(observation.get("phase", "DISCOVER")).upper()
     if phase == "DISCOVER":
         dag = resolve_ready_nodes(observation.get("tasks", []))
-        nxt = next_runtime_action(dag=dag, claims=observation.get("claims", {}))
+        authority = resolve_authorized_ready_nodes(
+            dag=dag,
+            manifest=observation.get("manifest"),
+            authority_valid=bool(observation.get("authority_valid")),
+        )
+        if authority.get("state") == "READY_FOR_AUTHORITY":
+            return {
+                **authority,
+                "adapter_action": "RESOLVE_RUN_AUTHORITY",
+                "dag": dag,
+            }
+        if authority.get("outcome") != "PASS":
+            return {**authority, "adapter_action": None, "dag": dag}
+        authorized_dag = {**dag, "ready_task_ids": authority["ready_task_ids"]}
+        nxt = next_runtime_action(dag=authorized_dag, claims=observation.get("claims", {}))
         if nxt.get("outcome") != "READY":
-            return {**nxt, "adapter_action": None, "dag": dag}
+            return {**nxt, "adapter_action": None, "dag": dag, "authority": authority}
         return {
             "outcome": "ALLOW",
-            "reason_code": "AUTONOMOUS_READY_TASK_SELECTED",
+            "reason_code": "AUTONOMOUS_AUTHORIZED_READY_TASK_SELECTED",
+            "state": "AUTHORIZED_READY",
             "task_id": nxt["task_id"],
             "adapter_action": "JIRA_GITHUB_CAS_CLAIM",
             "dag": dag,
+            "authority": authority,
         }
     if phase == "CLAIMED":
         return {
@@ -234,6 +277,6 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
 
 
 __all__ = [
-    "canonical_digest", "resolve_ready_nodes", "claim_task", "validate_task_scope",
+    "canonical_digest", "resolve_ready_nodes", "resolve_authorized_ready_nodes", "claim_task", "validate_task_scope",
     "child_delivery_decision", "next_runtime_action", "drive_closed_loop",
 ]

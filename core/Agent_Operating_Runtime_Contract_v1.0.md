@@ -48,7 +48,8 @@ this state `CHAT_ONLY_PREPARATION` and grant no execution authority.
 
 Formal G0/G1 artifacts, active-provider task creation or claim, and the exact G2
 approval command are required when the user explicitly requests transition
-to G2 or asks for a write-capable action.
+to G2 or asks for a write-capable action, except when a canonical route-specific
+standing/derived authority source already satisfies the exact G2 action.
 
 ## Intake Card
 
@@ -129,6 +130,83 @@ In ChatGPT `chat_connector_only` mode:
 - `/mnt/data` may be used for artifacts, reports, patch bundles, and fetched-file validation workspaces.
 - `/mnt/data` must not be treated as repository source of truth unless it contains a verified full checkout with Git metadata and expected base SHA.
 - Local `git clone`, `git pull`, `git checkout`, `git push`, branch, PR, merge, or CI commands in the container must not be used as authority.
+- A trusted checkout is NOT required to use an authorized repository write connector after the matching gate evidence, scope, claim, and authority have been validated.
+
+## Connector-runtime capability decomposition
+
+Execution mode and action capability are separate decisions. `chat_connector_only`
+means repository connectors remain source of truth; it does not mean the runtime
+is incapable of materialization, validation, or authorized connector writes.
+
+Resolve these capabilities independently:
+
+```text
+repository_read_capability
+local_materialization_capability
+validator_execution_capability
+repository_write_connector_capability
+```
+
+Rules:
+
+1. Connector file content/text/blob readback plus a writable isolated filesystem
+   is sufficient to materialize validation input. A mounted connector file is
+   not required.
+2. If connector reads, isolated filesystem, and a command runner are available,
+   the agent MUST fetch the exact protected-base validators/schemas/referenced
+   sources and run the validator before reporting validator unavailability.
+3. Absence of a trusted local checkout keeps the mode `chat_connector_only`; it
+   does not cancel independently available validator or repository-write
+   connector capabilities.
+4. After G0/G1 trusted validation and exact G2/route-specific authority, an
+   authorized GitHub/repository connector MAY create the guarded branch and
+   perform scoped writes. The connector action is the repository executor;
+   local Git is not required.
+5. Missing one capability blocks only actions that require that capability.
+   Do not collapse capability absence into a generic execution-mode blocker.
+
+Canonical connector-only ordering:
+
+```text
+EXACT CONNECTOR READBACK
+→ LOCAL/MNT MATERIALIZATION
+→ VALIDATOR EXECUTION
+→ EXACT G2 OR ROUTE-SPECIFIC STANDING AUTHORITY
+→ GUARDED REPOSITORY CONNECTOR WRITE
+→ EXACT READBACK / CI
+```
+
+## Route-specific authority precedence
+
+Generic gate prose defines the default authority route. A canonical
+route-specific policy can satisfy a gate with bounded standing/derived authority
+only for the exact action and bindings it validates. Route-specific authority
+does not bypass the gate; it supplies that gate's authority source.
+
+For `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`:
+
+```text
+DAG_SELECT
+→ AUTHORITY_RESOLVE
+→ AUTHORIZED_READY
+→ derived child G2
+→ auto/* child delivery to exact pre-prod
+→ exact-head standing G4 for auto/* → pre-prod
+→ Human G4 for pre-prod → main
+```
+
+Required semantics:
+
+- `pre-prod` is the autonomous child execution/integration base even when the
+  repository default branch is `main`.
+- `main` remains governance/release/promotion context for this route.
+- A valid trusted parent manifest/authority receipt plus valid derived child G2
+  replaces a redundant Human G2 request for that exact allowlisted child scope.
+- A valid standing exact-head G4 replaces a redundant Human G4 request only for
+  the bounded `auto/* → pre-prod` child merge.
+- Promotion/merge to `main` always requires Human G4.
+- If route-specific authority is missing, stale, untrusted, mismatched, or
+  expired, fail closed; do not silently infer authority from this contract.
 
 ## Context refresh trigger
 
@@ -160,7 +238,7 @@ Allowed next action:
 
 Humans do not invent gate tokens, artifact IDs, scope hashes, branches, file scope, or expiry.
 
-The agent must generate an approval request from current gate evidence and show the full context. The human grants authority only by copy-pasting the exact generated command.
+The agent must generate an approval request from current gate evidence and show the full context. The human grants authority only by copy-pasting the exact generated command when the active route requires human authority.
 
 Approval context must include:
 
@@ -190,23 +268,23 @@ The command must be placed in a standalone fenced `text` block. The agent must n
 
 ## Proactive approval generation on gate exit
 
-Upon completing any gate's exit criteria, the agent must immediately generate the
-approval request for the next gate without waiting for the user to ask. This
-proactive transition ensures no gate ends in a silent state and the user always
-has a clear, actionable next step.
+Upon completing any gate's exit criteria, the agent must immediately resolve the
+next gate's active authority source. Generate a human approval request only when
+the active route requires human authority for that exact next action.
 
 The agent must:
 
 1. Confirm the current gate's exit criteria are fully satisfied and validated.
-2. Generate the next gate's entry artifact (execution envelope, delivery record,
-   or approval record) using the current gate's evidence.
-3. Present the generated approval command in a standalone fenced text block.
-4. Wait for the user to execute the command before proceeding to the next gate.
+2. Resolve whether the next gate uses human authority or a canonical trusted
+   standing/derived authority source.
+3. Generate the next gate's entry artifact/decision using current evidence.
+4. If human authority is required, present the generated approval command in a
+   standalone fenced text block and wait for the user.
+5. If trusted standing/derived authority already satisfies the exact action,
+   continue without asking for a redundant human token.
 
-The user retains sole authority to grant or deny the next gate. The agent's
-proactive generation is a convenience mechanism, not a delegation of authority.
-The agent must not proceed to the next gate until the user executes the approval
-command.
+The agent must never manufacture standing authority. Missing or invalid standing
+authority fails closed at the same gate boundary.
 
 ## Acknowledgement-only phrases
 
@@ -243,10 +321,11 @@ Limitations:
 
 ## PR defaults
 
-Unless stricter project rules say otherwise:
+Unless stricter project or route-specific rules say otherwise:
 
 - create Draft PR only;
 - do not request reviewers automatically;
 - do not mark ready for review automatically;
-- do not merge or enable auto-merge without G4 authority;
-- CI success is evidence only, not authority.
+- do not merge or enable auto-merge without valid G4 authority from the active canonical authority source;
+- CI success is evidence only, not authority;
+- Human G4 is always required for merge/promotion to `main`.

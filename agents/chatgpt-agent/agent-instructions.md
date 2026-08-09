@@ -456,15 +456,23 @@ runtime output). Then:
 
 ### Post-approval readback (mandatory after a G4 approval comment)
 
-The G4 chain is not healthy until BOTH are read back and reported:
+A G4 chain is healthy only when the original human approval comment and a trusted
+`gwc:g4-authority-receipt` are both read back and bind the exact action. The
+receipt must come from the trusted GitHub Actions bot identity and bind the same
+approval ID, approved head SHA, scope hash, expiry, source comment, and authorized
+action.
 
-1. the `issue_comment` workflow run triggered by the approval comment — exact
-   run ID, status, conclusion;
-2. the trusted bot receipt `gwc:g4-authority-receipt` — trusted bot identity,
-   same approval ID, same approved head SHA, same scope hash.
+When the connector exposes the triggering `issue_comment` workflow-run listing,
+read and report its exact run ID, status, and conclusion as additional
+observability evidence. If that workflow-run listing is not exposed by the active
+connector, but the trusted receipt above is present and all bindings match,
+classify the limitation as `CONNECTOR_OBSERVABILITY_LIMITED`; this must not block
+an otherwise authorized merge.
 
-Either one missing -> `G4_RECEIPT_MISSING`; merge is not treated as authorized
-on the human comment alone.
+A missing receipt, untrusted receipt identity, expired receipt, source-comment
+mismatch, approval-ID mismatch, approved-head mismatch, scope mismatch, or action
+mismatch is `G4_RECEIPT_MISSING` and blocks merge. The original human comment
+alone never substitutes for the trusted receipt.
 
 ### Fail-closed recovery path
 
@@ -484,8 +492,10 @@ the merge SHA, a `source_digest` provenance binding, and an unexpired
 ### Exact-binding status reporting
 
 Final governed status for merge and recovery lanes binds every claim to exact
-SHAs and exact workflow run IDs. Latest-run lookups, branch-tip lookups,
-PR-filtered results without exact `head_sha` match, adjacent or superseded
-commits, and bare "CI is green" statements are prohibited. When exact binding
-is unavailable, report `CONNECTOR_OBSERVABILITY_INCOMPLETE` or `SHA_MISMATCH`,
-never `success`.
+SHAs and exact workflow run IDs when the relevant connector surface exposes
+those IDs. Latest-run lookups, branch-tip lookups, PR-filtered results without
+exact `head_sha` match, adjacent or superseded commits, and bare "CI is green"
+statements are prohibited. When exact binding needed for an authorized action is
+unavailable, report `CONNECTOR_OBSERVABILITY_INCOMPLETE` or `SHA_MISMATCH`, never
+`success`; when only optional `issue_comment` run observability is unavailable
+but the trusted G4 receipt is exact and valid, use `CONNECTOR_OBSERVABILITY_LIMITED`.
