@@ -16,9 +16,10 @@ SHA40=re.compile(r"^[0-9a-f]{40}$")
 RUNTIME_CONTRACTS={
  "intake_context.intake-card-render":{"schema":"schemas/intake-card.schema.json","evaluator":"tools/node_architect/intake_card_render.py","entrypoint":"render_intake_card","artifact_type":"intake-card"},
  "intake_context.context-gap-escalation":{"schema":"schemas/context-gap-decision.schema.json","evaluator":"tools/node_architect/context_gap_escalation.py","entrypoint":"decide_context_gap_escalation","artifact_type":"context-gap-decision"},
+ "intake_context.request-intake":{"schema":"schemas/intake-request.schema.json","evaluator":"tools/node_architect/request_intake.py","entrypoint":"render_request_intake","artifact_type":"intake-request"},
 }
 TYPED={
- "intake_context.request-intake":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes"},
+ "intake_context.request-intake":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes","source_resolution"},
  "intake_context.source-resolution":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes"},
  "intake_context.repo-identity-check":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes"},
  "intake_context.risk-classification":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes","risk_profile"},
