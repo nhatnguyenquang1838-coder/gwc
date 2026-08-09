@@ -542,6 +542,15 @@ jobs:
               pr.base.ref === 'pre-prod' &&
               pr.head.ref.startsWith('auto/') &&
               prBody.includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');
+            const parentReceiptMarker = 'gwc:autonomous-preprod-run-authority-receipt';
+            const parentReceiptFields = (body) => {
+              const marker = body.split('\n').find((line) => line.includes(parentReceiptMarker));
+              if (!marker) return null;
+              const fields = {};
+              for (const match of marker.matchAll(/([a-z_]+)=([^ ]+)/g)) fields[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+              return fields;
+            };
+            let parentAuthorityIssue = null;
             if (pr.base.ref === 'main') {
               // Definition PR (workflow/tool enablement) ships to main; the
               // autonomous-run *execution* contract only binds pre-prod targets
@@ -550,9 +559,51 @@ jobs:
               title = 'Autonomous G4 evidence not required (main-targeting definition PR)';
               summary = 'PR targets main and is not an autonomous-run execution delivery; G4 evidence binding is out of scope.';
             } else if (standingPreprod) {
-              conclusion = 'success';
-              title = 'Autonomous pre-prod standing authority applies';
-              summary = 'auto/* -> pre-prod is authorized by AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN standing policy; human G4 is reserved for promotion to main.';
+              const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
+              const parentReceiptComment = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes(parentReceiptMarker)).at(-1);
+              const parentReceipt = parentReceiptComment ? parentReceiptFields(parentReceiptComment.body) : null;
+              const taskMatch = prBody.match(/\bSCRUM-\d+\b/);
+              const taskId = taskMatch?.[0] || null;
+              if (!parentReceipt || parentReceiptComment.user?.login !== 'github-actions[bot]') {
+                parentAuthorityIssue = 'AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED';
+              } else {
+                const receiptCommentId = Number(parentReceipt.receipt_comment_id);
+                const sourceCommentId = Number(parentReceipt.source_comment_id);
+                const manifestCommentId = Number(parentReceipt.manifest_comment_id);
+                const sourceApproval = comments.find((item) => item.id === sourceCommentId);
+                const manifestComment = comments.find((item) => item.id === manifestCommentId);
+                const allowedTaskIds = (parentReceipt.allowed_tasks || parentReceipt.allowed_task_ids || parentReceipt.task_id || '')
+                  .split(',').map((value) => value.trim()).filter(Boolean);
+                const receiptTaskIds = (parentReceiptComment.body.match(/\bSCRUM-\d+\b/g) || []);
+                const expiresAt = Date.parse(parentReceipt.expires_at || '');
+                const issuedAt = Date.parse(parentReceipt.issued_at || '');
+                const validSource = sourceApproval && sourceApproval.user?.login !== 'github-actions[bot]' && /APPROVE AUTONOMOUS_RUN\b/.test(sourceApproval.body || '');
+                const validManifest = manifestComment && manifestComment.user?.login === 'github-actions[bot]' && manifestComment.id !== receiptCommentId;
+                const validScope = /^sha256:[0-9a-f]{64}$/.test(parentReceipt.manifest_scope_digest || '') &&
+                  /^[0-9a-f]{16}$/.test(parentReceipt.scope_hash_prefix || '') &&
+                  parentReceipt.scope_hash_prefix === parentReceipt.manifest_scope_digest.slice(7, 23);
+                const validReceipt = parentReceipt.status === 'present' &&
+                  parentReceipt.source === 'github_actions_bot_comment' &&
+                  parentReceipt.bot_login === 'github-actions[bot]' &&
+                  parentReceipt.marker === parentReceiptMarker &&
+                  parentReceipt.approved_run_id && parentReceipt.approved_policy_id &&
+                  Number.isInteger(receiptCommentId) && receiptCommentId === parentReceiptComment.id &&
+                  Number.isInteger(sourceCommentId) && sourceCommentId > 0 && sourceCommentId !== receiptCommentId &&
+                  Number.isInteger(manifestCommentId) && manifestCommentId > 0 && validSource && validManifest &&
+                  validScope && Number.isFinite(issuedAt) && issuedAt <= Date.now() &&
+                  Number.isFinite(expiresAt) && expiresAt > Date.now();
+                if (!validReceipt) parentAuthorityIssue = 'AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED';
+                else if (!taskId || (!allowedTaskIds.includes(taskId) && !receiptTaskIds.includes(taskId))) parentAuthorityIssue = 'AUTONOMOUS_TASK_NOT_ALLOWLISTED';
+              }
+              if (parentAuthorityIssue) {
+                conclusion = 'failure';
+                title = 'Autonomous pre-prod parent authority is not trusted';
+                summary = `${parentAuthorityIssue}: standing policy marker alone is insufficient; require Human source approval, trusted github-actions[bot] receipt, manifest comment, scope digest, expiry, and allowlisted task.`;
+              } else {
+                conclusion = 'success';
+                title = 'Autonomous pre-prod standing authority applies';
+                summary = 'Trusted Human parent approval plus github-actions[bot] receipt authorizes auto/* -> pre-prod; human G4 is reserved for promotion to main.';
+              }
             } else {
               const start = prBody.indexOf(begin);
               const finish = start >= 0 ? prBody.indexOf(end, start) + end.length : -1;
