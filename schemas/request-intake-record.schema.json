@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/request-intake-record.schema.json",
+  "title": "Request Intake Record",
+  "description": "Normalized user request intake with bounded intent, outcome, constraints, exclusions, entry guards, and reason codes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "base_sha",
+    "intent",
+    "outcome",
+    "constraints",
+    "exclusions",
+    "entry_guards",
+    "reason_code",
+    "reason_codes",
+    "snapshot_hash",
+    "read_only_projection",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "request-intake-record" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "repository": { "type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$" },
+    "base_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "intent": { "type": "string", "minLength": 1 },
+    "outcome": { "type": "string", "minLength": 1 },
+    "constraints": { "$ref": "#/$defs/uniqueStringArray" },
+    "exclusions": { "$ref": "#/$defs/uniqueStringArray" },
+    "entry_guards": { "$ref": "#/$defs/uniqueStringArray" },
+    "reason_code": { "type": "string", "minLength": 1 },
+    "reason_codes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "snapshot_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "read_only_projection": { "const": true },
+    "write_authority_granted": { "const": false },
+    "commit_authority_granted": { "const": false },
+    "push_authority_granted": { "const": false },
+    "pr_authority_granted": { "const": false },
+    "merge_authority_granted": { "const": false },
+    "deployment_authority_granted": { "const": false },
+    "production_authority_granted": { "const": false }
+  },
+  "$defs": {
+    "uniqueStringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

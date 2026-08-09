@@ -1,0 +1,107 @@
+# intake_context.request-intake G2 Execution Envelope
+# Generated after G1_ALIGNMENT PASS and before G2 write authority
+
+envelope_id: g2-scrum-298-20260809-0705
+task_id: SCRUM-298
+timestamp: 2026-08-09T07:05:00.000+0000
+run_id: g1-scrum-298-20260809-0703
+gate: G2_EXECUTION
+validated_by: Hermes (Hermes-PC autonomous cron)
+
+# Authority granted by human approval (to be filled after APPROVE G2_EXECUTION)
+# Format: APPROVE G2_EXECUTION <approval_id> <scope_hash_16> <expires_at_utc>
+# Example: APPROVE G2_EXECUTION ABCD1234 5c7882d8c6dc1ce7 2026-08-09T08:05:00Z
+approval_pending: true
+approval_id: TBD
+scope_hash_16: 5c7882d8c6dc1ce7
+expires_at_utc: 2026-08-09T08:05:00Z
+
+# Boundaries and constraints
+base_sha: cff9fb1bbe55493ccc8bc7b48e48f613521a58b2
+repository: nhatnguyenquang1838-coder/gwc
+worktree_path: C:/Users/PC/Work/NGH/wt/gwc-scrum-298
+branch: feat/scrum-298-intake-request-intake
+github_pair: #233
+
+# Permitted actions (guarded branch only)
+ permitted_actions:
+   - "git checkout feat/scrum-298-intake-request-intake"
+   - "git pull origin feat/scrum-298-intake-request-intake"
+   - "git add schemas/request-intake-record.schema.json"
+   - "git add tools/node_architect/request_intake.py"
+   - "git add tests/test_intake_context_request_intake_m4.py"
+   - "git add tools/node_architect/validate_node_catalog_intake_context.py"
+   - "git add .gwc/tasks/SCRUM-298/g0/context-snapshot.yaml"
+   - "git add .gwc/tasks/SCRUM-298/g1/intake/*.yaml"
+   - "git commit -m 'chore: implement intake_context.request-intake node'"
+   - "git push origin feat/scrum-298-intake-request-intake"
+   - "python tools/node_architect/validate_node_catalog_intake_context.py"
+   - "python -m pytest tests/test_intake_context_request_intake_m4.py -v"
+   - "python -m pytest tests/test_node_catalog_intake_context.py -v"
+
+# Prohibited actions (would violate authority boundary)
+ prohibited_actions:
+   - "git merge main"
+   - "git push origin main"
+   - "git reset --hard origin/main"
+   - "git checkout main"
+   - "git branch -d main"
+   - "git push --force"
+   - "git commit --amend"
+   - "git rebase -i"
+   - "Any write to .gwc/tasks/*/g2/ or g3/ or g4/ or g5/ or g6/ (human gates)"
+   - "Any write to schemas/ outside request-intake-record.schema.json"
+   - "Any write to tools/node_architect/ outside request_intake.py and validator update"
+   - "Any write to tests/ outside request-intake test files"
+   - "Any write to .gwc/ outside task-scoped directories"
+
+# Validation requirements
+validation_requirements:
+  - "Family validator must PASS before any commit"
+  - "All request-intake tests must PASS before any commit"
+  - "Exact base_sha validation: cff9fb1bbe55493ccc8bc7b48e48f613521a58b2"
+  - "Worktree must be isolated from fresh remote main"
+  - "Branch must be feat/scrum-298-intake-request-intake"
+  - "No merge/deploy authority claimed or implied"
+  - "G4 merge authority remains human-only"
+
+# Risk assessment
+risk_level: R0  # No production/deployment/credential/migration risk
+risk_flags: []
+required_gate: G2_EXECUTION
+additional_authority_gates: []
+
+# Evidence of preparation
+preparation_evidence:
+  g0_context_snapshot: ".gwc/tasks/SCRUM-298/g0/context-snapshot.yaml"
+  g1_alignment: ".gwc/tasks/SCRUM-298/g1/intake/alignment.yaml"
+  g1_brainstorming: ".gwc/tasks/SCRUM-298/g1/intake/brainstorming.yaml"
+  g1_decision: ".gwc/tasks/SCRUM-298/g1/intake/decision.yaml"
+  g1_preflight: ".gwc/tasks/SCRUM-298/g1/intake/preflight.yaml"
+  validator_pass: "PASS: intake_context node family has 9 valid nodes and 3 valid runtime contract binding(s)"
+  test_run: "All tests PASS"
+
+# Deterministic outputs (to be populated during implementation)
+expected_artifacts:
+  - "schemas/request-intake-record.schema.json"
+  - "tools/node_architect/request_intake.py"
+  - "tests/test_intake_context_request_intake_m4.py"
+  - "tools/node_architect/validate_node_catalog_intake_context.py"
+  - ".gwc/tasks/SCRUM-298/g0/context-snapshot.yaml"
+  - ".gwc/tasks/SCRUM-298/g1/intake/*.yaml"
+
+# Scope definition (for scope_hash calculation)
+scope_definition:
+  task_id: SCRUM-298
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: cff9fb1bbe55493ccc8bc7b48e48f613521a58b2
+  github_issue: #233
+  jira_ticket: SCRUM-298
+  node_id: intake_context.request-intake
+  changes:
+    - "schemas/request-intake-record.schema.json (ADD)"
+    - "tools/node_architect/request_intake.py (ADD)"
+    - "tests/test_intake_context_request_intake_m4.py (ADD)"
+    - "tools/node_architect/validate_node_catalog_intake_context.py (MODIFY)"
+    - ".gwc/tasks/SCRUM-298/g0/context-snapshot.yaml (ADD)"
+    - ".gwc/tasks/SCRUM-298/g1/intake/*.yaml (ADD)"

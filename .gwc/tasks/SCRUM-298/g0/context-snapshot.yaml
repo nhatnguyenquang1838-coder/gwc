@@ -1,0 +1,32 @@
+run_id: g1-scrum-298-20260809-0703
+task_id: SCRUM-298
+task_title: "[NA81-F1-N01] intake_context.request-intake — implement #233"
+claimed_by: "Hermes (Hermes-PC autonomous cron lane SCRUM-289 / NA81-F1)"
+claimed_at: "2026-08-09T06:58:00.000+0000"
+assignee: "Nhat Nguyen Quang"
+repository: "nhatnguyenquang1838-coder/gwc"
+base_sha: cff9fb1bbe55493ccc8bc7b48e48f613521a58b2
+execution_mode: local_agent
+gwc_boot: PASS
+core_contract_sha256: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+project_profile: projects/gwc/project-profile.yaml
+dag_predecessors: []
+dag_consumers:
+  - SCRUM-299
+  - SCRUM-306
+github_pair: "#233"
+family: SCRUM-289
+epic: SCRUM-288
+status: "In Progress"
+gwc_boot_details:
+  execution_mode: local_agent
+  core_contract_verified: true
+  project_profile_resolved: true
+  agent_claim: Hermes
+  assignee_unchanged: true
+  fresh_origin_main: cff9fb1bbe55493ccc8bc7b48e48f613521a58b2
+  scope: "implement canonical node intake_context.request-intake (paired GitHub #233)"
+  worktree: "C:/Users/PC/Work/NGH/wt/gwc-scrum-298"
+  guarded_branch_only: true
+  merge_deploy_authority_claimed: false
+  g4_human_authority: true

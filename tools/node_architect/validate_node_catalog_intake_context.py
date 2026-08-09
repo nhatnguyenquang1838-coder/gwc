@@ -14,8 +14,9 @@ ALLOWED_CANONICAL={"canonical","delivery_evidence","audit_projection","resume_hi
 REQUIRED_KEYS={"node_id","node_type","title","canonical","authority_boundary","gates"}
 SHA40=re.compile(r"^[0-9a-f]{40}$")
 RUNTIME_CONTRACTS={
- "intake_context.intake-card-render":{"schema":"schemas/intake-card.schema.json","evaluator":"tools/node_architect/intake_card_render.py","entrypoint":"render_intake_card","artifact_type":"intake-card"},
- "intake_context.context-gap-escalation":{"schema":"schemas/context-gap-decision.schema.json","evaluator":"tools/node_architect/context_gap_escalation.py","entrypoint":"decide_context_gap_escalation","artifact_type":"context-gap-decision"},
+ "intake_context.intake-card-render": {"schema": "schemas/intake-card.schema.json", "evaluator": "tools/node_architect/intake_card_render.py", "entrypoint": "render_intake_card", "artifact_type": "intake-card"},
+ "intake_context.context-gap-escalation": {"schema": "schemas/context-gap-decision.schema.json", "evaluator": "tools/node_architect/context_gap_escalation.py", "entrypoint": "decide_context_gap_escalation", "artifact_type": "context-gap-decision"},
+ "intake_context.request-intake": {"schema": "schemas/request-intake-record.schema.json", "evaluator": "tools/node_architect/request_intake.py", "entrypoint": "normalize_request_intake", "artifact_type": "request-intake-record"},
 }
 TYPED={
  "intake_context.request-intake":{"intent","outcome","constraints","exclusions","entry_guards","reason_codes"},

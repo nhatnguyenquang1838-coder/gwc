@@ -1,0 +1,21 @@
+# intake_context.request-intake G1 Brainstorming
+# Minimal artifact - main reasoning in alignment.yaml
+
+brainstorming_summary: |
+  Explored various approaches to request normalization:
+  1. Extending existing intake-card schema (rejected - conflates concerns)
+  2. Creating new request-intake-record schema (chosen - clean separation)
+  3. Using free-form text output (rejected - lacks structure for automation)
+  4. Reusing source-resolution patterns (rejected - different intent scope)
+
+key_insights:
+  - Separation of concerns: intake record vs intake card
+  - Fail-closed validation is essential for security
+  - Deterministic output requires canonical JSON and sorted collections
+  - Reason code precedence enables automation
+  - Isolated worktree prevents cross-lane contamination
+
+references:
+  - intake_context.node.json descriptor
+  - context-gap-escalation.py as pattern for fail-closed validation
+  - intake-card.schema.json for structure reference

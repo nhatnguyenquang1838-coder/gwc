@@ -1,0 +1,21 @@
+# intake_context.request-intake G1 Preflight Checks
+# Validation that implementation meets requirements
+
+preflight_checklist:
+  - "Request-intake record schema created and valid"
+  - "Deterministic evaluator implemented with fail-closed logic"
+  - "Runtime contract added to family validator"
+  - "Comprehensive test suite covering accept/reject cases"
+  - "Family validator passes with new node"
+  - "All unit tests pass"
+  - "G0 context snapshot created with claim verification"
+  - "G1 alignment artifacts completed"
+  - "No breaking changes to existing nodes"
+  - "Deterministic reason code precedence implemented"
+  - "Canonical JSON hashing for snapshot integrity"
+  - "No external dependencies in evaluator"
+  - "Separation of concerns maintained (record vs card)"
+
+blocking_issues: []
+warnings: []
+ready_for_g2: true

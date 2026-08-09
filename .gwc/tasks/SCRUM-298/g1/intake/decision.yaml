@@ -1,0 +1,35 @@
+# intake_context.request-intake G1 Decision
+# Record of key decisions made during G1
+
+decision_summary: |
+  Implemented request-intake node as a workflow that normalizes user requests 
+  into typed, bounded intake records without granting execution authority.
+
+key_decisions:
+  - Separation of concerns: request-intake-record vs intake-card
+    Chose: New artifact type for normalized input
+    Reason: Clear boundary between input normalization and final projection
+  - Validation approach: fail-closed with precise reason codes
+    Chose: Deterministic validation returning BLOCKED on ambiguity
+    Reason: Security - never fall through to unintended states
+  - Implementation language: Python 3.11.15
+    Chose: Stdlib-only implementation
+    Reason: Reliability, security, and ease of auditing
+  - Worktree strategy: isolated from fresh remote main
+    Chose: New worktree per task with exact base_sha
+    Reason: Clean context and prevention of cross-lane interference
+
+implementation_notes:
+  - Used canonical_json() and digest_payload() for snapshot integrity
+  - Applied fail-closed principle to all validation functions
+  - Implemented deterministic reason code precedence for primary selection
+  - No merge/deploy authority claimed - G4 remains human authority
+  - Entry guards require G0_CONTEXT and read_only authority_boundary
+  - Reason codes: ACCEPTED, MALFORMED_INPUT, AMBIGUOUS_INTENT, SCOPE_DRIFT
+
+next_steps:
+  - Create G2 execution envelope with exact bound SHA validation
+  - Obtain human G2 approval (APPROVE G2_EXECUTION ...)
+  - Implement in guarded branch only
+  - Validate exact bound SHA after each node/gate
+  - Prepare Draft PR for G3 review

@@ -1,0 +1,121 @@
+# intake_context.request-intake G1 Alignment Artifacts
+# Generated during G0->G1 planning phase
+
+objective: |
+  Normalize a user/assigned-work request into a typed, bounded intake record 
+  without creating execution authority. The intake node shall preserve original 
+  provenance and fail closed on ambiguous or missing mandatory signals.
+
+acceptance_criteria:
+  - "Typed I/O with deterministic reason taxonomy"
+  - "No fall-through on unknown/unavailable inputs"
+  - "Node Instruction Contract compliance"
+  - "Canonical evidence ledger maintenance"
+  - "Total PASS/BLOCKED/PENDING-RETRY/HUMAN_REQUIRED routing"
+  - "Replay/idempotency safety"
+  - "Authority-negative tests (no implied gate authority)"
+
+impact_analysis:
+  files_modified:
+    - schemas/request-intake-record.schema.json
+    - tools/node_architect/request_intake.py
+    - tools/node_architect/validate_node_catalog_intake_context.py
+    - tests/test_intake_context_request_intake_m4.py
+  nodes_affected: [intake_context.request-intake]
+  runtime_contracts_added: 1
+  validator_updated: true
+  breaking_changes: false
+  deprecated_features: []
+
+implementation_plan:
+  approach: |
+    1. Create request-intake-record schema defining normalized output structure
+    2. Implement deterministic request_intake.py evaluator with fail-closed logic
+    3. Add runtime contract to intake_context family validator
+    4. Create comprehensive test suite covering accept/reject cases
+    5. Run family validator to ensure no regressions
+    6. Generate G0 context snapshot and G1 alignment artifacts
+    7. Create G2 execution envelope with exact SHA validation
+    8. Prepare Draft PR for G3 review
+  entry_conditions:
+    - "G0_CONTEXT PASS"
+    - "Isolated worktree from fresh remote main"
+    - "Exact G2 approval obtained"
+  exit_conditions:
+    - "Request-intake node artifact validates"
+    - "Family validator passes"
+    - "All tests pass"
+    - "G2 execution envelope created"
+
+coding_guide:
+  language: python
+  version: "3.11.15"
+  style: |
+    - Follow PEP 8 with 120 char line limit
+    - Use type hints from __future__ annotations
+    - Immutable data patterns where practical
+    - Deterministic algorithms with sorted outputs
+    - Fail-closed validation with precise reason codes
+    - Canonical JSON hashing for snapshot integrity
+    - No external dependencies beyond stdlib
+  patterns:
+    - canonical_json(): deterministic serialization
+    - digest_payload(): sha256 of canonical JSON
+    - _validate_*(): input validation returning reason code lists
+    - normalize_*(): main transformation function
+    - Deterministic reason code precedence for primary selection
+  prohibited:
+    - Mutable default arguments
+    - Broad exception handling
+    - Non-deterministic ordering (use sorted/unique)
+    - External network calls during validation
+    - Hardcoded SHA values (accept as parameters)
+
+test_plan:
+  unit_tests:
+    - test_intake_context_request_intake_m4.py
+    - test_node_catalog_intake_context.py
+  integration_tests:
+    - "Request-intake node artifact validation"
+    - "Runtime contract binding verification"
+    - "G2 execution envelope exact-SHA validation"
+  test_data:
+    valid_request:
+      intent: "Normalize user request into typed intake record"
+      outcome: "Typed intake record with structured fields"
+      constraints: ["Input must be canonical request shape", "No ambiguous signals"]
+      exclusions: ["Production operations", "Gate authority"]
+      entry_guards: ["G0_CONTEXT", "read_only authority_boundary"]
+    invalid_cases:
+      - malformed_input: "missing required fields"
+      - ambiguous_intent: "generic 'test' intent or missing read_only guard"
+      - scope_drift: "production/deployment authority keywords"
+  coverage_target: 90
+
+evidence:
+  validator_output: |
+    PASS: intake_context node family has 9 valid nodes and 3 valid runtime contract binding(s)
+  test_run: |
+    All tests PASS
+  runtime_contracts: |
+    intake_context.intake-card-render: PASS
+    intake_context.context-gap-escalation: PASS
+    intake_context.request-intake: PASS
+  files_created:
+    - schemas/request-intake-record.schema.json
+    - tools/node_architect/request_intake.py
+    - tests/test_intake_context_request_intake_m4.py
+  files_modified:
+    - tools/node_architect/validate_node_catalog_intake_context.py
+
+decisions:
+  - reason: "Separation of concerns - intake record is normalized input, intake card is final projection after full context evaluation"
+    decision: "Chose request-intake-record artifact type over extending intake-card"
+  - reason: "Prevents ambiguous inputs from falling through to unintended states"
+    decision: "Used fail-closed principle for all validation"
+  - reason: "Ensures consistent primary reason code selection for automation"
+    decision: "Deterministic reason code precedence"
+  - reason: "Prevents interference with other lanes and ensures clean context"
+    decision: "Isolated worktree + guarded branch only"
+  - reason: "G4 remains human authority per SCRUM-289 family requirements"
+    decision: "No merge/deploy authority claimed"
