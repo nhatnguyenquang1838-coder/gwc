@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - pre-prod
 
 permissions:
   contents: read
@@ -110,12 +111,14 @@ jobs:
                   head_sha: pr.head.sha,
                   branch: pr.head.ref,
                   event_label: 'pull_request',
-                  main_sha: '',
+                  target_sha: '',
                   workflow_commit: context.sha,
                 };
               }
 
-              if (context.eventName === 'push' && context.ref === 'refs/heads/main') {
+              const protectedPushRefs = ['refs/heads/main', 'refs/heads/pre-prod'];
+              if (context.eventName === 'push' && protectedPushRefs.includes(context.ref)) {
+                const targetBranch = context.ref.replace('refs/heads/', '');
                 const associated = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                   owner,
                   repo,
@@ -123,7 +126,7 @@ jobs:
                 });
                 const pr = associated.data.find((item) => item.merged_at) || associated.data[0];
                 if (!pr) {
-                  core.info(`No associated pull request found for main commit ${context.sha}; skipping PR comment.`);
+                  core.info(`No associated pull request found for ${targetBranch} commit ${context.sha}; skipping PR comment.`);
                   return null;
                 }
                 return {
@@ -131,8 +134,8 @@ jobs:
                   pr_number: pr.number,
                   head_sha: pr.head.sha,
                   branch: pr.head.ref,
-                  event_label: 'push:main',
-                  main_sha: context.sha,
+                  event_label: `push:${targetBranch}`,
+                  target_sha: context.sha,
                   workflow_commit: context.sha,
                 };
               }
@@ -145,7 +148,7 @@ jobs:
               return;
             }
 
-            const mainCommitRow = target.main_sha ? `| Main commit | \`${target.main_sha}\` |\n` : '';
+            const targetCommitRow = target.target_sha ? `| Target commit | \`${target.target_sha}\` |\n` : '';
             const body = `${marker}
             ## GWC CI Report — Validate instructions
 
@@ -158,7 +161,7 @@ jobs:
             | PR | #${target.pr_number} |
             | Head | \`${target.head_sha}\` |
             | Branch | \`${target.branch}\` |
-            ${mainCommitRow}| Commit | \`${target.workflow_commit}\` |
+            ${targetCommitRow}| Commit | \`${target.workflow_commit}\` |
 
             _This comment is updated automatically by GitHub Actions._`;
 
