@@ -137,11 +137,23 @@ jobs:
             }
 
             const failedConclusions = ['failure', 'cancelled', 'timed_out', 'action_required'];
+            const pendingStatuses = ['queued', 'waiting', 'requested', 'in_progress'];
             const failed = selected.some((run) => failedConclusions.includes(run.conclusion));
             const allSuccessful = selected.length === requiredNames.length && selected.every((run) => run.status === 'completed' && run.conclusion === 'success');
-            const classification = failed ? 'failure' : allSuccessful ? 'success' : 'CONNECTOR_OBSERVABILITY_INCOMPLETE';
-            if (classification === 'CONNECTOR_OBSERVABILITY_INCOMPLETE') {
-              if (!fallbacksAttempted.includes('known_run_id')) fallbacksAttempted.push('known_run_id');
+            const hasPending = selected.some((run) => pendingStatuses.includes(run.status));
+            const indeterminate = !failed && !allSuccessful && !hasPending;
+            if (indeterminate) {
+              await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: mergeSha });
+              fallbacksAttempted.push('combined_commit_status');
+            }
+            const classification = failed
+              ? 'failure'
+              : allSuccessful
+                ? 'success'
+                : hasPending
+                  ? 'CI_PENDING'
+                  : 'CONNECTOR_OBSERVABILITY_INCOMPLETE';
+            if (classification === 'CONNECTOR_OBSERVABILITY_INCOMPLETE' && !fallbacksAttempted.includes('exact_preprod_push_lookup')) {
               fallbacksAttempted.push('exact_preprod_push_lookup');
             }
             const method = classification === 'CONNECTOR_OBSERVABILITY_INCOMPLETE'
@@ -165,7 +177,7 @@ jobs:
               required_workflows: requiredNames.map((name) => ({ name, required: true })),
               selected_runs: selected,
               rejected_candidates: [],
-              checkpoint_required: false,
+              checkpoint_required: classification === 'CI_PENDING',
               manual_action_authorized: false,
               evidence_chain: {
                 g4_authority: { approval_id: authority[1], source_comment_id: sourceCommentId, approved_head_sha: authority[2], scope_hash_prefix: authority[3] },
@@ -176,6 +188,10 @@ jobs:
                 no_recursive_evidence_pr: true,
               },
             };
+            if (classification === 'CI_PENDING') {
+              evidence.checkpoint_path = `actions://${context.runId}/g5-checkpoint.json`;
+              fs.writeFileSync('g5-checkpoint.json', JSON.stringify({ repository: `${owner}/${repo}`, merge_commit_sha: mergeSha, status: 'pending', selected_run_ids: selected.map((run) => run.run_id), next_check: 'next required workflow_run completion' }, null, 2));
+            }
             fs.writeFileSync('g5-ci-verification-evidence.json', JSON.stringify(evidence, null, 2));
             core.setOutput('applicable', 'true');
             core.setOutput('artifact_name', artifactName);
@@ -193,8 +209,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.evidence.outputs.artifact_name }}
-          path: g5-ci-verification-evidence.json
-          if-no-files-found: error
+          path: |
+            g5-ci-verification-evidence.json
+            g5-checkpoint.json
+          if-no-files-found: warn
 
       - name: Publish pre-prod G5 status
         if: steps.evidence.outputs.applicable == 'true'
