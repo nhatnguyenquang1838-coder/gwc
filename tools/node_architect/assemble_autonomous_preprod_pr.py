@@ -4,12 +4,14 @@ Wraps the SCRUM-271 graph/story renderer (``render_pr_run_evidence``) to produce
 the managed, digest-bounded PR description, and enforces the hard guardrails:
 * The PR base must be ``pre-prod``; ``main`` is forbidden.
 * The managed block must be bound to the exact current PR head SHA.
+* The autonomous route identity is materialized as an exact-head managed marker.
 * No deploy, release, or production authority is granted.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -23,6 +25,20 @@ from .render_pr_run_evidence import (
 
 FORBIDDEN_BASES = {"main"}
 REQUIRED_BASE = "pre-prod"
+ROUTE_ID = "AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN"
+_ROUTE_RE = re.compile(r"<!-- gwc:autonomous-preprod-route route=[^ ]+ base=[^ ]+ head=[0-9a-f]{40} -->")
+
+
+def _route_marker(*, base_ref: str, head_sha: str) -> str:
+    return f"<!-- gwc:autonomous-preprod-route route={ROUTE_ID} base={base_ref} head={head_sha} -->"
+
+
+def _upsert_route_marker(existing_body: str | None, marker: str) -> str:
+    body = existing_body or ""
+    if _ROUTE_RE.search(body):
+        return _ROUTE_RE.sub(marker, body, count=1)
+    body = body.rstrip()
+    return f"{body}{'\n\n' if body else ''}{marker}\n"
 
 
 def assemble_pr_body(
@@ -50,7 +66,12 @@ def assemble_pr_body(
     if BEGIN_MARKER not in block or END_MARKER not in block:
         reasons.append("AUTONOMOUS_PR_BLOCK_INVALID")
 
-    updated_body, body_digest = upsert_managed_block(existing_body, block)
+    marker = _route_marker(base_ref=base_ref, head_sha=head_sha)
+    body_with_route = _upsert_route_marker(existing_body, marker)
+    updated_body, body_digest = upsert_managed_block(body_with_route, block)
+
+    if marker not in updated_body:
+        reasons.append("AUTONOMOUS_PR_ROUTE_MARKER_MISSING")
 
     outcome = "PR_BODY_READY" if not reasons else "REJECTED"
     result = {
@@ -58,6 +79,8 @@ def assemble_pr_body(
         "artifact_type": "autonomous-preprod-pr-body",
         "run_id": graph.get("run_id"),
         "task_id": graph.get("task_id"),
+        "route_id": ROUTE_ID,
+        "route_marker": marker,
         "base_ref": base_ref,
         "head_sha": head_sha,
         "pr_body": updated_body,
