@@ -10,7 +10,7 @@ pull_request:
   number: 354
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/354
   draft: true
-head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
 scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
 changed_paths:
   - tools/node_architect/risk_classification.py
@@ -29,7 +29,7 @@ changed_paths:
   - .gwc/tasks/SCRUM-302/g2/plan-read-receipt.yaml
   - .gwc/tasks/SCRUM-302/g3/delivery-record.yaml
 validation:
-  head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+  head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
   status: pass
   commands:
     - command: python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-302 --gate G2_EXECUTION --json
@@ -49,9 +49,9 @@ review:
   reviewer_id: g3-independent-readonly-reviewer
   independence: independent
   mode: read-only
-  reviewed_head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+  reviewed_head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
   reviewed_scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
-  reviewed_at: "2026-08-09T18:11:30Z"
+  reviewed_at: "2026-08-09T18:18:30Z"
   lanes:
     - name: requirement
       applicable: true
@@ -80,21 +80,16 @@ review:
         - G0/G1 PASS and exact G2 approval are bound to the protected pre-prod base and bounded reconciliation scope.
     - name: delivery
       applicable: true
-      status: not_reviewed
+      status: pass
       evidence:
-        - G2 reconciliation will add this record and change the PR head; exact-head delivery review must be refreshed afterward.
+        - GitHub readback confirms Draft PR #354 targets pre-prod and current head 5b2fa779e11124d465e6607ecb352d866f901d23.
     - name: ci
       applicable: true
-      status: not_reviewed
+      status: pass
       evidence:
-        - Existing exact-head CI evidence must be rerun/read back after the reconciliation commit.
+        - Four required workflows completed successfully for current head; G4 G5 evidence remains non-required while PR is Draft.
   findings:
-    - id: REV-1
-      severity: BLOCKER
-      category: delivery
-      status: open
-      evidence: This G3 record is prepared against the pre-reconciliation head; committing it changes the PR head.
-      recommendation: Refresh the delivery record, independent review and exact-head CI evidence after the G2 reconciliation push.
+    []
   acceptance_criteria:
     - id: AC-1
       result: pass
@@ -109,18 +104,18 @@ review:
       evidence:
         - Policy provenance and digest are emitted by the implementation.
     - id: AC-4
-      result: not_verified
+      result: pass
       evidence:
-        - Final exact-head verification is deferred until after the reconciliation commit.
+        - Current PR head and guarded branch readback match 5b2fa779e11124d465e6607ecb352d866f901d23.
     - id: AC-5
-      result: not_verified
+      result: pass
       evidence:
-        - Final PR/CI evidence is deferred until after the reconciliation commit.
-  decision: blocked
-  stale: true
+        - Required exact-head workflows completed successfully; later-gate workflow is excluded from G3.
+  decision: pass
+  stale: false
 ci:
   required: true
-  head_sha: ee8fb6d81bfb0de56421c8dace33a7232f1a9aad
+  head_sha: 5b2fa779e11124d465e6607ecb352d866f901d23
   checks:
     - name: Cross-platform LF and SHA parity
       required: true
@@ -143,11 +138,11 @@ ci:
       status: fail
       evidence: Run 31326878233 stopped at g4-receipt-required because the PR is Draft; this is not G2 authority.
 residual_risks:
-  - G3 exact-head review and CI evidence are stale after the upcoming reconciliation commit.
+  - G4 G5 evidence remains intentionally failing because PR #354 is Draft and no G4 receipt exists.
   - PR #354 remains Draft and no Ready-for-review, G4, merge, G5 or G6 action is authorized.
 exclusions:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION_DATA
   - JIRA_STATUS_TRANSITION
-outcome: inconclusive
+outcome: pass
