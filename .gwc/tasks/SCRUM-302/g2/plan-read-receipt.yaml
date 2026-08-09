@@ -1,0 +1,15 @@
+schema_version: '1.0'
+artifact_type: g2-plan-read-receipt
+canonical_task_uid: SCRUM-302
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+plan_revision: sha256:b19e0b47420ad16cf13e3f46da2e6923f51cda995f49f561cb0e6448d3fec738
+paths_read:
+- g1/plan/requirements.md
+- g1/plan/design.md
+- g1/plan/tasks.md
+scope_consistency: MATCH
+repository_state: MATCH
+status: VERIFIED
+read_at_utc: '2026-08-09T17:18:16Z'
+read_by: Codex-GPT

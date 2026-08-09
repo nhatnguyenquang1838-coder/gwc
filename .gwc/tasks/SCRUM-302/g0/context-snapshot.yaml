@@ -1,0 +1,97 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-09T17:18:16Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: pre-prod
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- Execution mode is standard local_agent with a trusted local checkout and isolated worktree.
+- The implementation base is exact pre-prod@7f1d26e4fb0d4d09c49e9952994220a2f47a3824.
+- No direct write to pre-prod or main is allowed; writes require a guarded task branch.
+- Draft PR only; merge, auto-merge, deployment, release, and production operations are excluded.
+- Jira is projection/traceability; the SCRUM-302 claim must be read back before G2 writes.
+- The implementation stays inside the intake_context risk-classification runtime contract.
+applicable_policies:
+- id: Coding_Project_Governance_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: refs/remotes/origin/pre-prod
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: refs/remotes/origin/pre-prod
+  source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: refs/remotes/origin/pre-prod
+  source_sha: 826a162cad8e6474eda4b26037b0b6ac91d8a5c4
+- id: LOCAL_AGENT_RULE
+  path: core/LOCAL_AGENT_RULE.md
+  ref: refs/remotes/origin/pre-prod
+  source_sha: 936bd7b53d2cad3b27c2ba471a02413a43bc7e3c
+- id: KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0
+  path: core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  ref: refs/remotes/origin/pre-prod
+  source_sha: 51283934bde6df414248dded3ba960cdec5d2b25
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 819c60dfaa1d5e56f39ac6741e4004f5c441a48a
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: a1378c8f7a0a3acbc12d015063a57e033efeb6f1
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 60e460eed6e0bbc0f554b42475d1bbbd224a7a2c
+- path: core/node-architect/node-catalog/intake_context/risk-classification.node.json
+  required: true
+  status: AVAILABLE
+  source_sha: 0892b014ffa2aca1ec71b4bd814dfbba4417a6f8
+- path: core/node-architect/node-catalog/intake_context/README.md
+  required: true
+  status: AVAILABLE
+  source_sha: 6e3871dff9197886bf54c88614903fe498287ab4
+- path: tools/node_architect/validate_node_catalog_intake_context.py
+  required: true
+  status: AVAILABLE
+  source_sha: b06b6ef971be6b34e179fa63f2f1207de3233c64
+- path: SCRUM-302 Jira MCP readback
+  required: true
+  status: AVAILABLE
+  source_sha: 6bd571327571dc96acaa12279f647684e1f1f0e312ac673a64c526fa463fc626
+runtime_context:
+  agent_runtime_id: Codex-GPT
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+status: READY
+blockers: []
