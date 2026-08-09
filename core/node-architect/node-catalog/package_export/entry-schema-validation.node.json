@@ -1,9 +1,50 @@
 {
-  "node_id": "package-export-entry-schema-validation",
-  "node_type": "gate",
-  "title": "Entry Schema Validation",
-  "canonical": "delivery_evidence",
-  "authority_boundary": "g2_required",
-  "gates": ["G2_EXECUTION", "G3_PR"],
-  "description": "Validate each package entry against the closed schema before export."
+    "node_id": "package_export.entry-schema-validation",
+    "node_type": "gate",
+    "title": "Entry Schema Validation",
+    "canonical": "delivery_evidence",
+    "authority_boundary": "g2_required",
+    "gates": [
+        "G2_EXECUTION",
+        "G3_PR"
+    ],
+    "description": "Validate each package entry against the closed schema before export.",
+    "intent": "Validate every loaded package instruction entry against the closed entry schema before any path evaluation, filesystem access, or export. Fail closed on unknown fields, missing required fields, type mismatches, invalid entry identifiers, unsupported entry versions, and duplicate identifiers.",
+    "outcome": "Typed EntrySchemaValidationResult with schema_id, schema_version, outcome (PASS/FAIL), manifest_digest, schema_digest, source_sha, inventory (per-entry verdict), errors (ordered per-entry error list), and authority_granted (always false).",
+    "constraints": [
+        "The same manifest bytes and schema version must always produce the same ordered error list and the same semantic digest.",
+        "Unknown fields must be rejected, never ignored.",
+        "No filesystem read, copy, target mutation, or network access must occur during validation.",
+        "Schema validation is strictly separate from filesystem existence and path-root safety checks (those belong to source-path-safety-check and target-path-safety-check).",
+        "The typed result — not an exit code and not \"the parser did not crash\" — is the only PASS signal.",
+        "A valid result must never grant repository, PR, merge, deploy, or release authority.",
+        "Reason codes form a closed taxonomy and must not be extended without a schema version bump."
+    ],
+    "exclusions": [
+        "Filesystem existence or path-root safety checks.",
+        "Granting repository, PR, merge, deploy, or release authority.",
+        "Mutating repository state or changing gate authority.",
+        "Network access or production data operations.",
+        "Credential, secret, migration, or destructive operations."
+    ],
+    "entry_guards": [
+        "G2_EXECUTION",
+        "g2_required",
+        "manifest loaded by package_export.package-manifest-load",
+        "closed entry schema version resolved"
+    ],
+    "source_resolution": {
+        "evaluator": "tools/node_architect/package_export/entry_schema_validation.py",
+        "schema": "schemas/node-architect/package-export/entry-schema-validation.schema.json"
+    },
+    "reason_codes": {
+        "ENTRY_SCHEMA_VALID": "The entry passed all schema checks.",
+        "ENTRY_SCHEMA_INVALID": "The entry or manifest structure is structurally invalid (e.g. manifest missing entries array, empty path/target).",
+        "ENTRY_REQUIRED_FIELD_MISSING": "A required field (id, path, target, required) is absent from the entry.",
+        "ENTRY_TYPE_INVALID": "A field value has an incorrect type (e.g. non-string id, non-boolean required, non-object entry).",
+        "ENTRY_ID_INVALID": "The entry id does not match the canonical pattern ^[a-z0-9][a-z0-9._-]{0,127}$.",
+        "ENTRY_UNKNOWN_FIELD": "The entry contains a field not in the closed allowed set.",
+        "ENTRY_VERSION_UNSUPPORTED": "The entry_version value is not among the supported entry versions.",
+        "ENTRY_DUPLICATE_ID": "The entry id appears more than once in the manifest."
+    }
 }

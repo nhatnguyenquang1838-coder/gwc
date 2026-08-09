@@ -936,7 +936,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json",
-        "source_sha": "e8b62a437e58f1b6f64eccc46ecdf90c4b207da17fd77da8ba11bd57516dd7d2"
+        "source_sha": "07a910a324638e34116a747c2735b6b31a92138c3d715144b64e3cec668ec41e"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -964,13 +964,16 @@
       "id": "package_export.entry-schema-validation",
       "idempotency": "readback_required",
       "implementation_refs": [
-        "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json"
+        "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+        "core/node-architect/node-instructions/package_export/entry-schema-validation.node-instruction.yaml",
+        "tools/node_architect/package_export/entry_schema_validation.py",
+        "schemas/node-architect/package-export/entry-schema-validation.schema.json"
       ],
       "maturity": "experimental",
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
-        "source_sha": "5e5c6509d8691655fc762caff00f52c3b401ac600a626dc32702049135a9ce84"
+        "source_sha": "d988e91f8936f05bcc4cc06f47cbebc3390790437886f0f221bb6c37819fcacb"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1004,7 +1007,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/export-failure-routing.node.json",
-        "source_sha": "25e00ba11fd451ce9a4a5e34e54f527a4a927374fca1b4f92043f8b58caa26f7"
+        "source_sha": "bd49e5cc0604c3d9b5b603c32ec578d0cad7e2d7ea4f5d46c4d5f9cc1a8a3704"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1038,7 +1041,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/export-manifest-generation.node.json",
-        "source_sha": "6ec209736bd93b23b4337e2eddfe153973e39d3843e3c8bfb8b3adcc6127a953"
+        "source_sha": "6484522fe170d8ba96b0b11795623cd8835472c02872a9d51af8e94f15bf308e"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1072,7 +1075,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/governance-tree-build.node.json",
-        "source_sha": "73373ae4f8fe73f6c52e9dfec966340b41924d0bd51805fe736b1ffd4a92f272"
+        "source_sha": "758b893acf05384340db26b9386e84b8ac3ad3cab1383e19df2756f7a70647c7"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1106,7 +1109,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/package-manifest-load.node.json",
-        "source_sha": "f84385f87ef03b49559aae090ced98325116273f3c876496df5a332ddeeb8215"
+        "source_sha": "15f198c56d11b7fd9c873045ef1209a9df7e78a8d3497293a69397086528ab3c"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1140,7 +1143,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/smoke-verification.node.json",
-        "source_sha": "5dba6a112bd8c08300c43de44abe12954fd6c66e2f9176c415fd80a06bc9dbf9"
+        "source_sha": "2e4d1e64ef8198e886413254c20af33724a1fdb403280aff3caf02aa9133f02b"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1174,7 +1177,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/source-path-safety-check.node.json",
-        "source_sha": "645ab5c761b2474beb8c836bb779d6beb2dba77daa70c5c0cedcc75b1e0e5858"
+        "source_sha": "a21225911df08a74fd5a65b1ca598c4fb49c4413a6f44c6e5b933479b5558842"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -1208,7 +1211,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
-        "source_sha": "2f99fa2517e535298c77672f20267df40da057d621d6c9f24fa49f4dd6e93756"
+        "source_sha": "614106de0e403af9822d74b6074df93a602650d318f32b85db2575260681aa9c"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -2757,8 +2760,8 @@
       "version": "1.0.0"
     }
   ],
-  "provenance": "core/node-architect/node-catalog descriptors and SCRUM-100 current-state audit",
+  "provenance": "core/node-architect/node-catalog descriptors + SCRUM-288 entry-schema-validation maturity enrichment",
   "registry_id": "gwc-runtime-node-registry",
-  "revision": "scrum-104-20260726",
+  "revision": "scrum-288-entry-schema-validation-20260809-r1",
   "schema_version": "1.0.0"
 }

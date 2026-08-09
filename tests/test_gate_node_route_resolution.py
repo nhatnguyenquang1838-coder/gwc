@@ -55,7 +55,7 @@ def context(action: str = "repository_write", mode: str = "normal"):
         "base_sha": envelope["base_sha"],
         "working_branch": envelope["working_branch"],
         "scope_hash": envelope["scope_hash"],
-        "expected_profile_revision": "scrum-263-20260802-r1",
+        "expected_profile_revision": "scrum-288-entry-schema-validation-20260809-r1",
         "expected_graph_revision": "scrum-104-20260726",
         "available_connectors": ["GitHub.compare_commits"],
         "context": loaded,
