@@ -19,11 +19,18 @@ When higher-priority DWC runtime instructions are active for this project:
 - Human direction is required for financial, architecture, security-boundary,
   production configuration, credential, secret, production-data, destructive,
   irreversible, or broad-blast-radius changes.
-- G4 merge, G5 deploy, and G6 production operations always remain human gates.
+- G4 merge authority is human by default. A canonical route-specific policy may
+  supply bounded standing G4 authority for an exact action when that policy is
+  active and all of its bindings validate. For
+  `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`, a valid exact-head standing G4 may
+  authorize only the bounded `auto/* -> pre-prod` child merge. Human G4 remains
+  mandatory for every `pre-prod -> main` promotion/merge.
+- Manual G5 deploy/redeploy/release/runtime actions and all applicable G6
+  production operations remain separate human-authority boundaries.
 
 ## Global G0/G1 operational runbook
 
-All GWC agents follow `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` for the step-by-step execution of G0_CONTEXT and G1_ALIGNMENT. This project extension may tighten that runbook but must not weaken its proposal obligation, local `/mnt` validation path, connector retry behavior, approval boundaries, or G4-G6 HITL requirements.
+All GWC agents follow `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` for the step-by-step execution of G0_CONTEXT and G1_ALIGNMENT. This project extension may tighten that runbook but must not weaken its proposal obligation, local `/mnt` validation path, connector retry behavior, approval boundaries, or applicable human-authority requirements.
 
 ## Repository safety
 
@@ -60,14 +67,14 @@ core safety guarantees:
 - Standard documentation required
 - Bounded to explicitly stated scope
 - Agent-only task claim intake still required before any write-capable action
-- Draft PR only, no merge authority
+- Draft PR only; this mode itself grants no merge authority
 
 ### RESCUE MODE
 - Minimal validation (best-effort testing only)
 - Post-facto audit trail required
 - Agent-only task claim intake still required before any write-capable action when Jira is reachable
 - Still no production data access or main branch writes
-- Draft PR only, no merge authority
+- Draft PR only; this mode itself grants no merge authority
 
 **Activation requires explicit user command:**
 ```text
@@ -86,8 +93,32 @@ Retrospective claiming must never backdate `Claimed At`.
 - Agent-only task claim intake before write-capable action
 - Production data reads/writes (G6)
 - Credential/secret rotation
-- Merge authority (G4 requires human approval)
-- Deploy authority (G5 requires human approval)
+- Merge authority resolution: human is the default G4 authority source; a
+  canonical route-specific standing G4 is valid only for the exact action it
+  explicitly authorizes, and never for autonomous merge/promotion to `main`
+- Manual deploy authority (G5 requires human approval)
+
+## Route-specific authority precedence
+
+Route resolution happens before generic workflow authority wording is applied.
+For an active canonical route, route-specific authority determines the authority
+source for the exact gate/action; generic E2E, project-extension, or agent text
+supplies default behavior only and must not replace a valid route-specific
+decision.
+
+For `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`:
+
+```text
+G0/G1/G2/G3 mechanics
+-> resolve canonical route-specific G4 authority
+-> valid exact-head standing G4: auto/* -> pre-prod merge allowed
+-> exact merge-SHA G5 readback
+-> pre-prod -> main: Human G4 required
+```
+
+A missing, stale, or invalid standing autonomous authority fails closed under the
+autonomous policy. It must not be repaired by silently switching the same child
+action to generic Human G4 semantics.
 
 ## Node runtime mode invariant
 
@@ -100,15 +131,17 @@ resolution. Missing instruction, evidence, logs, next route, or an authority-
 escalating instruction fails closed before implementation.
 
 Jira, Slack, and Notion remain projection-only. Node instructions and route
-decisions never grant G2, G3, G4, G5, or G6 authority.
+decisions never grant G2, G3, G4, G5, or G6 authority; authority comes from the
+validated gate/route authority source.
 
 ## Governance hardening (SCRUM-268)
 
 - The `g4-receipt-required` GitHub check is the repository-side enforcement
-  surface for G4. It must fail until a trusted `gwc:g4-authority-receipt`
-  exists. Enabling it as a required branch-protection check is a manual
-  repository-admin follow-up; the workflow itself must never treat a missing
-  receipt as success.
+  surface for G4. It must fail until the applicable trusted G4 authority receipt
+  exists. For generic routes this is a human-derived receipt. For an active
+  canonical autonomous pre-prod route it may be the validated route-specific
+  exact-head standing G4 receipt. A receipt for `auto/* -> pre-prod` never
+  authorizes `pre-prod -> main`.
 - Gate artifacts under `.gwc/tasks/<task-id>/` are evidence projections and
   must not silently invalidate the implementation binding. The deterministic
   ordering is: finish implementation and validation at the approved base/head;
