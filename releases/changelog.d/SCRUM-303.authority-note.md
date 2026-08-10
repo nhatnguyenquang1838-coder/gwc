@@ -1,0 +1,1 @@
+Execution route: `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`. Parent authority anchor is stable while the task execution base binds the exact live descendant `pre-prod`; post-merge G5 is observational/non-blocking for autonomous child completion.
