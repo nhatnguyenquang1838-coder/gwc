@@ -1,52 +1,84 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "artifact_type": "gate-applicability-policy-registry",
   "registry_id": "gwc-gate-applicability-policy-registry",
-  "revision": "workflow-contract-gate-applicability-20260810-r2",
+  "revision": "policy-contract-hardening-20260811-r1",
   "policies": [
     {
       "id": "g0-context-required",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "required_evidence": ["g0-context-snapshot"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["WRITE_CAPABLE_ACTION_BEFORE_CONTEXT"]
     },
     {
       "id": "g1-alignment-required",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "required_evidence": ["g1-preflight-report", "g1-decision-record"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["SCOPE_EXPANSION_WITHOUT_REALIGNMENT"]
     },
     {
       "id": "g2-execution-required",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "required_evidence": ["execution-scope-authority"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["OUT_OF_SCOPE_PATH_WRITE"],
+      "authority": {
+        "required": false,
+        "allowed_sources": ["human", "derived-child-authority", "standing-machine-authority"],
+        "allowed_types": ["explicit-approval", "derived", "standing"]
+      }
     },
     {
       "id": "g3-pr-required",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "required_evidence": ["pull-request-reference"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["MERGE_BEFORE_PR_EVIDENCE"]
     },
     {
       "id": "g4-merge-required",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [
+        {"id": "exact-head-unverified", "field": "merge.exact_head_verified", "operator": "equals", "value": false}
+      ],
+      "required_evidence": ["gate-transition-decision", "exact-head-binding"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["MERGE_WITHOUT_EXACT_HEAD_BINDING", "AUTHORITY_SELF_GRANT"],
+      "authority": {
+        "required": false,
+        "allowed_sources": ["human", "standing-machine-authority"],
+        "allowed_types": ["explicit-approval", "standing-exact-head"],
+        "default_source": "standing-machine-authority",
+        "default_type": "standing-exact-head"
+      },
+      "terminal_effect": {
+        "REQUIRED": "GATE_MUST_BE_SATISFIED_WITH_BOUND_AUTHORITY"
+      }
     },
     {
       "id": "g5-deploy-effect-driven",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "NOT_APPLICABLE",
       "required_when": [
         {"id": "manual-deploy", "field": "effects.manual_deploy_requested", "operator": "truthy"},
@@ -57,11 +89,24 @@
       "not_applicable_when": [],
       "blocked_when": [
         {"id": "deploy-blocked", "field": "effects.deploy_blocked", "operator": "truthy"}
-      ]
+      ],
+      "required_evidence": ["deploy-authorization"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["IMPLICIT_DEPLOY", "NOT_APPLICABLE_AS_PASS"],
+      "authority": {
+        "required": false,
+        "allowed_sources": ["human"],
+        "allowed_types": ["explicit-approval"],
+        "default_source": "human",
+        "default_type": "explicit-approval"
+      },
+      "terminal_effect": {
+        "NOT_APPLICABLE": "GATE_SKIPPED_WITH_EXPLICIT_EVIDENCE_NO_DEPLOY_EFFECT"
+      }
     },
     {
       "id": "g6-production-effect-driven",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "default": "NOT_APPLICABLE",
       "required_when": [
         {"id": "production-data", "field": "effects.production_data_change", "operator": "truthy"},
@@ -72,7 +117,20 @@
       "not_applicable_when": [],
       "blocked_when": [
         {"id": "production-authority-missing", "field": "effects.production_authority_missing", "operator": "truthy"}
-      ]
+      ],
+      "required_evidence": ["production-change-authorization"],
+      "evidence_must_be_bound": false,
+      "prohibitions": ["IMPLICIT_PRODUCTION_DATA_CHANGE", "NOT_APPLICABLE_AS_PASS"],
+      "authority": {
+        "required": false,
+        "allowed_sources": ["human"],
+        "allowed_types": ["explicit-approval"],
+        "default_source": "human",
+        "default_type": "explicit-approval"
+      },
+      "terminal_effect": {
+        "NOT_APPLICABLE": "GATE_SKIPPED_WITH_EXPLICIT_EVIDENCE_NO_PRODUCTION_EFFECT"
+      }
     }
   ]
 }

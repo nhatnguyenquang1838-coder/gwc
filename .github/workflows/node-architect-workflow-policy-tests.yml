@@ -12,6 +12,7 @@ on:
       - 'tools/node_architect/evaluate_gate_applicability.py'
       - 'tools/node_architect/resolve_gate_node_route.py'
       - 'tests/test_workflow_profile_gate_applicability.py'
+      - 'tests/test_gate_applicability_policy_contract.py'
       - '.github/workflows/node-architect-workflow-policy-tests.yml'
 
 permissions:
@@ -31,4 +32,4 @@ jobs:
       - name: Compile workflow-policy tools
         run: python -m py_compile tools/node_architect/evaluate_gate_applicability.py tools/node_architect/resolve_gate_node_route.py
       - name: Run workflow-policy E2E contract tests
-        run: python -m unittest -v tests.test_workflow_profile_gate_applicability
+        run: python -m unittest -v tests.test_workflow_profile_gate_applicability tests.test_gate_applicability_policy_contract

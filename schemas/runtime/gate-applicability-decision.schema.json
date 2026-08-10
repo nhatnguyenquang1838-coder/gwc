@@ -5,20 +5,43 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "artifact_type", "flow_profile_id", "policy_registry_ref",
-    "gate", "policy_ref", "decision", "reason_code", "matched_rule",
-    "context_digest", "decision_digest"
+    "schema_version", "artifact_type", "binding", "flow_profile_id",
+    "flow_profile_version", "flow_profile_digest", "policy_registry_ref",
+    "policy_registry_digest", "gate", "policy_ref", "policy_version",
+    "policy_digest", "decision", "reason_code", "matched_rule",
+    "required_evidence", "prohibitions", "authority_source", "authority_type",
+    "terminal_effect", "context_digest", "decision_digest"
   ],
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {"const": "1.1"},
     "artifact_type": {"const": "gate-applicability-decision"},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "task_id", "repository"],
+      "properties": {
+        "run_id": {"type": "string", "minLength": 1},
+        "task_id": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1}
+      }
+    },
     "flow_profile_id": {"type": "string", "minLength": 1},
+    "flow_profile_version": {"type": "string", "minLength": 1},
+    "flow_profile_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "policy_registry_ref": {"type": "string", "minLength": 1},
+    "policy_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
     "policy_ref": {"type": ["string", "null"]},
+    "policy_version": {"type": ["string", "null"]},
+    "policy_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
     "decision": {"enum": ["REQUIRED", "NOT_APPLICABLE", "BLOCKED"]},
     "reason_code": {"type": "string", "minLength": 1},
     "matched_rule": {"type": ["string", "null"]},
+    "required_evidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "prohibitions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "authority_source": {"type": ["string", "null"]},
+    "authority_type": {"type": ["string", "null"]},
+    "terminal_effect": {"type": "string", "minLength": 1},
     "context_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
   }

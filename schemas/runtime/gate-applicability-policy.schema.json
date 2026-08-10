@@ -11,7 +11,45 @@
     "default": {"enum": ["REQUIRED", "NOT_APPLICABLE", "BLOCKED"]},
     "required_when": {"$ref": "#/$defs/conditions"},
     "not_applicable_when": {"$ref": "#/$defs/conditions"},
-    "blocked_when": {"$ref": "#/$defs/conditions"}
+    "blocked_when": {"$ref": "#/$defs/conditions"},
+    "required_evidence": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]*$"}
+    },
+    "evidence_must_be_bound": {"type": "boolean"},
+    "prohibitions": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required": {"type": "boolean"},
+        "allowed_sources": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "allowed_types": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "default_source": {"type": "string", "minLength": 1},
+        "default_type": {"type": "string", "minLength": 1}
+      }
+    },
+    "context_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required_fields": {"type": "array", "items": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"}},
+        "expected_context_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "max_context_age_seconds": {"type": "integer", "minimum": 0}
+      }
+    },
+    "terminal_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "REQUIRED": {"type": "string", "minLength": 1},
+        "NOT_APPLICABLE": {"type": "string", "minLength": 1},
+        "BLOCKED": {"type": "string", "minLength": 1}
+      }
+    }
   },
   "$defs": {
     "conditions": {
