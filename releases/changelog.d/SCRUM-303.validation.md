@@ -1,1 +1,0 @@
-Validation before PR: G0/G1 PASS, G2 evidence PASS, base-lineage proof PASS, focused `tests.test_intake_context_files_read_scope` 12/12 PASS. Exact-head repository CI remains authoritative after PR creation.
