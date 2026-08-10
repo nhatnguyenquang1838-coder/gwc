@@ -69,6 +69,38 @@ def _string_list(value: Any) -> list[str] | None:
     return list(value)
 
 
+def _base_lineage_allows(manifest: Mapping[str, Any], execution_base_sha: Any, proof: Any) -> bool:
+    """Accept the Human-approved anchor or a trusted descendant proof.
+
+    This function only validates the deterministic proof contract. The proof must
+    still be projected/attested by trusted repository CI that performed the
+    repository comparison; callers cannot turn a locally fabricated proof into
+    live authority.
+    """
+    anchor = manifest.get("approved_base_sha")
+    if not isinstance(execution_base_sha, str) or not SHA_RE.fullmatch(execution_base_sha):
+        return False
+    if execution_base_sha == anchor:
+        return True
+    if not isinstance(proof, Mapping):
+        return False
+    if proof.get("schema_version") != "1.0" or proof.get("artifact_type") != "autonomous-preprod-base-lineage-proof":
+        return False
+    if proof.get("run_id") != manifest.get("run_id") or proof.get("repository") != manifest.get("repository"):
+        return False
+    if proof.get("anchor_base_sha") != anchor or proof.get("current_base_sha") != execution_base_sha:
+        return False
+    supplied = proof.get("lineage_digest")
+    if not isinstance(supplied, str) or not DIGEST_RE.fullmatch(supplied):
+        return False
+    unsigned = dict(proof)
+    unsigned.pop("lineage_digest", None)
+    try:
+        return supplied == canonical_digest(unsigned)
+    except (TypeError, ValueError):
+        return False
+
+
 def derive_g2_authority(
     policy: Mapping[str, Any],
     manifest: Mapping[str, Any],
@@ -80,7 +112,7 @@ def derive_g2_authority(
     now = now or datetime.now(timezone.utc)
     try:
         validation = validate_manifest(policy, manifest, root=root, now=now)
-    except (TypeError, ValueError, KeyError) as exc:
+    except (TypeError, ValueError, KeyError):
         return _deny("G2_EXECUTION", "AUTONOMOUS_RUN_MANIFEST_INVALID")
     run_id = str(manifest.get("run_id", "")) or None
     if not isinstance(request, Mapping):
@@ -108,8 +140,9 @@ def derive_g2_authority(
         return _deny("G2_EXECUTION", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
     if request.get("observed_base_ref") != manifest.get("approved_base_ref"):
         return _deny("G2_EXECUTION", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
-    if request.get("observed_base_sha") != manifest.get("approved_base_sha"):
-        return _deny("G2_EXECUTION", "AUTONOMOUS_BASE_SHA_MISMATCH", run_id=run_id, task_id=task_id)
+    execution_base_sha = request.get("observed_base_sha")
+    if not _base_lineage_allows(manifest, execution_base_sha, request.get("base_lineage_proof")):
+        return _deny("G2_EXECUTION", "AUTONOMOUS_BASE_LINEAGE_INVALID", run_id=run_id, task_id=task_id)
     if request.get("working_branch") != task.get("working_branch"):
         return _deny("G2_EXECUTION", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
 
@@ -130,7 +163,8 @@ def derive_g2_authority(
         "authorized_paths": requested_paths,
         "authorized_actions": requested_actions,
         "base_ref": manifest["approved_base_ref"],
-        "base_sha": manifest["approved_base_sha"],
+        "base_sha": execution_base_sha,
+        "authority_anchor_sha": manifest["approved_base_sha"],
     }
     value: dict[str, Any] = {
         "schema_version": "1.0",
@@ -148,7 +182,8 @@ def derive_g2_authority(
         "task_id": task_id,
         "repository": manifest["repository"],
         "base_ref": manifest["approved_base_ref"],
-        "base_sha": manifest["approved_base_sha"],
+        "base_sha": execution_base_sha,
+        "authority_anchor_sha": manifest["approved_base_sha"],
         "working_branch": request["working_branch"],
         "risk_class": risk,
         "authorized_paths": requested_paths,
@@ -195,8 +230,9 @@ def derive_g4_receipt(
         return _deny("G4_MERGE", "AUTONOMOUS_PREPROD_TARGET_REQUIRED", run_id=run_id, task_id=task_id)
     if context.get("approved_base_ref") != manifest.get("approved_base_ref"):
         return _deny("G4_MERGE", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
-    if context.get("approved_base_sha") != manifest.get("approved_base_sha"):
-        return _deny("G4_MERGE", "AUTONOMOUS_BASE_SHA_MISMATCH", run_id=run_id, task_id=task_id)
+    execution_base_sha = context.get("approved_base_sha")
+    if not _base_lineage_allows(manifest, execution_base_sha, context.get("base_lineage_proof")):
+        return _deny("G4_MERGE", "AUTONOMOUS_BASE_LINEAGE_INVALID", run_id=run_id, task_id=task_id)
     if context.get("working_branch") != task.get("working_branch"):
         return _deny("G4_MERGE", "AUTONOMOUS_SCOPE_DRIFT", run_id=run_id, task_id=task_id)
     if context.get("authorized_action") != "merge_approved_pr":
@@ -237,7 +273,7 @@ def derive_g4_receipt(
         "repository": manifest["repository"],
         "target_branch": "pre-prod",
         "approved_base_ref": manifest["approved_base_ref"],
-        "approved_base_sha": manifest["approved_base_sha"],
+        "approved_base_sha": execution_base_sha,
         "working_branch": task["working_branch"],
         "pr_number": pr_number,
         "approved_head_sha": head,
@@ -306,7 +342,6 @@ def validate_g4_receipt(
             "repository": manifest.get("repository"),
             "target_branch": "pre-prod",
             "approved_base_ref": manifest.get("approved_base_ref"),
-            "approved_base_sha": manifest.get("approved_base_sha"),
             "expires_at": manifest.get("expires_at"),
             "trust_state": "requires_trusted_repo_ci_projection",
             "authorized_action": "merge_approved_pr",
@@ -338,9 +373,9 @@ def validate_g4_receipt(
         if current.get("approved_base_ref") != manifest.get("approved_base_ref"):
             reasons.append("AUTONOMOUS_SCOPE_DRIFT")
             details.append("current base ref does not match manifest")
-        if current.get("approved_base_sha") != manifest.get("approved_base_sha"):
-            reasons.append("AUTONOMOUS_BASE_SHA_MISMATCH")
-            details.append("current base SHA does not match manifest")
+        if not _base_lineage_allows(manifest, current.get("approved_base_sha"), current.get("base_lineage_proof")):
+            reasons.append("AUTONOMOUS_BASE_LINEAGE_INVALID")
+            details.append("current execution base is neither the authority anchor nor a trusted descendant proof")
         if task is not None and current.get("working_branch") != task.get("working_branch"):
             reasons.append("AUTONOMOUS_SCOPE_DRIFT")
             details.append("current working branch does not match task scope")
@@ -361,7 +396,7 @@ def validate_g4_receipt(
             ("repository", "AUTONOMOUS_SCOPE_DRIFT"),
             ("target_branch", "AUTONOMOUS_SCOPE_DRIFT"),
             ("approved_base_ref", "AUTONOMOUS_SCOPE_DRIFT"),
-            ("approved_base_sha", "AUTONOMOUS_BASE_SHA_MISMATCH"),
+            ("approved_base_sha", "AUTONOMOUS_BASE_LINEAGE_INVALID"),
             ("working_branch", "AUTONOMOUS_SCOPE_DRIFT"),
             ("authorized_action", "AUTONOMOUS_ACTION_FORBIDDEN"),
         ):
