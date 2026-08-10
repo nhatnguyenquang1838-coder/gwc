@@ -87,12 +87,13 @@ jobs:
               allowed_tasks: field('allowed_tasks'),
               expires_at: field('expires_at'),
             };
-            if (parentReceipt.status !== 'present' ||
-                parentReceipt.source !== 'github_actions_bot_comment' ||
-                parentReceipt.bot_login !== 'github-actions[bot]' ||
-                parentReceipt.marker !== receiptMarker ||
-                parentReceipt.approved_run_id !== expectedRunId) {
-              return fail('AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED', 'parent receipt identity fields are invalid');
+            // Legacy R3B receipt comments predate explicit status/source/bot_login/marker
+            // fields in the marker. The comment actor is trusted here; full receipt
+            // identity is verified below from the bot-authored manifest JSON.
+            if (parentReceipt.approved_run_id !== expectedRunId ||
+                !parentReceipt.approval_id || !parentReceipt.manifest_scope_digest ||
+                !parentReceipt.source_comment_id || !parentReceipt.receipt_comment_id) {
+              return fail('AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED', 'parent receipt binding fields are invalid');
             }
             const allowedTasks = new Set((parentReceipt.allowed_tasks || '').split(',').filter(Boolean));
             if (!allowedTasks.has(expectedTaskId)) {
@@ -145,6 +146,10 @@ jobs:
                 projectedReceipt.bot_login !== 'github-actions[bot]' ||
                 projectedReceipt.marker !== receiptMarker ||
                 projectedReceipt.approved_run_id !== expectedRunId ||
+                projectedReceipt.approval_id !== parentReceipt.approval_id ||
+                String(projectedReceipt.receipt_comment_id) !== String(parentReceipt.receipt_comment_id) ||
+                String(projectedReceipt.source_comment_id) !== String(parentReceipt.source_comment_id) ||
+                projectedReceipt.manifest_scope_digest !== parentReceipt.manifest_scope_digest ||
                 manifest.repository !== `${owner}/${repo}` ||
                 manifest.target_branch !== 'pre-prod' || manifest.approved_base_ref !== 'pre-prod') {
               return fail('AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED', 'trusted manifest/receipt identity is inconsistent');
