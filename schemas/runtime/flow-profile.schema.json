@@ -13,6 +13,7 @@
     "node_registry_ref": {"type": "string", "minLength": 1},
     "scenario_registry_ref": {"type": "string", "minLength": 1},
     "graph_registry_ref": {"type": "string", "minLength": 1},
+    "policy_registry_ref": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "revision": {"type": "string", "minLength": 1},
     "pilot_nodes": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1}},
     "routes": {
@@ -66,17 +67,13 @@
           }
         },
         "gate_bindings": {
-          "type": "array", "minItems": 1,
+          "type": "array", "minItems": 7, "maxItems": 7,
           "items": {
             "type": "object", "additionalProperties": false,
-            "required": ["gate", "policy_id", "default", "required_when", "not_applicable_when", "blocked_when"],
+            "required": ["gate", "policy_ref"],
             "properties": {
-              "gate": {"type": "string", "minLength": 1},
-              "policy_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
-              "default": {"enum": ["REQUIRED", "NOT_APPLICABLE", "BLOCKED"]},
-              "required_when": {"$ref": "#/$defs/conditions"},
-              "not_applicable_when": {"$ref": "#/$defs/conditions"},
-              "blocked_when": {"$ref": "#/$defs/conditions"}
+              "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+              "policy_ref": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
             }
           }
         }
@@ -101,26 +98,10 @@
       }
     }
   },
-  "$defs": {
-    "conditions": {
-      "type": "array",
-      "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["field", "operator"],
-        "properties": {
-          "id": {"type": "string", "minLength": 1},
-          "field": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"},
-          "operator": {"enum": ["equals", "in", "exists", "truthy"]},
-          "value": {},
-          "values": {"type": "array", "minItems": 1}
-        }
-      }
-    }
-  },
   "allOf": [
     {
       "if": {"properties": {"version": {"pattern": "^2\\."}}, "required": ["version"]},
-      "then": {"required": ["workflow"]}
+      "then": {"required": ["workflow", "policy_registry_ref"]}
     }
   ]
 }
