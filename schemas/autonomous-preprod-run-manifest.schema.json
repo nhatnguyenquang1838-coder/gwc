@@ -109,6 +109,8 @@
         "approved_policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
         "manifest_scope_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
         "scope_hash_prefix": {"type": "string", "pattern": "^[0-9a-f]{16}$"},
+        "approved_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "materialized_preprod_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
         "issued_at": {"type": "string", "format": "date-time"},
         "expires_at": {"type": "string", "format": "date-time"}
       }
