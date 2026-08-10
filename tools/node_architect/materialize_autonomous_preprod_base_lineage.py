@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Validate trusted pre-prod descendant lineage for a parent autonomous run.
 
-The parent manifest anchor remains immutable. A later pre-prod base is accepted
-only when every advance is a trusted, exact-SHA, same-run merge/G5 step for an
-allowlisted task. Arbitrary branch drift fails closed.
+The Human-approved parent anchor remains immutable. A later pre-prod base is
+accepted when each transition is backed by a trusted merge proof for the same
+run/repository and an allowlisted task. Post-merge G5 is observational for the
+AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN route and is never authority evidence.
 """
 from __future__ import annotations
 
@@ -54,16 +55,24 @@ def validate_base_lineage(
             reasons.append("AUTONOMOUS_BASE_LINEAGE_FOREIGN_REPOSITORY")
         if step.get("trusted_merge_proof") is not True:
             reasons.append("AUTONOMOUS_BASE_LINEAGE_UNTRUSTED")
-        if step.get("trusted_g5_evidence") is not True or step.get("g5_classification") != "success":
-            reasons.append("AUTONOMOUS_BASE_LINEAGE_G5_NOT_SUCCESS")
+
+        # G5 fields are retained only as observational audit metadata. They are
+        # deliberately not used to authorize lineage or dependency unlock.
+        g5_classification = step.get("g5_classification")
+        if g5_classification is not None and not isinstance(g5_classification, str):
+            reasons.append("AUTONOMOUS_BASE_LINEAGE_INVALID")
+        trusted_g5_evidence = step.get("trusted_g5_evidence")
+        if trusted_g5_evidence is not None and type(trusted_g5_evidence) is not bool:
+            reasons.append("AUTONOMOUS_BASE_LINEAGE_INVALID")
+
         normalized.append({
             "task_id": task_id,
             "previous_base_sha": previous,
             "merged_head_sha": merged_head,
             "merge_commit_sha": merge_sha,
-            "g5_classification": step.get("g5_classification"),
+            "g5_classification": g5_classification,
             "trusted_merge_proof": step.get("trusted_merge_proof"),
-            "trusted_g5_evidence": step.get("trusted_g5_evidence"),
+            "trusted_g5_evidence": trusted_g5_evidence,
         })
         cursor = str(merge_sha)
 
