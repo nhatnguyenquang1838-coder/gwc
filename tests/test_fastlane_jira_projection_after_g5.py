@@ -36,7 +36,7 @@ class FastLaneJiraProjectionAfterG5Tests(unittest.TestCase):
             "required workflow",
             "names",
             "connector could not query",
-            "push/main Actions runs",
+            "required Actions runs",
             "not",
             "connector-confirmed `PASS`",
         ]
@@ -61,7 +61,7 @@ class FastLaneJiraProjectionAfterG5Tests(unittest.TestCase):
         for phrase in [
             "traceability only",
             "never grants repository write",
-            "GWC gate artifacts and exact approvals remain the authority source",
+            "GWC gate artifacts and exact validated route/gate authority remain the authority source",
         ]:
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, self.e2e_text)
