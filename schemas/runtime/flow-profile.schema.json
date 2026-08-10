@@ -32,6 +32,56 @@
       }
     },
     "green_targets": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry_nodes", "terminal_nodes", "edges", "gate_bindings"],
+      "properties": {
+        "entry_nodes": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "terminal_nodes": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["node", "outcome"],
+            "properties": {
+              "node": {"type": "string", "minLength": 1},
+              "outcome": {"enum": ["GREEN", "CONDITIONAL", "BLOCKED", "HUMAN_REQUIRED"]}
+            }
+          }
+        },
+        "edges": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "target", "kind", "runtime_executable"],
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "kind": {"enum": ["runtime", "dependency", "conditional", "history", "human_authority"]},
+              "runtime_executable": {"type": "boolean"}
+            }
+          }
+        },
+        "gate_bindings": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["gate", "policy_id", "default", "required_when", "not_applicable_when", "blocked_when"],
+            "properties": {
+              "gate": {"type": "string", "minLength": 1},
+              "policy_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+              "default": {"enum": ["REQUIRED", "NOT_APPLICABLE", "BLOCKED"]},
+              "required_when": {"$ref": "#/$defs/conditions"},
+              "not_applicable_when": {"$ref": "#/$defs/conditions"},
+              "blocked_when": {"$ref": "#/$defs/conditions"}
+            }
+          }
+        }
+      }
+    },
     "visibility": {
       "type": "object",
       "additionalProperties": false,
@@ -50,5 +100,27 @@
         "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     }
-  }
+  },
+  "$defs": {
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["field", "operator"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "field": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"},
+          "operator": {"enum": ["equals", "in", "exists", "truthy"]},
+          "value": {},
+          "values": {"type": "array", "minItems": 1}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"version": {"pattern": "^2\\."}}, "required": ["version"]},
+      "then": {"required": ["workflow"]}
+    }
+  ]
 }
