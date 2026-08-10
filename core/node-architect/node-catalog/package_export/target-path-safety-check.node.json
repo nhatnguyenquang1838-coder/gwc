@@ -9,15 +9,9 @@
     "G3_PR"
   ],
   "description": "Reject unsafe, duplicate, or output-root-escaping consumer target paths.",
-  "implementation": "tools/node_architect/package_export/target_path_safety_check.py",
-  "schema_ref": "schemas/node-architect/package-export/target-path-safety-check.schema.json",
-  "reason_codes": [
-    "OUTSIDE_OUTPUT_ROOT",
-    "TRAVERSAL_DETECTED",
-    "PATH_COLLISION",
-    "NON_NORMALIZED_PATH",
-    "SELF_COPY",
-    "RESERVED_OR_SYSTEM_PATH"
-  ],
-  "provenance": {}
+  "provenance": {
+    "discovery_basis": "plan",
+    "source_path": "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
+    "source_sha": "2f99fa2517e535298c77672f20267df40da057d621d6c9f24fa49f4dd6e93756"
+  }
 }
