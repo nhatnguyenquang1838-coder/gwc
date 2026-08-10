@@ -103,6 +103,7 @@ class FilesReadScopeTests(unittest.TestCase):
         self.assertEqual("READY", artifact["outcome"])
         self.assertIn("tests/test_intake_context_files_read_scope.py", artifact["files_exclude"])
         self.assertEqual("Tests are not required by this analysis slice.", artifact["exclusion_reasons"]["tests/test_intake_context_files_read_scope.py"])
+        self.assert_schema(artifact)
 
     def test_outside_allowed_root_fails_closed_without_broadening(self):
         payload = self.payload()
@@ -110,6 +111,9 @@ class FilesReadScopeTests(unittest.TestCase):
         artifact = self.mod.render_files_read_scope(payload)
         self.assertEqual(("BLOCKED", "SCOPE_DRIFT", "RECOMPUTE_READ_SCOPE"), (artifact["outcome"], artifact["reason_code"], artifact["next_route"]))
         self.assertEqual([], artifact["files_read"])
+        self.assertIn(".github/workflows/validate-instructions.yml", artifact["files_exclude"])
+        self.assertEqual("Outside verified allowed roots.", artifact["exclusion_reasons"][".github/workflows/validate-instructions.yml"])
+        self.assert_schema(artifact)
 
     def test_ambiguous_candidates_fail_closed(self):
         payload = self.payload()
@@ -119,6 +123,7 @@ class FilesReadScopeTests(unittest.TestCase):
         ]
         artifact = self.mod.render_files_read_scope(payload)
         self.assertEqual(("BLOCKED", "MALFORMED_INPUT", "CLARIFY_READ_SCOPE"), (artifact["outcome"], artifact["reason_code"], artifact["next_route"]))
+        self.assert_schema(artifact)
 
     def test_missing_required_path_fails_closed(self):
         payload = self.payload()
@@ -126,16 +131,25 @@ class FilesReadScopeTests(unittest.TestCase):
         artifact = self.mod.render_files_read_scope(payload)
         self.assertEqual(("BLOCKED", "MISSING_EVIDENCE", "REPOSITORY_EVIDENCE_MISSING"), (artifact["outcome"], artifact["reason_code"], artifact["failure_classification"]))
         self.assertIn("tools/node_architect/missing.py", artifact["files_missing"])
+        self.assert_schema(artifact)
 
     def test_repository_or_ua_drift_invalidates_scope(self):
         artifact = self.render(repository_snapshot={"base_sha": "6" * 40, "tree_digest": "sha256:" + "1" * 64})
         self.assertEqual(("BLOCKED", "SCOPE_DRIFT", "RECOMPUTE_READ_SCOPE"), (artifact["outcome"], artifact["reason_code"], artifact["next_route"]))
+        self.assert_schema(artifact)
 
     def test_stale_source_binding_invalidates_scope(self):
         payload = self.payload()
         payload["source_bindings"][0]["status"] = "STALE"
         artifact = self.mod.render_files_read_scope(payload)
         self.assertEqual(("BLOCKED", "SCOPE_DRIFT"), (artifact["outcome"], artifact["reason_code"]))
+        self.assert_schema(artifact)
+
+    def test_malformed_source_bindings_block_with_schema_valid_artifact(self):
+        artifact = self.render(source_bindings=[])
+        self.assertEqual(("BLOCKED", "MALFORMED_INPUT", "RECOMPUTE_READ_SCOPE"), (artifact["outcome"], artifact["reason_code"], artifact["next_route"]))
+        self.assertEqual([], artifact["source_bindings"])
+        self.assert_schema(artifact)
 
     def test_scope_hash_is_deterministic_across_order_and_observation_time(self):
         first = self.render()
@@ -150,6 +164,30 @@ class FilesReadScopeTests(unittest.TestCase):
     def test_prior_scope_from_another_base_is_stale(self):
         artifact = self.render(prior_scope={"base_sha": "7" * 40, "scope_hash": "sha256:" + "3" * 64})
         self.assertEqual(("BLOCKED", "SCOPE_DRIFT"), (artifact["outcome"], artifact["reason_code"]))
+        self.assert_schema(artifact)
+
+    def test_same_base_source_revision_drift_invalidates_prior_scope(self):
+        first = self.render()
+        payload = self.payload()
+        payload["prior_scope"] = {"base_sha": BASE, "scope_hash": first["scope_hash"]}
+        payload["source_bindings"][1]["revision"] = "ua-v2"
+        payload["ua_snapshot"]["digest"] = "sha256:" + "9" * 64
+        artifact = self.mod.render_files_read_scope(payload)
+        self.assertEqual(("BLOCKED", "SCOPE_DRIFT", "RECOMPUTE_READ_SCOPE"), (artifact["outcome"], artifact["reason_code"], artifact["next_route"]))
+        self.assert_schema(artifact)
+
+    def test_all_candidates_excluded_is_scope_drift_not_missing_evidence(self):
+        payload = self.payload()
+        payload["read_requirements"] = [{
+            "requirement_id": "test-only",
+            "candidates": ["tests/test_intake_context_files_read_scope.py"],
+            "reason": "Test-only path is intentionally excluded.",
+        }]
+        artifact = self.mod.render_files_read_scope(payload)
+        self.assertEqual(("BLOCKED", "SCOPE_DRIFT"), (artifact["outcome"], artifact["reason_code"]))
+        self.assertEqual([], artifact["files_missing"])
+        self.assertIn("tests/test_intake_context_files_read_scope.py", artifact["files_exclude"])
+        self.assert_schema(artifact)
 
     def test_no_authority_is_ever_granted(self):
         artifact = self.render()
