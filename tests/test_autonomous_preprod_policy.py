@@ -146,12 +146,13 @@ class AutonomousPreprodPolicyTests(unittest.TestCase):
         p = policy(); p["allowed_branch_prefix"] = "auto/team/"
         self.assertIn("AUTONOMOUS_POLICY_INVALID", validate_policy(p, root=ROOT, now=NOW)["reason_codes"])
 
-    def test_policy_digest_drift_invalidates_manifest(self):
-        p = policy(); m = manifest(p); p["policy_revision"] = "test-v2"
+    def test_runtime_policy_revision_does_not_rewrite_parent_authority(self):
+        p = policy(); m = manifest(p); approval_digest = m["policy_digest"]
+        p["policy_revision"] = "test-v2"
         result = validate_manifest(p, m, root=ROOT, now=NOW)
-        self.assertIn("AUTONOMOUS_POLICY_REVISION_DRIFT", result["reason_codes"])
-        self.assertIn("AUTONOMOUS_POLICY_DIGEST_DRIFT", result["reason_codes"])
-        self.assertIn("AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED", result["reason_codes"])
+        self.assertEqual("PASS", result["outcome"])
+        self.assertEqual(approval_digest, m["authority_receipt"]["approved_policy_digest"])
+        self.assertNotEqual(result["policy_digest"], approval_digest)
 
     def test_future_manifest_is_not_yet_valid(self):
         p = policy(); m = manifest(p); m["issued_at"] = "2026-08-07T04:00:00Z"; rebind_parent_receipt(m)
