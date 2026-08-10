@@ -19,6 +19,20 @@ DIGEST_D = "sha256:" + "d" * 64
 DIGEST_E = "sha256:" + "e" * 64
 
 
+def lineage_proof(m: dict, current_sha: str) -> dict:
+    proof = {
+        "schema_version": "1.0",
+        "artifact_type": "autonomous-preprod-base-lineage-proof",
+        "run_id": m["run_id"],
+        "repository": m["repository"],
+        "anchor_base_sha": m["approved_base_sha"],
+        "current_base_sha": current_sha,
+        "steps": [],
+    }
+    proof["lineage_digest"] = canonical_digest(proof)
+    return proof
+
+
 def g2_request() -> dict:
     return {
         "task_id": "SCRUM-900",
@@ -69,15 +83,25 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         self.assertEqual(m["allowed_tasks"][0]["risk_class"], first["risk_class"])
         self.assertEqual(m["repository"], first["repository"])
         self.assertEqual(m["approved_base_ref"], first["base_ref"])
+        self.assertEqual(m["approved_base_sha"], first["authority_anchor_sha"])
         self.assertIn("create_commit", first["authorized_actions"])
 
     def test_unknown_task_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["task_id"] = "SCRUM-999"
         self.assertEqual("AUTONOMOUS_TASK_NOT_ALLOWLISTED", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
 
-    def test_base_drift_is_denied(self):
+    def test_descendant_base_without_proof_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["observed_base_sha"] = "f" * 40
-        self.assertEqual("AUTONOMOUS_BASE_SHA_MISMATCH", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
+        self.assertEqual("AUTONOMOUS_BASE_LINEAGE_INVALID", derive_g2_authority(p, m, request, root=ROOT, now=NOW)["reason_code"])
+
+    def test_descendant_base_with_matching_proof_is_allowed(self):
+        p = policy(); m = manifest(p); request = g2_request(); current = "f" * 40
+        request["observed_base_sha"] = current
+        request["base_lineage_proof"] = lineage_proof(m, current)
+        result = derive_g2_authority(p, m, request, root=ROOT, now=NOW)
+        self.assertEqual("ALLOW", result["decision"])
+        self.assertEqual(current, result["base_sha"])
+        self.assertEqual(m["approved_base_sha"], result["authority_anchor_sha"])
 
     def test_repository_drift_is_denied(self):
         p = policy(); m = manifest(p); request = g2_request(); request["observed_repository"] = "other/repo"
@@ -138,9 +162,17 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         p = policy(); m = manifest(p); context = g4_context(m); context["repository"] = "other/repo"
         self.assertEqual("AUTONOMOUS_SCOPE_DRIFT", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
 
-    def test_g4_base_drift_is_denied(self):
+    def test_g4_descendant_without_proof_is_denied(self):
         p = policy(); m = manifest(p); context = g4_context(m); context["approved_base_sha"] = "f" * 40
-        self.assertEqual("AUTONOMOUS_BASE_SHA_MISMATCH", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
+        self.assertEqual("AUTONOMOUS_BASE_LINEAGE_INVALID", derive_g4_receipt(p, m, context, root=ROOT, now=NOW)["reason_code"])
+
+    def test_g4_descendant_with_matching_proof_is_allowed(self):
+        p = policy(); m = manifest(p); context = g4_context(m); current = "f" * 40
+        context["approved_base_sha"] = current
+        context["base_lineage_proof"] = lineage_proof(m, current)
+        result = derive_g4_receipt(p, m, context, root=ROOT, now=NOW)
+        self.assertEqual("ALLOW", result["decision"])
+        self.assertEqual(current, result["approved_base_sha"])
 
     def test_g4_wrong_action_is_denied(self):
         p = policy(); m = manifest(p); context = g4_context(m); context["authorized_action"] = "deploy_approved_release"
@@ -170,7 +202,7 @@ class TaskAuthorityDerivationTests(unittest.TestCase):
         p = policy(); m = manifest(p); current = g4_context(m)
         receipt = derive_g4_receipt(p, m, current, root=ROOT, now=NOW)
         drifted = dict(current); drifted["approved_base_sha"] = "c" * 40
-        self.assertIn("AUTONOMOUS_BASE_SHA_MISMATCH", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
+        self.assertIn("AUTONOMOUS_BASE_LINEAGE_INVALID", validate_g4_receipt(receipt, p, m, drifted, root=ROOT, now=NOW)["reason_codes"])
 
     def test_receipt_base_ref_drift_is_invalid(self):
         p = policy(); m = manifest(p); current = g4_context(m)
