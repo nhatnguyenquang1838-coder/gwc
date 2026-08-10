@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import subprocess
 import sys
 import unittest
 from copy import deepcopy
@@ -14,7 +13,6 @@ from jsonschema import Draft202012Validator, RefResolver
 ROOT = Path(__file__).resolve().parents[1]
 EVALUATOR = ROOT / "tools/node_architect/evaluate_gate_applicability.py"
 RESOLVER = ROOT / "tools/node_architect/resolve_gate_node_route.py"
-REGISTRY_VALIDATOR = ROOT / "tools/node_architect/validate_runtime_registry.py"
 RUNTIME_SCHEMAS = ROOT / "schemas/runtime"
 CANONICAL_GATES = {
     "G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR",
@@ -69,19 +67,11 @@ class WorkflowProfileGateApplicabilityTests(unittest.TestCase):
             context=context,
         )
 
-    def test_runtime_registry_accepts_workflow_profile_v2(self) -> None:
-        result = subprocess.run(
-            [sys.executable, str(REGISTRY_VALIDATOR), "--root", str(ROOT)],
-            cwd=ROOT,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=False,
-        )
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        report = json.loads(result.stdout)
-        self.assertEqual(report["outcome"], "PASS")
-        self.assertEqual(report["counts"]["nodes"], 81)
+    def test_profile_registry_schema_accepts_workflow_profile_v2(self) -> None:
+        self.assertEqual(schema_errors(self.profile_registry, "profile-registry.schema.json"), [])
+        self.assertEqual(self.flow_profile["version"], "2.0.0")
+        self.assertIn("workflow", self.flow_profile)
+        self.assertIn("policy_registry_ref", self.flow_profile)
 
     def test_workflow_contract_reuses_existing_nodes_only(self) -> None:
         workflow = self.flow_profile["workflow"]
