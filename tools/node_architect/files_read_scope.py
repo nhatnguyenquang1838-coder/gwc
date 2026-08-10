@@ -32,13 +32,6 @@ AUTH_FIELDS = (
     "production_authority_granted",
 )
 
-REASON_CODES = {
-    "ACCEPTED",
-    "MISSING_EVIDENCE",
-    "MALFORMED_INPUT",
-    "SCOPE_DRIFT",
-}
-
 
 def _canon(value: Any) -> Any:
     if isinstance(value, Mapping):
@@ -310,6 +303,7 @@ def render_files_read_scope(payload: Mapping[str, Any]) -> dict[str, Any]:
             )
 
     prior_scope = payload.get("prior_scope")
+    prior_scope_hash: str | None = None
     if prior_scope is not None:
         if not isinstance(prior_scope, Mapping) or prior_scope.get("base_sha") != base_sha:
             return _artifact(
@@ -320,6 +314,18 @@ def render_files_read_scope(payload: Mapping[str, Any]) -> dict[str, Any]:
                 exclusion_reasons={}, reason_code="SCOPE_DRIFT",
                 next_route="RECOMPUTE_READ_SCOPE", observed_at=payload.get("observed_at"),
             )
+        candidate_hash = prior_scope.get("scope_hash")
+        if candidate_hash is not None:
+            if not isinstance(candidate_hash, str) or not SHA256.fullmatch(candidate_hash):
+                return _artifact(
+                    task_id=task_id, repository=repository, base_sha=base_sha, branch=branch,
+                    source_bindings=source_bindings, outcome="BLOCKED",
+                    failure_classification="AGENT_PREPARATION_BLOCKED",
+                    files_read=[], files_exclude=[], files_missing=[],
+                    exclusion_reasons={}, reason_code="MALFORMED_INPUT",
+                    next_route="RECOMPUTE_READ_SCOPE", observed_at=payload.get("observed_at"),
+                )
+            prior_scope_hash = candidate_hash
 
     allowed_roots_raw = payload.get("allowed_roots")
     allowed_roots = _paths(allowed_roots_raw) if allowed_roots_raw is not None else []
@@ -333,7 +339,14 @@ def render_files_read_scope(payload: Mapping[str, Any]) -> dict[str, Any]:
 
     for requirement in requirements:
         candidates = requirement["candidates"]
-        if allowed_roots and any(not any(_root_allows(path, root) for root in allowed_roots) for path in candidates):
+        outside_roots = [
+            path for path in candidates
+            if allowed_roots and not any(_root_allows(path, root) for root in allowed_roots)
+        ]
+        if outside_roots:
+            for path in outside_roots:
+                excluded.append(path)
+                exclusion_reasons[path] = "Outside verified allowed roots."
             return _artifact(
                 task_id=task_id, repository=repository, base_sha=base_sha, branch=branch,
                 source_bindings=source_bindings, outcome="BLOCKED",
@@ -352,6 +365,16 @@ def render_files_read_scope(payload: Mapping[str, Any]) -> dict[str, Any]:
             else:
                 eligible.append(candidate)
 
+        if not eligible:
+            return _artifact(
+                task_id=task_id, repository=repository, base_sha=base_sha, branch=branch,
+                source_bindings=source_bindings, outcome="BLOCKED",
+                failure_classification="AGENT_PREPARATION_BLOCKED",
+                files_read=selected, files_exclude=excluded, files_missing=missing,
+                exclusion_reasons=exclusion_reasons, reason_code="SCOPE_DRIFT",
+                next_route="RECOMPUTE_READ_SCOPE", observed_at=payload.get("observed_at"),
+            )
+
         available = eligible if repository_paths is None else [path for path in eligible if path in repository_paths]
         if len(available) > 1:
             return _artifact(
@@ -363,7 +386,7 @@ def render_files_read_scope(payload: Mapping[str, Any]) -> dict[str, Any]:
                 next_route="CLARIFY_READ_SCOPE", observed_at=payload.get("observed_at"),
             )
         if not available:
-            missing.extend(eligible or candidates)
+            missing.extend(eligible)
             continue
         selected.append(available[0])
 
@@ -389,13 +412,23 @@ def render_files_read_scope(payload: Mapping[str, Any]) -> dict[str, Any]:
             next_route="REFRESH_REPOSITORY_EVIDENCE", observed_at=payload.get("observed_at"),
         )
 
-    return _artifact(
+    ready = _artifact(
         task_id=task_id, repository=repository, base_sha=base_sha, branch=branch,
         source_bindings=source_bindings, outcome="READY", failure_classification=None,
         files_read=selected, files_exclude=excluded, files_missing=[],
         exclusion_reasons=exclusion_reasons, reason_code="ACCEPTED",
         next_route="READY_FOR_INTAKE_CARD", observed_at=payload.get("observed_at"),
     )
+    if prior_scope_hash is not None and prior_scope_hash != ready["scope_hash"]:
+        return _artifact(
+            task_id=task_id, repository=repository, base_sha=base_sha, branch=branch,
+            source_bindings=source_bindings, outcome="BLOCKED",
+            failure_classification="AGENT_PREPARATION_BLOCKED",
+            files_read=selected, files_exclude=excluded, files_missing=[],
+            exclusion_reasons=exclusion_reasons, reason_code="SCOPE_DRIFT",
+            next_route="RECOMPUTE_READ_SCOPE", observed_at=payload.get("observed_at"),
+        )
+    return ready
 
 
 __all__ = ["canonical_json", "compute_scope_hash", "digest_payload", "render_files_read_scope"]
