@@ -44,3 +44,9 @@ def test_partial_exact_sha_observation_is_pending_not_incomplete():
     assert "? 'CI_PENDING'" in WORKFLOW
     assert "checkpoint_required: classification === 'CI_PENDING'" in WORKFLOW
     assert "next required workflow_run completion" in WORKFLOW
+
+
+def test_autonomous_preprod_g5_is_explicitly_non_blocking():
+    assert "post-merge G5 is NOT REQUIRED for task completion or dependency unlock" in WORKFLOW
+    assert "core.setOutput('applicable', 'false')" in WORKFLOW
+    assert "core.setOutput('classification', 'NOT_REQUIRED_AUTONOMOUS_PREPROD')" in WORKFLOW
