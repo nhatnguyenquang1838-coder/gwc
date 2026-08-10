@@ -3,6 +3,21 @@
   "profiles": [
     {
       "artifact_type": "flow-profile",
+      "compatibility": {
+        "migration": "none",
+        "v1_compatible": true,
+        "v1_edge_kind_map": {
+          "conditional": "conditional",
+          "dependency": "continue",
+          "history": "continue",
+          "human_authority": "human_required",
+          "runtime": "continue"
+        }
+      },
+      "compiled": {
+        "projection_version": "1.0.0",
+        "workflow_digest": "sha256:1545b0e63fe90154c8b70654e5bbb5d3e9c0139c0f6da45a3ed282c226c6abdf"
+      },
       "graph_registry_ref": "gwc-runtime-graph-registry",
       "green_targets": [
         "runtime_checkpoint.checkpoint-persist",
@@ -21,7 +36,41 @@
         "source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
         "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"
       },
-      "revision": "workflow-contract-gate-applicability-20260810-r2",
+      "registry_bindings": [
+        {
+          "digest": "sha256:fd6736d3d8305163f1c257cafbfc2cffae45c250167977df7bf4116f9539d463",
+          "path": "core/node-architect/node-registry.json",
+          "registry": "node",
+          "registry_id": "gwc-runtime-node-registry",
+          "revision": "scrum-288-entry-schema-validation-20260809-r1",
+          "schema_version": "1.0.0"
+        },
+        {
+          "digest": "sha256:b88f2b804ebe6c8ca0609fb391ce975d04df95e1c8ecc56a905bebf2f3ab5580",
+          "path": "core/node-architect/scenario-registry.json",
+          "registry": "scenario",
+          "registry_id": "gwc-runtime-scenario-registry",
+          "revision": "scrum-115-20260727",
+          "schema_version": "1.1.0"
+        },
+        {
+          "digest": "sha256:55a66184d8afda10eb1829355afa5b9b695d6dbdbe78e01c2e4b3514aa75837f",
+          "path": "core/node-architect/runtime-graph-registry.json",
+          "registry": "graph",
+          "registry_id": "gwc-runtime-graph-registry",
+          "revision": "scrum-104-20260726",
+          "schema_version": "1.0.0"
+        },
+        {
+          "digest": "sha256:5a63fc0091c89d8e413781a7f8c895399585acbce774a842feb41d0a0404110c",
+          "path": "core/node-architect/gate-applicability-policy-registry.json",
+          "registry": "policy",
+          "registry_id": "gwc-gate-applicability-policy-registry",
+          "revision": "workflow-contract-gate-applicability-20260810-r2",
+          "schema_version": "1.0.0"
+        }
+      ],
+      "revision": "workflow-contract-v2-scrum392-20260811-r1",
       "routes": [
         {
           "human_boundary": false,
@@ -73,8 +122,80 @@
         "retain_inactive_nodes": true
       },
       "workflow": {
+        "edges": [
+          {
+            "kind": "runtime",
+            "runtime_executable": true,
+            "source": "repo_delivery.ci-run-capture",
+            "target": "runtime_checkpoint.checkpoint-persist"
+          },
+          {
+            "kind": "runtime",
+            "runtime_executable": true,
+            "source": "runtime_checkpoint.checkpoint-persist",
+            "target": "validation_quality.ci-evidence-capture"
+          },
+          {
+            "kind": "human_authority",
+            "runtime_executable": false,
+            "source": "repo_delivery.ci-run-capture",
+            "target": "failure_recovery.timeout-recovery"
+          }
+        ],
         "entry_nodes": [
           "repo_delivery.ci-run-capture"
+        ],
+        "gate_bindings": [
+          {
+            "gate": "G0_CONTEXT",
+            "policy_ref": "g0-context-required"
+          },
+          {
+            "gate": "G1_ALIGNMENT",
+            "policy_ref": "g1-alignment-required"
+          },
+          {
+            "gate": "G2_EXECUTION",
+            "policy_ref": "g2-execution-required"
+          },
+          {
+            "gate": "G3_PR",
+            "policy_ref": "g3-pr-required"
+          },
+          {
+            "gate": "G4_MERGE",
+            "policy_ref": "g4-merge-required"
+          },
+          {
+            "gate": "G5_DEPLOY",
+            "policy_ref": "g5-deploy-effect-driven"
+          },
+          {
+            "gate": "G6_PRODUCTION_DATA",
+            "policy_ref": "g6-production-effect-driven"
+          }
+        ],
+        "participants": [
+          {
+            "gate": "G3_PR",
+            "participant": "repo_delivery.ci-run-capture",
+            "participant_kind": "node"
+          },
+          {
+            "gate_neutral": true,
+            "participant": "runtime_checkpoint.checkpoint-persist",
+            "participant_kind": "node"
+          },
+          {
+            "gate": "G3_PR",
+            "participant": "validation_quality.ci-evidence-capture",
+            "participant_kind": "node"
+          },
+          {
+            "gate_neutral": true,
+            "participant": "failure_recovery.timeout-recovery",
+            "participant_kind": "node"
+          }
         ],
         "terminal_nodes": [
           {
@@ -85,41 +206,12 @@
             "node": "failure_recovery.timeout-recovery",
             "outcome": "HUMAN_REQUIRED"
           }
-        ],
-        "edges": [
-          {
-            "source": "repo_delivery.ci-run-capture",
-            "target": "runtime_checkpoint.checkpoint-persist",
-            "kind": "runtime",
-            "runtime_executable": true
-          },
-          {
-            "source": "runtime_checkpoint.checkpoint-persist",
-            "target": "validation_quality.ci-evidence-capture",
-            "kind": "runtime",
-            "runtime_executable": true
-          },
-          {
-            "source": "repo_delivery.ci-run-capture",
-            "target": "failure_recovery.timeout-recovery",
-            "kind": "human_authority",
-            "runtime_executable": false
-          }
-        ],
-        "gate_bindings": [
-          {"gate": "G0_CONTEXT", "policy_ref": "g0-context-required"},
-          {"gate": "G1_ALIGNMENT", "policy_ref": "g1-alignment-required"},
-          {"gate": "G2_EXECUTION", "policy_ref": "g2-execution-required"},
-          {"gate": "G3_PR", "policy_ref": "g3-pr-required"},
-          {"gate": "G4_MERGE", "policy_ref": "g4-merge-required"},
-          {"gate": "G5_DEPLOY", "policy_ref": "g5-deploy-effect-driven"},
-          {"gate": "G6_PRODUCTION_DATA", "policy_ref": "g6-production-effect-driven"}
         ]
       }
     }
   ],
   "provenance": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
   "registry_id": "gwc-runtime-profile-registry",
-  "revision": "workflow-contract-gate-applicability-20260810-r2",
+  "revision": "workflow-contract-v2-scrum392-20260811-r1",
   "schema_version": "1.0.0"
 }
