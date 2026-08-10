@@ -1,0 +1,56 @@
+name: Node Architect Flow Policy runtime E2E
+
+on:
+  pull_request:
+    paths:
+      - 'core/node-architect/profile-registry.json'
+      - 'core/node-architect/gate-applicability-policy-registry.json'
+      - 'core/node-architect/gate-node-route-profile.json'
+      - 'core/node-architect/flow-policy-runtime-profile.json'
+      - 'schemas/runtime/flow-profile.schema.json'
+      - 'schemas/runtime/gate-applicability-*.json'
+      - 'schemas/runtime/workflow-policy-decision.schema.json'
+      - 'schemas/runtime/flow-policy-runtime-profile.schema.json'
+      - 'tools/node_architect/validate_flow_profile_workflow.py'
+      - 'tools/node_architect/evaluate_gate_applicability.py'
+      - 'tools/node_architect/validate_flow_policy_compatibility.py'
+      - 'tools/node_architect/compile_flow_policy_decision.py'
+      - 'tools/node_architect/validate_flow_policy_runtime.py'
+      - 'tools/node_architect/resolve_flow_policy_runtime.py'
+      - 'tests/test_flow_profile_workflow_contract.py'
+      - 'tests/test_gate_policy_contract.py'
+      - 'tests/test_workflow_profile_gate_applicability.py'
+      - 'tests/test_flow_policy_runtime_e2e.py'
+      - '.github/workflows/node-architect-flow-policy-runtime-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  flow-policy-runtime-e2e:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Compile Flow Policy runtime tools
+        run: |
+          python -m py_compile \
+            tools/node_architect/validate_flow_profile_workflow.py \
+            tools/node_architect/evaluate_gate_applicability.py \
+            tools/node_architect/validate_flow_policy_compatibility.py \
+            tools/node_architect/compile_flow_policy_decision.py \
+            tools/node_architect/validate_flow_policy_runtime.py \
+            tools/node_architect/resolve_flow_policy_runtime.py
+      - name: Run Flow Policy contract and runtime E2E tests
+        run: |
+          python -m unittest -v \
+            tests.test_flow_profile_workflow_contract \
+            tests.test_gate_policy_contract \
+            tests.test_workflow_profile_gate_applicability \
+            tests.test_flow_policy_runtime_e2e
