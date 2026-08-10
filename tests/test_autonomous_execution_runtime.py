@@ -20,6 +20,14 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(result["ready_task_ids"], ["B"])
         self.assertEqual(result["blocked_dependencies"]["C"], ["B"])
 
+    def test_preprod_merged_predecessor_unlocks_consumer_without_g5(self):
+        tasks = [
+            {"task_id": "A", "status": "PREPROD_MERGED", "dependencies": []},
+            {"task_id": "B", "status": "TO_DO", "dependencies": ["A"]},
+        ]
+        result = resolve_ready_nodes(tasks)
+        self.assertEqual(result["ready_task_ids"], ["B"])
+
     def test_scrum_301_cannot_dispatch_while_scrum_300_incomplete(self):
         tasks = [
             {"task_id": "SCRUM-300", "status": "IN_PROGRESS", "dependencies": []},
@@ -117,6 +125,13 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(result["adapter_action"], "ASSEMBLE_AND_CREATE_OR_UPDATE_PREPROD_PR")
         self.assertEqual(result["route_id"], AUTONOMOUS_ROUTE_ID)
         self.assertTrue(result["managed_evidence_required"])
+
+    def test_preprod_merged_completes_without_post_merge_g5(self):
+        result = drive_closed_loop({"phase": "PREPROD_MERGED", "task_id": "X", "merge_sha": SHA})
+        self.assertEqual(result["state"], "COMPLETED")
+        self.assertEqual(result["reason_code"], "AUTONOMOUS_PREPROD_DELIVERY_COMPLETE")
+        self.assertFalse(result["post_merge_g5_required"])
+        self.assertEqual(result["adapter_action"], "MARK_COMPLETE_REQUERY_DAG_AND_PROMOTIONS")
 
     def test_closed_loop_wires_g5_back_to_dag_refresh(self):
         result = drive_closed_loop({"phase": "G5_VERIFIED", "task_id": "X"})
