@@ -26,9 +26,9 @@ class AutonomousPreprodBaseLineageTests(unittest.TestCase):
             "previous_base_sha": self.merge1,
             "merged_head_sha": "2" * 40,
             "merge_commit_sha": self.merge2,
-            "g5_classification": "success",
+            "g5_classification": "not_required",
             "trusted_merge_proof": True,
-            "trusted_g5_evidence": True,
+            "trusted_g5_evidence": False,
         }
 
     def check(self, current=None, steps=None):
@@ -65,10 +65,21 @@ class AutonomousPreprodBaseLineageTests(unittest.TestCase):
         result = self.check(steps=[step1, self.step2])
         self.assertIn("AUTONOMOUS_BASE_LINEAGE_FOREIGN_RUN", result["reason_codes"])
 
-    def test_missing_g5_success_fails_closed(self):
+    def test_g5_pending_does_not_block_trusted_merge_lineage(self):
         step1 = dict(self.step1, g5_classification="CI_PENDING", trusted_g5_evidence=False)
         result = self.check(steps=[step1, self.step2])
-        self.assertIn("AUTONOMOUS_BASE_LINEAGE_G5_NOT_SUCCESS", result["reason_codes"])
+        self.assertEqual("PASS", result["outcome"])
+        self.assertEqual("BASE_LINEAGE_TRUSTED", result["state"])
+
+    def test_missing_g5_metadata_does_not_grant_or_remove_authority(self):
+        step1 = dict(self.step1, g5_classification=None, trusted_g5_evidence=None)
+        result = self.check(steps=[step1, self.step2])
+        self.assertEqual("PASS", result["outcome"])
+
+    def test_missing_merge_proof_still_fails_closed(self):
+        step1 = dict(self.step1, trusted_merge_proof=False)
+        result = self.check(steps=[step1, self.step2])
+        self.assertIn("AUTONOMOUS_BASE_LINEAGE_UNTRUSTED", result["reason_codes"])
 
     def test_unallowlisted_task_fails_closed(self):
         step1 = dict(self.step1, task_id="SCRUM-999")
