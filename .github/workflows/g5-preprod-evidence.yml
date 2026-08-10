@@ -69,8 +69,11 @@ jobs:
               pr.head.ref.startsWith('auto/') &&
               (pr.body || '').includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');
             if (autonomousPreprod) {
-              core.notice('Autonomous pre-prod merge detected; route-specific autonomous runtime owns its post-merge evidence.');
+              core.notice('Autonomous pre-prod merge detected: post-merge G5 is NOT REQUIRED for task completion or dependency unlock.');
               core.setOutput('applicable', 'false');
+              core.setOutput('classification', 'NOT_REQUIRED_AUTONOMOUS_PREPROD');
+              core.setOutput('pr_number', String(pr.number));
+              core.setOutput('merge_sha', mergeSha);
               return;
             }
 
@@ -164,28 +167,18 @@ jobs:
 
             const artifactName = `g5-preprod-evidence-pr-${pr.number}-merge-${mergeSha.slice(0, 12)}-run-${context.runId}`;
             const evidence = {
-              schema_version: '1.0',
-              artifact_type: 'g5-ci-verification-evidence',
-              generated_at: new Date().toISOString(),
-              task_id: `PR-${pr.number}`,
-              repository: `${owner}/${repo}`,
-              gate: 'G5_DEPLOY',
-              merge_commit_sha: mergeSha,
-              g4_approval_id: authority[1],
-              classification,
+              schema_version: '1.0', artifact_type: 'g5-ci-verification-evidence', generated_at: new Date().toISOString(),
+              task_id: `PR-${pr.number}`, repository: `${owner}/${repo}`, gate: 'G5_DEPLOY', merge_commit_sha: mergeSha,
+              g4_approval_id: authority[1], classification,
               discovery: { method, exact_sha_lookup_attempted: true, fallbacks_attempted: fallbacksAttempted },
-              required_workflows: requiredNames.map((name) => ({ name, required: true })),
-              selected_runs: selected,
-              rejected_candidates: [],
-              checkpoint_required: classification === 'CI_PENDING',
-              manual_action_authorized: false,
+              required_workflows: requiredNames.map((name) => ({ name, required: true })), selected_runs: selected,
+              rejected_candidates: [], checkpoint_required: classification === 'CI_PENDING', manual_action_authorized: false,
               evidence_chain: {
                 g4_authority: { approval_id: authority[1], source_comment_id: sourceCommentId, approved_head_sha: authority[2], scope_hash_prefix: authority[3] },
                 merge_proof: { provider: 'github', event: 'pull_request.closed', pr_number: pr.number, merged_head_sha: proof[2], merge_commit_sha: proof[3], merged_at: pr.merged_at, merged_by: pr.merged_by.login, exact_head_match: true },
                 canonical_machine_evidence: { provider: 'github_actions_artifact', artifact_name: artifactName, workflow_run_id: context.runId },
                 human_traceability: { provider: 'github_pr_comment', pr_number: pr.number, comment_marker: 'gwc:g5-status' },
-                projection_authority: { jira: 'projection_only', slack: 'projection_only' },
-                no_recursive_evidence_pr: true,
+                projection_authority: { jira: 'projection_only', slack: 'projection_only' }, no_recursive_evidence_pr: true,
               },
             };
             if (classification === 'CI_PENDING') {
