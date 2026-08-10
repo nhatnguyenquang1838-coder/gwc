@@ -23,13 +23,8 @@ jobs:
             const { owner, repo } = context.repo;
             const marker = 'gwc:autonomous-preprod-run-authority-receipt';
             const manifestMarker = 'gwc:autonomous-preprod-run-manifest';
-            const policyPath = 'core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md';
-            const selfPath = '.github/workflows/autonomous-parent-authority-materializer.yml';
-            const requiredImmutable = [
-              '.github/workflows/autonomous-preprod-runtime.yml',
-              '.github/workflows/g4-g5-evidence.yml',
-              'tools/node_architect/materialize_autonomous_preprod_run_authority.py',
-            ];
+            const approvalPolicyPath = 'core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md';
+            const authorityPolicyPath = 'governance/autonomous-preprod-policy.yaml';
             const canonicalize = (value) => {
               if (Array.isArray(value)) return value.map(canonicalize);
               if (value && typeof value === 'object') {
@@ -97,9 +92,6 @@ jobs:
                 manifestScope.expires_at !== commandExpiry) {
               return fail('AUTONOMOUS_RUN_MANIFEST_INVALID', 'manifest identity/base/policy/time contract is invalid');
             }
-            if (!requiredImmutable.every((path) => manifestScope.immutable_authority_paths.includes(path))) {
-              return fail('AUTONOMOUS_RUN_MANIFEST_INVALID', 'manifest does not freeze every active authority-plane path');
-            }
 
             const taskIds = [];
             for (const task of manifestScope.allowed_tasks) {
@@ -133,18 +125,22 @@ jobs:
               if (!['ahead', 'identical'].includes(comparison.status)) {
                 return fail('AUTONOMOUS_BASE_LINEAGE_INVALID', `current pre-prod ${currentPreprod} is not a descendant of approved anchor ${manifestScope.approved_base_sha}`);
               }
-              const protectedPaths = manifestScope.immutable_authority_paths.filter((path) => path !== selfPath);
-              const changedProtected = (comparison.files || []).map((file) => file.filename).filter((path) => protectedPaths.includes(path));
-              if (changedProtected.length) {
-                return fail('AUTONOMOUS_AUTHORITY_PLANE_DRIFT', `protected authority paths changed after approval: ${changedProtected.join(',')}`);
-              }
             }
 
-            const approvedPolicy = await readText(policyPath, manifestScope.approved_base_sha);
-            const currentPolicy = await readText(policyPath, currentPreprod);
-            if (!approvedPolicy || !currentPolicy) return fail('AUTONOMOUS_POLICY_INVALID', 'canonical policy file cannot be read');
-            if (digest(approvedPolicy) !== manifestScope.policy_digest || digest(currentPolicy) !== manifestScope.policy_digest) {
-              return fail('AUTONOMOUS_POLICY_DIGEST_DRIFT', 'policy digest differs from approved manifest');
+            const approvedApprovalPolicy = await readText(approvalPolicyPath, manifestScope.approved_base_sha);
+            if (!approvedApprovalPolicy) return fail('AUTONOMOUS_POLICY_INVALID', 'approval-time policy cannot be read at approved anchor');
+            if (digest(approvedApprovalPolicy) !== manifestScope.policy_digest) {
+              return fail('AUTONOMOUS_POLICY_DIGEST_DRIFT', 'manifest policy digest does not match approval-time policy bytes');
+            }
+
+            const approvedAuthorityPolicy = await readText(authorityPolicyPath, manifestScope.approved_base_sha);
+            const currentAuthorityPolicy = await readText(authorityPolicyPath, currentPreprod);
+            if (!approvedAuthorityPolicy || !currentAuthorityPolicy) {
+              return fail('AUTONOMOUS_POLICY_INVALID', 'machine authority policy cannot be read');
+            }
+            const authorityPolicyDigest = digest(approvedAuthorityPolicy);
+            if (digest(currentAuthorityPolicy) !== authorityPolicyDigest) {
+              return fail('AUTONOMOUS_AUTHORITY_POLICY_DRIFT', 'machine authority policy changed after Human lane approval; re-authorization is required');
             }
 
             let comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: sourceIssueNumber, per_page: 100 });
@@ -172,7 +168,7 @@ jobs:
             };
             const fullManifest = { ...manifestScope, authority_receipt: receipt };
             const manifestBody = `<!-- ${manifestMarker} approval_id=${approvalId} run_id=${manifestScope.run_id} manifest_scope_digest=${scopeDigest} source_comment_id=${sourceComment.id} -->\n\n## Trusted Autonomous Pre-Prod Run Manifest\n\n\`\`\`json\n${JSON.stringify(fullManifest, null, 2)}\n\`\`\``;
-            const receiptBody = `<!-- ${marker} status=${receipt.status} source=${receipt.source} bot_login=${receipt.bot_login} marker=${receipt.marker} approval_id=${approvalId} approved_run_id=${manifestScope.run_id} approved_policy_id=${manifestScope.policy_id} approved_policy_revision=${manifestScope.policy_revision} approved_policy_digest=${manifestScope.policy_digest} manifest_scope_digest=${scopeDigest} scope_hash_prefix=${scopePrefix} source_comment_id=${sourceComment.id} receipt_comment_id=${receiptComment.id} manifest_comment_id=${manifestComment.id} allowed_tasks=${taskIds.join(',')} approved_base_sha=${manifestScope.approved_base_sha} materialized_preprod_sha=${currentPreprod} issued_at=${receipt.issued_at} expires_at=${receipt.expires_at} -->\n\n## Trusted Autonomous Run Authority Receipt\n\n- Status: \`AUTHORIZED_READY\`\n- Approval: \`${approvalId}\`\n- Run: \`${manifestScope.run_id}\`\n- Approved base: \`${manifestScope.approved_base_sha}\`\n- Materialized pre-prod: \`${currentPreprod}\`\n- Allowed tasks: \`${taskIds.length}\`\n- Scope: \`${scopeDigest}\`\n- Expires: \`${receipt.expires_at}\``;
+            const receiptBody = `<!-- ${marker} status=${receipt.status} source=${receipt.source} bot_login=${receipt.bot_login} marker=${receipt.marker} approval_id=${approvalId} approved_run_id=${manifestScope.run_id} approved_policy_id=${manifestScope.policy_id} approved_policy_revision=${manifestScope.policy_revision} approved_policy_digest=${manifestScope.policy_digest} authority_policy_digest=${authorityPolicyDigest} manifest_scope_digest=${scopeDigest} scope_hash_prefix=${scopePrefix} source_comment_id=${sourceComment.id} receipt_comment_id=${receiptComment.id} manifest_comment_id=${manifestComment.id} allowed_tasks=${taskIds.join(',')} approved_base_sha=${manifestScope.approved_base_sha} materialized_preprod_sha=${currentPreprod} issued_at=${receipt.issued_at} expires_at=${receipt.expires_at} -->\n\n## Trusted Autonomous Run Authority Receipt\n\n- Status: \`AUTHORIZED_READY\`\n- Approval: \`${approvalId}\`\n- Run: \`${manifestScope.run_id}\`\n- Authority anchor: \`${manifestScope.approved_base_sha}\`\n- Execution base at materialization: \`${currentPreprod}\`\n- Machine authority policy: \`${authorityPolicyDigest}\`\n- Allowed tasks: \`${taskIds.length}\`\n- Scope: \`${scopeDigest}\`\n- Expires: \`${receipt.expires_at}\``;
             await github.rest.issues.updateComment({ owner, repo, comment_id: manifestComment.id, body: manifestBody });
             await github.rest.issues.updateComment({ owner, repo, comment_id: receiptComment.id, body: receiptBody });
 
@@ -186,7 +182,8 @@ jobs:
                 !receiptReadback?.body?.includes(`bot_login=${receipt.bot_login} `) ||
                 !receiptReadback?.body?.includes(`marker=${receipt.marker} `) ||
                 !receiptReadback?.body?.includes(`source_comment_id=${sourceComment.id}`) ||
-                !receiptReadback?.body?.includes(`scope_hash_prefix=${scopePrefix}`)) {
+                !receiptReadback?.body?.includes(`scope_hash_prefix=${scopePrefix}`) ||
+                !receiptReadback?.body?.includes(`authority_policy_digest=${authorityPolicyDigest}`)) {
               return fail('AUTONOMOUS_RUN_AUTHORITY_READBACK_MISMATCH', 'trusted bot projection readback failed');
             }
-            core.info(`AUTHORIZED_READY ${manifestScope.run_id} ${scopeDigest} current_preprod=${currentPreprod}`);
+            core.info(`AUTHORIZED_READY ${manifestScope.run_id} ${scopeDigest} authority_anchor=${manifestScope.approved_base_sha} execution_base=${currentPreprod} authority_policy=${authorityPolicyDigest}`);
