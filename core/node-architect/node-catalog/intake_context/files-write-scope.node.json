@@ -7,13 +7,13 @@
   "gates": [
     "G0_CONTEXT"
   ],
-  "description": "Renders bounded write paths and exclusions for a later G2 execution envelope.",
-  "intent": "Render the bounded write set and explicit exclusions for a later G2 execution envelope.",
-  "outcome": "Deterministic files_write scope evidence with bounded write paths, excluded actions, and reason codes.",
+  "description": "Renders the smallest candidate bounded write scope and explicit exclusions for a later G2 execution envelope. This node only derives candidate scope; it never grants write/merge/deploy authority.",
+  "intent": "Render the smallest candidate future write set and explicit exclusions for a later G2 execution envelope.",
+  "outcome": "Deterministic candidate write-scope evidence with bounded write paths, prohibited targets, excluded actions, and reason codes.",
   "constraints": [
     "Write scope must be repo-relative and bounded to approved task files only.",
     "Write scope must exclude protected-branch, merge, deploy, release, credential, migration, and production-data actions.",
-    "Write scope must fail closed when the candidate write set is empty or ambiguous."
+    "Write scope must fail closed when the candidate write set is empty, ambiguous, or includes a prohibited target."
   ],
   "exclusions": [
     "Direct push to protected branches.",
@@ -25,10 +25,10 @@
     "read_only authority_boundary"
   ],
   "reason_codes": {
-    "ACCEPTED": "Required write scope rendered successfully.",
+    "ACCEPTED": "Required candidate write scope rendered successfully.",
     "EMPTY_SCOPE": "No bounded write paths were available for the task.",
     "PROHIBITED_ACTION": "Candidate write scope includes a prohibited action or target.",
     "MALFORMED_INPUT": "Write scope inputs are invalid or ambiguous.",
-    "SCOPE_DRIFT": "Requested write scope exceeds the bounded task envelope."
+    "SCOPE_DRIFT": "Requested write scope exceeds the bounded task envelope or has drifted from verified sources."
   }
 }
