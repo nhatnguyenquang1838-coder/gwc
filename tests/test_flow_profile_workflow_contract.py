@@ -304,6 +304,67 @@ class FlowProfileWorkflowContractTests(unittest.TestCase):
         self.assertEqual(result["outcome"], "BLOCKED")
         self.assertIn("WORKFLOW_DIGEST_MISMATCH", [f["code"] for f in result["findings"]])
 
+    # --- Flow/Policy layer separation (P1-C reconciliation) ---------------
+
+    def test_policy_registry_revision_change_does_not_change_workflow_digest(self) -> None:
+        """Policy-only content churn must not mutate Workflow identity."""
+        baseline = self.flow.compile_workflow_projection(self.profile)["workflow_digest"]
+        churned = deepcopy(self.profile)
+        for binding in churned["registry_bindings"]:
+            if binding["registry"] == "policy":
+                binding["revision"] = "policy-contract-v9-29991231-r9"
+                binding["digest"] = "sha256:" + "a" * 64
+                binding["schema_version"] = "9.9.9"
+        self.assertEqual(
+            self.flow.compile_workflow_projection(churned)["workflow_digest"], baseline
+        )
+
+    def test_flow_revision_metadata_is_not_workflow_semantics(self) -> None:
+        churned = deepcopy(self.profile)
+        churned["revision"] = "some-other-release-revision"
+        self.assertEqual(
+            self.flow.compile_workflow_projection(churned)["workflow_digest"],
+            self.profile["compiled"]["workflow_digest"],
+        )
+
+    def test_policy_ref_remains_part_of_workflow_composition(self) -> None:
+        """policy_ref is an opaque composition reference and IS workflow semantics."""
+        changed = deepcopy(self.profile)
+        changed["workflow"]["gate_bindings"][0]["policy_ref"] = "g1-alignment-required"
+        self.assertNotEqual(
+            self.flow.compile_workflow_projection(changed)["workflow_digest"],
+            self.profile["compiled"]["workflow_digest"],
+        )
+
+    def test_composition_registry_change_still_changes_workflow_digest(self) -> None:
+        for registry in ("node", "scenario", "graph"):
+            with self.subTest(registry=registry):
+                churned = deepcopy(self.profile)
+                for binding in churned["registry_bindings"]:
+                    if binding["registry"] == registry:
+                        binding["digest"] = "sha256:" + "b" * 64
+                self.assertNotEqual(
+                    self.flow.compile_workflow_projection(churned)["workflow_digest"],
+                    self.profile["compiled"]["workflow_digest"],
+                )
+
+    def test_policy_staleness_is_still_reported_as_diagnostic(self) -> None:
+        """Excluded from the digest, but still fails closed as a binding diagnostic."""
+        broken = deepcopy(self.profile)
+        for binding in broken["registry_bindings"]:
+            if binding["registry"] == "policy":
+                binding["revision"] = "stale-policy-revision"
+        result = self.validate(broken)
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertIn("REGISTRY_BINDING_STALE", [f["code"] for f in result["findings"]])
+
+    def test_projection_version_is_the_separated_layer_version(self) -> None:
+        self.assertEqual(self.flow.PROJECTION_VERSION, "2.0.0")
+        self.assertEqual(self.profile["compiled"]["projection_version"], "2.0.0")
+        self.assertEqual(self.flow.COMPOSITION_REGISTRIES, frozenset({"node", "scenario", "graph"}))
+        projection = self.flow.compile_workflow_projection(self.profile)["projection"]
+        self.assertNotIn("policy", [item[0] for item in projection["registry_bindings"]])
+
     def test_registry_level_validation_passes(self) -> None:
         result = self.flow.validate_profile_registry(self.registry, root=ROOT)
         self.assertEqual(result["outcome"], "PASS")
