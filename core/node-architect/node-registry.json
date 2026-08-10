@@ -562,7 +562,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/gate-transition-decision.node.json",
-        "source_sha": "33c7920777a9043ee07fbe0c1fd2a6ef159b827bd248f32c6234fdb52648dbf5"
+        "source_sha": "a82de87485b9c15fca1e8522b6b7e30fdb9aa69ef13c37aca0902291f8581bc6"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
