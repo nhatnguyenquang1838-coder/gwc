@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.local/schemas/runtime/flow-policy-compiled-profile.schema.json",
+  "title": "Flow Policy Compiled Profile",
+  "description": "Static cross-layer compilation of one Workflow composition against one Policy registry. It is immutable proof of a compatible binding, not live execution state. compiled_digest is the cross-layer identity: workflow_digest (policy-independent) + exact Policy digests + registry/gate-lifecycle/legacy-route bindings + compiler version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "compiler_version", "profile_id",
+    "revision", "workflow", "policy", "bindings", "compiled", "result",
+    "compiled_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "artifact_type": {"const": "flow-policy-compiled-profile"},
+    "compiler_version": {"type": "string", "minLength": 1},
+    "profile_id": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "workflow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "workflow_digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "workflow_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["registry_id", "revision", "registry_digest", "policy_refs"],
+      "properties": {
+        "registry_id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "policy_refs": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object", "additionalProperties": false,
+            "required": ["policy_ref", "policy_version", "policy_digest"],
+            "properties": {
+              "policy_ref": {"type": "string", "minLength": 1},
+              "policy_version": {"type": "string", "minLength": 1},
+              "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "bindings": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "node_registry_digest", "scenario_registry_digest",
+        "graph_registry_digest", "gate_lifecycle_revision",
+        "gate_lifecycle_digest", "legacy_route_projection_revision"
+      ],
+      "properties": {
+        "node_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "scenario_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "graph_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "gate_lifecycle_revision": {"type": "string", "minLength": 1},
+        "gate_lifecycle_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "legacy_route_projection_revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "compiled": {
+      "type": "object", "additionalProperties": false,
+      "required": ["route_table", "terminal_acceptance_bindings", "legacy_route_projection_revision"],
+      "properties": {
+        "route_table": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "target", "kind", "runtime_executable"],
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "kind": {"enum": ["continue", "conditional", "retry", "compensate", "blocked", "human_required", "terminal"]},
+              "condition_id": {"type": ["string", "null"]},
+              "runtime_executable": {"type": "boolean"},
+              "source_gate": {"type": ["string", "null"]},
+              "target_gate": {"type": ["string", "null"]}
+            }
+          }
+        },
+        "terminal_acceptance_bindings": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["node", "outcome"],
+            "properties": {
+              "node": {"type": "string", "minLength": 1},
+              "outcome": {"type": "string", "minLength": 1},
+              "gate": {"type": ["string", "null"]},
+              "policy_ref": {"type": ["string", "null"]}
+            }
+          }
+        },
+        "legacy_route_projection_revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reason_codes"],
+      "properties": {
+        "status": {"enum": ["COMPATIBLE", "BLOCKED"]},
+        "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "compiled_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

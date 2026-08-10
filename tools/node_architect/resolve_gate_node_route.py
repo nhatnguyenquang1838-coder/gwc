@@ -119,6 +119,12 @@ def _base_payload(*, task_id: str, gate: str, requested_action: str, mode: str,
         "log_contract_valid": False, "next_route_contract_valid": False,
         "mode_runtime_required": False,
         "next_node": None, "next_action": None, "next_gate": None,
+        "compiled_profile_digest": None, "workflow_digest": None,
+        "policy_registry_digest": None, "policy_ref": None, "policy_digest": None,
+        "applicability": None, "applicability_decision_digest": None,
+        "context_digest": None, "evidence_digest": None,
+        "skipped_gates": [], "traversed_nodes": [],
+        "terminal": None, "terminal_reason": None,
         "authority_granted": False, "write_authority_granted": False,
         "pr_authority_granted": False, "merge_authority_granted": False,
         "deployment_authority_granted": False, "production_authority_granted": False,
@@ -405,6 +411,348 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
 
 def _load(path: Path) -> Mapping[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+# ---------------------------------------------------------------------------
+# Compiled Flow x Policy route resolution (SCRUM-394 P1-C)
+#
+# This is the sole runtime route decision path. Routes come from the compiled
+# profile's closed route table (projected from Flow edges/conditions) and never
+# from caller-supplied ``next_nodes``/``terminal_disposition``. Policy semantics
+# are consumed from the Policy v2 applicability decision and are not
+# reimplemented here.
+# ---------------------------------------------------------------------------
+
+FLOW_FAIL_CODES = {
+    "COMPILED_PROFILE_MISSING", "COMPILED_PROFILE_NOT_COMPATIBLE",
+    "COMPILED_PROFILE_DIGEST_DRIFT", "COMPILED_PROFILE_BINDING_STALE",
+    "WORKFLOW_PARTICIPANT_UNBOUND", "WORKFLOW_GATE_CONTEXT_MISMATCH",
+    "WORKFLOW_NEXT_ROUTE_DEAD_END", "WORKFLOW_NEXT_ROUTE_AMBIGUOUS",
+    "WORKFLOW_TRAVERSAL_LOOP", "GATE_APPLICABILITY_BLOCKED",
+    "AUTHORITY_REQUIREMENTS_UNSATISFIED", "EVIDENCE_REQUIREMENTS_UNSATISFIED",
+    "POLICY_PROHIBITED_ACTION", "TERMINAL_ACCEPTANCE_UNMET",
+    "TERMINAL_ACCEPTANCE_UNKNOWN", "POLICY_DECISION_PROVENANCE_MISMATCH",
+    "WORKFLOW_SOURCE_DIGEST_DRIFT",
+}
+FAIL_CODES.update(FLOW_FAIL_CODES)
+
+_MAX_TRAVERSAL_STEPS = 128
+
+
+def _participant_gate_map(flow_profile: Mapping[str, Any]) -> dict[str, str | None]:
+    workflow = flow_profile.get("workflow")
+    if not isinstance(workflow, Mapping):
+        return {}
+    result: dict[str, str | None] = {}
+    for item in workflow.get("participants", []):
+        if not isinstance(item, Mapping) or not item.get("participant"):
+            continue
+        gate = item.get("gate")
+        result[str(item["participant"])] = str(gate) if gate else None
+    return result
+
+
+def _terminal_map(flow_profile: Mapping[str, Any]) -> dict[str, str]:
+    workflow = flow_profile.get("workflow")
+    if not isinstance(workflow, Mapping):
+        return {}
+    return {
+        str(item["node"]): str(item.get("outcome") or "TERMINAL")
+        for item in workflow.get("terminal_nodes", [])
+        if isinstance(item, Mapping) and item.get("node")
+    }
+
+
+def _edge_eligible(row: Mapping[str, Any], context: Mapping[str, Any]) -> bool:
+    """Deterministic Flow discriminator; no caller-supplied route choice."""
+    if row.get("runtime_executable") is not True:
+        return False
+    kind = str(row.get("kind") or "")
+    if kind == "continue":
+        return True
+    if kind == "conditional":
+        conditions = context.get("conditions")
+        condition_id = str(row.get("condition_id") or "")
+        return isinstance(conditions, Mapping) and conditions.get(condition_id) is True
+    if kind in {"retry", "compensate", "blocked", "human_required", "terminal"}:
+        return context.get("transition_kind") == kind
+    return False
+
+
+def _successors(route_table: Any, node: str, context: Mapping[str, Any]) -> tuple[list[str], str | None]:
+    rows = [
+        row for row in (route_table or [])
+        if isinstance(row, Mapping) and row.get("source") == node and _edge_eligible(row, context)
+    ]
+    targets = list(dict.fromkeys(str(row.get("target")) for row in rows if row.get("target")))
+    if not targets:
+        return [], "WORKFLOW_NEXT_ROUTE_DEAD_END"
+    if len(targets) > 1:
+        return targets, "WORKFLOW_NEXT_ROUTE_AMBIGUOUS"
+    return targets, None
+
+
+def _unsatisfied(items: Any) -> bool:
+    return isinstance(items, list) and any(
+        isinstance(item, Mapping) and item.get("satisfied") is False for item in items
+    )
+
+
+def _enforce_required(decision: Mapping[str, Any], context: Mapping[str, Any]) -> list[str]:
+    """Consume the Policy v2 decision; never re-derive Policy semantics."""
+    reasons: list[str] = []
+    requested = context.get("requested_action")
+    prohibited = {str(item) for item in decision.get("prohibited_actions", []) if item}
+    if requested is not None and str(requested) in prohibited:
+        reasons.append("POLICY_PROHIBITED_ACTION")
+    if _unsatisfied(decision.get("authority_requirements")):
+        reasons.append("AUTHORITY_REQUIREMENTS_UNSATISFIED")
+    if _unsatisfied(decision.get("evidence_requirements")):
+        reasons.append("EVIDENCE_REQUIREMENTS_UNSATISFIED")
+    return reasons
+
+
+def _terminal_reasons(decision: Mapping[str, Any] | None) -> list[str]:
+    if decision is None:
+        return ["TERMINAL_ACCEPTANCE_UNKNOWN"]
+    acceptance = decision.get("terminal_acceptance")
+    if not isinstance(acceptance, Mapping):
+        return ["TERMINAL_ACCEPTANCE_UNKNOWN"]
+    if acceptance.get("accepted") is True:
+        return []
+    return ["TERMINAL_ACCEPTANCE_UNMET"]
+
+
+def resolve_compiled_flow_route(
+    *, compiled_profile: Mapping[str, Any], flow_profile: Mapping[str, Any],
+    policy_registry: Mapping[str, Any], current_node: str,
+    context: Mapping[str, Any], root: Path,
+) -> dict[str, Any]:
+    """Resolve the next deterministic Flow step under the bound Policy.
+
+    Emits the canonical ``gate-node-route-decision`` artifact. ``NOT_APPLICABLE``
+    skips its gate and traversal continues to the next applicable gate; it is
+    never terminal by itself. A real Workflow terminal requires Policy
+    ``terminal_acceptance``. Zero or ambiguous legal routes fail closed.
+    """
+    task_id = str(context.get("task_id", ""))
+    gate_map = _participant_gate_map(flow_profile)
+    current_gate = str(context.get("gate") or gate_map.get(current_node) or "GATE_NEUTRAL")
+    action = str(context.get("requested_action") or "workflow_route_resolution")
+    mode = str(context.get("workflow_mode", "normal"))
+    common = dict(
+        task_id=task_id, gate=current_gate, requested_action=action, mode=mode,
+        profile_id=str(compiled_profile.get("profile_id", "")),
+        profile_revision=str(compiled_profile.get("revision", "")),
+        graph_revision=str(compiled_profile.get("bindings", {}).get("graph_registry_digest", "")),
+        current_node=current_node,
+    )
+
+    workflow_digest = str(compiled_profile.get("workflow", {}).get("workflow_digest") or "") or None
+    policy_registry_digest = str(compiled_profile.get("policy", {}).get("registry_digest") or "") or None
+    compiled_digest = str(compiled_profile.get("compiled_digest") or "") or None
+    evidence_digest = _digest({"evidence": context.get("evidence")})
+    context_digest = _digest(dict(context))
+
+    def emit(outcome: str, *, reasons: list[str], next_node: str | None = None,
+             next_gate: str | None = None, applicability: str | None = None,
+             applicability_decision: Mapping[str, Any] | None = None,
+             skipped: list[str] | None = None, traversed: list[str] | None = None,
+             terminal: bool | None = None, terminal_reason: str | None = None) -> dict[str, Any]:
+        codes = list(dict.fromkeys(reasons)) or ["ROUTE_SELECTED"]
+        payload = _base_payload(**common)
+        payload.update({
+            "outcome": outcome,
+            "reason_code": codes[0], "reason_codes": codes,
+            "next_node": next_node, "next_gate": next_gate,
+            "next_action": context.get("next_action") if outcome == "ROUTE_SELECTED" else None,
+            "compiled_profile_digest": compiled_digest,
+            "workflow_digest": workflow_digest,
+            "policy_registry_digest": policy_registry_digest,
+            "policy_ref": str(applicability_decision.get("policy_ref")) if applicability_decision and applicability_decision.get("policy_ref") else None,
+            "policy_digest": str(applicability_decision.get("policy_digest")) if applicability_decision and applicability_decision.get("policy_digest") else None,
+            "applicability": applicability,
+            "applicability_decision_digest": str(applicability_decision.get("decision_digest")) if applicability_decision and applicability_decision.get("decision_digest") else None,
+            "context_digest": context_digest,
+            "evidence_digest": evidence_digest,
+            "skipped_gates": list(dict.fromkeys(skipped or [])),
+            "traversed_nodes": list(traversed or []),
+            "terminal": terminal,
+            "terminal_reason": terminal_reason,
+        })
+        payload["decision_digest"] = _digest({k: v for k, v in payload.items() if k != "decision_digest"})
+        return payload
+
+    # --- exact compiled binding verification -------------------------------
+    if not compiled_profile:
+        return emit("BLOCKED", reasons=["COMPILED_PROFILE_MISSING"])
+    if str(compiled_profile.get("result", {}).get("status")) != "COMPATIBLE":
+        return emit("BLOCKED", reasons=["COMPILED_PROFILE_NOT_COMPATIBLE"])
+
+    from tools.node_architect.compile_flow_policy_profile import compute_compiled_digest
+
+    expected_digest = compute_compiled_digest(
+        workflow_digest=str(workflow_digest or ""),
+        policy=compiled_profile.get("policy", {}),
+        bindings=compiled_profile.get("bindings", {}),
+        compiler_version=str(compiled_profile.get("compiler_version") or ""),
+    )
+    if expected_digest != compiled_digest:
+        return emit("BLOCKED", reasons=["COMPILED_PROFILE_DIGEST_DRIFT"])
+    declared_workflow = flow_profile.get("compiled")
+    declared_workflow_digest = declared_workflow.get("workflow_digest") if isinstance(declared_workflow, Mapping) else None
+    if declared_workflow_digest != workflow_digest:
+        return emit("BLOCKED", reasons=["COMPILED_PROFILE_BINDING_STALE"])
+    # Live Workflow projection recompute: a declared digest that was frozen or
+    # tampered while the live Flow composition moved must fail closed here,
+    # even though declared == compiled above.
+    from tools.node_architect.validate_flow_profile_workflow import (
+        compile_workflow_projection,
+    )
+
+    try:
+        live_workflow_digest = compile_workflow_projection(dict(flow_profile))["workflow_digest"]
+    except Exception:
+        return emit("BLOCKED", reasons=["WORKFLOW_SOURCE_DIGEST_DRIFT"])
+    if live_workflow_digest != workflow_digest:
+        return emit("BLOCKED", reasons=["WORKFLOW_SOURCE_DIGEST_DRIFT"])
+    if _digest(policy_registry) != policy_registry_digest:
+        return emit("BLOCKED", reasons=["COMPILED_PROFILE_BINDING_STALE"])
+
+    if current_node not in gate_map:
+        return emit("BLOCKED", reasons=["WORKFLOW_PARTICIPANT_UNBOUND"])
+    bound_gate = gate_map.get(current_node)
+    if context.get("gate") and bound_gate and str(context["gate"]) != bound_gate:
+        return emit("BLOCKED", reasons=["WORKFLOW_GATE_CONTEXT_MISMATCH"])
+
+    evaluator = _gate_applicability_evaluator(root)
+    if evaluator is None:
+        return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"])
+
+    def applicability_for(gate: str | None) -> Mapping[str, Any] | None:
+        if not gate:
+            return None
+        try:
+            return evaluator.evaluate_gate_applicability(
+                flow_profile=flow_profile, policy_registry=policy_registry,
+                gate=gate, context=dict(context),
+            )
+        except Exception:
+            return None
+
+    route_table = compiled_profile.get("compiled", {}).get("route_table", [])
+    terminals = _terminal_map(flow_profile)
+
+    # --- current gate ------------------------------------------------------
+    current_decision = applicability_for(bound_gate)
+    current_applicability: str | None = None
+    if bound_gate:
+        if current_decision is None:
+            return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"])
+        if str(current_decision.get("policy_registry_digest") or "") != policy_registry_digest:
+            return emit("BLOCKED", reasons=["POLICY_DECISION_PROVENANCE_MISMATCH"],
+                        applicability_decision=current_decision)
+        current_applicability = str(current_decision.get("decision") or "BLOCKED")
+        if current_applicability == "BLOCKED":
+            return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"],
+                        applicability="BLOCKED", applicability_decision=current_decision)
+        if current_applicability == "REQUIRED":
+            unmet = _enforce_required(current_decision, context)
+            if unmet:
+                return emit("BLOCKED", reasons=unmet, applicability="REQUIRED",
+                            applicability_decision=current_decision)
+
+    # --- terminal node -----------------------------------------------------
+    if current_node in terminals:
+        unmet = _terminal_reasons(current_decision)
+        if unmet:
+            return emit("BLOCKED", reasons=unmet, applicability=current_applicability,
+                        applicability_decision=current_decision, terminal=True,
+                        terminal_reason=unmet[0])
+        return emit("TERMINAL", reasons=["WORKFLOW_TERMINAL_ACCEPTED"],
+                    applicability=current_applicability,
+                    applicability_decision=current_decision, terminal=True,
+                    terminal_reason=terminals[current_node])
+
+    # --- deterministic traversal to the next applicable gate ---------------
+    skipped: list[str] = []
+    # A current-node bound gate resolved NOT_APPLICABLE is an explicit skip and
+    # must be recorded before traversal starts.
+    if bound_gate and current_applicability == "NOT_APPLICABLE":
+        skipped.append(str(bound_gate))
+    traversed: list[str] = []
+    visited = {current_node}
+    node = current_node
+    first_target: str | None = None
+    for _ in range(_MAX_TRAVERSAL_STEPS):
+        targets, route_error = _successors(route_table, node, context)
+        if route_error:
+            return emit("BLOCKED", reasons=[route_error], applicability=current_applicability,
+                        applicability_decision=current_decision, skipped=skipped,
+                        traversed=traversed)
+        node = targets[0]
+        if node in visited:
+            return emit("BLOCKED", reasons=["WORKFLOW_TRAVERSAL_LOOP"],
+                        applicability=current_applicability,
+                        applicability_decision=current_decision, skipped=skipped,
+                        traversed=traversed)
+        visited.add(node)
+        traversed.append(node)
+        if first_target is None:
+            first_target = node
+
+        gate = gate_map.get(node)
+        decision = applicability_for(gate)
+        if gate:
+            if decision is None:
+                return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"],
+                            skipped=skipped, traversed=traversed)
+            applicability = str(decision.get("decision") or "BLOCKED")
+            if applicability == "BLOCKED":
+                return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"],
+                            applicability="BLOCKED", applicability_decision=decision,
+                            skipped=skipped, traversed=traversed)
+            if applicability == "NOT_APPLICABLE":
+                # Explicit gate skip: continue deterministic Flow traversal.
+                skipped.append(gate)
+                if node in terminals:
+                    unmet = _terminal_reasons(decision)
+                    if unmet:
+                        return emit("BLOCKED", reasons=unmet, applicability=applicability,
+                                    applicability_decision=decision, skipped=skipped,
+                                    traversed=traversed, terminal=True, terminal_reason=unmet[0])
+                    return emit("TERMINAL", reasons=["WORKFLOW_TERMINAL_ACCEPTED"],
+                                next_node=first_target, applicability=applicability,
+                                applicability_decision=decision, skipped=skipped,
+                                traversed=traversed, terminal=True,
+                                terminal_reason=terminals[node])
+                continue
+            # Boundary semantics: a traversed REQUIRED gate is the stop point.
+            # The resolver returns the route to it and does NOT traverse
+            # through it, and never enforces that future gate's authority /
+            # evidence / prohibited-action requirements in this call.
+            # Enforcement happens only when that gate/node becomes current.
+            if applicability == "REQUIRED":
+                return emit("ROUTE_SELECTED", reasons=["ROUTE_SELECTED", "NEXT_GATE_REQUIRED"],
+                            next_node=first_target, next_gate=gate, applicability=applicability,
+                            applicability_decision=decision, skipped=skipped,
+                            traversed=traversed, terminal=False)
+            # Any other/unknown applicability value fails closed.
+            return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"],
+                        applicability=applicability, applicability_decision=decision,
+                        skipped=skipped, traversed=traversed)
+
+        if node in terminals:
+            unmet = _terminal_reasons(applicability_for(gate_map.get(node)))
+            if unmet:
+                return emit("BLOCKED", reasons=unmet, skipped=skipped,
+                            traversed=traversed, terminal=True, terminal_reason=unmet[0])
+            return emit("TERMINAL", reasons=["WORKFLOW_TERMINAL_ACCEPTED"],
+                        next_node=first_target, skipped=skipped, traversed=traversed,
+                        terminal=True, terminal_reason=terminals[node])
+
+    return emit("BLOCKED", reasons=["WORKFLOW_TRAVERSAL_LOOP"], skipped=skipped,
+                traversed=traversed)
 
 
 def main() -> int:

@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "flow-policy-compiled-profile",
+  "compiler_version": "flow-policy-compiler/1.0.0",
+  "profile_id": "gwc-flow-policy-compiled-v1",
+  "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r2",
+  "workflow": {
+    "id": "full-flow-v3",
+    "version": "2.0.0",
+    "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r2",
+    "workflow_digest": "sha256:ee828b70e194f415498b3bfaed9a1c5cee04168f170814f3df8cd9257f69ecd1"
+  },
+  "policy": {
+    "registry_id": "gwc-gate-applicability-policy-registry",
+    "revision": "policy-contract-v2-20260811-r1",
+    "registry_digest": "sha256:5050be8fd7870427721902a7736364cb01ce0fa3e7e70ba8308340d81759d201",
+    "policy_refs": {
+      "G0_CONTEXT": {
+        "policy_ref": "g0-context-required",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:10a0d0992c5d8f922ee72496519731d0421da6f341c8d1482a272d8e46726f01"
+      },
+      "G1_ALIGNMENT": {
+        "policy_ref": "g1-alignment-required",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:f88e1cdfc580858efbed032a07a68597d9ca952af1a7cd4429c95b056ec417a5"
+      },
+      "G2_EXECUTION": {
+        "policy_ref": "g2-execution-required",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:243c50fec4e5f95d4f8eb53b64974233e8a97a698f118bbbd854d2adb17579d0"
+      },
+      "G3_PR": {
+        "policy_ref": "g3-pr-required",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:87bd6de1a22454dcb983e009475d71e7cb9403f32a939407f9f45a0982cd69dc"
+      },
+      "G4_MERGE": {
+        "policy_ref": "g4-merge-required",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:88bf342c7db835e556683bcb2c4d6d8286ac73e6835bd1164c1c4b4a05cbf418"
+      },
+      "G5_DEPLOY": {
+        "policy_ref": "g5-deploy-effect-driven",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:d12ec1200eea2141773da1f53ce7d2785ac713df264dad6a51e6987481145506"
+      },
+      "G6_PRODUCTION_DATA": {
+        "policy_ref": "g6-production-effect-driven",
+        "policy_version": "2.0.0",
+        "policy_digest": "sha256:121156f6e5725e1e7502efaff725bc0af071b1b381531e8cd431be391dede905"
+      }
+    }
+  },
+  "bindings": {
+    "node_registry_digest": "sha256:fd6736d3d8305163f1c257cafbfc2cffae45c250167977df7bf4116f9539d463",
+    "scenario_registry_digest": "sha256:b88f2b804ebe6c8ca0609fb391ce975d04df95e1c8ecc56a905bebf2f3ab5580",
+    "graph_registry_digest": "sha256:55a66184d8afda10eb1829355afa5b9b695d6dbdbe78e01c2e4b3514aa75837f",
+    "gate_lifecycle_revision": "1.0",
+    "gate_lifecycle_digest": "sha256:b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49",
+    "legacy_route_projection_revision": "workflow-contract-gate-applicability-20260810-r1"
+  },
+  "compiled": {
+    "route_table": [
+      {
+        "source": "repo_delivery.ci-run-capture",
+        "target": "failure_recovery.timeout-recovery",
+        "kind": "human_required",
+        "condition_id": null,
+        "runtime_executable": false,
+        "source_gate": "G3_PR",
+        "target_gate": null
+      },
+      {
+        "source": "repo_delivery.ci-run-capture",
+        "target": "runtime_checkpoint.checkpoint-persist",
+        "kind": "continue",
+        "condition_id": null,
+        "runtime_executable": true,
+        "source_gate": "G3_PR",
+        "target_gate": null
+      },
+      {
+        "source": "runtime_checkpoint.checkpoint-persist",
+        "target": "validation_quality.ci-evidence-capture",
+        "kind": "continue",
+        "condition_id": null,
+        "runtime_executable": true,
+        "source_gate": null,
+        "target_gate": "G3_PR"
+      }
+    ],
+    "terminal_acceptance_bindings": [
+      {
+        "node": "failure_recovery.timeout-recovery",
+        "outcome": "HUMAN_REQUIRED",
+        "gate": null,
+        "policy_ref": null
+      },
+      {
+        "node": "validation_quality.ci-evidence-capture",
+        "outcome": "GREEN",
+        "gate": "G3_PR",
+        "policy_ref": "g3-pr-required"
+      }
+    ],
+    "legacy_route_projection_revision": "workflow-contract-gate-applicability-20260810-r1"
+  },
+  "result": {
+    "status": "COMPATIBLE",
+    "reason_codes": [
+      "FLOW_POLICY_COMPILED"
+    ]
+  },
+  "compiled_digest": "sha256:89c9c1c1e0cda05c0a3675004bd9f54cd2e71f1316e819c6599b3ba56f2f7651"
+}
