@@ -22,6 +22,7 @@ FAIL_CODES = {
     "NODE_LOG_CONTRACT_MISSING", "NODE_NEXT_ROUTE_MISSING",
     "MODE_BYPASSES_NODE_RUNTIME", "NODE_AUTHORITY_ESCALATION_ATTEMPT",
     "FLOW_PROFILE_BINDING_MISMATCH", "GATE_APPLICABILITY_BLOCKED",
+    "POLICY_REGISTRY_BINDING_MISMATCH",
 }
 
 
@@ -142,81 +143,120 @@ def _is_loaded(value: Any) -> bool:
     return True
 
 
+def _load_bound_flow_profile(*, root: Path, route_profile: Mapping[str, Any],
+                             flow_profile: Mapping[str, Any] | None) -> tuple[Mapping[str, Any] | None, str | None]:
+    expected = str(route_profile.get("workflow_profile_ref") or "")
+    if flow_profile is not None:
+        actual = str(flow_profile.get("id") or "")
+        if expected and actual != expected:
+            return None, "FLOW_PROFILE_BINDING_MISMATCH"
+        return flow_profile, None
+    if not expected:
+        return None, None
+
+    path = root / "core/node-architect/profile-registry.json"
+    try:
+        registry = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None, "FLOW_PROFILE_BINDING_MISMATCH"
+    matches = [
+        item for item in registry.get("profiles", [])
+        if isinstance(item, Mapping) and item.get("id") == expected
+    ]
+    if len(matches) != 1:
+        return None, "FLOW_PROFILE_BINDING_MISMATCH"
+    return matches[0], None
+
+
+def _load_gate_policy_registry(*, root: Path, flow_profile: Mapping[str, Any]) -> tuple[Mapping[str, Any] | None, str | None]:
+    expected = str(flow_profile.get("policy_registry_ref") or "")
+    if not expected:
+        return None, "POLICY_REGISTRY_BINDING_MISMATCH"
+    path = root / "core/node-architect/gate-applicability-policy-registry.json"
+    try:
+        registry = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None, "POLICY_REGISTRY_BINDING_MISMATCH"
+    if str(registry.get("registry_id") or "") != expected:
+        return None, "POLICY_REGISTRY_BINDING_MISMATCH"
+    return registry, None
+
+
 def resolve_next_gate_applicability(*, route_profile: Mapping[str, Any],
                                     flow_profile: Mapping[str, Any] | None,
                                     next_gate: str | None,
                                     context: Mapping[str, Any],
                                     root: Path) -> dict[str, Any]:
-    """Resolve the effective next gate without hard-coding gate semantics.
+    """Resolve effective next gate from workflow binding plus policy registry.
 
-    Omitting ``flow_profile`` preserves the legacy resolver behavior. Supplying
-    one enables policy-driven applicability and turns ``NOT_APPLICABLE`` into a
-    skipped next gate (``None``). ``BLOCKED`` remains fail-closed.
+    A legacy route profile without ``workflow_profile_ref`` preserves its old
+    behavior. Current profiles auto-load their bound flow profile and policy
+    registry, so callers do not need gate-specific branching.
     """
-    if next_gate is None or flow_profile is None:
+    if next_gate is None:
         return {
-            "outcome": "PASS",
-            "next_gate": next_gate,
-            "reason_code": "GATE_APPLICABILITY_NOT_EVALUATED",
-            "decision": None,
+            "outcome": "PASS", "next_gate": None,
+            "reason_code": "GATE_APPLICABILITY_NOT_EVALUATED", "decision": None,
         }
-    expected = str(route_profile.get("workflow_profile_ref") or "")
-    actual = str(flow_profile.get("id") or "")
-    if expected and actual != expected:
+
+    bound_flow, flow_error = _load_bound_flow_profile(
+        root=root, route_profile=route_profile, flow_profile=flow_profile,
+    )
+    if flow_error:
         return {
-            "outcome": "BLOCKED",
-            "next_gate": next_gate,
-            "reason_code": "FLOW_PROFILE_BINDING_MISMATCH",
-            "decision": None,
+            "outcome": "BLOCKED", "next_gate": next_gate,
+            "reason_code": flow_error, "decision": None,
+        }
+    if bound_flow is None:
+        return {
+            "outcome": "PASS", "next_gate": next_gate,
+            "reason_code": "GATE_APPLICABILITY_NOT_EVALUATED", "decision": None,
+        }
+
+    policy_registry, policy_error = _load_gate_policy_registry(root=root, flow_profile=bound_flow)
+    if policy_error or policy_registry is None:
+        return {
+            "outcome": "BLOCKED", "next_gate": next_gate,
+            "reason_code": policy_error or "POLICY_REGISTRY_BINDING_MISMATCH", "decision": None,
         }
     evaluator = _gate_applicability_evaluator(root)
     if evaluator is None:
         return {
-            "outcome": "BLOCKED",
-            "next_gate": next_gate,
-            "reason_code": "GATE_APPLICABILITY_BLOCKED",
-            "decision": None,
+            "outcome": "BLOCKED", "next_gate": next_gate,
+            "reason_code": "GATE_APPLICABILITY_BLOCKED", "decision": None,
         }
     try:
         decision = evaluator.evaluate_gate_applicability(
-            flow_profile=flow_profile,
+            flow_profile=bound_flow,
+            policy_registry=policy_registry,
             gate=next_gate,
             context=context,
         )
     except Exception:
         return {
-            "outcome": "BLOCKED",
-            "next_gate": next_gate,
-            "reason_code": "GATE_APPLICABILITY_BLOCKED",
-            "decision": None,
+            "outcome": "BLOCKED", "next_gate": next_gate,
+            "reason_code": "GATE_APPLICABILITY_BLOCKED", "decision": None,
         }
+
     applicability = decision.get("decision")
     if applicability == "BLOCKED":
         return {
-            "outcome": "BLOCKED",
-            "next_gate": next_gate,
-            "reason_code": "GATE_APPLICABILITY_BLOCKED",
-            "decision": decision,
+            "outcome": "BLOCKED", "next_gate": next_gate,
+            "reason_code": "GATE_APPLICABILITY_BLOCKED", "decision": decision,
         }
     if applicability == "NOT_APPLICABLE":
         return {
-            "outcome": "PASS",
-            "next_gate": None,
-            "reason_code": "NEXT_GATE_NOT_APPLICABLE",
-            "decision": decision,
+            "outcome": "PASS", "next_gate": None,
+            "reason_code": "NEXT_GATE_NOT_APPLICABLE", "decision": decision,
         }
     if applicability == "REQUIRED":
         return {
-            "outcome": "PASS",
-            "next_gate": next_gate,
-            "reason_code": "NEXT_GATE_REQUIRED",
-            "decision": decision,
+            "outcome": "PASS", "next_gate": next_gate,
+            "reason_code": "NEXT_GATE_REQUIRED", "decision": decision,
         }
     return {
-        "outcome": "BLOCKED",
-        "next_gate": next_gate,
-        "reason_code": "GATE_APPLICABILITY_BLOCKED",
-        "decision": decision,
+        "outcome": "BLOCKED", "next_gate": next_gate,
+        "reason_code": "GATE_APPLICABILITY_BLOCKED", "decision": decision,
     }
 
 
@@ -345,7 +385,7 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
         return _blocked(reasons=[str(next_gate_result["reason_code"])], **route_common)
 
     reason_codes = ["ROUTE_SELECTED"]
-    if flow_profile is not None and route.get("next_gate") is not None:
+    if route.get("next_gate") is not None:
         reason_codes.append(str(next_gate_result["reason_code"]))
     payload = _base_payload(**route_common)
     payload.update({
