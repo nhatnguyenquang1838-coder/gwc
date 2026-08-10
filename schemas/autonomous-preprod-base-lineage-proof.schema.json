@@ -11,6 +11,7 @@
     "repository",
     "anchor_base_sha",
     "current_base_sha",
+    "repository_readback",
     "steps",
     "lineage_digest"
   ],
@@ -21,6 +22,31 @@
     "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
     "anchor_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "current_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "repository_readback": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "comparison_status",
+            "merge_base_sha",
+            "authority_policy_anchor_digest",
+            "authority_policy_current_digest",
+            "trusted_repository_readback"
+          ],
+          "properties": {
+            "source": {"enum": ["github_compare", "repo_ci", "trusted_local_git"]},
+            "comparison_status": {"enum": ["ahead", "identical"]},
+            "merge_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "authority_policy_anchor_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "authority_policy_current_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "trusted_repository_readback": {"const": true}
+          }
+        }
+      ]
+    },
     "steps": {
       "type": "array",
       "items": {
