@@ -16,7 +16,7 @@
       },
       "compiled": {
         "projection_version": "1.0.0",
-        "workflow_digest": "sha256:1545b0e63fe90154c8b70654e5bbb5d3e9c0139c0f6da45a3ed282c226c6abdf"
+        "workflow_digest": "sha256:3e4068ae203bfb6d5e98cb490b1b8aef106557520cf87332a00f435ed34646d5"
       },
       "graph_registry_ref": "gwc-runtime-graph-registry",
       "green_targets": [
@@ -62,15 +62,15 @@
           "schema_version": "1.0.0"
         },
         {
-          "digest": "sha256:5a63fc0091c89d8e413781a7f8c895399585acbce774a842feb41d0a0404110c",
+          "digest": "sha256:5050be8fd7870427721902a7736364cb01ce0fa3e7e70ba8308340d81759d201",
           "path": "core/node-architect/gate-applicability-policy-registry.json",
           "registry": "policy",
           "registry_id": "gwc-gate-applicability-policy-registry",
-          "revision": "workflow-contract-gate-applicability-20260810-r2",
-          "schema_version": "1.0.0"
+          "revision": "policy-contract-v2-20260811-r1",
+          "schema_version": "1.1.0"
         }
       ],
-      "revision": "workflow-contract-v2-scrum392-20260811-r1",
+      "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r1",
       "routes": [
         {
           "human_boundary": false,
@@ -212,6 +212,6 @@
   ],
   "provenance": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
   "registry_id": "gwc-runtime-profile-registry",
-  "revision": "workflow-contract-v2-scrum392-20260811-r1",
+  "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r1",
   "schema_version": "1.0.0"
 }
