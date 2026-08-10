@@ -86,6 +86,7 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
             expected_task_id="SCRUM-302",
             expected_base_sha=self.anchor,
             base_lineage_steps=[],
+            repository_readback=None,
             now=self.now,
         )
         args.update(overrides)
@@ -110,10 +111,19 @@ class AutonomousPreprodRunAuthorityTests(unittest.TestCase):
             "trusted_merge_proof": True,
             "trusted_g5_evidence": True,
         }
+        repository_readback = {
+            "source": "repo_ci",
+            "comparison_status": "ahead",
+            "merge_base_sha": self.anchor,
+            "authority_policy_anchor_digest": "sha256:" + "4" * 64,
+            "authority_policy_current_digest": "sha256:" + "4" * 64,
+            "trusted_repository_readback": True,
+        }
         result = self.check(
             expected_task_id="SCRUM-303",
             expected_base_sha=current,
             base_lineage_steps=[step],
+            repository_readback=repository_readback,
         )
         self.assertEqual("AUTHORIZED_READY", result["state"])
         self.assertEqual(current, result["base_lineage_proof"]["current_base_sha"])
