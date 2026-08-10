@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://dw-super.local/schemas/runtime/flow-policy-compiled-profile.schema.json",
   "title": "Flow Policy Compiled Profile",
-  "description": "Static cross-layer compilation of one Workflow composition against one Policy registry. It is immutable proof of a compatible binding, not live execution state. compiled_digest is the cross-layer identity: workflow_digest (policy-independent) + exact Policy digests + registry/gate-lifecycle bindings + compiler version.",
+  "description": "Static cross-layer compilation of one Workflow composition against one Policy registry. It is immutable proof of a compatible binding, not live execution state. compiled_digest is the cross-layer identity: workflow_digest (policy-independent) + exact Policy digests + registry/gate-lifecycle/legacy-route bindings + compiler version.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -53,14 +53,15 @@
       "required": [
         "node_registry_digest", "scenario_registry_digest",
         "graph_registry_digest", "gate_lifecycle_revision",
-        "gate_lifecycle_digest"
+        "gate_lifecycle_digest", "legacy_route_projection_revision"
       ],
       "properties": {
         "node_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
         "scenario_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
         "graph_registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
         "gate_lifecycle_revision": {"type": "string", "minLength": 1},
-        "gate_lifecycle_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        "gate_lifecycle_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "legacy_route_projection_revision": {"type": "string", "minLength": 1}
       }
     },
     "compiled": {
