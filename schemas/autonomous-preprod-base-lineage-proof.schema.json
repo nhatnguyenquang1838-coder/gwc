@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/autonomous-preprod-base-lineage-proof.schema.json",
+  "title": "Autonomous pre-prod base lineage proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "run_id",
+    "repository",
+    "anchor_base_sha",
+    "current_base_sha",
+    "steps",
+    "lineage_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "autonomous-preprod-base-lineage-proof"},
+    "run_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "anchor_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "current_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "previous_base_sha",
+          "merged_head_sha",
+          "merge_commit_sha",
+          "g5_classification",
+          "trusted_merge_proof",
+          "trusted_g5_evidence"
+        ],
+        "properties": {
+          "task_id": {"type": "string", "minLength": 1},
+          "previous_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "merged_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "g5_classification": {"type": ["string", "null"]},
+          "trusted_merge_proof": {"const": true},
+          "trusted_g5_evidence": {"type": ["boolean", "null"]}
+        }
+      }
+    },
+    "lineage_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
