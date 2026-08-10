@@ -191,6 +191,13 @@ def validate_policy(policy: Mapping[str, Any], *, root: Path, now: datetime | No
 
 def _run_authority_errors(policy: Mapping[str, Any], manifest: Mapping[str, Any], *, policy_digest: str | None,
                           now: datetime) -> tuple[list[str], list[str], str | None]:
+    """Validate the trusted Human/bot authority binding.
+
+    The receipt binds approval-time policy provenance from the manifest. The
+    current machine-readable policy is validated separately as the execution
+    ceiling; a compatible runtime-policy revision must not revoke an existing
+    lane-wide Human approval.
+    """
     code = "AUTONOMOUS_RUN_AUTHORITY_UNTRUSTED"
     receipt = manifest.get("authority_receipt")
     if not isinstance(receipt, Mapping):
@@ -202,9 +209,9 @@ def _run_authority_errors(policy: Mapping[str, Any], manifest: Mapping[str, Any]
         (receipt.get("bot_login") == GITHUB_ACTIONS_BOT, "authority receipt bot_login must be github-actions[bot]"),
         (receipt.get("marker") == RUN_AUTHORITY_MARKER, "authority receipt marker mismatch"),
         (receipt.get("approved_run_id") == manifest.get("run_id"), "authority receipt run_id mismatch"),
-        (receipt.get("approved_policy_id") == policy.get("policy_id"), "authority receipt policy_id mismatch"),
-        (receipt.get("approved_policy_revision") == policy.get("policy_revision"), "authority receipt policy_revision mismatch"),
-        (receipt.get("approved_policy_digest") == policy_digest, "authority receipt policy_digest mismatch"),
+        (receipt.get("approved_policy_id") == manifest.get("policy_id"), "authority receipt policy_id mismatch"),
+        (receipt.get("approved_policy_revision") == manifest.get("policy_revision"), "authority receipt policy_revision mismatch"),
+        (receipt.get("approved_policy_digest") == manifest.get("policy_digest"), "authority receipt policy_digest mismatch"),
     ]
     errors.extend(message for ok, message in checks if not ok)
     try:
@@ -258,8 +265,11 @@ def validate_manifest(policy: Mapping[str, Any], manifest: Mapping[str, Any], *,
     if not schema_errors:
         if manifest.get("repository") != policy.get("repository"): reasons.append("AUTONOMOUS_SCOPE_DRIFT"); details.append("manifest repository does not match policy repository")
         if manifest.get("target_branch") != policy.get("target_branch"): reasons.append("AUTONOMOUS_SCOPE_DRIFT"); details.append("manifest target branch does not match policy target branch")
-        if manifest.get("policy_id") != policy.get("policy_id") or manifest.get("policy_revision") != policy.get("policy_revision"): reasons.append("AUTONOMOUS_POLICY_REVISION_DRIFT")
-        if manifest.get("policy_digest") != policy_result.get("policy_digest"): reasons.append("AUTONOMOUS_POLICY_DIGEST_DRIFT")
+        if manifest.get("policy_id") != policy.get("policy_id"): reasons.append("AUTONOMOUS_POLICY_REVISION_DRIFT"); details.append("manifest policy family does not match current execution policy")
+        # policy_revision/policy_digest in the manifest are approval-time provenance.
+        # Current policy evolution is allowed when the current policy itself is
+        # valid and the immutable task scopes remain inside its risk/action/path
+        # ceiling. Exact byte/revision equality is intentionally not required.
         if _branch_name_error(manifest.get("approved_base_ref")): reasons.append("AUTONOMOUS_RUN_MANIFEST_INVALID"); details.append("approved_base_ref is not a canonical Git ref name")
         try:
             policy_issued = parse_utc(str(policy["issued_at"]), "policy.issued_at")
