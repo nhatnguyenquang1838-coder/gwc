@@ -155,12 +155,19 @@ def compile_flow_policy_decision(
     if requested_action is not None and str(requested_action) in prohibited:
         applicability = "BLOCKED"
         reasons.append("POLICY_PROHIBITED_ACTION")
-    if applicability == "REQUIRED" and _unsatisfied(authority):
-        applicability = "BLOCKED"
-        reasons.append("AUTHORITY_REQUIREMENTS_UNSATISFIED")
-    if applicability == "REQUIRED" and _unsatisfied(evidence):
-        applicability = "BLOCKED"
-        reasons.append("EVIDENCE_REQUIREMENTS_UNSATISFIED")
+
+    # Aggregate all unmet requirements from the originally REQUIRED policy
+    # decision before collapsing the runtime outcome to BLOCKED. This keeps the
+    # decision useful for deterministic remediation without weakening fail-close.
+    if str(applicability_decision.get("decision")) == "REQUIRED":
+        authority_missing = bool(_unsatisfied(authority))
+        evidence_missing = bool(_unsatisfied(evidence))
+        if authority_missing:
+            reasons.append("AUTHORITY_REQUIREMENTS_UNSATISFIED")
+        if evidence_missing:
+            reasons.append("EVIDENCE_REQUIREMENTS_UNSATISFIED")
+        if authority_missing or evidence_missing:
+            applicability = "BLOCKED"
 
     declared_terminal = _terminal_outcome(flow_profile, current_node)
     effective_terminal = terminal_disposition or declared_terminal
