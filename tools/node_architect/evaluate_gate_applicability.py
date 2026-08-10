@@ -1,8 +1,8 @@
-"""Evaluate workflow gate applicability from a flow-profile policy.
+"""Evaluate gate applicability from a workflow-bound policy registry.
 
-The evaluator is intentionally pure and controller-agnostic. It consumes a
-``flow-profile`` workflow gate binding plus runtime facts and returns exactly
-one of ``REQUIRED``, ``NOT_APPLICABLE`` or ``BLOCKED``.
+The evaluator is pure and controller-agnostic. Workflow composition only binds
+``gate -> policy_ref``; applicability rules live in a separate policy registry.
+The result is a deterministic, digest-bound decision artifact.
 """
 from __future__ import annotations
 
@@ -18,10 +18,8 @@ def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
-def _digest(value: Mapping[str, Any]) -> str:
-    unsigned = dict(value)
-    unsigned.pop("decision_digest", None)
-    return "sha256:" + hashlib.sha256(_canonical(unsigned).encode("utf-8")).hexdigest()
+def _sha256(value: Any) -> str:
+    return "sha256:" + hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
 
 
 def _read_path(context: Mapping[str, Any], dotted_path: str) -> tuple[bool, Any]:
@@ -42,7 +40,7 @@ def _condition_matches(condition: Mapping[str, Any], context: Mapping[str, Any])
     exists, actual = _read_path(context, field)
     if operator == "exists":
         expected = condition.get("value", True)
-        return exists is bool(expected)
+        return exists == bool(expected)
     if not exists:
         return False
     if operator == "truthy":
@@ -67,71 +65,108 @@ def _first_match(conditions: Any, context: Mapping[str, Any]) -> str | None:
     return None
 
 
-def _decision(*, gate: str, policy_id: str | None, decision: str, reason_code: str,
-              matched_rule: str | None = None) -> dict[str, Any]:
+def _decision(*, flow_profile_id: str, policy_registry_ref: str, gate: str,
+              policy_ref: str | None, decision: str, reason_code: str,
+              context: Mapping[str, Any], matched_rule: str | None = None) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "schema_version": "1.0",
         "artifact_type": "gate-applicability-decision",
+        "flow_profile_id": flow_profile_id or "unbound",
+        "policy_registry_ref": policy_registry_ref or "unbound",
         "gate": gate,
-        "policy_id": policy_id,
+        "policy_ref": policy_ref,
         "decision": decision,
         "reason_code": reason_code,
         "matched_rule": matched_rule,
+        "context_digest": _sha256(context),
     }
-    payload["decision_digest"] = _digest(payload)
+    payload["decision_digest"] = _sha256(payload)
     return payload
 
 
-def evaluate_gate_applicability(*, flow_profile: Mapping[str, Any], gate: str,
+def evaluate_gate_applicability(*, flow_profile: Mapping[str, Any],
+                                policy_registry: Mapping[str, Any], gate: str,
                                 context: Mapping[str, Any]) -> dict[str, Any]:
-    """Return a deterministic applicability decision for ``gate``.
+    """Return REQUIRED, NOT_APPLICABLE or BLOCKED for one canonical gate.
 
-    Precedence is fail-closed and deterministic: ``BLOCKED`` rules win over
-    ``REQUIRED`` rules, which win over explicit ``NOT_APPLICABLE`` rules, then
-    the binding default applies. Duplicate or missing bindings are blocked.
+    Precedence is deterministic and fail-closed: BLOCKED rules win over
+    REQUIRED rules, which win over explicit NOT_APPLICABLE rules; otherwise
+    the policy default applies. Missing/ambiguous bindings or policies block.
     """
+    flow_profile_id = str(flow_profile.get("id") or "unbound")
+    expected_registry = str(flow_profile.get("policy_registry_ref") or "")
+    actual_registry = str(policy_registry.get("registry_id") or "")
+    registry_ref = expected_registry or actual_registry or "unbound"
+
     workflow = flow_profile.get("workflow")
     if not isinstance(workflow, Mapping):
         return _decision(
-            gate=gate, policy_id=None, decision="BLOCKED",
-            reason_code="WORKFLOW_CONTRACT_MISSING",
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=None, decision="BLOCKED",
+            reason_code="WORKFLOW_CONTRACT_MISSING", context=context,
         )
+    if not expected_registry or expected_registry != actual_registry:
+        return _decision(
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=None, decision="BLOCKED",
+            reason_code="POLICY_REGISTRY_BINDING_MISMATCH", context=context,
+        )
+
     bindings = [
         item for item in workflow.get("gate_bindings", [])
         if isinstance(item, Mapping) and item.get("gate") == gate
     ]
     if len(bindings) != 1:
         return _decision(
-            gate=gate, policy_id=None, decision="BLOCKED",
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=None, decision="BLOCKED",
             reason_code="GATE_BINDING_MISSING" if not bindings else "GATE_BINDING_AMBIGUOUS",
+            context=context,
         )
 
-    binding = bindings[0]
-    policy_id = str(binding.get("policy_id") or "") or None
-    blocked = _first_match(binding.get("blocked_when"), context)
+    policy_ref = str(bindings[0].get("policy_ref") or "") or None
+    policies = [
+        item for item in policy_registry.get("policies", [])
+        if isinstance(item, Mapping) and item.get("id") == policy_ref
+    ]
+    if len(policies) != 1:
+        return _decision(
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=policy_ref, decision="BLOCKED",
+            reason_code="GATE_POLICY_MISSING" if not policies else "GATE_POLICY_AMBIGUOUS",
+            context=context,
+        )
+
+    policy = policies[0]
+    blocked = _first_match(policy.get("blocked_when"), context)
     if blocked:
         return _decision(
-            gate=gate, policy_id=policy_id, decision="BLOCKED",
-            reason_code="GATE_POLICY_BLOCKED", matched_rule=blocked,
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=policy_ref, decision="BLOCKED",
+            reason_code="GATE_POLICY_BLOCKED", matched_rule=blocked, context=context,
         )
-    required = _first_match(binding.get("required_when"), context)
+    required = _first_match(policy.get("required_when"), context)
     if required:
         return _decision(
-            gate=gate, policy_id=policy_id, decision="REQUIRED",
-            reason_code="GATE_REQUIRED_BY_POLICY", matched_rule=required,
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=policy_ref, decision="REQUIRED",
+            reason_code="GATE_REQUIRED_BY_POLICY", matched_rule=required, context=context,
         )
-    not_applicable = _first_match(binding.get("not_applicable_when"), context)
+    not_applicable = _first_match(policy.get("not_applicable_when"), context)
     if not_applicable:
         return _decision(
-            gate=gate, policy_id=policy_id, decision="NOT_APPLICABLE",
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=policy_ref, decision="NOT_APPLICABLE",
             reason_code="GATE_NOT_APPLICABLE_BY_POLICY", matched_rule=not_applicable,
+            context=context,
         )
 
-    default = binding.get("default")
+    default = policy.get("default")
     if default not in DECISIONS:
         return _decision(
-            gate=gate, policy_id=policy_id, decision="BLOCKED",
-            reason_code="GATE_POLICY_INVALID",
+            flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+            gate=gate, policy_ref=policy_ref, decision="BLOCKED",
+            reason_code="GATE_POLICY_INVALID", context=context,
         )
     reason = {
         "REQUIRED": "GATE_REQUIRED_BY_DEFAULT",
@@ -139,7 +174,9 @@ def evaluate_gate_applicability(*, flow_profile: Mapping[str, Any], gate: str,
         "BLOCKED": "GATE_BLOCKED_BY_DEFAULT",
     }[str(default)]
     return _decision(
-        gate=gate, policy_id=policy_id, decision=str(default), reason_code=reason,
+        flow_profile_id=flow_profile_id, policy_registry_ref=registry_ref,
+        gate=gate, policy_ref=policy_ref, decision=str(default),
+        reason_code=reason, context=context,
     )
 
 
