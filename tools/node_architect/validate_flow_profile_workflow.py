@@ -59,7 +59,12 @@ V1_EDGE_KIND_MAP = {
 
 CYCLE_LEGAL_KINDS = frozenset({"retry", "compensate"})
 
-PROJECTION_VERSION = "1.0.0"
+PROJECTION_VERSION = "2.0.0"
+
+# Registries whose content identity IS Workflow composition semantics.
+# 'policy' is intentionally excluded: Policy content identity belongs to the
+# Policy lane digest, and the combined identity to the P1-C compiled profile.
+COMPOSITION_REGISTRIES = frozenset({"node", "scenario", "graph"})
 
 REGISTRY_PATHS = {
     "node": "core/node-architect/node-registry.json",
@@ -99,14 +104,24 @@ def file_digest(path: Path) -> str:
 def compile_workflow_projection(flow_profile: dict[str, Any]) -> dict[str, Any]:
     """Deterministic compiled projection of the workflow composition.
 
-    Pure function of the profile content: same composition -> same digest.
+    Layer boundary (P1-C reconciliation, SCRUM-392):
+
+        workflow_digest = hash(Workflow composition semantics only)
+        policy_digest   = hash(Policy semantics only)          # Policy lane
+        compiled_digest = hash(workflow + policy + bindings)   # P1-C lane
+
+    Therefore this projection covers workflow structure plus the *composition*
+    registry bindings (node/scenario/graph) only. ``policy_ref`` is carried as
+    an opaque Flow composition reference; the Policy registry content
+    revision/digest is deliberately excluded so that a Policy-only revision
+    never mutates Workflow identity. Flow-profile ``revision`` is excluded for
+    the same reason: it is release metadata, not composition semantics.
     """
     workflow = flow_profile.get("workflow") or {}
     projection = {
         "projection_version": PROJECTION_VERSION,
         "flow_id": flow_profile.get("id"),
         "flow_version": flow_profile.get("version"),
-        "revision": flow_profile.get("revision"),
         "entry_nodes": sorted(workflow.get("entry_nodes", [])),
         "terminal_nodes": sorted(
             (item["node"], item["outcome"]) for item in workflow.get("terminal_nodes", [])
@@ -135,6 +150,7 @@ def compile_workflow_projection(flow_profile: dict[str, Any]) -> dict[str, Any]:
         "registry_bindings": sorted(
             (item["registry"], item["registry_id"], item["revision"], item["digest"])
             for item in flow_profile.get("registry_bindings", [])
+            if item["registry"] in COMPOSITION_REGISTRIES
         ),
     }
     blob = json.dumps(projection, sort_keys=True, separators=(",", ":")).encode("utf-8")
