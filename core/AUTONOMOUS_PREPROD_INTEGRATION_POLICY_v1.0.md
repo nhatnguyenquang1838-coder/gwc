@@ -39,7 +39,7 @@ AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN
 15. The broader `control_plane_protected_paths` policy list remains a defense/governance inventory and policy integrity requirement. It MUST NOT by itself be interpreted as the current run's immutable authority-plane overlap set.
 16. Policy, manifest and parent authority timestamps are activation boundaries, not metadata only. Future/expired objects fail closed.
 17. Repository paths and working branch refs are canonicalized. Traversal/root aliases, control characters, backslashes/globs and malformed Git refs fail closed.
-18. G5 remains read-only exact merge-SHA verification. This contract grants no deploy/release/runtime-reload authority.
+18. **Autonomous child delivery is complete at a governed exact-head merge into `pre-prod`. Post-merge G5 verification is not required for autonomous task completion or dependency unlock.** G5 may remain observational for non-autonomous delivery and promotion evidence, but its absence MUST NOT block the autonomous lane. This contract grants no deploy/release/runtime-reload authority.
 19. G6 production data/configuration/credential/secret/migration authority is not applicable and is never granted.
 
 ## Parent run approval trust model
@@ -103,7 +103,7 @@ DAG_SELECT
 
 A task that satisfies dependencies but lacks valid parent authority is `READY_FOR_AUTHORITY`; it is not claimable. Once trusted/current authority is valid and the task is allowlisted, it becomes `AUTHORIZED_READY`. Only `AUTHORIZED_READY` may emit the Jira/GitHub CAS claim action.
 
-A downstream task MUST NOT dispatch while any declared predecessor is not terminal-complete (`COMPLETED` or `G5_VERIFIED` under the runtime contract). Jira `Done` text alone is not sufficient when the canonical DAG snapshot does not classify the predecessor as terminal-complete.
+A downstream task MUST NOT dispatch while any declared predecessor is not terminal-complete. For this autonomous route, terminal-complete includes `COMPLETED` and `PREPROD_MERGED`; `G5_VERIFIED` remains accepted for compatibility but is not required after autonomous merge to `pre-prod`. Jira `Done` text alone is not sufficient when the canonical DAG snapshot does not classify the predecessor as terminal-complete.
 
 ## Child G2 derivation
 
