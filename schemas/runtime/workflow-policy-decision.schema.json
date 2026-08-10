@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.local/schemas/runtime/workflow-policy-decision.schema.json",
+  "title": "Workflow Policy Runtime Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "workflow",
+    "policy",
+    "current_node",
+    "current_gate",
+    "applicability",
+    "outcome",
+    "reason_codes",
+    "context_digest",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "artifact_type": {"const": "workflow-policy-runtime-decision"},
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "digest"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry_id", "revision", "digest", "policy_ref"],
+      "properties": {
+        "registry_id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "policy_ref": {"type": ["string", "null"]}
+      }
+    },
+    "current_node": {"type": "string", "minLength": 1},
+    "current_gate": {
+      "enum": [
+        "G0_CONTEXT",
+        "G1_ALIGNMENT",
+        "G2_EXECUTION",
+        "G3_PR",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION_DATA"
+      ]
+    },
+    "applicability": {"enum": ["REQUIRED", "NOT_APPLICABLE", "BLOCKED"]},
+    "outcome": {"enum": ["CONTINUE", "TERMINAL", "BLOCKED", "HUMAN_REQUIRED"]},
+    "next_nodes": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "default": []
+    },
+    "terminal_disposition": {"type": ["string", "null"]},
+    "authority_requirement": {"type": ["object", "null"]},
+    "evidence_requirements": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "default": []
+    },
+    "evidence_results": {
+      "type": "array",
+      "items": {"type": "object"},
+      "default": []
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "context_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome": {"const": "CONTINUE"}}},
+      "then": {"required": ["next_nodes"], "properties": {"next_nodes": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "TERMINAL"}}},
+      "then": {"required": ["terminal_disposition"], "properties": {"terminal_disposition": {"type": "string", "minLength": 1}}}
+    },
+    {
+      "if": {"properties": {"applicability": {"const": "BLOCKED"}}},
+      "then": {"properties": {"outcome": {"const": "BLOCKED"}}}
+    }
+  ]
+}
