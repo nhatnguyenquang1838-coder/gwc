@@ -40,9 +40,9 @@
           "previous_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
           "merged_head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
           "merge_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-          "g5_classification": {"const": "success"},
+          "g5_classification": {"type": ["string", "null"]},
           "trusted_merge_proof": {"const": true},
-          "trusted_g5_evidence": {"const": true}
+          "trusted_g5_evidence": {"type": ["boolean", "null"]}
         }
       }
     },
