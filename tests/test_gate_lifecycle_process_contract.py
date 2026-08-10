@@ -27,7 +27,7 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("For G5, do not infer a manual deploy/reload from the gate name.", chatgpt)
         self.assertIn("G5 checks those workflow/deployment statuses", e2e)
         self.assertIn("Read-only `G5_STATUS_VERIFY` starts automatically", gate_contract)
-        self.assertIn("Read-only `G5_STATUS_VERIFY` runs automatically after G4 merge", e2e)
+        self.assertIn("read-only `G5_STATUS_VERIFY` runs automatically after G4 merge", e2e)
 
     def test_ready_for_review_is_g3_metadata_completion(self) -> None:
         gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
