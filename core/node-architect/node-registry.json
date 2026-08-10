@@ -1208,7 +1208,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
-        "source_sha": "662187262c118dfc903e914a03ead7edc8f739331382b93d08b4c1b2a3880c06"
+        "source_sha": "a2cefa121d6e240e228918e86a09b7e773a9b35fc842cbf7dd7a27723fab0778"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
