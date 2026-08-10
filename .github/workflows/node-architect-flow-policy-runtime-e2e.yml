@@ -25,6 +25,7 @@ on:
       - 'tests/test_gate_policy_contract.py'
       - 'tests/test_workflow_profile_gate_applicability.py'
       - 'tests/test_flow_policy_runtime_e2e.py'
+      - 'tests/test_flow_policy_activation_source_binding.py'
       - '.github/workflows/node-architect-flow-policy-runtime-e2e.yml'
   workflow_dispatch:
 
@@ -84,4 +85,5 @@ jobs:
             tests.test_flow_profile_workflow_contract \
             tests.test_gate_policy_contract \
             tests.test_workflow_profile_gate_applicability \
-            tests.test_flow_policy_runtime_e2e
+            tests.test_flow_policy_runtime_e2e \
+            tests.test_flow_policy_activation_source_binding
