@@ -1,12 +1,36 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "artifact_type": "gate-applicability-policy-registry",
   "registry_id": "gwc-gate-applicability-policy-registry",
-  "revision": "workflow-contract-gate-applicability-20260810-r2",
+  "revision": "policy-contract-v2-20260811-r1",
+  "policy_contract_version": "2.0.0",
+  "tighten_only": true,
+  "canonical_minimums": {
+    "G0_CONTEXT": {"min_decision": "REQUIRED"},
+    "G1_ALIGNMENT": {"min_decision": "REQUIRED"},
+    "G2_EXECUTION": {
+      "min_decision": "REQUIRED",
+      "required_authority_types": ["gate_approval"],
+      "required_evidence_types": ["scope_declaration"],
+      "prohibited_actions": ["write_outside_declared_scope"]
+    },
+    "G3_PR": {
+      "min_decision": "REQUIRED",
+      "required_evidence_types": ["diff_readback"]
+    },
+    "G4_MERGE": {
+      "min_decision": "REQUIRED",
+      "required_authority_types": ["merge_approval"],
+      "prohibited_actions": ["merge_without_approval"]
+    },
+    "G5_DEPLOY": {"min_decision": "NOT_APPLICABLE"},
+    "G6_PRODUCTION_DATA": {"min_decision": "NOT_APPLICABLE"}
+  },
   "policies": [
     {
       "id": "g0-context-required",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Context capture is always required before any bound execution.",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
@@ -14,7 +38,8 @@
     },
     {
       "id": "g1-alignment-required",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Alignment is always required before execution authority is requested.",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
@@ -22,31 +47,85 @@
     },
     {
       "id": "g2-execution-required",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Execution requires a bound, unexpired gate approval and a declared scope.",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "authority_requirements": [
+        {
+          "id": "execution-approval",
+          "authority_type": "gate_approval",
+          "allowed_providers": ["human", "standing_authority"],
+          "required_bindings": ["scope_hash", "base_sha"],
+          "max_age_seconds": 86400,
+          "equivalence": {"accepts": ["derived_child_approval"], "mode": "equivalent_only_if_declared"}
+        }
+      ],
+      "evidence_requirements": [
+        {"id": "scope-declaration", "evidence_type": "scope_declaration", "mandatory": true}
+      ],
+      "prohibited_actions": [
+        {"id": "no-out-of-scope-write", "action": "write_outside_declared_scope", "reason_code": "SCOPE_VIOLATION"}
+      ]
     },
     {
       "id": "g3-pr-required",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Pull request delivery requires readback evidence of the exact head.",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "evidence_requirements": [
+        {
+          "id": "diff-readback",
+          "evidence_type": "diff_readback",
+          "mandatory": true,
+          "acceptance": [
+            {"id": "readback-verified", "field": "evidence_item.verified", "operator": "truthy"}
+          ]
+        }
+      ],
+      "terminal_acceptance": {
+        "mode": "all",
+        "predicates": [
+          {"id": "pr-open", "field": "pr.state", "operator": "in", "values": ["OPEN", "MERGED"]}
+        ]
+      }
     },
     {
       "id": "g4-merge-required",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Merge requires an exact-head merge approval bound to the target branch.",
       "default": "REQUIRED",
       "required_when": [],
       "not_applicable_when": [],
-      "blocked_when": []
+      "blocked_when": [],
+      "authority_requirements": [
+        {
+          "id": "merge-approval",
+          "authority_type": "merge_approval",
+          "allowed_providers": ["human", "standing_authority"],
+          "required_bindings": ["head_sha", "target_branch"],
+          "max_age_seconds": 86400
+        }
+      ],
+      "prohibited_actions": [
+        {"id": "no-unapproved-merge", "action": "merge_without_approval", "reason_code": "MERGE_NOT_AUTHORIZED"}
+      ],
+      "terminal_acceptance": {
+        "mode": "all",
+        "predicates": [
+          {"id": "merge-complete", "field": "pr.state", "operator": "equals", "value": "MERGED"}
+        ]
+      }
     },
     {
       "id": "g5-deploy-effect-driven",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Deploy applies only when a deployment-class effect is requested.",
       "default": "NOT_APPLICABLE",
       "required_when": [
         {"id": "manual-deploy", "field": "effects.manual_deploy_requested", "operator": "truthy"},
@@ -57,11 +136,24 @@
       "not_applicable_when": [],
       "blocked_when": [
         {"id": "deploy-blocked", "field": "effects.deploy_blocked", "operator": "truthy"}
+      ],
+      "authority_requirements": [
+        {
+          "id": "deploy-approval",
+          "authority_type": "deploy_approval",
+          "allowed_providers": ["human"],
+          "required_bindings": ["environment"],
+          "max_age_seconds": 3600
+        }
+      ],
+      "prohibited_actions": [
+        {"id": "no-silent-deploy", "action": "deploy_without_gate", "reason_code": "DEPLOY_NOT_AUTHORIZED"}
       ]
     },
     {
       "id": "g6-production-effect-driven",
-      "version": "1.0.0",
+      "version": "2.0.0",
+      "description": "Production-data gate applies only when a production-class effect is requested.",
       "default": "NOT_APPLICABLE",
       "required_when": [
         {"id": "production-data", "field": "effects.production_data_change", "operator": "truthy"},
@@ -72,6 +164,21 @@
       "not_applicable_when": [],
       "blocked_when": [
         {"id": "production-authority-missing", "field": "effects.production_authority_missing", "operator": "truthy"}
+      ],
+      "authority_requirements": [
+        {
+          "id": "production-approval",
+          "authority_type": "production_data_approval",
+          "allowed_providers": ["human"],
+          "required_bindings": ["environment", "dataset"],
+          "max_age_seconds": 3600
+        }
+      ],
+      "evidence_requirements": [
+        {"id": "rollback-plan", "evidence_type": "rollback_plan", "mandatory": true}
+      ],
+      "prohibited_actions": [
+        {"id": "no-unreviewed-production-write", "action": "production_write_without_gate", "reason_code": "PRODUCTION_WRITE_NOT_AUTHORIZED"}
       ]
     }
   ]
