@@ -57,7 +57,8 @@
     "scenario_registry_digest": "sha256:b88f2b804ebe6c8ca0609fb391ce975d04df95e1c8ecc56a905bebf2f3ab5580",
     "graph_registry_digest": "sha256:55a66184d8afda10eb1829355afa5b9b695d6dbdbe78e01c2e4b3514aa75837f",
     "gate_lifecycle_revision": "1.0",
-    "gate_lifecycle_digest": "sha256:b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49"
+    "gate_lifecycle_digest": "sha256:b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49",
+    "legacy_route_projection_revision": "workflow-contract-gate-applicability-20260810-r1"
   },
   "compiled": {
     "route_table": [
@@ -111,5 +112,5 @@
       "FLOW_POLICY_COMPILED"
     ]
   },
-  "compiled_digest": "sha256:e6a133ad6ff63d6b9b57d974ea1006fc563e5632d7ea14a0ce762572faefd169"
+  "compiled_digest": "sha256:89c9c1c1e0cda05c0a3675004bd9f54cd2e71f1316e819c6599b3ba56f2f7651"
 }
