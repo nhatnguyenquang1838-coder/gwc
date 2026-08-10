@@ -6,8 +6,9 @@ perform GitHub/Jira writes. Live adapters must read the authority projection
 from trusted GitHub evidence and pass the observed bot identity explicitly.
 
 The parent manifest binds an immutable anchor base. Later pre-prod bases are
-accepted only through a trusted same-run descendant lineage proven by exact-SHA
-merge/G5 evidence for allowlisted tasks.
+accepted only through trusted same-run descendant lineage. Current runtimes
+should supply trusted repository ancestry/policy readback; optional task merge
+steps remain audit detail and do not make G5 an authority source.
 """
 from __future__ import annotations
 
@@ -46,6 +47,7 @@ def validate_parent_run_authority(
     expected_task_id: str,
     expected_base_sha: str,
     base_lineage_steps: Sequence[Mapping[str, Any]] = (),
+    repository_readback: Mapping[str, Any] | None = None,
     now: datetime | None = None,
 ) -> dict[str, Any]:
     """Return AUTHORIZED_READY only for current parent authority and trusted base lineage."""
@@ -113,6 +115,7 @@ def validate_parent_run_authority(
         current_base_sha=expected_base_sha,
         allowed_task_ids=sorted(allowed),
         steps=base_lineage_steps,
+        repository_readback=repository_readback,
     )
     if lineage["outcome"] != "PASS":
         reasons.extend(lineage["reason_codes"])
