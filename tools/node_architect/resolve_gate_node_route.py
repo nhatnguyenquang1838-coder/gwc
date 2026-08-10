@@ -432,6 +432,7 @@ FLOW_FAIL_CODES = {
     "AUTHORITY_REQUIREMENTS_UNSATISFIED", "EVIDENCE_REQUIREMENTS_UNSATISFIED",
     "POLICY_PROHIBITED_ACTION", "TERMINAL_ACCEPTANCE_UNMET",
     "TERMINAL_ACCEPTANCE_UNKNOWN", "POLICY_DECISION_PROVENANCE_MISMATCH",
+    "WORKFLOW_SOURCE_DIGEST_DRIFT",
 }
 FAIL_CODES.update(FLOW_FAIL_CODES)
 
@@ -602,6 +603,19 @@ def resolve_compiled_flow_route(
     declared_workflow_digest = declared_workflow.get("workflow_digest") if isinstance(declared_workflow, Mapping) else None
     if declared_workflow_digest != workflow_digest:
         return emit("BLOCKED", reasons=["COMPILED_PROFILE_BINDING_STALE"])
+    # Live Workflow projection recompute: a declared digest that was frozen or
+    # tampered while the live Flow composition moved must fail closed here,
+    # even though declared == compiled above.
+    from tools.node_architect.validate_flow_profile_workflow import (
+        compile_workflow_projection,
+    )
+
+    try:
+        live_workflow_digest = compile_workflow_projection(dict(flow_profile))["workflow_digest"]
+    except Exception:
+        return emit("BLOCKED", reasons=["WORKFLOW_SOURCE_DIGEST_DRIFT"])
+    if live_workflow_digest != workflow_digest:
+        return emit("BLOCKED", reasons=["WORKFLOW_SOURCE_DIGEST_DRIFT"])
     if _digest(policy_registry) != policy_registry_digest:
         return emit("BLOCKED", reasons=["COMPILED_PROFILE_BINDING_STALE"])
 
@@ -662,6 +676,10 @@ def resolve_compiled_flow_route(
 
     # --- deterministic traversal to the next applicable gate ---------------
     skipped: list[str] = []
+    # A current-node bound gate resolved NOT_APPLICABLE is an explicit skip and
+    # must be recorded before traversal starts.
+    if bound_gate and current_applicability == "NOT_APPLICABLE":
+        skipped.append(str(bound_gate))
     traversed: list[str] = []
     visited = {current_node}
     node = current_node
@@ -709,10 +727,20 @@ def resolve_compiled_flow_route(
                                 traversed=traversed, terminal=True,
                                 terminal_reason=terminals[node])
                 continue
-            return emit("ROUTE_SELECTED", reasons=["ROUTE_SELECTED", "NEXT_GATE_REQUIRED"],
-                        next_node=first_target, next_gate=gate, applicability=applicability,
-                        applicability_decision=decision, skipped=skipped,
-                        traversed=traversed, terminal=False)
+            # Boundary semantics: a traversed REQUIRED gate is the stop point.
+            # The resolver returns the route to it and does NOT traverse
+            # through it, and never enforces that future gate's authority /
+            # evidence / prohibited-action requirements in this call.
+            # Enforcement happens only when that gate/node becomes current.
+            if applicability == "REQUIRED":
+                return emit("ROUTE_SELECTED", reasons=["ROUTE_SELECTED", "NEXT_GATE_REQUIRED"],
+                            next_node=first_target, next_gate=gate, applicability=applicability,
+                            applicability_decision=decision, skipped=skipped,
+                            traversed=traversed, terminal=False)
+            # Any other/unknown applicability value fails closed.
+            return emit("BLOCKED", reasons=["GATE_APPLICABILITY_BLOCKED"],
+                        applicability=applicability, applicability_decision=decision,
+                        skipped=skipped, traversed=traversed)
 
         if node in terminals:
             unmet = _terminal_reasons(applicability_for(gate_map.get(node)))
