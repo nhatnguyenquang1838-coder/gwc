@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.local/schemas/runtime/flow-policy-activation-registry.schema.json",
+  "title": "Flow Policy Activation Registry",
+  "description": "Pointer-only activation registry. It names exactly one active immutable compiled_digest and the previously registered COMPATIBLE digests available for rollback. It stores no execution state: rollback changes the pointer and never rewrites Workflow, Policy or historical evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "revision", "active_compiled_profile", "registered"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "artifact_type": {"const": "flow-policy-activation-registry"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "active_compiled_profile": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "registered": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["compiled_digest", "profile_ref", "status"],
+        "properties": {
+          "compiled_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "profile_ref": {"type": "string", "minLength": 1},
+          "status": {"enum": ["COMPATIBLE", "BLOCKED", "SUPERSEDED"]},
+          "note": {"type": "string"}
+        }
+      }
+    }
+  }
+}

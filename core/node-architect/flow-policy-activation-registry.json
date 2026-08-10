@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "flow-policy-activation-registry",
+  "registry_id": "gwc-flow-policy-activation",
+  "revision": "scrum-394-flow-policy-integration-v2-20260811-r1",
+  "active_compiled_profile": "sha256:e6a133ad6ff63d6b9b57d974ea1006fc563e5632d7ea14a0ce762572faefd169",
+  "registered": [
+    {
+      "compiled_digest": "sha256:e6a133ad6ff63d6b9b57d974ea1006fc563e5632d7ea14a0ce762572faefd169",
+      "profile_ref": "core/node-architect/flow-policy-compiled-profile.json",
+      "status": "COMPATIBLE",
+      "note": "Flow full-flow-v3 v2.0.0 compiled against Policy registry revision policy-contract-v2-20260811-r1."
+    }
+  ]
+}
