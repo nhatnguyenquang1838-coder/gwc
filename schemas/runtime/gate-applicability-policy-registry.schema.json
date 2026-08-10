@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/gate-applicability-policy-registry.schema.json",
+  "title": "Gate Applicability Policy Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "revision", "policies"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "gate-applicability-policy-registry"},
+    "registry_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "revision": {"type": "string", "minLength": 1},
+    "policies": {"type": "array", "minItems": 1, "items": {"$ref": "gate-applicability-policy.schema.json"}}
+  }
+}

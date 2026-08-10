@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/gate-applicability-decision.schema.json",
+  "title": "Gate Applicability Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "flow_profile_id", "policy_registry_ref",
+    "gate", "policy_ref", "decision", "reason_code", "matched_rule",
+    "context_digest", "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-applicability-decision"},
+    "flow_profile_id": {"type": "string", "minLength": 1},
+    "policy_registry_ref": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+    "policy_ref": {"type": ["string", "null"]},
+    "decision": {"enum": ["REQUIRED", "NOT_APPLICABLE", "BLOCKED"]},
+    "reason_code": {"type": "string", "minLength": 1},
+    "matched_rule": {"type": ["string", "null"]},
+    "context_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

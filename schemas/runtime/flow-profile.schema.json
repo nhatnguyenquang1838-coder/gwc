@@ -13,6 +13,7 @@
     "node_registry_ref": {"type": "string", "minLength": 1},
     "scenario_registry_ref": {"type": "string", "minLength": 1},
     "graph_registry_ref": {"type": "string", "minLength": 1},
+    "policy_registry_ref": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "revision": {"type": "string", "minLength": 1},
     "pilot_nodes": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1}},
     "routes": {
@@ -32,6 +33,52 @@
       }
     },
     "green_targets": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry_nodes", "terminal_nodes", "edges", "gate_bindings"],
+      "properties": {
+        "entry_nodes": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "terminal_nodes": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["node", "outcome"],
+            "properties": {
+              "node": {"type": "string", "minLength": 1},
+              "outcome": {"enum": ["GREEN", "CONDITIONAL", "BLOCKED", "HUMAN_REQUIRED"]}
+            }
+          }
+        },
+        "edges": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "target", "kind", "runtime_executable"],
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "kind": {"enum": ["runtime", "dependency", "conditional", "history", "human_authority"]},
+              "runtime_executable": {"type": "boolean"}
+            }
+          }
+        },
+        "gate_bindings": {
+          "type": "array", "minItems": 7, "maxItems": 7,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["gate", "policy_ref"],
+            "properties": {
+              "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+              "policy_ref": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
+            }
+          }
+        }
+      }
+    },
     "visibility": {
       "type": "object",
       "additionalProperties": false,
@@ -50,5 +97,11 @@
         "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"version": {"pattern": "^2\\."}}, "required": ["version"]},
+      "then": {"required": ["workflow", "policy_registry_ref"]}
+    }
+  ]
 }
