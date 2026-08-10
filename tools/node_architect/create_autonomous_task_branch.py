@@ -24,7 +24,7 @@ import json
 import re
 from typing import Any, Mapping
 
-BRANCH_RE = re.compile(r"^auto/[A-Za-z0-9._-]+/SCRUM-[0-9]+$")
+BRANCH_RE = re.compile(r"^auto/[A-Za-z0-9][A-Za-z0-9._-]{0,63}/[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 FORBIDDEN_BASES = {"main"}
 ALLOWED_BASES = {"pre-prod", "main"}  # main permitted only for the initial bootstrap
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")
