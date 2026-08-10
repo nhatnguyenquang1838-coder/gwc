@@ -2,17 +2,16 @@
 
 Layer boundary (SCRUM-394 P1-C):
 
-    workflow_digest = hash(Workflow composition semantics only)   # Flow lane
-    policy_digest   = hash(Policy semantics only)                 # Policy lane
+    workflow_digest = hash(Workflow composition semantics only)
+    policy_digest   = hash(Policy semantics only)
     compiled_digest = hash(workflow_digest + policy digests
-                           + exact registry/gate-lifecycle bindings
-                           + compiler version)                    # this lane
+                           + exact registry/gate-lifecycle/legacy bindings
+                           + compiler version)
 
-The compiler is pure and side-effect free. It produces a static
-``flow-policy-compiled-profile``: an immutable proof that one exact Workflow
-revision and one exact Policy revision can be activated together, plus the
-closed route table derived from Flow edges. It carries no live execution
-state, grants no authority and reimplements no Policy semantics.
+The compiler is pure with respect to repository state: it reads bound sources
+when ``root`` is supplied, emits a static ``flow-policy-compiled-profile`` and
+never mutates Workflow, Policy or runtime state. Declared composition digests
+are not trusted blindly; compile fails closed if their live sources drift.
 """
 from __future__ import annotations
 
@@ -32,6 +31,7 @@ from tools.node_architect.validate_flow_profile_workflow import (
     CANONICAL_GATES,
     canonical_edge_kind,
     compile_workflow_projection,
+    file_digest,
 )
 
 COMPILER_VERSION = "flow-policy-compiler/1.0.0"
@@ -40,6 +40,11 @@ GATE_LIFECYCLE_PATH = "core/GATE_LIFECYCLE_CONTRACT_v1.0.md"
 GATE_LIFECYCLE_REVISION = "1.0"
 
 _COMPOSITION_REGISTRIES = ("node", "scenario", "graph")
+_COMPOSITION_REGISTRY_PATHS = {
+    "node": "core/node-architect/node-registry.json",
+    "scenario": "core/node-architect/scenario-registry.json",
+    "graph": "core/node-architect/runtime-graph-registry.json",
+}
 
 
 def _canonical(value: Any) -> str:
@@ -82,6 +87,11 @@ def _binding_digest(flow_profile: Mapping[str, Any], registry: str) -> str | Non
     return None
 
 
+def _live_composition_digest(root: Path, registry: str) -> str:
+    """Hash the exact live composition registry using Flow's canonical digest."""
+    return file_digest(root / _COMPOSITION_REGISTRY_PATHS[registry])
+
+
 def _gate_lifecycle_digest(root: Path | None) -> str:
     if root is None:
         return _text_digest(GATE_LIFECYCLE_REVISION)
@@ -120,7 +130,7 @@ def compile_route_table(flow_profile: Mapping[str, Any]) -> list[dict[str, Any]]
 
 
 def compile_terminal_bindings(flow_profile: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """Terminal nodes bound to the Policy that owns their terminal acceptance."""
+    """Terminal nodes bound to the Policy that owns terminal acceptance."""
     workflow = flow_profile.get("workflow")
     if not isinstance(workflow, Mapping):
         return []
@@ -146,16 +156,11 @@ def compile_terminal_bindings(flow_profile: Mapping[str, Any]) -> list[dict[str,
     return rows
 
 
-def compute_compiled_digest(*, workflow_digest: str, policy: Mapping[str, Any],
-                            bindings: Mapping[str, Any],
-                            compiler_version: str = COMPILER_VERSION) -> str:
-    """Cross-layer identity.
-
-    Deliberately bound to identity inputs only (workflow digest, exact Policy
-    digests, exact registry/gate-lifecycle bindings, compiler version) so that
-    the digest is stable for a re-compilation of the same inputs and changes
-    whenever any bound layer changes.
-    """
+def compute_compiled_digest(
+    *, workflow_digest: str, policy: Mapping[str, Any],
+    bindings: Mapping[str, Any], compiler_version: str = COMPILER_VERSION,
+) -> str:
+    """Cross-layer identity for one exact activatable Flow x Policy binding."""
     return _digest({
         "compiler_version": compiler_version,
         "workflow_digest": workflow_digest,
@@ -197,7 +202,11 @@ def compile_flow_policy_profile(
 
     workflow = flow_profile.get("workflow")
     workflow = workflow if isinstance(workflow, Mapping) else {}
-    policies = {str(item.get("id")): item for item in _mappings(policy_registry.get("policies")) if item.get("id")}
+    policies = {
+        str(item.get("id")): item
+        for item in _mappings(policy_registry.get("policies"))
+        if item.get("id")
+    }
     policy_refs: dict[str, dict[str, str]] = {}
     for binding in _mappings(workflow.get("gate_bindings")):
         gate = str(binding.get("gate") or "")
@@ -227,20 +236,35 @@ def compile_flow_policy_profile(
         "policy_refs": policy_refs,
     }
 
-    bindings: dict[str, Any] = {}
-    for registry in _COMPOSITION_REGISTRIES:
-        digest = _binding_digest(flow_profile, registry)
-        if digest is None:
-            compatible = False
-            reasons.append("COMPOSITION_BINDING_MISSING")
-        bindings[f"{registry}_registry_digest"] = digest or ("sha256:" + "0" * 64)
-    bindings["gate_lifecycle_revision"] = GATE_LIFECYCLE_REVISION
-    bindings["gate_lifecycle_digest"] = _gate_lifecycle_digest(root)
-
     legacy_revision = str(route_profile.get("revision") or "unbound")
     if str(route_profile.get("workflow_profile_ref") or "") != str(flow_profile.get("id") or ""):
         compatible = False
         reasons.append("LEGACY_ROUTE_PROJECTION_UNBOUND")
+
+    bindings: dict[str, Any] = {}
+    for registry in _COMPOSITION_REGISTRIES:
+        declared_registry_digest = _binding_digest(flow_profile, registry)
+        if declared_registry_digest is None:
+            compatible = False
+            reasons.append("COMPOSITION_BINDING_MISSING")
+        elif root is not None:
+            try:
+                live_registry_digest = _live_composition_digest(Path(root), registry)
+            except (OSError, UnicodeError, json.JSONDecodeError, KeyError, ValueError):
+                compatible = False
+                reasons.append("COMPOSITION_REGISTRY_UNREADABLE")
+            else:
+                if live_registry_digest != declared_registry_digest:
+                    compatible = False
+                    reasons.append("COMPOSITION_REGISTRY_DIGEST_DRIFT")
+        bindings[f"{registry}_registry_digest"] = declared_registry_digest or ("sha256:" + "0" * 64)
+
+    bindings["gate_lifecycle_revision"] = GATE_LIFECYCLE_REVISION
+    bindings["gate_lifecycle_digest"] = _gate_lifecycle_digest(root)
+    # Compatibility projection identity is part of the compiled cross-layer
+    # identity. Changing the legacy projection therefore invalidates activation
+    # even when Workflow and Policy digests themselves are unchanged.
+    bindings["legacy_route_projection_revision"] = legacy_revision
 
     unique = [code for code in dict.fromkeys(reasons) if code != "FLOW_POLICY_COMPATIBLE"]
     profile: dict[str, Any] = {
@@ -305,6 +329,7 @@ __all__ = [
     "compile_terminal_bindings",
     "compute_compiled_digest",
     "COMPILER_VERSION",
+    "GATE_LIFECYCLE_PATH",
 ]
 
 
