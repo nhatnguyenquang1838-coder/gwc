@@ -271,7 +271,7 @@ jobs:
                   "action": "render_fixture_evidence",
                   "outcome": "FIXTURE_EVIDENCE_RENDERED",
                   "evidence_refs": ["fixture:runtime-result"],
-                  "next_event_id": null,
+                  "next_event_id": None,
                   "edge_type": "runtime",
                   "route_provenance": "fixture:g2-terminal",
               },
@@ -543,6 +543,9 @@ jobs:
               pr.head.ref.startsWith('auto/') &&
               prBody.includes('AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN');
             if (pr.base.ref === 'main') {
+              // Definition PR (workflow/tool enablement) ships to main; the
+              // autonomous-run *execution* contract only binds pre-prod targets
+              // with an auto/* head. Skip enforcement for main-targeting PRs.
               conclusion = 'success';
               title = 'Autonomous G4 evidence not required (main-targeting definition PR)';
               summary = 'PR targets main and is not an autonomous-run execution delivery; G4 evidence binding is out of scope.';
