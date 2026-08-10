@@ -11,7 +11,9 @@ import hashlib
 import json
 from typing import Any, Mapping, Sequence
 
-TERMINAL_COMPLETE = {"COMPLETED", "G5_VERIFIED"}
+# Autonomous child delivery is terminal-complete once the governed exact-head merge
+# to pre-prod succeeds. Post-merge G5 is observational/non-blocking for this route.
+TERMINAL_COMPLETE = {"COMPLETED", "PREPROD_MERGED", "G5_VERIFIED"}
 EXECUTABLE_STATUSES = {"TO_DO", "READY", "RETRYABLE"}
 MAX_AUTONOMOUS_RISK = 2
 RISK_ORDER = {"R0": 0, "R1": 1, "R2": 2, "R3": 3}
@@ -54,11 +56,7 @@ def resolve_ready_nodes(tasks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 
 def resolve_authorized_ready_nodes(*, dag: Mapping[str, Any], manifest: Mapping[str, Any] | None,
                                    authority_valid: bool) -> dict[str, Any]:
-    """Gate DAG-ready tasks through trusted parent authority before any claim intent.
-
-    READY is only dependency eligibility. AUTHORIZED_READY additionally requires a
-    trusted/current run authority and explicit task membership in the manifest.
-    """
+    """Gate DAG-ready tasks through trusted parent authority before any claim intent."""
     ready = [str(x) for x in dag.get("ready_task_ids", [])]
     if not ready:
         return {"outcome": "IDLE", "reason_code": "AUTONOMOUS_NO_READY_TASK"}
@@ -195,11 +193,7 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             authority_valid=bool(observation.get("authority_valid")),
         )
         if authority.get("state") == "READY_FOR_AUTHORITY":
-            return {
-                **authority,
-                "adapter_action": "RESOLVE_RUN_AUTHORITY",
-                "dag": dag,
-            }
+            return {**authority, "adapter_action": "RESOLVE_RUN_AUTHORITY", "dag": dag}
         if authority.get("outcome") != "PASS":
             return {**authority, "adapter_action": None, "dag": dag}
         authorized_dag = {**dag, "ready_task_ids": authority["ready_task_ids"]}
@@ -216,12 +210,7 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             "authority": authority,
         }
     if phase == "CLAIMED":
-        return {
-            "outcome": "ALLOW",
-            "reason_code": "AUTONOMOUS_AGENT_EXECUTION_REQUIRED",
-            "task_id": observation.get("task_id"),
-            "adapter_action": "INVOKE_AGENT_E2E",
-        }
+        return {"outcome": "ALLOW", "reason_code": "AUTONOMOUS_AGENT_EXECUTION_REQUIRED", "task_id": observation.get("task_id"), "adapter_action": "INVOKE_AGENT_E2E"}
     if phase == "IMPLEMENTED":
         return {
             "outcome": "ALLOW",
@@ -250,12 +239,16 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
     if phase == "PREPROD_MERGED":
         return {
             "outcome": "ALLOW",
-            "reason_code": "AUTONOMOUS_G5_EXACT_SHA_REQUIRED",
+            "reason_code": "AUTONOMOUS_PREPROD_DELIVERY_COMPLETE",
+            "state": "COMPLETED",
             "task_id": observation.get("task_id"),
             "merge_sha": observation.get("merge_sha"),
-            "adapter_action": "VERIFY_PREPROD_G5_EXACT_SHA",
+            "post_merge_g5_required": False,
+            "adapter_action": "MARK_COMPLETE_REQUERY_DAG_AND_PROMOTIONS",
         }
     if phase == "G5_VERIFIED":
+        # Compatibility path for older observations; G5 is no longer required for
+        # autonomous pre-prod dependency unlock.
         return {
             "outcome": "ALLOW",
             "reason_code": "AUTONOMOUS_DAG_REFRESH_REQUIRED",
