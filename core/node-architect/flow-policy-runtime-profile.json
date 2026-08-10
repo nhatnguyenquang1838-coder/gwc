@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "flow-policy-runtime-profile",
+  "profile_id": "gwc-flow-policy-runtime-v1",
+  "revision": "scrum-394-flow-policy-runtime-20260811-r1",
+  "status": "active",
+  "workflow": {
+    "profile_id": "full-flow-v3",
+    "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r1",
+    "workflow_digest": "sha256:3e4068ae203bfb6d5e98cb490b1b8aef106557520cf87332a00f435ed34646d5"
+  },
+  "policy": {
+    "registry_id": "gwc-gate-applicability-policy-registry",
+    "revision": "policy-contract-v2-20260811-r1",
+    "registry_digest": "sha256:5050be8fd7870427721902a7736364cb01ce0fa3e7e70ba8308340d81759d201"
+  },
+  "route_profile": {
+    "profile_id": "gwc-gate-node-runtime-binding",
+    "revision": "workflow-contract-gate-applicability-20260810-r1"
+  },
+  "runtime": {
+    "adapter_ref": "tools/node_architect/resolve_flow_policy_runtime.py:resolve_flow_policy_runtime",
+    "decision_schema_ref": "schemas/runtime/workflow-policy-decision.schema.json",
+    "compatibility_validator_ref": "tools/node_architect/validate_flow_policy_compatibility.py:validate_flow_policy_compatibility"
+  }
+}
