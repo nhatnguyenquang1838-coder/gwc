@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+import json
+import os
 import unittest
 
 from tools.node_architect.approval_token_generation import generate_approval_request
@@ -18,6 +20,9 @@ from tools.node_architect.approval_command_validation import (
     REASON_ALREADY_CONSUMED,
     REASON_REPLAY_CONFLICT,
     REASON_G6_SCOPE_INVALID,
+    REASON_ACTOR_MISMATCH,
+    REASON_ACTOR_MISSING,
+    REASON_TARGET_MISMATCH,
 )
 
 REQUEST_KWARGS = dict(
@@ -46,6 +51,10 @@ READBACK = dict(
     base_sha="7269a5219750b7c4fa7c5229eb95df395fd4712d",
     head_sha="7269a5219750b7c4fa7c5229eb95df395fd4712d",
     scope_hash="sha256:c3aeacd2a68f9ad6da45a657cf21f21740262f0a063f654c99cc4fb8babda5b1",
+    action="branch_worktree_file_commit_push",
+    branch=REQUEST_KWARGS["scope_identity"]["branch"],
+    pr_number=REQUEST_KWARGS["scope_identity"]["pr_number"],
+    current_actor=REQUEST_KWARGS["actor_target"],
     pr=None,
     environment=None,
     production_applicable=False,
@@ -146,7 +155,8 @@ class TestRejection(unittest.TestCase):
         req = _request(gate="G4_MERGE", scope_identity={
             **REQUEST_KWARGS["scope_identity"], "pr_number": 221})
         rb = _readback(pr={"open": True, "draft": True, "state": "open",
-                          "head_sha": REQUEST_KWARGS["scope_identity"]["head_sha"]})
+                          "head_sha": REQUEST_KWARGS["scope_identity"]["head_sha"]},
+                       pr_number=221)
         res = validate_approval_command(
             approval_request=req, human_response=req["approval_command"],
             current_readback=rb, event_id_or_idempotency_key="evt-7")
@@ -181,11 +191,109 @@ class TestRejection(unittest.TestCase):
                                                     "production_scope_applicable": True},
                        scope_identity={**REQUEST_KWARGS["scope_identity"],
                                        "environment": "prod"})
-        rb = _readback(production_applicable=False, environment="prod")
+        rb = _readback(production_applicable=False, environment="prod",
+                       action="production_config_change")
         res = validate_approval_command(
             approval_request=req, human_response=req["approval_command"],
             current_readback=rb, event_id_or_idempotency_key="evt-11")
         self.assertEqual(res["primary_reason_code"], REASON_G6_SCOPE_INVALID)
+
+    def test_wrong_actor_rejected(self):
+        req = _request()
+        rb = _readback(current_actor={"type": "user", "id": "U0000000000000"})
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-15")
+        self.assertEqual(res["primary_reason_code"], REASON_ACTOR_MISMATCH)
+
+    def test_actor_missing_rejected(self):
+        req = _request()
+        rb = _readback(current_actor=None)
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-16")
+        self.assertEqual(res["primary_reason_code"], REASON_ACTOR_MISMATCH)
+
+    def test_wrong_action_rejected(self):
+        req = _request()
+        rb = _readback(action="different_action")
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-17")
+        self.assertEqual(res["primary_reason_code"], REASON_TARGET_MISMATCH)
+
+    def test_wrong_branch_rejected(self):
+        req = _request()
+        rb = _readback(branch="refs/heads/wrong-branch")
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-18")
+        self.assertEqual(res["primary_reason_code"], REASON_TARGET_MISMATCH)
+
+
+class TestReadbackUnavailable(unittest.TestCase):
+    """Verify that a BLOCKED UNAVAILABLE result is still schema-valid."""
+
+    def test_blocked_result_schema_valid(self):
+        jsonschema = _import_jsonschema()
+        schema = _load_validation_schema()
+        req = _request()
+        rb = _readback(status="UNAVAILABLE")
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-schema-blocked")
+        jsonschema.validate(res, schema)
+
+
+class TestSchemaConformance(unittest.TestCase):
+    """Every validator result must conform to gate-approval-validation.schema.json."""
+
+    def test_valid_result_conforms(self):
+        jsonschema = _import_jsonschema()
+        schema = _load_validation_schema()
+        req = _request()
+        rb = _readback()
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-schema-valid")
+        jsonschema.validate(res, schema)
+
+    def test_invalid_result_conforms(self):
+        jsonschema = _import_jsonschema()
+        schema = _load_validation_schema()
+        req = _request()
+        rb = _readback(head_sha="0" * 40)
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-schema-invalid")
+        jsonschema.validate(res, schema)
+
+    def test_authority_granted_always_false(self):
+        req = _request()
+        rb = _readback()
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-auth-false")
+        self.assertFalse(res["execution_authority_granted"])
+        self.assertFalse(res["merge_authority_granted"])
+        self.assertFalse(res["deployment_authority_granted"])
+        self.assertFalse(res["production_authority_granted"])
+
+
+def _import_jsonschema():
+    try:
+        import jsonschema
+        return jsonschema
+    except ImportError:
+        raise unittest.SkipTest("jsonschema not available")
+
+
+def _load_validation_schema():
+    here = os.path.dirname(os.path.abspath(__file__))
+    schema_path = os.path.normpath(
+        os.path.join(here, "..", "schemas", "gate-approval-validation.schema.json"))
+    with open(schema_path, encoding="utf-8") as f:
+        return json.load(f)
 
 
 if __name__ == "__main__":

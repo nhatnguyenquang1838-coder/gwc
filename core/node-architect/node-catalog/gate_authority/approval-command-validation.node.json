@@ -8,5 +8,54 @@
     "G1_ALIGNMENT",
     "G2_EXECUTION"
   ],
-  "description": "Validates that a human response matches the exact approval command before any G2, G4, G5, or G6 action proceeds."
+  "description": "Validates that a human response matches the exact approval command before any G2, G4, G5, or G6 action proceeds. Generation creates a request for authority; it does not create or grant authority.",
+  "intent": "Pure, replay-safe validation of a single human approval response against the generated approval request and current repository/action readback. The evaluator binds approval_request_id, 16-hex scope_hash_short, gate, target, actor, and expiry exactly; vague, stale, expired, mismatched, unavailable, or already-consumed inputs fail closed. Equivalent replay is idempotent and non-expanding; the validator never grants a higher gate than was validated and never performs the action.",
+  "outcome": "Typed gate-approval-validation artifact containing schema_version, approval_request_ref, outcome (VALID/INVALID/BLOCKED), approval_valid, consumption_key, reason_codes, primary_reason_code, replay_status (FIRST_SEEN/IDEMPOTENT_REPLAY/REPLAY_CONFLICT), validation_digest (sha256), validated_at, event_id_or_idempotency_key, and all *_authority_granted flags const-false. The validator performs no action and grants no execution, merge, deploy, or production authority.",
+  "constraints": [
+    "The evaluator is pure and deterministic for the same semantic inputs; the validation_digest is over approval_request_id, scope_hash_short, expires_at, and consumption_key.",
+    "The human response must match the canonical command grammar APPROVE <GATE_SHORT> <approval_request_id> <scope_hash_short:16hex> <expires_at_utc> extracted from the generated approval_command; extra tokens or grammar deviations fail closed as INPUT_INVALID.",
+    "Material drift in scope_hash, base_sha, head_sha, repository, action, target, actor, or expiry invalidates prior evidence and requires re-validation.",
+    "Validations are single-consumption; idempotent replay under the same event/idempotency key returns IDEMPOTENT_REPLAY; cross-event reuse of a consumed request returns ALREADY_CONSUMED.",
+    "The validator must never grant G2, G4, G5, G6, merge, deploy, release, credential, migration, or production-data authority; all *_authority_granted fields are const false.",
+    "Readback UNAVAILABLE is a BLOCKED outcome (not an invalid-human-approval), so the approval is not consumed."
+  ],
+  "exclusions": [
+    "Granting or performing any gate transition, merge, deploy, release, migration, or production-data operation.",
+    "Issuing, minting, or consuming approvals; token generation is the consumer node gate_authority.approval-token-generation.",
+    "Writing to repositories, Jira, GitHub, branches, worktrees, PRs, or production data.",
+    "Authority-plane modifications outside the explicit task scope."
+  ],
+  "entry_guards": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION",
+    "approval_request (gate-approval-request artifact) is present",
+    "human_response is a non-empty string",
+    "current_readback is available and bound to the repository/action",
+    "current_readback.current_actor matches approval_request.actor_target",
+    "current_readback.branch and pr_number match the approval request bindings"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/approval_command_validation.py",
+    "schema": "schemas/gate-approval-validation.schema.json"
+  },
+  "reason_codes": {
+    "APPROVAL_VALID": "The exact human response matched the generated approval request and current readback; the response may be evaluated by the next authority node.",
+    "APPROVAL_INPUT_INVALID": "The human response did not match the canonical command grammar or required input was malformed/empty.",
+    "APPROVAL_COMMAND_MISMATCH": "The request_id, gate, or expiry in the human response did not match the generated approval request exactly.",
+    "APPROVAL_TOKEN_MISMATCH": "The scope_hash_short in the human response did not match the generated approval request exactly.",
+    "APPROVAL_EXPIRED": "The approval response's expiry is at or before the validated_at timestamp.",
+    "APPROVAL_NOT_YET_VALID": "The approval request's issued_at is after the validated_at timestamp.",
+    "APPROVAL_READBACK_UNAVAILABLE": "The current readback status is UNAVAILABLE; the approval is not consumed and the outcome is BLOCKED.",
+    "APPROVAL_BINDING_MISMATCH": "base_sha or repository in the readback did not match the approval request bindings.",
+    "APPROVAL_SCOPE_DRIFT": "scope_hash in the readback did not match the approval request scope_hash.",
+    "APPROVAL_HEAD_DRIFT": "head_sha in the readback did not match the approval request bindings head_sha.",
+    "APPROVAL_PR_STATE_INVALID": "For G4, the PR is not open, is a draft, is closed/merged, or PR head_sha does not match.",
+    "APPROVAL_ALREADY_CONSUMED": "The approval request was already consumed by a different event/idempotency key.",
+    "APPROVAL_REPLAY_CONFLICT": "A prior validation produced a non-idempotent conflicting outcome for the same idempotency key.",
+    "APPROVAL_G5_SCOPE_INVALID": "A G5 deploy response was made against a status-only or production-applicable=false action.",
+    "APPROVAL_G6_SCOPE_INVALID": "A G6 response was made without production scope applicability or environment mismatch.",
+    "APPROVAL_ACTOR_MISMATCH": "The current_actor in the readback did not match the approval_request.actor_target exactly.",
+    "APPROVAL_ACTOR_MISSING": "The approval request does not contain a valid actor_target.",
+    "APPROVAL_TARGET_MISMATCH": "The current action, branch, or pr_number in the readback did not match the approval request bindings exactly."
+  }
 }
