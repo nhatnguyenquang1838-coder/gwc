@@ -107,8 +107,10 @@ class TestRejection(unittest.TestCase):
         req = _request()
         rb = _readback()
         parts = req["approval_command"].split(" ")
-        task, tok, exp = parts[2], parts[3], parts[4]
-        tampered = f"APPROVE G2 {task} {'f' * 64} {exp}"
+        req_id, scope_short, exp = parts[2], parts[3], parts[4]
+        # Tamper the 16-hex scope_hash_short (command binds the short, not the 64-hex token)
+        tampered_scope = "f" * 16
+        tampered = f"APPROVE G2 {req_id} {tampered_scope} {exp}"
         res = validate_approval_command(
             approval_request=req, human_response=tampered,
             current_readback=rb, event_id_or_idempotency_key="evt-3")

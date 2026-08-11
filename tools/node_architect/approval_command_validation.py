@@ -11,8 +11,15 @@ import hashlib
 import re
 from typing import Any
 
+# Canonical human response grammar — must match the command emitted by
+# tools/node_architect/approval_token_generation.py and the schema bound by
+# schemas/node-architect/gate-authority/approval-request.schema.json:
+#   APPROVE G[2456] <approval_request_id> <scope_hash_short:16hex> <expires_at_utc>
+# The full 64-hex approval_token is intentionally NOT present in the human
+# command (non-secret integrity evidence only); validation of the binding
+# short is done against the request's scope_hash_short.
 RESPONSE_PATTERN = re.compile(
-    r"^APPROVE\s+(G2|G4|G5|G6)\s+([A-Za-z0-9._-]+)\s+([0-9a-f]{64})\s+(\S+)$"
+    r"^APPROVE\s+(G2|G4|G5|G6)\s+([a-z0-9][a-z0-9._-]{2,120})\s+([0-9a-f]{16})\s+(\S+)$"
 )
 GATE_SHORT_TO_FULL = {
     "G2": "G2_EXECUTION",
@@ -78,17 +85,19 @@ def validate_approval_command(
         return _fail(REASON_INPUT_INVALID, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
 
-    resp_gate_short, resp_task, resp_token, resp_expires = match.groups()
+    resp_gate_short, resp_request_id, resp_scope_short, resp_expires = match.groups()
     resp_gate = GATE_SHORT_TO_FULL[resp_gate_short]
 
-    # Rule 2/5: match task, gate, token, expiry exactly.
-    if resp_task != approval_request.get("task_id"):
+    # Rule 2/5: match request_id, gate, scope short, expiry exactly.
+    # The canonical command binds the 16-hex scope_hash_short (not the full
+    # 64-hex token) — verify the short against the request's scope_hash_short.
+    if resp_request_id != approval_request.get("approval_request_id"):
         return _fail(REASON_COMMAND_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
     if resp_gate != approval_request.get("gate"):
         return _fail(REASON_COMMAND_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
-    if resp_token != approval_request.get("approval_token"):
+    if resp_scope_short != approval_request.get("scope_hash_short"):
         return _fail(REASON_TOKEN_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
     if resp_expires != approval_request.get("expires_at"):
@@ -169,7 +178,7 @@ def validate_approval_command(
                          approval_request.get("approval_request_id", ""), validated_at)
 
     consumption_key = event_id_or_idempotency_key
-    digest = _digest(approval_request.get("approval_request_id", ""), resp_token,
+    digest = _digest(approval_request.get("approval_request_id", ""), resp_scope_short,
                      resp_expires, consumption_key)
     return {
         "schema_version": "1.0",
