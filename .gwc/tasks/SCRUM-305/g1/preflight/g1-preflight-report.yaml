@@ -1,0 +1,143 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-11T05:12:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-305
+  base_sha: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: pre-prod
+  base_sha: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE_COMMIT_PRESENT
+  status: PASS
+  code: BASE_OBJECT_OK
+  message: Locked base 4e3cd0cb is a valid commit object in the repository.
+  evidence:
+  - git cat-file -t 4e3cd0cb = commit
+- id: ANCESTRY_303
+  status: PASS
+  code: ANCESTOR_OK
+  message: SCRUM-303 merge aca264e... is ancestor of base.
+  evidence:
+  - git merge-base --is-ancestor aca264e867ca899af51afc84d332c7ee05ff91ce 4e3cd0cb
+    -> exit 0
+- id: ANCESTRY_304
+  status: PASS
+  code: ANCESTOR_OK
+  message: SCRUM-304 merge 0431acad... is ancestor of base.
+  evidence:
+  - git merge-base --is-ancestor 0431acad38f3b0cfa0a022c7b1376e0c8c52abc2 4e3cd0cb
+    -> exit 0
+- id: SOURCES_AVAILABLE
+  status: PASS
+  code: SOURCES_OK
+  message: All required governing sources available at base with verified blob SHAs.
+  evidence:
+  - 10 governing docs AVAILABLE
+- id: AUTHORITY_PRESENT
+  status: PASS
+  code: AUTHORITY_OK
+  message: Parent authority AR-SCRUM288-20260810-R3B supplied for lane SCRUM-288.
+  evidence:
+  - authority token AR-SCRUM288-20260810-R3B
+- id: WORKTREE_NOISE_CLASSIFIED
+  status: WARN
+  code: NON_CONTENT_WORKTREE_NOISE
+  message: 65 worktree files show CRLF-only drift; classified NON_CONTENT_WORKTREE_NOISE,
+    not real content change.
+  evidence:
+  - git diff --ignore-space-at-eol --stat empty; numstat add==del
+risk_class: R1
+required_gate: G2_AUTOMATIC_BOUNDED
+blockers: []
+outcome: PASS
+process_readback:
+  process_id: gwc-g0-g1-lifecycle
+  terminal_outcome: G1 alignment PASS; proceed to exact G2 on auto/* branch from pre-prod
+  required_sources:
+  - AGENTS.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-1
+    name: G0 context snapshot
+    gate: G0_CONTEXT
+    actor: agent
+    action_class: snapshot
+    capability_required: local_agent
+    capability_status: VERIFIED
+    primary_route: local worktree
+    fallback_routes: []
+    continuation: Proceed to G1 intake
+    expected_evidence: g0/context-snapshot.yaml
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-2
+    name: G1 alignment
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: align
+    capability_required: local_agent
+    capability_status: VERIFIED
+    primary_route: local worktree
+    fallback_routes: []
+    continuation: Proceed to G2
+    expected_evidence: g1/* artifacts + validator PASS
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-3
+    name: G2 exact implementation
+    gate: G2_EXECUTION
+    actor: agent
+    action_class: implement
+    capability_required: auto/* branch from pre-prod
+    capability_status: VERIFIED
+    primary_route: auto/SCRUM-305-na81-20260810
+    fallback_routes: []
+    continuation: Open child PR to pre-prod
+    expected_evidence: renderer code+tests, exact-head CI green
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-4
+    name: G3 exact-head review
+    gate: G3_PR
+    actor: agent_or_human
+    action_class: review
+    capability_required: independent reviewer
+    capability_status: VERIFIED
+    primary_route: GitHub PR review
+    fallback_routes: []
+    continuation: Merge via standing G4
+    expected_evidence: G3 delivery record
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-5
+    name: G4 merge to pre-prod
+    gate: G4_MERGE
+    actor: human_authorized_agent
+    action_class: merge
+    capability_required: standing G4 auto/*->pre-prod
+    capability_status: VERIFIED
+    primary_route: exact merge-SHA G4
+    fallback_routes: []
+    continuation: G5 verification
+    expected_evidence: merge-SHA readback
+    bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+runtime_context:
+  agent_runtime_id: hermes-fallback-runtime
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  required_behavior_contracts:
+  - Agent_Operating_Runtime_Contract_v1.0

@@ -104,6 +104,16 @@ def _source_ok(value):
         seen.add(key)
     return True
 
+def _non_verified_source_statuses(*artifacts):
+    statuses = []
+    for artifact in artifacts:
+        if not isinstance(artifact, Mapping):
+            continue
+        for row in artifact.get('source_bindings', []):
+            if isinstance(row, Mapping) and row.get('status') != 'VERIFIED':
+                statuses.append(str(row.get('status') or 'UNKNOWN'))
+    return sorted(set(statuses))
+
 def _required(mapping, fields):
     return all((field in mapping for field in fields))
 
@@ -262,6 +272,15 @@ def render_intake_card(*, task_id, repository, base_sha, request_contract, sourc
     error = _contract(*mappings)
     if error:
         return _blocked(task_id, repository, base_sha, [error], created_at)
+    non_verified = _non_verified_source_statuses(source_resolution, risk_profile, bounded_read_scope, bounded_write_scope)
+    if non_verified:
+        return _blocked(
+            task_id,
+            repository,
+            base_sha,
+            ['CARD_SOURCE_NOT_VERIFIED', *(f'CARD_SOURCE_{status}' for status in non_verified)],
+            created_at,
+        )
     bindings = validate_upstream_bindings(task_id=task_id, repository=repository, base_sha=base_sha, request_contract=request_contract, source_resolution=source_resolution, repo_identity=repo_identity, protected_base_snapshot=protected_base_snapshot, risk_profile=risk_profile, bounded_read_scope=bounded_read_scope, bounded_write_scope=bounded_write_scope)
     if bindings['has_errors']:
         return _blocked(task_id, repository, base_sha, ['CARD_SOURCE_BINDING_MISMATCH'], created_at)
