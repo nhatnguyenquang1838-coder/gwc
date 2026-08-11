@@ -1114,10 +1114,10 @@
       "reversibility": "reversible",
       "schema_version": "1.0.0",
       "slot_review": {
-        "decision": "defer",
-        "rationale": "proposed"
+        "decision": "keep",
+        "rationale": "source-backed"
       },
-      "source_status": "proposed_registry_slot",
+      "source_status": "canonical_explicit",
       "suspension": {
         "resume_metadata": [
           "task",
