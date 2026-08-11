@@ -45,10 +45,21 @@ def decide_crash_checkpoint_recovery(
     idempotency_key: str,
     resume_token: str,
     observed_at: str | None = None,
+    observed_head_sha: str | None = None,
 ) -> dict[str, Any]:
     """Return a deterministic post-crash recovery decision."""
 
-    if checkpoint_status != "CANONICAL":
+    if not resume_token:
+        outcome, reason = "BLOCKED", "MISSING_RESUME_TOKEN"
+    elif not head_sha:
+        outcome, reason = "BLOCKED", "MISSING_HEAD_SHA"
+    elif not checkpoint_id:
+        outcome, reason = "BLOCKED", "INVALID_CHECKPOINT_ID"
+    elif observed_head_sha is not None and observed_head_sha != head_sha:
+        outcome, reason = "RECONCILE", "HEAD_DRIFT"
+    elif checkpoint_status == "PARTIAL":
+        outcome, reason = "RECONCILE", "PARTIAL_CHECKPOINT"
+    elif checkpoint_status != "CANONICAL":
         outcome, reason = "RECONCILE", "CHECKPOINT_NOT_CANONICAL"
     elif checkpoint_revision < 0:
         outcome, reason = "FAIL", "INVALID_CHECKPOINT_REVISION"
@@ -68,6 +79,8 @@ def decide_crash_checkpoint_recovery(
         outcome, reason = "FAIL", "PENDING_ACTION_CONFIRMED_FAILED"
     elif pending_action_status == "STALE":
         outcome, reason = "RECONCILE", "STALE_PENDING_ACTION"
+    elif pending_action_status == "PARTIAL":
+        outcome, reason = "RECONCILE", "PARTIAL_CRASH_PENDING_ACTION"
     else:
         outcome, reason = "RECONCILE", "UNSUPPORTED_CRASH_RECOVERY_STATE"
 
@@ -100,8 +113,8 @@ def decide_crash_checkpoint_recovery(
         "observed_at": observed_at or _now(),
         "outcome": outcome,
         "reason_code": reason,
-        "checkpoint_required": outcome in {"RESUME", "RECONCILE", "HUMAN_REQUIRED"},
-        "readback_required_before_effect": outcome in {"RESUME", "RECONCILE", "HUMAN_REQUIRED"},
+        "checkpoint_required": outcome in {"RESUME", "RECONCILE", "HUMAN_REQUIRED", "BLOCKED"},
+        "readback_required_before_effect": outcome in {"RESUME", "RECONCILE", "HUMAN_REQUIRED", "BLOCKED"},
         "duplicate_effect_allowed": duplicate_effect_allowed,
     }
     decision["decision_digest"] = digest_payload({k: v for k, v in decision.items() if k != "decision_digest"})
