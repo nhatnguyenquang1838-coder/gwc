@@ -16,7 +16,7 @@
       },
       "compiled": {
         "projection_version": "2.0.0",
-        "workflow_digest": "sha256:9708af358514ca625d22a927440a0e007849357393d48f8538f3290551a30dd5"
+        "workflow_digest": "sha256:e3035693e32a39ba649d61ec94d0896a013dd85d1adb8052245385504322e1f9"
       },
       "graph_registry_ref": "gwc-runtime-graph-registry",
       "green_targets": [
@@ -38,7 +38,7 @@
       },
       "registry_bindings": [
         {
-          "digest": "sha256:b5370838a8d2b5d24026197348d0a92838de360a0b9659060af0eb4346ac4e6e",
+          "digest": "sha256:0c8da17f93090c5ce0ccda8ced46ac6ccf14dfdcc131f2a26e2b7a225e488fc6",
           "path": "core/node-architect/node-registry.json",
           "registry": "node",
           "registry_id": "gwc-runtime-node-registry",

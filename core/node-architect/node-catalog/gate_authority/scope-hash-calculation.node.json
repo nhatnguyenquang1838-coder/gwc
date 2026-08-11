@@ -8,5 +8,39 @@
     "G1_ALIGNMENT",
     "G2_EXECUTION"
   ],
-  "description": "Calculates deterministic scope hashes from approved files, actions, exclusions, base SHA, and expiry inputs."
+  "description": "Calculates the canonical semantic scope identity for an approved candidate action without granting authority.",
+  "intent": "Canonicalize task, repository, base, branch, head, risk, path, action, exclusion, and binding inputs into one deterministic scope identity, failing closed for malformed, ambiguous, conflicting, overbroad, unbound, or empty write scope.",
+  "outcome": "GateScopeIdentity with READY or BLOCKED outcome, deterministic reason_codes, canonical scope_hash only when READY, null scope_hash when BLOCKED, and authority_granted=false.",
+  "constraints": [
+    "The evaluator is pure and deterministic for the same semantic inputs; calculated_at is diagnostic and never part of the hash.",
+    "Equivalent normalized semantic scope must produce the same scope_hash; material changes to task, repository, base, head, risk, paths, actions, exclusions, or bindings must change it.",
+    "The action vocabulary and additional binding keys are closed; unknown values, authorized/excluded conflicts, invalid paths, root wildcards, missing branch/head bindings, and empty write scope fail closed.",
+    "A BLOCKED result must not expose a usable scope_hash, and scope identity never grants G2, G4, G5, G6, merge, deploy, release, credential, migration, or production-data authority."
+  ],
+  "exclusions": [
+    "Granting or validating human approval or gate authority.",
+    "Reading or mutating repositories, Jira, GitHub, branches, worktrees, PRs, deployments, releases, credentials, migrations, or production data.",
+    "Treating a scope digest as an approval, bypassing current base/head/scope binding, or accepting projection-only task status as canonical evidence."
+  ],
+  "entry_guards": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION",
+    "task, repository, base_ref, and base_sha are present",
+    "candidate paths, actions, exclusions, and additional bindings are supplied as bounded semantic inputs"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/scope_hash_calculation.py",
+    "schema": "schemas/node-architect/gate-authority/scope-hash-calculation.schema.json"
+  },
+  "reason_codes": {
+    "SCOPE_HASH_CALCULATED": "Canonical semantic scope is valid and produced a READY identity.",
+    "SCOPE_INPUT_INVALID": "Task, repository, ref, SHA, risk, or collection input is structurally invalid.",
+    "SCOPE_PATH_INVALID": "A path is absolute, traverses upward, contains a NUL, or uses an invalid form.",
+    "SCOPE_PATH_OVERBROAD": "A root or unbounded wildcard path was supplied.",
+    "SCOPE_ACTION_CONFLICT": "An action is both authorized and excluded.",
+    "SCOPE_BINDING_REQUIRED": "A branch or head binding required by the action set is absent.",
+    "SCOPE_UNKNOWN_SEMANTIC": "An action or additional binding key is outside the closed vocabulary.",
+    "SCOPE_WRITE_SET_EMPTY": "A write-intent action set has no authorized path.",
+    "SCOPE_SEMANTIC_DRIFT": "The candidate semantic scope differs from the previously bound scope identity."
+  }
 }

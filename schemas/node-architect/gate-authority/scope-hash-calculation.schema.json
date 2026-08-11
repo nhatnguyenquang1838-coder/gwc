@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://gwc.local/schemas/gate-scope-identity.schema.json",
+  "$id": "https://gwc.local/schemas/node-architect/gate-authority/scope-hash-calculation.schema.json",
   "title": "GWC Gate Scope Identity",
   "description": "Canonical identity + semantic scope_hash for a proposed gate action. This artifact identifies scope only; it never grants authority.",
   "type": "object",
