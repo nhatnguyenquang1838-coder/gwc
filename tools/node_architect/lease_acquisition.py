@@ -127,6 +127,7 @@ def decide_lease_acquisition(
     observed_fencing_token: int | None = None,
     observed_scope_hash: str | None = None,
     observed_repository: str | None = None,
+    observed_run_id: str | None = None,
     lease_expired: bool = False,
     side_effect_status: str = "NONE",
     readback_status: str = "VERIFIED_ZERO_EFFECT",
@@ -160,6 +161,12 @@ def decide_lease_acquisition(
         fencing_token = None
     elif observed_repository is not None and observed_repository != repository:
         outcome, reason = "SCOPE_MISMATCH", "OBSERVED_REPOSITORY_MISMATCH"
+        advancement_allowed = False
+        side_effect_allowed = False
+        reacquire_required = False
+        fencing_token = None
+    elif observed_run_id is not None and observed_run_id != run_id:
+        outcome, reason = "SCOPE_MISMATCH", "RUN_ID_MISMATCH"
         advancement_allowed = False
         side_effect_allowed = False
         reacquire_required = False
