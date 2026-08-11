@@ -58,6 +58,7 @@ RECONCILE_REASONS = (
     "OWNER_MISMATCH",
     "FENCING_NOT_MONOTONIC",
     "LEASE_EXPIRED_NO_GRACE",
+    "RUN_ID_MISMATCH",
 )
 
 
@@ -79,6 +80,10 @@ class Lease:
     issued_at: str
     expires_at: str
     repository: str
+    # NA81 (SCRUM-330): bind the lease to the authorizing autonomous run so a
+    # renewal can only be performed by the same actor/run. Defaults to "" for
+    # legacy leases that predate run binding (backward-compatible).
+    run_id: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -94,6 +99,7 @@ class Lease:
             "issued_at": self.issued_at,
             "expires_at": self.expires_at,
             "repository": self.repository,
+            "run_id": self.run_id,
         }
 
 
@@ -175,6 +181,8 @@ def evaluate_renewal(
     now: str | None = None,
     renewal_grace: timedelta = _DEFAULT_RENEWAL_GRACE,
     approval_expires_at: str | None = None,
+    run_id: str | None = None,
+    observed_run_id: str | None = None,
 ) -> RenewalDecision:
     """Evaluate whether ``current_lease`` may be renewed under the approved scope.
 
@@ -198,6 +206,20 @@ def evaluate_renewal(
         return RenewalDecision(
             renewed=False, reconcile_reason="OWNER_MISMATCH", evaluated_at=evaluated_at
         )
+
+    # 1b. Run identity must match the active lease (same actor/run, NA81
+    # SCRUM-330). A renewal requested under a different run, or observed under a
+    # conflicting run, must fail closed — renewal must never rebind execution
+    # to a different autonomous run.
+    if run_id is not None and run_id.strip():
+        if current_lease.run_id and current_lease.run_id != run_id:
+            return RenewalDecision(
+                renewed=False, reconcile_reason="RUN_ID_MISMATCH", evaluated_at=evaluated_at
+            )
+        if observed_run_id is not None and observed_run_id != run_id:
+            return RenewalDecision(
+                renewed=False, reconcile_reason="RUN_ID_MISMATCH", evaluated_at=evaluated_at
+            )
 
     # 2. Binding scope must match the lease (no silent scope drift).
     if current_lease.task_id != task_id:
@@ -259,6 +281,7 @@ def evaluate_renewal(
         issued_at=evaluated_at,
         expires_at=_parse_ts(current_lease.expires_at).isoformat().replace("+00:00", "Z"),
         repository=repository,
+        run_id=run_id if run_id is not None else current_lease.run_id,
     )
     return RenewalDecision(renewed=True, lease=renewed_lease, evaluated_at=evaluated_at)
 
@@ -276,6 +299,8 @@ def renew_lease(
     now: str | None = None,
     renewal_grace: timedelta = _DEFAULT_RENEWAL_GRACE,
     approval_expires_at: str | None = None,
+    run_id: str | None = None,
+    observed_run_id: str | None = None,
 ) -> Lease:
     """Convenience wrapper: renew or raise on reconcile route.
 
@@ -295,6 +320,8 @@ def renew_lease(
         now=now,
         renewal_grace=renewal_grace,
         approval_expires_at=approval_expires_at,
+        run_id=run_id,
+        observed_run_id=observed_run_id,
     )
     if not decision.renewed or decision.lease is None:
         raise LeaseRenewalError(
