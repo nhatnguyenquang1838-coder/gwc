@@ -8,5 +8,41 @@
     "G1_ALIGNMENT",
     "G2_EXECUTION"
   ],
-  "description": "Produces exact human approval commands with gate, approval request ID, scope hash, and UTC expiry for gated actions."
+  "description": "Produces exact human approval commands with gate, approval request ID, scope hash short, and UTC expiry for gated actions. Generation creates a request for authority; it does not create or grant authority.",
+  "intent": "Generate a deterministic, non-secret gate-approval-request artifact that binds gate, approval_request_id, 16-hex scope_hash_short, target, actor, and UTC expiry, failing closed on missing, ambiguous, stale, or non-approval-boundary inputs. The emitted approval_command follows the canonical grammar APPROVE <GATE_SHORT> <approval_request_id> <scope_hash_short:16hex> <expires_at_utc>.",
+  "outcome": "gate-approval-request artifact containing approval_request_id, task_id, repository, gate, action, scope bindings (base_sha, head_sha, branch, pr_number, environment), scope_hash, scope_hash_short, actor_target, issued_at, expires_at, non-secret 64-hex approval_token (integrity evidence only, never in the human command), canonical approval_command, request_digest (sha256), reason_codes, and authority_granted=false.",
+  "constraints": [
+    "The evaluator is pure and deterministic for the same semantic inputs; issued_at/expires_at are binding inputs to the digest, not diagnostic.",
+    "Equivalent normalized semantic inputs must produce the same approval_token, approval_command, and request_digest; material changes to task, repository, gate, action, base_sha, head_sha, scope_hash, actor, or expiry must change/invalidate prior evidence.",
+    "Generation must never grant G2, G4, G5, G6, merge, deploy, release, credential, migration, or production-data authority; authority_granted must be false.",
+    "The human approval_command must bind gate_short, approval_request_id, 16-hex scope_hash_short, and second-precision UTC expiry exactly per the canonical grammar; the 64-hex approval_token is integrity evidence only and must never appear in the human command.",
+    "Material drift in scope_hash, base_sha, head_sha, or actor invalidates the prior token evidence and requires regeneration."
+  ],
+  "exclusions": [
+    "Granting or validating human approval or gate transition authority.",
+    "Performing a gate transition, merge, deploy, release, migration, or production-data operation.",
+    "Reading or mutating repositories, Jira, GitHub, branches, worktrees, PRs, deployments, releases, credentials, or production data.",
+    "Consumed-token state tracking or replay consumption; that belongs to consumer node gate_authority.approval-command-validation (SCRUM-309)."
+  ],
+  "entry_guards": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION",
+    "authority_boundary_decision = REQUIRE_APPROVAL is present",
+    "task_id, repository, gate, action, scope_identity (with scope_hash, base_sha, head_sha), actor_target.id, issued_at, expires_at are available"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/approval_token_generation.py",
+    "schema": "schemas/node-architect/gate-authority/approval-token-generation.schema.json"
+  },
+  "reason_codes": {
+    "APPROVAL_REQUEST_GENERATED": "A deterministic gate-approval-request artifact was produced; authority is not granted.",
+    "APPROVAL_INPUT_INVALID": "task_id, repository, gate, action, scope_identity, actor_target.id, or expiry inputs are structurally invalid.",
+    "APPROVAL_BOUNDARY_NOT_REQUESTED": "The authority boundary decision does not require approval.",
+    "APPROVAL_GATE_ACTION_MISMATCH": "The requested action does not match the boundary decision's requested_action.",
+    "APPROVAL_BINDING_REQUIRED": "A required scope binding (base_sha, head_sha, branch, pr_number, environment) is absent or malformed.",
+    "APPROVAL_EXPIRY_INVALID": "Expiry is absent, not after issuance, or not second-precision UTC.",
+    "APPROVAL_G5_MANUAL_SCOPE_REQUIRED": "A G5 gate request lacks a manual environment binding.",
+    "APPROVAL_G6_NOT_APPLICABLE": "A G6 gate request is made without applicable production scope.",
+    "APPROVAL_REDACTION_REQUIRED": "A derived identifier or token failed the non-secret canonical format contract."
+  }
 }

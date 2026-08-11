@@ -358,7 +358,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json",
-        "source_sha": "cfce9b54bb9b05ed3f25d5203cdf6e3bbdab227ba641de9218f8bc3e8d672bfe"
+        "source_sha": "47aae12a6f37243bca07c3ebe59437e5f4be7cea5379bef4ae66193d29ff8b07"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
