@@ -8,7 +8,7 @@
     "id": "full-flow-v3",
     "version": "2.0.0",
     "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r2",
-    "workflow_digest": "sha256:f842492905d4c5718e623149a548e94050caf77fb493d133e7f4c7e1296222ca"
+    "workflow_digest": "sha256:9708af358514ca625d22a927440a0e007849357393d48f8538f3290551a30dd5"
   },
   "policy": {
     "registry_id": "gwc-gate-applicability-policy-registry",
@@ -53,7 +53,7 @@
     }
   },
   "bindings": {
-    "node_registry_digest": "sha256:2b0b014dbbc7933277796df3243cb3603c9c4c66cc6077312fb2d8ff7e4a7951",
+    "node_registry_digest": "sha256:b5370838a8d2b5d24026197348d0a92838de360a0b9659060af0eb4346ac4e6e",
     "scenario_registry_digest": "sha256:b88f2b804ebe6c8ca0609fb391ce975d04df95e1c8ecc56a905bebf2f3ab5580",
     "graph_registry_digest": "sha256:55a66184d8afda10eb1829355afa5b9b695d6dbdbe78e01c2e4b3514aa75837f",
     "gate_lifecycle_revision": "1.0",
@@ -112,5 +112,5 @@
       "FLOW_POLICY_COMPILED"
     ]
   },
-  "compiled_digest": "sha256:fd468d8c8ad480c7c839287baef5440cbd1abf6e1c8c26b1b33dcadf8b9f9b42"
+  "compiled_digest": "sha256:be74578aa0c63b4e9ef03e182964fdc311c0a8e5c6064e67d61c0b72fd0469e1"
 }
