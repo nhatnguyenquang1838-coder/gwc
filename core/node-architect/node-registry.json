@@ -528,7 +528,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json",
-        "source_sha": "7091126590f55ffe3cce5931063ae933ba0d492c83f4f32df78a108cffc33c53"
+        "source_sha": "f7f381e5f9f2c13a97709c5e02e3160bdff4baf3"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
