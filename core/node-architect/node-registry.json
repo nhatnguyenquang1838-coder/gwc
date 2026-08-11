@@ -454,13 +454,16 @@
       "id": "gate_authority.evidence-artifact-map",
       "idempotency": "readback_required",
       "implementation_refs": [
-        "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json"
+        "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
+        "core/node-architect/node-instructions/gate_authority/evidence-artifact-map.node-instruction.yaml",
+        "tools/node_architect/evidence_artifact_map.py",
+        "schemas/node-architect/gate-authority/evidence-artifact-map.schema.json"
       ],
       "maturity": "experimental",
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
-        "source_sha": "0cfadd394b481ced6e917849023458fc015c203907991758183b5c8bdb45040e"
+        "source_sha": "fbb6b1ee585b24b3032e94ae857f7efb568901b8b5a35e4e1db2cdd4f5e68430"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
