@@ -9,10 +9,12 @@ before any event/checkpoint mutation.
 from __future__ import annotations
 
 import argparse
+import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 import json
+import tempfile
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -87,8 +89,19 @@ def load_store(path: Path) -> dict[str, Any]:
 
 
 def write_store(path: Path, payload: dict[str, Any]) -> None:
+    """Persist store JSON atomically: temp-file + os.replace leaves original intact on failure."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=str(path.parent), suffix=".tmp")
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+        os.replace(tmp_path, str(path))
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 def checkpoint_key(task_id: str, run_id: str, node_id: str) -> str:
@@ -241,6 +254,18 @@ def _prepare_cas_context(
         "store_digest": store.get("store_digest"),
     }
     context["committed_effects"] = store.get("effects", {})
+    if not context.get("idempotency_key"):
+        idempotency_payload = {
+            "task_id": item.task_id,
+            "run_id": item.run_id,
+            "node_id": item.node_id,
+            "repository": item.repository,
+            "branch": item.branch,
+            "base_sha": item.base_sha,
+            "scope_hash": item.scope_hash,
+            "checkpoint_key": checkpoint_key(item.task_id, item.run_id, item.node_id),
+        }
+        context["idempotency_key"] = digest_payload(idempotency_payload)
     context["precondition_errors"] = sorted(set(errors))
     return context
 
@@ -354,6 +379,107 @@ def persist_to_file(
     updated = persist_checkpoint(store, item, evaluation_time=evaluation_time)
     write_store(path, updated)
     return updated
+
+
+class ReadbackMismatch(CheckpointConflict):
+    """Raised when a persisted checkpoint record does not match expected state."""
+
+
+def reconcile_unknown_outcome(
+    store: Mapping[str, Any], item: CheckpointInput
+) -> dict[str, Any]:
+    """Inspect store for unknown/corrupt persistence outcomes.
+
+    Returns a reconciliation decision. A ``KNOWN_STATE`` outcome means the
+    store integrity is consistent and the persisted checkpoint can be trusted
+    for readback. Any other outcome requires caller-side reconciliation before
+    retry.
+    """
+    key = checkpoint_key(item.task_id, item.run_id, item.node_id)
+    reasons: list[str] = []
+    try:
+        revision = int(store.get("revision", 0))
+    except (TypeError, ValueError):
+        return {
+            "outcome": "UNKNOWN_OUTCOME",
+            "reasons": ["INVALID_REVISION"],
+            "reconciliation_route": "RELOAD_LATEST",
+            "next_action": "reload_latest_state_and_reconcile_without_auto_retry",
+        }
+
+    checkpoints = store.get("checkpoints", {})
+    if not isinstance(checkpoints, Mapping):
+        reasons.append("INVALID_CHECKPOINTS")
+    else:
+        record = checkpoints.get(key)
+        if record is None:
+            reasons.append("MISSING_CHECKPOINT_RECORD")
+        elif isinstance(record, Mapping) and int(record.get("revision", -1)) != revision:
+            reasons.append("REVISION_CHECKPOINT_MISMATCH")
+
+    store_digest = store.get("store_digest")
+    if store_digest:
+        expected = digest_payload(
+            {
+                "revision": store.get("revision", 0),
+                "binding": store.get("binding"),
+                "lease_binding": store.get("lease_binding"),
+                "events": store.get("events", []),
+                "checkpoints": checkpoints if isinstance(checkpoints, Mapping) else {},
+                "effects": store.get("effects", {}),
+            }
+        )
+        if expected != store_digest:
+            reasons.append("STORE_DIGEST_MISMATCH")
+
+    if reasons:
+        return {
+            "outcome": "UNKNOWN_OUTCOME",
+            "reasons": reasons,
+            "reconciliation_route": "RELOAD_LATEST",
+            "next_action": "reload_latest_state_and_reconcile_without_auto_retry",
+        }
+    return {
+        "outcome": "KNOWN_STATE",
+        "reasons": [],
+        "reconciliation_route": None,
+        "next_action": "proceed",
+    }
+
+
+def validate_readback(
+    store: Mapping[str, Any], item: CheckpointInput
+) -> dict[str, Any]:
+    """Read back the persisted checkpoint record and validate state digest.
+
+    Returns ``{"outcome": "PASS", "revision": ..., "state_digest": ...}``
+    or raises ``ReadbackMismatch``.
+    """
+    key = checkpoint_key(item.task_id, item.run_id, item.node_id)
+    checkpoints = store.get("checkpoints", {})
+    if not isinstance(checkpoints, Mapping):
+        raise ReadbackMismatch(
+            f"READBACK_MISSING_CHECKPOINTS key={key}",
+            decision={"outcome": "UNKNOWN_OUTCOME", "reasons": ["INVALID_CHECKPOINTS"]},
+        )
+    record = checkpoints.get(key)
+    if record is None:
+        raise ReadbackMismatch(
+            f"READBACK_MISSING_RECORD key={key}",
+            decision={"outcome": "UNKNOWN_OUTCOME", "reasons": ["MISSING_CHECKPOINT_RECORD"]},
+        )
+    expected = digest_payload(item.state)
+    actual = record.get("state_digest")
+    if actual != expected:
+        raise ReadbackMismatch(
+            f"READBACK_DIGEST_MISMATCH expected={expected} actual={actual}",
+            decision={
+                "outcome": "READBACK_MISMATCH",
+                "expected_digest": expected,
+                "actual_digest": actual,
+            },
+        )
+    return {"outcome": "PASS", "revision": record.get("revision"), "state_digest": actual}
 
 
 def replay_checkpoint(store: dict[str, Any], task_id: str, run_id: str, node_id: str) -> dict[str, Any] | None:
