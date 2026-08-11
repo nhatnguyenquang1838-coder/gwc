@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
@@ -27,6 +28,84 @@ from .checkpoint_store import canonical_json, digest_payload
 
 def _now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+# Closed, explicit patterns for state entries that must never be captured.
+# Checkpoint capture is minimal replay/reconciliation state only: it must
+# exclude secrets and unbounded working memory / unrelated state (EARS #3 / #5,
+# SCRUM-325 current brief). Patterns are targeted to avoid false positives on
+# ordinary execution-state keys.
+_SECRET_KEY_RE = re.compile(
+    r"(secret|password|passwd|pwd|token|credential|private_?key|"
+    r"api_?key|access_?key|authorization|auth_?token|session_?secret|"
+    r"client_?secret|privatekey)",
+    re.IGNORECASE,
+)
+_OVERBROAD_KEY_RE = re.compile(
+    r"(working_?memory|cache|caches|unbounded|full_?context|entire_?state|"
+    r"state_?dump|all_?memory|whole_?context|everything|global_?state|"
+    r"full_?snapshot)",
+    re.IGNORECASE,
+)
+
+# Replay-relevant checkpoints are small, closed snapshots. Bounds keep capture
+# from sweeping unbounded runtime memory.
+_MAX_STATE_KEYS = 64
+_MAX_STATE_BYTES = 64 * 1024  # 64 KiB
+
+
+def _scan_forbidden_state_keys(obj: Any, path: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], str]]:
+    """Return (path, kind) for every secret/overbroad key found in ``obj``."""
+    hits: list[tuple[tuple[str, ...], str]] = []
+    if isinstance(obj, Mapping):
+        for key, value in obj.items():
+            key_str = str(key)
+            if _SECRET_KEY_RE.search(key_str):
+                hits.append((path + (key_str,), "secret"))
+            elif _OVERBROAD_KEY_RE.search(key_str):
+                hits.append((path + (key_str,), "overbroad"))
+            hits.extend(_scan_forbidden_state_keys(value, path + (key_str,)))
+    elif isinstance(obj, (list, tuple, set, frozenset)):
+        for index, value in enumerate(obj):
+            hits.extend(_scan_forbidden_state_keys(value, path + (f"[{index}]",)))
+    return hits
+
+
+def _count_state_keys(obj: Any) -> int:
+    total = 0
+    if isinstance(obj, Mapping):
+        total += len(obj)
+        for value in obj.values():
+            total += _count_state_keys(value)
+    elif isinstance(obj, (list, tuple, set, frozenset)):
+        for value in obj:
+            total += _count_state_keys(value)
+    return total
+
+
+def _validate_state_exclusion(
+    state: Mapping[str, Any],
+    *,
+    max_state_keys: int = _MAX_STATE_KEYS,
+    max_state_bytes: int = _MAX_STATE_BYTES,
+) -> None:
+    """Fail closed when state carries forbidden secret/overbroad entries (EARS #3/#5)."""
+    forbidden = _scan_forbidden_state_keys(state)
+    if forbidden:
+        detail = ", ".join(f"{'.'.join(p)}:{kind}" for p, kind in forbidden)
+        raise CheckpointCaptureError(
+            "capture rejected: state must exclude secrets and overbroad/unbounded entries: "
+            + detail
+        )
+    serialized = canonical_json(state).encode("utf-8")
+    if len(serialized) > max_state_bytes:
+        raise CheckpointCaptureError(
+            f"capture rejected: state exceeds bound of {max_state_bytes} bytes"
+        )
+    if _count_state_keys(state) > max_state_keys:
+        raise CheckpointCaptureError(
+            f"capture rejected: state exceeds bound of {max_state_keys} keys"
+        )
 
 
 # Closed set of binding fields whose absence must fail closed (EARS #3).
@@ -191,6 +270,11 @@ def capture_checkpoint(
 
     if state is None or not isinstance(state, Mapping):
         raise CheckpointCaptureError("capture rejected: state must be a mapping")
+
+    # Fail closed: exclude secrets, overbroad/unbounded state, and enforce the
+    # minimal replay-state bound (SCRUM-325 current brief: "must exclude secrets,
+    # unbounded working memory and unrelated state").
+    _validate_state_exclusion(state)
 
     normalized_pending = tuple(
         a if isinstance(a, PendingAction) else PendingAction(**dict(a))
