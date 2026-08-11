@@ -4,6 +4,18 @@ Generation creates a request for authority; it does not create or grant
 authority. The emitted ``approval_token`` is a non-secret integrity identifier
 derived from canonical request content; possession alone does not authorize an
 action.
+
+The human ``approval_command`` follows the canonical grammar bound by
+``schemas/approval-request.schema.json``:
+
+    APPROVE <GATE_SHORT> <approval_request_id> <scope_hash_short:16hex> <expires_at_utc>
+
+It binds (1) gate short, (2) a deterministic request id, (3) the 16-hex scope
+short, and (4) a UTC expiry. The full 64-hex ``approval_token`` is preserved
+in the payload as non-secret integrity evidence but is never placed in the
+human command. Equivalent inputs render identical output; material drift
+(scope_hash, base_sha, head_sha, action, actor, expiry) changes the token and
+invalidates prior evidence.
 """
 from __future__ import annotations
 
@@ -22,7 +34,24 @@ REPOSITORY_PATTERN = re.compile(r"^[^/\s]+/[^/\s]+$")
 SHA40_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SCOPE_HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
 TOKEN64_PATTERN = re.compile(r"^[0-9a-f]{64}$")
-APPROVAL_REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
+# task_id: alphanumeric + . _ - , length 1..100. Bounded so that
+# <gate_short_lower>_<task_id_lower>_<token[:16]> stays <=122 chars (the
+# request-ID projection's max) and the lowercase projection satisfies the
+# canonical request-id pattern. No lossy sanitization — invalid input fails.
+TASK_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$")
+
+# approval_request_id: lowercase, starts lowercase alphanumeric, 3..122 chars.
+APPROVAL_REQUEST_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]{2,120}$")
+# scope_hash_short: exactly 16 lowercase hex.
+SCOPE_HASH_SHORT_PATTERN = re.compile(r"^[0-9a-f]{16}$")
+# UTC expiry bound in the command: YYYY-MM-DDTHH:MM:SSZ (ISO-8601 second-precision UTC).
+UTC_EXPIRY_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+# Canonical human command grammar bound by schemas/approval-request.schema.json:
+#   APPROVE G[2-6] <approval_request_id> <scope_hash_short:16hex> <expires_at_utc>
+APPROVAL_COMMAND_PATTERN = re.compile(
+    r"^APPROVE G[2456] [a-z0-9][a-z0-9._-]{2,120} [0-9a-f]{16} "
+    r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"
+)
 
 REASON_GENERATED = "APPROVAL_REQUEST_GENERATED"
 REASON_INPUT_INVALID = "APPROVAL_INPUT_INVALID"
@@ -76,6 +105,34 @@ def _canonical_binding_string(
     return "|".join(parts)
 
 
+def _build_scope_hash_short(scope_hash: str) -> str:
+    """Extract the canonical 16-hex scope short from a sha256:64hex scope_hash."""
+    value = scope_hash.replace("sha256:", "")
+    return value[:16]
+
+
+def _build_approval_request_id(gate_short: str, task_id: str, token: str) -> str:
+    """Deterministic request id: <gate_short_lower>_<task_id_lower>_<token[:16]>
+
+    The token-derived suffix ensures actor/target/base/head/scope/action/expiry
+    drift propagates into the request_id (and thus the human command), while
+    equivalent inputs render an identical id. The visible prefix is normalized
+    to lowercase to satisfy the canonical schema pattern.
+
+    Example: g2_scrum-185_9f3c1de6b0aa4d5e
+    """
+    return f"{gate_short.lower()}_{task_id.lower()}_{token[:16]}"
+
+
+def _validate_utc_expiry(expires_at: str) -> None:
+    """Confirm the expiry renders as a second-precision UTC timestamp."""
+    _require(
+        bool(UTC_EXPIRY_PATTERN.match(expires_at)),
+        REASON_EXPIRY_INVALID,
+        f"expires_at must be second-precision UTC (YYYY-MM-DDTHH:MM:SSZ), got {expires_at!r}",
+    )
+
+
 def generate_approval_request(
     *,
     task_id: str,
@@ -92,8 +149,10 @@ def generate_approval_request(
 
     Returns a ``gate-approval-request`` dict. Never grants authority.
     """
-    if not isinstance(task_id, str) or not task_id:
-        raise ApprovalRequestError(f"{REASON_INPUT_INVALID}: task_id required")
+    if not isinstance(task_id, str) or not TASK_ID_PATTERN.match(task_id):
+        raise ApprovalRequestError(
+            f"{REASON_INPUT_INVALID}: task_id must match {TASK_ID_PATTERN.pattern}, got {task_id!r}"
+        )
     if not isinstance(repository, str) or not REPOSITORY_PATTERN.match(repository):
         raise ApprovalRequestError(f"{REASON_INPUT_INVALID}: repository must match owner/name")
     if gate not in VALID_GATES:
@@ -152,6 +211,8 @@ def generate_approval_request(
         raise ApprovalRequestError(f"{REASON_EXPIRY_INVALID}: issued_at/expires_at required")
     if expires_at <= issued_at:
         raise ApprovalRequestError(f"{REASON_EXPIRY_INVALID}: expires_at must be after issued_at")
+    # Canonical command expiry must be second-precision UTC (Rule 8).
+    _validate_utc_expiry(expires_at)
 
     bindings: dict[str, Any] = {
         "base_sha": base_sha,
@@ -172,10 +233,31 @@ def generate_approval_request(
     )
     token = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     digest = hashlib.sha256((canonical + "|token=" + token).encode("utf-8")).hexdigest()
-    request_id = f"{gate}-{task_id}-{token[:16]}"
+
+    scope_hash_short = _build_scope_hash_short(scope_hash)
+    _require(
+        bool(SCOPE_HASH_SHORT_PATTERN.match(scope_hash_short)),
+        REASON_REDACTION_REQUIRED,
+        f"scope_hash_short must be 16 lowercase hex, got {scope_hash_short!r}",
+    )
+
+    request_id = _build_approval_request_id(
+        gate_short=GATE_SHORT[gate], task_id=task_id, token=token)
+    _require(
+        bool(APPROVAL_REQUEST_ID_PATTERN.match(request_id)),
+        REASON_REDACTION_REQUIRED,
+        f"approval_request_id must match {APPROVAL_REQUEST_ID_PATTERN.pattern}, got {request_id!r}",
+    )
 
     gate_short = GATE_SHORT[gate]
-    command = f"APPROVE {gate_short} {task_id} {token} {expires_at}"
+    # Canonical human command grammar: APPROVE <GATE> <request_id> <scope_short:16hex> <expiry_utc>
+    command = f"APPROVE {gate_short} {request_id} {scope_hash_short} {expires_at}"
+    # Verify the rendered command matches the canonical grammar (gate, id, scope short, UTC expiry).
+    _require(
+        bool(APPROVAL_COMMAND_PATTERN.match(command)),
+        REASON_REDACTION_REQUIRED,
+        f"approval_command does not match canonical grammar: {command!r}",
+    )
 
     # No secret material may ever appear in the request (Rule 9).
     payload = {
@@ -188,6 +270,7 @@ def generate_approval_request(
         "action": action,
         "bindings": bindings,
         "scope_hash": scope_hash,
+        "scope_hash_short": scope_hash_short,
         "actor_target": {
             "type": actor_target.get("type", "user"),
             "id": actor_target["id"],
