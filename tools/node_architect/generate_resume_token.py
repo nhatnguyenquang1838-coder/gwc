@@ -69,6 +69,11 @@ def generate_resume_token(
     scope_hash = _required(scope_hash, "scope_hash")
     next_gate = _required(next_gate, "next_gate")
     next_action = _required(next_action, "next_action")
+    if not isinstance(checkpoint, Mapping):
+        raise ResumeTokenError(
+            "RESUME_TOKEN_CHECKPOINT_INVALID",
+            "checkpoint must be a mapping/object; invalid checkpoint must not yield a token",
+        )
     checkpoint_id = _required(checkpoint.get("checkpoint_id"), "checkpoint.checkpoint_id")
     state_digest = _required(state_digest, "state_digest")
     checkpoint_task = checkpoint.get("task") or {}
