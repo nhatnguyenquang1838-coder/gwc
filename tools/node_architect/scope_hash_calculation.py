@@ -136,7 +136,7 @@ def _normalize_paths(paths: Sequence[str]) -> tuple[list[str], list[str]]:
             continue
         if p not in out:  # dedup while preserving first-seen order
             out.append(p)
-    return out, reasons
+    return sorted(out), reasons
 
 
 def _normalize_bindings(bindings: Sequence[dict[str, str]]) -> tuple[list[dict[str, str]], list[str]]:
@@ -153,7 +153,7 @@ def _normalize_bindings(bindings: Sequence[dict[str, str]]) -> tuple[list[dict[s
             reasons.append("SCOPE_UNKNOWN_SEMANTIC")
             continue
         out.append({"key": b["key"], "value": b["value"]})
-    return out, reasons
+    return sorted(out, key=lambda item: (item["key"], item["value"])), reasons
 
 
 def _canonical_json_bytes(model: dict[str, Any]) -> bytes:
