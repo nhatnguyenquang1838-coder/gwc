@@ -698,7 +698,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/intake_context/files-write-scope.node.json",
-        "source_sha": "1751504747c1703825e295fd920a376fafe31069ac9b8af4a54509dc5fb6eeb0"
+        "source_sha": "28d6b70da0d8f05540f407919a4213c438fabeded2297abc6e5dd76183f5c270"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",

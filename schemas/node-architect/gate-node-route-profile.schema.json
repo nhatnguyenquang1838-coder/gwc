@@ -9,12 +9,13 @@
     "bound_graph_revision", "bound_node_registry_revision", "routes"
   ],
   "properties": {
-    "schema_version": {"enum": ["1.0", "1.1"]},
+    "schema_version": {"enum": ["1.0", "1.1", "1.2"]},
     "artifact_type": {"const": "gate-node-route-profile"},
     "profile_id": {"type": "string", "minLength": 1},
     "revision": {"type": "string", "minLength": 1},
     "bound_graph_revision": {"type": "string", "minLength": 1},
     "bound_node_registry_revision": {"type": "string", "minLength": 1},
+    "workflow_profile_ref": {"type": "string", "minLength": 1},
     "routes": {
       "type": "array", "minItems": 1,
       "items": {
@@ -52,5 +53,11 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"schema_version": {"const": "1.2"}}, "required": ["schema_version"]},
+      "then": {"required": ["workflow_profile_ref"]}
+    }
+  ]
 }

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/runtime/gate-applicability-policy-registry.schema.json",
+  "title": "Gate Applicability Policy Registry",
+  "description": "Versioned Policy contract container. Independently versioned and digested from Workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "revision", "policies"],
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "artifact_type": {"const": "gate-applicability-policy-registry"},
+    "registry_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "revision": {"type": "string", "minLength": 1},
+    "policy_contract_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "tighten_only": {"type": "boolean"},
+    "canonical_minimums": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {
+        "enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]
+      },
+      "patternProperties": {
+        "^G[0-6]_[A-Z_]+$": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min_decision": {"enum": ["REQUIRED", "NOT_APPLICABLE"]},
+            "required_authority_types": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "required_evidence_types": {"type": "array", "items": {"type": "string", "minLength": 1}},
+            "prohibited_actions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+          }
+        }
+      }
+    },
+    "policies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "gate-applicability-policy.schema.json"}
+    }
+  }
+}
