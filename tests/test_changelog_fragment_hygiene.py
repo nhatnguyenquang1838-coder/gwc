@@ -36,12 +36,17 @@ class ChangelogFragmentHygieneTests(unittest.TestCase):
     def test_missing_task_id_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            self._write_fragment(
+            path = self._write_fragment(
                 root,
                 "2026-07-21-missing-task.md",
                 "## 2026-07-21 — missing task\n\n### Added\n\n- Missing task marker.\n",
             )
-            self.assertEqual(main(["--root", str(root)]), 1)
+            try:
+                self.assertEqual(main(["--root", str(root)]), 1)
+            finally:
+                # Explicit cleanup so a leaked temp dir can never leave a
+                # stray invalid fragment in a reused CI workspace.
+                path.unlink(missing_ok=True)
 
     def test_missing_fragment_directory_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
