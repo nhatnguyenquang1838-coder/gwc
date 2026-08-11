@@ -5,7 +5,16 @@ logic is reuse evidence only; the current brief (SCRUM-323 / GitHub #258) requir
 promotion to Ready ONLY when G3 PASS + required CI green + no blockers + same exact
 head, failing closed otherwise, and granting no merge authority.
 """
+import os
+import sys
 import unittest
+
+# Make the `node_architect` package importable under multiple run contexts:
+#  - `PYTHONPATH=tools python -m unittest ...`  (local dev)
+#  - `python -m unittest discover` from repo root (CI, Python 3.12 namespace pkgs)
+# Insert the absolute tools/ dir so `import node_architect` resolves.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(_HERE, "..", "tools"))
 
 from node_architect.promotion_controller import (
     promote_to_ready_for_review,
