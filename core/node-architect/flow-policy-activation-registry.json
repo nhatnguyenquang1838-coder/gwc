@@ -3,10 +3,10 @@
   "artifact_type": "flow-policy-activation-registry",
   "registry_id": "gwc-flow-policy-activation",
   "revision": "scrum-394-flow-policy-integration-v2-20260811-r2",
-  "active_compiled_profile": "sha256:be74578aa0c63b4e9ef03e182964fdc311c0a8e5c6064e67d61c0b72fd0469e1",
+  "active_compiled_profile": "sha256:b7f4f6da3a093f1e6c6355fc14582202a75728796dc2d9802035403c8a6c8be0",
   "registered": [
     {
-      "compiled_digest": "sha256:be74578aa0c63b4e9ef03e182964fdc311c0a8e5c6064e67d61c0b72fd0469e1",
+      "compiled_digest": "sha256:b7f4f6da3a093f1e6c6355fc14582202a75728796dc2d9802035403c8a6c8be0",
       "profile_ref": "core/node-architect/flow-policy-compiled-profile.json",
       "status": "COMPATIBLE",
       "note": "Flow full-flow-v3 v2.0.0 compiled against Policy registry revision policy-contract-v2-20260811-r1 with exact live composition, gate-lifecycle and legacy-route bindings."
