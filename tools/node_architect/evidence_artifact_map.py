@@ -254,6 +254,20 @@ def build_gate_evidence_artifact_map(
             scope_hash = scope_identity.get("scope_hash")  # type: ignore[assignment]
             if not _valid_digest(scope_hash):
                 reasons.add("EVIDENCE_INPUT_INVALID")
+        if isinstance(scope_identity, Mapping):
+            # A scope projection is a compact identity binding, not merely a
+            # source for scope_hash.  Every identity component must match the
+            # live invocation so a stale task/base/head projection cannot be
+            # accepted while carrying a current-looking digest.
+            for field, expected in (
+                ("task_id", task_id),
+                ("repository", repository),
+                ("base_sha", base_sha),
+                ("head_sha", head_sha),
+                ("scope_hash", scope_hash),
+            ):
+                if field not in scope_identity or scope_identity.get(field) != expected:
+                    reasons.add("EVIDENCE_BINDING_MISMATCH")
     for observed in (observed_base_sha, observed_head_sha):
         if observed is not None and not _valid_sha(observed):
             reasons.add("EVIDENCE_INPUT_INVALID")
@@ -490,7 +504,12 @@ def build_gate_evidence_artifact_map(
     if "EVIDENCE_G6_NOT_APPLICABLE" in sorted_reasons:
         reported.append("EVIDENCE_G6_NOT_APPLICABLE")
     sorted_entries = sorted(
-        entries, key=lambda entry: (str(entry.get("gate")), str(entry.get("evidence_key")))
+        entries,
+        key=lambda entry: (
+            str(entry.get("gate")),
+            str(entry.get("evidence_key")),
+            _canonical_json_bytes(entry),
+        ),
     )
     map_model = {
         "task_id": task_id,

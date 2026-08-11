@@ -72,6 +72,18 @@ def build(**overrides: object) -> dict[str, object]:
     return build_gate_evidence_artifact_map(**value)
 
 
+def scope_identity(**overrides: object) -> dict[str, object]:
+    value: dict[str, object] = {
+        "task_id": TASK,
+        "repository": REPOSITORY,
+        "base_sha": BASE,
+        "head_sha": HEAD,
+        "scope_hash": SCOPE,
+    }
+    value.update(overrides)
+    return value
+
+
 class EvidenceArtifactMapNA81Tests(unittest.TestCase):
     def test_current_gate_action_selects_exact_required_artifact_set(self):
         result = build()
@@ -114,6 +126,30 @@ class EvidenceArtifactMapNA81Tests(unittest.TestCase):
                 result = build(evidence_candidates=[candidate(**{field: value})])
                 self.assertEqual(result["outcome"], "BLOCKED")
                 self.assertIn("EVIDENCE_BINDING_MISMATCH", result["reason_codes"])
+
+    def test_scope_identity_is_bound_as_a_complete_projection(self):
+        ready = build(scope_identity=scope_identity())
+        self.assertEqual(ready["outcome"], "READY")
+        for field, value in (
+            ("task_id", "SCRUM-999"),
+            ("repository", "other/repository"),
+            ("base_sha", "e" * 40),
+            ("head_sha", "e" * 40),
+            ("scope_hash", "sha256:" + "e" * 64),
+        ):
+            with self.subTest(field=field):
+                result = build(scope_identity=scope_identity(**{field: value}))
+                self.assertEqual(result["outcome"], "BLOCKED")
+                self.assertIn("EVIDENCE_BINDING_MISMATCH", result["reason_codes"])
+
+    def test_conflicting_duplicate_evidence_digest_is_order_stable(self):
+        first = candidate(digest="sha256:" + "d" * 64)
+        second = candidate(digest="sha256:" + "e" * 64)
+        left = build(evidence_candidates=[first, second])
+        right = build(evidence_candidates=[second, first])
+        self.assertEqual(left["outcome"], "BLOCKED")
+        self.assertIn("EVIDENCE_CONFLICT", left["reason_codes"])
+        self.assertEqual(left["map_digest"], right["map_digest"])
 
     def test_head_binding_and_drift_invalidate_mapping(self):
         result = build(

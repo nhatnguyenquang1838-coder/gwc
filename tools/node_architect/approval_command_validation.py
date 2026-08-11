@@ -42,6 +42,9 @@ REASON_ALREADY_CONSUMED = "APPROVAL_ALREADY_CONSUMED"
 REASON_REPLAY_CONFLICT = "APPROVAL_REPLAY_CONFLICT"
 REASON_G5_SCOPE_INVALID = "APPROVAL_G5_SCOPE_INVALID"
 REASON_G6_SCOPE_INVALID = "APPROVAL_G6_SCOPE_INVALID"
+REASON_ACTOR_MISMATCH = "APPROVAL_ACTOR_MISMATCH"
+REASON_ACTOR_MISSING = "APPROVAL_ACTOR_MISSING"
+REASON_TARGET_MISMATCH = "APPROVAL_TARGET_MISMATCH"
 
 
 class ApprovalValidationError(ValueError):
@@ -137,6 +140,39 @@ def validate_approval_command(
                      approval_request.get("approval_request_id", ""), validated_at)
     if rb.get("repository") != approval_request.get("repository"):
         return _fail(REASON_BINDING_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+
+    # Rule 13: current actor_target exact binding vs approval request.
+    # The actor named in the request must be the actor exercising the
+    # current approval; absent/missing or mismatched actor fails closed.
+    req_actor = approval_request.get("actor_target")
+    if not isinstance(req_actor, dict) or not req_actor.get("id"):
+        return _fail(REASON_ACTOR_MISSING, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    rb_actor = rb.get("current_actor")
+    if not isinstance(rb_actor, dict) or not rb_actor.get("id"):
+        return _fail(REASON_ACTOR_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    if (rb_actor.get("type") != req_actor.get("type") or
+            rb_actor.get("id") != req_actor.get("id")):
+        return _fail(REASON_ACTOR_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+
+    # Rule 14: current action target binding vs approval request + req bindings.
+    # The action, branch, and pr_number in the readback must match the request
+    # exactly; absent/missing where the request expects a value fails closed.
+    rb_action = rb.get("action")
+    req_action = approval_request.get("action")
+    if rb_action != req_action:
+        return _fail(REASON_TARGET_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    rb_branch = rb.get("branch")
+    rb_pr = rb.get("pr_number")
+    if rb_branch != req_bindings.get("branch"):
+        return _fail(REASON_TARGET_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    if rb_pr != req_bindings.get("pr_number"):
+        return _fail(REASON_TARGET_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
 
     # Rule 9: G4 requires PR open, non-draft, exact current head.
