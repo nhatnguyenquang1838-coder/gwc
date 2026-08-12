@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/package-export/package-manifest-load.schema.json",
+  "title": "package_export.package-manifest-load runtime result",
+  "description": "Closed, versioned runtime contract for the package manifest load evaluator (SCRUM-229, M4_DETERMINISTIC). The typed result is the only LOADED signal; it never grants repository, PR, merge, deploy or release authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "outcome",
+    "manifest_digest",
+    "binding",
+    "source_sha",
+    "entries",
+    "errors",
+    "authority_granted"
+  ],
+  "properties": {
+    "schema_id": { "const": "gwc.package_export.package_manifest_load" },
+    "schema_version": { "type": "string", "enum": ["0.1"] },
+    "outcome": { "type": "string", "enum": ["LOADED", "BLOCKED"] },
+    "manifest_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "source_sha": {
+      "anyOf": [
+        { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        { "type": "null" }
+      ]
+    },
+    "authority_granted": { "const": false },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "repository",
+        "package_path",
+        "source_ref",
+        "source_sha",
+        "package_version"
+      ],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "package_path": { "type": "string", "minLength": 1 },
+        "source_ref": { "type": "string", "minLength": 1 },
+        "source_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "package_version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "target", "required"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason_code", "json_path", "detail"],
+        "properties": {
+          "reason_code": { "$ref": "#/definitions/reasonCode" },
+          "json_path": { "type": "string", "minLength": 1 },
+          "detail": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "reasonCode": {
+      "type": "string",
+      "enum": [
+        "MANIFEST_LOADED",
+        "MANIFEST_MISSING",
+        "MANIFEST_PARSE_ERROR",
+        "MANIFEST_SCHEMA_UNSUPPORTED",
+        "MANIFEST_VERSION_UNSUPPORTED",
+        "MANIFEST_STALE_SOURCE",
+        "MANIFEST_DUPLICATE_ENTRY_ID",
+        "MANIFEST_AMBIGUOUS_SOURCE",
+        "MANIFEST_REPLAY_CONFLICT",
+        "MANIFEST_MISSING_INSTRUCTIONS"
+      ]
+    }
+  }
+}

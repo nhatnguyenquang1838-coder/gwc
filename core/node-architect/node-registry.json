@@ -1112,7 +1112,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/package_export/package-manifest-load.node.json",
-        "source_sha": "15f198c56d11b7fd9c873045ef1209a9df7e78a8d3497293a69397086528ab3c"
+        "source_sha": "77b6b68db16f45f3ad739c766dcb705d5e93caed70bda6ab657ce3831a848a8c"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",

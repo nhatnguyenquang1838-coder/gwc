@@ -60,6 +60,28 @@ class PackageExportNodeCatalogTest(unittest.TestCase):
             self.assertEqual(actual["evaluator"], expected["evaluator"])
             self.assertEqual(actual["test"], expected["test"])
 
+    def test_runtime_contracts_bind_package_manifest_load(self):
+        from tools.node_architect.validate_node_catalog_package_export import RUNTIME_CONTRACTS
+        expected = {
+            "schema": "schemas/node-architect/package-export/package-manifest-load.schema.json",
+            "evaluator": "tools/node_architect/package_export/package_manifest_load.py",
+            "test": "tests/package_export/test_package_manifest_load.py",
+        }
+        actual = RUNTIME_CONTRACTS["package_export.package-manifest-load"]
+        self.assertEqual(actual["schema"], expected["schema"])
+        self.assertEqual(actual["evaluator"], expected["evaluator"])
+        self.assertEqual(actual["test"], expected["test"])
+
+    def test_both_materialized_nodes_are_enriched(self):
+        enriched_stems = {"entry-schema-validation", "package-manifest-load"}
+        for stem in enriched_stems:
+            path = FAMILY_DIR / f"{stem}.node.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            for field in ("intent", "outcome", "constraints", "exclusions", "entry_guards", "reason_codes"):
+                self.assertTrue(payload.get(field), f"{stem} missing field {field}")
+            self.assertIn("evaluator", payload["source_resolution"])
+            self.assertIn("schema", payload["source_resolution"])
+
     def test_validator_rejects_canonical_authority_drift(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_dir = Path(tmp)
