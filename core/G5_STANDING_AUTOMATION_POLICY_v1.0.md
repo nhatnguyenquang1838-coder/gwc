@@ -60,6 +60,18 @@ Each standing automated G5 run should be auditable from GitHub evidence:
 If the required evidence cannot be read back, the correct status is not "G5
 PASS"; it is an unavailable or incomplete evidence state.
 
+## Post-PASS runtime cleanup
+
+After terminal G5 PASS and after the exact-SHA audit evidence above is persisted,
+any controller or Node Architect runtime observing the run must execute
+`core/node-architect/G5_POST_PASS_RUNTIME_CLEANUP_RULE_v0.1.md`.
+
+The cleanup is runtime-only: retire completed G5 checkpoints and continuation
+cursors, stop G5 observers and lease renewal, release G5-only leases/claims, and
+clear ephemeral G5 session pointers while preserving canonical evidence. When
+G6 is not applicable, task runtime completion requires successful cleanup. When
+G6 is applicable, cleanup must affect only G5-scoped runtime state.
+
 ## Boundary
 
 This policy does not grant merge authority, deploy authority for other systems,
