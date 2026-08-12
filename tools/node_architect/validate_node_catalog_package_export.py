@@ -25,7 +25,7 @@ REQUIRED_SEMANTICS = {
     "target-path-safety-check", "governance-tree-build", "export-manifest-generation",
     "deterministic-hash-verification", "smoke-verification", "export-failure-routing",
 }
-ENFORCE_ENRICHED = {"entry-schema-validation"}
+ENFORCE_ENRICHED = {"entry-schema-validation", "package-manifest-load"}
 REASON_CODE_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 # Runtime contracts for package_export nodes that carry evaluator + schema bindings.
@@ -35,6 +35,12 @@ RUNTIME_CONTRACTS: dict[str, dict[str, str]] = {
         "schema": "schemas/node-architect/package-export/entry-schema-validation.schema.json",
         "evaluator": "tools/node_architect/package_export/entry_schema_validation.py",
         "test": "tests/test_package_export_entry_schema_validation.py",
+    },
+    "package_export.package-manifest-load": {
+        "artifact_type": "package-manifest-load",
+        "schema": "schemas/node-architect/package-export/package-manifest-load.schema.json",
+        "evaluator": "tools/node_architect/package_export/package_manifest_load.py",
+        "test": "tests/package_export/test_package_manifest_load.py",
     },
 }
 

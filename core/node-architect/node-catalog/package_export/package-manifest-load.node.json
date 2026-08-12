@@ -7,5 +7,54 @@
     "gates": [
         "G2_EXECUTION"
     ],
-    "description": "Load the approved project package manifest and preserve its stable entry order before export."
+    "description": "Load the approved project package manifest and preserve its stable entry order before export.",
+    "intent": "Acquire the canonical project package manifest (projects/gwc/package.yaml) via a mutually-exclusive source XOR source_path evaluator argument, parse YAML via yaml.safe_load as a JSON-compatible object, validate it against the closed schemas/project-package.schema.json, and build deterministic entries preserving declared instruction order for downstream entry-schema-validation. Resolve a separate exact 40-hex Git source SHA as controller-decided execution input. No filesystem write, copy, target mutation, or network access beyond read-only source resolution.",
+    "outcome": "Typed ManifestLoadResult with schema_id, schema_version, outcome (LOADED|BLOCKED), manifest_digest (sha256: semantic, no timestamps), binding (full SourceBinding: task_id, repository, package_path, source_ref, source_sha, package_version), source_sha (exact Git commit SHA, 40-hex), entries (preserving declared instruction order), errors (ordered by reason taxonomy), authority_granted (always false). Compatibility aliases: LoadResult = ManifestLoadResult, OUTCOME_LOADED, OUTCOME_BLOCKED.",
+    "constraints": [
+        "The same manifest bytes and source SHA must always produce the same deterministic entries, manifest_digest, and replay identity.",
+        "source and source_path are mutually-exclusive function arguments; neither is ever written into the canonical package payload.",
+        "source_sha is an exact Git commit SHA (40 hex), never a content hash or SHA256(payload).",
+        "observed_source_sha is execution-only keyword-only input; it must never appear in the result, to_dict, or schema.",
+        "Exactly one source mode: source XOR source_path; both present => BLOCKED ambiguous-source; neither => BLOCKED missing-source. No fallback guessing.",
+        "SourceBinding must include task_id, repository, package_path, source_ref, source_sha, package_version; missing/incomplete => BLOCKED using closed task taxonomy.",
+        "observed_source_sha and binding.source_sha are both valid 40-hex for success; missing/invalid observed => BLOCKED missing/incomplete input; observed != binding.source_sha => MANIFEST_STALE_SOURCE.",
+        "payload[\"package_version\"] must equal binding.package_version; mismatch => MANIFEST_STALE_SOURCE.",
+        "manifest_digest is a deterministic sha256: semantic digest of loaded canonical manifest content, excluding timestamps.",
+        "Decision/replay identity must include normalized payload + loaded manifest + FULL binding identity + observed Git SHA so semantic binding changes cannot disappear.",
+        "No schema weakening to satisfy fixtures.",
+        "The typed result — not an exit code and not \"the parser did not crash\" — is the only success signal."
+    ],
+    "exclusions": [
+        "Filesystem existence or path-root safety checks (belong to source-path-safety-check and target-path-safety-check).",
+        "Entry-level schema field validation (belong to package_export.entry-schema-validation).",
+        "Granting repository, PR, merge, deploy, or release authority.",
+        "Mutating repository state or changing gate authority.",
+        "Network access or production data operations.",
+        "Credential, secret, migration, or destructive operations.",
+        "Promoting source_status; canonical_explicit=4 / proposed_registry_slot=77 invariant is preserved, not authored here."
+    ],
+    "entry_guards": [
+        "G2 authority validated independently for this node",
+        "route decision selected this node",
+        "closed input schema resolved (schemas/project-package.schema.json)",
+        "exact 40-hex Git source SHA resolved"
+    ],
+    "source_resolution": {
+        "evaluator": "tools/node_architect/package_export/package_manifest_load.py",
+        "schema": "schemas/node-architect/package-export/package-manifest-load.schema.json",
+        "input_schema": "schemas/project-package.schema.json"
+    },
+    "reason_codes": {
+        "MANIFEST_LOADED": "The manifest loaded successfully and produced deterministic entries bound by a valid SourceBinding.",
+        "MANIFEST_MISSING": "The source/source_path is absent or the SourceBinding is missing/incomplete.",
+        "MANIFEST_PARSE_ERROR": "The manifest YAML/JSON could not be parsed via yaml.safe_load (malformed, non-object root).",
+        "MANIFEST_SCHEMA_UNSUPPORTED": "The manifest declares an unrecognized or unsupported schema_version.",
+        "MANIFEST_VERSION_UNSUPPORTED": "The manifest schema_version is recognized in taxonomy but not supported by this loader.",
+        "MANIFEST_STALE_SOURCE": "observed_source_sha is missing/invalid, or observed_source_sha != binding.source_sha, or payload package_version != binding.package_version.",
+        "MANIFEST_DUPLICATE_ENTRY_ID": "Two or more manifest entries share the same id after normalization.",
+        "MANIFEST_AMBIGUOUS_SOURCE": "Both source and source_path are present (source XOR source_path), or source resolution is otherwise ambiguous.",
+        "MANIFEST_REPLAY_CONFLICT": "Same key + valid semantic identity change (payload, task, repo, path, ref, Git SHA, or version) detected on replay.",
+        "MANIFEST_MISSING_INSTRUCTIONS": "The manifest instructions list is absent or empty after precheck.",
+        "MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE": "Closed input schema validation is unavailable (missing jsonschema, missing schema file, schema load failure, or validator build failure); the loader BLOCKS rather than silently passing."
+    }
 }
