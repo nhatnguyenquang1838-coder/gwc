@@ -14,7 +14,7 @@ class TestNodeCatalog(unittest.TestCase):
         self.assertEqual(rep["summary"], "OK")
         self.assertTrue(rep["all_present"])
         self.assertEqual(set(rep["nodes"].keys()),
-                         {"SCRUM-185", "SCRUM-186", "SCRUM-190", "SCRUM-191", "SCRUM-192"})
+                         {"SCRUM-185", "SCRUM-186", "SCRUM-190", "SCRUM-191", "SCRUM-192", "SCRUM-312"})
 
     def test_every_node_has_required_callable(self):
         rep = validate_node_catalog_gate_authority()

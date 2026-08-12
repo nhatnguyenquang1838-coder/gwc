@@ -35,7 +35,7 @@
     "authority_status": {"enum": ["CONFIRMED", "REJECTED"]},
     "reason_code": {"type": "string"},
     "reason_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
-    "routing_verdict": {"enum": ["RETRYABLE", "HARD_DENIED", "STALE_EVIDENCE", "AUTHORITY_CONFLICT", "BLOCKED"]},
+    "routing_verdict": {"enum": ["RETRYABLE", "HARD_DENIED", "STALE_EVIDENCE", "AUTHORITY_CONFLICT", "BLOCKED", "RETRYABLE_EXHAUSTED", "HUMAN_REQUIRED", "ADVISORY_NONBLOCKING"]},
     "observed_at": {"type": ["string", "null"], "format": "date-time"},
     "read_only_projection": {"const": true},
     "write_authority_granted": {"const": false},

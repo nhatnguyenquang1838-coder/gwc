@@ -427,7 +427,7 @@ class CompiledProfileContractTests(unittest.TestCase):
         committed = _load("core/node-architect/flow-policy-compiled-profile.json")
         self.assertEqual(
             committed["workflow"]["workflow_digest"],
-            "sha256:f842492905d4c5718e623149a548e94050caf77fb493d133e7f4c7e1296222ca",
+            "sha256:9d6618d9d6e9abbb3ac942e24c4b2c4c4c5da6a8f7e3d1adf8e49915914ebde8",
         )
 
     def test_activation_registry_resolves_active_profile(self):

@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.dev/schemas/node-architect/gate-authority/gate-state-resolution.schema.json",
+  "title": "gate_authority.gate-state-resolution runtime result",
+  "description": "Closed, versioned runtime contract for the deterministic gate-state-resolution evaluator (SCRUM-307). The typed result is authoritative only as a fail-closed resolution; it never grants gate or execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "current_base_sha",
+    "scope_hash",
+    "head_sha",
+    "current_gate",
+    "gate_status",
+    "last_passed_gate",
+    "next_gate",
+    "next_action_class",
+    "canonical_evidence_refs",
+    "projection_warnings",
+    "missing_evidence",
+    "stale_evidence",
+    "conflicting_evidence",
+    "drift_decision",
+    "primary_reason_code",
+    "reason_codes",
+    "event_id_or_idempotency_key",
+    "replay_status",
+    "resolution_digest",
+    "observed_at",
+    "gate_evaluations",
+    "authority_granted",
+    "write_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "const": "gate-state-resolution"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "current_base_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "scope_hash": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "head_sha": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "current_gate": {
+      "$ref": "#/$defs/gate"
+    },
+    "gate_status": {
+      "enum": [
+        "READY",
+        "RUNNING",
+        "PASS",
+        "BLOCKED",
+        "FAILED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "last_passed_gate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/gate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "next_gate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/gate"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "next_action_class": {
+      "type": "string",
+      "minLength": 1
+    },
+    "canonical_evidence_refs": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "projection_warnings": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "missing_evidence": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "stale_evidence": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "conflicting_evidence": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "drift_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason_codes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "NO_DRIFT",
+            "REVALIDATE",
+            "REAPPROVE",
+            "STOP"
+          ]
+        },
+        "reason_codes": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "primary_reason_code": {
+      "type": "string",
+      "enum": [
+        "GATE_STATE_INPUT_INVALID",
+        "GATE_STATE_REPLAY_CONFLICT",
+        "GATE_STATE_BINDING_MISMATCH",
+        "GATE_STATE_EVIDENCE_CONFLICT",
+        "GATE_STATE_GATE_FAILED",
+        "GATE_STATE_DRIFT",
+        "GATE_STATE_EVIDENCE_STALE",
+        "GATE_STATE_REQUIRED_EVIDENCE_MISSING",
+        "GATE_STATE_LATER_GATE_INHERITANCE_REJECTED",
+        "GATE_STATE_RESOLVED",
+        "GATE_STATE_PROJECTION_MISMATCH",
+        "GATE_STATE_G6_NOT_APPLICABLE"
+      ]
+    },
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "GATE_STATE_INPUT_INVALID",
+          "GATE_STATE_REPLAY_CONFLICT",
+          "GATE_STATE_BINDING_MISMATCH",
+          "GATE_STATE_EVIDENCE_CONFLICT",
+          "GATE_STATE_GATE_FAILED",
+          "GATE_STATE_DRIFT",
+          "GATE_STATE_EVIDENCE_STALE",
+          "GATE_STATE_REQUIRED_EVIDENCE_MISSING",
+          "GATE_STATE_LATER_GATE_INHERITANCE_REJECTED",
+          "GATE_STATE_RESOLVED",
+          "GATE_STATE_PROJECTION_MISMATCH",
+          "GATE_STATE_G6_NOT_APPLICABLE"
+        ]
+      }
+    },
+    "event_id_or_idempotency_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replay_status": {
+      "enum": [
+        "FIRST_SEEN",
+        "IDEMPOTENT_REPLAY",
+        "REPLAY_CONFLICT"
+      ]
+    },
+    "resolution_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "observed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "gate_evaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "gate",
+          "status"
+        ],
+        "properties": {
+          "gate": {
+            "$ref": "#/$defs/gate"
+          },
+          "status": {
+            "enum": [
+              "READY",
+              "RUNNING",
+              "PASS",
+              "BLOCKED",
+              "FAILED",
+              "NOT_APPLICABLE"
+            ]
+          }
+        }
+      }
+    },
+    "authority_granted": {
+      "const": false
+    },
+    "write_authority_granted": {
+      "const": false
+    },
+    "pr_authority_granted": {
+      "const": false
+    },
+    "merge_authority_granted": {
+      "const": false
+    },
+    "deployment_authority_granted": {
+      "const": false
+    },
+    "production_authority_granted": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "gate": {
+      "enum": [
+        "G0_CONTEXT",
+        "G1_ALIGNMENT",
+        "G2_EXECUTION",
+        "G3_PR",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION_DATA"
+      ]
+    },
+    "stringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

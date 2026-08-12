@@ -40,6 +40,7 @@
     "replay_status": {"type": "string", "enum": ["FIRST_SEEN", "IDEMPOTENT_REPLAY", "REPLAY_CONFLICT"]},
     "validation_digest": {"$ref": "#/$defs/scope_hash"},
     "validated_at": {"type": "string", "format": "date-time"},
+    "event_id_or_idempotency_key": {"type": ["string", "null"], "minLength": 1},
     "execution_authority_granted": {"const": false},
     "merge_authority_granted": {"const": false},
     "deployment_authority_granted": {"const": false},

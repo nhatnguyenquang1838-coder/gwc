@@ -10,6 +10,7 @@ Final integration owner for the `gate_authority` node family.
 | SCRUM-190 | tools/node_architect/gate_transition_decision.py | decide_gate_transition |
 | SCRUM-191 | tools/node_architect/g2_execution_envelope_render.py | render_g2_execution_envelope |
 | SCRUM-192 | tools/node_architect/blocked_action_escalation.py | escalate_blocked_action |
+| SCRUM-312 | tools/node_architect/evidence_artifact_map.py | build_gate_evidence_artifact_map |
 
 ## Contract
 - Each node is pure and offline; no execution authority is granted.

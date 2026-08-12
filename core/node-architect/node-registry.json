@@ -324,7 +324,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/approval-command-validation.node.json",
-        "source_sha": "06c9216e6610a89f16e400d5a3d758cdf5ca5d2b115e406017517157be6a1711"
+        "source_sha": "3c785b722aeaa1d5f0eb9cdf98ea7050de7976572bc9341e4cbe38c255ac3657"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -358,7 +358,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/approval-token-generation.node.json",
-        "source_sha": "cfce9b54bb9b05ed3f25d5203cdf6e3bbdab227ba641de9218f8bc3e8d672bfe"
+        "source_sha": "47aae12a6f37243bca07c3ebe59437e5f4be7cea5379bef4ae66193d29ff8b07"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -454,13 +454,16 @@
       "id": "gate_authority.evidence-artifact-map",
       "idempotency": "readback_required",
       "implementation_refs": [
-        "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json"
+        "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
+        "core/node-architect/node-instructions/gate_authority/evidence-artifact-map.node-instruction.yaml",
+        "tools/node_architect/evidence_artifact_map.py",
+        "schemas/node-architect/gate-authority/evidence-artifact-map.schema.json"
       ],
       "maturity": "experimental",
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
-        "source_sha": "0cfadd394b481ced6e917849023458fc015c203907991758183b5c8bdb45040e"
+        "source_sha": "fbb6b1ee585b24b3032e94ae857f7efb568901b8b5a35e4e1db2cdd4f5e68430"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -528,7 +531,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/gate-state-resolution.node.json",
-        "source_sha": "7091126590f55ffe3cce5931063ae933ba0d492c83f4f32df78a108cffc33c53"
+        "source_sha": "64877882cbdf41b1c97975d3571c04da083af7325ff741b6be2688526875b5de"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
@@ -596,7 +599,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json",
-        "source_sha": "b840bd55ecc85c5408f788b0ce097e5d794001a622b88352cf04a06505fd5aae"
+        "source_sha": "cbad3c9f81989dc4a51f28c37a4b450ad881aeff6c23060dbe04f81817838c36"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",

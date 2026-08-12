@@ -1,0 +1,131 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+gate:
+- G1_ALIGNMENT
+- G2_EXECUTION
+forbidden_actions:
+- grant_gate_authority
+- grant_g2_authority
+- grant_g3_authority
+- merge
+- auto_merge
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credential_change
+- secret_change
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+evidence_required:
+- node-start
+- node-decision
+- node-result
+- node-readback
+- checkpoint
+- runtime-event
+- next-route-decision
+logs_required:
+- runtime-events.jsonl
+- decision_digest
+- state_digest
+- event_digest
+retry:
+  idempotency_key_fields:
+  - task_id
+  - run_id
+  - node_id
+  - scope_hash
+  replay_check: Re-run the pure evaluator with canonical inputs and compare map_digest before any continuation.
+  max_attempts: 3
+  pending_reconciliation: Unknown evidence must route to observation/remediation and must never be treated as PASS.
+rollback:
+  reversible: true
+  strategy: Discard only the derived map and reconcile canonical evidence readback; this node has no external effect.
+  reconciliation: Record the replay or invalidation decision in the canonical node evidence ledger.
+  human_required_when:
+  - scope drift
+  - authority mismatch
+  - unavailable canonical evidence
+  - contradictory artifact digests
+authority_boundary:
+  statement: This node identifies evidence requirements and never grants G1, G2, G3, G4, G5, or G6 authority.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes:
+  - normal
+  - fastlane
+  - e2e
+  - hotfix
+  - rescue
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: true
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true
+node_id: gate_authority.evidence-artifact-map
+purpose: Resolve the exact current gate/action evidence set and fail closed on missing, stale, invalid, unavailable, or mismatched proof.
+entry_conditions:
+- GWC boot completed
+- current task claim and exact base readback loaded
+- current gate/action and evidence candidates are available
+inputs:
+- task_id
+- repository
+- base_sha
+- head_sha
+- scope_hash
+- current_gate
+- current_action
+- evidence_candidates
+- canonical policy revision
+allowed_actions:
+- resolve_current_gate_action_evidence
+- validate_artifact_readbacks
+- emit_typed_evidence_gaps
+- emit_next_route_input
+outputs:
+- gate_evidence_artifact_map
+- typed_evidence_gaps
+- map_digest
+- authority_negative_flags
+next:
+  pass:
+    disposition: continue
+    reason: Evidence map is structurally valid; continue only through the canonical route.
+    next_node: gate_authority.gate-state-resolution
+    next_action: resolve_execution_node
+    next_gate: null
+  blocked:
+    disposition: stop
+    reason: Fail closed and report the typed evidence gap without invoking a later action.
+    next_node: null
+    next_action: stop_and_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Evidence availability or readback is incomplete; reconcile before retrying.
+    next_node: null
+    next_action: persist_checkpoint_and_wait
+    next_gate: null
+  retry:
+    disposition: retry
+    reason: Replay only after canonical evidence and identity bindings are re-read.
+    next_node: null
+    next_action: reconcile_then_retry
+    next_gate: null

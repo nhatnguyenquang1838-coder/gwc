@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/blocked-action-escalation.schema.json",
   "title": "GWC Blocked Action Escalation",
-  "description": "Replay-safe escalation decision for a blocked action. Enforces checkpoint-before-wait and minimal exact remediation; never performs the action.",
+  "description": "Replay-safe escalation decision for a blocked action. Converts unauthorized/stale/expired/unsupported/unknown-evidence actions into one deterministic BLOCKED/HUMAN_REQUIRED outcome with the minimum legal remediation. Never performs the action; zero protected side effects.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -11,8 +11,10 @@
     "task_id",
     "repository",
     "blocked_action",
+    "authority_check",
+    "evidence_available",
     "decision",
-    "checkpoint_required",
+    "escalation_class",
     "execution_performed",
     "reason_code",
     "escalation_digest"
@@ -23,9 +25,30 @@
     "task_id": { "type": "string", "pattern": "^SCRUM-[0-9]+$" },
     "repository": { "type": "string", "minLength": 1 },
     "blocked_action": { "type": "string", "minLength": 1 },
+    "authority_check": {
+      "type": "string",
+      "enum": ["UNSUPPORTED", "UNAUTHORIZED", "STALE", "EXPIRED", "UNKNOWN", "OK"]
+    },
+    "evidence_available": { "type": "boolean" },
     "decision": {
       "type": "string",
-      "enum": ["ESCALATE", "WAIT", "RESOLVE_MINIMAL"]
+      "enum": ["BLOCKED", "HUMAN_REQUIRED", "WAIT", "RESOLVE_MINIMAL"]
+    },
+    "escalation_class": {
+      "type": "string",
+      "enum": [
+        "REMEDIATE_EVIDENCE",
+        "RECAPTURE_BASE_OR_HEAD",
+        "REVALIDATE_SCOPE",
+        "REQUEST_G2_APPROVAL",
+        "REQUEST_G4_APPROVAL",
+        "REQUEST_G5_MANUAL_APPROVAL",
+        "REQUEST_G6_APPROVAL",
+        "WAIT_FOR_READBACK",
+        "WAIT_FOR_CI",
+        "REQUEST_HUMAN_INPUT",
+        "TERMINAL_STOP"
+      ]
     },
     "checkpoint_required": { "type": "boolean" },
     "remediation_scope": {

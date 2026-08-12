@@ -73,7 +73,58 @@ def evaluate_promotion(*, promotion_id: str, required_nodes: Sequence[str], comp
 
 def autonomous_main_action_allowed(action: str) -> bool:
     """Only immutable-cut Draft PR assembly is autonomous on the main boundary."""
-    return action in {"create_promotion_branch", "create_draft_pr", "readback_draft_pr"}
+    return action in {"create_promotion_branch", "create_draft_pr", "readback_draft_pr",
+                      "mark_ready_for_review"}
 
 
-__all__ = ["evaluate_promotion", "autonomous_main_action_allowed"]
+def promote_to_ready_for_review(*, promotion_id: str, head_sha: str, reviewed_head_sha: str,
+                                 g3_conclusion: str, required_ci_conclusion: str,
+                                 blockers: Sequence[str], draft: bool, pr_open: bool,
+                                 existing_ready: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """Mark a Draft PR Ready for Review ONLY when every required proof binds the SAME exact head.
+
+    Implements repo_delivery.ready-for-review-promotion (SCRUM-323 / NA81-F3-N08).
+    Ready status grants NO merge authority. Fails closed for stale/missing/mixed-head/
+    pending/failing/blocker evidence. Reconciles an already-Ready state idempotently.
+    """
+    if not _valid_sha(head_sha) or not _valid_sha(reviewed_head_sha):
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_READY_SHA_INVALID",
+                "main_merge_allowed": False}
+    if head_sha != reviewed_head_sha:
+        # head moved under the reviewed evidence -> never promote; require fresh G3/CI
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_READY_MIXED_HEAD",
+                "observed_head": head_sha, "reviewed_head": reviewed_head_sha,
+                "main_merge_allowed": False}
+    if not draft or not pr_open:
+        # not a live Draft PR -> cannot promote
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_READY_NOT_DRAFT_PR",
+                "draft": draft, "pr_open": pr_open, "main_merge_allowed": False}
+    if blockers:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_READY_BLOCKER_PRESENT",
+                "blockers": sorted(set(str(b) for b in blockers)), "main_merge_allowed": False}
+    if g3_conclusion != "pass":
+        return {"outcome": "PENDING" if g3_conclusion in {"queued", "in_progress", "pending", ""} else "BLOCKED",
+                "reason_code": "AUTONOMOUS_READY_G3_NOT_PASS", "g3_conclusion": g3_conclusion,
+                "main_merge_allowed": False}
+    if required_ci_conclusion != "success":
+        return {"outcome": "PENDING" if required_ci_conclusion in {"queued", "in_progress", "pending", ""} else "BLOCKED",
+                "reason_code": "AUTONOMOUS_READY_CI_NOT_GREEN", "ci_conclusion": required_ci_conclusion,
+                "main_merge_allowed": False}
+
+    identity = {"promotion_id": promotion_id, "head_sha": head_sha,
+                "g3_conclusion": g3_conclusion, "required_ci_conclusion": required_ci_conclusion}
+    evidence_digest = _digest(identity)
+    idempotency_key = _digest({"kind": "ready-for-review", **identity})
+
+    if existing_ready and existing_ready.get("idempotency_key") == idempotency_key:
+        # already Ready, same exact bindings -> idempotent readback, no no-op re-promotion
+        return {"outcome": "READY", "reason_code": "AUTONOMOUS_READY_REPLAY",
+                "action": "READBACK_READY_PR", "idempotency_key": idempotency_key,
+                "evidence_digest": evidence_digest, "main_merge_allowed": False}
+
+    return {"outcome": "READY", "reason_code": "AUTONOMOUS_READY_PROMOTED",
+            "action": "MARK_READY_FOR_REVIEW", "idempotency_key": idempotency_key,
+            "evidence_digest": evidence_digest, "main_merge_allowed": False}
+
+
+__all__ = ["evaluate_promotion", "autonomous_main_action_allowed", "promote_to_ready_for_review"]

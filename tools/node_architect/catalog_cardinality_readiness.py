@@ -63,12 +63,18 @@ def decide_catalog_cardinality_readiness(
     expected_revision: str,
     family_node_ids: dict[str, list[str]],
     expected_node_ids: list[str],
+    expected_family_node_ids: dict[str, list[str]] | None = None,
     expected_family_count: int = EXPECTED_FAMILY_COUNT,
     expected_nodes_per_family: int = EXPECTED_NODES_PER_FAMILY,
     expected_total_nodes: int = EXPECTED_TOTAL_NODES,
     observed_at: str | None = None,
 ) -> dict[str, Any]:
-    """Return deterministic catalog readiness without granting scale or audit authority."""
+    """Return deterministic catalog readiness without granting scale or audit authority.
+
+    When ``expected_family_node_ids`` is supplied, each observed node must belong
+    to its expected family (family membership consistency, SCRUM-373 current
+    AC). A node placed under the wrong family is rejected deterministically.
+    """
     outcome = "BLOCKED"
     reason_code = "CATALOG_READINESS_NOT_SATISFIED"
     readiness_passed = False
@@ -110,6 +116,24 @@ def decide_catalog_cardinality_readiness(
     )
     expected_set = set(expected_node_ids) if not expected_invalid else set()
     observed_set = set(flattened)
+
+    # Family membership consistency: when the expected family->node map is
+    # supplied, every observed node must sit under its expected family. A node
+    # under the wrong family is a deterministic BLOCK (SCRUM-373 AC: "family
+    # membership consistent"). This is fail-closed: if the map is absent we skip
+    # the check (backward-compatible with older callers).
+    family_membership_violations: dict[str, str] = {}
+    if expected_family_node_ids is not None and not mapping_invalid:
+        expected_node_to_family: dict[str, str] = {}
+        for fam, nids in expected_family_node_ids.items():
+            for nid in nids:
+                expected_node_to_family[nid] = fam
+        for fam, nids in family_node_ids.items():
+            for nid in nids:
+                exp_fam = expected_node_to_family.get(nid)
+                if exp_fam is not None and exp_fam != fam:
+                    family_membership_violations[nid] = f"{fam}!=expected:{exp_fam}"
+
     missing_node_ids = sorted(expected_set - observed_set)
     unexpected_node_ids = sorted(observed_set - expected_set)
 
@@ -133,6 +157,8 @@ def decide_catalog_cardinality_readiness(
         reason_code = "FAMILY_CARDINALITY_MISMATCH"
     elif duplicate_node_ids:
         reason_code = "DUPLICATE_NODE_ID"
+    elif family_membership_violations:
+        reason_code = "FAMILY_MEMBERSHIP_MISMATCH"
     elif len(flattened) != expected_total_nodes:
         reason_code = "TOTAL_NODE_COUNT_MISMATCH"
     elif missing_node_ids:
@@ -161,6 +187,7 @@ def decide_catalog_cardinality_readiness(
         "observed_node_count": len(flattened),
         "observed_unique_node_count": len(observed_set),
         "family_size_violations": family_size_violations,
+        "family_membership_violations": family_membership_violations,
         "duplicate_node_ids": duplicate_node_ids,
         "missing_node_ids": missing_node_ids,
         "unexpected_node_ids": unexpected_node_ids,

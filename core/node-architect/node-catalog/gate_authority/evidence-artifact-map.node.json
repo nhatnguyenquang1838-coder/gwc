@@ -8,5 +8,39 @@
     "G1_ALIGNMENT",
     "G2_EXECUTION"
   ],
-  "description": "Maps required gate evidence to canonical artifact locations so agents do not claim pass without traceable proof."
+  "description": "Maps the current gate/action to exact canonical evidence requirements and emits typed gaps without inferring PASS or granting authority.",
+  "intent": "Resolve a deterministic, replay-stable evidence map for the current gate/action and verify presence, schema, freshness, task, repository, base, head, and scope bindings.",
+  "outcome": "Typed gate-evidence-artifact-map with exact requirements, canonical entries, missing/stale/projection gaps, deterministic map_digest, and authority_granted=false.",
+  "constraints": [
+    "The evaluator is pure and offline; materialization, schema, freshness, and identity readbacks are supplied as inputs.",
+    "Missing, unavailable, stale, malformed, projected, duplicated, or mismatched evidence fails closed with typed reason codes.",
+    "Current gate/action selection is exact and cannot be broadened by the node output.",
+    "Equivalent candidate ordering and mapped_at timestamps produce the same map_digest.",
+    "The map identifies proof requirements and never grants gate, write, PR, merge, deploy, release, or production authority."
+  ],
+  "exclusions": [
+    "Reading or mutating Jira, GitHub, repositories, deployment systems, or production state.",
+    "Inferring PASS from a projection, evidence presence, or Jira status.",
+    "Creating approvals, broadening scope, changing policy, or authorizing a later gate."
+  ],
+  "entry_guards": [
+    "G1_ALIGNMENT or G2_EXECUTION is active",
+    "current task, repository, base SHA, and action are available",
+    "candidate evidence readbacks are materialized or explicitly unavailable"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/evidence_artifact_map.py:build_gate_evidence_artifact_map",
+    "schema": "schemas/node-architect/gate-authority/evidence-artifact-map.schema.json"
+  },
+  "reason_codes": {
+    "EVIDENCE_INPUT_INVALID": "Input or candidate schema/readback is structurally invalid.",
+    "EVIDENCE_BINDING_MISMATCH": "Task, repository, base, head, scope, gate, action, or artifact binding does not match.",
+    "EVIDENCE_CONFLICT": "Equivalent evidence keys have contradictory digests.",
+    "EVIDENCE_PROJECTION_ONLY": "A non-canonical projection was supplied for canonical proof.",
+    "EVIDENCE_STALE": "Required evidence is stale.",
+    "EVIDENCE_REQUIRED_MISSING": "A required canonical artifact is missing.",
+    "EVIDENCE_OBSERVABILITY_INCOMPLETE": "Evidence presence or freshness cannot be observed.",
+    "EVIDENCE_CI_BINDING_MISMATCH": "Delivery/CI evidence is not bound to the exact head.",
+    "EVIDENCE_G6_NOT_APPLICABLE": "Production evidence is not applicable when G6 is outside scope."
+  }
 }

@@ -15,6 +15,7 @@ _NODES = {
     "SCRUM-190": "tools.node_architect.gate_transition_decision",
     "SCRUM-191": "tools.node_architect.g2_execution_envelope_render",
     "SCRUM-192": "tools.node_architect.blocked_action_escalation",
+    "SCRUM-312": "tools.node_architect.evidence_artifact_map",
 }
 
 _REQUIRED_PUBLIC_ATTRS = {
@@ -23,6 +24,7 @@ _REQUIRED_PUBLIC_ATTRS = {
     "SCRUM-190": ["decide_gate_transition"],
     "SCRUM-191": ["render_g2_execution_envelope"],
     "SCRUM-192": ["escalate_blocked_action"],
+    "SCRUM-312": ["build_gate_evidence_artifact_map"],
 }
 
 

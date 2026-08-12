@@ -67,6 +67,27 @@ def _valid_manifest(manifest: object) -> bool:
     )
 
 
+_ALLOWED_EVIDENCE_STATUS = {"proven", "missing", "stale", "partial"}
+
+
+def _valid_evidence_map(evidence_map: object) -> bool:
+    """An evidence map is optional; when present every entry must bind a
+    non-empty requirement to an explicit status. Missing/stale evidence is
+    intentionally carried (status != 'proven'), not rejected here."""
+    if evidence_map is None:
+        return True
+    if not isinstance(evidence_map, list):
+        return False
+    for item in evidence_map:
+        if not isinstance(item, dict):
+            return False
+        if not _valid_non_empty(item.get("requirement")):
+            return False
+        if item.get("status") not in _ALLOWED_EVIDENCE_STATUS:
+            return False
+    return True
+
+
 def _valid_ci(item: object) -> bool:
     return (
         isinstance(item, dict)
@@ -92,6 +113,13 @@ def decide_independent_audit_handoff(
     ci_evidence: list[dict[str, Any]],
     limitation_disclosures: list[str],
     reviewer: str,
+    implementer: str | None = None,
+    evidence_map: list[dict[str, Any]] | None = None,
+    dag_dependencies: list[str] | None = None,
+    exclusions: list[str] | None = None,
+    findings: list[str] | None = None,
+    unresolved_risks: list[str] | None = None,
+    next_legal_action: str | None = None,
     observed_at: str | None = None,
 ) -> dict[str, Any]:
     """Prepare an independent-audit handoff without granting audit or scale authority."""
@@ -112,6 +140,12 @@ def decide_independent_audit_handoff(
     ci_by_name = {} if ci_invalid else {item["workflow"]: item for item in ci_evidence if item["head_sha"] == head_sha}
     missing_ci_workflows = [] if ci_invalid else sorted(REQUIRED_CI - set(ci_by_name))
     failed_ci_workflows = [] if ci_invalid else sorted(name for name, item in ci_by_name.items() if item["conclusion"] != "success")
+
+    evidence_map_invalid = not _valid_evidence_map(evidence_map)
+    unverified_evidence = (
+        [] if evidence_map_invalid or not evidence_map
+        else [item["requirement"] for item in evidence_map if item.get("status") != "proven"]
+    )
 
     if identity_invalid:
         reason_code = "REQUIRED_IDENTITY_MISSING"
@@ -137,6 +171,10 @@ def decide_independent_audit_handoff(
         reason_code = "REQUIRED_CI_FAILED"
     elif limitations_invalid:
         reason_code = "LIMITATION_DISCLOSURE_INCOMPLETE"
+    elif evidence_map_invalid:
+        reason_code = "INVALID_EVIDENCE_MAP"
+    elif implementer and reviewer and implementer == reviewer:
+        reason_code = "REVIEWER_CONFLICT"
     else:
         handoff_status = "READY_FOR_INDEPENDENT_AUDIT"
         reason_code = "REVISION_BOUND_AUDIT_HANDOFF_READY"
@@ -156,6 +194,15 @@ def decide_independent_audit_handoff(
         "failed_ci_workflows": failed_ci_workflows,
         "limitation_disclosures": sorted(limitation_disclosures) if isinstance(limitation_disclosures, list) else [],
         "reviewer": reviewer,
+        "implementer": implementer,
+        "reviewer_independent": not (implementer and reviewer and implementer == reviewer),
+        "evidence_map": evidence_map if isinstance(evidence_map, list) else [],
+        "unverified_evidence": unverified_evidence,
+        "dag_dependencies": dag_dependencies if isinstance(dag_dependencies, list) else [],
+        "exclusions": exclusions if isinstance(exclusions, list) else [],
+        "findings": findings if isinstance(findings, list) else [],
+        "unresolved_risks": unresolved_risks if isinstance(unresolved_risks, list) else [],
+        "next_legal_action": next_legal_action or "",
         "handoff_status": handoff_status,
         "reason_code": reason_code,
         "read_only_projection": True,
