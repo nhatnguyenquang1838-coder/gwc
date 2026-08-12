@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/runtime/flow-profile.schema.json",
   "title": "Canonical Runtime Flow Profile",
+  "description": "Flow = Workflow composition contract. Owns identity, membership, entry/terminal, typed edges, gate bindings by policy_ref, registry revision bindings and compatibility metadata. MUST NOT own gate applicability rules, authority provider rules, evidence acceptance rules, prohibited-action policy, terminal acceptance policy or live runtime state.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "artifact_type", "id", "version", "node_registry_ref", "scenario_registry_ref", "graph_registry_ref", "routes", "green_targets", "visibility", "provenance"],
@@ -13,6 +14,7 @@
     "node_registry_ref": {"type": "string", "minLength": 1},
     "scenario_registry_ref": {"type": "string", "minLength": 1},
     "graph_registry_ref": {"type": "string", "minLength": 1},
+    "policy_registry_ref": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "revision": {"type": "string", "minLength": 1},
     "pilot_nodes": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1}},
     "routes": {
@@ -24,7 +26,7 @@
         "required": ["route_id", "kind", "nodes", "outcome", "human_boundary"],
         "properties": {
           "route_id": {"type": "string", "minLength": 1},
-          "kind": {"enum": ["happy_path", "history", "valid", "conditional", "blocked", "human_authority"]},
+          "kind": {"enum": ["happy_path", "history", "valid", "conditional", "blocked", "human_authority", "retry", "compensate"]},
           "nodes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
           "outcome": {"enum": ["GREEN", "CONDITIONAL", "BLOCKED", "HUMAN_REQUIRED"]},
           "human_boundary": {"type": "boolean"}
@@ -32,6 +34,132 @@
       }
     },
     "green_targets": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry_nodes", "terminal_nodes", "edges", "gate_bindings"],
+      "properties": {
+        "entry_nodes": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "terminal_nodes": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["node", "outcome"],
+            "properties": {
+              "node": {"type": "string", "minLength": 1},
+              "outcome": {"enum": ["GREEN", "CONDITIONAL", "BLOCKED", "HUMAN_REQUIRED"]}
+            }
+          }
+        },
+        "edges": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "target", "kind", "runtime_executable"],
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "kind": {
+                "description": "v2 typed edge semantics. 'runtime'/'dependency'/'history' are retained v1-compatible aliases; v2 canonical set is continue|conditional|retry|compensate|blocked|human_required|terminal.",
+                "enum": [
+                  "runtime", "dependency", "history", "human_authority",
+                  "continue", "conditional", "retry", "compensate", "blocked", "human_required", "terminal"
+                ]
+              },
+              "runtime_executable": {"type": "boolean"},
+              "condition_id": {"type": "string", "minLength": 1},
+              "cycle_allowed": {"type": "boolean"},
+              "failure_class": {"type": "string", "minLength": 1}
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"kind": {"const": "conditional"}}, "required": ["kind"]},
+                "then": {"required": ["condition_id"]}
+              },
+              {
+                "if": {"properties": {"kind": {"enum": ["retry", "compensate"]}}, "required": ["kind"]},
+                "then": {"properties": {"cycle_allowed": {"const": true}}, "required": ["cycle_allowed"]}
+              }
+            ]
+          }
+        },
+        "participants": {
+          "description": "Executable participants (nodes/scenarios). Each participant is either bound to a canonical gate or explicitly gate_neutral.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["participant", "participant_kind"],
+            "properties": {
+              "participant": {"type": "string", "minLength": 1},
+              "participant_kind": {"enum": ["node", "scenario"]},
+              "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+              "gate_neutral": {"const": true}
+            },
+            "oneOf": [
+              {"required": ["gate"], "not": {"required": ["gate_neutral"]}},
+              {"required": ["gate_neutral"], "not": {"required": ["gate"]}}
+            ]
+          }
+        },
+        "gate_bindings": {
+          "type": "array", "minItems": 7, "maxItems": 7,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["gate", "policy_ref"],
+            "properties": {
+              "gate": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]},
+              "policy_ref": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
+            }
+          }
+        }
+      }
+    },
+    "registry_bindings": {
+      "description": "Version/digest/revision binding of every referenced registry so stale composition fails closed.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["registry", "registry_id", "path", "schema_version", "revision", "digest"],
+        "properties": {
+          "registry": {"enum": ["node", "scenario", "graph", "policy"]},
+          "registry_id": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "schema_version": {"type": "string", "minLength": 1},
+          "revision": {"type": "string", "minLength": 1},
+          "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["v1_compatible", "migration"],
+      "properties": {
+        "v1_compatible": {"type": "boolean"},
+        "migration": {"enum": ["none", "deterministic_upgrade"]},
+        "v1_edge_kind_map": {
+          "type": "object",
+          "additionalProperties": {"enum": ["continue", "conditional", "retry", "compensate", "blocked", "human_required", "terminal"]}
+        }
+      }
+    },
+    "compiled": {
+      "description": "Deterministic compiled workflow projection digest. Derived, not authoritative state.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projection_version", "workflow_digest"],
+      "properties": {
+        "projection_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+        "workflow_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+      }
+    },
     "visibility": {
       "type": "object",
       "additionalProperties": false,
@@ -50,5 +178,22 @@
         "source_sha": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"version": {"pattern": "^2\\."}}, "required": ["version"]},
+      "then": {"required": ["workflow", "policy_registry_ref", "registry_bindings", "compatibility"]}
+    },
+    {
+      "if": {
+        "properties": {"version": {"pattern": "^2\\."}},
+        "required": ["version"]
+      },
+      "then": {
+        "properties": {
+          "workflow": {"required": ["entry_nodes", "terminal_nodes", "edges", "gate_bindings", "participants"]}
+        }
+      }
+    }
+  ]
 }

@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -195,6 +196,7 @@ def _materialize_or_stop(
     approval: Mapping[str, Any],
     *,
     effects_started: list[str] | None = None,
+    now: datetime | None = None,
 ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
     try:
         materialization = materialize_research_execution(
@@ -202,6 +204,7 @@ def _materialize_or_stop(
             approval,
             payload.get("projection_readbacks", {}),
             effects_started=effects_started,
+            now=now,
         )
     except (ValueError, TypeError, KeyError) as exc:
         reason = str(exc).strip() or "RESEARCH_APPROVAL_INVALID"
@@ -217,7 +220,9 @@ def _materialize_or_stop(
     return materialization, None
 
 
-def run_research_execution_flow(payload: Mapping[str, Any]) -> dict[str, Any]:
+def run_research_execution_flow(
+    payload: Mapping[str, Any], *, now: datetime | None = None
+) -> dict[str, Any]:
     run_id = str(payload.get("run_id", "")).strip()
     dispatch_id = str(payload.get("dispatch_id", "")).strip()
     trigger_mode = str(payload.get("trigger_mode", "")).strip()
@@ -281,7 +286,7 @@ def run_research_execution_flow(payload: Mapping[str, Any]) -> dict[str, Any]:
             "approvals": approvals,
             "dependency_evidence": payload.get("dependency_evidence", {}),
         }
-        selection = select_approved_research(selector_input)
+        selection = select_approved_research(selector_input, now=now)
         ref = selection.get("selected_research")
         if not ref:
             return _result(
@@ -337,6 +342,7 @@ def run_research_execution_flow(payload: Mapping[str, Any]) -> dict[str, Any]:
             research,
             approval,
             effects_started=list(cp.get("effects_started", [])),
+            now=now,
         )
         if stopped is not None:
             return stopped
@@ -452,6 +458,7 @@ def run_research_execution_flow(payload: Mapping[str, Any]) -> dict[str, Any]:
                 research,
                 approval,
                 effects_started=list(cp.get("effects_started", [])),
+            now=now,
             )
             if stopped is not None:
                 return stopped
@@ -534,6 +541,7 @@ def run_research_execution_flow(payload: Mapping[str, Any]) -> dict[str, Any]:
             research,
             approval,
             effects_started=list(cp.get("effects_started", [])),
+            now=now,
         )
         if stopped is not None:
             return stopped

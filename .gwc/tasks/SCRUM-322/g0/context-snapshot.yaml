@@ -1,0 +1,52 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-09T19:24:43Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: pre-prod
+  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
+  protected_branches:
+  - main
+  - pre-prod
+  connector: GitHub
+  write_enabled: true
+constraints:
+- implement repo_delivery.ci-failure-repair node (SCRUM-322)
+- bounded PR scope only
+- no merge/deploy/release/production/credential authority
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: '7174b8657b540d64d150044f70ba0418292e60a0'
+  source_sha: 0ff69b82d0a63b30174a59157ba40e2e69f9b8f4f7ef8db2707c3e40e8d37fdc
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: '7174b8657b540d64d150044f70ba0418292e60a0'
+  source_sha: b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: '7174b8657b540d64d150044f70ba0418292e60a0'
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 0ff69b82d0a63b30174a59157ba40e2e69f9b8f4f7ef8db2707c3e40e8d37fdc
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: e45a706654915b1e02c0ce895420495f92999f9d62422509fa5453f812c874af
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+status: READY
+blockers: []

@@ -1,0 +1,170 @@
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-09T17:18:16Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-302
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: pre-prod
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: REPO_IDENTITY
+  status: PASS
+  code: REPO_VERIFIED
+  message: Repository identity and write-enabled profile are verified.
+  evidence:
+  - nhatnguyenquang1838-coder/gwc
+  - projects/gwc/project-profile.yaml
+- id: PROTECTED_BASE
+  status: PASS
+  code: PREPROD_BASE_VERIFIED
+  message: The task is rebound to the current remote pre-prod head after a protected-base refresh, not origin/main.
+  evidence:
+  - refs/remotes/origin/pre-prod
+  - 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+- id: GOVERNANCE_SOURCE
+  status: PASS
+  code: CORE_POLICY_HASH_VERIFIED
+  message: Required governance sources and core version 1.0 were read from the protected base.
+  evidence:
+  - core/Coding_Project_Governance_v1.0.md
+  - ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: IMPLEMENTATION_GAP
+  status: PASS
+  code: RUNTIME_CONTRACT_GAP_CONFIRMED
+  message: The descriptor exists but the risk-classification evaluator and schema binding are absent from pre-prod.
+  evidence:
+  - core/node-architect/node-catalog/intake_context/risk-classification.node.json
+  - tools/node_architect/validate_node_catalog_intake_context.py
+- id: PLAN_BINDING
+  status: PASS
+  code: GENERATED_KIRO_PLAN_VALIDATED
+  message: The required implementation plan is present and validated for SCRUM-302 and the exact pre-prod base.
+  evidence:
+  - g1/plan/requirements.md
+  - g1/plan/design.md
+  - g1/plan/tasks.md
+  - sha256:b19e0b47420ad16cf13e3f46da2e6923f51cda995f49f561cb0e6448d3fec738
+- id: WORK_TRACKING
+  status: PASS
+  code: JIRA_CLAIM_READBACK_VERIFIED
+  message: Jira claim reconciliation is read back as Codex in In Progress before G2.
+  evidence:
+  - SCRUM-302
+  - AI Agent=Codex
+  - Claimed At=2026-08-10T00:10:00.000+0700
+  - status=In Progress
+  - 'user route decision: standard local_agent from protected pre-prod'
+process_readback:
+  process_id: g1-scrum-302-standard-local-agent-20260809
+  terminal_outcome: G1 PASS with refreshed exact pre-prod binding and Jira claim readback; the prior G2 approval was invalidated by expiry/base drift and a new exact approval is required.
+  required_sources:
+  - AGENTS.md
+  - core/Coding_Project_Governance_v1.0.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  - core/LOCAL_AGENT_RULE.md
+  - core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+  - projects/gwc/project-profile.yaml
+  - projects/gwc/project-instructions.md
+  - projects/gwc/project-extension.md
+  - agents/chatgpt-agent/agent-instructions.md
+  - SCRUM-302 Jira MCP readback
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+  - id: STEP-1
+    name: Materialize and validate G0/G1 evidence
+    gate: G1_ALIGNMENT
+    actor: agent
+    action_class: local_validation
+    capability_required: Local filesystem and protected-base validator
+    capability_status: VERIFIED
+    primary_route: External task workspace plus tools/validate_g01.py
+    fallback_routes: []
+    continuation: Generate exact G2 envelope after PASS.
+    expected_evidence: Validator JSON with G1 PASS.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-2
+    name: Reconcile Jira claim
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: work_tracking_write
+    capability_required: Atlassian Jira MCP and explicit user direction
+    capability_status: VERIFIED
+    primary_route: SCRUM-302 claim readback as Codex
+    fallback_routes: []
+    continuation: Continue only after AI Agent and Claimed At read back.
+    expected_evidence: SCRUM-302 projection readback.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-3
+    name: Create guarded branch and worktree
+    gate: G2_EXECUTION
+    actor: human_authorized_agent
+    action_class: repository_write
+    capability_required: Exact non-expired G2 approval
+    capability_status: SEPARATE_GATE
+    primary_route: Local git worktree from pre-prod
+    fallback_routes: []
+    continuation: Implement only the approved file scope.
+    expected_evidence: Branch and worktree bound to exact pre-prod SHA.
+    bypass_eligibility: FORBIDDEN
+  - id: STEP-4
+    name: Create Draft PR
+    gate: G3_PR
+    actor: agent
+    action_class: draft_pr_metadata
+    capability_required: G3 delivery evidence
+    capability_status: SEPARATE_GATE
+    primary_route: GitHub connector targeting pre-prod
+    fallback_routes: []
+    continuation: Report CI and stop before G4.
+    expected_evidence: Draft PR exact base/head record.
+    bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+implementation_plan:
+  applicability: required
+  reason: SCRUM-302 is a material R2 runtime/schema change with focused tests and exact-head evidence requirements.
+  source: generated_kiro
+  task_me_applicable: true
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: Task Me connector/capability is not available in this runtime; a canonical three-file Kiro plan was generated from protected-base sources.
+  canonical_task_uid: SCRUM-302
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  plan_root: g1/plan
+  requirements_path: g1/plan/requirements.md
+  design_path: g1/plan/design.md
+  tasks_path: g1/plan/tasks.md
+  plan_revision: sha256:b19e0b47420ad16cf13e3f46da2e6923f51cda995f49f561cb0e6448d3fec738
+  validation_status: PASS
+  validation_evidence: g1/plan/PLAN_VALIDATION.md
+  generated_by: Codex-GPT:generated_kiro
+  generated_at_utc: '2026-08-09T17:18:16Z'
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: Codex-GPT
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+blockers: []
+outcome: PASS

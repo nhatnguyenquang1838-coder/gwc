@@ -1,0 +1,30 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-09T19:24:43Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-322
+  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
+  g0_snapshot: '../../g0/context-snapshot.yaml'
+options:
+- id: OPT-01
+  title: implement-ci-failure-repair-node
+  description: 'Create ci_failure_repair.py deterministic classification module and M5 tests on guarded branch base=pre-prod, deliver via Draft PR.'
+  benefits:
+  - fulfills SCRUM-322 implementation requirement
+  - deterministic CI repair classification bounded by approved file scope
+  - family integration tests confirm no authority expansion
+  tradeoffs:
+  - only one deliverable option; no alternative path
+  risks:
+  - concurrent Hermes agent may race if claim window reopens
+  constraint_fit: FIT
+  skills_distribution:
+  - skill_id: jira-mcp
+    description: Claim and transition Jira task
+    is_required: true
+recommended_option_id: 'OPT-01'
+recommendation_rationale: 'Single bounded option; node and tests already validated locally; no authority expansion.'
+decision_required: true
+status: READY

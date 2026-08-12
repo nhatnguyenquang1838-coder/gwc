@@ -319,5 +319,242 @@ def main(argv: list[str] | None = None) -> int:
     return 0 if result.outcome is Outcome.PASS else 1
 
 
+# ---------------------------------------------------------------------------
+# NA81 SCRUM-332 extension (2026-08-12, Hermes): three-source reconciliation
+# with deterministic source precedence and explicit UNKNOWN handling.
+#
+# This is a backward-compatible addition to the historical SCRUM-209
+# ``reconcile_state`` surface. It does NOT change any existing symbol. The
+# node remains a pure, authority-free evidence generator.
+#
+# Family invariants (SCRUM-332):
+#   * Deterministic source precedence: canonical > external_readback > checkpoint.
+#   * UNKNOWN must never be guessed into completion (UNKNOWN -> outcome FAIL).
+#   * Retry / replay requires an authoritative external readback first.
+#   * Conflicting sources are surfaced (conflict=True) and routed to REPAIR
+#     only when the readback confirms the authoritative state.
+# ---------------------------------------------------------------------------
+
+class SourceState(str, Enum):
+    CONFIRMED = "CONFIRMED"
+    PENDING = "PENDING"
+    FAILED = "FAILED"
+    UNKNOWN = "UNKNOWN"
+    ABSENT = "ABSENT"
+
+    @classmethod
+    def from_raw(cls, raw: Any) -> "SourceState":
+        if raw is None:
+            return cls.ABSENT
+        token = str(raw).strip().upper()
+        mapping = {
+            "CONFIRMED": cls.CONFIRMED,
+            "COMPLETE": cls.CONFIRMED,
+            "COMPLETED": cls.CONFIRMED,
+            "DONE": cls.CONFIRMED,
+            "SUCCESS": cls.CONFIRMED,
+            "PENDING": cls.PENDING,
+            "IN_PROGRESS": cls.PENDING,
+            "RUNNING": cls.PENDING,
+            "ACTIVE": cls.PENDING,
+            "FAILED": cls.FAILED,
+            "FAIL": cls.FAILED,
+            "ERROR": cls.FAILED,
+            "UNKNOWN": cls.UNKNOWN,
+        }
+        return mapping.get(token, cls.UNKNOWN)
+
+
+# Deterministic source precedence, highest authority first. Canonical task /
+# runtime state is authoritative; external readback is the authoritative re-read
+# used to confirm or repair; persisted checkpoint is local memory and may be
+# stale.
+SOURCE_PRECEDENCE = ("canonical_state", "external_readback", "persisted_checkpoint")
+
+_DETERMINATE = (SourceState.CONFIRMED, SourceState.PENDING, SourceState.FAILED)
+
+
+@dataclass(frozen=True)
+class SourceReconciliationResult:
+    """Deterministic three-source reconciliation evidence. Carries no authority."""
+
+    task_id: str
+    state: str
+    authoritative_source: str | None
+    source_precedence: tuple
+    conflict: bool
+    readback_required: bool
+    retry_allowed: bool
+    route: str
+    outcome: str
+    reason: str
+    authority_granted: bool = False
+    exact_head_ci_verified: bool = False
+    result_digest: str = ""
+    schema_id: str = "gwc.runtime_checkpoint.state_reconciliation.sources"
+    schema_version: str = "0.1"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": self.schema_id,
+            "schema_version": self.schema_version,
+            "task_id": self.task_id,
+            "state": self.state,
+            "authoritative_source": self.authoritative_source,
+            "source_precedence": list(self.source_precedence),
+            "conflict": self.conflict,
+            "readback_required": self.readback_required,
+            "retry_allowed": self.retry_allowed,
+            "route": self.route,
+            "outcome": self.outcome,
+            "reason": self.reason,
+            "authority_granted": self.authority_granted,
+            "exact_head_ci_verified": self.exact_head_ci_verified,
+            "result_digest": self.result_digest,
+        }
+
+
+def classify_source_state(source: Any) -> SourceState:
+    """Map a raw source payload to a deterministic SourceState."""
+    if source is None:
+        return SourceState.ABSENT
+    if isinstance(source, Mapping):
+        for key in ("status", "state", "outcome"):
+            if key in source and source[key] is not None:
+                return SourceState.from_raw(source[key])
+        return SourceState.UNKNOWN
+    return SourceState.from_raw(source)
+
+
+def _mk_result(
+    evidence: Mapping[str, Any],
+    *,
+    state: SourceState,
+    authoritative_source: str | None,
+    conflict: bool,
+    readback_required: bool,
+    retry_allowed: bool,
+    route: str,
+    outcome: str,
+    reason: str,
+    exact_head_ci_verified: bool = False,
+) -> SourceReconciliationResult:
+    body = {
+        "schema_id": "gwc.runtime_checkpoint.state_reconciliation.sources",
+        "schema_version": "0.1",
+        "task_id": evidence.get("task_id", "") if isinstance(evidence, Mapping) else "",
+        "state": state.value,
+        "authoritative_source": authoritative_source,
+        "source_precedence": list(SOURCE_PRECEDENCE),
+        "conflict": conflict,
+        "readback_required": readback_required,
+        "retry_allowed": retry_allowed,
+        "route": route,
+        "outcome": outcome,
+        "reason": reason,
+        "exact_head_ci_verified": exact_head_ci_verified,
+    }
+    return SourceReconciliationResult(
+        task_id=body["task_id"],
+        state=body["state"],
+        authoritative_source=authoritative_source,
+        source_precedence=SOURCE_PRECEDENCE,
+        conflict=conflict,
+        readback_required=readback_required,
+        retry_allowed=retry_allowed,
+        route=route,
+        outcome=outcome,
+        reason=reason,
+        authority_granted=False,
+        exact_head_ci_verified=exact_head_ci_verified,
+        result_digest=digest_payload(_stable(body)),
+    )
+
+
+def reconcile_sources(evidence: Mapping[str, Any]) -> SourceReconciliationResult:
+    """Reconcile persisted checkpoint, external readback and canonical state.
+
+    The node never grants authority and never fakes a CI PASS. ``unknown`` is
+    never inferred into completion; retry requires an authoritative external
+    readback first.
+    """
+    if not isinstance(evidence, Mapping):
+        evidence = {}
+    cs = classify_source_state(evidence.get("canonical_state"))
+    rs = classify_source_state(evidence.get("external_readback"))
+    ps = classify_source_state(evidence.get("persisted_checkpoint"))
+
+    determinate_states = [s for s in (cs, rs, ps) if s in _DETERMINATE]
+    conflict = len(set(determinate_states)) > 1
+
+    # pick authoritative source by precedence, skipping ABSENT / UNKNOWN
+    auth_source: str | None = None
+    auth_state: SourceState | None = None
+    for name in SOURCE_PRECEDENCE:
+        st = {"canonical_state": cs, "external_readback": rs, "persisted_checkpoint": ps}[name]
+        if st not in (SourceState.ABSENT, SourceState.UNKNOWN):
+            auth_source, auth_state = name, st
+            break
+
+    ci = evidence.get("ci") or {}
+    exact_head_ci_verified = bool(
+        ci.get("evidence_available") and ci.get("conclusion") == "SUCCESS"
+    )
+
+    # Authoritative source indeterminate -> cannot complete; never guess.
+    if auth_state is None:
+        return _mk_result(
+            evidence, state=SourceState.UNKNOWN, authoritative_source=None,
+            conflict=False, readback_required=True, retry_allowed=False,
+            route="STOP_BLOCKED", outcome="FAIL",
+            reason="AUTHORITATIVE_READBACK_UNAVAILABLE",
+            exact_head_ci_verified=exact_head_ci_verified,
+        )
+
+    if auth_state is SourceState.FAILED:
+        return _mk_result(
+            evidence, state=SourceState.FAILED, authoritative_source=auth_source,
+            conflict=conflict, readback_required=False, retry_allowed=False,
+            route="STOP_BLOCKED", outcome="FAIL",
+            reason="AUTHORITATIVE_STATE_FAILED",
+            exact_head_ci_verified=exact_head_ci_verified,
+        )
+
+    # Retry / replay requires an authoritative external readback first.
+    readback_ok = rs not in (SourceState.ABSENT, SourceState.UNKNOWN)
+    if not readback_ok:
+        return _mk_result(
+            evidence, state=auth_state, authoritative_source=auth_source,
+            conflict=conflict, readback_required=True, retry_allowed=False,
+            route="STOP_BLOCKED", outcome="FAIL",
+            reason="READBACK_REQUIRED_BEFORE_RETRY",
+            exact_head_ci_verified=exact_head_ci_verified,
+        )
+
+    if conflict:
+        # Persisted checkpoint disagrees with authoritative state. The readback
+        # must confirm the authoritative state before we repair the checkpoint.
+        if rs == auth_state:
+            return _mk_result(
+                evidence, state=auth_state, authoritative_source=auth_source,
+                conflict=True, readback_required=False, retry_allowed=True,
+                route="REPAIR", outcome="PASS", reason="RECONCILED_REPAIR_STALE_CHECKPOINT",
+                exact_head_ci_verified=exact_head_ci_verified,
+            )
+        return _mk_result(
+            evidence, state=auth_state, authoritative_source=auth_source,
+            conflict=True, readback_required=True, retry_allowed=False,
+            route="STOP_BLOCKED", outcome="FAIL", reason="CONFLICTING_SOURCES",
+            exact_head_ci_verified=exact_head_ci_verified,
+        )
+
+    return _mk_result(
+        evidence, state=auth_state, authoritative_source=auth_source,
+        conflict=False, readback_required=False, retry_allowed=True,
+        route="RESUME", outcome="PASS", reason="RECONCILED_RESUME",
+        exact_head_ci_verified=exact_head_ci_verified,
+    )
+
+
 if __name__ == "__main__":
     raise SystemExit(main())

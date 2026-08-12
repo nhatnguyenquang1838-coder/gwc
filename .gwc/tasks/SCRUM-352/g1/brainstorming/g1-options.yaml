@@ -1,0 +1,26 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-09T18:28:14Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-352
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g1_snapshot: ../../g1/preflight/g1-preflight-report.yaml
+options:
+  - id: OPT-1
+    title: Implement loader as pure evaluator with file and dict sources
+    description: Matches export_failure_routing.py family contract; minimal scope change.
+    risk: low
+    confidence: high
+    selected: true
+    rationale: Downstream nodes already expect a loaded manifest with deterministic digest.
+  - id: OPT-2
+    title: Extend entry_schema_validation.py to include loader inline
+    description: Merge loader into existing validation module.
+    risk: medium
+    confidence: medium
+    selected: false
+    rationale: Violates single-responsibility and makes future family validation harder.
+status: DECIDED
+selected_option_id: OPT-1

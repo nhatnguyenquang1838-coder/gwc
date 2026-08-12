@@ -38,7 +38,8 @@ def _upsert_route_marker(existing_body: str | None, marker: str) -> str:
     if _ROUTE_RE.search(body):
         return _ROUTE_RE.sub(marker, body, count=1)
     body = body.rstrip()
-    return f"{body}{'\n\n' if body else ''}{marker}\n"
+    sep = "\n\n" if body else ""
+    return f"{body}{sep}{marker}\n"
 
 
 def assemble_pr_body(

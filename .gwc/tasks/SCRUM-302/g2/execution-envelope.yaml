@@ -1,0 +1,93 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+activation_state: ACTIVE
+task_id: SCRUM-302
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: pre-prod
+base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+working_branch: codex/scrum-302-risk-classification-20260810-r2
+risk_class: R2
+risk_digest: sha256:b19e0b47420ad16cf13e3f46da2e6923f51cda995f49f561cb0e6448d3fec738
+bounded_read_scope:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- core/LOCAL_AGENT_RULE.md
+- core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- projects/gwc/project-extension.md
+- agents/chatgpt-agent/agent-instructions.md
+- core/node-architect/node-catalog/intake_context/risk-classification.node.json
+- core/node-architect/node-catalog/intake_context/README.md
+- tools/node_architect/request_intake.py
+- tools/node_architect/source_resolution.py
+- tools/node_architect/repo_identity_check.py
+- tools/node_architect/protected_base_capture.py
+- tools/node_architect/validate_node_catalog_intake_context.py
+- schemas/intake-request.schema.json
+- schemas/source-resolution.schema.json
+- schemas/repo-identity.schema.json
+- schemas/protected-base-capture.schema.json
+bounded_write_scope:
+- .gwc/tasks/SCRUM-302/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-302/g2/plan-read-receipt.yaml
+- .gwc/tasks/SCRUM-302/g3/delivery-record.yaml
+authorized_actions:
+- create_working_branch
+- add_files
+- run_sandboxed_validation
+- stage_commit_push
+excluded_actions:
+- open_draft_pr
+- mark_pr_ready
+- merge
+- auto_merge
+- force_push
+- branch_deletion
+- protected_branch_write
+- deploy
+- release
+- production_data_change
+- production_config_change
+- g3_pr_promotion
+- g4_merge
+- g5_deploy
+- g6_production
+scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+f1_artifact_digests:
+  g0: sha256:8612e197dfa970e4480ef1eec0a64c4fa63e4ecf40d1790048f50f28318b3688
+  g1_intake: sha256:91e7fd4a95f7adaa0d40dd7a45964186f6bcc6f0e7a71e9ffbb177d4db3ba8c3
+  g1_preflight: sha256:8422f727655028db283d39fa5992624c4c205db9d3515789e4b5828656452b1c
+  g1_options: sha256:aa6d2c451dad5ef2f8f5e703db27d5a34adeedf835a7edb9b7f8365e70972fad
+  g1_decision: sha256:fd836f04189ab57940f50fa146a8f1a796a3d604b9d56f609e9cb35cf6d080b0
+  plan: sha256:b19e0b47420ad16cf13e3f46da2e6923f51cda995f49f561cb0e6448d3fec738
+f2_digests:
+  gate_state: sha256:7f1d26e4fb0d4d09c49e9952994220a2f47a3824c43db02b9dd7173f83e4e8ea3
+  authority_boundary: sha256:9f5b1d8a0cde3a8f2241bb641f1a4f8d5d6635f01a96e10dd94eb78db8bfcc11
+approval_request_ref:
+  gate: G2_EXECUTION
+  approval_id: APPROVE_G2_SCRUM-302_20260810
+  scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+  scope_hash_16: 4310af5588b3e135
+  issued_at: '2026-08-09T18:07:54Z'
+  expires_at: '2026-08-10T18:07:54Z'
+approval_validation_ref:
+  outcome: VALID
+  approval_id: APPROVE_G2_SCRUM-302_20260810
+  scope_hash: sha256:4310af5588b3e135e92ddac4a9b857da09bb669ef4d1cbbc423f6ebb442b4e6e
+  scope_hash_16: 4310af5588b3e135
+  received_at: '2026-08-09T18:11:30Z'
+  command: 'APPROVE G2 APPROVE_G2_SCRUM-302_20260810 4310af5588b3e135 2026-08-10T18:07:54Z'
+checkpoint_id: scrum-302-g2-g3-evidence-reconciliation-20260810
+issued_at: '2026-08-09T18:07:54Z'
+expires_at: '2026-08-10T18:07:54Z'
+reason_code: G2_ENVELOPE_ACTIVE
+envelope_digest: sha256:c5b4405d1555f874336aff49bece372c0c93982b45698655d95eeb31000583d9
+exclusions:
+- G3_PR
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION
+execution_started: false

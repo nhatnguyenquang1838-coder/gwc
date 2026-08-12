@@ -67,6 +67,9 @@ TOKEN_EXPIRED = "TOKEN_EXPIRED"
 TOKEN_TAMPERED = "TOKEN_TAMPERED"
 TASK_MISMATCH = "TASK_MISMATCH"
 SCOPE_MISMATCH = "SCOPE_MISMATCH"
+SCOPE_HASH_MISMATCH = "SCOPE_HASH_MISMATCH"
+RUN_MISMATCH = "RUN_MISMATCH"
+AUTHORITY_ESCALATION = "AUTHORITY_ESCALATION"
 APPROVAL_EXPIRED = "APPROVAL_EXPIRED"
 BASE_DRIFT = "BASE_DRIFT"
 HEAD_DRIFT = "HEAD_DRIFT"
@@ -92,6 +95,7 @@ class CurrentContext:
     head_sha: Optional[str]
     gate: str
     scope_hash_16: Optional[str]
+    run_id: Optional[str] = None
     graph_revision: Optional[str] = None
     lease_expiry_utc: Optional[str] = None
     fencing_token: Optional[str] = None
@@ -126,6 +130,14 @@ def _checkpoint_digest(checkpoint: Dict[str, Any]) -> str:
     }
     normalized = json.dumps(binding, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def _canonical_json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _digest(value: Any) -> str:
+    return "sha256:" + hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
 
 
 # ---------------------------------------------------------------------------
@@ -232,6 +244,19 @@ def validate_resume_token(
             evidence=evidence,
         )
 
+    # --- 5b. Run binding (if context provides run_id) ---
+    token_run = token.get("run_id")
+    ctx_run = getattr(ctx, "run_id", None)
+    if token_run is not None and ctx_run is not None and token_run != ctx_run:
+        return RouteDecision(
+            route=Route.STOP_FAIL_CLOSED,
+            reason=RUN_MISMATCH,
+            token_id=token_id,
+            checkpoint_id=checkpoint_id,
+            validated_at_utc=now,
+            evidence={**evidence, "token_run_id": token_run, "context_run_id": ctx_run},
+        )
+
     # --- 6. Repository base SHA binding ---
     cp_repo = checkpoint.get("repository", {})
     cp_base_sha = cp_repo.get("base_sha", "")
@@ -276,6 +301,18 @@ def validate_resume_token(
                 validated_at_utc=now,
                 evidence={**evidence, "detail": "checkpoint has empty files_write"},
             )
+
+    # --- 8b. Exact scope_hash prefix binding (if present) ---
+    token_scope = token.get("scope_hash")
+    if token_scope and ctx.scope_hash_16 and not token_scope.startswith(ctx.scope_hash_16):
+        return RouteDecision(
+            route=Route.RECONCILE_REQUIRED,
+            reason=SCOPE_HASH_MISMATCH,
+            token_id=token_id,
+            checkpoint_id=checkpoint_id,
+            validated_at_utc=now,
+            evidence={**evidence, "token_scope_hash": token_scope, "context_scope_hash_16": ctx.scope_hash_16},
+        )
 
     # --- 9. Gate binding ---
     cp_gate = checkpoint.get("gate", {})
@@ -374,6 +411,38 @@ def validate_resume_token(
     # --- 14. Checkpoint digest (tamper detection) ---
     digest = _checkpoint_digest(checkpoint)
     evidence["checkpoint_digest"] = digest[:16]
+
+    # --- 14b. Token self-integrity (token_digest) ---
+    token_digest = token.get("token_digest")
+    if token_digest:
+        body = {k: v for k, v in token.items() if k != "token_digest"}
+        if _digest(body) != token_digest:
+            return RouteDecision(
+                route=Route.STOP_FAIL_CLOSED,
+                reason=TOKEN_TAMPERED,
+                token_id=token_id,
+                checkpoint_id=checkpoint_id,
+                validated_at_utc=now,
+                evidence={**evidence, "detail": "token_digest mismatch"},
+            )
+
+    # --- 14c. Authority escalation rejection ---
+    for auth_key in (
+        "authority_granted",
+        "write_authority_granted",
+        "merge_authority_granted",
+        "deployment_authority_granted",
+        "production_authority_granted",
+    ):
+        if token.get(auth_key):
+            return RouteDecision(
+                route=Route.STOP_FAIL_CLOSED,
+                reason=AUTHORITY_ESCALATION,
+                token_id=token_id,
+                checkpoint_id=checkpoint_id,
+                validated_at_utc=now,
+                evidence={**evidence, "detail": f"authority field set: {auth_key}={token.get(auth_key)}"},
+            )
 
     # --- All checks passed → RESUME ---
     evidence["all_checks_passed"] = True

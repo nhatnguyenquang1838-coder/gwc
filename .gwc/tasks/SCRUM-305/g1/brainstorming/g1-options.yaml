@@ -1,0 +1,29 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-11T05:12:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-305
+  base_sha: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Reuse+extend existing renderer with deterministic provenance/digest
+  description: Inspect current renderer/schema/tests; implement only missing deterministic
+    render/order/provenance/error behavior on auto/* branch.
+  benefits:
+  - No duplicate renderer
+  - Minimal, bounded change
+  - Reuses verified F1 schema
+  tradeoffs:
+  - Requires reuse evidence on exact SHA
+  risks:
+  - Historical renderer may not cover negative/replay/authority cases
+  constraint_fit: FIT
+recommended_option_id: OPT-1
+recommendation_rationale: Reuse-with-extension is the lowest-risk path that satisfies
+  all F1 N08 EARS requirements without a no-op PR; matches NA81 autonomous brief (reuse
+  requires current evidence on exact SHA).
+decision_required: true
+status: READY

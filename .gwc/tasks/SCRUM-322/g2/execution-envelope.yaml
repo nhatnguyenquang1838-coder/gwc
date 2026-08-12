@@ -1,0 +1,59 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+activation_state: ACTIVE
+task_id: SCRUM-322
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: pre-prod
+base_sha: 7174b8657b540d64d150044f70ba0418292e60a0
+working_branch: auto/SCRUM-322-ci-failure-repair-20260809
+risk_class: R0
+risk_digest: sha256:0c199a630af1812ff9ac8e63531d411aa152eba1fdda310a21125acd52c1aa8f
+bounded_write_scope:
+- tools/node_architect/ci_failure_repair.py
+- tests/test_ci_failure_repair.py
+- tests/test_ci_failure_repair_family_integration.py
+authorized_actions:
+- create_working_branch
+- add_files
+- run_sandboxed_validation
+- stage_commit_push
+excluded_actions:
+- open_draft_pr
+- mark_pr_ready
+- merge
+- auto_merge
+- force_push
+- branch_deletion
+- protected_branch_write
+- deploy
+- release
+- production_data_change
+- production_config_change
+- g3_pr_promotion
+- g4_merge
+- g5_deploy
+- g6_production
+scope_hash: sha256:71953fbe107582bdf78e75c2cb194d52ebc69c64ec60b04656fca7c2c6f62e93
+f1_artifact_digests:
+  g0-context-snapshot: sha256:4b84d4b49b9ea03d5494729f81b8bc88bb7e95c7d0e47a98583e31653adcfd7c
+  g1-intake-brief: sha256:55205b9fe43d889bcb80b9c1a9874b8180df036dbb6030f57768fb8d3543aa27
+  g1-preflight-report: sha256:cfa07ca3125e3f359a738776490a66cdb1bc84a8be2abb5d7384124a9e20909c
+  g1-options: sha256:50c63daae09b4ad87d2cf51587402d4074490fde57182454a4efad342b91d199
+  g1-decision-record: sha256:9d77c1d92704468a8ccc7c3826a20a3cabb590997ad0dd050aa967bf5f12fb4e
+f2_digests:
+  scope_hash: sha256:71953fbe107582bdf78e75c2cb194d52ebc69c64ec60b04656fca7c2c6f62e93
+  scope_normalized: '{"in_scope":["tools/node_architect/ci_failure_repair.py","tests/test_ci_failure_repair.py","tests/test_ci_failure_repair_family_integration.py","core/node-architect/node-catalog/repo_delivery/ci-failure-repair.node.json"],"non_goals":["merge
+    to main","deploy/release/production configuration","credential or secret operations"]}'
+approval_request_ref: null
+approval_validation_ref: null
+checkpoint_id: checkpoint-scrum-322-20260809
+issued_at: '2026-08-09T19:40:21.566807+00:00'
+expires_at: '2027-08-09T19:40:21.566807+00:00'
+reason_code: G2_ENVELOPE_BOUNDED_REPOSITORY_FIX
+envelope_digest: sha256:408b638a5b1940aba97aa8bbabdcf10833ad6a5aab36c236e40eb3d3a84a03bf
+exclusions:
+- G3_PR
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION
+execution_started: false

@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-09T17:18:16Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-302
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Add minimal typed evaluator, schema, validator binding, and tests
+  description: Implement one pure risk-classification evaluator with a closed risk-profile schema, bind it to the existing intake_context validator, and add focused negative/drift/replay/authority tests.
+  benefits:
+  - Directly satisfies SCRUM-302 EARS and existing typed-runtime conventions.
+  - Keeps the change bounded to four implementation surfaces plus evidence.
+  - Provides deterministic and fail-closed behavior for downstream consumers.
+  tradeoffs:
+  - Requires defining a stable input contract from adjacent evaluator patterns.
+  - Does not refactor older risk primitives outside this task.
+  risks:
+  - A too-narrow signal vocabulary may require a later additive policy revision.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Update only the catalog descriptor
+  description: Extend the existing JSON descriptor without adding an executable evaluator or schema.
+  benefits:
+  - Smallest diff.
+  tradeoffs:
+  - Leaves the requested runtime behavior unimplemented.
+  risks:
+  - Downstream consumers cannot validate or replay typed risk decisions.
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Refactor shared gate-risk primitives first
+  description: Generalize existing gate authority risk fields into a new shared library before implementing the node.
+  benefits:
+  - Could reduce future duplication.
+  tradeoffs:
+  - Larger blast radius and harder exact-head review.
+  risks:
+  - Unrelated gate behavior may drift and scope may expand beyond SCRUM-302.
+  constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the smallest complete implementation that satisfies the typed contract, fail-closed behavior, policy drift, authority-negative requirements, and exact protected-base validation.
+decision_required: true
+status: READY

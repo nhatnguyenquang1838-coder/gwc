@@ -3,27 +3,215 @@
   "profiles": [
     {
       "artifact_type": "flow-profile",
+      "compatibility": {
+        "migration": "none",
+        "v1_compatible": true,
+        "v1_edge_kind_map": {
+          "conditional": "conditional",
+          "dependency": "continue",
+          "history": "continue",
+          "human_authority": "human_required",
+          "runtime": "continue"
+        }
+      },
+      "compiled": {
+        "projection_version": "2.0.0",
+        "workflow_digest": "sha256:c7919cb8252e9c8f890d14faa3f7e78c22834c2f3c56c75f14e0d0ee9cb17965"
+      },
       "graph_registry_ref": "gwc-runtime-graph-registry",
-      "green_targets": ["runtime_checkpoint.checkpoint-persist", "validation_quality.ci-evidence-capture", "failure_recovery.timeout-recovery"],
+      "green_targets": [
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture",
+        "failure_recovery.timeout-recovery"
+      ],
       "id": "full-flow-v3",
       "node_registry_ref": "gwc-runtime-node-registry",
-      "pilot_nodes": ["repo_delivery.ci-run-capture", "runtime_checkpoint.checkpoint-persist", "validation_quality.ci-evidence-capture"],
-      "provenance": {"source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md", "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"},
-      "revision": "scrum-104-20260726",
+      "pilot_nodes": [
+        "repo_delivery.ci-run-capture",
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture"
+      ],
+      "policy_registry_ref": "gwc-gate-applicability-policy-registry",
+      "provenance": {
+        "source_path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+        "source_sha": "7b7ddbab2dd8ca73d715e6e2ed7c67cda5df8ef1215a27c0e22a9b240722ee9d"
+      },
+      "registry_bindings": [
+        {
+          "digest": "sha256:d3877bd1b990a2ad34d002bfa9ce75d412c49b9816546f64e4a95c9154e47c13",
+          "path": "core/node-architect/node-registry.json",
+          "registry": "node",
+          "registry_id": "gwc-runtime-node-registry",
+          "revision": "scrum-288-entry-schema-validation-20260809-r1",
+          "schema_version": "1.0.0"
+        },
+        {
+          "digest": "sha256:b88f2b804ebe6c8ca0609fb391ce975d04df95e1c8ecc56a905bebf2f3ab5580",
+          "path": "core/node-architect/scenario-registry.json",
+          "registry": "scenario",
+          "registry_id": "gwc-runtime-scenario-registry",
+          "revision": "scrum-115-20260727",
+          "schema_version": "1.1.0"
+        },
+        {
+          "digest": "sha256:55a66184d8afda10eb1829355afa5b9b695d6dbdbe78e01c2e4b3514aa75837f",
+          "path": "core/node-architect/runtime-graph-registry.json",
+          "registry": "graph",
+          "registry_id": "gwc-runtime-graph-registry",
+          "revision": "scrum-104-20260726",
+          "schema_version": "1.0.0"
+        },
+        {
+          "digest": "sha256:5050be8fd7870427721902a7736364cb01ce0fa3e7e70ba8308340d81759d201",
+          "path": "core/node-architect/gate-applicability-policy-registry.json",
+          "registry": "policy",
+          "registry_id": "gwc-gate-applicability-policy-registry",
+          "revision": "policy-contract-v2-20260811-r1",
+          "schema_version": "1.1.0"
+        }
+      ],
+      "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r2",
       "routes": [
-        {"human_boundary": false, "kind": "happy_path", "nodes": ["repo_delivery.ci-run-capture", "runtime_checkpoint.checkpoint-persist", "validation_quality.ci-evidence-capture"], "outcome": "GREEN", "route_id": "happy-path-ci-evidence"},
-        {"human_boundary": false, "kind": "history", "nodes": ["repo_delivery.ci-run-capture", "runtime_checkpoint.checkpoint-persist"], "outcome": "GREEN", "route_id": "history-missing-run"},
-        {"human_boundary": true, "kind": "human_authority", "nodes": ["repo_delivery.ci-run-capture", "failure_recovery.timeout-recovery"], "outcome": "HUMAN_REQUIRED", "route_id": "human-sha-review"},
-        {"human_boundary": false, "kind": "conditional", "nodes": ["runtime_checkpoint.checkpoint-persist", "validation_quality.ci-evidence-capture"], "outcome": "CONDITIONAL", "route_id": "conditional-ci-pending"}
+        {
+          "human_boundary": false,
+          "kind": "happy_path",
+          "nodes": [
+            "repo_delivery.ci-run-capture",
+            "runtime_checkpoint.checkpoint-persist",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "outcome": "GREEN",
+          "route_id": "happy-path-ci-evidence"
+        },
+        {
+          "human_boundary": false,
+          "kind": "history",
+          "nodes": [
+            "repo_delivery.ci-run-capture",
+            "runtime_checkpoint.checkpoint-persist"
+          ],
+          "outcome": "GREEN",
+          "route_id": "history-missing-run"
+        },
+        {
+          "human_boundary": true,
+          "kind": "human_authority",
+          "nodes": [
+            "repo_delivery.ci-run-capture",
+            "failure_recovery.timeout-recovery"
+          ],
+          "outcome": "HUMAN_REQUIRED",
+          "route_id": "human-sha-review"
+        },
+        {
+          "human_boundary": false,
+          "kind": "conditional",
+          "nodes": [
+            "runtime_checkpoint.checkpoint-persist",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "outcome": "CONDITIONAL",
+          "route_id": "conditional-ci-pending"
+        }
       ],
       "scenario_registry_ref": "gwc-runtime-scenario-registry",
       "schema_version": "1.0.0",
-      "version": "1.0.0",
-      "visibility": {"inactive_node_class": "inactive", "retain_inactive_nodes": true}
+      "version": "2.0.0",
+      "visibility": {
+        "inactive_node_class": "inactive",
+        "retain_inactive_nodes": true
+      },
+      "workflow": {
+        "edges": [
+          {
+            "kind": "runtime",
+            "runtime_executable": true,
+            "source": "repo_delivery.ci-run-capture",
+            "target": "runtime_checkpoint.checkpoint-persist"
+          },
+          {
+            "kind": "runtime",
+            "runtime_executable": true,
+            "source": "runtime_checkpoint.checkpoint-persist",
+            "target": "validation_quality.ci-evidence-capture"
+          },
+          {
+            "kind": "human_authority",
+            "runtime_executable": false,
+            "source": "repo_delivery.ci-run-capture",
+            "target": "failure_recovery.timeout-recovery"
+          }
+        ],
+        "entry_nodes": [
+          "repo_delivery.ci-run-capture"
+        ],
+        "gate_bindings": [
+          {
+            "gate": "G0_CONTEXT",
+            "policy_ref": "g0-context-required"
+          },
+          {
+            "gate": "G1_ALIGNMENT",
+            "policy_ref": "g1-alignment-required"
+          },
+          {
+            "gate": "G2_EXECUTION",
+            "policy_ref": "g2-execution-required"
+          },
+          {
+            "gate": "G3_PR",
+            "policy_ref": "g3-pr-required"
+          },
+          {
+            "gate": "G4_MERGE",
+            "policy_ref": "g4-merge-required"
+          },
+          {
+            "gate": "G5_DEPLOY",
+            "policy_ref": "g5-deploy-effect-driven"
+          },
+          {
+            "gate": "G6_PRODUCTION_DATA",
+            "policy_ref": "g6-production-effect-driven"
+          }
+        ],
+        "participants": [
+          {
+            "gate": "G3_PR",
+            "participant": "repo_delivery.ci-run-capture",
+            "participant_kind": "node"
+          },
+          {
+            "gate_neutral": true,
+            "participant": "runtime_checkpoint.checkpoint-persist",
+            "participant_kind": "node"
+          },
+          {
+            "gate": "G3_PR",
+            "participant": "validation_quality.ci-evidence-capture",
+            "participant_kind": "node"
+          },
+          {
+            "gate_neutral": true,
+            "participant": "failure_recovery.timeout-recovery",
+            "participant_kind": "node"
+          }
+        ],
+        "terminal_nodes": [
+          {
+            "node": "validation_quality.ci-evidence-capture",
+            "outcome": "GREEN"
+          },
+          {
+            "node": "failure_recovery.timeout-recovery",
+            "outcome": "HUMAN_REQUIRED"
+          }
+        ]
+      }
     }
   ],
   "provenance": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
   "registry_id": "gwc-runtime-profile-registry",
-  "revision": "scrum-104-20260726",
+  "revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r2",
   "schema_version": "1.0.0"
 }

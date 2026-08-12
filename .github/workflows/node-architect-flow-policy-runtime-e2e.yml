@@ -1,0 +1,95 @@
+name: Node Architect Flow Policy runtime E2E
+
+on:
+  pull_request:
+    paths:
+      - 'core/node-architect/profile-registry.json'
+      - 'core/node-architect/gate-applicability-policy-registry.json'
+      - 'core/node-architect/gate-node-route-profile.json'
+      - 'core/node-architect/flow-policy-compiled-profile.json'
+      - 'core/node-architect/flow-policy-activation-registry.json'
+      - 'core/node-architect/node-registry.json'
+      - 'schemas/runtime/flow-profile.schema.json'
+      - 'schemas/runtime/gate-applicability-*.json'
+      - 'schemas/runtime/flow-policy-compiled-profile.schema.json'
+      - 'schemas/runtime/flow-policy-activation-registry.schema.json'
+      - 'schemas/node-architect/gate-node-route-decision.schema.json'
+      - 'schemas/node-architect/gate-node-route-profile.schema.json'
+      - 'tools/node_architect/validate_flow_profile_workflow.py'
+      - 'tools/node_architect/evaluate_gate_applicability.py'
+      - 'tools/node_architect/validate_flow_policy_compatibility.py'
+      - 'tools/node_architect/compile_flow_policy_profile.py'
+      - 'tools/node_architect/resolve_active_flow_policy_profile.py'
+      - 'tools/node_architect/resolve_gate_node_route.py'
+      - 'tests/test_flow_profile_workflow_contract.py'
+      - 'tests/test_gate_policy_contract.py'
+      - 'tests/test_workflow_profile_gate_applicability.py'
+      - 'tests/test_flow_policy_runtime_e2e.py'
+      - 'tests/test_flow_policy_activation_source_binding.py'
+      - 'tests/test_flow_policy_compiler_identity_hardening.py'
+      - 'tests/test_flow_policy_runtime_hardening.py'
+      - 'tests/test_gate_node_route_resolution.py'
+      - '.github/workflows/node-architect-flow-policy-runtime-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  flow-policy-runtime-e2e:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Compile Flow Policy runtime tools
+        run: |
+          python -m py_compile \
+            tools/node_architect/validate_flow_profile_workflow.py \
+            tools/node_architect/evaluate_gate_applicability.py \
+            tools/node_architect/validate_flow_policy_compatibility.py \
+            tools/node_architect/compile_flow_policy_profile.py \
+            tools/node_architect/resolve_active_flow_policy_profile.py \
+            tools/node_architect/resolve_gate_node_route.py
+      - name: Assert single runtime route-decision truth
+        run: |
+          for stale in \
+            schemas/runtime/workflow-policy-decision.schema.json \
+            schemas/runtime/flow-policy-runtime-profile.schema.json \
+            core/node-architect/flow-policy-runtime-profile.json \
+            tools/node_architect/resolve_flow_policy_runtime.py \
+            tools/node_architect/compile_flow_policy_decision.py \
+            tools/node_architect/validate_flow_policy_runtime.py; do
+            if [ -e "$stale" ]; then
+              echo "duplicate runtime truth reintroduced: $stale" >&2
+              exit 1
+            fi
+          done
+      - name: Recompile compiled profile and assert committed digest is exact
+        run: |
+          python tools/node_architect/compile_flow_policy_profile.py --root . --out /tmp/recompiled.json
+          python - <<'PY'
+          import json
+          committed = json.load(open("core/node-architect/flow-policy-compiled-profile.json"))
+          fresh = json.load(open("/tmp/recompiled.json"))
+          assert committed == fresh, "committed compiled profile is not a byte-exact recompilation"
+          assert committed["result"]["status"] == "COMPATIBLE", committed["result"]
+          print("compiled_digest", committed["compiled_digest"])
+          PY
+      - name: Resolve activation pointer
+        run: python tools/node_architect/resolve_active_flow_policy_profile.py --root .
+      - name: Run Flow Policy contract and runtime E2E tests
+        run: |
+          python -m unittest -v \
+            tests.test_flow_profile_workflow_contract \
+            tests.test_gate_policy_contract \
+            tests.test_workflow_profile_gate_applicability \
+            tests.test_flow_policy_runtime_e2e \
+            tests.test_flow_policy_activation_source_binding \
+            tests.test_flow_policy_compiler_identity_hardening \
+            tests.test_flow_policy_runtime_hardening \
+            tests.test_gate_node_route_resolution

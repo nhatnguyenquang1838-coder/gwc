@@ -8,5 +8,45 @@
     "G1_ALIGNMENT",
     "G2_EXECUTION"
   ],
-  "description": "Resolves the active GWC gate from intake facts, task artifacts, and prior gate evidence before any transition is considered."
+  "description": "Resolves the active GWC gate from intake facts, task artifacts, and prior gate evidence before any transition is considered.",
+  "intent": "Resolve exactly one current typed GWC gate state from canonical intake, scope, evidence, transition, and prior-resolution inputs without inferring PASS, granting authority, or performing a transition.",
+  "outcome": "Typed GateStateResolution with current_gate, gate_status, last_passed_gate, next_gate, next_action_class, canonical evidence references, missing/stale/conflicting evidence, drift decision, replay status, deterministic resolution_digest, and authority-negative flags.",
+  "constraints": [
+    "The resolution must be a pure function of supplied inputs; it must not read or mutate external state.",
+    "Canonical evidence and fixed reason precedence control the result; task projections are warnings only and cannot grant authority.",
+    "Current base SHA, scope identity, evidence-map bindings, and exact G3-or-later head SHA must match; normal descendant drift is not itself a blocker when the current canonical base is bound.",
+    "Stale, contradictory, malformed, missing, or later-gate-inheritance evidence fails closed at the earliest affected gate.",
+    "Replay with the same idempotency key must return the same resolution_digest; a semantic mismatch must return GATE_STATE_REPLAY_CONFLICT.",
+    "The result never grants gate, write, PR, merge, deploy, release, production, credential, migration, or production-data authority."
+  ],
+  "exclusions": [
+    "Mutating task, gate, repository, PR, Jira, deployment, release, or production state.",
+    "Performing a gate transition, approval, merge, deploy, release, migration, or production-data operation.",
+    "Using projection-only status as canonical authority or inheriting a later gate over an unresolved earlier gate.",
+    "Network access, credential or secret handling, destructive operations, and schema or policy migration."
+  ],
+  "entry_guards": [
+    "G1_ALIGNMENT",
+    "G2_EXECUTION",
+    "canonical scope identity, evidence map, transition map, and prior-resolution inputs are available",
+    "node evidence ledger and runtime binding are present"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/gate_state_resolution.py",
+    "schema": "schemas/node-architect/gate-authority/gate-state-resolution.schema.json"
+  },
+  "reason_codes": {
+    "GATE_STATE_INPUT_INVALID": "Supplied task, repository, SHA, scope, evidence-map, transition-map, or event inputs are structurally invalid.",
+    "GATE_STATE_REPLAY_CONFLICT": "The same idempotency key produced a different semantic resolution; fail closed.",
+    "GATE_STATE_BINDING_MISMATCH": "Scope, evidence, prior-resolution, or exact-head bindings do not match.",
+    "GATE_STATE_EVIDENCE_CONFLICT": "Canonical evidence is contradictory or duplicated with conflicting values.",
+    "GATE_STATE_GATE_FAILED": "The earliest required gate has a terminal failure.",
+    "GATE_STATE_DRIFT": "The current base, evidence base, or bound head has drifted and requires revalidation or reapproval.",
+    "GATE_STATE_EVIDENCE_STALE": "Required evidence is stale.",
+    "GATE_STATE_REQUIRED_EVIDENCE_MISSING": "Required canonical evidence is absent.",
+    "GATE_STATE_LATER_GATE_INHERITANCE_REJECTED": "A later-gate result cannot inherit over an unresolved earlier gate.",
+    "GATE_STATE_RESOLVED": "The canonical gate state resolved without a blocking condition.",
+    "GATE_STATE_PROJECTION_MISMATCH": "A task projection disagrees with canonical state; projection remains non-authoritative.",
+    "GATE_STATE_G6_NOT_APPLICABLE": "G6 is not applicable because production scope is not authorized."
+  }
 }

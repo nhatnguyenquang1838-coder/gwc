@@ -4,7 +4,7 @@ on:
   issue_comment:
     types: [created, edited]
   pull_request:
-    types: [opened, reopened, synchronize, closed]
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft, closed]
   workflow_run:
     workflows:
       - Validate instructions
@@ -133,12 +133,12 @@ jobs:
             await github.rest.issues.createComment({ owner, repo, issue_number, body });
 
   g4-receipt-required:
-    # This check is intended to be required by branch protection. It runs on
-    # every PR update and fails before merge until the trusted receipt exists.
+    # Required by branch protection, but G4 is inactive while the PR is Draft.
+    # Draft G2/G3 work must not fail merely because future G4 evidence is absent.
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
-      - name: Require trusted G4 authority receipt
+      - name: Require trusted G4 authority receipt when G4 is active
         uses: actions/github-script@v7
         with:
           script: |
@@ -153,13 +153,23 @@ jobs:
               core.info('Standing pre-prod authority applies: human G4 receipt is not required for auto/* -> pre-prod. Human G4 remains mandatory for promotion to main.');
               return;
             }
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
-            const receipt = comments.find((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-authority-receipt '));
-            if (!receipt) {
-              core.setFailed('G4 merge is blocked: no trusted gwc:g4-authority-receipt has been published for this PR. Post the exact human approval as a PR comment and wait for the receipt workflow.');
+            if (pr.draft) {
+              core.info('G4 is not active while the PR is Draft; G2/G3 CI remains non-blocking.');
               return;
             }
-            core.info(`Trusted G4 authority receipt found in comment ${receipt.id}.`);
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 });
+            const receipts = comments.filter((item) => item.user?.login === 'github-actions[bot]' && item.body?.includes('<!-- gwc:g4-authority-receipt '));
+            const receipt = receipts.at(-1);
+            if (!receipt) {
+              core.setFailed('G4 merge is blocked: this PR is Ready for Review but no trusted gwc:g4-authority-receipt has been published.');
+              return;
+            }
+            const parsed = receipt.body.match(/approval_id=([^ ]+) head=([0-9a-f]{40}) scope=([0-9a-f]{16}) expires=([^ ]+) source_comment_id=(\d+)/);
+            if (!parsed) { core.setFailed('G4 merge is blocked: trusted receipt marker is malformed.'); return; }
+            if (parsed[2] !== pr.head.sha) { core.setFailed(`G4 merge is blocked: receipt head ${parsed[2]} is stale; current head is ${pr.head.sha}.`); return; }
+            const expiresAt = new Date(parsed[4]);
+            if (!Number.isFinite(expiresAt.getTime()) || expiresAt <= new Date()) { core.setFailed('G4 merge is blocked: trusted receipt is expired or invalid.'); return; }
+            core.info(`Trusted exact-head G4 authority receipt found in comment ${receipt.id}.`);
 
   g4-merge-proof:
     # Post-merge evidence is observational. Missing G4 evidence after a merge
