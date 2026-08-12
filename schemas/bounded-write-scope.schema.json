@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://gwc.local/schemas/bounded-write-scope.schema.json",
+  "id": "https://gwc.local/schemas/bounded-write-scope.schema.json",
   "title": "Bounded Write Scope",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema_version",
     "artifact_type",
+    "contract_revision",
     "node_id",
     "task_id",
     "repository",
@@ -14,122 +15,126 @@
     "branch",
     "gate",
     "authority_boundary",
+    "source_bindings",
+    "outcome",
+    "failure_classification",
     "files_write",
+    "files_exclude",
+    "prohibited_targets",
+    "exclusion_reasons",
     "constraints",
     "exclusions",
     "excluded_actions",
     "entry_guards",
-    "reason_codes"
+    "reason_code",
+    "reason_codes",
+    "next_route",
+    "observed_at",
+    "scope_hash",
+    "read_only_projection",
+    "candidate_write_scope",
+    "authority_negative",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted"
   ],
   "properties": {
-    "schema_version": {
-      "const": "1.0"
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "bounded-write-scope"},
+    "contract_revision": {"const": "files-write-scope/v2"},
+    "node_id": {"const": "intake_context.files-write-scope"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "branch": {"type": "string", "minLength": 1},
+    "gate": {"const": "G0_CONTEXT"},
+    "authority_boundary": {"const": "read_only"},
+    "source_bindings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_type", "ref", "revision", "status"],
+        "properties": {
+          "source_type": {"type": "string", "minLength": 1},
+          "ref": {"type": "string", "minLength": 1},
+          "revision": {"type": "string", "minLength": 1},
+          "status": {"enum": ["VERIFIED", "STALE", "MISSING", "AMBIGUOUS", "CONFLICT"]}
+        }
+      }
     },
-    "artifact_type": {
-      "const": "bounded-write-scope"
-    },
-    "node_id": {
-      "const": "intake_context.files-write-scope"
-    },
-    "task_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "repository": {
-      "type": "string",
-      "pattern": "^[^/\\s]+/[^/\\s]+$"
-    },
-    "base_sha": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
-    },
-    "branch": {
-      "type": "string",
-      "minLength": 1
-    },
-    "gate": {
-      "const": "G0_CONTEXT"
-    },
-    "authority_boundary": {
-      "const": "read_only"
+    "outcome": {"enum": ["READY", "BLOCKED"]},
+    "failure_classification": {
+      "type": ["string", "null"],
+      "enum": [null, "AGENT_PREPARATION_BLOCKED", "REPOSITORY_EVIDENCE_MISSING", "VALIDATION_FAILED"]
     },
     "files_write": {
       "type": "array",
-      "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "pattern": "^(?!/)(?!.*\\.\\.)(?!.*\\\\)(?!.*:).+$"
-      }
+      "items": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*:).+$"}
     },
-    "constraints": {
+    "files_exclude": {
       "type": "array",
-      "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "items": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*:).+$"}
     },
-    "exclusions": {
+    "prohibited_targets": {
       "type": "array",
-      "minItems": 1,
       "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+      "items": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*:).+$"}
     },
-    "excluded_actions": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
-    },
-    "entry_guards": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
-    },
-    "reason_codes": {
+    "exclusion_reasons": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "ACCEPTED",
-        "EMPTY_SCOPE",
-        "PROHIBITED_ACTION",
-        "MALFORMED_INPUT",
-        "SCOPE_DRIFT"
-      ],
-      "properties": {
-        "ACCEPTED": {
-          "type": "string",
-          "minLength": 1
-        },
-        "EMPTY_SCOPE": {
-          "type": "string",
-          "minLength": 1
-        },
-        "PROHIBITED_ACTION": {
-          "type": "string",
-          "minLength": 1
-        },
-        "MALFORMED_INPUT": {
-          "type": "string",
-          "minLength": 1
-        },
-        "SCOPE_DRIFT": {
-          "type": "string",
-          "minLength": 1
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "constraints": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "exclusions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "excluded_actions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "entry_guards": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "reason_code": {"enum": ["ACCEPTED", "EMPTY_SCOPE", "PROHIBITED_ACTION", "MALFORMED_INPUT", "SCOPE_DRIFT", "MISSING_EVIDENCE"]},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["ACCEPTED", "EMPTY_SCOPE", "PROHIBITED_ACTION", "MALFORMED_INPUT", "SCOPE_DRIFT", "MISSING_EVIDENCE"]}
+    },
+    "next_route": {"enum": ["READY_FOR_INTAKE_CARD", "RECOMPUTE_WRITE_SCOPE", "CLARIFY_WRITE_SCOPE", "RESTRICT_WRITE_SCOPE", "REFRESH_REPOSITORY_EVIDENCE"]},
+    "observed_at": {"type": ["string", "null"]},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "read_only_projection": {"const": true},
+    "candidate_write_scope": {"const": true},
+    "authority_negative": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome": {"const": "READY"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {
+          "source_bindings": {"minItems": 1},
+          "files_write": {"minItems": 1},
+          "failure_classification": {"const": null}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "BLOCKED"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {
+          "failure_classification": {"type": "string"}
         }
       }
     }
-  }
+  ]
 }

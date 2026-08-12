@@ -7,7 +7,8 @@ runtime workflow creates the branch only after this tool returns
 
 Hard invariants enforced here:
 
-* The autonomous task head must match ``auto/<run-id>/<task-id>``.
+* The autonomous task head must match ``auto/SCRUM-<task-id>-na81-20260810``
+  (the exact working-branch convention bound by the parent run manifest).
 * A normal task branch is based on ``pre-prod`` only. ``main`` is never an
   autonomous task-branch base or the task branch itself.
 * The protected ``pre-prod`` branch may be bootstrapped from an explicitly
@@ -24,7 +25,7 @@ import json
 import re
 from typing import Any, Mapping
 
-BRANCH_RE = re.compile(r"^auto/[A-Za-z0-9._-]+/SCRUM-[0-9]+$")
+BRANCH_RE = re.compile(r"^auto/SCRUM-[0-9]+-na81-20260810$")
 FORBIDDEN_BASES = {"main"}
 ALLOWED_BASES = {"pre-prod", "main"}  # main permitted only for the initial bootstrap
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")

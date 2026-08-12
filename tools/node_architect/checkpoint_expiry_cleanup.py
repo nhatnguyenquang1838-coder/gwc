@@ -43,6 +43,17 @@ DISPOSABLE_ARTIFACT_TYPES = frozenset({"resume-hint", "interrupt-frame"})
 RETAINED_ARTIFACT_TYPES = frozenset(
     {"governance-evidence", "audit-evidence", "runtime-event"}
 )
+# Canonical evidence types that must never be tombstoned, even when
+# mislabeled as disposable (defense-in-depth for corruption/drift).
+# Covers approval, CI, PR, merge, and G0-G6 evidence as required by the
+# NA81 SCRUM-333 brief.
+PROTECTED_CANONICAL_TYPES = frozenset({
+    "approval-evidence",
+    "ci-evidence",
+    "pr-evidence",
+    "merge-evidence",
+    *{f"g{i}-evidence" for i in range(7)},
+})
 
 
 def _now() -> str:
@@ -126,8 +137,14 @@ def classify_entry(entry: CleanupEntry, policy: CleanupPolicy) -> str:
 
     Returns one of: ``RETAIN_GOVERNANCE``, ``RETAIN_AUDIT``,
     ``RETAIN_APPEND_ONLY``, ``RETAIN_ACTIVE_RESUME`` (valid resume beats
-    cleanup), ``TOMBSTONE_EXPIRED``, or ``RETAIN_VALID`` (unexpired disposable).
+    cleanup), ``RETAIN_CANONICAL`` (protected canonical evidence even if
+    mislabeled disposable), ``TOMBSTONE_EXPIRED``, or ``RETAIN_VALID``
+    (unexpired disposable).
     """
+    # NA81 defense-in-depth: canonical evidence must never be tombstoned,
+    # even when the retention_class is corrupted/mislabeled as disposable.
+    if entry.artifact_type in PROTECTED_CANONICAL_TYPES:
+        return "RETAIN_CANONICAL"
     # Retained verbatim: governance / audit evidence never expires.
     if entry.retention_class in EXEMPT_RETENTION_CLASSES:
         if entry.retention_class == "governance":
@@ -232,6 +249,9 @@ def apply_cleanup(
         "tombstoned": tombstones,
         "retained_governance_or_audit": sorted(
             e.entry_id for e in entries if e.retention_class in EXEMPT_RETENTION_CLASSES
+        ),
+        "retained_canonical_evidence": sorted(
+            e.entry_id for e in entries if e.artifact_type in PROTECTED_CANONICAL_TYPES
         ),
         "registry": [e.to_dict() for e in updated],
         "entries_tombstoned": len(tombstones),

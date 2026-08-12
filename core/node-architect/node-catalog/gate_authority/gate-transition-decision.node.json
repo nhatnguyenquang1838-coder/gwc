@@ -8,5 +8,44 @@
     "G1_ALIGNMENT",
     "G2_EXECUTION"
   ],
-  "description": "Determines whether a gate should pass, block, request approval, continue validation, or fail closed."
+  "description": "Determines whether a gate should pass, block, request approval, continue validation, or fail closed.",
+  "intent": "Decide the next legal gate transition (PASS / BLOCK / CONTINUE / AWAITING_APPROVAL) for a task from the reconciled G2 execution result and exact readback evidence, without performing the transition or granting any gate authority.",
+  "outcome": "Typed GateTransitionDecision with decision, reason_code, transition, expected_state, readback_required, next_gate, next_node, requires_human_approval, checkpoint_required, evidence_refs, replay_status, and a deterministic decision_digest. The decision — not a side effect — is the only signal; the node never performs the transition.",
+  "constraints": [
+    "The decision must be a pure function of the supplied evidence; no external state may be read or mutated.",
+    "Replay with the same idempotency key must return the same decision and decision_digest (idempotent) unless the prior decision conflicts, in which case it must BLOCK with TRANSITION_REPLAY_CONFLICT.",
+    "Exact readback of observed_task_state against current_state is required before declaring PASS; a mismatch must BLOCK with TRANSITION_READBACK_MISMATCH.",
+    "Blocking conditions are evaluated by fixed precedence; the highest-precedence blocking flag wins.",
+    "A valid result must never grant gate, G2, G3, G4, G5, or G6 authority, merge, deploy, release, or any other execution authority."
+  ],
+  "exclusions": [
+    "Performing the gate transition or any state mutation.",
+    "Granting repository, PR, merge, deploy, release, or production authority.",
+    "Network access, credential, secret, migration, or destructive operations.",
+    "Changing gate authority or later-gate inheritance."
+  ],
+  "entry_guards": [
+    "G2_EXECUTION",
+    "g2_required",
+    "G2 write result reconciled and exact diff readback passed",
+    "node evidence ledger complete"
+  ],
+  "source_resolution": {
+    "evaluator": "tools/node_architect/gate_transition_decision.py",
+    "schema": "schemas/node-architect/gate-authority/gate-transition-decision.schema.json"
+  },
+  "reason_codes": {
+    "TRANSITION_INPUT_INVALID": "The supplied transition inputs are structurally invalid.",
+    "TRANSITION_REPLAY_CONFLICT": "Same idempotency key produced a different semantic decision on replay; fail closed.",
+    "TRANSITION_BINDING_MISMATCH": "The resolved binding does not match the approved scope binding.",
+    "TRANSITION_EVIDENCE_MISSING": "Required gate evidence is absent from the evidence ledger.",
+    "TRANSITION_EVIDENCE_STALE": "The available gate evidence is older than the required readback window.",
+    "TRANSITION_APPROVAL_REQUIRED": "No approval validation was supplied; human approval is required before PASS.",
+    "TRANSITION_APPROVAL_INVALID": "The supplied approval validation is invalid or expired.",
+    "TRANSITION_ENVELOPE_INACTIVE": "The G2 execution envelope is not in the ACTIVE activation state.",
+    "TRANSITION_READBACK_REQUIRED": "Observed task state is unavailable; readback is required before PASS.",
+    "TRANSITION_READBACK_MISMATCH": "Observed task state does not match the resolved current state.",
+    "TRANSITION_LATER_GATE_INHERITANCE_REJECTED": "A later-gate inheritance claim was rejected by the boundary check.",
+    "TRANSITION_PASS": "All guards passed; the transition is permitted and the decision is PASS."
+  }
 }

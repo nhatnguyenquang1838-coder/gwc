@@ -11,8 +11,15 @@ import hashlib
 import re
 from typing import Any
 
+# Canonical human response grammar — must match the command emitted by
+# tools/node_architect/approval_token_generation.py and the schema bound by
+# schemas/node-architect/gate-authority/approval-request.schema.json:
+#   APPROVE G[2456] <approval_request_id> <scope_hash_short:16hex> <expires_at_utc>
+# The full 64-hex approval_token is intentionally NOT present in the human
+# command (non-secret integrity evidence only); validation of the binding
+# short is done against the request's scope_hash_short.
 RESPONSE_PATTERN = re.compile(
-    r"^APPROVE\s+(G2|G4|G5|G6)\s+([A-Za-z0-9._-]+)\s+([0-9a-f]{64})\s+(\S+)$"
+    r"^APPROVE\s+(G2|G4|G5|G6)\s+([a-z0-9][a-z0-9._-]{2,120})\s+([0-9a-f]{16})\s+(\S+)$"
 )
 GATE_SHORT_TO_FULL = {
     "G2": "G2_EXECUTION",
@@ -35,6 +42,9 @@ REASON_ALREADY_CONSUMED = "APPROVAL_ALREADY_CONSUMED"
 REASON_REPLAY_CONFLICT = "APPROVAL_REPLAY_CONFLICT"
 REASON_G5_SCOPE_INVALID = "APPROVAL_G5_SCOPE_INVALID"
 REASON_G6_SCOPE_INVALID = "APPROVAL_G6_SCOPE_INVALID"
+REASON_ACTOR_MISMATCH = "APPROVAL_ACTOR_MISMATCH"
+REASON_ACTOR_MISSING = "APPROVAL_ACTOR_MISSING"
+REASON_TARGET_MISMATCH = "APPROVAL_TARGET_MISMATCH"
 
 
 class ApprovalValidationError(ValueError):
@@ -78,17 +88,19 @@ def validate_approval_command(
         return _fail(REASON_INPUT_INVALID, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
 
-    resp_gate_short, resp_task, resp_token, resp_expires = match.groups()
+    resp_gate_short, resp_request_id, resp_scope_short, resp_expires = match.groups()
     resp_gate = GATE_SHORT_TO_FULL[resp_gate_short]
 
-    # Rule 2/5: match task, gate, token, expiry exactly.
-    if resp_task != approval_request.get("task_id"):
+    # Rule 2/5: match request_id, gate, scope short, expiry exactly.
+    # The canonical command binds the 16-hex scope_hash_short (not the full
+    # 64-hex token) — verify the short against the request's scope_hash_short.
+    if resp_request_id != approval_request.get("approval_request_id"):
         return _fail(REASON_COMMAND_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
     if resp_gate != approval_request.get("gate"):
         return _fail(REASON_COMMAND_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
-    if resp_token != approval_request.get("approval_token"):
+    if resp_scope_short != approval_request.get("scope_hash_short"):
         return _fail(REASON_TOKEN_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
     if resp_expires != approval_request.get("expires_at"):
@@ -130,6 +142,39 @@ def validate_approval_command(
         return _fail(REASON_BINDING_MISMATCH, event_id_or_idempotency_key,
                      approval_request.get("approval_request_id", ""), validated_at)
 
+    # Rule 13: current actor_target exact binding vs approval request.
+    # The actor named in the request must be the actor exercising the
+    # current approval; absent/missing or mismatched actor fails closed.
+    req_actor = approval_request.get("actor_target")
+    if not isinstance(req_actor, dict) or not req_actor.get("id"):
+        return _fail(REASON_ACTOR_MISSING, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    rb_actor = rb.get("current_actor")
+    if not isinstance(rb_actor, dict) or not rb_actor.get("id"):
+        return _fail(REASON_ACTOR_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    if (rb_actor.get("type") != req_actor.get("type") or
+            rb_actor.get("id") != req_actor.get("id")):
+        return _fail(REASON_ACTOR_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+
+    # Rule 14: current action target binding vs approval request + req bindings.
+    # The action, branch, and pr_number in the readback must match the request
+    # exactly; absent/missing where the request expects a value fails closed.
+    rb_action = rb.get("action")
+    req_action = approval_request.get("action")
+    if rb_action != req_action:
+        return _fail(REASON_TARGET_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    rb_branch = rb.get("branch")
+    rb_pr = rb.get("pr_number")
+    if rb_branch != req_bindings.get("branch"):
+        return _fail(REASON_TARGET_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+    if rb_pr != req_bindings.get("pr_number"):
+        return _fail(REASON_TARGET_MISMATCH, event_id_or_idempotency_key,
+                     approval_request.get("approval_request_id", ""), validated_at)
+
     # Rule 9: G4 requires PR open, non-draft, exact current head.
     if resp_gate == "G4_MERGE":
         pr = rb.get("pr") or {}
@@ -169,7 +214,7 @@ def validate_approval_command(
                          approval_request.get("approval_request_id", ""), validated_at)
 
     consumption_key = event_id_or_idempotency_key
-    digest = _digest(approval_request.get("approval_request_id", ""), resp_token,
+    digest = _digest(approval_request.get("approval_request_id", ""), resp_scope_short,
                      resp_expires, consumption_key)
     return {
         "schema_version": "1.0",

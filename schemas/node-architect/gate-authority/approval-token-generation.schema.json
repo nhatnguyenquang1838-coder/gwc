@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.dev/schemas/node-architect/gate-authority/approval-token-generation.schema.json",
+  "title": "gate_authority.approval-token-generation runtime result",
+  "description": "Closed, versioned runtime contract for the deterministic approval token generation evaluator (SCRUM-308). The typed result is authoritative only as a fail-closed request artifact; it never grants gate, G2, G4, G5, G6, merge, deploy, release, credential, migration, or production-data authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "approval_request_id",
+    "task_id",
+    "repository",
+    "gate",
+    "action",
+    "bindings",
+    "authority_granted",
+    "consumed",
+    "scope_hash",
+    "scope_hash_short",
+    "approval_token",
+    "approval_command",
+    "request_digest",
+    "primary_reason_code",
+    "reason_codes",
+    "actor_target",
+    "issued_at",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "gate-approval-request" },
+    "approval_request_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$"
+    },
+    "task_id": { "type": "string", "minLength": 1 },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "gate": {
+      "type": "string",
+      "enum": [
+        "G2_EXECUTION",
+        "G4_MERGE",
+        "G5_DEPLOY",
+        "G6_PRODUCTION_DATA"
+      ]
+    },
+    "action": { "type": "string", "minLength": 1 },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_sha", "head_sha", "scope_hash"],
+      "properties": {
+        "base_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "head_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "branch": { "type": ["string", "null"] },
+        "pr_number": { "type": ["integer", "null"] },
+        "environment": { "type": ["string", "null"] },
+        "scope_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "scope_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "scope_hash_short": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "actor_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["user", "component_account", "human"]
+        },
+        "id": { "type": "string", "minLength": 1 },
+        "display_name": { "type": ["string", "null"] }
+      }
+    },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "approval_token": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Deterministic non-secret integrity identifier derived from canonical request content; must never appear in the human approval_command."
+    },
+    "approval_command": {
+      "type": "string",
+      "pattern": "^APPROVE G[2456] [a-z0-9][a-z0-9._-]{2,120} [0-9a-f]{16} \\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "request_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "APPROVAL_REQUEST_GENERATED",
+          "APPROVAL_INPUT_INVALID",
+          "APPROVAL_BOUNDARY_NOT_REQUESTED",
+          "APPROVAL_GATE_ACTION_MISMATCH",
+          "APPROVAL_BINDING_REQUIRED",
+          "APPROVAL_EXPIRY_INVALID",
+          "APPROVAL_G5_MANUAL_SCOPE_REQUIRED",
+          "APPROVAL_G6_NOT_APPLICABLE",
+          "APPROVAL_REDACTION_REQUIRED"
+        ]
+      }
+    },
+    "primary_reason_code": {
+      "type": "string",
+      "enum": [
+        "APPROVAL_REQUEST_GENERATED",
+        "APPROVAL_INPUT_INVALID",
+        "APPROVAL_BOUNDARY_NOT_REQUESTED",
+        "APPROVAL_GATE_ACTION_MISMATCH",
+        "APPROVAL_BINDING_REQUIRED",
+        "APPROVAL_EXPIRY_INVALID",
+        "APPROVAL_G5_MANUAL_SCOPE_REQUIRED",
+        "APPROVAL_G6_NOT_APPLICABLE",
+        "APPROVAL_REDACTION_REQUIRED"
+      ]
+    },
+    "authority_granted": { "const": false },
+    "consumed": { "const": false }
+  },
+  "$defs": {}
+}

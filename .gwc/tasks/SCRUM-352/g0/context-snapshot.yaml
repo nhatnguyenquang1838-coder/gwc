@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-09T18:28:14Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: pre-prod
+  base_sha: 7f1d26e4fb0d4d09c49e9952994220a2f47a3824
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - Never write directly to main
+  - G4 merge, G5 deploy, and G6 production remain separate human gates
+applicable_policies:
+  - id: CODING-PROJECT-GOVERNANCE
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: pre-prod
+    source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+  - id: GWC-PROJECT-INSTRUCTIONS
+    path: projects/gwc/project-instructions.md
+    ref: pre-prod
+    source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 819c60dfaa1d5e56f39ac6741e4004f5c441a48a
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+status: READY
+blockers: []
+contextual_discovery:
+  historical_context: []

@@ -1,0 +1,119 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-11T05:12:37Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: pre-prod
+  base_sha: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  protected_branches:
+  - main
+  - pre-prod
+  connector: GitHub
+  write_enabled: true
+constraints:
+- 'AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN: child PR targets pre-prod; pre-prod->main
+  is Human G4'
+- Never use main HEAD as child execution base
+- No autonomous main target/merge, silent rebase, force-push, deploy/release/G6
+- 65 worktree files are EOL-only (NON_CONTENT_WORKTREE_NOISE); not real content drift
+applicable_policies:
+- id: AGENTS.md
+  path: AGENTS.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: b02ee723f10c85d5c03d4673810a5f24c7fa9d7e
+- id: core/Coding_Project_Governance_v1.0.md
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- id: core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  path: core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 7166832a142098d0c64fdeb81380cffef8dbec97
+- id: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+- id: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 626da4a219aca3d64cd75c1b94d4ec8fe3113859
+- id: core/Agent_Operating_Runtime_Contract_v1.0.md
+  path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 0c477a509737accb28b022ec3504b4a3151680db
+- id: projects/gwc/project-profile.yaml
+  path: projects/gwc/project-profile.yaml
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- id: projects/gwc/project-instructions.md
+  path: projects/gwc/project-instructions.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+- id: projects/gwc/project-extension.md
+  path: projects/gwc/project-extension.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 70416712125a61d546bf408d5bd84aa67e812ac3
+- id: agents/chatgpt-agent/agent-instructions.md
+  path: agents/chatgpt-agent/agent-instructions.md
+  ref: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  source_sha: 60e460eed6e0bbc0f554b42475d1bbbd224a7a2c
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: b02ee723f10c85d5c03d4673810a5f24c7fa9d7e
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ffca7aee6cb6f977f788d9e2d7d230a3faedb6e3
+- path: core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 7166832a142098d0c64fdeb81380cffef8dbec97
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5a9a197bddddb903067996f71a66b1cc98c639c6
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: 626da4a219aca3d64cd75c1b94d4ec8fe3113859
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 0c477a509737accb28b022ec3504b4a3151680db
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 487bb5e227b20cd9cde85ad6a17305e8610177dc
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: 70416712125a61d546bf408d5bd84aa67e812ac3
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 60e460eed6e0bbc0f554b42475d1bbbd224a7a2c
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: hermes-fallback-runtime
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  required_behavior_contracts:
+  - Agent_Operating_Runtime_Contract_v1.0
+  - Agent_Behavior_Semantic_Contract_v1.0

@@ -46,6 +46,7 @@ def context(action: str = "repository_write", mode: str = "normal"):
         loaded["write_result"] = {"status": "success"}
     if action == "resolve_gate_transition":
         loaded["diff_readback"] = {"status": "PASS"}
+    route_profile = load("core/node-architect/gate-node-route-profile.json")
     return {
         "task_id": "SCRUM-263",
         "gate": "G2_EXECUTION",
@@ -55,8 +56,8 @@ def context(action: str = "repository_write", mode: str = "normal"):
         "base_sha": envelope["base_sha"],
         "working_branch": envelope["working_branch"],
         "scope_hash": envelope["scope_hash"],
-        "expected_profile_revision": "scrum-263-20260802-r1",
-        "expected_graph_revision": "scrum-104-20260726",
+        "expected_profile_revision": route_profile["revision"],
+        "expected_graph_revision": route_profile["bound_graph_revision"],
         "available_connectors": ["GitHub.compare_commits"],
         "context": loaded,
     }

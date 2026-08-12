@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/protected-base-capture.schema.json",
+  "title": "GWC Protected Base Capture",
+  "description": "Captures the exact protected base commit SHA used for later gate and PR evidence. Read-only G0_CONTEXT node: it records the verified base and creates no execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "protected_base_sha",
+    "evidence_source",
+    "captured_at",
+    "verified_sha",
+    "prior_base_sha",
+    "readback_status",
+    "drift_state",
+    "outcome",
+    "reason_code",
+    "reason_codes",
+    "observed_at",
+    "read_only_projection",
+    "write_authority_granted",
+    "commit_authority_granted",
+    "push_authority_granted",
+    "pr_authority_granted",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted",
+    "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "protected-base-capture"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "protected_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "evidence_source": {"type": "string", "minLength": 1},
+    "captured_at": {"type": ["string", "null"]},
+    "verified_sha": {"type": ["string", "null"]},
+    "prior_base_sha": {"type": ["string", "null"]},
+    "readback_status": {"enum": ["VERIFIED", "MISMATCH", "STALE", "UNKNOWN"]},
+    "drift_state": {"enum": ["NONE", "STALE", "DRIFTED"]},
+    "outcome": {"enum": ["ACCEPTED", "BLOCKED", "PENDING", "HUMAN_REQUIRED"]},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reason_code"},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "remediation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["route", "next_action", "stop_condition"],
+      "properties": {
+        "route": {"enum": ["BLOCK_G0_REVIEW", "REQUEST_HUMAN_INPUT", "REFRESH_BASE", "RETRY_CAPTURE"]},
+        "next_action": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "next_allowed_nodes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^intake_context\\."},
+      "uniqueItems": true
+    },
+    "observed_at": {"type": ["string", "null"]},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "reason_code": {
+      "enum": [
+        "BASE_CAPTURED",
+        "BASE_MALFORMED_INPUT",
+        "BASE_MISSING_EVIDENCE",
+        "BASE_READBACK_MISMATCH",
+        "BASE_DRIFTED",
+        "BASE_HUMAN_REQUIRED"
+      ]
+    }
+  }
+}

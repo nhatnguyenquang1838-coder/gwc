@@ -1,0 +1,53 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-09T19:24:43Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-322
+  base_sha: '7174b8657b540d64d150044f70ba0418292e60a0'
+  g0_snapshot: '../../g0/context-snapshot.yaml'
+options_ref: '../brainstorming/g1-options.yaml'
+preflight_ref: '../preflight/g1-preflight-report.yaml'
+status: ACCEPTED
+selected_option_id: OPT-01
+user_decision:
+  actor: agent
+  source: jira_mcp
+  decided_at: '2026-08-09T19:24:43Z'
+  explicit: true
+rationale: 'Node implementation required for repo_delivery.ci-failure-repair; deterministic classification; bounded scope; no authority expansion.'
+rejected_option_ids: []
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+scope_hash: sha256:71953fbe107582bdf78e75c2cb194d52ebc69c64ec60b04656fca7c2c6f62e93
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Create ci_failure_repair.py module
+    dependencies: []
+  - sub_task_id: SUB-TASK-2
+    description: Add M5 and family integration tests
+    dependencies: [SUB-TASK-1]
+  - sub_task_id: SUB-TASK-3
+    description: Validate and push PR
+    dependencies: [SUB-TASK-2]
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: local_agent
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: local_agent
+    agent_type: primary
+  - sub_task_id: SUB-TASK-3
+    skill_id: local_agent
+    agent_type: primary
+  execution_order: [SUB-TASK-1, SUB-TASK-2, SUB-TASK-3]

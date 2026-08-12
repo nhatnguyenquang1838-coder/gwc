@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-08-11T05:12:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-305
+  base_sha: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: ChatGPT controller
+  decided_at: '2026-08-11T05:12:37Z'
+  source: GPT controller authority AR-SCRUM288-20260810-R3B (parent manifest SCRUM-288)
+  explicit: true
+rationale: 'Accepted OPT-1: reuse-and-extend the existing renderer with deterministic
+  provenance/digest, bounded to auto/*->pre-prod, excluding merge/deploy/production
+  authority.'
+rejected_option_ids: []
+acceptance_criteria_refs:
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+scope_hash: sha256:bde5c0be992fbc58c85210e9532eee0efc29b450155c05d0fccf304dbe5dd133
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Implement deterministic render/order/provenance/error behavior in
+      existing renderer.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-renderer
+    agent_type: primary
+  execution_order:
+  - SUB-TASK-1

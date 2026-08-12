@@ -109,14 +109,29 @@ def decide_ready_for_review_promotion(evidence: Mapping[str, Any]) -> dict[str, 
 
 
 def decide_pr_blocker_check(evidence: Mapping[str, Any]) -> dict[str, Any]:
-    """Classify current-head PR blockers without granting merge authority."""
+    """Classify current-head PR blockers without granting merge authority.
+
+    NA81 delta (SCRUM-324): produces CLEAR / BLOCKED / PENDING_RETRY /
+    HUMAN_REQUIRED. Unavailable/stale/mixed-head/unsupported reviewer evidence
+    never PASS; readiness never grants merge authority.
+    """
     repo = str(evidence.get("repository", ""))
     pr_number = evidence.get("pr_number")
     head_sha = str(evidence.get("head_sha", ""))
     pr = evidence.get("pr") if isinstance(evidence.get("pr"), Mapping) else {}
     blockers: list[dict[str, str]] = []
+    pending: list[str] = []
+    human_required: list[str] = []
+
     def block(code: str, severity: str, source: str) -> None:
         blockers.append({"code": code, "severity": severity, "source": source})
+
+    def wait(code: str, source: str) -> None:
+        pending.append(code)
+
+    def human(code: str, source: str) -> None:
+        human_required.append(code)
+
     if not repo: block("REPOSITORY_MISSING", "high", "input")
     if not isinstance(pr_number, int): block("PR_NUMBER_MISSING", "high", "input")
     if not _is_sha(head_sha): block("INVALID_HEAD_SHA", "high", "input")
@@ -125,27 +140,66 @@ def decide_pr_blocker_check(evidence: Mapping[str, Any]) -> dict[str, Any]:
     if pr.get("mergeable") is False: block("PR_NOT_MERGEABLE", "medium", "pr")
     if pr.get("draft") is True: block("PR_STILL_DRAFT", "medium", "pr")
     if pr.get("merged") is True: block("PR_ALREADY_MERGED", "high", "pr")
+
     checks = list(evidence.get("required_checks") or [])
-    if not checks: block("REQUIRED_CHECKS_MISSING", "medium", "checks")
+    if not checks:
+        wait("REQUIRED_CHECKS_MISSING", "checks")
     for check in checks:
         if not isinstance(check, Mapping):
             block("INVALID_CHECK_READBACK", "medium", "checks"); continue
         if check.get("head_sha") != head_sha:
             block("STALE_CHECK_IGNORED", "medium", "checks"); continue
-        if check.get("status") != "completed": block("CHECK_NON_TERMINAL", "medium", "checks")
-        elif str(check.get("conclusion") or "").lower() not in SUCCESS: block("CHECK_NOT_SUCCESSFUL", "high", "checks")
+        if check.get("status") != "completed":
+            wait("CHECK_NON_TERMINAL", "checks")
+        elif str(check.get("conclusion") or "").lower() not in SUCCESS:
+            block("CHECK_NOT_SUCCESSFUL", "high", "checks")
+
     for thread in list(evidence.get("review_threads") or []):
-        if isinstance(thread, Mapping) and thread.get("resolved") is False: block("UNRESOLVED_REVIEW_THREAD", "medium", "review_threads")
-    latest: dict[str, str] = {}
-    for review in list(evidence.get("reviews") or []):
-        if not isinstance(review, Mapping): continue
-        if review.get("head_sha") != head_sha:
-            block("STALE_REVIEW_IGNORED", "low", "reviews"); continue
-        latest[str(review.get("author") or review.get("user") or "unknown")] = str(review.get("state") or "").upper()
-    if any(state == "CHANGES_REQUESTED" for state in latest.values()): block("CHANGES_REQUESTED", "high", "reviews")
-    outcome = "CLEAR" if not blockers else "BLOCKED"
-    reasons = sorted({b["code"] for b in blockers}) or ["NO_PR_BLOCKERS_DETECTED"]
-    return {"outcome": outcome, "reason_codes": reasons, "repository": repo, "pr_number": pr_number, "head_sha": head_sha, "blockers": blockers, "decision_digest": _digest({"repo": repo, "pr": pr_number, "head": head_sha, "blockers": blockers, "outcome": outcome}), **_no_higher_authority()}
+        if isinstance(thread, Mapping) and thread.get("resolved") is False:
+            block("UNRESOLVED_REVIEW_THREAD", "medium", "review_threads")
+
+    reviews = list(evidence.get("reviews") or [])
+    if not reviews:
+        human("UNSUPPORTED_REVIEWER", "reviews")
+    else:
+        latest: dict[str, str] = {}
+        for review in reviews:
+            if not isinstance(review, Mapping): continue
+            if review.get("head_sha") != head_sha:
+                block("STALE_REVIEW_IGNORED", "low", "reviews"); continue
+            author = str(review.get("author") or review.get("user") or "")
+            if not author:
+                human("UNSUPPORTED_REVIEWER", "reviews"); continue
+            latest[author] = str(review.get("state") or "").upper()
+        if any(state == "CHANGES_REQUESTED" for state in latest.values()):
+            block("CHANGES_REQUESTED", "high", "reviews")
+
+    # Outcome precedence: BLOCKED > HUMAN_REQUIRED > PENDING_RETRY > CLEAR
+    if blockers:
+        outcome = "BLOCKED"
+        reason_codes = sorted({b["code"] for b in blockers})
+    elif human_required:
+        outcome = "HUMAN_REQUIRED"
+        reason_codes = sorted(set(human_required))
+    elif pending:
+        outcome = "PENDING_RETRY"
+        reason_codes = sorted(set(pending))
+    else:
+        outcome = "CLEAR"
+        reason_codes = ["NO_PR_BLOCKERS_DETECTED"]
+
+    payload = {"repo": repo, "pr": pr_number, "head": head_sha,
+               "blockers": blockers, "pending": pending,
+               "human_required": human_required, "outcome": outcome,
+               "reasons": reason_codes}
+    return {
+        "outcome": outcome, "reason_codes": reason_codes,
+        "repository": repo, "pr_number": pr_number, "head_sha": head_sha,
+        "blockers": blockers, "pending_reasons": pending,
+        "human_required_reasons": human_required,
+        "decision_digest": _digest(payload),
+        **_no_higher_authority(),
+    }
 
 
 def validate_family(family_dir: Path) -> list[str]:

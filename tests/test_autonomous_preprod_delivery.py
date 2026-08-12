@@ -58,7 +58,7 @@ class AutonomousTaskBranchTests(unittest.TestCase):
     def test_valid_autonomous_branch(self):
         d = decide_branch(
             run_id=RUN_ID, task_id=TASK_ID,
-            proposed_branch=f"auto/{RUN_ID}/{TASK_ID}",
+            proposed_branch=f"auto/{TASK_ID}-na81-20260810",
             base_branch="pre-prod", base_sha=PREPROD_SHA,
         )
         self.assertEqual("CREATE_BRANCH", d["outcome"])

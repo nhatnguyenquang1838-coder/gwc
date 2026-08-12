@@ -1,10 +1,11 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "artifact_type": "gate-node-route-profile",
   "profile_id": "gwc-gate-node-runtime-binding",
-  "revision": "scrum-263-20260802-r1",
+  "revision": "workflow-contract-gate-applicability-20260810-r1",
   "bound_graph_revision": "scrum-104-20260726",
-  "bound_node_registry_revision": "scrum-104-20260726",
+  "bound_node_registry_revision": "scrum-288-entry-schema-validation-20260809-r1",
+  "workflow_profile_ref": "full-flow-v3",
   "routes": [
     {
       "route_id": "g2-resolve-execution-node",
@@ -67,6 +68,21 @@
       "next_gate": "G3_PR"
     },
     {
+      "route_id": "g2-validate-entry-schema",
+      "gate": "G2_EXECUTION",
+      "requested_action": "validate_entry_schema",
+      "current_node": "package_export.entry-schema-validation",
+      "node_descriptor_ref": "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/package_export/entry-schema-validation.node-instruction.yaml",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback", "manifest_loaded"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "python", "ref": "tools/node_architect/package_export/entry_schema_validation.py:validate_entries"},
+      "next_node": "package_export.target-path-safety-check",
+      "next_action": "proceed_to_path_safety_check",
+      "next_gate": "G3_PR"
+    },
+    {
       "route_id": "g2-resume-token-generation",
       "gate": "G2_EXECUTION",
       "requested_action": "generate_resume_token",
@@ -80,6 +96,21 @@
       "next_node": null,
       "next_action": "validate_resume_token",
       "next_gate": "G2_EXECUTION"
+    },
+    {
+      "route_id": "g2-resolve-evidence-artifact-map",
+      "gate": "G2_EXECUTION",
+      "requested_action": "resolve_evidence_map",
+      "current_node": "gate_authority.evidence-artifact-map",
+      "node_descriptor_ref": "core/node-architect/node-catalog/gate_authority/evidence-artifact-map.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/gate_authority/evidence-artifact-map.node-instruction.yaml",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "python", "ref": "tools/node_architect/evidence_artifact_map.py:build_gate_evidence_artifact_map"},
+      "next_node": "gate_authority.gate-state-resolution",
+      "next_action": "resolve_execution_node",
+      "next_gate": null
     }
   ]
 }

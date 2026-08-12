@@ -1,0 +1,76 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-11T05:12:37Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-305
+  base_sha: 4e3cd0cbf8b47cf8bfdb5263a41551fc1a2f2fbb
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-305 requires deterministic rendering of accepted F1 intake artifacts
+    into one traceable human/agent-readable intake card with stable provenance and
+    digests.
+  why_now: Predecessors SCRUM-303 and SCRUM-304 are Done and ancestors of base; the
+    NA81-F1 intake_context node N08 is the next gated deliverable and is currently
+    claimed/In Progress.
+desired_outcome: A deterministic, replay-stable intake card rendered from accepted
+  F1 artifacts, refusing misleading PASS on missing/stale/mismatched inputs, presented
+  as evidence only.
+stakeholders:
+  requester: Nhat Nguyen Quang (lane owner, SCRUM-288/289)
+  affected:
+  - F2 consumers (#242/SCRUM-307)
+  - F9 consumers (#308/SCRUM-373)
+  - autonomous runtime
+scope:
+  in_scope:
+  - Render accepted F1 intake artifacts into a canonical intake card
+  - Canonical deterministic ordering, source provenance, stable digest
+  - Blocked/incomplete/mismatched input handling (BLOCKED/HUMAN_REQUIRED)
+  - Replay equivalence and drift invalidation
+  - Evidence-only framing (no execution authority)
+  non_goals:
+  - Implementing F2 gate_authority or F9 scale_control nodes
+  - Merging to main (Human G4, pre-prod->main)
+  - Deploying or releasing (G5/G6 out of scope for this task)
+  - Re-implementing an unrelated historical renderer (SCRUM-182 evidence only)
+constraints:
+- Exact pre-prod base; do not use main HEAD as execution base
+- Child PR targets pre-prod; pre-prod->main is Human G4
+- No duplicate renderer; no no-op PR
+assumptions:
+- Accepted F1 artifacts and digests are current on exact pre-prod
+- Parent authority AR-SCRUM288-20260810-R3B remains valid for lane SCRUM-288
+risks:
+- id: RISK-1
+  description: On-disk CRLF normalization across 65 worktree files may be misread
+    as content drift.
+  impact: low
+  mitigation: Classified NON_CONTENT_WORKTREE_NOISE; no reset/clean/normalize performed.
+- id: RISK-2
+  description: Digest mismatch between rendered card and source artifacts on drift.
+  impact: medium
+  mitigation: Render BLOCKED/HUMAN_REQUIRED and require refresh on source drift.
+acceptance_criteria:
+- id: AC-1
+  statement: When all required F1 inputs are accepted, node renders fields in canonical
+    deterministic order with provenance and stable digest.
+  verifiable: true
+- id: AC-2
+  statement: If any required input is missing/stale/ambiguous/digest-mismatched, node
+    renders no misleading PASS and routes BLOCKED/HUMAN_REQUIRED.
+  verifiable: true
+- id: AC-3
+  statement: Replaying identical accepted inputs yields byte/logically equivalent
+    output and digest.
+  verifiable: true
+- id: AC-4
+  statement: Source artifact drift invalidates prior card and requires refresh.
+  verifiable: true
+- id: AC-5
+  statement: Rendered card states context/scope/risk as evidence only, never as execution
+    authority.
+  verifiable: true
+unresolved_questions: []
+status: READY

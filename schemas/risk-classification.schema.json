@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/risk-classification.schema.json",
+  "title": "GWC Intake Context Risk Profile",
+  "description": "Closed, deterministic, read-only risk classification output.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "contract_revision", "task_id", "repository", "base_sha",
+    "outcome", "risk_level", "risk_flags", "required_gate", "additional_authority_gates",
+    "approval_requirements", "reason_code", "reason_codes", "source_bindings", "policy_provenance",
+    "contributing_signals", "remediation", "next_allowed_nodes", "classified_at", "read_only_projection",
+    "write_authority_granted", "commit_authority_granted", "push_authority_granted", "pr_authority_granted",
+    "merge_authority_granted", "deployment_authority_granted", "production_authority_granted", "decision_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "risk-profile"},
+    "contract_revision": {"const": "risk-classification/v1"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "outcome": {"enum": ["ACCEPTED", "BLOCKED", "HUMAN_REQUIRED"]},
+    "risk_level": {"type": ["string", "null"], "enum": ["R0", "R1", "R2", "R3", null]},
+    "risk_flags": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "required_gate": {"enum": ["G1_ALIGNMENT", "G2_AUTOMATIC_BOUNDED", "G2_HUMAN_DIRECTION"]},
+    "additional_authority_gates": {"type": "array", "items": {"enum": ["G5_DEPLOY", "G6_PRODUCTION_DATA"]}, "uniqueItems": true},
+    "approval_requirements": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "reason_code": {"$ref": "#/$defs/reason_code"},
+    "reason_codes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/reason_code"}, "uniqueItems": true},
+    "source_bindings": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_intake", "source_resolution", "repo_identity", "protected_base_capture", "repository", "base_sha"],
+      "properties": {
+        "request_intake": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "source_resolution": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "repo_identity": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "protected_base_capture": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "repository": {"type": "string", "minLength": 1},
+        "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "policy_provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy_id", "version", "digest", "rules_digest", "source"],
+      "properties": {
+        "policy_id": {"type": ["string", "null"]},
+        "version": {"type": ["string", "null"]},
+        "digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "rules_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "source": {"type": ["string", "null"]}
+      }
+    },
+    "contributing_signals": {
+      "type": "array", "items": {"$ref": "#/$defs/signal"}
+    },
+    "remediation": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["route", "next_action", "stop_condition"],
+      "properties": {
+        "route": {"enum": ["REQUEST_HUMAN_INPUT", "REFRESH_SOURCE", "BLOCK_G1_REVIEW"]},
+        "next_action": {"type": "string", "minLength": 1},
+        "stop_condition": {"type": "string", "minLength": 1}
+      }
+    },
+    "next_allowed_nodes": {"type": "array", "items": {"type": "string", "pattern": "^intake_context\\."}, "uniqueItems": true},
+    "classified_at": {"type": ["string", "null"]},
+    "read_only_projection": {"const": true},
+    "write_authority_granted": {"const": false},
+    "commit_authority_granted": {"const": false},
+    "push_authority_granted": {"const": false},
+    "pr_authority_granted": {"const": false},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false},
+    "decision_digest": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "reason_code": {"enum": [
+      "RISK_PRODUCTION_OPERATION", "RISK_SECRET_CHANGE", "RISK_DESTRUCTIVE_OPERATION", "RISK_MIGRATION",
+      "RISK_RELEASE_DEPLOYMENT", "RISK_SCOPE_AMBIGUOUS", "RISK_SOURCE_STALE", "RISK_UNCLASSIFIED",
+      "RISK_CLASSIFIED_R0", "RISK_CLASSIFIED_R1", "RISK_CLASSIFIED_R2", "RISK_CLASSIFIED_R3"
+    ]},
+    "signal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["signal", "risk_level", "reason_code", "risk_flag", "source"],
+      "properties": {
+        "signal": {"type": "string", "minLength": 1},
+        "risk_level": {"enum": ["R0", "R1", "R2", "R3"]},
+        "reason_code": {"$ref": "#/$defs/reason_code"},
+        "risk_flag": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

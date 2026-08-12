@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/gate-authority/gate-transition-decision.schema.json",
+  "title": "gate_authority.gate-transition-decision runtime result",
+  "description": "Closed, versioned runtime contract for the gate transition decision evaluator (SCRUM-313). The typed decision is the only signal; it never grants gate, G2, G3, G4, G5, or G6 authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "repository",
+    "decision",
+    "reason_code",
+    "decision_digest",
+    "execution_performed",
+    "event_id_or_idempotency_key"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "enum": ["1.0"] },
+    "artifact_type": { "const": "gate-transition-decision" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "repository": { "type": "string", "minLength": 1 },
+    "current_gate": { "type": "string" },
+    "current_state": { "type": "string" },
+    "decision": {
+      "type": "string",
+      "enum": ["PASS", "BLOCK", "CONTINUE", "AWAITING_APPROVAL", "NOT_APPLICABLE"]
+    },
+    "transition": { "type": ["string", "null"] },
+    "expected_state": { "type": ["string", "null"] },
+    "readback_required": { "type": "boolean" },
+    "next_gate": { "type": ["string", "null"] },
+    "next_node": { "type": ["string", "null"] },
+    "requires_human_approval": { "type": "boolean" },
+    "checkpoint_required": { "type": "boolean" },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "reason_code": {
+      "type": ["string", "null"],
+      "enum": [
+        "TRANSITION_INPUT_INVALID",
+        "TRANSITION_REPLAY_CONFLICT",
+        "TRANSITION_BINDING_MISMATCH",
+        "TRANSITION_EVIDENCE_MISSING",
+        "TRANSITION_EVIDENCE_STALE",
+        "TRANSITION_APPROVAL_REQUIRED",
+        "TRANSITION_APPROVAL_INVALID",
+        "TRANSITION_ENVELOPE_INACTIVE",
+        "TRANSITION_READBACK_REQUIRED",
+        "TRANSITION_READBACK_MISMATCH",
+        "TRANSITION_LATER_GATE_INHERITANCE_REJECTED",
+        "TRANSITION_PASS"
+      ]
+    },
+    "replay_status": { "type": "string", "enum": ["IDEMPOTENT", "CONFLICT", "UNKNOWN"] },
+    "decision_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "execution_performed": { "const": false },
+    "event_id_or_idempotency_key": { "type": "string", "minLength": 1 },
+    "decided_at": { "type": ["string", "null"] }
+  }
+}

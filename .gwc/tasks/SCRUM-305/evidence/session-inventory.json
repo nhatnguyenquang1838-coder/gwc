@@ -1,0 +1,56 @@
+[
+  {
+    "path": "AGENTS.md",
+    "bytes": 32927,
+    "git_blob_sha1": "b02ee723f10c85d5c03d4673810a5f24c7fa9d7e",
+    "sha256": "37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59"
+  },
+  {
+    "path": "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
+    "bytes": 15608,
+    "git_blob_sha1": "7166832a142098d0c64fdeb81380cffef8dbec97",
+    "sha256": "9b7b161ec1921e1f94b3597a982c16e6164fb9ad4d10ceaca566417d4a69e300"
+  },
+  {
+    "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "bytes": 20779,
+    "git_blob_sha1": "5a9a197bddddb903067996f71a66b1cc98c639c6",
+    "sha256": "b97961efc9df0a34ed0c4b992c83cc9f959305f62821afb19195dbc1b00e1f49"
+  },
+  {
+    "path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+    "bytes": 22304,
+    "git_blob_sha1": "626da4a219aca3d64cd75c1b94d4ec8fe3113859",
+    "sha256": "c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921"
+  },
+  {
+    "path": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+    "bytes": 13139,
+    "git_blob_sha1": "0c477a509737accb28b022ec3504b4a3151680db",
+    "sha256": "5a2aba718df97ebee207a49072d4df1e6f5b787263c17a530c06738fead40ec2"
+  },
+  {
+    "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+    "bytes": 15948,
+    "git_blob_sha1": "bc116f07b27ae08c2646a73a021e3cf2e06a0362",
+    "sha256": "4905d7f48ac99ca1cdccdf954339ef64ad06ced59cafcb839b9cedc0a22f4cef"
+  },
+  {
+    "path": "agents/chatgpt-agent/agent-instructions.md",
+    "bytes": 24616,
+    "git_blob_sha1": "60e460eed6e0bbc0f554b42475d1bbbd224a7a2c",
+    "sha256": "5497e0a80e8f95ca12648e3f066c4365c5a0320d1f89ceacf6b5dc068d81cea9"
+  },
+  {
+    "path": "projects/gwc/project-instructions.md",
+    "bytes": 7354,
+    "git_blob_sha1": "d75a15d05bfcad4f70a0c2c72c91e2d6e18b5508",
+    "sha256": "c3ff5cb159213b64334a9bbe210a63b0e086608f9fa6cf7c55c136c608551a34"
+  },
+  {
+    "path": "projects/gwc/project-extension.md",
+    "bytes": 7719,
+    "git_blob_sha1": "70416712125a61d546bf408d5bd84aa67e812ac3",
+    "sha256": "9d21378ac92fd29917a648070797b82ce51c3cf16d37a9c3f83db89686135b1e"
+  }
+]

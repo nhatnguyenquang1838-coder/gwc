@@ -25,6 +25,10 @@ def attach_digest(decision: dict[str, Any]) -> dict[str, Any]:
     return decision
 
 
+def _valid_non_empty(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
 def decide_version_drift_rollback_routing(
     *,
     task_id: str,
@@ -57,7 +61,16 @@ def decide_version_drift_rollback_routing(
     governed_repair_required = False
     rollback_route_required = False
 
-    if stale_replay:
+    version_evidence_unavailable = not (
+        _valid_non_empty(snapshot_node_version) and _valid_non_empty(runtime_node_version)
+    )
+
+    if version_evidence_unavailable:
+        outcome = "BLOCK_UNSUPPORTED_DRIFT"
+        reason_code = "VERSION_EVIDENCE_UNAVAILABLE"
+        replay_allowed = False
+        governed_repair_required = True
+    elif stale_replay:
         outcome = "REJECT_STALE_REPLAY"
         reason_code = "REPLAY_EPOCH_BEHIND_CURRENT_EPOCH"
         replay_allowed = False
@@ -112,6 +125,7 @@ def decide_version_drift_rollback_routing(
         "rollback_evidence_digest": rollback_evidence_digest,
         "evidence_preserved": evidence_preserved,
         "g5_manual_action_authorized": g5_manual_action_authorized,
+        "version_evidence_unavailable": version_evidence_unavailable,
         "outcome": outcome,
         "reason_code": reason_code,
         "observed_at": observed_at or now_utc(),

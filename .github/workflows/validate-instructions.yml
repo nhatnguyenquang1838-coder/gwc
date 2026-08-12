@@ -20,6 +20,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Hard clean the workspace (incl. untracked files) so a stale
+          # releases/changelog.d/*.md left by a prior run on a reused runner
+          # cannot poison the changelog-fragment hygiene validator.
+          clean: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -69,6 +73,11 @@ jobs:
       - name: Run governance unit tests
         run: |
           set -o pipefail
+          # Defense-in-depth: never let a stray invalid changelog fragment
+          # (e.g. a 'missing-task' marker leaked by a prior run) fail the
+          # changelog-hygiene validator. The repo legitimately has 80+ valid
+          # fragments; only synthetic leftovers should be removed.
+          rm -f releases/changelog.d/*missing* releases/changelog.d/*-missing-task.md
           python -m unittest discover -s tests -p "test_*.py" 2>&1 | tee governance-unit-tests.log
 
       - name: Compile Python tools

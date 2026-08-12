@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
-"""Pure deterministic projection reconcile-readback for SCRUM-225 (M4).
+"""Pure deterministic projection reconcile-readback for SCRUM-225 (M4) + NA81 readback contract.
 
 Consumes the shared closed envelope, the three B1 decisions (source-authority,
 evidence-linkset, privacy-boundary), the SCRUM-224 drift decision, a B2-rendered
 external projection, and a prior projection readback, then reconciles the
 projection against the prior readback.
+
+NA81 extension (SCRUM-348): when ``source_revision`` and/or ``idempotency_identity``
+are provided, the evaluator returns the NA81 readback taxonomy:
+
+* ``CONFIRMED``  — readback confirms the expected state.
+* ``PENDING``    — readback is pending / unknown; must be read before any repeat attempt.
+* ``CONFLICT``   — readback diverges from expected state.
+* ``UNAVAILABLE``— external readback is unavailable or pre-conditions are blocked.
+
+Unknown outcome is never inferred success. Historical SCRUM-225 outcomes (READY/BLOCKED)
+are preserved when the new parameters are omitted, so existing M4 callers/tests
+continue to pass unchanged.
 
 The evaluator is pure: it performs no connector call, network request, filesystem
 mutation, Jira transition, branch/PR action, approval, merge, deployment, release,
@@ -43,13 +55,18 @@ def reconcile_projection_readback(
     privacy_boundary_decision: Dict[str, Any],
     drift_decision: Dict[str, Any],
     projection: Dict[str, Any],
-    prior_readback: Dict[str, Any],
+    prior_readback: Optional[Dict[str, Any]] = None,
+    source_revision: str = "",
+    idempotency_identity: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Reconcile an external projection against a prior readback and drift decision.
 
-    Returns a closed ``projection-reconcile-readback`` artifact. Fails closed (BLOCKED)
+    Returns a closed ``projection-reconcile-readback`` artifact. Fails closed (UNAVAILABLE)
     for invalid input, missing/blocked B1 decisions, missing drift decision, or
     projection divergence from the prior readback.
+
+    NA81 readback contract: when ``source_revision`` or ``idempotency_identity`` is
+    supplied, the outcome becomes one of CONFIRMED / PENDING / CONFLICT / UNAVAILABLE.
     """
     reason_codes: List[str] = []
     divergence_fields: List[str] = []
@@ -59,7 +76,7 @@ def reconcile_projection_readback(
         reason_codes.append("RECONCILE_INPUT_INVALID")
     if not isinstance(projection, dict):
         reason_codes.append("RECONCILE_INPUT_INVALID")
-    if not isinstance(prior_readback, dict):
+    if prior_readback is not None and not isinstance(prior_readback, dict):
         reason_codes.append("RECONCILE_INPUT_INVALID")
 
     # --- B1 prerequisite gates ---------------------------------------------
@@ -76,35 +93,80 @@ def reconcile_projection_readback(
     elif drift_decision.get("drift_detected") is True:
         reason_codes.append("RECONCILE_DRIFT_DETECTED")
 
-    # --- Readback comparison ------------------------------------------------
-    if isinstance(projection, dict) and isinstance(prior_readback, dict):
-        proj_state = projection.get("canonical_state")
-        prior_state = prior_readback.get("canonical_state")
-        if proj_state is None:
-            reason_codes.append("RECONCILE_PROJECTION_STATE_MISSING")
-        elif prior_state is None:
-            reason_codes.append("RECONCILE_PRIOR_STATE_MISSING")
+    # --- Outcome selection ---------------------------------------------------
+    use_new_contract = bool(source_revision) or bool(idempotency_identity)
+
+    if use_new_contract:
+        # NA81 readback taxonomy (SCRUM-348): blocked pre-conditions are UNAVAILABLE.
+        if reason_codes:
+            outcome = "UNAVAILABLE"
+            reason_code = reason_codes[0]
+            current = False
+            divergence_fields = []
+        elif not isinstance(projection, dict) or (prior_readback is not None and not isinstance(prior_readback, dict)):
+            outcome = "UNAVAILABLE"
+            reason_code = "RECONCILE_INPUT_INVALID"
+            current = False
+            divergence_fields = []
+        elif not isinstance(prior_readback, dict):
+            # No prior readback at all — pending readback before repeat.
+            outcome = "PENDING"
+            reason_code = "RECONCILE_READBACK_PENDING"
+            current = False
+            divergence_fields = []
         else:
-            if proj_state != prior_state:
-                reason_codes.append("RECONCILE_READBACK_DIVERGENCE")
+            proj_state = projection.get("canonical_state")
+            prior_state = prior_readback.get("canonical_state")
+            if proj_state is None or prior_state is None:
+                outcome = "PENDING"
+                reason_code = "RECONCILE_READBACK_PENDING"
+                current = False
+                divergence_fields = []
+            elif proj_state != prior_state:
+                outcome = "CONFLICT"
+                reason_code = "RECONCILE_READBACK_CONFLICT"
+                current = False
                 for key in set(proj_state.keys()) | set(prior_state.keys()):
                     if proj_state.get(key) != prior_state.get(key):
                         divergence_fields.append(str(key))
-
-    current = not bool(reason_codes) and not bool(divergence_fields)
-    if current:
-        outcome = "READY"
-        reason_code = "PROJECTION_CURRENT"
-    elif divergence_fields:
-        outcome = "BLOCKED"
-        reason_code = "RECONCILE_READBACK_DIVERGENCE"
+                divergence_fields = sorted(divergence_fields)
+            else:
+                outcome = "CONFIRMED"
+                reason_code = "PROJECTION_READBACK_CONFIRMED"
+                current = True
+                divergence_fields = []
     else:
-        outcome = "BLOCKED"
-        reason_code = reason_codes[0]
+        # Legacy M4 contract (backward-compatible READY / BLOCKED)
+        if isinstance(projection, dict) and isinstance(prior_readback, dict):
+            proj_state = projection.get("canonical_state")
+            prior_state = prior_readback.get("canonical_state")
+            if proj_state is None:
+                reason_codes.append("RECONCILE_PROJECTION_STATE_MISSING")
+            elif prior_state is None:
+                reason_codes.append("RECONCILE_PRIOR_STATE_MISSING")
+            else:
+                if proj_state != prior_state:
+                    reason_codes.append("RECONCILE_READBACK_DIVERGENCE")
+                    for key in set(proj_state.keys()) | set(prior_state.keys()):
+                        if proj_state.get(key) != prior_state.get(key):
+                            divergence_fields.append(str(key))
 
-    semantic = {
+        current = not bool(reason_codes) and not bool(divergence_fields)
+        if current:
+            outcome = "READY"
+            reason_code = "PROJECTION_CURRENT"
+        elif divergence_fields:
+            outcome = "BLOCKED"
+            reason_code = "RECONCILE_READBACK_DIVERGENCE"
+        else:
+            outcome = "BLOCKED"
+            reason_code = reason_codes[0]
+
+    semantic: Dict[str, Any] = {
         "task_id": envelope.get("task_id") if isinstance(envelope, dict) else None,
         "projection_target": envelope.get("projection_target") if isinstance(envelope, dict) else None,
+        "source_revision": source_revision,
+        "idempotency_identity": idempotency_identity or {},
         "outcome": outcome,
         "current": current,
         "divergence_fields": sorted(divergence_fields),
@@ -112,18 +174,18 @@ def reconcile_projection_readback(
     }
     decision_digest = "sha256:" + hashlib.sha256(_stable_json(semantic).encode("utf-8")).hexdigest()
 
-    return {
+    result: Dict[str, Any] = {
         "schema_version": "1.0",
         "artifact_type": "projection-reconcile-readback",
         "task_id": (envelope.get("task_id") if isinstance(envelope, dict) else None),
         "repository": (envelope.get("repository") if isinstance(envelope, dict) else None),
         "projection_target": (envelope.get("projection_target") if isinstance(envelope, dict) else None),
         "outcome": outcome,
-        "authority_status": "REJECTED" if outcome == "BLOCKED" else "CONFIRMED",
+        "authority_status": "REJECTED" if outcome in ("BLOCKED", "UNAVAILABLE", "CONFLICT", "PENDING") else "CONFIRMED",
         "reason_code": reason_code,
-        "reason_codes": sorted(set(reason_codes)) if reason_codes else (["PROJECTION_CURRENT"] if current else ["RECONCILE_READBACK_DIVERGENCE"]),
+        "reason_codes": sorted(set(reason_codes)) if reason_codes else ([reason_code]),
         "current": current,
-        "divergence_fields": divergence_fields,
+        "divergence_fields": sorted(divergence_fields),
         "canonical_state_digest": semantic["canonical_state_digest"],
         "observed_at": None,
         "read_only_projection": True,
@@ -134,3 +196,8 @@ def reconcile_projection_readback(
         "production_authority_granted": False,
         "decision_digest": decision_digest,
     }
+    if source_revision:
+        result["source_revision"] = source_revision
+    if idempotency_identity:
+        result["idempotency_identity"] = idempotency_identity
+    return result

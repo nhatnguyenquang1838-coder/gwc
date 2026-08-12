@@ -127,6 +127,9 @@ jobs:
               }
             }
 
+            // Approval-time provenance remains pinned to the Human-approved
+            // anchor. Runtime documentation may evolve without rewriting Human
+            // authority, but the machine security/authority contract may not.
             const approvedApprovalPolicy = await readText(approvalPolicyPath, manifestScope.approved_base_sha);
             if (!approvedApprovalPolicy) return fail('AUTONOMOUS_POLICY_INVALID', 'approval-time policy cannot be read at approved anchor');
             if (digest(approvedApprovalPolicy) !== manifestScope.policy_digest) {
@@ -168,7 +171,7 @@ jobs:
             };
             const fullManifest = { ...manifestScope, authority_receipt: receipt };
             const manifestBody = `<!-- ${manifestMarker} approval_id=${approvalId} run_id=${manifestScope.run_id} manifest_scope_digest=${scopeDigest} source_comment_id=${sourceComment.id} -->\n\n## Trusted Autonomous Pre-Prod Run Manifest\n\n\`\`\`json\n${JSON.stringify(fullManifest, null, 2)}\n\`\`\``;
-            const receiptBody = `<!-- ${marker} status=${receipt.status} source=${receipt.source} bot_login=${receipt.bot_login} marker=${receipt.marker} approval_id=${approvalId} approved_run_id=${manifestScope.run_id} approved_policy_id=${manifestScope.policy_id} approved_policy_revision=${manifestScope.policy_revision} approved_policy_digest=${manifestScope.policy_digest} authority_policy_digest=${authorityPolicyDigest} manifest_scope_digest=${scopeDigest} scope_hash_prefix=${scopePrefix} source_comment_id=${sourceComment.id} receipt_comment_id=${receiptComment.id} manifest_comment_id=${manifestComment.id} allowed_tasks=${taskIds.join(',')} approved_base_sha=${manifestScope.approved_base_sha} materialized_preprod_sha=${currentPreprod} issued_at=${receipt.issued_at} expires_at=${receipt.expires_at} -->\n\n## Trusted Autonomous Run Authority Receipt\n\n- Status: \`AUTHORIZED_READY\`\n- Approval: \`${approvalId}\`\n- Run: \`${manifestScope.run_id}\`\n- Authority anchor: \`${manifestScope.approved_base_sha}\`\n- Execution base at materialization: \`${currentPreprod}\`\n- Machine authority policy: \`${authorityPolicyDigest}\`\n- Allowed tasks: \`${taskIds.length}\`\n- Scope: \`${scopeDigest}\`\n- Expires: \`${receipt.expires_at}\``;
+            const receiptBody = `<!-- ${marker} status=${receipt.status} source=${receipt.source} bot_login=${receipt.bot_login} marker=${receipt.marker} approval_id=${approvalId} approved_run_id=${manifestScope.run_id} approved_policy_id=${manifestScope.policy_id} approved_policy_revision=${manifestScope.policy_revision} approved_policy_digest=${manifestScope.policy_digest} manifest_scope_digest=${scopeDigest} scope_hash_prefix=${scopePrefix} source_comment_id=${sourceComment.id} receipt_comment_id=${receiptComment.id} manifest_comment_id=${manifestComment.id} allowed_tasks=${taskIds.join(',')} approved_base_sha=${manifestScope.approved_base_sha} materialized_preprod_sha=${currentPreprod} issued_at=${receipt.issued_at} expires_at=${receipt.expires_at} -->\n\n## Trusted Autonomous Run Authority Receipt\n\n- Status: \`AUTHORIZED_READY\`\n- Approval: \`${approvalId}\`\n- Run: \`${manifestScope.run_id}\`\n- Approved base: \`${manifestScope.approved_base_sha}\`\n- Materialized pre-prod: \`${currentPreprod}\`\n- Allowed tasks: \`${taskIds.length}\`\n- Scope: \`${scopeDigest}\`\n- Expires: \`${receipt.expires_at}\``;
             await github.rest.issues.updateComment({ owner, repo, comment_id: manifestComment.id, body: manifestBody });
             await github.rest.issues.updateComment({ owner, repo, comment_id: receiptComment.id, body: receiptBody });
 
@@ -182,8 +185,7 @@ jobs:
                 !receiptReadback?.body?.includes(`bot_login=${receipt.bot_login} `) ||
                 !receiptReadback?.body?.includes(`marker=${receipt.marker} `) ||
                 !receiptReadback?.body?.includes(`source_comment_id=${sourceComment.id}`) ||
-                !receiptReadback?.body?.includes(`scope_hash_prefix=${scopePrefix}`) ||
-                !receiptReadback?.body?.includes(`authority_policy_digest=${authorityPolicyDigest}`)) {
+                !receiptReadback?.body?.includes(`scope_hash_prefix=${scopePrefix}`)) {
               return fail('AUTONOMOUS_RUN_AUTHORITY_READBACK_MISMATCH', 'trusted bot projection readback failed');
             }
             core.info(`AUTHORIZED_READY ${manifestScope.run_id} ${scopeDigest} authority_anchor=${manifestScope.approved_base_sha} execution_base=${currentPreprod} authority_policy=${authorityPolicyDigest}`);

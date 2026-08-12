@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/gate-authority/evidence-artifact-map.schema.json",
+  "title": "GWC Evidence Artifact Map",
+  "description": "Closed, read-only evidence map for a current gate/action. It identifies proof and never grants authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "task_id", "repository", "base_sha",
+    "policy_revision", "outcome", "entries", "requirements", "missing_required",
+    "stale_required", "projection_only", "map_digest", "authority_granted"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-evidence-artifact-map"},
+    "task_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "policy_revision": {"type": "string", "minLength": 1},
+    "mapped_at": {"type": ["string", "null"], "format": "date-time"},
+    "outcome": {"enum": ["READY", "BLOCKED"]},
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "EVIDENCE_MAP_READY", "EVIDENCE_INPUT_INVALID", "EVIDENCE_BINDING_MISMATCH",
+          "EVIDENCE_CONFLICT", "EVIDENCE_PROJECTION_ONLY", "EVIDENCE_STALE",
+          "EVIDENCE_REQUIRED_MISSING", "EVIDENCE_OBSERVABILITY_INCOMPLETE",
+          "EVIDENCE_CI_BINDING_MISMATCH", "EVIDENCE_G6_NOT_APPLICABLE"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "entries": {"type": "array", "items": {"$ref": "#/$defs/entry"}},
+    "requirements": {"type": "array", "items": {"$ref": "#/$defs/requirement"}},
+    "missing_required": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "stale_required": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "projection_only": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "map_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authority_granted": {"const": false}
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_key", "gate", "artifact_role", "artifact_type", "classification",
+        "required", "source_type", "target", "binding_status", "freshness_status",
+        "materialization_status", "source_of_truth", "reason_codes"
+      ],
+      "properties": {
+        "evidence_key": {"type": "string", "minLength": 1},
+        "gate": {"type": "string", "minLength": 1},
+        "artifact_role": {"type": "string", "minLength": 1},
+        "artifact_type": {"type": "string", "minLength": 1},
+        "classification": {
+          "enum": ["CANONICAL_AUTHORITY", "CANONICAL_GATE_EVIDENCE", "DELIVERY_EVIDENCE", "AUDIT_PROJECTION", "RESUME_HINT"]
+        },
+        "required": {"type": "boolean"},
+        "source_type": {"type": "string", "minLength": 1},
+        "target": {"type": ["string", "null"]},
+        "ref": {"type": ["string", "null"]},
+        "revision": {"type": ["string", "null"]},
+        "digest": {"type": ["string", "null"]},
+        "binding_status": {"enum": ["BOUND", "MISMATCHED", "UNOBSERVED", "NOT_APPLICABLE"]},
+        "freshness_status": {"enum": ["FRESH", "STALE", "UNOBSERVED"]},
+        "materialization_status": {"enum": ["MATERIALIZED", "MISSING", "UNOBSERVED"]},
+        "source_of_truth": {"type": "boolean"},
+        "reason_codes": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate", "artifact_role", "target", "required"],
+      "properties": {
+        "gate": {"type": "string", "minLength": 1},
+        "artifact_role": {"type": "string", "minLength": 1},
+        "target": {"type": "string", "minLength": 1},
+        "required": {"type": "boolean"}
+      }
+    }
+  }
+}
