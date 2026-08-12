@@ -3,6 +3,10 @@ import unittest
 
 import yaml
 
+from helpers.chatgpt_instruction_composer import (
+    compose_chatgpt_instructions,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ROOT_INSTRUCTIONS = ROOT / "AGENTS.md"
@@ -16,7 +20,9 @@ class ChatGPTArtifactContinuationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.root_text = ROOT_INSTRUCTIONS.read_text(encoding="utf-8")
-        cls.text = INSTRUCTIONS.read_text(encoding="utf-8")
+        # Composed Entrypoint: validate the effective ChatGPT instructions
+        # (composer + gwc-governed-base.md) per SCRUM-404 / GitHub #441.
+        cls.text = compose_chatgpt_instructions(ROOT)
         cls.package = yaml.safe_load(PACKAGE.read_text(encoding="utf-8"))
         cls.kiro_text = KIRO_RULE.read_text(encoding="utf-8")
 

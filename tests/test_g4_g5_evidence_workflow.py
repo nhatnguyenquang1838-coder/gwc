@@ -16,7 +16,13 @@ G4_SCHEMA = ROOT / "schemas" / "g4-merge-authority-receipt.schema.json"
 G4_TEMPLATE = ROOT / "templates" / "gates" / "g4-merge-authority-receipt.template.json"
 G5_TOOL = ROOT / "tools" / "node_architect" / "validate_g5_ci_verification.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "g4-g5-evidence.yml"
-AGENT_INSTRUCTIONS = ROOT / "agents" / "chatgpt-agent" / "agent-instructions.md"
+# Composed Entrypoint: validate the effective (composer + gwc-governed-base.md)
+# ChatGPT instructions per SCRUM-404 / GitHub #441.
+from helpers.chatgpt_instruction_composer import (
+    compose_chatgpt_instructions,
+)
+
+AGENT_INSTRUCTIONS = compose_chatgpt_instructions(ROOT)
 
 SPEC = importlib.util.spec_from_file_location("validate_g4_merge_authority", G4_TOOL)
 assert SPEC and SPEC.loader
@@ -219,7 +225,9 @@ class G4G5EvidenceWorkflowTests(unittest.TestCase):
         self.assertEqual(1, names.count("g5-recovery"))
 
     def test_agent_instruction_materializes_full_g4_g5_flow(self) -> None:
-        text = AGENT_INSTRUCTIONS.read_text(encoding="utf-8")
+        # AGENT_INSTRUCTIONS is the pre-composed effective ChatGPT instructions
+        # (composer + gwc-governed-base.md) per SCRUM-404 / GitHub #441.
+        text = AGENT_INSTRUCTIONS
         for marker in (
             "G4/G5 GitHub evidence flow",
             "APPROVE G4 <approval_id> <scope_hash_16> <expires_at_utc>",
