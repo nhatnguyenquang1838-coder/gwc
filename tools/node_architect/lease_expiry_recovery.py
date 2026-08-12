@@ -3,6 +3,11 @@
 
 The router prevents stale workers from advancing after lease expiry and only
 allows continuation after safe readback and monotonic lease reacquisition.
+
+NA81 (SCRUM-366) delta: a holder may resume/reacquire only when it is the
+*current authorized actor/run/scope*. Wrong actor/run/scope and renewal-race
+attempts are fenced rather than silently allowed. All new parameters default to
+None/False so historical callers (e.g. SCRUM-243 M5 tests) keep passing.
 """
 from __future__ import annotations
 
@@ -25,7 +30,20 @@ def digest_payload(payload: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
 
-def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, base_sha: str, head_sha: str, scope_hash: str, lease_id: str, worker_id: str, now_epoch_ms: int, lease_expires_epoch_ms: int, observed_fencing_token: int, worker_fencing_token: int, readback_status: str, reacquire_status: str, duplicate_agent_detected: bool, side_effect_status: str, observed_at: str | None = None) -> dict[str, Any]:
+def _binding_violation(*, worker_id: str, run_id: str | None, scope_hash: str,
+                        expected_actor_id: str | None, expected_run_id: str | None,
+                        expected_scope_hash: str | None):
+    """Return (outcome, reason) if the resuming holder is not the authorized one."""
+    if expected_actor_id is not None and worker_id != expected_actor_id:
+        return "FENCE_WRONG_ACTOR", "RESUME_BY_WRONG_ACTOR"
+    if expected_run_id is not None and run_id != expected_run_id:
+        return "FENCE_WRONG_RUN", "RESUME_BY_WRONG_RUN"
+    if expected_scope_hash is not None and scope_hash != expected_scope_hash:
+        return "FENCE_WRONG_SCOPE", "RESUME_BY_WRONG_SCOPE"
+    return None
+
+
+def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, base_sha: str, head_sha: str, scope_hash: str, lease_id: str, worker_id: str, now_epoch_ms: int, lease_expires_epoch_ms: int, observed_fencing_token: int, worker_fencing_token: int, readback_status: str, reacquire_status: str, duplicate_agent_detected: bool, side_effect_status: str, observed_at: str | None = None, expected_actor_id: str | None = None, expected_run_id: str | None = None, run_id: str | None = None, expected_scope_hash: str | None = None, concurrent_reacquire_detected: bool = False) -> dict[str, Any]:
     lease_expired = now_epoch_ms >= lease_expires_epoch_ms
     stale_worker = worker_fencing_token < observed_fencing_token
 
@@ -33,12 +51,21 @@ def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, 
     side_effect_allowed = False
     reacquire_required = False
     checkpoint_required = True
+    binding_valid = True
 
     if not lease_expired:
-        outcome, reason = "CONTINUE", "LEASE_STILL_VALID"
-        advancement_allowed = True
-        side_effect_allowed = side_effect_status == "NONE"
-        checkpoint_required = False
+        binding = _binding_violation(
+            worker_id=worker_id, run_id=run_id, scope_hash=scope_hash,
+            expected_actor_id=expected_actor_id, expected_run_id=expected_run_id,
+            expected_scope_hash=expected_scope_hash)
+        if binding is not None:
+            outcome, reason = binding
+            binding_valid = False
+        else:
+            outcome, reason = "CONTINUE", "LEASE_STILL_VALID"
+            advancement_allowed = True
+            side_effect_allowed = side_effect_status == "NONE"
+            checkpoint_required = False
     elif stale_worker:
         outcome, reason = "FENCE_STALE_WORKER", "WORKER_FENCING_TOKEN_STALE"
     elif readback_status != "VERIFIED_ZERO_EFFECT":
@@ -51,10 +78,20 @@ def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, 
         outcome, reason = "REACQUIRE_LEASE", "MONOTONIC_REACQUIRE_REQUIRED"
         reacquire_required = True
     else:
-        outcome, reason = "CONTINUE_AFTER_REACQUIRE", "LEASE_REACQUIRED_WITH_MONOTONIC_FENCE"
-        advancement_allowed = True
-        side_effect_allowed = True
-        checkpoint_required = False
+        binding = _binding_violation(
+            worker_id=worker_id, run_id=run_id, scope_hash=scope_hash,
+            expected_actor_id=expected_actor_id, expected_run_id=expected_run_id,
+            expected_scope_hash=expected_scope_hash)
+        if binding is not None:
+            outcome, reason = binding
+            binding_valid = False
+        elif concurrent_reacquire_detected:
+            outcome, reason = "FENCE_CONCURRENT_REACQUIRE", "RENEWAL_RACE_DETECTED"
+        else:
+            outcome, reason = "CONTINUE_AFTER_REACQUIRE", "LEASE_REACQUIRED_WITH_MONOTONIC_FENCE"
+            advancement_allowed = True
+            side_effect_allowed = True
+            checkpoint_required = False
 
     decision = {
         "schema_version": "1.0",
@@ -67,6 +104,7 @@ def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, 
         "scope_hash": scope_hash,
         "lease_id": lease_id,
         "worker_id": worker_id,
+        "run_id": run_id,
         "now_epoch_ms": now_epoch_ms,
         "lease_expires_epoch_ms": lease_expires_epoch_ms,
         "lease_expired": lease_expired,
@@ -76,6 +114,10 @@ def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, 
         "reacquire_status": reacquire_status,
         "duplicate_agent_detected": duplicate_agent_detected,
         "side_effect_status": side_effect_status,
+        "expected_actor_id": expected_actor_id,
+        "expected_run_id": expected_run_id,
+        "expected_scope_hash": expected_scope_hash,
+        "concurrent_reacquire_detected": concurrent_reacquire_detected,
         "observed_at": observed_at or _now(),
         "outcome": outcome,
         "reason_code": reason,
@@ -83,6 +125,7 @@ def decide_lease_expiry_recovery(*, task_id: str, repository: str, branch: str, 
         "side_effect_allowed": side_effect_allowed,
         "reacquire_required": reacquire_required,
         "checkpoint_required": checkpoint_required,
+        "binding_valid": binding_valid,
         "blind_retry_allowed": False,
     }
     decision["decision_digest"] = digest_payload({k: v for k, v in decision.items() if k != "decision_digest"})
