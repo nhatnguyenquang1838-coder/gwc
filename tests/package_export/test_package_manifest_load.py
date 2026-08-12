@@ -11,6 +11,7 @@ existing closed schemas/project-package.schema.json.
 from __future__ import annotations
 
 import os
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -37,6 +38,10 @@ from package_manifest_load import (  # noqa: E402
     MANIFEST_AMBIGUOUS_SOURCE,
     MANIFEST_REPLAY_CONFLICT,
     MANIFEST_MISSING_INSTRUCTIONS,
+    MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE,
+    REPLAY_STATUS_NONE,
+    REPLAY_STATUS_IDEMPOTENT,
+    REPLAY_STATUS_CONFLICT,
     SourceBinding,
     load_manifest,
 )
@@ -272,31 +277,44 @@ class TestPackageManifestLoadBlocked(unittest.TestCase):
 class TestReplay(unittest.TestCase):
     def test_idempotent_replay_same_identity(self):
         payload = _canonical_package()
-        r1 = _load_ok(payload)
-        r2 = _load_ok(payload)
-        self.assertEqual(r1.manifest_digest, r2.manifest_digest)
-        self.assertEqual(r1.outcome, r2.outcome)
-        self.assertEqual(len(r1.entries), len(r2.entries))
+        key = "k1"
+        prior = load_manifest(source=payload, binding=_binding(), observed_source_sha=OBSERVED_SHA, idempotency_key=key)
+        self.assertEqual(prior.outcome, OUTCOME_LOADED)
+        self.assertEqual(prior.replay_status, REPLAY_STATUS_NONE)
+        # A prior_decision carrying the same replay_identity must replay IDEMPOTENT.
+        prior_decision = {"replay_identity": prior.replay_identity}
+        r2 = load_manifest(source=payload, binding=_binding(), observed_source_sha=OBSERVED_SHA,
+                            idempotency_key=key, prior_decision=prior_decision)
+        self.assertEqual(r2.outcome, OUTCOME_LOADED)
+        self.assertEqual(r2.replay_status, REPLAY_STATUS_IDEMPOTENT)
+        self.assertEqual(r2.replay_identity, prior.replay_identity)
+        self.assertNotIn("observed_source_sha", r2.to_dict())
 
     def test_replay_changed_payload_conflict(self):
-        r1 = _load_ok(_canonical_package(instructions=[
-            {"id": "aaa", "path": "p1", "target": "t1"},
-        ]))
-        r2 = _load_ok(_canonical_package(instructions=[
-            {"id": "aaa", "path": "p1", "target": "DIFFERENT"},
-        ]))
-        # Different semantic manifest => different digest; same key under same
-        # binding + observed SHA is a valid identity drift (REPLAY_CONFLICT class
-        # applies when prior_decision identity differs). Here we assert the
-        # digests differ (traceability) and that the loader remains deterministic.
-        self.assertNotEqual(r1.manifest_digest, r2.manifest_digest)
+        key = "k2"
+        prior_payload = _canonical_package(instructions=[{"id": "aaa", "path": "p1", "target": "t1"}])
+        prior = load_manifest(source=prior_payload, binding=_binding(), observed_source_sha=OBSERVED_SHA, idempotency_key=key)
+        self.assertEqual(prior.outcome, OUTCOME_LOADED)
+        # Same key, changed semantic payload => prior replay identity differs.
+        new_payload = _canonical_package(instructions=[{"id": "aaa", "path": "p1", "target": "DIFFERENT"}])
+        r2 = load_manifest(source=new_payload, binding=_binding(), observed_source_sha=OBSERVED_SHA,
+                            idempotency_key=key, prior_decision={"replay_identity": prior.replay_identity})
+        self.assertEqual(r2.outcome, OUTCOME_BLOCKED)
+        self.assertEqual(r2.errors[0].reason_code, MANIFEST_REPLAY_CONFLICT)
+        self.assertEqual(r2.replay_status, REPLAY_STATUS_CONFLICT)
 
     def test_replay_changed_source_ref_conflict(self):
-        r1 = _load_ok()
-        r2 = _load_ok(binding=_binding())
-        # Same payload, same binding => identical. Changing source_ref is part of
-        # binding identity; verify binding surfaces in result for traceability.
-        self.assertEqual(r1.binding.source_ref, r2.binding.source_ref)
+        key = "k3"
+        prior = load_manifest(source=_canonical_package(), binding=_binding(), observed_source_sha=OBSERVED_SHA, idempotency_key=key)
+        self.assertEqual(prior.outcome, OUTCOME_LOADED)
+        # Same key + changed binding.source_ref only => different FULL binding => conflict.
+        changed_binding = _binding()
+        changed_binding["source_ref"] = "refs/heads/other-branch"
+        r2 = load_manifest(source=_canonical_package(), binding=changed_binding, observed_source_sha=OBSERVED_SHA,
+                            idempotency_key=key, prior_decision={"replay_identity": prior.replay_identity})
+        self.assertEqual(r2.outcome, OUTCOME_BLOCKED)
+        self.assertEqual(r2.errors[0].reason_code, MANIFEST_REPLAY_CONFLICT)
+        self.assertEqual(r2.replay_status, REPLAY_STATUS_CONFLICT)
 
     def test_replay_changed_observed_sha_conflict(self):
         r_ok = _load_ok()
@@ -304,6 +322,80 @@ class TestReplay(unittest.TestCase):
         self.assertEqual(r_ok.outcome, OUTCOME_LOADED)
         self.assertEqual(r_stale.outcome, OUTCOME_BLOCKED)
         self.assertEqual(r_stale.errors[0].reason_code, MANIFEST_STALE_SOURCE)
+
+
+class TestResultSchemaContract(unittest.TestCase):
+    """Validate the typed result against the committed result schema.
+
+    Uses jsonschema.Draft7Validator.iter_errors (Context7-confirmed API).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import jsonschema  # type: ignore
+        cls._jsonschema = jsonschema
+        repo_root = Path(__file__).resolve().parents[2]
+        schema_path = repo_root / "schemas" / "node-architect" / "package-export" / "package-manifest-load.schema.json"
+        cls._schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        cls._validator = jsonschema.Draft7Validator(cls._schema)
+
+    def _assert_valid(self, result):
+        errors = list(self._validator.iter_errors(result.to_dict()))
+        self.assertEqual(errors, [], [e.message for e in errors])
+
+    def test_loaded_result_validates(self):
+        r = _load_ok(idempotency_key="schema-k1")
+        self.assertEqual(r.outcome, OUTCOME_LOADED)
+        self._assert_valid(r)
+
+    def test_blocked_no_source_validates(self):
+        r = load_manifest(binding=_binding(), observed_source_sha=OBSERVED_SHA)
+        self.assertEqual(r.outcome, OUTCOME_BLOCKED)
+        self.assertIsNone(r.binding)
+        self.assertIsNone(r.to_dict()["binding"])
+        self._assert_valid(r)
+
+    def test_blocked_malformed_yaml_validates(self):
+        r = load_manifest(source="instructions: [unclosed", binding=_binding(), observed_source_sha=OBSERVED_SHA)
+        self.assertEqual(r.outcome, OUTCOME_BLOCKED)
+        self._assert_valid(r)
+
+    def test_blocked_missing_binding_validates(self):
+        r = load_manifest(source=_canonical_package(), binding={"task_id": "x"}, observed_source_sha=OBSERVED_SHA)
+        self.assertEqual(r.outcome, OUTCOME_BLOCKED)
+        self._assert_valid(r)
+
+    def test_blocked_stale_source_sha_validates(self):
+        r = load_manifest(source=_canonical_package(), binding=_binding(), observed_source_sha=WRONG_SHA)
+        self.assertEqual(r.outcome, OUTCOME_BLOCKED)
+        self._assert_valid(r)
+
+    def test_blocked_replay_conflict_validates(self):
+        key = "schema-k2"
+        prior = load_manifest(source=_canonical_package(instructions=[{"id": "aaa", "path": "p1", "target": "t1"}]),
+                               binding=_binding(), observed_source_sha=OBSERVED_SHA, idempotency_key=key)
+        self.assertEqual(prior.outcome, OUTCOME_LOADED)
+        r2 = load_manifest(source=_canonical_package(instructions=[{"id": "aaa", "path": "p1", "target": "DIFFERENT"}]),
+                            binding=_binding(), observed_source_sha=OBSERVED_SHA, idempotency_key=key,
+                            prior_decision={"replay_identity": prior.replay_identity})
+        self.assertEqual(r2.outcome, OUTCOME_BLOCKED)
+        self._assert_valid(r2)
+
+    def test_observed_source_sha_never_emitted(self):
+        r = _load_ok()
+        self.assertNotIn("observed_source_sha", r.to_dict())
+
+
+class TestSchemaValidationUnavailable(unittest.TestCase):
+    """The closed input schema validation path must fail CLOSED, not silently pass."""
+
+    def test_unavailable_blocks_closed(self):
+        import package_manifest_load as mod
+        import unittest.mock as mock
+        with mock.patch.object(mod, "_load_input_schema", return_value=(None, "injected-unavailable")):
+            r = load_manifest(source=_canonical_package(), binding=_binding(), observed_source_sha=OBSERVED_SHA)
+        self.assertEqual(r.outcome, OUTCOME_BLOCKED)
+        self.assertEqual(r.errors[0].reason_code, MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE)
 
 
 if __name__ == "__main__":

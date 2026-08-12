@@ -52,6 +52,12 @@ MANIFEST_DUPLICATE_ENTRY_ID = "MANIFEST_DUPLICATE_ENTRY_ID"
 MANIFEST_AMBIGUOUS_SOURCE = "MANIFEST_AMBIGUOUS_SOURCE"
 MANIFEST_REPLAY_CONFLICT = "MANIFEST_REPLAY_CONFLICT"
 MANIFEST_MISSING_INSTRUCTIONS = "MANIFEST_MISSING_INSTRUCTIONS"
+MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE = "MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE"
+
+# Replay status taxonomy (recorded in result; non-authoritative).
+REPLAY_STATUS_NONE = "NONE"
+REPLAY_STATUS_IDEMPOTENT = "IDEMPOTENT"
+REPLAY_STATUS_CONFLICT = "CONFLICT"
 
 REASON_CODES: Tuple[str, ...] = (
     MANIFEST_LOADED,
@@ -64,6 +70,7 @@ REASON_CODES: Tuple[str, ...] = (
     MANIFEST_AMBIGUOUS_SOURCE,
     MANIFEST_REPLAY_CONFLICT,
     MANIFEST_MISSING_INSTRUCTIONS,
+    MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE,
 )
 
 GIT_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
@@ -195,11 +202,14 @@ class ManifestLoadResult:
     schema_version: str
     outcome: Outcome
     manifest_digest: str
-    binding: SourceBinding
+    binding: Optional[SourceBinding]
     source_sha: str
     entries: List[LoadedEntry] = field(default_factory=list)
     errors: List[ManifestError] = field(default_factory=list)
     authority_granted: bool = False  # never grants authority
+    idempotency_key: str = ""
+    replay_identity: str = ""
+    replay_status: str = REPLAY_STATUS_NONE
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -207,11 +217,14 @@ class ManifestLoadResult:
             "schema_version": self.schema_version,
             "outcome": self.outcome.value,
             "manifest_digest": self.manifest_digest,
-            "binding": self.binding.to_dict(),
-            "source_sha": self.source_sha,
+            "binding": self.binding.to_dict() if self.binding is not None else None,
+            "source_sha": self.source_sha if self.source_sha else None,
             "entries": [e.to_dict() for e in self.entries],
             "errors": [e.to_dict() for e in self.errors],
             "authority_granted": self.authority_granted,
+            "idempotency_key": self.idempotency_key,
+            "replay_identity": self.replay_identity,
+            "replay_status": self.replay_status,
         }
 
     def to_json(self) -> str:
@@ -393,25 +406,34 @@ def _materialize_entries(
 
 
 def _load_input_schema():
-    """Load schemas/project-package.schema.json if jsonschema is available."""
+    """Load schemas/project-package.schema.json if jsonschema is available.
+
+    Returns a tuple ``(validator, unavailable_reason)`` where exactly one is
+    non-None. When validation is unavailable (missing jsonschema, missing or
+    unreadable schema, or schema-load failure) the caller MUST fail closed
+    with MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE rather than silently passing.
+    """
     try:
         import jsonschema  # type: ignore
     except ImportError:
-        return None
+        return (None, "jsonschema is not installed")
     from pathlib import Path
     repo_root = Path(__file__).resolve().parents[3]
     candidate = repo_root / "schemas" / "project-package.schema.json"
     if not candidate.is_file():
-        return None
+        return (None, f"schema file not found: {candidate}")
     try:
         schema = json.loads(candidate.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001 - load failures must fail closed
+        return (None, f"schema file unreadable: {exc}")
+    try:
         if str(schema.get("$schema", "")).startswith("https://json-schema.org/draft/2020"):
             validator_cls = jsonschema.Draft202012Validator
         else:
             validator_cls = jsonschema.Draft7Validator
-        return validator_cls(schema)
-    except Exception:
-        return None
+        return (validator_cls(schema), None)
+    except Exception as exc:  # noqa: BLE001 - validator build failures must fail closed
+        return (None, f"schema validator build failed: {exc}")
 
 
 def _schema_error_to_manifest_error(err: Any) -> ManifestError:
@@ -491,6 +513,9 @@ def _blocked_result(
     manifest_digest: str,
     source_sha: str = "",
     entries: Optional[List[LoadedEntry]] = None,
+    idempotency_key: str = "",
+    replay_identity: str = "",
+    replay_status: str = REPLAY_STATUS_NONE,
 ) -> ManifestLoadResult:
     errors = sorted(errors, key=lambda e: e.sort_key()) if errors else []
     effective_binding = binding if binding is not None else _NULL_BINDING
@@ -499,11 +524,14 @@ def _blocked_result(
         schema_version=SCHEMA_VERSION,
         outcome=Outcome.BLOCKED,
         manifest_digest=manifest_digest,
-        binding=effective_binding,
-        source_sha=source_sha if source_sha else effective_binding.source_sha,
+        binding=binding,
+        source_sha=source_sha if source_sha else (effective_binding.source_sha if effective_binding is not _NULL_BINDING else ""),
         entries=entries or [],
         errors=errors,
         authority_granted=False,
+        idempotency_key=idempotency_key,
+        replay_identity=replay_identity,
+        replay_status=replay_status,
     )
 
 
@@ -643,20 +671,55 @@ def load_manifest(
             source_sha=binding_obj.source_sha,
         )
 
-    # --- Full input schema validation (jsonschema, when available) ---
-    validator = _load_input_schema()
-    if validator is not None:
-        schema_errors = sorted(validator.iter_errors(payload), key=lambda e: list(e.absolute_path))
-        if schema_errors:
-            errors = [_schema_error_to_manifest_error(err) for err in schema_errors]
-            return _blocked_result(
-                errors=errors,
-                binding=binding_obj,
-                manifest_digest=compute_manifest_digest(payload),
-                source_sha=binding_obj.source_sha,
-            )
+    # --- Full input schema validation (jsonschema, fail-closed) ---
+    validator, schema_unavailable = _load_input_schema()
+    if schema_unavailable is not None:
+        return _blocked_result(
+            errors=[ManifestError(
+                reason_code=MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE,
+                json_path="$.manifest",
+                detail=f"closed input schema validation unavailable: {schema_unavailable}",
+            )],
+            binding=binding_obj,
+            manifest_digest=compute_manifest_digest(payload),
+            source_sha=binding_obj.source_sha,
+            idempotency_key=idempotency_key,
+        )
+    schema_errors = sorted(validator.iter_errors(payload), key=lambda e: list(e.absolute_path))
+    if schema_errors:
+        errors = [_schema_error_to_manifest_error(err) for err in schema_errors]
+        return _blocked_result(
+            errors=errors,
+            binding=binding_obj,
+            manifest_digest=compute_manifest_digest(payload),
+            source_sha=binding_obj.source_sha,
+            idempotency_key=idempotency_key,
+        )
 
     manifest_digest = compute_manifest_digest(payload)
+
+    # --- Replay identity + replay enforcement (deterministic) ---
+    replay_identity = _replay_identity(payload, binding_obj, observed_source_sha or "")
+    replay_status = REPLAY_STATUS_NONE
+    if idempotency_key and prior_decision:
+        prior_id = prior_decision.get("replay_identity")
+        if prior_id is not None:
+            if prior_id == replay_identity:
+                replay_status = REPLAY_STATUS_IDEMPOTENT
+            else:
+                return _blocked_result(
+                    errors=[ManifestError(
+                        reason_code=MANIFEST_REPLAY_CONFLICT,
+                        json_path="$.manifest",
+                        detail="prior_decision replay_identity differs from current load under the same idempotency_key",
+                    )],
+                    binding=binding_obj,
+                    manifest_digest=manifest_digest,
+                    source_sha=binding_obj.source_sha,
+                    idempotency_key=idempotency_key,
+                    replay_identity=replay_identity,
+                    replay_status=REPLAY_STATUS_CONFLICT,
+                )
 
     # --- Source SHA freshness check (observed vs binding) ---
     sha_err = _resolve_source_sha(binding_obj, observed_source_sha)
@@ -691,9 +754,7 @@ def load_manifest(
             source_sha=binding_obj.source_sha,
         )
 
-    # --- Replay identity (traceability only; not stored in result) ---
-    _ = _replay_identity(payload, binding_obj, observed_source_sha or "")
-
+    # --- Replay evidence carried on the typed result ---
     return ManifestLoadResult(
         schema_id=SCHEMA_ID,
         schema_version=SCHEMA_VERSION,
@@ -704,4 +765,7 @@ def load_manifest(
         entries=entries,
         errors=[],
         authority_granted=False,
+        idempotency_key=idempotency_key,
+        replay_identity=replay_identity,
+        replay_status=replay_status,
     )

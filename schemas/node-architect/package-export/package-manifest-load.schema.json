@@ -14,7 +14,10 @@
     "source_sha",
     "entries",
     "errors",
-    "authority_granted"
+    "authority_granted",
+    "idempotency_key",
+    "replay_identity",
+    "replay_status"
   ],
   "properties": {
     "schema_id": { "const": "gwc.package_export.package_manifest_load" },
@@ -28,8 +31,11 @@
       ]
     },
     "authority_granted": { "const": false },
+    "idempotency_key": { "type": "string" },
+    "replay_identity": { "type": "string", "pattern": "^(sha256:[0-9a-f]{64})?$" },
+    "replay_status": { "type": "string", "enum": ["NONE", "IDEMPOTENT", "CONFLICT"] },
     "binding": {
-      "type": "object",
+      "type": ["object", "null"],
       "additionalProperties": false,
       "required": [
         "task_id",
@@ -76,6 +82,48 @@
       }
     }
   },
+  "if": {
+    "properties": { "outcome": { "const": "LOADED" } }
+  },
+  "then": {
+    "properties": {
+      "binding": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "repository",
+          "package_path",
+          "source_ref",
+          "source_sha",
+          "package_version"
+        ],
+        "properties": {
+          "task_id": { "type": "string", "minLength": 1 },
+          "repository": { "type": "string", "minLength": 1 },
+          "package_path": { "type": "string", "minLength": 1 },
+          "source_ref": { "type": "string", "minLength": 1 },
+          "source_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+          "package_version": { "type": "string", "minLength": 1 }
+        }
+      },
+      "source_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+      "replay_identity": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+      "replay_status": { "type": "string", "enum": ["NONE", "IDEMPOTENT", "CONFLICT"] }
+    },
+    "required": ["binding", "source_sha", "replay_identity"]
+  },
+  "else": {
+    "properties": {
+      "binding": { "type": ["object", "null"] },
+      "source_sha": {
+        "anyOf": [
+          { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+          { "type": "null" }
+        ]
+      }
+    }
+  },
   "definitions": {
     "reasonCode": {
       "type": "string",
@@ -89,7 +137,8 @@
         "MANIFEST_DUPLICATE_ENTRY_ID",
         "MANIFEST_AMBIGUOUS_SOURCE",
         "MANIFEST_REPLAY_CONFLICT",
-        "MANIFEST_MISSING_INSTRUCTIONS"
+        "MANIFEST_MISSING_INSTRUCTIONS",
+        "MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE"
       ]
     }
   }
