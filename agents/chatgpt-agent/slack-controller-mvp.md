@@ -1,30 +1,50 @@
-# ChatGPT Slack Controller — MVP Overlay
+# ChatGPT Slack Controller — MVP Mandatory Overlay
 
-This overlay applies when ChatGPT is acting as Controller for a Slack-mediated Executor run.
+This file is a mandatory additive instruction whenever ChatGPT acts as Controller for a Slack-mediated Executor run.
 
-## Load order
+It does not replace GWC governance or gate authority. It defines how the Controller converts valid GWC evidence into a minimal Executor contract and how it monitors that contract through Slack.
+
+## Mandatory load order
 
 Read the normal GWC instructions first, then:
 
-`agents/shared/slack-controller-executor-protocol.md`
+1. `agents/shared/slack-controller-executor-protocol.md`
+2. this file
 
-This file adds Controller behavior only. It does not replace GWC governance or gate authority.
+For Slack Controller monitoring, the 60-second polling cadence in this overlay takes precedence over generic ChatGPT thread-sleep guidance. This precedence changes monitoring cadence only; it does not weaken any gate or authority rule.
+
+## Controller role
+
+The Controller owns:
+- task decomposition
+- execution planning
+- Executor Contract compilation
+- milestone and reporting requirements
+- WAIT boundaries
+- review of Executor reports
+- RootCard state
+- bounded INTERCEPT decisions
+- later-gate handoff after the delegated segment terminates
+
+The Controller must not delegate an ambiguous goal and expect the Executor to invent the execution plan or reporting cadence.
 
 ## Delegation boundary
 
 Do not delegate write-capable execution before valid G2 authority exists for the exact intended action.
 
-When delegating, compile the Executor Contract from:
+Compile the Executor Contract from:
 - canonical G0 context
 - G1 aligned decision, using only the selected option
 - exact G2 execution/approval envelope or valid route-specific G2 authority
 - exact current repository/base/head/branch/scope evidence
 
-Do not forward rejected alternatives, brainstorming history, or irrelevant analysis to the Executor.
+Executor-facing context must be minimal. Do not forward rejected alternatives, brainstorming history, superseded options, or unrelated analysis.
 
-## Plan contract
+## Plan and reporting contract
 
-Split the selected option into 3–5 meaningful subtasks. For every subtask define:
+Split the selected option into 3–5 meaningful subtasks.
+
+Every subtask must define exactly:
 
 ```text
 ID
@@ -35,29 +55,97 @@ Report requirement
 After report = CONTINUE | WAIT_CONTROLLER | TERMINAL
 ```
 
-The Controller owns subtask order, required milestones, report timing, expected evidence, and explicit WAIT points.
+For every subtask, the Controller must state:
+- what meaningful unit of work may be completed before reporting
+- which milestone ends that unit
+- which evidence must be included in the report
+- whether the Executor may continue immediately or must wait for Controller review
+
+Default reporting boundary: one contracted subtask or milestone. The Executor may perform any number of low-level tool actions inside that boundary, but must not silently cross a contracted reporting or WAIT boundary.
+
+The Controller should use `WAIT_CONTROLLER` only at high-value review points such as:
+- validation before delivery/push
+- material scope or architecture consequence
+- evidence conflict
+- authority boundary
+- explicit human-control checkpoint
+
+Use `CONTINUE` for ordinary bounded execution where a mandatory stop would add latency without improving control.
+
+## Required Executor report content
+
+For each contracted milestone, require a structured thread reply containing the applicable fields:
+
+```text
+Subtask / milestone
+Status
+Completed
+Evidence
+Finding / Risk        # only when material
+Next
+After = CONTINUE | WAIT_CONTROLLER | TERMINAL
+```
+
+Immediate exception reporting is required for:
+- scope drift
+- authority drift
+- plan drift
+- evidence conflict
+- blocker or terminal failure
+- material finding that invalidates the next contracted action
+
+Thinking, tool chatter, raw output, repetitive polling, and recovered transient retries remain silent under the shared protocol.
 
 ## RootCard
 
-Create or maintain one RootCard for the run using the shared protocol. Keep it concise and human-readable. Update it only on material state/evidence changes.
+Maintain exactly one RootCard for the run using the shared protocol. RootCard is the human quick view, not the execution journal.
 
-## Monitoring
+Keep visible when available:
+- human owner/watcher
+- human-readable G0→G6 journey with current gate
+- Controller and Executor identity
+- actual Executor model
+- token usage only when the runtime exposes it; otherwise `N/A`
+- cost only as `FREE | metered | unknown`; never infer it
+- active subtask and overall progress
+- branch / PR / exact HEAD / CI
+- risk or blocker
+- Now / Next
+- last material update
 
-After delegation, stay in the active execution:
+Detailed milestone evidence belongs in thread replies.
+
+Human action buttons are contextual control intents:
+- `PAUSE` — stop before the next meaningful action boundary
+- `STOP` — no new mutation starts; return stopped/blocked state
+- `APPROVE` — only when exact human authority is required; the click itself does not create canonical GWC authority
+- `MERGE` — only at a valid G4 state and bound to exact PR/head; the click itself does not bypass GWC authority validation
+
+## Controller monitoring loop
+
+After delegation, remain in the active execution:
 
 ```text
 sleep 60s
-→ read only new Slack thread replies after last_seen_ts
-→ compare with the expected report contract
-→ continue | review | intercept | terminal
+→ read only Slack thread replies newer than last_seen_ts
+→ classify new structured Executor reports
+→ compare each report with the expected subtask/milestone contract
+→ OK / CONTINUE: keep monitoring
+→ WAIT_CONTROLLER: review before release
+→ DRIFT: INTERCEPT
+→ TERMINAL: close the delegated control segment
 ```
 
-Do not create a scheduler/reminder/automation to replace the active wait loop.
-Do not post polling chatter.
+Rules:
+- polling itself is silent
+- do not post heartbeat or "still waiting" messages
+- do not re-read the whole thread every cycle when `last_seen_ts` is available
+- do not create a scheduler, reminder, or detached automation to replace the active wait loop
+- RootCard updates happen only on material state/evidence changes
 
-## Controller review
+## Controller review and INTERCEPT
 
-At `WAIT_CONTROLLER`, do not release the next subtask until the reported result and material evidence satisfy the contract.
+At `WAIT_CONTROLLER`, do not release the next subtask until the reported result and required evidence satisfy the contract.
 
 INTERCEPT only for:
 - scope drift
@@ -66,8 +154,29 @@ INTERCEPT only for:
 - evidence conflict
 - material finding that invalidates the next contracted action
 
-Do not micromanage tool selection or ordinary execution details.
+Do not intercept for:
+- ordinary tool choice differences
+- successful transient retries
+- normal implementation progress
+- expected test runtime
+- low-level actions that remain inside the contracted subtask
+
+When an INTERCEPT is required, state the exact observed drift, the required correction, and whether the Executor must `WAIT`, `REPLAN`, or `REVERT_LAST` before continuing.
 
 ## Terminal handling
 
-A terminal Executor report ends the current delegated control segment. Re-read the relevant canonical evidence before making any later-gate decision. Executor completion never grants later-gate authority by itself.
+A terminal Executor report ends the current delegated control segment.
+
+Before any later-gate decision:
+- re-read the relevant canonical evidence
+- verify exact refs/head/status
+- update RootCard to the terminal state
+- continue only through the next legal GWC gate/action
+
+Executor completion never grants later-gate authority by itself.
+
+## MVP boundary
+
+Keep this pilot slim: one Controller, one main Executor, one Slack thread, one RootCard, 3–5 subtasks, contracted milestone reports, incremental 60-second polling, and bounded intercepts.
+
+Do not add lease fencing, sequence/replay machinery, multi-executor orchestration, durable recovery, or other Full E2E protocol logic until the MVP pilot demonstrates a concrete need.
