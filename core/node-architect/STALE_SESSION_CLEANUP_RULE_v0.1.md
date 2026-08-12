@@ -16,6 +16,10 @@ without deleting canonical GWC evidence.
 It targets temporary runtime folders such as `/mnt/data/...` session folders,
 not repository source-of-truth artifacts.
 
+This stale-age cleanup is distinct from terminal G5 cleanup. A successful G5
+verification must use `G5_POST_PASS_RUNTIME_CLEANUP_RULE_v0.1.md` immediately;
+it must not wait for a stale threshold before retiring G5-owned runtime state.
+
 ## Cleanup principle
 
 ```text
@@ -81,3 +85,5 @@ When the manifest is missing, the tool must classify the folder conservatively.
 
 This rule is additive and local-agent friendly. It does not introduce automatic
 background cleanup, cron jobs, production actions, or repository mutation.
+Terminal G5 runtime finalization remains governed by the dedicated post-PASS
+cleanup rule and is not delayed until a session becomes stale.
