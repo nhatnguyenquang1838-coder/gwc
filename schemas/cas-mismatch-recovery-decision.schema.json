@@ -22,11 +22,18 @@
     "retry_count": {"type": "integer", "minimum": 0},
     "max_retries": {"type": "integer", "minimum": 0},
     "observed_at": {"type": "string", "format": "date-time"},
-    "outcome": {"enum": ["NO_MISMATCH", "RELOAD", "RECONCILE", "RETRY_AFTER_RELOAD", "HUMAN_REQUIRED", "FAIL"]},
+    "outcome": {"enum": ["NO_MISMATCH", "RELOAD", "RECONCILE", "RETRY_AFTER_RELOAD", "REPLAN", "HUMAN_REQUIRED", "STALE_WRITER_DENIED", "FAIL"]},
     "reason_code": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
     "overwrite_allowed": {"const": false},
     "blind_retry_allowed": {"const": false},
     "checkpoint_required": {"type": "boolean"},
+    "authoritative_reread_required": {"type": "boolean"},
+    "stale_writer_denied": {"type": "boolean"},
+    "actor_id": {"type": ["string", "null"]},
+    "expected_actor_id": {"type": ["string", "null"]},
+    "fence_token": {"type": ["string", "null"]},
+    "expected_fence_token": {"type": ["string", "null"]},
+    "plan_status": {"enum": ["CURRENT", "STALE"]},
     "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
   }
 }

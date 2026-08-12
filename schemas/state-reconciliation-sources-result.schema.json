@@ -1,0 +1,73 @@
+{
+  "$id": "https://dw-super.local/schemas/state-reconciliation-sources-result.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SCRUM-332 state-reconciliation three-source result",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "task_id",
+    "state",
+    "authoritative_source",
+    "source_precedence",
+    "conflict",
+    "readback_required",
+    "retry_allowed",
+    "route",
+    "outcome",
+    "reason",
+    "authority_granted",
+    "exact_head_ci_verified",
+    "result_digest"
+  ],
+  "properties": {
+    "schema_id": {
+      "const": "gwc.runtime_checkpoint.state_reconciliation.sources"
+    },
+    "schema_version": {
+      "const": "0.1"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "state": {
+      "enum": ["CONFIRMED", "PENDING", "FAILED", "UNKNOWN"]
+    },
+    "authoritative_source": {
+      "type": ["string", "null"]
+    },
+    "source_precedence": {
+      "type": "array",
+      "items": {
+        "enum": ["canonical_state", "external_readback", "persisted_checkpoint"]
+      }
+    },
+    "conflict": {
+      "type": "boolean"
+    },
+    "readback_required": {
+      "type": "boolean"
+    },
+    "retry_allowed": {
+      "type": "boolean"
+    },
+    "route": {
+      "type": "string"
+    },
+    "outcome": {
+      "enum": ["PASS", "FAIL"]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "authority_granted": {
+      "const": false
+    },
+    "exact_head_ci_verified": {
+      "type": "boolean"
+    },
+    "result_digest": {
+      "type": "string"
+    }
+  }
+}
