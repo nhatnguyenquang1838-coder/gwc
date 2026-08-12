@@ -92,3 +92,29 @@ remain projection-only and cannot replace canonical repository evidence.
 
 The profile binds exact node-registry and runtime-graph revisions. A mismatch is
 a blocking drift condition requiring refreshed profile or gate evidence.
+
+## 9. G5 terminal runtime finalization
+
+A terminal exact-SHA G5 PASS is not the end of Node Architect runtime ownership
+until G5-scoped runtime state is finalized. After canonical G5 evidence is
+persisted, the runtime MUST execute
+`core/node-architect/G5_POST_PASS_RUNTIME_CLEANUP_RULE_v0.1.md`.
+
+The finalization hook is idempotent and MUST:
+
+1. retire G5 checkpoints, resume tokens, continuation cursors, and next-check
+   pointers for the completed merge SHA;
+2. stop G5 observer/poll loops and lease renewal;
+3. release leases or claims held only for G5 verification;
+4. clear ephemeral G5 session/cache pointers;
+5. append a cleanup summary to the task/run runtime ledger;
+6. preserve all canonical gate/node evidence and immutable GitHub evidence.
+
+If G6 is not applicable, runtime state may become terminal `completed` only
+after cleanup succeeds. If G6 is applicable, finalization cleans only G5-scoped
+state and preserves the task context needed to enter G6 under separate authority.
+
+A cleanup failure leaves valid G5 CI evidence unchanged but records runtime
+state as `CLEANUP_REQUIRED`; only the idempotent cleanup path may be retried.
+This finalization hook is not a new catalog node and does not alter the baseline
+81-node registry or post-81 extension numbering.

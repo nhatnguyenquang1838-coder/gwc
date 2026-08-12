@@ -211,6 +211,24 @@ A successful G5 evidence artifact must conform to `schemas/g5-ci-verification-ev
 - `no_recursive_evidence_pr: true`;
 - timestamp and actor/runtime identity.
 
+## Post-PASS runtime finalization
+
+After a terminal exact-SHA `success` / G5 PASS, the canonical G5 evidence above
+must be persisted and readable before runtime cleanup starts. The observing
+controller or Node Architect runtime must then execute
+`core/node-architect/G5_POST_PASS_RUNTIME_CLEANUP_RULE_v0.1.md`.
+
+Post-PASS cleanup is idempotent and runtime-only. It retires completed G5
+checkpoints, observer/poll continuations, G5-only leases or claims, resume
+cursors, next-check pointers, and ephemeral session/cache pointers while
+preserving canonical gate/node evidence and immutable GitHub evidence.
+
+A cleanup failure does not invalidate valid G5 CI evidence. It records runtime
+finalization as `CLEANUP_REQUIRED` and retries only the cleanup path. When G6 is
+not applicable, runtime state may become terminal `completed` only after cleanup
+succeeds. When G6 applies, cleanup must affect only G5-scoped runtime state and
+must preserve the context needed to continue into G6.
+
 ## Human-authorized bootstrap recovery
 
 Bootstrap recovery is permitted only when a merged PR could not have emitted the normal G4/G5 receipt chain because it introduced or activated that chain itself. Recovery extends `.github/workflows/g4-g5-evidence.yml`; it is not a parallel governance system.
