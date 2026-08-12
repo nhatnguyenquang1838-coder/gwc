@@ -60,6 +60,9 @@ TERMINAL_SUCCESS = {"success"}
 TERMINAL_FAILURES = {"failure", "cancelled", "timed_out", "action_required", "stale"}
 PENDING_STATUSES = {"queued", "pending", "in_progress", "waiting", "requested"}
 CONNECTOR_STATUSES = {"CONFIRMED", "EMPTY", "ERROR", "UNSUPPORTED"}
+MIXED_HEAD_EVIDENCE_BLOCKED = "MIXED_HEAD_EVIDENCE_BLOCKED"
+BLOCKER_FINDINGS_PRESENT = "BLOCKER_FINDINGS_PRESENT"
+SCOPE_DRIFT_DETECTED = "SCOPE_DRIFT_DETECTED"
 
 
 def _valid_check(check: object) -> bool:
@@ -95,6 +98,8 @@ def decide_exact_head_readiness(
     observed_artifacts: list[dict[str, Any]],
     connector_status: str,
     exact_head_filter_applied: bool,
+    blocker_findings: list[str] | None = None,
+    scope_drift_detected: bool = False,
     observed_at: str | None = None,
 ) -> dict[str, Any]:
     """Determine whether readiness evidence is bound to the exact current head."""
@@ -115,6 +120,12 @@ def decide_exact_head_readiness(
         and all(_valid_artifact(artifact) for artifact in observed_artifacts)
     )
     connector_invalid = connector_status not in CONNECTOR_STATUSES or not isinstance(exact_head_filter_applied, bool)
+    blocker_findings_invalid = (
+        blocker_findings is not None
+        and (not isinstance(blocker_findings, list)
+             or not all(isinstance(f, str) and f.strip() for f in blocker_findings))
+    )
+    scope_drift_invalid = not isinstance(scope_drift_detected, bool)
 
     exact_checks = [] if checks_invalid else [check for check in observed_checks if check["head_sha"] == current_head_sha]
     mismatched_check_count = 0 if checks_invalid else len(observed_checks) - len(exact_checks)
@@ -162,6 +173,10 @@ def decide_exact_head_readiness(
         reason_code = "INVALID_REQUIRED_CHECK_MAPPING"
     elif artifacts_invalid:
         reason_code = "INVALID_ARTIFACT_EVIDENCE"
+    elif blocker_findings_invalid:
+        reason_code = "INVALID_BLOCKER_FINDINGS"
+    elif scope_drift_invalid:
+        reason_code = "INVALID_SCOPE_DRIFT"
     elif missing_check_names:
         reason_code = "REQUIRED_CHECK_MISSING"
     elif pending_check_names:
@@ -171,9 +186,11 @@ def decide_exact_head_readiness(
     elif missing_artifact_names:
         reason_code = "REQUIRED_ARTIFACT_MISSING"
     elif mismatched_check_count or mismatched_artifact_count:
-        reason_code = "NON_EXACT_EVIDENCE_IGNORED"
-        outcome = "READY"
-        readiness_passed = True
+        reason_code = MIXED_HEAD_EVIDENCE_BLOCKED
+    elif blocker_findings:
+        reason_code = BLOCKER_FINDINGS_PRESENT
+    elif scope_drift_detected:
+        reason_code = SCOPE_DRIFT_DETECTED
     else:
         reason_code = "EXACT_HEAD_READY"
         outcome = "READY"
@@ -199,6 +216,8 @@ def decide_exact_head_readiness(
         "missing_artifact_names": missing_artifact_names,
         "mismatched_check_count": mismatched_check_count,
         "mismatched_artifact_count": mismatched_artifact_count,
+        "blocker_findings": blocker_findings or [],
+        "scope_drift_detected": bool(scope_drift_detected),
         "readiness_passed": readiness_passed,
         "read_only_projection": True,
         "merge_authority_granted": False,
