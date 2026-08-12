@@ -54,6 +54,7 @@
         "MANIFEST_DUPLICATE_ENTRY_ID": "Two or more manifest entries share the same id after normalization.",
         "MANIFEST_AMBIGUOUS_SOURCE": "Both source and source_path are present (source XOR source_path), or source resolution is otherwise ambiguous.",
         "MANIFEST_REPLAY_CONFLICT": "Same key + valid semantic identity change (payload, task, repo, path, ref, Git SHA, or version) detected on replay.",
-        "MANIFEST_MISSING_INSTRUCTIONS": "The manifest instructions list is absent or empty after precheck."
+        "MANIFEST_MISSING_INSTRUCTIONS": "The manifest instructions list is absent or empty after precheck.",
+        "MANIFEST_SCHEMA_VALIDATION_UNAVAILABLE": "Closed input schema validation is unavailable (missing jsonschema, missing schema file, schema load failure, or validator build failure); the loader BLOCKS rather than silently passing."
     }
 }
