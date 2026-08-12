@@ -62,13 +62,14 @@ def resolve_base_edge(entrypoint_text: str) -> str:
     canonical base content. If that edge is absent, the composition invariant
     is broken and we fail closed.
     """
-    match = _BASE_EDGE_RE.search(entrypoint_text)
-    if not match:
+    matches = _BASE_EDGE_RE.findall(entrypoint_text)
+    if len(matches) != 1:
         raise ChatGPTInstructionCompositionError(
-            "entrypoint does not declare the gwc-governed-base.md composition "
-            "edge; Composed Entrypoint invariant broken"
+            "entrypoint must declare exactly one gwc-governed-base.md "
+            f"composition edge; found {len(matches)}; Composed Entrypoint "
+            "invariant broken"
         )
-    return match.group(1)
+    return matches[0]
 
 
 def compose_chatgpt_instructions(root: Path | None = None) -> str:

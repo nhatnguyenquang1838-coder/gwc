@@ -4,7 +4,9 @@ from pathlib import Path
 import unittest
 
 from helpers.chatgpt_instruction_composer import (
+    ChatGPTInstructionCompositionError,
     compose_chatgpt_instructions,
+    resolve_base_edge,
 )
 
 
@@ -39,6 +41,15 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("G5 checks those workflow/deployment statuses", e2e)
         self.assertIn("Read-only `G5_STATUS_VERIFY` starts automatically", gate_contract)
         self.assertIn("read-only `G5_STATUS_VERIFY` runs automatically after G4 merge", e2e)
+
+    def test_composed_entrypoint_requires_exactly_one_base_edge(self) -> None:
+        entrypoint = "`agents/chatgpt-agent/gwc-governed-base.md`\n"
+        self.assertEqual(
+            resolve_base_edge(entrypoint),
+            "agents/chatgpt-agent/gwc-governed-base.md",
+        )
+        with self.assertRaises(ChatGPTInstructionCompositionError):
+            resolve_base_edge(entrypoint + entrypoint)
 
     def test_ready_for_review_is_g3_metadata_completion(self) -> None:
         gate_contract = self.normalized_text("core/GATE_LIFECYCLE_CONTRACT_v1.0.md")
