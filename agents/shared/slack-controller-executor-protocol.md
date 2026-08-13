@@ -6,6 +6,13 @@ Status: MVP pilot contract. Full E2E protocol is deferred.
 
 Use Slack as a low-noise execution visibility and control surface between a GPT Controller and one Executor (Hermes in the pilot). Slack is not governance authority or source of truth.
 
+## Canonical RootCard contract
+
+`schemas/task-controller-root-card.schema.json` is the machine-readable semantic SOT for TaskController RootCards.
+`tools/node_architect/slack_task_controller.py` is the deterministic compiler/validator for that contract.
+
+Slack Canvas may define communication and layout policy only. Slack Block Kit, GG, and other platform renderers are projections of a validated RootCard payload. They must not redefine fields, repair invalid payloads, synthesize missing semantic state, or reconstruct navigation URLs.
+
 ## RootCard
 
 One root message per run. The RootCard is a fast human snapshot and is updated in place.
@@ -22,12 +29,32 @@ Required fields:
 - Risk / blocker
 - `Now` and `Next`
 - Last material update
+- Conversation navigation when ChatGPT is the Controller
+
+### Conversation navigation
+
+For a ChatGPT Controller, the RootCard MUST bind:
+- `conversation.platform = chatgpt`
+- the exact runtime-supplied ChatGPT `conversation_id`
+- the exact runtime-supplied ChatGPT conversation `deeplink`
+
+`Open in GPT` is compiler-derived from that exact `deeplink`. Callers and renderers must not provide or override an independent `Open in GPT` URL.
+
+Forbidden:
+- `https://chatgpt.com/` or any generic ChatGPT home/landing fallback
+- shared/public conversation links such as `/share/...`
+- fabricated or reconstructed conversation URLs
+- substituting task ID, run ID, GPT ID, or any other identifier for the actual conversation reference
+- a deeplink whose `/c/<conversation_id>` does not match the bound conversation
+
+If the exact conversation reference is missing or invalid, RootCard compilation fails closed. A renderer must not show a fallback `Open in GPT` action. A valid deeplink is passed through unchanged, including its supported GPT-specific route, query, and fragment.
 
 Contextual actions:
 - `PAUSE`: soft control intent; stop before the next meaningful action boundary
 - `STOP`: hard stop intent; start no new mutation and return stopped/blocked state
 - `APPROVE`: visible only when an exact human authority boundary exists; button intent is not authority by itself
 - `MERGE`: visible only when merge is a valid next action and exact PR/head is bound; button intent is not authority by itself
+- `Open in GPT`: navigation only; compiler-derived from the validated exact conversation deeplink
 
 ## Controller Plan & Contract
 
