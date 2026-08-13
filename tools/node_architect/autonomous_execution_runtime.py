@@ -142,11 +142,14 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
                             audit_conclusion: str = "",
                             audit_head_sha: str = "",
                             audit_independent: bool = False,
+                            audit_trust_valid: bool = False,
                             audit_receipt_valid: bool = False,
                             audit_receipt_digest: str = "") -> dict[str, Any]:
-    """Decide whether an exact-head child PR may merge autonomously to pre-prod.
+    """Decide whether normalized, trusted exact-head evidence permits pre-prod merge.
 
-    Independent audit is evidence only; standing G4 remains the merge evaluator.
+    The caller must obtain ``audit_receipt_valid`` from ``validate_audit_receipt``
+    and ``audit_trust_valid`` from the trusted auditor-dispatch/readback adapter.
+    Audit evidence never grants merge authority; standing G4 remains the evaluator.
     """
     if target_branch == "main":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_CHILD_MAIN_TARGET_FORBIDDEN"}
@@ -163,19 +166,18 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_PR_MANAGED_EVIDENCE_NOT_CURRENT"}
     if review_conclusion != "pass":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G3_REVIEW_NOT_PASS"}
-
-    # G4_PREPROD_AUDIT_TRIGGER: audit must be independent and bound to this exact head.
     if str(audit_conclusion).lower() != "pass":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_NOT_PASS"}
     if audit_head_sha != head_sha:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_STALE"}
     if not audit_independent:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_NOT_INDEPENDENT"}
+    if not audit_trust_valid:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDITOR_TRUST_INVALID"}
     if not audit_receipt_valid:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_RECEIPT_INVALID"}
     if not audit_receipt_digest.startswith("sha256:") or len(audit_receipt_digest) != 71:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_DIGEST_INVALID"}
-
     if not standing_g4_valid:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_STANDING_G4_AUTHORITY_INVALID"}
     evidence = {
@@ -187,6 +189,7 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
         "managed_evidence_current": True,
         "g3_review": "pass",
         "independent_g4_audit": "pass",
+        "audit_trust_valid": True,
         "audit_receipt_digest": audit_receipt_digest,
         "standing_g4_valid": True,
     }
@@ -209,6 +212,23 @@ def next_runtime_action(*, dag: Mapping[str, Any], claims: Mapping[str, Mapping[
         if task_id not in claims:
             return {"outcome": "READY", "task_id": task_id, "action": "CLAIM_AND_EXECUTE"}
     return {"outcome": "IDLE", "reason_code": "AUTONOMOUS_NO_UNCLAIMED_READY_TASK"}
+
+
+def _validate_runtime_audit_binding(observation: Mapping[str, Any], receipt: Mapping[str, Any]) -> dict[str, Any]:
+    """Bind the independently produced receipt to the current runtime observation."""
+    expected = {
+        "task_id": str(observation.get("task_id", "")),
+        "repository": str(observation.get("repository", "")),
+        "pr_number": observation.get("pr_number"),
+        "target_branch": str(observation.get("target_branch", "")),
+        "base_sha": str(observation.get("base_sha", "")),
+        "head_sha": str(observation.get("head_sha", "")),
+    }
+    for field, expected_value in expected.items():
+        if not expected_value or receipt.get(field) != expected_value:
+            return {"outcome": "BLOCK", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_BINDING_MISMATCH", "field": field}
+    from .audit_guardrail import validate_audit_receipt
+    return validate_audit_receipt(receipt, expected_head_sha=expected["head_sha"])
 
 
 def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
@@ -277,8 +297,8 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             "adapter_action": "ASSEMBLE_AND_CREATE_OR_UPDATE_PREPROD_PR",
         }
     if phase == "G3_READY":
-        # No audit evidence yet: trigger independent read-only audit before invoking standing G4.
-        if not observation.get("audit_conclusion") and not observation.get("audit_receipt_digest"):
+        receipt = observation.get("audit_receipt")
+        if not isinstance(receipt, Mapping):
             return {
                 "outcome": "PENDING",
                 "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_REQUIRED",
@@ -290,6 +310,11 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
                 "audit_merge_authority": False,
                 "adapter_action": "INVOKE_INDEPENDENT_G4_AUDIT",
             }
+        receipt_validation = _validate_runtime_audit_binding(observation, receipt)
+        if receipt_validation.get("outcome") != "PASS":
+            return {**receipt_validation, "adapter_action": None}
+        if observation.get("audit_trust_valid") is not True:
+            return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDITOR_TRUST_INVALID", "adapter_action": None}
         decision = child_delivery_decision(
             task_id=str(observation.get("task_id", "")),
             target_branch=str(observation.get("target_branch", "")),
@@ -299,11 +324,12 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             standing_g4_valid=bool(observation.get("standing_g4_valid")),
             managed_evidence_current=bool(observation.get("managed_evidence_current")),
             required_checks_terminal_success=bool(observation.get("required_checks_terminal_success")),
-            audit_conclusion=str(observation.get("audit_conclusion", "")),
-            audit_head_sha=str(observation.get("audit_head_sha", "")),
-            audit_independent=bool(observation.get("audit_independent")),
-            audit_receipt_valid=bool(observation.get("audit_receipt_valid")),
-            audit_receipt_digest=str(observation.get("audit_receipt_digest", "")),
+            audit_conclusion=str(receipt.get("audit_outcome", "")),
+            audit_head_sha=str(receipt.get("head_sha", "")),
+            audit_independent=receipt.get("independent") is True,
+            audit_trust_valid=True,
+            audit_receipt_valid=True,
+            audit_receipt_digest=str(receipt.get("receipt_digest", "")),
         )
         if decision.get("outcome") != "ALLOW":
             return {**decision, "adapter_action": None}

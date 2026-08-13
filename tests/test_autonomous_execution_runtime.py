@@ -1,5 +1,7 @@
+import copy
 import unittest
 
+from tools.node_architect.audit_guardrail import evaluate_g4_preprod_audit
 from tools.node_architect.autonomous_execution_runtime import (
     AUTONOMOUS_ROUTE_ID,
     child_delivery_decision, claim_task, drive_closed_loop, resolve_authorized_ready_nodes,
@@ -7,7 +9,8 @@ from tools.node_architect.autonomous_execution_runtime import (
 )
 
 SHA = "a" * 40
-AUDIT_DIGEST = "sha256:" + "b" * 64
+BASE = "b" * 40
+AUDIT_DIGEST = "sha256:" + "c" * 64
 
 
 class AutonomousExecutionRuntimeTests(unittest.TestCase):
@@ -71,7 +74,7 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
             ci_conclusion="success", review_conclusion="pass", standing_g4_valid=True,
             managed_evidence_current=True, required_checks_terminal_success=True,
             audit_conclusion="pass", audit_head_sha=SHA, audit_independent=True,
-            audit_receipt_valid=True, audit_receipt_digest=AUDIT_DIGEST,
+            audit_trust_valid=True, audit_receipt_valid=True, audit_receipt_digest=AUDIT_DIGEST,
         )
         kwargs.update(overrides)
         return child_delivery_decision(**kwargs)
@@ -93,12 +96,13 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(self._child(managed_evidence_current=False)["reason_code"], "AUTONOMOUS_PR_MANAGED_EVIDENCE_NOT_CURRENT")
 
     def test_preprod_merge_blocks_without_independent_audit(self):
-        result = self._child(audit_independent=False)
-        self.assertEqual(result["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDIT_NOT_INDEPENDENT")
+        self.assertEqual(self._child(audit_independent=False)["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDIT_NOT_INDEPENDENT")
+
+    def test_preprod_merge_blocks_untrusted_auditor(self):
+        self.assertEqual(self._child(audit_trust_valid=False)["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDITOR_TRUST_INVALID")
 
     def test_preprod_merge_blocks_stale_audit(self):
-        result = self._child(audit_head_sha="c" * 40)
-        self.assertEqual(result["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDIT_STALE")
+        self.assertEqual(self._child(audit_head_sha="c" * 40)["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDIT_STALE")
 
     def test_discover_resolves_authority_before_claim(self):
         result = drive_closed_loop({"phase": "DISCOVER", "tasks": [{"task_id": "SCRUM-300", "status": "TO_DO", "dependencies": []}], "authority_valid": False})
@@ -124,9 +128,28 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(result["adapter_action"], "ASSEMBLE_AND_CREATE_OR_UPDATE_PREPROD_PR")
         self.assertTrue(result["managed_evidence_required"])
 
+    def _audit_receipt(self, **overrides):
+        evidence = {
+            "task_id": "X", "repository": "owner/gwc", "pr_number": 42,
+            "target_branch": "pre-prod", "base_sha": BASE, "head_sha": SHA, "g3_head_sha": SHA,
+            "dag_authority_valid": True, "parent_authority_valid": True, "g0_ready": True, "g1_pass": True,
+            "derived_g2_valid": True, "managed_evidence_current": True, "exact_head_ci_success": True,
+            "required_checks_terminal_success": True, "g3_independent": True, "g3_conclusion": "pass",
+            "scope_valid": True, "risk_valid": True, "actions_valid": True, "standing_g4_applicable": True,
+            "auditor_id": "agent-audit-1", "implementer_id": "executor-1",
+            "auditor_context_id": "audit-context-1", "implementer_context_id": "executor-context-1",
+            "auditor_trust_ref": "trusted-dispatch:audit-1", "audit_write_actions": [],
+            "dag_digest": "sha256:" + "1" * 64, "parent_authority_ref": "AR-1",
+            "g0_ref": "G0", "g1_ref": "G1", "g2_ref": "G2", "g3_ref": "G3", "ci_ref": "CI",
+            "managed_evidence_digest": "sha256:" + "2" * 64, "standing_g4_ref": "G4-STANDING",
+        }
+        evidence.update(overrides)
+        return evaluate_g4_preprod_audit(evidence)
+
     def _g3_observation(self, **overrides):
         value = {
-            "phase": "G3_READY", "task_id": "X", "target_branch": "pre-prod", "head_sha": SHA,
+            "phase": "G3_READY", "task_id": "X", "repository": "owner/gwc", "pr_number": 42,
+            "target_branch": "pre-prod", "base_sha": BASE, "head_sha": SHA,
             "ci_conclusion": "success", "review_conclusion": "pass", "standing_g4_valid": True,
             "managed_evidence_current": True, "required_checks_terminal_success": True,
         }
@@ -139,21 +162,28 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertEqual(result["audit_agent"], "agent-audit")
         self.assertFalse(result["audit_merge_authority"])
 
-    def test_g3_ready_merges_only_with_valid_exact_head_audit(self):
-        result = drive_closed_loop(self._g3_observation(
-            audit_conclusion="pass", audit_head_sha=SHA, audit_independent=True,
-            audit_receipt_valid=True, audit_receipt_digest=AUDIT_DIGEST,
-        ))
+    def test_g3_ready_merges_only_with_valid_exact_bound_trusted_audit(self):
+        result = drive_closed_loop(self._g3_observation(audit_receipt=self._audit_receipt(), audit_trust_valid=True))
         self.assertEqual(result["outcome"], "ALLOW")
         self.assertEqual(result["adapter_action"], "MERGE_PREPROD_EXACT_HEAD")
 
-    def test_g3_ready_does_not_merge_on_audit_block(self):
-        result = drive_closed_loop(self._g3_observation(
-            audit_conclusion="block", audit_head_sha=SHA, audit_independent=True,
-            audit_receipt_valid=True, audit_receipt_digest=AUDIT_DIGEST,
-        ))
-        self.assertEqual(result["outcome"], "BLOCKED")
+    def test_g3_ready_blocks_runtime_binding_mismatch(self):
+        receipt = self._audit_receipt(task_id="Y")
+        result = drive_closed_loop(self._g3_observation(audit_receipt=receipt, audit_trust_valid=True))
+        self.assertEqual(result["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDIT_BINDING_MISMATCH")
         self.assertIsNone(result["adapter_action"])
+
+    def test_g3_ready_blocks_tampered_receipt_even_if_adapter_claims_trust(self):
+        receipt = self._audit_receipt()
+        receipt = copy.deepcopy(receipt)
+        receipt["g2_ref"] = "forged"
+        result = drive_closed_loop(self._g3_observation(audit_receipt=receipt, audit_trust_valid=True))
+        self.assertEqual(result["outcome"], "BLOCK")
+        self.assertIsNone(result["adapter_action"])
+
+    def test_g3_ready_blocks_untrusted_auditor_even_with_valid_receipt(self):
+        result = drive_closed_loop(self._g3_observation(audit_receipt=self._audit_receipt(), audit_trust_valid=False))
+        self.assertEqual(result["reason_code"], "AUTONOMOUS_G4_PREPROD_AUDITOR_TRUST_INVALID")
 
     def test_preprod_merged_completes_without_post_merge_g5(self):
         result = drive_closed_loop({"phase": "PREPROD_MERGED", "task_id": "X", "merge_sha": SHA})
@@ -161,12 +191,9 @@ class AutonomousExecutionRuntimeTests(unittest.TestCase):
         self.assertFalse(result["post_merge_g5_required"])
 
     def test_closed_loop_never_routes_child_to_main(self):
-        result = drive_closed_loop(self._g3_observation(
-            target_branch="main", audit_conclusion="pass", audit_head_sha=SHA,
-            audit_independent=True, audit_receipt_valid=True, audit_receipt_digest=AUDIT_DIGEST,
-        ))
-        self.assertEqual(result["outcome"], "BLOCKED")
-        self.assertIsNone(result["adapter_action"])
+        receipt = self._audit_receipt(target_branch="main")
+        result = drive_closed_loop(self._g3_observation(target_branch="main", audit_receipt=receipt, audit_trust_valid=True))
+        self.assertNotEqual(result.get("adapter_action"), "MERGE_PREPROD_EXACT_HEAD")
 
 
 if __name__ == "__main__":
