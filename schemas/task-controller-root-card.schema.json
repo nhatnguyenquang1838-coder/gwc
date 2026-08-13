@@ -34,181 +34,68 @@
     "card_digest"
   ],
   "properties": {
-    "artifact_type": {
-      "const": "task-controller-root-card"
-    },
-    "schema_version": {
-      "const": "1.0"
-    },
-    "schema_ref": {
-      "const": "schemas/task-controller-root-card.schema.json"
-    },
-    "run_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "task_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "human_owner": {
-      "type": "string",
-      "minLength": 1
-    },
-    "gate": {
-      "enum": [
-        "G0",
-        "G1",
-        "G2",
-        "G3",
-        "G4",
-        "G5",
-        "G6"
-      ]
-    },
-    "controller_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "executor_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "executor_model": {
-      "type": "string",
-      "minLength": 1
-    },
-    "token_usage": {
-      "type": "string",
-      "minLength": 1
-    },
-    "cost": {
-      "enum": [
-        "FREE",
-        "metered",
-        "unknown"
-      ]
-    },
-    "active_subtask": {
-      "type": "string",
-      "minLength": 1
-    },
-    "progress": {
-      "type": "string",
-      "minLength": 1
-    },
-    "repository": {
-      "type": "string",
-      "pattern": "^[^/]+/[^/]+$"
-    },
-    "branch": {
-      "type": "string",
-      "minLength": 1
-    },
-    "pr": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "head_sha": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
-    },
-    "ci": {
-      "type": "string",
-      "minLength": 1
-    },
-    "risk": {
-      "type": "string",
-      "minLength": 1
-    },
-    "now": {
-      "type": "string",
-      "minLength": 1
-    },
-    "next": {
-      "type": "string",
-      "minLength": 1
-    },
-    "last_material_update": {
-      "type": "string",
-      "minLength": 1
-    },
+    "artifact_type": {"const": "task-controller-root-card"},
+    "schema_version": {"const": "1.1"},
+    "schema_ref": {"const": "schemas/task-controller-root-card.schema.json"},
+    "run_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "human_owner": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+    "controller_id": {"type": "string", "minLength": 1},
+    "executor_id": {"type": "string", "minLength": 1},
+    "executor_model": {"type": "string", "minLength": 1},
+    "token_usage": {"type": "string", "minLength": 1},
+    "cost": {"enum": ["FREE", "metered", "unknown"]},
+    "active_subtask": {"type": "string", "minLength": 1},
+    "progress": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "pr": {"type": ["string", "null"]},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "ci": {"type": "string", "minLength": 1},
+    "risk": {"type": "string", "minLength": 1},
+    "now": {"type": "string", "minLength": 1},
+    "next": {"type": "string", "minLength": 1},
+    "last_material_update": {"type": "string", "minLength": 1},
     "conversation": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "platform",
-        "conversation_id",
-        "deeplink"
-      ],
+      "required": ["platform", "source", "deeplink"],
       "properties": {
-        "platform": {
-          "const": "chatgpt"
-        },
-        "conversation_id": {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^[^/?#]+$"
-        },
+        "platform": {"const": "chatgpt"},
+        "source": {"const": "gpt_runtime_current_chat"},
         "deeplink": {
           "type": "string",
           "format": "uri",
-          "pattern": "^https://chatgpt\\.com/(?:[^/?#]+/)*c/[^/?#]+(?:[/?#].*)?$"
+          "pattern": "^https://chatgpt\\.com/(?!share(?:/|$)).+"
         },
-        "context_key": {
-          "type": "string",
-          "minLength": 1
-        }
+        "context_key": {"type": "string", "minLength": 1}
       }
     },
     "actions": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "pause",
-        "stop",
-        "approve",
-        "merge",
-        "open_in_gpt"
-      ],
+      "required": ["pause", "stop", "approve", "merge", "open_in_gpt"],
       "properties": {
-        "pause": {
-          "type": "boolean"
-        },
-        "stop": {
-          "type": "boolean"
-        },
-        "approve": {
-          "type": "boolean"
-        },
-        "merge": {
-          "type": "boolean"
-        },
+        "pause": {"type": "boolean"},
+        "stop": {"type": "boolean"},
+        "approve": {"type": "boolean"},
+        "merge": {"type": "boolean"},
         "open_in_gpt": {
           "type": "object",
           "additionalProperties": false,
-          "required": [
-            "label",
-            "url"
-          ],
+          "required": ["label", "url"],
           "properties": {
-            "label": {
-              "const": "Open in GPT"
-            },
+            "label": {"const": "Open in GPT"},
             "url": {
               "type": "string",
               "format": "uri",
-              "pattern": "^https://chatgpt\\.com/(?:[^/?#]+/)*c/[^/?#]+(?:[/?#].*)?$"
+              "pattern": "^https://chatgpt\\.com/(?!share(?:/|$)).+"
             }
           }
         }
       }
     },
-    "card_digest": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
-    }
+    "card_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
   }
 }

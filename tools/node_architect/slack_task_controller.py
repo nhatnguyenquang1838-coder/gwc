@@ -12,10 +12,11 @@ INTERCEPT_FLAGS = ("scope_drift", "authority_drift", "plan_drift", "evidence_con
 FORBIDDEN_SELECTED_OPTION_KEYS = {"rejected_options", "alternatives", "brainstorm", "brainstorming", "all_options"}
 
 ROOT_CARD_SCHEMA_REF = "schemas/task-controller-root-card.schema.json"
-ROOT_CARD_SCHEMA_VERSION = "1.0"
+ROOT_CARD_SCHEMA_VERSION = "1.1"
 ROOT_CARD_GATES = {"G0", "G1", "G2", "G3", "G4", "G5", "G6"}
 ROOT_CARD_COSTS = {"FREE", "metered", "unknown"}
 ROOT_CARD_CONTROL_ACTIONS = {"pause", "stop", "approve", "merge"}
+CHATGPT_CONVERSATION_SOURCE = "gpt_runtime_current_chat"
 
 
 def canonical_digest(value: Any) -> str:
@@ -34,13 +35,13 @@ def _required_text(value: Any, reason_code: str) -> str:
     return text
 
 
-def validate_chatgpt_conversation_deeplink(*, conversation_id: str, deeplink: str) -> str:
-    """Validate an exact runtime-supplied ChatGPT conversation URL without reconstructing it."""
-    conversation_ref = _required_text(conversation_id, "TASK_CONTROLLER_CHATGPT_CONVERSATION_REQUIRED")
-    url = _required_text(deeplink, "TASK_CONTROLLER_CHATGPT_CONVERSATION_REQUIRED")
-    if any(char in conversation_ref for char in "/?#"):
-        raise ValueError("TASK_CONTROLLER_CHATGPT_CONVERSATION_ID_INVALID")
+def validate_chatgpt_conversation_deeplink(*, deeplink: str) -> str:
+    """Validate an opaque runtime-supplied URL for the current ChatGPT chat.
 
+    The route shape is intentionally not reconstructed or pinned to `/c/...`.
+    The Controller runtime is responsible for supplying the actual current-chat URL.
+    """
+    url = _required_text(deeplink, "TASK_CONTROLLER_CHATGPT_CONVERSATION_REQUIRED")
     parsed = urlparse(url)
     try:
         port = parsed.port
@@ -63,12 +64,6 @@ def validate_chatgpt_conversation_deeplink(*, conversation_id: str, deeplink: st
     if any(segment.lower() == "share" for segment in segments):
         raise ValueError("TASK_CONTROLLER_CHATGPT_DEEPLINK_SHARE_FORBIDDEN")
 
-    matched = any(
-        segment == conversation_ref and index > 0 and segments[index - 1] == "c"
-        for index, segment in enumerate(segments)
-    )
-    if not matched:
-        raise ValueError("TASK_CONTROLLER_CHATGPT_DEEPLINK_CONVERSATION_MISMATCH")
     return url
 
 
@@ -133,16 +128,15 @@ def compile_root_card(
 
     if str(conversation.get("platform", "")).lower() != "chatgpt":
         raise ValueError("TASK_CONTROLLER_ROOT_CARD_CONVERSATION_PLATFORM_INVALID")
-    conversation_id = _required_text(
-        conversation.get("conversation_id", ""), "TASK_CONTROLLER_CHATGPT_CONVERSATION_REQUIRED"
-    )
+    if conversation.get("source") != CHATGPT_CONVERSATION_SOURCE:
+        raise ValueError("TASK_CONTROLLER_CHATGPT_CONVERSATION_SOURCE_INVALID")
+
     deeplink = validate_chatgpt_conversation_deeplink(
-        conversation_id=conversation_id,
         deeplink=str(conversation.get("deeplink", "")),
     )
     normalized_conversation: dict[str, Any] = {
         "platform": "chatgpt",
-        "conversation_id": conversation_id,
+        "source": CHATGPT_CONVERSATION_SOURCE,
         "deeplink": deeplink,
     }
     if conversation.get("context_key") is not None:
