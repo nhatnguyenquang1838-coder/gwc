@@ -14,10 +14,11 @@ Boot sequence:
 3. select only an authorized READY task;
 4. claim using the canonical tracker/claim mechanism;
 5. load `agents/shared/slack-controller-executor-protocol.md`;
-6. load the Controller overlay `agents/chatgpt-agent/slack-controller-mvp.md` when ChatGPT is Controller;
-7. compile a minimal Executor Contract from G0 + selected G1 option + exact derived G2 authority;
-8. dispatch the bounded Executor through the run's Slack RootCard/thread;
-9. remain in-session, monitor semantic milestone reports, and intercept only contract-defined material drift.
+6. resolve/reuse the canonical task thread for `thread_key=<project_id>:<task_id>` (exactly one active RootCard/thread per logical task lifecycle) before any Slack dispatch — a run, authority refresh, retry, failover, or recovery MUST NOT create a new root; if an existing binding is ambiguous, fail closed as `TASK_CONTROLLER_THREAD_BINDING_AMBIGUOUS`;
+7. load the Controller overlay `agents/chatgpt-agent/slack-controller-mvp.md` when ChatGPT is Controller;
+8. compile a minimal Executor Contract from G0 + selected G1 option + exact derived G2 authority;
+9. dispatch the bounded Executor through the run's Slack RootCard/thread (reusing the resolved task thread);
+10. remain in-session, monitor semantic milestone reports, and intercept only contract-defined material drift.
 
 Slack is communication/projection only. A Slack message, button, ACK, Executor completion, or Controller instruction does not create GWC authority.
 

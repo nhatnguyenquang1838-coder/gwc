@@ -98,7 +98,15 @@ Thinking, tool chatter, raw output, repetitive polling, and recovered transient 
 
 ## RootCard
 
-Maintain exactly one RootCard for the run using the shared protocol. RootCard is the human quick view, not the execution journal.
+Maintain exactly one RootCard for the logical task lifecycle (keyed by `thread_key=<project_id>:<task_id>`), reusing the same Slack thread for every run/event — never open a second root for the same task. A run is an event inside the task thread; it does not create a new root.
+
+**Mandatory pre-send binding resolution:** before posting any RootCard or thread reply, resolve the existing binding for `thread_key=<project_id>:<task_id>`:
+
+- if an active thread already exists for the task, REPLY to it (no duplicate root); a second root for the same task is the fault `TASK_CONTROLLER_DUPLICATE_ROOT_FOR_TASK`;
+- if more than one candidate binding resolves, fail closed as `TASK_CONTROLLER_THREAD_BINDING_AMBIGUOUS`;
+- replacement of the active root is allowed ONLY for a different task, with an explicit `THREAD_RESET`, or when the original thread is inaccessible — and must carry supersession metadata.
+
+RootCard is the human quick view, not the execution journal.
 
 Keep visible when available:
 - human owner/watcher
@@ -177,6 +185,6 @@ Executor completion never grants later-gate authority by itself.
 
 ## MVP boundary
 
-Keep this pilot slim: one Controller, one main Executor, one Slack thread, one RootCard, 3–5 subtasks, contracted milestone reports, incremental 60-second polling, and bounded intercepts.
+Keep this pilot slim: one Controller, one main Executor, one Slack thread per logical task lifecycle (reused by every run/event), one RootCard, 3–5 subtasks, contracted milestone reports, incremental 60-second polling, and bounded intercepts.
 
 Do not add lease fencing, sequence/replay machinery, multi-executor orchestration, durable recovery, or other Full E2E protocol logic until the MVP pilot demonstrates a concrete need.

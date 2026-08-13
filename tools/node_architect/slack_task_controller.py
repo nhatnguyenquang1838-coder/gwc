@@ -96,4 +96,67 @@ def controller_next_action(report: Mapping[str, Any], *, expected_subtask_id: st
     return {"outcome": "INTERCEPT", "action": "WAIT", "reason_code": "TASK_CONTROLLER_REPORT_INVALID"}
 
 
-__all__ = ["compile_executor_contract", "controller_next_action"]
+# --- Thread identity resolution (fail-closed) -------------------------------------------
+#
+# Deterministic helper enforcing the canonical invariant: exactly one active RootCard/thread
+# per logical task lifecycle, keyed by `thread_key=<project_id>:<task_id>`. A *run* is an event
+# inside the task thread and MUST reuse the same thread.
+THREAD_ACTION_CREATE_ROOT = "CREATE_ROOT"
+THREAD_ACTION_REPLY_EXISTING = "REPLY_EXISTING_THREAD"
+THREAD_ACTION_REPLACE = "REPLACE_THREAD"
+
+
+def resolve_thread_action(*, thread_key: str, existing_threads: Sequence[Mapping[str, Any]],
+                          requested_task_id: str | None = None, reset_requested: bool = False,
+                          original_inaccessible: bool = False, force_create_root: bool = False) -> dict[str, Any]:
+    """Resolve the Slack action for a Controller dispatch against the canonical thread invariant.
+
+    Args:
+        thread_key: canonical binding key `<project_id>:<task_id>`.
+        existing_threads: candidate bindings already recorded for `thread_key`
+            (each mapping MUST carry at least `thread_ref`; may carry `task_id`, `superseded`).
+        requested_task_id: the task the new dispatch targets (used to detect a genuinely different task).
+        reset_requested: explicit `THREAD_RESET` supplied by the Controller.
+        original_inaccessible: the previously bound thread can no longer be posted to.
+        force_create_root: caller explicitly demands a fresh root. Fail-closed — refused when an active
+            same-task binding already exists without reset/inaccessible, raising
+            `TASK_CONTROLLER_DUPLICATE_ROOT_FOR_TASK`.
+
+    Returns a dict with `action` (one of THREAD_ACTION_*) and a `reason_code`.
+    Fail-closed: ambiguity, invalid key, or an unauthorized duplicate raises ValueError.
+    """
+    if not thread_key or ":" not in thread_key:
+        raise ValueError("TASK_CONTROLLER_THREAD_KEY_INVALID")
+    active = [t for t in existing_threads if not t.get("superseded")]
+
+    # 1) multiple live bindings for the same key -> ambiguous, fail closed
+    if len(active) > 1:
+        raise ValueError("TASK_CONTROLLER_THREAD_BINDING_AMBIGUOUS")
+
+    # 2) no active binding -> safe to create the root
+    if not active:
+        if force_create_root or reset_requested or original_inaccessible:
+            return {"action": THREAD_ACTION_CREATE_ROOT, "reason_code": "TASK_CONTROLLER_NO_PRIOR_BINDING"}
+        return {"action": THREAD_ACTION_CREATE_ROOT, "reason_code": "TASK_CONTROLLER_NO_PRIOR_BINDING"}
+
+    existing = active[0]
+    existing_task = existing.get("task_id")
+
+    # 3) genuinely different task -> allowed to create/replace a fresh root for the new task
+    if requested_task_id and existing_task and requested_task_id != existing_task:
+        return {"action": THREAD_ACTION_CREATE_ROOT, "reason_code": "TASK_CONTROLLER_DIFFERENT_TASK"}
+
+    # 4) explicit demand for a new root over an active same-task binding -> duplicate root fault
+    if force_create_root:
+        raise ValueError("TASK_CONTROLLER_DUPLICATE_ROOT_FOR_TASK")
+
+    # 5) replacement requires explicit reset OR inaccessible original, with supersession metadata
+    if reset_requested or original_inaccessible:
+        return {"action": THREAD_ACTION_REPLACE, "reason_code": "TASK_CONTROLLER_SUPERSESSION_REQUIRED"}
+
+    # 6) same task, already bound, no reset -> reuse the existing thread
+    return {"action": THREAD_ACTION_REPLY_EXISTING, "reason_code": "TASK_CONTROLLER_REUSE_EXISTING_THREAD"}
+
+
+__all__ = ["compile_executor_contract", "controller_next_action", "resolve_thread_action",
+           "THREAD_ACTION_CREATE_ROOT", "THREAD_ACTION_REPLY_EXISTING", "THREAD_ACTION_REPLACE"]

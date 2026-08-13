@@ -24,6 +24,6 @@ TaskController selects only a canonical DAG-ready + authorized task. It compiles
 
 `After report` is exactly `CONTINUE | WAIT_CONTROLLER | TERMINAL`.
 
-Slack is a control/visibility surface, never authority. RootCard is one root message per run; semantic milestone updates stay in its thread. Poll active runs incrementally every 60 seconds without posting polling chatter.
+Slack is a control/visibility surface, never authority. RootCard is one root per logical task lifecycle keyed by `thread_key=<project_id>:<task_id>`; a run is an event inside that task thread and reuses the same thread. Semantic milestone updates stay in that single thread. Poll active runs incrementally every 60 seconds without posting polling chatter.
 
 At Executor terminal evidence, re-read exact refs before CI/G3/G4 routing. At G4 pre-prod, invoke independent audit; do not merge based on Controller or Executor self-review.

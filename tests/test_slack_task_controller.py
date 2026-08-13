@@ -1,6 +1,13 @@
 import unittest
 
-from tools.node_architect.slack_task_controller import compile_executor_contract, controller_next_action
+from tools.node_architect.slack_task_controller import (
+    compile_executor_contract,
+    controller_next_action,
+    resolve_thread_action,
+    THREAD_ACTION_CREATE_ROOT,
+    THREAD_ACTION_REPLY_EXISTING,
+    THREAD_ACTION_REPLACE,
+)
 
 
 class SlackTaskControllerTests(unittest.TestCase):
@@ -55,6 +62,72 @@ class SlackTaskControllerTests(unittest.TestCase):
     def test_material_drift_intercepts(self):
         result = controller_next_action({"subtask_id": "S1", "status": "RUNNING", "after_report": "CONTINUE", "scope_drift": True}, expected_subtask_id="S1")
         self.assertEqual(result["outcome"], "INTERCEPT")
+
+
+class ThreadIdentityTests(unittest.TestCase):
+    KEY = "gwc:SCRUM-300"
+
+    def test_new_task_allows_root(self):
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=[])
+        self.assertEqual(r["action"], THREAD_ACTION_CREATE_ROOT)
+
+    def test_same_task_new_run_reuses(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300")
+        self.assertEqual(r["action"], THREAD_ACTION_REPLY_EXISTING)
+
+    def test_authority_revision_reuses(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300", reset_requested=False)
+        self.assertEqual(r["action"], THREAD_ACTION_REPLY_EXISTING)
+
+    def test_recert_reuses(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300")
+        self.assertEqual(r["action"], THREAD_ACTION_REPLY_EXISTING)
+
+    def test_executor_failover_reuses(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300")
+        self.assertEqual(r["action"], THREAD_ACTION_REPLY_EXISTING)
+
+    def test_audit_recovery_reuses(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300")
+        self.assertEqual(r["action"], THREAD_ACTION_REPLY_EXISTING)
+
+    def test_duplicate_root_fails(self):
+        with self.assertRaisesRegex(ValueError, "DUPLICATE_ROOT_FOR_TASK"):
+            resolve_thread_action(thread_key=self.KEY, existing_threads=[{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}],
+                                  requested_task_id="SCRUM-300", reset_requested=False, original_inaccessible=False,
+                                  force_create_root=True)
+
+    def test_multiple_bindings_fails_ambiguous(self):
+        existing = [
+            {"thread_ref": "C1:1.1", "task_id": "SCRUM-300"},
+            {"thread_ref": "C1:2.2", "task_id": "SCRUM-300"},
+        ]
+        with self.assertRaisesRegex(ValueError, "THREAD_BINDING_AMBIGUOUS"):
+            resolve_thread_action(thread_key=self.KEY, existing_threads=existing)
+
+    def test_explicit_thread_reset_allows_replacement(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300", reset_requested=True)
+        self.assertEqual(r["action"], THREAD_ACTION_REPLACE)
+
+    def test_inaccessible_original_allows_replacement(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-300", original_inaccessible=True)
+        self.assertEqual(r["action"], THREAD_ACTION_REPLACE)
+
+    def test_different_task_allows_root(self):
+        existing = [{"thread_ref": "C1:1.1", "task_id": "SCRUM-300"}]
+        r = resolve_thread_action(thread_key=self.KEY, existing_threads=existing, requested_task_id="SCRUM-301")
+        self.assertEqual(r["action"], THREAD_ACTION_CREATE_ROOT)
+
+    def test_invalid_thread_key_fails(self):
+        with self.assertRaisesRegex(ValueError, "THREAD_KEY_INVALID"):
+            resolve_thread_action(thread_key="no-colon", existing_threads=[])
 
 
 if __name__ == "__main__":

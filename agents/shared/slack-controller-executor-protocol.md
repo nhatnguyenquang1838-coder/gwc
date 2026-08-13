@@ -6,9 +6,24 @@ Status: MVP pilot contract. Full E2E protocol is deferred.
 
 Use Slack as a low-noise execution visibility and control surface between a GPT Controller and one Executor (Hermes in the pilot). Slack is not governance authority or source of truth.
 
+## Thread identity (canonical invariant)
+
+- Thread binding key is exactly `thread_key=<project_id>:<task_id>`.
+- Exactly **one active RootCard/thread per logical task lifecycle**. A *run* is an event that happens inside the task thread, not a reason to open a new root.
+- The same thread MUST be reused for every event across the whole lifecycle, including:
+  R6→R7, authority refresh, retry, recert/reopen, G0→G6 progression, PR/HEAD/CI changes,
+  audit retry/recovery, Controller retry, Executor restart/failover, BLOCKED→resume, and WAIT→continue.
+- Creating a second root for the same `<project_id>:<task_id>` is a fault:
+  `TASK_CONTROLLER_DUPLICATE_ROOT_FOR_TASK`.
+- If more than one candidate binding resolves for the same `thread_key`, fail closed as ambiguous:
+  `TASK_CONTROLLER_THREAD_BINDING_AMBIGUOUS`.
+- Replacement of the active root is allowed ONLY when the task is genuinely different, an explicit
+  `THREAD_RESET` is supplied, or the original thread is inaccessible — and the replacement MUST carry
+  supersession metadata (superseded `thread_key`, original thread ref, reset reason).
+
 ## RootCard
 
-One root message per run. The RootCard is a fast human snapshot and is updated in place.
+One RootCard per logical task lifecycle (keyed by `thread_key=<project_id>:<task_id>`). The RootCard is a fast human snapshot and is updated in place within its single thread.
 
 Required fields:
 - Human owner / watcher
@@ -119,10 +134,10 @@ Do not intercept harmless tool-choice differences, successful retries, normal pr
 ## Pilot topology
 
 ```text
-1 task
+1 task  (logical lifecycle, keyed by <project_id>:<task_id>)
 1 GPT Controller
 1 Hermes main Executor
-1 Slack RootCard/thread
+1 Slack RootCard/thread  (exactly one per task lifecycle; reused by every run/event)
 3–5 subtasks
 1 in-session 60s polling loop
 ```
