@@ -281,5 +281,104 @@ class FilesWriteScopeTests(unittest.TestCase):
             })
 
 
+    # --- SCRUM-304 R7 recert: exact-match denial of the 5 immutable control-plane paths ---
+
+    R7_PROHIBITED_EXACT = [
+        "tools/node_architect/materialize_autonomous_preprod_run_authority.py",
+        "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
+        "tools/node_architect/audit_guardrail.py",
+        "tools/node_architect/autonomous_execution_runtime.py",
+        "tools/node_architect/slack_task_controller.py",
+    ]
+    # Representative pre-existing R6 prohibitions retained for the 8-path denial probe.
+    R6_PRESERVED_PROHIBITED = [
+        "secrets/token.json",
+        "core/node-architect/authority/x.json",
+        ".env",
+    ]
+
+    def _sole_requirement_payload(self, candidate: str) -> dict:
+        return {
+            "task_id": TASK,
+            "repository": REPO,
+            "base_sha": BASE,
+            "branch": BRANCH,
+            "write_requirements": [{
+                "requirement_id": "probe",
+                "candidates": [candidate],
+                "reason": "Probe denial of control-plane path.",
+            }],
+            "source_bindings": [
+                {"source_type": "repository", "ref": "pre-prod", "revision": BASE, "status": "VERIFIED"},
+            ],
+            "repository_snapshot": {"base_sha": BASE, "tree_digest": "sha256:" + "1" * 64},
+        }
+
+    def test_r7_five_control_plane_paths_fail_closed(self):
+        for path in self.R7_PROHIBITED_EXACT:
+            with self.subTest(path=path):
+                artifact = self.mod.render_files_write_scope(self._sole_requirement_payload(path))
+                self.assertEqual(
+                    ("BLOCKED", "PROHIBITED_ACTION", "RESTRICT_WRITE_SCOPE"),
+                    (artifact["outcome"], artifact["reason_code"], artifact["next_route"]),
+                )
+                self.assertIn(path, artifact["prohibited_targets"])
+                self.assertIn(path, artifact["files_exclude"])
+                self.assertNotIn(path, artifact["files_write"])
+                self.assertFalse(
+                    any(value for key, value in artifact.items() if key.endswith("authority_granted"))
+                )
+                self.assert_artifact(artifact)
+
+    def test_r7_eight_path_denial_probe_preserves_existing_prohibitions(self):
+        # 5 new exact-match denials + 3 preserved R6 prohibitions = explicit 8-path probe.
+        for path in (*self.R7_PROHIBITED_EXACT, *self.R6_PRESERVED_PROHIBITED):
+            with self.subTest(path=path):
+                artifact = self.mod.render_files_write_scope(self._sole_requirement_payload(path))
+                self.assertEqual("BLOCKED", artifact["outcome"])
+                self.assertEqual("PROHIBITED_ACTION", artifact["reason_code"])
+                self.assertIn(path, artifact["prohibited_targets"])
+                self.assertNotIn(path, artifact["files_write"])
+                self.assert_artifact(artifact)
+
+    def test_r7_mixed_payload_excludes_control_plane_but_keeps_safe_writes(self):
+        payload = self.payload()
+        payload["write_requirements"].append({
+            "requirement_id": "control-plane-attempt",
+            "candidates": [
+                "tools/node_architect/audit_guardrail.py",
+                "tools/node_architect/files_write_scope.py",
+            ],
+            "reason": "Attempt to broaden into control-plane plus safe evaluator.",
+        })
+        artifact = self.mod.render_files_write_scope(payload)
+        # Control-plane path is excluded; the safe evaluator remains eligible for that
+        # requirement, so the overall scope stays READY (no broadening of the gap).
+        self.assertEqual("READY", artifact["outcome"])
+        self.assertIn("tools/node_architect/audit_guardrail.py", artifact["prohibited_targets"])
+        self.assertIn("tools/node_architect/audit_guardrail.py", artifact["files_exclude"])
+        self.assertNotIn("tools/node_architect/audit_guardrail.py", artifact["files_write"])
+        self.assert_artifact(artifact)
+
+    def test_r7_negative_authority_holds_under_denial(self):
+        for path in self.R7_PROHIBITED_EXACT:
+            with self.subTest(path=path):
+                artifact = self.mod.render_files_write_scope(self._sole_requirement_payload(path))
+                self.assertTrue(artifact["authority_negative"])
+                self.assertTrue(artifact["read_only_projection"])
+                self.assertTrue(artifact["candidate_write_scope"])
+                granted = [key for key in artifact if key.endswith("authority_granted")]
+                self.assertTrue(granted, "expected authority_granted fields present")
+                self.assertFalse(
+                    any(artifact[key] for key in granted),
+                    "no authority may be granted under denial",
+                )
+        ready = self.render()
+        self.assertTrue(ready["authority_negative"])
+        self.assertFalse(
+            any(value for key, value in ready.items() if key.endswith("authority_granted"))
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

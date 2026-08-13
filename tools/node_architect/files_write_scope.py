@@ -58,6 +58,19 @@ DEFAULT_PROHIBITED = (
     {"path": "core/node-architect/authority", "reason": "Authority control-plane is prohibited write scope.", "match": "prefix"},
     {"path": ".env", "reason": "Environment secrets are prohibited write scope.", "match": "exact"},
     {"path": ".git", "reason": "VCS internals are prohibited write scope.", "match": "prefix"},
+    # SCRUM-304 R7 recert: exact-match denials for the 5 immutable authority/control-plane
+    # paths that were incorrectly accepted into candidate files_write under R6. These preserve
+    # every existing prohibition above and add no prefix/catch-all broadening.
+    {"path": "tools/node_architect/materialize_autonomous_preprod_run_authority.py",
+     "reason": "Autonomous preprod run-authority materializer is immutable control-plane.", "match": "exact"},
+    {"path": "core/AUTONOMOUS_PREPROD_INTEGRATION_POLICY_v1.0.md",
+     "reason": "Autonomous preprod integration policy is immutable authority.", "match": "exact"},
+    {"path": "tools/node_architect/audit_guardrail.py",
+     "reason": "Audit guardrail is immutable control-plane.", "match": "exact"},
+    {"path": "tools/node_architect/autonomous_execution_runtime.py",
+     "reason": "Autonomous execution runtime is immutable control-plane.", "match": "exact"},
+    {"path": "tools/node_architect/slack_task_controller.py",
+     "reason": "Slack task controller is immutable control-plane.", "match": "exact"},
 )
 
 
