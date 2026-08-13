@@ -35,8 +35,10 @@ Required fields:
 
 For a ChatGPT Controller, the RootCard MUST bind:
 - `conversation.platform = chatgpt`
-- the exact runtime-supplied ChatGPT `conversation_id`
-- the exact runtime-supplied ChatGPT conversation `deeplink`
+- `conversation.source = gpt_runtime_current_chat`
+- the exact runtime-supplied URL of the current ChatGPT chat in `conversation.deeplink`
+
+The deeplink is opaque runtime data. The contract does **not** require a separate `conversation_id` and does **not** define one canonical route shape such as `/c/<id>`.
 
 `Open in GPT` is compiler-derived from that exact `deeplink`. Callers and renderers must not provide or override an independent `Open in GPT` URL.
 
@@ -44,17 +46,17 @@ Forbidden:
 - `https://chatgpt.com/` or any generic ChatGPT home/landing fallback
 - shared/public conversation links such as `/share/...`
 - fabricated or reconstructed conversation URLs
-- substituting task ID, run ID, GPT ID, or any other identifier for the actual conversation reference
-- a deeplink whose `/c/<conversation_id>` does not match the bound conversation
+- substituting task ID, run ID, GPT ID, or any other identifier for the actual current-chat URL
+- rewriting a valid runtime-supplied current-chat URL to another assumed route shape
 
-If the exact conversation reference is missing or invalid, RootCard compilation fails closed. A renderer must not show a fallback `Open in GPT` action. A valid deeplink is passed through unchanged, including its supported GPT-specific route, query, and fragment.
+If the exact current-chat URL is missing or invalid, RootCard compilation fails closed. A renderer must not show a fallback `Open in GPT` action. A valid deeplink is passed through unchanged, including its supported GPT-specific route, query, and fragment.
 
 Contextual actions:
 - `PAUSE`: soft control intent; stop before the next meaningful action boundary
 - `STOP`: hard stop intent; start no new mutation and return stopped/blocked state
 - `APPROVE`: visible only when an exact human authority boundary exists; button intent is not authority by itself
 - `MERGE`: visible only when merge is a valid next action and exact PR/head is bound; button intent is not authority by itself
-- `Open in GPT`: navigation only; compiler-derived from the validated exact conversation deeplink
+- `Open in GPT`: navigation only; compiler-derived from the validated exact current-chat deeplink
 
 ## Controller Plan & Contract
 

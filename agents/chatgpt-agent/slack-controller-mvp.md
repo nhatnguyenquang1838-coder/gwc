@@ -122,7 +122,9 @@ Detailed milestone evidence belongs in thread replies.
 
 ### Exact ChatGPT conversation deep-link
 
-The Controller runtime MUST supply both the actual ChatGPT `conversation_id` and the exact URL for this conversation.
+The Controller runtime MUST supply the exact URL of the **current ChatGPT chat created/owned by this GPT runtime** as `conversation.deeplink`, together with `conversation.source = gpt_runtime_current_chat`.
+
+Treat the deeplink as opaque runtime data. Do not require a separate `conversation_id` and do not pin the contract to `/c/<conversation_id>` or any other undocumented route shape.
 
 The canonical compiler derives `Open in GPT` from that exact URL. Never:
 - use `https://chatgpt.com/` or another landing page as fallback
@@ -131,14 +133,14 @@ The canonical compiler derives `Open in GPT` from that exact URL. Never:
 - accept an independently supplied `Open in GPT` URL
 - rewrite a valid exact deeplink in the renderer
 
-If the runtime cannot supply a valid exact conversation URL whose `/c/<conversation_id>` matches the bound conversation, RootCard compilation must fail closed. Slack/Block Kit/GG must not repair the payload or render a fake navigation button.
+If the runtime cannot supply a valid exact current-chat URL, RootCard compilation must fail closed. Slack/Block Kit/GG must not repair the payload or render a fake navigation button.
 
 Human action buttons are contextual control intents:
 - `PAUSE` — stop before the next meaningful action boundary
 - `STOP` — no new mutation starts; return stopped/blocked state
 - `APPROVE` — only when exact human authority is required; the click itself does not create canonical GWC authority
 - `MERGE` — only at a valid G4 state and bound to exact PR/head; the click itself does not bypass GWC authority validation
-- `Open in GPT` — navigation only; compiler-derived and bound to this exact ChatGPT conversation
+- `Open in GPT` — navigation only; compiler-derived and bound to this exact current ChatGPT chat
 
 ## Controller monitoring loop
 
