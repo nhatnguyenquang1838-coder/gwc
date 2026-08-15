@@ -9,6 +9,7 @@ from collections.abc import Mapping, Sequence
 import hashlib
 import json
 import re
+from datetime import datetime
 from typing import Any
 
 
@@ -50,6 +51,9 @@ GATE_STATUSES = {"READY", "RUNNING", "PASS", "BLOCKED", "FAILED", "NOT_APPLICABL
 REPOSITORY_PATTERN = re.compile(r"^[^/\s]+/[^/\s]+$")
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 SCOPE_HASH_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
+# SCRUM-311: if a caller supplies both an evidence age and this threshold, ages
+# beyond it are rejected as stale. None => not enforced (opt-in, fail-soft-open).
+STALE_EVIDENCE_MAX_AGE_S: int | None = None
 SCOPE_IDENTITY_KEYS = {
     "schema_version", "artifact_type", "task_id", "repository", "base_ref",
     "base_sha", "working_branch", "head_sha", "risk_class", "authorized_paths",
@@ -160,6 +164,18 @@ def _canonical_json(value: Any) -> str:
 
 def _digest(value: Any) -> str:
     return "sha256:" + hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def _parse_iso8601(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        return None
 
 
 def _as_string(value: Any) -> str | None:
@@ -368,6 +384,8 @@ def _request_fingerprint(
     *, task_id: str, repository: str, action: str | None, minimum_gate: str | None,
     current_gate: str | None, scope: Mapping[str, Any], state: Mapping[str, Any],
     risk_class: str, production_scope_applicable: bool, manual_g5_action: bool,
+    envelope_expires_at: str | None = None, stale_evidence: bool = False,
+    evidence_age_s: int | None = None,
 ) -> str:
     payload = {
         "task_id": task_id,
@@ -381,6 +399,9 @@ def _request_fingerprint(
         "risk_class": risk_class,
         "production_scope_applicable": production_scope_applicable,
         "manual_g5_action": manual_g5_action,
+        "envelope_expires_at": envelope_expires_at,
+        "stale_evidence": stale_evidence,
+        "evidence_age_s": evidence_age_s,
     }
     return _digest(payload)
 
@@ -403,7 +424,8 @@ def _base_output(
     scope_identity: Mapping[str, Any], gate_state: Mapping[str, Any], risk_class: str,
     production_scope_applicable: bool, manual_g5_action: bool,
     event_id_or_idempotency_key: str, replay_status: str, request_fingerprint: str,
-    evaluated_at: str | None,
+    evaluated_at: str | None, envelope_expires_at: str | None = None,
+    stale_evidence: bool = False,
 ) -> dict[str, Any]:
     # Nested `scope_identity` is the compact projection described in the module
     # note (MINOR#4): it mirrors the canonical gate-scope-identity bindings for
@@ -435,6 +457,8 @@ def _base_output(
         "risk_class": risk_class,
         "production_scope_applicable": production_scope_applicable,
         "manual_g5_action": manual_g5_action,
+        "envelope_expires_at": envelope_expires_at,
+        "stale_evidence": stale_evidence,
         "event_id_or_idempotency_key": event_id_or_idempotency_key,
         "replay_status": replay_status,
         "request_fingerprint": request_fingerprint,
@@ -481,6 +505,9 @@ def check_authority_boundary(
     event_id_or_idempotency_key: str,
     prior_decision: dict[str, object] | None = None,
     evaluated_at: str | None = None,
+    envelope_expires_at: str | None = None,
+    stale_evidence: bool = False,
+    evidence_age_s: int | None = None,
 ) -> dict[str, object]:
     """Evaluate one action without performing it or granting authority."""
     state = gate_state_resolution if isinstance(gate_state_resolution, Mapping) else {}
@@ -494,6 +521,8 @@ def check_authority_boundary(
     safe_risk_class = risk_class if _valid_risk_class(risk_class) else "R0"
     safe_production_scope = production_scope_applicable if isinstance(production_scope_applicable, bool) else False
     safe_manual_g5 = manual_g5_action if isinstance(manual_g5_action, bool) else False
+    safe_envelope_expires_at = envelope_expires_at if isinstance(envelope_expires_at, str) else None
+    safe_stale_evidence = stale_evidence if isinstance(stale_evidence, bool) else False
     safe_event_id = _safe_text(event_id_or_idempotency_key, "invalid-event")
     safe_evaluated_at = evaluated_at if isinstance(evaluated_at, str) else None
     minimum_gate = ACTION_TO_MINIMUM_GATE.get(action)
@@ -509,6 +538,8 @@ def check_authority_boundary(
         state=state, risk_class=risk_class,
         production_scope_applicable=production_scope_applicable,
         manual_g5_action=manual_g5_action,
+        envelope_expires_at=envelope_expires_at, stale_evidence=stale_evidence,
+        evidence_age_s=evidence_age_s,
     )
     output = _base_output(
         task_id=safe_task_id, repository=safe_repository, requested_action=safe_requested_action,
@@ -517,6 +548,8 @@ def check_authority_boundary(
         scope_identity=safe_scope, gate_state=state, risk_class=safe_risk_class,
         production_scope_applicable=safe_production_scope,
         manual_g5_action=safe_manual_g5,
+        envelope_expires_at=safe_envelope_expires_at,
+        stale_evidence=safe_stale_evidence,
         event_id_or_idempotency_key=safe_event_id,
         replay_status="FIRST_SEEN", request_fingerprint=fingerprint,
         evaluated_at=safe_evaluated_at,
@@ -534,9 +567,27 @@ def check_authority_boundary(
         not isinstance(manual_g5_action, bool),
         not isinstance(event_id_or_idempotency_key, str) or not event_id_or_idempotency_key,
         evaluated_at is not None and not isinstance(evaluated_at, str),
+        not isinstance(envelope_expires_at, (str, type(None))),
+        not isinstance(stale_evidence, bool),
+        not isinstance(evidence_age_s, (int, type(None))),
     ]
     if any(invalid) or not current_gate or not current_status or current_status not in GATE_STATUSES:
         return _finish(output, ["AUTHORITY_INPUT_INVALID"])
+
+    # SCRUM-311: closed-envelope expiry + stale-evidence determinism.
+    exp = _parse_iso8601(envelope_expires_at)
+    ref = _parse_iso8601(evaluated_at) if isinstance(evaluated_at, str) else None
+    if envelope_expires_at is not None:
+        if exp is None or ref is None or ref > exp:
+            return _finish(output, ["AUTHORITY_ENVELOPE_EXPIRED"])
+    if stale_evidence:
+        return _finish(output, ["AUTHORITY_STALE_EVIDENCE_REJECTED"])
+    if (
+        evidence_age_s is not None
+        and STALE_EVIDENCE_MAX_AGE_S is not None
+        and evidence_age_s > STALE_EVIDENCE_MAX_AGE_S
+    ):
+        return _finish(output, ["AUTHORITY_STALE_EVIDENCE_REJECTED"])
 
     if minimum_gate:
         policy_gate = _policy_gate(action, policy, minimum_gate)
@@ -551,6 +602,8 @@ def check_authority_boundary(
         state=state, risk_class=risk_class,
         production_scope_applicable=production_scope_applicable,
         manual_g5_action=manual_g5_action,
+        envelope_expires_at=envelope_expires_at, stale_evidence=stale_evidence,
+        evidence_age_s=evidence_age_s,
     )
     fingerprint = output["request_fingerprint"]
 
