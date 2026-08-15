@@ -25,15 +25,51 @@ def digest_payload(payload: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
 
-def decide_unknown_write_reconciliation(*, task_id: str, repository: str, branch: str, base_sha: str, head_sha: str, scope_hash: str, operation_id: str, provider_readback_status: str, external_effect_status: str, idempotency_key: str, retry_count: int, max_retries: int, pending_action_recorded: bool, observed_at: str | None = None) -> dict[str, Any]:
+VERIFIED_READBACK = "VERIFIED"
+PARTIAL_READBACK = "PARTIAL"
+
+RECONCILIATION_STATE_CONFIRMED = "CONFIRMED"
+RECONCILIATION_STATE_PENDING = "PENDING"
+RECONCILIATION_STATE_FAILED = "FAILED"
+RECONCILIATION_STATE_UNKNOWN = "UNKNOWN"
+RECONCILIATION_STATE_DUPLICATE_EQUIVALENT = "DUPLICATE_EQUIVALENT"
+
+# An outcome may only be projected as an explicit reconciliation state; an
+# ambiguous or non-authoritative readback is never guessed into CONFIRMED/FAILED.
+_RECONCILIATION_STATE_BY_REASON = {
+    "PENDING_ACTION_EVIDENCE_MISSING": RECONCILIATION_STATE_PENDING,
+    "PROVIDER_READBACK_NOT_VERIFIED": RECONCILIATION_STATE_UNKNOWN,
+    "PROVIDER_READBACK_PARTIAL": RECONCILIATION_STATE_UNKNOWN,
+    "STALE_HEAD_READBACK": RECONCILIATION_STATE_UNKNOWN,
+    "UNKNOWN_EXTERNAL_EFFECT": RECONCILIATION_STATE_UNKNOWN,
+    "WRITE_ALREADY_COMMITTED": RECONCILIATION_STATE_CONFIRMED,
+    "DUPLICATE_EQUIVALENT_EFFECT": RECONCILIATION_STATE_DUPLICATE_EQUIVALENT,
+    "READBACK_CONFIRMED_FAILURE": RECONCILIATION_STATE_FAILED,
+    "ZERO_EFFECT_WITH_RETRY_BUDGET": RECONCILIATION_STATE_FAILED,
+    "RETRY_BUDGET_EXHAUSTED": RECONCILIATION_STATE_FAILED,
+    "UNSUPPORTED_EFFECT_STATUS": RECONCILIATION_STATE_UNKNOWN,
+}
+
+
+def decide_unknown_write_reconciliation(*, task_id: str, repository: str, branch: str, base_sha: str, head_sha: str, scope_hash: str, operation_id: str, provider_readback_status: str, external_effect_status: str, idempotency_key: str, retry_count: int, max_retries: int, pending_action_recorded: bool, observed_at: str | None = None, observed_head_sha: str | None = None) -> dict[str, Any]:
+    # Stale readback: evidence observed against a head other than the write's own
+    # head cannot authoritatively resolve the ambiguous effect.
+    head_is_stale = observed_head_sha is not None and observed_head_sha != head_sha
+
     if not pending_action_recorded:
         outcome, reason = "RECONCILE", "PENDING_ACTION_EVIDENCE_MISSING"
-    elif provider_readback_status != "VERIFIED":
+    elif head_is_stale:
+        outcome, reason = "RECONCILE", "STALE_HEAD_READBACK"
+    elif provider_readback_status == PARTIAL_READBACK:
+        outcome, reason = "RECONCILE", "PROVIDER_READBACK_PARTIAL"
+    elif provider_readback_status != VERIFIED_READBACK:
         outcome, reason = "RECONCILE", "PROVIDER_READBACK_NOT_VERIFIED"
     elif external_effect_status == "UNKNOWN":
         outcome, reason = "RECONCILE", "UNKNOWN_EXTERNAL_EFFECT"
     elif external_effect_status == "COMMITTED":
         outcome, reason = "HUMAN_REQUIRED", "WRITE_ALREADY_COMMITTED"
+    elif external_effect_status == "DUPLICATE_EQUIVALENT":
+        outcome, reason = "HUMAN_REQUIRED", "DUPLICATE_EQUIVALENT_EFFECT"
     elif external_effect_status == "FAILED":
         outcome, reason = "FAIL", "READBACK_CONFIRMED_FAILURE"
     elif external_effect_status == "ZERO_EFFECT" and retry_count < max_retries:
@@ -42,6 +78,11 @@ def decide_unknown_write_reconciliation(*, task_id: str, repository: str, branch
         outcome, reason = "FAIL", "RETRY_BUDGET_EXHAUSTED"
     else:
         outcome, reason = "RECONCILE", "UNSUPPORTED_EFFECT_STATUS"
+
+    reconciliation_state = _RECONCILIATION_STATE_BY_REASON[reason]
+    # A repeat write is authorized only when an authoritative readback proved a
+    # ZERO_EFFECT outcome and retry budget remains. UNKNOWN/PENDING never retry.
+    retry_permitted = outcome == "BOUNDED_RETRY"
 
     decision = {
         "schema_version": "1.0",
@@ -60,10 +101,13 @@ def decide_unknown_write_reconciliation(*, task_id: str, repository: str, branch
         "max_retries": max_retries,
         "pending_action_recorded": pending_action_recorded,
         "observed_at": observed_at or _now(),
+        "observed_head_sha": observed_head_sha,
         "outcome": outcome,
         "reason_code": reason,
+        "reconciliation_state": reconciliation_state,
+        "retry_permitted": retry_permitted,
         "blind_retry_allowed": False,
-        "pass_allowed": outcome == "BOUNDED_RETRY" or external_effect_status == "COMMITTED",
+        "pass_allowed": outcome == "BOUNDED_RETRY" or reconciliation_state in {RECONCILIATION_STATE_CONFIRMED, RECONCILIATION_STATE_DUPLICATE_EQUIVALENT},
         "checkpoint_required": outcome in {"BOUNDED_RETRY", "RECONCILE", "HUMAN_REQUIRED"},
     }
     decision["decision_digest"] = digest_payload({k: v for k, v in decision.items() if k != "decision_digest"})
