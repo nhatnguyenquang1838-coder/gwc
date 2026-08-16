@@ -25,6 +25,9 @@ _REASON_AMBIGUOUS = "G2_ENVELOPE_APPROVAL_AMBIGUOUS"
 _REASON_GATE_STATE_BLOCKED = "G2_ENVELOPE_GATE_STATE_BLOCKED"
 _REASON_AUTHORITY_BLOCKED = "G2_ENVELOPE_AUTHORITY_BLOCKED"
 _REASON_EVIDENCE_BLOCKED = "G2_ENVELOPE_EVIDENCE_BLOCKED"
+_REASON_GATE_STATE_IDENTITY = "G2_ENVELOPE_GATE_STATE_IDENTITY_MISMATCH"
+_REASON_AUTHORITY_IDENTITY = "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH"
+_REASON_EVIDENCE_IDENTITY = "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH"
 
 _SCOPE_HASH_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -102,11 +105,15 @@ _EVIDENCE_BLOCKERS = {
 
 
 def _gate_state_accepted(gs: object) -> bool:
-    """True iff gate_state_resolution is in its canonical accepted state:
-    gate_status PASS/NOT_APPLICABLE, no drift, no replay conflict, no blockers."""
+    """True iff gate_state_resolution is in its canonical *accepted* state AND
+    the accepted status is provably G2-compatible. Only `PASS` is accepted; a
+    generic `NOT_APPLICABLE` is never accepted by name alone — this G2 envelope
+    cannot prove the action/gate semantics that would make it applicable, so it
+    fails closed per the controller intercept. No drift, no replay conflict, no
+    blockers."""
     if not isinstance(gs, dict):
         return False
-    if gs.get("gate_status") not in ("PASS", "NOT_APPLICABLE"):
+    if gs.get("gate_status") != "PASS":
         return False
     drift = gs.get("drift_decision")
     if isinstance(drift, dict) and drift.get("status") not in ("NO_DRIFT", None):
@@ -120,12 +127,14 @@ def _gate_state_accepted(gs: object) -> bool:
 
 
 def _authority_accepted(ab: object) -> bool:
-    """True iff authority_boundary_decision permits execution: decision is one
-    of REQUIRE_APPROVAL/ALLOW_PREPARATION/NOT_APPLICABLE, not prohibited, not
-    replay/stale-conflicted."""
+    """True iff authority_boundary_decision permits execution AND the accepted
+    decision is provably G2-compatible. Only `REQUIRE_APPROVAL`/`ALLOW_PREPARATION`
+    are accepted; a generic `NOT_APPLICABLE` is never accepted by name alone (no
+    proof of G2 applicability) -> fail closed. Not prohibited, not replay/stale
+    conflict."""
     if not isinstance(ab, dict):
         return False
-    if ab.get("decision") not in ("REQUIRE_APPROVAL", "ALLOW_PREPARATION", "NOT_APPLICABLE"):
+    if ab.get("decision") not in ("REQUIRE_APPROVAL", "ALLOW_PREPARATION"):
         return False
     if ab.get("prohibited") is True:
         return False
@@ -147,6 +156,85 @@ def _evidence_accepted(em: object) -> bool:
     if any(r in _EVIDENCE_BLOCKERS for r in reasons):
         return False
     if em.get("missing_required") or em.get("stale_required") or em.get("projection_only"):
+        return False
+    return True
+
+
+def _gate_state_identity_ok(gs: object, *, task_id: str, repository: str,
+                            base_sha: str, scope_hash: str) -> bool:
+    """Smallest canonical identity projection gate_state_resolution must carry to
+    prove it belongs to THIS envelope, grounded in its real top-level keys
+    (task_id, repository, current_base_sha, scope_hash). A PASS with missing or
+    foreign identity fields is malformed/ambiguous -> False."""
+    if not isinstance(gs, dict):
+        return False
+    if not gs.get("task_id") or gs.get("task_id") != task_id:
+        return False
+    if not gs.get("repository") or gs.get("repository") != repository:
+        return False
+    if not gs.get("current_base_sha") or gs.get("current_base_sha") != base_sha:
+        return False
+    if not gs.get("scope_hash") or gs.get("scope_hash") != scope_hash:
+        return False
+    return True
+
+
+def _authority_identity_ok(ab: object, *, task_id: str, repository: str,
+                           base_sha: str, scope_hash: str, risk_class: str,
+                           authorized_actions: tuple[str, ...],
+                           working_branch: str = "") -> bool:
+    """authority_boundary_decision identity: top-level task_id/repository/
+    current_base_sha/scope_hash/risk_class AND the embedded scope_identity
+    projection (task_id, repository, base_sha, scope_hash, authorized_actions)."""
+    if not isinstance(ab, dict):
+        return False
+    if not ab.get("task_id") or ab.get("task_id") != task_id:
+        return False
+    if not ab.get("repository") or ab.get("repository") != repository:
+        return False
+    if not ab.get("current_base_sha") or ab.get("current_base_sha") != base_sha:
+        return False
+    if not ab.get("scope_hash") or ab.get("scope_hash") != scope_hash:
+        return False
+    rc = ab.get("risk_class")
+    if rc is not None and rc != risk_class:
+        return False
+    si = ab.get("scope_identity")
+    if isinstance(si, dict):
+        if si.get("task_id") not in (None, task_id):
+            return False
+        if si.get("repository") not in (None, repository):
+            return False
+        if si.get("base_sha") not in (None, base_sha):
+            return False
+        if si.get("scope_hash") not in (None, scope_hash):
+            return False
+        wb = si.get("working_branch")
+        if wb is not None and wb != working_branch:
+            return False
+        acts = si.get("authorized_actions")
+        if acts is not None:
+            exp = set(authorized_actions)
+            if not set(acts).issubset(exp):
+                return False
+    return True
+
+
+def _evidence_identity_ok(em: object, *, task_id: str, repository: str,
+                          base_sha: str) -> bool:
+    """Smallest canonical identity projection evidence_artifact_map must carry
+    (top-level task_id, repository, base_sha — the ONLY identity keys the producer
+    emits; it exposes no top-level scope_hash and head_sha is not bound for this
+    G2 map). A READY map with missing/foreign task/repo/base binding is
+    stale/foreign -> False. Scope mismatch is already reflected by the canonical
+    map's own BLOCKED/reason when correctly constructed."""
+    if not isinstance(em, dict):
+        return False
+    if not em.get("task_id") or em.get("task_id") != task_id:
+        return False
+    if not em.get("repository") or em.get("repository") != repository:
+        return False
+    if not em.get("base_sha") or em.get("base_sha") != base_sha:
         return False
     return True
 
@@ -275,6 +363,26 @@ def render_g2_execution_envelope(
         elif not _evidence_accepted(evidence_map):
             activation_state = "BLOCKED"
             reason_code = _REASON_EVIDENCE_BLOCKED
+        elif not _gate_state_identity_ok(
+            gate_state_resolution,
+            task_id=task_id, repository=repository, base_sha=base_sha, scope_hash=scope_hash,
+        ):
+            activation_state = "BLOCKED"
+            reason_code = _REASON_GATE_STATE_IDENTITY
+        elif not _authority_identity_ok(
+            authority_boundary_decision,
+            task_id=task_id, repository=repository, base_sha=base_sha,
+            scope_hash=scope_hash, risk_class=risk_class, authorized_actions=authorized_actions,
+            working_branch=working_branch,
+        ):
+            activation_state = "BLOCKED"
+            reason_code = _REASON_AUTHORITY_IDENTITY
+        elif not _evidence_identity_ok(
+            evidence_map,
+            task_id=task_id, repository=repository, base_sha=base_sha,
+        ):
+            activation_state = "BLOCKED"
+            reason_code = _REASON_EVIDENCE_IDENTITY
         else:
             activation_state = "ACTIVE"
             reason_code = _REASON_ACTIVE
@@ -296,6 +404,29 @@ def render_g2_execution_envelope(
             evidence_map.get("missing_required") if isinstance(evidence_map, dict) else None,
             evidence_map.get("stale_required") if isinstance(evidence_map, dict) else None,
             evidence_map.get("projection_only") if isinstance(evidence_map, dict) else None,
+        ),
+        # Identity projection of each required input: foreign/stale identity must
+        # change the digest (task/repo/base for gate+evidence; task/repo/base/
+        # scope/risk/branch/actions for authority). Grounded in each producer's
+        # real emitted identity keys — evidence has no scope_hash, so omitted.
+        _digest(
+            _canon(gate_state_resolution.get("task_id")) if isinstance(gate_state_resolution, dict) else None,
+            _canon(gate_state_resolution.get("repository")) if isinstance(gate_state_resolution, dict) else None,
+            _canon(gate_state_resolution.get("current_base_sha")) if isinstance(gate_state_resolution, dict) else None,
+            _canon(gate_state_resolution.get("scope_hash")) if isinstance(gate_state_resolution, dict) else None,
+        ),
+        _digest(
+            _canon(authority_boundary_decision.get("task_id")) if isinstance(authority_boundary_decision, dict) else None,
+            _canon(authority_boundary_decision.get("repository")) if isinstance(authority_boundary_decision, dict) else None,
+            _canon(authority_boundary_decision.get("current_base_sha")) if isinstance(authority_boundary_decision, dict) else None,
+            _canon(authority_boundary_decision.get("scope_hash")) if isinstance(authority_boundary_decision, dict) else None,
+            _canon(authority_boundary_decision.get("risk_class")) if isinstance(authority_boundary_decision, dict) else None,
+            _canon(authority_boundary_decision.get("scope_identity")) if isinstance(authority_boundary_decision, dict) else None,
+        ),
+        _digest(
+            _canon(evidence_map.get("task_id")) if isinstance(evidence_map, dict) else None,
+            _canon(evidence_map.get("repository")) if isinstance(evidence_map, dict) else None,
+            _canon(evidence_map.get("base_sha")) if isinstance(evidence_map, dict) else None,
         ),
     )
 

@@ -30,14 +30,22 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
                                     "run_sandboxed_validation", "stage_commit_push"],
         },
         scope_identity={"scope_hash": _SCOPE},
-        # gate_state_resolution: canonical PASS / NO_DRIFT / not replay-conflicted.
+        # gate_state_resolution: canonical PASS / NO_DRIFT / not replay-conflicted,
+        # carrying its real top-level identity (task_id, repository,
+        # current_base_sha, scope_hash).
         gate_state_resolution={
+            "task_id": "SCRUM-191",
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "current_base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+            "scope_hash": _SCOPE,
             "gate_status": "PASS",
             "drift_decision": {"status": "NO_DRIFT", "reason_codes": []},
             "replay_status": "FIRST_SEEN",
             "reason_codes": ["GATE_STATE_RESOLVED", "GATE_STATE_G6_NOT_APPLICABLE"],
         },
-        # authority_boundary_decision: decision REQUIRE_APPROVAL, not prohibited.
+        # authority_boundary_decision: decision REQUIRE_APPROVAL, not prohibited,
+        # with its real top-level identity + nested scope_identity (which carries
+        # task/repo/base/scope/risk/branch/actions identity for this G2 render).
         authority_boundary_decision={
             "decision": "REQUIRE_APPROVAL",
             "approval_required": True,
@@ -45,9 +53,28 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
             "replay_status": "FIRST_SEEN",
             "stale_evidence": False,
             "reason_codes": ["AUTHORITY_APPROVAL_REQUIRED"],
+            "task_id": "SCRUM-191",
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "current_base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+            "scope_hash": _SCOPE,
+            "risk_class": "R2",
+            "scope_identity": {
+                "task_id": "SCRUM-191",
+                "repository": "nhatnguyenquang1838-coder/gwc",
+                "base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+                "head_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+                "scope_hash": _SCOPE,
+                "working_branch": "hermes/scrum-191-x",
+                "authorized_actions": ["create_working_branch", "add_files",
+                                       "run_sandboxed_validation", "stage_commit_push"],
+            },
         },
         # evidence_artifact_map: READY with no blocker reasons / missing / stale.
+        # Real emitted identity = task_id / repository / base_sha (no scope_hash).
         evidence_map={
+            "task_id": "SCRUM-191",
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
             "outcome": "READY",
             "reason_codes": ["EVIDENCE_MAP_READY"],
             "missing_required": [],
@@ -399,6 +426,189 @@ class TestS2RequiredInputFailClosedSCRUM314(unittest.TestCase):
         kw["evidence_map"] = dict(kw["evidence_map"])
         kw["evidence_map"]["reason_codes"] = ["EVIDENCE_STALE"]
         kw["evidence_map"]["stale_required"] = ["x"]
+        b = render_g2_execution_envelope(**kw)
+        self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
+
+
+class TestS2RequiredInputIdentitySCRUM314(unittest.TestCase):
+    """SCRUM-314 final identity-gap repair (controller intercept d836): a VALID
+    approval must NOT reach ACTIVE when any required producer input's *identity*
+    (task/repo/base/scope/risk/branch/actions) is missing or belongs to another
+    task. Identity is read from each producer's real emitted keys:
+      - gate_state_resolution: task_id, repository, current_base_sha, scope_hash
+      - authority_boundary_decision: task_id, repository, current_base_sha,
+        scope_hash, risk_class + nested scope_identity (task/repo/base/scope/
+        branch/actions)
+      - evidence_artifact_map: task_id, repository, base_sha (no scope_hash)
+    A generic NOT_APPLICABLE is never accepted by name alone (fail closed)."""
+
+    def _accepted(self):
+        return _base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE})
+
+    # ---- gate_state_resolution identity ----
+    def test_blocked_when_gate_identity_foreign_task(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["task_id"] = "SCRUM-999"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_IDENTITY_MISMATCH")
+
+    def test_blocked_when_gate_identity_foreign_base(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["current_base_sha"] = "0" * 40
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_IDENTITY_MISMATCH")
+
+    def test_blocked_when_gate_identity_missing_fields(self):
+        kw = self._accepted()
+        g = dict(kw["gate_state_resolution"])
+        del g["task_id"]
+        del g["repository"]
+        kw["gate_state_resolution"] = g
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_IDENTITY_MISMATCH")
+
+    def test_blocked_when_gate_status_not_applicable(self):
+        # Generic NOT_APPLICABLE is never accepted by name alone -> fail closed.
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["gate_status"] = "NOT_APPLICABLE"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    # ---- authority_boundary_decision identity ----
+    def test_blocked_when_authority_identity_foreign_task(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["task_id"] = "SCRUM-999"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_identity_foreign_base(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["current_base_sha"] = "0" * 40
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_identity_foreign_scope(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["scope_hash"] = "sha256:" + "f" * 64
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_identity_foreign_risk_class(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["risk_class"] = "R9"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_scope_identity_foreign_branch(self):
+        kw = self._accepted()
+        si = dict(kw["authority_boundary_decision"]["scope_identity"])
+        si["working_branch"] = "auto/SCRUM-000-x"
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["scope_identity"] = si
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_scope_identity_foreign_actions(self):
+        kw = self._accepted()
+        si = dict(kw["authority_boundary_decision"]["scope_identity"])
+        si["authorized_actions"] = ["create_working_branch", "g3_pr_promotion"]
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["scope_identity"] = si
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_identity_missing_fields(self):
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        del a["task_id"]
+        del a["current_base_sha"]
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_decision_not_applicable(self):
+        # Generic NOT_APPLICABLE is never accepted by name alone -> fail closed.
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["decision"] = "NOT_APPLICABLE"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
+
+    # ---- evidence_artifact_map identity ----
+    def test_blocked_when_evidence_identity_foreign_task(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["task_id"] = "SCRUM-999"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH")
+
+    def test_blocked_when_evidence_identity_foreign_repo(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["repository"] = "other-org/other-repo"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH")
+
+    def test_blocked_when_evidence_identity_foreign_base(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["base_sha"] = "0" * 40
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH")
+
+    def test_blocked_when_evidence_identity_missing_fields(self):
+        kw = self._accepted()
+        e = dict(kw["evidence_map"])
+        del e["task_id"]
+        del e["repository"]
+        kw["evidence_map"] = e
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH")
+
+    # ---- happy path: real producer-shaped current inputs activate ----
+    def test_active_when_all_identities_current(self):
+        env = render_g2_execution_envelope(**self._accepted())
+        self.assertEqual(env["activation_state"], "ACTIVE")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_ACTIVE")
+        self.assertEqual(env["execution_started"], False)
+
+    # ---- digest must change when a required input carries foreign identity ----
+    def test_digest_changes_when_gate_identity_foreign(self):
+        a = render_g2_execution_envelope(**self._accepted())
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["task_id"] = "SCRUM-999"
+        b = render_g2_execution_envelope(**kw)
+        self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
+
+    def test_digest_changes_when_evidence_identity_foreign(self):
+        a = render_g2_execution_envelope(**self._accepted())
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["task_id"] = "SCRUM-999"
         b = render_g2_execution_envelope(**kw)
         self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
 
