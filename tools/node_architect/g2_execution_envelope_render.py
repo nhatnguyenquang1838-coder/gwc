@@ -29,7 +29,8 @@ _REASON_GATE_STATE_IDENTITY = "G2_ENVELOPE_GATE_STATE_IDENTITY_MISMATCH"
 _REASON_AUTHORITY_IDENTITY = "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH"
 _REASON_EVIDENCE_IDENTITY = "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH"
 
-_SCOPE_HASH_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+_SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+_SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 @dataclass(frozen=True)
@@ -183,11 +184,24 @@ def _authority_identity_ok(ab: object, *, task_id: str, repository: str,
                            base_sha: str, scope_hash: str, risk_class: str,
                            authorized_actions: tuple[str, ...],
                            working_branch: str = "") -> bool:
-    """authority_boundary_decision identity: top-level task_id/repository/
-    current_base_sha/scope_hash/risk_class AND the embedded scope_identity
-    projection (task_id, repository, base_sha, scope_hash, authorized_actions)."""
+    """authority_boundary_decision identity — strict per canonical
+    authority-boundary-decision schema (controller micro-intercept 121a).
+
+    The canonical schema REQUIRES top-level `risk_class` and `scope_identity`, and
+    the nested `scope_identity` REQUIRES task_id/repository/base_sha/head_sha/
+    scope_hash/authorized_actions. Every one of those must be present and the
+    identity-bearing ones must match THIS envelope exactly. The embedded
+    `head_sha` is validated as a real producer-shaped 40-hex commit (never
+    compared to an invented envelope head — the renderer has no head binding).
+    `authorized_actions` must be EXACTLY the envelope's authorized actions
+    (order-normalized): a subset would be an authority *expansion* (granting
+    fewer than the envelope is allowed — not an identity), a superset an
+    over-privilege; both are rejected. `working_branch` is optional in the
+    schema, so absence is allowed, but when present it must equal the envelope
+    branch."""
     if not isinstance(ab, dict):
         return False
+    # Top-level canonical identity (all required, exact match).
     if not ab.get("task_id") or ab.get("task_id") != task_id:
         return False
     if not ab.get("repository") or ab.get("repository") != repository:
@@ -196,27 +210,39 @@ def _authority_identity_ok(ab: object, *, task_id: str, repository: str,
         return False
     if not ab.get("scope_hash") or ab.get("scope_hash") != scope_hash:
         return False
+    # Top-level risk_class is required and must equal the envelope risk_class.
     rc = ab.get("risk_class")
-    if rc is not None and rc != risk_class:
+    if rc != risk_class:
         return False
+    # scope_identity is required and must be a dict.
     si = ab.get("scope_identity")
-    if isinstance(si, dict):
-        if si.get("task_id") not in (None, task_id):
-            return False
-        if si.get("repository") not in (None, repository):
-            return False
-        if si.get("base_sha") not in (None, base_sha):
-            return False
-        if si.get("scope_hash") not in (None, scope_hash):
-            return False
-        wb = si.get("working_branch")
-        if wb is not None and wb != working_branch:
-            return False
-        acts = si.get("authorized_actions")
-        if acts is not None:
-            exp = set(authorized_actions)
-            if not set(acts).issubset(exp):
-                return False
+    if not isinstance(si, dict):
+        return False
+    # Nested canonical identity — all keys required, exact match.
+    if not si.get("task_id") or si.get("task_id") != task_id:
+        return False
+    if not si.get("repository") or si.get("repository") != repository:
+        return False
+    if not si.get("base_sha") or si.get("base_sha") != base_sha:
+        return False
+    if not si.get("scope_hash") or si.get("scope_hash") != scope_hash:
+        return False
+    # head_sha is required and must be a real producer-shaped 40-hex commit;
+    # validated for shape only (the renderer has no head binding to compare to).
+    hs = si.get("head_sha")
+    if not isinstance(hs, str) or not _SHA40_RE.match(hs):
+        return False
+    # working_branch is optional in the schema: absent allowed; present => exact.
+    wb = si.get("working_branch")
+    if wb is not None and wb != working_branch:
+        return False
+    # authorized_actions required and EXACTLY the envelope's (order-normalized).
+    acts = si.get("authorized_actions")
+    if not isinstance(acts, (list, tuple)):
+        return False
+    exp = list(authorized_actions)
+    if sorted(acts) != sorted(exp):
+        return False
     return True
 
 
@@ -258,7 +284,7 @@ def render_g2_execution_envelope(
     rendered_at: str | None = None,
 ) -> dict[str, object]:
     """Render a closed G2 execution envelope (no execution side-effect)."""
-    if not _SCOPE_HASH_RE.match(str(scope_identity.get("scope_hash", ""))):
+    if not _SHA256_RE.match(str(scope_identity.get("scope_hash", ""))):
         raise ValueError(
             f"{_REASON_SCOPE_MISMATCH}: scope_hash must be sha256:<64hex>"
         )
@@ -267,7 +293,7 @@ def render_g2_execution_envelope(
     risk_digest = str(risk_profile.get("risk_digest", ""))
     if not re.match(r"^R[0-9]$", risk_class):
         raise ValueError(f"{_REASON_SCOPE_MISMATCH}: risk_class invalid")
-    if not _SCOPE_HASH_RE.match(risk_digest):
+    if not _SHA256_RE.match(risk_digest):
         raise ValueError(f"{_REASON_SCOPE_MISMATCH}: risk_digest invalid")
 
     # Normalize all required *structured* inputs to dicts up front so a malformed

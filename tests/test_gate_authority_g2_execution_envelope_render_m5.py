@@ -553,6 +553,91 @@ class TestS2RequiredInputIdentitySCRUM314(unittest.TestCase):
         self.assertEqual(env["activation_state"], "BLOCKED")
         self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
 
+    # ---- micro-intercept 121a: strict authority schema identity ----
+    def test_blocked_when_authority_missing_scope_identity(self):
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        del a["scope_identity"]
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_scope_identity_not_dict(self):
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        a["scope_identity"] = "not-a-dict"
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_missing_risk_class(self):
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        del a["risk_class"]
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_risk_class_mismatch(self):
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        a["risk_class"] = "R9"
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_scope_identity_missing_required_key(self):
+        # Drop a required nested key (head_sha) -> malformed -> fail closed.
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        si = dict(a["scope_identity"])
+        del si["head_sha"]
+        a["scope_identity"] = si
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_actions_subset(self):
+        # Fewer actions than the envelope = authority expansion -> rejected.
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        si = dict(a["scope_identity"])
+        si["authorized_actions"] = ["create_working_branch", "add_files"]
+        a["scope_identity"] = si
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_blocked_when_authority_actions_superset(self):
+        # More actions than the envelope = over-privilege -> rejected.
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        si = dict(a["scope_identity"])
+        si["authorized_actions"] = list(si["authorized_actions"]) + ["g4_pr_merge"]
+        a["scope_identity"] = si
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH")
+
+    def test_active_when_authority_actions_reordered(self):
+        # Same actions in a different order are still exactly equal -> ACTIVE.
+        kw = self._accepted()
+        a = dict(kw["authority_boundary_decision"])
+        si = dict(a["scope_identity"])
+        si["authorized_actions"] = list(reversed(si["authorized_actions"]))
+        a["scope_identity"] = si
+        kw["authority_boundary_decision"] = a
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "ACTIVE")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_ACTIVE")
+
     # ---- evidence_artifact_map identity ----
     def test_blocked_when_evidence_identity_foreign_task(self):
         kw = self._accepted()
