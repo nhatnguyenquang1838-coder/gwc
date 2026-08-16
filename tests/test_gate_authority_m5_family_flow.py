@@ -98,6 +98,34 @@ class TestFamilyFlow(unittest.TestCase):
             checkpoint={"checkpoint_id": "ck-family"})
         self.assertEqual(env["execution_started"], False)
 
+    def test_314_foreign_approval_never_activates(self):
+        # A VALID approval bound to a DIFFERENT task (SCRUM-192) must not
+        # activate this envelope (SCRUM-191) — fail-closed per SCRUM-314.
+        env = render_g2_execution_envelope(
+            task_id="SCRUM-191", repository="nhatnguyenquang1838-coder/gwc",
+            base_ref="main", base_sha="54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+            risk_profile={"risk_class": "R2", "risk_digest": "sha256:" + "c" * 64},
+            bounded_read_scope={"paths": [".gwc/tasks/SCRUM-191/**"]},
+            bounded_write_scope={"working_branch": "hermes/scrum-191-x",
+                                 "paths": ["tools/x.py"],
+                                 "authorized_actions": ["create_working_branch"]},
+            scope_identity={"scope_hash": "sha256:" + "d" * 64},
+            gate_state_resolution={"gate": "G2", "state": "AWAITING"},
+            authority_boundary_decision={"excluded": ["G4_MERGE"]},
+            evidence_map={"f1_artifact_digests": {"g0": "sha256:" + "e" * 64}},
+            approval_request={"issued_at": "2026-08-05T10:00:00Z",
+                              "expires_at": "2026-08-06T10:00:00Z"},
+            approval_validation={"outcome": "VALID", "scope_hash": "sha256:" + "d" * 64,
+                                 "task_id": "SCRUM-192",
+                                 "repository": "nhatnguyenquang1838-coder/gwc",
+                                 "base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+                                 "working_branch": "hermes/scrum-191-x",
+                                 "risk_class": "R2",
+                                 "authorized_actions": ["create_working_branch"]},
+            checkpoint={"checkpoint_id": "ck-family"})
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
 
 if __name__ == "__main__":
     unittest.main()

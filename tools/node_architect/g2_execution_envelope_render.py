@@ -20,6 +20,8 @@ _REASON_DRAFT = "G2_ENVELOPE_DRAFT"
 _REASON_BLOCKED = "G2_ENVELOPE_APPROVAL_INVALID"
 _REASON_EXPIRED = "G2_ENVELOPE_EXPIRED"
 _REASON_SCOPE_MISMATCH = "G2_ENVELOPE_SCOPE_HASH_MISMATCH"
+_REASON_BINDING_MISMATCH = "G2_ENVELOPE_BINDING_MISMATCH"
+_REASON_AMBIGUOUS = "G2_ENVELOPE_APPROVAL_AMBIGUOUS"
 
 _SCOPE_HASH_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -127,7 +129,7 @@ def render_g2_execution_envelope(
         issued_at=str(approval_request.get("issued_at", "")),
         expires_at=str(approval_request.get("expires_at", "")),
         approval_request=dict(approval_request),
-        approval_validation=dict(approval_validation) if approval_validation else None,
+        approval_validation=dict(approval_validation) if isinstance(approval_validation, dict) else None,
         working_branch=working_branch,
     )
 
@@ -142,19 +144,51 @@ def render_g2_execution_envelope(
         activation_state = "AWAITING_APPROVAL"
         reason_code = _REASON_AWAITING
     else:
-        # ACTIVE requires exact valid SCRUM-186 approval and matching bindings.
-        valid = bool(approval_validation.get("outcome") == "VALID")
-        scope_ok = str(approval_validation.get("scope_hash", "")) == scope_hash
-        if valid and scope_ok:
+        # ACTIVE requires an exact, valid SCRUM-186 approval whose asserted
+        # bindings match this envelope on every material axis. Any missing,
+        # ambiguous, or mismatched binding fails closed to BLOCKED — never
+        # ACTIVE. This closes the SCRUM-314 fail-closed gap: an approval that
+        # is valid for a *different* task/base/branch/risk/action must not
+        # activate this envelope (wrong binding, stale evidence, replay).
+        av = approval_validation
+        valid = isinstance(av, dict) and av.get("outcome") == "VALID"
+        scope_ok = bool(isinstance(av, dict) and str(av.get("scope_hash", "")) == scope_hash)
+        _binding_fields = (
+            ("task_id", task_id),
+            ("repository", repository),
+            ("base_sha", base_sha),
+            ("working_branch", working_branch),
+            ("risk_class", risk_class),
+            ("authorized_actions", list(authorized_actions)),
+        )
+        binding_ok = True
+        for _key, _expected in _binding_fields:
+            if not isinstance(av, dict) or _key not in av or av[_key] != _expected:
+                binding_ok = False
+                break
+        if valid and scope_ok and binding_ok:
             activation_state = "ACTIVE"
             reason_code = _REASON_ACTIVE
         else:
             activation_state = "BLOCKED"
-            reason_code = _REASON_BLOCKED
+            if not (isinstance(av, dict) and "outcome" in av):
+                reason_code = _REASON_AMBIGUOUS
+            elif not valid:
+                reason_code = _REASON_BLOCKED
+            elif not scope_ok:
+                reason_code = _REASON_SCOPE_MISMATCH
+            else:
+                reason_code = _REASON_BINDING_MISMATCH
 
+    # Digest covers every material binding so any material drift (base, branch,
+    # scope, risk, actions, read/write scope) changes the envelope digest —
+    # satisfying "digest changes on material drift" while staying replay-stable
+    # for identical inputs.
     envelope_digest = _digest(
         task_id, repository, base_sha, scope_hash, activation_state,
         inp.checkpoint_id, issued_at, expires_at,
+        working_branch, risk_class, list(authorized_actions),
+        list(inp.bounded_read_scope), list(inp.bounded_write_scope),
     )
 
     return {

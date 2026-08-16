@@ -12,8 +12,8 @@ _SCOPE = "sha256:" + "a" * 64
 _RISK_DIGEST = "sha256:" + "b" * 64
 
 
-def _base_kwargs(approval_request=None, approval_validation=None):
-    return dict(
+def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
+    base = dict(
         task_id="SCRUM-191",
         repository="nhatnguyenquang1838-coder/gwc",
         base_ref="main",
@@ -35,9 +35,26 @@ def _base_kwargs(approval_request=None, approval_validation=None):
             "issued_at": "2026-08-05T22:40:00Z",
             "expires_at": "2026-08-06T22:40:00Z",
         },
-        approval_validation=approval_validation,
         checkpoint={"checkpoint_id": "ck-191-1"},
     )
+    # Always pass approval_validation explicitly (renderer requires it); it may be
+    # None or a non-dict (both fail closed inside the renderer). When bind=True an
+    # explicit VALID approval has every material binding injected + overridable.
+    base["approval_validation"] = approval_validation
+    if approval_validation is not None and bind:
+        base["approval_validation"] = {
+            "outcome": "VALID",
+            "scope_hash": _SCOPE,
+            "task_id": "SCRUM-191",
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
+            "working_branch": "hermes/scrum-191-x",
+            "risk_class": "R2",
+            "authorized_actions": ["create_working_branch", "add_files",
+                                   "run_sandboxed_validation", "stage_commit_push"],
+            **approval_validation,
+        }
+    return base
 
 
 class TestRenderingShape(unittest.TestCase):
@@ -113,6 +130,89 @@ class TestExpiryAndIntegrity(unittest.TestCase):
         blob = repr(env).lower()
         for secret in ["token", "secret", "password", "credential", "api_key"]:
             self.assertNotIn(secret, blob)
+
+
+class TestS1FailClosedBindingSCRUM314(unittest.TestCase):
+    """SCRUM-314: ACTIVE is impossible unless the approval asserts and matches
+    every material binding; any missing/ambiguous/mismatched/stale binding
+    (wrong task/base/branch/risk/action/scope) fails closed to BLOCKED."""
+
+    def test_accepted_current_inputs_are_usable_envelope(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE}))
+        self.assertEqual(env["activation_state"], "ACTIVE")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_ACTIVE")
+        self.assertEqual(env["execution_started"], False)
+        for a in ["g3_pr_promotion", "g4_merge", "g5_deploy", "g6_production"]:
+            self.assertIn(a, env["excluded_actions"])
+
+    def test_blocked_when_task_mismatch(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID",
+                                               "scope_hash": _SCOPE,
+                                               "task_id": "SCRUM-999"}))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+    def test_blocked_when_base_sha_mismatch(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID",
+                                               "scope_hash": _SCOPE,
+                                               "base_sha": "0" * 40}))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+    def test_blocked_when_working_branch_mismatch(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID",
+                                               "scope_hash": _SCOPE,
+                                               "working_branch": "auto/SCRUM-000-x"}))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+    def test_blocked_when_risk_class_mismatch(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID",
+                                               "scope_hash": _SCOPE,
+                                               "risk_class": "R9"}))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+    def test_blocked_when_authorized_actions_mismatch(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID",
+                                               "scope_hash": _SCOPE,
+                                               "authorized_actions": ["create_working_branch"]}))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+    def test_blocked_when_approval_ambiguous_missing_outcome(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"scope_hash": _SCOPE}, bind=False))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_APPROVAL_AMBIGUOUS")
+
+    def test_blocked_when_approval_validation_not_a_dict(self):
+        env = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation="not-a-dict", bind=False))
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_APPROVAL_AMBIGUOUS")
+
+    def test_digest_changes_on_material_drift(self):
+        a = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE}))
+        b = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID",
+                                               "scope_hash": _SCOPE,
+                                               "base_sha": "f" * 40}))
+        self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
+
+    def test_replay_deterministic_after_hardening(self):
+        a = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE}))
+        b = render_g2_execution_envelope(
+            **_base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE}))
+        self.assertEqual(a["envelope_digest"], b["envelope_digest"])
 
 
 if __name__ == "__main__":
