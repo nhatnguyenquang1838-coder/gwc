@@ -13,6 +13,8 @@ _RISK_DIGEST = "sha256:" + "b" * 64
 
 
 def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
+    # Producer-shaped happy-path defaults so ACTIVE is reachable: each required
+    # input carries its canonical *accepted* state (same keys the producers emit).
     base = dict(
         task_id="SCRUM-191",
         repository="nhatnguyenquang1838-coder/gwc",
@@ -28,14 +30,36 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
                                     "run_sandboxed_validation", "stage_commit_push"],
         },
         scope_identity={"scope_hash": _SCOPE},
-        gate_state_resolution={"gate": "G2", "state": "AWAITING"},
-        authority_boundary_decision={"excluded": ["G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION"]},
-        evidence_map={"f1_artifact_digests": {"g0": "sha256:" + "c" * 64}},
+        # gate_state_resolution: canonical PASS / NO_DRIFT / not replay-conflicted.
+        gate_state_resolution={
+            "gate_status": "PASS",
+            "drift_decision": {"status": "NO_DRIFT", "reason_codes": []},
+            "replay_status": "FIRST_SEEN",
+            "reason_codes": ["GATE_STATE_RESOLVED", "GATE_STATE_G6_NOT_APPLICABLE"],
+        },
+        # authority_boundary_decision: decision REQUIRE_APPROVAL, not prohibited.
+        authority_boundary_decision={
+            "decision": "REQUIRE_APPROVAL",
+            "approval_required": True,
+            "prohibited": False,
+            "replay_status": "FIRST_SEEN",
+            "stale_evidence": False,
+            "reason_codes": ["AUTHORITY_APPROVAL_REQUIRED"],
+        },
+        # evidence_artifact_map: READY with no blocker reasons / missing / stale.
+        evidence_map={
+            "outcome": "READY",
+            "reason_codes": ["EVIDENCE_MAP_READY"],
+            "missing_required": [],
+            "stale_required": [],
+            "projection_only": [],
+            "f1_artifact_digests": {"g0": "sha256:" + "c" * 64},
+        },
         approval_request=approval_request or {
             "issued_at": "2026-08-05T22:40:00Z",
             "expires_at": "2026-08-06T22:40:00Z",
         },
-        checkpoint={"checkpoint_id": "ck-191-1"},
+        checkpoint=dict(checkpoint_id="ck-191-1"),
     )
     # Always pass approval_validation explicitly (renderer requires it); it may be
     # None or a non-dict (both fail closed inside the renderer). When bind=True an
@@ -213,6 +237,170 @@ class TestS1FailClosedBindingSCRUM314(unittest.TestCase):
         b = render_g2_execution_envelope(
             **_base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE}))
         self.assertEqual(a["envelope_digest"], b["envelope_digest"])
+
+
+class TestS2RequiredInputFailClosedSCRUM314(unittest.TestCase):
+    """SCRUM-314 S2 repair (independent-review intercept): a VALID approval must
+    NOT reach ACTIVE while any required input (gate_state_resolution,
+    authority_boundary_decision, evidence_artifact_map) is in a blocking,
+    stale, drifted, replay-conflicted, prohibited, or malformed state. Each case
+    fails closed to BLOCKED with its own reason code. Canonical blocker
+    semantics mirror the producer modules (gate_state_resolution.py /
+    authority_boundary_check.py / evidence_artifact_map.py)."""
+
+    def _accepted(self):
+        return _base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE})
+
+    # ---- gate_state_resolution ----
+    def test_blocked_when_gate_state_failed(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["gate_status"] = "FAILED"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    def test_blocked_when_gate_state_blocked(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["gate_status"] = "BLOCKED"
+        kw["gate_state_resolution"]["reason_codes"] = ["GATE_STATE_REQUIRED_EVIDENCE_MISSING"]
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    def test_blocked_when_gate_state_drift(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["drift_decision"] = {
+            "status": "REAPPROVE", "reason_codes": ["BASE_SHA_DRIFT"]}
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    def test_blocked_when_gate_state_evidence_stale(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["reason_codes"] = ["GATE_STATE_EVIDENCE_STALE"]
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    def test_blocked_when_gate_state_replay_conflict(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["replay_status"] = "REPLAY_CONFLICT"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    def test_blocked_when_gate_state_not_a_dict(self):
+        kw = self._accepted()
+        kw["gate_state_resolution"] = "not-a-dict"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_GATE_STATE_BLOCKED")
+
+    # ---- authority_boundary_decision ----
+    def test_blocked_when_authority_decision_block(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["decision"] = "BLOCK"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
+
+    def test_blocked_when_authority_prohibited(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["prohibited"] = True
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
+
+    def test_blocked_when_authority_replay_conflict(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["replay_status"] = "REPLAY_CONFLICT"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
+
+    def test_blocked_when_authority_stale_evidence(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+        kw["authority_boundary_decision"]["stale_evidence"] = True
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
+
+    def test_blocked_when_authority_not_a_dict(self):
+        kw = self._accepted()
+        kw["authority_boundary_decision"] = None
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_AUTHORITY_BLOCKED")
+
+    # ---- evidence_artifact_map ----
+    def test_blocked_when_evidence_outcome_blocked(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["outcome"] = "BLOCKED"
+        kw["evidence_map"]["reason_codes"] = ["EVIDENCE_REQUIRED_MISSING"]
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_BLOCKED")
+
+    def test_blocked_when_evidence_stale(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["reason_codes"] = ["EVIDENCE_STALE"]
+        kw["evidence_map"]["stale_required"] = [".gwc/tasks/SCRUM-191/g0/context-snapshot.yaml"]
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_BLOCKED")
+
+    def test_blocked_when_evidence_required_missing(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["reason_codes"] = ["EVIDENCE_REQUIRED_MISSING"]
+        kw["evidence_map"]["missing_required"] = [".gwc/tasks/SCRUM-191/g1/intake/g1-intake-brief.yaml"]
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_BLOCKED")
+
+    def test_blocked_when_evidence_conflict(self):
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["reason_codes"] = ["EVIDENCE_CONFLICT"]
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_BLOCKED")
+
+    def test_blocked_when_evidence_not_a_dict(self):
+        kw = self._accepted()
+        kw["evidence_map"] = "not-a-dict"
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_EVIDENCE_BLOCKED")
+
+    # ---- digest must change with material input, not merely bindings ----
+    def test_digest_changes_when_gate_state_blocks(self):
+        a = render_g2_execution_envelope(**self._accepted())
+        kw = self._accepted()
+        kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+        kw["gate_state_resolution"]["gate_status"] = "BLOCKED"
+        b = render_g2_execution_envelope(**kw)
+        self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
+
+    def test_digest_changes_when_evidence_blocks(self):
+        a = render_g2_execution_envelope(**self._accepted())
+        kw = self._accepted()
+        kw["evidence_map"] = dict(kw["evidence_map"])
+        kw["evidence_map"]["reason_codes"] = ["EVIDENCE_STALE"]
+        kw["evidence_map"]["stale_required"] = ["x"]
+        b = render_g2_execution_envelope(**kw)
+        self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
 
 
 if __name__ == "__main__":
