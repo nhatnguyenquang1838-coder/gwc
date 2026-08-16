@@ -1,6 +1,10 @@
 from pathlib import Path
 import unittest
 
+from helpers.chatgpt_instruction_composer import (
+    compose_chatgpt_instructions,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -10,7 +14,9 @@ class ChatConnectorRuntimeContractTests(unittest.TestCase):
     def setUpClass(cls):
         cls.agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         cls.runtime = (ROOT / "core/Agent_Operating_Runtime_Contract_v1.0.md").read_text(encoding="utf-8")
-        cls.chatgpt = (ROOT / "agents/chatgpt-agent/agent-instructions.md").read_text(encoding="utf-8")
+        # Composed Entrypoint: validate the effective ChatGPT instructions
+        # (composer + gwc-governed-base.md) per SCRUM-404 / GitHub #441.
+        cls.chatgpt = compose_chatgpt_instructions(ROOT)
         cls.runbook = (ROOT / "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md").read_text(encoding="utf-8")
 
     def test_execution_mode_depends_on_trusted_checkout_not_validator_runner(self):
