@@ -9,8 +9,11 @@ Closes the live SCRUM-319 AC gaps (Controller CORRECTION seq=3, DELTA_REQUIRED):
   * same-input replay/digest stability,
   * never grants review/merge/deploy authority.
 
-Backward compatible: new inputs are optional; when absent the legacy verdict
-is preserved so pre-existing callers/tests stay green.
+Backward compatible: new inputs `prohibited_paths`, `expected_base_sha`/`expected_head_sha`,
+and `approved_paths` are optional and legacy-lenient. `readback_coverage` is the exception:
+when absent it defaults to `unknown` and FAILS CLOSED (OUTCOME=BLOCKED) — a missing
+completeness proof can never silently pass. Pre-existing tests were updated to pass explicit
+`complete` coverage where a PASS verdict is intended.
 """
 
 from __future__ import annotations
