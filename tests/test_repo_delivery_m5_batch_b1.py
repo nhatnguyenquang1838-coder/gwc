@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import unittest
+from typing import Any
 
 from jsonschema import Draft202012Validator
 
@@ -184,6 +185,112 @@ class RepoDeliveryM5BatchB1Tests(unittest.TestCase):
             self.assertFalse(decision["merge_authority_granted"])
             self.assertFalse(decision["deployment_authority_granted"])
             self.assertFalse(decision["production_authority_granted"])
+
+
+class RepoDeliverySCRUM316BranchCreationTests(unittest.TestCase):
+    """Task-bound tests for SCRUM-316 (auto/* branch guard acceptance).
+
+    Minimal DELTA_REQUIRED: the pure branch-creation guard must accept the
+    canonical autonomous working branch `auto/SCRUM-316-na81-recert-20260814-r10`
+    while preserving every existing allowed prefix and fail-closed behavior.
+
+    Corrected at S2_CORRECTION (controller seq 5): BASE is bound to the exact
+    current execution base `b8b3ab344b470b19e90a1aea408cba9675efa855` so the
+    tests prove the commanded exact base, not a historical one. `OTHER` is a
+    different valid 40-hex SHA used only for drift/collision scenarios.
+    """
+
+    BASE = "b8b3ab344b470b19e90a1aea408cba9675efa855"
+    OTHER = "c3a5c2f0e1d4b8a7960f2c3d4e5a6b7c8d9e0f1a"
+    TASK_BRANCH = "auto/SCRUM-316-na81-recert-20260814-r10"
+    ID = "scrum-316-na81-recert"
+
+    def _decide(self, **overrides: Any) -> dict:
+        obs = {
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "branch_name": self.TASK_BRANCH,
+            "approved_base_sha": self.BASE,
+            "observed_current_base_sha": self.BASE,
+            "idempotency_key": self.ID,
+        }
+        obs.update(overrides)
+        return decide_branch_creation(obs)
+
+    def test_auto_branch_ready_to_create_on_exact_current_base(self) -> None:
+        decision = self._decide()
+        self.assertEqual(decision["outcome"], "READY_TO_CREATE")
+        self.assertTrue(decision["may_create_branch"])
+        self.assertNotIn("INVALID_BRANCH_NAME", decision["reason_codes"])
+        self.assertEqual(decision["base_sha"], self.BASE)
+        self.assertFalse(decision["merge_authority_granted"])
+        self.assertFalse(decision["deployment_authority_granted"])
+        self.assertFalse(decision["production_authority_granted"])
+        # Output contract must remain schema-valid (no contract change).
+        self._validate("branch-creation-decision.schema.json", decision)
+
+    def test_auto_branch_reconciles_existing_same_exact_base(self) -> None:
+        decision = self._decide(existing_branch_sha=self.BASE)
+        self.assertEqual(decision["outcome"], "RECONCILED_EXISTING")
+        self.assertFalse(decision["may_create_branch"])
+
+    def test_auto_branch_blocks_base_drift_and_collision(self) -> None:
+        drift = self._decide(observed_current_base_sha=self.OTHER)
+        collision = self._decide(existing_branch_sha=self.OTHER)
+        self.assertEqual(drift["outcome"], "BLOCKED_BASE_DRIFT")
+        self.assertTrue(drift["requires_reapproval"])
+        self.assertEqual(collision["outcome"], "BLOCKED_BRANCH_COLLISION")
+
+    def test_auto_branch_unknown_result_persists_pending_action(self) -> None:
+        decision = self._decide(create_result="unknown")
+        self.assertEqual(decision["outcome"], "PENDING_READBACK_REQUIRED")
+        self.assertEqual(decision["pending_action"], f"branch-create:{self.ID}")
+        self.assertFalse(decision["may_create_branch"])
+
+    def test_auto_branch_idempotent_replay_success(self) -> None:
+        decision = self._decide(create_result="success")
+        self.assertEqual(decision["outcome"], "CREATED")
+        self.assertEqual(decision["observed_ref_sha"], self.BASE)
+        self.assertFalse(decision["may_create_branch"])
+
+    def test_auto_branch_unknown_then_same_base_readback_reconciles(self) -> None:
+        # Replay-safe: an unknown external write outcome must persist a pending
+        # action, then authoritative same-base readback reconciles idempotently.
+        unknown = self._decide(create_result="unknown")
+        self.assertEqual(unknown["outcome"], "PENDING_READBACK_REQUIRED")
+        self.assertEqual(unknown["pending_action"], f"branch-create:{self.ID}")
+        # Later readback shows the branch already sits at the exact approved base.
+        reconciled = self._decide(existing_branch_sha=self.BASE)
+        self.assertEqual(reconciled["outcome"], "RECONCILED_EXISTING")
+        self.assertFalse(reconciled["may_create_branch"])
+
+    def test_protected_targets_main_and_preprod_denied(self) -> None:
+        # Protected refs (main, pre-prod) are never valid working-branch targets.
+        for protected_ref in ("main", "pre-prod"):
+            decision = decide_branch_creation({
+                "repository": "nhatnguyenquang1838-coder/gwc",
+                "branch_name": protected_ref,
+                "approved_base_sha": self.BASE,
+                "observed_current_base_sha": self.BASE,
+                "idempotency_key": self.ID,
+            })
+            self.assertEqual(decision["outcome"], "INVALID_INPUT", protected_ref)
+            self.assertIn("INVALID_BRANCH_NAME", decision["reason_codes"], protected_ref)
+            self.assertFalse(decision["may_create_branch"], protected_ref)
+        # A non-allowlisted prefix is also denied by the fail-closed guard.
+        non_prefix = decide_branch_creation({
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "branch_name": "release/SCRUM-316-na81-recert-20260814-r10",
+            "approved_base_sha": self.BASE,
+            "observed_current_base_sha": self.BASE,
+            "idempotency_key": self.ID,
+        })
+        self.assertEqual(non_prefix["outcome"], "INVALID_INPUT")
+        self.assertIn("INVALID_BRANCH_NAME", non_prefix["reason_codes"])
+
+    def _validate(self, name: str, payload: dict) -> None:
+        schema = json.loads((Path("schemas") / name).read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(payload)
 
 
 if __name__ == "__main__":
