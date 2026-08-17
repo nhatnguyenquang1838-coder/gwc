@@ -238,6 +238,32 @@
       "next_node": "repo_delivery.pr-blocker-check",
       "next_action": "pr_blocker_check",
       "next_gate": "G3_PR"
+    },
+    {
+      "route_id": "g2-ci-run-capture",
+      "gate": "G2_EXECUTION",
+      "requested_action": "ci_run_capture",
+      "current_node": "repo_delivery.ci-run-capture",
+      "node_descriptor_ref": "core/node-architect/node-catalog/repo_delivery/ci-run-capture.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/repo_delivery/ci-run-capture.node-instruction.yaml",
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback",
+        "draft_pr_result"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/ci_run_capture.py:decide_ci_run_capture"
+      },
+      "next_node": "repo_delivery.pr-blocker-check",
+      "next_action": "pr_blocker_check",
+      "next_gate": "G3_PR"
     }
   ]
 }
