@@ -1,0 +1,49 @@
+{
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "exact_base_sha": "cd2e219bc60f6f61685ba307091838ec44f6d8f5",
+  "base_ref": "main",
+  "github_issue": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/467",
+  "jira": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-554",
+  "gg_revision": "AIroW378s9uStEwtFnvQaj1S2wArsLm2VxPoWJBILypyqVzhDBla3SpEr2Yjv7kX1PTpVqTjwsEffXmVs7TiEUnJHliLX8WteE4OaTFWLYk",
+  "source_evidence": [
+    {
+      "kind": "repo-file",
+      "path": "schemas/gate-action-authority.schema.json",
+      "ref": "cd2e219bc60f6f61685ba307091838ec44f6d8f5"
+    },
+    {
+      "kind": "repo-file",
+      "path": "tools/validate_gate_action.py",
+      "ref": "cd2e219bc60f6f61685ba307091838ec44f6d8f5"
+    },
+    {
+      "kind": "repo-file",
+      "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "ref": "cd2e219bc60f6f61685ba307091838ec44f6d8f5"
+    },
+    {
+      "kind": "repo-file",
+      "path": "core/task-lifecycle/gate-transition-map.yaml",
+      "ref": "cd2e219bc60f6f61685ba307091838ec44f6d8f5"
+    },
+    {
+      "kind": "repo-file",
+      "path": "tests/",
+      "ref": "cd2e219bc60f6f61685ba307091838ec44f6d8f5"
+    }
+  ],
+  "governance_evidence": [
+    {
+      "kind": "gg-instruction",
+      "section": "1A. DEVELOPMENT TASK BOOTSTRAP — SPEC-DRIVEN SESSION BOUNDARY",
+      "revision": "AIroW378s9uStEwtFnvQaj1S2wArsLm2VxPoWJBILypyqVzhDBla3SpEr2Yjv7kX1PTpVqTjwsEffXmVs7TiEUnJHliLX8WteE4OaTFWLYk"
+    },
+    {
+      "kind": "gwc-validator-bundle",
+      "version": "1.16.0",
+      "sha256": "15191523ce650f9136e4b32916841cfe20c24279de83e9cad1b2b13fd486bb29"
+    }
+  ],
+  "observed_incident": "Rental Home G4 direct merge deterministically triggered archive export/release-dist write+retention delete outside direct G4 scope.",
+  "confidence": 0.93
+}

@@ -1,0 +1,39 @@
+schema_version: '1.0'
+task_id: SCRUM-554
+title: GWC transitive side-effect authority and capability-bound gate validation
+status: SPEC_READY_AWAITING_G2
+objective: Extend GWC from direct action authorization to deterministic causal-effect
+  authority closure with machine-readable capability and exact evidence identity semantics.
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: cd2e219bc60f6f61685ba307091838ec44f6d8f5
+working_branch: spec/SCRUM-554-gwc-transitive-effect-authority
+jira: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-554
+github_issue: https://github.com/nhatnguyenquang1838-coder/gwc/issues/467
+gg_instruction_revision: AIroW378s9uStEwtFnvQaj1S2wArsLm2VxPoWJBILypyqVzhDBla3SpEr2Yjv7kX1PTpVqTjwsEffXmVs7TiEUnJHliLX8WteE4OaTFWLYk
+risk_class: R2
+delivery:
+  mode: spec_only
+  allowed_paths:
+  - .task-me/runs/gwc-transitive-authority-20260818/**
+  implementation_in_this_session: false
+  draft_pr_requires_g3: true
+dependencies: []
+acceptance_criteria:
+- Canonical Task-Me package is reviewable and bound to exact repository/base SHA.
+- Spec-only branch contains no implementation source/tests/workflows outside the Task-Me
+  run path.
+- Implementation plan names concrete candidate surfaces and TDD validation without
+  inventing current symbols not verified by evidence.
+- Transitive authority and exact evidence identity are explicit acceptance requirements.
+- Fresh implementation session is required after spec PR exact-head validation; current
+  bootstrap session cannot implement source code.
+non_goals:
+- merge
+- deploy
+- release
+- production-data/config
+- secret/credential
+- migration
+- destructive action
+- source implementation in current bootstrap session
