@@ -1,0 +1,132 @@
+{
+  "node_id": "repo_delivery.draft-pr-creation",
+  "gate": "G2_EXECUTION",
+  "purpose": "Create or update a Draft PR bound to the approved branch, scope, and exact head SHA; keep it Draft until required CI passes, an independent read-only reviewer completes, G3 evidence closes, and Ready-for-Review promotion guards pass.",
+  "entry_conditions": {
+    "prerequisite_gate": "G2_EXECUTION",
+    "artifacts_required": [
+      ".gwc/tasks/<task-id>/g2/execution-envelope.yaml",
+      ".gwc/tasks/<task-id>/g2/write-evidence.yaml",
+      ".gwc/tasks/<task-id>/g2/diff-readback.yaml"
+    ],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/execution-envelope.yaml"
+      },
+      {
+        "type": "artifact_valid",
+        "expression": "schema: schemas/gate-action-authority.schema.json"
+      },
+      {
+        "type": "state_match",
+        "expression": "envelope.base_sha == repository.base_sha"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "execution_envelope",
+        "type": "path",
+        "description": "Path to G2 execution envelope"
+      },
+      {
+        "name": "working_branch",
+        "type": "branch",
+        "description": "Branch the Draft PR targets for the task"
+      },
+      {
+        "name": "base_sha",
+        "type": "sha",
+        "description": "Exact base SHA the Draft PR is bound to"
+      },
+      {
+        "name": "head_sha",
+        "type": "sha",
+        "description": "Exact head SHA of the task branch"
+      },
+      {
+        "name": "scope_hash",
+        "type": "scope-hash",
+        "description": "Approved task scope hash"
+      }
+    ],
+    "optional": [
+      {
+        "name": "author_name",
+        "type": "string",
+        "description": "Git author name",
+        "default": "AI Agent"
+      },
+      {
+        "name": "author_email",
+        "type": "string",
+        "description": "Git author email",
+        "default": "ai-agent@gwc.example.com"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "read_repository",
+    "create_checkpoint",
+    "validate_pr_scope",
+    "create_draft_pr"
+  ],
+  "forbidden_actions": [
+    "merge",
+    "auto_merge",
+    "deploy",
+    "release",
+    "production_config",
+    "credential_rotation",
+    "production_data",
+    "force_push",
+    "pr_base_change"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g2/draft-pr-creation.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g2/draft-pr-creation.yaml"
+  },
+  "logs_required": {
+    "type": "event",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": "repo_delivery.pr-blocker-check",
+    "next_gate": "G3_PR",
+    "next_route": "full-flow-v3",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff": "exponential",
+    "exponential_base": 2.0,
+    "retryable_errors": [
+      "CONNECTOR_TEMPORARY_FAILURE",
+      "RESOURCE_CONTENTION"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "draft PR was created or updated",
+    "action": "reconcile_draft_pr_state",
+    "conditions": [
+      "branch exists",
+      "draft PR created for branch"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": true,
+    "grants_merge_authority": false
+  }
+}
