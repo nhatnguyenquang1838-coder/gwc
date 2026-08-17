@@ -12,7 +12,7 @@ import re
 from typing import Any, Mapping
 
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-_SAFE_BRANCH_RE = re.compile(r"^(codex|feat|fix|chore|docs|test|refactor|hotfix)/[A-Za-z0-9._/-]+$")
+_SAFE_BRANCH_RE = re.compile(r"^(auto|codex|feat|fix|chore|docs|test|refactor|hotfix)/[A-Za-z0-9._/-]+$")
 
 
 @dataclass(frozen=True)
