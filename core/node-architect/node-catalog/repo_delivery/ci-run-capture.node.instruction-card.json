@@ -1,0 +1,131 @@
+{
+  "node_id": "repo_delivery.ci-run-capture",
+  "gate": "G2_EXECUTION",
+  "purpose": "Capture exact-current-head CI/check evidence for the approved PR head SHA and classify only PASS, FAIL, PENDING, or observability-unavailable; prepare delivery-evidence identifiers that bind the G4 GitHub merge event and G5 post-merge runs to the exact head/merge commit. CI status grants no merge authority.",
+  "entry_conditions": {
+    "prerequisite_gate": "G2_EXECUTION",
+    "artifacts_required": [
+      ".gwc/tasks/<task-id>/g2/execution-envelope.yaml",
+      ".gwc/tasks/<task-id>/g2/draft-pr-creation.yaml"
+    ],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/execution-envelope.yaml"
+      },
+      {
+        "type": "artifact_valid",
+        "expression": "schema: schemas/gate-action-authority.schema.json"
+      },
+      {
+        "type": "state_match",
+        "expression": "envelope.base_sha == repository.base_sha"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "execution_envelope",
+        "type": "path",
+        "description": "Path to G2 execution envelope"
+      },
+      {
+        "name": "working_branch",
+        "type": "branch",
+        "description": "Branch the Draft PR targets for the task"
+      },
+      {
+        "name": "base_sha",
+        "type": "sha",
+        "description": "Exact base SHA the Draft PR is bound to"
+      },
+      {
+        "name": "head_sha",
+        "type": "sha",
+        "description": "Exact head SHA of the task branch / PR head"
+      },
+      {
+        "name": "scope_hash",
+        "type": "scope-hash",
+        "description": "Approved task scope hash"
+      }
+    ],
+    "optional": [
+      {
+        "name": "author_name",
+        "type": "string",
+        "description": "Git author name",
+        "default": "AI Agent"
+      },
+      {
+        "name": "author_email",
+        "type": "string",
+        "description": "Git author email",
+        "default": "ai-agent@gwc.example.com"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "read_repository",
+    "capture_ci_evidence",
+    "create_checkpoint",
+    "record_ci_observation"
+  ],
+  "forbidden_actions": [
+    "merge",
+    "auto_merge",
+    "deploy",
+    "release",
+    "production_config",
+    "credential_rotation",
+    "production_data",
+    "force_push",
+    "pr_base_change"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g2/ci-run-capture.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g2/ci-run-capture.yaml"
+  },
+  "logs_required": {
+    "type": "event",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": "repo_delivery.pr-blocker-check",
+    "next_gate": "G3_PR",
+    "next_route": "full-flow-v3",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff": "exponential",
+    "exponential_base": 2.0,
+    "retryable_errors": [
+      "CONNECTOR_TEMPORARY_FAILURE",
+      "RESOURCE_CONTENTION"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "CI observation recorded",
+    "action": "reconcile_ci_observation",
+    "conditions": [
+      "branch exists",
+      "head SHA known"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": false,
+    "grants_merge_authority": false
+  }
+}
