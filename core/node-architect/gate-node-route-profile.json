@@ -111,6 +111,21 @@
       "next_node": "gate_authority.gate-state-resolution",
       "next_action": "resolve_execution_node",
       "next_gate": null
+    },
+    {
+      "route_id": "g2-base-drift-check",
+      "gate": "G2_EXECUTION",
+      "requested_action": "base_drift_check",
+      "current_node": "repo_delivery.base-drift-check",
+      "node_descriptor_ref": "core/node-architect/node-catalog/repo_delivery/base-drift-check.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/repo_delivery/base-drift-check.node-instruction.yaml",
+      "required_context": ["g0_context", "g1_decision", "g2_envelope", "approval_receipt", "task_claim", "base_sha_readback"],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {"kind": "python", "ref": "tools/node_architect/base_drift_check.py:decide_base_drift"},
+      "next_node": "repo_delivery.scoped-file-write",
+      "next_action": "repository_write",
+      "next_gate": null
     }
   ]
 }
