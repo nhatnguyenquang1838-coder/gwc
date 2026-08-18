@@ -15,9 +15,10 @@
 7. Conditional child: predicate `false` excludes only with bound evidence; `true` is reachable; `unknown` mutating child is treated as potentially reachable and authority-closed or blocked.
 8. Retention/delete child maps to destructive capability and cannot be absorbed into ordinary release/publish.
 9. Same replay identity is equivalent; effect-graph/policy/evidence drift under the same identity is rejected.
-10. Legacy packet with trusted `NO_TRANSITIVE_MUTATION` profile remains compatible without an effect graph; trigger-capable/unknown legacy packet without graph fails `EFFECT_GRAPH_REQUIRED`.
-11. Existing safe G0-G6 direct-action packets remain valid when their trusted action profile proves no unauthorized transitive mutation.
-12. Capability registry, effect graph and lifecycle docs expose one consistent semantic source of truth.
+10. Legacy packet with trusted `NO_TRANSITIVE_MUTATION` profile remains compatible without a per-packet effect graph.
+11. Legacy trigger-capable packet with a current digest-bound `BOUNDED_TRANSITIVE_EFFECTS` profile remains compatible when its complete closure contains only read-only or otherwise fully authorized effects; the same profile with an unauthorized higher-capability/cross-repo child is rejected.
+12. Trigger-capable or unknown action with neither a valid effect graph nor a complete trusted effect profile fails `EFFECT_GRAPH_REQUIRED`; incomplete/stale profile digest also fails closed.
+13. Capability registry, effect graph/profile semantics and lifecycle docs expose one consistent semantic source of truth.
 
 ## CI discipline
 After every pushed implementation/spec head, check CI for that exact SHA. If non-terminal, remain in-session, sleep 60 seconds, and re-read the exact SHA until terminal.

@@ -1,7 +1,7 @@
 run_id: gwc-transitive-authority-20260818
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: cd2e219bc60f6f61685ba307091838ec44f6d8f5
-status: SPEC_REPAIR_READY_AWAITING_G2_R2
+status: SPEC_REPAIR_READY_AWAITING_G2_R3
 tasks:
 - task_id: SCRUM-554
   path: tasks/SCRUM-554-gwc-transitive-effect-authority

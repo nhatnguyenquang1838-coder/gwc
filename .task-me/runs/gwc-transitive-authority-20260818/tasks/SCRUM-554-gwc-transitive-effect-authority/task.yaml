@@ -1,9 +1,10 @@
 schema_version: '1.0'
 task_id: SCRUM-554
 title: GWC transitive side-effect authority and capability-bound gate validation
-status: SPEC_REPAIR_READY_AWAITING_G2_R2
-objective: Extend GWC from direct-action authorization to causal-effect authority closure with machine-readable
-  capability, conditional-effect and exact evidence identity semantics.
+status: SPEC_REPAIR_READY_AWAITING_G2_R3
+objective: Extend GWC from direct-action authorization to causal-effect authority
+  closure with machine-readable capability, conditional-effect and exact evidence
+  identity semantics.
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
 base_sha: cd2e219bc60f6f61685ba307091838ec44f6d8f5
@@ -31,17 +32,23 @@ acceptance_criteria:
 - id: SPEC-AC-1
   text: Issue AC1-AC8 are traced to implementation-plan steps and planned tests.
 - id: SPEC-AC-2
-  text: 'Conditional effect semantics are explicit: false excludes with evidence; true is reachable; unknown mutating/cross-repo/release/destructive/production
+  text: 'Conditional effect semantics are explicit: false excludes with evidence;
+    true is reachable; unknown mutating/cross-repo/release/destructive/production
     effects are authority-closed as potentially reachable.'
 - id: SPEC-AC-3
-  text: Retention/delete effects map to a destructive capability distinct from ordinary release write/publish capability.
+  text: Retention/delete effects map to a destructive capability distinct from ordinary
+    release write/publish capability.
 - id: SPEC-AC-4
-  text: Legacy direct-action packets without an effect graph remain compatible only for an explicitly trusted no-transitive-mutation
-    action profile; trigger-capable/unknown actions require an effect graph and fail closed when absent.
+  text: Legacy packets without per-packet graphs remain compatible through a versioned
+    trusted effect profile only when the profile completely closes all reachable/potentially
+    reachable effects within current or independent authority; otherwise effect graph
+    is required and validation fails closed.
 - id: SPEC-AC-5
-  text: Historical successful workflow/check evidence from another SHA/event/gate cannot become current authority.
+  text: Historical successful workflow/check evidence from another SHA/event/gate
+    cannot become current authority.
 - id: SPEC-AC-6
-  text: Fresh implementation session is required; current spec session grants no implementation/merge/deploy authority.
+  text: Fresh implementation session is required; current spec session grants no implementation/merge/deploy
+    authority.
 non_goals:
 - DW-SuperApps TaskController runtime implementation
 - merge

@@ -17,7 +17,10 @@ A conditional mutating child is excluded only when predicate=false is proven. Pr
 Confidence: high.
 
 ## Decision 5 — legacy compatibility
-Legacy packets without effect graphs do not receive blanket grandfathering. They remain compatible only under a versioned trusted `NO_TRANSITIVE_MUTATION` action profile; trigger-capable or unknown actions require an effect graph and fail closed when absent.
+Legacy packets without per-packet effect graphs do not receive blanket grandfathering. They may remain compatible under a versioned trusted effect profile bound to the action identity and authority decision:
+- `NO_TRANSITIVE_MUTATION` proves no mutating transitive effect exists;
+- `BOUNDED_TRANSITIVE_EFFECTS` enumerates the complete deterministic and potentially reachable conditional closure, affected repo/environment, capability and predicate policy.
+A trigger-capable legacy action is compatible only when the trusted profile is current, complete, digest-bound, and every reachable/potentially reachable child is already within the current authority or has independent authority. Missing/incomplete/unknown profile evidence requires an effect graph and fails closed.
 Confidence: high.
 
 ## Decision 6 — destructive retention

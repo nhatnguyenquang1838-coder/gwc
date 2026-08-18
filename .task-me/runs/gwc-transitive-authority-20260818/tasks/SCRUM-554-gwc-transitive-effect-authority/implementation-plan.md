@@ -1,30 +1,34 @@
 # Implementation plan
 
-**Fresh implementation session required.** Use TDD and exact-base drift readback before modifying source. GWC is the normative owner of the capability vocabulary and causal-effect authority semantics consumed by TaskController.
+> **Fresh-session only.** Re-read current main and this exact spec PR head before any source edit. If drift changes authority/workflow semantics, return to G0/G1 instead of silently adapting.
 
-## Step 1 — Capability registry
-Define a versioned machine-readable capability registry that separates semantic capabilities from gate labels while preserving existing G0-G6 projections. At minimum distinguish read-only/compute, guarded repo write, PR mutation, merge, release/publish, **destructive/delete/retention**, production data/config, secret/credential and migration.
+## Step 1 — Capability registry and schemas
+Define machine-readable capability semantics independent from gate-number labels. Include at minimum `read_only`, `compute`, `merge`, `release`, `deploy`, `migration`, `destructive`, and `production_data` capability classes, plus independent affected-repository/environment identity. Define the trusted effect profile schema alongside effect graph identity.
 
-Validation checkpoint: registry schema + compatibility tests; no silent gate renumbering.
+Validation checkpoint: capability registry and schema fixtures parse; deletion/retention is explicitly destructive.
 
-## Step 2 — Effect graph and conditional semantics
-Define a transitive-effect graph schema with exact source action identity, predicate evidence, edge state (`deterministic` or `conditional`), affected repository/environment, capability, required authority, evidence/readback identity and graph digest.
+## Step 2 — Effect graph and conditional policy
+Represent direct parent and transitive children with trigger/event, deterministic vs conditional classification, predicate state/evidence when conditional, affected repo/environment, capability and mutation type.
 
 Normative conditional policy:
-- predicate proven `false` -> edge is excluded only with predicate evidence bound to the parent action identity;
-- predicate `true` -> child is reachable;
-- predicate `unknown` -> a mutating/cross-repo/release/destructive/production-capable child is potentially reachable and must be authority-closed at its worst-case capability or the parent action is blocked;
-- unresolved read-only/compute children may remain non-escalating but must remain observable.
+- `predicate=false` + bound evidence => child excluded from authority closure;
+- `predicate=true` => child reachable and included;
+- `predicate=unknown` + mutating/cross-repo/release/deploy/migration/destructive/production capability => potentially reachable and included at worst-case capability;
+- unknown read-only/compute child remains observable and does not spuriously escalate beyond its own capability.
 
-Validation checkpoint: true/false/unknown fixtures, including cross-repo and destructive children.
+Validation checkpoint: true/false/unknown fixtures yield deterministic closure.
 
-## Step 3 — Packet binding and legacy compatibility
-Extend the gate-action authority packet/schema with effect-graph ref/digest and requested capability identity. Compatibility is explicit, not `optional where safe`:
-- legacy packets lacking an effect graph may use `LEGACY_DIRECT_ACTION_COMPAT` only when a versioned trusted action profile proves the action has **no transitive mutation trigger**;
-- trigger-capable or unknown-profile actions without an effect graph fail closed with `EFFECT_GRAPH_REQUIRED`;
-- the compatibility profile/digest is itself bound to the authority decision and drift invalidates it.
+## Step 3 — Backward-compatible packet extension
+Preserve existing compatible direct-action packets, but never infer `absent effect graph == no effects`.
 
-Validation checkpoint: safe no-trigger legacy packet remains valid; trigger-capable legacy packet without graph is rejected.
+Introduce a versioned trusted action effect profile bound to exact action identity:
+- `NO_TRANSITIVE_MUTATION` is the trivial profile proving no mutating transitive effect exists;
+- `BOUNDED_TRANSITIVE_EFFECTS` contains a complete precomputed closure for deterministic and potentially reachable conditional effects, including affected repository/environment, capability, predicate policy and profile digest;
+- the trusted profile may substitute for a per-packet graph only when current/complete and every child effect is already inside the packet authority or has independent repository/capability authority;
+- trigger-capable or unknown-profile actions with neither a valid graph nor a complete trusted profile fail closed with `EFFECT_GRAPH_REQUIRED`;
+- profile digest/version is bound to the authority decision; profile drift invalidates the decision.
+
+Validation checkpoint: safe no-trigger legacy packet passes; legacy trigger-capable packet with complete read-only/fully-authorized profile passes; same action with incomplete/unknown profile or unauthorized child fails closed.
 
 ## Step 4 — Causal authority closure
 Compute closure across deterministic and potentially reachable conditional children. Reject a parent action when any child capability/repository is unauthorized. Safe read-only children must not spuriously escalate authority. Cross-repo mutations require independent authority for the affected repo.

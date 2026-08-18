@@ -11,7 +11,7 @@ Source requirement: GitHub issue #467 / Jira SCRUM-554.
 | AC5 | Effect/evidence identity deterministic, digest-bound and replay-safe | Steps 2, 3, 5 | Scenarios 1, 9 |
 | AC6 | PR-head checks cannot satisfy merge-SHA evidence | Step 5 | Scenario 5 |
 | AC7 | Historical successful automation never becomes authority | Step 5 | Scenario 6 |
-| AC8 | Compatible direct-action packets remain valid when no unauthorized transitive mutation exists | Step 3 | Scenarios 10, 11 |
+| AC8 | Compatible direct-action packets remain valid when no unauthorized transitive mutation exists | Step 3 | Scenarios 10, 11, 12 |
 
 Additional spec hardening from independent review:
 - conditional mutating effects: Step 2 / Scenario 7;

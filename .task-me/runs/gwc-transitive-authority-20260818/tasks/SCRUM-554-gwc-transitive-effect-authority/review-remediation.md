@@ -14,3 +14,13 @@ Decision: `CHANGES_REQUIRED`
 | B-6 | MINOR | Defined bounded legacy compatibility: trusted no-transitive-mutation profile only; otherwise effect graph required. |
 | B-7 | NIT | Validator bundle is explicitly marked external materialized provenance, not repo-derived authority. |
 | B-8 | NIT | DAG now shows downstream SCRUM-553 consumer. |
+
+## Fresh-context GPT R2 review
+
+Reviewed head: `f4fed3ffc16778cf17dd5bc659e2c2ae0a0e5329`
+Review mode: `fresh-context` (GPT is implementation/spec author; Hermes verdict is not governance authority)
+Decision: `CHANGES_REQUIRED`
+
+| Finding | Severity | Planned repair in R3 |
+|---|---|---|
+| R2-GWC-1 | MAJOR | Reconcile issue AC8 with fail-closed legacy behavior using a versioned trusted bounded-effect profile. Trigger-capable legacy actions can remain compatible only when the complete profile closure proves all effects are within current/independent authority; otherwise an effect graph is required. |

@@ -9,7 +9,8 @@
 ## Required semantic boundaries
 - `destructive/delete/retention` is distinct from ordinary release/publish.
 - `conditional + unknown + mutating` is potentially reachable, never silently ignored.
-- legacy no-effect compatibility requires an explicit trusted action profile; absence of graph on trigger-capable/unknown actions is fail-closed.
+- legacy compatibility requires an explicit versioned trusted effect profile. `NO_TRANSITIVE_MUTATION` is only the trivial profile; trigger-capable actions may remain compatible only when a `BOUNDED_TRANSITIVE_EFFECTS` profile completely enumerates reachable/potentially reachable effects and proves they are within current authority or independently authorized.
+- absence of both an effect graph and a complete trusted effect profile on trigger-capable/unknown actions is fail-closed.
 
 ## Forbidden shortcuts
 - No invented semantic remapping.
