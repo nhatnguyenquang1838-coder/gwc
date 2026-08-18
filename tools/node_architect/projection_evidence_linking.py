@@ -233,6 +233,47 @@ def _linkset_digest(payload: dict[str, Any]) -> str:
     return _hash(semantic)
 
 
+def _has_supersede_cycle(links: list[dict[str, Any]]) -> bool:
+    """Return True when the SUPERSEDES revision graph is cyclic.
+
+    Each ``SUPERSEDES`` link asserts that its ``revision`` supersedes its
+    ``supersedes_revision`` (newer -> older). A cycle means a revision
+    simultaneously supersedes and is superseded by another -- a circular
+    provenance link that must fail closed (SCRUM-350 / NA81-F6-N08).
+    """
+    edges: dict[str, str] = {}
+    nodes: set[str] = set()
+    for link in links:
+        if link.get("relation") != "SUPERSEDES":
+            continue
+        newer = link.get("revision")
+        older = link.get("supersedes_revision")
+        if not isinstance(newer, str) or not isinstance(older, str):
+            continue
+        edges[newer] = older
+        nodes.add(newer)
+        nodes.add(older)
+
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color: dict[str, int] = {node: WHITE for node in nodes}
+
+    def visit(node: str) -> bool:
+        color[node] = GRAY
+        nxt = edges.get(node)
+        if nxt is not None:
+            if color.get(nxt) == GRAY:
+                return True
+            if color.get(nxt) == WHITE and visit(nxt):
+                return True
+        color[node] = BLACK
+        return False
+
+    for node in nodes:
+        if color[node] == WHITE and visit(node):
+            return True
+    return False
+
+
 def build_projection_evidence_linkset(
     *,
     task_id: str,
@@ -277,6 +318,27 @@ def build_projection_evidence_linkset(
     authority_valid, authority_digest, canonical_sources, authorized_fields = _authority_is_valid(
         source_authority_decision, task_id, repository, projection_target
     )
+    # SCRUM-350 (NA81-F6-N08): projection-derived source defense. A source
+    # binding with authority_class PROJECTION (even VERIFIED) is never canonical
+    # provenance. Collect those identities so an evidence link that reuses one
+    # fails closed. Computed inline to keep ``_authority_is_valid``'s contract
+    # and existing call-sites unchanged.
+    projection_sources: set[tuple[str, str, str]] = set()
+    if isinstance(source_authority_decision, dict):
+        for binding in source_authority_decision.get("source_bindings", []) or []:
+            if (
+                isinstance(binding, dict)
+                and binding.get("authority_class") == "PROJECTION"
+                and binding.get("status") == "VERIFIED"
+                and isinstance(binding.get("ref"), str)
+                and isinstance(binding.get("revision"), str)
+                and _REVISION_RE.fullmatch(binding.get("revision", ""))
+                and isinstance(binding.get("content_digest"), str)
+                and _DIGEST_RE.fullmatch(binding.get("content_digest", ""))
+            ):
+                projection_sources.add(
+                    (binding["ref"], binding["revision"], binding["content_digest"])
+                )
     if not authority_valid:
         reasons.add("EVIDENCE_LINK_SOURCE_AUTHORITY_INVALID")
 
@@ -380,7 +442,21 @@ def build_projection_evidence_linkset(
         else:
             by_semantic[semantic_key] = link
 
-    normalized_links = sorted(by_semantic.values(), key=lambda item: (
+    normalized_links = list(by_semantic.values())
+
+    # SCRUM-350 (NA81-F6-N08): two additional fail-closed provenance defenses.
+    # Both reuse EVIDENCE_LINK_CONTRACT_INVALID so the linkset artifact stays
+    # within the schema reason_code enum (schemas/projection-evidence-linkset
+    # .schema.json lives outside the authorized change paths and is unchanged).
+    if _has_supersede_cycle(normalized_links):
+        reasons.add("EVIDENCE_LINK_CONTRACT_INVALID")
+    if projection_sources:
+        for link in normalized_links:
+            if (link["ref"], link["revision"], link["content_digest"]) in projection_sources:
+                reasons.add("EVIDENCE_LINK_CONTRACT_INVALID")
+                break
+
+    normalized_links = sorted(normalized_links, key=lambda item: (
         item["source_type"], item["ref"], item["revision"], item["relation"], item["evidence_id"], item["content_digest"]
     ))
 
