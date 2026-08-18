@@ -296,3 +296,95 @@ def project_external_audit_event(
         "reason_codes": sorted(reasons),
         "projection_digest": _digest(projection),
     }
+
+
+def _observed_at_dt(decision: object) -> datetime | None:
+    """Return the UTC ``datetime`` of a decision's ``observed_at`` or ``None``.
+
+    A missing, empty, malformed, or timezone-less ``observed_at`` yields ``None``
+    so callers treat freshness as indeterminate rather than fabricating a
+    comparison. Pure parsing only; no I/O or mutation.
+    """
+    raw = decision.get("observed_at") if isinstance(decision, dict) else None
+    if not isinstance(raw, str) or not raw:
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except Exception:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+# SCRUM-345 (NA81-F6-N03) stale-source reason code. Added to the precedence list
+# so a stale-but-digest-valid source authority decision is surfaced distinctly
+# from a structurally invalid one. Backward compatible: the base renderer is
+# unchanged and this code is only emitted by ``project_external_audit_event_na81``.
+REASON_PRECEDENCE = [*REASON_PRECEDENCE, "EXTERNAL_AUDIT_SOURCE_STALE"]
+
+STALE_REASON = "EXTERNAL_AUDIT_SOURCE_STALE"
+
+
+def project_external_audit_event_na81(
+    *,
+    task_id: str,
+    repository: str,
+    projection_target: str,
+    source_authority_decision: dict[str, Any],
+    evidence_linkset: dict[str, Any],
+    privacy_boundary_decision: dict[str, Any],
+    envelope: dict[str, Any],
+    prior_projection: dict[str, Any] | None = None,
+    projected_at: str | None = None,
+    source_freshness_cutoff: str | None = None,
+) -> dict[str, object]:
+    """SCRUM-345 (NA81-F6-N03) external audit-event projection with stale-source guard.
+
+    Delegates all canonical-source rendering, stable correlation, idempotent
+    duplicate replay, privacy-boundary handling and non-authority semantics to
+    ``project_external_audit_event`` (SCRUM-222), which is left unchanged for
+    backward compatibility. This wrapper adds the single behavior the current
+    SCRUM-345 brief requires that the base renderer lacks:
+
+    STALE SOURCE — a source-authority decision that is digest-valid but was
+    observed against a canonical snapshot older than ``source_freshness_cutoff``
+    is rendered ``BLOCKED`` with ``EXTERNAL_AUDIT_SOURCE_STALE`` instead of
+    ``READY``. ``source_freshness_cutoff`` is the canonical source's known-current
+    freshness timestamp; when ``None`` (default) no staleness check is performed
+    and behavior is identical to the base renderer.
+
+    Read-only. Performs no connector call, network request, filesystem mutation,
+    Jira transition, branch creation, commit, PR action, approval, merge,
+    deployment or production operation. Never grants write/approval/merge/deploy/
+    production authority and never projects secrets or derives truth from another
+    projection.
+    """
+    result = project_external_audit_event(
+        task_id=task_id,
+        repository=repository,
+        projection_target=projection_target,
+        source_authority_decision=source_authority_decision,
+        evidence_linkset=evidence_linkset,
+        privacy_boundary_decision=privacy_boundary_decision,
+        envelope=envelope,
+        prior_projection=prior_projection,
+        projected_at=projected_at,
+    )
+    if source_freshness_cutoff is None or result.get("outcome") != "READY":
+        return result
+
+    observed = _observed_at_dt(source_authority_decision)
+    cutoff = _observed_at_dt({"observed_at": source_freshness_cutoff})
+    if observed is None or cutoff is None:
+        return result
+    if observed < cutoff:
+        result["outcome"] = "BLOCKED"
+        result["reason_code"] = STALE_REASON
+        result["reason_codes"] = sorted(set(result.get("reason_codes", [])) | {STALE_REASON})
+        proj_only = {
+            k: v for k, v in result.items()
+            if k not in ("outcome", "reason_code", "reason_codes", "projection_digest")
+        }
+        result["projection_digest"] = _digest(proj_only)
+    return result
