@@ -307,3 +307,224 @@ def project_task_center_sync(
         "reason_codes": sorted(reasons),
         "projection_digest": _digest(projection),
     }
+
+
+# ---------------------------------------------------------------------------
+# NA81 execution-level Task Center sync intent (SCRUM-279 / SCRUM-344)
+#
+# The M4 ``project_task_center_sync`` renderer above is a pure projection of
+# B1 decisions + envelope. SCRUM-279 (#279) requires the *execution-level*
+# deterministic sync intent with three properties the M4 renderer does not
+# expose:
+#
+#   * monotonic source revision  -- a strictly increasing ``source_revision``
+#                                   that rejects out-of-order / stale sources;
+#   * stable idempotency key     -- a deterministic key over canonical facts so
+#                                   duplicate replay is a clean no-op;
+#   * explicit readback expectation -- the consumer is told exactly what to read
+#                                   back (expected canonical digest + revision).
+#
+# This function is additive and backward-compatible: ``project_task_center_sync``
+# is unchanged. It is pure: no connector call, network request, filesystem
+# mutation, Jira transition, approval, merge, deployment or production
+# operation. Task Center remains a projection surface -- it never becomes
+# canonical task truth or authority (PROJECTION_IS_NOT_CANONICAL_TASK_TRUTH),
+# and a projection failure never mutates canonical outcome
+# (PROJECTION_FAILURE_DOES_NOT_MUTATE_CANONICAL_OUTCOME).
+# ---------------------------------------------------------------------------
+
+NA81_REASON_PRECEDENCE = [
+    "TASK_CENTER_NA81_INPUT_INVALID",
+    "TASK_CENTER_NA81_MISSING_CANONICAL_SOURCE",
+    "TASK_CENTER_NA81_NON_AUTHORITATIVE",
+    "TASK_CENTER_NA81_PRIVACY_BOUNDARY_INVALID",
+    "TASK_CENTER_NA81_REVISION_OUT_OF_ORDER",
+    "TASK_CENTER_NA81_STALE_SOURCE",
+    "TASK_CENTER_NA81_PRIOR_READBACK_MISMATCH",
+    "TASK_CENTER_NA81_SYNC_READY",
+    "TASK_CENTER_NA81_SYNC_CURRENT",
+]
+
+NA81_ARTIFACT_TYPE = "task-center-sync-intent"
+
+
+def _na81_primary(reasons: set[str]) -> str:
+    for code in NA81_REASON_PRECEDENCE:
+        if code in reasons:
+            return code
+    return "TASK_CENTER_NA81_INPUT_INVALID"
+
+
+def render_task_center_sync_na81(
+    *,
+    task_id: str,
+    repository: str,
+    projection_target: str,
+    source_authority_decision: dict[str, Any],
+    evidence_linkset: dict[str, Any],
+    privacy_boundary_decision: dict[str, Any],
+    envelope: dict[str, Any],
+    source_revision: int,
+    prior_readback_expectation: dict[str, Any] | None = None,
+    projected_at: str | None = None,
+) -> dict[str, object]:
+    """Render a deterministic Task Center sync intent with monotonic revision.
+
+    Returns a read-only, authority-false intent carrying a stable
+    ``idempotency_key`` and an explicit ``readback_expectation``. Rejects
+    out-of-order (``source_revision`` regresses) and stale (same revision but
+    canonical content mutated) sources. Never derives canonical truth from the
+    projection.
+    """
+
+    reasons: set[str] = set()
+    safe_task_id = task_id if isinstance(task_id, str) and _TASK_RE.fullmatch(task_id) else "INVALID-1"
+    safe_repository = repository if isinstance(repository, str) and _REPOSITORY_RE.fullmatch(repository) else "invalid/repository"
+    safe_target = projection_target if isinstance(projection_target, str) and _TARGET_RE.fullmatch(projection_target) else "invalid-target"
+    if safe_task_id != task_id or safe_repository != repository or safe_target != projection_target:
+        reasons.add("TASK_CENTER_NA81_INPUT_INVALID")
+
+    if not isinstance(source_revision, int) or isinstance(source_revision, bool) or source_revision < 0:
+        reasons.add("TASK_CENTER_NA81_INPUT_INVALID")
+
+    try:
+        projected_at_text = _timestamp(projected_at)
+    except Exception:
+        projected_at_text = "1970-01-01T00:00:00Z"
+        reasons.add("TASK_CENTER_NA81_INPUT_INVALID")
+
+    if not isinstance(envelope, dict):
+        reasons.add("TASK_CENTER_NA81_INPUT_INVALID")
+        envelope = {}
+
+    authority_ok = _source_authority_is_valid(source_authority_decision, safe_task_id, safe_repository, safe_target)
+    if not authority_ok:
+        reasons.add("TASK_CENTER_NA81_NON_AUTHORITATIVE")
+    linkset_ok = _evidence_linkset_is_valid(evidence_linkset, safe_task_id, safe_repository, safe_target)
+    if not linkset_ok:
+        reasons.add("TASK_CENTER_NA81_NON_AUTHORITATIVE")
+    privacy_ok = _privacy_boundary_is_valid(privacy_boundary_decision, safe_task_id, safe_repository, safe_target)
+    if not privacy_ok:
+        reasons.add("TASK_CENTER_NA81_PRIVACY_BOUNDARY_INVALID")
+
+    canonical_state: dict[str, Any] = {}
+    if isinstance(envelope.get("canonical_state"), dict):
+        for key, value in envelope["canonical_state"].items():
+            if key not in ALLOWED_CANONICAL_KEYS:
+                reasons.add("TASK_CENTER_NA81_INPUT_INVALID")
+                continue
+            canonical_state[key] = value
+    else:
+        reasons.add("TASK_CENTER_NA81_INPUT_INVALID")
+
+    # A Task Center sync intent needs a canonical source anchor. Without a
+    # repository head we have no canonical source to project.
+    if "repository_head" not in canonical_state:
+        reasons.add("TASK_CENTER_NA81_MISSING_CANONICAL_SOURCE")
+
+    authority_digest = source_authority_decision.get("decision_digest") if isinstance(source_authority_decision, dict) else None
+    linkset_digest = evidence_linkset.get("linkset_digest") if isinstance(evidence_linkset, dict) else None
+    privacy_digest = privacy_boundary_decision.get("decision_digest") if isinstance(privacy_boundary_decision, dict) else None
+    if not (isinstance(authority_digest, str) and _DIGEST_RE.fullmatch(authority_digest)):
+        authority_digest = envelope.get("source_authority_digest") if isinstance(envelope.get("source_authority_digest"), str) and _DIGEST_RE.fullmatch(envelope["source_authority_digest"]) else None
+    if not (isinstance(linkset_digest, str) and _DIGEST_RE.fullmatch(linkset_digest)):
+        linkset_digest = envelope.get("evidence_linkset_digest") if isinstance(envelope.get("evidence_linkset_digest"), str) and _DIGEST_RE.fullmatch(envelope["evidence_linkset_digest"]) else None
+    if not (isinstance(privacy_digest, str) and _DIGEST_RE.fullmatch(privacy_digest)):
+        privacy_digest = envelope.get("privacy_boundary_digest") if isinstance(envelope.get("privacy_boundary_digest"), str) and _DIGEST_RE.fullmatch(envelope["privacy_boundary_digest"]) else None
+
+    canonical_state_digest = _canonical_state_digest(canonical_state)
+
+    # Stable idempotency key over canonical facts + revision. Deterministic and
+    # order-independent so duplicate replay yields an identical intent.
+    idempotency_facts = {
+        "task_id": safe_task_id,
+        "repository": safe_repository,
+        "projection_target": safe_target,
+        "source_revision": source_revision,
+        "canonical_state_digest": canonical_state_digest,
+        "source_authority_digest": authority_digest or _ZERO_DIGEST,
+        "evidence_linkset_digest": linkset_digest or _ZERO_DIGEST,
+        "privacy_boundary_digest": privacy_digest or _ZERO_DIGEST,
+    }
+    idempotency_key = _digest(idempotency_facts)
+
+    # Monotonic revision + stale-source rejection using the prior readback.
+    if not reasons and isinstance(prior_readback_expectation, dict):
+        prior_rev = prior_readback_expectation.get("source_revision")
+        prior_digest = prior_readback_expectation.get("expected_canonical_state_digest")
+        prior_idem = prior_readback_expectation.get("idempotency_key")
+        if not (
+            isinstance(prior_rev, int) and not isinstance(prior_rev, bool)
+            and isinstance(prior_digest, str) and bool(_DIGEST_RE.fullmatch(prior_digest))
+            and isinstance(prior_idem, str) and bool(_DIGEST_RE.fullmatch(prior_idem))
+        ):
+            reasons.add("TASK_CENTER_NA81_PRIOR_READBACK_MISMATCH")
+        elif prior_rev > source_revision:
+            # Source moved backwards -> out-of-order, never accepted.
+            reasons.add("TASK_CENTER_NA81_REVISION_OUT_OF_ORDER")
+        elif prior_rev == source_revision and prior_digest != canonical_state_digest:
+            # Same revision but canonical content changed -> stale source.
+            reasons.add("TASK_CENTER_NA81_STALE_SOURCE")
+
+    if not reasons:
+        if isinstance(prior_readback_expectation, dict):
+            prior_rev = prior_readback_expectation.get("source_revision")
+            prior_digest = prior_readback_expectation.get("expected_canonical_state_digest")
+            prior_idem = prior_readback_expectation.get("idempotency_key")
+            if (
+                isinstance(prior_rev, int) and not isinstance(prior_rev, bool)
+                and prior_rev == source_revision
+                and prior_digest == canonical_state_digest
+                and prior_idem == idempotency_key
+            ):
+                reasons.add("TASK_CENTER_NA81_SYNC_CURRENT")
+            else:
+                reasons.add("TASK_CENTER_NA81_SYNC_READY")
+        else:
+            reasons.add("TASK_CENTER_NA81_SYNC_READY")
+
+    primary = _na81_primary(reasons)
+    ready = reasons == {"TASK_CENTER_NA81_SYNC_READY"} or reasons == {"TASK_CENTER_NA81_SYNC_CURRENT"}
+
+    readback_expectation: dict[str, object] | None = None
+    if ready:
+        readback_expectation = {
+            "task_id": safe_task_id,
+            "projection_target": safe_target,
+            "source_revision": source_revision,
+            "expected_canonical_state_digest": canonical_state_digest,
+            "idempotency_key": idempotency_key,
+        }
+
+    projection = {
+        "schema_version": SCHEMA_VERSION,
+        "artifact_type": NA81_ARTIFACT_TYPE,
+        "task_id": safe_task_id,
+        "repository": safe_repository,
+        "projection_target": safe_target,
+        "source_authority_digest": authority_digest or (envelope.get("source_authority_digest") or _ZERO_DIGEST),
+        "evidence_linkset_digest": linkset_digest or (envelope.get("evidence_linkset_digest") or _ZERO_DIGEST),
+        "privacy_boundary_digest": privacy_digest or (envelope.get("privacy_boundary_digest") or _ZERO_DIGEST),
+        "canonical_state": canonical_state,
+        "canonical_state_digest": canonical_state_digest,
+        "monotonic_source_revision": source_revision if ready else None,
+        "idempotency_key": idempotency_key,
+        "readback_expectation": readback_expectation,
+        "prior_readback_present": isinstance(prior_readback_expectation, dict),
+        "read_only_projection": True,
+        "write_authority_granted": False,
+        "approval_authority_granted": False,
+        "merge_authority_granted": False,
+        "deployment_authority_granted": False,
+        "production_authority_granted": False,
+        "projected_at": projected_at_text,
+    }
+
+    return {
+        **projection,
+        "outcome": "READY" if ready else "BLOCKED",
+        "reason_code": primary,
+        "reason_codes": sorted(reasons),
+        "projection_digest": _digest(projection),
+        "decision_digest": _digest(projection),
+    }
