@@ -4,7 +4,6 @@
   "base_ref": "main",
   "github_issue": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/467",
   "jira": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-554",
-  "gg_revision": "AIroW378s9uStEwtFnvQaj1S2wArsLm2VxPoWJBILypyqVzhDBla3SpEr2Yjv7kX1PTpVqTjwsEffXmVs7TiEUnJHliLX8WteE4OaTFWLYk",
   "source_evidence": [
     {
       "kind": "repo-file",
@@ -45,5 +44,36 @@
     }
   ],
   "observed_incident": "Rental Home G4 direct merge deterministically triggered archive export/release-dist write+retention delete outside direct G4 scope.",
-  "confidence": 0.93
+  "confidence": 0.93,
+  "gg_identity": {
+    "revision": "AIroW378s9uStEwtFnvQaj1S2wArsLm2VxPoWJBILypyqVzhDBla3SpEr2Yjv7kX1PTpVqTjwsEffXmVs7TiEUnJHliLX8WteE4OaTFWLYk",
+    "version": "2026-08-18",
+    "edition": "LLM-Semantic 2.3",
+    "section": "1A. DEVELOPMENT TASK BOOTSTRAP — SPEC-DRIVEN SESSION BOUNDARY",
+    "section_sha256": "COMPUTE_AT_HANDOFF_FROM_EXACT_NORMALIZED_SECTION_TEXT"
+  },
+  "consumers": [
+    "SCRUM-553"
+  ],
+  "validator_bundle_provenance": {
+    "source": "ChatGPT/GPT Library materialized artifact, external to this repository",
+    "version": "1.16.0",
+    "sha256": "15191523ce650f9136e4b32916841cfe20c24279de83e9cad1b2b13fd486bb29",
+    "claim_scope": "materialized external execution dependency; not derivable from PR diff and not repository authority"
+  },
+  "review_repair": {
+    "reviewer": "Hermes Cloud U0BNANGC3PB",
+    "reviewed_head": "4b3d39c8be10b53a502ea3a887fd8dc2ced97540",
+    "decision": "CHANGES_REQUIRED",
+    "resolved_findings_target": [
+      "B-1",
+      "B-2",
+      "B-3",
+      "B-4",
+      "B-5",
+      "B-6",
+      "B-7",
+      "B-8"
+    ]
+  }
 }

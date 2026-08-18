@@ -1,41 +1,50 @@
 # Implementation plan
 
-**Fresh implementation session required.** Use TDD and exact-base drift readback before modifying source.
+**Fresh implementation session required.** Use TDD and exact-base drift readback before modifying source. GWC is the normative owner of the capability vocabulary and causal-effect authority semantics consumed by TaskController.
 
-## Step 1
-Define a versioned capability registry that separates semantic capabilities (read-only verify, repo write, PR mutation, merge, release, production data/config, secret, migration/destructive) from gate labels while preserving existing G0-G6 compatibility.
+## Step 1 — Capability registry
+Define a versioned machine-readable capability registry that separates semantic capabilities from gate labels while preserving existing G0-G6 projections. At minimum distinguish read-only/compute, guarded repo write, PR mutation, merge, release/publish, **destructive/delete/retention**, production data/config, secret/credential and migration.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+Validation checkpoint: registry schema + compatibility tests; no silent gate renumbering.
 
-## Step 2
-Define a transitive-effect graph schema with exact source action identity, deterministic/conditional edges, affected repository/environment, capability, authority requirement, evidence/readback identity and digest.
+## Step 2 — Effect graph and conditional semantics
+Define a transitive-effect graph schema with exact source action identity, predicate evidence, edge state (`deterministic` or `conditional`), affected repository/environment, capability, required authority, evidence/readback identity and graph digest.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+Normative conditional policy:
+- predicate proven `false` -> edge is excluded only with predicate evidence bound to the parent action identity;
+- predicate `true` -> child is reachable;
+- predicate `unknown` -> a mutating/cross-repo/release/destructive/production-capable child is potentially reachable and must be authority-closed at its worst-case capability or the parent action is blocked;
+- unresolved read-only/compute children may remain non-escalating but must remain observable.
 
-## Step 3
-Extend gate-action authority packet/schema with effect graph ref/digest and requested capability identity using backward-compatible optional fields where safe.
+Validation checkpoint: true/false/unknown fixtures, including cross-repo and destructive children.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+## Step 3 — Packet binding and legacy compatibility
+Extend the gate-action authority packet/schema with effect-graph ref/digest and requested capability identity. Compatibility is explicit, not `optional where safe`:
+- legacy packets lacking an effect graph may use `LEGACY_DIRECT_ACTION_COMPAT` only when a versioned trusted action profile proves the action has **no transitive mutation trigger**;
+- trigger-capable or unknown-profile actions without an effect graph fail closed with `EFFECT_GRAPH_REQUIRED`;
+- the compatibility profile/digest is itself bound to the authority decision and drift invalidates it.
 
-## Step 4
-Extend validation to compute deterministic reachable closure and fail closed when any child capability/repository is unauthorized; safe read-only children must remain non-escalating.
+Validation checkpoint: safe no-trigger legacy packet remains valid; trigger-capable legacy packet without graph is rejected.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+## Step 4 — Causal authority closure
+Compute closure across deterministic and potentially reachable conditional children. Reject a parent action when any child capability/repository is unauthorized. Safe read-only children must not spuriously escalate authority. Cross-repo mutations require independent authority for the affected repo.
 
-## Step 5
-Bind evidence consumption to repository + event/action + branch/PR + exact SHA + run/check + gate/node identity and reject wrong-node reuse.
+Validation checkpoint: direct-authorized/child-unauthorized, cross-repo, safe-read-only and unknown-condition cases.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+## Step 5 — Exact evidence consumption identity
+Bind evidence to repository + event/action + branch/PR + exact SHA + run/check + gate/node identity. Reject wrong-node reuse and historical-success substitution. A successful run for another SHA/event/gate is evidence of that historical execution only, never authority for the current packet.
 
-## Step 6
-Add regression fixture for G4 merge -> push main -> export archive -> release-dist write/delete, plus multi-repo, safe child, drift and replay cases.
+Validation checkpoint: PR-head-vs-merge-SHA and prior-success-different-SHA/gate fixtures.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+## Step 6 — Incident and destructive regressions
+Add regression fixtures for `G4 merge -> push main -> export archive -> release-dist write + retention delete`, multi-repo child effects, conditional predicates, drift/replay and historical success. Explicitly assert that retention deletion maps to destructive capability rather than being absorbed into ordinary release/publish.
 
-## Step 7
-Update lifecycle documentation/map only where required to make capability/effect semantics normative without renumbering existing gates.
+Validation checkpoint: incident fixture must fail before required child authority and pass only when every reachable/potentially reachable effect is covered.
 
-Validation checkpoint: run the narrowest relevant RED/GREEN tests and inspect the complete diff before proceeding.
+## Step 7 — Normative lifecycle/docs
+Update lifecycle documentation/map only where required to make capability/effect semantics normative without renumbering existing gates. Document compatibility profile, reason codes and policy digest requirements so gate labels remain projections rather than a second semantic source.
+
+Validation checkpoint: schema/docs/validator tests agree on one capability/effect source of truth.
 
 ## Delivery boundary
 Implementation commits belong to a fresh G2-authorized implementation branch/session, not this spec-only branch. G3/G4/G5/G6 remain separate authority boundaries.
