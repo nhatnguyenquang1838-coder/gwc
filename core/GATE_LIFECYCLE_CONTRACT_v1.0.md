@@ -69,6 +69,56 @@ SHA, head SHA, branch, gate, action, canonical scope hash, expiry, actor, and
 readback event. A valid packet is evidence of a matching envelope; it is not a
 new approval and never broadens the envelope's authorized actions.
 
+## Capability and causal-effect authority
+
+Gate labels remain compatibility projections. The normative semantic source of
+truth for action capability and transitive-policy classification is
+`governance/gate-action-capability-registry.yaml`, validated by
+`schemas/gate-action-capability-registry.schema.json`. Existing G0-G6 gate
+numbers and action mappings remain in force; capability semantics do not
+renumber gates or create an alternate gate sequence.
+
+A gate-action packet may bind a per-packet effect graph using
+`schemas/gate-action-effect-graph.schema.json`, or a trusted compatibility
+profile using `schemas/gate-action-effect-profile.schema.json`. The packet
+binds the selected graph/profile by reference and canonical SHA-256 digest.
+The same digest is read back as execution evidence, and digest drift invalidates
+the authority decision.
+
+For actions classified `GRAPH_OR_TRUSTED_PROFILE_REQUIRED`, absence of both a
+valid graph and a current, complete trusted profile fails closed with
+`EFFECT_GRAPH_REQUIRED`. Legacy packets remain compatible only through one of
+two explicit trusted profiles:
+
+- `NO_TRANSITIVE_MUTATION` proves that the bound action identity has no
+  mutating transitive effect;
+- `BOUNDED_TRANSITIVE_EFFECTS` enumerates the complete deterministic and
+  potentially reachable conditional closure.
+
+A profile is usable only while current, complete, action-identity-bound, and
+digest-bound. Every mutating child effect in a bounded profile must already be
+inside the packet's capability authority or have independent authority for the
+affected repository/environment. Cross-repository mutation never borrows the
+parent repository's authority.
+
+Conditional effects are evaluated fail-closed: predicate `false` excludes an
+edge only when predicate evidence is bound to the parent action identity;
+predicate `true` is reachable; predicate `unknown` with a mutating capability
+is potentially reachable and must be closed at its declared worst-case
+capability. Unknown `READ_ONLY` or `COMPUTE` effects remain observable but do
+not escalate mutation authority.
+
+`DESTRUCTIVE` is a separate capability for delete, purge, and retention
+operations. `RELEASE_PUBLISH` authority does not imply `DESTRUCTIVE` authority.
+Production data/config, secret/credential, and migration capabilities likewise
+remain explicit and cannot be inferred from a lower-capability gate action.
+
+Execution evidence identity is exact where applicable: repository, event/action,
+branch or PR, SHA and SHA-kind, workflow run/check, gate, and node. PR-head
+evidence cannot satisfy merge-commit/post-merge evidence. A successful
+historical workflow/check for another SHA, event, gate, or node is evidence of
+that historical execution only and never authority for the current packet.
+
 The executable state transitions are defined in
 `core/task-lifecycle/gate-transition-map.yaml`. G3 validation/review now ends
 in `merge_pending`; G4 approval and merge move through `merge_running` to
@@ -361,6 +411,15 @@ GATE_ACTION_NOT_AUTHORIZED
 GATE_APPROVAL_EXPIRED
 GATE_HUMAN_APPROVAL_REQUIRED
 GATE_EVIDENCE_MISSING
+EFFECT_GRAPH_REQUIRED
+EFFECT_GRAPH_DIGEST_MISMATCH
+EFFECT_PROFILE_DIGEST_MISMATCH
+EFFECT_PROFILE_INCOMPLETE
+EFFECT_PROFILE_STALE
+TRANSITIVE_AUTHORITY_REQUIRED
+CROSS_REPO_AUTHORITY_REQUIRED
+PREDICATE_EVIDENCE_REQUIRED
+EVIDENCE_IDENTITY_REQUIRED
 ```
 
 ## Compatibility

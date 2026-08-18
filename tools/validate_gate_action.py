@@ -23,6 +23,8 @@ from typing import Any
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
+from tools.gate_effect_authority import evaluate_transitive_authority, validate_evidence_identity
+
 GATE_MINIMUM_ACTIONS = {
     "G0_CONTEXT": {"read_repository", "inspect_connector", "inspect_task"},
     "G1_ALIGNMENT": {"materialize_g1_artifacts", "run_read_only_validation"},
@@ -277,6 +279,18 @@ def semantic_errors(
     if gate in GATE_MINIMUM_ACTIONS and action not in GATE_MINIMUM_ACTIONS[gate]:
         errors.append(f"action {action!r} is not valid for {gate}")
 
+    transitive = evaluate_transitive_authority(
+        packet,
+        effect_graph=packet.get("effect_graph") if isinstance(packet.get("effect_graph"), dict) else None,
+        trusted_profile=(
+            packet.get("trusted_effect_profile")
+            if isinstance(packet.get("trusted_effect_profile"), dict)
+            else None
+        ),
+    )
+    if not transitive["allowed"]:
+        errors.extend(transitive["reason_codes"])
+
     if gate == G4_MERGE_GATE and action == G4_MERGE_ACTION:
         if expected_head_sha is None:
             errors.append("G4 merge requires expected current PR head SHA")
@@ -322,6 +336,14 @@ def semantic_errors(
             errors.append(f"evidence_readback.{field} does not match packet.{field}")
     if not readback.get("event_id_or_idempotency_key"):
         errors.append("evidence_readback.event_id_or_idempotency_key is required")
+
+    expected_identity = packet.get("expected_evidence_identity")
+    observed_identity = readback.get("execution_identity")
+    if expected_identity is not None or observed_identity is not None:
+        if not isinstance(expected_identity, dict) or not isinstance(observed_identity, dict):
+            errors.append("EVIDENCE_IDENTITY_REQUIRED")
+        else:
+            errors.extend(validate_evidence_identity(expected_identity, observed_identity))
     return errors
 
 
@@ -343,6 +365,18 @@ def validate(
     expected_evidence_digest: str | None = None,
 ) -> list[str]:
     errors = schema_errors(packet, schema_path)
+    if not errors:
+        focused_policies = (
+            ("effect_graph", "gate-action-effect-graph.schema.json"),
+            ("trusted_effect_profile", "gate-action-effect-profile.schema.json"),
+        )
+        for field, schema_name in focused_policies:
+            policy = packet.get(field)
+            if isinstance(policy, dict):
+                errors.extend(
+                    f"{field}.{error}"
+                    for error in schema_errors(policy, schema_path.parent / schema_name)
+                )
     if not errors:
         errors.extend(
             semantic_errors(
