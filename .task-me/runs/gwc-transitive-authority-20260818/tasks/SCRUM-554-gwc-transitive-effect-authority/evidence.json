@@ -76,11 +76,11 @@
       "B-8"
     ]
   },
-  "fresh_context_review": {
-    "reviewer": "GPT",
+  "fresh_context_r2_review": {
+    "reviewer": "GPT fresh-context adjudication",
     "reviewed_head": "f4fed3ffc16778cf17dd5bc659e2c2ae0a0e5329",
     "decision": "CHANGES_REQUIRED",
     "finding": "R2-GWC-1",
-    "summary": "Legacy compatibility was too narrow: the R2 trusted no-transitive-mutation profile did not satisfy issue AC8 for trigger-capable legacy actions whose complete transitive effects are read-only or already fully authorized. R3 replaces this with versioned trusted effect profiles and complete bounded closure semantics."
+    "basis": "Issue AC8 vs R2 NO_TRANSITIVE_MUTATION-only compatibility inconsistency"
   }
 }
