@@ -2,7 +2,7 @@
   "node_id": "failure_recovery.timeout-recovery",
   "node_type": "workflow",
   "title": "Timeout Recovery",
-  "description": "Classify a bounded timeout, distinguish a real pending effect and an interruption from unavailable evidence and terminal failure, preserve current checkpoint evidence, and stop or resume without assuming the side effect failed.",
+  "description": "Classify a bounded timeout, preserve current checkpoint evidence, and stop or resume without assuming the side effect failed.",
   "canonical": "canonical",
   "authority_boundary": "g2_required",
   "gates": [
