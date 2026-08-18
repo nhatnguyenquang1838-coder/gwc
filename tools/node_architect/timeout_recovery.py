@@ -41,6 +41,16 @@ def decide_timeout_recovery(*, task_id: str, repository: str, branch: str, base_
         outcome, reason = "BOUNDED_RETRY", "ZERO_EFFECT_WITH_RETRY_BUDGET"
     elif effect_status == "ZERO_EFFECT":
         outcome, reason = "FAIL", "RETRY_BUDGET_EXHAUSTED"
+    elif effect_status == "PENDING":
+        # Real pending effect: it is in flight and has not been read back.
+        # Reconcile (read back) before any retry so duplicate effects are
+        # impossible. Never blind-redispatch.
+        outcome, reason = "RECONCILE", "PENDING_EFFECT_RECONCILE"
+    elif effect_status == "INTERRUPTED":
+        # The operation was interrupted before its result was observed; the
+        # external effect is unknown. Reconcile before retry (family
+        # invariant UNKNOWN_EFFECT => READBACK_OR_RECONCILE_BEFORE_RETRY).
+        outcome, reason = "RECONCILE", "INTERRUPTED_UNKNOWN_EFFECT"
     else:
         outcome, reason = "RECONCILE", "UNSUPPORTED_EFFECT_STATUS"
 
