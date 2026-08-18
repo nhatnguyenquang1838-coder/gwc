@@ -20,14 +20,40 @@ Design invariants (SCRUM-233 / F7 family contract):
 * Closed reason-code taxonomy: unknown states are rejected, never ignored.
 * A complete build grants no repository, PR, merge, deploy or release
   authority; it is execution-plane evidence only.
+
+NA81-F7 delta (SCRUM-356)
+-------------------------
+The SCRUM-233 builder only copied files flat. SCRUM-356 requires the tree
+builder to be *topology aware*: it must construct a deterministic governance /
+instruction tree from validated entries with a stable canonical order and
+per-entry provenance, and it must block cycles, duplicate entries, missing
+parents and ambiguous ordering. This delta adds that capability, fail-closed
+and backward compatible:
+
+* ``PlanEntry`` gains ``parent`` (instruction-tree parent target) and
+  ``order`` (sibling ordering key). Entries without a parent are roots;
+  ``order`` is optional.
+* Pre-build topology validation (before any staging write):
+  - ``TREE_DUPLICATE_ENTRY`` — two entries share the same ``(source, target)``.
+  - ``TREE_MISSING_PARENT`` — an entry references a parent not in the plan.
+  - ``TREE_CYCLE_DETECTED`` — the parent graph contains a cycle.
+  - ``TREE_AMBIGUOUS_ORDER`` — two siblings share an explicit ``order``.
+* Canonical ordering: entries are copied in topological order (parents before
+  children), siblings ordered by ``order`` then target — fully deterministic.
+* Per-entry provenance: each inventory row now carries ``parent``, ``order``,
+  ``depth`` (root distance), ``tree_path`` (root->node path) and ``index``
+  (canonical position).
+* Legacy flat plans (no parent / no order) keep the exact prior behaviour.
 """
 
 from __future__ import annotations
 
 import hashlib
+import heapq
 import json
 import os
 import shutil
+from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -53,6 +79,11 @@ TREE_READBACK_MISMATCH = "TREE_READBACK_MISMATCH"
 TREE_STALE_SOURCE = "TREE_STALE_SOURCE"
 TREE_IDEMPOTENT_REPLAY = "TREE_IDEMPOTENT_REPLAY"
 TREE_REPLAY_CONFLICT = "TREE_REPLAY_CONFLICT"
+# NA81-F7 topology reason codes (SCRUM-356)
+TREE_DUPLICATE_ENTRY = "TREE_DUPLICATE_ENTRY"
+TREE_MISSING_PARENT = "TREE_MISSING_PARENT"
+TREE_CYCLE_DETECTED = "TREE_CYCLE_DETECTED"
+TREE_AMBIGUOUS_ORDER = "TREE_AMBIGUOUS_ORDER"
 
 REASON_CODES: Tuple[str, ...] = (
     TREE_BUILD_COMPLETE,
@@ -65,6 +96,10 @@ REASON_CODES: Tuple[str, ...] = (
     TREE_STALE_SOURCE,
     TREE_IDEMPOTENT_REPLAY,
     TREE_REPLAY_CONFLICT,
+    TREE_DUPLICATE_ENTRY,
+    TREE_MISSING_PARENT,
+    TREE_CYCLE_DETECTED,
+    TREE_AMBIGUOUS_ORDER,
 )
 
 
@@ -77,15 +112,20 @@ class Outcome(str, Enum):
 class PlanEntry:
     """One accepted source/target pair from the upstream (M4) plan.
 
-    `source_digest` is the digest recorded at planning time. If the source has
+    ``source_digest`` is the digest recorded at planning time. If the source has
     changed since planning, the build fails `TREE_STALE_SOURCE` rather than
     silently exporting drifted bytes.
+
+    NA81-F7: ``parent`` is the instruction-tree parent target (``None`` for a
+    root); ``order`` is the optional sibling ordering key.
     """
 
     source: str
     target: str
     required: bool = True
     source_digest: Optional[str] = None
+    parent: Optional[str] = None
+    order: Optional[int] = None
 
 
 @dataclass
@@ -97,6 +137,11 @@ class EntryResult:
     source_digest: Optional[str] = None
     target_digest: Optional[str] = None
     byte_count: Optional[int] = None
+    parent: Optional[str] = None
+    order: Optional[int] = None
+    depth: int = 0
+    tree_path: str = ""
+    index: int = -1
     detail: str = ""
 
 
@@ -136,23 +181,167 @@ def compute_plan_digest(entries: List[PlanEntry]) -> str:
             "target": e.target,
             "required": bool(e.required),
             "source_digest": e.source_digest or "",
+            "parent": e.parent or "",
+            "order": e.order if e.order is not None else -1,
         }
         for e in entries
     ]
-    canonical.sort(key=lambda d: (d["target"], d["source"]))
+    canonical.sort(
+        key=lambda d: (
+            d["target"],
+            d["source"],
+            d["parent"],
+            d["order"],
+        )
+    )
     blob = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
     return _sha256_bytes(blob.encode("utf-8"))
 
 
 def compute_tree_digest(results: List[EntryResult]) -> str:
-    """Semantic digest of the produced tree: target path + content digest."""
+    """Semantic digest of the produced tree: topology + content digests."""
     canonical = sorted(
-        (r.target, r.target_digest or "", r.byte_count if r.byte_count is not None else -1)
+        (
+            r.target,
+            r.parent or "",
+            r.order if r.order is not None else -1,
+            r.depth,
+            r.tree_path or "",
+            r.target_digest or "",
+            r.byte_count if r.byte_count is not None else -1,
+        )
         for r in results
         if r.outcome == Outcome.PASS and r.target_digest is not None
     )
     blob = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
     return _sha256_bytes(blob.encode("utf-8"))
+
+
+# ---------------------------------------------------------------------------
+# Topology validation (NA81-F7)
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class TopoResult:
+    ok: bool
+    ordered: List[PlanEntry] = field(default_factory=list)
+    depth: Dict[str, int] = field(default_factory=dict)
+    tree_path: Dict[str, str] = field(default_factory=dict)
+    reason: str = ""
+    detail: str = ""
+
+
+def _topologize(entries: List[PlanEntry]) -> TopoResult:
+    """Validate the instruction-tree topology and produce a canonical order.
+
+    Returns ``ok=True`` with a deterministically ordered entry list, or
+    ``ok=False`` with a closed reason code describing the blocking defect.
+    Runs entirely in-memory: it never writes to the filesystem.
+    """
+    by_id = {e.target: e for e in entries}
+
+    # --- Duplicate entry (same source AND target) -------------------------
+    seen_pair: Dict[Tuple[str, str], str] = {}
+    for e in entries:
+        key = (e.source, e.target)
+        if key in seen_pair:
+            return TopoResult(
+                ok=False,
+                reason=TREE_DUPLICATE_ENTRY,
+                detail=f"duplicate entry {e.source!r} -> {e.target!r}",
+            )
+        seen_pair[key] = e.target
+
+    # --- Missing parent ----------------------------------------------------
+    for e in entries:
+        if e.parent is not None and e.parent not in by_id:
+            return TopoResult(
+                ok=False,
+                reason=TREE_MISSING_PARENT,
+                detail=f"entry {e.target!r} references missing parent {e.parent!r}",
+            )
+
+    # --- Cycle detection (DFS colouring) -----------------------------------
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color: Dict[str, int] = {e.target: WHITE for e in entries}
+
+    def _dfs(target: str) -> bool:
+        color[target] = GRAY
+        parent = by_id[target].parent
+        if parent is not None:
+            if color.get(parent) == GRAY:
+                return True
+            if color.get(parent) == WHITE and _dfs(parent):
+                return True
+        color[target] = BLACK
+        return False
+
+    for e in entries:
+        if color[e.target] == WHITE and _dfs(e.target):
+            return TopoResult(
+                ok=False,
+                reason=TREE_CYCLE_DETECTED,
+                detail=f"cycle detected involving {e.target!r}",
+            )
+
+    # --- Ambiguous ordering (two siblings share an explicit order) ---------
+    groups: Dict[Optional[str], List[PlanEntry]] = defaultdict(list)
+    for e in entries:
+        groups[e.parent].append(e)
+    for parent, group in groups.items():
+        seen_orders: Dict[int, str] = {}
+        for e in group:
+            if e.order is None:
+                continue
+            if e.order in seen_orders:
+                return TopoResult(
+                    ok=False,
+                    reason=TREE_AMBIGUOUS_ORDER,
+                    detail=f"ambiguous order {e.order} under parent {parent!r}",
+                )
+            seen_orders[e.order] = e.target
+
+    # --- Kahn topological sort (deterministic sibling order) --------------
+    children: Dict[str, List[str]] = defaultdict(list)
+    indeg: Dict[str, int] = {e.target: 0 for e in entries}
+    for e in entries:
+        if e.parent is not None:
+            children[e.parent].append(e.target)
+            indeg[e.target] += 1
+
+    def _sort_key(t: str) -> Tuple[int, str]:
+        o = by_id[t].order
+        return (o if o is not None else -1, t)
+
+    heap: List[Tuple[int, str]] = []
+    for e in entries:
+        if indeg[e.target] == 0:
+            o = e.order
+            heapq.heappush(heap, (o if o is not None else -1, e.target))
+
+    ordered: List[PlanEntry] = []
+    depth: Dict[str, int] = {}
+    while heap:
+        _, target = heapq.heappop(heap)
+        e = by_id[target]
+        d = 0 if e.parent is None else depth[e.parent] + 1
+        depth[target] = d
+        ordered.append(e)
+        for child in sorted(children[target], key=_sort_key):
+            indeg[child] -= 1
+            if indeg[child] == 0:
+                co = by_id[child].order
+                heapq.heappush(heap, (co if co is not None else -1, child))
+
+    # --- Tree path provenance (root -> node) -------------------------------
+    tree_path: Dict[str, str] = {}
+    for e in ordered:
+        tree_path[e.target] = (
+            e.target if e.parent is None else tree_path[e.parent] + "/" + e.target
+        )
+
+    return TopoResult(ok=True, ordered=ordered, depth=depth, tree_path=tree_path)
 
 
 # ---------------------------------------------------------------------------
@@ -187,6 +376,11 @@ def build_governance_tree(
     Returns a `BuildResult`. A result is only `TREE_BUILD_COMPLETE` when every
     entry was copied, read back byte-exact from the FINAL output tree and the
     completion marker was written.
+
+    NA81-F7: entries are validated for instruction-tree topology before any
+    write (cycle / duplicate / missing-parent / ambiguous-order block the
+    build fail-closed) and copied in a canonical deterministic order with
+    per-entry provenance recorded in the completion evidence.
     """
     source_root = Path(source_root)
     output_root = Path(output_root)
@@ -216,6 +410,20 @@ def build_governance_tree(
                 detail="same idempotency key with a different plan digest",
             )
 
+    # --- Topology validation (before any staging write) --------------------
+    topo = _topologize(entries)
+    if not topo.ok:
+        return BuildResult(
+            outcome=Outcome.FAIL,
+            reason=topo.reason,
+            idempotency_key=idempotency_key,
+            plan_digest=plan_digest,
+            detail=topo.detail,
+        )
+    ordered_entries = topo.ordered
+    depth_map = topo.depth
+    tree_path_map = topo.tree_path
+
     staging = Path(staging_root) if staging_root else output_root.parent / (
         output_root.name + STAGING_DIRNAME + "-" + idempotency_key
     )
@@ -241,15 +449,19 @@ def build_governance_tree(
             detail=detail,
         )
 
-    # --- Stage in canonical entry order ------------------------------------
-    for entry in sorted(entries, key=lambda e: (e.target, e.source)):
+    # --- Stage in canonical topological order ------------------------------
+    for entry in ordered_entries:
         if entry.target in seen_targets:
+            idx = len(results)
             results.append(
                 EntryResult(
                     target=entry.target,
                     source=entry.source,
                     outcome=Outcome.FAIL,
                     reason=TREE_TARGET_COLLISION,
+                    parent=entry.parent,
+                    order=entry.order,
+                    index=idx,
                     detail=f"target already produced by {seen_targets[entry.target]!r}",
                 )
             )
@@ -262,12 +474,16 @@ def build_governance_tree(
         src = source_root / entry.source
         if not src.is_file():
             if entry.required:
+                idx = len(results)
                 results.append(
                     EntryResult(
                         target=entry.target,
                         source=entry.source,
                         outcome=Outcome.FAIL,
                         reason=TREE_REQUIRED_SOURCE_MISSING,
+                        parent=entry.parent,
+                        order=entry.order,
+                        index=idx,
                         detail="required source missing at build time",
                     )
                 )
@@ -283,6 +499,7 @@ def build_governance_tree(
         digest = _sha256_bytes(data)
 
         if entry.source_digest and entry.source_digest != digest:
+            idx = len(results)
             results.append(
                 EntryResult(
                     target=entry.target,
@@ -290,6 +507,9 @@ def build_governance_tree(
                     outcome=Outcome.FAIL,
                     reason=TREE_STALE_SOURCE,
                     source_digest=digest,
+                    parent=entry.parent,
+                    order=entry.order,
+                    index=idx,
                     detail="source changed since planning",
                 )
             )
@@ -306,6 +526,7 @@ def build_governance_tree(
         # Immediate staging readback: copy must be byte-exact.
         staged = dest.read_bytes()
         if staged != data or len(staged) != len(data):
+            idx = len(results)
             results.append(
                 EntryResult(
                     target=entry.target,
@@ -315,12 +536,16 @@ def build_governance_tree(
                     source_digest=digest,
                     target_digest=_sha256_bytes(staged),
                     byte_count=len(staged),
+                    parent=entry.parent,
+                    order=entry.order,
+                    index=idx,
                     detail="staged bytes differ from source bytes",
                 )
             )
             return _fail(TREE_COPY_MISMATCH, f"copy mismatch for {entry.target!r}", results)
 
         seen_targets[entry.target] = entry.source
+        idx = len(results)
         results.append(
             EntryResult(
                 target=entry.target,
@@ -330,6 +555,11 @@ def build_governance_tree(
                 source_digest=digest,
                 target_digest=_sha256_bytes(staged),
                 byte_count=len(staged),
+                parent=entry.parent,
+                order=entry.order,
+                depth=depth_map.get(entry.target, 0),
+                tree_path=tree_path_map.get(entry.target, entry.target),
+                index=idx,
                 detail="staged",
             )
         )
@@ -394,6 +624,11 @@ def build_governance_tree(
             {
                 "target": r.target,
                 "source": r.source,
+                "parent": r.parent,
+                "order": r.order,
+                "depth": r.depth,
+                "tree_path": r.tree_path,
+                "index": r.index,
                 "source_digest": r.source_digest,
                 "target_digest": r.target_digest,
                 "byte_count": r.byte_count,
