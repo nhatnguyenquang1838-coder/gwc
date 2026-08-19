@@ -264,6 +264,32 @@
       "next_node": "repo_delivery.pr-blocker-check",
       "next_action": "pr_blocker_check",
       "next_gate": "G3_PR"
+    },
+    {
+      "route_id": "g3-ci-evidence-capture",
+      "gate": "G3_PR",
+      "requested_action": "ci_evidence_capture",
+      "current_node": "validation_quality.ci-evidence-capture",
+      "node_descriptor_ref": "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/validation_quality/ci-evidence-capture.node-instruction.yaml",
+      "required_context": [
+        "g0_context",
+        "g1_decision",
+        "g2_envelope",
+        "approval_receipt",
+        "task_claim",
+        "base_sha_readback",
+        "draft_pr_result"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/ci_evidence_capture.py:capture_ci_evidence"
+      },
+      "next_node": null,
+      "next_action": "complete_delivery_evidence",
+      "next_gate": null
     }
   ]
 }
