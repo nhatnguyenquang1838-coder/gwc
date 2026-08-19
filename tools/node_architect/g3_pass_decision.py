@@ -154,4 +154,104 @@ def decide_g3_pass(evidence: Mapping[str, Any], *, replay_cache: MutableMapping[
     return result
 
 
-__all__ = ["G3_BLOCKED", "G3_CHANGES_REQUIRED", "G3_INCONCLUSIVE", "G3_PASS", "NODE_ID", "REASON_CODES", "decide_g3_pass"]
+# --- SCRUM-342 (NA81-F5-N09) bounded g3-pass-decision -----------------
+#
+# NA81 extension over the existing ``decide_g3_pass`` renderer (SCRUM-219).
+# The base renderer performs the fail-closed G3 decision with a deterministic
+# digest, replay cache and authority boundary (merge/deploy/production=False);
+# this NA81 layer adds the explicit SCRUM-342 semantics required by the current
+# NA81-F5-N09 brief that the core did not assert on its own surface:
+#
+#   * deterministic / replay idempotency -- identical inputs yield an identical
+#     na81_decision_digest (na81.deterministic / na81.idempotent);
+#   * explicit authority boundary -- no merge / approval / deployment /
+#     production authority is granted (approval_authority_granted surfaced
+#     False and the core authority boundary embedded);
+#   * fail-closed -- if the core returns a non-PASS outcome caused by
+#     EVIDENCE_REJECTED / HEAD_DRIFT / REQUIRED_EVIDENCE_MISSING the NA81
+#     result stays BLOCKED (never silently passes);
+#   * explicit non-authoritative guarantee with a stable decision_digest.
+#
+# Backward-compatible: ``decide_g3_pass`` is unchanged and is reused as the
+# core. The NA81 result embeds the core decision under ``decision`` and surfaces
+# the NA81 assertions under ``na81``.
+_NA81_BLOCKING_REASONS = frozenset({"EVIDENCE_REJECTED", "HEAD_DRIFT", "REQUIRED_EVIDENCE_MISSING"})
+_NA81_IDENTITY_FIELDS = (
+    "task_id", "repository", "branch", "base_sha", "head_sha",
+    "scope_hash", "graph_revision", "policy_digest", "idempotency_key",
+)
+
+
+def decide_g3_pass_na81(
+    evidence: Mapping[str, Any],
+    *,
+    replay_cache: MutableMapping[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """NA81 g3-pass-decision semantics over the decide_g3_pass core (SCRUM-342).
+
+    Reuses ``decide_g3_pass`` as the fail-closed G3 decision core (VERIFIED_REUSE
+    of the SCRUM-219 renderer) and layers the explicit SCRUM-342 NA81-F5-N09
+    guarantees on top. Pure and read-only: no connector call, network request,
+    filesystem mutation, Jira transition, branch/PR action, approval, merge,
+    deployment or production operation. The returned ``decision`` is the closed,
+    schema-valid ``g3-pass-decision`` artifact; ``na81`` carries the explicit
+    semantic guarantees.
+
+    G3 PASS never grants merge authority; standing pre-prod authority is
+    evaluated separately. This function is mechanical only -- it does not and
+    cannot perform any autonomous merge/main action.
+    """
+    core = decide_g3_pass(evidence, replay_cache=replay_cache)
+
+    core_reasons = frozenset(core.get("reason_codes", []))
+    blocking_present = bool(core_reasons & _NA81_BLOCKING_REASONS)
+
+    # Fail-closed: NA81 never upgrades a blocked decision to PASS, and any
+    # evidence-blocking reason keeps the decision BLOCKED (never silently pass).
+    na81_outcome = core["outcome"]
+    if blocking_present:
+        na81_outcome = G3_BLOCKED
+    na81_reasons = list(core["reason_codes"])
+    if blocking_present and "NA81_FAIL_CLOSED" not in na81_reasons:
+        na81_reasons = sorted(set(na81_reasons) | {"NA81_FAIL_CLOSED"})
+
+    identity = {field: core.get(field, "") for field in _NA81_IDENTITY_FIELDS}
+    authority_boundary = _authority_boundary()
+
+    na81 = {
+        "deterministic": True,
+        "idempotent": True,
+        "fail_closed": bool(blocking_present),
+        "non_authoritative": True,
+        "approval_authority_granted": False,
+        "authority_boundary": authority_boundary,
+    }
+
+    na81_basis = {
+        "identity": identity,
+        "outcome": na81_outcome,
+        "reason_codes": na81_reasons,
+        "decision_digest": core["decision_digest"],
+    }
+    na81_decision_digest = _digest(na81_basis)
+
+    return {
+        "schema_version": "1.0",
+        "artifact_type": "g3-pass-decision-na81",
+        "node_id": NODE_ID,
+        **identity,
+        "decision": core,
+        "na81": na81,
+        "outcome": na81_outcome,
+        "reason_codes": na81_reasons,
+        "input_digest": core["input_digest"],
+        "decision_digest": core["decision_digest"],
+        "na81_decision_digest": na81_decision_digest,
+        "transition_effect_applied": False,
+        "replayed": bool(core.get("replayed", False)),
+        **authority_boundary,
+        "approval_authority_granted": False,
+    }
+
+
+__all__ = ["G3_BLOCKED", "G3_CHANGES_REQUIRED", "G3_INCONCLUSIVE", "G3_PASS", "NODE_ID", "REASON_CODES", "decide_g3_pass", "decide_g3_pass_na81"]
