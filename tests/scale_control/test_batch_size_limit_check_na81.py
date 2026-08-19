@@ -46,7 +46,7 @@ import sys
 import tempfile
 import unittest
 
-sys.path.insert(0, "/home/ubuntu/gwc-ctrl-r10/.wt/SCRUM-371/tools")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "tools")))
 from node_architect import batch_size_limit_check as bslc  # noqa: E402
 
 try:
