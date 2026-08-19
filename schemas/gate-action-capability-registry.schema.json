@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-action-capability-registry.schema.json",
+  "title": "GWC Gate Action Capability Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "capabilities", "actions"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-action-capability-registry"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "capabilities": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["mutating", "description"],
+        "properties": {
+          "mutating": {"type": "boolean"},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "actions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability", "transitive_policy"],
+        "properties": {
+          "capability": {"type": "string", "minLength": 1},
+          "transitive_policy": {
+            "enum": ["NO_TRANSITIVE_MUTATION", "GRAPH_OR_TRUSTED_PROFILE_REQUIRED"]
+          }
+        }
+      }
+    }
+  }
+}

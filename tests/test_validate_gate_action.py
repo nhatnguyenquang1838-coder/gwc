@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 
+from tools.gate_effect_authority import canonical_digest
 from tools.validate_gate_action import canonical_scope_hash, validate
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -115,6 +116,31 @@ def g4_merge_packet(
         value["evidence_readback"]["g4_authority_receipt"] = authority or g4_authority_receipt()
     if include_evidence:
         value["evidence_readback"]["g4_pr_evidence_receipt"] = evidence or g4_pr_evidence_receipt()
+    profile = {
+        "schema_version": "1.0",
+        "artifact_type": "gate-action-effect-profile",
+        "profile_id": "legacy-g4-no-transitive-mutation",
+        "profile_version": "1",
+        "profile_kind": "NO_TRANSITIVE_MUTATION",
+        "current": True,
+        "complete": True,
+        "action_identity": {
+            "repository": value["repository"],
+            "event_id_or_idempotency_key": value["evidence_readback"]["event_id_or_idempotency_key"],
+            "action": value["action"],
+            "branch": value["working_branch"],
+            "pr_number": 271,
+            "sha": value["head_sha"],
+            "sha_kind": "pr_head",
+            "gate": value["gate"],
+            "node": "G4/merge",
+        },
+        "effects": [],
+    }
+    value["trusted_effect_profile_ref"] = "profile:legacy-g4-no-transitive-mutation@1"
+    value["trusted_effect_profile"] = profile
+    value["trusted_effect_profile_digest"] = canonical_digest(profile)
+    value["evidence_readback"]["effect_policy_digest"] = value["trusted_effect_profile_digest"]
     value["scope_hash"] = canonical_scope_hash(value)
     value["evidence_readback"]["scope_hash"] = value["scope_hash"]
     return value
@@ -160,8 +186,17 @@ class GateActionAuthorityTests(unittest.TestCase):
         value["scope_hash"] = canonical_scope_hash(value); value["evidence_readback"]["action"] = value["action"]; value["evidence_readback"]["scope_hash"] = value["scope_hash"]
         self.assertTrue(any("not valid for G2_EXECUTION" in e for e in validate(value, schema_path=ROOT / "schemas/gate-action-authority.schema.json")))
 
-    def test_legacy_g4_merge_passes_with_authority_receipt_only(self):
+    def test_legacy_g4_merge_passes_with_authority_receipt_and_trusted_profile(self):
         self.assertEqual([], self.validate_g4(g4_merge_packet(include_evidence=False)))
+
+    def test_legacy_g4_merge_without_effect_policy_fails_closed(self):
+        value = g4_merge_packet(include_evidence=False)
+        value.pop("trusted_effect_profile_ref")
+        value.pop("trusted_effect_profile_digest")
+        value.pop("trusted_effect_profile")
+        value["evidence_readback"].pop("effect_policy_digest")
+        rehash(value)
+        self.assertIn("EFFECT_GRAPH_REQUIRED", self.validate_g4(value))
 
     def test_autonomous_g4_merge_requires_pr_evidence_receipt(self):
         value = g4_merge_packet(include_evidence=False)

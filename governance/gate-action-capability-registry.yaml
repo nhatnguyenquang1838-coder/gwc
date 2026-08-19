@@ -1,0 +1,58 @@
+schema_version: '1.0'
+artifact_type: gate-action-capability-registry
+registry_id: gwc-gate-action-capabilities
+capabilities:
+  READ_ONLY:
+    mutating: false
+    description: Observe repository/runtime state without mutation.
+  COMPUTE:
+    mutating: false
+    description: Deterministic local/read-only computation or validation.
+  GUARDED_REPO_WRITE:
+    mutating: true
+    description: Bounded repository or guarded-branch mutation.
+  PR_MUTATION:
+    mutating: true
+    description: Pull-request state or metadata mutation.
+  MERGE:
+    mutating: true
+    description: Merge an approved pull request.
+  RELEASE_PUBLISH:
+    mutating: true
+    description: Release or publish an artifact without destructive retention semantics.
+  DESTRUCTIVE:
+    mutating: true
+    description: Delete, retention, purge, or destructive state change.
+  PRODUCTION_DATA_CONFIG:
+    mutating: true
+    description: Production data or production configuration mutation.
+  SECRET_CREDENTIAL:
+    mutating: true
+    description: Secret or credential mutation/rotation.
+  MIGRATION:
+    mutating: true
+    description: Schema/data/runtime migration.
+actions:
+  read_repository: {capability: READ_ONLY, transitive_policy: NO_TRANSITIVE_MUTATION}
+  inspect_connector: {capability: READ_ONLY, transitive_policy: NO_TRANSITIVE_MUTATION}
+  inspect_task: {capability: READ_ONLY, transitive_policy: NO_TRANSITIVE_MUTATION}
+  materialize_g1_artifacts: {capability: COMPUTE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  run_read_only_validation: {capability: COMPUTE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  create_guarded_branch_or_worktree: {capability: GUARDED_REPO_WRITE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  modify_approved_files: {capability: GUARDED_REPO_WRITE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  run_sandboxed_validation: {capability: COMPUTE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  stage: {capability: GUARDED_REPO_WRITE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  create_commit: {capability: GUARDED_REPO_WRITE, transitive_policy: NO_TRANSITIVE_MUTATION}
+  push_working_branch: {capability: GUARDED_REPO_WRITE, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  open_or_update_draft_pr: {capability: PR_MUTATION, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  mark_pr_ready_for_review: {capability: PR_MUTATION, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  run_independent_review: {capability: READ_ONLY, transitive_policy: NO_TRANSITIVE_MUTATION}
+  merge_approved_pr: {capability: MERGE, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  verify_post_merge_ci: {capability: READ_ONLY, transitive_policy: NO_TRANSITIVE_MUTATION}
+  deploy_approved_release: {capability: RELEASE_PUBLISH, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  reload_approved_runtime: {capability: RELEASE_PUBLISH, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  production_data_read: {capability: READ_ONLY, transitive_policy: NO_TRANSITIVE_MUTATION}
+  production_data_write: {capability: PRODUCTION_DATA_CONFIG, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  production_config_change: {capability: PRODUCTION_DATA_CONFIG, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  credential_rotation: {capability: SECRET_CREDENTIAL, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}
+  migration: {capability: MIGRATION, transitive_policy: GRAPH_OR_TRUSTED_PROFILE_REQUIRED}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/gate-action-effect-profile.schema.json",
+  "title": "GWC Gate Action Trusted Effect Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "profile_id", "profile_version", "profile_kind", "current", "complete", "action_identity", "effects"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "gate-action-effect-profile"},
+    "profile_id": {"type": "string", "minLength": 1},
+    "profile_version": {"type": "string", "minLength": 1},
+    "profile_kind": {"enum": ["NO_TRANSITIVE_MUTATION", "BOUNDED_TRANSITIVE_EFFECTS"]},
+    "current": {"const": true},
+    "complete": {"const": true},
+    "action_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "event_id_or_idempotency_key", "action", "sha", "sha_kind", "gate", "node"],
+      "properties": {
+        "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+        "event_id_or_idempotency_key": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "branch": {"type": ["string", "null"]},
+        "pr_number": {"type": ["integer", "null"], "minimum": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "sha_kind": {"enum": ["branch_head", "pr_head", "merge_commit", "release_commit", "runtime_revision"]},
+        "workflow_run_id": {"type": ["string", "null"]},
+        "gate": {"type": "string", "minLength": 1},
+        "node": {"type": "string", "minLength": 1}
+      }
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["effect_id", "edge_state", "repository", "environment", "capability"],
+        "properties": {
+          "effect_id": {"type": "string", "minLength": 1},
+          "parent_effect_id": {"type": ["string", "null"]},
+          "edge_state": {"enum": ["deterministic", "conditional"]},
+          "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+          "environment": {"type": "string", "minLength": 1},
+          "capability": {"type": "string", "minLength": 1},
+          "required_authority": {"type": ["string", "null"]},
+          "predicate": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["state"],
+            "properties": {
+              "state": {"enum": ["false", "true", "unknown"]},
+              "evidence_identity_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"edge_state": {"const": "conditional"}}, "required": ["edge_state"]},
+            "then": {"required": ["predicate"]}
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"profile_kind": {"const": "NO_TRANSITIVE_MUTATION"}}, "required": ["profile_kind"]},
+      "then": {"properties": {"effects": {"maxItems": 0}}}
+    }
+  ]
+}
