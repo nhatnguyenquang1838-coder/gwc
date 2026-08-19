@@ -1,0 +1,139 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+gate:
+- G3_PR
+node_id: scale_control.execution-throttle-control
+purpose: >-
+  Apply bounded execution throttling as a deterministic capacity control that
+  admits at most one sequential implementation batch with bounded parallelism,
+  preserving active-lane ordering and never granting task or gate authority.
+entry_conditions:
+- GWC boot completed
+- agent task claim read back
+- G0 and G1 evidence loaded
+- exact pre-prod base/head SHA read back
+inputs:
+- task_identity
+- batch_identity
+- active_implementation_batch_ids
+- capacity_signal
+- failure_rate_signal
+- previous_batch_terminal_state
+allowed_actions:
+- compute_allowed_parallelism
+- evaluate_capacity_bound
+- evaluate_failure_rate_signal
+- decide_throttle_admission
+- emit_throttle_decision
+forbidden_actions:
+- grant_gate_authority
+- grant_g2_authority
+- grant_g3_authority
+- merge
+- auto_merge
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credential_change
+- secret_change
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+outputs:
+- allowed_parallelism
+- throttle_decision
+- throttle_reason_code
+- execution_allowed
+evidence_required:
+- node-start
+- node-decision
+- node-result
+- node-readback
+- checkpoint
+- runtime-event
+- next-route-decision
+logs_required:
+- runtime-events.jsonl
+- decision_digest
+- state_digest
+- event_digest
+next:
+  pass:
+    disposition: continue
+    reason: Throttle decision admitted the bounded batch; continue only through the canonical active-lane route.
+    next_node: scale_control.batch-admission-check
+    next_action: continue_batch_admission
+    next_gate: null
+  blocked:
+    disposition: stop
+    reason: Fail closed and report the stable throttle blocker without invoking later effects.
+    next_node: null
+    next_action: stop_and_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Persist a checkpoint and reconcile the pending capacity signal before continuation.
+    next_node: null
+    next_action: persist_checkpoint_and_wait
+    next_gate: null
+  retry:
+    disposition: retry
+    reason: Replay only after idempotency and readback reconciliation pass.
+    next_node: null
+    next_action: reconcile_then_retry
+    next_gate: null
+retry:
+  idempotency_key_fields:
+  - task_id
+  - batch_id
+  - head_sha
+  replay_check: >-
+    Read canonical node evidence and re-evaluate deterministic capacity inputs
+    before repeating the throttle decision.
+  max_attempts: 3
+  pending_reconciliation: >-
+    Unknown or pending capacity signals must route to checkpoint/reconciliation;
+    never repeat blindly.
+rollback:
+  reversible: true
+  strategy: >-
+    Throttle decisions are advisory capacity controls; restore only reversible
+    task-scoped effects and re-read active-lane ordering.
+  reconciliation: Record rollback or no-op readback in the canonical node evidence ledger.
+  human_required_when:
+  - scope drift
+  - authority mismatch
+  - unknown external effect
+  - irreversible effect
+authority_boundary:
+  statement: >-
+    Node instructions constrain execution throttling and do not grant G2, G3,
+    G4, G5, or G6 authority, task authority, or gate authority.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes:
+  - normal
+  - fastlane
+  - e2e
+  - hotfix
+  - rescue
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: true
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true
