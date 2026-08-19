@@ -532,3 +532,159 @@ def decide_projection_privacy(
         "sanitized_digest": sanitized_digest,
         "decision_digest": decision_digest,
     }
+
+
+# ---------------------------------------------------------------------------
+# NA81 (SCRUM-351 / GitHub #286) explicit privacy-boundary assertion layer.
+#
+# Reuses the SCRUM-228 ``decide_projection_privacy`` core (closed,
+# fail-closed classification) and asserts the explicit SCRUM-351 guarantees
+# that consumers (SCRUM-343 / SCRUM-344 / SCRUM-345) rely on before any
+# projection intent is emitted:
+#
+#   * every field resolves deterministically to ALLOW / SANITIZE / DENY;
+#   * an unknown classification fails closed (never projected);
+#   * secrets / credentials / prohibited data never reach the output;
+#   * the boundary decision is never authoritative (read-only only).
+#
+# The base core is unchanged and reused as the decision engine. This layer is
+# additive: it does not mutate the base decision, the node descriptor, or any
+# ``*.node.json`` provenance field.
+# ---------------------------------------------------------------------------
+
+NA81_ARTIFACT_TYPE = "projection-privacy-boundary-decision"
+
+# Deterministic per-field dispositions required by SCRUM-351.
+DISPOSITION_ALLOW = "ALLOW"
+DISPOSITION_SANITIZE = "SANITIZE"
+DISPOSITION_DENY = "DENY"
+DISPOSITION_UNKNOWN_FAIL_CLOSED = "UNKNOWN_FAIL_CLOSED"
+
+
+def na81_disposition_for(
+    key: str,
+    classification: str | None,
+    classification_map: dict[str, str],
+) -> str:
+    """Deterministically map one field to ALLOW / SANITIZE / DENY / UNKNOWN_FAIL_CLOSED.
+
+    SCRUM-351 requires every field to resolve to exactly one disposition before
+    any projection intent is emitted. An explicit but unrecognized classification
+    fails closed (DENY / ``UNKNOWN_FAIL_CLOSED``) and must never be projected; a
+    mandatory protected key without a classification also fails closed.
+    """
+    if classification in CLASSIFICATIONS:
+        cls = classification
+    elif key in classification_map:
+        cls = classification_map[key]
+    elif classification in (None, ""):
+        # No hint: protected keys fail closed; other keys default to ALLOW (public).
+        return DISPOSITION_UNKNOWN_FAIL_CLOSED if _is_protected_key(key) else DISPOSITION_ALLOW
+    else:
+        # Explicit but unrecognized classification -> fail closed.
+        return DISPOSITION_UNKNOWN_FAIL_CLOSED
+
+    if cls in PROHIBITED or cls == "HIDDEN_REASONING":
+        return DISPOSITION_DENY
+    if cls in RESTRICTED:
+        return DISPOSITION_SANITIZE
+    return DISPOSITION_ALLOW
+
+
+def decide_projection_privacy_na81(
+    *,
+    task_id: str,
+    repository: str,
+    projection_target: str,
+    source_authority_decision: dict[str, object],
+    candidate_payload: dict[str, object],
+    field_classifications: list[dict[str, str]],
+    redaction_policy: dict[str, object],
+    expected_sanitized_digest: str | None = None,
+    evaluated_at: str | None = None,
+) -> dict[str, object]:
+    """Return an NA81-bounded projection-privacy-boundary decision.
+
+    The base SCRUM-228 decision is reused as the privacy engine; this layer
+    adds the explicit SCRUM-351 assertions and a consumer-bindable
+    ``privacy_boundary_digest`` (the base ``decision_digest``). The base
+    decision is preserved verbatim under ``privacy_decision`` so the underlying
+    provenance is untouched.
+    """
+
+    # Explicit SCRUM-351 pre-flight: detect unknown classifications (fail closed).
+    unknown_classification_detected = False
+    if isinstance(field_classifications, list):
+        for entry in field_classifications:
+            if isinstance(entry, dict):
+                cls = entry.get("classification")
+                if isinstance(cls, str) and cls and cls not in CLASSIFICATIONS:
+                    unknown_classification_detected = True
+
+    def _run() -> dict[str, object]:
+        return decide_projection_privacy(
+            task_id=task_id,
+            repository=repository,
+            projection_target=projection_target,
+            source_authority_decision=source_authority_decision,
+            candidate_payload=candidate_payload,
+            field_classifications=field_classifications,
+            redaction_policy=redaction_policy,
+            expected_sanitized_digest=expected_sanitized_digest,
+            evaluated_at=evaluated_at,
+        )
+
+    base = _run()
+    # Replay for determinism / idempotency assertion.
+    replay = _run()
+    deterministic = replay.get("decision_digest") == base.get("decision_digest")
+
+    # Explicit non-authoritative guarantee.
+    non_authoritative = (
+        base.get("read_only_projection") is True
+        and all(
+            base.get(k) is False
+            for k in (
+                "write_authority_granted",
+                "approval_authority_granted",
+                "merge_authority_granted",
+                "deployment_authority_granted",
+                "production_authority_granted",
+            )
+        )
+    )
+
+    # No secrets / credentials: leak scan on the final sanitized output.
+    leak = set()
+    _leak_scan(base.get("sanitized_payload", {}), leak)
+    no_secrets_credentials = not leak
+
+    # Unknown classification fails closed: never yields a READY projection.
+    unknown_classification_fail_closed = (not unknown_classification_detected) or (
+        base.get("outcome") == "BLOCKED"
+    )
+
+    privacy_boundary_digest = base.get("decision_digest", _ZERO_DIGEST)
+
+    na81 = {
+        "deterministic": deterministic,
+        "non_authoritative": non_authoritative,
+        "no_secrets_credentials": no_secrets_credentials,
+        "unknown_classification_fail_closed": unknown_classification_fail_closed,
+        "unknown_classification_detected": unknown_classification_detected,
+        "privacy_boundary_digest": privacy_boundary_digest,
+    }
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "artifact_type": NA81_ARTIFACT_TYPE,
+        "task_id": base.get("task_id"),
+        "repository": base.get("repository"),
+        "projection_target": base.get("projection_target"),
+        "outcome": base.get("outcome"),
+        "reason_code": base.get("reason_code"),
+        "privacy_status": base.get("privacy_status"),
+        "privacy_boundary_digest": privacy_boundary_digest,
+        "privacy_decision": base,
+        "na81": na81,
+    }
