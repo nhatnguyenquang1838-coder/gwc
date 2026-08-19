@@ -1,0 +1,130 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+node_id: validation_quality.ci-evidence-capture
+gate:
+- G3_PR
+purpose: Capture exact-current-head CI/check evidence for the approved PR head SHA and classify only PASS, FAIL, PENDING, or observability-unavailable; bind the G4 GitHub merge event and G5 post-merge runs to the exact head/merge commit as canonical machine evidence while the PR status comment is human traceability only. CI status grants no merge authority.
+entry_conditions:
+- G3 authority validated independently
+- route decision selected this node
+- approved branch/scope/base-sha loaded
+- node-start evidence recorded before the capture
+- task-scoped head SHA known and reconciled to approved scope
+inputs:
+- g2_envelope
+- approval_receipt
+- approved_paths
+- working_branch
+- base_sha
+- head_sha
+- scope_hash
+- idempotency_key
+allowed_actions:
+- reconcile_pr_head_state
+- capture_ci_evidence
+- record_ci_observation
+- request_effect_readback
+forbidden_actions:
+- grant_gate_authority
+- grant_g2_authority
+- grant_g3_authority
+- merge
+- auto_merge
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credential_change
+- secret_change
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+outputs:
+- ci_capture_decision
+- ci_capture_result
+- pending_action_or_idempotency_readback
+evidence_required:
+- node-start
+- node-decision
+- node-result
+- node-readback
+- checkpoint
+- runtime-event
+- next-route-decision
+logs_required:
+- runtime-events.jsonl
+- decision_digest
+- state_digest
+- event_digest
+retry:
+  idempotency_key_fields:
+  - task_id
+  - run_id
+  - node_id
+  - scope_hash
+  replay_check: Read canonical node evidence and the existing CI observation readback before repeating the capture.
+  max_attempts: 3
+  pending_reconciliation: Unknown or pending CI effects must route to checkpoint/reconciliation; never repeat blindly.
+rollback:
+  reversible: true
+  strategy: Reconcile current CI observation state against the approved scope and restore only reversible task-scoped effects.
+  reconciliation: Record rollback or no-op readback in the canonical node evidence ledger.
+  human_required_when:
+  - scope drift
+  - authority mismatch
+  - unknown external effect
+  - irreversible effect
+authority_boundary:
+  statement: Node instructions constrain execution and do not grant G2, G3, G4, G5, or G6 authority. CI evidence capture is observability only; merge/promotion to pre-prod or main remains Human-G4.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes:
+  - normal
+  - fastlane
+  - e2e
+  - hotfix
+  - rescue
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: true
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true
+next:
+  pass:
+    disposition: continue
+    reason: Node outcome passed; delivery evidence captured and bound to the approved PR head; flow terminates GREEN at G3.
+    next_node: null
+    next_action: complete_delivery_evidence
+    next_gate: null
+  blocked:
+    disposition: stop
+    reason: Fail closed and report the stable blocker without invoking later effects.
+    next_node: null
+    next_action: stop_and_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Persist a checkpoint and reconcile the pending CI observation state before continuation.
+    next_node: null
+    next_action: persist_checkpoint_and_wait
+    next_gate: null
+  retry:
+    disposition: retry
+    reason: Replay only after idempotency and readback reconciliation pass.
+    next_node: null
+    next_action: reconcile_then_retry
+    next_gate: null

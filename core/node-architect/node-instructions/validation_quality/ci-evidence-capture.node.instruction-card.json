@@ -1,0 +1,64 @@
+{
+  "node_id": "validation_quality.ci-evidence-capture",
+  "gate": "G3_PR",
+  "purpose": "Capture exact-current-head CI/check evidence for the approved PR head SHA and classify only PASS, FAIL, PENDING, or observability-unavailable; bind the G4 GitHub merge event and G5 post-merge runs to the exact head/merge commit as canonical machine evidence while the PR status comment is human traceability only. CI status grants no merge authority.",
+  "entry_conditions": {
+    "prerequisite_gate": "G3_PR",
+    "artifacts_required": ["g2_envelope", "approval_receipt", "draft_pr_result"],
+    "conditions": [
+      {"type": "state_match", "expression": "route_decision.selected_node == validation_quality.ci-evidence-capture"},
+      {"type": "artifact_exists", "expression": "approved_branch_and_scope_loaded"}
+    ]
+  },
+  "inputs": {
+    "required": [
+      {"name": "g2_envelope", "type": "object", "description": "G2 execution envelope binding task, base sha, branch, scope hash"},
+      {"name": "approval_receipt", "type": "object", "description": "Standing G4 / approval receipt validating authority"},
+      {"name": "working_branch", "type": "branch", "description": "Guarded branch under capture"},
+      {"name": "base_sha", "type": "sha", "description": "Approved base SHA"},
+      {"name": "head_sha", "type": "sha", "description": "Task-scoped PR head SHA"},
+      {"name": "scope_hash", "type": "string", "description": "Approved scope hash"}
+    ],
+    "optional": [
+      {"name": "idempotency_key", "type": "string", "description": "Idempotency key for replay safety", "default": ""}
+    ]
+  },
+  "allowed_actions": ["read_repository", "read_gate_artifact", "persist_evidence", "emit_event", "create_checkpoint", "resolve_route", "validate_schema", "execute_validator", "read_state", "update_state"],
+  "forbidden_actions": ["merge", "auto_merge", "deploy", "redeploy", "release", "publish", "production_config", "credential_rotation", "production_data", "migration", "secret_access", "branch_delete", "force_push", "rewrite_history"],
+  "outputs": {
+    "required_artifacts": ["ci_capture_decision", "ci_capture_result", "pending_action_or_idempotency_readback"],
+    "evidence_contract": "canonical_node_evidence_ledger",
+    "logs_contract": "runtime_events_jsonl"
+  },
+  "evidence_required": {
+    "type": "emitted",
+    "schema": "schemas/node-architect/ci-evidence-capture.schema.json",
+    "location": "core/node-architect/node-instructions/validation_quality/ci-evidence-capture.evidence.json"
+  },
+  "logs_required": {
+    "type": "event",
+    "format": "json",
+    "persistence": "checkpoint"
+  },
+  "next": {
+    "next_node": null,
+    "next_gate": null,
+    "next_route": "complete_delivery_evidence",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff": "exponential",
+    "retryable_errors": ["ci_pending", "observability_unavailable"]
+  },
+  "rollback": {
+    "prerequisite": "node-start evidence recorded",
+    "action": "restore_checkpoint",
+    "conditions": ["scope_drift", "authority_mismatch", "unknown_external_effect", "irreversible_effect"]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": false,
+    "grants_merge_authority": false
+  }
+}

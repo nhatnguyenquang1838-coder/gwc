@@ -50,6 +50,22 @@ def digest_payload(payload: Any) -> str:
     return "sha256:" + hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
 
 
+def bridge_node_identity(raw_id: str) -> str:
+    """Normalize a node identity to its canonical descriptor form.
+
+    The catalog descriptor id is kebab-case (e.g.
+    ``validation-quality-ci-evidence-capture``) while the runtime/card/registry/route
+    identifiers use the dotted form (``validation_quality.ci-evidence-capture``). Both
+    refer to the same logical node. Normalizing ``.`` and ``_`` to ``-`` reconciles
+    them deterministically.
+
+    This bridge is used only for identity reconciliation in instruction validation;
+    it never mutates the catalog descriptor (which remains kebab-case) so catalog
+    family validation stays green.
+    """
+    return str(raw_id or "").replace(".", "-").replace("_", "-")
+
+
 def load_data(path: Path) -> Any:
     text = path.read_text(encoding="utf-8")
     return json.loads(text) if path.suffix.lower() == ".json" else yaml.safe_load(text)
@@ -86,10 +102,10 @@ def validate_instruction(
         codes.append("NODE_INSTRUCTION_INVALID")
 
     identities = {
-        node_id,
-        str(descriptor.get("node_id", "")),
-        str(registry_node.get("id", "")),
-        str(route.get("current_node", "")),
+        bridge_node_identity(node_id),
+        bridge_node_identity(descriptor.get("node_id", "")),
+        bridge_node_identity(registry_node.get("id", "")),
+        bridge_node_identity(route.get("current_node", "")),
     }
     if len(identities) != 1 or "" in identities:
         codes.append("NODE_INSTRUCTION_INVALID")
@@ -186,15 +202,30 @@ def validate_instruction_path(
         if not all(isinstance(item, Mapping) for item in (card, schema, descriptor, registry, profile)):
             raise ValueError("instruction validation inputs must be objects")
         node_id = str(card.get("node_id", ""))
-        registry_node = next((node for node in registry.get("nodes", []) if node.get("id") == node_id), {})
-        routes = [route for route in profile.get("routes", []) if route.get("current_node") == node_id and route.get("gate") == active_gate]
+        routes = [route for route in profile.get("routes", []) if isinstance(route, Mapping) and route.get("current_node") == node_id and route.get("gate") == active_gate]
         if route_id:
             routes = [route for route in routes if route.get("route_id") == route_id]
         if len(routes) != 1:
             raise ValueError("instruction must resolve to exactly one route")
+        route = routes[0]
+        # B2 identity bridge: resolve the descriptor identity through the registry
+        # entry whose provenance.source_path matches the route descriptor path
+        # (registry_provenance_source_path_identity_bridge). Fail closed on
+        # missing or ambiguous provenance so a mismatched/duplicate descriptor
+        # source path can never silently bind to the wrong runtime node.
+        descriptor_ref = str(route.get("node_descriptor_ref", ""))
+        registry_nodes = registry.get("nodes", []) if isinstance(registry, Mapping) else []
+        matched = [
+            node for node in registry_nodes
+            if isinstance(node, Mapping)
+            and str((node.get("provenance", {}) or {}).get("source_path", "")) == descriptor_ref
+        ]
+        if len(matched) != 1:
+            raise ValueError("descriptor must resolve to exactly one registry node via provenance.source_path")
+        registry_node = matched[0]
         return validate_instruction(
             card=card, schema=schema, descriptor=descriptor,
-            registry_node=registry_node, route=routes[0], active_gate=active_gate, mode=mode,
+            registry_node=registry_node, route=route, active_gate=active_gate, mode=mode,
         )
     except Exception:
         return InstructionValidationReport(
