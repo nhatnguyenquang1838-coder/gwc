@@ -9,8 +9,12 @@ explicit authority-negative contract.
 
 from __future__ import annotations
 
+import json
+import os
+import tempfile
 import unittest
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any, Dict, Tuple
 
 from tools.node_architect.schema_validation import (
     ARTIFACT_INVALID,
@@ -19,6 +23,7 @@ from tools.node_architect.schema_validation import (
     FAIL,
     PASS,
     SCHEMA_AMBIGUOUS,
+    SCHEMA_INVALID,
     SCHEMA_MALFORMED,
     SCHEMA_MISSING,
     SCHEMA_UNSUPPORTED,
@@ -219,6 +224,120 @@ class SchemaValidationM5Tests(unittest.TestCase):
             "production_authority_granted",
         ):
             self.assertFalse(r[field], f"{field} must be False")
+
+    # --- canonical schema self-validation (G3 review fix) -----------------
+
+    def _save_schema_state(self) -> Tuple[Any, ...]:
+        import tools.node_architect.schema_validation as sv
+
+        return (
+            sv._SCHEMA_PATH,
+            sv._SCHEMA,
+            sv._SCHEMA_VALIDATOR,
+            sv._SCHEMA_INVALID_REASON,
+            dict(sv._SUPPORTED_SCHEMAS),
+        )
+
+    def _restore_schema_state(self, saved: Tuple[Any, ...]) -> None:
+        import tools.node_architect.schema_validation as sv
+
+        sv._SCHEMA_PATH = saved[0]
+        sv._SCHEMA = saved[1]
+        sv._SCHEMA_VALIDATOR = saved[2]
+        sv._SCHEMA_INVALID_REASON = saved[3]
+        sv._SUPPORTED_SCHEMAS.clear()
+        sv._SUPPORTED_SCHEMAS.update(saved[4])
+
+    def _write_temp_schema(self, content: Dict[str, Any]) -> str:
+        fd, path = tempfile.mkstemp(suffix=".json")
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            json.dump(content, fh)
+        return path
+
+    def test_load_and_register_rejects_invalid_schema(self):
+        """An invalid-but-parseable canonical schema fails closed (check_schema)."""
+        import tools.node_architect.schema_validation as sv
+
+        path = self._write_temp_schema(
+            {"type": 123, "properties": {"x": {"type": "string"}}}
+        )
+        saved = self._save_schema_state()
+        try:
+            sv._SCHEMA_PATH = Path(path)
+            sv._SCHEMA = None
+            sv._SCHEMA_VALIDATOR = None
+            sv._SCHEMA_INVALID_REASON = None
+            sv._SUPPORTED_SCHEMAS.clear()
+            sv._load_and_register()
+            self.assertEqual(sv._SCHEMA_INVALID_REASON, SCHEMA_INVALID)
+            self.assertIsNone(sv._SCHEMA_VALIDATOR)
+            self.assertNotIn(RUNTIME_NODE_SCHEMA_ID, sv._SUPPORTED_SCHEMAS)
+        finally:
+            self._restore_schema_state(saved)
+            os.unlink(path)
+
+    def test_load_and_register_rejects_id_mismatch(self):
+        """A valid schema with the wrong $id fails closed (identity binding)."""
+        import tools.node_architect.schema_validation as sv
+
+        path = self._write_temp_schema(
+            {
+                "$id": "https://wrong.example/x.json",
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {"a": {"type": "string"}},
+                "required": ["a"],
+                "additionalProperties": False,
+            }
+        )
+        saved = self._save_schema_state()
+        try:
+            sv._SCHEMA_PATH = Path(path)
+            sv._SCHEMA = None
+            sv._SCHEMA_VALIDATOR = None
+            sv._SCHEMA_INVALID_REASON = None
+            sv._SUPPORTED_SCHEMAS.clear()
+            sv._load_and_register()
+            self.assertEqual(sv._SCHEMA_INVALID_REASON, SCHEMA_INVALID)
+            self.assertIsNone(sv._SCHEMA_VALIDATOR)
+        finally:
+            self._restore_schema_state(saved)
+            os.unlink(path)
+
+    def test_load_and_register_accepts_valid_schema(self):
+        """The real canonical schema passes check_schema + $id and registers."""
+        import tools.node_architect.schema_validation as sv
+
+        saved = self._save_schema_state()
+        try:
+            sv._SCHEMA = None
+            sv._SCHEMA_VALIDATOR = None
+            sv._SCHEMA_INVALID_REASON = None
+            sv._SUPPORTED_SCHEMAS.clear()
+            sv._load_and_register()
+            self.assertIsNone(sv._SCHEMA_INVALID_REASON)
+            self.assertIsNotNone(sv._SCHEMA_VALIDATOR)
+            self.assertIn(RUNTIME_NODE_SCHEMA_ID, sv._SUPPORTED_SCHEMAS)
+            self.assertEqual(
+                sv._SUPPORTED_SCHEMAS[RUNTIME_NODE_SCHEMA_ID][0].get("$id"),
+                RUNTIME_NODE_SCHEMA_ID,
+            )
+        finally:
+            self._restore_schema_state(saved)
+
+    def test_fails_closed_end_to_end_on_invalid_schema(self):
+        """When the canonical schema is invalid, validate_schema fails closed."""
+        import tools.node_architect.schema_validation as sv
+
+        saved = self._save_schema_state()
+        try:
+            sv._SCHEMA_INVALID_REASON = SCHEMA_INVALID
+            sv._SCHEMA_VALIDATOR = None
+            r = result(artifact=valid_artifact())
+            self.assertEqual(r["status"], FAIL)
+            self.assertIn(SCHEMA_INVALID, r["reason_codes"])
+        finally:
+            self._restore_schema_state(saved)
 
 
 if __name__ == "__main__":

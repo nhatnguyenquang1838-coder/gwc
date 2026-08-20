@@ -47,6 +47,7 @@ SUPPORTED_RUNTIME_NODE_VERSIONS: tuple[str, ...] = ("1.0.0",)
 
 SCHEMA_MISSING = "SCHEMA_MISSING"
 SCHEMA_MALFORMED = "SCHEMA_MALFORMED"
+SCHEMA_INVALID = "SCHEMA_INVALID"
 SCHEMA_UNSUPPORTED = "SCHEMA_UNSUPPORTED"
 SCHEMA_VERSION_INCOMPATIBLE = "SCHEMA_VERSION_INCOMPATIBLE"
 SCHEMA_AMBIGUOUS = "SCHEMA_AMBIGUOUS"
@@ -59,6 +60,7 @@ SCHEMA_VALID = "SCHEMA_VALID"
 REASON_ORDER: tuple[str, ...] = (
     SCHEMA_MISSING,
     SCHEMA_MALFORMED,
+    SCHEMA_INVALID,
     SCHEMA_UNSUPPORTED,
     SCHEMA_VERSION_INCOMPATIBLE,
     SCHEMA_AMBIGUOUS,
@@ -85,32 +87,55 @@ _SCHEMA_PATH = (
 # schema_id -> tuple of resolved schema definitions. Normally 1:1; >1 => ambiguous.
 _SUPPORTED_SCHEMAS: dict[str, tuple[dict[str, Any], ...]] = {}
 
+# Loaded canonical schema + compiled validator. _SCHEMA_INVALID_REASON is set
+# (non-None) when the canonical schema is missing, unparseable, fails Draft
+# 2020-12 meta-schema validation, or carries a mismatched $id. While set,
+# every validation fails closed with that reason (no silent registration of a
+# wrong/undefined schema under the expected id).
+_SCHEMA: dict[str, Any] | None = None
+_SCHEMA_VALIDATOR: Draft202012Validator | None = None
+_SCHEMA_INVALID_REASON: str | None = None
 
-def _init_registry() -> None:
-    if _SUPPORTED_SCHEMAS:
+
+def _load_and_register() -> None:
+    """Load + validate the canonical runtime-node schema; fail closed on defect.
+
+    Runs at most once (guarded by _SCHEMA / _SCHEMA_INVALID_REASON being set).
+    On any defect it records _SCHEMA_INVALID_REASON and leaves _SCHEMA_VALIDATOR
+    None, so validation fails closed instead of using an undefined schema.
+    """
+    global _SCHEMA, _SCHEMA_VALIDATOR, _SCHEMA_INVALID_REASON
+    if _SCHEMA is not None or _SCHEMA_INVALID_REASON is not None:
         return
     try:
         with open(_SCHEMA_PATH, "r", encoding="utf-8") as fh:
             schema = json.load(fh)
     except (OSError, json.JSONDecodeError):
-        # Leave registry empty -> every validation fails closed (UNSUPPORTED).
+        _SCHEMA_INVALID_REASON = SCHEMA_INVALID
         return
+    # (1) The canonical schema itself must be a valid Draft 2020-12 schema.
+    try:
+        Draft202012Validator.check_schema(schema)
+    except Exception:
+        _SCHEMA_INVALID_REASON = SCHEMA_INVALID
+        return
+    # (2) Bind identity explicitly: the canonical path must carry the expected $id.
+    if schema.get("$id") != RUNTIME_NODE_SCHEMA_ID:
+        _SCHEMA_INVALID_REASON = SCHEMA_INVALID
+        return
+    _SCHEMA = schema
     _SUPPORTED_SCHEMAS[RUNTIME_NODE_SCHEMA_ID] = (schema,)
+    _SCHEMA_VALIDATOR = Draft202012Validator(schema)
 
 
-_init_registry()
-
-_VALIDATOR: Draft202012Validator | None = None
+_load_and_register()
 
 
 def _get_validator() -> Draft202012Validator:
-    global _VALIDATOR
-    if _VALIDATOR is None:
-        schema = _SUPPORTED_SCHEMAS.get(RUNTIME_NODE_SCHEMA_ID, (None,))[0]
-        if schema is None:
-            raise RuntimeError("canonical runtime-node schema is not available")
-        _VALIDATOR = Draft202012Validator(schema)
-    return _VALIDATOR
+    _load_and_register()
+    if _SCHEMA_VALIDATOR is None:
+        raise RuntimeError("canonical runtime-node schema is unavailable or invalid")
+    return _SCHEMA_VALIDATOR
 
 
 # ---------------------------------------------------------------------------
@@ -220,6 +245,24 @@ def _evaluate(
     idempotency_key: str | None,
     task_id: str | None,
 ) -> dict[str, Any]:
+    # Canonical schema integrity must hold before any binding. If the canonical
+    # schema is missing/unparseable/invalid or carries a mismatched $id, fail
+    # closed immediately (deterministic) rather than using an undefined schema.
+    _load_and_register()
+    if _SCHEMA_INVALID_REASON is not None:
+        return _build(
+            FAIL,
+            {_SCHEMA_INVALID_REASON},
+            [],
+            artifact_sha=artifact_sha,
+            input_digest=input_digest,
+            declared_schema_id=declared_schema_id,
+            declared_schema_version=declared_schema_version,
+            head_sha=head_sha,
+            idempotency_key=idempotency_key,
+            task_id=task_id,
+        )
+
     reasons: set[str] = set()
 
     # --- bind declared schema id ---
@@ -273,12 +316,12 @@ def _evaluate(
         validator = _get_validator()
         errs = sorted(
             validator.iter_errors(dict(artifact)),
-            key=lambda e: (_json_path(e), str(e.validator)),
+            key=lambda e: (_json_path(e), str(e.validator), e.message),
         )
-    except Exception:  # schema unavailable / malformed -> fail closed
+    except Exception:  # schema unavailable / invalid -> fail closed
         return _build(
             FAIL,
-            {SCHEMA_MALFORMED},
+            {SCHEMA_INVALID},
             [],
             artifact_sha=artifact_sha,
             input_digest=input_digest,

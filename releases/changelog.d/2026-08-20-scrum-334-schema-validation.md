@@ -9,6 +9,7 @@
 - Deterministic replay / result digest.
 - Explicit authority-negative: a PASS grants no G2/G3/G4/G5/G6, merge, deploy or production authority.
 - Dedicated SCRUM-334 focused tests (`tests/test_validation_quality_schema_validation_m5.py`) covering all negative / drift / authority-negative cases.
+- G3 fix: canonical runtime-node schema is self-validated against the Draft 2020-12 meta-schema (`Draft202012Validator.check_schema`) and identity-bound (`$id == RUNTIME_NODE_SCHEMA_ID`) at load; a defective canonical schema fails closed (no silent registration). Deterministic error ordering `(json_path, keyword, message)`.
 
 ### Safety
 
