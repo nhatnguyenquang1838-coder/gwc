@@ -1,0 +1,22 @@
+schema_version: '1.0'
+artifact_type: implementation-validation
+research_parent: SCRUM-000
+paired_github_issue: https://github.com/OWNER/REPO/issues/0
+s1_snapshot_sha: 0000000000000000000000000000000000000000
+current_main_sha: 0000000000000000000000000000000000000000
+four_lens_verdicts:
+  L1_ARCHITECTURE_CORRECTNESS: APPROVE
+  L2_SECURITY_TRUST: APPROVE
+  L3_RELIABILITY_OPERABILITY: APPROVE
+  L4_GOVERNANCE_IMPLEMENTABILITY: APPROVE
+classification: RESEARCH_VALIDATED
+final_validated_recommendation: REPLACE_WITH_VALIDATED_RECOMMENDATION
+amendments: []
+implementation_surfaces:
+- REPLACE_WITH_REPO_SURFACE
+risks:
+- REPLACE_WITH_MATERIAL_RISK
+acceptance_criteria:
+- REPLACE_WITH_MEASURABLE_ACCEPTANCE_CRITERION
+dependencies: []
+human_review_scope_hash: sha256:RECOMPUTE_WITH_tools_validate_research_implementation_bridge

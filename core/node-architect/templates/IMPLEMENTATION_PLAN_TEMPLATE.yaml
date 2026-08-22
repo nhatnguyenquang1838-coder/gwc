@@ -1,0 +1,46 @@
+schema_version: '1.0'
+artifact_type: implementation-plan
+research_parent: SCRUM-000
+planning_base_sha: 0000000000000000000000000000000000000000
+implementation_scope_hash: sha256:RECOMPUTE_FOR_PLAN_SCOPE
+objective: REPLACE_WITH_IMPLEMENTATION_OBJECTIVE
+non_goals:
+- REPLACE_WITH_NON_GOAL
+requirement_to_change:
+- requirement: R1
+  changes:
+  - REPLACE_WITH_COMPONENT_OR_FILE
+work_packages:
+- id: WP1
+  objective: REPLACE_WITH_ATOMIC_OBJECTIVE
+  depends_on: []
+- id: WP2
+  objective: REPLACE_WITH_ATOMIC_OBJECTIVE
+  depends_on:
+  - WP1
+- id: WP3
+  objective: REPLACE_WITH_ATOMIC_OBJECTIVE
+  depends_on:
+  - WP2
+test_matrix:
+- REPLACE_WITH_TEST_CASE_OR_LAYER
+observability:
+- REPLACE_WITH_OBSERVABILITY_REQUIREMENT
+rollback:
+- REPLACE_WITH_ROLLBACK_ACTION
+acceptance_criteria:
+- REPLACE_WITH_MEASURABLE_ACCEPTANCE_CRITERION
+risks:
+- REPLACE_WITH_IMPLEMENTATION_RISK
+pr_slicing:
+- REPLACE_WITH_PR_SLICE_AND_INTEGRATION_ORDER
+gate_path:
+- G0
+- G1
+- G2
+- G3
+- G4
+- G5
+grants_execution_authority: false
+state: IMPLEMENTATION_PLAN_READY
+next_state: AWAITING_G2_AUTHORITY
