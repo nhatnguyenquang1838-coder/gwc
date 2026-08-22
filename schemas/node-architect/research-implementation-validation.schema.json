@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.local/schemas/node-architect/research-implementation-validation.schema.json",
+  "title": "Node Architect Research Implementation Validation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "artifact_type", "validated_at", "research_parent",
+    "paired_github_issue", "s1_snapshot_sha", "current_main_sha",
+    "four_lens_verdicts", "classification", "material_drift",
+    "assumptions_confirmed", "assumptions_invalidated",
+    "final_validated_recommendation", "amendments", "implementation_surfaces",
+    "compatibility_migration", "test_strategy", "rollback_requirements",
+    "observability_requirements", "unresolved_questions", "risks",
+    "acceptance_criteria", "dependencies", "human_review_scope_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "implementation-validation"},
+    "validated_at": {"type": "string", "format": "date-time"},
+    "research_parent": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*-[0-9]+$"},
+    "paired_github_issue": {"type": "string", "format": "uri"},
+    "s1_snapshot_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "current_main_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "four_lens_verdicts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "L1_ARCHITECTURE_CORRECTNESS", "L2_SECURITY_TRUST",
+        "L3_RELIABILITY_OPERABILITY", "L4_GOVERNANCE_IMPLEMENTABILITY"
+      ],
+      "properties": {
+        "L1_ARCHITECTURE_CORRECTNESS": {"enum": ["APPROVE", "REJECT", "NEEDS_CLARIFICATION"]},
+        "L2_SECURITY_TRUST": {"enum": ["APPROVE", "REJECT", "NEEDS_CLARIFICATION"]},
+        "L3_RELIABILITY_OPERABILITY": {"enum": ["APPROVE", "REJECT", "NEEDS_CLARIFICATION"]},
+        "L4_GOVERNANCE_IMPLEMENTABILITY": {"enum": ["APPROVE", "REJECT", "NEEDS_CLARIFICATION"]}
+      }
+    },
+    "classification": {
+      "enum": [
+        "RESEARCH_VALIDATED", "RESEARCH_VALIDATED_WITH_AMENDMENTS",
+        "RESEARCH_STALE_REVIEW_REQUIRED", "RESEARCH_INVALIDATED",
+        "AGENT_PREPARATION_BLOCKED"
+      ]
+    },
+    "material_drift": {"type": "array", "items": {"type": "string"}},
+    "assumptions_confirmed": {"type": "array", "items": {"type": "string"}},
+    "assumptions_invalidated": {"type": "array", "items": {"type": "string"}},
+    "final_validated_recommendation": {"type": "string", "minLength": 1},
+    "amendments": {"type": "array", "items": {"type": "string"}},
+    "implementation_surfaces": {"type": "array", "items": {"type": "string"}},
+    "compatibility_migration": {"type": "array", "items": {"type": "string"}},
+    "test_strategy": {"type": "array", "items": {"type": "string"}},
+    "rollback_requirements": {"type": "array", "items": {"type": "string"}},
+    "observability_requirements": {"type": "array", "items": {"type": "string"}},
+    "unresolved_questions": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "acceptance_criteria": {"type": "array", "items": {"type": "string"}},
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "deliverable_evidence"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "minLength": 1},
+          "deliverable_evidence": {"type": "boolean"}
+        }
+      }
+    },
+    "human_review_scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

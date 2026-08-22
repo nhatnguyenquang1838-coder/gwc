@@ -1,0 +1,84 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+status: ACTIVE
+activation_state: AUTOMATIC_G2_WITH_EXPLICIT_HUMAN_DIRECTION
+generated_at_utc: '2026-08-22T17:24:54Z'
+task_id: SCRUM-556
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+working_branch: feat/scrum-556-research-implementation-bridge-20260823
+risk_class: R1
+scope_hash: sha256:21012777c6365559b4d8a63ec7f8f88194d3cb522dc79987742c4872b118fa37
+scope:
+  files_write:
+  - core/node-architect/RESEARCH_IMPLEMENTATION_BRIDGE_CONTRACT_v0.1.md
+  - core/node-architect/templates/IMPLEMENTATION_VALIDATION_TEMPLATE.yaml
+  - core/node-architect/templates/IMPLEMENTATION_PLAN_TEMPLATE.yaml
+  - schemas/node-architect/research-implementation-validation.schema.json
+  - schemas/node-architect/implementation-plan.schema.json
+  - tools/validate_research_implementation_bridge.py
+  - tests/test_research_implementation_bridge.py
+  - .gwc/tasks/SCRUM-556/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-556/g1/decision/research-implementation-bridge-decision.yaml
+  - .gwc/tasks/SCRUM-556/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-556/g3/delivery-record.yaml
+  - .gwc/tasks/SCRUM-556/evidence/**
+  authorized_actions:
+  - create_guarded_branch_from_exact_base
+  - modify_approved_task_artifacts
+  - run_sandboxed_validation
+  - create_commit
+  - push_working_branch
+  - create_draft_pr_after_validation
+  - perform_exact_head_g3_review
+  excluded_actions:
+  - downstream_feature_implementation
+  - direct_main_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - migration_execution
+  - production_data_access
+  - force_push
+  - branch_deletion
+work_item:
+  provider: Atlassian Jira
+  id: SCRUM-556
+  claim_required: true
+  claim_verified: true
+  ai_agent: ChatGPT
+  state: In Progress
+g0_context_ref: g0/context-snapshot.yaml
+g1_decision_ref: g1/decision/research-implementation-bridge-decision.yaml
+human_direction:
+  required_for_architecture_change: true
+  received: true
+  actor: user
+  received_in: current ChatGPT conversation
+  instruction: implement the agreed Research-to-Implementation bridge using GitHub and Slack connectors
+prerequisites:
+- id: G0_CONTEXT
+  status: READY
+  evidence: g0/context-snapshot.yaml
+- id: G1_ALIGNMENT
+  status: PASS
+  evidence: g1/decision/research-implementation-bridge-decision.yaml
+- id: AGENT_TASK_CLAIM
+  status: PASS
+  evidence: Jira SCRUM-556 readback
+- id: BASE_READBACK
+  status: PASS
+  evidence: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+invalidation_conditions:
+- protected main changes before a scope-sensitive revalidation step
+- scope hash changes without a refreshed G2 envelope
+- Jira AI Agent claim conflicts or is released
+- working branch changes unexpectedly
+warning: >-
+  This G2 applies only to SCRUM-556 bridge materialization. Research-plan Human
+  approval created by this bridge grants planning only and never grants downstream
+  implementation G2 or merge/deploy/production authority.

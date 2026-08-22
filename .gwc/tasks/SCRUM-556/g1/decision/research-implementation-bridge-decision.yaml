@@ -1,0 +1,57 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+task_id: SCRUM-556
+decision: EXTEND_EXISTING_GWC_LIFECYCLE
+status: PASS
+base_sha: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+problem: >-
+  S2 can conclude four-lens research review, but the repository lacks a canonical,
+  machine-checkable bridge from 4/4 APPROVE research to current-main validation,
+  exact Human planning approval, and a non-authoritative implementation plan.
+reuse_extend_analysis:
+  current_mechanisms:
+  - .gwc/tasks/<TASK>/g0..g4 task-scoped evidence
+  - exact approval command anti-vague-acknowledgement semantics
+  - Python semantic validators plus JSON schemas
+  limitation: >-
+    No repository-native research implementation validation record, deterministic
+    HUMAN_REVIEW_SCOPE_HASH contract, RESEARCH_PLAN approval validator, or
+    implementation-plan state contract exists.
+  smallest_compatible_improvement: >-
+    Add one Node Architect bridge contract, two schemas, two templates, one
+    semantic validator, and contract tests while preserving G0-G6 unchanged.
+selected_states:
+- RESEARCH_CANDIDATE_VALID
+- RESEARCH_VALIDATED
+- RESEARCH_VALIDATED_WITH_AMENDMENTS
+- RESEARCH_STALE_REVIEW_REQUIRED
+- RESEARCH_INVALIDATED
+- AGENT_PREPARATION_BLOCKED
+- HUMAN_REVIEW_REQUIRED
+- HUMAN_REVIEW_APPROVED
+- IMPLEMENTATION_PLAN_READY
+- AWAITING_G2_AUTHORITY
+authority_separation:
+  research_plan_approval_grants: implementation_plan_materialization_only
+  research_plan_approval_does_not_grant:
+  - G2_EXECUTION
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_OR_DATA
+compatibility:
+- Existing S1/S2 Jira and Slack projections can adopt the record without changing GWC gate numbering.
+- Existing downstream implementation nodes continue to enter normal G0/G1/G2.
+- Existing Jira Done semantics remain projection-only.
+validation_strategy:
+- positive 4/4 APPROVE current-main validation
+- reject non-APPROVE lens for Human-review-eligible classifications
+- detect exact-current-main drift
+- reject Done dependency without deliverable evidence
+- deterministic and drift-sensitive scope hash
+- exact run/hash-bound Human approval; reject vague acknowledgements
+- require 3-7 acyclic work packages and grants_execution_authority=false
+human_direction:
+  source: current ChatGPT conversation
+  date: '2026-08-23'
+  instruction: implement the agreed bridge using GitHub and Slack connectors
+blockers: []

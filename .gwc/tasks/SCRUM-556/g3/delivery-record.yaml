@@ -1,0 +1,187 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-556
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+working_branch: feat/scrum-556-research-implementation-bridge-20260823
+pull_request:
+  number: 505
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/505
+  draft: true
+head_sha: b3b994d6cced7a1182e2c04c020bdc3db118f342
+scope_hash: sha256:21012777c6365559b4d8a63ec7f8f88194d3cb522dc79987742c4872b118fa37
+changed_paths:
+- .gwc/tasks/SCRUM-556/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-556/g1/decision/research-implementation-bridge-decision.yaml
+- .gwc/tasks/SCRUM-556/g2/execution-envelope.yaml
+- core/node-architect/RESEARCH_IMPLEMENTATION_BRIDGE_CONTRACT_v0.1.md
+- core/node-architect/templates/IMPLEMENTATION_PLAN_TEMPLATE.yaml
+- core/node-architect/templates/IMPLEMENTATION_VALIDATION_TEMPLATE.yaml
+- schemas/node-architect/implementation-plan.schema.json
+- schemas/node-architect/research-implementation-validation.schema.json
+- tests/test_research_implementation_bridge.py
+- tools/validate_research_implementation_bridge.py
+validation:
+  head_sha: b3b994d6cced7a1182e2c04c020bdc3db118f342
+  status: pass
+  commands:
+  - command: 'GitHub Actions: Validate instructions'
+    result: pass
+    evidence: Run 32589443002 PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342; 2532 governance tests passed; Python tools compiled; 10 changed files passed LF/UTF-8 validation.
+  - command: 'GitHub Actions: Build instruction packages'
+    result: pass
+    evidence: Run 32589443047 PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342.
+  - command: 'GitHub Actions: Cross-platform LF and SHA parity'
+    result: pass
+    evidence: Run 32589443015 PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342.
+  - command: 'GitHub Actions: Autonomous parent authority required'
+    result: pass
+    evidence: Run 32589443032 PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342.
+  - command: 'GitHub Actions: Autonomous pre-prod runtime evidence'
+    result: pass
+    evidence: Run 32589443016 PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342.
+  - command: 'GitHub Actions: G4 G5 evidence'
+    result: pass
+    evidence: Run 32589443007 PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342.
+  - command: Full PR diff and scope review against protected base
+    result: pass
+    evidence: Compare 21f36a45495c6d14a67b9ee779db7d2e372a3623..b3b994d6cced7a1182e2c04c020bdc3db118f342 is ahead by 5 commits, behind by 0, with exactly 10 authorized additions-only paths and no unrelated lane changes.
+review:
+  implementer_id: chatgpt-governed-executor
+  reviewer_id: chatgpt-fresh-context-read-only-reviewer-r3
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: b3b994d6cced7a1182e2c04c020bdc3db118f342
+  reviewed_scope_hash: sha256:21012777c6365559b4d8a63ec7f8f88194d3cb522dc79987742c4872b118fa37
+  reviewed_at: '2026-08-22T18:02:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - 'Bridge implements the agreed post-S2 flow: 4/4 research validation, current-main revalidation, exact Human planning approval, non-authoritative implementation plan, then separate downstream G2.'
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Extends existing GWC lifecycle without adding a gate; explicit state machine separates research validity, Human planning approval, implementation planning, G2 execution, and G4 merge authority.
+    - Implementation plan includes repository/base, 3-7 atomic work packages, DAG, safe parallelism, migration/backcompat, tests, observability, rollback, per-gate evidence, ownership assumptions, and deterministic scope hash.
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - Semantic validator applies JSON Schema plus invariants for 4/4 lens approval, current-main drift, unsafe Done dependencies, exact approval syntax, DAG integrity, safe-parallel dependency exclusion, gate-evidence parity, and authority separation.
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - Contract tests cover valid flow, non-APPROVE lens, current-main drift, unsafe Done dependency, deterministic hashes, vague/mismatched approval, required operational fields, extra-field rejection, unknown parallel work package, dependency-related parallelization, and gate-evidence mismatch.
+    - Validate instructions run 32589443002 executed 2532 tests successfully on exact head.
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - SCRUM-556 agent claim verified before write; G0/G1/G2 artifacts are task-scoped; G2 excludes downstream implementation, merge, deploy, release, production, secrets, migrations, force-push, and branch deletion.
+    - Jira Done remains projection-only and cannot satisfy dependency evidence without durable deliverable proof.
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - Draft PR #505 targets protected main from the guarded SCRUM-556 branch; exact implementation head is b3b994d6cced7a1182e2c04c020bdc3db118f342.
+    - This delivery record is an evidence-only successor and requires successor-head CI plus fresh scope review before Ready/G4 request.
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - All six PR-triggered workflows are terminal PASS on exact implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342.
+  findings:
+  - id: REV-1
+    severity: MAJOR
+    category: design
+    status: resolved
+    evidence: Initial bridge schema/plan omitted several agreed operational fields; repaired in 1c2571d73f9bb63d3122915de9f1f5108d0fe91d.
+    recommendation: Keep schema and semantic validator aligned with the full implementation-validation and plan contract.
+    resolution: Resolved before exact implementation head.
+  - id: REV-2
+    severity: MAJOR
+    category: code
+    status: resolved
+    evidence: Safe-parallelism originally verified only work-package existence, not dependency relation; transitive dependency exclusion and regression test added in b3b994d6cced7a1182e2c04c020bdc3db118f342.
+    recommendation: Preserve transitive dependency checks for all declared parallel groups.
+    resolution: Resolved at exact implementation head and covered by exact-head CI.
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - 4/4 APPROVE is required before Human-review-eligible research classification.
+  - id: AC-2
+    result: pass
+    evidence:
+    - Validation binds to exact current protected main and fails on main drift.
+  - id: AC-3
+    result: pass
+    evidence:
+    - Done without durable deliverable evidence is rejected as unsafe dependency evidence.
+  - id: AC-4
+    result: pass
+    evidence:
+    - Human planning approval accepts only exact APPROVE RESEARCH_PLAN run/hash-bound syntax and rejects vague acknowledgements.
+  - id: AC-5
+    result: pass
+    evidence:
+    - Implementation plan is machine-validated, deterministic-hash-bound, has 3-7 acyclic work packages, safe parallelism, test/rollback/observability, evidence and ownership assumptions.
+  - id: AC-6
+    result: pass
+    evidence:
+    - Implementation plan sets grants_execution_authority=false and terminates at AWAITING_G2_AUTHORITY.
+  - id: AC-7
+    result: pass
+    evidence:
+    - Exact-head CI is terminal PASS and PR scope is confined to 10 authorized paths.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: b3b994d6cced7a1182e2c04c020bdc3db118f342
+  checks:
+  - name: Validate instructions
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/32589443002
+  - name: Build instruction packages
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/32589443047
+  - name: Cross-platform LF and SHA parity
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/32589443015
+  - name: Autonomous parent authority required
+    required: false
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/32589443032
+  - name: Autonomous pre-prod runtime evidence
+    required: false
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/32589443016
+  - name: G4 G5 evidence
+    required: false
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/32589443007
+residual_risks:
+- This delivery record is an evidence-only successor after reviewed implementation head b3b994d6cced7a1182e2c04c020bdc3db118f342; successor-head CI and fresh read-only scope review are mandatory before Ready/G4 request.
+- The bridge materializes governance/validation contracts only; it does not implement any downstream research recommendation.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+- DOWNSTREAM_FEATURE_IMPLEMENTATION
+- PROTECTED_MAIN_WRITE
+- DEPLOY_OR_RELEASE
+- PRODUCTION_CONFIG_OR_CREDENTIAL_CHANGE
+- MIGRATION_OR_PRODUCTION_DATA
+- FORCE_PUSH_OR_HISTORY_REWRITE
+- BRANCH_DELETION
+outcome: pass

@@ -1,0 +1,57 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-22T17:24:54Z'
+project:
+  id: gwc
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+work_item:
+  provider: Atlassian Jira
+  id: SCRUM-556
+  status: In Progress
+  ai_agent: ChatGPT
+  claim_verified: true
+active_lane: Node Architect Research
+excluded_lanes:
+- DW Run Observatory / SCRUM-555
+- SCRUM-554
+- SCRUM-288 / NA81
+- Rental Home
+constraints:
+- Extend existing GWC lifecycle; do not create a new GWC gate.
+- No downstream feature implementation in SCRUM-556.
+- No implicit downstream G2, G4, G5, or G6 authority.
+- Jira Done alone is not dependency evidence.
+- GitHub is repository/evidence truth; Jira and Slack are projections.
+applicable_policies:
+- path: AGENTS.md
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+- path: core/Coding_Project_Governance_v1.0.md
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+- path: core/END_TO_END_GATE_VALIDATION_SCHEMA_v1.0.md
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+- path: projects/gwc/project-profile.yaml
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+- path: projects/gwc/project-instructions.md
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+- path: agents/chatgpt-agent/agent-instructions.md
+  ref: 21f36a45495c6d14a67b9ee779db7d2e372a3623
+existing_mechanisms:
+- .gwc/tasks/<TASK>/g0..g4 task-scoped evidence convention
+- tools/validate_g3_delivery.py schema-plus-semantic validator pattern
+- tests/test_approval_request.py exact-approval anti-acknowledgement pattern
+canonical_slack_root:
+  channel_id: C0BKACJMV7G
+  thread_ts: '1787419369.853199'
+  url: https://dw-ngh.slack.com/archives/C0BKACJMV7G/p1787419369853199
+status: READY
+blockers: []
