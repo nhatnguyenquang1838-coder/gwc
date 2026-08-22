@@ -1,5 +1,6 @@
 schema_version: '1.0'
 artifact_type: implementation-validation
+validated_at: '1970-01-01T00:00:00Z'
 research_parent: SCRUM-000
 paired_github_issue: https://github.com/OWNER/REPO/issues/0
 s1_snapshot_sha: 0000000000000000000000000000000000000000
@@ -10,13 +11,27 @@ four_lens_verdicts:
   L3_RELIABILITY_OPERABILITY: APPROVE
   L4_GOVERNANCE_IMPLEMENTABILITY: APPROVE
 classification: RESEARCH_VALIDATED
+material_drift: []
+assumptions_confirmed:
+- REPLACE_WITH_CONFIRMED_ASSUMPTION
+assumptions_invalidated: []
 final_validated_recommendation: REPLACE_WITH_VALIDATED_RECOMMENDATION
 amendments: []
 implementation_surfaces:
 - REPLACE_WITH_REPO_SURFACE
+compatibility_migration:
+- REPLACE_WITH_COMPATIBILITY_OR_MIGRATION_CONSIDERATION
+test_strategy:
+- REPLACE_WITH_TEST_STRATEGY
+rollback_requirements:
+- REPLACE_WITH_ROLLBACK_REQUIREMENT
+observability_requirements:
+- REPLACE_WITH_OBSERVABILITY_REQUIREMENT
+unresolved_questions: []
 risks:
 - REPLACE_WITH_MATERIAL_RISK
 acceptance_criteria:
 - REPLACE_WITH_MEASURABLE_ACCEPTANCE_CRITERION
 dependencies: []
-human_review_scope_hash: sha256:RECOMPUTE_WITH_tools_validate_research_implementation_bridge
+# Recompute with compute_scope_hash(); zeros are a non-authoritative placeholder.
+human_review_scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000

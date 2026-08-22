@@ -5,20 +5,23 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "artifact_type", "research_parent", "planning_base_sha",
-    "implementation_scope_hash", "objective", "non_goals", "requirement_to_change",
-    "work_packages", "test_matrix", "observability", "rollback",
+    "schema_version", "artifact_type", "research_parent", "target_repository",
+    "planning_base_sha", "implementation_scope_hash", "objective", "non_goals",
+    "requirement_to_change", "work_packages", "safe_parallelism",
+    "migration_backward_compatibility", "test_matrix", "observability", "rollback",
     "acceptance_criteria", "risks", "pr_slicing", "gate_path",
+    "required_evidence_by_gate", "ownership_executor_assumptions",
     "grants_execution_authority", "state", "next_state"
   ],
   "properties": {
     "schema_version": {"const": "1.0"},
     "artifact_type": {"const": "implementation-plan"},
     "research_parent": {"type": "string", "pattern": "^[A-Z][A-Z0-9]*-[0-9]+$"},
+    "target_repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
     "planning_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "implementation_scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "objective": {"type": "string", "minLength": 1},
-    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "non_goals": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "requirement_to_change": {
       "type": "array", "minItems": 1,
       "items": {
@@ -26,7 +29,7 @@
         "required": ["requirement", "changes"],
         "properties": {
           "requirement": {"type": "string", "minLength": 1},
-          "changes": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+          "changes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
         }
       }
     },
@@ -38,22 +41,41 @@
         "properties": {
           "id": {"type": "string", "pattern": "^[A-Z0-9_-]+$"},
           "objective": {"type": "string", "minLength": 1},
-          "depends_on": {"type": "array", "items": {"type": "string"}}
+          "depends_on": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
         }
       }
     },
-    "test_matrix": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "observability": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "rollback": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "risks": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-    "pr_slicing": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "safe_parallelism": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["group_id", "work_packages", "rationale"],
+        "properties": {
+          "group_id": {"type": "string", "minLength": 1},
+          "work_packages": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "rationale": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "migration_backward_compatibility": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "test_matrix": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "observability": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "rollback": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "acceptance_criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "risks": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "pr_slicing": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "gate_path": {
       "oneOf": [
         {"const": ["G0", "G1", "G2", "G3", "G4", "G5"]},
         {"const": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]}
       ]
     },
+    "required_evidence_by_gate": {
+      "type": "object",
+      "propertyNames": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+      "additionalProperties": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+    },
+    "ownership_executor_assumptions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "grants_execution_authority": {"const": false},
     "state": {"const": "IMPLEMENTATION_PLAN_READY"},
     "next_state": {"const": "AWAITING_G2_AUTHORITY"}

@@ -2,6 +2,7 @@ import copy
 import unittest
 
 from tools.validate_research_implementation_bridge import (
+    compute_plan_scope_hash,
     compute_scope_hash,
     validate_human_approval,
     validate_implementation_plan,
@@ -17,6 +18,7 @@ def valid_validation_record():
     record = {
         "schema_version": "1.0",
         "artifact_type": "implementation-validation",
+        "validated_at": "2026-08-23T00:30:00+07:00",
         "research_parent": "SCRUM-500",
         "paired_github_issue": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/500",
         "s1_snapshot_sha": SNAPSHOT_SHA,
@@ -28,9 +30,17 @@ def valid_validation_record():
             "L4_GOVERNANCE_IMPLEMENTABILITY": "APPROVE",
         },
         "classification": "RESEARCH_VALIDATED",
+        "material_drift": [],
+        "assumptions_confirmed": ["Current main preserves the researched control boundary."],
+        "assumptions_invalidated": [],
         "final_validated_recommendation": "Adopt the validated bounded design.",
         "amendments": [],
         "implementation_surfaces": ["core/node-architect/example.md"],
+        "compatibility_migration": ["Preserve backward compatibility with existing nodes."],
+        "test_strategy": ["Unit and contract tests on exact planning scope."],
+        "rollback_requirements": ["Revert bounded implementation PR."],
+        "observability_requirements": ["Persist exact validation receipt and bound SHA."],
+        "unresolved_questions": [],
         "risks": ["Backward compatibility must be preserved."],
         "acceptance_criteria": ["All exact-scope validators pass."],
         "dependencies": [
@@ -43,6 +53,47 @@ def valid_validation_record():
     }
     record["human_review_scope_hash"] = compute_scope_hash(record)
     return record
+
+
+def valid_plan():
+    plan = {
+        "schema_version": "1.0",
+        "artifact_type": "implementation-plan",
+        "research_parent": "SCRUM-500",
+        "target_repository": "nhatnguyenquang1838-coder/gwc",
+        "planning_base_sha": BASE_SHA,
+        "objective": "Implement validated research.",
+        "non_goals": ["No production deployment."],
+        "requirement_to_change": [{"requirement": "R1", "changes": ["a.py"]}],
+        "work_packages": [
+            {"id": "WP1", "objective": "Contract", "depends_on": []},
+            {"id": "WP2", "objective": "Implementation", "depends_on": ["WP1"]},
+            {"id": "WP3", "objective": "Validation", "depends_on": ["WP2"]},
+        ],
+        "safe_parallelism": [],
+        "migration_backward_compatibility": ["Preserve existing contract behavior."],
+        "test_matrix": ["unit", "integration"],
+        "observability": ["structured validation receipt"],
+        "rollback": ["revert bounded PR"],
+        "acceptance_criteria": ["All required tests pass."],
+        "risks": ["Compatibility drift"],
+        "pr_slicing": ["PR1 contract", "PR2 implementation"],
+        "gate_path": ["G0", "G1", "G2", "G3", "G4", "G5"],
+        "required_evidence_by_gate": {
+            "G0": ["context"],
+            "G1": ["decision"],
+            "G2": ["execution scope"],
+            "G3": ["exact-head review and CI"],
+            "G4": ["exact Human merge approval"],
+            "G5": ["merge-SHA readback"],
+        },
+        "ownership_executor_assumptions": ["TaskController controls; executor stays in G2 scope."],
+        "grants_execution_authority": False,
+        "state": "IMPLEMENTATION_PLAN_READY",
+        "next_state": "AWAITING_G2_AUTHORITY",
+    }
+    plan["implementation_scope_hash"] = compute_plan_scope_hash(plan)
+    return plan
 
 
 class ImplementationValidationTests(unittest.TestCase):
@@ -78,6 +129,18 @@ class ImplementationValidationTests(unittest.TestCase):
         changed = copy.deepcopy(first)
         changed["risks"].append("New material risk")
         self.assertNotEqual(compute_scope_hash(first), compute_scope_hash(changed))
+
+    def test_operational_validation_fields_are_machine_required(self):
+        record = valid_validation_record()
+        del record["test_strategy"]
+        issues = validate_implementation_validation(record, BASE_SHA)
+        self.assertTrue(any("test_strategy" in issue for issue in issues))
+
+    def test_extra_validation_fields_are_rejected_by_schema(self):
+        record = valid_validation_record()
+        record["uncontrolled_field"] = "not allowed"
+        issues = validate_implementation_validation(record, BASE_SHA)
+        self.assertTrue(any("additional properties" in issue.lower() for issue in issues))
 
 
 class HumanApprovalTests(unittest.TestCase):
@@ -116,38 +179,50 @@ class HumanApprovalTests(unittest.TestCase):
 
 
 class ImplementationPlanTests(unittest.TestCase):
-    def test_plan_requires_three_to_seven_atomic_work_packages_and_separate_g2(self):
-        plan = {
-            "schema_version": "1.0",
-            "artifact_type": "implementation-plan",
-            "research_parent": "SCRUM-500",
-            "planning_base_sha": BASE_SHA,
-            "implementation_scope_hash": "sha256:" + "a" * 64,
-            "objective": "Implement validated research.",
-            "non_goals": ["No production deployment."],
-            "requirement_to_change": [{"requirement": "R1", "changes": ["a.py"]}],
-            "work_packages": [
-                {"id": "WP1", "objective": "Contract", "depends_on": []},
-                {"id": "WP2", "objective": "Implementation", "depends_on": ["WP1"]},
-                {"id": "WP3", "objective": "Validation", "depends_on": ["WP2"]},
-            ],
-            "test_matrix": ["unit", "integration"],
-            "observability": ["structured validation receipt"],
-            "rollback": ["revert bounded PR"],
-            "acceptance_criteria": ["All required tests pass."],
-            "risks": ["Compatibility drift"],
-            "pr_slicing": ["PR1 contract", "PR2 implementation"],
-            "gate_path": ["G0", "G1", "G2", "G3", "G4", "G5"],
-            "grants_execution_authority": False,
-            "state": "IMPLEMENTATION_PLAN_READY",
-            "next_state": "AWAITING_G2_AUTHORITY",
-        }
+    def test_complete_plan_passes_and_does_not_grant_g2(self):
+        plan = valid_plan()
         self.assertEqual(validate_implementation_plan(plan), [])
 
         plan["grants_execution_authority"] = True
-        self.assertTrue(
-            any("must not grant" in issue.lower() for issue in validate_implementation_plan(plan))
+        self.assertTrue(validate_implementation_plan(plan))
+
+    def test_plan_scope_hash_is_deterministic_and_sensitive(self):
+        plan = valid_plan()
+        reordered = copy.deepcopy(plan)
+        reordered["required_evidence_by_gate"] = dict(
+            reversed(list(reordered["required_evidence_by_gate"].items()))
         )
+        self.assertEqual(compute_plan_scope_hash(plan), compute_plan_scope_hash(reordered))
+
+        changed = copy.deepcopy(plan)
+        changed["risks"].append("new risk")
+        self.assertNotEqual(compute_plan_scope_hash(plan), compute_plan_scope_hash(changed))
+
+    def test_plan_requires_operational_and_ownership_contract(self):
+        plan = valid_plan()
+        del plan["ownership_executor_assumptions"]
+        issues = validate_implementation_plan(plan)
+        self.assertTrue(any("ownership_executor_assumptions" in issue for issue in issues))
+
+    def test_unknown_parallel_work_package_fails(self):
+        plan = valid_plan()
+        plan["safe_parallelism"] = [
+            {
+                "group_id": "P1",
+                "work_packages": ["WP1", "WP404"],
+                "rationale": "independent files",
+            }
+        ]
+        plan["implementation_scope_hash"] = compute_plan_scope_hash(plan)
+        issues = validate_implementation_plan(plan)
+        self.assertTrue(any("unknown work package" in issue.lower() for issue in issues))
+
+    def test_gate_evidence_must_match_gate_path(self):
+        plan = valid_plan()
+        del plan["required_evidence_by_gate"]["G5"]
+        plan["implementation_scope_hash"] = compute_plan_scope_hash(plan)
+        issues = validate_implementation_plan(plan)
+        self.assertTrue(any("required_evidence_by_gate missing" in issue for issue in issues))
 
 
 if __name__ == "__main__":

@@ -1,8 +1,10 @@
 schema_version: '1.0'
 artifact_type: implementation-plan
 research_parent: SCRUM-000
+target_repository: OWNER/REPO
 planning_base_sha: 0000000000000000000000000000000000000000
-implementation_scope_hash: sha256:RECOMPUTE_FOR_PLAN_SCOPE
+# Recompute with compute_plan_scope_hash(); zeros are a non-authoritative placeholder.
+implementation_scope_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
 objective: REPLACE_WITH_IMPLEMENTATION_OBJECTIVE
 non_goals:
 - REPLACE_WITH_NON_GOAL
@@ -22,6 +24,10 @@ work_packages:
   objective: REPLACE_WITH_ATOMIC_OBJECTIVE
   depends_on:
   - WP2
+# Empty is explicit: no work packages are safe to execute in parallel.
+safe_parallelism: []
+migration_backward_compatibility:
+- REPLACE_WITH_MIGRATION_OR_BACKWARD_COMPATIBILITY_STRATEGY
 test_matrix:
 - REPLACE_WITH_TEST_CASE_OR_LAYER
 observability:
@@ -41,6 +47,21 @@ gate_path:
 - G3
 - G4
 - G5
+required_evidence_by_gate:
+  G0:
+  - context snapshot bound to exact planning base
+  G1:
+  - bounded decision and reuse/extend analysis
+  G2:
+  - exact authorized implementation scope
+  G3:
+  - exact-head validation, CI, and fresh/independent review
+  G4:
+  - exact Human merge authority bound to final head
+  G5:
+  - exact merge-SHA readback and post-merge verification
+ownership_executor_assumptions:
+- REPLACE_WITH_CONTROLLER_EXECUTOR_OR_OWNERSHIP_ASSUMPTION
 grants_execution_authority: false
 state: IMPLEMENTATION_PLAN_READY
 next_state: AWAITING_G2_AUTHORITY
