@@ -9,7 +9,7 @@ base_ref: main
 base_sha: 21f36a45495c6d14a67b9ee779db7d2e372a3623
 working_branch: feat/scrum-556-research-implementation-bridge-20260823
 risk_class: R1
-scope_hash: sha256:802c69ea235327766352704b1792cb60ca22e13cc9f00ccb102888c5eb057cd8
+scope_hash: sha256:21012777c6365559b4d8a63ec7f8f88194d3cb522dc79987742c4872b118fa37
 scope:
   files_write:
   - core/node-architect/RESEARCH_IMPLEMENTATION_BRIDGE_CONTRACT_v0.1.md
@@ -22,6 +22,8 @@ scope:
   - .gwc/tasks/SCRUM-556/g0/context-snapshot.yaml
   - .gwc/tasks/SCRUM-556/g1/decision/research-implementation-bridge-decision.yaml
   - .gwc/tasks/SCRUM-556/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-556/g3/delivery-record.yaml
+  - .gwc/tasks/SCRUM-556/evidence/**
   authorized_actions:
   - create_guarded_branch_from_exact_base
   - modify_approved_task_artifacts
