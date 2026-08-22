@@ -1,0 +1,61 @@
+schema_version: '1.0'
+task_id: SCRUM-554
+title: GWC transitive side-effect authority and capability-bound gate validation
+status: SPEC_REPAIR_READY_AWAITING_G2_R3
+objective: Extend GWC from direct-action authorization to causal-effect authority
+  closure with machine-readable capability, conditional-effect and exact evidence
+  identity semantics.
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: cd2e219bc60f6f61685ba307091838ec44f6d8f5
+working_branch: spec/SCRUM-554-gwc-transitive-effect-authority
+jira: https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-554
+github_issue: https://github.com/nhatnguyenquang1838-coder/gwc/issues/467
+gg_instruction:
+  revision: AIroW378s9uStEwtFnvQaj1S2wArsLm2VxPoWJBILypyqVzhDBla3SpEr2Yjv7kX1PTpVqTjwsEffXmVs7TiEUnJHliLX8WteE4OaTFWLYk
+  version: '2026-08-18'
+  edition: LLM-Semantic 2.3
+  section: 1A. DEVELOPMENT TASK BOOTSTRAP — SPEC-DRIVEN SESSION BOUNDARY
+  section_sha256_required_at_handoff: true
+risk_class: R2
+delivery:
+  mode: spec_only
+  allowed_paths:
+  - .task-me/runs/gwc-transitive-authority-20260818/**
+  implementation_in_this_session: false
+  draft_pr_requires_g3: true
+dependencies: []
+consumers:
+- SCRUM-553
+requirement_trace_file: ac-traceability.md
+acceptance_criteria:
+- id: SPEC-AC-1
+  text: Issue AC1-AC8 are traced to implementation-plan steps and planned tests.
+- id: SPEC-AC-2
+  text: 'Conditional effect semantics are explicit: false excludes with evidence;
+    true is reachable; unknown mutating/cross-repo/release/destructive/production
+    effects are authority-closed as potentially reachable.'
+- id: SPEC-AC-3
+  text: Retention/delete effects map to a destructive capability distinct from ordinary
+    release write/publish capability.
+- id: SPEC-AC-4
+  text: Legacy packets without per-packet graphs remain compatible through a versioned
+    trusted effect profile only when the profile completely closes all reachable/potentially
+    reachable effects within current or independent authority; otherwise effect graph
+    is required and validation fails closed.
+- id: SPEC-AC-5
+  text: Historical successful workflow/check evidence from another SHA/event/gate
+    cannot become current authority.
+- id: SPEC-AC-6
+  text: Fresh implementation session is required; current spec session grants no implementation/merge/deploy
+    authority.
+non_goals:
+- DW-SuperApps TaskController runtime implementation
+- merge
+- deploy
+- release
+- production-data/config
+- secret/credential
+- migration
+- destructive action
+- source implementation in current bootstrap session
