@@ -217,6 +217,19 @@ class ImplementationPlanTests(unittest.TestCase):
         issues = validate_implementation_plan(plan)
         self.assertTrue(any("unknown work package" in issue.lower() for issue in issues))
 
+    def test_dependency_related_work_packages_cannot_be_parallelized(self):
+        plan = valid_plan()
+        plan["safe_parallelism"] = [
+            {
+                "group_id": "P1",
+                "work_packages": ["WP1", "WP3"],
+                "rationale": "incorrectly claimed independent",
+            }
+        ]
+        plan["implementation_scope_hash"] = compute_plan_scope_hash(plan)
+        issues = validate_implementation_plan(plan)
+        self.assertTrue(any("dependency-related" in issue.lower() for issue in issues))
+
     def test_gate_evidence_must_match_gate_path(self):
         plan = valid_plan()
         del plan["required_evidence_by_gate"]["G5"]

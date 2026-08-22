@@ -72,7 +72,6 @@ PLAN_SCOPE_FIELDS = (
     "required_evidence_by_gate",
     "ownership_executor_assumptions",
 )
-SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 HASH_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 APPROVAL_RE = re.compile(
     r"^APPROVE RESEARCH_PLAN ([A-Z][A-Z0-9]*-\d+-\d{8}-R\d+) ([0-9a-f]{16})$"
@@ -190,8 +189,12 @@ def validate_human_approval(
     return issues
 
 
+def _dependency_graph(packages: list[dict[str, Any]]) -> dict[str, list[str]]:
+    return {item["id"]: list(item.get("depends_on", [])) for item in packages}
+
+
 def _has_cycle(packages: list[dict[str, Any]]) -> bool:
-    graph = {item["id"]: list(item.get("depends_on", [])) for item in packages}
+    graph = _dependency_graph(packages)
     visiting: set[str] = set()
     visited: set[str] = set()
 
@@ -211,6 +214,21 @@ def _has_cycle(packages: list[dict[str, Any]]) -> bool:
     return any(visit(node) for node in graph)
 
 
+def _depends_transitively(
+    graph: dict[str, list[str]], source: str, target: str, seen: set[str] | None = None
+) -> bool:
+    if source == target:
+        return True
+    seen = set() if seen is None else seen
+    if source in seen:
+        return False
+    seen.add(source)
+    for dependency in graph.get(source, []):
+        if dependency == target or _depends_transitively(graph, dependency, target, seen):
+            return True
+    return False
+
+
 def validate_implementation_plan(plan: dict[str, Any]) -> list[str]:
     issues = _schema_issues(plan, PLAN_SCHEMA)
     if issues or not isinstance(plan, dict):
@@ -221,6 +239,7 @@ def validate_implementation_plan(plan: dict[str, Any]) -> list[str]:
     if len(ids) != len(set(ids)):
         issues.append("work package ids must be unique")
     known = set(ids)
+    graph = _dependency_graph(packages)
     for item in packages:
         for dependency in item["depends_on"]:
             if dependency not in known:
@@ -230,9 +249,14 @@ def validate_implementation_plan(plan: dict[str, Any]) -> list[str]:
     if _has_cycle(packages):
         issues.append("work package DAG must be acyclic")
 
+    seen_group_ids: set[str] = set()
     seen_parallel: set[str] = set()
     for group in plan["safe_parallelism"]:
-        for work_package in group["work_packages"]:
+        if group["group_id"] in seen_group_ids:
+            issues.append(f"safe_parallelism: duplicate group_id {group['group_id']}")
+        seen_group_ids.add(group["group_id"])
+        members = group["work_packages"]
+        for work_package in members:
             if work_package not in known:
                 issues.append(
                     f"safe_parallelism {group['group_id']}: unknown work package {work_package}"
@@ -242,6 +266,18 @@ def validate_implementation_plan(plan: dict[str, Any]) -> list[str]:
                     f"safe_parallelism: work package {work_package} appears in multiple groups"
                 )
             seen_parallel.add(work_package)
+        for index, left in enumerate(members):
+            if left not in known:
+                continue
+            for right in members[index + 1 :]:
+                if right not in known:
+                    continue
+                if _depends_transitively(graph, left, right) or _depends_transitively(
+                    graph, right, left
+                ):
+                    issues.append(
+                        f"safe_parallelism {group['group_id']}: {left} and {right} are dependency-related and cannot run in parallel"
+                    )
 
     expected_gates = set(plan["gate_path"])
     evidence_gates = set(plan["required_evidence_by_gate"])
