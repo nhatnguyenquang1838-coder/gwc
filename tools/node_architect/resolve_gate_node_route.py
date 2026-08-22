@@ -10,7 +10,7 @@ from pathlib import Path
 import sys
 from typing import Any, Mapping
 
-MATURITY = {"experimental": 0, "pilot": 1, "stable": 2}
+MATURITY = {"experimental": 0, "candidate": 0.5, "pilot": 1, "stable": 2}
 SUPPORTED_MODES = {"normal", "fastlane", "e2e", "hotfix", "rescue"}
 FAIL_CODES = {
     "NODE_CONTEXT_NOT_LOADED", "NODE_ROUTE_MISSING", "NODE_ROUTE_AMBIGUOUS",
@@ -342,7 +342,18 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
         descriptor = {}
     if any(not descriptor.get(key) for key in ("node_id", "node_type", "authority_boundary", "gates")):
         return _blocked(reasons=["NODE_CONTRACT_INCOMPLETE"], **route_common)
-    if descriptor.get("node_id") != node_id or gate not in descriptor.get("gates", []):
+    if any(not descriptor.get(key) for key in ("node_id", "node_type", "authority_boundary", "gates")):
+        return _blocked(reasons=["NODE_CONTRACT_INCOMPLETE"], **route_common)
+    # Deterministic descriptor-to-runtime identity bridge: the catalog descriptor id
+    # is kebab-case (validation-quality-ci-evidence-capture) while the runtime/card/
+    # registry/route identifiers are dotted (validation_quality.ci-evidence-capture).
+    # Reconcile them via the shared bridge so the catalog descriptor is never mutated.
+    vin = _instruction_validator(root)
+    if vin is not None and hasattr(vin, "bridge_node_identity"):
+        id_match = vin.bridge_node_identity(descriptor.get("node_id")) == vin.bridge_node_identity(node_id)
+    else:
+        id_match = descriptor.get("node_id") == node_id
+    if not id_match or gate not in descriptor.get("gates", []):
         return _blocked(reasons=["GATE_NODE_BINDING_MISMATCH"], **route_common)
 
     current_maturity = str(node.get("maturity", ""))

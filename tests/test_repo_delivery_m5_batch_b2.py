@@ -54,6 +54,7 @@ class RepoDeliveryB2Tests(unittest.TestCase):
             "ahead_by": 17,
             "behind_by": 0,
             "approved_paths": APPROVED,
+            "readback_coverage": "complete",
             "changed_files": [
                 {"filename": "tools/node_architect/diff_readback.py", "status": "added", "additions": 10, "deletions": 0},
                 {"filename": ".gwc/tasks/SCRUM-196/g2/execution-envelope.yaml", "status": "added", "additions": 5, "deletions": 0},
@@ -168,7 +169,7 @@ class RepoDeliveryB2Tests(unittest.TestCase):
 
     def test_decisions_have_no_merge_or_production_authority(self) -> None:
         decisions = [
-            decide_diff_readback({"repository": REPO, "base_sha": BASE, "head_sha": HEAD, "branch": BRANCH, "compare_status": "ahead", "ahead_by": 1, "behind_by": 0, "approved_paths": APPROVED, "changed_files": [{"filename": "tools/node_architect/diff_readback.py"}]}),
+            decide_diff_readback({"repository": REPO, "base_sha": BASE, "head_sha": HEAD, "branch": BRANCH, "compare_status": "ahead", "ahead_by": 1, "behind_by": 0, "approved_paths": APPROVED, "readback_coverage": "complete", "changed_files": [{"filename": "tools/node_architect/diff_readback.py"}]}),
             decide_draft_pr_creation({"repository": REPO, "base_branch": "main", "branch": BRANCH, "base_sha": BASE, "head_sha": HEAD}),
             decide_ci_run_capture({"repository": REPO, "branch": BRANCH, "head_sha": HEAD, "required_workflows": ["Validate instructions"], "runs": [{"name": "Validate instructions", "run_id": 1, "status": "completed", "conclusion": "success", "head_sha": HEAD}]}),
         ]

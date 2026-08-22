@@ -8,8 +8,10 @@ It does not replace GWC governance or gate authority. It defines how the Control
 
 Read the normal GWC instructions first, then:
 
-1. `agents/shared/slack-controller-executor-protocol.md`
-2. this file
+1. `schemas/task-controller-root-card.schema.json`
+2. `agents/shared/slack-controller-executor-protocol.md`
+3. this file
+4. `tools/node_architect/slack_task_controller.py`
 
 For Slack Controller monitoring, the 60-second polling cadence in this overlay takes precedence over generic ChatGPT thread-sleep guidance. This precedence changes monitoring cadence only; it does not weaken any gate or authority rule.
 
@@ -98,6 +100,8 @@ Thinking, tool chatter, raw output, repetitive polling, and recovered transient 
 
 ## RootCard
 
+Compile RootCard state through `tools/node_architect/slack_task_controller.py` against `schemas/task-controller-root-card.schema.json` before rendering it to Slack Block Kit, GG, or another surface.
+
 Maintain exactly one RootCard for the run using the shared protocol. RootCard is the human quick view, not the execution journal.
 
 Keep visible when available:
@@ -112,14 +116,31 @@ Keep visible when available:
 - risk or blocker
 - Now / Next
 - last material update
+- exact ChatGPT conversation navigation
 
 Detailed milestone evidence belongs in thread replies.
+
+### Exact ChatGPT conversation deep-link
+
+The Controller runtime MUST supply the exact URL of the **current ChatGPT chat created/owned by this GPT runtime** as `conversation.deeplink`, together with `conversation.source = gpt_runtime_current_chat`.
+
+Treat the deeplink as opaque runtime data. Do not require a separate `conversation_id` and do not pin the contract to `/c/<conversation_id>` or any other undocumented route shape.
+
+The canonical compiler derives `Open in GPT` from that exact URL. Never:
+- use `https://chatgpt.com/` or another landing page as fallback
+- create a share/public link
+- fabricate or infer a conversation URL from a task/run/GPT identifier
+- accept an independently supplied `Open in GPT` URL
+- rewrite a valid exact deeplink in the renderer
+
+If the runtime cannot supply a valid exact current-chat URL, RootCard compilation must fail closed. Slack/Block Kit/GG must not repair the payload or render a fake navigation button.
 
 Human action buttons are contextual control intents:
 - `PAUSE` — stop before the next meaningful action boundary
 - `STOP` — no new mutation starts; return stopped/blocked state
 - `APPROVE` — only when exact human authority is required; the click itself does not create canonical GWC authority
 - `MERGE` — only at a valid G4 state and bound to exact PR/head; the click itself does not bypass GWC authority validation
+- `Open in GPT` — navigation only; compiler-derived and bound to this exact current ChatGPT chat
 
 ## Controller monitoring loop
 

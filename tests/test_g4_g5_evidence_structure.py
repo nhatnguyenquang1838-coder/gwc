@@ -18,11 +18,18 @@ import unittest
 
 import yaml
 
+from helpers.chatgpt_instruction_composer import (
+    compose_chatgpt_instructions,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "g4-g5-evidence.yml"
 CONTRACT = ROOT / "core" / "GATE_LIFECYCLE_CONTRACT_v1.0.md"
+# The ChatGPT agent instructions are a Composed Entrypoint; validate the
+# effective (composer + gwc-governed-base.md) content per SCRUM-404 / #441.
+CHATGPT_INSTRUCTIONS = compose_chatgpt_instructions(ROOT)
 INSTRUCTION_SURFACES = (
-    ROOT / "agents" / "chatgpt-agent" / "agent-instructions.md",
+    CHATGPT_INSTRUCTIONS,
     ROOT / "agents" / "dwc" / "agent-instructions.md",
     ROOT / "agents" / "instructionops-agent" / "agent-instructions.md",
 )
@@ -124,10 +131,13 @@ class G4G5EvidenceStructureTests(unittest.TestCase):
             self.assertIn(marker, text, f"missing in gate contract: {marker}")
 
     def test_instruction_surfaces_declare_lane_integrity_obligations(self) -> None:
-        for path in INSTRUCTION_SURFACES:
-            text = path.read_text(encoding="utf-8")
+        for surface in INSTRUCTION_SURFACES:
+            # Surfaces are pre-composed effective-instruction strings
+            # (composer + gwc-governed-base.md for ChatGPT) per SCRUM-404 / #441.
+            text = surface if isinstance(surface, str) else surface.read_text(encoding="utf-8")
+            label = "chatgpt-composed" if isinstance(surface, str) else surface.name
             for marker in LANE_MARKERS:
-                self.assertIn(marker, text, f"missing in {path.name}: {marker}")
+                self.assertIn(marker, text, f"missing in {label}: {marker}")
 
 
 if __name__ == "__main__":

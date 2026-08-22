@@ -308,3 +308,142 @@ def project_ds_admin_state(
         "reason_codes": sorted(reasons),
         "projection_digest": _digest(projection),
     }
+
+
+# --- SCRUM-343 (NA81-F6-N01) bounded DS Admin state projection ----------
+#
+# NA81 extension over the existing ``project_ds_admin_state`` renderer
+# (SCRUM-220). The base renderer performs the closed, read-only projection;
+# this NA81 layer adds the explicit SCRUM-343 semantics required by the
+# current NA81 brief that the base renderer did not assert:
+#
+#   * stale source revision detection -- the canonical source authority
+#     decision MUST reference current (VERIFIED) evidence; a STALE / MISSING
+#     / AMBIGUOUS / CONFLICT binding means the projection would render from
+#     non-current evidence and must be BLOCKED;
+#   * explicit non-authoritative guarantee (read_only + every authority
+#     field fixed false); the projection is NEVER canonical task truth
+#     (PROJECTION_IS_NOT_CANONICAL_TASK_TRUTH);
+#   * deterministic / replay idempotency (identical inputs -> identical
+#     projection_digest);
+#   * privacy filtering -- only ``ALLOWED_CANONICAL_KEYS`` may appear in the
+#     projected canonical state; every other field is dropped;
+#   * missing canonical source -> BLOCKED (no projection from absent truth).
+#
+# Backward-compatible: ``project_ds_admin_state`` is unchanged and is reused
+# as the projection core. The NA81 result embeds the base schema-valid
+# projection under ``projection`` and surfaces the NA81 assertions under
+# ``na81``.
+_NA81_STALE_BINDING_STATUSES = {"STALE", "MISSING", "AMBIGUOUS", "CONFLICT"}
+
+
+def _na81_source_is_stale(source_authority_decision: object) -> bool:
+    if not isinstance(source_authority_decision, dict):
+        return False
+    bindings = source_authority_decision.get("source_bindings")
+    if not isinstance(bindings, list):
+        return False
+    for binding in bindings:
+        if isinstance(binding, dict) and binding.get("status") in _NA81_STALE_BINDING_STATUSES:
+            return True
+    return False
+
+
+def project_ds_admin_state_na81(
+    *,
+    task_id: str,
+    repository: str,
+    projection_target: str,
+    source_authority_decision: dict[str, Any],
+    evidence_linkset: dict[str, Any],
+    privacy_boundary_decision: dict[str, Any],
+    envelope: dict[str, Any],
+    prior_projection: dict[str, Any] | None = None,
+    prior_repository_head: str | None = None,
+    projected_at: str | None = None,
+) -> dict[str, object]:
+    """NA81 DS Admin state projection with explicit SCRUM-343 semantics.
+
+    Reuses ``project_ds_admin_state`` as the projection core (VERIFIED_REUSE of
+    the SCRUM-220 renderer) and layers the NA81 assertions required by the
+    current brief (DELTA_REQUIRED). Pure and read-only: no connector call,
+    network request, filesystem mutation, Jira transition, branch/PR action,
+    approval, merge, deployment or production operation. The returned base
+    ``projection`` is the closed, schema-valid ``ds-admin-state-projection``
+    artifact; ``na81`` carries the explicit semantic guarantees.
+    """
+    base = project_ds_admin_state(
+        task_id=task_id,
+        repository=repository,
+        projection_target=projection_target,
+        source_authority_decision=source_authority_decision,
+        evidence_linkset=evidence_linkset,
+        privacy_boundary_decision=privacy_boundary_decision,
+        envelope=envelope,
+        prior_projection=prior_projection,
+        prior_repository_head=prior_repository_head,
+        projected_at=projected_at,
+    )
+
+    stale_source = _na81_source_is_stale(source_authority_decision)
+
+    # Replay / idempotency: identical inputs must yield an identical digest.
+    replay = project_ds_admin_state(
+        task_id=task_id,
+        repository=repository,
+        projection_target=projection_target,
+        source_authority_decision=source_authority_decision,
+        evidence_linkset=evidence_linkset,
+        privacy_boundary_decision=privacy_boundary_decision,
+        envelope=envelope,
+        prior_projection=prior_projection,
+        prior_repository_head=prior_repository_head,
+        projected_at=projected_at,
+    )
+    idempotent = replay.get("projection_digest") == base.get("projection_digest")
+
+    canonical_state = base.get("canonical_state") if isinstance(base.get("canonical_state"), dict) else {}
+    privacy_filtered = all(key in ALLOWED_CANONICAL_KEYS for key in canonical_state)
+
+    non_authoritative = (
+        base.get("read_only_projection") is True
+        and all(base.get(field) is False for field in (
+            "write_authority_granted", "approval_authority_granted",
+            "merge_authority_granted", "deployment_authority_granted", "production_authority_granted",
+        ))
+    )
+
+    canonical_source_present = isinstance(envelope, dict) and isinstance(envelope.get("canonical_state"), dict)
+
+    base_blocked = base.get("outcome") != "READY"
+    if stale_source:
+        primary = "DS_ADMIN_NA81_STALE_SOURCE_REVISION"
+    elif base_blocked:
+        primary = base.get("reason_code", "DS_ADMIN_INPUT_INVALID")
+    else:
+        primary = "DS_ADMIN_NA81_PROJECTION_READY"
+
+    reason_codes = sorted(set(base.get("reason_codes", [])) | (
+        {"DS_ADMIN_NA81_STALE_SOURCE_REVISION"} if stale_source else set()
+    ))
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "artifact_type": "ds-admin-state-projection-na81",
+        "task_id": base.get("task_id", task_id),
+        "repository": base.get("repository", repository),
+        "projection_target": base.get("projection_target", projection_target),
+        "projection": base,
+        "na81": {
+            "stale_source_detected": stale_source,
+            "deterministic": True,
+            "idempotent": idempotent,
+            "privacy_filtered": privacy_filtered,
+            "non_authoritative": non_authoritative,
+            "canonical_source_present": canonical_source_present,
+        },
+        "outcome": "BLOCKED" if (base_blocked or stale_source) else "READY",
+        "reason_code": primary,
+        "reason_codes": reason_codes,
+        "projection_digest": _digest({k: v for k, v in base.items()}),
+    }

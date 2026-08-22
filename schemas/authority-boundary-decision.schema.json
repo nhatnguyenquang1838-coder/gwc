@@ -104,6 +104,8 @@
     "risk_class": {"enum": ["R0", "R1", "R2", "R3"]},
     "production_scope_applicable": {"type": "boolean"},
     "manual_g5_action": {"type": "boolean"},
+    "envelope_expires_at": {"type": ["string", "null"]},
+    "stale_evidence": {"type": "boolean"},
     "event_id_or_idempotency_key": {"type": "string", "minLength": 1},
     "replay_status": {"enum": ["FIRST_SEEN", "IDEMPOTENT_REPLAY", "REPLAY_CONFLICT"]},
     "request_fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},

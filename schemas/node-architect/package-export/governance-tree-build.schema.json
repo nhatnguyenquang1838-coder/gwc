@@ -41,7 +41,7 @@
     },
     "plan_digest": {
       "type": "string",
-      "description": "Canonical semantic digest of the accepted source/target plan.",
+      "description": "Canonical semantic digest of the accepted source/target plan (topology-aware).",
       "pattern": "^[0-9a-f]{64}$"
     },
     "idempotency_key": {
@@ -51,19 +51,47 @@
     },
     "tree_digest": {
       "type": "string",
-      "description": "Deterministic semantic digest of the produced output tree.",
+      "description": "Deterministic semantic digest of the produced output tree (topology + content).",
       "pattern": "^[0-9a-f]{64}$"
     },
     "entry_inventory": {
       "type": "array",
-      "description": "Complete immutable entry inventory consumed downstream (SCRUM-234).",
+      "description": "Complete immutable entry inventory consumed downstream (SCRUM-234, SCRUM-356).",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["target", "source", "source_digest", "target_digest", "byte_count"],
+        "required": [
+          "target",
+          "source",
+          "source_digest",
+          "target_digest",
+          "byte_count"
+        ],
         "properties": {
           "target": { "type": "string" },
           "source": { "type": "string" },
+          "parent": {
+            "type": ["string", "null"],
+            "description": "Instruction-tree parent target (null for roots). NA81-F7."
+          },
+          "order": {
+            "type": ["integer", "null"],
+            "description": "Sibling ordering key (null when unordered). NA81-F7."
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Root distance in the instruction tree. NA81-F7."
+          },
+          "tree_path": {
+            "type": "string",
+            "description": "Root -> node path in the instruction tree. NA81-F7."
+          },
+          "index": {
+            "type": "integer",
+            "minimum": -1,
+            "description": "Canonical position in the build order. NA81-F7."
+          },
           "source_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
           "target_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
           "byte_count": { "type": ["integer", "null"], "minimum": 0 }
@@ -86,7 +114,11 @@
         "TREE_READBACK_MISMATCH",
         "TREE_STALE_SOURCE",
         "TREE_IDEMPOTENT_REPLAY",
-        "TREE_REPLAY_CONFLICT"
+        "TREE_REPLAY_CONFLICT",
+        "TREE_DUPLICATE_ENTRY",
+        "TREE_MISSING_PARENT",
+        "TREE_CYCLE_DETECTED",
+        "TREE_AMBIGUOUS_ORDER"
       ]
     }
   }

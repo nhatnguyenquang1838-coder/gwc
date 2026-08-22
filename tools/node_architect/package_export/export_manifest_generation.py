@@ -18,6 +18,25 @@ Design invariants (SCRUM-234 / F7 family contract):
   re-derive authority of any kind.
 * A generated manifest grants no repository, PR, merge, deploy or release
   authority; it is execution-plane evidence only.
+
+NA81-F7 delta (SCRUM-357)
+-------------------------
+The closed taxonomy already declared ``MANIFEST_ENTRY_INVALID`` and the
+family manifest schema already declared provenance fields, but the generator
+never emitted either. This delta closes that gap, fail-closed and backward
+compatible:
+
+* ``MANIFEST_ENTRY_INVALID`` is now emitted when the accepted plan carries a
+  duplicate target, when required provenance is missing, or when an entry is
+  not part of the validated upstream inventory (``require_validated``).
+* Provenance (exact source repository / ref / base SHA, project id, target
+  root) is bound to the manifest and, when ``require_provenance`` is set, its
+  absence blocks generation.
+* Per-entry ``expected_source_digest`` enables direct source-drift detection
+  (``MANIFEST_DIGEST_MISMATCH``) without a full upstream evidence cross-check.
+
+All new gates are opt-in (safe defaults) so existing callers and tests keep
+their prior behaviour.
 """
 
 from __future__ import annotations
@@ -50,6 +69,15 @@ REASON_CODES: Tuple[str, ...] = (
     MANIFEST_IDEMPOTENT_REPLAY,
 )
 
+# Provenance fields bound into the manifest and blockable when required.
+PROVENANCE_KEYS: Tuple[str, ...] = (
+    "source_repository",
+    "source_ref",
+    "source_base_sha",
+    "project_id",
+    "target_root",
+)
+
 ENTRY_STATUS_ACCEPTED = "ACCEPTED"
 ENTRY_STATUS_MISSING = "MISSING"
 ENTRY_STATUS_REJECTED = "REJECTED"
@@ -71,6 +99,9 @@ class ManifestPlanEntry:
     source: str
     target: str
     required: bool = True
+    # Optional declared digest; when set, a mismatch with the recomputed
+    # source digest is surface source drift (MANIFEST_DIGEST_MISMATCH).
+    expected_source_digest: Optional[str] = None
 
 
 @dataclass
@@ -146,6 +177,7 @@ def _build_manifest_dict(
     entries: List[EntryEvidence],
     outcome: Outcome,
     reason: str,
+    provenance: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     manifest = {
         "schema_id": SCHEMA_ID,
@@ -171,8 +203,49 @@ def _build_manifest_dict(
         "outcome": outcome.value,
         "reason": reason,
     }
+    # Bind provenance only when present (keeps prior manifests unchanged).
+    prov = provenance or {}
+    for key in PROVENANCE_KEYS:
+        value = prov.get(key)
+        if value:
+            manifest[key] = value
     manifest["manifest_digest"] = "sha256:" + compute_manifest_digest(manifest)
     return manifest
+
+
+# ---------------------------------------------------------------------------
+# Closed-schema validity gates (fail closed)
+# ---------------------------------------------------------------------------
+
+
+def _detect_duplicate_target(plan: List[ManifestPlanEntry]) -> Optional[str]:
+    """Return the first target that appears more than once in the plan."""
+    seen: set[str] = set()
+    for entry in plan:
+        if entry.target in seen:
+            return entry.target
+        seen.add(entry.target)
+    return None
+
+
+def _missing_provenance(
+    provenance: Optional[Dict[str, str]], *, require: bool
+) -> List[str]:
+    """List provenance keys required but absent/empty."""
+    if not require:
+        return []
+    prov = provenance or {}
+    return [key for key in PROVENANCE_KEYS if not prov.get(key)]
+
+
+def _extra_entries(
+    plan: List[ManifestPlanEntry],
+    upstream: Dict[str, Dict[str, Any]],
+) -> List[ManifestPlanEntry]:
+    """Entries whose target is not part of the validated upstream inventory."""
+    if not upstream:
+        return []
+    return [e for e in plan if e.target not in upstream]
 
 
 # ---------------------------------------------------------------------------
@@ -190,6 +263,41 @@ def _upstream_by_target(tree_build_evidence: Optional[Dict[str, Any]]) -> Dict[s
     return out
 
 
+def _fail_closed(
+    *,
+    idempotency_key: str,
+    plan_digest: str,
+    reason: str,
+    detail: str,
+    entries: List[EntryEvidence],
+    task_id: str,
+    source_sha: str,
+    package_version: str,
+    provenance: Optional[Dict[str, str]],
+) -> ExportManifestResult:
+    manifest = _build_manifest_dict(
+        task_id=task_id,
+        source_sha=source_sha,
+        package_version=package_version,
+        idempotency_key=idempotency_key,
+        plan_digest=plan_digest,
+        entries=entries,
+        outcome=Outcome.FAIL,
+        reason=reason,
+        provenance=provenance,
+    )
+    return ExportManifestResult(
+        outcome=Outcome.FAIL,
+        reason=reason,
+        idempotency_key=idempotency_key,
+        manifest_digest=manifest["manifest_digest"],
+        plan_digest=plan_digest,
+        entries=entries,
+        manifest=manifest,
+        detail=detail,
+    )
+
+
 def generate_export_manifest(
     plan: List[ManifestPlanEntry],
     source_root: str | os.PathLike[str],
@@ -201,6 +309,9 @@ def generate_export_manifest(
     tree_build_evidence: Optional[Dict[str, Any]] = None,
     cross_check: bool = False,
     existing_manifest: Optional[Dict[str, Any]] = None,
+    provenance: Optional[Dict[str, str]] = None,
+    require_provenance: bool = False,
+    require_validated: bool = False,
 ) -> ExportManifestResult:
     """Generate the deterministic export manifest for an accepted plan.
 
@@ -213,6 +324,16 @@ def generate_export_manifest(
     A result is only ``MANIFEST_GENERATED`` when every required source exists
     and (when cross-checked) digests agree. The manifest dict is embedded in
     the result and is byte-deterministic for identical inputs.
+
+    NA81-F7 closed-schema gates (fail closed, opt-in where noted):
+
+    * Duplicate target in the plan -> ``MANIFEST_ENTRY_INVALID`` (always on).
+    * ``require_provenance`` and a missing provenance key ->
+      ``MANIFEST_ENTRY_INVALID``.
+    * ``require_validated`` and a plan entry absent from the validated upstream
+      inventory -> ``MANIFEST_ENTRY_INVALID`` (extra entry).
+    * Per-entry ``expected_source_digest`` mismatching the recomputed source
+      digest -> ``MANIFEST_DIGEST_MISMATCH`` (source drift).
     """
     source_root = Path(source_root)
     plan_digest = compute_plan_digest(plan)
@@ -254,6 +375,84 @@ def generate_export_manifest(
             )
 
     upstream = _upstream_by_target(tree_build_evidence)
+
+    # --- Closed-schema validity gates (fail closed) -----------------------
+    dup = _detect_duplicate_target(plan)
+    if dup is not None:
+        return _fail_closed(
+            idempotency_key=idempotency_key,
+            plan_digest=plan_digest,
+            reason=MANIFEST_ENTRY_INVALID,
+            detail=f"plan contains duplicate target {dup!r}",
+            entries=[
+                EntryEvidence(
+                    source="",
+                    target=dup,
+                    entry_status=ENTRY_STATUS_REJECTED,
+                    source_digest=None,
+                    target_digest=None,
+                    byte_count=None,
+                    reason=MANIFEST_ENTRY_INVALID,
+                    detail=f"duplicate target in plan: {dup!r}",
+                )
+            ],
+            task_id=task_id,
+            source_sha=source_sha,
+            package_version=package_version,
+            provenance=provenance,
+        )
+
+    missing_prov = _missing_provenance(provenance, require=require_provenance)
+    if missing_prov:
+        return _fail_closed(
+            idempotency_key=idempotency_key,
+            plan_digest=plan_digest,
+            reason=MANIFEST_ENTRY_INVALID,
+            detail="missing required provenance: " + ", ".join(missing_prov),
+            entries=[
+                EntryEvidence(
+                    source="",
+                    target="",
+                    entry_status=ENTRY_STATUS_REJECTED,
+                    source_digest=None,
+                    target_digest=None,
+                    byte_count=None,
+                    reason=MANIFEST_ENTRY_INVALID,
+                    detail="missing required provenance: " + ", ".join(missing_prov),
+                )
+            ],
+            task_id=task_id,
+            source_sha=source_sha,
+            package_version=package_version,
+            provenance=provenance,
+        )
+
+    extra = _extra_entries(plan, upstream) if require_validated else []
+    if extra:
+        return _fail_closed(
+            idempotency_key=idempotency_key,
+            plan_digest=plan_digest,
+            reason=MANIFEST_ENTRY_INVALID,
+            detail="plan contains entries not in validated upstream inventory",
+            entries=[
+                EntryEvidence(
+                    source=e.source,
+                    target=e.target,
+                    entry_status=ENTRY_STATUS_REJECTED,
+                    source_digest=None,
+                    target_digest=None,
+                    byte_count=None,
+                    reason=MANIFEST_ENTRY_INVALID,
+                    detail="entry not present in validated upstream inventory",
+                )
+                for e in extra
+            ],
+            task_id=task_id,
+            source_sha=source_sha,
+            package_version=package_version,
+            provenance=provenance,
+        )
+
     entries: List[EntryEvidence] = []
 
     for entry in sorted(plan, key=lambda e: (e.target, e.source)):
@@ -272,25 +471,16 @@ def generate_export_manifest(
                         detail="required source missing at manifest time",
                     )
                 )
-                manifest = _build_manifest_dict(
+                return _fail_closed(
+                    idempotency_key=idempotency_key,
+                    plan_digest=plan_digest,
+                    reason=MANIFEST_SOURCE_MISSING,
+                    detail=f"required source {entry.source!r} missing",
+                    entries=entries,
                     task_id=task_id,
                     source_sha=source_sha,
                     package_version=package_version,
-                    idempotency_key=idempotency_key,
-                    plan_digest=plan_digest,
-                    entries=entries,
-                    outcome=Outcome.FAIL,
-                    reason=MANIFEST_SOURCE_MISSING,
-                )
-                return ExportManifestResult(
-                    outcome=Outcome.FAIL,
-                    reason=MANIFEST_SOURCE_MISSING,
-                    idempotency_key=idempotency_key,
-                    manifest_digest="sha256:" + manifest["manifest_digest"].split("sha256:")[1],
-                    plan_digest=plan_digest,
-                    entries=entries,
-                    manifest=manifest,
-                    detail=f"required source {entry.source!r} missing",
+                    provenance=provenance,
                 )
             # Optional missing entries are recorded as skipped evidence.
             entries.append(
@@ -309,6 +499,34 @@ def generate_export_manifest(
 
         data = src.read_bytes()
         source_digest = _sha256_bytes(data)
+
+        # Per-entry source-drift detection (independent of full upstream
+        # cross-check). Declared expected digest diverges from reality.
+        if entry.expected_source_digest and entry.expected_source_digest != source_digest:
+            entries.append(
+                EntryEvidence(
+                    source=entry.source,
+                    target=entry.target,
+                    entry_status=ENTRY_STATUS_REJECTED,
+                    source_digest=source_digest,
+                    target_digest=None,
+                    byte_count=len(data),
+                    reason=MANIFEST_DIGEST_MISMATCH,
+                    detail="source content drifted from declared expected digest",
+                )
+            )
+            return _fail_closed(
+                idempotency_key=idempotency_key,
+                plan_digest=plan_digest,
+                reason=MANIFEST_DIGEST_MISMATCH,
+                detail=f"source {entry.source!r} drifted from expected digest",
+                entries=entries,
+                task_id=task_id,
+                source_sha=source_sha,
+                package_version=package_version,
+                provenance=provenance,
+            )
+
         up = upstream.get(entry.target, {})
         target_digest = up.get("target_digest")
         up_source = up.get("source_digest")
@@ -326,25 +544,16 @@ def generate_export_manifest(
                     detail="source digest diverges from upstream tree-build evidence",
                 )
             )
-            manifest = _build_manifest_dict(
+            return _fail_closed(
+                idempotency_key=idempotency_key,
+                plan_digest=plan_digest,
+                reason=MANIFEST_DIGEST_MISMATCH,
+                detail=f"source {entry.source!r} digest mismatch vs upstream",
+                entries=entries,
                 task_id=task_id,
                 source_sha=source_sha,
                 package_version=package_version,
-                idempotency_key=idempotency_key,
-                plan_digest=plan_digest,
-                entries=entries,
-                outcome=Outcome.FAIL,
-                reason=MANIFEST_DIGEST_MISMATCH,
-            )
-            return ExportManifestResult(
-                outcome=Outcome.FAIL,
-                reason=MANIFEST_DIGEST_MISMATCH,
-                idempotency_key=idempotency_key,
-                manifest_digest="sha256:" + manifest["manifest_digest"].split("sha256:")[1],
-                plan_digest=plan_digest,
-                entries=entries,
-                manifest=manifest,
-                detail=f"source {entry.source!r} digest mismatch vs upstream",
+                provenance=provenance,
             )
 
         entries.append(
@@ -369,6 +578,7 @@ def generate_export_manifest(
         entries=entries,
         outcome=Outcome.PASS,
         reason=MANIFEST_GENERATED,
+        provenance=provenance,
     )
     return ExportManifestResult(
         outcome=Outcome.PASS,

@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """Deterministic closed-loop decisions for autonomous delivery to pre-prod.
 
-SCRUM-379 hotfix invariant: AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN.
-This module is deliberately side-effect free. Adapters perform Jira/GitHub/CI writes
-only after consuming an ALLOW decision bound to the same immutable inputs.
+Route invariant: AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN.
+This module is deliberately side-effect free. Adapters perform tracker/GitHub/Slack/CI
+writes only after consuming a decision bound to the same immutable inputs.
+
+The autonomous agent boots as TaskController. Claimed work is delegated through the
+existing Slack Controller–Executor MVP. Before a child can reach the standing G4 merge
+evaluator, an independent exact-head G4 pre-prod audit receipt is mandatory.
 """
 from __future__ import annotations
 
@@ -11,8 +15,6 @@ import hashlib
 import json
 from typing import Any, Mapping, Sequence
 
-# Autonomous child delivery is terminal-complete once the governed exact-head merge
-# to pre-prod succeeds. Post-merge G5 is observational/non-blocking for this route.
 TERMINAL_COMPLETE = {"COMPLETED", "PREPROD_MERGED", "G5_VERIFIED"}
 EXECUTABLE_STATUSES = {"TO_DO", "READY", "RETRYABLE"}
 MAX_AUTONOMOUS_RISK = 2
@@ -91,7 +93,7 @@ def resolve_authorized_ready_nodes(*, dag: Mapping[str, Any], manifest: Mapping[
 
 def claim_task(*, task_id: str, ready_task_ids: Sequence[str], claimant: str, lease_id: str,
                existing_claim: Mapping[str, Any] | None = None) -> dict[str, Any]:
-    """Produce replay-safe atomic-claim intent; adapter must CAS this against Jira/GitHub."""
+    """Produce replay-safe atomic-claim intent; adapter must CAS this against trackers."""
     if task_id not in set(ready_task_ids):
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_TASK_NOT_READY", "task_id": task_id}
     desired = {"task_id": task_id, "claimant": claimant, "lease_id": lease_id}
@@ -106,7 +108,7 @@ def claim_task(*, task_id: str, ready_task_ids: Sequence[str], claimant: str, le
 
 def validate_task_scope(*, task: Mapping[str, Any], manifest_task: Mapping[str, Any],
                         requested_paths: Sequence[str], immutable_authority_paths: Sequence[str]) -> dict[str, Any]:
-    """Allow Node Architect implementation when it cannot rewrite this run's authority plane."""
+    """Allow implementation when it cannot rewrite this run's active authority plane."""
     if task.get("task_id") != manifest_task.get("task_id"):
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_TASK_NOT_ALLOWLISTED"}
     risk = str(task.get("risk", manifest_task.get("risk", manifest_task.get("risk_class", "R3"))))
@@ -136,8 +138,19 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
                             ci_conclusion: str, review_conclusion: str,
                             standing_g4_valid: bool,
                             managed_evidence_current: bool = False,
-                            required_checks_terminal_success: bool = False) -> dict[str, Any]:
-    """Decide whether an exact-head child PR may merge autonomously to pre-prod."""
+                            required_checks_terminal_success: bool = False,
+                            audit_conclusion: str = "",
+                            audit_head_sha: str = "",
+                            audit_independent: bool = False,
+                            audit_trust_valid: bool = False,
+                            audit_receipt_valid: bool = False,
+                            audit_receipt_digest: str = "") -> dict[str, Any]:
+    """Decide whether normalized, trusted exact-head evidence permits pre-prod merge.
+
+    The caller must obtain ``audit_receipt_valid`` from ``validate_audit_receipt``
+    and ``audit_trust_valid`` from the trusted auditor-dispatch/readback adapter.
+    Audit evidence never grants merge authority; standing G4 remains the evaluator.
+    """
     if target_branch == "main":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_CHILD_MAIN_TARGET_FORBIDDEN"}
     if target_branch != "pre-prod":
@@ -153,6 +166,18 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_PR_MANAGED_EVIDENCE_NOT_CURRENT"}
     if review_conclusion != "pass":
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G3_REVIEW_NOT_PASS"}
+    if str(audit_conclusion).lower() != "pass":
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_NOT_PASS"}
+    if audit_head_sha != head_sha:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_STALE"}
+    if not audit_independent:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_NOT_INDEPENDENT"}
+    if not audit_trust_valid:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDITOR_TRUST_INVALID"}
+    if not audit_receipt_valid:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_RECEIPT_INVALID"}
+    if not audit_receipt_digest.startswith("sha256:") or len(audit_receipt_digest) != 71:
+        return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_DIGEST_INVALID"}
     if not standing_g4_valid:
         return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_STANDING_G4_AUTHORITY_INVALID"}
     evidence = {
@@ -162,6 +187,10 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
         "route_id": AUTONOMOUS_ROUTE_ID,
         "required_checks_terminal_success": True,
         "managed_evidence_current": True,
+        "g3_review": "pass",
+        "independent_g4_audit": "pass",
+        "audit_trust_valid": True,
+        "audit_receipt_digest": audit_receipt_digest,
         "standing_g4_valid": True,
     }
     return {
@@ -170,6 +199,9 @@ def child_delivery_decision(*, task_id: str, target_branch: str, head_sha: str,
         "route_id": AUTONOMOUS_ROUTE_ID,
         "merge_allowed": True,
         "main_merge_allowed": False,
+        "audit_required": True,
+        "audit_merge_authority": False,
+        "audit_receipt_digest": audit_receipt_digest,
         "evidence_digest": canonical_digest(evidence),
     }
 
@@ -180,6 +212,23 @@ def next_runtime_action(*, dag: Mapping[str, Any], claims: Mapping[str, Mapping[
         if task_id not in claims:
             return {"outcome": "READY", "task_id": task_id, "action": "CLAIM_AND_EXECUTE"}
     return {"outcome": "IDLE", "reason_code": "AUTONOMOUS_NO_UNCLAIMED_READY_TASK"}
+
+
+def _validate_runtime_audit_binding(observation: Mapping[str, Any], receipt: Mapping[str, Any]) -> dict[str, Any]:
+    """Bind the independently produced receipt to the current runtime observation."""
+    expected = {
+        "task_id": str(observation.get("task_id", "")),
+        "repository": str(observation.get("repository", "")),
+        "pr_number": observation.get("pr_number"),
+        "target_branch": str(observation.get("target_branch", "")),
+        "base_sha": str(observation.get("base_sha", "")),
+        "head_sha": str(observation.get("head_sha", "")),
+    }
+    for field, expected_value in expected.items():
+        if not expected_value or receipt.get(field) != expected_value:
+            return {"outcome": "BLOCK", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_BINDING_MISMATCH", "field": field}
+    from .audit_guardrail import validate_audit_receipt
+    return validate_audit_receipt(receipt, expected_head_sha=expected["head_sha"])
 
 
 def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
@@ -205,12 +254,37 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             "reason_code": "AUTONOMOUS_AUTHORIZED_READY_TASK_SELECTED",
             "state": "AUTHORIZED_READY",
             "task_id": nxt["task_id"],
+            "controller_role": "TaskController",
             "adapter_action": "JIRA_GITHUB_CAS_CLAIM",
             "dag": dag,
             "authority": authority,
         }
     if phase == "CLAIMED":
-        return {"outcome": "ALLOW", "reason_code": "AUTONOMOUS_AGENT_EXECUTION_REQUIRED", "task_id": observation.get("task_id"), "adapter_action": "INVOKE_AGENT_E2E"}
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_TASK_CONTROLLER_EXECUTOR_DISPATCH_REQUIRED",
+            "task_id": observation.get("task_id"),
+            "controller_role": "TaskController",
+            "executor_protocol": "agents/shared/slack-controller-executor-protocol.md",
+            "controller_skill": "skills/task-controller/SKILL.md",
+            "executor_skill": "skills/executor/SKILL.md",
+            "slack_is_authority": False,
+            "adapter_action": "TASK_CONTROLLER_DISPATCH_EXECUTOR_SLACK",
+        }
+    if phase == "EXECUTOR_WAIT_CONTROLLER":
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_TASK_CONTROLLER_REVIEW_REQUIRED",
+            "task_id": observation.get("task_id"),
+            "adapter_action": "TASK_CONTROLLER_REVIEW_EXECUTOR_REPORT",
+        }
+    if phase == "EXECUTOR_TERMINAL":
+        return {
+            "outcome": "ALLOW",
+            "reason_code": "AUTONOMOUS_EXECUTOR_TERMINAL_EVIDENCE_RECHECK_REQUIRED",
+            "task_id": observation.get("task_id"),
+            "adapter_action": "VERIFY_EXECUTOR_TERMINAL_EVIDENCE",
+        }
     if phase == "IMPLEMENTED":
         return {
             "outcome": "ALLOW",
@@ -223,6 +297,24 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             "adapter_action": "ASSEMBLE_AND_CREATE_OR_UPDATE_PREPROD_PR",
         }
     if phase == "G3_READY":
+        receipt = observation.get("audit_receipt")
+        if not isinstance(receipt, Mapping):
+            return {
+                "outcome": "PENDING",
+                "reason_code": "AUTONOMOUS_G4_PREPROD_AUDIT_REQUIRED",
+                "task_id": observation.get("task_id"),
+                "target_branch": observation.get("target_branch"),
+                "head_sha": observation.get("head_sha"),
+                "audit_agent": "agent-audit",
+                "audit_skill": "skills/audit-guardrail/SKILL.md",
+                "audit_merge_authority": False,
+                "adapter_action": "INVOKE_INDEPENDENT_G4_AUDIT",
+            }
+        receipt_validation = _validate_runtime_audit_binding(observation, receipt)
+        if receipt_validation.get("outcome") != "PASS":
+            return {**receipt_validation, "adapter_action": None}
+        if observation.get("audit_trust_valid") is not True:
+            return {"outcome": "BLOCKED", "reason_code": "AUTONOMOUS_G4_PREPROD_AUDITOR_TRUST_INVALID", "adapter_action": None}
         decision = child_delivery_decision(
             task_id=str(observation.get("task_id", "")),
             target_branch=str(observation.get("target_branch", "")),
@@ -232,6 +324,12 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             standing_g4_valid=bool(observation.get("standing_g4_valid")),
             managed_evidence_current=bool(observation.get("managed_evidence_current")),
             required_checks_terminal_success=bool(observation.get("required_checks_terminal_success")),
+            audit_conclusion=str(receipt.get("audit_outcome", "")),
+            audit_head_sha=str(receipt.get("head_sha", "")),
+            audit_independent=receipt.get("independent") is True,
+            audit_trust_valid=True,
+            audit_receipt_valid=True,
+            audit_receipt_digest=str(receipt.get("receipt_digest", "")),
         )
         if decision.get("outcome") != "ALLOW":
             return {**decision, "adapter_action": None}
@@ -247,8 +345,6 @@ def drive_closed_loop(observation: Mapping[str, Any]) -> dict[str, Any]:
             "adapter_action": "MARK_COMPLETE_REQUERY_DAG_AND_PROMOTIONS",
         }
     if phase == "G5_VERIFIED":
-        # Compatibility path for older observations; G5 is no longer required for
-        # autonomous pre-prod dependency unlock.
         return {
             "outcome": "ALLOW",
             "reason_code": "AUTONOMOUS_DAG_REFRESH_REQUIRED",

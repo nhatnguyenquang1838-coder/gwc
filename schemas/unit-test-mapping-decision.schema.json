@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/unit-test-mapping-decision.schema.json",
+  "title": "Unit Test Mapping Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "node_id",
+    "task_id",
+    "run_id",
+    "repository",
+    "branch",
+    "base_sha",
+    "head_sha",
+    "scope_hash",
+    "graph_revision",
+    "policy_digest",
+    "idempotency_key",
+    "status",
+    "reason_code",
+    "input_digest",
+    "evidence_digest",
+    "mapping",
+    "mapped_test_ids",
+    "replayed",
+    "merge_authority_granted",
+    "deployment_authority_granted",
+    "production_authority_granted"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "unit-test-mapping-decision"},
+    "node_id": {"const": "validation_quality.unit-test-mapping"},
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/\\s]+/[^/\\s]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "graph_revision": {"type": "string", "minLength": 1},
+    "policy_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PASS", "BLOCKED"]},
+    "reason_code": {"enum": [
+      "MAPPED_PASS",
+      "DOCS_ONLY",
+      "UNMAPPED_CHANGE",
+      "MISSING_REQUIRED_TEST",
+      "MAPPING_CONFLICT",
+      "POLICY_DRIFT",
+      "INVALID_INPUT",
+      "CONFLICTING_IDENTITY"
+    ]},
+    "input_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "evidence_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "mapping": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact",
+          "rule_id",
+          "classification",
+          "docs_only",
+          "required_tests",
+          "present_tests",
+          "missing_tests",
+          "status"
+        ],
+        "properties": {
+          "artifact": {"type": "string"},
+          "rule_id": {"type": ["string", "null"]},
+          "classification": {"type": ["string", "null"]},
+          "docs_only": {"type": "boolean"},
+          "required_tests": {"type": "array", "items": {"type": "string"}},
+          "present_tests": {"type": "array", "items": {"type": "string"}},
+          "missing_tests": {"type": "array", "items": {"type": "string"}},
+          "status": {"enum": ["MAPPED", "DOCS_ONLY", "UNMAPPED", "MISSING_TEST", "CONFLICT"]}
+        }
+      }
+    },
+    "mapped_test_ids": {"type": "array", "items": {"type": "string"}},
+    "replayed": {"type": "boolean"},
+    "merge_authority_granted": {"const": false},
+    "deployment_authority_granted": {"const": false},
+    "production_authority_granted": {"const": false}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "PASS"}}},
+      "then": {"properties": {"reason_code": {"enum": ["MAPPED_PASS", "DOCS_ONLY"]}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "BLOCKED"}}},
+      "then": {"properties": {"reason_code": {"enum": [
+        "UNMAPPED_CHANGE",
+        "MISSING_REQUIRED_TEST",
+        "MAPPING_CONFLICT",
+        "POLICY_DRIFT",
+        "INVALID_INPUT",
+        "CONFLICTING_IDENTITY"
+      ]}}}
+    }
+  ]
+}

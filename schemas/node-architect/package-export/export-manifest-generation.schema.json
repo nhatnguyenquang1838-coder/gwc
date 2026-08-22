@@ -40,6 +40,27 @@
       "type": "string",
       "description": "Consumer package version identity."
     },
+    "source_repository": {
+      "type": ["string", "null"],
+      "description": "Provenance: owner/repo the export was sourced from."
+    },
+    "source_ref": {
+      "type": ["string", "null"],
+      "description": "Provenance: exact source ref (branch/tag) the export was built from."
+    },
+    "source_base_sha": {
+      "type": ["string", "null"],
+      "description": "Provenance: exact 40-char base commit SHA the export was validated against.",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "project_id": {
+      "type": ["string", "null"],
+      "description": "Provenance: governed project identity."
+    },
+    "target_root": {
+      "type": ["string", "null"],
+      "description": "Provenance: exact target layout root the package is delivered to."
+    },
     "idempotency_key": {
       "type": "string",
       "minLength": 1,

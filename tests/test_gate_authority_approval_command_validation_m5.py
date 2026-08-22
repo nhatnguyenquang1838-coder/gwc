@@ -11,8 +11,10 @@ from tools.node_architect.approval_command_validation import (
     validate_approval_command,
     REASON_VALID,
     REASON_INPUT_INVALID,
+    REASON_COMMAND_MISMATCH,
     REASON_TOKEN_MISMATCH,
     REASON_EXPIRED,
+    REASON_BINDING_MISMATCH,
     REASON_HEAD_DRIFT,
     REASON_SCOPE_DRIFT,
     REASON_PR_STATE_INVALID,
@@ -229,6 +231,91 @@ class TestRejection(unittest.TestCase):
             approval_request=req, human_response=req["approval_command"],
             current_readback=rb, event_id_or_idempotency_key="evt-18")
         self.assertEqual(res["primary_reason_code"], REASON_TARGET_MISMATCH)
+
+
+class TestMandatedScenarioMatrix(unittest.TestCase):
+    """Brief-mandated scenarios (SCRUM-309 #244) not covered by the base matrix:
+
+    wrong approval ID, wrong/higher gate rejection, base_sha drift,
+    pr_number target mismatch, and replay-conflict. All are fail-closed and
+    must NOT expand authority to a higher gate than was validated.
+    """
+
+    def test_wrong_approval_id_rejected(self):
+        req = _request()
+        rb = _readback()
+        parts = req["approval_command"].split(" ")
+        bad = f"APPROVE G2 wrong-id-{parts[2]} {parts[3]} {parts[4]}"
+        res = validate_approval_command(
+            approval_request=req, human_response=bad,
+            current_readback=rb, event_id_or_idempotency_key="evt-id-1")
+        self.assertEqual(res["outcome"], "INVALID")
+        self.assertEqual(res["primary_reason_code"], REASON_COMMAND_MISMATCH)
+        self.assertFalse(res["execution_authority_granted"])
+
+    def test_wrong_gate_rejected(self):
+        # request expects G2 but human responds G4 -> mismatch (never upgrades)
+        req = _request(gate="G2_EXECUTION")
+        rb = _readback()
+        parts = req["approval_command"].split(" ")
+        bad = f"APPROVE G4 {parts[2]} {parts[3]} {parts[4]}"
+        res = validate_approval_command(
+            approval_request=req, human_response=bad,
+            current_readback=rb, event_id_or_idempotency_key="evt-gate-1")
+        self.assertEqual(res["outcome"], "INVALID")
+        self.assertEqual(res["primary_reason_code"], REASON_COMMAND_MISMATCH)
+        self.assertFalse(res["merge_authority_granted"])
+
+    def test_higher_gate_rejected(self):
+        # a G2-scoped approval must never authorize G4/G5/G6 -> fail closed
+        req = _request(gate="G2_EXECUTION")
+        rb = _readback()
+        parts = req["approval_command"].split(" ")
+        for hi in ("G4", "G5", "G6"):
+            bad = f"APPROVE {hi} {parts[2]} {parts[3]} {parts[4]}"
+            res = validate_approval_command(
+                approval_request=req, human_response=bad,
+                current_readback=rb, event_id_or_idempotency_key=f"evt-hi-{hi}")
+            self.assertEqual(res["outcome"], "INVALID",
+                             f"{hi} must not be accepted by a G2-scoped request")
+            self.assertFalse(res["merge_authority_granted"])
+            self.assertFalse(res["deployment_authority_granted"])
+            self.assertFalse(res["production_authority_granted"])
+
+    def test_base_sha_drift_rejected(self):
+        req = _request()
+        rb = _readback(base_sha="0" * 40)
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-base-1")
+        self.assertEqual(res["primary_reason_code"], REASON_BINDING_MISMATCH)
+        self.assertFalse(res["approval_valid"])
+
+    def test_pr_number_target_mismatch_rejected(self):
+        req = _request(scope_identity={
+            **REQUEST_KWARGS["scope_identity"], "pr_number": 221})
+        rb = _readback(pr_number=999)  # readback disagrees with request binding
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-pr-1")
+        self.assertEqual(res["primary_reason_code"], REASON_TARGET_MISMATCH)
+        self.assertFalse(res["approval_valid"])
+
+    def test_replay_conflict_rejected(self):
+        req = _request()
+        rb = _readback()
+        first = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-rc-1")
+        # second validation with a CONFLICTING prior outcome under same key
+        prior = dict(first, outcome="INVALID",
+                     primary_reason_code="APPROVAL_INPUT_INVALID")
+        second = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="evt-rc-1",
+            prior_validation=prior)
+        self.assertEqual(second["primary_reason_code"], REASON_REPLAY_CONFLICT)
+        self.assertFalse(second["approval_valid"])
 
 
 class TestReadbackUnavailable(unittest.TestCase):

@@ -140,6 +140,11 @@ DECISION_TABLE: Dict[str, tuple[str, bool, bool]] = {
     "TREE_BUILD_STAGED": (ROUTE_REVERIFY_READBACK, False, False),
     "TREE_IDEMPOTENT_REPLAY": (ROUTE_REVERIFY_READBACK, False, False),
     "TREE_REPLAY_CONFLICT": (ROUTE_HUMAN_REQUIRED, False, False),
+    # --- governance-tree-build NA81-F7 topology (SCRUM-356) ---
+    "TREE_DUPLICATE_ENTRY": (ROUTE_REPAIR_INPUT, False, False),
+    "TREE_MISSING_PARENT": (ROUTE_REPAIR_INPUT, False, False),
+    "TREE_AMBIGUOUS_ORDER": (ROUTE_REPAIR_INPUT, False, False),
+    "TREE_CYCLE_DETECTED": (ROUTE_HUMAN_REQUIRED, False, False),
     # --- deterministic-hash-verification (HASH_*) ---
     "HASH_TARGET_MISSING": (ROUTE_REPAIR_INPUT, False, False),
     "HASH_SOURCE_MISMATCH": (ROUTE_HUMAN_REQUIRED, False, False),

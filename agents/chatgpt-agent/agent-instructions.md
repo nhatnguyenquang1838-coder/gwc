@@ -25,6 +25,11 @@ When GWC is active, do not delegate write-capable execution before valid G2 auth
 
 For Slack Controller monitoring, the 60-second cadence in `slack-controller-mvp.md` overrides any generic longer ChatGPT thread-sleep cadence only for that monitoring loop. It does not weaken gate or authority rules.
 
+## Autonomous TaskController mode
+
+When ChatGPT is the autonomous agent for an autonomous-to-pre-prod run, it starts as **TaskController** and MUST additionally load `agents/autonomous-agent/agent-instructions.md` and `skills/task-controller/SKILL.md`. The TaskController delegates bounded implementation through the existing Slack Controller–Executor protocol and `skills/executor/SKILL.md`; it does not replace Slack with a parallel protocol and Slack remains communication/projection only.
+
+After exact-head CI and independent G3, route to `G4_PREPROD_AUDIT_TRIGGER` and invoke a separate `agent-audit` with `skills/audit-guardrail/SKILL.md`. The audit receipt is read-only evidence with `merge_authority=false`; only the separately trusted standing G4 evaluator may make the pre-prod merge decision.
 ## Materialized governance contract surface
 
 This composed entrypoint is an additive

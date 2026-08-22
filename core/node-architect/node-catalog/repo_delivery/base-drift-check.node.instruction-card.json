@@ -1,0 +1,129 @@
+{
+  "node_id": "repo_delivery.base-drift-check",
+  "gate": "G2_EXECUTION",
+  "purpose": "Detect base drift before branch creation, PR updates, and merge-bound checks; invalidate stale approval/envelope evidence when the observed base is not an exact trusted descendant of the approved base.",
+  "entry_conditions": {
+    "prerequisite_gate": "G2_EXECUTION",
+    "artifacts_required": [
+      ".gwc/tasks/<task-id>/g2/execution-envelope.yaml"
+    ],
+    "conditions": [
+      {
+        "type": "artifact_exists",
+        "expression": ".gwc/tasks/<task-id>/g2/execution-envelope.yaml"
+      },
+      {
+        "type": "state_match",
+        "expression": "envelope.base_sha == approved_base_sha"
+      }
+    ]
+  },
+  "inputs": {
+    "required": [
+      {
+        "name": "repository",
+        "type": "string",
+        "description": "Target repository (owner/name)"
+      },
+      {
+        "name": "approved_base_sha",
+        "type": "sha",
+        "description": "Exact bound autonomous base SHA (pre-prod)"
+      },
+      {
+        "name": "observed_base_sha",
+        "type": "sha",
+        "description": "Observed current remote pre-prod base SHA"
+      },
+      {
+        "name": "scope_hash",
+        "type": "string",
+        "description": "Canonical scope hash of the active envelope"
+      }
+    ],
+    "optional": [
+      {
+        "name": "pending_action",
+        "type": "string",
+        "description": "Any pending external action requiring reconciliation before drift check"
+      },
+      {
+        "name": "connector_status",
+        "type": "string",
+        "description": "Connector readback status (observed/unavailable/ambiguous)"
+      }
+    ]
+  },
+  "allowed_actions": [
+    "compare_exact_refs",
+    "validate_base_ancestry",
+    "classify_base_drift",
+    "invalidate_stale_approval",
+    "record_base_drift_decision"
+  ],
+  "forbidden_actions": [
+    "grant_gate_authority",
+    "grant_g2_authority",
+    "grant_g3_authority",
+    "merge",
+    "auto_merge",
+    "deploy",
+    "redeploy",
+    "release",
+    "publish",
+    "runtime_reload",
+    "production_configuration",
+    "production_data",
+    "credential_change",
+    "secret_change",
+    "migration",
+    "force_push",
+    "branch_deletion",
+    "history_rewrite",
+    "pr_base_change"
+  ],
+  "outputs": {
+    "required_artifacts": [
+      ".gwc/tasks/<task-id>/g2/base-drift-decision.yaml"
+    ],
+    "evidence_contract": "schemas/node-architect/evidence-ledger.schema.json",
+    "logs_contract": "schemas/node-architect/log-ledger.schema.json"
+  },
+  "evidence_required": {
+    "type": "artifact",
+    "schema": "schemas/node-architect/evidence-ledger.schema.json",
+    "location": ".gwc/tasks/<task-id>/g2/base-drift-decision.yaml"
+  },
+  "logs_required": {
+    "type": "event",
+    "format": "json",
+    "persistence": "local"
+  },
+  "next": {
+    "next_node": "repo_delivery.scoped-file-write",
+    "next_gate": null,
+    "next_route": "full-flow-v3",
+    "route_resolution": "static"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff": "linear",
+    "exponential_base": 1.5,
+    "retryable_errors": [
+      "BASE_READBACK_UNAVAILABLE"
+    ]
+  },
+  "rollback": {
+    "prerequisite": "base drift decision recorded with invalidated approval",
+    "action": "notify_human",
+    "conditions": [
+      "approved_base_sha != observed_base_sha",
+      "envelope invalidated"
+    ]
+  },
+  "authority_boundary": {
+    "grants_gate_authority": false,
+    "grants_write_authority": false,
+    "grants_merge_authority": false
+  }
+}

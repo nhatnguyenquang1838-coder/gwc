@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/task-controller-root-card.schema.json",
+  "title": "TaskController RootCard",
+  "description": "Canonical machine-readable semantic contract for TaskController RootCard projections.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "schema_ref",
+    "run_id",
+    "task_id",
+    "human_owner",
+    "gate",
+    "controller_id",
+    "executor_id",
+    "executor_model",
+    "token_usage",
+    "cost",
+    "active_subtask",
+    "progress",
+    "repository",
+    "branch",
+    "pr",
+    "head_sha",
+    "ci",
+    "risk",
+    "now",
+    "next",
+    "last_material_update",
+    "conversation",
+    "actions",
+    "card_digest"
+  ],
+  "properties": {
+    "artifact_type": {"const": "task-controller-root-card"},
+    "schema_version": {"const": "1.1"},
+    "schema_ref": {"const": "schemas/task-controller-root-card.schema.json"},
+    "run_id": {"type": "string", "minLength": 1},
+    "task_id": {"type": "string", "minLength": 1},
+    "human_owner": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+    "controller_id": {"type": "string", "minLength": 1},
+    "executor_id": {"type": "string", "minLength": 1},
+    "executor_model": {"type": "string", "minLength": 1},
+    "token_usage": {"type": "string", "minLength": 1},
+    "cost": {"enum": ["FREE", "metered", "unknown"]},
+    "active_subtask": {"type": "string", "minLength": 1},
+    "progress": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "branch": {"type": "string", "minLength": 1},
+    "pr": {"type": ["string", "null"]},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "ci": {"type": "string", "minLength": 1},
+    "risk": {"type": "string", "minLength": 1},
+    "now": {"type": "string", "minLength": 1},
+    "next": {"type": "string", "minLength": 1},
+    "last_material_update": {"type": "string", "minLength": 1},
+    "conversation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform", "source", "deeplink"],
+      "properties": {
+        "platform": {"const": "chatgpt"},
+        "source": {"const": "gpt_runtime_current_chat"},
+        "deeplink": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://chatgpt\\.com/(?!share(?:/|$)).+"
+        },
+        "context_key": {"type": "string", "minLength": 1}
+      }
+    },
+    "actions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pause", "stop", "approve", "merge", "open_in_gpt"],
+      "properties": {
+        "pause": {"type": "boolean"},
+        "stop": {"type": "boolean"},
+        "approve": {"type": "boolean"},
+        "merge": {"type": "boolean"},
+        "open_in_gpt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "url"],
+          "properties": {
+            "label": {"const": "Open in GPT"},
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://chatgpt\\.com/(?!share(?:/|$)).+"
+            }
+          }
+        }
+      }
+    },
+    "card_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
