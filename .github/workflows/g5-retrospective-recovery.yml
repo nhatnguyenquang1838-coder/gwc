@@ -1,1 +1,132 @@
-x
+name: G5 retrospective recovery
+
+on:
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  g5-retrospective-recovery:
+    if: github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout protected base
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Materialize retrospective recovery candidate
+        id: candidate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = context.payload.comment.body || '';
+            if (!body.includes('RETROSPECTIVE G5 RECOVERY EVIDENCE')) {
+              core.setOutput('matched', 'false');
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const prNumber = context.payload.issue.number;
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner,
+              repo,
+              username: context.payload.comment.user.login,
+            });
+
+            const candidate = {
+              schema_version: '1.0',
+              artifact_type: 'g5-retrospective-recovery-candidate',
+              repository: `${owner}/${repo}`,
+              comment_body: body,
+              comment_id: context.payload.comment.id,
+              comment_url: context.payload.comment.html_url,
+              comment_author: context.payload.comment.user.login,
+              comment_author_permission: permission.permission,
+              pr_number: pr.number,
+              pr_merged: pr.merged === true,
+              pr_head_sha: pr.head.sha,
+              merge_commit_sha: pr.merge_commit_sha,
+              merged_at: pr.merged_at,
+              new_merge_authority_inferred: false,
+              manual_g5_action_authorized: false,
+              g6_authorized: false,
+            };
+            fs.writeFileSync('g5-retrospective-candidate.json', JSON.stringify(candidate, null, 2));
+            core.setOutput('matched', 'true');
+
+      - name: Validate retrospective G5 recovery evidence
+        if: steps.candidate.outputs.matched == 'true'
+        run: >-
+          python tools/validate_g5_retrospective_recovery.py
+          g5-retrospective-candidate.json
+          --write-artifact g5-retrospective-recovery.json
+
+      - name: Upload retrospective G5 recovery artifact
+        if: steps.candidate.outputs.matched == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: g5-retrospective-recovery-pr-${{ github.event.issue.number }}
+          path: g5-retrospective-recovery.json
+          if-no-files-found: error
+
+      - name: Publish retrospective G5 recovery trace
+        if: steps.candidate.outputs.matched == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.issue.number;
+            const proof = JSON.parse(fs.readFileSync('g5-retrospective-recovery.json', 'utf8'));
+            const marker = `<!-- gwc:g5-retrospective-recovery pr=${proof.pr_number} merge=${proof.merge_commit_sha} source_comment_id=${proof.source_comment_id} mode=retrospective -->`;
+            const body = `${marker}
+            ## G5 Retrospective Recovery Receipt
+
+            | Field | Value |
+            |---|---|
+            | Recovery mode | \`${proof.recovery_mode}\` |
+            | Gate | \`${proof.gate}\` |
+            | Approval ID | \`${proof.approval_id}\` |
+            | PR | #${proof.pr_number} |
+            | Approved head | \`${proof.approved_head_sha}\` |
+            | Merge commit | \`${proof.merge_commit_sha}\` |
+            | Failed post-merge run | \`${proof.failed_post_merge_run_id}\` |
+            | Source comment | \`${proof.source_comment_id}\` |
+            | Normal G4 authority minted | \`${proof.normal_g4_authority_minted}\` |
+            | New merge authority inferred | \`${proof.new_merge_authority_inferred}\` |
+            | Manual G5 action authorized | \`${proof.manual_g5_action_authorized}\` |
+            | G6 authorized | \`${proof.g6_authorized}\` |
+
+            This is a retrospective evidence-recovery receipt only. It does not backdate G4 authority and does not authorize deployment, release, production data/config changes, migration, or G6.`;
+            try {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              core.notice(`Published retrospective G5 recovery receipt for PR #${issue_number}.`);
+            } catch (error) {
+              const status = error?.status || error?.response?.status || 'unknown';
+              const message = error?.message || String(error);
+              core.warning(`Retrospective G5 recovery evidence is valid and artifact upload already completed, but PR receipt publication failed with status ${status}: ${message}`);
+              await core.summary
+                .addHeading('G5 retrospective recovery trace publish skipped')
+                .addRaw('Canonical machine evidence remains the uploaded `g5-retrospective-recovery-pr-*` artifact.\n\n')
+                .addTable([
+                  [{data: 'Field', header: true}, {data: 'Value', header: true}],
+                  ['PR', `#${proof.pr_number}`],
+                  ['Merge commit', `\`${proof.merge_commit_sha}\``],
+                  ['Source comment', `\`${proof.source_comment_id}\``],
+                  ['Publish status', `\`${status}\``],
+                  ['Manual G5 action authorized', `\`${proof.manual_g5_action_authorized}\``],
+                  ['G6 authorized', `\`${proof.g6_authorized}\``],
+                ])
+                .write();
+            }
