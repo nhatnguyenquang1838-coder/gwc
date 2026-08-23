@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: scrum-397-wp1-executor-report
+task_id: SCRUM-397
+work_package: WP1
+run_id: SCRUM-397-WP1-DIGEST-INVENTORY-R1
+controller: ChatGPT
+auxiliary_executor: Hermes Cloud
+repository: nhatnguyenquang1838-coder/gwc
+base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
+g2_request_id: g2_scrum-397_9c60c3e24a130eec
+g2_scope_hash: sha256:5d88ce89ca868d1d540510244a34a047cdd936cd1a83c9d197052feba7128c1a
+implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+status: BLOCKED
+reason_codes:
+- EXHAUSTIVE_INVENTORY_NOT_PROVEN
+- GITHUB_CODE_SEARCH_RESULT_CAP_100
+- HERMES_EXECUTOR_ENV_NO_SPACE_LEFT_ON_DEVICE
+- HERMES_RESET_RECOVERY_FAILED
+facts:
+- Human G2 approval validated VALID/FIRST_SEEN before execution.
+- Guarded branch was created from exact approved base SHA.
+- All durable writes performed by Controller are under .gwc/tasks/SCRUM-397/**.
+- No runtime/product source was changed.
+- GitHub direct probes produced a large candidate set and confirmed representative RAW_BYTES, SEMANTIC_PROFILED, and mixed callsites.
+- Broad hashlib.sha256 probe hit connector cap at 100 results, preventing proof that no source callsite was omitted.
+- Hermes Cloud was dispatched on the canonical Slack thread for repo-local exhaustive enumeration and failed before mutation with Errno 28 No space left on device.
+- A bounded reset/recovery intercept was attempted; Hermes failed again with the same Errno 28 before mutation.
+- Direct /reset plus fresh-session probe produced no usable Hermes execution context.
+completion_contract:
+  exhaustive_inventory: false
+  classifications_complete: false
+  unresolved_ambiguities_zero: false
+  runtime_behavior_changed: false
+  consumer_migration_performed: false
+  pr_created_or_updated: false
+  merge_performed: false
+  deploy_or_release_performed: false
+  g3_g4_g5_g6_authority_used: false
+changed_paths_expected:
+- .gwc/tasks/SCRUM-397/g2/approval-readback.yaml
+- .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
+- .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
+next_action: >-
+  WAIT_CONTROLLER. Do not advance to WP2. Recover an execution environment capable of exhaustive repo-local enumeration,
+  or obtain an equivalent exhaustive repository search/AST capability, then resume WP1 under the same bounded objective.
+wp2_eligible: false
