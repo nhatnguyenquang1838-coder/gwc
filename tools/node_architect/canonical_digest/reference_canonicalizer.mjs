@@ -67,7 +67,9 @@ export class CanonicalDigestError extends Error {
 
 // --- Lexical JSON tokenizer preserving duplicate-key / -0 evidence -------
 
-const WS = /\s/;
+// JSON whitespace is EXACTLY four characters: SP/TAB/CR/LF. Anything else
+// (e.g. NBSP U+00A0) is a syntax error -> DIGEST_INPUT_DOMAIN_VIOLATION.
+const WS = new Set([" ", "\t", "\r", "\n"]);
 const DIGIT = /[0-9]/;
 
 class Tokenizer {
@@ -79,7 +81,13 @@ class Tokenizer {
     throw new CanonicalDigestError(code, detail);
   }
   skipWs() {
-    while (this.pos < this.text.length && WS.test(this.text[this.pos])) this.pos++;
+    while (this.pos < this.text.length && WS.has(this.text[this.pos])) this.pos++;
+    // Reject non-JSON whitespace (e.g. NBSP U+00A0): syntax error, not a
+    // key/separator token.
+    if (this.pos < this.text.length && /\s/.test(this.text[this.pos]) &&
+        !WS.has(this.text[this.pos])) {
+      this.error(ERROR.DIGEST_INPUT_DOMAIN_VIOLATION, "non-JSON whitespace");
+    }
   }
   peek() {
     this.skipWs();

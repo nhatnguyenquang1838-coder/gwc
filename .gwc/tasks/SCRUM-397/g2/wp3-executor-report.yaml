@@ -12,11 +12,18 @@ status: PASS
 
 summary: >-
   WP3 cross-runtime conformance corpus + independent Python and Node reference
-  canonicalizers materialized. 36 golden vectors (22 positive, 14 negative)
+  canonicalizers materialized. 53 golden vectors (36 positive, 17 negative)
   are language-neutral and were generated only after both runtimes agreed
   byte-for-byte on canonical bytes + framed SHA-256 (positive) and the exact
   DIGEST_* taxonomy error (negative). No production/shared API, no
   package_export runtime edit, no consumer migration.
+
+correction_log:
+  - INTERCEPT_C1: object key ordering uses RFC-8785 UTF-16 code units (not code points); vector P23 distinguishes U+1F600 vs U+E000 ordering
+  - INTERCEPT_C1: all JSON numeric tokens parsed with IEEE-754 binary64 semantics; vectors P27/P28/P29 (9007199254740991/2/3) + RFC-8785 numeric edges (P31-P36)
+  - INTERCEPT_C1: negative-zero detection moved to lexical numeric tokens (never string content/key text); P24/P25/P26 prove '-0' string content is not numeric negative zero
+  - INTERCEPT_C1: lexical whitespace restricted to JSON SP/TAB/CR/LF; N15 (NBSP) rejected DIGEST_INPUT_DOMAIN_VIOLATION by both runtimes
+  - INTERCEPT_C1: RFC-8785 Appendix-B-style representative numeric values added (P31-P36, P34 rounding)
 
 authorized_paths_written:
   - .gwc/tasks/SCRUM-397/g2/wp3-execution-envelope.yaml
@@ -34,14 +41,17 @@ validation:
   python_tests: 4
   python_passed: 4
   node_conformance: node --test tests/conformance/canonical_digest/test_node_conformance.mjs
-  node_tests: 38
-  node_passed: 38
+  node_tests: 55
+  node_passed: 55
   node_failed: 0
-  corpus_schema_validation: 36/36 vectors conform to canonical-digest-golden-vector.schema.json
-  cross_runtime_proof: byte-identical canonical bytes + framed SHA-256 on all 22 positive vectors; exact DIGEST_* error on all 14 negative vectors
+  corpus_schema_validation: 53/53 vectors conform to canonical-digest-golden-vector.schema.json
+  cross_runtime_proof: byte-identical canonical bytes + framed SHA-256 on all 36 positive vectors; exact DIGEST_* error on all 17 negative vectors
   yaml_json_parse: ALL_OK (corpus is JSON text, valid YAML 1.2)
   network_side_effects: none
   secrets_touched: none
+  golden_vector_count: 53
+  positive_vectors: 36
+  negative_vectors: 17
 
 semantic_decisions:
   runtimes: [python3.9, node22]

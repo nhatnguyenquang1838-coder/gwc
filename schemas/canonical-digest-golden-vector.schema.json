@@ -34,6 +34,7 @@
     "expected_error": {
       "type": "string",
       "enum": [
+        "DIGEST_INPUT_DOMAIN_VIOLATION",
         "DIGEST_NEGATIVE_ZERO_REJECTED",
         "DIGEST_NON_FINITE_REJECTED",
         "DIGEST_NON_STRING_KEY_REJECTED",

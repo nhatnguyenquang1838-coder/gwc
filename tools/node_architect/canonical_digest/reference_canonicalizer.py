@@ -171,39 +171,246 @@ def _escape_string(s: str, *, max_string_bytes: int) -> str:
     return result
 
 
-# --- Negative-zero lexical detection ----------------------------------------
-_JSON_NUMBER_TOKEN = re.compile(
-    r"-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?"
-)
+def _utf16_code_units(s: str) -> tuple:
+    """UTF-16 code units (RFC-8785 key ordering), not code points.
 
-
-def _has_negative_zero(raw_text: str) -> bool:
-    """Detect any JSON number token whose value is exactly -0.
-
-    Parsers collapse -0 to 0, so this must be checked at the lexical layer on
-    the raw input (preserves evidence that semantic parsing would erase).
+    Big-endian UTF-16 bytes preserve lexicographic code-unit order: comparing
+    two keys byte-by-byte on utf-16-be equals comparing their UTF-16 code-unit
+    sequences. (utf-16-le would reverse pair order.)
     """
-    for m in _JSON_NUMBER_TOKEN.finditer(raw_text):
-        tok = m.group(0)
-        if not tok.startswith("-"):
-            continue
-        rest = re.sub(r"[eE][+-]?\d+$", "", tok[1:])
-        if rest.replace(".", "").strip("0") == "":
-            return True
-    return False
+    return tuple(s.encode("utf-16-be"))
 
 
-def _reject_duplicate_or_nonstring_keys(pairs):
-    """object_pairs_hook: reject duplicate raw keys before semantic collapse
-    and reject non-string object keys (DIGEST_* taxonomy)."""
-    seen = set()
-    for key, _ in pairs:
-        if not isinstance(key, str):
-            raise CanonicalDigestError(DIGEST_NON_STRING_KEY_REJECTED)
-        if key in seen:
-            raise CanonicalDigestError(DIGEST_DUPLICATE_RAW_KEY_REJECTED)
-        seen.add(key)
-    return dict(pairs)
+# --- Lexical JSON tokenizer ------------------------------------------------
+# JSON whitespace is EXACTLY four characters: SP/TAB/CR/LF. Anything else
+# (e.g. NBSP U+00A0) is a syntax error -> DIGEST_INPUT_DOMAIN_VIOLATION.
+_JSON_WS = {" ", "\t", "\r", "\n"}
+
+
+class _JsonTokenizer:
+    def __init__(self, text: str, limits: dict):
+        self.text = text
+        self.pos = 0
+        self.limits = limits
+
+    def err(self, code: str):
+        raise CanonicalDigestError(code)
+
+    def _skip_ws(self):
+        while self.pos < len(self.text) and self.text[self.pos] in _JSON_WS:
+            self.pos += 1
+        # Reject non-JSON whitespace (e.g. NBSP U+00A0): it is a syntax error,
+        # not a key/separator token.
+        if self.pos < len(self.text) and self.text[self.pos].isspace() \
+                and self.text[self.pos] not in _JSON_WS:
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+
+    def _peek(self):
+        self._skip_ws()
+        return self.text[self.pos] if self.pos < len(self.text) else None
+
+    def _parse_string(self) -> str:
+        self._skip_ws()
+        if self.pos >= len(self.text) or self.text[self.pos] != '"':
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        self.pos += 1
+        out = []
+        while True:
+            if self.pos >= len(self.text):
+                self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            ch = self.text[self.pos]
+            if ch == '"':
+                self.pos += 1
+                break
+            if ch == "\\":
+                self.pos += 1
+                if self.pos >= len(self.text):
+                    self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+                e = self.text[self.pos]
+                simple = {'"': '"', "\\": "\\", "/": "/",
+                          "b": "\b", "f": "\f", "n": "\n",
+                          "r": "\r", "t": "\t"}
+                if e in simple:
+                    out.append(simple[e]); self.pos += 1
+                elif e == "u":
+                    hexs = self.text[self.pos + 1:self.pos + 5]
+                    if len(hexs) != 4 or any(c not in "0123456789abcdefABCDEF" for c in hexs):
+                        self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+                    cp = int(hexs, 16)
+                    self.pos += 5
+                    # Surrogate pair: \uD83D\uDE00 -> single non-BMP code point.
+                    if 0xD800 <= cp <= 0xDBFF and self.pos + 1 < len(self.text) \
+                            and self.text[self.pos:self.pos + 2] == "\\u":
+                        low_hex = self.text[self.pos + 2:self.pos + 6]
+                        if len(low_hex) == 4 and all(c in "0123456789abcdefABCDEF" for c in low_hex):
+                            low = int(low_hex, 16)
+                            if 0xDC00 <= low <= 0xDFFF:
+                                out.append(chr(0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00)))
+                                self.pos += 6
+                                continue
+                    out.append(chr(cp))
+                else:
+                    self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            else:
+                cc = ord(ch)
+                if cc < 0x20:
+                    self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+                out.append(ch)
+                self.pos += 1
+        s = "".join(out)
+        # Reject UNPAIRED surrogates (invalid Unicode) — NOT normalization.
+        i = 0
+        n = len(s)
+        while i < n:
+            cc = ord(s[i])
+            if 0xD800 <= cc <= 0xDBFF:
+                nxt = ord(s[i + 1]) if i + 1 < n else 0
+                if 0xDC00 <= nxt <= 0xDFFF:
+                    i += 2
+                    continue
+                self.err(DIGEST_INVALID_UNICODE_REJECTED)
+            elif 0xDC00 <= cc <= 0xDFFF:
+                self.err(DIGEST_INVALID_UNICODE_REJECTED)
+            i += 1
+        # Length check only after surrogate rejection (lone surrogates cannot
+        # be UTF-8 encoded, so they must be rejected first).
+        if len(s.encode("utf-8")) > self.limits["max_string_bytes"]:
+            self.err(DIGEST_RESOURCE_LIMIT_EXCEEDED)
+        return s
+
+    def _parse_number(self):
+        self._skip_ws()
+        start = self.pos
+        if self.pos < len(self.text) and self.text[self.pos] == "-":
+            self.pos += 1
+        if self.pos >= len(self.text):
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        if self.text[self.pos] == "0":
+            self.pos += 1
+        elif self.text[self.pos].isdigit():
+            while self.pos < len(self.text) and self.text[self.pos].isdigit():
+                self.pos += 1
+        else:
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        if self.pos < len(self.text) and self.text[self.pos] == ".":
+            self.pos += 1
+            if self.pos >= len(self.text) or not self.text[self.pos].isdigit():
+                self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            while self.pos < len(self.text) and self.text[self.pos].isdigit():
+                self.pos += 1
+        if self.pos < len(self.text) and self.text[self.pos] in ("e", "E"):
+            self.pos += 1
+            if self.pos < len(self.text) and self.text[self.pos] in ("+", "-"):
+                self.pos += 1
+            if self.pos >= len(self.text) or not self.text[self.pos].isdigit():
+                self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            while self.pos < len(self.text) and self.text[self.pos].isdigit():
+                self.pos += 1
+        tok = self.text[start:self.pos]
+        # Lexical negative-zero detection (token-level, NOT a global scan).
+        if tok.startswith("-"):
+            rest = tok[1:]
+            rest = re.sub(r"[eE][+-]?\d+$", "", rest)
+            if rest.replace(".", "").strip("0") == "":
+                self.err(DIGEST_NEGATIVE_ZERO_REJECTED)
+        value = float(tok)  # IEEE-754 binary64 semantics (like JS Number)
+        if value != value or value in (math.inf, -math.inf):
+            self.err(DIGEST_NON_FINITE_REJECTED)
+        return value
+
+    def _parse_value(self, depth: int):
+        if depth > self.limits["max_object_depth"]:
+            self.err(DIGEST_RESOURCE_LIMIT_EXCEEDED)
+        c = self._peek()
+        if c is None:
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        if self.text.startswith("-Infinity", self.pos):
+            self.err(DIGEST_NON_FINITE_REJECTED)
+        if c == "{":
+            return self._parse_object(depth)
+        if c == "[":
+            return self._parse_array(depth)
+        if c == '"':
+            return self._parse_string()
+        if c == "-" or (c is not None and c.isdigit()):
+            return self._parse_number()
+        self._skip_ws()
+        rest = self.text[self.pos:]
+        if rest.startswith("true"):
+            self.pos += 4; return True
+        if rest.startswith("false"):
+            self.pos += 5; return False
+        if rest.startswith("null"):
+            self.pos += 4; return None
+        if rest.startswith("NaN") or rest.startswith("Infinity"):
+            self.err(DIGEST_NON_FINITE_REJECTED)
+        self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+
+    def _parse_array(self, depth: int):
+        self.pos += 1  # '['
+        arr = []
+        self._skip_ws()
+        if self.pos < len(self.text) and self.text[self.pos] == "]":
+            self.pos += 1
+            return arr
+        while True:
+            arr.append(self._parse_value(depth + 1))
+            if len(arr) > self.limits["max_array_items"]:
+                self.err(DIGEST_RESOURCE_LIMIT_EXCEEDED)
+            self._skip_ws()
+            if self.pos >= len(self.text):
+                self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            if self.text[self.pos] == ",":
+                self.pos += 1
+                continue
+            if self.text[self.pos] == "]":
+                self.pos += 1
+                break
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        return arr
+
+    def _parse_object(self, depth: int):
+        self.pos += 1  # '{'
+        obj = {}
+        seen = set()
+        self._skip_ws()
+        if self.pos < len(self.text) and self.text[self.pos] == "}":
+            self.pos += 1
+            return obj
+        while True:
+            self._skip_ws()
+            if self.pos >= len(self.text) or self.text[self.pos] != '"':
+                # Non-string object key -> reject (also covers bare keys).
+                self.err(DIGEST_NON_STRING_KEY_REJECTED)
+            key = self._parse_string()
+            if key in seen:
+                self.err(DIGEST_DUPLICATE_RAW_KEY_REJECTED)
+            seen.add(key)
+            self._skip_ws()
+            if self.pos >= len(self.text) or self.text[self.pos] != ":":
+                self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            self.pos += 1
+            obj[key] = self._parse_value(depth + 1)
+            if len(obj) > self.limits["max_object_keys"]:
+                self.err(DIGEST_RESOURCE_LIMIT_EXCEEDED)
+            self._skip_ws()
+            if self.pos >= len(self.text):
+                self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+            if self.text[self.pos] == ",":
+                self.pos += 1
+                continue
+            if self.text[self.pos] == "}":
+                self.pos += 1
+                break
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        return obj
+
+    def parse(self):
+        value = self._parse_value(1)
+        self._skip_ws()
+        if self.pos != len(self.text):
+            self.err(DIGEST_INPUT_DOMAIN_VIOLATION)
+        return value
 
 
 # --- Canonical serialization walk ------------------------------------------
@@ -218,10 +425,6 @@ def _canonicalize_value(value, depth: int, limits: dict) -> str:
         return "false"
     if isinstance(value, float):
         return _js_number(value)
-    if isinstance(value, int):
-        # JSON integer (non-float) — from a strict-JSON parser these are the
-        # values that are exactly integers; serialize as plain decimal.
-        return str(value)
     if isinstance(value, str):
         return _escape_string(value, max_string_bytes=limits["max_string_bytes"])
     if isinstance(value, list):
@@ -234,8 +437,8 @@ def _canonicalize_value(value, depth: int, limits: dict) -> str:
         if len(value) > limits["max_object_keys"]:
             raise CanonicalDigestError(DIGEST_RESOURCE_LIMIT_EXCEEDED)
         members = []
-        for key in sorted(value, key=lambda k: tuple(ord(c) for c in k)):
-            # RFC-8785 key ordering: lexicographic by UTF-16 code units.
+        # RFC-8785 key ordering: lexicographic by UTF-16 CODE UNITS.
+        for key in sorted(value, key=_utf16_code_units):
             members.append(
                 _escape_string(key, max_string_bytes=limits["max_string_bytes"])
                 + ":"
@@ -243,11 +446,6 @@ def _canonicalize_value(value, depth: int, limits: dict) -> str:
             )
         return "{" + ",".join(members) + "}"
     raise CanonicalDigestError(DIGEST_INPUT_DOMAIN_VIOLATION)
-
-
-def _parse_constant(name):
-    # NaN / Infinity / -Infinity literals (and overflowed literals handled in walk)
-    raise CanonicalDigestError(DIGEST_NON_FINITE_REJECTED)
 
 
 # --- Public reference API ----------------------------------------------------
@@ -260,25 +458,15 @@ def canonicalize_json_text(
     """Canonicalize raw JSON text to exact RFC-8785/JCS UTF-8 bytes.
 
     Returns the canonical preimage bytes. Raises CanonicalDigestError with a
-    deterministic DIGEST_* code on any strict-domain violation.
+    deterministic DIGEST_* code on any strict-domain violation. Parsing is a
+    full lexical tokenizer so duplicate keys, negative zero, and invalid
+    Unicode are detected on the raw lexical tokens (never on string content),
+    and every number is read with IEEE-754 binary64 semantics.
     """
     limits = {**DEFAULT_RESOURCE_LIMITS, **(resource_limits or {})}
     if len(raw_text.encode("utf-8")) > limits["max_preimage_bytes"]:
         raise CanonicalDigestError(DIGEST_RESOURCE_LIMIT_EXCEEDED)
-    if _has_negative_zero(raw_text):
-        raise CanonicalDigestError(DIGEST_NEGATIVE_ZERO_REJECTED)
-    try:
-        value = json.loads(
-            raw_text,
-            object_pairs_hook=_reject_duplicate_or_nonstring_keys,
-            parse_constant=_parse_constant,
-        )
-    except json.JSONDecodeError as exc:
-        # Non-string object keys are rejected by the stdlib parser before the
-        # object_pairs_hook is consulted; map to the deterministic taxonomy.
-        if "Expecting property name" in str(exc):
-            raise CanonicalDigestError(DIGEST_NON_STRING_KEY_REJECTED) from exc
-        raise CanonicalDigestError(DIGEST_INPUT_DOMAIN_VIOLATION) from exc
+    value = _JsonTokenizer(raw_text, limits).parse()
     canonical = _canonicalize_value(value, 1, limits)
     out = canonical.encode("utf-8")
     if len(out) > limits["max_preimage_bytes"]:
