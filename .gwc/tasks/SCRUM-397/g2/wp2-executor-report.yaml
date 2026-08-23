@@ -30,8 +30,8 @@ authorized_paths_written:
 
 validation:
   test_command: python3 -m unittest tests.package_export.test_canonical_digest_profile
-  tests_run: 22
-  tests_passed: 22
+  tests_run: 38
+  tests_passed: 38
   tests_failed: 0
   yaml_json_parse: ALL_OK
   schemas_validated:
@@ -40,6 +40,14 @@ validation:
     - digest-envelope.schema.json
   network_side_effects: none
   secrets_touched: none
+
+correction_log:
+  - INTERCEPT_1: registry lifecycle schema conditional constraints (NEW_WRITE_ALLOWED/VERIFY_ONLY/REJECTED semantics)
+  - INTERCEPT_1: explicit length-prefixed domain framing u32be(tag_len)||tag||u64be(preimage_len)||preimage
+  - INTERCEPT_1: envelope-binding list exactly six, unique, no extras
+  - INTERCEPT_1: profile status -> defined (definition maturity, not activation)
+  - INTERCEPT_2: schema status enum defined|deprecated (active MUST NOT validate)
+  - INTERCEPT_2: schema framing const = exact length-prefixed framing string (old implicit-length framing rejected)
 
 semantic_decisions:
   gwc_jcs_v1_profile:

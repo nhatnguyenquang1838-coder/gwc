@@ -369,5 +369,41 @@ class EnvelopeBindingExactSetTest(unittest.TestCase):
         self.assertFalse(self.validator.is_valid(bad))
 
 
+class FinalTighteningNegativeTest(unittest.TestCase):
+    """FINAL_SCHEMA_TIGHTENING: status=active and ambiguous framing MUST NOT validate."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_status_active_rejected_by_schema(self):
+        # 'active' is an activation term; profile status must describe definition
+        # maturity only. Registry is the sole write/verify activation authority.
+        bad = dict(self.profile)
+        bad["status"] = "active"
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_status_defined_still_valid(self):
+        self.assertTrue(self.validator.is_valid(self.profile))
+
+    def test_old_implicit_domain_length_framing_rejected_by_schema(self):
+        # The old ambiguous framing with implicit domain-tag length must fail.
+        bad = dict(self.profile)
+        bad["domain_separation"] = dict(self.profile["domain_separation"])
+        bad["domain_separation"]["framing"] = (
+            "sha256(domain_tag || 0x00 || u64be(preimage_len) || preimage)"
+        )
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_explicit_length_prefixed_framing_valid(self):
+        self.assertEqual(
+            self.profile["domain_separation"]["framing"],
+            "sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )",
+        )
+        self.assertTrue(self.validator.is_valid(self.profile))
+
+
 if __name__ == "__main__":
     unittest.main()
