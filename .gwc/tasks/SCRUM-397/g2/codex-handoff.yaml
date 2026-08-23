@@ -1,0 +1,120 @@
+schema_version: '1.0'
+artifact_type: codex-handoff
+task_id: SCRUM-397
+work_package: WP1
+active_lane: Node Architect Research
+repository: nhatnguyenquang1838-coder/gwc
+created_for: Codex
+created_at_local: '2026-08-23T19:29:00+07:00'
+state: BLOCKED_RESUMABLE
+controller: ChatGPT
+source_executor: Hermes Cloud
+source_executor_state: EXECUTOR_ENV_BLOCKED
+
+bindings:
+  protected_main_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  approved_base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  source_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
+  source_head_before_handoff: 2b99dde268bb657f2a375d32123a1065d346cbf1
+  github_issue: 392
+  jira_task: SCRUM-397
+  canonical_slack_channel: C0BKACJMV7G
+  canonical_slack_thread_ts: '1786435501.701199'
+
+implementation_plan:
+  hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+  dag: 'WP1 -> WP2 -> (WP3 || WP4) -> WP5'
+  current_wp: WP1
+  wp2_eligible: false
+
+human_g2:
+  request_id: g2_scrum-397_9c60c3e24a130eec
+  scope_hash: sha256:5d88ce89ca868d1d540510244a34a047cdd936cd1a83c9d197052feba7128c1a
+  command: 'APPROVE G2 g2_scrum-397_9c60c3e24a130eec 5d88ce89ca868d1d 2026-08-23T13:31:00Z'
+  validation: VALID_FIRST_SEEN
+  expires_at: '2026-08-23T13:31:00Z'
+  authority_scope: WP1 inventory/classification evidence only
+  grants_g3: false
+  grants_g4: false
+  grants_g5: false
+  grants_g6: false
+
+allowed_writes:
+  - .gwc/tasks/SCRUM-397/**
+
+forbidden:
+  - runtime_or_product_code_change
+  - digest_behavior_change
+  - consumer_migration
+  - protected_main_write
+  - pull_request_creation_or_update
+  - merge_or_auto_merge
+  - force_push
+  - branch_deletion
+  - base_change
+  - deploy_or_release
+  - production_data_or_config_change
+  - credential_or_secret_change
+  - migration
+  - scope_expansion
+  - start_WP2_before_WP1_terminal_pass
+
+existing_evidence:
+  - .gwc/tasks/SCRUM-397/g2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
+
+current_blocker:
+  code: EXHAUSTIVE_COVERAGE_NOT_PROVEN
+  detail: >-
+    GitHub code-search broad SHA-256 probe reached the connector candidate cap of 100,
+    so current-main exhaustive digest callsite coverage could not be proven. Hermes Cloud
+    was dispatched for repo-local exhaustive enumeration but failed before repository
+    mutation with Errno 28 No space left on device. Recovery/reset failed identically.
+  ci: CI_UNAVAILABLE_AT_CHECK
+
+codex_resume_contract:
+  objective: >-
+    Complete a repo-local exhaustive inventory of every SHA-256/digest-producing source
+    callsite at the approved repository state and classify every callsite exactly once.
+  first_actions:
+    - Verify protected main is still exactly 938b8d67ff741eab027a1f2487d4a171444a5b25.
+    - Verify this branch descends from that exact base with no rebase/base substitution.
+    - Read approval-readback.yaml, wp1-digest-callsite-inventory.yaml, and wp1-executor-report.yaml.
+    - Revalidate Human G2 is still unexpired before any write; if expired, STOP and request new G2.
+    - Run exhaustive repo-local AST/text inventory rather than GitHub code-search capped queries.
+  minimum_probes:
+    - hashlib.sha256 and hashlib.new('sha256')
+    - direct or aliased sha256 imports/calls
+    - hexdigest/digest callsites connected to SHA-256 constructors
+    - json/canonical serializers feeding SHA-256
+    - read_bytes/file streaming raw byte hashes
+    - custom joined/framed-string semantic digests
+    - helper wrappers that transitively produce SHA-256 digests
+  classification_values:
+    - SEMANTIC_PROFILED
+    - RAW_BYTES
+    - OUT_OF_SCOPE
+  required_row_fields:
+    - path
+    - function_or_symbol
+    - line
+    - classification
+    - preimage_shape
+    - hash_algorithm
+    - rationale
+    - mixed_file_note
+  completion_requirements:
+    - coverage.complete must become true
+    - unresolved_ambiguities must be zero
+    - candidate/search methodology and counts must be reproducible
+    - preserve intentional raw-byte/file/package identity as RAW_BYTES
+    - do not classify by filename alone; inspect ambiguous callsites
+    - update only WP1 evidence files under authorized task tree
+    - commit/push to the same guarded branch
+    - return exact final head SHA and changed paths
+    - then check CI for that exact head SHA; do not infer PASS if unavailable
+    - stop at WAIT_CONTROLLER; do not start WP2
+
+terminal_success_state: WP1_PASS_WAIT_CONTROLLER
+terminal_blocked_state: WP1_BLOCKED_WAIT_CONTROLLER
