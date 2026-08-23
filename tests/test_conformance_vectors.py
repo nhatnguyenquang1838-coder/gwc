@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -46,6 +48,25 @@ class ConformanceVectorTests(unittest.TestCase):
         a = digest({"a": 1, "b": 2})
         b = digest({"b": 2, "a": 1})
         self.assertEqual(a, b)
+
+    def test_node_verifier_independent_implementation(self) -> None:
+        """AC19: a second independent implementation (Node.js) matches vectors."""
+        node = shutil.which("node")
+        if node is None:
+            self.skipTest("node not available in this environment")
+        verifier = VECTORS_PATH.parent / "verify_canonical_node.mjs"
+        proc = subprocess.run(
+            [node, str(verifier), str(VECTORS_PATH)],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(
+            proc.returncode,
+            0,
+            f"node verifier failed:\n{proc.stdout}\n{proc.stderr}",
+        )
+        self.assertIn("3/3 passed", proc.stdout)
 
 
 if __name__ == "__main__":
