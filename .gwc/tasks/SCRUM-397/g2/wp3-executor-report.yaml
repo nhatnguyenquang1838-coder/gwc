@@ -1,0 +1,76 @@
+schema_version: '1.0'
+artifact_type: g2-executor-report
+task_id: SCRUM-397
+work_package: WP3
+run: SCRUM-397-WP3-CONFORMANCE-R1
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+approval_request_id: g2_scrum-397_3eaaa1aff1450939
+scope_hash: sha256:ce4bc85f8598473db1c6064b89451080f541bb15ba01f5ad3eb692cc880f2ad8
+source_head: 99d862b1e4f9992aa48ae96756c427fd7d0dcd10
+status: PASS
+
+summary: >-
+  WP3 cross-runtime conformance corpus + independent Python and Node reference
+  canonicalizers materialized. 36 golden vectors (22 positive, 14 negative)
+  are language-neutral and were generated only after both runtimes agreed
+  byte-for-byte on canonical bytes + framed SHA-256 (positive) and the exact
+  DIGEST_* taxonomy error (negative). No production/shared API, no
+  package_export runtime edit, no consumer migration.
+
+authorized_paths_written:
+  - .gwc/tasks/SCRUM-397/g2/wp3-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3-executor-report.yaml
+  - tests/conformance/canonical_digest/golden_vectors.yaml
+  - schemas/canonical-digest-golden-vector.schema.json
+  - tools/node_architect/canonical_digest/reference_canonicalizer.py
+  - tools/node_architect/canonical_digest/reference_canonicalizer.mjs
+  - tests/conformance/canonical_digest/test_python_conformance.py
+  - tests/conformance/canonical_digest/test_node_conformance.mjs
+
+validation:
+  python_conformance: python3 -m unittest tests.conformance.canonical_digest.test_python_conformance
+  python_tests: 4
+  python_passed: 4
+  node_conformance: node --test tests/conformance/canonical_digest/test_node_conformance.mjs
+  node_tests: 38
+  node_passed: 38
+  node_failed: 0
+  corpus_schema_validation: 36/36 vectors conform to canonical-digest-golden-vector.schema.json
+  cross_runtime_proof: byte-identical canonical bytes + framed SHA-256 on all 22 positive vectors; exact DIGEST_* error on all 14 negative vectors
+  yaml_json_parse: ALL_OK (corpus is JSON text, valid YAML 1.2)
+  network_side_effects: none
+  secrets_touched: none
+
+semantic_decisions:
+  runtimes: [python3.9, node22]
+  independence: Python and Node references never invoke each other (no shell-out) for canonicalization
+  positive_coverage:
+    - lexicographic key ordering (ASCII + non-BMP surrogate-pair keys)
+    - ES6 shortest-round-trip number serialization (1.0->1, exponent formats, boundaries 1e-6/1e21)
+    - minimal RFC-8785 string escaping (C0 controls, \\u00xx lowercase, non-ASCII literal)
+    - Unicode normalization none (valid non-BMP preserved)
+    - nested objects/arrays, max double, max safe integer, precision preservation
+  negative_coverage:
+    - negative zero (-0, -0.0, -0e5) -> DIGEST_NEGATIVE_ZERO_REJECTED
+    - NaN/Infinity/-Infinity/overflow(1e400) -> DIGEST_NON_FINITE_REJECTED
+    - non-string key -> DIGEST_NON_STRING_KEY_REJECTED
+    - duplicate raw key -> DIGEST_DUPLICATE_RAW_KEY_REJECTED
+    - unpaired/lone surrogate -> DIGEST_INVALID_UNICODE_REJECTED
+    - depth > 64 and keys > 100000 -> DIGEST_RESOURCE_LIMIT_EXCEEDED
+  framing_contract: sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )
+  domain: gwc.governance.evidence.canonical.v1
+  envelope_binding: profile_id/hash_algorithm/domain/schema_ref/preimage_framing_scheme/hexdigest
+  duplicate_key_encoding: raw lexical JSON text preserved in corpus (input_is_raw_text=true), never a YAML mapping that collapses duplicates
+  canonicalization_never_grants_authority: true
+
+exclusions_respected:
+  - no production/shared API
+  - no edit to tools/node_architect/package_export/**
+  - no consumer migration
+  - no PR/G3, merge/G4, main write, deploy/G5, G6/prod/config/data/secret/migration
+  - no rebase/force-push/branch deletion/base retarget
+
+unresolved_issues: []
+ci_status: CI_UNAVAILABLE_AT_CHECK (controller verifies exact-head CI)
