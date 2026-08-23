@@ -8,10 +8,10 @@ trace:
   base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
   working_branch: hermes/scrum-396-durable-schema-replay-20260824
   g1_decision_ref: ../g1/decision/g1-decision-record.yaml
-approval_id: CP-20260824-396-G2-R1
-scope_hash: sha256:c69058057ad8f6333d86c827726a7f7b6b70ebabd06508d821874ebe928ed72c
-scope_hash_16: c69058057ad8f633
-approval_command: APPROVE G2_EXECUTION CP-20260824-396-G2-R1 c69058057ad8f633 2026-08-25T01:56:00Z
+approval_id: CP-20260824-396-G2-R2
+scope_hash: sha256:11b6ddce7f29412769e866a8774a8571b0d68b991074fe0ed71eb8e0169c2299
+scope_hash_16: 11b6ddce7f294127
+approval_command: APPROVE G2_EXECUTION CP-20260824-396-G2-R2 11b6ddce7f294127 2026-08-25T02:10:00Z
 risk_class: R2
 authorized_paths:
 - schemas/node-architect/durable-artifact-envelope.schema.json
@@ -19,7 +19,11 @@ authorized_paths:
 - schemas/node-architect/migration-operation-journal.schema.json
 - tools/node_architect/checkpoint_store.py
 - tools/node_architect/schema_compatibility_resolver.py
+- tools/node_architect/checkpoint_sqlite.py
 - tests/test_schema_compatibility_resolver.py
+- tests/test_checkpoint_sqlite.py
+- tests/test_conformance_vectors.py
+- tests/test_dw_observation_compat.py
 - tests/conformance_vectors/
 - .gwc/tasks/SCRUM-396/
 authorized_actions:

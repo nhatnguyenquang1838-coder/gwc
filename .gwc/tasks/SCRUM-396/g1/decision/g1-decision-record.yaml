@@ -88,7 +88,7 @@ acceptance_criteria_refs:
 - AC-18
 - AC-19
 - AC-20
-scope_hash: sha256:c69058057ad8f6333d86c827726a7f7b6b70ebabd06508d821874ebe928ed72c
+scope_hash: sha256:11b6ddce7f29412769e866a8774a8571b0d68b991074fe0ed71eb8e0169c2299
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
