@@ -1,0 +1,26 @@
+{
+  "profile_id": "gwc-jcs-v1",
+  "profile_version": "1.0",
+  "hash_algorithm": "sha256",
+  "canonicalization": "sort_keys=True, separators=(',',':'), ensure_ascii=False, UTF-8 sha256",
+  "cases": [
+    {
+      "id": "simple-object",
+      "input": {"b": 2, "a": 1, "nested": {"z": "last", "y": "first"}},
+      "expected_canonical_sha256": "0bab2bf20d98c3fb4ab8d1eae9ba52495b277e5e96be4ba942845675c90b1f00",
+      "note": "sorted keys, compact separators"
+    },
+    {
+      "id": "unicode-preserved",
+      "input": {"name": "Nguyễn Quang Nhật", "emoji": "🚀"},
+      "expected_canonical_sha256": "680b4788f0b1eb0671895c88225ca134f66cffbe8602b7784d95fb5ccb28f0c8",
+      "note": "ensure_ascii=False, UTF-8 preserved"
+    },
+    {
+      "id": "nested-array",
+      "input": {"items": [3, 1, 2], "flag": true, "none": null},
+      "expected_canonical_sha256": "9d11810cde8c61e613b356f0ac99e0bc4161587850e8673cd0b56f44d85b34fb",
+      "note": "arrays keep order; booleans/null canonical"
+    }
+  ]
+}

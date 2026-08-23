@@ -1,0 +1,64 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-24T01:55:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- 'research/tracking authority only until G2; Human G2 granted 2026-08-24'
+- 'UNKNOWN_SCHEMA_CANNOT_ENTER_REPLAY normative'
+- 'CANONICALIZATION_NEVER_GRANTS_AUTHORITY normative'
+- 'DW observation sync preserved (no break to .run/.projection topology)'
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+status: READY
+blockers: []

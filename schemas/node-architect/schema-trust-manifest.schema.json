@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/schema-trust-manifest.schema.json",
+  "title": "GWC Schema Trust Manifest",
+  "description": "GWC-owned allowlist of writer schema id/version/profile/hash bindings. Profile selection MUST be policy-allowlisted, never artifact-authorized.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "manifest_id",
+    "issuer",
+    "issued_at",
+    "validity",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "schema-trust-manifest" },
+    "manifest_id": { "type": "string", "minLength": 1 },
+    "issuer": { "type": "string", "minLength": 1 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["not_before", "not_after"],
+      "properties": {
+        "not_before": { "type": "string", "format": "date-time" },
+        "not_after": { "type": "string", "format": "date-time" }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "writer_schema_id",
+          "writer_schema_version",
+          "profile_id",
+          "profile_version",
+          "hash_algorithm",
+          "lifecycle"
+        ],
+        "properties": {
+          "writer_schema_id": { "type": "string", "minLength": 1 },
+          "writer_schema_version": { "type": "string", "minLength": 1 },
+          "profile_id": { "type": "string", "minLength": 1 },
+          "profile_version": { "type": "string", "minLength": 1 },
+          "hash_algorithm": { "const": "sha256" },
+          "lifecycle": {
+            "type": "string",
+            "enum": ["NEW_WRITE_ALLOWED", "VERIFY_ONLY", "REJECTED"]
+          }
+        }
+      }
+    },
+    "signature": { "type": "string", "minLength": 1 }
+  }
+}

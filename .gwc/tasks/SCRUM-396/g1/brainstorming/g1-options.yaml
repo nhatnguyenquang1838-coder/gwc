@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-24T01:56:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-396
+  base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: 5-package DAG — envelope + SQLite checkpoint ext + resolver + manifest glue + journal
+  description: 'Implement AMENDMENT R1 exactly as approved: (1) DurableArtifactEnvelope schema, (2) SchemaTrustManifest schema, (3) MigrationOperationJournal schema, (4) schema_compatibility_resolver.py + checkpoint_store SQLite transaction, (5) conformance vectors Python+Go. Matches research AC1-20 + Nhat decisions D2-B/D3-A.'
+  benefits:
+  - Matches approved research scope exactly (v2 APPROVE)
+  - Bounded 5-package DAG, each merge-gated
+  - Deterministic, digest-bound, replay-safe by construction
+  tradeoffs:
+  - Extends checkpoint_store.py (approved surface) — moderate blast radius
+  risks:
+  - SQLite migration needs careful transaction semantics
+  constraint_fit: FIT
+- id: OPT-2
+  title: Minimal single-package (envelope only)
+  description: 'Implement only the envelope schema + resolver, defer SQLite journal to later task.'
+  benefits:
+  - Smallest diff
+  tradeoffs:
+  - Fails approved AC10-15 (journal/SQLite/SLOs) — does not satisfy v2 APPROVE scope
+  risks:
+  - Research v2 approved the full 20 AC; partial delivery breaks authority boundary
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: 'OPT-1 matches the approved AMENDMENT R1 20-AC scope and Nhat decisions D2-B/D3-A exactly; OPT-2 fails approved reliability/governance AC and breaks the authority boundary.'
+decision_required: true
+status: READY

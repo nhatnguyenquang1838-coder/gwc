@@ -1,0 +1,57 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-24T01:56:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-396
+  base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: Protected base resolved from origin/main and matches the issue baseline.
+  evidence:
+  - 938b8d67ff741eab027a1f2487d4a171444a5b25
+- id: BLOCKER-RESEARCH-APPROVED
+  status: PASS
+  code: BLOCKER_RESOLVED
+  message: Four-lens research v2 APPROVED (SCRUM-562/563/564/565 Done) + HUMAN RESEARCH APPROVAL on SCRUM-396 + Human G2 granted by Nhat 2026-08-24.
+  evidence:
+  - SCRUM-562
+  - SCRUM-563
+  - SCRUM-564
+  - SCRUM-565
+  - SCRUM-396 comment 12079
+- id: NEW-MODULE-SCOPE
+  status: PASS
+  code: FRESH_ISOLATED_MODULE
+  message: schema_compatibility_resolver.py + 3 new schemas + conformance vectors are new; checkpoint_store.py extended with SQLite transaction (approved AC11); no shared exporter mutated.
+  evidence:
+  - schemas/node-architect/durable-artifact-envelope.schema.json
+  - schemas/node-architect/schema-trust-manifest.schema.json
+  - schemas/node-architect/migration-operation-journal.schema.json
+  - tools/node_architect/checkpoint_store.py
+- id: SCOPE-HASH
+  status: PASS
+  code: SCOPE_HASH_DERIVED
+  message: scope_hash derived via calculate_gate_scope_identity (outcome READY), not guessed.
+  evidence:
+  - sha256:c69058057ad8f6333d86c827726a7f7b6b70ebabd06508d821874ebe928ed72c
+- id: NO-COLLISION
+  status: PASS
+  code: BRANCH_UNIQUE
+  message: No existing worktree/branch/PR for SCRUM-396; branch hermes/scrum-396-durable-schema-replay-20260824 created fresh from origin/main.
+  evidence:
+  - git worktree list
+  - gh pr list --search SCRUM-396
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS
