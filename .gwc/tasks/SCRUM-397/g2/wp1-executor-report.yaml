@@ -8,42 +8,43 @@ executor: Hermes Mac
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
 working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
-current_head_sha: aa36d44d76737809cbbbf346fe51de744529b79d
+current_head_sha: 40522f74e05aab6da4ac3d8a3b5b1c33363290dd
 g2_request_id: g2_scrum-397_wp1_codex_r2_20260823
 g2_scope_hash: sha256:3f3db1aef2d89cf40dd9e7171f6fcc83fee5a6fe0c517e1ef98b668e97be43b3
 implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
 status: PASS
+revision_of_commit: 40522f74e05aab6da4ac3d8a3b5b1c33363290dd
 reason_codes:
 - REPO_LOCAL_AST_ENUMERATION_EXHAUSTIVE
+- WRAPPER_USE_CLASSIFIED_AT_CALLERS
 - UNRESOLVED_AMBIGUITIES_0
 - COVERAGE_COMPLETE
 facts:
-- 'Pre-mutation binding gate passed: main=938b8d67ff741eab027a1f2487d4a171444a5b25 (matches approved base);
-  branch HEAD=aa36d44d76737809cbbbf346fe51de744529b79d (matches contract); G2 expiry 2026-08-23T16:11:24Z
-  not yet reached; no concurrent writer detected.'
-- Work performed in an isolated git worktree at exact branch HEAD; local machine checkout (pre-prod) was
-  never modified.
-- 'Exhaustive enumeration used a repo-local Python AST walk (no connector result cap). Probes: all hashlib.<algo>()/hashlib.new()
-  call nodes; data-flow slice of the hashed argument to separate read_bytes()/file.read() (RAW_BYTES)
-  from encode()/canonical-json/serializer/framing (SEMANTIC_PROFILED); streaming hashlib.sha256()+update()
-  traced via .update() args; transitive wrapper resolution for polymorphic _sha256_bytes/_sha256_hex callers;
-  secondary probes for hashlib aliases, hashlib.new, hmac, cryptography, hash() builtin, and def sha256/sha1
-  wrappers (all already captured or non-productive).'
-- 'Total runtime/product producer lines: 140 (132 SEMANTIC_PROFILED, 8 RAW_BYTES). One sha1 producer (tools/node_architect/ai_agent_adapter.py:259,
-  deterministic derived-head identity) classified SEMANTIC_PROFILED. No md5/sha512/sha384 producers present
-  in runtime code.'
-- '8 RAW_BYTES sites are intentional exact file/source/path byte identity and MUST stay byte-based: build_project_package,
-  diff_instruction_package, validate_instructions, hash_integrity_artifacts, verify_rollout, verify_package_export_smoke,
-  export_project_package:117, and source_path_safety.py:207 (._file_digest streaming read_bytes).'
-- 132 SEMANTIC_PROFILED sites are structured/semantic preimages (canonical JSON, pipe/||-joined framing,
-  recursive canonicalization, resume/approval tokens) and are candidates for later CanonicalDigestProfile
-  work.
-- 0 unresolved ambiguities. All single-variable / helper-wrapped sites were traced to a concrete preimage
-  source.
+- 'Pre-mutation binding re-verified: main=938b8d67ff741eab027a1f2487d4a171444a5b25 (approved base); branch
+  HEAD=40522f74e05aab6da4ac3d8a3b5b1c33363290dd (origin, no drift); G2 expiry 2026-08-23T16:11:24Z not
+  yet reached; no concurrent writer.'
+- 'Controller EVIDENCE_CONFLICT correction applied: the 5 polymorphic bytes-typed helpers (_sha256_bytes/_sha256_hex)
+  are no longer single SEMANTIC_PROFILED rows with unresolved preimage. They are documented as wrapper_metadata;
+  every concrete producer-use callsite is classified at its caller location with concrete preimage.'
+- 'Correction method: repo-local AST walk extracted ALL 19 call sites of the 5 wrappers across the repo;
+  each classified SEMANTIC_PROFILED (blob.encode/json.dumps/.encode of structured fields) or RAW_BYTES
+  (read_bytes()/staged/final exact file bytes). The 6 ambiguous data/staged/final args were resolved by
+  reading enclosing function bodies (all read_bytes()).'
+- 'Total classified producer callsites = 154: 135 direct hashlib primitives + 19 wrapper-use callsites.
+  5 wrapper primitives held as metadata (not producer rows). Breakdown: SEMANTIC_PROFILED 138, RAW_BYTES
+  16, sha1 1 (ai_agent_adapter.py:259 derived-head identity, SEMANTIC_PROFILED).'
+- '16 RAW_BYTES: 8 direct file/source/path byte helpers + 8 wrapper-use callsites that pass exact-file
+  bytes (read_bytes/staged/final). All MUST stay byte-based.'
+- '0 unresolved ambiguities: no row retains variable-no-known-assignment or equivalent. Every direct primitive
+  accounted for; every transitive wrapper use classified at caller.'
+- Exhaustive coverage proven via local AST (no connector cap). Secondary probes for hashlib aliases, hashlib.new,
+  hmac, cryptography, hash() builtin, and def sha256/sha1 wrappers found no additional SHA-256 producers
+  in runtime code.
 completion_contract:
   exhaustive_inventory: true
   classifications_complete: true
   unresolved_ambiguities_zero: true
+  wrapper_primitives_documented_as_metadata: true
   runtime_behavior_changed: false
   consumer_migration_performed: false
   pr_created_or_updated: false
@@ -53,7 +54,7 @@ completion_contract:
 changed_paths_expected:
 - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
 - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
-next_action: WP1 terminal PASS. Exact-head CI must be checked by Controller (executor does not claim CI
-  PASS). Do not advance to WP2. WAIT_CONTROLLER.
+next_action: WP1 terminal PASS (corrected). Exact-head CI must be checked by Controller (executor does
+  not claim CI PASS). Do not advance to WP2. WAIT_CONTROLLER.
 wp2_eligible: false
-generated_at_utc: '2026-08-23T15:43:40Z'
+generated_at_utc: '2026-08-23T15:50:58Z'

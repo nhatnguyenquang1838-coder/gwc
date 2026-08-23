@@ -10,7 +10,11 @@ implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2af
 g2_request_id: g2_scrum-397_wp1_codex_r2_20260823
 g2_scope_hash: sha256:3f3db1aef2d89cf40dd9e7171f6fcc83fee5a6fe0c517e1ef98b668e97be43b3
 executor: Hermes Mac
-generated_at_utc: '2026-08-23T15:42:49Z'
+generated_at_utc: '2026-08-23T15:50:24Z'
+correction_note: 'R2 re-correction per Controller EVIDENCE_CONFLICT: polymorphic _sha256_bytes/_sha256_hex
+  primitive definitions are no longer classified as standalone producer rows with unresolved preimage.
+  They are documented in wrapper_metadata and every concrete producer-use callsite is classified at caller
+  location. Vocabulary unchanged (3 classes).'
 methodology:
   engine: repo-local Python AST walk (ast) over tracked runtime/product .py files
   excluded_dirs:
@@ -25,32 +29,104 @@ methodology:
   - data-flow slice of the hashed argument to separate read_bytes()/file.read() (RAW_BYTES) from encode()/serializer/canonical-json/framing
     (SEMANTIC_PROFILED)
   - streaming hashlib.sha256()+update() traced through .update() arguments
-  - 'transitive wrapper resolution: polymorphic _sha256_bytes/_sha256_hex callers traced to blob.encode(''utf-8'')=SEMANTIC
-    vs read_bytes()/staged/final=RAW_BYTES'
+  - 'transitive wrapper resolution: every call to polymorphic helpers _sha256_bytes/_sha256_hex traced
+    repo-wide (AST) to ALL callers; each caller-use classified with concrete preimage; primitive definition
+    documented separately as wrapper_metadata'
   - 'secondary probes: hashlib import aliases, hashlib.new, hmac, cryptography, hash() builtin, def sha256/sha1
     wrappers (all already captured or non-productive)'
-  reproducible_command: 'python3 /tmp/classify_digests.py  # AST walk + slice; output /tmp/digest_records.json
-    (140 producer lines)'
+  reproducible_command: 'python3 /tmp/classify_digests.py  # AST walk; python3 /tmp/extract_wrapper_calls.py  #
+    wrapper caller resolution'
   no_result_cap: ripgrep/ast enumeration is local and unbounded; no connector 100-cap reached
+  counts_model: confirmed_callsites = direct hashlib primitives (135) + classified wrapper-use callsites
+    (19) = 154; wrapper primitive definitions (5) are metadata, not producer rows
 coverage:
   complete: true
   terminal_status: PASS
   reason_codes:
   - REPO_LOCAL_AST_EXHAUSTIVE
+  - WRAPPER_USE_CLASSIFIED_AT_CALLERS
   - UNRESOLVED_AMBIGUITIES_0
 classification_vocabulary:
 - SEMANTIC_PROFILED
 - RAW_BYTES
 - OUT_OF_SCOPE
 counts:
-  total_runtime_producer_lines: 140
+  direct_hashlib_primitives: 135
+  wrapper_use_callsites: 19
+  total_classified_producer_callsites: 154
   by_classification:
-    SEMANTIC_PROFILED: 132
-    RAW_BYTES: 8
+    SEMANTIC_PROFILED: 138
+    RAW_BYTES: 16
   by_algorithm:
-    sha256: 139
+    sha256: 153
     sha1: 1
+  wrapper_primitives_documented: 5
   files_touched: 119
+wrapper_metadata:
+- file: tools/node_architect/package_export/governance_tree_build.py
+  function: _sha256_bytes
+  definition_line: 173
+  hash_algorithm: sha256
+  polymorphic: true
+  note: bytes-typed helper; called by both exact-file-byte (RAW_BYTES) and semantic-serializer (SEMANTIC_PROFILED)
+    inputs. Not a standalone producer row; classified at every caller use.
+  caller_use_count: 6
+  caller_use_lines:
+  - 198
+  - 217
+  - 499
+  - 537
+  - 556
+  - 600
+- file: tools/node_architect/package_export/deterministic_hash_verification.py
+  function: _sha256_bytes
+  definition_line: 145
+  hash_algorithm: sha256
+  polymorphic: true
+  note: bytes-typed helper; called by both exact-file-byte (RAW_BYTES) and semantic-serializer (SEMANTIC_PROFILED)
+    inputs. Not a standalone producer row; classified at every caller use.
+  caller_use_count: 4
+  caller_use_lines:
+  - 168
+  - 182
+  - 184
+  - 201
+- file: tools/node_architect/package_export/export_failure_routing.py
+  function: _sha256_hex
+  definition_line: 225
+  hash_algorithm: sha256
+  polymorphic: true
+  note: bytes-typed helper; called by both exact-file-byte (RAW_BYTES) and semantic-serializer (SEMANTIC_PROFILED)
+    inputs. Not a standalone producer row; classified at every caller use.
+  caller_use_count: 2
+  caller_use_lines:
+  - 250
+  - 266
+- file: tools/node_architect/package_export/export_manifest_generation.py
+  function: _sha256_bytes
+  definition_line: 146
+  hash_algorithm: sha256
+  polymorphic: true
+  note: bytes-typed helper; called by both exact-file-byte (RAW_BYTES) and semantic-serializer (SEMANTIC_PROFILED)
+    inputs. Not a standalone producer row; classified at every caller use.
+  caller_use_count: 3
+  caller_use_lines:
+  - 161
+  - 167
+  - 501
+- file: tools/node_architect/package_export/smoke_verification.py
+  function: _sha256_bytes
+  definition_line: 207
+  hash_algorithm: sha256
+  polymorphic: true
+  note: bytes-typed helper; called by both exact-file-byte (RAW_BYTES) and semantic-serializer (SEMANTIC_PROFILED)
+    inputs. Not a standalone producer row; classified at every caller use.
+  caller_use_count: 4
+  caller_use_lines:
+  - 228
+  - 256
+  - 307
+  - 468
 confirmed_callsites:
 - path: tools/capture_g01_decision.py
   function_or_symbol: _scope_hash
@@ -60,7 +136,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/verify_package_export_smoke.py
   function_or_symbol: sha256_file
   line: 37
@@ -69,7 +145,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(path.read_bytes())
   mixed_file_note: ''
-  call_src: hashlib.sha256(path.read_bytes())
+  wrapper: null
 - path: tools/verify_rollout.py
   function_or_symbol: sha256
   line: 16
@@ -78,7 +154,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(path.read_bytes())
   mixed_file_note: ''
-  call_src: hashlib.sha256(path.read_bytes())
+  wrapper: null
 - path: tools/validate_gate_action.py
   function_or_symbol: canonical_scope_hash
   line: 83
@@ -87,7 +163,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/hash_integrity_artifacts.py
   function_or_symbol: sha256
   line: 13
@@ -96,7 +172,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(path.read_bytes())
   mixed_file_note: ''
-  call_src: hashlib.sha256(path.read_bytes())
+  wrapper: null
 - path: tools/validate_instructions.py
   function_or_symbol: sha256
   line: 21
@@ -105,7 +181,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(path.read_bytes())
   mixed_file_note: ''
-  call_src: hashlib.sha256(path.read_bytes())
+  wrapper: null
 - path: tools/diff_instruction_package.py
   function_or_symbol: sha256
   line: 20
@@ -114,7 +190,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(path.read_bytes())
   mixed_file_note: ''
-  call_src: hashlib.sha256(path.read_bytes())
+  wrapper: null
 - path: tools/build_project_package.py
   function_or_symbol: sha256
   line: 19
@@ -123,16 +199,16 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(path.read_bytes())
   mixed_file_note: ''
-  call_src: hashlib.sha256(path.read_bytes())
+  wrapper: null
 - path: tools/export_project_package.py
   function_or_symbol: export_package
   line: 117
   classification: RAW_BYTES
-  preimage_shape: exact copied source/path.read_bytes() file content
+  preimage_shape: exact file path.read_bytes()
   hash_algorithm: sha256
   rationale: hashlib.sha256(data)
   mixed_file_note: ''
-  call_src: hashlib.sha256(data)
+  wrapper: null
 - path: tools/gate_effect_authority.py
   function_or_symbol: canonical_digest
   line: 24
@@ -141,7 +217,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/validate_research_implementation_bridge.py
   function_or_symbol: _canonical_hash
   line: 88
@@ -150,7 +226,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload)
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload)
+  wrapper: null
 - path: tools/node_architect/approval_expiry_recovery.py
   function_or_symbol: digest_payload
   line: 26
@@ -159,7 +235,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/gate_transition_decision.py
   function_or_symbol: _digest
   line: 25
@@ -168,7 +244,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256()
   mixed_file_note: ''
-  call_src: hashlib.sha256()
+  wrapper: null
 - path: tools/node_architect/resolve_gate_node_route.py
   function_or_symbol: _digest
   line: 34
@@ -177,7 +253,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/slack_task_controller.py
   function_or_symbol: canonical_digest
   line: 24
@@ -186,7 +262,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_flow_profile_workflow.py
   function_or_symbol: file_digest
   line: 101
@@ -195,7 +271,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(blob)
   mixed_file_note: ''
-  call_src: hashlib.sha256(blob)
+  wrapper: null
 - path: tools/node_architect/validate_flow_profile_workflow.py
   function_or_symbol: compile_workflow_projection
   line: 157
@@ -204,7 +280,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(blob)
   mixed_file_note: ''
-  call_src: hashlib.sha256(blob)
+  wrapper: null
 - path: tools/node_architect/validate_flow_profile_workflow.py
   function_or_symbol: validate_flow_profile_workflow
   line: 504
@@ -213,7 +289,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/audit_guardrail.py
   function_or_symbol: canonical_digest
   line: 28
@@ -222,7 +298,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/checkpoint_store.py
   function_or_symbol: digest_payload
   line: 33
@@ -231,7 +307,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/gate_state_resolution.py
   function_or_symbol: _digest
   line: 166
@@ -240,7 +316,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/gate_state_resolution.py
   function_or_symbol: _transition_valid
   line: 459
@@ -249,7 +325,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: 'hashlib.sha256(_canonical_json({key: transition_map[key] for key in keys}).encode(''utf-8''))'
   mixed_file_note: ''
-  call_src: 'hashlib.sha256(_canonical_json({key: transition_map[key] for key in keys}).encode(''utf-8''))'
+  wrapper: null
 - path: tools/node_architect/evaluate_gate_applicability.py
   function_or_symbol: _sha256
   line: 40
@@ -258,7 +334,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/evidence_quality_check.py
   function_or_symbol: _digest
   line: 38
@@ -267,7 +343,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/promotion_controller.py
   function_or_symbol: _digest
   line: 12
@@ -276,7 +352,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw)
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw)
+  wrapper: null
 - path: tools/node_architect/ds_admin_state_projection.py
   function_or_symbol: _digest
   line: 63
@@ -285,7 +361,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/resume_token_validation.py
   function_or_symbol: _checkpoint_digest
   line: 132
@@ -294,7 +370,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(normalized.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(normalized.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/resume_token_validation.py
   function_or_symbol: _digest
   line: 140
@@ -303,7 +379,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/resolve_active_flow_policy_profile.py
   function_or_symbol: _canonical_digest
   line: 40
@@ -312,7 +388,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(blob)
   mixed_file_note: ''
-  call_src: hashlib.sha256(blob)
+  wrapper: null
 - path: tools/node_architect/resolve_active_flow_policy_profile.py
   function_or_symbol: _text_digest
   line: 44
@@ -321,7 +397,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(text.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(text.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/scoped_file_write.py
   function_or_symbol: _digest
   line: 31
@@ -330,7 +406,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/create_autonomous_task_branch.py
   function_or_symbol: _digest
   line: 36
@@ -339,7 +415,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/draft_pr_creation.py
   function_or_symbol: _digest
   line: 33
@@ -348,7 +424,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_source_authority_check.py
   function_or_symbol: _digest
   line: 76
@@ -357,7 +433,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(digest_input).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(digest_input).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/ci_run_capture.py
   function_or_symbol: digest_payload
   line: 43
@@ -366,7 +442,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/timeout_recovery.py
   function_or_symbol: digest_payload
   line: 26
@@ -375,7 +451,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_runtime_registry.py
   function_or_symbol: source_hash
   line: 72
@@ -384,7 +460,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(data)
   mixed_file_note: ''
-  call_src: hashlib.sha256(data)
+  wrapper: null
 - path: tools/node_architect/validate_runtime_registry.py
   function_or_symbol: _validate_extension_registry
   line: 91
@@ -393,7 +469,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(json.dumps(sorted(baseline_node_set), separators=(',', ':')).encode())
   mixed_file_note: ''
-  call_src: hashlib.sha256(json.dumps(sorted(baseline_node_set), separators=(',', ':')).encode())
+  wrapper: null
 - path: tools/node_architect/repo_identity_check.py
   function_or_symbol: _digest
   line: 76
@@ -402,7 +478,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/render_gate_story.py
   function_or_symbol: _digest
   line: 42
@@ -411,7 +487,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/task_center_sync.py
   function_or_symbol: _digest
   line: 62
@@ -420,7 +496,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/scope_hash_calculation.py
   function_or_symbol: calculate_gate_scope_identity
   line: 265
@@ -429,7 +505,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json_bytes(semantic))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json_bytes(semantic))
+  wrapper: null
 - path: tools/node_architect/node_evidence_ledger.py
   function_or_symbol: digest_payload
   line: 31
@@ -438,7 +514,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/protected_base_capture.py
   function_or_symbol: digest_payload
   line: 87
@@ -447,7 +523,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/external_audit_event_projection.py
   function_or_symbol: _digest
   line: 59
@@ -456,7 +532,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/materialize_autonomous_preprod_base_lineage.py
   function_or_symbol: canonical_digest
   line: 30
@@ -465,7 +541,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/previous_batch_g5_verification.py
   function_or_symbol: digest_payload
   line: 34
@@ -474,7 +550,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_evidence_linking.py
   function_or_symbol: _hash
   line: 64
@@ -483,7 +559,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/ai_agent_adapter.py
   function_or_symbol: _sha256
   line: 65
@@ -492,7 +568,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(text.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(text.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/ai_agent_adapter.py
   function_or_symbol: _derive_head
   line: 259
@@ -501,7 +577,7 @@ confirmed_callsites:
   hash_algorithm: sha1
   rationale: hashlib.sha1(seed.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha1(seed.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/autonomous_execution_runtime.py
   function_or_symbol: canonical_digest
   line: 27
@@ -510,7 +586,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/reproducibility_check.py
   function_or_symbol: _digest
   line: 73
@@ -519,7 +595,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/risk_classification.py
   function_or_symbol: digest_payload
   line: 100
@@ -528,7 +604,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/blocked_action_escalation.py
   function_or_symbol: _digest
   line: 73
@@ -537,7 +613,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256()
   mixed_file_note: ''
-  call_src: hashlib.sha256()
+  wrapper: null
 - path: tools/node_architect/checkpoint_expiry_cleanup.py
   function_or_symbol: digest_payload
   line: 68
@@ -546,7 +622,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_checkpoint_resume.py
   function_or_symbol: digest
   line: 43
@@ -555,7 +631,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/request_intake.py
   function_or_symbol: digest_payload
   line: 122
@@ -564,7 +640,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/catalog_cardinality_readiness.py
   function_or_symbol: digest_payload
   line: 19
@@ -573,7 +649,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/g3_pass_decision.py
   function_or_symbol: _digest
   line: 36
@@ -582,7 +658,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode())
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode())
+  wrapper: null
 - path: tools/node_architect/source_resolution.py
   function_or_symbol: digest_payload
   line: 129
@@ -591,7 +667,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/execution_throttle_control.py
   function_or_symbol: digest_payload
   line: 19
@@ -600,7 +676,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_reconcile_readback.py
   function_or_symbol: _digest
   line: 47
@@ -609,7 +685,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_stable_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_stable_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_reconcile_readback.py
   function_or_symbol: reconcile_projection_readback
   line: 175
@@ -618,7 +694,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_stable_json(semantic).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_stable_json(semantic).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/version_drift_rollback_routing.py
   function_or_symbol: digest_payload
   line: 20
@@ -627,7 +703,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_drift_detection.py
   function_or_symbol: _canonical_state_digest
   line: 29
@@ -636,7 +712,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_stable_json(canonical_state).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_stable_json(canonical_state).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_drift_detection.py
   function_or_symbol: detect_projection_drift
   line: 151
@@ -648,10 +724,7 @@ confirmed_callsites:
     dict) else None, ''outcome'': outcome, ''drift_detected'': drift_detected, ''drift_fields'': sorted(drift_fields),
     ''canonical_state_digest'': canonical_digest}).encode(''utf-8''))'
   mixed_file_note: ''
-  call_src: 'hashlib.sha256(_stable_json({''task_id'': envelope.get(''task_id'') if isinstance(envelope,
-    dict) else None, ''projection_target'': envelope.get(''projection_target'') if isinstance(envelope,
-    dict) else None, ''outcome'': outcome, ''drift_detected'': drift_detected, ''drift_fields'': sorted(drift_fields),
-    ''canonical_state_digest'': canonical_digest}).encode(''utf-8''))'
+  wrapper: null
 - path: tools/node_architect/projection_drift_detection.py
   function_or_symbol: classify_projection_drift_na81
   line: 335
@@ -660,7 +733,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_stable_json(decision_core).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_stable_json(decision_core).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_drift_detection.py
   function_or_symbol: _na81_canonical_state_digest
   line: 368
@@ -669,7 +742,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_stable_json(state).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_stable_json(state).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_node_instruction.py
   function_or_symbol: digest_payload
   line: 50
@@ -678,7 +751,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/materialize_research_execution.py
   function_or_symbol: _digest
   line: 28
@@ -687,7 +760,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(value).encode())
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(value).encode())
+  wrapper: null
 - path: tools/node_architect/lease_expiry_recovery.py
   function_or_symbol: digest_payload
   line: 30
@@ -696,7 +769,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/build_node_instruction_pack.py
   function_or_symbol: content_digest
   line: 61
@@ -705,7 +778,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical)
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical)
+  wrapper: null
 - path: tools/node_architect/diff_readback.py
   function_or_symbol: _digest
   line: 53
@@ -714,7 +787,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/batch_size_limit_check.py
   function_or_symbol: digest_payload
   line: 20
@@ -723,7 +796,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/blocker_severity_classification.py
   function_or_symbol: _digest
   line: 89
@@ -732,7 +805,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/base_drift_check.py
   function_or_symbol: _digest
   line: 34
@@ -741,7 +814,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/exact_head_readiness.py
   function_or_symbol: digest_payload
   line: 19
@@ -750,7 +823,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/run_task_continuation_loop.py
   function_or_symbol: _digest
   line: 27
@@ -759,7 +832,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/stale_session_reconciliation.py
   function_or_symbol: digest_payload
   line: 40
@@ -768,7 +841,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/approval_command_validation.py
   function_or_symbol: _digest
   line: 61
@@ -777,7 +850,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(joined.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(joined.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/reconcile_autonomous_task_state.py
   function_or_symbol: _digest
   line: 13
@@ -786,7 +859,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_flow_policy_compatibility.py
   function_or_symbol: _digest
   line: 23
@@ -795,7 +868,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/select_autonomous_jira_task.py
   function_or_symbol: _digest
   line: 35
@@ -804,7 +877,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/select_approved_research.py
   function_or_symbol: _digest
   line: 28
@@ -813,7 +886,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(value).encode())
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(value).encode())
+  wrapper: null
 - path: tools/node_architect/render_pr_run_evidence.py
   function_or_symbol: sha256_text
   line: 31
@@ -822,7 +895,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(value.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(value.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/render_pr_run_evidence.py
   function_or_symbol: _canonical_digest
   line: 36
@@ -831,7 +904,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_privacy_boundary_check.py
   function_or_symbol: _digest
   line: 133
@@ -840,7 +913,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/cas_write_guard.py
   function_or_symbol: digest_payload
   line: 50
@@ -849,7 +922,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/projection_failure_routing.py
   function_or_symbol: route_projection_failure
   line: 136
@@ -858,7 +931,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_stable_json(semantic).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_stable_json(semantic).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/merge_autonomous_preprod_pr.py
   function_or_symbol: _digest
   line: 36
@@ -867,7 +940,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_node_catalog_package_export.py
   function_or_symbol: _sha256
   line: 53
@@ -876,7 +949,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(text.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(text.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/side_effect_check.py
   function_or_symbol: _digest
   line: 66
@@ -885,7 +958,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/evidence_artifact_map.py
   function_or_symbol: build_gate_evidence_artifact_map
   line: 526
@@ -894,7 +967,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json_bytes(map_model))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json_bytes(map_model))
+  wrapper: null
 - path: tools/node_architect/independent_audit_handoff.py
   function_or_symbol: digest_payload
   line: 19
@@ -903,7 +976,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/files_read_scope.py
   function_or_symbol: digest_payload
   line: 50
@@ -912,7 +985,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_autonomous_preprod_policy.py
   function_or_symbol: canonical_digest
   line: 76
@@ -921,7 +994,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/run_autonomous_preprod_canary.py
   function_or_symbol: run_autonomous_preprod_canary
   line: 141
@@ -932,9 +1005,7 @@ confirmed_callsites:
     ''overall_outcome'': overall, ''task_count'': len(tasks), ''completed_count'': len(completed_node_ids)},
     sort_keys=True, separators=('','', '':'')).encode(''utf-8''))'
   mixed_file_note: ''
-  call_src: 'hashlib.sha256(json.dumps({''run_id'': run_id, ''manifest_digest'': manifest_digest_value,
-    ''overall_outcome'': overall, ''task_count'': len(tasks), ''completed_count'': len(completed_node_ids)},
-    sort_keys=True, separators=('','', '':'')).encode(''utf-8''))'
+  wrapper: null
 - path: tools/node_architect/context_gap_escalation.py
   function_or_symbol: digest_payload
   line: 25
@@ -943,7 +1014,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode())
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode())
+  wrapper: null
 - path: tools/node_architect/build_run_graph.py
   function_or_symbol: _canonical_digest
   line: 38
@@ -952,7 +1023,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(payload.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(payload.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/files_write_scope.py
   function_or_symbol: digest_payload
   line: 91
@@ -961,7 +1032,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/render_kiro_local_agent_package.py
   function_or_symbol: stable_hash
   line: 60
@@ -970,7 +1041,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(encoded)
   mixed_file_note: ''
-  call_src: hashlib.sha256(encoded)
+  wrapper: null
 - path: tools/node_architect/compile_flow_policy_profile.py
   function_or_symbol: _digest
   line: 55
@@ -979,7 +1050,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/compile_flow_policy_profile.py
   function_or_symbol: _text_digest
   line: 59
@@ -988,7 +1059,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(text.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(text.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/rollout_progress_projection.py
   function_or_symbol: digest_payload
   line: 19
@@ -997,7 +1068,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/crash_checkpoint_recovery.py
   function_or_symbol: digest_payload
   line: 27
@@ -1006,7 +1077,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/intake_card_render.py
   function_or_symbol: digest_payload
   line: 41
@@ -1015,7 +1086,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/duplicate_agent_fencing.py
   function_or_symbol: digest_payload
   line: 20
@@ -1024,7 +1095,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/lease_renewal.py
   function_or_symbol: _lease_digest
   line: 168
@@ -1033,7 +1104,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/ci_failure_repair.py
   function_or_symbol: _digest
   line: 110
@@ -1042,7 +1113,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256()
   mixed_file_note: ''
-  call_src: hashlib.sha256()
+  wrapper: null
 - path: tools/node_architect/g2_execution_envelope_render.py
   function_or_symbol: _digest
   line: 78
@@ -1051,7 +1122,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256()
   mixed_file_note: ''
-  call_src: hashlib.sha256()
+  wrapper: null
 - path: tools/node_architect/run_research_execution_flow.py
   function_or_symbol: _digest
   line: 21
@@ -1060,7 +1131,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw)
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw)
+  wrapper: null
 - path: tools/node_architect/cas_mismatch_recovery.py
   function_or_symbol: digest_payload
   line: 31
@@ -1069,7 +1140,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/authority_boundary_check.py
   function_or_symbol: _digest
   line: 166
@@ -1078,7 +1149,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/approval_token_generation.py
   function_or_symbol: generate_approval_request
   line: 234
@@ -1087,7 +1158,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/approval_token_generation.py
   function_or_symbol: generate_approval_request
   line: 235
@@ -1096,7 +1167,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256((canonical + '|token=' + token).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256((canonical + '|token=' + token).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/generate_resume_token.py
   function_or_symbol: digest
   line: 29
@@ -1105,7 +1176,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(value).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(value).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/materialize_autonomous_preprod_run_authority.py
   function_or_symbol: canonical_digest
   line: 29
@@ -1114,7 +1185,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/batch_admission_check.py
   function_or_symbol: digest_payload
   line: 31
@@ -1123,7 +1194,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/schema_validation.py
   function_or_symbol: _sha
   line: 148
@@ -1132,7 +1203,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/workflow_run_observability.py
   function_or_symbol: digest_payload
   line: 19
@@ -1141,7 +1212,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/validate_node_catalog_repo_delivery.py
   function_or_symbol: _digest
   line: 31
@@ -1150,7 +1221,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(raw.encode())
   mixed_file_note: ''
-  call_src: hashlib.sha256(raw.encode())
+  wrapper: null
 - path: tools/node_architect/branch_creation.py
   function_or_symbol: _digest
   line: 40
@@ -1159,7 +1230,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/unknown_write_reconciliation.py
   function_or_symbol: digest_payload
   line: 25
@@ -1168,7 +1239,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/entry_schema_validation.py
   function_or_symbol: semantic_digest
   line: 165
@@ -1177,7 +1248,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(self.to_json().encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(self.to_json().encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/entry_schema_validation.py
   function_or_symbol: compute_manifest_digest
   line: 178
@@ -1186,7 +1257,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(manifest).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(manifest).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/entry_schema_validation.py
   function_or_symbol: compute_schema_digest
   line: 192
@@ -1195,43 +1266,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(spec).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(spec).encode('utf-8'))
-- path: tools/node_architect/package_export/governance_tree_build.py
-  function_or_symbol: _sha256_bytes
-  line: 173
-  classification: SEMANTIC_PROFILED
-  preimage_shape: variable-no-known-assignment
-  hash_algorithm: sha256
-  rationale: hashlib.sha256(data)
-  mixed_file_note: ''
-  call_src: hashlib.sha256(data)
-- path: tools/node_architect/package_export/deterministic_hash_verification.py
-  function_or_symbol: _sha256_bytes
-  line: 145
-  classification: SEMANTIC_PROFILED
-  preimage_shape: variable-no-known-assignment
-  hash_algorithm: sha256
-  rationale: hashlib.sha256(data)
-  mixed_file_note: ''
-  call_src: hashlib.sha256(data)
-- path: tools/node_architect/package_export/export_failure_routing.py
-  function_or_symbol: _sha256_hex
-  line: 225
-  classification: SEMANTIC_PROFILED
-  preimage_shape: variable-no-known-assignment
-  hash_algorithm: sha256
-  rationale: hashlib.sha256(data)
-  mixed_file_note: ''
-  call_src: hashlib.sha256(data)
-- path: tools/node_architect/package_export/export_manifest_generation.py
-  function_or_symbol: _sha256_bytes
-  line: 146
-  classification: SEMANTIC_PROFILED
-  preimage_shape: variable-no-known-assignment
-  hash_algorithm: sha256
-  rationale: hashlib.sha256(data)
-  mixed_file_note: ''
-  call_src: hashlib.sha256(data)
+  wrapper: null
 - path: tools/node_architect/package_export/source_path_safety.py
   function_or_symbol: semantic_digest
   line: 190
@@ -1240,7 +1275,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(self.to_json().encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(self.to_json().encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/source_path_safety.py
   function_or_symbol: compute_input_digest
   line: 203
@@ -1249,16 +1284,16 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(list(entries)).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(list(entries)).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/source_path_safety.py
   function_or_symbol: _file_digest
   line: 207
   classification: RAW_BYTES
-  preimage_shape: streaming exact source file bytes (._file_digest = hashlib.sha256() then .update(read_bytes))
+  preimage_shape: exact file path.read_bytes()
   hash_algorithm: sha256
   rationale: hashlib.sha256()
   mixed_file_note: ''
-  call_src: hashlib.sha256()
+  wrapper: null
 - path: tools/node_architect/package_export/package_manifest_load.py
   function_or_symbol: semantic_digest
   line: 235
@@ -1267,7 +1302,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(self.to_json().encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(self.to_json().encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/package_manifest_load.py
   function_or_symbol: compute_manifest_digest
   line: 253
@@ -1276,7 +1311,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(manifest).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(manifest).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/package_manifest_load.py
   function_or_symbol: _replay_identity
   line: 465
@@ -1285,7 +1320,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(_canonical_json(identity).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(_canonical_json(identity).encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/target_path_safety_check.py
   function_or_symbol: evaluate_target
   line: 279
@@ -1294,7 +1329,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(digest_input.encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(digest_input.encode('utf-8'))
+  wrapper: null
 - path: tools/node_architect/package_export/target_path_safety_check.py
   function_or_symbol: _plan_digest
   line: 381
@@ -1303,16 +1338,7 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256('||'.join(parts).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256('||'.join(parts).encode('utf-8'))
-- path: tools/node_architect/package_export/smoke_verification.py
-  function_or_symbol: _sha256_bytes
-  line: 207
-  classification: SEMANTIC_PROFILED
-  preimage_shape: variable-no-known-assignment
-  hash_algorithm: sha256
-  rationale: hashlib.sha256(data)
-  mixed_file_note: ''
-  call_src: hashlib.sha256(data)
+  wrapper: null
 - path: tools/node_architect/runtime_checkpoint/state_reconciliation.py
   function_or_symbol: digest_payload
   line: 150
@@ -1321,6 +1347,178 @@ confirmed_callsites:
   hash_algorithm: sha256
   rationale: hashlib.sha256(canonical_json(payload).encode('utf-8'))
   mixed_file_note: ''
-  call_src: hashlib.sha256(canonical_json(payload).encode('utf-8'))
+  wrapper: null
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  function_or_symbol: canonical_manifest_digest -> _sha256_bytes
+  line: 168
+  classification: SEMANTIC_PROFILED
+  preimage_shape: sorted/manifest semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  function_or_symbol: compute_output_tree_digest -> _sha256_bytes
+  line: 182
+  classification: RAW_BYTES
+  preimage_shape: exact file bytes p.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(p.read_bytes())
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  function_or_symbol: compute_output_tree_digest -> _sha256_bytes
+  line: 184
+  classification: SEMANTIC_PROFILED
+  preimage_shape: sorted/tree semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  function_or_symbol: _read_digest_and_bytes -> _sha256_bytes
+  line: 201
+  classification: RAW_BYTES
+  preimage_shape: exact file bytes path.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(data)
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/export_failure_routing.py
+  function_or_symbol: compute_evidence_hash -> _sha256_hex
+  line: 250
+  classification: SEMANTIC_PROFILED
+  preimage_shape: evidence semantic fields encoded UTF-8 (wrapper _sha256_hex)
+  hash_algorithm: sha256
+  rationale: _sha256_hex(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_hex
+- path: tools/node_architect/package_export/export_failure_routing.py
+  function_or_symbol: compute_decision_digest -> _sha256_hex
+  line: 266
+  classification: SEMANTIC_PROFILED
+  preimage_shape: decision semantic fields encoded UTF-8 (wrapper _sha256_hex)
+  hash_algorithm: sha256
+  rationale: _sha256_hex(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_hex
+- path: tools/node_architect/package_export/export_manifest_generation.py
+  function_or_symbol: compute_plan_digest -> _sha256_bytes
+  line: 161
+  classification: SEMANTIC_PROFILED
+  preimage_shape: plan semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/export_manifest_generation.py
+  function_or_symbol: compute_manifest_digest -> _sha256_bytes
+  line: 167
+  classification: SEMANTIC_PROFILED
+  preimage_shape: manifest semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/export_manifest_generation.py
+  function_or_symbol: generate_export_manifest -> _sha256_bytes
+  line: 501
+  classification: RAW_BYTES
+  preimage_shape: exact source file bytes src.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(data)
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/governance_tree_build.py
+  function_or_symbol: compute_plan_digest -> _sha256_bytes
+  line: 198
+  classification: SEMANTIC_PROFILED
+  preimage_shape: plan semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/governance_tree_build.py
+  function_or_symbol: compute_tree_digest -> _sha256_bytes
+  line: 217
+  classification: SEMANTIC_PROFILED
+  preimage_shape: tree semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/governance_tree_build.py
+  function_or_symbol: build_governance_tree -> _sha256_bytes
+  line: 499
+  classification: RAW_BYTES
+  preimage_shape: exact source file bytes src.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(data)
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/governance_tree_build.py
+  function_or_symbol: build_governance_tree -> _sha256_bytes
+  line: 537
+  classification: RAW_BYTES
+  preimage_shape: staging readback exact bytes dest.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(staged)
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/governance_tree_build.py
+  function_or_symbol: build_governance_tree -> _sha256_bytes
+  line: 556
+  classification: RAW_BYTES
+  preimage_shape: staging readback exact bytes dest.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(staged)
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/governance_tree_build.py
+  function_or_symbol: build_governance_tree -> _sha256_bytes
+  line: 600
+  classification: RAW_BYTES
+  preimage_shape: promoted-tree readback exact bytes final.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(final.read_bytes())
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/smoke_verification.py
+  function_or_symbol: compute_environment_digest -> _sha256_bytes
+  line: 228
+  classification: SEMANTIC_PROFILED
+  preimage_shape: environment semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/smoke_verification.py
+  function_or_symbol: compute_result_digest -> _sha256_bytes
+  line: 256
+  classification: SEMANTIC_PROFILED
+  preimage_shape: result semantic fields encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(blob.encode('utf-8'))
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/smoke_verification.py
+  function_or_symbol: write_checkpoint -> _sha256_bytes
+  line: 307
+  classification: SEMANTIC_PROFILED
+  preimage_shape: canonical JSON of idempotency/package-identity encoded UTF-8 (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: '_sha256_bytes(json.dumps({''idempotency_key'': idempotency_key, ''package_identity'': package_identity},
+    sort_keys=True, separators=('','', '':''), ensure_ascii=False).encode(''utf-8''))'
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
+- path: tools/node_architect/package_export/smoke_verification.py
+  function_or_symbol: _bind_package_identity -> _sha256_bytes
+  line: 468
+  classification: RAW_BYTES
+  preimage_shape: exact target file bytes tgt.read_bytes() (wrapper _sha256_bytes)
+  hash_algorithm: sha256
+  rationale: _sha256_bytes(data)
+  mixed_file_note: POLYMORPHIC_WRAPPER_USE
+  wrapper: _sha256_bytes
 unresolved_ambiguities: []
 wp1_pass_eligible: true
