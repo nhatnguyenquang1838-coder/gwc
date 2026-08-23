@@ -30,8 +30,8 @@ authorized_paths_written:
 
 validation:
   test_command: python3 -m unittest tests.package_export.test_canonical_digest_profile
-  tests_run: 42
-  tests_passed: 42
+  tests_run: 47
+  tests_passed: 47
   tests_failed: 0
   yaml_json_parse: ALL_OK
   schemas_validated:
@@ -49,6 +49,7 @@ correction_log:
   - INTERCEPT_2: schema status enum defined|deprecated (active MUST NOT validate)
   - INTERCEPT_2: schema framing const = exact length-prefixed framing string (old implicit-length framing rejected)
   - INTERCEPT_3: digest_envelope_binding.binds uses actual envelope field 'domain' (not 'domain_tag'); cross-artifact consistency test added
+  - INTERCEPT_4: explicit invalid_unicode_policy=reject_unpaired_surrogates + DIGEST_INVALID_UNICODE_REJECTED taxonomy; normalization stays none
 
 semantic_decisions:
   gwc_jcs_v1_profile:

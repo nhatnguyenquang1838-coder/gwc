@@ -39,6 +39,7 @@
         "non_string_key_policy",
         "duplicate_raw_key_policy",
         "unicode_normalization",
+        "invalid_unicode_policy",
         "unsupported_value_policy"
       ],
       "properties": {
@@ -51,6 +52,7 @@
         "non_string_key_policy": {"type": "string", "const": "reject"},
         "duplicate_raw_key_policy": {"type": "string", "const": "reject_before_semantic_collapse"},
         "unicode_normalization": {"type": "string", "const": "none"},
+        "invalid_unicode_policy": {"type": "string", "const": "reject_unpaired_surrogates"},
         "unsupported_value_policy": {"type": "string", "const": "reject_with_deterministic_error"}
       }
     },
@@ -78,6 +80,7 @@
         "key_value_separator": {"type": "string", "const": ":"},
         "utf8_encoding": {"type": "string", "const": "strict_utf8"},
         "unicode_normalization": {"type": "string", "const": "none"},
+        "invalid_unicode_note": {"type": "string"},
         "trailing_whitespace": {"type": "string", "const": "forbidden"},
         "newline": {"type": "string", "const": "none"}
       }
@@ -136,6 +139,7 @@
         "DIGEST_NON_FINITE_REJECTED",
         "DIGEST_NON_STRING_KEY_REJECTED",
         "DIGEST_DUPLICATE_RAW_KEY_REJECTED",
+        "DIGEST_INVALID_UNICODE_REJECTED",
         "DIGEST_UNICODE_NORMALIZATION_NONE",
         "DIGEST_RESOURCE_LIMIT_EXCEEDED",
         "DIGEST_DOMAIN_TAG_MISMATCH",
@@ -148,6 +152,7 @@
         "DIGEST_NON_FINITE_REJECTED": {"type": "string"},
         "DIGEST_NON_STRING_KEY_REJECTED": {"type": "string"},
         "DIGEST_DUPLICATE_RAW_KEY_REJECTED": {"type": "string"},
+        "DIGEST_INVALID_UNICODE_REJECTED": {"type": "string"},
         "DIGEST_UNICODE_NORMALIZATION_NONE": {"type": "string"},
         "DIGEST_RESOURCE_LIMIT_EXCEEDED": {"type": "string"},
         "DIGEST_DOMAIN_TAG_MISMATCH": {"type": "string"},

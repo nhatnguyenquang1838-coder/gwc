@@ -80,6 +80,9 @@ class ProfileSchemaTest(unittest.TestCase):
         self.assertEqual(d["non_string_key_policy"], "reject")
         self.assertEqual(d["duplicate_raw_key_policy"], "reject_before_semantic_collapse")
         self.assertEqual(d["unicode_normalization"], "none")
+        # Explicit invalid-Unicode policy (lone-surrogate rejection is NOT
+        # normalization; normalization remains none).
+        self.assertEqual(d["invalid_unicode_policy"], "reject_unpaired_surrogates")
 
     def test_canonical_byte_contract_is_not_naive_json_dumps(self):
         c = self.profile["canonical_byte_contract"]
@@ -123,8 +126,8 @@ class ProfileSchemaTest(unittest.TestCase):
         et = self.profile["error_taxonomy"]
         for code in ("DIGEST_NEGATIVE_ZERO_REJECTED", "DIGEST_NON_FINITE_REJECTED",
                      "DIGEST_NON_STRING_KEY_REJECTED", "DIGEST_DUPLICATE_RAW_KEY_REJECTED",
-                     "DIGEST_RESOURCE_LIMIT_EXCEEDED", "DIGEST_DOMAIN_TAG_MISMATCH",
-                     "DIGEST_ENVELOPE_BINDING_MISMATCH"):
+                     "DIGEST_INVALID_UNICODE_REJECTED", "DIGEST_RESOURCE_LIMIT_EXCEEDED",
+                     "DIGEST_DOMAIN_TAG_MISMATCH", "DIGEST_ENVELOPE_BINDING_MISMATCH"):
             self.assertIn(code, et)
         self.assertEqual(et["error_delivery"], "deterministic_and_replayable")
 
@@ -441,6 +444,45 @@ class CrossArtifactBindingConsistencyTest(unittest.TestCase):
         binds = set(self.profile["digest_envelope_binding"]["binds"])
         self.assertNotIn("domain_tag", binds)
         self.assertNotIn("domain_tag", set(self.envelope_schema["required"]))
+
+
+class InvalidUnicodePolicyTest(unittest.TestCase):
+    """INVALID_UNICODE_POLICY_EXPLICIT: schema must enforce the explicit policy."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_profile_carries_exact_policy(self):
+        self.assertEqual(
+            self.profile["strict_input_domain"]["invalid_unicode_policy"],
+            "reject_unpaired_surrogates",
+        )
+
+    def test_profile_carries_dedicated_error_code(self):
+        self.assertIn("DIGEST_INVALID_UNICODE_REJECTED",
+                      self.profile["error_taxonomy"])
+
+    def test_schema_rejects_missing_policy(self):
+        bad = dict(self.profile)
+        bad["strict_input_domain"] = dict(self.profile["strict_input_domain"])
+        del bad["strict_input_domain"]["invalid_unicode_policy"]
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_schema_rejects_altered_policy(self):
+        bad = dict(self.profile)
+        bad["strict_input_domain"] = dict(self.profile["strict_input_domain"])
+        bad["strict_input_domain"]["invalid_unicode_policy"] = "allow_any"
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_normalization_still_none(self):
+        # Rejecting malformed/lone-surrogate Unicode is NOT normalization.
+        self.assertEqual(
+            self.profile["strict_input_domain"]["unicode_normalization"],
+            "none",
+        )
 
 
 if __name__ == "__main__":

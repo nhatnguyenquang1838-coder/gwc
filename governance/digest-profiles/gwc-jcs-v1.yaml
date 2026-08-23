@@ -25,6 +25,7 @@ strict_input_domain:
   non_string_key_policy: reject
   duplicate_raw_key_policy: reject_before_semantic_collapse
   unicode_normalization: none
+  invalid_unicode_policy: reject_unpaired_surrogates
   unsupported_value_policy: reject_with_deterministic_error
 
 # --- Canonical byte contract -----------------------------------------------
@@ -41,6 +42,11 @@ canonical_byte_contract:
   key_value_separator: ':'
   utf8_encoding: strict_utf8
   unicode_normalization: none
+  invalid_unicode_note: >-
+    unicode_normalization=none means valid Unicode is preserved byte-for-byte.
+    This is distinct from invalid_unicode_policy=reject_unpaired_surrogates:
+    malformed UTF-8 and lone/unpaired surrogate code units are REJECTED before
+    digest; that rejection is not a form of normalization.
   trailing_whitespace: forbidden
   newline: none
 
@@ -81,6 +87,7 @@ error_taxonomy:
   DIGEST_NON_FINITE_REJECTED: nan_or_infinity_is_not_allowed
   DIGEST_NON_STRING_KEY_REJECTED: object_key_must_be_string
   DIGEST_DUPLICATE_RAW_KEY_REJECTED: duplicate_raw_json_key_before_semantic_collapse
+  DIGEST_INVALID_UNICODE_REJECTED: invalid_unicode_or_unpaired_surrogate_rejected
   DIGEST_UNICODE_NORMALIZATION_NONE: no_unicode_normalization_is_applied
   DIGEST_RESOURCE_LIMIT_EXCEEDED: preimage_size_or_depth_or_cardinality_exceeded
   DIGEST_DOMAIN_TAG_MISMATCH: domain_tag_not_bound_in_registry
