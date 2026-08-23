@@ -169,7 +169,7 @@
           "allOf": [
             {"contains": {"const": "profile_id"}},
             {"contains": {"const": "hash_algorithm"}},
-            {"contains": {"const": "domain_tag"}},
+            {"contains": {"const": "domain"}},
             {"contains": {"const": "schema_ref"}},
             {"contains": {"const": "preimage_framing_scheme"}},
             {"contains": {"const": "hexdigest"}}

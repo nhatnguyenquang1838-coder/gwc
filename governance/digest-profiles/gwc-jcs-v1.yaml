@@ -92,7 +92,7 @@ digest_envelope_binding:
   binds:
     - profile_id
     - hash_algorithm
-    - domain_tag
+    - domain
     - schema_ref
     - preimage_framing_scheme
     - hexdigest
@@ -100,7 +100,10 @@ digest_envelope_binding:
   integrity_rule: >-
     An envelope is valid only when every bound field is present and consistent
     with the profile/registry; a digest without its envelope binding is not a
-    governance-authentic digest.
+    governance-authentic digest. The field names here MUST match the envelope
+    schema's required set (profile_id, hash_algorithm, domain, schema_ref,
+    preimage_framing_scheme, hexdigest); the domain value is sourced from the
+    registry entry.domain.
 
 # --- Governance posture ----------------------------------------------------
 governance:

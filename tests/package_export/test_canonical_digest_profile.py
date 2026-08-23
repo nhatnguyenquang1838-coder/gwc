@@ -130,7 +130,7 @@ class ProfileSchemaTest(unittest.TestCase):
 
     def test_envelope_binding_fields(self):
         eb = self.profile["digest_envelope_binding"]
-        for field in ("profile_id", "hash_algorithm", "domain_tag", "schema_ref",
+        for field in ("profile_id", "hash_algorithm", "domain", "schema_ref",
                       "preimage_framing_scheme", "hexdigest"):
             self.assertIn(field, eb["binds"])
         self.assertEqual(eb["schema"], "schemas/digest-envelope.schema.json")
@@ -335,7 +335,7 @@ class EnvelopeBindingExactSetTest(unittest.TestCase):
         self.assertEqual(len(binds), 6)
         self.assertEqual(len(set(binds)), 6)
         self.assertEqual(set(binds), {
-            "profile_id", "hash_algorithm", "domain_tag", "schema_ref",
+            "profile_id", "hash_algorithm", "domain", "schema_ref",
             "preimage_framing_scheme", "hexdigest",
         })
 
@@ -403,6 +403,44 @@ class FinalTighteningNegativeTest(unittest.TestCase):
             "sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )",
         )
         self.assertTrue(self.validator.is_valid(self.profile))
+
+
+class CrossArtifactBindingConsistencyTest(unittest.TestCase):
+    """CROSS_ARTIFACT_BINDING_MISMATCH guard: profile.digest_envelope_binding.binds
+    must match the digest-envelope schema's required set exactly, so field names
+    cannot drift between the profile artifact and the envelope schema."""
+
+    NORMATIVE_BINDS = {
+        "profile_id", "hash_algorithm", "domain", "schema_ref",
+        "preimage_framing_scheme", "hexdigest",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+        cls.envelope_schema = _load_json(SCHEMAS / "digest-envelope.schema.json")
+
+    def test_profile_binds_subset_of_envelope_required(self):
+        binds = set(self.profile["digest_envelope_binding"]["binds"])
+        required = set(self.envelope_schema["required"])
+        missing = binds - required
+        self.assertEqual(missing, set(),
+                         f"profile binds not present in envelope required: {missing}")
+
+    def test_envelope_required_contains_normative_binds(self):
+        required = set(self.envelope_schema["required"])
+        self.assertTrue(self.NORMATIVE_BINDS <= required,
+                        f"envelope schema missing normative bindings: {self.NORMATIVE_BINDS - required}")
+
+    def test_normative_set_exact_and_unique(self):
+        binds = set(self.profile["digest_envelope_binding"]["binds"])
+        self.assertEqual(binds, self.NORMATIVE_BINDS)
+
+    def test_domain_tag_should_not_be_a_binding(self):
+        # The actual envelope field is 'domain', not 'domain_tag'.
+        binds = set(self.profile["digest_envelope_binding"]["binds"])
+        self.assertNotIn("domain_tag", binds)
+        self.assertNotIn("domain_tag", set(self.envelope_schema["required"]))
 
 
 if __name__ == "__main__":
