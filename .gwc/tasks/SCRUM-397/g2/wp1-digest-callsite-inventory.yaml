@@ -6,7 +6,8 @@ repository: nhatnguyenquang1838-coder/gwc
 inventory_base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
 working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
 implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
-g2_scope_hash: sha256:5d88ce89ca868d1d540510244a34a047cdd936cd1a83c9d197052feba7128c1a
+g2_approval_request_id: g2_scrum-397_wp1_codex_r2_20260823
+g2_scope_hash: sha256:3f3db1aef2d89cf40dd9e7171f6fcc83fee5a6fe0c517e1ef98b668e97be43b3
 classification_vocabulary:
 - SEMANTIC_PROFILED
 - RAW_BYTES

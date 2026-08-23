@@ -5,14 +5,14 @@ work_package: WP1
 repository: nhatnguyenquang1838-coder/gwc
 gate: G2_EXECUTION
 action: branch_worktree_file_commit_push
-approval_request_id: g2_scrum-397_9c60c3e24a130eec
-human_response: APPROVE G2 g2_scrum-397_9c60c3e24a130eec 5d88ce89ca868d1d 2026-08-23T13:31:00Z
-approval_scope_hash: sha256:5d88ce89ca868d1d540510244a34a047cdd936cd1a83c9d197052feba7128c1a
-scope_hash_short: 5d88ce89ca868d1d
+approval_request_id: g2_scrum-397_wp1_codex_r2_20260823
+human_response: APPROVE G2_EXECUTION g2_scrum-397_wp1_codex_r2_20260823 3f3db1aef2d89cf4 2026-08-23T16:11:24Z
+approval_scope_hash: sha256:3f3db1aef2d89cf40dd9e7171f6fcc83fee5a6fe0c517e1ef98b668e97be43b3
+scope_hash_short: 3f3db1aef2d89cf4
 implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
-issued_at: '2026-08-23T12:01:00Z'
-expires_at: '2026-08-23T13:31:00Z'
-validated_at: '2026-08-23T12:11:00Z'
+issued_at: '2026-08-23T14:11:24Z'
+expires_at: '2026-08-23T16:11:24Z'
+validated_at: '2026-08-23T14:29:55Z'
 validation_outcome: VALID
 validation_reason: APPROVAL_VALID
 replay_status: FIRST_SEEN
@@ -21,7 +21,7 @@ actor_target:
   id: U0BJRF5L99T
 base_ref: main
 base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
-head_sha_at_validation: 938b8d67ff741eab027a1f2487d4a171444a5b25
+head_sha_at_validation: 3f5d80f3e622a61620e1f4b4b4d998cd685053b7
 working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
 risk_class: R1
 authorized_paths:
