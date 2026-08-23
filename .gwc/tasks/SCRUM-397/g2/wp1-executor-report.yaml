@@ -8,15 +8,13 @@ auxiliary_executor: Hermes Cloud
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
 working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
+current_head_sha: 971aca779b7368385e159b2cb7d62fc1a0b49a19
 g2_request_id: g2_scrum-397_wp1_codex_r2_20260823
 g2_scope_hash: sha256:3f3db1aef2d89cf40dd9e7171f6fcc83fee5a6fe0c517e1ef98b668e97be43b3
 implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
-status: BLOCKED
+status: IN_PROGRESS
 reason_codes:
-- EXHAUSTIVE_INVENTORY_NOT_PROVEN
-- GITHUB_CODE_SEARCH_RESULT_CAP_100
-- HERMES_EXECUTOR_ENV_NO_SPACE_LEFT_ON_DEVICE
-- HERMES_RESET_RECOVERY_FAILED
+- WP1_REPO_LOCAL_INVENTORY_IN_PROGRESS
 facts:
 - Human G2 approval validated VALID/FIRST_SEEN before execution.
 - Guarded branch was created from exact approved base SHA.
@@ -27,6 +25,8 @@ facts:
 - Hermes Cloud was dispatched on the canonical Slack thread for repo-local exhaustive enumeration and failed before mutation with Errno 28 No space left on device.
 - A bounded reset/recovery intercept was attempted; Hermes failed again with the same Errno 28 before mutation.
 - Direct /reset plus fresh-session probe produced no usable Hermes execution context.
+- Refreshed G2 approval was validated before mutation; the execution envelope and approval readback were committed and pushed at exact head 971aca779b7368385e159b2cb7d62fc1a0b49a19.
+- Repo-local AST enumeration began against committed HEAD and found 128 direct SHA-256 constructors plus one SHA-1 constructor classified OUT_OF_SCOPE; exhaustive producer/wrapper classification is not yet terminal.
 completion_contract:
   exhaustive_inventory: false
   classifications_complete: false
@@ -38,10 +38,11 @@ completion_contract:
   deploy_or_release_performed: false
   g3_g4_g5_g6_authority_used: false
 changed_paths_expected:
+- .gwc/tasks/SCRUM-397/g2/execution-envelope.yaml
 - .gwc/tasks/SCRUM-397/g2/approval-readback.yaml
 - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
 - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
 next_action: >-
-  WAIT_CONTROLLER. Do not advance to WP2. Recover an execution environment capable of exhaustive repo-local enumeration,
-  or obtain an equivalent exhaustive repository search/AST capability, then resume WP1 under the same bounded objective.
+  Continue the bounded repo-local exhaustive enumeration and classify every producer exactly once. Do not advance to WP2.
+  Handover remains WAIT_CONTROLLER if the local execution cannot prove complete coverage or unresolved ambiguities zero.
 wp2_eligible: false
