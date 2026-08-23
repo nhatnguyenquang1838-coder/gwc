@@ -2,35 +2,48 @@ schema_version: '1.0'
 artifact_type: scrum-397-wp1-executor-report
 task_id: SCRUM-397
 work_package: WP1
-run_id: SCRUM-397-WP1-DIGEST-INVENTORY-R1
+run_id: SCRUM-397-WP1-DIGEST-INVENTORY-R2
 controller: ChatGPT
-auxiliary_executor: Hermes Cloud
+executor: Hermes Mac
 repository: nhatnguyenquang1838-coder/gwc
 base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
 working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
-current_head_sha: 971aca779b7368385e159b2cb7d62fc1a0b49a19
+current_head_sha: aa36d44d76737809cbbbf346fe51de744529b79d
 g2_request_id: g2_scrum-397_wp1_codex_r2_20260823
 g2_scope_hash: sha256:3f3db1aef2d89cf40dd9e7171f6fcc83fee5a6fe0c517e1ef98b668e97be43b3
 implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
-status: IN_PROGRESS
+status: PASS
 reason_codes:
-- WP1_REPO_LOCAL_INVENTORY_IN_PROGRESS
+- REPO_LOCAL_AST_ENUMERATION_EXHAUSTIVE
+- UNRESOLVED_AMBIGUITIES_0
+- COVERAGE_COMPLETE
 facts:
-- Human G2 approval validated VALID/FIRST_SEEN before execution.
-- Guarded branch was created from exact approved base SHA.
-- All durable writes performed by Controller are under .gwc/tasks/SCRUM-397/**.
-- No runtime/product source was changed.
-- GitHub direct probes produced a large candidate set and confirmed representative RAW_BYTES, SEMANTIC_PROFILED, and mixed callsites.
-- Broad hashlib.sha256 probe hit connector cap at 100 results, preventing proof that no source callsite was omitted.
-- Hermes Cloud was dispatched on the canonical Slack thread for repo-local exhaustive enumeration and failed before mutation with Errno 28 No space left on device.
-- A bounded reset/recovery intercept was attempted; Hermes failed again with the same Errno 28 before mutation.
-- Direct /reset plus fresh-session probe produced no usable Hermes execution context.
-- Refreshed G2 approval was validated before mutation; the execution envelope and approval readback were committed and pushed at exact head 971aca779b7368385e159b2cb7d62fc1a0b49a19.
-- Repo-local AST enumeration began against committed HEAD and found 128 direct SHA-256 constructors plus one SHA-1 constructor classified OUT_OF_SCOPE; exhaustive producer/wrapper classification is not yet terminal.
+- 'Pre-mutation binding gate passed: main=938b8d67ff741eab027a1f2487d4a171444a5b25 (matches approved base);
+  branch HEAD=aa36d44d76737809cbbbf346fe51de744529b79d (matches contract); G2 expiry 2026-08-23T16:11:24Z
+  not yet reached; no concurrent writer detected.'
+- Work performed in an isolated git worktree at exact branch HEAD; local machine checkout (pre-prod) was
+  never modified.
+- 'Exhaustive enumeration used a repo-local Python AST walk (no connector result cap). Probes: all hashlib.<algo>()/hashlib.new()
+  call nodes; data-flow slice of the hashed argument to separate read_bytes()/file.read() (RAW_BYTES)
+  from encode()/canonical-json/serializer/framing (SEMANTIC_PROFILED); streaming hashlib.sha256()+update()
+  traced via .update() args; transitive wrapper resolution for polymorphic _sha256_bytes/_sha256_hex callers;
+  secondary probes for hashlib aliases, hashlib.new, hmac, cryptography, hash() builtin, and def sha256/sha1
+  wrappers (all already captured or non-productive).'
+- 'Total runtime/product producer lines: 140 (132 SEMANTIC_PROFILED, 8 RAW_BYTES). One sha1 producer (tools/node_architect/ai_agent_adapter.py:259,
+  deterministic derived-head identity) classified SEMANTIC_PROFILED. No md5/sha512/sha384 producers present
+  in runtime code.'
+- '8 RAW_BYTES sites are intentional exact file/source/path byte identity and MUST stay byte-based: build_project_package,
+  diff_instruction_package, validate_instructions, hash_integrity_artifacts, verify_rollout, verify_package_export_smoke,
+  export_project_package:117, and source_path_safety.py:207 (._file_digest streaming read_bytes).'
+- 132 SEMANTIC_PROFILED sites are structured/semantic preimages (canonical JSON, pipe/||-joined framing,
+  recursive canonicalization, resume/approval tokens) and are candidates for later CanonicalDigestProfile
+  work.
+- 0 unresolved ambiguities. All single-variable / helper-wrapped sites were traced to a concrete preimage
+  source.
 completion_contract:
-  exhaustive_inventory: false
-  classifications_complete: false
-  unresolved_ambiguities_zero: false
+  exhaustive_inventory: true
+  classifications_complete: true
+  unresolved_ambiguities_zero: true
   runtime_behavior_changed: false
   consumer_migration_performed: false
   pr_created_or_updated: false
@@ -38,11 +51,9 @@ completion_contract:
   deploy_or_release_performed: false
   g3_g4_g5_g6_authority_used: false
 changed_paths_expected:
-- .gwc/tasks/SCRUM-397/g2/execution-envelope.yaml
-- .gwc/tasks/SCRUM-397/g2/approval-readback.yaml
 - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
 - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
-next_action: >-
-  Continue the bounded repo-local exhaustive enumeration and classify every producer exactly once. Do not advance to WP2.
-  Handover remains WAIT_CONTROLLER if the local execution cannot prove complete coverage or unresolved ambiguities zero.
+next_action: WP1 terminal PASS. Exact-head CI must be checked by Controller (executor does not claim CI
+  PASS). Do not advance to WP2. WAIT_CONTROLLER.
 wp2_eligible: false
+generated_at_utc: '2026-08-23T15:43:40Z'
