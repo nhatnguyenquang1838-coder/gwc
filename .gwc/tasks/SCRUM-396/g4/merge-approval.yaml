@@ -1,0 +1,29 @@
+schema_version: '1.0'
+artifact_type: g4-merge-approval
+gate: G4_MERGE
+task_id: SCRUM-396
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+working_branch: hermes/scrum-396-durable-schema-replay-20260824
+pull_request:
+  number: 510
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/510
+head_sha: e8ff373a1d64db4ee5a0440f5ec52aa4b49b237a
+scope_hash: sha256:f9cdaeea551afde858f4e8fcb19a129e1003cf97c9631a50fe108aa7d77429d3
+scope_hash_16: f9cdaeea551afde8
+approval_id: CP-20260824-396-G4-R1
+approval_command: APPROVE G4_MERGE CP-20260824-396-G4-R1 f9cdaeea551afde8 2026-08-25T02:20:00Z
+status: PENDING_HUMAN_APPROVAL
+evidence:
+- G3 delivery-record PASS (schema valid)
+- CI 6/6 success on head e8ff373a
+- 27 tests PASS
+- Draft PR 510 MERGEABLE
+authority_boundaries:
+  grants:
+  - G4_MERGE (pending Human approval)
+  excluded:
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - G3_PR (already complete)
