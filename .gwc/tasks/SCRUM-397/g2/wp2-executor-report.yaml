@@ -60,9 +60,10 @@ semantic_decisions:
       non_string_key_policy: reject
       duplicate_raw_key_policy: reject_before_semantic_collapse
       unicode_normalization: none
+      invalid_unicode_policy: reject_unpaired_surrogates
     canonical_byte_contract: RFC_8785_JCS (NOT python json.dumps sort_keys renamed)
     hash_algorithm: SHA-256
-    domain_separation: gwc-domain-sep-v1 framing sha256(domain_tag||0x00||u64be(len)||preimage)
+    domain_separation: gwc-domain-sep-v1 framing sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )
     resource_limits: bounded (max_preimage_bytes, depth, keys, array items, string bytes)
     error_taxonomy: deterministic codes
     canonicalization_never_grants_authority: true
