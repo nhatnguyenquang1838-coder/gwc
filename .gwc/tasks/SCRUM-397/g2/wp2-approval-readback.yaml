@@ -1,0 +1,59 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+task_id: SCRUM-397
+work_package: WP2
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+action: branch_worktree_file_commit_push
+approval_request_id: g2_scrum-397_1fc165cae68a2345
+human_response: APPROVE G2 g2_scrum-397_1fc165cae68a2345 842a2c55cfe3d170 2026-08-23T19:57:00Z
+approval_scope_hash: sha256:842a2c55cfe3d170d412028cce21eeaee14522d67a4e2d080dab412b145e9a8f
+scope_hash_short: 842a2c55cfe3d170
+implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+issued_at: '2026-08-23T17:57:00Z'
+expires_at: '2026-08-23T19:57:00Z'
+validated_at: '2026-08-23T18:13:14Z'
+validation_outcome: VALID
+validation_reason: APPROVAL_VALID
+replay_status: FIRST_SEEN
+actor_target:
+  type: agent
+  id: U0BLW98GENT
+  display_name: Hermes Mac
+base_ref: main
+base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+head_sha_at_validation: 556e3b68812be9c22b5a151b5361db7f917bcddb
+working_branch: fastlane/scrum-397-canonical-digest-wp2-profile-registry
+risk_class: R2
+authorized_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp2-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2-executor-report.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - governance/digest-profile-registry.yaml
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - schemas/digest-envelope.schema.json
+  - tests/package_export/test_canonical_digest_profile.py
+forbidden_effects:
+  - runtime_or_shared_digest_api
+  - legacy_verifier_implementation
+  - cross_runtime_reference_verifier_or_golden_corpus
+  - wp1_154_callsite_change
+  - consumer_migration
+  - protected_main_write
+  - pr_creation_or_update
+  - merge_or_auto_merge
+  - force_push
+  - branch_deletion
+  - pr_base_change
+  - deploy_or_release
+  - production_data_or_config_change
+  - credential_or_secret_change
+  - migration
+  - scope_expansion
+execution_authority_granted: true
+g3_authority_granted: false
+g4_authority_granted: false
+g5_authority_granted: false
+g6_authority_granted: false

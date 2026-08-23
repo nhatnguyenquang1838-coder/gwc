@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/digest-profile-registry.schema.json",
+  "title": "Digest Profile Registry",
+  "description": "Lifecycle registry for canonical digest profiles. Lifecycle states are EXACTLY NEW_WRITE_ALLOWED | VERIFY_ONLY | REJECTED. Fail-closed by default.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "registry_id", "task", "work_package", "entries", "policy"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "artifact_type": {"type": "string", "const": "digest-profile-registry"},
+    "registry_id": {"type": "string", "const": "gwc-digest-profile-registry"},
+    "task": {"type": "string"},
+    "work_package": {"type": "string"},
+    "entries": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile_id",
+          "lifecycle_state",
+          "new_write_allowed",
+          "verify_only_allowed",
+          "reason",
+          "domain",
+          "envelope_schema_ref",
+          "hash_algorithm"
+        ],
+        "properties": {
+          "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+          "lifecycle_state": {"type": "string", "enum": ["NEW_WRITE_ALLOWED", "VERIFY_ONLY", "REJECTED"]},
+          "new_write_allowed": {"type": "boolean"},
+          "verify_only_allowed": {"type": "boolean"},
+          "reason": {"type": "string"},
+          "domain": {"type": "string", "minLength": 1},
+          "schema_ref": {"type": ["string", "null"]},
+          "envelope_schema_ref": {"type": "string"},
+          "hash_algorithm": {"type": "string", "enum": ["SHA-256"]},
+          "activation_preconditions": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "activation_policy": {"type": "string", "const": "FAIL_CLOSED"},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["new_write_gate", "verify_gate", "unknown_profile_policy", "domain_binding_required", "fail_closed"],
+      "properties": {
+        "new_write_gate": {"type": "string", "const": "registry_lifecycle_state_must_equal_NEW_WRITE_ALLOWED"},
+        "verify_gate": {"type": "string", "const": "registry_lifecycle_state_in_NEW_WRITE_ALLOWED_OR_VERIFY_ONLY"},
+        "unknown_profile_policy": {"type": "string", "const": "REJECTED"},
+        "domain_binding_required": {"type": "boolean", "const": true},
+        "fail_closed": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

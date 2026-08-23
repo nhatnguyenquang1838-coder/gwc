@@ -1,0 +1,77 @@
+schema_version: '1.0'
+artifact_type: g2-executor-report
+task_id: SCRUM-397
+work_package: WP2
+run: SCRUM-397-WP2-PROFILE-REGISTRY-R1
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+approval_request_id: g2_scrum-397_1fc165cae68a2345
+scope_hash: sha256:842a2c55cfe3d170d412028cce21eeaee14522d67a4e2d080dab412b145e9a8f
+source_head: 556e3b68812be9c22b5a151b5361db7f917bcddb
+status: PASS
+
+summary: >-
+  WP2 normative profile/registry contract materialized. gwc-jcs-v1 canonical
+  digest profile, digest-profile-registry (fail-closed), three JSON-Schema
+  contracts, and a WP2-only contract test suite. No runtime/shared digest API,
+  no legacy verifier, no cross-runtime verifier/golden corpus, no WP1 callsite
+  change, no consumer migration.
+
+authorized_paths_written:
+  - .gwc/tasks/SCRUM-397/g2/wp2-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2-executor-report.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - governance/digest-profile-registry.yaml
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - schemas/digest-envelope.schema.json
+  - tests/package_export/test_canonical_digest_profile.py
+
+validation:
+  test_command: python3 -m unittest tests.package_export.test_canonical_digest_profile
+  tests_run: 22
+  tests_passed: 22
+  tests_failed: 0
+  yaml_json_parse: ALL_OK
+  schemas_validated:
+    - canonical-digest-profile.schema.json
+    - digest-profile-registry.schema.json
+    - digest-envelope.schema.json
+  network_side_effects: none
+  secrets_touched: none
+
+semantic_decisions:
+  gwc_jcs_v1_profile:
+    specification: RFC_8785_JCS_COMPATIBLE
+    strict_domain_policies:
+      negative_zero_policy: reject
+      non_finite_policy: reject
+      non_string_key_policy: reject
+      duplicate_raw_key_policy: reject_before_semantic_collapse
+      unicode_normalization: none
+    canonical_byte_contract: RFC_8785_JCS (NOT python json.dumps sort_keys renamed)
+    hash_algorithm: SHA-256
+    domain_separation: gwc-domain-sep-v1 framing sha256(domain_tag||0x00||u64be(len)||preimage)
+    resource_limits: bounded (max_preimage_bytes, depth, keys, array items, string bytes)
+    error_taxonomy: deterministic codes
+    canonicalization_never_grants_authority: true
+  registry_activation_state:
+    gwc_jcs_v1: REJECTED (new_write_allowed=false; pending WP3/WP4)
+    legacy_python_json_v1: VERIFY_ONLY (compatibility metadata only, no verifier)
+    lifecycle_states: NEW_WRITE_ALLOWED|VERIFY_ONLY|REJECTED (closed set enforced)
+    fail_closed: true
+
+registry_activation_state: FAIL_CLOSED_NOT_ACTIVATED
+
+exclusions_respected:
+  - no runtime/shared digest API
+  - no legacy verifier implementation
+  - no cross-runtime reference verifier/golden corpus
+  - no change to 154 WP1 producer callsites
+  - no consumer migration
+  - no PR/G3, merge/G4, main write, deploy/G5, G6/prod/config/data/secret/migration
+  - no rebase/force-push/branch deletion/base retarget
+
+unresolved_issues: []
+ci_status: CI_UNAVAILABLE_AT_CHECK (controller verifies exact-head CI)
