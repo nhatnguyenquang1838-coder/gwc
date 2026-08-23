@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+task_id: SCRUM-397
+work_package: WP1
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+action: branch_worktree_file_commit_push
+approval_request_id: g2_scrum-397_9c60c3e24a130eec
+human_response: APPROVE G2 g2_scrum-397_9c60c3e24a130eec 5d88ce89ca868d1d 2026-08-23T13:31:00Z
+approval_scope_hash: sha256:5d88ce89ca868d1d540510244a34a047cdd936cd1a83c9d197052feba7128c1a
+scope_hash_short: 5d88ce89ca868d1d
+implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+issued_at: '2026-08-23T12:01:00Z'
+expires_at: '2026-08-23T13:31:00Z'
+validated_at: '2026-08-23T12:11:00Z'
+validation_outcome: VALID
+validation_reason: APPROVAL_VALID
+replay_status: FIRST_SEEN
+actor_target:
+  type: user
+  id: U0BJRF5L99T
+base_ref: main
+base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+head_sha_at_validation: 938b8d67ff741eab027a1f2487d4a171444a5b25
+working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
+risk_class: R1
+authorized_paths:
+- .gwc/tasks/SCRUM-397/**
+forbidden_effects:
+- runtime_or_product_code_change
+- digest_behavior_change
+- consumer_migration
+- protected_main_write
+- merge_or_auto_merge
+- force_push
+- branch_deletion
+- pr_base_change
+- deploy_or_release
+- production_data_or_config_change
+- credential_or_secret_change
+- migration
+- scope_expansion
+execution_authority_granted: true
+g3_authority_granted: false
+g4_authority_granted: false
+g5_authority_granted: false
+g6_authority_granted: false
