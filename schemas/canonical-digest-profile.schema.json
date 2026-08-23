@@ -24,7 +24,7 @@
     "schema_version": {"type": "string", "const": "1.0"},
     "profile_type": {"type": "string", "const": "canonical_digest_profile"},
     "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
-    "status": {"type": "string", "enum": ["active", "deprecated"]},
+    "status": {"type": "string", "enum": ["defined", "active", "deprecated"]},
     "specification": {"type": "string", "const": "RFC_8785_JCS_COMPATIBLE"},
     "task": {"type": "string"},
     "work_package": {"type": "string"},
@@ -160,7 +160,17 @@
         "binds": {
           "type": "array",
           "items": {"type": "string"},
-          "contains": {"type": "string", "enum": ["profile_id", "hash_algorithm", "domain_tag", "schema_ref", "preimage_framing_scheme", "hexdigest"]}
+          "uniqueItems": true,
+          "minItems": 6,
+          "maxItems": 6,
+          "allOf": [
+            {"contains": {"const": "profile_id"}},
+            {"contains": {"const": "hash_algorithm"}},
+            {"contains": {"const": "domain_tag"}},
+            {"contains": {"const": "schema_ref"}},
+            {"contains": {"const": "preimage_framing_scheme"}},
+            {"contains": {"const": "hexdigest"}}
+          ]
         },
         "schema": {"type": "string"},
         "integrity_rule": {"type": "string"}

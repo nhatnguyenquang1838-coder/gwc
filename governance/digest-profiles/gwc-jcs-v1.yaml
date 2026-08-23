@@ -1,7 +1,7 @@
 schema_version: '1.0'
 profile_type: canonical_digest_profile
 profile_id: gwc-jcs-v1
-status: active
+status: defined
 specification: RFC_8785_JCS_COMPATIBLE
 task: SCRUM-397
 work_package: WP2
@@ -54,13 +54,16 @@ hash_binding:
 # --- Domain separation + preimage framing ----------------------------------
 domain_separation:
   scheme: gwc-domain-sep-v1
-  framing: 'sha256( domain_tag || 0x00 || u64be(byte_len(preimage)) || preimage )'
+  framing: 'sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )'
   domain_tag_source: governance/digest-profile-registry.yaml (entry.domain)
   framing_rule: >-
-    The exact bytes hashed MUST be the concatenation of the UTF-8 domain tag,
-    a single 0x00 separator octet, the 8-byte big-endian length of the canonical
-    preimage, and the canonical preimage bytes. The domain tag is bound to the
-    profile and is never user-supplied.
+    The exact bytes hashed MUST be the concatenation of: (1) the 4-byte
+    big-endian UTF-8 byte length of the domain tag, (2) the UTF-8 domain tag
+    bytes, (3) the 8-byte big-endian byte length of the canonical preimage,
+    (4) the canonical preimage bytes. Every framing component is explicitly
+    length-prefixed; there is no implicit-length field and no ambiguity between
+    domain tag and preimage. The domain tag is bound to the profile and is
+    never user-supplied.
 
 # --- Resource limits (measurable, bounded) ---------------------------------
 resource_limits:

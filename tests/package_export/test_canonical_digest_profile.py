@@ -65,6 +65,11 @@ class ProfileSchemaTest(unittest.TestCase):
     def test_profile_id(self):
         self.assertEqual(self.profile["profile_id"], "gwc-jcs-v1")
 
+    def test_status_is_definition_maturity_not_activation(self):
+        # status describes definition maturity only; registry is the sole
+        # activation authority (gwc-jcs-v1 lifecycle=REJECTED there).
+        self.assertEqual(self.profile["status"], "defined")
+
     def test_specification_is_rfc8785_jcs(self):
         self.assertEqual(self.profile["specification"], "RFC_8785_JCS_COMPATIBLE")
 
@@ -95,9 +100,17 @@ class ProfileSchemaTest(unittest.TestCase):
     def test_domain_separation_framing(self):
         ds = self.profile["domain_separation"]
         self.assertEqual(ds["scheme"], "gwc-domain-sep-v1")
-        self.assertIn("domain_tag", ds["framing"])
+        # Explicit length-prefixed framing: u32be(domain_tag len) || tag ||
+        # u64be(preimage len) || preimage. No implicit-length field.
+        self.assertIn("u32be", ds["framing"])
+        self.assertIn("utf8_len(domain_tag)", ds["framing"])
         self.assertIn("u64be", ds["framing"])
-        self.assertIn("preimage", ds["framing"])
+        self.assertIn("byte_len(preimage)", ds["framing"])
+        # The framing_rule prose must describe explicit length-prefix framing
+        # and never allow user-supplied domain tags.
+        self.assertIn("length-prefixed", ds["framing_rule"])
+        self.assertIn("no implicit-length field", ds["framing_rule"])
+        self.assertIn("never user-supplied", ds["framing_rule"])
 
     def test_resource_limits_bounded(self):
         rl = self.profile["resource_limits"]
@@ -239,6 +252,121 @@ class SchemaWellFormedTest(unittest.TestCase):
             schema = _load_json(SCHEMAS / name)
             self.assertEqual(schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
             jsonschema.Draft202012Validator.check_schema(schema)
+
+
+class RegistryLifecycleNegativeTest(unittest.TestCase):
+    """Correction: registry schema must REJECT inconsistent lifecycle combinations."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "digest-profile-registry.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+
+    def _entry(self, lifecycle_state, new_write_allowed, verify_only_allowed):
+        return {
+            "schema_version": "1.0",
+            "artifact_type": "digest-profile-registry",
+            "registry_id": "gwc-digest-profile-registry",
+            "task": "SCRUM-397",
+            "work_package": "WP2",
+            "entries": {
+                "test-profile": {
+                    "profile_id": "test-profile",
+                    "lifecycle_state": lifecycle_state,
+                    "new_write_allowed": new_write_allowed,
+                    "verify_only_allowed": verify_only_allowed,
+                    "reason": "negative test",
+                    "domain": "gwc.test.domain",
+                    "schema_ref": None,
+                    "envelope_schema_ref": "schemas/digest-envelope.schema.json",
+                    "hash_algorithm": "SHA-256",
+                }
+            },
+            "policy": {
+                "new_write_gate": "registry_lifecycle_state_must_equal_NEW_WRITE_ALLOWED",
+                "verify_gate": "registry_lifecycle_state_in_NEW_WRITE_ALLOWED_OR_VERIFY_ONLY",
+                "unknown_profile_policy": "REJECTED",
+                "domain_binding_required": True,
+                "fail_closed": True,
+            },
+        }
+
+    def test_rejected_with_new_write_true_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("REJECTED", True, False)))
+
+    def test_new_write_allowed_with_new_write_false_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("NEW_WRITE_ALLOWED", False, True)))
+
+    def test_verify_only_with_new_write_true_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("VERIFY_ONLY", True, True)))
+
+    def test_rejected_with_verify_only_true_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("REJECTED", False, True)))
+
+    def test_valid_rejected_entry_passes(self):
+        self.assertTrue(self.validator.is_valid(
+            self._entry("REJECTED", False, False)))
+
+    def test_valid_verify_only_entry_passes(self):
+        self.assertTrue(self.validator.is_valid(
+            self._entry("VERIFY_ONLY", False, True)))
+
+    def test_valid_new_write_allowed_entry_passes(self):
+        self.assertTrue(self.validator.is_valid(
+            self._entry("NEW_WRITE_ALLOWED", True, True)))
+
+
+class EnvelopeBindingExactSetTest(unittest.TestCase):
+    """Correction: profile envelope-binding list must be EXACTLY the six
+    normative fields, unique, no extras."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_binding_list_exactly_six_unique(self):
+        binds = self.profile["digest_envelope_binding"]["binds"]
+        self.assertEqual(len(binds), 6)
+        self.assertEqual(len(set(binds)), 6)
+        self.assertEqual(set(binds), {
+            "profile_id", "hash_algorithm", "domain_tag", "schema_ref",
+            "preimage_framing_scheme", "hexdigest",
+        })
+
+    def test_incomplete_binding_list_rejected(self):
+        bad = dict(self.profile)
+        bad["digest_envelope_binding"] = {
+            "binds": ["profile_id", "hash_algorithm", "domain_tag"],
+            "schema": "schemas/digest-envelope.schema.json",
+            "integrity_rule": "x",
+        }
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_extra_binding_field_rejected(self):
+        bad = dict(self.profile)
+        bad["digest_envelope_binding"] = {
+            "binds": ["profile_id", "hash_algorithm", "domain_tag", "schema_ref",
+                      "preimage_framing_scheme", "hexdigest", "extra_field"],
+            "schema": "schemas/digest-envelope.schema.json",
+            "integrity_rule": "x",
+        }
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_duplicate_binding_field_rejected(self):
+        bad = dict(self.profile)
+        bad["digest_envelope_binding"] = {
+            "binds": ["profile_id", "profile_id", "hash_algorithm", "domain_tag",
+                      "schema_ref", "preimage_framing_scheme"],
+            "schema": "schemas/digest-envelope.schema.json",
+            "integrity_rule": "x",
+        }
+        self.assertFalse(self.validator.is_valid(bad))
 
 
 if __name__ == "__main__":
