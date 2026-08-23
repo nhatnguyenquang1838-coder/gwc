@@ -1,0 +1,297 @@
+schema_version: '1.0'
+artifact_type: scrum-397-wp1-digest-callsite-inventory
+task_id: SCRUM-397
+work_package: WP1
+repository: nhatnguyenquang1838-coder/gwc
+inventory_base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+working_branch: fastlane/scrum-397-canonical-digest-wp1-inventory
+implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+g2_scope_hash: sha256:5d88ce89ca868d1d540510244a34a047cdd936cd1a83c9d197052feba7128c1a
+classification_vocabulary:
+- SEMANTIC_PROFILED
+- RAW_BYTES
+- OUT_OF_SCOPE
+coverage:
+  complete: false
+  terminal_status: BLOCKED
+  reason_codes:
+  - GITHUB_CODE_SEARCH_RESULT_CAP_100
+  - HERMES_EXECUTOR_ENV_NO_SPACE_LEFT_ON_DEVICE
+  - EXACT_REPO_LOCAL_AST_ENUMERATION_UNAVAILABLE
+  note: >-
+    Controller intentionally does not claim exhaustive coverage. GitHub connector search reached
+    its 100-result cap for broad SHA-256 probes. Hermes Cloud was dispatched for repo-local exhaustive
+    enumeration but failed before mutation with Errno 28 and failed again after reset/recovery intercept.
+search_methodology:
+- probe: hashlib.sha256
+  connector_result_limit: 100
+  result: cap_reached
+- probe: json.dumps sort_keys=True separators ensure_ascii=False
+  connector_result_limit: 100
+  result: broad structured-semantic candidate set collected
+- probe: read_bytes hashlib.sha256
+  result: raw-byte and mixed candidates collected
+- probe: hashlib.sha256 join parts encode utf-8
+  result: custom framing semantic candidates collected
+- probe: source-specific exact file reads
+  result: ambiguous representative callsites inspected and classified by preimage semantics
+confirmed_callsites:
+- path: tools/hash_integrity_artifacts.py
+  function_or_symbol: sha256
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: RAW_BYTES
+  preimage_shape: exact Path.read_bytes() file content
+  hash_algorithm: sha256
+  rationale: SHA256SUMS-style byte identity; must remain byte-based.
+  mixed_file: false
+- path: tools/node_architect/schema_validation.py
+  function_or_symbol: _sha
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: sorted compact JSON UTF-8 of structured payload
+  hash_algorithm: sha256
+  rationale: Stable semantic result/input identity, not raw file bytes.
+  mixed_file: false
+- path: tools/node_architect/gate_transition_decision.py
+  function_or_symbol: _digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: custom recursive canonicalization of dict/list/scalar parts then concatenated UTF-8
+  hash_algorithm: sha256
+  rationale: Gate transition semantic decision identity; custom framing is protocol-relevant.
+  mixed_file: false
+- path: tools/node_architect/blocked_action_escalation.py
+  function_or_symbol: _digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: custom recursive canonicalization of semantic decision parts
+  hash_algorithm: sha256
+  rationale: Replay/escalation semantic identity.
+  mixed_file: false
+- path: tools/node_architect/build_node_instruction_pack.py
+  function_or_symbol: InstructionPack.content_digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: pipe-delimited identity fields plus sorted collection joins
+  hash_algorithm: sha256
+  rationale: Idempotency/replay identity of instruction pack; ad-hoc framing is protocol-relevant.
+  mixed_file: false
+- path: tools/node_architect/ai_agent_adapter.py
+  function_or_symbol: _digest_paths / _digest_validation
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: newline-joined sorted paths or ordered validation findings
+  hash_algorithm: sha256
+  rationale: Semantic result/replay evidence, not exact persisted file bytes.
+  mixed_file: false
+- path: tools/node_architect/package_export/target_path_safety_check.py
+  function_or_symbol: semantic_digest / _plan_digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: pipe-delimited target/normalized/outcome/reason/overwrite decision fields
+  hash_algorithm: sha256
+  rationale: Explicitly documented semantic digest of deterministic safety decisions.
+  mixed_file: false
+- path: tools/node_architect/package_export/source_path_safety.py
+  function_or_symbol: semantic_digest / compute_input_digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: sorted compact JSON of structured result/input entries
+  hash_algorithm: sha256
+  rationale: Semantic result/input identity.
+  mixed_file: true
+- path: tools/node_architect/package_export/source_path_safety.py
+  function_or_symbol: _file_digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: RAW_BYTES
+  preimage_shape: streaming exact source file bytes
+  hash_algorithm: sha256
+  rationale: Accepted source-file byte binding.
+  mixed_file: true
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  function_or_symbol: _sha256_bytes
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: RAW_BYTES
+  preimage_shape: exact source/target bytes
+  hash_algorithm: sha256
+  rationale: Byte-for-byte package verification.
+  mixed_file: true
+- path: tools/node_architect/package_export/deterministic_hash_verification.py
+  function_or_symbol: canonical_manifest_digest / compute_output_tree_digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: sorted compact JSON over manifest semantic fields or sorted target/digest records
+  hash_algorithm: sha256
+  rationale: Aggregate semantic manifest/tree identity built over byte-hash leaves.
+  mixed_file: true
+- path: tools/node_architect/validate_runtime_registry.py
+  function_or_symbol: source_hash / baseline_digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: normalized/transformed source content and sorted node-id JSON, not exact source bytes
+  hash_algorithm: sha256
+  rationale: Registry/provenance semantic identity after normalization/transformation.
+  mixed_file: true
+- path: tools/node_architect/approval_command_validation.py
+  function_or_symbol: _digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: pipe-delimited approval/replay semantic fields
+  hash_algorithm: sha256
+  rationale: Approval integrity/replay identity; not raw bytes.
+  mixed_file: false
+- path: tools/node_architect/approval_token_generation.py
+  function_or_symbol: generate_approval_request token/request digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: key=value pipe-delimited canonical binding string
+  hash_algorithm: sha256
+  rationale: Non-secret semantic integrity token bound to actor/action/base/head/scope/expiry.
+  mixed_file: false
+- path: tools/node_architect/g2_execution_envelope_render.py
+  function_or_symbol: _digest
+  line: null
+  line_status: connector_exact_line_unavailable
+  classification: SEMANTIC_PROFILED
+  preimage_shape: custom recursive canonicalization of structured envelope inputs
+  hash_algorithm: sha256
+  rationale: G2 envelope identity and evidence digests.
+  mixed_file: false
+candidate_semantic_files_from_compact_json_probe:
+- tools/capture_g01_decision.py
+- tools/node_architect/request_intake.py
+- tools/node_architect/diff_readback.py
+- tools/node_architect/branch_creation.py
+- tools/node_architect/timeout_recovery.py
+- tools/node_architect/base_drift_check.py
+- tools/node_architect/render_gate_story.py
+- tools/node_architect/draft_pr_creation.py
+- tools/node_architect/scoped_file_write.py
+- tools/node_architect/risk_classification.py
+- tools/node_architect/ci_run_capture.py
+- tools/node_architect/repo_identity_check.py
+- tools/node_architect/promotion_controller.py
+- tools/node_architect/context_gap_escalation.py
+- tools/node_architect/node_evidence_ledger.py
+- tools/node_architect/generate_resume_token.py
+- tools/node_architect/batch_admission_check.py
+- tools/node_architect/cas_mismatch_recovery.py
+- tools/node_architect/lease_expiry_recovery.py
+- tools/node_architect/batch_size_limit_check.py
+- tools/node_architect/resume_token_validation.py
+- tools/node_architect/duplicate_agent_fencing.py
+- tools/node_architect/protected_base_capture.py
+- tools/node_architect/select_approved_research.py
+- tools/node_architect/render_pr_run_evidence.py
+- tools/node_architect/files_read_scope.py
+- tools/node_architect/approval_expiry_recovery.py
+- tools/node_architect/checkpoint_store.py
+- tools/node_architect/crash_checkpoint_recovery.py
+- tools/node_architect/checkpoint_expiry_cleanup.py
+- tools/node_architect/validate_node_instruction.py
+- tools/node_architect/exact_head_readiness.py
+- tools/node_architect/validate_checkpoint_resume.py
+- tools/node_architect/independent_audit_handoff.py
+- tools/node_architect/execution_throttle_control.py
+- tools/node_architect/projection_failure_routing.py
+- tools/node_architect/evidence_quality_check.py
+- tools/node_architect/audit_guardrail.py
+- tools/node_architect/build_run_graph.py
+- tools/gate_effect_authority.py
+- tools/node_architect/merge_autonomous_preprod_pr.py
+- tools/node_architect/rollout_progress_projection.py
+- tools/node_architect/select_autonomous_jira_task.py
+- tools/node_architect/unknown_write_reconciliation.py
+- tools/node_architect/stale_session_reconciliation.py
+- tools/node_architect/catalog_cardinality_readiness.py
+- tools/node_architect/create_autonomous_task_branch.py
+- tools/node_architect/version_drift_rollback_routing.py
+- tools/node_architect/previous_batch_g5_verification.py
+- tools/node_architect/files_write_scope.py
+- tools/node_architect/compile_flow_policy_profile.py
+- tools/node_architect/g3_pass_decision.py
+- tools/node_architect/reconcile_autonomous_task_state.py
+- tools/node_architect/side_effect_check.py
+- tools/node_architect/workflow_run_observability.py
+- tools/node_architect/resolve_active_flow_policy_profile.py
+- tools/node_architect/validate_flow_policy_compatibility.py
+- tools/node_architect/intake_card_render.py
+- tools/node_architect/cas_write_guard.py
+- tools/validate_gate_action.py
+- tools/node_architect/slack_task_controller.py
+- tools/node_architect/validate_node_catalog_package_export.py
+- tools/node_architect/scope_hash_calculation.py
+- tools/node_architect/projection_reconcile_readback.py
+- tools/node_architect/source_resolution.py
+- tools/node_architect/package_export/export_failure_routing.py
+- tools/validate_research_implementation_bridge.py
+- tools/node_architect/package_export/entry_schema_validation.py
+- tools/node_architect/run_task_continuation_loop.py
+- tools/node_architect/reproducibility_check.py
+- tools/node_architect/materialize_autonomous_preprod_base_lineage.py
+- tools/node_architect/materialize_research_execution.py
+- tools/node_architect/materialize_autonomous_preprod_run_authority.py
+- tools/node_architect/task_center_sync.py
+- tools/node_architect/blocker_severity_classification.py
+- tools/node_architect/projection_drift_detection.py
+- tools/node_architect/evidence_artifact_map.py
+- tools/node_architect/package_export/package_manifest_load.py
+- tools/node_architect/package_export/smoke_verification.py
+- tools/node_architect/validate_node_catalog_repo_delivery.py
+- tools/node_architect/ds_admin_state_projection.py
+- tools/node_architect/autonomous_execution_runtime.py
+- tools/node_architect/evaluate_gate_applicability.py
+- tools/node_architect/validate_autonomous_preprod_policy.py
+- tools/node_architect/resolve_gate_node_route.py
+- tools/node_architect/external_audit_event_projection.py
+- tools/node_architect/package_export/export_manifest_generation.py
+- tools/node_architect/projection_evidence_linking.py
+- tools/node_architect/projection_source_authority_check.py
+- tools/node_architect/gate_state_resolution.py
+- tools/node_architect/authority_boundary_check.py
+- tools/node_architect/run_research_execution_flow.py
+- tools/node_architect/runtime_checkpoint/state_reconciliation.py
+- tools/node_architect/projection_privacy_boundary_check.py
+raw_or_mixed_candidates_from_byte_probe:
+- tools/verify_rollout.py
+- tools/build_project_package.py
+- tools/diff_instruction_package.py
+- tools/hash_integrity_artifacts.py
+- tools/verify_package_export_smoke.py
+- tools/validate_instructions.py
+- tools/export_project_package.py
+- tools/node_architect/validate_runtime_registry.py
+- tools/node_architect/package_export/governance_tree_build.py
+- tools/node_architect/package_export/deterministic_hash_verification.py
+- tools/node_architect/package_export/smoke_verification.py
+- tools/node_architect/package_export/export_manifest_generation.py
+out_of_scope_test_workflow_candidates:
+- tests/test_g3_pass_decision_na81.py
+- tests/test_research_execution_materialization.py
+- tests/test_sync_projection_m4_batch_b2.py
+- tests/test_g3_offline_skill_library.py
+- tests/test_g0_g1_offline_skill_library.py
+- tests/package_export/test_governance_tree_build.py
+- .github/workflows/line-ending-parity.yml
+unresolved:
+- issue: exhaustive_callsite_enumeration
+  count: unknown
+  reason: broad connector search reached result cap and repo-local executor unavailable
+- issue: exact_line_materialization
+  count: 15_confirmed_rows
+  reason: connector evidence confirms symbols/content but does not provide stable source-line coordinates in this inventory run
+wp1_pass_eligible: false
