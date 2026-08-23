@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/durable-artifact-envelope.schema.json",
+  "title": "GWC Durable Artifact Envelope",
+  "description": "Writer-schema identity + digest binding for durable checkpoint/evidence/observation artifacts. UNKNOWN_SCHEMA_CANNOT_ENTER_REPLAY; CANONICALIZATION_NEVER_GRANTS_AUTHORITY.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "artifact_kind",
+    "writer_schema_id",
+    "writer_schema_version",
+    "schema_digest",
+    "payload_digest",
+    "migration_lineage"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "durable-artifact-envelope" },
+    "artifact_kind": {
+      "type": "string",
+      "enum": ["checkpoint", "evidence", "observation"]
+    },
+    "writer_schema_id": { "type": "string", "minLength": 1 },
+    "writer_schema_version": { "type": "string", "minLength": 1 },
+    "schema_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "payload_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "migration_lineage": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    },
+    "profile_id": { "type": "string", "minLength": 1 },
+    "profile_version": { "type": "string", "minLength": 1 },
+    "hash_algorithm": { "const": "sha256" },
+    "domain_separator": { "type": "string", "minLength": 1 }
+  }
+}

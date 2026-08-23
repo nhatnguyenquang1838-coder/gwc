@@ -1,0 +1,119 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-24T01:55:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-396
+  base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: 'Implement DurableArtifactEnvelope + SchemaTrustManifest + MigrationOperationJournal so persisted checkpoint/evidence/observation artifacts carry explicit writer schema identity and fail closed on unknown/incompatible schema versions during replay (AMENDMENT R1, v2 APPROVED).'
+  why_now: 'Four-lens research v2 APPROVED 2026-08-24; Human G2 granted by Nhat. Implementation bridge ELIGIBLE.'
+desired_outcome: 'Deterministic replay-safe evidence contract: UNKNOWN_SCHEMA_CANNOT_ENTER_REPLAY, CANONICALIZATION_NEVER_GRANTS_AUTHORITY, conformance vectors Python+Go, SLOs met.'
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - future governed agents
+  - DW observation project (dw-observation)
+scope:
+  in_scope:
+  - schemas/node-architect/durable-artifact-envelope.schema.json
+  - schemas/node-architect/schema-trust-manifest.schema.json
+  - schemas/node-architect/migration-operation-journal.schema.json
+  - tools/node_architect/checkpoint_store.py
+  - tools/node_architect/schema_compatibility_resolver.py
+  - tests/test_schema_compatibility_resolver.py
+  - tests/conformance_vectors/
+  - .gwc/tasks/SCRUM-396/**
+  non_goals:
+  - archive publication
+  - consumer repository write
+  - package-version bump
+  - merge/deploy (G4/G5/G6)
+constraints:
+- 'AMENDMENT R1 scope exactly (20 AC)'
+- 'D2-B: SQLite/transactional storage'
+- 'D3-A: Go JCS as second implementation for golden vectors'
+- 'SLOs: write p99<50ms, queue-age<5min, drift<1min, reconcile<15min'
+assumptions:
+- 'SHA-256 remains current unless separately governed'
+- 'Historical digests must remain verifiable; no silent rewrite'
+- 'Canonicalization is byte determinism, not semantic Unicode normalization'
+risks:
+- id: RISK-1
+  description: Python-local determinism mislabeled as cross-runtime canonicality
+  impact: medium
+  mitigation: Golden vectors on ≥2 independent implementations
+- id: RISK-2
+  description: SQLite migration partial-write or locking issues
+  impact: high
+  mitigation: Transactional commit + readback validation
+- id: RISK-3
+  description: Broad blast radius of shared canonicalizer
+  impact: medium
+  mitigation: Consumer inventory + staged rollout
+status: READY
+acceptance_criteria:
+- id: AC-1
+  statement: DurableArtifactEnvelope schema closed (Draft 2020-12, unevaluatedProperties false) with writer_schema_id/version + schema_digest + payload_digest + migration_lineage.
+  verifiable: true
+- id: AC-2
+  statement: Resolver state machine EXACT/COMPATIBLE/MIGRATION_REQUIRED/UNSUPPORTED before replay; unique acyclic migration DAG 5 packages.
+  verifiable: true
+- id: AC-3
+  statement: Reader/registry generation pinned for full attempt; no hidden live reads downstream.
+  verifiable: true
+- id: AC-4
+  statement: Cross-artifact atomicity source/output/lineage/eligibility via SQLite transaction.
+  verifiable: true
+- id: AC-5
+  statement: SchemaTrustManifest GWC-owned allowlist; verifier resolves profile through allowlist only.
+  verifiable: true
+- id: AC-6
+  statement: Legacy path verification-only scoped by family/version/cutover; never valid for new writes.
+  verifiable: true
+- id: AC-7
+  statement: Tuple-bound single-use anti-replay {semantic_domain, schema version, profile, hash_alg}.
+  verifiable: true
+- id: AC-8
+  statement: Role separation publisher/collector/compiler/executor/verifier; downgrade prevention; quarantine-first legacy.
+  verifiable: true
+- id: AC-9
+  statement: Negative vectors profile substitution, unknown/deprecated profile, duplicate-key smuggling, cross-artifact replay, legacy-downgrade.
+  verifiable: true
+- id: AC-10
+  statement: MigrationOperationJournal states + OUTCOME_UNKNOWN + quarantine + recovery ownership.
+  verifiable: true
+- id: AC-11
+  statement: Durable commit SQLite transactional + lease/fencing + reload/readback before success.
+  verifiable: true
+- id: AC-12
+  statement: Deterministic idempotency + reconcile-before-retry; one retry owner; bounded backoff/jitter; poison quarantine.
+  verifiable: true
+- id: AC-13
+  statement: Fail-closed isolated degraded modes (registry/key/archive outage); unrelated compatible replay continues.
+  verifiable: true
+- id: AC-14
+  statement: Resource/admission/backpressure controls; staged migration draining; reference-aware retention.
+  verifiable: true
+- id: AC-15
+  statement: Fault-injection AC every journal boundary + SLOs (write p99<50ms, queue-age<5min, drift<1min, reconcile<15min).
+  verifiable: true
+- id: AC-16
+  statement: Consumer inventory — every digest call site classified SEMANTIC_PROFILED | RAW_BYTES | OUT_OF_SCOPE.
+  verifiable: true
+- id: AC-17
+  statement: Compatibility matrix per artifact kind incl. old-writer/new-reader, mixed generations, interrupted migration, downgrade.
+  verifiable: true
+- id: AC-18
+  statement: Requirement→surface→test→evidence map before G1/G2; 5-package DAG; staged rollout/rollback (write-cutover, no rewrite historical).
+  verifiable: true
+- id: AC-19
+  statement: Conformance matrix ≥2 independent implementations (Python + Go JCS); exact-head CI; unavailable CI → CI_UNAVAILABLE_AT_CHECK.
+  verifiable: true
+- id: AC-20
+  statement: Human G2 boundary for security-boundary/broad-blast-radius; UNKNOWN_SCHEMA_CANNOT_ENTER_REPLAY + CANONICALIZATION_NEVER_GRANTS_AUTHORITY normative.
+  verifiable: true
+unresolved_questions: []

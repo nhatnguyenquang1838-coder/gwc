@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/migration-operation-journal.schema.json",
+  "title": "GWC Migration Operation Journal",
+  "description": "Durable migration/replay operation journal states. OUTCOME_UNKNOWN requires reconciliation before retry; poison artifacts enter quarantine.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "journal_id",
+    "operation_key",
+    "artifact_kind",
+    "state",
+    "created_at",
+    "updated_at",
+    "attempt_count",
+    "idempotency_key"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "migration-operation-journal" },
+    "journal_id": { "type": "string", "minLength": 1 },
+    "operation_key": { "type": "string", "minLength": 1 },
+    "artifact_kind": {
+      "type": "string",
+      "enum": ["checkpoint", "evidence", "observation"]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "DISCOVERED",
+        "TRUST_RESOLVED",
+        "COMPATIBILITY_CLASSIFIED",
+        "MIGRATION_PREPARED",
+        "OUTPUT_WRITTEN",
+        "OUTPUT_READBACK_VERIFIED",
+        "REPLAY_ELIGIBLE",
+        "UNSUPPORTED",
+        "QUARANTINED",
+        "OUTCOME_UNKNOWN",
+        "FAILED"
+      ]
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "attempt_count": { "type": "integer", "minimum": 0 },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "source_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "output_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "reconciliation_owner": { "type": "string", "minLength": 1 },
+    "retry_owner": { "type": "string", "minLength": 1 },
+    "quarantine_reason": { "type": "string" }
+  }
+}

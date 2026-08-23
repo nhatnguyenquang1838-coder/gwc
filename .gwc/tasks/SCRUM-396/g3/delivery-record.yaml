@@ -1,0 +1,218 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-396
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+working_branch: hermes/scrum-396-durable-schema-replay-20260824
+pull_request:
+  number: 510
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/510
+  draft: true
+head_sha: ed214ab12532942989d405fd2fdca895fd805903
+scope_hash: sha256:11b6ddce7f29412769e866a8774a8571b0d68b991074fe0ed71eb8e0169c2299
+changed_paths:
+- .gwc/tasks/SCRUM-396/draft-amendments.md
+- .gwc/tasks/SCRUM-396/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-396/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-396/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-396/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-396/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-396/g2/execution-envelope.yaml
+- schemas/node-architect/durable-artifact-envelope.schema.json
+- schemas/node-architect/schema-trust-manifest.schema.json
+- schemas/node-architect/migration-operation-journal.schema.json
+- tools/node_architect/schema_compatibility_resolver.py
+- tools/node_architect/checkpoint_sqlite.py
+- tests/test_schema_compatibility_resolver.py
+- tests/test_checkpoint_sqlite.py
+- tests/test_conformance_vectors.py
+- tests/test_dw_observation_compat.py
+- tests/conformance_vectors/jcs_vectors.json
+- tests/conformance_vectors/verify_canonical_node.mjs
+validation:
+  head_sha: ed214ab12532942989d405fd2fdca895fd805903
+  status: pass
+  commands:
+  - command: PYTHONPATH=. python tests/test_schema_compatibility_resolver.py
+    result: pass
+    evidence: Ran 13 tests OK
+  - command: PYTHONPATH=. python tests/test_checkpoint_sqlite.py
+    result: pass
+    evidence: Ran 6 tests OK
+  - command: PYTHONPATH=. python tests/test_conformance_vectors.py
+    result: pass
+    evidence: Ran 4 tests OK incl Node verifier 3/3
+  - command: PYTHONPATH=. python tests/test_dw_observation_compat.py
+    result: pass
+    evidence: Ran 4 tests OK
+  - command: PYTHONPATH=. python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-396 --gate G2_EXECUTION --json
+    result: pass
+    evidence: outcome PASS valid true issues 0
+review:
+  implementer_id: Hermes (DWA)
+  reviewer_id: gwc-bot independent read-only
+  independence: independent
+  mode: read-only
+  reviewed_head_sha: ed214ab12532942989d405fd2fdca895fd805903
+  reviewed_scope_hash: sha256:11b6ddce7f29412769e866a8774a8571b0d68b991074fe0ed71eb8e0169c2299
+  reviewed_at: '2026-08-24T02:15:00Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+      - AMENDMENT R1 20 AC mapped; four-lens v2 APPROVE (SCRUM-562..565)
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+      - envelope/manifest/journal schemas Draft 2020-12; resolver state machine; SQLite CAS
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+      - schema_compatibility_resolver.py + checkpoint_sqlite.py; 27 tests green
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+      - 13+6+4+4 PASS; Node independent verifier 3/3; DW-observation compat proven
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+      - G0/G1/G2 artifacts validator PASS; G2 R2 approved by Nhat; scope hash derived
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+      - Draft PR 510 MERGEABLE; G3 delivery record assembled
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+      - 6/6 workflows success on head ed214ab1
+  findings: []
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+      - DurableArtifactEnvelope schema closed with writer_schema_id/version + digests
+  - id: AC-2
+    result: pass
+    evidence:
+      - Resolver EXACT/COMPATIBLE/MIGRATION_REQUIRED/UNSUPPORTED + 5-package DAG
+  - id: AC-3
+    result: pass
+    evidence:
+      - Reader/registry generation pinned; no hidden live reads
+  - id: AC-4
+    result: pass
+    evidence:
+      - SQLite transaction atomicity (checkpoint_sqlite.py CAS/readback)
+  - id: AC-5
+    result: pass
+    evidence:
+      - SchemaTrustManifest allowlist-only resolution
+  - id: AC-6
+    result: pass
+    evidence:
+      - Legacy VERIFY_ONLY path + migration chain
+  - id: AC-7
+    result: pass
+    evidence:
+      - Tuple-bound digest envelope with schema/profile/hash
+  - id: AC-8
+    result: pass
+    evidence:
+      - Role separation documented; quarantine-first
+  - id: AC-9
+    result: pass
+    evidence:
+      - Negative vectors (unsupported/rejected schema) tested
+  - id: AC-10
+    result: pass
+    evidence:
+      - MigrationOperationJournal states + OUTCOME_UNKNOWN + quarantine tested
+  - id: AC-11
+    result: pass
+    evidence:
+      - SQLite transactional commit + lease/fencing + readback tested
+  - id: AC-12
+    result: pass
+    evidence:
+      - Idempotency key unique; reconcile-before-retry (journal test)
+  - id: AC-13
+    result: pass
+    evidence:
+      - Fail-closed UNSUPPORTED path tested
+  - id: AC-14
+    result: pass
+    evidence:
+      - Journal bounds attempt_count + retry owner fields
+  - id: AC-15
+    result: pass
+    evidence:
+      - SLOs documented (p99 under 50ms, queue under 5min, drift under 1min, reconcile under 15min)
+  - id: AC-16
+    result: pass
+    evidence:
+      - Consumer inventory enumerated in changed_paths
+  - id: AC-17
+    result: pass
+    evidence:
+      - Compatibility matrix exact/verify-only/rejected fixtures
+  - id: AC-18
+    result: pass
+    evidence:
+      - requirement to surface to test to evidence map in G0/G1/G2 artifacts
+  - id: AC-19
+    result: pass
+    evidence:
+      - Python + Node independent conformance 3/3; CI green
+  - id: AC-20
+    result: pass
+    evidence:
+      - Human G2 R2 approved; G4/G5/G6 excluded
+  decision: pass
+  stale: false
+ci:
+  required: true
+  head_sha: ed214ab12532942989d405fd2fdca895fd805903
+  checks:
+  - name: G4 G5 evidence
+    required: true
+    status: pass
+    evidence: run 32660086687 success
+  - name: Autonomous pre-prod runtime evidence
+    required: true
+    status: pass
+    evidence: run 32660086801 success
+  - name: Autonomous parent authority required
+    required: true
+    status: pass
+    evidence: run 32660086609 success
+  - name: Build instruction packages
+    required: true
+    status: pass
+    evidence: run 32660086601 success
+  - name: Cross-platform LF and SHA parity
+    required: true
+    status: pass
+    evidence: run 32660086599 success
+  - name: Validate instructions
+    required: true
+    status: pass
+    evidence: run 32660086636 success
+residual_risks:
+- 'Full RFC 8785 JCS (UTF-16 key ordering) not implemented - current profile is Python/Node sort_keys rule; JCS conformance is separate governed change.'
+- 'Go toolchain unavailable; Node.js used as second independent implementation (AC19 satisfied).'
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+- runtime engine/scheduler/worker implementation
+outcome: pass
+
