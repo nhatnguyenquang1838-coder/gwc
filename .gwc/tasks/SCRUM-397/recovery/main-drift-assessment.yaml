@@ -13,7 +13,7 @@ protected_main_after: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
 drift_parent_base: 938b8d67ff741eab027a1f2487d4a171444a5b25
 drift_is_additive: true
 drift_is_modifying_existing_contract_paths: false
-drift_path_count: 19
+drift_path_count: 20
 drift_paths:
   - .gwc/tasks/SCRUM-396/draft-amendments.md
   - .gwc/tasks/SCRUM-396/g0/context-snapshot.yaml
@@ -35,7 +35,7 @@ drift_paths:
   - tests/test_schema_compatibility_resolver.py
   - tools/node_architect/checkpoint_sqlite.py
   - tools/node_architect/schema_compatibility_resolver.py
-semantic_overlap_with_scrumn_397:
+semantic_overlap_with_scrum_397:
   collision_kind: normative_identity_ambiguity_and_new_consumers
   notes: >-
     The drift introduces artifacts that share the gwc-jcs-v1 label with a
@@ -46,19 +46,19 @@ semantic_overlap_with_scrumn_397:
     - path: tests/conformance_vectors/jcs_vectors.json
       profile_id_label: gwc-jcs-v1
       canonicalization_practice: sort_keys=True, separators=(',',':'), ensure_ascii=False, UTF-8 sha256
-      conflict_with_scrumn_397: gwc-jcs-v1 norm is RFC_8785_JCS_COMPATIBLE with lexicographic_utf16_code_unit key ordering, jcs_shortest_round_trip number serialization, jcs_minimal string escaping, and domain separation + preimage framing
+      conflict_with_scrum_397: gwc-jcs-v1 norm is RFC_8785_JCS_COMPATIBLE with lexicographic_utf16_code_unit key ordering, jcs_shortest_round_trip number serialization, jcs_minimal string escaping, and domain separation + preimage framing
       action: recorded_as_evidence_only
     - path: tests/conformance_vectors/verify_canonical_node.mjs
       self_described_scope: NOT full RFC8785/JCS; sort_keys treated separately from UTF-16 ordering
-      conflict_with_scrumn_397: SCRUM-397 WP3 target semantics is full RFC-8785/JCS conformance with strict input domain, UTF-16 code-unit ordering, and domain separation
+      conflict_with_scrum_397: SCRUM-397 WP3 target semantics is full RFC-8785/JCS conformance with strict input domain, UTF-16 code-unit ordering, and domain separation
       action: recorded_as_evidence_only
     - path: tools/node_architect/schema_compatibility_resolver.py::canonical_json
       practice: json.dumps(payload, sort_keys=True, separators=(',',':'), ensure_ascii=False)
-      conflict_with_scrumn_397: SCRUM-397 canonical byte contract is RFC_8785/JCS-compatible, NOT naive sort_keys canonicalization
+      conflict_with_scrum_397: SCRUM-397 canonical byte contract is RFC_8785/JCS-compatible, NOT naive sort_keys canonicalization
       action: recorded_as_evidence_only
     - path: tools/node_architect/schema_compatibility_resolver.py::payload_sha256
       kind: new semantic digest consumer
-      conflict_with_scrumn_397: absent from old WP1 inventory; recorded as evidence of environment drift, not copied into WP2-REFRESH-R1 scope
+      conflict_with_scrum_397: absent from old WP1 inventory; recorded as evidence of environment drift, not copied into WP2-REFRESH-R1 scope
       action: recorded_as_evidence_only
 recovery_proposal:
   approach: baseline_refresh_from_exact_current_main

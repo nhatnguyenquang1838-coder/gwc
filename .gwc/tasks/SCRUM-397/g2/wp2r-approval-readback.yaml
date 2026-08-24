@@ -48,7 +48,7 @@ forbidden_effects:
   - credential_or_secret_change
   - migration
   - scope_expansion
-  - scrumn_396_write
+  - scrum_396_write
   - wp1_wp2_wp3_wp4_wp5_consumer_migration
 execution_authority_granted: true
 g3_authority_granted: false

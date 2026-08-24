@@ -487,5 +487,122 @@ class InvalidUnicodePolicyTest(unittest.TestCase):
         )
 
 
+class RecoveryEvidenceIntegrityTest(unittest.TestCase):
+    """Bounded evidence-integrity checks (WP2-REFRESH-R1): recovery evidence
+    must be internally consistent, carry no durable scrumn_ typo keys/tokens,
+    and the terminal executor-report must not remain in a pending/RUNNING state."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.repo_root = REPO_ROOT
+        cls.recovery = REPO_ROOT / ".gwc" / "tasks" / "SCRUM-397" / "recovery"
+        cls.main_drift = cls.recovery / "main-drift-assessment.yaml"
+        cls.inventory_delta = cls.recovery / "current-main-inventory-delta.yaml"
+        cls.executor_report = REPO_ROOT / ".gwc" / "tasks" / "SCRUM-397" / "g2" / "wp2r-executor-report.yaml"
+        with cls.main_drift.open("r", encoding="utf-8") as fh:
+            cls.main_drift_text = fh.read()
+        with cls.main_drift.open("r", encoding="utf-8") as fh:
+            cls.main_drift_doc = yaml.safe_load(fh)
+        with cls.inventory_delta.open("r", encoding="utf-8") as fh:
+            cls.inventory_delta_text = fh.read()
+        with cls.executor_report.open("r", encoding="utf-8") as fh:
+            cls.executor_report_doc = yaml.safe_load(fh)
+
+    def _typo_token_present(self, text):
+        import re
+        return bool(re.search(r"scrumn_\b|scrumn_397|scrumn_396", text))
+
+    def test_no_durable_scrumn_typo_in_drift_assessment(self):
+        self.assertFalse(
+            self._typo_token_present(self.main_drift_text),
+            "main-drift-assessment.yaml carries a durable scrumn_ typo key/token",
+        )
+
+    def test_durable_drift_keys_are_scrum_397(self):
+        doc = self.main_drift_doc
+        self.assertIn("semantic_overlap_with_scrum_397", doc)
+        collisions = doc.get("semantic_overlap_with_scrum_397", {})
+        collision_list = collisions.get("collisions", [])
+        for item in collision_list:
+            for key in item:
+                self.assertNotIn(
+                    "scrumn_", key,
+                    f"collision item key still carries scrumn_ typo: {key}",
+                )
+
+    def test_drift_path_count_matches_list(self):
+        doc = self.main_drift_doc
+        count = doc.get("drift_path_count")
+        paths = doc.get("drift_paths", [])
+        self.assertIsNotNone(count, "drift_path_count missing from recovery assessment")
+        self.assertIsInstance(count, int)
+        self.assertEqual(
+            count, len(paths),
+            f"drift_path_count={count} does not match drift_paths list length={len(paths)}",
+        )
+
+    def test_inventory_delta_classifies_new_digest_producers_accurately(self):
+        doc = yaml.safe_load(self.inventory_delta_text)
+        producers = doc.get("relevant_new_consumers", [])
+        producer_kinds = {p.get("kind") for p in producers if p.get("kind")}
+        self.assertIn("actual new semantic digest producer", producer_kinds)
+        self.assertIn("semantic serialization helper", producer_kinds)
+        self.assertIn("store/pass-through helper", producer_kinds)
+        self.assertIn("collision/conformance evidence", producer_kinds)
+        # checkpoint_sqlite.py must NOT be labeled a new digest producer.
+        checkpoint_entries = [p for p in producers if p.get("path", "").endswith("checkpoint_sqlite.py")]
+        for p in checkpoint_entries:
+            self.assertNotIn(
+                "new semantic digest producer", p.get("kind", ""),
+                "checkpoint_sqlite.py must not be classified as a new digest producer",
+            )
+
+    def test_inventory_delta_reports_exact_new_producer_count(self):
+        doc = yaml.safe_load(self.inventory_delta_text)
+        count = doc.get("incremental_new_producer_count")
+        self.assertIsNotNone(count)
+        self.assertEqual(count, 1)
+
+    def test_executor_report_is_pass_not_running(self):
+        doc = self.executor_report_doc
+        self.assertIn("status", doc)
+        self.assertNotEqual(doc["status"], "RUNNING")
+        self.assertNotEqual(doc["status"], "pending")
+
+    def test_executor_report_terminal_fields_not_pending(self):
+        doc = self.executor_report_doc
+        for field in ("materialized_files_count", "authorized_paths_count", "validation_counts"):
+            self.assertIn(field, doc, f"executor-report missing {field}")
+        mv = doc.get("materialized_files_count")
+        self.assertNotEqual(mv, "pending")
+        self.assertIsInstance(mv, int)
+        ap = doc.get("authorized_paths_count")
+        self.assertNotEqual(ap, "pending")
+        self.assertIsInstance(ap, int)
+        vc = doc.get("validation_counts")
+        self.assertIn("bounded_unit_tests", vc)
+        self.assertNotEqual(vc["bounded_unit_tests_result"], "pending")
+
+    def test_executor_report_scope_audit_is_exact(self):
+        doc = self.executor_report_doc
+        self.assertIn("scope_audit", doc)
+        self.assertEqual(doc["scope_audit"], "EXACT")
+
+    def test_executor_report_bound_collision_is_fail_closed(self):
+        doc = self.executor_report_doc
+        collisions = doc.get("unresolved_bounded_collisions", [])
+        self.assertIsInstance(collisions, list)
+        self.assertGreaterEqual(len(collisions), 1)
+        for c in collisions:
+            self.assertTrue(c.get("bounded", False))
+            self.assertTrue(c.get("fail_closed", False))
+        gwc_state = None
+        for c in collisions:
+            if c.get("gwc_jcs_v1_state"):
+                gwc_state = c["gwc_jcs_v1_state"]
+        self.assertEqual(gwc_state, "REJECTED")
+
+
 if __name__ == "__main__":
     unittest.main()
+
