@@ -1,0 +1,76 @@
+schema_version: '1.0'
+artifact_type: main_drift_assessment
+task_id: SCRUM-397
+work_package: WP2-REFRESH-R1
+repository: nhatnguyenquang1838-coder/gwc
+assessment_type: transient_main_drift_recovery
+drift_classification: external_env_change_not_lane_switch
+drift_source_lane: SCRUM-396
+drift_source_lane_status: excluded_read_only_evidence
+affected_work: SCRUM-397 canonical digest profile/registry rebinding
+protected_main_before: 938b8d67ff741eab027a1f2487d4a171444a5b25
+protected_main_after: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+drift_parent_base: 938b8d67ff741eab027a1f2487d4a171444a5b25
+drift_is_additive: true
+drift_is_modifying_existing_contract_paths: false
+drift_path_count: 19
+drift_paths:
+  - .gwc/tasks/SCRUM-396/draft-amendments.md
+  - .gwc/tasks/SCRUM-396/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-396/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-396/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-396/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-396/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-396/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-396/g3/delivery-record.yaml
+  - .gwc/tasks/SCRUM-396/g4/merge-approval.yaml
+  - schemas/node-architect/durable-artifact-envelope.schema.json
+  - schemas/node-architect/migration-operation-journal.schema.json
+  - schemas/node-architect/schema-trust-manifest.schema.json
+  - tests/conformance_vectors/jcs_vectors.json
+  - tests/conformance_vectors/verify_canonical_node.mjs
+  - tests/test_checkpoint_sqlite.py
+  - tests/test_conformance_vectors.py
+  - tests/test_dw_observation_compat.py
+  - tests/test_schema_compatibility_resolver.py
+  - tools/node_architect/checkpoint_sqlite.py
+  - tools/node_architect/schema_compatibility_resolver.py
+semantic_overlap_with_scrumn_397:
+  collision_kind: normative_identity_ambiguity_and_new_consumers
+  notes: >-
+    The drift introduces artifacts that share the gwc-jcs-v1 label with a
+    non-JCS canonicalization, plus new semantic digest consumers in
+    tools/node_architect/. These are recorded as read-only evidence, not
+    copied into SCRUM-397 scope and not treated as fresh authority evidence.
+  collisions:
+    - path: tests/conformance_vectors/jcs_vectors.json
+      profile_id_label: gwc-jcs-v1
+      canonicalization_practice: sort_keys=True, separators=(',',':'), ensure_ascii=False, UTF-8 sha256
+      conflict_with_scrumn_397: gwc-jcs-v1 norm is RFC_8785_JCS_COMPATIBLE with lexicographic_utf16_code_unit key ordering, jcs_shortest_round_trip number serialization, jcs_minimal string escaping, and domain separation + preimage framing
+      action: recorded_as_evidence_only
+    - path: tests/conformance_vectors/verify_canonical_node.mjs
+      self_described_scope: NOT full RFC8785/JCS; sort_keys treated separately from UTF-16 ordering
+      conflict_with_scrumn_397: SCRUM-397 WP3 target semantics is full RFC-8785/JCS conformance with strict input domain, UTF-16 code-unit ordering, and domain separation
+      action: recorded_as_evidence_only
+    - path: tools/node_architect/schema_compatibility_resolver.py::canonical_json
+      practice: json.dumps(payload, sort_keys=True, separators=(',',':'), ensure_ascii=False)
+      conflict_with_scrumn_397: SCRUM-397 canonical byte contract is RFC_8785/JCS-compatible, NOT naive sort_keys canonicalization
+      action: recorded_as_evidence_only
+    - path: tools/node_architect/schema_compatibility_resolver.py::payload_sha256
+      kind: new semantic digest consumer
+      conflict_with_scrumn_397: absent from old WP1 inventory; recorded as evidence of environment drift, not copied into WP2-REFRESH-R1 scope
+      action: recorded_as_evidence_only
+recovery_proposal:
+  approach: baseline_refresh_from_exact_current_main
+  source_ancestry: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+  carry_old_wp2_as: design_input_only
+  keep_gwc_jcs_v1_state: REJECTED
+  do_not_modify: SCRUM-396 paths
+  do_not_copy_in: SCRUM-396 artifacts
+  authorized_scope: 11 SCRUM-397-owned paths
+recovery_assumptions:
+  - protected main is exact before any guarded write
+  - G2 has not expired
+  - scope hash is unchanged for the 11-path scope
+  - no scope expansion required
+  - no new approval is needed for this exact scope

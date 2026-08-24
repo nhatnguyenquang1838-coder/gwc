@@ -1,0 +1,52 @@
+schema_version: '1.0'
+artifact_type: digest-profile-registry
+registry_id: gwc-digest-profile-registry
+task: SCRUM-397
+work_package: WP2-REFRESH-R1
+
+# Lifecycle states are EXACTLY: NEW_WRITE_ALLOWED | VERIFY_ONLY | REJECTED
+# Registry MUST fail closed: gwc-jcs-v1 is NOT activated for new writes until
+# WP3 (cross-runtime verifier/golden corpus) + WP4 (legacy verifier) prerequisites
+# are met. Historical evidence and raw-byte hashes are immutable.
+
+entries:
+  gwc-jcs-v1:
+    profile_id: gwc-jcs-v1
+    lifecycle_state: REJECTED
+    new_write_allowed: false
+    verify_only_allowed: false
+    reason: NOT_ACTIVATED_PENDING_WP3_WP4
+    domain: gwc.governance.evidence.canonical.v1
+    schema_ref: schemas/canonical-digest-profile.schema.json
+    envelope_schema_ref: schemas/digest-envelope.schema.json
+    hash_algorithm: SHA-256
+    activation_preconditions:
+      - cross_runtime_reference_verifier_available
+      - golden_corpus_validated
+      - legacy_verifier_available
+    activation_policy: FAIL_CLOSED
+    notes: >-
+      Contract/schema/registry definition committed under WP2. New writes using
+      gwc-jcs-v1 remain blocked until the Controller grants a separate WP3/WP4
+      authority and the activation preconditions are met.
+
+  legacy-python-json-v1:
+    profile_id: legacy-python-json-v1
+    lifecycle_state: VERIFY_ONLY
+    new_write_allowed: false
+    verify_only_allowed: true
+    reason: COMPATIBILITY_METADATA_ONLY_NO_VERIFIER
+    domain: gwc.governance.evidence.legacy.v1
+    schema_ref: null
+    envelope_schema_ref: schemas/digest-envelope.schema.json
+    hash_algorithm: SHA-256
+    notes: >-
+      Represented strictly as compatibility metadata for historical evidence
+      reference. NO legacy verifier implementation is included (WP4 excluded).
+
+policy:
+  new_write_gate: registry_lifecycle_state_must_equal_NEW_WRITE_ALLOWED
+  verify_gate: registry_lifecycle_state_in_NEW_WRITE_ALLOWED_OR_VERIFY_ONLY
+  unknown_profile_policy: REJECTED
+  domain_binding_required: true
+  fail_closed: true

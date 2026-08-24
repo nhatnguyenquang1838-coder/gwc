@@ -1,0 +1,37 @@
+schema_version: '1.0'
+artifact_type: current_main_inventory_delta
+task_id: SCRUM-397
+work_package: WP2-REFRESH-R1
+repository: nhatnguyenquang1838-coder/gwc
+baseline_main_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+baseline_work_package: WP1
+current_main_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+delta_kind: additive_environment_drift_from_excluded_lane
+delta_scope: only SCRUM-397-relevant semantic digest consumers and collisions recorded; full diff is SCRUM-396 evidence
+relevant_new_paths:
+  - tests/conformance_vectors/jcs_vectors.json
+  - tests/conformance_vectors/verify_canonical_node.mjs
+  - tools/node_architect/schema_compatibility_resolver.py
+  - tools/node_architect/checkpoint_sqlite.py
+relevant_new_consumers:
+  - path: tests/conformance_vectors/jcs_vectors.json
+    profile_id_label: gwc-jcs-v1
+    canonicalization: sort_keys=True, separators=(',',':'), ensure_ascii=False, UTF-8 sha256
+    note: labels gwc-jcs-v1 but does NOT use RFC-8785/JCS UTF-16 code-unit ordering; recorded as evidence, not copied into scope
+  - path: tests/conformance_vectors/verify_canonical_node.mjs
+    self_described_scope: NOT full RFC8785/JCS; sort_keys treated separately from UTF-16 ordering
+    note: different conformance assertion under similar name; recorded as evidence
+  - path: tools/node_architect/schema_compatibility_resolver.py::canonical_json
+    implementation: json.dumps(payload, sort_keys=True, separators=(',',':'), ensure_ascii=False)
+    note: new semantic digest consumer using non-JCS canonicalization; absent from old WP1 inventory
+  - path: tools/node_architect/schema_compatibility_resolver.py::payload_sha256
+    kind: semantic digest consumer over sha256
+    note: new SHA-256 consumer in tools/node_architect/ absent from old WP1 inventory
+old_wp1_inventory_status: not retroactively applied; WP1 was produced against old main
+action: record_as_evidence_only; do not copy into WP2-REFRESH-R1 scope; do not treat as fresh authority evidence
+conclusions:
+  - The drift introduced new semantic digest consumers in tools/node_architect/
+  - The drift introduced a gwc-jcs-v1-labeled artifact using non-JCS canonicalization
+  - The drift does NOT modify existing SCRUM-397 contract paths
+  - WP2-REFRESH-R1 rebinds the profile/registry to current main while keeping gwc-jcs-v1=REJECTED
+  - Old WP2 artifacts are carried as design input only

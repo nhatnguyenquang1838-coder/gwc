@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/digest-envelope.schema.json",
+  "title": "Digest Envelope",
+  "description": "Binds profile/hash/domain/schema/framing/digest into one governance-authentic envelope. An envelope is valid only when every bound field is present and consistent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "profile_id",
+    "hash_algorithm",
+    "domain",
+    "schema_ref",
+    "preimage_framing_scheme",
+    "hexdigest"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "artifact_type": {"type": "string", "const": "digest-envelope"},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "hash_algorithm": {"type": "string", "const": "SHA-256"},
+    "domain": {"type": "string", "minLength": 1},
+    "schema_ref": {"type": "string", "minLength": 1},
+    "preimage_framing_scheme": {"type": "string", "const": "gwc-domain-sep-v1"},
+    "hexdigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "preimage_byte_length": {"type": "integer", "minimum": 0},
+    "evidence_ref": {"type": "string"}
+  }
+}
