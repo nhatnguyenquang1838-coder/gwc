@@ -602,6 +602,23 @@ class RecoveryEvidenceIntegrityTest(unittest.TestCase):
                 gwc_state = c["gwc_jcs_v1_state"]
         self.assertEqual(gwc_state, "REJECTED")
 
+    def test_executor_report_terminal_not_self_referential_or_stale(self):
+        report = self.executor_report_doc
+        src = report["terminal_head_source"]
+        sha = report["terminal_head_sha"]
+        pre = report.get("pre_correction_head")
+        # Terminal exact SHA must be externally supplied by Controller after commit.
+        # A durable commit cannot truthfully contain its own final SHA.
+        self.assertEqual(src, "CONTROLLER_EXTERNAL_READBACK")
+        # sha must be a non-iterable, non-string placeholder (null/None) in the
+        # durable pre-readback state, not a hidden self-referential/SHA claim.
+        self.assertIsNone(sha, "expected terminal_head_sha=null before external readback")
+        self.assertNotIn("terminal_head_sha", str(sha))
+        # pre_correction_head must be the exact pre-write branch head, never a
+        # stale SCRUM-397 WP2R2 terminal SHA.
+        self.assertNotEqual(pre, "5d1876ca27325d46868da2640ffeb4104f76f400")
+        self.assertEqual(pre, "8fbd0bf8220b062ec3fadb89bc438549dae12a63")
+
 
 if __name__ == "__main__":
     unittest.main()

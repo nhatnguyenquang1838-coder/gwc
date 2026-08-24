@@ -5,24 +5,28 @@ work_package: WP2-REFRESH-R1
 run: SCRUM-397-WP2-REFRESH-R1-R2
 repository: nhatnguyenquang1838-coder/gwc
 gate: G2_EXECUTION
-approval_request_id: g2_scrum-397_21045bb2e2c750c3
-approval_command: APPROVE G2 g2_scrum-397_21045bb2e2c750c3 d1080a40a9446909 2026-08-24T18:14:00Z
+approval_request_id: g2_scrum-397_0da263b2a7bfdef9
+approval_command: APPROVE G2 g2_scrum-397_0da263b2a7bfdef9 cdf885aafe372d88 2026-08-24T21:39:00Z
 status: PASS
 summary: >-
-  WP2-REFRESH-R1: rebind SCRUM-397 canonical digest profile/registry artifacts to
-  current protected main f2d08df4 after SCRUM-396 env drift. Carry old WP2 artifacts
-  (99d862b1) as design input only; do not treat old envelope/readback/report as fresh
-  authority evidence. Keep gwc-jcs-v1 lifecycle_state=REJECTED, new_write_allowed=false,
-  activation BLOCKED_PENDING_WP3_WP4, fail-closed. Record current-main collision
-  explicitly as bounded/fail-closed: jcs_vectors.json labels gwc-jcs-v1 but uses
-  non-JCS sort_keys semantics; verify_canonical_node.mjs says NOT full RFC8785/JCS;
-  schema_compatibility_resolver.py::payload_sha256 is the only new semantic digest
-  producer; canonical_json is a serialization helper, not a digest producer;
-  checkpoint_sqlite.py is a store/pass-through helper, not a digest producer.
-  SCRUM-396 paths remain read-only evidence; not modified. No PR/merge/deploy.
+  WP2-REFRESH-R1 evidence self-reference correction under consumed G2
+  g2_scrum-397_0da263b2a7bfdef9 (APPROVE G2 g2_scrum-397_0da263b2a7bfdef9
+  cdf885aafe372d88 2026-08-24T21:39:00Z).
+
+  Corrects durable executor report on 8fbd0bf8220b062ec3fadb89bc438549dae12a63
+  so it no longer embeds a stale/self-referential terminal SHA. Terminal exact
+  SHA is projected externally by Controller after remote push; the commit that
+  contains this report cannot truthfully contain its own final SHA.
+
+  Corrected durable validation count to 56 (47 schema + 9 evidence-integrity)
+  to match the actual corrected run instead of stale 47.
+
+  No normative profile/registry change; no SCRUM-396 write; no WP3/WP4 runtime
+  work; no PR/merge/deploy.
 source_base_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
-terminal_head_sha: 5d1876ca27325d46868da2640ffeb4104f76f400
-terminal_head_after_correction: 5d1876ca27325d46868da2640ffeb4104f76f400
+pre_correction_head: 8fbd0bf8220b062ec3fadb89bc438549dae12a63
+terminal_head_source: CONTROLLER_EXTERNAL_READBACK
+terminal_head_sha: null
 materialized_files_count: 11
 authorized_paths_count: 11
 authorized_paths:
@@ -40,7 +44,7 @@ authorized_paths:
 validation_counts:
   py_compile: 1
   py_compile_result: PASS
-  bounded_unit_tests: 47
+  bounded_unit_tests: 56
   bounded_unit_tests_result: PASS
   schema_schema_checks: 1
   schema_schema_checks_result: PASS
@@ -48,6 +52,8 @@ scope_audit: EXACT
 scope_audit_details: staged set == exactly the 11 authorized paths; 0 out-of-scope staged
 scope_hash: sha256:d1080a40a9446909e0ae627b291f9067e439040b92ca54440ff5b679b0d77858
 scope_hash_short: d1080a40a9446909
+correction_scope_hash: sha256:cdf885aafe372d88ecdc672875f664b5a4a4fe2e4e6aca4fed6cd1255ca454b5
+correction_scope_hash_short: cdf885aafe372d88
 drift_delta_count: 20
 drift_delta_note: exact GitHub compare 938b8d67... -> f2d08df4... contains 20 files
 drift_new_producer_count: 1
@@ -55,10 +61,10 @@ drift_new_producer_note: schema_compatibility_resolver.py::payload_sha256 is the
 ci_status: CI_UNAVAILABLE_AT_CHECK
 ci_note: 0 statuses, 0 runs at terminal check time
 authorization:
-  g2_request_id: g2_scrum-397_21045bb2e2c750c3
-  g2_token: 21045bb2e2c750c34b3870569eb7ac7400bf4059a31689671ce066c154718e67
-  g2_request_digest: sha256:110d3c1d5c6ce6cb13c769e54f7711495a8986d7ff45d57f7bfb337fad01f91e
-  g2_command: APPROVE G2 g2_scrum-397_21045bb2e2c750c3 d1080a40a9446909 2026-08-24T18:14:00Z
+  g2_request_id: g2_scrum-397_0da263b2a7bfdef9
+  g2_token: 0da263b2a7bfdef9a718cf3cc70dd7974d47855a678162bbd9ef579f62d63037
+  g2_request_digest: sha256:20e3e2a279e66c9640a4d7288aa497f623c338a4d931d8b48ef96ac7b3b185ac
+  g2_command: APPROVE G2 g2_scrum-397_0da263b2a7bfdef9 cdf885aafe372d88 2026-08-24T21:39:00Z
   g2_consumed: true
   g2_kind: FIRST_SEEN | VALID | CONSUMED
   authority_granted: true
@@ -82,4 +88,7 @@ unresolved_bounded_collisions:
     note: recorded as evidence only; not resolved here; not treated as fresh authority evidence
 forced_confirmation:
   protected_main_before_push: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
-  g2_not_expired_before_push: 2026-08-24T18:14:00Z
+  pre_correction_head_before_push: 8fbd0bf8220b062ec3fadb89bc438549dae12a63
+  g2_not_expired_before_push: 2026-08-24T21:39:00Z
+  terminal_head_sha_placeholder: null
+  terminal_head_sha_is_external: true
