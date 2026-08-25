@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "destination-trust-registry",
+  "registry_id": "gwc-external-audit-destination-trust-registry",
+  "revision": "scrum-533-destination-trust-initial-20260826-r1",
+  "declared_entry_count": 0,
+  "provenance": "SCRUM-533 v3.1 research — DestinationTrustProfile registration authority (L2.1). Registration is a reviewed entry; no dynamic runtime destination creation. New destinations require a governed registry change, not runtime mutation.",
+  "entries": []
+}

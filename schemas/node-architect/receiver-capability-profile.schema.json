@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/receiver-capability-profile.schema.json",
+  "title": "Receiver Capability Profile",
+  "description": "SCRUM-533 receiver capability declaration. Push/webhook transports NEVER claim exactly_once_capable unless the transport provably supports receiver acknowledgement/readback; default for webhook is at_least_once.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "receiver_id",
+    "delivery_semantics",
+    "supports_ack",
+    "supports_readback",
+    "supports_ordering",
+    "transport"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "artifact_type": { "const": "receiver-capability-profile" },
+    "receiver_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+    "delivery_semantics": { "enum": ["at_least_once", "exactly_once_capable", "best_effort"] },
+    "supports_ack": { "type": "boolean" },
+    "supports_readback": { "type": "boolean" },
+    "supports_ordering": { "type": "boolean" },
+    "transport": { "enum": ["push_webhook", "pull_poll", "event_bus_sub", "syslog"] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "transport": { "const": "push_webhook" } } },
+      "then": {
+        "properties": { "delivery_semantics": { "enum": ["at_least_once", "best_effort"] } }
+      }
+    },
+    {
+      "if": { "properties": { "delivery_semantics": { "const": "exactly_once_capable" } } },
+      "then": {
+        "properties": {
+          "supports_ack": { "const": true },
+          "supports_readback": { "const": true }
+        }
+      }
+    }
+  ]
+}
