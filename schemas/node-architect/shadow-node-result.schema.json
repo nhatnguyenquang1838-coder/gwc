@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ShadowNodeResult",
+  "type": "object",
+  "required": ["node_id", "applicability", "outcome", "reason_code", "executed_effects", "proposed_effects", "authority_granted"],
+  "properties": {
+    "node_id": {"type": "string", "minLength": 1},
+    "node_version": {"type": ["string", "null"]},
+    "family": {"type": ["string", "null"]},
+    "maturity": {"type": ["string", "null"]},
+    "task_id": {"type": "string"},
+    "run_id": {"type": "string"},
+    "gate": {"type": "string"},
+    "exact_revision": {"type": "string"},
+    "applicability": {"enum": ["APPLICABLE", "NOT_APPLICABLE", "BLOCKED"]},
+    "outcome": {"type": "string", "minLength": 1},
+    "reason_code": {"type": "string", "minLength": 1},
+    "proposed_effects": {"type": "array"},
+    "executed_effects": {"type": "array", "maxItems": 0},
+    "authority_granted": {"const": false},
+    "checkpoint": {"type": "object"},
+    "result_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
