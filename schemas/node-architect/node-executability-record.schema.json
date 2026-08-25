@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dw-super.local/schemas/node-architect/node-executability-record.schema.json",
+  "title": "Node Architect executability qualification record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["node_id", "executability_level", "runtime_executable", "instruction_contract", "qualification"],
+  "properties": {
+    "node_id": {"type": "string", "minLength": 1},
+    "family": {"type": ["string", "null"]},
+    "version": {"type": ["string", "null"]},
+    "maturity": {"type": ["string", "null"]},
+    "source_status": {"type": ["string", "null"]},
+    "effect_class": {"type": ["string", "null"]},
+    "authority_class": {"type": ["string", "null"]},
+    "executability_level": {"enum": ["E0_CATALOGUED", "E1_INSTRUCTION_READY", "E2_ADAPTER_BOUND", "E3_ROUTE_BOUND", "E4_REPLAY_PROVEN", "E5_OBSERVED"]},
+    "runtime_executable": {"type": "boolean"},
+    "instruction_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry", "do", "branches", "exit", "next"],
+      "properties": {
+        "entry": {"type": "object"},
+        "do": {"type": "object"},
+        "branches": {"type": "object"},
+        "exit": {"type": "object"},
+        "next": {"type": "object"}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["catalogued", "instruction_ready", "adapter_bound", "route_bound", "replay_proven", "observed"],
+      "properties": {
+        "catalogued": {"type": "boolean"},
+        "instruction_ready": {"type": "boolean"},
+        "adapter_bound": {"type": "boolean"},
+        "route_bound": {"type": "boolean"},
+        "replay_proven": {"type": "boolean"},
+        "observed": {"type": "boolean"}
+      }
+    }
+  }
+}
