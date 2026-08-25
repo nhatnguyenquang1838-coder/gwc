@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "shadow-runtime-activation",
+  "enabled": true,
+  "kill_switch_engaged": false,
+  "mode": "shadow_readonly",
+  "authority": "none",
+  "output_effect": "observe_only",
+  "decision_authority": false,
+  "automatic_gate_advance": false,
+  "fail_closed": true,
+  "exact_revision_binding": true,
+  "canonical_population": "canonical_81",
+  "route_source": "tools/node_architect/gate_node_routes.py",
+  "adapter_source": "tools/node_architect/shadow_adapters.py",
+  "registry_source": "core/node-architect/node-registry.json"
+}
