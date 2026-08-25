@@ -1,0 +1,51 @@
+name: Node Architect shadow observer
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  g3-shadow-observer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Materialize immutable G3 shadow event
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ACTION: ${{ github.event.action }}
+        run: |
+          python - <<'PY'
+          import json, os
+          event = {
+              "task_id": f"PR-{os.environ['PR_NUMBER']}",
+              "run_id": f"github-{os.environ['RUN_ID']}",
+              "gate": "G3_PR",
+              "exact_revision": os.environ["HEAD_SHA"],
+              "scenario": "standard_pr_delivery",
+              "input_payload": {"event": "pull_request", "action": os.environ["ACTION"]},
+          }
+          with open("shadow-event.json", "w", encoding="utf-8") as handle:
+              json.dump(event, handle, sort_keys=True)
+          PY
+      - name: Run Node Architect shadow observer
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PYTHONPATH=. python tools/node_architect/shadow_gate_observer.py shadow-event.json \
+            --root . --observed-revision "$HEAD_SHA" | tee shadow-output.json
+      - name: Upload shadow evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-architect-shadow-${{ github.run_id }}
+          path: |
+            shadow-event.json
+            shadow-output.json
