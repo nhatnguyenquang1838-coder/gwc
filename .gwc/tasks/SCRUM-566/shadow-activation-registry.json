@@ -1,0 +1,31 @@
+{
+  "artifact_type": "shadow-activation-registry",
+  "registry_id": "shadow-activation-registry-scrum-566-canonical-81",
+  "schema_version": "0.1.0-draft",
+  "provenance": "shadow",
+  "authoritative": false,
+  "generated_at": "2026-08-24T16:30:00Z",
+  "status": "PROPOSED_NON_AUTHORITATIVE",
+  "binding": {
+    "base_ref": "main",
+    "base_sha": "f2d08df464c4e485d8a5bbc0df4579b1727ed32f",
+    "authoritative_registry_ref": "core/node-architect/node-registry.json",
+    "authoritative_slot_count": 81
+  },
+  "fail_closed": {
+    "kill_switch": "ENABLED",
+    "kill_switch_policy": "Any activation attempt against this shadow registry is denied unless an exact human G2 envelope (sha256:2c3bf3e761b05bcf3ae2f1fdd4be09c470d0a1e88e644fc24f2aa5771c02f8f8) is present and unexpired and bound to base_sha f2d08df464c4e485d8a5bbc0df4579b1727ed32f.",
+    "revision_drift_action": "DENY_AND_HALT",
+    "authoritative_baseline_mutation": "FORBIDDEN"
+  },
+  "telemetry": {
+    "E0": "out-of-band shadow-state emission (non-mutating readback only)",
+    "E1": "out-of-band activation-attempt denial event (no authoritative side effect)"
+  },
+  "baseline_81_refs": {
+    "description": "All 81 immutable baseline node descriptors referenced by id + source_sha. The authoritative registry is NOT modified.",
+    "reference_mode": "read_only_by_id_and_source_sha",
+    "nodes": "ALL_81_FROM_core/node-architect/node-registry.json"
+  },
+  "note": "This is a SHADOW TRIAL deliverable. It is non-authoritative (provenance=shadow). The authoritative 81-node baseline in core/node-architect/node-registry.json remains the single source of truth. Materialized under bounded G2_EXECUTION (seq=16 AUTHORITY_RELEASE) on branch auto/SCRUM-566-na81-shadow-20260824 from base_sha f2d08df464c4e485d8a5bbc0df4579b1727ed32f. Activation requires the exact unexpired human G2 envelope (scope_hash sha256:2c3bf3e761b05bcf3ae2f1fdd4be09c470d0a1e88e644fc24f2aa5771c02f8f8)."
+}
