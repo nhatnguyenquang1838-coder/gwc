@@ -185,6 +185,89 @@ def compute_output_tree_digest(output_root: str | os.PathLike[str]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# SCRUM-397 WP4 extension: canonical digest profile primitives
+#
+# Shared, registry-agnostic framing/envelope primitives for the gwc-jcs-v1
+# canonical digest profile (WP2 normative contract). These are imported by
+# canonical_digest_api.py so the envelope framing is implemented exactly once
+# in this module (extend, not duplicate). No profile activation or write
+# authority is granted here — registry fail-closed semantics live in the API.
+# CANONICALIZATION_NEVER_GRANTS_AUTHORITY.
+# ---------------------------------------------------------------------------
+
+PROFILE_DIGEST_FRAMING_SCHEME = "gwc-domain-sep-v1"
+PROFILE_DIGEST_ENVELOPE_OK = "PROFILE_DIGEST_ENVELOPE_OK"
+PROFILE_DIGEST_ENVELOPE_MISMATCH = "PROFILE_DIGEST_ENVELOPE_MISMATCH"
+PROFILE_DIGEST_ALGORITHM = "SHA-256"
+
+
+def framed_profile_sha256(canonical_bytes: bytes, domain: str) -> str:
+    """Length-prefixed framed SHA-256 per gwc-jcs-v1 domain separation.
+
+    sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8
+         || u64be(byte_len(preimage)) || preimage )
+    """
+    import struct
+    domain_utf8 = domain.encode("utf-8")
+    frame = (
+        struct.pack(">I", len(domain_utf8))
+        + domain_utf8
+        + struct.pack(">Q", len(canonical_bytes))
+        + canonical_bytes
+    )
+    return _sha256_bytes(frame)
+
+
+def build_digest_envelope(
+    *,
+    profile_id: str,
+    canonical_bytes: bytes,
+    domain: str,
+    schema_ref: str,
+) -> Dict[str, Any]:
+    """Construct a gwc-jcs-v1 digest envelope binding profile/hash/domain/
+    schema/framing/digest. The hexdigest is the length-prefixed framed SHA-256.
+    """
+    return {
+        "schema_version": "1.0",
+        "artifact_type": "digest-envelope",
+        "profile_id": profile_id,
+        "hash_algorithm": PROFILE_DIGEST_ALGORITHM,
+        "domain": domain,
+        "schema_ref": schema_ref,
+        "preimage_framing_scheme": PROFILE_DIGEST_FRAMING_SCHEME,
+        "preimage_byte_length": len(canonical_bytes),
+        "hexdigest": framed_profile_sha256(canonical_bytes, domain),
+    }
+
+
+def verify_digest_envelope(envelope: Dict[str, Any], canonical_bytes: bytes) -> str:
+    """Recompute and compare an envelope's digest and bound fields.
+
+    Returns PROFILE_DIGEST_ENVELOPE_OK on exact match, otherwise
+    PROFILE_DIGEST_ENVELOPE_MISMATCH (never raises; deterministic).
+    """
+    try:
+        expected = build_digest_envelope(
+            profile_id=envelope["profile_id"],
+            canonical_bytes=canonical_bytes,
+            domain=envelope["domain"],
+            schema_ref=envelope["schema_ref"],
+        )
+    except (KeyError, TypeError):
+        return PROFILE_DIGEST_ENVELOPE_MISMATCH
+    if envelope.get("preimage_framing_scheme") != PROFILE_DIGEST_FRAMING_SCHEME:
+        return PROFILE_DIGEST_ENVELOPE_MISMATCH
+    if envelope.get("hash_algorithm") != PROFILE_DIGEST_ALGORITHM:
+        return PROFILE_DIGEST_ENVELOPE_MISMATCH
+    if envelope.get("hexdigest") != expected["hexdigest"]:
+        return PROFILE_DIGEST_ENVELOPE_MISMATCH
+    if envelope.get("preimage_byte_length") != len(canonical_bytes):
+        return PROFILE_DIGEST_ENVELOPE_MISMATCH
+    return PROFILE_DIGEST_ENVELOPE_OK
+
+
+# ---------------------------------------------------------------------------
 # Verification
 # ---------------------------------------------------------------------------
 
