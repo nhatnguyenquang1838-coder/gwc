@@ -9,8 +9,8 @@ evidence_integrity:
 expires_at: '2026-08-24T22:23:00Z'
 forbidden_effects: []
 g2:
-  command: APPROVE G2 g2_scrum-397_3eba5ba26a12cc6e 488c0fc2e7331534 2026-08-24T22:23:00Z
-  request_id: g2_scrum-397_3eba5ba26a12cc6e
+  command: APPROVE G2 g2_scrum-397_wp3r_recovery_20260825_1434 488c0fc2e7331534 2026-08-25T17:00:00Z
+  request_id: g2_scrum-397_wp3r_recovery_20260825_1434
   scope_hash: sha256:488c0fc2e73315349737a08aa4c5fe99b618be83100d80d96d20de2e795521e3
 gate: G2_EXECUTION
 issued_at: '2026-08-24T22:23:00Z'

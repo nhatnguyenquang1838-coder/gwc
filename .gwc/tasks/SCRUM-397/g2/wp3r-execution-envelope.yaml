@@ -38,8 +38,8 @@ excluded_actions:
 - tag_protected_main
 - main_write
 g2:
-  command: APPROVE G2 g2_scrum-397_3eba5ba26a12cc6e 488c0fc2e7331534 2026-08-24T22:23:00Z
-  request_id: g2_scrum-397_3eba5ba26a12cc6e
+  command: APPROVE G2 g2_scrum-397_wp3r_recovery_20260825_1434 488c0fc2e7331534 2026-08-25T17:00:00Z
+  request_id: g2_scrum-397_wp3r_recovery_20260825_1434
 gate: G2_EXECUTION
 protected_main_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
 repository: nhatnguyenquang1838-coder/gwc
