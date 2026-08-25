@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Node Architect shadow runtime activation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "enabled", "kill_switch_engaged", "mode", "authority", "output_effect", "decision_authority", "automatic_gate_advance", "fail_closed", "exact_revision_binding", "canonical_population", "route_source", "adapter_source", "registry_source"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "shadow-runtime-activation"},
+    "enabled": {"type": "boolean"},
+    "kill_switch_engaged": {"type": "boolean"},
+    "mode": {"const": "shadow_readonly"},
+    "authority": {"const": "none"},
+    "output_effect": {"const": "observe_only"},
+    "decision_authority": {"const": false},
+    "automatic_gate_advance": {"const": false},
+    "fail_closed": {"const": true},
+    "exact_revision_binding": {"const": true},
+    "canonical_population": {"const": "canonical_81"},
+    "route_source": {"type": "string", "minLength": 1},
+    "adapter_source": {"type": "string", "minLength": 1},
+    "registry_source": {"type": "string", "minLength": 1}
+  }
+}
