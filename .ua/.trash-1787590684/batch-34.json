@@ -1,0 +1,81 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/design.md",
+   "language": "markdown",
+   "sizeLines": 164,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/requirements.md",
+   "language": "markdown",
+   "sizeLines": 101,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/tasks.md",
+   "language": "markdown",
+   "sizeLines": 76,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 164 lines): Implement SCRUM-176 by extending the existing `intake_context.source-resolution` descriptor in place. The goal is to turn source selection into a typed, provenance-backed read-only boundary that deterministically resolves REPO, PACKAGE, or MIXED source authority while preserving the current 9-node",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 101 lines): SCRUM-176 advances `intake_context.source-resolution` from a descriptive read-only catalog node into a typed source-authority boundary. The node must resolve the active instruction source as `REPO`, `PACKAGE`, or `MIXED`, emit provenance evidence, and stop closed when source authority is ambiguous.",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 76 lines): Implement SCRUM-176 in dependency order while keeping the change inside the existing `intake_context` family and preserving the current G0-only boundary. The plan should be small enough to review independently and should not introduce a parallel family or broader workflow surface.",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/design.md",
+   "target": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/requirements.md",
+   "target": "file:.kiro/specs/scrum-176-intake-context-source-resolution-m1-to-m4/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

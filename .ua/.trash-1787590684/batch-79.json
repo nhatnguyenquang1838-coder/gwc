@@ -1,0 +1,170 @@
+{
+ "batchFiles": [
+  {
+   "path": "examples/integrations/e2e-pilot/positive-pilot-run.json",
+   "language": "json",
+   "sizeLines": 20,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/e2e-pilot/rejected-bmad-scope-violation.json",
+   "language": "json",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/e2e-pilot/rejected-duplicate-side-effect.json",
+   "language": "json",
+   "sizeLines": 13,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/e2e-pilot/rejected-nondeterministic-replay.json",
+   "language": "json",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/e2e-pilot/rejected-production-action.json",
+   "language": "json",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/e2e-pilot/rejected-projection-authority-leakage.json",
+   "language": "json",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/e2e-pilot/rejected-stale-artifact.json",
+   "language": "json",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:examples/integrations/e2e-pilot/positive-pilot-run.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/positive-pilot-run.json",
+   "summary": "JSON data file \"SCRUM-121\" (positive-pilot-run.json, 20 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/e2e-pilot/rejected-bmad-scope-violation.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/rejected-bmad-scope-violation.json",
+   "summary": "JSON data file \"SCRUM-121\" (rejected-bmad-scope-violation.json, 10 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/e2e-pilot/rejected-duplicate-side-effect.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/rejected-duplicate-side-effect.json",
+   "summary": "JSON data file \"SCRUM-121\" (rejected-duplicate-side-effect.json, 13 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/e2e-pilot/rejected-nondeterministic-replay.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/rejected-nondeterministic-replay.json",
+   "summary": "JSON data file \"SCRUM-121\" (rejected-nondeterministic-replay.json, 10 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/e2e-pilot/rejected-production-action.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/rejected-production-action.json",
+   "summary": "JSON data file \"SCRUM-121\" (rejected-production-action.json, 10 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/e2e-pilot/rejected-projection-authority-leakage.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/rejected-projection-authority-leakage.json",
+   "summary": "JSON data file \"SCRUM-121\" (rejected-projection-authority-leakage.json, 10 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/e2e-pilot/rejected-stale-artifact.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": "examples/integrations/e2e-pilot/rejected-stale-artifact.json",
+   "summary": "JSON data file \"SCRUM-121\" (rejected-stale-artifact.json, 10 lines) Top-level keys: schema_version, task_id, pilot_id, g6, nodes, side_effects.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:examples/integrations/e2e-pilot/positive-pilot-run.json",
+   "target": "file:examples/integrations/e2e-pilot/rejected-bmad-scope-violation.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/e2e-pilot/rejected-bmad-scope-violation.json",
+   "target": "file:examples/integrations/e2e-pilot/rejected-duplicate-side-effect.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/e2e-pilot/rejected-duplicate-side-effect.json",
+   "target": "file:examples/integrations/e2e-pilot/rejected-nondeterministic-replay.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/e2e-pilot/rejected-nondeterministic-replay.json",
+   "target": "file:examples/integrations/e2e-pilot/rejected-production-action.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/e2e-pilot/rejected-production-action.json",
+   "target": "file:examples/integrations/e2e-pilot/rejected-projection-authority-leakage.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/e2e-pilot/rejected-projection-authority-leakage.json",
+   "target": "file:examples/integrations/e2e-pilot/rejected-stale-artifact.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

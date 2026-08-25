@@ -1,0 +1,83 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-105-durable-runtime-contracts/design.md",
+   "language": "markdown",
+   "sizeLines": 89,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-105-durable-runtime-contracts/requirements.md",
+   "language": "markdown",
+   "sizeLines": 121,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-105-durable-runtime-contracts/tasks.md",
+   "language": "markdown",
+   "sizeLines": 49,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-105-durable-runtime-contracts/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/scrum-105-durable-runtime-contracts/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 89 lines): Add a contract-only durable runtime layer under the existing `schemas/runtime` and `core/node-architect` ownership boundaries. Reuse the existing node- architect `runtime-event`, `checkpoint`, `transition-envelope`, `node-pack`, and `RUNTIME_KERNEL` concepts; extend them with explicit durable",
+   "tags": [
+    "contract",
+    "documentation",
+    "kiro",
+    "runtime",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-105-durable-runtime-contracts/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/scrum-105-durable-runtime-contracts/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 121 lines): SCRUM-105 defines the durable runtime contract needed by the GWC three-node vertical slice. The deliverable is a versioned contract package, not a production runtime implementation. It must make replay, suspension, bounded external writes, and storage replacement explicit without granting any new GWC authority.",
+   "tags": [
+    "contract",
+    "documentation",
+    "kiro",
+    "runtime",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-105-durable-runtime-contracts/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/scrum-105-durable-runtime-contracts/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 49 lines): Implement SCRUM-105 as a contract-only vertical slice. The first tasks define the durable models and prose invariants; tests and package registration close the traceability loop. No task executes a storage migration or runtime node.",
+   "tags": [
+    "contract",
+    "documentation",
+    "kiro",
+    "runtime",
+    "scrum"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-105-durable-runtime-contracts/design.md",
+   "target": "file:.kiro/specs/scrum-105-durable-runtime-contracts/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-105-durable-runtime-contracts/requirements.md",
+   "target": "file:.kiro/specs/scrum-105-durable-runtime-contracts/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

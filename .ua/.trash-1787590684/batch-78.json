@@ -1,0 +1,171 @@
+{
+ "batchFiles": [
+  {
+   "path": "examples/integrations/cross-phase/positive-cross-phase-run.json",
+   "language": "json",
+   "sizeLines": 25,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/cross-phase/rejected-automatic-promotion.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/cross-phase/rejected-gate-head-drift.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/cross-phase/rejected-metric-fabrication.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/cross-phase/rejected-projection-authority.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/cross-phase/rejected-replay-divergence.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/cross-phase/rejected-stale-dependency.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:examples/integrations/cross-phase/positive-cross-phase-run.json",
+   "type": "config",
+   "name": "SCRUM-150",
+   "filePath": "examples/integrations/cross-phase/positive-cross-phase-run.json",
+   "summary": "JSON data file \"SCRUM-150\" (positive-cross-phase-run.json, 25 lines) Top-level keys: schema_version, task_id, chain_id, linked_task_ids, repository, composite_base_sha.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/cross-phase/rejected-automatic-promotion.json",
+   "type": "config",
+   "name": "rejected automatic promotion",
+   "filePath": "examples/integrations/cross-phase/rejected-automatic-promotion.json",
+   "summary": "JSON data file \"rejected automatic promotion\" (rejected-automatic-promotion.json, 5 lines) Top-level keys: fixture_type, base, mutations.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/cross-phase/rejected-gate-head-drift.json",
+   "type": "config",
+   "name": "rejected gate head drift",
+   "filePath": "examples/integrations/cross-phase/rejected-gate-head-drift.json",
+   "summary": "JSON data file \"rejected gate head drift\" (rejected-gate-head-drift.json, 5 lines) Top-level keys: fixture_type, base, mutations.",
+   "tags": [
+    "examples",
+    "gates",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/cross-phase/rejected-metric-fabrication.json",
+   "type": "config",
+   "name": "rejected metric fabrication",
+   "filePath": "examples/integrations/cross-phase/rejected-metric-fabrication.json",
+   "summary": "JSON data file \"rejected metric fabrication\" (rejected-metric-fabrication.json, 5 lines) Top-level keys: fixture_type, base, mutations.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/cross-phase/rejected-projection-authority.json",
+   "type": "config",
+   "name": "rejected projection authority",
+   "filePath": "examples/integrations/cross-phase/rejected-projection-authority.json",
+   "summary": "JSON data file \"rejected projection authority\" (rejected-projection-authority.json, 5 lines) Top-level keys: fixture_type, base, mutations.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/cross-phase/rejected-replay-divergence.json",
+   "type": "config",
+   "name": "rejected replay divergence",
+   "filePath": "examples/integrations/cross-phase/rejected-replay-divergence.json",
+   "summary": "JSON data file \"rejected replay divergence\" (rejected-replay-divergence.json, 5 lines) Top-level keys: fixture_type, base, mutations.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/cross-phase/rejected-stale-dependency.json",
+   "type": "config",
+   "name": "rejected stale dependency",
+   "filePath": "examples/integrations/cross-phase/rejected-stale-dependency.json",
+   "summary": "JSON data file \"rejected stale dependency\" (rejected-stale-dependency.json, 5 lines) Top-level keys: fixture_type, base, mutations.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:examples/integrations/cross-phase/positive-cross-phase-run.json",
+   "target": "file:examples/integrations/cross-phase/rejected-automatic-promotion.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/cross-phase/rejected-automatic-promotion.json",
+   "target": "file:examples/integrations/cross-phase/rejected-gate-head-drift.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/cross-phase/rejected-gate-head-drift.json",
+   "target": "file:examples/integrations/cross-phase/rejected-metric-fabrication.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/cross-phase/rejected-metric-fabrication.json",
+   "target": "file:examples/integrations/cross-phase/rejected-projection-authority.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/cross-phase/rejected-projection-authority.json",
+   "target": "file:examples/integrations/cross-phase/rejected-replay-divergence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/cross-phase/rejected-replay-divergence.json",
+   "target": "file:examples/integrations/cross-phase/rejected-stale-dependency.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

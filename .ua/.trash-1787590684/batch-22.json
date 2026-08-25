@@ -1,0 +1,80 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/design.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/requirements.md",
+   "language": "markdown",
+   "sizeLines": 11,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/tasks.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/design.md",
+   "type": "document",
+   "name": "Design",
+   "filePath": ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/design.md",
+   "summary": "Markdown document \"Design\" (specification, 5 lines): Task-Me host mode is a strict planner adapter. It consumes immutable UA snapshot references and produces task packages, impact analysis, dependency DAGs, estimates, coding guides and validation plans under `.task-me/**`.",
+   "tags": [
+    "contract",
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/requirements.md",
+   "type": "document",
+   "name": "Requirements",
+   "filePath": ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/requirements.md",
+   "summary": "Markdown document \"Requirements\" (specification, 11 lines).",
+   "tags": [
+    "contract",
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/tasks.md",
+   "type": "document",
+   "name": "Tasks",
+   "filePath": ".kiro/specs/GWC-P4-K3-task-me-host-mode-contract/tasks.md",
+   "summary": "Markdown document \"Tasks\" (specification, 7 lines): - [x] Define request, result and task-package schemas. - [x] Bind accepted SCRUM-117 contract digest. - [x] Add complete, partial, stale-UA and cyclic-DAG examples. - [x] Add validator and unittest coverage. - [x] Bind to SCRUM-116 topology/provenance contract.",
+   "tags": [
+    "contract",
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/design.md",
+   "target": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/requirements.md",
+   "target": "file:.kiro/specs/GWC-P4-K3-task-me-host-mode-contract/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

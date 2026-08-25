@@ -1,0 +1,559 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kilo/plans/1784743045360-gwc-gitignore-ua-temp.md",
+   "language": "markdown",
+   "sizeLines": 49,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kilo/setup-script",
+   "language": "unknown",
+   "sizeLines": 45,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".kiro/specs/SCRUM-136-g01-human-review/PLAN-REVISION.txt",
+   "language": "txt",
+   "sizeLines": 1,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/SCRUM-136-g01-human-review/tasks.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-architect/config.json",
+   "language": "json",
+   "sizeLines": 102,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/RUN-SUMMARY.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/task-dag.mmd",
+   "language": "mmd",
+   "sizeLines": 10,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/task-index.yaml",
+   "language": "yaml",
+   "sizeLines": 17,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-122-126-g1-20260727/RUN-SUMMARY.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-122-126-g1-20260727/task-dag.mmd",
+   "language": "mmd",
+   "sizeLines": 17,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-122-126-g1-20260727/task-index.yaml",
+   "language": "yaml",
+   "sizeLines": 56,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/RUN-SUMMARY.md",
+   "language": "markdown",
+   "sizeLines": 19,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-dag.mmd",
+   "language": "mmd",
+   "sizeLines": 6,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-index.yaml",
+   "language": "yaml",
+   "sizeLines": 38,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd",
+   "language": "mmd",
+   "sizeLines": 5,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/task-index.yaml",
+   "language": "yaml",
+   "sizeLines": 14,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/RUN-SUMMARY.md",
+   "language": "markdown",
+   "sizeLines": 52,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/task-dag.mmd",
+   "language": "mmd",
+   "sizeLines": 16,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/task-index.yaml",
+   "language": "yaml",
+   "sizeLines": 62,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-97-p3/README.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-120-github-g5-g6-jira-projection/run-summary.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-120-github-g5-g6-jira-projection/tasks/SCRUM-120-github-state-g5-g6-jira-projection/evidence.json",
+   "language": "json",
+   "sizeLines": 7,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-121-replayable-e2e-pilot/run-summary.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kilo/plans/1784743045360-gwc-gitignore-ua-temp.md",
+   "type": "document",
+   "name": "Plan — Tách nhánh + cập nhật `.gitignore` cho UA temp artifacts",
+   "filePath": ".kilo/plans/1784743045360-gwc-gitignore-ua-temp.md",
+   "summary": "Markdown document \"Plan — Tách nhánh + cập nhật `.gitignore` cho UA temp artifacts\" (plan, 49 lines).",
+   "tags": [
+    "documentation",
+    "kilo"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kilo/setup-script",
+   "type": "module",
+   "name": "setup-script",
+   "filePath": ".kilo/setup-script",
+   "summary": "File (setup-script, 45 lines) of undetected type.",
+   "tags": [
+    "kilo",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/SCRUM-136-g01-human-review/PLAN-REVISION.txt",
+   "type": "resource",
+   "name": "PLAN-REVISION",
+   "filePath": ".kiro/specs/SCRUM-136-g01-human-review/PLAN-REVISION.txt",
+   "summary": "Plain-text file (PLAN-REVISION.txt, 1 lines).",
+   "tags": [
+    "documentation",
+    "g0",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/SCRUM-136-g01-human-review/tasks.md",
+   "type": "document",
+   "name": "SCRUM-136 G0/G1 Human Review Tasks",
+   "filePath": ".kiro/specs/SCRUM-136-g01-human-review/tasks.md",
+   "summary": "Markdown document \"SCRUM-136 G0/G1 Human Review Tasks\" (specification, 26 lines): Implement schema contracts for Task Me/UA impact provenance and the normalized G0/G1 human-review projection.",
+   "tags": [
+    "documentation",
+    "g0",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-architect/config.json",
+   "type": "config",
+   "name": "gwc",
+   "filePath": ".task-architect/config.json",
+   "summary": "JSON data file \"gwc\" (config.json, 102 lines) Top-level keys: schema_version, project, knowledge, sources, ua, analysis.",
+   "tags": [
+    "config",
+    "json",
+    "task-architect",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/RUN-SUMMARY.md",
+   "type": "document",
+   "name": "Task-Me run summary",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/RUN-SUMMARY.md",
+   "summary": "Markdown document \"Task-Me run summary\" (report, 5 lines): `SCRUM-116` was decomposed as one bounded contract outcome with independently reviewable topology, ownership, provenance and collision-control evidence. The plan uses verified protected-base paths, one task folder, a cyclic-free DAG, explicit exclusions, and a G2-only implementation handoff.",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/task-dag.mmd",
+   "type": "module",
+   "name": "task-dag",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/task-dag.mmd",
+   "summary": "Mermaid diagram source (task-dag.mmd) describing architecture or flow visually.",
+   "tags": [
+    "diagram",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/task-index.yaml",
+   "type": "config",
+   "name": "task-index",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/task-index.yaml",
+   "summary": "GWC task governance YAML (task-index.yaml, 17 lines). Top-level keys: schema_version, run_id, repository, protected_base_sha, tasks.",
+   "tags": [
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/RUN-SUMMARY.md",
+   "type": "document",
+   "name": "Task-Me run summary",
+   "filePath": ".task-me/runs/gwc-scrum-122-126-g1-20260727/RUN-SUMMARY.md",
+   "summary": "Markdown document \"Task-Me run summary\" (report, 6 lines): `SCRUM-122` through `SCRUM-126` were decomposed as one bounded P5 evaluation and controlled self-improvement chain with a single guarded implementation branch, one Kiro fallback spec package, and three implementation waves.",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/task-dag.mmd",
+   "type": "module",
+   "name": "task-dag",
+   "filePath": ".task-me/runs/gwc-scrum-122-126-g1-20260727/task-dag.mmd",
+   "summary": "Mermaid diagram source (task-dag.mmd) describing architecture or flow visually.",
+   "tags": [
+    "diagram",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/task-index.yaml",
+   "type": "config",
+   "name": "task-index",
+   "filePath": ".task-me/runs/gwc-scrum-122-126-g1-20260727/task-index.yaml",
+   "summary": "GWC task governance YAML (task-index.yaml, 56 lines). Top-level keys: schema_version, run_id, repository, protected_base_sha, tasks.",
+   "tags": [
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/RUN-SUMMARY.md",
+   "type": "document",
+   "name": "Task Me FastLane plan: SCRUM-146–149",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/RUN-SUMMARY.md",
+   "summary": "Markdown document \"Task Me FastLane plan: SCRUM-146–149\" (report, 19 lines): This plan decomposes the four recovery subtasks into independently reviewable waves against the observed protected-base candidate `origin/main` at `b0341da8414aacad93719a6919babcd183e03f02`. Direct GitHub reachability was attempted and was unavailable in this session (`SKIPPED_OFFLINE`); the local",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-dag.mmd",
+   "type": "module",
+   "name": "task-dag",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-dag.mmd",
+   "summary": "Mermaid diagram source (task-dag.mmd) describing architecture or flow visually.",
+   "tags": [
+    "diagram",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-index.yaml",
+   "type": "config",
+   "name": "task-index",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-index.yaml",
+   "summary": "GWC task governance YAML (task-index.yaml, 38 lines). Top-level keys: schema_version, run_id, repository, protected_base_sha, remote_verification, tasks.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md",
+   "type": "document",
+   "name": "Task Me FastLane plan: SCRUM-150",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md",
+   "summary": "Markdown document \"Task Me FastLane plan: SCRUM-150\" (report, 28 lines): This is a single-task, evidence-backed implementation plan for the P2-to-P5 cross-phase replay, authority and outcome regression. The plan is based on the observed protected-base candidate `origin/main` at `6c2b6ac273b0d0d23a31e311b081d2cefd9aa9be`.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd",
+   "type": "module",
+   "name": "task-dag",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd",
+   "summary": "Mermaid diagram source (task-dag.mmd) describing architecture or flow visually.",
+   "tags": [
+    "diagram",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/task-index.yaml",
+   "type": "config",
+   "name": "task-index",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/task-index.yaml",
+   "summary": "GWC task governance YAML (task-index.yaml, 14 lines). Top-level keys: schema_version, run_id, repository, protected_base_sha, remote_verification, tasks.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/RUN-SUMMARY.md",
+   "type": "document",
+   "name": "RUN SUMMARY",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/RUN-SUMMARY.md",
+   "summary": "Markdown document \"RUN SUMMARY\" (report, 52 lines): - Run ID: `gwc-scrum-95-20260725-r2` - Task: `SCRUM-95` - Repository: `nhatnguyenquang1838-coder/gwc` - Protected base: `main@d33ab8a52d341fa7f9ae65a1a88cb193ba61aded` - Task-Me skill source: `nhatnguyenquang1838-coder/task-me@ef0b890b1fb9140109c04cbb490b41d9aa94bfff` - Generated:",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/task-dag.mmd",
+   "type": "module",
+   "name": "task-dag",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/task-dag.mmd",
+   "summary": "Mermaid diagram source (task-dag.mmd) describing architecture or flow visually.",
+   "tags": [
+    "diagram",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/task-index.yaml",
+   "type": "config",
+   "name": "task-index",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/task-index.yaml",
+   "summary": "GWC task governance YAML (task-index.yaml, 62 lines). Top-level keys: schema_version, run_id, repository, protected_base_sha, tasks.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-97-p3/README.md",
+   "type": "document",
+   "name": "Task-Me Projection — SCRUM-97 P3 FastLane",
+   "filePath": ".task-me/runs/gwc-scrum-97-p3/README.md",
+   "summary": "Markdown document \"Task-Me Projection — SCRUM-97 P3 FastLane\" (document, 3 lines): Two-thread projection: SCRUM-111 compiler contract and SCRUM-112 scenario routing contract. Jira/Notion remain projection only.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-120-github-g5-g6-jira-projection/run-summary.md",
+   "type": "document",
+   "name": "SCRUM-120 Task-Me Planning Run",
+   "filePath": ".task-me/runs/scrum-120-github-g5-g6-jira-projection/run-summary.md",
+   "summary": "Markdown document \"SCRUM-120 Task-Me Planning Run\" (report, 5 lines): Base: `68deae88f686ecb66b15cb8aa2e5b943ad02adf1` Plan revision: `sha256:7fee659f740c4fd2b59b38f19a0772d518588beece882ea0752bfdbf4e4980a4` Selected option: OPT-1 strict exact-state contract and validator.",
+   "tags": [
+    "documentation",
+    "g5",
+    "g6",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-120-github-g5-g6-jira-projection/tasks/SCRUM-120-github-state-g5-g6-jira-projection/evidence.json",
+   "type": "config",
+   "name": "SCRUM-120",
+   "filePath": ".task-me/runs/scrum-120-github-g5-g6-jira-projection/tasks/SCRUM-120-github-state-g5-g6-jira-projection/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-120\" (evidence.json, 7 lines) Top-level keys: task_id, base_sha, plan_revision, selected_option, status.",
+   "tags": [
+    "g5",
+    "g6",
+    "json",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-121-replayable-e2e-pilot/run-summary.md",
+   "type": "document",
+   "name": "SCRUM-121 Task-Me Run Summary",
+   "filePath": ".task-me/runs/scrum-121-replayable-e2e-pilot/run-summary.md",
+   "summary": "Markdown document \"SCRUM-121 Task-Me Run Summary\" (report, 7 lines): Route: G0 context → UA snapshot readback → Task-Me impact package → G1 alignment → backward scenario route → G2 authority → BMAD bounded implementation procedure → GitHub Draft PR/CI → G3 review → G4 approval request → automatic read-only G5 verification → G6 not applicable.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/SCRUM-136-g01-human-review/PLAN-REVISION.txt",
+   "target": "file:.kiro/specs/SCRUM-136-g01-human-review/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-116-g1-20260727/RUN-SUMMARY.md",
+   "target": "file:.task-me/runs/gwc-scrum-116-g1-20260727/task-dag.mmd",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-116-g1-20260727/task-dag.mmd",
+   "target": "file:.task-me/runs/gwc-scrum-116-g1-20260727/task-index.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/RUN-SUMMARY.md",
+   "target": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/task-dag.mmd",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/task-dag.mmd",
+   "target": "file:.task-me/runs/gwc-scrum-122-126-g1-20260727/task-index.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/RUN-SUMMARY.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-dag.mmd",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-dag.mmd",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/task-index.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/RUN-SUMMARY.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/task-dag.mmd",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/task-index.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/RUN-SUMMARY.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/task-dag.mmd",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/task-dag.mmd",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/task-index.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,218 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/README.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/decisions.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/evidence.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 11,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/task.yaml",
+   "language": "yaml",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 11,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/README.md",
+   "type": "document",
+   "name": "SCRUM-147",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/README.md",
+   "summary": "Markdown document \"SCRUM-147\" (document, 6 lines): Implement and prove one integrated durable execution path. Existing runtime store and crash-replay harness are the starting mechanisms; extend them only as needed to cover the Jira acceptance scenarios and preserve fail-closed typed outcomes. Do not add a scheduler, provider migration, or production adapter.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/coding-guide.md",
+   "type": "document",
+   "name": "Coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/coding-guide.md",
+   "summary": "Markdown document \"Coding guide\" (document, 10 lines): - Preserve the provider-neutral in-memory boundary in `tools/node_architect/durable_checkpoint_runtime.py`. - Preserve the scenario-matrix and typed outcome model in `tools/node_architect/crash_replay_harness.py`. - Treat unknown external outcomes as unresolved until readback; never blind retry an",
+   "tags": [
+    "documentation",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 7 lines): - Selected: extend the existing store/harness vertical slice. - Rejected: adding a second runtime loop or live database adapter; both exceed the contract/test acceptance boundary. - Confidence: high for current code targets; exact missing acceptance seam is a G2 discovery item.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/evidence.json",
+   "type": "config",
+   "name": "SCRUM-147",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-147\" (evidence.json, 1 lines) Top-level keys: task_id, evidence.",
+   "tags": [
+    "json",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/impact-analysis.md",
+   "type": "document",
+   "name": "Impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/impact-analysis.md",
+   "summary": "Markdown document \"Impact analysis\" (document, 7 lines): Direct impact is limited to the verified durable runtime and replay harness, their focused tests, and any existing runtime schema/fixture required to make the integrated evidence executable. Downstream consumers are SCRUM-149 E2E and SCRUM-146 closure evidence. Reuse the existing",
+   "tags": [
+    "documentation",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/implementation-plan.md",
+   "summary": "Markdown document \"Implementation plan\" (plan, 11 lines): 1. Re-read the durable runtime contracts and the current store/harness APIs. 2. Map each SCRUM-147 scenario to checkpoint revisions, lease/fencing state, pending side-effect state, and deterministic replay evidence. 3. Extend the smallest existing runtime seam for missing integrated behavior. 4.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/task.yaml",
+   "type": "config",
+   "name": "Prove integrated durable runtime acceptance",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/task.yaml",
+   "summary": "GWC task governance YAML \"Prove integrated durable runtime acceptance\" (task.yaml, 16 lines). Top-level keys: task_id, title, objective, wave, requires, parallel_with.",
+   "tags": [
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/test-plan.md",
+   "type": "document",
+   "name": "Test plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/test-plan.md",
+   "summary": "Markdown document \"Test plan\" (plan, 11 lines): ```text python -m unittest discover -s tests -p 'test_durable_checkpoint_runtime.py' python -m unittest discover -s tests -p 'test_crash_replay_harness.py' python -m unittest discover -s tests -p 'test_durable_runtime_contracts.py' ```",
+   "tags": [
+    "documentation",
+    "runtime",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-147-integrated-durable-runtime-acceptance/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,426 @@
+{
+ "batchFiles": [
+  {
+   "path": "releases/changelog.d/2026-07-26-gwc-p1-followup-graph-revision.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-26-scrum-103-lifecycle-authority.md",
+   "language": "markdown",
+   "sizeLines": 22,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-26-scrum-105-durable-runtime-contracts.md",
+   "language": "markdown",
+   "sizeLines": 16,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-27-scrum-108-bounded-external-write-runtime-node.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-27-scrum-109-durable-checkpoint-cas-lease-resume.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-27-scrum-116-dw-super-app-integration-topology.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-28-scrum-117-ua-host-mode-contract.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-28-scrum-118-task-me-host-mode-contract.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-28-scrum-119-bmad-procedure-adapter.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-28-scrum-120-github-g5-g6-jira-projection.md",
+   "language": "markdown",
+   "sizeLines": 4,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-28-scrum-121-replayable-e2e-pilot.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-30-scrum-198-ci-run-capture-m5.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-30-scrum-203-checkpoint-persist-m5.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-30-scrum-238-timeout-recovery-m5.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-30-scrum-239-crash-checkpoint-recovery-m5.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-31-scrum-240-stale-session-reconciliation-m5.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-31-scrum-241-unknown-write-reconciliation-m5.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-31-scrum-242-cas-mismatch-recovery-m5.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-31-scrum-243-lease-expiry-recovery-m5.md",
+   "language": "markdown",
+   "sizeLines": 13,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:releases/changelog.d/2026-07-26-gwc-p1-followup-graph-revision.md",
+   "type": "document",
+   "name": "GWC P1 follow-up: graph revision schema export",
+   "filePath": "releases/changelog.d/2026-07-26-gwc-p1-followup-graph-revision.md",
+   "summary": "Markdown document \"GWC P1 follow-up: graph revision schema export\" (changelog entry, 8 lines): - Add standalone `schemas/runtime/graph-revision.schema.json`. - Refactor `schemas/runtime/runtime-graph.schema.json` to reuse the exported graph revision schema without changing payload shape. - Add focused tests for graph revision validation and runtime graph `$ref` wiring. - Export the graph",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-26-scrum-103-lifecycle-authority.md",
+   "type": "document",
+   "name": "SCRUM-103 lifecycle and authority enforcement",
+   "filePath": "releases/changelog.d/2026-07-26-scrum-103-lifecycle-authority.md",
+   "summary": "Markdown document \"SCRUM-103 lifecycle and authority enforcement\" (changelog entry, 22 lines): - Explicit state transitions for G3 review, G4 merge, read-only or manual G5, and conditional G6 operations. - Fail-closed gate-action authority schema and validator binding task, repository, base/head SHAs, scope hash, expiry, actor, and readback. - Deterministic G5 candidate resolver and",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md",
+   "type": "document",
+   "name": "SCRUM-104 canonical registries and v3 binding",
+   "filePath": "releases/changelog.d/2026-07-26-scrum-104-canonical-registries.md",
+   "summary": "Markdown document \"SCRUM-104 canonical registries and v3 binding\" (changelog entry, 6 lines): - Added source-backed node, scenario, typed decision-rule, flow-profile and runtime-graph registries. - Recorded all 81 catalog slots with explicit maturity, provenance and slot-review status; proposed slots remain non-stable. - Added cross-registry validation and a data-only Cytoscape v3 adapter",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-26-scrum-105-durable-runtime-contracts.md",
+   "type": "document",
+   "name": "2026 07 26 scrum 105 durable runtime contracts",
+   "filePath": "releases/changelog.d/2026-07-26-scrum-105-durable-runtime-contracts.md",
+   "summary": "Markdown document \"2026 07 26 scrum 105 durable runtime contracts\" (changelog entry, 16 lines): - Added provider-neutral durable run, event, checkpoint, pending-action, adapter, and storage-migration schemas for the P2-K1 contract lane. - Defined CAS, lease, fencing, idempotency, readback, version pinning, and SQLite-to-PostgreSQL/Supabase compatibility semantics without implementing a",
+   "tags": [
+    "changelog",
+    "contract",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-27-scrum-108-bounded-external-write-runtime-node.md",
+   "type": "document",
+   "name": "SCRUM-108 bounded external-write runtime node",
+   "filePath": "releases/changelog.d/2026-07-27-scrum-108-bounded-external-write-runtime-node.md",
+   "summary": "Markdown document \"SCRUM-108 bounded external-write runtime node\" (changelog entry, 5 lines): - Adds a provider-neutral bounded external-write classifier for persisted intent, idempotency, exact scope binding, live-state readback reconciliation, duplicate-worker prevention, stale checkpoint fencing, and ambiguous timeout human handoff. - Adds focused unit coverage for validation failure,",
+   "tags": [
+    "changelog",
+    "documentation",
+    "nodes",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-27-scrum-109-durable-checkpoint-cas-lease-resume.md",
+   "type": "document",
+   "name": "SCRUM-109 durable checkpoint/CAS/lease/resume runtime",
+   "filePath": "releases/changelog.d/2026-07-27-scrum-109-durable-checkpoint-cas-lease-resume.md",
+   "summary": "Markdown document \"SCRUM-109 durable checkpoint/CAS/lease/resume runtime\" (changelog entry, 10 lines): - Added provider-neutral in-memory durable checkpoint runtime pilot. - Enforced expected-revision CAS before checkpoint advancement. - Enforced active lease owner and current fencing token before mutation. - Bound resume to task, repository, base SHA, scope hash, graph revision, runtime version,",
+   "tags": [
+    "changelog",
+    "checkpoint",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-27-scrum-116-dw-super-app-integration-topology.md",
+   "type": "document",
+   "name": "SCRUM-116 — DW SUPER APP integration topology",
+   "filePath": "releases/changelog.d/2026-07-27-scrum-116-dw-super-app-integration-topology.md",
+   "summary": "Markdown document \"SCRUM-116 — DW SUPER APP integration topology\" (changelog entry, 6 lines): - Added a versioned topology, ownership, authority and provenance contract. - Added fail-closed owner-root, scope, checkpoint, lease/fencing and idempotency rules. - Documented submodule, power-dist, immutable-release and offline-zip compatibility modes. - Added schema and focused validation tests;",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-28-scrum-117-ua-host-mode-contract.md",
+   "type": "document",
+   "name": "SCRUM-117 — UA host-mode contract",
+   "filePath": "releases/changelog.d/2026-07-28-scrum-117-ua-host-mode-contract.md",
+   "summary": "Markdown document \"SCRUM-117 — UA host-mode contract\" (changelog entry, 6 lines): - Added UA host request, snapshot and result schemas. - Added fresh, stale and unavailable examples. - Added local validator and unittest coverage. - Bound the contract to SCRUM-116 topology/provenance rules and GWC main e0031b01ea9ea4f72a1119a81d732bbaee2b4921.",
+   "tags": [
+    "changelog",
+    "contract",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-28-scrum-118-task-me-host-mode-contract.md",
+   "type": "document",
+   "name": "SCRUM-118 — Task-Me host-mode contract",
+   "filePath": "releases/changelog.d/2026-07-28-scrum-118-task-me-host-mode-contract.md",
+   "summary": "Markdown document \"SCRUM-118 — Task-Me host-mode contract\" (changelog entry, 6 lines): - Added Task-Me host request, result and task-package schemas. - Added complete, partial, stale-UA and cyclic-DAG examples. - Added local validator and unittest coverage. - Bound the contract to SCRUM-116 topology/provenance rules, GWC main e0031b01ea9ea4f72a1119a81d732bbaee2b4921 and accepted SCRUM-117 digest.",
+   "tags": [
+    "changelog",
+    "contract",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-28-scrum-119-bmad-procedure-adapter.md",
+   "type": "document",
+   "name": "SCRUM-119 — BMAD procedure-adapter contract",
+   "filePath": "releases/changelog.d/2026-07-28-scrum-119-bmad-procedure-adapter.md",
+   "summary": "Markdown document \"SCRUM-119 — BMAD procedure-adapter contract\" (changelog entry, 9 lines): - Adds the canonical GWC BMAD procedure registry, request, result and permission schemas. - Defines exact task/repository/SHA/scope/provenance binding. - Enforces permission checks before side effects and prohibits BMAD gate authority. - Adds idempotency, checkpoint/resume and explicit failure",
+   "tags": [
+    "adapter",
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-28-scrum-120-github-g5-g6-jira-projection.md",
+   "type": "document",
+   "name": "SCRUM-120 — GitHub G5/G6 Jira projection contract",
+   "filePath": "releases/changelog.d/2026-07-28-scrum-120-github-g5-g6-jira-projection.md",
+   "summary": "Markdown document \"SCRUM-120 — GitHub G5/G6 Jira projection contract\" (changelog entry, 4 lines): - Added exact-state GitHub evidence, G5 verification and Jira projection schemas. - Added validator and tests for PR-head drift, missing CI, projection authority leakage and G6 separation.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "g5",
+    "g6",
+    "release"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-28-scrum-121-replayable-e2e-pilot.md",
+   "type": "document",
+   "name": "SCRUM-121 — Replayable E2E Pilot",
+   "filePath": "releases/changelog.d/2026-07-28-scrum-121-replayable-e2e-pilot.md",
+   "summary": "Markdown document \"SCRUM-121 — Replayable E2E Pilot\" (changelog entry, 5 lines): - Added no-production DW SUPER E2E pilot contract. - Added replayable run-history examples and validator coverage. - Added explicit fault scenarios for stale artifacts, duplicate side effects, replay divergence, projection authority leakage, BMAD scope violation and G6 exclusion.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-30-scrum-198-ci-run-capture-m5.md",
+   "type": "document",
+   "name": "SCRUM-198 — ci-run-capture M5 slice",
+   "filePath": "releases/changelog.d/2026-07-30-scrum-198-ci-run-capture-m5.md",
+   "summary": "Markdown document \"SCRUM-198 — ci-run-capture M5 slice\" (changelog entry, 8 lines): - Added exact-head CI observation normalization. - Added fail-closed handling for absent provider data and SHA mismatch. - Added pending-CI checkpoint requirement. - Added CI observation schema and replay-equivalence tests.",
+   "tags": [
+    "capture",
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-30-scrum-203-checkpoint-persist-m5.md",
+   "type": "document",
+   "name": "SCRUM-203 — checkpoint-persist M5 slice",
+   "filePath": "releases/changelog.d/2026-07-30-scrum-203-checkpoint-persist-m5.md",
+   "summary": "Markdown document \"SCRUM-203 — checkpoint-persist M5 slice\" (changelog entry, 9 lines): - Added replay-safe checkpoint store primitives. - Added CAS mismatch protection with no event mutation on conflict. - Added crash-after-commit readback behavior to prevent duplicate effects. - Added runtime checkpoint and runtime event schemas. - Added scoped unittest coverage for CAS, append-only",
+   "tags": [
+    "changelog",
+    "checkpoint",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-30-scrum-238-timeout-recovery-m5.md",
+   "type": "document",
+   "name": "SCRUM-238 — timeout-recovery M5 slice",
+   "filePath": "releases/changelog.d/2026-07-30-scrum-238-timeout-recovery-m5.md",
+   "summary": "Markdown document \"SCRUM-238 — timeout-recovery M5 slice\" (changelog entry, 9 lines): - Added deterministic timeout recovery decision router. - Added no-blind-redispatch handling for unknown external effects. - Added readback-not-verified reconciliation routing. - Added bounded retry and checkpoint-required classification. - Added schema and replay-equivalence tests.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-30-scrum-239-crash-checkpoint-recovery-m5.md",
+   "type": "document",
+   "name": "SCRUM-239 — crash-checkpoint-recovery M5 slice",
+   "filePath": "releases/changelog.d/2026-07-30-scrum-239-crash-checkpoint-recovery-m5.md",
+   "summary": "Markdown document \"SCRUM-239 — crash-checkpoint-recovery M5 slice\" (changelog entry, 9 lines): - Added deterministic crash checkpoint recovery decision router. - Added canonical checkpoint and pending-action readback routing. - Added no-duplicate-effect handling for unknown or committed post-crash effects. - Added schema and replay-equivalence tests for crash resume. - Bound implementation",
+   "tags": [
+    "changelog",
+    "checkpoint",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-31-scrum-240-stale-session-reconciliation-m5.md",
+   "type": "document",
+   "name": "SCRUM-240 — stale-session-reconciliation M5 slice",
+   "filePath": "releases/changelog.d/2026-07-31-scrum-240-stale-session-reconciliation-m5.md",
+   "summary": "Markdown document \"SCRUM-240 — stale-session-reconciliation M5 slice\" (changelog entry, 8 lines): - Added deterministic stale session reconciliation router. - Added stale owner/checkpoint supersede routing. - Added dirty working tree and pending action reconciliation routing. - Added replay-equivalence tests.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-31-scrum-241-unknown-write-reconciliation-m5.md",
+   "type": "document",
+   "name": "SCRUM-241 — unknown-write-reconciliation M5 slice",
+   "filePath": "releases/changelog.d/2026-07-31-scrum-241-unknown-write-reconciliation-m5.md",
+   "summary": "Markdown document \"SCRUM-241 — unknown-write-reconciliation M5 slice\" (changelog entry, 8 lines): - Added deterministic unknown write reconciliation router. - Added provider readback requirement before retry or PASS. - Added no-blind-retry handling for unknown external effects. - Added duplicate-effect and replay-equivalence tests.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-31-scrum-242-cas-mismatch-recovery-m5.md",
+   "type": "document",
+   "name": "SCRUM-242 — cas-mismatch-recovery M5 slice",
+   "filePath": "releases/changelog.d/2026-07-31-scrum-242-cas-mismatch-recovery-m5.md",
+   "summary": "Markdown document \"SCRUM-242 — cas-mismatch-recovery M5 slice\" (changelog entry, 8 lines): - Added deterministic CAS mismatch recovery router. - Added reload-before-retry behavior for newer checkpoint revisions. - Added no-overwrite/no-blind-retry guarantees. - Added concurrency and replay-equivalence tests.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-31-scrum-243-lease-expiry-recovery-m5.md",
+   "type": "document",
+   "name": "SCRUM-243 — lease expiry recovery M5",
+   "filePath": "releases/changelog.d/2026-07-31-scrum-243-lease-expiry-recovery-m5.md",
+   "summary": "Markdown document \"SCRUM-243 — lease expiry recovery M5\" (changelog entry, 13 lines): Adds deterministic lease-expiry recovery routing for `failure_recovery.lease-expiry-recovery`.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "schema"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

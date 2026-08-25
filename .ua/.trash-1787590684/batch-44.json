@@ -1,0 +1,211 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/README.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/decisions.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/evidence.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 11,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/task.yaml",
+   "language": "yaml",
+   "sizeLines": 17,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/README.md",
+   "type": "document",
+   "name": "SCRUM-149",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/README.md",
+   "summary": "Markdown document \"SCRUM-149\" (document, 6 lines): Run the real bounded host-mode and offline-consumer acceptance path. Fixture examples are inputs and regression oracles; they are not by themselves proof of real provider calls. Preserve exact package/source/ref provenance and typed failure behavior at every adapter boundary.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/coding-guide.md",
+   "type": "document",
+   "name": "Coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/coding-guide.md",
+   "summary": "Markdown document \"Coding guide\" (document, 10 lines): - Keep the no-production boundary enforced by `tools/validate_dw_super_e2e_pilot.py`. - Reuse the request/result shapes under `examples/integrations/ua-host` and `examples/integrations/task-me-host`; do not widen output roots beyond target-owned `.ua/**` and `.task-me/**` in the host contracts. -",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 6 lines): - Selected: reuse the existing replayable E2E pilot and host-mode contracts. - Rejected: treat fixture-only validation as real provider or browser E2E proof. - Confidence: medium-high; real adapter reachability and offline package source must be verified at execution time.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/evidence.json",
+   "type": "config",
+   "name": "SCRUM-149",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-149\" (evidence.json, 1 lines) Top-level keys: task_id, evidence.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/impact-analysis.md",
+   "type": "document",
+   "name": "Impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/impact-analysis.md",
+   "summary": "Markdown document \"Impact analysis\" (document, 7 lines): This is the integration wave consuming SCRUM-147 runtime evidence and SCRUM-148 deterministic routing. It spans the existing E2E pilot validator and host-mode example contracts for UA and Task-Me, with BMAD/GitHub evidence bound by their existing integration rules. It must remain a no-production",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/implementation-plan.md",
+   "summary": "Markdown document \"Implementation plan\" (plan, 11 lines): 1. Verify the exact base, package/source versions, and host-mode contract inputs from the two prerequisite lanes. 2. Execute one bounded UA/Task-Me/BMAD/GitHub/CI path through approved adapters. 3. Build/install the supplied package in a clean offline consumer workspace and run doctor, instruction",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/task.yaml",
+   "type": "config",
+   "name": "Prove real host-mode E2E and offline package consumption",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/task.yaml",
+   "summary": "GWC task governance YAML \"Prove real host-mode E2E and offline package consumption\" (task.yaml, 17 lines). Top-level keys: task_id, title, objective, wave, requires, parallel_with.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/test-plan.md",
+   "type": "document",
+   "name": "Test plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/test-plan.md",
+   "summary": "Markdown document \"Test plan\" (plan, 12 lines): ```text python -m unittest discover -s tests -p 'test_dw_super_e2e_pilot.py' python -m unittest discover -s tests -p 'test_ua_host_contract.py' python -m unittest discover -s tests -p 'test_task_me_host_contract.py' python -m unittest discover -s tests -p 'test_kiro_local_agent_package.py' ```",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-149-host-offline-e2e/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,103 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/integration/BMAD_PROCEDURE_ADAPTER_CONTRACT_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 61,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integration/DW_SUPER_APP_INTEGRATION_TOPOLOGY_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 53,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integration/bmad-procedure-adapter-contract.json",
+   "language": "json",
+   "sizeLines": 179,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/integration/dw-super-app-integration-contract.json",
+   "language": "json",
+   "sizeLines": 74,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/integration/BMAD_PROCEDURE_ADAPTER_CONTRACT_v1.0.md",
+   "type": "document",
+   "name": "BMAD Procedure Adapter Contract v1.0",
+   "filePath": "core/integration/BMAD_PROCEDURE_ADAPTER_CONTRACT_v1.0.md",
+   "summary": "Markdown document \"BMAD Procedure Adapter Contract v1.0\" (guideline/contract, 61 lines): GWC owns canonical gate state and decides whether a procedure may run. BMAD executes only a registered, versioned procedure inside an exact permission envelope. A BMAD result is evidence and recommendation; it is never gate approval.",
+   "tags": [
+    "adapter",
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integration/DW_SUPER_APP_INTEGRATION_TOPOLOGY_v1.0.md",
+   "type": "document",
+   "name": "DW SUPER APP integration topology v1.0",
+   "filePath": "core/integration/DW_SUPER_APP_INTEGRATION_TOPOLOGY_v1.0.md",
+   "summary": "Markdown document \"DW SUPER APP integration topology v1.0\" (document, 53 lines): Status: implementation contract for SCRUM-116, bound to `nhatnguyenquang1838-coder/gwc@main:32d8c308f7d67de3dbd914a19837871d99c22ab4` and the read-only DW-SuperApps input `main:fc93228c721b59a5ac1de7e916a615eb452ef70a`.",
+   "tags": [
+    "core",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integration/bmad-procedure-adapter-contract.json",
+   "type": "config",
+   "name": "bmad procedure adapter contract",
+   "filePath": "core/integration/bmad-procedure-adapter-contract.json",
+   "summary": "JSON data file \"bmad procedure adapter contract\" (bmad-procedure-adapter-contract.json, 179 lines) Top-level keys: schema_version, contract_id, task_id, status, source_context, registry.",
+   "tags": [
+    "adapter",
+    "contract",
+    "core",
+    "json"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/integration/dw-super-app-integration-contract.json",
+   "type": "config",
+   "name": "SCRUM-116",
+   "filePath": "core/integration/dw-super-app-integration-contract.json",
+   "summary": "JSON data file \"SCRUM-116\" (dw-super-app-integration-contract.json, 74 lines) Top-level keys: schema_version, artifact_type, contract_id, task_id, generated_at, source_context.",
+   "tags": [
+    "contract",
+    "core",
+    "json"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:core/integration/BMAD_PROCEDURE_ADAPTER_CONTRACT_v1.0.md",
+   "target": "file:core/integration/DW_SUPER_APP_INTEGRATION_TOPOLOGY_v1.0.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integration/DW_SUPER_APP_INTEGRATION_TOPOLOGY_v1.0.md",
+   "target": "file:core/integration/bmad-procedure-adapter-contract.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integration/bmad-procedure-adapter-contract.json",
+   "target": "file:core/integration/dw-super-app-integration-contract.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

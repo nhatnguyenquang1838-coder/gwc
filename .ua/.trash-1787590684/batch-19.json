@@ -1,0 +1,75 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P3-backward-graph-compiler/design.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P3-backward-graph-compiler/requirements.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P3-backward-graph-compiler/tasks.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P3-backward-graph-compiler/design.md",
+   "type": "document",
+   "name": "Design — SCRUM-97 P3 Contract-First Split",
+   "filePath": ".kiro/specs/GWC-P3-backward-graph-compiler/design.md",
+   "summary": "Markdown document \"Design — SCRUM-97 P3 Contract-First Split\" (specification, 5 lines): P3 compiles from desired/safe-failure outcomes backward through capabilities and evidence dependencies. NetworkX-style DiGraph semantics map to predecessors, successors, topological ordering, cycle detection and bounded path enumeration. Cytoscape.js binding uses element JSON with nodes and edges",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P3-backward-graph-compiler/requirements.md",
+   "type": "document",
+   "name": "Requirements — SCRUM-97 P3 Backward Graph Compiler & Scenario Decision Engine",
+   "filePath": ".kiro/specs/GWC-P3-backward-graph-compiler/requirements.md",
+   "summary": "Markdown document \"Requirements — SCRUM-97 P3 Backward Graph Compiler & Scenario Decision Engine\" (specification, 8 lines): - Thread A / SCRUM-111: compiler request/result, backward derivation, dependency closure, deterministic ordering and planning evidence. - Thread B / SCRUM-112: scenario taxonomy, typed guards, route classification/ranking, authority stops and dominance pruning.",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P3-backward-graph-compiler/tasks.md",
+   "type": "document",
+   "name": "Tasks — SCRUM-97 FastLane P3 K1/K2 Contracts",
+   "filePath": ".kiro/specs/GWC-P3-backward-graph-compiler/tasks.md",
+   "summary": "Markdown document \"Tasks — SCRUM-97 FastLane P3 K1/K2 Contracts\" (specification, 7 lines): - [x] SCRUM-111: define backward compiler semantics and planning-evidence contract. - [x] SCRUM-112: define scenario taxonomy, typed guards and route-ranking policy. - [ ] Open Draft PR and wait for authoritative CI. - [ ] Keep SCRUM-113/SCRUM-114 blocked until K1/K2 merge. - [ ] Keep SCRUM-115",
+   "tags": [
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P3-backward-graph-compiler/design.md",
+   "target": "file:.kiro/specs/GWC-P3-backward-graph-compiler/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P3-backward-graph-compiler/requirements.md",
+   "target": "file:.kiro/specs/GWC-P3-backward-graph-compiler/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

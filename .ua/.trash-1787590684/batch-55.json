@@ -1,0 +1,74 @@
+{
+ "batchFiles": [
+  {
+   "path": ".ua/fingerprints.json",
+   "language": "json",
+   "sizeLines": 22444,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/knowledge-graph.json",
+   "language": "json",
+   "sizeLines": 57513,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/meta.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.ua/fingerprints.json",
+   "type": "config",
+   "name": "fingerprints",
+   "filePath": ".ua/fingerprints.json",
+   "summary": "JSON data file \"fingerprints\" (fingerprints.json, 22445 lines) Top-level keys: version, gitCommitHash, generatedAt, files.",
+   "tags": [
+    "json",
+    "ua"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:.ua/knowledge-graph.json",
+   "type": "config",
+   "name": "knowledge graph",
+   "filePath": ".ua/knowledge-graph.json",
+   "summary": "JSON data file \"knowledge graph\" (knowledge-graph.json, 57514 lines) Top-level keys: version, project, nodes, edges, layers, tour.",
+   "tags": [
+    "json",
+    "ua"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:.ua/meta.json",
+   "type": "config",
+   "name": "meta",
+   "filePath": ".ua/meta.json",
+   "summary": "JSON data file \"meta\" (meta.json, 6 lines) Top-level keys: lastAnalyzedAt, gitCommitHash, version, analyzedFiles.",
+   "tags": [
+    "json",
+    "ua"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.ua/fingerprints.json",
+   "target": "file:.ua/knowledge-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.ua/knowledge-graph.json",
+   "target": "file:.ua/meta.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

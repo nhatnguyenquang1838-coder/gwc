@@ -1,0 +1,208 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/package_export/README.md",
+   "language": "markdown",
+   "sizeLines": 55,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/export-failure-routing.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/export-manifest-generation.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/governance-tree-build.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/package-manifest-load.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/smoke-verification.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/source-path-safety-check.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/README.md",
+   "type": "document",
+   "name": "package_export node family",
+   "filePath": "core/node-architect/node-catalog/package_export/README.md",
+   "summary": "Markdown document \"package_export node family\" (document, 55 lines): Task: `SCRUM-68` Batch: `batch-07-package-export` Family: `package_export` Planned nodes: 9 Authority boundary: `G2_EXECUTION_G3_PR`",
+   "tags": [
+    "catalog",
+    "core",
+    "documentation",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json",
+   "type": "config",
+   "name": "Deterministic Hash Verification",
+   "filePath": "core/node-architect/node-catalog/package_export/deterministic-hash-verification.node.json",
+   "summary": "JSON data file \"Deterministic Hash Verification\" (deterministic-hash-verification.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+   "type": "config",
+   "name": "Entry Schema Validation",
+   "filePath": "core/node-architect/node-catalog/package_export/entry-schema-validation.node.json",
+   "summary": "JSON Schema definition \"Entry Schema Validation\" (entry-schema-validation.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/export-failure-routing.node.json",
+   "type": "config",
+   "name": "Export Failure Routing",
+   "filePath": "core/node-architect/node-catalog/package_export/export-failure-routing.node.json",
+   "summary": "JSON data file \"Export Failure Routing\" (export-failure-routing.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/export-manifest-generation.node.json",
+   "type": "config",
+   "name": "Export Manifest Generation",
+   "filePath": "core/node-architect/node-catalog/package_export/export-manifest-generation.node.json",
+   "summary": "manifest \"Export Manifest Generation\" (export-manifest-generation.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/governance-tree-build.node.json",
+   "type": "config",
+   "name": "Governance Tree Build",
+   "filePath": "core/node-architect/node-catalog/package_export/governance-tree-build.node.json",
+   "summary": "JSON data file \"Governance Tree Build\" (governance-tree-build.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/package-manifest-load.node.json",
+   "type": "config",
+   "name": "Package Manifest Load",
+   "filePath": "core/node-architect/node-catalog/package_export/package-manifest-load.node.json",
+   "summary": "manifest \"Package Manifest Load\" (package-manifest-load.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/smoke-verification.node.json",
+   "type": "config",
+   "name": "Smoke Verification",
+   "filePath": "core/node-architect/node-catalog/package_export/smoke-verification.node.json",
+   "summary": "JSON data file \"Smoke Verification\" (smoke-verification.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/source-path-safety-check.node.json",
+   "type": "config",
+   "name": "Source Path Safety Check",
+   "filePath": "core/node-architect/node-catalog/package_export/source-path-safety-check.node.json",
+   "summary": "JSON data file \"Source Path Safety Check\" (source-path-safety-check.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
+   "type": "config",
+   "name": "Target Path Safety Check",
+   "filePath": "core/node-architect/node-catalog/package_export/target-path-safety-check.node.json",
+   "summary": "JSON data file \"Target Path Safety Check\" (target-path-safety-check.node.json, 9 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

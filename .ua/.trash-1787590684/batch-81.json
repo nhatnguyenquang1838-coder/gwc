@@ -1,0 +1,152 @@
+{
+ "batchFiles": [
+  {
+   "path": "examples/integrations/task-me-host/complete-request.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/task-me-host/complete-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/task-me-host/cyclic-dag-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/task-me-host/partial-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/task-me-host/stale-ua-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/task-me-host/task-package.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:examples/integrations/task-me-host/complete-request.json",
+   "type": "config",
+   "name": "SCRUM-118",
+   "filePath": "examples/integrations/task-me-host/complete-request.json",
+   "summary": "Task Me run artifact \"SCRUM-118\" (complete-request.json, 1 lines) Top-level keys: schema_version, task_id, run_id, target, task_me, ua_snapshot.",
+   "tags": [
+    "examples",
+    "json",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/task-me-host/complete-result.json",
+   "type": "config",
+   "name": "SCRUM-118",
+   "filePath": "examples/integrations/task-me-host/complete-result.json",
+   "summary": "Task Me run artifact \"SCRUM-118\" (complete-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/task-me-host/cyclic-dag-result.json",
+   "type": "config",
+   "name": "SCRUM-118",
+   "filePath": "examples/integrations/task-me-host/cyclic-dag-result.json",
+   "summary": "Task Me run artifact \"SCRUM-118\" (cyclic-dag-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/task-me-host/partial-result.json",
+   "type": "config",
+   "name": "SCRUM-118",
+   "filePath": "examples/integrations/task-me-host/partial-result.json",
+   "summary": "Task Me run artifact \"SCRUM-118\" (partial-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/task-me-host/stale-ua-result.json",
+   "type": "config",
+   "name": "SCRUM-118",
+   "filePath": "examples/integrations/task-me-host/stale-ua-result.json",
+   "summary": "Task Me run artifact \"SCRUM-118\" (stale-ua-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/task-me-host/task-package.json",
+   "type": "config",
+   "name": "Task-Me host-mode contract validation",
+   "filePath": "examples/integrations/task-me-host/task-package.json",
+   "summary": "Task Me run artifact \"Task-Me host-mode contract validation\" (task-package.json, 1 lines) Top-level keys: schema_version, task_id, title, objective, output_folder, owner_root.",
+   "tags": [
+    "examples",
+    "json",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:examples/integrations/task-me-host/complete-request.json",
+   "target": "file:examples/integrations/task-me-host/complete-result.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/task-me-host/complete-result.json",
+   "target": "file:examples/integrations/task-me-host/cyclic-dag-result.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/task-me-host/cyclic-dag-result.json",
+   "target": "file:examples/integrations/task-me-host/partial-result.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/task-me-host/partial-result.json",
+   "target": "file:examples/integrations/task-me-host/stale-ua-result.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/task-me-host/stale-ua-result.json",
+   "target": "file:examples/integrations/task-me-host/task-package.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

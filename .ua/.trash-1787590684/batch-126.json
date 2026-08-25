@@ -1,0 +1,1255 @@
+{
+ "batchFiles": [
+  {
+   "path": "tests/test_g1_implementation_plan_handoff.py",
+   "language": "python",
+   "sizeLines": 212,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_g5_ci_verification_runtime.py",
+   "language": "python",
+   "sizeLines": 108,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_g5_status_resolver.py",
+   "language": "python",
+   "sizeLines": 80,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_gate_lifecycle_process_contract.py",
+   "language": "python",
+   "sizeLines": 173,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_github_g5_g6_jira_projection.py",
+   "language": "python",
+   "sizeLines": 17,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_graph_revision_schema_contracts.py",
+   "language": "python",
+   "sizeLines": 70,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_human_bypass_contract.py",
+   "language": "python",
+   "sizeLines": 235,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_human_takeover_packet.py",
+   "language": "python",
+   "sizeLines": 59,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_lease_expiry_recovery.py",
+   "language": "python",
+   "sizeLines": 63,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_no_plaintext_provider_credentials.py",
+   "language": "python",
+   "sizeLines": 75,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_node_architect_runtime_validation.py",
+   "language": "python",
+   "sizeLines": 200,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tests/test_g1_implementation_plan_handoff.py",
+   "type": "module",
+   "name": "test_g1_implementation_plan_handoff",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Python test module (test_g1_implementation_plan_handoff.py, 212 lines) covering g1 implementation plan handoff. Defines: load_module, ImplementationPlanHandoffTests.",
+   "tags": [
+    "g1",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_g1_implementation_plan_handoff.py:ImplementationPlanHandoffTests",
+   "type": "class",
+   "name": "ImplementationPlanHandoffTests",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Class ImplementationPlanHandoffTests defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:load_module",
+   "type": "function",
+   "name": "load_module",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function load_module defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_g2_requires_plan_read_receipt",
+   "type": "function",
+   "name": "test_g2_requires_plan_read_receipt",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_g2_requires_plan_read_receipt defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_base_drift_blocks",
+   "type": "function",
+   "name": "test_base_drift_blocks",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_base_drift_blocks defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_invalid_plan_status_blocks",
+   "type": "function",
+   "name": "test_invalid_plan_status_blocks",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_invalid_plan_status_blocks defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_complete_generated_kiro_fallback_passes",
+   "type": "function",
+   "name": "test_complete_generated_kiro_fallback_passes",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_complete_generated_kiro_fallback_passes defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_existing_plan_reuse_passes",
+   "type": "function",
+   "name": "test_existing_plan_reuse_passes",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_existing_plan_reuse_passes defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_missing_required_plan_field_blocks",
+   "type": "function",
+   "name": "test_missing_required_plan_field_blocks",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_missing_required_plan_field_blocks defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:plan",
+   "type": "function",
+   "name": "plan",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function plan defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_stale_revision_blocks",
+   "type": "function",
+   "name": "test_stale_revision_blocks",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_stale_revision_blocks defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g1_implementation_plan_handoff.py:test_plan_aware_schema_version_requires_pair",
+   "type": "function",
+   "name": "test_plan_aware_schema_version_requires_pair",
+   "filePath": "tests/test_g1_implementation_plan_handoff.py",
+   "summary": "Function test_plan_aware_schema_version_requires_pair defined in tests/test_g1_implementation_plan_handoff.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_g5_ci_verification_runtime.py",
+   "type": "module",
+   "name": "test_g5_ci_verification_runtime",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Python test module (test_g5_ci_verification_runtime.py, 108 lines) covering g5 ci verification runtime. Defines: evidence, run_validator, G5CiVerificationRuntimeTests.",
+   "tags": [
+    "g5",
+    "runtime",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_g5_ci_verification_runtime.py:G5CiVerificationRuntimeTests",
+   "type": "class",
+   "name": "G5CiVerificationRuntimeTests",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Class G5CiVerificationRuntimeTests defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:evidence",
+   "type": "function",
+   "name": "evidence",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function evidence defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:run_validator",
+   "type": "function",
+   "name": "run_validator",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function run_validator defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:test_success_rejects_sha_mismatch",
+   "type": "function",
+   "name": "test_success_rejects_sha_mismatch",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function test_success_rejects_sha_mismatch defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:test_failed_exact_run_is_failure",
+   "type": "function",
+   "name": "test_failed_exact_run_is_failure",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function test_failed_exact_run_is_failure defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:test_ci_pending_requires_checkpoint",
+   "type": "function",
+   "name": "test_ci_pending_requires_checkpoint",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function test_ci_pending_requires_checkpoint defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:test_sha_mismatch_requires_rejected_candidate",
+   "type": "function",
+   "name": "test_sha_mismatch_requires_rejected_candidate",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function test_sha_mismatch_requires_rejected_candidate defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:test_empty_lookup_is_observability_incomplete_not_pending",
+   "type": "function",
+   "name": "test_empty_lookup_is_observability_incomplete_not_pending",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function test_empty_lookup_is_observability_incomplete_not_pending defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_ci_verification_runtime.py:test_success_requires_exact_merge_sha_and_required_workflow",
+   "type": "function",
+   "name": "test_success_requires_exact_merge_sha_and_required_workflow",
+   "filePath": "tests/test_g5_ci_verification_runtime.py",
+   "summary": "Function test_success_requires_exact_merge_sha_and_required_workflow defined in tests/test_g5_ci_verification_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_g5_status_resolver.py",
+   "type": "module",
+   "name": "test_g5_status_resolver",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Python test module (test_g5_status_resolver.py, 80 lines) covering g5 status resolver. Defines: candidate, payload, G5StatusResolverTests.",
+   "tags": [
+    "g5",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_g5_status_resolver.py:G5StatusResolverTests",
+   "type": "class",
+   "name": "G5StatusResolverTests",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Class G5StatusResolverTests defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_status_resolver.py:payload",
+   "type": "function",
+   "name": "payload",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Function payload defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_status_resolver.py:candidate",
+   "type": "function",
+   "name": "candidate",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Function candidate defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_status_resolver.py:test_sha_mismatch_is_not_selected",
+   "type": "function",
+   "name": "test_sha_mismatch_is_not_selected",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Function test_sha_mismatch_is_not_selected defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_status_resolver.py:test_pending_requires_checkpoint",
+   "type": "function",
+   "name": "test_pending_requires_checkpoint",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Function test_pending_requires_checkpoint defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_status_resolver.py:test_empty_lookup_is_observability_gap",
+   "type": "function",
+   "name": "test_empty_lookup_is_observability_gap",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Function test_empty_lookup_is_observability_gap defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g5_status_resolver.py:test_exact_sha_success_is_valid",
+   "type": "function",
+   "name": "test_exact_sha_success_is_valid",
+   "filePath": "tests/test_g5_status_resolver.py",
+   "summary": "Function test_exact_sha_success_is_valid defined in tests/test_g5_status_resolver.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_gate_lifecycle_process_contract.py",
+   "type": "module",
+   "name": "test_gate_lifecycle_process_contract",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Python test module (test_gate_lifecycle_process_contract.py, 173 lines) covering gate lifecycle process contract: Regression tests for consolidated gate lifecycle process rules.. Defines: GateLifecycleProcessContractTests.",
+   "tags": [
+    "contract",
+    "gates",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_gate_lifecycle_process_contract.py:GateLifecycleProcessContractTests",
+   "type": "class",
+   "name": "GateLifecycleProcessContractTests",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Class GateLifecycleProcessContractTests defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_g5_is_status_check_when_cicd_handles_deployment",
+   "type": "function",
+   "name": "test_g5_is_status_check_when_cicd_handles_deployment",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_g5_is_status_check_when_cicd_handles_deployment defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:normalized_text",
+   "type": "function",
+   "name": "normalized_text",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function normalized_text defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_approval_evidence_is_sanitized",
+   "type": "function",
+   "name": "test_approval_evidence_is_sanitized",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_approval_evidence_is_sanitized defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_work_tracking_sync_and_late_reconciliation_are_required",
+   "type": "function",
+   "name": "test_work_tracking_sync_and_late_reconciliation_are_required",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_work_tracking_sync_and_late_reconciliation_are_required defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_g3_async_ci_continuation_uses_environment_aware_mechanism",
+   "type": "function",
+   "name": "test_g3_async_ci_continuation_uses_environment_aware_mechanism",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_g3_async_ci_continuation_uses_environment_aware_mechanism defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_ready_for_review_is_g3_metadata_completion",
+   "type": "function",
+   "name": "test_ready_for_review_is_g3_metadata_completion",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_ready_for_review_is_g3_metadata_completion defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_g4_ready_for_review_precheck_blocks_draft_pr_merge",
+   "type": "function",
+   "name": "test_g4_ready_for_review_precheck_blocks_draft_pr_merge",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_g4_ready_for_review_precheck_blocks_draft_pr_merge defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_gwc_uses_direct_jira_mcp_for_new_tasks",
+   "type": "function",
+   "name": "test_gwc_uses_direct_jira_mcp_for_new_tasks",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_gwc_uses_direct_jira_mcp_for_new_tasks defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_chatgpt_gwc_responses_are_vietnamese_first",
+   "type": "function",
+   "name": "test_chatgpt_gwc_responses_are_vietnamese_first",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_chatgpt_gwc_responses_are_vietnamese_first defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_gate_lifecycle_process_contract.py:test_g6_is_not_generated_without_production_operation_scope",
+   "type": "function",
+   "name": "test_g6_is_not_generated_without_production_operation_scope",
+   "filePath": "tests/test_gate_lifecycle_process_contract.py",
+   "summary": "Function test_g6_is_not_generated_without_production_operation_scope defined in tests/test_gate_lifecycle_process_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_github_g5_g6_jira_projection.py",
+   "type": "module",
+   "name": "test_github_g5_g6_jira_projection",
+   "filePath": "tests/test_github_g5_g6_jira_projection.py",
+   "summary": "Python test module (test_github_g5_g6_jira_projection.py, 17 lines) covering github g5 g6 jira projection. Defines: rec, T.",
+   "tags": [
+    "g5",
+    "g6",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_graph_revision_schema_contracts.py",
+   "type": "module",
+   "name": "test_graph_revision_schema_contracts",
+   "filePath": "tests/test_graph_revision_schema_contracts.py",
+   "summary": "Python test module (test_graph_revision_schema_contracts.py, 70 lines) covering graph revision schema contracts. Defines: load, GraphRevisionSchemaTests.",
+   "tags": [
+    "contract",
+    "schema",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_human_bypass_contract.py",
+   "type": "module",
+   "name": "test_human_bypass_contract",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Python test module (test_human_bypass_contract.py, 235 lines) covering human bypass contract. Defines: load_schema, load_module, valid_record, HumanBypassSchemaTests, G1FeasibilityValidatorTests.",
+   "tags": [
+    "contract",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_human_bypass_contract.py:G1FeasibilityValidatorTests",
+   "type": "class",
+   "name": "G1FeasibilityValidatorTests",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Class G1FeasibilityValidatorTests defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tests/test_human_bypass_contract.py:HumanBypassSchemaTests",
+   "type": "class",
+   "name": "HumanBypassSchemaTests",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Class HumanBypassSchemaTests defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:load_schema",
+   "type": "function",
+   "name": "load_schema",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function load_schema defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:valid_record",
+   "type": "function",
+   "name": "valid_record",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function valid_record defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:load_module",
+   "type": "function",
+   "name": "load_module",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function load_module defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:test_duplicate_acceptance_is_idempotent_only_for_same_binding",
+   "type": "function",
+   "name": "test_duplicate_acceptance_is_idempotent_only_for_same_binding",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function test_duplicate_acceptance_is_idempotent_only_for_same_binding defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:test_eligible_bypass_with_readback_passes",
+   "type": "function",
+   "name": "test_eligible_bypass_with_readback_passes",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function test_eligible_bypass_with_readback_passes defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:errors",
+   "type": "function",
+   "name": "errors",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function errors defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:test_forbidden_bypass_is_excluded_by_contract",
+   "type": "function",
+   "name": "test_forbidden_bypass_is_excluded_by_contract",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function test_forbidden_bypass_is_excluded_by_contract defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:test_expiry_is_terminal_and_not_success",
+   "type": "function",
+   "name": "test_expiry_is_terminal_and_not_success",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function test_expiry_is_terminal_and_not_success defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:test_runtime_event_requires_bypass_binding",
+   "type": "function",
+   "name": "test_runtime_event_requires_bypass_binding",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function test_runtime_event_requires_bypass_binding defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_human_bypass_contract.py:valid_preflight",
+   "type": "function",
+   "name": "valid_preflight",
+   "filePath": "tests/test_human_bypass_contract.py",
+   "summary": "Function valid_preflight defined in tests/test_human_bypass_contract.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_human_takeover_packet.py",
+   "type": "module",
+   "name": "test_human_takeover_packet",
+   "filePath": "tests/test_human_takeover_packet.py",
+   "summary": "Python test module (test_human_takeover_packet.py, 59 lines) covering human takeover packet. Defines: HumanTakeoverPacketTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_lease_expiry_recovery.py",
+   "type": "module",
+   "name": "test_lease_expiry_recovery",
+   "filePath": "tests/test_lease_expiry_recovery.py",
+   "summary": "Python test module (test_lease_expiry_recovery.py, 63 lines) covering lease expiry recovery. Defines: decide, LeaseExpiryRecoveryTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_no_plaintext_provider_credentials.py",
+   "type": "module",
+   "name": "test_no_plaintext_provider_credentials",
+   "filePath": "tests/test_no_plaintext_provider_credentials.py",
+   "summary": "Python test module (test_no_plaintext_provider_credentials.py, 75 lines) covering no plaintext provider credentials. Defines: NoPlaintextProviderCredentialsTest.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_node_architect_runtime_validation.py",
+   "type": "module",
+   "name": "test_node_architect_runtime_validation",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Python test module (test_node_architect_runtime_validation.py, 200 lines) covering node architect runtime validation: Tests for the GWC node-architect runtime validator harness.. Defines: write_json, run_tool, NodeArchitectRuntimeValidationTests.",
+   "tags": [
+    "nodes",
+    "runtime",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_node_architect_runtime_validation.py:NodeArchitectRuntimeValidationTests",
+   "type": "class",
+   "name": "NodeArchitectRuntimeValidationTests",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Class NodeArchitectRuntimeValidationTests defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:run_tool",
+   "type": "function",
+   "name": "run_tool",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function run_tool defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:write_json",
+   "type": "function",
+   "name": "write_json",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function write_json defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:test_simulation_blocks_merge_without_g4_gate",
+   "type": "function",
+   "name": "test_simulation_blocks_merge_without_g4_gate",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function test_simulation_blocks_merge_without_g4_gate defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:test_full_repository_catalog_compiles_and_validates",
+   "type": "function",
+   "name": "test_full_repository_catalog_compiles_and_validates",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function test_full_repository_catalog_compiles_and_validates defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:test_compile_validate_and_simulate_pass",
+   "type": "function",
+   "name": "test_compile_validate_and_simulate_pass",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function test_compile_validate_and_simulate_pass defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:test_projection_cannot_be_canonical_authority",
+   "type": "function",
+   "name": "test_projection_cannot_be_canonical_authority",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function test_projection_cannot_be_canonical_authority defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_architect_runtime_validation.py:test_validate_fails_duplicate_nodes",
+   "type": "function",
+   "name": "test_validate_fails_duplicate_nodes",
+   "filePath": "tests/test_node_architect_runtime_validation.py",
+   "summary": "Function test_validate_fails_duplicate_nodes defined in tests/test_node_architect_runtime_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "class:tests/test_g1_implementation_plan_handoff.py:ImplementationPlanHandoffTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:load_module",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_g2_requires_plan_read_receipt",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_base_drift_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_invalid_plan_status_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_complete_generated_kiro_fallback_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_existing_plan_reuse_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_missing_required_plan_field_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:plan",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_stale_revision_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g1_implementation_plan_handoff.py",
+   "target": "function:tests/test_g1_implementation_plan_handoff.py:test_plan_aware_schema_version_requires_pair",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "class:tests/test_g5_ci_verification_runtime.py:G5CiVerificationRuntimeTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:evidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:run_validator",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:test_success_rejects_sha_mismatch",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:test_failed_exact_run_is_failure",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:test_ci_pending_requires_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:test_sha_mismatch_requires_rejected_candidate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:test_empty_lookup_is_observability_incomplete_not_pending",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_ci_verification_runtime.py",
+   "target": "function:tests/test_g5_ci_verification_runtime.py:test_success_requires_exact_merge_sha_and_required_workflow",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "class:tests/test_g5_status_resolver.py:G5StatusResolverTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "function:tests/test_g5_status_resolver.py:payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "function:tests/test_g5_status_resolver.py:candidate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "function:tests/test_g5_status_resolver.py:test_sha_mismatch_is_not_selected",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "function:tests/test_g5_status_resolver.py:test_pending_requires_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "function:tests/test_g5_status_resolver.py:test_empty_lookup_is_observability_gap",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g5_status_resolver.py",
+   "target": "function:tests/test_g5_status_resolver.py:test_exact_sha_success_is_valid",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "class:tests/test_gate_lifecycle_process_contract.py:GateLifecycleProcessContractTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_g5_is_status_check_when_cicd_handles_deployment",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:normalized_text",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_approval_evidence_is_sanitized",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_work_tracking_sync_and_late_reconciliation_are_required",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_g3_async_ci_continuation_uses_environment_aware_mechanism",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_ready_for_review_is_g3_metadata_completion",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_g4_ready_for_review_precheck_blocks_draft_pr_merge",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_gwc_uses_direct_jira_mcp_for_new_tasks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_chatgpt_gwc_responses_are_vietnamese_first",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_gate_lifecycle_process_contract.py",
+   "target": "function:tests/test_gate_lifecycle_process_contract.py:test_g6_is_not_generated_without_production_operation_scope",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "class:tests/test_human_bypass_contract.py:G1FeasibilityValidatorTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "class:tests/test_human_bypass_contract.py:HumanBypassSchemaTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:load_schema",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:valid_record",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:load_module",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:test_duplicate_acceptance_is_idempotent_only_for_same_binding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:test_eligible_bypass_with_readback_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:errors",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:test_forbidden_bypass_is_excluded_by_contract",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:test_expiry_is_terminal_and_not_success",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:test_runtime_event_requires_bypass_binding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_human_bypass_contract.py",
+   "target": "function:tests/test_human_bypass_contract.py:valid_preflight",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "class:tests/test_node_architect_runtime_validation.py:NodeArchitectRuntimeValidationTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:run_tool",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:write_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:test_simulation_blocks_merge_without_g4_gate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:test_full_repository_catalog_compiles_and_validates",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:test_compile_validate_and_simulate_pass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:test_projection_cannot_be_canonical_authority",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_architect_runtime_validation.py",
+   "target": "function:tests/test_node_architect_runtime_validation.py:test_validate_fails_duplicate_nodes",
+   "type": "contains",
+   "weight": 0.9
+  }
+ ]
+}

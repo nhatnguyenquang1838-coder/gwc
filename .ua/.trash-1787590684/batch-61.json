@@ -1,0 +1,186 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 110,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/RUNTIME_KERNEL_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 112,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/decision-rule-registry.json",
+   "language": "json",
+   "sizeLines": 46,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-registry.json",
+   "language": "json",
+   "sizeLines": 0,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/profile-registry.json",
+   "language": "json",
+   "sizeLines": 29,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/runtime-graph-registry.json",
+   "language": "json",
+   "sizeLines": 176,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/scenario-registry.json",
+   "language": "json",
+   "sizeLines": 835,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md",
+   "type": "document",
+   "name": "Durable Runtime Store Contract v0.1",
+   "filePath": "core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md",
+   "summary": "Markdown document \"Durable Runtime Store Contract v0.1\" (guideline/contract, 110 lines): This contract connects the existing `RUNTIME_KERNEL@0.1`, runtime event, checkpoint, transition-envelope, and node-pack primitives into one durable store boundary. It defines logical operations and correctness rules for future implementations. It does not implement a worker, scheduler, adapter,",
+   "tags": [
+    "contract",
+    "core",
+    "documentation",
+    "nodes",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/node-architect/RUNTIME_KERNEL_v0.1.md",
+   "type": "document",
+   "name": "Runtime Kernel v0.1",
+   "filePath": "core/node-architect/RUNTIME_KERNEL_v0.1.md",
+   "summary": "Markdown document \"Runtime Kernel v0.1\" (document, 112 lines): - Kernel ID: `RUNTIME_KERNEL` - Version: `0.1` - Scope: `REVAMP_UPGRADE_GWC` - Introduced by: `REVAMP-GWC-009` - Lifecycle: additive node-architect runtime contract",
+   "tags": [
+    "core",
+    "documentation",
+    "nodes",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/node-architect/decision-rule-registry.json",
+   "type": "config",
+   "name": "workflow-run-missing",
+   "filePath": "core/node-architect/decision-rule-registry.json",
+   "summary": "registry data \"workflow-run-missing\" (decision-rule-registry.json, 46 lines) Top-level keys: artifact_type, provenance, registry_id, revision, rules, schema_version.",
+   "tags": [
+    "core",
+    "json",
+    "nodes",
+    "registry"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-registry.json",
+   "type": "config",
+   "name": "failure_recovery.approval-expiry-recovery",
+   "filePath": "core/node-architect/node-registry.json",
+   "summary": "registry data \"failure_recovery.approval-expiry-recovery\" (node-registry.json, 1 lines) Top-level keys: artifact_type, declared_slot_count, nodes, provenance, registry_id, revision.",
+   "tags": [
+    "core",
+    "json",
+    "nodes",
+    "registry"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/profile-registry.json",
+   "type": "config",
+   "name": "full-flow-v3",
+   "filePath": "core/node-architect/profile-registry.json",
+   "summary": "registry data \"full-flow-v3\" (profile-registry.json, 29 lines) Top-level keys: artifact_type, profiles, provenance, registry_id, revision, schema_version.",
+   "tags": [
+    "core",
+    "json",
+    "nodes",
+    "registry"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/runtime-graph-registry.json",
+   "type": "config",
+   "name": "runtime graph registry",
+   "filePath": "core/node-architect/runtime-graph-registry.json",
+   "summary": "registry data \"runtime graph registry\" (runtime-graph-registry.json, 176 lines) Top-level keys: artifact_type, edges, graph_id, nodes, provenance, revision.",
+   "tags": [
+    "core",
+    "json",
+    "nodes",
+    "registry",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/node-architect/scenario-registry.json",
+   "type": "config",
+   "name": "scenario registry",
+   "filePath": "core/node-architect/scenario-registry.json",
+   "summary": "registry data \"scenario registry\" (scenario-registry.json, 835 lines) Top-level keys: artifact_type, declared_scenario_count, materialized_scenario_count, provenance, registry_id, revision.",
+   "tags": [
+    "core",
+    "json",
+    "nodes",
+    "registry"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:core/node-architect/DURABLE_RUNTIME_STORE_CONTRACT_v0.1.md",
+   "target": "file:core/node-architect/RUNTIME_KERNEL_v0.1.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/RUNTIME_KERNEL_v0.1.md",
+   "target": "file:core/node-architect/decision-rule-registry.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/decision-rule-registry.json",
+   "target": "file:core/node-architect/node-registry.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/node-registry.json",
+   "target": "file:core/node-architect/profile-registry.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/profile-registry.json",
+   "target": "file:core/node-architect/runtime-graph-registry.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/runtime-graph-registry.json",
+   "target": "file:core/node-architect/scenario-registry.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

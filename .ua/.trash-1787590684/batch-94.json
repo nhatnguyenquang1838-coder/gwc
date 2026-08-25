@@ -1,0 +1,253 @@
+{
+ "batchFiles": [
+  {
+   "path": "releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md",
+   "language": "markdown",
+   "sizeLines": 21,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-22-security-credential-remediation.md",
+   "language": "markdown",
+   "sizeLines": 25,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-base-drift-interrupt-flow.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md",
+   "language": "markdown",
+   "sizeLines": 21,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-scrum-68-node-registry-authority-consistency.md",
+   "language": "markdown",
+   "sizeLines": 17,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-scrum-69-g5-connector-observability.md",
+   "language": "markdown",
+   "sizeLines": 27,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md",
+   "language": "markdown",
+   "sizeLines": 20,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-23-scrum-76-fastlane-jira-projection.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-24-gwc-power-distribution.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md",
+   "type": "document",
+   "name": "REVAMP-GWC-022 — sync projection node family",
+   "filePath": "releases/changelog.d/2026-07-22-revamp-gwc-022-sync-projection.md",
+   "summary": "Markdown document \"REVAMP-GWC-022 — sync projection node family\" (changelog entry, 21 lines): Adds the sixth controlled node catalog batch for audit-only synchronization and projection behavior.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-22-security-credential-remediation.md",
+   "type": "document",
+   "name": "Security remediation — plaintext provider credential",
+   "filePath": "releases/changelog.d/2026-07-22-security-credential-remediation.md",
+   "summary": "Markdown document \"Security remediation — plaintext provider credential\" (changelog entry, 25 lines): Removes a plaintext Alibaba provider credential from the Continue example configuration and replaces it with a Continue secret reference.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-base-drift-interrupt-flow.md",
+   "type": "document",
+   "name": "Base drift interrupt flow",
+   "filePath": "releases/changelog.d/2026-07-23-base-drift-interrupt-flow.md",
+   "summary": "Markdown document \"Base drift interrupt flow\" (changelog entry, 7 lines): - Add `core/INTERRUPT_FLOW_CONTRACT_v1.0.md` to define shared interrupt, checkpoint, resume, reroute, and stop semantics. - Extend base-drift policy and evaluator output with reason codes, authority effects, evidence effects, and continuation modes. - Add interrupt frame and node-interruptibility",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md",
+   "type": "document",
+   "name": "G1 execution feasibility and HUMAN BYPASS",
+   "filePath": "releases/changelog.d/2026-07-23-g1-feasibility-human-bypass.md",
+   "summary": "Markdown document \"G1 execution feasibility and HUMAN BYPASS\" (changelog entry, 6 lines): - Require G1 process readback and an end-to-end execution-feasibility route matrix before G1 PASS. - Fail closed when a mandatory route step has an unknown or hard-blocked capability, lacks continuation, or cannot produce deterministic evidence. - Add a one-time, step-bound HUMAN BYPASS record with",
+   "tags": [
+    "changelog",
+    "documentation",
+    "g1",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md",
+   "type": "document",
+   "name": "REVAMP-GWC-023 — package export node family",
+   "filePath": "releases/changelog.d/2026-07-23-revamp-gwc-023-package-export.md",
+   "summary": "Markdown document \"REVAMP-GWC-023 — package export node family\" (changelog entry, 21 lines): Adds the seventh controlled node catalog batch for deterministic package build, export, manifest, readback, and smoke verification behavior.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md",
+   "type": "document",
+   "name": "REVAMP-GWC-024 — Failure recovery node family",
+   "filePath": "releases/changelog.d/2026-07-23-revamp-gwc-024-failure-recovery.md",
+   "summary": "Markdown document \"REVAMP-GWC-024 — Failure recovery node family\" (changelog entry, 5 lines): Adds Batch 08 `failure_recovery` with exactly nine runtime-node descriptors for timeout, crash, stale-session reconciliation, ambiguous-write readback, CAS conflict, lease/approval expiry, duplicate-agent fencing, and version-drift rollback routing.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md",
+   "type": "document",
+   "name": "REVAMP-GWC-025 — scale_control node catalog",
+   "filePath": "releases/changelog.d/2026-07-23-revamp-gwc-025-scale-control.md",
+   "summary": "Markdown document \"REVAMP-GWC-025 — scale_control node catalog\" (changelog entry, 6 lines): - Adds the ninth controlled node family with nine descriptors for admission, cardinality, throttling, exact-head observability, rollout projection, and independent-audit handoff. - Completes the package export surface for 81 unique runtime nodes while keeping `scale_81_nodes_allowed` false pending",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-scrum-68-node-registry-authority-consistency.md",
+   "type": "document",
+   "name": "2026 07 23 scrum 68 node registry authority consistency",
+   "filePath": "releases/changelog.d/2026-07-23-scrum-68-node-registry-authority-consistency.md",
+   "summary": "Markdown document \"2026 07 23 scrum 68 node registry authority consistency\" (changelog entry, 17 lines): - Align all `sync_projection` descriptors with the global runtime registry invariant by setting `authority_boundary: read_only` while retaining G2/G3 applicability metadata. - Align the `scale_control.workflow-run-observability` and `scale_control.rollout-progress-projection` audit projections with",
+   "tags": [
+    "changelog",
+    "documentation",
+    "nodes",
+    "registry",
+    "release"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-scrum-69-g5-connector-observability.md",
+   "type": "document",
+   "name": "2026 07 23 scrum 69 g5 connector observability",
+   "filePath": "releases/changelog.d/2026-07-23-scrum-69-g5-connector-observability.md",
+   "summary": "Markdown document \"2026 07 23 scrum 69 g5 connector observability\" (changelog entry, 27 lines): - Exact post-merge verification procedure for read-only `G5_STATUS_VERIFY`: agents must first attempt `event=push`, `branch=main`, and `head_sha=<merge_sha>` lookup, then fall back to known `run_id` and direct jobs/artifacts lookup when the connector surface does not support those filters or",
+   "tags": [
+    "changelog",
+    "documentation",
+    "g5",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md",
+   "type": "document",
+   "name": "2026 07 23 scrum 75 g5 ci kg normalization",
+   "filePath": "releases/changelog.d/2026-07-23-scrum-75-g5-ci-kg-normalization.md",
+   "summary": "Markdown document \"2026 07 23 scrum 75 g5 ci kg normalization\" (changelog entry, 20 lines): - `core/G5_CI_VERIFICATION_CONTRACT_v1.0.md` for exact merge-SHA GitHub Actions run resolution, fallback routing, checkpointing, and G5 evidence classification. - `core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md` to standardize Gate, Capability Family, Runtime Node, Edge Scenario, and",
+   "tags": [
+    "changelog",
+    "documentation",
+    "g5",
+    "release",
+    "releases"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-23-scrum-76-fastlane-jira-projection.md",
+   "type": "document",
+   "name": "SCRUM-76 — FastLane Jira projection after G5 PASS",
+   "filePath": "releases/changelog.d/2026-07-23-scrum-76-fastlane-jira-projection.md",
+   "summary": "Markdown document \"SCRUM-76 — FastLane Jira projection after G5 PASS\" (changelog entry, 6 lines): - Require FastLane/E2E delivery to project final G5 PASS state to the active work-tracking provider. - Require Jira audit comment, legal transition, readback evidence, and final report binding when provider access is available. - Require explicit `JIRA_UPDATE_BLOCKED` late-reconciliation evidence",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-24-gwc-power-distribution.md",
+   "type": "document",
+   "name": "GWC skills-only Power distribution",
+   "filePath": "releases/changelog.d/2026-07-24-gwc-power-distribution.md",
+   "summary": "Markdown document \"GWC skills-only Power distribution\" (changelog entry, 8 lines): - Added a strict GWC G0/G1 skills-only provider recipe for DW Power Distribution v1. - Added host-neutral runtime defaults and a JSON Schema contract. - Added a reusable publishing workflow pinned to DW-SuperApps commit `4e552ea3d915a4790814b08b3155c66e3c5736a1`. - Added provider tests for",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "schema"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

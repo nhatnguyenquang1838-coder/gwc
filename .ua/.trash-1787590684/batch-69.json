@@ -1,0 +1,209 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/README.md",
+   "language": "markdown",
+   "sizeLines": 57,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/sync_projection/task-center-sync.node.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/README.md",
+   "type": "document",
+   "name": "sync_projection node family",
+   "filePath": "core/node-architect/node-catalog/sync_projection/README.md",
+   "summary": "Markdown document \"sync_projection node family\" (document, 57 lines): Task: `REVAMP-GWC-022` Batch: `batch-06-sync-projection` Family: `sync_projection` Planned nodes: 9 Authority boundary: `read_only`; applicability gates: `G2_EXECUTION_G3_PR`",
+   "tags": [
+    "catalog",
+    "core",
+    "documentation",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json",
+   "type": "config",
+   "name": "DS Admin State Projection",
+   "filePath": "core/node-architect/node-catalog/sync_projection/ds-admin-state-projection.node.json",
+   "summary": "JSON data file \"DS Admin State Projection\" (ds-admin-state-projection.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json",
+   "type": "config",
+   "name": "External Audit Event Projection",
+   "filePath": "core/node-architect/node-catalog/sync_projection/external-audit-event-projection.node.json",
+   "summary": "JSON data file \"External Audit Event Projection\" (external-audit-event-projection.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "audit",
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json",
+   "type": "config",
+   "name": "Projection Drift Detection",
+   "filePath": "core/node-architect/node-catalog/sync_projection/projection-drift-detection.node.json",
+   "summary": "JSON data file \"Projection Drift Detection\" (projection-drift-detection.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json",
+   "type": "config",
+   "name": "Projection Evidence Linking",
+   "filePath": "core/node-architect/node-catalog/sync_projection/projection-evidence-linking.node.json",
+   "summary": "JSON data file \"Projection Evidence Linking\" (projection-evidence-linking.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json",
+   "type": "config",
+   "name": "Projection Failure Routing",
+   "filePath": "core/node-architect/node-catalog/sync_projection/projection-failure-routing.node.json",
+   "summary": "JSON data file \"Projection Failure Routing\" (projection-failure-routing.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json",
+   "type": "config",
+   "name": "Projection Privacy Boundary Check",
+   "filePath": "core/node-architect/node-catalog/sync_projection/projection-privacy-boundary-check.node.json",
+   "summary": "JSON data file \"Projection Privacy Boundary Check\" (projection-privacy-boundary-check.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json",
+   "type": "config",
+   "name": "Projection Reconcile Readback",
+   "filePath": "core/node-architect/node-catalog/sync_projection/projection-reconcile-readback.node.json",
+   "summary": "JSON data file \"Projection Reconcile Readback\" (projection-reconcile-readback.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json",
+   "type": "config",
+   "name": "Projection Source Authority Check",
+   "filePath": "core/node-architect/node-catalog/sync_projection/projection-source-authority-check.node.json",
+   "summary": "JSON data file \"Projection Source Authority Check\" (projection-source-authority-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/sync_projection/task-center-sync.node.json",
+   "type": "config",
+   "name": "Task Center Sync",
+   "filePath": "core/node-architect/node-catalog/sync_projection/task-center-sync.node.json",
+   "summary": "JSON data file \"Task Center Sync\" (task-center-sync.node.json, 12 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

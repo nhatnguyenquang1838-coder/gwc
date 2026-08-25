@@ -1,0 +1,123 @@
+{
+ "batchFiles": [
+  {
+   "path": "AGENTS.md",
+   "language": "markdown",
+   "sizeLines": 551,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "BUNDLE-REPORT.json",
+   "language": "json",
+   "sizeLines": 26,
+   "fileCategory": "config"
+  },
+  {
+   "path": "README.md",
+   "language": "markdown",
+   "sizeLines": 239,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "SHA256SUMS.txt",
+   "language": "txt",
+   "sizeLines": 782,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "TREE.txt",
+   "language": "txt",
+   "sizeLines": 793,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:AGENTS.md",
+   "type": "document",
+   "name": "AGENTS.md — Instruction Governance Repository",
+   "filePath": "AGENTS.md",
+   "summary": "Markdown document \"AGENTS.md — Instruction Governance Repository\" (document, 551 lines): 1. System, platform, developer, and active project runtime instructions 2. `core/Coding_Project_Governance_v1.0.md` 3. `core/GATE_LIFECYCLE_CONTRACT_v1.0.md` 4. Active `projects/<project-id>/project-profile.yaml` 5. `projects/<project-id>/project-extension.md` 6.",
+   "tags": [
+    "agents.md",
+    "agents",
+    "documentation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:BUNDLE-REPORT.json",
+   "type": "config",
+   "name": "BUNDLE REPORT",
+   "filePath": "BUNDLE-REPORT.json",
+   "summary": "JSON data file \"BUNDLE REPORT\" (BUNDLE-REPORT.json, 26 lines) Top-level keys: schema_version, bundle, repository, base_ref, base_sha, package_definition.",
+   "tags": [
+    "bundle-report.json",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:README.md",
+   "type": "document",
+   "name": "GWC — Governed Workflow Control",
+   "filePath": "README.md",
+   "summary": "Markdown document \"GWC — Governed Workflow Control\" (document, 239 lines): GWC is a Git-based governance and delivery control plane for project instructions, gate policy, authority checks, task evidence, deterministic runtime routing, validation, release packages, projections, and post-merge verification.",
+   "tags": [
+    "readme.md",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:SHA256SUMS.txt",
+   "type": "resource",
+   "name": "SHA256SUMS",
+   "filePath": "SHA256SUMS.txt",
+   "summary": "Plain-text file (SHA256SUMS.txt, 782 lines).",
+   "tags": [
+    "sha256sums.txt",
+    "documentation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:TREE.txt",
+   "type": "resource",
+   "name": "TREE",
+   "filePath": "TREE.txt",
+   "summary": "Plain-text file (TREE.txt, 793 lines).",
+   "tags": [
+    "tree.txt",
+    "documentation"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:AGENTS.md",
+   "target": "file:BUNDLE-REPORT.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:BUNDLE-REPORT.json",
+   "target": "file:README.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:README.md",
+   "target": "file:SHA256SUMS.txt",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:SHA256SUMS.txt",
+   "target": "file:TREE.txt",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

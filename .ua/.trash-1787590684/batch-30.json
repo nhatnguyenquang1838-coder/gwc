@@ -1,0 +1,78 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/design.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/requirements.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/tasks.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/design.md",
+   "type": "document",
+   "name": "SCRUM-110 Design",
+   "filePath": ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/design.md",
+   "summary": "Markdown document \"SCRUM-110 Design\" (specification, 3 lines): The provider-neutral harness composes exact-state capture, bounded-write classification and durable checkpoint/CAS/lease/fencing primitives. Crash injection is deterministic and side-effect free. Human takeover is emitted only when live state cannot prove PASS or safe retry. The v3 history adapter",
+   "tags": [
+    "documentation",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/requirements.md",
+   "type": "document",
+   "name": "SCRUM-110 Requirements",
+   "filePath": ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/requirements.md",
+   "summary": "Markdown document \"SCRUM-110 Requirements\" (specification, 7 lines): - Inject crashes at canonical B0-B5 boundaries. - Execute all 27 SCRUM-106 scenarios deterministically. - Prevent stale-worker checkpoint writes and duplicate external effects. - Produce audited human-takeover packets for ambiguous state. - Project durable run, event and checkpoint history to",
+   "tags": [
+    "documentation",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/tasks.md",
+   "type": "document",
+   "name": "SCRUM-110 Tasks",
+   "filePath": ".kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/tasks.md",
+   "summary": "Markdown document \"SCRUM-110 Tasks\" (specification, 8 lines): - [x] Implement B0-B5 crash/replay harness. - [x] Verify all 27 scenario rows and replay invariants. - [x] Implement human-takeover packet and bounded decisions. - [x] Implement durable run-history Cytoscape adapter. - [x] Add focused tests. - [ ] Validate full repository in authoritative CI.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/design.md",
+   "target": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/requirements.md",
+   "target": "file:.kiro/specs/scrum-110-crash-replay-human-takeover-v3-history/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

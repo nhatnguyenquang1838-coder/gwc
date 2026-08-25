@@ -1,0 +1,99 @@
+{
+ "batchFiles": [
+  {
+   "path": "projects/gwc/package.yaml",
+   "language": "yaml",
+   "sizeLines": 298,
+   "fileCategory": "config"
+  },
+  {
+   "path": "projects/gwc/project-extension.md",
+   "language": "markdown",
+   "sizeLines": 79,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "projects/gwc/project-instructions.md",
+   "language": "markdown",
+   "sizeLines": 147,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "projects/gwc/project-profile.yaml",
+   "language": "yaml",
+   "sizeLines": 80,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:projects/gwc/package.yaml",
+   "type": "config",
+   "name": "package",
+   "filePath": "projects/gwc/package.yaml",
+   "summary": "YAML configuration (package.yaml, 298 lines). Top-level keys: schema_version, project_id, package_version, status, profile, instructions.",
+   "tags": [
+    "projects",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:projects/gwc/project-extension.md",
+   "type": "document",
+   "name": "GWC Project Extension",
+   "filePath": "projects/gwc/project-extension.md",
+   "summary": "Markdown document \"GWC Project Extension\" (document, 79 lines): - Extends: `projects/gwc/project-profile.yaml` - Scope: `nhatnguyenquang1838-coder/gwc` - Runtime: DWC - Authority: non-authoritative relative to system, platform, developer, and canonical core policy",
+   "tags": [
+    "documentation",
+    "projects"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:projects/gwc/project-instructions.md",
+   "type": "document",
+   "name": "GWC Project Instructions",
+   "filePath": "projects/gwc/project-instructions.md",
+   "summary": "Markdown document \"GWC Project Instructions\" (document, 147 lines): - Project ID: `gwc` - Repository: `nhatnguyenquang1838-coder/gwc` - Runtime agent: `DWC` - Work-tracking source of truth for new tasks: Jira via Atlassian MCP - Existing DS Admin and Rental Home tasks are not migrated - GWC gate artifacts remain authoritative for G0-G6 evidence and approvals",
+   "tags": [
+    "documentation",
+    "instructions",
+    "projects"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:projects/gwc/project-profile.yaml",
+   "type": "config",
+   "name": "project-profile",
+   "filePath": "projects/gwc/project-profile.yaml",
+   "summary": "YAML configuration (project-profile.yaml, 80 lines). Top-level keys: version, profile_id, project, repository, connectors, context.",
+   "tags": [
+    "projects",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:projects/gwc/package.yaml",
+   "target": "file:projects/gwc/project-extension.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:projects/gwc/project-extension.md",
+   "target": "file:projects/gwc/project-instructions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:projects/gwc/project-instructions.md",
+   "target": "file:projects/gwc/project-profile.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

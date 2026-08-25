@@ -1,0 +1,137 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/intake_context/README.md",
+   "language": "markdown",
+   "sizeLines": 90,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+   "language": "json",
+   "sizeLines": 22,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+   "language": "json",
+   "sizeLines": 36,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+   "language": "json",
+   "sizeLines": 33,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/intake_context/source-resolution.node.json",
+   "language": "json",
+   "sizeLines": 37,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/intake_context/README.md",
+   "type": "document",
+   "name": "Intake Context Node Family v0.1",
+   "filePath": "core/node-architect/node-catalog/intake_context/README.md",
+   "summary": "Markdown document \"Intake Context Node Family v0.1\" (document, 90 lines): ```text Task: REVAMP-GWC-016 Batch: batch-01-intake-context Family: intake_context Authority boundary: G0_CONTEXT Planned nodes: 9 Runtime behavior change: none",
+   "tags": [
+    "catalog",
+    "core",
+    "documentation",
+    "intake",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+   "type": "config",
+   "name": "Protected Base Capture",
+   "filePath": "core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+   "summary": "JSON data file \"Protected Base Capture\" (protected-base-capture.node.json, 22 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "capture",
+    "catalog",
+    "core",
+    "intake",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+   "type": "config",
+   "name": "Repository Identity Check",
+   "filePath": "core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+   "summary": "JSON data file \"Repository Identity Check\" (repo-identity-check.node.json, 36 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "intake",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/intake_context/request-intake.node.json",
+   "type": "config",
+   "name": "Request Intake",
+   "filePath": "core/node-architect/node-catalog/intake_context/request-intake.node.json",
+   "summary": "JSON data file \"Request Intake\" (request-intake.node.json, 33 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "intake",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/intake_context/source-resolution.node.json",
+   "type": "config",
+   "name": "Source Resolution",
+   "filePath": "core/node-architect/node-catalog/intake_context/source-resolution.node.json",
+   "summary": "JSON data file \"Source Resolution\" (source-resolution.node.json, 37 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "intake",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:core/node-architect/node-catalog/intake_context/README.md",
+   "target": "file:core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/node-catalog/intake_context/protected-base-capture.node.json",
+   "target": "file:core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/node-catalog/intake_context/repo-identity-check.node.json",
+   "target": "file:core/node-architect/node-catalog/intake_context/request-intake.node.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/node-architect/node-catalog/intake_context/request-intake.node.json",
+   "target": "file:core/node-architect/node-catalog/intake_context/source-resolution.node.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,77 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md",
+   "language": "markdown",
+   "sizeLines": 107,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md",
+   "language": "markdown",
+   "sizeLines": 75,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md",
+   "language": "markdown",
+   "sizeLines": 59,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 107 lines): The implementation extends GWC with provider-owned distribution metadata only. It reuses the deterministic builder, portable runtime, schemas, and reusable workflow already implemented in DW-SuperApps. Existing GWC skills and governance contracts are packaged by allowlist without modifying their behavior.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "schema"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 75 lines): DW-PDIST-02 adds a governed, skills-only GWC provider package for DW Power Distribution v1. The package must be installable without cloning the GWC development repository, must preserve GWC authority boundaries, and must not contain task evidence, generated plans, dashboards, secrets, caches, or populated runtime data.",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 59 lines): Implement the GWC skills-only provider package on `feat/dw-power-distribution-v1`, validate it against the protected base and shared DW foundation, then stop before G3/PR activity.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "schema",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/design.md",
+   "target": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/requirements.md",
+   "target": "file:.kiro/specs/dw-pdist-02-gwc-skills-distribution/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

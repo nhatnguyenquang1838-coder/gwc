@@ -1,0 +1,210 @@
+{
+ "batchFiles": [
+  {
+   "path": "examples/integrations/github-g5-g6-jira/jira-projection-comment.json",
+   "language": "json",
+   "sizeLines": 8,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/positive-g5-verification.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/rejected-ci-failed.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/rejected-ci-unavailable.json",
+   "language": "json",
+   "sizeLines": 21,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/rejected-merge-sha-mismatch.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/rejected-pr-head-drift.json",
+   "language": "json",
+   "sizeLines": 30,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/rejected-projection-authority-leakage.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/github-g5-g6-jira/rejected-stale-main.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/jira-projection-comment.json",
+   "type": "config",
+   "name": "jira projection comment",
+   "filePath": "examples/integrations/github-g5-g6-jira/jira-projection-comment.json",
+   "summary": "JSON data file \"jira projection comment\" (jira-projection-comment.json, 8 lines) Top-level keys: schema_version, issue_key, authority, grants_gate_authority, status, failure_code.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/positive-g5-verification.json",
+   "type": "config",
+   "name": "positive g5 verification",
+   "filePath": "examples/integrations/github-g5-g6-jira/positive-g5-verification.json",
+   "summary": "JSON data file \"positive g5 verification\" (positive-g5-verification.json, 32 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/rejected-ci-failed.json",
+   "type": "config",
+   "name": "rejected ci failed",
+   "filePath": "examples/integrations/github-g5-g6-jira/rejected-ci-failed.json",
+   "summary": "JSON data file \"rejected ci failed\" (rejected-ci-failed.json, 32 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/rejected-ci-unavailable.json",
+   "type": "config",
+   "name": "rejected ci unavailable",
+   "filePath": "examples/integrations/github-g5-g6-jira/rejected-ci-unavailable.json",
+   "summary": "JSON data file \"rejected ci unavailable\" (rejected-ci-unavailable.json, 21 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/rejected-merge-sha-mismatch.json",
+   "type": "config",
+   "name": "rejected merge sha mismatch",
+   "filePath": "examples/integrations/github-g5-g6-jira/rejected-merge-sha-mismatch.json",
+   "summary": "JSON data file \"rejected merge sha mismatch\" (rejected-merge-sha-mismatch.json, 32 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/rejected-pr-head-drift.json",
+   "type": "config",
+   "name": "rejected pr head drift",
+   "filePath": "examples/integrations/github-g5-g6-jira/rejected-pr-head-drift.json",
+   "summary": "JSON data file \"rejected pr head drift\" (rejected-pr-head-drift.json, 30 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/rejected-projection-authority-leakage.json",
+   "type": "config",
+   "name": "rejected projection authority leakage",
+   "filePath": "examples/integrations/github-g5-g6-jira/rejected-projection-authority-leakage.json",
+   "summary": "JSON data file \"rejected projection authority leakage\" (rejected-projection-authority-leakage.json, 32 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/github-g5-g6-jira/rejected-stale-main.json",
+   "type": "config",
+   "name": "rejected stale main",
+   "filePath": "examples/integrations/github-g5-g6-jira/rejected-stale-main.json",
+   "summary": "JSON data file \"rejected stale main\" (rejected-stale-main.json, 32 lines) Top-level keys: schema_version, repository, evidence_type, expected, observed, ci.",
+   "tags": [
+    "examples",
+    "g5",
+    "g6",
+    "json"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/jira-projection-comment.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/positive-g5-verification.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/positive-g5-verification.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/rejected-ci-failed.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/rejected-ci-failed.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/rejected-ci-unavailable.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/rejected-ci-unavailable.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/rejected-merge-sha-mismatch.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/rejected-merge-sha-mismatch.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/rejected-pr-head-drift.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/rejected-pr-head-drift.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/rejected-projection-authority-leakage.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/github-g5-g6-jira/rejected-projection-authority-leakage.json",
+   "target": "file:examples/integrations/github-g5-g6-jira/rejected-stale-main.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

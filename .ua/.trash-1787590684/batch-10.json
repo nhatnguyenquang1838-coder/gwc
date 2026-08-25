@@ -1,0 +1,107 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-146/evidence/scrum-147-integrated-runtime.json",
+   "language": "json",
+   "sizeLines": 22,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json",
+   "language": "json",
+   "sizeLines": 54,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json",
+   "language": "json",
+   "sizeLines": 34,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/evidence/validation-report.json",
+   "language": "json",
+   "sizeLines": 19,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/evidence/scrum-147-integrated-runtime.json",
+   "type": "config",
+   "name": "SCRUM-147",
+   "filePath": ".gwc/tasks/SCRUM-146/evidence/scrum-147-integrated-runtime.json",
+   "summary": "JSON data file \"SCRUM-147\" (scrum-147-integrated-runtime.json, 22 lines) Top-level keys: artifact_type, base_sha, boundaries, components, duplicate_effect_preventions, graph_revision.",
+   "tags": [
+    "gwc",
+    "json",
+    "runtime",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json",
+   "type": "config",
+   "name": "SCRUM-148",
+   "filePath": ".gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json",
+   "summary": "JSON data file \"SCRUM-148\" (scrum-148-scenario-coverage-and-budgets.json, 54 lines) Top-level keys: artifact_type, task_id, repository, base_sha, status, coverage.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json",
+   "type": "config",
+   "name": "SCRUM-149",
+   "filePath": ".gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json",
+   "summary": "JSON data file \"SCRUM-149\" (scrum-149-host-offline-e2e.json, 34 lines) Top-level keys: artifact_type, task_id, repository, base_sha, status, evidence.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/evidence/validation-report.json",
+   "type": "config",
+   "name": "SCRUM-146",
+   "filePath": ".gwc/tasks/SCRUM-146/evidence/validation-report.json",
+   "summary": "JSON data file \"SCRUM-146\" (validation-report.json, 19 lines) Top-level keys: artifact_type, task_id, base_sha, working_branch, results, scope_note.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/evidence/scrum-147-integrated-runtime.json",
+   "target": "file:.gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/evidence/scrum-148-scenario-coverage-and-budgets.json",
+   "target": "file:.gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/evidence/scrum-149-host-offline-e2e.json",
+   "target": "file:.gwc/tasks/SCRUM-146/evidence/validation-report.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,80 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/design.md",
+   "language": "markdown",
+   "sizeLines": 190,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md",
+   "language": "markdown",
+   "sizeLines": 84,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/tasks.md",
+   "language": "markdown",
+   "sizeLines": 90,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 190 lines): Extend the existing G0/G1 runtime generator, schemas and validator instead of creating a parallel planning workflow. The selected design follows `Reuse → Extend`: reuse the active Kiro rule, current task-scoped G0/G1 artifacts, the `process_readback` / `execution_feasibility` preflight extension,",
+   "tags": [
+    "documentation",
+    "g1",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 84 lines): SCRUM-89 strengthens the GWC G0/G1 → G2 handoff so implementation-capable work cannot reach source mutation without one validated, durable implementation plan. The workflow must reuse a current Kiro spec when possible, call Task Me when planning complexity warrants it and the capability is",
+   "tags": [
+    "documentation",
+    "g1",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 90 lines): Implement the SCRUM-89 handoff in dependency order, keeping current G0/G1 compatibility and adding fail-closed enforcement for new plan-aware artifacts. All repository writes require the SCRUM-89 G2 envelope and must occur on `feat/scrum-89-g1-plan-handoff` or a governance-approved equivalent branch.",
+   "tags": [
+    "documentation",
+    "g1",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/design.md",
+   "target": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/requirements.md",
+   "target": "file:.kiro/specs/gwc-g1-plan-01-task-me-kiro-handoff/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,83 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/design.md",
+   "language": "markdown",
+   "sizeLines": 169,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/requirements.md",
+   "language": "markdown",
+   "sizeLines": 99,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/tasks.md",
+   "language": "markdown",
+   "sizeLines": 78,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 169 lines): Implement SCRUM-178 by extending the existing `intake_context.protected-base-capture` descriptor in place. The goal is to turn protected-base capture into a typed, immutable, evidence-backed read-only boundary that deterministically records the exact protected-base SHA, verifies it by readback, and",
+   "tags": [
+    "capture",
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 99 lines): SCRUM-178 advances `intake_context.protected-base-capture` from a descriptive read-only catalog node into a typed protected-base evidence boundary. The node must capture the exact protected-base SHA as immutable evidence, support deterministic readback, and reject stale-base or drifted evidence.",
+   "tags": [
+    "capture",
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 78 lines): Implement SCRUM-178 in dependency order while keeping the change inside the existing `intake_context` family and preserving the current G0-only boundary. The plan should be small enough to review independently and should not introduce a parallel family or broader workflow surface.",
+   "tags": [
+    "capture",
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/design.md",
+   "target": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/requirements.md",
+   "target": "file:.kiro/specs/scrum-178-intake-context-protected-base-capture-m2-to-m4/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

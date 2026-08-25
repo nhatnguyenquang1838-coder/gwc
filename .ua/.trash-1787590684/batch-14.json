@@ -1,0 +1,83 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-91/g2/base-drift-evaluation.yaml",
+   "language": "yaml",
+   "sizeLines": 59,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-91/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 71,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-91/g2/reconciliation-record.yaml",
+   "language": "yaml",
+   "sizeLines": 22,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-91/g2/base-drift-evaluation.yaml",
+   "type": "config",
+   "name": "base-drift-evaluation",
+   "filePath": ".gwc/tasks/SCRUM-91/g2/base-drift-evaluation.yaml",
+   "summary": "GWC task governance YAML (base-drift-evaluation.yaml, 59 lines). Top-level keys: schema_version, artifact_type, evaluation_id, task_id, repository, working_branch.",
+   "tags": [
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-91/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-91/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 71 lines). Top-level keys: schema_version, artifact_type, approval_id, authority_gate, task_id, issued_at.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-91/g2/reconciliation-record.yaml",
+   "type": "config",
+   "name": "reconciliation-record",
+   "filePath": ".gwc/tasks/SCRUM-91/g2/reconciliation-record.yaml",
+   "summary": "GWC task governance YAML (reconciliation-record.yaml, 22 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-91/g2/base-drift-evaluation.yaml",
+   "target": "file:.gwc/tasks/SCRUM-91/g2/execution-envelope.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-91/g2/execution-envelope.yaml",
+   "target": "file:.gwc/tasks/SCRUM-91/g2/reconciliation-record.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

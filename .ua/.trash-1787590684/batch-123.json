@@ -1,0 +1,165 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/integration/examples/bmad-procedure-adapter-examples.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/task-lifecycle/gate-transition-map.yaml",
+   "language": "yaml",
+   "sizeLines": 127,
+   "fileCategory": "config"
+  },
+  {
+   "path": "distribution/README.md",
+   "language": "markdown",
+   "sizeLines": 23,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "distribution/config/gwc.defaults.yaml",
+   "language": "yaml",
+   "sizeLines": 19,
+   "fileCategory": "config"
+  },
+  {
+   "path": "distribution/contracts/gwc-config.schema.json",
+   "language": "json",
+   "sizeLines": 54,
+   "fileCategory": "config"
+  },
+  {
+   "path": "distribution/power-package.yaml",
+   "language": "yaml",
+   "sizeLines": 109,
+   "fileCategory": "config"
+  },
+  {
+   "path": "docs/authority/dw-super-app-source-of-truth-authority-matrix.md",
+   "language": "markdown",
+   "sizeLines": 93,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "governance/base-drift-policy.yaml",
+   "language": "yaml",
+   "sizeLines": 93,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/integration/examples/bmad-procedure-adapter-examples.json",
+   "type": "config",
+   "name": "SCRUM-119",
+   "filePath": "core/integration/examples/bmad-procedure-adapter-examples.json",
+   "summary": "JSON data file \"SCRUM-119\" (bmad-procedure-adapter-examples.json, 1 lines) Top-level keys: schema_version, task_id, examples.",
+   "tags": [
+    "adapter",
+    "core",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/task-lifecycle/gate-transition-map.yaml",
+   "type": "config",
+   "name": "gate-transition-map",
+   "filePath": "core/task-lifecycle/gate-transition-map.yaml",
+   "summary": "YAML configuration (gate-transition-map.yaml, 127 lines). Top-level keys: contract_version, authority, rules, terminal_states, verification.",
+   "tags": [
+    "core",
+    "gates",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:distribution/README.md",
+   "type": "document",
+   "name": "GWC skills-only distribution",
+   "filePath": "distribution/README.md",
+   "summary": "Markdown document \"GWC skills-only distribution\" (document, 23 lines): This directory defines the provider-owned package consumed by DW Power Distribution v1.",
+   "tags": [
+    "distribution",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:distribution/config/gwc.defaults.yaml",
+   "type": "config",
+   "name": "gwc.defaults",
+   "filePath": "distribution/config/gwc.defaults.yaml",
+   "summary": "configuration file (gwc.defaults.yaml, 19 lines). Top-level keys: apiVersion, kind, metadata, spec.",
+   "tags": [
+    "config",
+    "distribution",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:distribution/contracts/gwc-config.schema.json",
+   "type": "config",
+   "name": "GWC Runtime Configuration",
+   "filePath": "distribution/contracts/gwc-config.schema.json",
+   "summary": "JSON Schema definition \"GWC Runtime Configuration\" (gwc-config.schema.json, 54 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "config",
+    "contract",
+    "distribution",
+    "json",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:distribution/power-package.yaml",
+   "type": "config",
+   "name": "power-package",
+   "filePath": "distribution/power-package.yaml",
+   "summary": "YAML configuration (power-package.yaml, 109 lines). Top-level keys: apiVersion, kind, metadata, spec.",
+   "tags": [
+    "distribution",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:docs/authority/dw-super-app-source-of-truth-authority-matrix.md",
+   "type": "document",
+   "name": "DW SUPER APP Source-of-Truth and Authority Matrix",
+   "filePath": "docs/authority/dw-super-app-source-of-truth-authority-matrix.md",
+   "summary": "Markdown document \"DW SUPER APP Source-of-Truth and Authority Matrix\" (document, 93 lines): **Task:** SCRUM-101 **Repository:** `nhatnguyenquang1838-coder/gwc` **Base:** `main@319e611d1a318df8ec5eccd3210078652e01369d`",
+   "tags": [
+    "docs",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:governance/base-drift-policy.yaml",
+   "type": "config",
+   "name": "base-drift-policy",
+   "filePath": "governance/base-drift-policy.yaml",
+   "summary": "YAML configuration (base-drift-policy.yaml, 93 lines). Top-level keys: schema_version, policy_id, status, repository, base_reference, description.",
+   "tags": [
+    "governance",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:distribution/README.md",
+   "target": "file:distribution/power-package.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

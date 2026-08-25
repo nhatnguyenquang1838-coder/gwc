@@ -1,0 +1,241 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/g5-status-evidence.schema.json",
+   "language": "json",
+   "sizeLines": 100,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/gate-action-authority.schema.json",
+   "language": "json",
+   "sizeLines": 112,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/human-bypass.schema.json",
+   "language": "json",
+   "sizeLines": 73,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/interrupt-frame.schema.json",
+   "language": "json",
+   "sizeLines": 74,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/lease-expiry-recovery-decision.schema.json",
+   "language": "json",
+   "sizeLines": 67,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-interruptibility.schema.json",
+   "language": "json",
+   "sizeLines": 31,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime-checkpoint.schema.json",
+   "language": "json",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime-event.schema.json",
+   "language": "json",
+   "sizeLines": 24,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/stale-session-reconciliation-decision.schema.json",
+   "language": "json",
+   "sizeLines": 34,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/timeout-recovery-decision.schema.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/unknown-write-reconciliation-decision.schema.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/version-drift-rollback-routing-decision.schema.json",
+   "language": "json",
+   "sizeLines": 48,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/g5-status-evidence.schema.json",
+   "type": "config",
+   "name": "G5 Post-Merge Status Evidence",
+   "filePath": "schemas/g5-status-evidence.schema.json",
+   "summary": "JSON Schema definition \"G5 Post-Merge Status Evidence\" (g5-status-evidence.schema.json, 100 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g5",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/gate-action-authority.schema.json",
+   "type": "config",
+   "name": "GWC Gate Action Authority",
+   "filePath": "schemas/gate-action-authority.schema.json",
+   "summary": "JSON Schema definition \"GWC Gate Action Authority\" (gate-action-authority.schema.json, 112 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "gates",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/human-bypass.schema.json",
+   "type": "config",
+   "name": "GWC Human Bypass Record",
+   "filePath": "schemas/human-bypass.schema.json",
+   "summary": "JSON Schema definition \"GWC Human Bypass Record\" (human-bypass.schema.json, 73 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/interrupt-frame.schema.json",
+   "type": "config",
+   "name": "GWC Interrupt Frame",
+   "filePath": "schemas/interrupt-frame.schema.json",
+   "summary": "JSON Schema definition \"GWC Interrupt Frame\" (interrupt-frame.schema.json, 74 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/lease-expiry-recovery-decision.schema.json",
+   "type": "config",
+   "name": "Lease Expiry Recovery Decision",
+   "filePath": "schemas/lease-expiry-recovery-decision.schema.json",
+   "summary": "JSON Schema definition \"Lease Expiry Recovery Decision\" (lease-expiry-recovery-decision.schema.json, 67 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-interruptibility.schema.json",
+   "type": "config",
+   "name": "GWC Runtime Node Interruptibility",
+   "filePath": "schemas/node-interruptibility.schema.json",
+   "summary": "JSON Schema definition \"GWC Runtime Node Interruptibility\" (node-interruptibility.schema.json, 31 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime-checkpoint.schema.json",
+   "type": "config",
+   "name": "GWC Runtime Checkpoint",
+   "filePath": "schemas/runtime-checkpoint.schema.json",
+   "summary": "JSON Schema definition \"GWC Runtime Checkpoint\" (runtime-checkpoint.schema.json, 28 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "checkpoint",
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime-event.schema.json",
+   "type": "config",
+   "name": "GWC Runtime Event",
+   "filePath": "schemas/runtime-event.schema.json",
+   "summary": "JSON Schema definition \"GWC Runtime Event\" (runtime-event.schema.json, 24 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/stale-session-reconciliation-decision.schema.json",
+   "type": "config",
+   "name": "GWC Stale Session Reconciliation Decision",
+   "filePath": "schemas/stale-session-reconciliation-decision.schema.json",
+   "summary": "JSON Schema definition \"GWC Stale Session Reconciliation Decision\" (stale-session-reconciliation-decision.schema.json, 34 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/timeout-recovery-decision.schema.json",
+   "type": "config",
+   "name": "GWC Timeout Recovery Decision",
+   "filePath": "schemas/timeout-recovery-decision.schema.json",
+   "summary": "JSON Schema definition \"GWC Timeout Recovery Decision\" (timeout-recovery-decision.schema.json, 32 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/unknown-write-reconciliation-decision.schema.json",
+   "type": "config",
+   "name": "GWC Unknown Write Reconciliation Decision",
+   "filePath": "schemas/unknown-write-reconciliation-decision.schema.json",
+   "summary": "JSON Schema definition \"GWC Unknown Write Reconciliation Decision\" (unknown-write-reconciliation-decision.schema.json, 32 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/version-drift-rollback-routing-decision.schema.json",
+   "type": "config",
+   "name": "Version Drift Rollback Routing Decision",
+   "filePath": "schemas/version-drift-rollback-routing-decision.schema.json",
+   "summary": "JSON Schema definition \"Version Drift Rollback Routing Decision\" (version-drift-rollback-routing-decision.schema.json, 48 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

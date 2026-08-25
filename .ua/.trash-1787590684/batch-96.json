@@ -1,0 +1,27 @@
+{
+ "batchFiles": [
+  {
+   "path": "releases/changelog.md",
+   "language": "markdown",
+   "sizeLines": 451,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:releases/changelog.md",
+   "type": "document",
+   "name": "Changelog",
+   "filePath": "releases/changelog.md",
+   "summary": "Markdown document \"Changelog\" (changelog entry, 451 lines): - Plan-aware G0/G1 runtime input, preflight, decision-capture, and validation evidence. - Exact implementation-plan reference propagation from G1 into the G2 execution envelope. - Verified G2 plan-read receipt enforcement before repository mutation. - Kiro fallback routing when Task Me is applicable but unavailable.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": []
+}

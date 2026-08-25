@@ -1,0 +1,509 @@
+{
+ "batchFiles": [
+  {
+   "path": "tools/validate_interrupt_flow.py",
+   "language": "python",
+   "sizeLines": 120,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_p5_evaluation.py",
+   "language": "python",
+   "sizeLines": 243,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_scrum_150_cross_phase.py",
+   "language": "python",
+   "sizeLines": 257,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_task_me_host_contract.py",
+   "language": "python",
+   "sizeLines": 20,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_ua_host_contract.py",
+   "language": "python",
+   "sizeLines": 20,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tools/validate_interrupt_flow.py",
+   "type": "module",
+   "name": "validate_interrupt_flow",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Python module (validate_interrupt_flow.py, 120 lines): Validate GWC interrupt-flow schemas and base-drift sample frames. Defines: load_json, validate, sample_frame, sample_node, run_tests.",
+   "tags": [
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/validate_interrupt_flow.py:sample_frame",
+   "type": "function",
+   "name": "sample_frame",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Function sample_frame defined in tools/validate_interrupt_flow.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_interrupt_flow.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Function main defined in tools/validate_interrupt_flow.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_interrupt_flow.py:load_json",
+   "type": "function",
+   "name": "load_json",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Function load_json defined in tools/validate_interrupt_flow.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_interrupt_flow.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Function validate defined in tools/validate_interrupt_flow.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_interrupt_flow.py:run_tests",
+   "type": "function",
+   "name": "run_tests",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Function run_tests defined in tools/validate_interrupt_flow.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_interrupt_flow.py:sample_node",
+   "type": "function",
+   "name": "sample_node",
+   "filePath": "tools/validate_interrupt_flow.py",
+   "summary": "Function sample_node defined in tools/validate_interrupt_flow.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_p5_evaluation.py",
+   "type": "module",
+   "name": "validate_p5_evaluation",
+   "filePath": "tools/validate_p5_evaluation.py",
+   "summary": "Python module (validate_p5_evaluation.py, 243 lines) providing validate p5 evaluation functionality. Defines: issue, _as_set, validate_record, run_suite, main.",
+   "tags": [
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/validate_p5_evaluation.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_p5_evaluation.py",
+   "summary": "Function main defined in tools/validate_p5_evaluation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_p5_evaluation.py:_as_set",
+   "type": "function",
+   "name": "_as_set",
+   "filePath": "tools/validate_p5_evaluation.py",
+   "summary": "Function _as_set defined in tools/validate_p5_evaluation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_p5_evaluation.py:issue",
+   "type": "function",
+   "name": "issue",
+   "filePath": "tools/validate_p5_evaluation.py",
+   "summary": "Function issue defined in tools/validate_p5_evaluation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_p5_evaluation.py:run_suite",
+   "type": "function",
+   "name": "run_suite",
+   "filePath": "tools/validate_p5_evaluation.py",
+   "summary": "Function run_suite defined in tools/validate_p5_evaluation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_p5_evaluation.py:validate_record",
+   "type": "function",
+   "name": "validate_record",
+   "filePath": "tools/validate_p5_evaluation.py",
+   "summary": "Function validate_record defined in tools/validate_p5_evaluation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_scrum_150_cross_phase.py",
+   "type": "module",
+   "name": "validate_scrum_150_cross_phase",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Python module (validate_scrum_150_cross_phase.py, 257 lines): Validate the SCRUM-150 cross-phase evidence contract. This validator is deliberately pure: it reads an observed JSON record and returns typed failures. It never executes a provider, mutates a checkpoint, changes a gate, writes a projection, or promotes a candidate. Defines: issue, _is_sha, _nonempty, _as_list, _validate_ci.",
+   "tags": [
+    "python",
+    "scrum",
+    "tools",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function main defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_validate_metric",
+   "type": "function",
+   "name": "_validate_metric",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _validate_metric defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_as_list",
+   "type": "function",
+   "name": "_as_list",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _as_list defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_validate_binding",
+   "type": "function",
+   "name": "_validate_binding",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _validate_binding defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_load_fixture",
+   "type": "function",
+   "name": "_load_fixture",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _load_fixture defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:issue",
+   "type": "function",
+   "name": "issue",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function issue defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_set_path",
+   "type": "function",
+   "name": "_set_path",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _set_path defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_nonempty",
+   "type": "function",
+   "name": "_nonempty",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _nonempty defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_is_sha",
+   "type": "function",
+   "name": "_is_sha",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _is_sha defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_scrum_150_cross_phase.py:_validate_ci",
+   "type": "function",
+   "name": "_validate_ci",
+   "filePath": "tools/validate_scrum_150_cross_phase.py",
+   "summary": "Function _validate_ci defined in tools/validate_scrum_150_cross_phase.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_task_me_host_contract.py",
+   "type": "module",
+   "name": "validate_task_me_host_contract",
+   "filePath": "tools/validate_task_me_host_contract.py",
+   "summary": "Python module (validate_task_me_host_contract.py, 20 lines) providing validate task me host contract functionality. Defines: load, validate, main.",
+   "tags": [
+    "contract",
+    "python",
+    "tasks",
+    "tools",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_ua_host_contract.py",
+   "type": "module",
+   "name": "validate_ua_host_contract",
+   "filePath": "tools/validate_ua_host_contract.py",
+   "summary": "Python module (validate_ua_host_contract.py, 20 lines) providing validate ua host contract functionality. Defines: load, validate, main.",
+   "tags": [
+    "contract",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "function:tools/validate_interrupt_flow.py:sample_frame",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "function:tools/validate_interrupt_flow.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "function:tools/validate_interrupt_flow.py:load_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "function:tools/validate_interrupt_flow.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "function:tools/validate_interrupt_flow.py:run_tests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "function:tools/validate_interrupt_flow.py:sample_node",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_p5_evaluation.py",
+   "target": "function:tools/validate_p5_evaluation.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_p5_evaluation.py",
+   "target": "function:tools/validate_p5_evaluation.py:_as_set",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_p5_evaluation.py",
+   "target": "function:tools/validate_p5_evaluation.py:issue",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_p5_evaluation.py",
+   "target": "function:tools/validate_p5_evaluation.py:run_suite",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_p5_evaluation.py",
+   "target": "function:tools/validate_p5_evaluation.py:validate_record",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_validate_metric",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_as_list",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_validate_binding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_load_fixture",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:issue",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_set_path",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_nonempty",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_is_sha",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "function:tools/validate_scrum_150_cross_phase.py:_validate_ci",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_interrupt_flow.py",
+   "target": "file:tools/validate_p5_evaluation.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/validate_p5_evaluation.py",
+   "target": "file:tools/validate_scrum_150_cross_phase.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/validate_scrum_150_cross_phase.py",
+   "target": "file:tools/validate_task_me_host_contract.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/validate_task_me_host_contract.py",
+   "target": "file:tools/validate_ua_host_contract.py",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

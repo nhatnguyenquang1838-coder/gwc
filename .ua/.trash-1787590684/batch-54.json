@@ -1,0 +1,218 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/README.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 38,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/decisions.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/evidence.json",
+   "language": "json",
+   "sizeLines": 35,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 36,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 60,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/task.yaml",
+   "language": "yaml",
+   "sizeLines": 24,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 39,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/README.md",
+   "type": "document",
+   "name": "SCRUM-175",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/README.md",
+   "summary": "Markdown document \"SCRUM-175\" (document, 5 lines): Normalize `intake_context.request-intake` into a typed G0 intake step that can turn a user request into a bounded fact set with explicit intent, outcomes, constraints, exclusions, guards, and reason codes.",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/coding-guide.md",
+   "type": "document",
+   "name": "Coding Guide",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/coding-guide.md",
+   "summary": "Markdown document \"Coding Guide\" (document, 38 lines): - `core/node-architect/node-catalog/intake_context/request-intake.node.json` - `tools/node_architect/validate_node_catalog_intake_context.py` - `tests/test_node_catalog_intake_context.py` - `core/node-architect/node-catalog/intake_context/README.md` -",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 28 lines): - **Evidence used:** `request-intake.node.json`, family README, validator, tests, runtime graph, node registry. - **Alternatives considered:** Create a new family or a separate runtime helper. - **Rule applied:** Reuse the existing bounded family when the node identity already exists. -",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/evidence.json",
+   "type": "config",
+   "name": "SCRUM-175",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-175\" (evidence.json, 35 lines) Top-level keys: schema_version, task_id, issue_summary, evidence, decision.",
+   "tags": [
+    "intake",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/impact-analysis.md",
+   "type": "document",
+   "name": "Impact Analysis",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/impact-analysis.md",
+   "summary": "Markdown document \"Impact Analysis\" (document, 36 lines): This task is tightly bounded to the current `intake_context` family. The primary change is the `request-intake` node contract, with supporting validator and regression test updates.",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/implementation-plan.md",
+   "summary": "Markdown document \"Implementation Plan\" (plan, 60 lines): Implement the request-intake contract in dependency order, keeping the change inside the existing intake-context family and preserving the current G0-only boundary.",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/task.yaml",
+   "type": "config",
+   "name": "Normalize request intake into typed intent, outcomes, constraints and exclusions",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/task.yaml",
+   "summary": "GWC task governance YAML \"Normalize request intake into typed intent, outcomes, constraints and exclusions\" (task.yaml, 24 lines). Top-level keys: task_id, title, objective, wave, requires, parallel_with.",
+   "tags": [
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/test-plan.md",
+   "type": "document",
+   "name": "Test Plan",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/test-plan.md",
+   "summary": "Markdown document \"Test Plan\" (plan, 39 lines): - Deterministic normalization for the canonical request shape. - Rejection of malformed payloads. - Rejection of ambiguous payloads. - Stable reason-code emission for each failure mode. - Family validator still accepts the real node set and rejects authority or gate drift.",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/README.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/coding-guide.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/decisions.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/evidence.json",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/impact-analysis.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/implementation-plan.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/task.yaml",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/tasks/SCRUM-175-normalize-request-intake-to-typed-intent/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

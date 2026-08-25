@@ -1,0 +1,1817 @@
+{
+ "batchFiles": [
+  {
+   "path": "tools/node_architect/validate_node_catalog_validation_quality.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_registry.py",
+   "language": "python",
+   "sizeLines": 129,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_runtime_catalog_taxonomy.py",
+   "language": "python",
+   "sizeLines": 65,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_runtime_registry.py",
+   "language": "python",
+   "sizeLines": 278,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/version_drift_rollback_routing.py",
+   "language": "python",
+   "sizeLines": 119,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/viewer/README.md",
+   "language": "markdown",
+   "sizeLines": 15,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "language": "python",
+   "sizeLines": 281,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/viewer/registry_adapter.py",
+   "language": "python",
+   "sizeLines": 282,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/viewer/run_history_adapter.py",
+   "language": "python",
+   "sizeLines": 181,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/p3_backward_graph.py",
+   "language": "python",
+   "sizeLines": 494,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/power_help.py",
+   "language": "python",
+   "sizeLines": 58,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/resolve_g5_status.py",
+   "language": "python",
+   "sizeLines": 149,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_bmad_procedure_adapter.py",
+   "language": "python",
+   "sizeLines": 72,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_dw_super_app_integration.py",
+   "language": "python",
+   "sizeLines": 141,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_dw_super_e2e_pilot.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_g01.py",
+   "language": "python",
+   "sizeLines": 622,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_g5_status.py",
+   "language": "python",
+   "sizeLines": 89,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_gate_action.py",
+   "language": "python",
+   "sizeLines": 221,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/validate_github_g5_g6_jira_projection.py",
+   "language": "python",
+   "sizeLines": 51,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_validation_quality.py",
+   "type": "module",
+   "name": "validate_node_catalog_validation_quality",
+   "filePath": "tools/node_architect/validate_node_catalog_validation_quality.py",
+   "summary": "Python module (validate_node_catalog_validation_quality.py, 62 lines): Validate the validation_quality controlled node catalog family. Defines: validate_family, main.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_registry.py",
+   "type": "module",
+   "name": "validate_node_registry",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Python module (validate_node_registry.py, 129 lines): Validate a compiled GWC node registry using stdlib-only checks. Defines: _finding, _load_registry, validate_registry, validation_result, build_parser.",
+   "tags": [
+    "nodes",
+    "python",
+    "registry",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_registry.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_registry.py:build_parser",
+   "type": "function",
+   "name": "build_parser",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Function build_parser defined in tools/node_architect/validate_node_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_registry.py:validate_registry",
+   "type": "function",
+   "name": "validate_registry",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Function validate_registry defined in tools/node_architect/validate_node_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_registry.py:validation_result",
+   "type": "function",
+   "name": "validation_result",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Function validation_result defined in tools/node_architect/validate_node_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_registry.py:_finding",
+   "type": "function",
+   "name": "_finding",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Function _finding defined in tools/node_architect/validate_node_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_registry.py:_load_registry",
+   "type": "function",
+   "name": "_load_registry",
+   "filePath": "tools/node_architect/validate_node_registry.py",
+   "summary": "Function _load_registry defined in tools/node_architect/validate_node_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_runtime_catalog_taxonomy.py",
+   "type": "service",
+   "name": "validate_runtime_catalog_taxonomy",
+   "filePath": "tools/node_architect/validate_runtime_catalog_taxonomy.py",
+   "summary": "Python module (validate_runtime_catalog_taxonomy.py, 65 lines): Validate the canonical GWC runtime catalog taxonomy. Defines: load_json, main.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "python",
+    "runtime",
+    "tools"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_runtime_registry.py",
+   "type": "service",
+   "name": "validate_runtime_registry",
+   "filePath": "tools/node_architect/validate_runtime_registry.py",
+   "summary": "Python module (validate_runtime_registry.py, 278 lines): Validate canonical runtime registries and their cross-references. Defines: load, validate_schema, source_hash, validate_registry, main.",
+   "tags": [
+    "nodes",
+    "python",
+    "registry",
+    "runtime",
+    "schema"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_runtime_registry.py:validate_schema",
+   "type": "function",
+   "name": "validate_schema",
+   "filePath": "tools/node_architect/validate_runtime_registry.py",
+   "summary": "Function validate_schema defined in tools/node_architect/validate_runtime_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_runtime_registry.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_runtime_registry.py",
+   "summary": "Function main defined in tools/node_architect/validate_runtime_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_runtime_registry.py:validate_registry",
+   "type": "function",
+   "name": "validate_registry",
+   "filePath": "tools/node_architect/validate_runtime_registry.py",
+   "summary": "Function validate_registry defined in tools/node_architect/validate_runtime_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_runtime_registry.py:source_hash",
+   "type": "function",
+   "name": "source_hash",
+   "filePath": "tools/node_architect/validate_runtime_registry.py",
+   "summary": "Function source_hash defined in tools/node_architect/validate_runtime_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_runtime_registry.py:load",
+   "type": "function",
+   "name": "load",
+   "filePath": "tools/node_architect/validate_runtime_registry.py",
+   "summary": "Function load defined in tools/node_architect/validate_runtime_registry.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "type": "module",
+   "name": "version_drift_rollback_routing",
+   "filePath": "tools/node_architect/version_drift_rollback_routing.py",
+   "summary": "Python module (version_drift_rollback_routing.py, 119 lines): Deterministic version-drift rollback routing for GWC failure-recovery nodes. Defines: now_utc, canonical_json, digest_payload, attach_digest, decide_version_drift_rollback_routing.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/version_drift_rollback_routing.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/version_drift_rollback_routing.py",
+   "summary": "Function canonical_json defined in tools/node_architect/version_drift_rollback_routing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/version_drift_rollback_routing.py:attach_digest",
+   "type": "function",
+   "name": "attach_digest",
+   "filePath": "tools/node_architect/version_drift_rollback_routing.py",
+   "summary": "Function attach_digest defined in tools/node_architect/version_drift_rollback_routing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/version_drift_rollback_routing.py:decide_version_drift_rollback_routing",
+   "type": "function",
+   "name": "decide_version_drift_rollback_routing",
+   "filePath": "tools/node_architect/version_drift_rollback_routing.py",
+   "summary": "Function decide_version_drift_rollback_routing defined in tools/node_architect/version_drift_rollback_routing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/version_drift_rollback_routing.py:now_utc",
+   "type": "function",
+   "name": "now_utc",
+   "filePath": "tools/node_architect/version_drift_rollback_routing.py",
+   "summary": "Function now_utc defined in tools/node_architect/version_drift_rollback_routing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/version_drift_rollback_routing.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/version_drift_rollback_routing.py",
+   "summary": "Function digest_payload defined in tools/node_architect/version_drift_rollback_routing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/viewer/README.md",
+   "type": "document",
+   "name": "Cytoscape v3 registry and run-history adapters",
+   "filePath": "tools/node_architect/viewer/README.md",
+   "summary": "Markdown document \"Cytoscape v3 registry and run-history adapters\" (document, 15 lines): `registry_adapter.py` is the renderer-neutral data boundary for the v3 full-flow view. It retains every canonical registry node. Active routes change CSS classes only; visual scaffold edges never become executable runtime dependencies.",
+   "tags": [
+    "documentation",
+    "nodes",
+    "tools",
+    "viewer"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "type": "module",
+   "name": "p5_evaluation_adapter",
+   "filePath": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "summary": "Python module (p5_evaluation_adapter.py, 281 lines): Render P5 evaluation and promotion records as Cytoscape elements. Defines: _status_class, _metric_class, _promotion_class, build_p5_evaluation_elements, overlay_p5_evaluation.",
+   "tags": [
+    "adapter",
+    "nodes",
+    "python",
+    "tools",
+    "viewer"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:_status_class",
+   "type": "function",
+   "name": "_status_class",
+   "filePath": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "summary": "Function _status_class defined in tools/node_architect/viewer/p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:_promotion_class",
+   "type": "function",
+   "name": "_promotion_class",
+   "filePath": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "summary": "Function _promotion_class defined in tools/node_architect/viewer/p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:_metric_class",
+   "type": "function",
+   "name": "_metric_class",
+   "filePath": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "summary": "Function _metric_class defined in tools/node_architect/viewer/p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:overlay_p5_evaluation",
+   "type": "function",
+   "name": "overlay_p5_evaluation",
+   "filePath": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "summary": "Function overlay_p5_evaluation defined in tools/node_architect/viewer/p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:build_p5_evaluation_elements",
+   "type": "function",
+   "name": "build_p5_evaluation_elements",
+   "filePath": "tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "summary": "Function build_p5_evaluation_elements defined in tools/node_architect/viewer/p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/viewer/registry_adapter.py",
+   "type": "module",
+   "name": "registry_adapter",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Python module (registry_adapter.py, 282 lines): Data-only Cytoscape v3 adapter for canonical registries and history. Defines: load_registry_bundle, _edge_classes, build_scenario_decision_elements, build_cytoscape_elements, enumerate_routes_to_green.",
+   "tags": [
+    "adapter",
+    "nodes",
+    "python",
+    "registry",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:build_scenario_decision_elements",
+   "type": "function",
+   "name": "build_scenario_decision_elements",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function build_scenario_decision_elements defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function main defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:enumerate_routes_to_green",
+   "type": "function",
+   "name": "enumerate_routes_to_green",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function enumerate_routes_to_green defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:classify_route",
+   "type": "function",
+   "name": "classify_route",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function classify_route defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:load_registry_bundle",
+   "type": "function",
+   "name": "load_registry_bundle",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function load_registry_bundle defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:build_cytoscape_elements",
+   "type": "function",
+   "name": "build_cytoscape_elements",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function build_cytoscape_elements defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:_edge_classes",
+   "type": "function",
+   "name": "_edge_classes",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function _edge_classes defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/registry_adapter.py:visit",
+   "type": "function",
+   "name": "visit",
+   "filePath": "tools/node_architect/viewer/registry_adapter.py",
+   "summary": "Function visit defined in tools/node_architect/viewer/registry_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/viewer/run_history_adapter.py",
+   "type": "module",
+   "name": "run_history_adapter",
+   "filePath": "tools/node_architect/viewer/run_history_adapter.py",
+   "summary": "Python module (run_history_adapter.py, 181 lines): Convert durable run/event/checkpoint history into Cytoscape elements. Defines: _status_class, build_run_history_elements, overlay_run_history.",
+   "tags": [
+    "adapter",
+    "nodes",
+    "python",
+    "tools",
+    "viewer"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/run_history_adapter.py:_status_class",
+   "type": "function",
+   "name": "_status_class",
+   "filePath": "tools/node_architect/viewer/run_history_adapter.py",
+   "summary": "Function _status_class defined in tools/node_architect/viewer/run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/run_history_adapter.py:build_run_history_elements",
+   "type": "function",
+   "name": "build_run_history_elements",
+   "filePath": "tools/node_architect/viewer/run_history_adapter.py",
+   "summary": "Function build_run_history_elements defined in tools/node_architect/viewer/run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/viewer/run_history_adapter.py:overlay_run_history",
+   "type": "function",
+   "name": "overlay_run_history",
+   "filePath": "tools/node_architect/viewer/run_history_adapter.py",
+   "summary": "Function overlay_run_history defined in tools/node_architect/viewer/run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/p3_backward_graph.py",
+   "type": "module",
+   "name": "p3_backward_graph",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Python module (p3_backward_graph.py, 494 lines): Deterministic P3 backward graph compiler and scenario routing engine. The module intentionally uses only the Python standard library so repository and CI consumers can execute it without adding a runtime dependency. Defines: CompileError, BudgetExceeded, RouteBudget, RouteClass, GuardResult.",
+   "tags": [
+    "python",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tools/p3_backward_graph.py:GuardResult",
+   "type": "class",
+   "name": "GuardResult",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Class GuardResult defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/p3_backward_graph.py:RouteBudget",
+   "type": "class",
+   "name": "RouteBudget",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Class RouteBudget defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/p3_backward_graph.py:RouteClass",
+   "type": "class",
+   "name": "RouteClass",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Class RouteClass defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/p3_backward_graph.py:CompileError",
+   "type": "class",
+   "name": "CompileError",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Class CompileError defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/p3_backward_graph.py:BudgetExceeded",
+   "type": "class",
+   "name": "BudgetExceeded",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Class BudgetExceeded defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:_digest",
+   "type": "function",
+   "name": "_digest",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function _digest defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:decide_scenario",
+   "type": "function",
+   "name": "decide_scenario",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function decide_scenario defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:append_scenario_decision",
+   "type": "function",
+   "name": "append_scenario_decision",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function append_scenario_decision defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:scenario_nodes",
+   "type": "function",
+   "name": "scenario_nodes",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function scenario_nodes defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:route_decision",
+   "type": "function",
+   "name": "route_decision",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function route_decision defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:enumerate_routes",
+   "type": "function",
+   "name": "enumerate_routes",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function enumerate_routes defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:_stable",
+   "type": "function",
+   "name": "_stable",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function _stable defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:compile_backward_graph",
+   "type": "function",
+   "name": "compile_backward_graph",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function compile_backward_graph defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:evaluate_guard",
+   "type": "function",
+   "name": "evaluate_guard",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function evaluate_guard defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/p3_backward_graph.py:as_dict",
+   "type": "function",
+   "name": "as_dict",
+   "filePath": "tools/p3_backward_graph.py",
+   "summary": "Function as_dict defined in tools/p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/power_help.py",
+   "type": "module",
+   "name": "power_help",
+   "filePath": "tools/power_help.py",
+   "summary": "Python module (power_help.py, 58 lines): Read-only, source-owned help for the GWC Power. Defines: main.",
+   "tags": [
+    "python",
+    "tools"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/resolve_g5_status.py",
+   "type": "module",
+   "name": "resolve_g5_status",
+   "filePath": "tools/resolve_g5_status.py",
+   "summary": "Python module (resolve_g5_status.py, 149 lines): Resolve connector-provided G5 candidates into exact-SHA status evidence. This tool intentionally performs no connector calls. The caller supplies the observed candidates and discovery trace; the resolver rejects stale or unrelated runs and produces a deterministic, fail-closed ev Defines: load, utc_now, _workflow_names, resolve, main.",
+   "tags": [
+    "g5",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/resolve_g5_status.py:_workflow_names",
+   "type": "function",
+   "name": "_workflow_names",
+   "filePath": "tools/resolve_g5_status.py",
+   "summary": "Function _workflow_names defined in tools/resolve_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/resolve_g5_status.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/resolve_g5_status.py",
+   "summary": "Function main defined in tools/resolve_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/resolve_g5_status.py:utc_now",
+   "type": "function",
+   "name": "utc_now",
+   "filePath": "tools/resolve_g5_status.py",
+   "summary": "Function utc_now defined in tools/resolve_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/resolve_g5_status.py:load",
+   "type": "function",
+   "name": "load",
+   "filePath": "tools/resolve_g5_status.py",
+   "summary": "Function load defined in tools/resolve_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/resolve_g5_status.py:resolve",
+   "type": "function",
+   "name": "resolve",
+   "filePath": "tools/resolve_g5_status.py",
+   "summary": "Function resolve defined in tools/resolve_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_bmad_procedure_adapter.py",
+   "type": "module",
+   "name": "validate_bmad_procedure_adapter",
+   "filePath": "tools/validate_bmad_procedure_adapter.py",
+   "summary": "Python module (validate_bmad_procedure_adapter.py, 72 lines): Validate the SCRUM-119 BMAD procedure-adapter contract. Defines: load, validate_instance, validate, main.",
+   "tags": [
+    "adapter",
+    "python",
+    "schema",
+    "tools",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_dw_super_app_integration.py",
+   "type": "module",
+   "name": "validate_dw_super_app_integration",
+   "filePath": "tools/validate_dw_super_app_integration.py",
+   "summary": "Python module (validate_dw_super_app_integration.py, 141 lines): Validate the SCRUM-116 topology, ownership and provenance contract. Defines: load_json, validate_contract, main.",
+   "tags": [
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/validate_dw_super_app_integration.py:load_json",
+   "type": "function",
+   "name": "load_json",
+   "filePath": "tools/validate_dw_super_app_integration.py",
+   "summary": "Function load_json defined in tools/validate_dw_super_app_integration.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_dw_super_app_integration.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_dw_super_app_integration.py",
+   "summary": "Function main defined in tools/validate_dw_super_app_integration.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_dw_super_app_integration.py:validate_contract",
+   "type": "function",
+   "name": "validate_contract",
+   "filePath": "tools/validate_dw_super_app_integration.py",
+   "summary": "Function validate_contract defined in tools/validate_dw_super_app_integration.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_dw_super_e2e_pilot.py",
+   "type": "module",
+   "name": "validate_dw_super_e2e_pilot",
+   "filePath": "tools/validate_dw_super_e2e_pilot.py",
+   "summary": "Python module (validate_dw_super_e2e_pilot.py, 62 lines) providing validate dw super e2e pilot functionality. Defines: issue, validate_run, run_suite, main.",
+   "tags": [
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_g01.py",
+   "type": "module",
+   "name": "validate_g01",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Python module (validate_g01.py, 622 lines): Validate canonical G0/G1 lifecycle artifacts. Exit codes: - 0: artifacts are valid and the G1 gate evaluates to PASS. - 1: artifacts are present but invalid, inconsistent, or blocked. - 2: validator configuration or I/O failed. Defines: ValidationIssue, ValidationReport, _load_yaml, _load_json, _issue.",
+   "tags": [
+    "g0",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tools/validate_g01.py:ValidationReport",
+   "type": "class",
+   "name": "ValidationReport",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Class ValidationReport defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/validate_g01.py:ValidationIssue",
+   "type": "class",
+   "name": "ValidationIssue",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Class ValidationIssue defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_issue",
+   "type": "function",
+   "name": "_issue",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _issue defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function main defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_cross_artifact_issues",
+   "type": "function",
+   "name": "_cross_artifact_issues",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _cross_artifact_issues defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_g2_plan_read_issues",
+   "type": "function",
+   "name": "_g2_plan_read_issues",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _g2_plan_read_issues defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:validate_gate_artifact",
+   "type": "function",
+   "name": "validate_gate_artifact",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function validate_gate_artifact defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_implementation_plan_issues",
+   "type": "function",
+   "name": "_implementation_plan_issues",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _implementation_plan_issues defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_schema_issues",
+   "type": "function",
+   "name": "_schema_issues",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _schema_issues defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_execution_feasibility_issues",
+   "type": "function",
+   "name": "_execution_feasibility_issues",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _execution_feasibility_issues defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:validate_workspace",
+   "type": "function",
+   "name": "validate_workspace",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function validate_workspace defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g01.py:_load_yaml",
+   "type": "function",
+   "name": "_load_yaml",
+   "filePath": "tools/validate_g01.py",
+   "summary": "Function _load_yaml defined in tools/validate_g01.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_g5_status.py",
+   "type": "module",
+   "name": "validate_g5_status",
+   "filePath": "tools/validate_g5_status.py",
+   "summary": "Python module (validate_g5_status.py, 89 lines): Validate normalized G5 post-merge status evidence. Defines: load, validate, main.",
+   "tags": [
+    "g5",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/validate_g5_status.py:load",
+   "type": "function",
+   "name": "load",
+   "filePath": "tools/validate_g5_status.py",
+   "summary": "Function load defined in tools/validate_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g5_status.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_g5_status.py",
+   "summary": "Function main defined in tools/validate_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_g5_status.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tools/validate_g5_status.py",
+   "summary": "Function validate defined in tools/validate_g5_status.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_gate_action.py",
+   "type": "module",
+   "name": "validate_gate_action",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Python module (validate_gate_action.py, 221 lines): Fail-closed validation for a task-scoped gate action packet. The validator is deliberately local and data-only. It does not grant authority and it does not call Jira, GitHub, or a deployment system. A packet is valid only when its scope hash, expiry, actor, repository identity, a Defines: load, parse_utc, canonical_scope_hash, schema_errors, semantic_errors.",
+   "tags": [
+    "gates",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:parse_utc",
+   "type": "function",
+   "name": "parse_utc",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function parse_utc defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:schema_errors",
+   "type": "function",
+   "name": "schema_errors",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function schema_errors defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:semantic_errors",
+   "type": "function",
+   "name": "semantic_errors",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function semantic_errors defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function main defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function validate defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:load",
+   "type": "function",
+   "name": "load",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function load defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/validate_gate_action.py:canonical_scope_hash",
+   "type": "function",
+   "name": "canonical_scope_hash",
+   "filePath": "tools/validate_gate_action.py",
+   "summary": "Function canonical_scope_hash defined in tools/validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/validate_github_g5_g6_jira_projection.py",
+   "type": "module",
+   "name": "validate_github_g5_g6_jira_projection",
+   "filePath": "tools/validate_github_g5_g6_jira_projection.py",
+   "summary": "Python module (validate_github_g5_g6_jira_projection.py, 51 lines) providing validate github g5 g6 jira projection functionality. Defines: issue, is_sha, validate_jira_projection, validate_g5_verification, validate_github_evidence.",
+   "tags": [
+    "g5",
+    "g6",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "function:tools/node_architect/validate_node_registry.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "function:tools/node_architect/validate_node_registry.py:build_parser",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "function:tools/node_architect/validate_node_registry.py:validate_registry",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "function:tools/node_architect/validate_node_registry.py:validation_result",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "function:tools/node_architect/validate_node_registry.py:_finding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "function:tools/node_architect/validate_node_registry.py:_load_registry",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_registry.py",
+   "target": "function:tools/node_architect/validate_runtime_registry.py:validate_schema",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_registry.py",
+   "target": "function:tools/node_architect/validate_runtime_registry.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_registry.py",
+   "target": "function:tools/node_architect/validate_runtime_registry.py:validate_registry",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_registry.py",
+   "target": "function:tools/node_architect/validate_runtime_registry.py:source_hash",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_registry.py",
+   "target": "function:tools/node_architect/validate_runtime_registry.py:load",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "target": "function:tools/node_architect/version_drift_rollback_routing.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "target": "function:tools/node_architect/version_drift_rollback_routing.py:attach_digest",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "target": "function:tools/node_architect/version_drift_rollback_routing.py:decide_version_drift_rollback_routing",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "target": "function:tools/node_architect/version_drift_rollback_routing.py:now_utc",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "target": "function:tools/node_architect/version_drift_rollback_routing.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "target": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:_status_class",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "target": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:_promotion_class",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "target": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:_metric_class",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "target": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:overlay_p5_evaluation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "target": "function:tools/node_architect/viewer/p5_evaluation_adapter.py:build_p5_evaluation_elements",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:build_scenario_decision_elements",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:enumerate_routes_to_green",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:classify_route",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:load_registry_bundle",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:build_cytoscape_elements",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:_edge_classes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "function:tools/node_architect/viewer/registry_adapter.py:visit",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/run_history_adapter.py",
+   "target": "function:tools/node_architect/viewer/run_history_adapter.py:_status_class",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/run_history_adapter.py",
+   "target": "function:tools/node_architect/viewer/run_history_adapter.py:build_run_history_elements",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/viewer/run_history_adapter.py",
+   "target": "function:tools/node_architect/viewer/run_history_adapter.py:overlay_run_history",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "class:tools/p3_backward_graph.py:GuardResult",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "class:tools/p3_backward_graph.py:RouteBudget",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "class:tools/p3_backward_graph.py:RouteClass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "class:tools/p3_backward_graph.py:CompileError",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "class:tools/p3_backward_graph.py:BudgetExceeded",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:_digest",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:decide_scenario",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:append_scenario_decision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:scenario_nodes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:route_decision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:enumerate_routes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:_stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:compile_backward_graph",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:evaluate_guard",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/p3_backward_graph.py",
+   "target": "function:tools/p3_backward_graph.py:as_dict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/resolve_g5_status.py",
+   "target": "function:tools/resolve_g5_status.py:_workflow_names",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/resolve_g5_status.py",
+   "target": "function:tools/resolve_g5_status.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/resolve_g5_status.py",
+   "target": "function:tools/resolve_g5_status.py:utc_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/resolve_g5_status.py",
+   "target": "function:tools/resolve_g5_status.py:load",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/resolve_g5_status.py",
+   "target": "function:tools/resolve_g5_status.py:resolve",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_dw_super_app_integration.py",
+   "target": "function:tools/validate_dw_super_app_integration.py:load_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_dw_super_app_integration.py",
+   "target": "function:tools/validate_dw_super_app_integration.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_dw_super_app_integration.py",
+   "target": "function:tools/validate_dw_super_app_integration.py:validate_contract",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "class:tools/validate_g01.py:ValidationReport",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "class:tools/validate_g01.py:ValidationIssue",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_issue",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_cross_artifact_issues",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_g2_plan_read_issues",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:validate_gate_artifact",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_implementation_plan_issues",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_schema_issues",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_execution_feasibility_issues",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:validate_workspace",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g01.py",
+   "target": "function:tools/validate_g01.py:_load_yaml",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g5_status.py",
+   "target": "function:tools/validate_g5_status.py:load",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g5_status.py",
+   "target": "function:tools/validate_g5_status.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_g5_status.py",
+   "target": "function:tools/validate_g5_status.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:parse_utc",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:schema_errors",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:semantic_errors",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:load",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/validate_gate_action.py",
+   "target": "function:tools/validate_gate_action.py:canonical_scope_hash",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_validation_quality.py",
+   "target": "file:tools/node_architect/validate_node_registry.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_registry.py",
+   "target": "file:tools/node_architect/validate_runtime_catalog_taxonomy.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_catalog_taxonomy.py",
+   "target": "file:tools/node_architect/validate_runtime_registry.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/node_architect/validate_runtime_registry.py",
+   "target": "file:tools/node_architect/version_drift_rollback_routing.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/node_architect/viewer/README.md",
+   "target": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/node_architect/viewer/p5_evaluation_adapter.py",
+   "target": "file:tools/node_architect/viewer/registry_adapter.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/node_architect/viewer/registry_adapter.py",
+   "target": "file:tools/node_architect/viewer/run_history_adapter.py",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

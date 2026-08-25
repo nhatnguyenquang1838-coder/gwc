@@ -1,0 +1,531 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-151/g0/hotfix-intake.yaml",
+   "language": "yaml",
+   "sizeLines": 30,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-151/g1/minimal-preflight.yaml",
+   "language": "yaml",
+   "sizeLines": 20,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-151/h2/execution-record.yaml",
+   "language": "yaml",
+   "sizeLines": 37,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-198/FASTLANE-G2-R3-HANDOFF.md",
+   "language": "markdown",
+   "sizeLines": 39,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-198/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 49,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-198/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 114,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-203/FASTLANE-G2-R3-HANDOFF.md",
+   "language": "markdown",
+   "sizeLines": 37,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-203/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 49,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-203/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 23,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-238/FASTLANE-G2-R3-HANDOFF.md",
+   "language": "markdown",
+   "sizeLines": 39,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-238/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 50,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-238/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 26,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-239/FASTLANE-G2-HANDOFF.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-239/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 44,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-239/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 23,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-240/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 31,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-240/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 18,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-241/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 31,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-241/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 18,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-242/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 31,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-242/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 18,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-243/g0/context-snapshot.yaml",
+   "language": "yaml",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-243/g1/brainstorming/g1-options.yaml",
+   "language": "yaml",
+   "sizeLines": 19,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-243/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-243/g1/intake/g1-intake-brief.yaml",
+   "language": "yaml",
+   "sizeLines": 24,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-151/g0/hotfix-intake.yaml",
+   "type": "config",
+   "name": "hotfix-intake",
+   "filePath": ".gwc/tasks/SCRUM-151/g0/hotfix-intake.yaml",
+   "summary": "GWC task governance YAML (hotfix-intake.yaml, 30 lines). Top-level keys: schema_version, artifact_type, mode, task_id, repository, base_ref.",
+   "tags": [
+    "g0",
+    "gwc",
+    "intake",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-151/g1/minimal-preflight.yaml",
+   "type": "config",
+   "name": "minimal-preflight",
+   "filePath": ".gwc/tasks/SCRUM-151/g1/minimal-preflight.yaml",
+   "summary": "GWC task governance YAML (minimal-preflight.yaml, 20 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_sha, working_branch.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-151/h2/execution-record.yaml",
+   "type": "config",
+   "name": "execution-record",
+   "filePath": ".gwc/tasks/SCRUM-151/h2/execution-record.yaml",
+   "summary": "GWC task governance YAML (execution-record.yaml, 37 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-198/FASTLANE-G2-R3-HANDOFF.md",
+   "type": "document",
+   "name": "SCRUM-198 Fastlane G2 R3 handoff",
+   "filePath": ".gwc/tasks/SCRUM-198/FASTLANE-G2-R3-HANDOFF.md",
+   "summary": "Markdown document \"SCRUM-198 Fastlane G2 R3 handoff\" (document, 39 lines): - Repository: `nhatnguyenquang1838-coder/gwc` - Base: `main@3b0938065e71e699d327d041f5b6023ed30a29dc` - Branch: `codex/scrum-198-ci-run-capture-m5-fastlane-r3-20260730` - Node: `repo_delivery.ci-run-capture` - Approval: `CP-20260730-198-G2-R3` - Scope hash:",
+   "tags": [
+    "documentation",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-198/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-198/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 49 lines). Top-level keys: schema_version, artifact_type, gate, task_id, coordination_task, node_id.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-198/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-198/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 114 lines). Top-level keys: schema_version, artifact_type, gate, task_id, repository, base_ref.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-203/FASTLANE-G2-R3-HANDOFF.md",
+   "type": "document",
+   "name": "SCRUM-203 Fastlane G2 R3 handoff",
+   "filePath": ".gwc/tasks/SCRUM-203/FASTLANE-G2-R3-HANDOFF.md",
+   "summary": "Markdown document \"SCRUM-203 Fastlane G2 R3 handoff\" (document, 37 lines): - Repository: `nhatnguyenquang1838-coder/gwc` - Base: `main@3b0938065e71e699d327d041f5b6023ed30a29dc` - Branch: `codex/scrum-203-checkpoint-persist-m5-fastlane-r3-20260730` - Node: `runtime_checkpoint.checkpoint-persist` - Approval: `CP-20260730-203-G2-R3` - Scope hash:",
+   "tags": [
+    "documentation",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-203/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-203/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 49 lines). Top-level keys: schema_version, artifact_type, gate, task_id, coordination_task, node_id.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-203/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-203/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 23 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-238/FASTLANE-G2-R3-HANDOFF.md",
+   "type": "document",
+   "name": "SCRUM-238 Fastlane G2 R3 handoff",
+   "filePath": ".gwc/tasks/SCRUM-238/FASTLANE-G2-R3-HANDOFF.md",
+   "summary": "Markdown document \"SCRUM-238 Fastlane G2 R3 handoff\" (document, 39 lines): - Repository: `nhatnguyenquang1838-coder/gwc` - Base: `main@3b0938065e71e699d327d041f5b6023ed30a29dc` - Branch: `codex/scrum-238-timeout-recovery-m5-fastlane-r3-20260730` - Node: `failure_recovery.timeout-recovery` - Approval: `CP-20260730-238-G2-R3` - Scope hash:",
+   "tags": [
+    "documentation",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-238/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-238/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 50 lines). Top-level keys: schema_version, artifact_type, gate, task_id, coordination_task, node_id.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-238/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-238/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 26 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-239/FASTLANE-G2-HANDOFF.md",
+   "type": "document",
+   "name": "SCRUM-239 G2 handoff",
+   "filePath": ".gwc/tasks/SCRUM-239/FASTLANE-G2-HANDOFF.md",
+   "summary": "Markdown document \"SCRUM-239 G2 handoff\" (document, 26 lines): - Repository: `nhatnguyenquang1838-coder/gwc` - Base: `main@b9c6dddf3da4394cc0f3d52e030aeaecf4f5d380` - Branch: `codex/scrum-239-crash-checkpoint-recovery-m5-20260730` - Node: `failure_recovery.crash-checkpoint-recovery` - Approval: `CP-20260730-239-G2-R1` - Scope hash prefix: `42793641d2d5dd38`",
+   "tags": [
+    "documentation",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-239/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-239/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 44 lines). Top-level keys: schema_version, artifact_type, gate, task_id, node_id, catalog_node_id.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-239/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-239/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 23 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-240/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-240/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 31 lines). Top-level keys: schema_version, artifact_type, gate, task_id, node_id, target_maturity.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-240/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-240/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 18 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-241/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-241/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 31 lines). Top-level keys: schema_version, artifact_type, gate, task_id, node_id, target_maturity.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-241/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-241/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 18 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-242/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-242/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 31 lines). Top-level keys: schema_version, artifact_type, gate, task_id, node_id, target_maturity.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-242/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-242/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 18 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_ref, base_sha.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-243/g0/context-snapshot.yaml",
+   "type": "config",
+   "name": "context-snapshot",
+   "filePath": ".gwc/tasks/SCRUM-243/g0/context-snapshot.yaml",
+   "summary": "GWC task governance YAML (context-snapshot.yaml, 28 lines). Top-level keys: schema_version, task_id, gate, status, created_at, repository.",
+   "tags": [
+    "g0",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-243/g1/brainstorming/g1-options.yaml",
+   "type": "config",
+   "name": "g1-options",
+   "filePath": ".gwc/tasks/SCRUM-243/g1/brainstorming/g1-options.yaml",
+   "summary": "GWC task governance YAML (g1-options.yaml, 19 lines). Top-level keys: schema_version, task_id, gate, artifact, status, options.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-243/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/SCRUM-243/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 16 lines). Top-level keys: schema_version, task_id, gate, artifact, status, decision.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-243/g1/intake/g1-intake-brief.yaml",
+   "type": "config",
+   "name": "g1-intake-brief",
+   "filePath": ".gwc/tasks/SCRUM-243/g1/intake/g1-intake-brief.yaml",
+   "summary": "GWC task governance YAML (g1-intake-brief.yaml, 24 lines). Top-level keys: schema_version, task_id, gate, artifact, status, problem_statement.",
+   "tags": [
+    "g1",
+    "gwc",
+    "intake",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

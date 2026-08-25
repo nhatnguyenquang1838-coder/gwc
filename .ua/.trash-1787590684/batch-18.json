@@ -1,0 +1,75 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md",
+   "language": "markdown",
+   "sizeLines": 137,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+   "language": "markdown",
+   "sizeLines": 77,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/tasks.md",
+   "language": "markdown",
+   "sizeLines": 61,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 137 lines): SCRUM-115 extends the existing P3 implementation rather than creating a second routing engine. Canonical scenario data remains in `core/node-architect/scenario-registry.json`; schema contracts remain under `schemas/runtime`; deterministic typed guard and route evaluation remain in",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 77 lines): SCRUM-115 completes the P3 integration lane by materializing an initial canonical scenario set, binding those scenarios to deterministic typed routing, and exposing runtime and immutable history state through the registry-backed Cytoscape v3 adapter. SCRUM-113 and SCRUM-114 are merged",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/GWC-P3-I3-canonical-scenarios-v3/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 61 lines): Deliver SCRUM-115 as one bounded guarded-branch change after SCRUM-113 and SCRUM-114 are merged. The implementation adds 14 canonical scenarios, deterministic scenario decisions and immutable history, registry validation, and Cytoscape v3 projection.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/design.md",
+   "target": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/requirements.md",
+   "target": "file:.kiro/specs/GWC-P3-I3-canonical-scenarios-v3/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

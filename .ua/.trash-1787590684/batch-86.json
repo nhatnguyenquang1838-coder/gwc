@@ -1,0 +1,26 @@
+{
+ "batchFiles": [
+  {
+   "path": "libs/g2-skill-library/skills/g2-execution-plan.md",
+   "language": "markdown",
+   "sizeLines": 50,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:libs/g2-skill-library/skills/g2-execution-plan.md",
+   "type": "document",
+   "name": "G2 Execution Plan Blueprint",
+   "filePath": "libs/g2-skill-library/skills/g2-execution-plan.md",
+   "summary": "Markdown document \"G2 Execution Plan Blueprint\" (plan, 50 lines): **Input:** `G1_APPROVAL_HASH` (The immutable signature confirming intent and scope). **Output:** A linear, verified sequence of operations leading to the G3 ready state.",
+   "tags": [
+    "documentation",
+    "g2",
+    "libs"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

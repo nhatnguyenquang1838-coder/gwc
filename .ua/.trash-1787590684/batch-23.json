@@ -1,0 +1,81 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/design.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/requirements.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/tasks.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 3 lines): Add three machine-readable evidence schemas, examples, a validator and unit tests. The validator fails closed on stale main, PR-head drift, absent/failing CI, merge-SHA mismatch and Jira projection authority leakage.",
+   "tags": [
+    "documentation",
+    "g5",
+    "g6",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 3 lines): SCRUM-120 binds gate evidence to exact GitHub refs, PR heads, merge SHAs and workflow runs. G5 is post-merge verification only. G6 is required for deployment, release, production data, secret, migration or destructive operations. Jira is projection only and cannot grant GWC authority.",
+   "tags": [
+    "documentation",
+    "g5",
+    "g6",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 7 lines): - [x] Define exact GitHub evidence schemas and examples. - [x] Define G5 post-merge verification schema and examples. - [x] Define Jira projection-only schema. - [x] Add validator and negative tests. - [x] Add release note and G3 evidence.",
+   "tags": [
+    "documentation",
+    "g5",
+    "g6",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/design.md",
+   "target": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/requirements.md",
+   "target": "file:.kiro/specs/GWC-P4-K4-github-g5-g6-jira-projection/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

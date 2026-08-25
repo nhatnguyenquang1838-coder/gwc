@@ -1,0 +1,80 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-141/p1-validation-matrix.json",
+   "language": "json",
+   "sizeLines": 100,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-141/p1-validation-report.md",
+   "language": "markdown",
+   "sizeLines": 62,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md",
+   "type": "document",
+   "name": "SCRUM-141 P1 Blocker Reconciliation",
+   "filePath": ".gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md",
+   "summary": "Markdown document \"SCRUM-141 P1 Blocker Reconciliation\" (document, 26 lines): Generated: 2026-07-26T17:42:00+07:00 Repository: `nhatnguyenquang1838-coder/gwc` Base: `main@9c79409052db73868cb76f4e04822fca07b2a0d7`",
+   "tags": [
+    "documentation",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-141/p1-validation-matrix.json",
+   "type": "config",
+   "name": "AC2",
+   "filePath": ".gwc/tasks/SCRUM-141/p1-validation-matrix.json",
+   "summary": "JSON data file \"AC2\" (p1-validation-matrix.json, 100 lines) Top-level keys: task, repository, base_sha, ac2, acceptance_criteria, ci_run_id.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-141/p1-validation-report.md",
+   "type": "document",
+   "name": "SCRUM-141 P1 Validation Report",
+   "filePath": ".gwc/tasks/SCRUM-141/p1-validation-report.md",
+   "summary": "Markdown document \"SCRUM-141 P1 Validation Report\" (report, 62 lines): Generated: 2026-07-26T17:42:00+07:00 Repository: `nhatnguyenquang1838-coder/gwc` Base: `main@9c79409052db73868cb76f4e04822fca07b2a0d7` Execution mode: `chat_connector_only` with G2-approved guarded branch persistence. Run ID: `g1-SCRUM-141-20260726-1715`",
+   "tags": [
+    "documentation",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-141/p1-blocker-reconciliation.md",
+   "target": "file:.gwc/tasks/SCRUM-141/p1-validation-matrix.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-141/p1-validation-matrix.json",
+   "target": "file:.gwc/tasks/SCRUM-141/p1-validation-report.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

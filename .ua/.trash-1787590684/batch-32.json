@@ -1,0 +1,81 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-119-bmad-procedure-adapter/design.md",
+   "language": "markdown",
+   "sizeLines": 37,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-119-bmad-procedure-adapter/requirements.md",
+   "language": "markdown",
+   "sizeLines": 25,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-119-bmad-procedure-adapter/tasks.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/design.md",
+   "type": "document",
+   "name": "SCRUM-119 Design",
+   "filePath": ".kiro/specs/scrum-119-bmad-procedure-adapter/design.md",
+   "summary": "Markdown document \"SCRUM-119 Design\" (specification, 37 lines): ```text GWC invocation authority -> request schema validation -> permission preflight -> procedure registry lookup -> bounded BMAD executor -> result schema validation -> evidence/provenance return ```",
+   "tags": [
+    "adapter",
+    "documentation",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/requirements.md",
+   "type": "document",
+   "name": "SCRUM-119 Requirements",
+   "filePath": ".kiro/specs/scrum-119-bmad-procedure-adapter/requirements.md",
+   "summary": "Markdown document \"SCRUM-119 Requirements\" (specification, 25 lines).",
+   "tags": [
+    "adapter",
+    "documentation",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/tasks.md",
+   "type": "document",
+   "name": "SCRUM-119 Tasks",
+   "filePath": ".kiro/specs/scrum-119-bmad-procedure-adapter/tasks.md",
+   "summary": "Markdown document \"SCRUM-119 Tasks\" (specification, 12 lines): - [x] Define procedure registry schema and canonical procedure set. - [x] Define request schema with exact task/repository/SHA/scope binding. - [x] Define result schema with evidence, risks and provenance. - [x] Define permission model for read-only, bounded-write and prohibited actions. - [x]",
+   "tags": [
+    "adapter",
+    "documentation",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/design.md",
+   "target": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/requirements.md",
+   "target": "file:.kiro/specs/scrum-119-bmad-procedure-adapter/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

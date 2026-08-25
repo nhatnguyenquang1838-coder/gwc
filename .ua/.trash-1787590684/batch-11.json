@@ -1,0 +1,137 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-146/g2/approval-envelope.json",
+   "language": "json",
+   "sizeLines": 76,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g2/approval-readback.yaml",
+   "language": "yaml",
+   "sizeLines": 35,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g2/execution-envelope.json",
+   "language": "json",
+   "sizeLines": 116,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 116,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g2/plan-read-receipt.yaml",
+   "language": "yaml",
+   "sizeLines": 22,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g2/approval-envelope.json",
+   "type": "config",
+   "name": "SCRUM-146",
+   "filePath": ".gwc/tasks/SCRUM-146/g2/approval-envelope.json",
+   "summary": "JSON data file \"SCRUM-146\" (approval-envelope.json, 76 lines) Top-level keys: approval_id, authority_gate, task_id, issued_at, expires_at, scope_version.",
+   "tags": [
+    "approvals",
+    "envelope",
+    "g2",
+    "gwc",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g2/approval-readback.yaml",
+   "type": "config",
+   "name": "approval-readback",
+   "filePath": ".gwc/tasks/SCRUM-146/g2/approval-readback.yaml",
+   "summary": "GWC task governance YAML (approval-readback.yaml, 35 lines). Top-level keys: schema_version, artifact_type, approval_id, authority_gate, task_id, repository.",
+   "tags": [
+    "approvals",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g2/execution-envelope.json",
+   "type": "config",
+   "name": "Coordinated SCRUM-146–149 post-P5 recovery and acceptance reconciliation",
+   "filePath": ".gwc/tasks/SCRUM-146/g2/execution-envelope.json",
+   "summary": "JSON data file \"Coordinated SCRUM-146–149 post-P5 recovery and acceptance reconciliation\" (execution-envelope.json, 116 lines) Top-level keys: schema_version, workflow, temporary, sunset_condition, task, repository.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "json",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-146/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 116 lines).",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g2/plan-read-receipt.yaml",
+   "type": "config",
+   "name": "plan-read-receipt",
+   "filePath": ".gwc/tasks/SCRUM-146/g2/plan-read-receipt.yaml",
+   "summary": "GWC task governance YAML (plan-read-receipt.yaml, 22 lines). Top-level keys: schema_version, artifact_type, task_id, canonical_task_uid, repository, base_sha.",
+   "tags": [
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/g2/approval-envelope.json",
+   "target": "file:.gwc/tasks/SCRUM-146/g2/approval-readback.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/g2/approval-readback.yaml",
+   "target": "file:.gwc/tasks/SCRUM-146/g2/execution-envelope.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/g2/execution-envelope.json",
+   "target": "file:.gwc/tasks/SCRUM-146/g2/execution-envelope.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/g2/execution-envelope.yaml",
+   "target": "file:.gwc/tasks/SCRUM-146/g2/plan-read-receipt.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

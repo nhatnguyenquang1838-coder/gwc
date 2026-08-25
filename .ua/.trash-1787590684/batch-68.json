@@ -1,0 +1,210 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/scale_control/README.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/batch-admission-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/README.md",
+   "type": "document",
+   "name": "`scale_control` node family",
+   "filePath": "core/node-architect/node-catalog/scale_control/README.md",
+   "summary": "Markdown document \"`scale_control` node family\" (document, 28 lines): Batch 09 is the final controlled catalog family. It defines batch admission, sequential throttling, exact-head observability, cardinality readiness, and independent-audit handoff.",
+   "tags": [
+    "catalog",
+    "core",
+    "documentation",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/batch-admission-check.node.json",
+   "type": "config",
+   "name": "Batch Admission Check",
+   "filePath": "core/node-architect/node-catalog/scale_control/batch-admission-check.node.json",
+   "summary": "JSON data file \"Batch Admission Check\" (batch-admission-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json",
+   "type": "config",
+   "name": "Batch Size Limit Check",
+   "filePath": "core/node-architect/node-catalog/scale_control/batch-size-limit-check.node.json",
+   "summary": "JSON data file \"Batch Size Limit Check\" (batch-size-limit-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json",
+   "type": "config",
+   "name": "Catalog Cardinality Readiness",
+   "filePath": "core/node-architect/node-catalog/scale_control/catalog-cardinality-readiness.node.json",
+   "summary": "JSON data file \"Catalog Cardinality Readiness\" (catalog-cardinality-readiness.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json",
+   "type": "config",
+   "name": "Exact Head Readiness Check",
+   "filePath": "core/node-architect/node-catalog/scale_control/exact-head-readiness-check.node.json",
+   "summary": "JSON data file \"Exact Head Readiness Check\" (exact-head-readiness-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json",
+   "type": "config",
+   "name": "Execution Throttle Control",
+   "filePath": "core/node-architect/node-catalog/scale_control/execution-throttle-control.node.json",
+   "summary": "JSON data file \"Execution Throttle Control\" (execution-throttle-control.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json",
+   "type": "config",
+   "name": "Independent Audit Handoff",
+   "filePath": "core/node-architect/node-catalog/scale_control/independent-audit-handoff.node.json",
+   "summary": "JSON data file \"Independent Audit Handoff\" (independent-audit-handoff.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "audit",
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json",
+   "type": "config",
+   "name": "Previous Batch G5 Verification",
+   "filePath": "core/node-architect/node-catalog/scale_control/previous-batch-g5-verification.node.json",
+   "summary": "JSON data file \"Previous Batch G5 Verification\" (previous-batch-g5-verification.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "g5",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json",
+   "type": "config",
+   "name": "Rollout Progress Projection",
+   "filePath": "core/node-architect/node-catalog/scale_control/rollout-progress-projection.node.json",
+   "summary": "JSON data file \"Rollout Progress Projection\" (rollout-progress-projection.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json",
+   "type": "config",
+   "name": "Workflow Run Observability",
+   "filePath": "core/node-architect/node-catalog/scale_control/workflow-run-observability.node.json",
+   "summary": "JSON data file \"Workflow Run Observability\" (workflow-run-observability.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "ci",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

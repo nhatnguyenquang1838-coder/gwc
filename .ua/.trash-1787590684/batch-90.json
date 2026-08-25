@@ -1,0 +1,51 @@
+{
+ "batchFiles": [
+  {
+   "path": "projects/ds-mcp/project-extension.md",
+   "language": "markdown",
+   "sizeLines": 48,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "projects/ds-mcp/project-instructions.md",
+   "language": "markdown",
+   "sizeLines": 600,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:projects/ds-mcp/project-extension.md",
+   "type": "document",
+   "name": "DS MCP Project Extension",
+   "filePath": "projects/ds-mcp/project-extension.md",
+   "summary": "Markdown document \"DS MCP Project Extension\" (document, 48 lines): --- extension_id: ds-mcp-conventions version: '1.0' authoritative: false extends_profile: ds-mcp core_policy: CODING-PROJECT-GOVERNANCE@1.0 core_sha256: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48 mode: tighten_only source_note: DS MCP API, workflow, connector, data, and Admin UI invariants. ---",
+   "tags": [
+    "documentation",
+    "projects"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:projects/ds-mcp/project-instructions.md",
+   "type": "document",
+   "name": "DS MCP LLM Operational Instructions v2.1",
+   "filePath": "projects/ds-mcp/project-instructions.md",
+   "summary": "Markdown document \"DS MCP LLM Operational Instructions v2.1\" (document, 600 lines): --- spec_id: DS-MCP-LLM-OPS version: \"2.1\" status: active authoritative: true language: en timezone: Asia/Ho_Chi_Minh repository: dw18031988/ds_mcp_server repository_url: https://github.com/dw18031988/ds_mcp_server github_connector: DW approval_protocol: scoped-envelope ci_recheck_delay: PT2M",
+   "tags": [
+    "documentation",
+    "instructions",
+    "projects"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:projects/ds-mcp/project-extension.md",
+   "target": "file:projects/ds-mcp/project-instructions.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

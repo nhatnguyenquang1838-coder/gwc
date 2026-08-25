@@ -1,0 +1,259 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/README.md",
+   "language": "markdown",
+   "sizeLines": 41,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/blocker-register.md",
+   "language": "markdown",
+   "sizeLines": 74,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 31,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/current-state-baseline.md",
+   "language": "markdown",
+   "sizeLines": 136,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/decisions.md",
+   "language": "markdown",
+   "sizeLines": 19,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence-provenance-map.md",
+   "language": "markdown",
+   "sizeLines": 89,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence.json",
+   "language": "json",
+   "sizeLines": 88,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/executable-surface-inventory.md",
+   "language": "markdown",
+   "sizeLines": 169,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/task.yaml",
+   "language": "yaml",
+   "sizeLines": 85,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 14,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/README.md",
+   "type": "document",
+   "name": "README",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/README.md",
+   "summary": "Markdown document \"README\" (guideline/contract, 41 lines): Produce a source-backed current-state audit that separates contracts, executable enforcement, tests, generated package behavior and proposed architecture.",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/blocker-register.md",
+   "type": "document",
+   "name": "Blocker Register",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/blocker-register.md",
+   "summary": "Markdown document \"Blocker Register\" (guideline/contract, 74 lines): - **Severity:** `BLOCKER` - **Recommended owner:** `SCRUM-103` - **Finding:** gate-transition-map.yaml omits explicit G4/G5/G6 progression and terminates at completed after validation passed. - **Required remediation:** Introduce a versioned transition/state model that preserves G3 validation, G4",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/coding-guide.md",
+   "type": "document",
+   "name": "coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/coding-guide.md",
+   "summary": "Markdown document \"coding guide\" (guideline/contract, 31 lines): - `AGENTS.md` - `projects/gwc/project-profile.yaml` - `projects/gwc/project-instructions.md` - `projects/gwc/project-extension.md` - `core/task-lifecycle/gate-transition-map.yaml` - `tools/validate_g01.py` - `tests/test_g1_implementation_plan_handoff.py` -",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/current-state-baseline.md",
+   "type": "document",
+   "name": "SCRUM-100 Current-State Baseline",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/current-state-baseline.md",
+   "summary": "Markdown document \"SCRUM-100 Current-State Baseline\" (guideline/contract, 136 lines): **Repository:** `nhatnguyenquang1838-coder/gwc` **Default branch:** `main` **Exact protected-base SHA:** `82755198c772cdba7b07ebaa5fc7e8c1801a6bb0` **Recovered planning merge:** PR `#96` **Execution mode:** `chat_connector_only` **Run:** `g1-SCRUM-100-20260725-current-state-baseline` **Initial",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/decisions.md",
+   "type": "document",
+   "name": "decisions",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/decisions.md",
+   "summary": "Markdown document \"decisions\" (guideline/contract, 19 lines): - Evidence used: protected-base GWC contracts, project profile/instructions and verified implementation/test paths. - Alternatives considered: broad rewrite; additive extension; defer. - Rule applied: `Reuse 鈫?Extend 鈫?Refactor 鈫?Replace`. - Decision: use additive extension and compatibility tests.",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence-provenance-map.md",
+   "type": "document",
+   "name": "Evidence and Provenance Map",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence-provenance-map.md",
+   "summary": "Markdown document \"Evidence and Provenance Map\" (guideline/contract, 89 lines): - Repository: `nhatnguyenquang1838-coder/gwc` - Default branch: `main` - Exact main SHA: `82755198c772cdba7b07ebaa5fc7e8c1801a6bb0` - Planning merge: PR `#96` - Jira projection: `SCRUM-100`, status `In Progress`, parent `SCRUM-95`, blocks `SCRUM-103`",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence.json",
+   "type": "config",
+   "name": "SCRUM-100",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-100\" (evidence.json, 88 lines) Top-level keys: task_id, repository, base_sha, requirements, sources, confidence.",
+   "tags": [
+    "audit",
+    "contract",
+    "json",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/executable-surface-inventory.md",
+   "type": "document",
+   "name": "Executable-Surface Inventory",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/executable-surface-inventory.md",
+   "summary": "Markdown document \"Executable-Surface Inventory\" (guideline/contract, 169 lines): - **Classification:** `PARTIAL` - **Finding:** All seven gates are documented, but executable enforcement is uneven and the state transition map does not represent the full sequence. - **Evidence:** - `core/GATE_LIFECYCLE_CONTRACT_v1.0.md` - `core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md` -",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/impact-analysis.md",
+   "type": "document",
+   "name": "impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/impact-analysis.md",
+   "summary": "Markdown document \"impact analysis\" (guideline/contract, 28 lines): - `AGENTS.md` - `projects/gwc/project-profile.yaml` - `projects/gwc/project-instructions.md` - `projects/gwc/project-extension.md` - `core/task-lifecycle/gate-transition-map.yaml` - `tools/validate_g01.py` - `tests/test_g1_implementation_plan_handoff.py` -",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/implementation-plan.md",
+   "type": "document",
+   "name": "implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/implementation-plan.md",
+   "summary": "Markdown document \"implementation plan\" (plan, 8 lines): 1. Build a table of declared behavior versus executable enforcement. 2. Classify each finding as implemented, partial, contract-only, proposed or stale. 3. Verify every blocker against a protected-base path and test where available. 4. Separate edge-scenario count from graph-edge count. 5. Publish",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/task.yaml",
+   "type": "config",
+   "name": "Audit current GWC contracts, blockers and executable surfaces",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/task.yaml",
+   "summary": "GWC task governance YAML \"Audit current GWC contracts, blockers and executable surfaces\" (task.yaml, 85 lines). Top-level keys: schema_version, task_id, title, slug, objective, repository.",
+   "tags": [
+    "audit",
+    "contract",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/test-plan.md",
+   "type": "document",
+   "name": "test plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-100-audit-current-gwc-contracts-blockers-surfaces/test-plan.md",
+   "summary": "Markdown document \"test plan\" (plan, 14 lines): - Path existence checks for every cited file. - Cross-check audit statements against current tests and schemas. - No inferred implementation may be labelled canonical.",
+   "tags": [
+    "audit",
+    "contract",
+    "documentation",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

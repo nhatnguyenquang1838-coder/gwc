@@ -1,0 +1,211 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/README.md",
+   "language": "markdown",
+   "sizeLines": 40,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/decisions.md",
+   "language": "markdown",
+   "sizeLines": 19,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/evidence.json",
+   "language": "json",
+   "sizeLines": 41,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 23,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/task.yaml",
+   "language": "yaml",
+   "sizeLines": 73,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 14,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/README.md",
+   "type": "document",
+   "name": "README",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/README.md",
+   "summary": "Markdown document \"README\" (document, 40 lines): Define the integration ownership and authority boundaries for GWC, UA, Task-Me, BMAD, GitHub/CI, deployment systems and Jira.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/coding-guide.md",
+   "type": "document",
+   "name": "coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/coding-guide.md",
+   "summary": "Markdown document \"coding guide\" (document, 26 lines): - `projects/gwc/project-profile.yaml` - `projects/gwc/project-instructions.md` - `projects/gwc/project-extension.md` - `docs/project-consumer-agent-instructions.md`",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/decisions.md",
+   "type": "document",
+   "name": "decisions",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/decisions.md",
+   "summary": "Markdown document \"decisions\" (document, 19 lines): - Evidence used: protected-base GWC contracts, project profile/instructions and verified implementation/test paths. - Alternatives considered: broad rewrite; additive extension; defer. - Rule applied: `Reuse 鈫?Extend 鈫?Refactor 鈫?Replace`. - Decision: use additive extension and compatibility tests.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/evidence.json",
+   "type": "config",
+   "name": "SCRUM-101",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-101\" (evidence.json, 41 lines) Top-level keys: task_id, repository, base_sha, requirements, sources, confidence.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/impact-analysis.md",
+   "type": "document",
+   "name": "impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/impact-analysis.md",
+   "summary": "Markdown document \"impact analysis\" (document, 23 lines): - `projects/gwc/project-profile.yaml` - `projects/gwc/project-instructions.md` - `projects/gwc/project-extension.md` - `docs/project-consumer-agent-instructions.md`",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/implementation-plan.md",
+   "type": "document",
+   "name": "implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/implementation-plan.md",
+   "summary": "Markdown document \"implementation plan\" (plan, 8 lines): 1. Define canonical owner for product source, requirements, knowledge, plans, gate state, runtime history and external status. 2. Define GWC/UA/Task-Me/BMAD input/output contracts. 3. Define prohibited cross-component writes. 4. Define GitHub, deployment and Jira evidence/projection roles. 5.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/task.yaml",
+   "type": "config",
+   "name": "Define DW SUPER APP source-of-truth and authority matrix",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/task.yaml",
+   "summary": "GWC task governance YAML \"Define DW SUPER APP source-of-truth and authority matrix\" (task.yaml, 73 lines). Top-level keys: schema_version, task_id, title, slug, objective, repository.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/test-plan.md",
+   "type": "document",
+   "name": "test plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/test-plan.md",
+   "summary": "Markdown document \"test plan\" (plan, 14 lines): - Every state-changing operation resolves to exactly one authority owner. - Jira and external projections cannot grant G0-G6 authority. - Task-Me and BMAD outputs cannot mutate canonical GWC state.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-101-define-dw-super-app-source-of-truth-authority/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

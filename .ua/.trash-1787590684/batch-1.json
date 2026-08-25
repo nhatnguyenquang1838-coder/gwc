@@ -1,0 +1,76 @@
+{
+ "batchFiles": [
+  {
+   "path": ".github/workflows/build-packages.yml",
+   "language": "yaml",
+   "sizeLines": 146,
+   "fileCategory": "infra"
+  },
+  {
+   "path": ".github/workflows/publish-power.yml",
+   "language": "yaml",
+   "sizeLines": 40,
+   "fileCategory": "infra"
+  },
+  {
+   "path": ".github/workflows/validate-instructions.yml",
+   "language": "yaml",
+   "sizeLines": 160,
+   "fileCategory": "infra"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.github/workflows/build-packages.yml",
+   "type": "pipeline",
+   "name": "build-packages.yml",
+   "filePath": ".github/workflows/build-packages.yml",
+   "summary": "GitHub Actions CI workflow (build-packages.yml) defining automated pipeline steps for the GWC repository across 146 lines of YAML. Key jobs/steps include: Build instruction packages, Checkout, Set up Python. Triggered on pull_request events.",
+   "tags": [
+    "ci",
+    "github-actions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.github/workflows/publish-power.yml",
+   "type": "pipeline",
+   "name": "publish-power.yml",
+   "filePath": ".github/workflows/publish-power.yml",
+   "summary": "GitHub Actions CI workflow (publish-power.yml) defining automated pipeline steps for the GWC repository across 40 lines of YAML. Key jobs/steps include: Publish GWC Power. Triggered on push, description events.",
+   "tags": [
+    "ci",
+    "github-actions"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.github/workflows/validate-instructions.yml",
+   "type": "pipeline",
+   "name": "validate-instructions.yml",
+   "filePath": ".github/workflows/validate-instructions.yml",
+   "summary": "GitHub Actions CI workflow (validate-instructions.yml) defining automated pipeline steps for the GWC repository across 160 lines of YAML. Key jobs/steps include: Validate instructions, Checkout, Set up Python. Triggered on pull_request events.",
+   "tags": [
+    "ci",
+    "github-actions",
+    "instructions",
+    "validation"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.github/workflows/build-packages.yml",
+   "target": "file:.github/workflows/publish-power.yml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.github/workflows/publish-power.yml",
+   "target": "file:.github/workflows/validate-instructions.yml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

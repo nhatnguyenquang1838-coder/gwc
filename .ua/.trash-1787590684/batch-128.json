@@ -1,0 +1,2862 @@
+{
+ "batchFiles": [
+  {
+   "path": "tests/test_timeout_recovery.py",
+   "language": "python",
+   "sizeLines": 48,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_ua_host_contract.py",
+   "language": "python",
+   "sizeLines": 9,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_unknown_write_reconciliation.py",
+   "language": "python",
+   "sizeLines": 48,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_v3_registry_adapter.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_v3_run_history_adapter.py",
+   "language": "python",
+   "sizeLines": 193,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_validate_gate_action.py",
+   "language": "python",
+   "sizeLines": 163,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/capture_g01_decision.py",
+   "language": "python",
+   "sizeLines": 282,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/evaluate_base_drift.py",
+   "language": "python",
+   "sizeLines": 206,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/generate_g01_runtime.py",
+   "language": "python",
+   "sizeLines": 452,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/approval_expiry_recovery.py",
+   "language": "python",
+   "sizeLines": 142,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/bounded_external_write.py",
+   "language": "python",
+   "sizeLines": 190,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/cas_mismatch_recovery.py",
+   "language": "python",
+   "sizeLines": 88,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/checkpoint_store.py",
+   "language": "python",
+   "sizeLines": 160,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/ci_run_capture.py",
+   "language": "python",
+   "sizeLines": 100,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/crash_checkpoint_recovery.py",
+   "language": "python",
+   "sizeLines": 128,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/crash_replay_harness.py",
+   "language": "python",
+   "sizeLines": 395,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/duplicate_agent_fencing.py",
+   "language": "python",
+   "sizeLines": 108,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/durable_checkpoint_runtime.py",
+   "language": "python",
+   "sizeLines": 326,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tests/test_timeout_recovery.py",
+   "type": "module",
+   "name": "test_timeout_recovery",
+   "filePath": "tests/test_timeout_recovery.py",
+   "summary": "Python test module (test_timeout_recovery.py, 48 lines) covering timeout recovery. Defines: decide, TimeoutRecoveryTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_ua_host_contract.py",
+   "type": "module",
+   "name": "test_ua_host_contract",
+   "filePath": "tests/test_ua_host_contract.py",
+   "summary": "Python test module (test_ua_host_contract.py, 9 lines) covering ua host contract. Defines: UAHostContractTests.",
+   "tags": [
+    "contract",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_unknown_write_reconciliation.py",
+   "type": "module",
+   "name": "test_unknown_write_reconciliation",
+   "filePath": "tests/test_unknown_write_reconciliation.py",
+   "summary": "Python test module (test_unknown_write_reconciliation.py, 48 lines) covering unknown write reconciliation. Defines: decide, UnknownWriteReconciliationTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_v3_registry_adapter.py",
+   "type": "module",
+   "name": "test_v3_registry_adapter",
+   "filePath": "tests/test_v3_registry_adapter.py",
+   "summary": "Python test module (test_v3_registry_adapter.py, 62 lines) covering v3 registry adapter. Defines: V3RegistryAdapterTests.",
+   "tags": [
+    "adapter",
+    "registry",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_v3_run_history_adapter.py",
+   "type": "module",
+   "name": "test_v3_run_history_adapter",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Python test module (test_v3_run_history_adapter.py, 193 lines) covering v3 run history adapter. Defines: V3RunHistoryAdapterTests.",
+   "tags": [
+    "adapter",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_v3_run_history_adapter.py:V3RunHistoryAdapterTests",
+   "type": "class",
+   "name": "V3RunHistoryAdapterTests",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Class V3RunHistoryAdapterTests defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_registry_adapter_accepts_scenario_decision",
+   "type": "function",
+   "name": "test_registry_adapter_accepts_scenario_decision",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_registry_adapter_accepts_scenario_decision defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_missing_scenario_decision_id_is_rejected",
+   "type": "function",
+   "name": "test_missing_scenario_decision_id_is_rejected",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_missing_scenario_decision_id_is_rejected defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_registry_adapter_accepts_real_history_without_promoting_edges",
+   "type": "function",
+   "name": "test_registry_adapter_accepts_real_history_without_promoting_edges",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_registry_adapter_accepts_real_history_without_promoting_edges defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_real_history_preserves_exact_ids_and_bindings",
+   "type": "function",
+   "name": "test_real_history_preserves_exact_ids_and_bindings",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_real_history_preserves_exact_ids_and_bindings defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_scenario_overlay_edges_are_non_executable",
+   "type": "function",
+   "name": "test_scenario_overlay_edges_are_non_executable",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_scenario_overlay_edges_are_non_executable defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_missing_run_id_is_rejected",
+   "type": "function",
+   "name": "test_missing_run_id_is_rejected",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_missing_run_id_is_rejected defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_v3_run_history_adapter.py:test_overlay_retains_registry_and_marks_observed_nodes",
+   "type": "function",
+   "name": "test_overlay_retains_registry_and_marks_observed_nodes",
+   "filePath": "tests/test_v3_run_history_adapter.py",
+   "summary": "Function test_overlay_retains_registry_and_marks_observed_nodes defined in tests/test_v3_run_history_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_validate_gate_action.py",
+   "type": "module",
+   "name": "test_validate_gate_action",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Python test module (test_validate_gate_action.py, 163 lines) covering validate gate action. Defines: packet, g4_merge_packet, GateActionAuthorityTests.",
+   "tags": [
+    "gates",
+    "tests",
+    "validation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_validate_gate_action.py:GateActionAuthorityTests",
+   "type": "class",
+   "name": "GateActionAuthorityTests",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Class GateActionAuthorityTests defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:packet",
+   "type": "function",
+   "name": "packet",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function packet defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:g4_merge_packet",
+   "type": "function",
+   "name": "g4_merge_packet",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function g4_merge_packet defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_g4_merge_rejects_post_merge_or_closed_pr_state",
+   "type": "function",
+   "name": "test_g4_merge_rejects_post_merge_or_closed_pr_state",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_g4_merge_rejects_post_merge_or_closed_pr_state defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_expiry_fails_closed",
+   "type": "function",
+   "name": "test_expiry_fails_closed",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_expiry_fails_closed defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_g4_merge_requires_runtime_current_head",
+   "type": "function",
+   "name": "test_g4_merge_requires_runtime_current_head",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_g4_merge_requires_runtime_current_head defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_scope_tampering_fails_closed",
+   "type": "function",
+   "name": "test_scope_tampering_fails_closed",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_scope_tampering_fails_closed defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_g4_merge_valid_only_for_current_open_pr_head",
+   "type": "function",
+   "name": "test_g4_merge_valid_only_for_current_open_pr_head",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_g4_merge_valid_only_for_current_open_pr_head defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_valid_packet_passes",
+   "type": "function",
+   "name": "test_valid_packet_passes",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_valid_packet_passes defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_gate_action_mapping_rejects_merge_at_g2",
+   "type": "function",
+   "name": "test_gate_action_mapping_rejects_merge_at_g2",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_gate_action_mapping_rejects_merge_at_g2 defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_validate_gate_action.py:test_g4_merge_rejects_stale_head_approval",
+   "type": "function",
+   "name": "test_g4_merge_rejects_stale_head_approval",
+   "filePath": "tests/test_validate_gate_action.py",
+   "summary": "Function test_g4_merge_rejects_stale_head_approval defined in tests/test_validate_gate_action.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/capture_g01_decision.py",
+   "type": "module",
+   "name": "capture_g01_decision",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Python module (capture_g01_decision.py, 282 lines) providing capture g01 decision functionality. Defines: _load_yaml, _load_json, _validation_messages, _scope_hash, _load_validator.",
+   "tags": [
+    "capture",
+    "g0",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_write_yaml_atomic",
+   "type": "function",
+   "name": "_write_yaml_atomic",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _write_yaml_atomic defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function main defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_validation_messages",
+   "type": "function",
+   "name": "_validation_messages",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _validation_messages defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:generate_artifacts",
+   "type": "function",
+   "name": "generate_artifacts",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function generate_artifacts defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_load_validator",
+   "type": "function",
+   "name": "_load_validator",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _load_validator defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_plan_reference",
+   "type": "function",
+   "name": "_plan_reference",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _plan_reference defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_scope_hash",
+   "type": "function",
+   "name": "_scope_hash",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _scope_hash defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_load_yaml",
+   "type": "function",
+   "name": "_load_yaml",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _load_yaml defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/capture_g01_decision.py:_load_json",
+   "type": "function",
+   "name": "_load_json",
+   "filePath": "tools/capture_g01_decision.py",
+   "summary": "Function _load_json defined in tools/capture_g01_decision.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/evaluate_base_drift.py",
+   "type": "module",
+   "name": "evaluate_base_drift",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Python module (evaluate_base_drift.py, 206 lines) providing evaluate base drift functionality. Defines: load_yaml, load_json, _normalize, classify_changed_file, _path_overlaps_scope.",
+   "tags": [
+    "python",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:_normalize",
+   "type": "function",
+   "name": "_normalize",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function _normalize defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:classify_changed_file",
+   "type": "function",
+   "name": "classify_changed_file",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function classify_changed_file defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:load_yaml",
+   "type": "function",
+   "name": "load_yaml",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function load_yaml defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:validate_payload",
+   "type": "function",
+   "name": "validate_payload",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function validate_payload defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:build_result",
+   "type": "function",
+   "name": "build_result",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function build_result defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function main defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:load_json",
+   "type": "function",
+   "name": "load_json",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function load_json defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:_path_overlaps_scope",
+   "type": "function",
+   "name": "_path_overlaps_scope",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function _path_overlaps_scope defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:choose_decision",
+   "type": "function",
+   "name": "choose_decision",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function choose_decision defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/evaluate_base_drift.py:_effects_for_decision",
+   "type": "function",
+   "name": "_effects_for_decision",
+   "filePath": "tools/evaluate_base_drift.py",
+   "summary": "Function _effects_for_decision defined in tools/evaluate_base_drift.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/generate_g01_runtime.py",
+   "type": "service",
+   "name": "generate_g01_runtime",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Python module (generate_g01_runtime.py, 452 lines): Generate canonical G0 context, G1 intake, and G1 preflight artifacts. The command consumes already-observed runtime evidence. It performs no external side effect. Missing, contradictory, or non-executable evidence fails closed. Defines: _load_yaml, _load_json, _validation_messages, _blocker, _check.",
+   "tags": [
+    "g0",
+    "python",
+    "runtime",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_intake_is_complete",
+   "type": "function",
+   "name": "_intake_is_complete",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _intake_is_complete defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_write_yaml_atomic",
+   "type": "function",
+   "name": "_write_yaml_atomic",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _write_yaml_atomic defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function main defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_selected_connector_available",
+   "type": "function",
+   "name": "_selected_connector_available",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _selected_connector_available defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_validation_messages",
+   "type": "function",
+   "name": "_validation_messages",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _validation_messages defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_route_steps",
+   "type": "function",
+   "name": "_route_steps",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _route_steps defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:generate_artifacts",
+   "type": "function",
+   "name": "generate_artifacts",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function generate_artifacts defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_check",
+   "type": "function",
+   "name": "_check",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _check defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_classify_execution_feasibility",
+   "type": "function",
+   "name": "_classify_execution_feasibility",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _classify_execution_feasibility defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/generate_g01_runtime.py:_load_yaml",
+   "type": "function",
+   "name": "_load_yaml",
+   "filePath": "tools/generate_g01_runtime.py",
+   "summary": "Function _load_yaml defined in tools/generate_g01_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/approval_expiry_recovery.py",
+   "type": "module",
+   "name": "approval_expiry_recovery",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Python module (approval_expiry_recovery.py, 142 lines): Deterministic approval-expiry recovery for GWC failure-recovery nodes. Defines: now_utc, parse_utc, canonical_json, digest_payload, attach_digest.",
+   "tags": [
+    "approvals",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:parse_utc",
+   "type": "function",
+   "name": "parse_utc",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function parse_utc defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function canonical_json defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:attach_digest",
+   "type": "function",
+   "name": "attach_digest",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function attach_digest defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:decide_approval_expiry_recovery",
+   "type": "function",
+   "name": "decide_approval_expiry_recovery",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function decide_approval_expiry_recovery defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:replay_safe",
+   "type": "function",
+   "name": "replay_safe",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function replay_safe defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:now_utc",
+   "type": "function",
+   "name": "now_utc",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function now_utc defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/approval_expiry_recovery.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/approval_expiry_recovery.py",
+   "summary": "Function digest_payload defined in tools/node_architect/approval_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/bounded_external_write.py",
+   "type": "module",
+   "name": "bounded_external_write",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Python module (bounded_external_write.py, 190 lines): Provider-neutral bounded external-write classifier for SCRUM-108. Defines: BoundedWriteState, BoundedWriteIntent, AdapterDispatch, BoundedWriteReadback, BoundedWriteEvidence.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tools/node_architect/bounded_external_write.py:AdapterDispatch",
+   "type": "class",
+   "name": "AdapterDispatch",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Class AdapterDispatch defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/bounded_external_write.py:BoundedWriteEvidence",
+   "type": "class",
+   "name": "BoundedWriteEvidence",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Class BoundedWriteEvidence defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/bounded_external_write.py:BoundedWriteIntent",
+   "type": "class",
+   "name": "BoundedWriteIntent",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Class BoundedWriteIntent defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/bounded_external_write.py:BoundedWriteReadback",
+   "type": "class",
+   "name": "BoundedWriteReadback",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Class BoundedWriteReadback defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/bounded_external_write.py:BoundedWriteState",
+   "type": "class",
+   "name": "BoundedWriteState",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Class BoundedWriteState defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:_collect_evidence",
+   "type": "function",
+   "name": "_collect_evidence",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function _collect_evidence defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:_coerce_readback",
+   "type": "function",
+   "name": "_coerce_readback",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function _coerce_readback defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:_ambiguous",
+   "type": "function",
+   "name": "_ambiguous",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function _ambiguous defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:_coerce_dispatch",
+   "type": "function",
+   "name": "_coerce_dispatch",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function _coerce_dispatch defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:_evidence",
+   "type": "function",
+   "name": "_evidence",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function _evidence defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:classify_bounded_external_write",
+   "type": "function",
+   "name": "classify_bounded_external_write",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function classify_bounded_external_write defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:as_dict",
+   "type": "function",
+   "name": "as_dict",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function as_dict defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/bounded_external_write.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tools/node_architect/bounded_external_write.py",
+   "summary": "Function validate defined in tools/node_architect/bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "type": "module",
+   "name": "cas_mismatch_recovery",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Python module (cas_mismatch_recovery.py, 88 lines): Deterministic CAS mismatch recovery for GWC failure-recovery nodes. The router reloads newer checkpoint state after compare-and-swap mismatch. It never overwrites newer state or blindly retries after concurrent changes. Defines: _now, canonical_json, digest_payload, decide_cas_mismatch_recovery, is_replay_equivalent.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function _now defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function canonical_json defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function main defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:decide_cas_mismatch_recovery",
+   "type": "function",
+   "name": "decide_cas_mismatch_recovery",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function decide_cas_mismatch_recovery defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function digest_payload defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/cas_mismatch_recovery.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/cas_mismatch_recovery.py",
+   "summary": "Function stable defined in tools/node_architect/cas_mismatch_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/checkpoint_store.py",
+   "type": "module",
+   "name": "checkpoint_store",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Python module (checkpoint_store.py, 160 lines) providing checkpoint store functionality. Defines: _now, canonical_json, digest_payload, CheckpointInput, CheckpointConflict.",
+   "tags": [
+    "checkpoint",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tools/node_architect/checkpoint_store.py:CheckpointInput",
+   "type": "class",
+   "name": "CheckpointInput",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Class CheckpointInput defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/checkpoint_store.py:CheckpointConflict",
+   "type": "class",
+   "name": "CheckpointConflict",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Class CheckpointConflict defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function _now defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function canonical_json defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:checkpoint_key",
+   "type": "function",
+   "name": "checkpoint_key",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function checkpoint_key defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:load_store",
+   "type": "function",
+   "name": "load_store",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function load_store defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function main defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:write_store",
+   "type": "function",
+   "name": "write_store",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function write_store defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:persist_to_file",
+   "type": "function",
+   "name": "persist_to_file",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function persist_to_file defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:empty_store",
+   "type": "function",
+   "name": "empty_store",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function empty_store defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:persist_checkpoint",
+   "type": "function",
+   "name": "persist_checkpoint",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function persist_checkpoint defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/checkpoint_store.py:replay_checkpoint",
+   "type": "function",
+   "name": "replay_checkpoint",
+   "filePath": "tools/node_architect/checkpoint_store.py",
+   "summary": "Function replay_checkpoint defined in tools/node_architect/checkpoint_store.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/ci_run_capture.py",
+   "type": "module",
+   "name": "ci_run_capture",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Python module (ci_run_capture.py, 100 lines): Exact-head CI observation capture for GWC repository delivery nodes. This module normalizes provider-supplied CI facts into deterministic local observation evidence. It does not call GitHub itself; callers provide already-read workflow/status payloads. The classifier is fail-clos Defines: _now, canonical_json, digest_payload, _run_conclusion, classify_provider_payload.",
+   "tags": [
+    "capture",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function _now defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function canonical_json defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function main defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:_run_conclusion",
+   "type": "function",
+   "name": "_run_conclusion",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function _run_conclusion defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:capture_ci_observation",
+   "type": "function",
+   "name": "capture_ci_observation",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function capture_ci_observation defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:classify_provider_payload",
+   "type": "function",
+   "name": "classify_provider_payload",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function classify_provider_payload defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function digest_payload defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/ci_run_capture.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/ci_run_capture.py",
+   "summary": "Function stable defined in tools/node_architect/ci_run_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "type": "module",
+   "name": "crash_checkpoint_recovery",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Python module (crash_checkpoint_recovery.py, 128 lines): Deterministic crash checkpoint recovery routing for GWC failure-recovery nodes. The router makes no external calls. It receives canonical checkpoint and pending-action evidence produced by a caller and returns a bounded recovery decision. Crash resume never creates a duplicate ef Defines: _now, canonical_json, digest_payload, decide_crash_checkpoint_recovery, is_replay_equivalent.",
+   "tags": [
+    "checkpoint",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function _now defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function canonical_json defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function main defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function digest_payload defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:decide_crash_checkpoint_recovery",
+   "type": "function",
+   "name": "decide_crash_checkpoint_recovery",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function decide_crash_checkpoint_recovery defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_checkpoint_recovery.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/crash_checkpoint_recovery.py",
+   "summary": "Function stable defined in tools/node_architect/crash_checkpoint_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/crash_replay_harness.py",
+   "type": "module",
+   "name": "crash_replay_harness",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Python module (crash_replay_harness.py, 395 lines): Deterministic crash/replay verification harness for SCRUM-110. The harness is provider-neutral. It injects crashes at canonical B0-B5 boundaries, records ordered evidence, and verifies replay invariants without calling external systems. Defines: CrashBoundary, NodeClass, Scenario, ReplayEvidence, parse_scenario_matrix.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tools/node_architect/crash_replay_harness.py:CrashReplayHarness",
+   "type": "class",
+   "name": "CrashReplayHarness",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Class CrashReplayHarness defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/crash_replay_harness.py:CrashBoundary",
+   "type": "class",
+   "name": "CrashBoundary",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Class CrashBoundary defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/crash_replay_harness.py:ReplayEvidence",
+   "type": "class",
+   "name": "ReplayEvidence",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Class ReplayEvidence defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/crash_replay_harness.py:NodeClass",
+   "type": "class",
+   "name": "NodeClass",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Class NodeClass defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/crash_replay_harness.py:Scenario",
+   "type": "class",
+   "name": "Scenario",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Class Scenario defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_replay_harness.py:integrated_acceptance",
+   "type": "function",
+   "name": "integrated_acceptance",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Function integrated_acceptance defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_replay_harness.py:verify_matrix",
+   "type": "function",
+   "name": "verify_matrix",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Function verify_matrix defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_replay_harness.py:parse_scenario_matrix",
+   "type": "function",
+   "name": "parse_scenario_matrix",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Function parse_scenario_matrix defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_replay_harness.py:as_dict",
+   "type": "function",
+   "name": "as_dict",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Function as_dict defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_replay_harness.py:run",
+   "type": "function",
+   "name": "run",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Function run defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/crash_replay_harness.py:__init__",
+   "type": "function",
+   "name": "__init__",
+   "filePath": "tools/node_architect/crash_replay_harness.py",
+   "summary": "Function __init__ defined in tools/node_architect/crash_replay_harness.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/duplicate_agent_fencing.py",
+   "type": "module",
+   "name": "duplicate_agent_fencing",
+   "filePath": "tools/node_architect/duplicate_agent_fencing.py",
+   "summary": "Python module (duplicate_agent_fencing.py, 108 lines): Deterministic duplicate-agent fencing for GWC failure-recovery nodes. Defines: now_utc, canonical_json, digest_payload, attach_digest, decide_duplicate_agent_fencing.",
+   "tags": [
+    "agents",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/duplicate_agent_fencing.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/duplicate_agent_fencing.py",
+   "summary": "Function canonical_json defined in tools/node_architect/duplicate_agent_fencing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/duplicate_agent_fencing.py:attach_digest",
+   "type": "function",
+   "name": "attach_digest",
+   "filePath": "tools/node_architect/duplicate_agent_fencing.py",
+   "summary": "Function attach_digest defined in tools/node_architect/duplicate_agent_fencing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/duplicate_agent_fencing.py:now_utc",
+   "type": "function",
+   "name": "now_utc",
+   "filePath": "tools/node_architect/duplicate_agent_fencing.py",
+   "summary": "Function now_utc defined in tools/node_architect/duplicate_agent_fencing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/duplicate_agent_fencing.py:decide_duplicate_agent_fencing",
+   "type": "function",
+   "name": "decide_duplicate_agent_fencing",
+   "filePath": "tools/node_architect/duplicate_agent_fencing.py",
+   "summary": "Function decide_duplicate_agent_fencing defined in tools/node_architect/duplicate_agent_fencing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/duplicate_agent_fencing.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/duplicate_agent_fencing.py",
+   "summary": "Function digest_payload defined in tools/node_architect/duplicate_agent_fencing.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "type": "service",
+   "name": "durable_checkpoint_runtime",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Python module (durable_checkpoint_runtime.py, 326 lines): Durable checkpoint/CAS/lease/resume pilot for SCRUM-109. Provider-neutral and in-memory by design. It models the correctness boundary from SCRUM-105/SCRUM-106 without adding a scheduler, database adapter, deployment, migration, credential handling, or production runtime. Defines: _utc_now, _ensure_aware_utc, RuntimeBinding, Checkpoint, CheckpointError.",
+   "tags": [
+    "checkpoint",
+    "nodes",
+    "python",
+    "runtime",
+    "tools"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:FencingTokenMismatch",
+   "type": "class",
+   "name": "FencingTokenMismatch",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class FencingTokenMismatch defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:Checkpoint",
+   "type": "class",
+   "name": "Checkpoint",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class Checkpoint defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:RuntimeBinding",
+   "type": "class",
+   "name": "RuntimeBinding",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class RuntimeBinding defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:RunAlreadyExists",
+   "type": "class",
+   "name": "RunAlreadyExists",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class RunAlreadyExists defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:DurableCheckpointStore",
+   "type": "class",
+   "name": "DurableCheckpointStore",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class DurableCheckpointStore defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:CheckpointError",
+   "type": "class",
+   "name": "CheckpointError",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class CheckpointError defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:StaleCheckpoint",
+   "type": "class",
+   "name": "StaleCheckpoint",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class StaleCheckpoint defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/durable_checkpoint_runtime.py:RunNotFound",
+   "type": "class",
+   "name": "RunNotFound",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Class RunNotFound defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:_utc_now",
+   "type": "function",
+   "name": "_utc_now",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function _utc_now defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:_ensure_aware_utc",
+   "type": "function",
+   "name": "_ensure_aware_utc",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function _ensure_aware_utc defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:read_checkpoint",
+   "type": "function",
+   "name": "read_checkpoint",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function read_checkpoint defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:renew_lease",
+   "type": "function",
+   "name": "renew_lease",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function renew_lease defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:cas_checkpoint",
+   "type": "function",
+   "name": "cas_checkpoint",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function cas_checkpoint defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function validate defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:acquire_lease",
+   "type": "function",
+   "name": "acquire_lease",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function acquire_lease defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:create_run",
+   "type": "function",
+   "name": "create_run",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function create_run defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:release_lease",
+   "type": "function",
+   "name": "release_lease",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function release_lease defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/durable_checkpoint_runtime.py:resume_checkpoint",
+   "type": "function",
+   "name": "resume_checkpoint",
+   "filePath": "tools/node_architect/durable_checkpoint_runtime.py",
+   "summary": "Function resume_checkpoint defined in tools/node_architect/durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "class:tests/test_v3_run_history_adapter.py:V3RunHistoryAdapterTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_registry_adapter_accepts_scenario_decision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_missing_scenario_decision_id_is_rejected",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_registry_adapter_accepts_real_history_without_promoting_edges",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_real_history_preserves_exact_ids_and_bindings",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_scenario_overlay_edges_are_non_executable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_missing_run_id_is_rejected",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "function:tests/test_v3_run_history_adapter.py:test_overlay_retains_registry_and_marks_observed_nodes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "class:tests/test_validate_gate_action.py:GateActionAuthorityTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:packet",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:g4_merge_packet",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_g4_merge_rejects_post_merge_or_closed_pr_state",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_expiry_fails_closed",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_g4_merge_requires_runtime_current_head",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_scope_tampering_fails_closed",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_g4_merge_valid_only_for_current_open_pr_head",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_valid_packet_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_gate_action_mapping_rejects_merge_at_g2",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_validate_gate_action.py",
+   "target": "function:tests/test_validate_gate_action.py:test_g4_merge_rejects_stale_head_approval",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_write_yaml_atomic",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_validation_messages",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:generate_artifacts",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_load_validator",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_plan_reference",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_scope_hash",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_load_yaml",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "function:tools/capture_g01_decision.py:_load_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:_normalize",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:classify_changed_file",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:load_yaml",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:validate_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:build_result",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:load_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:_path_overlaps_scope",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:choose_decision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "function:tools/evaluate_base_drift.py:_effects_for_decision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_intake_is_complete",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_write_yaml_atomic",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_selected_connector_available",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_validation_messages",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_route_steps",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:generate_artifacts",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_check",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_classify_execution_feasibility",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/generate_g01_runtime.py",
+   "target": "function:tools/generate_g01_runtime.py:_load_yaml",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:parse_utc",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:attach_digest",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:decide_approval_expiry_recovery",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:replay_safe",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:now_utc",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/approval_expiry_recovery.py",
+   "target": "function:tools/node_architect/approval_expiry_recovery.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "class:tools/node_architect/bounded_external_write.py:AdapterDispatch",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "class:tools/node_architect/bounded_external_write.py:BoundedWriteEvidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "class:tools/node_architect/bounded_external_write.py:BoundedWriteIntent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "class:tools/node_architect/bounded_external_write.py:BoundedWriteReadback",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "class:tools/node_architect/bounded_external_write.py:BoundedWriteState",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:_collect_evidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:_coerce_readback",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:_ambiguous",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:_coerce_dispatch",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:_evidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:classify_bounded_external_write",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:as_dict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/bounded_external_write.py",
+   "target": "function:tools/node_architect/bounded_external_write.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:decide_cas_mismatch_recovery",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/cas_mismatch_recovery.py",
+   "target": "function:tools/node_architect/cas_mismatch_recovery.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "class:tools/node_architect/checkpoint_store.py:CheckpointInput",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "class:tools/node_architect/checkpoint_store.py:CheckpointConflict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:checkpoint_key",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:load_store",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:write_store",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:persist_to_file",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:empty_store",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:persist_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/checkpoint_store.py",
+   "target": "function:tools/node_architect/checkpoint_store.py:replay_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:_run_conclusion",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:capture_ci_observation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:classify_provider_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/ci_run_capture.py",
+   "target": "function:tools/node_architect/ci_run_capture.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:decide_crash_checkpoint_recovery",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_checkpoint_recovery.py",
+   "target": "function:tools/node_architect/crash_checkpoint_recovery.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "class:tools/node_architect/crash_replay_harness.py:CrashReplayHarness",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "class:tools/node_architect/crash_replay_harness.py:CrashBoundary",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "class:tools/node_architect/crash_replay_harness.py:ReplayEvidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "class:tools/node_architect/crash_replay_harness.py:NodeClass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "class:tools/node_architect/crash_replay_harness.py:Scenario",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "function:tools/node_architect/crash_replay_harness.py:integrated_acceptance",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "function:tools/node_architect/crash_replay_harness.py:verify_matrix",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "function:tools/node_architect/crash_replay_harness.py:parse_scenario_matrix",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "function:tools/node_architect/crash_replay_harness.py:as_dict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "function:tools/node_architect/crash_replay_harness.py:run",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/crash_replay_harness.py",
+   "target": "function:tools/node_architect/crash_replay_harness.py:__init__",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/duplicate_agent_fencing.py",
+   "target": "function:tools/node_architect/duplicate_agent_fencing.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/duplicate_agent_fencing.py",
+   "target": "function:tools/node_architect/duplicate_agent_fencing.py:attach_digest",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/duplicate_agent_fencing.py",
+   "target": "function:tools/node_architect/duplicate_agent_fencing.py:now_utc",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/duplicate_agent_fencing.py",
+   "target": "function:tools/node_architect/duplicate_agent_fencing.py:decide_duplicate_agent_fencing",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/duplicate_agent_fencing.py",
+   "target": "function:tools/node_architect/duplicate_agent_fencing.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:FencingTokenMismatch",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:Checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:RuntimeBinding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:RunAlreadyExists",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:DurableCheckpointStore",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:CheckpointError",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:StaleCheckpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "class:tools/node_architect/durable_checkpoint_runtime.py:RunNotFound",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:_utc_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:_ensure_aware_utc",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:read_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:renew_lease",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:cas_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:acquire_lease",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:create_run",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:release_lease",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/durable_checkpoint_runtime.py",
+   "target": "function:tools/node_architect/durable_checkpoint_runtime.py:resume_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_timeout_recovery.py",
+   "target": "file:tests/test_ua_host_contract.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_ua_host_contract.py",
+   "target": "file:tests/test_unknown_write_reconciliation.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_unknown_write_reconciliation.py",
+   "target": "file:tests/test_v3_registry_adapter.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_v3_registry_adapter.py",
+   "target": "file:tests/test_v3_run_history_adapter.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_v3_run_history_adapter.py",
+   "target": "file:tests/test_validate_gate_action.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/capture_g01_decision.py",
+   "target": "file:tools/evaluate_base_drift.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tools/evaluate_base_drift.py",
+   "target": "file:tools/generate_g01_runtime.py",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

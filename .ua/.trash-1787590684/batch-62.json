@@ -1,0 +1,210 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/README.md",
+   "language": "markdown",
+   "sizeLines": 53,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/README.md",
+   "type": "document",
+   "name": "failure_recovery node family",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/README.md",
+   "summary": "Markdown document \"failure_recovery node family\" (document, 53 lines): Task: `SCRUM-68` Batch: `batch-08-failure-recovery` Family: `failure_recovery` Planned nodes: 9 Authority boundary: `G2_EXECUTION_G5_DEPLOY`",
+   "tags": [
+    "catalog",
+    "core",
+    "documentation",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json",
+   "type": "config",
+   "name": "Approval Expiry Recovery",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/approval-expiry-recovery.node.json",
+   "summary": "JSON data file \"Approval Expiry Recovery\" (approval-expiry-recovery.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "approvals",
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json",
+   "type": "config",
+   "name": "CAS Mismatch Recovery",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/cas-mismatch-recovery.node.json",
+   "summary": "JSON data file \"CAS Mismatch Recovery\" (cas-mismatch-recovery.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json",
+   "type": "config",
+   "name": "Crash Checkpoint Recovery",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/crash-checkpoint-recovery.node.json",
+   "summary": "JSON data file \"Crash Checkpoint Recovery\" (crash-checkpoint-recovery.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "checkpoint",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json",
+   "type": "config",
+   "name": "Duplicate Agent Fencing",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/duplicate-agent-fencing.node.json",
+   "summary": "JSON data file \"Duplicate Agent Fencing\" (duplicate-agent-fencing.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "agents",
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json",
+   "type": "config",
+   "name": "Lease Expiry Recovery",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/lease-expiry-recovery.node.json",
+   "summary": "JSON data file \"Lease Expiry Recovery\" (lease-expiry-recovery.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json",
+   "type": "config",
+   "name": "Stale Session Reconciliation",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/stale-session-reconciliation.node.json",
+   "summary": "JSON data file \"Stale Session Reconciliation\" (stale-session-reconciliation.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json",
+   "type": "config",
+   "name": "Timeout Recovery",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/timeout-recovery.node.json",
+   "summary": "JSON data file \"Timeout Recovery\" (timeout-recovery.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json",
+   "type": "config",
+   "name": "Unknown Write Reconciliation",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/unknown-write-reconciliation.node.json",
+   "summary": "JSON data file \"Unknown Write Reconciliation\" (unknown-write-reconciliation.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json",
+   "type": "config",
+   "name": "Version Drift Rollback Routing",
+   "filePath": "core/node-architect/node-catalog/failure_recovery/version-drift-rollback-routing.node.json",
+   "summary": "JSON data file \"Version Drift Rollback Routing\" (version-drift-rollback-routing.node.json, 11 lines) Top-level keys: node_id, node_type, title, description, canonical, authority_boundary.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

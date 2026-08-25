@@ -1,0 +1,211 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/README.md",
+   "language": "markdown",
+   "sizeLines": 43,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 28,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/decisions.md",
+   "language": "markdown",
+   "sizeLines": 19,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/evidence.json",
+   "language": "json",
+   "sizeLines": 56,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 25,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/task.yaml",
+   "language": "yaml",
+   "sizeLines": 82,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 16,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/README.md",
+   "type": "document",
+   "name": "README",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/README.md",
+   "summary": "Markdown document \"README\" (document, 43 lines): ﻿# SCRUM-103 鈥?Resolve lifecycle, authority-validator, workspace and package blockers",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/coding-guide.md",
+   "type": "document",
+   "name": "coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/coding-guide.md",
+   "summary": "Markdown document \"coding guide\" (document, 28 lines): - `core/task-lifecycle/gate-transition-map.yaml` - `core/GATE_LIFECYCLE_CONTRACT_v1.0.md` - `tools/validate_g01.py` - `projects/gwc/project-instructions.md` - `distribution/power-package.yaml` - `.github/workflows/validate-instructions.yml`",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/decisions.md",
+   "type": "document",
+   "name": "decisions",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/decisions.md",
+   "summary": "Markdown document \"decisions\" (document, 19 lines): - Evidence used: protected-base GWC contracts, project profile/instructions and verified implementation/test paths. - Alternatives considered: broad rewrite; additive extension; defer. - Rule applied: `Reuse 鈫?Extend 鈫?Refactor 鈫?Replace`. - Decision: use additive extension and compatibility tests.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/evidence.json",
+   "type": "config",
+   "name": "SCRUM-103",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-103\" (evidence.json, 56 lines) Top-level keys: task_id, repository, base_sha, requirements, sources, confidence.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/impact-analysis.md",
+   "type": "document",
+   "name": "impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/impact-analysis.md",
+   "summary": "Markdown document \"impact analysis\" (document, 25 lines): - `core/task-lifecycle/gate-transition-map.yaml` - `core/GATE_LIFECYCLE_CONTRACT_v1.0.md` - `tools/validate_g01.py` - `projects/gwc/project-instructions.md` - `distribution/power-package.yaml` - `.github/workflows/validate-instructions.yml`",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/implementation-plan.md",
+   "type": "document",
+   "name": "implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/implementation-plan.md",
+   "summary": "Markdown document \"implementation plan\" (plan, 9 lines): 1. Write failing tests for confirmed current blockers. 2. Extend the existing mechanism rather than replace it. 3. Implement action-to-gate validation with exact task/repo/SHA/scope binding. 4. Align task workspace and G3 state semantics. 5. Regenerate package/integrity outputs through one",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/task.yaml",
+   "type": "config",
+   "name": "Resolve lifecycle, authority-validator, workspace and package blockers",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/task.yaml",
+   "summary": "GWC task governance YAML \"Resolve lifecycle, authority-validator, workspace and package blockers\" (task.yaml, 82 lines). Top-level keys: schema_version, task_id, title, slug, objective, repository.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/test-plan.md",
+   "type": "document",
+   "name": "test plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/test-plan.md",
+   "summary": "Markdown document \"test plan\" (plan, 16 lines): - Lifecycle transition positive/negative tests. - Authority mismatch and expired approval tests. - Canonical/legacy workspace compatibility tests. - G3 stale-head and Draft/ready transition tests. - Package manifest/checksum drift tests.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-103-resolve-lifecycle-authority-workspace-package-blockers/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

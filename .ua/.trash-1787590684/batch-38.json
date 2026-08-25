@@ -1,0 +1,238 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/README.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/decisions.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/design.md",
+   "language": "markdown",
+   "sizeLines": 17,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/evidence.json",
+   "language": "json",
+   "sizeLines": 23,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/requirements.md",
+   "language": "markdown",
+   "sizeLines": 21,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/task.yaml",
+   "language": "yaml",
+   "sizeLines": 108,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/tasks.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/README.md",
+   "type": "document",
+   "name": "SCRUM-116 — topology, ownership and provenance",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/README.md",
+   "summary": "Markdown document \"SCRUM-116 — topology, ownership and provenance\" (document, 3 lines): This task is a bounded architecture/contract handoff for G2. It does not authorize source writes. Read `task.yaml`, `impact-analysis.md`, `implementation-plan.md`, `coding-guide.md`, and `test-plan.md` together; the folder is self-contained for an implementation agent after exact G2 approval.",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/coding-guide.md",
+   "type": "document",
+   "name": "Coding and contract guide",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/coding-guide.md",
+   "summary": "Markdown document \"Coding and contract guide\" (document, 9 lines): - Follow existing YAML/JSON schema and validator conventions; do not invent a parallel GWC gate format. - Use exact repository/ref/SHA fields for all provenance; conversation text is never evidence. - Keep package source under `DW-SuperApps/.dw/powers`; keep target runtime outputs under the",
+   "tags": [
+    "documentation",
+    "g1",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 5 lines): - Reuse and extend existing governance and durable-runtime mechanisms. - Use GWC artifacts and exact repository/CI evidence as authority; use Jira, Notion and Slack only as projections. - Keep G1 decision pending until the requester explicitly selects an option and accepts the bounded scope.",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/design.md",
+   "type": "document",
+   "name": "SCRUM-116 architecture handoff",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/design.md",
+   "summary": "Markdown document \"SCRUM-116 architecture handoff\" (document, 17 lines): Use a governed control-plane plus target-runtime ownership model. The package store and host adapters live in DW-SuperApps; GWC gate artifacts and governance contracts live in the GWC repository; each selected target owns generated `.gwc`, `.ua`, `.task-me`, and `.bmad` outputs. Projections read",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/evidence.json",
+   "type": "config",
+   "name": "SCRUM-116",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-116\" (evidence.json, 23 lines) Top-level keys: task_id, protected_base_sha, source_refs, external_readbacks, limitations.",
+   "tags": [
+    "g1",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/impact-analysis.md",
+   "type": "document",
+   "name": "Task-specific impact",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/impact-analysis.md",
+   "summary": "Markdown document \"Task-specific impact\" (document, 5 lines): Direct owners: GWC owns gate artifacts and governance contracts; DW-SuperApps owns the package store and host adapters; each registered target owns its `.gwc`, `.ua`, `.task-me`, and `.bmad` runtime outputs. UA, Task-Me and BMAD provide read/analysis/planning inputs but cannot mutate canonical GWC",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/implementation-plan.md",
+   "summary": "Markdown document \"Implementation plan\" (plan, 10 lines): 1. Read the accepted G1 plan and exact protected-base paths; write a G2 plan-read receipt before any repository mutation. 2. Author the topology, source-of-truth, ownership and projection matrix using verified DW-SuperApps and GWC contracts. 3. Add a versioned provenance envelope with",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/requirements.md",
+   "type": "document",
+   "name": "SCRUM-116 requirements handoff",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/requirements.md",
+   "summary": "Markdown document \"SCRUM-116 requirements handoff\" (specification, 21 lines): Every P4 artifact type resolves to exactly one owner and storage root. Tool source, package distribution, target-owned generated output, gate state and external projections must not share authority.",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/task.yaml",
+   "type": "config",
+   "name": "Lock DW SUPER APP integration topology, ownership and provenance",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/task.yaml",
+   "summary": "GWC task governance YAML \"Lock DW SUPER APP integration topology, ownership and provenance\" (task.yaml, 108 lines). Top-level keys: schema_version, task_id, title, slug, objective, repository.",
+   "tags": [
+    "g1",
+    "schema",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/tasks.md",
+   "type": "document",
+   "name": "SCRUM-116 implementation tasks",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/tasks.md",
+   "summary": "Markdown document \"SCRUM-116 implementation tasks\" (document, 10 lines): - T1: Read exact protected-base plan and confirm target paths; write plan-read receipt. - T2: Add topology/source-of-truth/ownership contract and denied-write rules. - T3: Add provenance envelope schema and positive/negative examples. - T4: Add collision-control behavior using existing",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/test-plan.md",
+   "type": "document",
+   "name": "Validation plan",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/tasks/SCRUM-116-lock-topology-ownership-provenance/test-plan.md",
+   "summary": "Markdown document \"Validation plan\" (plan, 7 lines): - `python3 tools/validate_g01.py --workspace .gwc/tasks/SCRUM-116 --json` before G2 and again with `--gate G2_EXECUTION` before the first write. - Validate every new schema/fixture with the repository's existing JSON/YAML validators. - Run focused governance, provenance, checkpoint/CAS/lease and",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

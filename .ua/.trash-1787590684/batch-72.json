@@ -1,0 +1,54 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 224,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/runbooks/NOTIFICATION_CAPABILITY_GUIDANCE.md",
+   "language": "markdown",
+   "sizeLines": 78,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+   "type": "document",
+   "name": "Gate G0/G1 Operational Runbook v1.0",
+   "filePath": "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+   "summary": "Markdown document \"Gate G0/G1 Operational Runbook v1.0\" (runbook, 224 lines): This is the canonical step-by-step operating procedure for G0_CONTEXT and G1_ALIGNMENT. It applies to all agents, all projects, and every supported execution mode. Project extensions may tighten this runbook but must not weaken it.",
+   "tags": [
+    "core",
+    "documentation",
+    "g0",
+    "g1",
+    "gates"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/runbooks/NOTIFICATION_CAPABILITY_GUIDANCE.md",
+   "type": "document",
+   "name": "Gate Notification Capability Guidance",
+   "filePath": "core/runbooks/NOTIFICATION_CAPABILITY_GUIDANCE.md",
+   "summary": "Markdown document \"Gate Notification Capability Guidance\" (runbook, 78 lines): Define how agents provide execution visibility after governance events without coupling GWC to a specific communication provider.",
+   "tags": [
+    "core",
+    "documentation",
+    "runbook"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+   "target": "file:core/runbooks/NOTIFICATION_CAPABILITY_GUIDANCE.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "batchFiles": [
+  {
+   "path": "templates/g01/g1-preflight-report.template.yaml",
+   "language": "yaml",
+   "sizeLines": 50,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:templates/g01/g1-preflight-report.template.yaml",
+   "type": "config",
+   "name": "g1-preflight-report.template",
+   "filePath": "templates/g01/g1-preflight-report.template.yaml",
+   "summary": "G0/G1 gate-phase artifact (g1-preflight-report.template.yaml, 50 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, repository_state, checks.",
+   "tags": [
+    "g0",
+    "g1",
+    "templates",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

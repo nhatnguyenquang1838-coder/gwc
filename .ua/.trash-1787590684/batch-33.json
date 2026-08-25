@@ -1,0 +1,81 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-175-request-intake-to-typed-intent/design.md",
+   "language": "markdown",
+   "sizeLines": 162,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-175-request-intake-to-typed-intent/requirements.md",
+   "language": "markdown",
+   "sizeLines": 63,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-175-request-intake-to-typed-intent/tasks.md",
+   "language": "markdown",
+   "sizeLines": 62,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/scrum-175-request-intake-to-typed-intent/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 162 lines): Implement the SCRUM-175 typed intake contract in place. Reuse the existing `intake_context` node family, its validator, and its regression tests instead of introducing a new family or a broader workflow surface.",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/scrum-175-request-intake-to-typed-intent/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 63 lines): SCRUM-175 upgrades `intake_context.request-intake` from a descriptive G0 context node into a deterministic typed intake boundary. The node must normalize a user request into machine-readable intent, outcome, constraints, exclusions, entry guards, and stable reason codes while preserving the",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/scrum-175-request-intake-to-typed-intent/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 62 lines): Implement SCRUM-175 in dependency order while keeping the change inside the existing `intake_context` family and preserving the current G0-only boundary. The plan should be small enough to review independently and should not introduce a parallel family or broader workflow surface.",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/design.md",
+   "target": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/requirements.md",
+   "target": "file:.kiro/specs/scrum-175-request-intake-to-typed-intent/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

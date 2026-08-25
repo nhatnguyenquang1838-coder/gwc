@@ -1,0 +1,218 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/README.md",
+   "language": "markdown",
+   "sizeLines": 42,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/decisions.md",
+   "language": "markdown",
+   "sizeLines": 19,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/evidence.json",
+   "language": "json",
+   "sizeLines": 45,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 23,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/task.yaml",
+   "language": "yaml",
+   "sizeLines": 78,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 15,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/README.md",
+   "type": "document",
+   "name": "README",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/README.md",
+   "summary": "Markdown document \"README\" (document, 42 lines): Define typed versioned contracts for runtime nodes, scenarios, profiles, guard expressions, graphs, revisions and history.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/coding-guide.md",
+   "type": "document",
+   "name": "coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/coding-guide.md",
+   "summary": "Markdown document \"coding guide\" (document, 26 lines): - `schemas/node-architect/runtime-catalog-taxonomy.schema.json` - `core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md` - `tools/node_architect/project_runtime_knowledge_graph.py` - `tests/test_runtime_catalog_taxonomy_kg.py`",
+   "tags": [
+    "documentation",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/decisions.md",
+   "type": "document",
+   "name": "decisions",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/decisions.md",
+   "summary": "Markdown document \"decisions\" (document, 19 lines): - Evidence used: protected-base GWC contracts, project profile/instructions and verified implementation/test paths. - Alternatives considered: broad rewrite; additive extension; defer. - Rule applied: `Reuse 鈫?Extend 鈫?Refactor 鈫?Replace`. - Decision: use additive extension and compatibility tests.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/evidence.json",
+   "type": "config",
+   "name": "SCRUM-102",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/evidence.json",
+   "summary": "JSON Schema definition \"SCRUM-102\" (evidence.json, 45 lines) Top-level keys: task_id, repository, base_sha, requirements, sources, confidence.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/impact-analysis.md",
+   "type": "document",
+   "name": "impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/impact-analysis.md",
+   "summary": "Markdown document \"impact analysis\" (document, 23 lines): - `schemas/node-architect/runtime-catalog-taxonomy.schema.json` - `core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md` - `tools/node_architect/project_runtime_knowledge_graph.py` - `tests/test_runtime_catalog_taxonomy_kg.py`",
+   "tags": [
+    "documentation",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/implementation-plan.md",
+   "type": "document",
+   "name": "implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/implementation-plan.md",
+   "summary": "Markdown document \"implementation plan\" (plan, 9 lines): 1. Define stable ID and independent semantic version fields. 2. Separate effect, authority, reversibility, idempotency, suspension and determinism dimensions. 3. Define runtime versus visualization edge categories. 4. Define scenario facts, typed guards, green anchors and human boundaries. 5.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/task.yaml",
+   "type": "config",
+   "name": "Design canonical node, scenario, profile and history schemas",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/task.yaml",
+   "summary": "GWC task governance YAML \"Design canonical node, scenario, profile and history schemas\" (task.yaml, 78 lines). Top-level keys: schema_version, task_id, title, slug, objective, repository.",
+   "tags": [
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/test-plan.md",
+   "type": "document",
+   "name": "test plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/test-plan.md",
+   "summary": "Markdown document \"test plan\" (plan, 15 lines): - Schema meta-validation. - Positive and negative fixtures for every contract. - Reject free-form executable guards. - Reject promoted nodes without evidence contract and implementation owner.",
+   "tags": [
+    "documentation",
+    "runtime",
+    "schema",
+    "scrum",
+    "task-me"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-102-design-canonical-runtime-schemas/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

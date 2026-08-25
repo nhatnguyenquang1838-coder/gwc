@@ -1,0 +1,132 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/01-source-inventory.json",
+   "language": "json",
+   "sizeLines": 25,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/02-traceability.json",
+   "language": "json",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/03-evidence-graph.json",
+   "language": "json",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/07-validation-report.json",
+   "language": "json",
+   "sizeLines": 13,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/01-source-inventory.json",
+   "type": "config",
+   "name": "01 source inventory",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/01-source-inventory.json",
+   "summary": "Task Me run artifact \"01 source inventory\" (01-source-inventory.json, 25 lines) Top-level keys: schema_version, run_id, repository, verified_at, files, excluded.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/02-traceability.json",
+   "type": "config",
+   "name": "SCRUM-150",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/02-traceability.json",
+   "summary": "Task Me run artifact \"SCRUM-150\" (02-traceability.json, 16 lines) Top-level keys: schema_version, task_id, requirements, candidate_outputs.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/03-evidence-graph.json",
+   "type": "config",
+   "name": "p2",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/03-evidence-graph.json",
+   "summary": "Task Me run artifact \"p2\" (03-evidence-graph.json, 16 lines) Top-level keys: schema_version, nodes, edges.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md",
+   "type": "document",
+   "name": "Impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md",
+   "summary": "Markdown document \"Impact analysis\" (document, 26 lines): - Add one provider-neutral cross-phase evidence validator and focused unit tests. - Add one positive composite record and typed rejection fixtures. - Add task-scoped SCRUM-150 G0/G1/G2/G3 evidence only as the governed work progresses.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/07-validation-report.json",
+   "type": "config",
+   "name": "config-read",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/07-validation-report.json",
+   "summary": "Task Me run artifact \"config-read\" (07-validation-report.json, 13 lines) Top-level keys: schema_version, run_id, status, checks, limitations.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/01-source-inventory.json",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/02-traceability.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/02-traceability.json",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/03-evidence-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/03-evidence-graph.json",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/04-impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/_shared/07-validation-report.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

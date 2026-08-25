@@ -1,0 +1,137 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/01-source-inventory.json",
+   "language": "json",
+   "sizeLines": 88,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/02-traceability.json",
+   "language": "json",
+   "sizeLines": 70,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/03-evidence-graph.json",
+   "language": "json",
+   "sizeLines": 98,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/04-impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 52,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/07-validation-report.json",
+   "language": "json",
+   "sizeLines": 17,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/01-source-inventory.json",
+   "type": "config",
+   "name": "01 source inventory",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/01-source-inventory.json",
+   "summary": "Task Me run artifact \"01 source inventory\" (01-source-inventory.json, 88 lines) Top-level keys: schema_version, run_id, repository, protected_base_sha, generated_at_utc, scope.",
+   "tags": [
+    "intake",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/02-traceability.json",
+   "type": "config",
+   "name": "SCRUM-175",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/02-traceability.json",
+   "summary": "Task Me run artifact \"SCRUM-175\" (02-traceability.json, 70 lines) Top-level keys: schema_version, run_id, task_id, issue, requirements, scope.",
+   "tags": [
+    "intake",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/03-evidence-graph.json",
+   "type": "config",
+   "name": "jira:SCRUM-175",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/03-evidence-graph.json",
+   "summary": "Task Me run artifact \"jira:SCRUM-175\" (03-evidence-graph.json, 98 lines) Top-level keys: schema_version, run_id, nodes, edges.",
+   "tags": [
+    "intake",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/04-impact-analysis.md",
+   "type": "document",
+   "name": "Impact Analysis",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/04-impact-analysis.md",
+   "summary": "Markdown document \"Impact Analysis\" (document, 52 lines): SCRUM-175 is a bounded G0 context change inside the existing `intake_context` node family. The current node descriptor is already present, and the family already has a validator plus regression tests. The task therefore extends an established catalog surface rather than introducing a new family or authority boundary.",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/07-validation-report.json",
+   "type": "config",
+   "name": "SCRUM-175",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/07-validation-report.json",
+   "summary": "Task Me run artifact \"SCRUM-175\" (07-validation-report.json, 17 lines) Top-level keys: schema_version, run_id, task_id, status, reason, planned_checks.",
+   "tags": [
+    "intake",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/01-source-inventory.json",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/02-traceability.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/02-traceability.json",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/03-evidence-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/03-evidence-graph.json",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/04-impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/04-impact-analysis.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/_shared/07-validation-report.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

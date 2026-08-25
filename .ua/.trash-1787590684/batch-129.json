@@ -1,0 +1,1424 @@
+{
+ "batchFiles": [
+  {
+   "path": "tools/node_architect/exact_state_capture.py",
+   "language": "python",
+   "sizeLines": 117,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/human_takeover_packet.py",
+   "language": "python",
+   "sizeLines": 154,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/lease_expiry_recovery.py",
+   "language": "python",
+   "sizeLines": 107,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/project_runtime_knowledge_graph.py",
+   "language": "python",
+   "sizeLines": 90,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/stale_session_reconciliation.py",
+   "language": "python",
+   "sizeLines": 97,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/timeout_recovery.py",
+   "language": "python",
+   "sizeLines": 90,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/unknown_write_reconciliation.py",
+   "language": "python",
+   "sizeLines": 88,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_g5_ci_verification.py",
+   "language": "python",
+   "sizeLines": 124,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "language": "python",
+   "sizeLines": 96,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "language": "python",
+   "sizeLines": 261,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_catalog_package_export.py",
+   "language": "python",
+   "sizeLines": 88,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "language": "python",
+   "sizeLines": 132,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_catalog_scale_control.py",
+   "language": "python",
+   "sizeLines": 108,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tools/node_architect/validate_node_catalog_sync_projection.py",
+   "language": "python",
+   "sizeLines": 85,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tools/node_architect/exact_state_capture.py",
+   "type": "module",
+   "name": "exact_state_capture",
+   "filePath": "tools/node_architect/exact_state_capture.py",
+   "summary": "Python module (exact_state_capture.py, 117 lines): Normalize read-only repository and CI observations into an exact-state result. The capture operation only evaluates supplied observations. It never calls a provider, changes repository state, or treats a latest/non-matching observation as evidence for the requested SHA. Defines: ExactState, ExactStateEvidence, capture_exact_state.",
+   "tags": [
+    "capture",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tools/node_architect/exact_state_capture.py:ExactState",
+   "type": "class",
+   "name": "ExactState",
+   "filePath": "tools/node_architect/exact_state_capture.py",
+   "summary": "Class ExactState defined in tools/node_architect/exact_state_capture.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/exact_state_capture.py:ExactStateEvidence",
+   "type": "class",
+   "name": "ExactStateEvidence",
+   "filePath": "tools/node_architect/exact_state_capture.py",
+   "summary": "Class ExactStateEvidence defined in tools/node_architect/exact_state_capture.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/exact_state_capture.py:capture_exact_state",
+   "type": "function",
+   "name": "capture_exact_state",
+   "filePath": "tools/node_architect/exact_state_capture.py",
+   "summary": "Function capture_exact_state defined in tools/node_architect/exact_state_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/exact_state_capture.py:as_dict",
+   "type": "function",
+   "name": "as_dict",
+   "filePath": "tools/node_architect/exact_state_capture.py",
+   "summary": "Function as_dict defined in tools/node_architect/exact_state_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/human_takeover_packet.py",
+   "type": "module",
+   "name": "human_takeover_packet",
+   "filePath": "tools/node_architect/human_takeover_packet.py",
+   "summary": "Python module (human_takeover_packet.py, 154 lines): Audited human-takeover packet builder for ambiguous runtime state. Defines: TakeoverDecision, HumanTakeoverPacket, build_human_takeover_packet.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tools/node_architect/human_takeover_packet.py:TakeoverDecision",
+   "type": "class",
+   "name": "TakeoverDecision",
+   "filePath": "tools/node_architect/human_takeover_packet.py",
+   "summary": "Class TakeoverDecision defined in tools/node_architect/human_takeover_packet.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tools/node_architect/human_takeover_packet.py:HumanTakeoverPacket",
+   "type": "class",
+   "name": "HumanTakeoverPacket",
+   "filePath": "tools/node_architect/human_takeover_packet.py",
+   "summary": "Class HumanTakeoverPacket defined in tools/node_architect/human_takeover_packet.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/human_takeover_packet.py:build_human_takeover_packet",
+   "type": "function",
+   "name": "build_human_takeover_packet",
+   "filePath": "tools/node_architect/human_takeover_packet.py",
+   "summary": "Function build_human_takeover_packet defined in tools/node_architect/human_takeover_packet.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/human_takeover_packet.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tools/node_architect/human_takeover_packet.py",
+   "summary": "Function validate defined in tools/node_architect/human_takeover_packet.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/human_takeover_packet.py:as_dict",
+   "type": "function",
+   "name": "as_dict",
+   "filePath": "tools/node_architect/human_takeover_packet.py",
+   "summary": "Function as_dict defined in tools/node_architect/human_takeover_packet.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/lease_expiry_recovery.py",
+   "type": "module",
+   "name": "lease_expiry_recovery",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Python module (lease_expiry_recovery.py, 107 lines): Deterministic lease-expiry recovery for GWC failure-recovery nodes. The router prevents stale workers from advancing after lease expiry and only allows continuation after safe readback and monotonic lease reacquisition. Defines: _now, canonical_json, digest_payload, decide_lease_expiry_recovery, is_replay_equivalent.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function _now defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function canonical_json defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function main defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:decide_lease_expiry_recovery",
+   "type": "function",
+   "name": "decide_lease_expiry_recovery",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function decide_lease_expiry_recovery defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function digest_payload defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/lease_expiry_recovery.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/lease_expiry_recovery.py",
+   "summary": "Function stable defined in tools/node_architect/lease_expiry_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/project_runtime_knowledge_graph.py",
+   "type": "service",
+   "name": "project_runtime_knowledge_graph",
+   "filePath": "tools/node_architect/project_runtime_knowledge_graph.py",
+   "summary": "Python module (project_runtime_knowledge_graph.py, 90 lines): Project a small canonical runtime catalog knowledge graph. The tool is deterministic and source-oriented. It does not replace the larger UA or generated graph artifacts; it emits a focused governance KG projection that normalizes the catalog taxonomy and G5 CI verification relati Defines: projection, main.",
+   "tags": [
+    "nodes",
+    "python",
+    "runtime",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/project_runtime_knowledge_graph.py:projection",
+   "type": "function",
+   "name": "projection",
+   "filePath": "tools/node_architect/project_runtime_knowledge_graph.py",
+   "summary": "Function projection defined in tools/node_architect/project_runtime_knowledge_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/project_runtime_knowledge_graph.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/project_runtime_knowledge_graph.py",
+   "summary": "Function main defined in tools/node_architect/project_runtime_knowledge_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/stale_session_reconciliation.py",
+   "type": "module",
+   "name": "stale_session_reconciliation",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Python module (stale_session_reconciliation.py, 97 lines): Deterministic stale-session reconciliation for GWC failure-recovery nodes. The router receives observed session/checkpoint/lease evidence and returns a bounded continuation decision. Stale observations never advance work directly; they supersede, reconcile, or require human revie Defines: _now, canonical_json, digest_payload, decide_stale_session_reconciliation, is_replay_equivalent.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function _now defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function canonical_json defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function main defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function digest_payload defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:decide_stale_session_reconciliation",
+   "type": "function",
+   "name": "decide_stale_session_reconciliation",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function decide_stale_session_reconciliation defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/stale_session_reconciliation.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/stale_session_reconciliation.py",
+   "summary": "Function stable defined in tools/node_architect/stale_session_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/timeout_recovery.py",
+   "type": "module",
+   "name": "timeout_recovery",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Python module (timeout_recovery.py, 90 lines): Deterministic timeout recovery routing for GWC failure-recovery nodes. The router makes no external calls. It receives readback evidence produced by a caller and returns one of the bounded outcomes. Unknown external effects never produce blind redispatch; they route to reconcilia Defines: _now, canonical_json, digest_payload, decide_timeout_recovery, is_replay_equivalent.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function _now defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function canonical_json defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function main defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function digest_payload defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:decide_timeout_recovery",
+   "type": "function",
+   "name": "decide_timeout_recovery",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function decide_timeout_recovery defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/timeout_recovery.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/timeout_recovery.py",
+   "summary": "Function stable defined in tools/node_architect/timeout_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "type": "module",
+   "name": "unknown_write_reconciliation",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Python module (unknown_write_reconciliation.py, 88 lines): Deterministic unknown-write reconciliation for GWC failure-recovery nodes. The router requires provider readback before retrying or accepting an ambiguous write. Unknown external effects never produce blind retry or PASS. Defines: _now, canonical_json, digest_payload, decide_unknown_write_reconciliation, is_replay_equivalent.",
+   "tags": [
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:_now",
+   "type": "function",
+   "name": "_now",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function _now defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:canonical_json",
+   "type": "function",
+   "name": "canonical_json",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function canonical_json defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function main defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:digest_payload",
+   "type": "function",
+   "name": "digest_payload",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function digest_payload defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:decide_unknown_write_reconciliation",
+   "type": "function",
+   "name": "decide_unknown_write_reconciliation",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function decide_unknown_write_reconciliation defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:is_replay_equivalent",
+   "type": "function",
+   "name": "is_replay_equivalent",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function is_replay_equivalent defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/unknown_write_reconciliation.py:stable",
+   "type": "function",
+   "name": "stable",
+   "filePath": "tools/node_architect/unknown_write_reconciliation.py",
+   "summary": "Function stable defined in tools/node_architect/unknown_write_reconciliation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_g5_ci_verification.py",
+   "type": "module",
+   "name": "validate_g5_ci_verification",
+   "filePath": "tools/node_architect/validate_g5_ci_verification.py",
+   "summary": "Python module (validate_g5_ci_verification.py, 124 lines): Validate G5 CI verification evidence and checkpoints. This validator is intentionally data-oriented. It does not call GitHub and does not execute repository-controlled code. It validates an already-collected G5 status bundle against exact-SHA and no-false-pass invariants. Defines: load_json, schema_errors, semantic_errors, validate_checkpoint, main.",
+   "tags": [
+    "g5",
+    "nodes",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_g5_ci_verification.py:schema_errors",
+   "type": "function",
+   "name": "schema_errors",
+   "filePath": "tools/node_architect/validate_g5_ci_verification.py",
+   "summary": "Function schema_errors defined in tools/node_architect/validate_g5_ci_verification.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_g5_ci_verification.py:semantic_errors",
+   "type": "function",
+   "name": "semantic_errors",
+   "filePath": "tools/node_architect/validate_g5_ci_verification.py",
+   "summary": "Function semantic_errors defined in tools/node_architect/validate_g5_ci_verification.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_g5_ci_verification.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_g5_ci_verification.py",
+   "summary": "Function main defined in tools/node_architect/validate_g5_ci_verification.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_g5_ci_verification.py:load_json",
+   "type": "function",
+   "name": "load_json",
+   "filePath": "tools/node_architect/validate_g5_ci_verification.py",
+   "summary": "Function load_json defined in tools/node_architect/validate_g5_ci_verification.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_g5_ci_verification.py:validate_checkpoint",
+   "type": "function",
+   "name": "validate_checkpoint",
+   "filePath": "tools/node_architect/validate_g5_ci_verification.py",
+   "summary": "Function validate_checkpoint defined in tools/node_architect/validate_g5_ci_verification.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "type": "module",
+   "name": "validate_node_catalog_failure_recovery",
+   "filePath": "tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "summary": "Python module (validate_node_catalog_failure_recovery.py, 96 lines): Validate the failure_recovery controlled node catalog family. Defines: validate_family, main.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_failure_recovery.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_catalog_failure_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_failure_recovery.py:validate_family",
+   "type": "function",
+   "name": "validate_family",
+   "filePath": "tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "summary": "Function validate_family defined in tools/node_architect/validate_node_catalog_failure_recovery.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "type": "module",
+   "name": "validate_node_catalog_intake_context",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Python module (validate_node_catalog_intake_context.py, 261 lines): Validate the REVAMP-GWC-016 intake_context node family. Defines: _repo_root, _default_family_dir, _load_node, _validate_reason_codes, _validate_node.",
+   "tags": [
+    "catalog",
+    "intake",
+    "nodes",
+    "python",
+    "tools"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:_load_node",
+   "type": "function",
+   "name": "_load_node",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function _load_node defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:_validate_node",
+   "type": "function",
+   "name": "_validate_node",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function _validate_node defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:validate_family",
+   "type": "function",
+   "name": "validate_family",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function validate_family defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:_repo_root",
+   "type": "function",
+   "name": "_repo_root",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function _repo_root defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:_default_family_dir",
+   "type": "function",
+   "name": "_default_family_dir",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function _default_family_dir defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_intake_context.py:_validate_reason_codes",
+   "type": "function",
+   "name": "_validate_reason_codes",
+   "filePath": "tools/node_architect/validate_node_catalog_intake_context.py",
+   "summary": "Function _validate_reason_codes defined in tools/node_architect/validate_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_package_export.py",
+   "type": "module",
+   "name": "validate_node_catalog_package_export",
+   "filePath": "tools/node_architect/validate_node_catalog_package_export.py",
+   "summary": "Python module (validate_node_catalog_package_export.py, 88 lines): Validate the package_export controlled node catalog family. Defines: validate_family, main.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_package_export.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_catalog_package_export.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_catalog_package_export.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_package_export.py:validate_family",
+   "type": "function",
+   "name": "validate_family",
+   "filePath": "tools/node_architect/validate_node_catalog_package_export.py",
+   "summary": "Function validate_family defined in tools/node_architect/validate_node_catalog_package_export.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "type": "service",
+   "name": "validate_node_catalog_runtime_checkpoint",
+   "filePath": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "summary": "Python module (validate_node_catalog_runtime_checkpoint.py, 132 lines): Validate the runtime_checkpoint controlled node catalog batch. This validator is intentionally stdlib-only so it can run in minimal governance workspaces without installing JSON Schema dependencies. Defines: load_json, iter_node_files, validate_family, main.",
+   "tags": [
+    "catalog",
+    "checkpoint",
+    "nodes",
+    "python",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:load_json",
+   "type": "function",
+   "name": "load_json",
+   "filePath": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "summary": "Function load_json defined in tools/node_architect/validate_node_catalog_runtime_checkpoint.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:iter_node_files",
+   "type": "function",
+   "name": "iter_node_files",
+   "filePath": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "summary": "Function iter_node_files defined in tools/node_architect/validate_node_catalog_runtime_checkpoint.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_catalog_runtime_checkpoint.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:validate_family",
+   "type": "function",
+   "name": "validate_family",
+   "filePath": "tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "summary": "Function validate_family defined in tools/node_architect/validate_node_catalog_runtime_checkpoint.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_scale_control.py",
+   "type": "module",
+   "name": "validate_node_catalog_scale_control",
+   "filePath": "tools/node_architect/validate_node_catalog_scale_control.py",
+   "summary": "Python module (validate_node_catalog_scale_control.py, 108 lines): Validate the scale_control controlled node catalog family. Defines: validate_family, main.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_scale_control.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_catalog_scale_control.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_scale_control.py:validate_family",
+   "type": "function",
+   "name": "validate_family",
+   "filePath": "tools/node_architect/validate_node_catalog_scale_control.py",
+   "summary": "Function validate_family defined in tools/node_architect/validate_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tools/node_architect/validate_node_catalog_sync_projection.py",
+   "type": "module",
+   "name": "validate_node_catalog_sync_projection",
+   "filePath": "tools/node_architect/validate_node_catalog_sync_projection.py",
+   "summary": "Python module (validate_node_catalog_sync_projection.py, 85 lines): Validate the sync_projection controlled node catalog family. Defines: validate_family, main.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "python",
+    "tools",
+    "validation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_sync_projection.py:main",
+   "type": "function",
+   "name": "main",
+   "filePath": "tools/node_architect/validate_node_catalog_sync_projection.py",
+   "summary": "Function main defined in tools/node_architect/validate_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tools/node_architect/validate_node_catalog_sync_projection.py:validate_family",
+   "type": "function",
+   "name": "validate_family",
+   "filePath": "tools/node_architect/validate_node_catalog_sync_projection.py",
+   "summary": "Function validate_family defined in tools/node_architect/validate_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tools/node_architect/exact_state_capture.py",
+   "target": "class:tools/node_architect/exact_state_capture.py:ExactState",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/exact_state_capture.py",
+   "target": "class:tools/node_architect/exact_state_capture.py:ExactStateEvidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/exact_state_capture.py",
+   "target": "function:tools/node_architect/exact_state_capture.py:capture_exact_state",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/exact_state_capture.py",
+   "target": "function:tools/node_architect/exact_state_capture.py:as_dict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/human_takeover_packet.py",
+   "target": "class:tools/node_architect/human_takeover_packet.py:TakeoverDecision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/human_takeover_packet.py",
+   "target": "class:tools/node_architect/human_takeover_packet.py:HumanTakeoverPacket",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/human_takeover_packet.py",
+   "target": "function:tools/node_architect/human_takeover_packet.py:build_human_takeover_packet",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/human_takeover_packet.py",
+   "target": "function:tools/node_architect/human_takeover_packet.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/human_takeover_packet.py",
+   "target": "function:tools/node_architect/human_takeover_packet.py:as_dict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:decide_lease_expiry_recovery",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/lease_expiry_recovery.py",
+   "target": "function:tools/node_architect/lease_expiry_recovery.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/project_runtime_knowledge_graph.py",
+   "target": "function:tools/node_architect/project_runtime_knowledge_graph.py:projection",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/project_runtime_knowledge_graph.py",
+   "target": "function:tools/node_architect/project_runtime_knowledge_graph.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:decide_stale_session_reconciliation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/stale_session_reconciliation.py",
+   "target": "function:tools/node_architect/stale_session_reconciliation.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:decide_timeout_recovery",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/timeout_recovery.py",
+   "target": "function:tools/node_architect/timeout_recovery.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:_now",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:canonical_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:digest_payload",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:decide_unknown_write_reconciliation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:is_replay_equivalent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/unknown_write_reconciliation.py",
+   "target": "function:tools/node_architect/unknown_write_reconciliation.py:stable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_g5_ci_verification.py",
+   "target": "function:tools/node_architect/validate_g5_ci_verification.py:schema_errors",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_g5_ci_verification.py",
+   "target": "function:tools/node_architect/validate_g5_ci_verification.py:semantic_errors",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_g5_ci_verification.py",
+   "target": "function:tools/node_architect/validate_g5_ci_verification.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_g5_ci_verification.py",
+   "target": "function:tools/node_architect/validate_g5_ci_verification.py:load_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_g5_ci_verification.py",
+   "target": "function:tools/node_architect/validate_g5_ci_verification.py:validate_checkpoint",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "target": "function:tools/node_architect/validate_node_catalog_failure_recovery.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_failure_recovery.py",
+   "target": "function:tools/node_architect/validate_node_catalog_failure_recovery.py:validate_family",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:_load_node",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:_validate_node",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:validate_family",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:_repo_root",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:_default_family_dir",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_intake_context.py",
+   "target": "function:tools/node_architect/validate_node_catalog_intake_context.py:_validate_reason_codes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_package_export.py",
+   "target": "function:tools/node_architect/validate_node_catalog_package_export.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_package_export.py",
+   "target": "function:tools/node_architect/validate_node_catalog_package_export.py:validate_family",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "target": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:load_json",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "target": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:iter_node_files",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "target": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_runtime_checkpoint.py",
+   "target": "function:tools/node_architect/validate_node_catalog_runtime_checkpoint.py:validate_family",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_scale_control.py",
+   "target": "function:tools/node_architect/validate_node_catalog_scale_control.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_scale_control.py",
+   "target": "function:tools/node_architect/validate_node_catalog_scale_control.py:validate_family",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_sync_projection.py",
+   "target": "function:tools/node_architect/validate_node_catalog_sync_projection.py:main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tools/node_architect/validate_node_catalog_sync_projection.py",
+   "target": "function:tools/node_architect/validate_node_catalog_sync_projection.py:validate_family",
+   "type": "contains",
+   "weight": 0.9
+  }
+ ]
+}

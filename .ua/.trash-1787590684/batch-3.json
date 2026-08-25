@@ -1,0 +1,162 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-100/evidence/evidence-provenance-map.json",
+   "language": "json",
+   "sizeLines": 110,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json",
+   "language": "json",
+   "sizeLines": 50,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.stdout.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json",
+   "language": "json",
+   "sizeLines": 20,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.stdout.json",
+   "language": "json",
+   "sizeLines": 5,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-100/evidence/task-me-plan-binding-refresh-20260725T171942Z.json",
+   "language": "json",
+   "sizeLines": 67,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-100/evidence/evidence-provenance-map.json",
+   "type": "config",
+   "name": "evidence provenance map",
+   "filePath": ".gwc/tasks/SCRUM-100/evidence/evidence-provenance-map.json",
+   "summary": "JSON data file \"evidence provenance map\" (evidence-provenance-map.json, 110 lines) Top-level keys: repository, default_branch, base_sha, merge_pr, jira, plan.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json",
+   "type": "config",
+   "name": "SCRUM-100",
+   "filePath": ".gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json",
+   "summary": "JSON data file \"SCRUM-100\" (g01-validator-20260725T172000Z.meta.json, 50 lines) Top-level keys: schema_version, artifact_type, generated_at_utc, task_id, repository, base_sha.",
+   "tags": [
+    "g0",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.stdout.json",
+   "type": "config",
+   "name": "g01 validator 20260725T172000Z.stdout",
+   "filePath": ".gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.stdout.json",
+   "summary": "JSON data file \"g01 validator 20260725T172000Z.stdout\" (g01-validator-20260725T172000Z.stdout.json, 5 lines) Top-level keys: outcome, valid, issues.",
+   "tags": [
+    "g0",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json",
+   "type": "config",
+   "name": "SCRUM-100",
+   "filePath": ".gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json",
+   "summary": "JSON data file \"SCRUM-100\" (g2-final-validator-20260725T174500Z.meta.json, 20 lines) Top-level keys: schema_version, artifact_type, generated_at_utc, task_id, repository, base_sha.",
+   "tags": [
+    "g2",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.stdout.json",
+   "type": "config",
+   "name": "g2 final validator 20260725T174500Z.stdout",
+   "filePath": ".gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.stdout.json",
+   "summary": "JSON data file \"g2 final validator 20260725T174500Z.stdout\" (g2-final-validator-20260725T174500Z.stdout.json, 5 lines) Top-level keys: outcome, valid, issues.",
+   "tags": [
+    "g2",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-100/evidence/task-me-plan-binding-refresh-20260725T171942Z.json",
+   "type": "config",
+   "name": "task me plan binding refresh 20260725T171942Z",
+   "filePath": ".gwc/tasks/SCRUM-100/evidence/task-me-plan-binding-refresh-20260725T171942Z.json",
+   "summary": "Task Me run artifact \"task me plan binding refresh 20260725T171942Z\" (task-me-plan-binding-refresh-20260725T171942Z.json, 67 lines) Top-level keys: schema_version, artifact_type, generated_at_utc, canonical_task_uid, source_planning_task_uid, source_run_id.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-100/evidence/evidence-provenance-map.json",
+   "target": "file:.gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.meta.json",
+   "target": "file:.gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.stdout.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-100/evidence/g01-validator-20260725T172000Z.stdout.json",
+   "target": "file:.gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.meta.json",
+   "target": "file:.gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.stdout.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-100/evidence/g2-final-validator-20260725T174500Z.stdout.json",
+   "target": "file:.gwc/tasks/SCRUM-100/evidence/task-me-plan-binding-refresh-20260725T171942Z.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

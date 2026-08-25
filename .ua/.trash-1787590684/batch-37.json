@@ -1,0 +1,137 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/01-source-inventory.json",
+   "language": "json",
+   "sizeLines": 29,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/02-traceability.json",
+   "language": "json",
+   "sizeLines": 18,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/03-evidence-graph.json",
+   "language": "json",
+   "sizeLines": 20,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/04-impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/07-validation-report.json",
+   "language": "json",
+   "sizeLines": 13,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/01-source-inventory.json",
+   "type": "config",
+   "name": "01 source inventory",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/01-source-inventory.json",
+   "summary": "Task Me run artifact \"01 source inventory\" (01-source-inventory.json, 29 lines) Top-level keys: schema_version, run_id, repository, protected_base_sha, sources, excluded_by_config.",
+   "tags": [
+    "g1",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/02-traceability.json",
+   "type": "config",
+   "name": "02 traceability",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/02-traceability.json",
+   "summary": "Task Me run artifact \"02 traceability\" (02-traceability.json, 18 lines) Top-level keys: schema_version, run_id, links, unresolved.",
+   "tags": [
+    "g1",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/03-evidence-graph.json",
+   "type": "config",
+   "name": "GWC-PROTECTED-BASE",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/03-evidence-graph.json",
+   "summary": "Task Me run artifact \"GWC-PROTECTED-BASE\" (03-evidence-graph.json, 20 lines) Top-level keys: schema_version, run_id, nodes, edges.",
+   "tags": [
+    "g1",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/04-impact-analysis.md",
+   "type": "document",
+   "name": "SCRUM-116 impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/04-impact-analysis.md",
+   "summary": "Markdown document \"SCRUM-116 impact analysis\" (document, 7 lines): The requested outcome is a contract and ownership boundary, not an implementation adapter. The direct impact is the GWC governance contract surface, the DW-SuperApps distribution/control-plane contract, and the target-owned runtime roots. The transitive impact is to SCRUM-117 through SCRUM-121,",
+   "tags": [
+    "documentation",
+    "g1",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/07-validation-report.json",
+   "type": "config",
+   "name": "07 validation report",
+   "filePath": ".task-me/runs/gwc-scrum-116-g1-20260727/_shared/07-validation-report.json",
+   "summary": "Task Me run artifact \"07 validation report\" (07-validation-report.json, 13 lines) Top-level keys: schema_version, run_id, status, checks, limitations.",
+   "tags": [
+    "g1",
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/01-source-inventory.json",
+   "target": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/02-traceability.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/02-traceability.json",
+   "target": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/03-evidence-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/03-evidence-graph.json",
+   "target": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/04-impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/04-impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-116-g1-20260727/_shared/07-validation-report.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md",
+   "language": "markdown",
+   "sizeLines": 219,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+   "language": "markdown",
+   "sizeLines": 81,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md",
+   "language": "markdown",
+   "sizeLines": 97,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md",
+   "type": "document",
+   "name": "design",
+   "filePath": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md",
+   "summary": "Markdown document \"design\" (specification, 219 lines): Phase 1 introduces a canonical planning and registry foundation around the existing GWC governance system. The design extends current contracts rather than replacing them and keeps Task-Me as a planning-only component.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "registry"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+   "type": "document",
+   "name": "requirements",
+   "filePath": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+   "summary": "Markdown document \"requirements\" (specification, 81 lines): GWC requires an architecture-readiness baseline before expanding into a durable adaptive runtime. The current repository contains authoritative G0-G6 governance contracts, task-scoped evidence, exact-SHA verification and a declared runtime-catalog shape, but executable coverage and canonical",
+   "tags": [
+    "documentation",
+    "kiro",
+    "registry"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md",
+   "type": "document",
+   "name": "tasks",
+   "filePath": ".kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md",
+   "summary": "Markdown document \"tasks\" (specification, 97 lines): This plan implements the Phase 1 architecture-readiness and canonical-registry foundation. Knowledge tasks execute in parallel and converge before registry/v3 implementation. Source changes are not authorized by this plan alone; GWC G2/G3 evidence is still required.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "registry",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/design.md",
+   "target": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/requirements.md",
+   "target": "file:.kiro/specs/GWC-P1-architecture-readiness-canonical-registry/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

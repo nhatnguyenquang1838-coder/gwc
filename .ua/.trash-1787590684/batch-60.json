@@ -1,0 +1,180 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/integrations/DW_SUPER_E2E_REPLAYABLE_PILOT_CONTRACT_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 17,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integrations/GITHUB_G5_G6_JIRA_PROJECTION_CONTRACT_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integrations/P5_EVALUATION_CONTROLLED_SELF_IMPROVEMENT_CONTRACT_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 51,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integrations/TASK_ME_HOST_MODE_CONTRACT_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 18,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integrations/UA_HOST_MODE_CONTRACT_v0.1.md",
+   "language": "markdown",
+   "sizeLines": 18,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/integrations/dw-super-e2e-replayable-pilot-contract.json",
+   "language": "json",
+   "sizeLines": 37,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/integrations/p5-evaluation-controlled-self-improvement-contract.json",
+   "language": "json",
+   "sizeLines": 62,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/integrations/DW_SUPER_E2E_REPLAYABLE_PILOT_CONTRACT_v0.1.md",
+   "type": "document",
+   "name": "DW SUPER E2E Replayable Pilot Contract v0.1",
+   "filePath": "core/integrations/DW_SUPER_E2E_REPLAYABLE_PILOT_CONTRACT_v0.1.md",
+   "summary": "Markdown document \"DW SUPER E2E Replayable Pilot Contract v0.1\" (guideline/contract, 17 lines): GWC remains authoritative for G0-G6. GitHub remains authoritative for repository refs, PR heads, merge commits and CI. UA, Task-Me and BMAD are bounded providers. Jira, Slack and Notion are projections only and cannot grant gate authority.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integrations/GITHUB_G5_G6_JIRA_PROJECTION_CONTRACT_v0.1.md",
+   "type": "document",
+   "name": "GitHub G5/G6 Jira Projection Contract v0.1",
+   "filePath": "core/integrations/GITHUB_G5_G6_JIRA_PROJECTION_CONTRACT_v0.1.md",
+   "summary": "Markdown document \"GitHub G5/G6 Jira Projection Contract v0.1\" (guideline/contract, 12 lines): GitHub is authoritative for repository refs, PR heads, merge commits and CI. GWC gate artifacts and exact approvals are authoritative for G0-G6. Jira, Slack and Notion are projections only.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation",
+    "g5",
+    "g6"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integrations/P5_EVALUATION_CONTROLLED_SELF_IMPROVEMENT_CONTRACT_v0.1.md",
+   "type": "document",
+   "name": "P5 Evaluation and Controlled Self-Improvement Contract v0.1",
+   "filePath": "core/integrations/P5_EVALUATION_CONTROLLED_SELF_IMPROVEMENT_CONTRACT_v0.1.md",
+   "summary": "Markdown document \"P5 Evaluation and Controlled Self-Improvement Contract v0.1\" (guideline/contract, 51 lines): GWC remains authoritative for gates and exact approval envelopes. GitHub remains authoritative for repository refs, PR heads, merge commits and CI. Jira, Slack and Notion remain projection layers and cannot grant gate authority.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integrations/TASK_ME_HOST_MODE_CONTRACT_v0.1.md",
+   "type": "document",
+   "name": "Task-Me Host-Mode Contract v0.1",
+   "filePath": "core/integrations/TASK_ME_HOST_MODE_CONTRACT_v0.1.md",
+   "summary": "Markdown document \"Task-Me Host-Mode Contract v0.1\" (guideline/contract, 18 lines).",
+   "tags": [
+    "contract",
+    "core",
+    "documentation",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integrations/UA_HOST_MODE_CONTRACT_v0.1.md",
+   "type": "document",
+   "name": "UA Host-Mode Contract v0.1",
+   "filePath": "core/integrations/UA_HOST_MODE_CONTRACT_v0.1.md",
+   "summary": "Markdown document \"UA Host-Mode Contract v0.1\" (guideline/contract, 18 lines).",
+   "tags": [
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integrations/dw-super-e2e-replayable-pilot-contract.json",
+   "type": "config",
+   "name": "dw super e2e replayable pilot contract",
+   "filePath": "core/integrations/dw-super-e2e-replayable-pilot-contract.json",
+   "summary": "JSON data file \"dw super e2e replayable pilot contract\" (dw-super-e2e-replayable-pilot-contract.json, 38 lines) Top-level keys: schema_version, contract, authority, providers, required_guards, failure_codes.",
+   "tags": [
+    "contract",
+    "core",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/integrations/p5-evaluation-controlled-self-improvement-contract.json",
+   "type": "config",
+   "name": "p5 evaluation controlled self improvement contract",
+   "filePath": "core/integrations/p5-evaluation-controlled-self-improvement-contract.json",
+   "summary": "JSON data file \"p5 evaluation controlled self improvement contract\" (p5-evaluation-controlled-self-improvement-contract.json, 62 lines) Top-level keys: schema_version, contract, authority, task_chain, metric_families, required_guards.",
+   "tags": [
+    "contract",
+    "core",
+    "json"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:core/integrations/DW_SUPER_E2E_REPLAYABLE_PILOT_CONTRACT_v0.1.md",
+   "target": "file:core/integrations/GITHUB_G5_G6_JIRA_PROJECTION_CONTRACT_v0.1.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integrations/GITHUB_G5_G6_JIRA_PROJECTION_CONTRACT_v0.1.md",
+   "target": "file:core/integrations/P5_EVALUATION_CONTROLLED_SELF_IMPROVEMENT_CONTRACT_v0.1.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integrations/P5_EVALUATION_CONTROLLED_SELF_IMPROVEMENT_CONTRACT_v0.1.md",
+   "target": "file:core/integrations/TASK_ME_HOST_MODE_CONTRACT_v0.1.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integrations/TASK_ME_HOST_MODE_CONTRACT_v0.1.md",
+   "target": "file:core/integrations/UA_HOST_MODE_CONTRACT_v0.1.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integrations/UA_HOST_MODE_CONTRACT_v0.1.md",
+   "target": "file:core/integrations/dw-super-e2e-replayable-pilot-contract.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:core/integrations/dw-super-e2e-replayable-pilot-contract.json",
+   "target": "file:core/integrations/p5-evaluation-controlled-self-improvement-contract.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

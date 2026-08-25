@@ -1,0 +1,28 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/runtime_checkpoint/README.md",
+   "language": "markdown",
+   "sizeLines": 85,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/runtime_checkpoint/README.md",
+   "type": "document",
+   "name": "Runtime Checkpoint Node Family",
+   "filePath": "core/node-architect/node-catalog/runtime_checkpoint/README.md",
+   "summary": "Markdown document \"Runtime Checkpoint Node Family\" (document, 85 lines): ```text Task: REVAMP-GWC-019 / SCRUM-74 extension Batch: batch-04-runtime-checkpoint Family: runtime_checkpoint Planned nodes: 9 Authority boundary: G2_EXECUTION ```",
+   "tags": [
+    "catalog",
+    "checkpoint",
+    "core",
+    "documentation",
+    "nodes"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

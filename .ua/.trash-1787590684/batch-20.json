@@ -1,0 +1,75 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/design.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/requirements.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/tasks.md",
+   "language": "markdown",
+   "sizeLines": 8,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/design.md",
+   "type": "document",
+   "name": "SCRUM-121 Design — Replayable E2E Pilot",
+   "filePath": ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/design.md",
+   "summary": "Markdown document \"SCRUM-121 Design — Replayable E2E Pilot\" (specification, 5 lines): The pilot records a typed run history made of nodes, decisions, evidence bindings, side-effect keys and projection receipts. The validator checks that each side effect has an idempotency key, each provider artifact has an immutable version or SHA, and each replay decision either matches the",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/requirements.md",
+   "type": "document",
+   "name": "SCRUM-121 Requirements — Replayable E2E Pilot",
+   "filePath": ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/requirements.md",
+   "summary": "Markdown document \"SCRUM-121 Requirements — Replayable E2E Pilot\" (specification, 12 lines): The pilot MUST demonstrate an end-to-end governed execution path without production data, deployment, release, secret, credential, migration or destructive action.",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/tasks.md",
+   "type": "document",
+   "name": "SCRUM-121 Tasks",
+   "filePath": ".kiro/specs/GWC-P4-I2-replayable-e2e-pilot/tasks.md",
+   "summary": "Markdown document \"SCRUM-121 Tasks\" (specification, 8 lines): - [x] Select no-production E2E pilot. - [x] Define provenance and replay evidence shape. - [x] Add pass/fail examples for required fault scenarios. - [x] Add validator and unit tests. - [ ] Open Draft PR and bind CI to exact head. - [ ] Complete G3 readback and prepare G4 envelope only after CI passes.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/design.md",
+   "target": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/requirements.md",
+   "target": "file:.kiro/specs/GWC-P4-I2-replayable-e2e-pilot/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

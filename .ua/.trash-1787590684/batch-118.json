@@ -1,0 +1,250 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g0/context-snapshot.yaml",
+   "language": "yaml",
+   "sizeLines": 60,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/brainstorming/g1-options.yaml",
+   "language": "yaml",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 40,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/intake/g1-intake-brief.yaml",
+   "language": "yaml",
+   "sizeLines": 62,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/preflight/g1-preflight-report.yaml",
+   "language": "yaml",
+   "sizeLines": 56,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 68,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 96,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g0/context-snapshot.yaml",
+   "language": "yaml",
+   "sizeLines": 63,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/brainstorming/g1-options.yaml",
+   "language": "yaml",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 50,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/intake/g1-intake-brief.yaml",
+   "language": "yaml",
+   "sizeLines": 62,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/preflight/g1-preflight-report.yaml",
+   "language": "yaml",
+   "sizeLines": 61,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g0/context-snapshot.yaml",
+   "type": "config",
+   "name": "context-snapshot",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g0/context-snapshot.yaml",
+   "summary": "GWC task governance YAML (context-snapshot.yaml, 60 lines). Top-level keys: schema_version, artifact_type, generated_at, project, repository, constraints.",
+   "tags": [
+    "g0",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/brainstorming/g1-options.yaml",
+   "type": "config",
+   "name": "g1-options",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/brainstorming/g1-options.yaml",
+   "summary": "GWC task governance YAML (g1-options.yaml, 28 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options, recommended_option_id.",
+   "tags": [
+    "g1",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 40 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options_ref, preflight_ref.",
+   "tags": [
+    "g1",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/intake/g1-intake-brief.yaml",
+   "type": "config",
+   "name": "g1-intake-brief",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/intake/g1-intake-brief.yaml",
+   "summary": "GWC task governance YAML (g1-intake-brief.yaml, 62 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, problem, desired_outcome.",
+   "tags": [
+    "g1",
+    "gwc",
+    "intake",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/preflight/g1-preflight-report.yaml",
+   "type": "config",
+   "name": "g1-preflight-report",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g1/preflight/g1-preflight-report.yaml",
+   "summary": "GWC task governance YAML (g1-preflight-report.yaml, 56 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, repository_state, checks.",
+   "tags": [
+    "g1",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 68 lines). Top-level keys: schema_version, artifact_type, task_id, approval_request_id, authority_gate, issued_at.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/task_59f0756e-86cb-4efa-8a0d-d7902c924567/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 96 lines). Top-level keys: schema_version, artifact_type, gate, task_id, repository, base_ref.",
+   "tags": [
+    "g3",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g0/context-snapshot.yaml",
+   "type": "config",
+   "name": "context-snapshot",
+   "filePath": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g0/context-snapshot.yaml",
+   "summary": "GWC task governance YAML (context-snapshot.yaml, 63 lines). Top-level keys: schema_version, artifact_type, generated_at, project, repository, constraints.",
+   "tags": [
+    "g0",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/brainstorming/g1-options.yaml",
+   "type": "config",
+   "name": "g1-options",
+   "filePath": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/brainstorming/g1-options.yaml",
+   "summary": "GWC task governance YAML (g1-options.yaml, 28 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options, recommended_option_id.",
+   "tags": [
+    "g1",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 50 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options_ref, preflight_ref.",
+   "tags": [
+    "g1",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/intake/g1-intake-brief.yaml",
+   "type": "config",
+   "name": "g1-intake-brief",
+   "filePath": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/intake/g1-intake-brief.yaml",
+   "summary": "GWC task governance YAML (g1-intake-brief.yaml, 62 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, problem, desired_outcome.",
+   "tags": [
+    "g1",
+    "gwc",
+    "intake",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/preflight/g1-preflight-report.yaml",
+   "type": "config",
+   "name": "g1-preflight-report",
+   "filePath": ".gwc/tasks/task_6e8c52f6-25e2-465f-8590-5b6642cf69a1/g1/preflight/g1-preflight-report.yaml",
+   "summary": "GWC task governance YAML (g1-preflight-report.yaml, 61 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, repository_state, checks.",
+   "tags": [
+    "g1",
+    "gwc",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

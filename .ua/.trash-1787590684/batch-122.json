@@ -1,0 +1,330 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/scrum-121-replayable-e2e-pilot/tasks/PILOT-121-A/evidence.json",
+   "language": "json",
+   "sizeLines": 27,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/RUN-SUMMARY.md",
+   "language": "markdown",
+   "sizeLines": 39,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-dag.mmd",
+   "language": "mmd",
+   "sizeLines": 2,
+   "fileCategory": "code"
+  },
+  {
+   "path": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-index.yaml",
+   "language": "yaml",
+   "sizeLines": 13,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/analysis/SCRUM-118/accepted-snapshot-reference.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/extensions/planning-graph.json",
+   "language": "json",
+   "sizeLines": 126,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/extensions/traceability-graph.json",
+   "language": "json",
+   "sizeLines": 143,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/gwc/graph-snapshot.json",
+   "language": "json",
+   "sizeLines": 70,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".ua/gwc/graph-summary.md",
+   "language": "markdown",
+   "sizeLines": 34,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".ua/gwc/p3/README.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".ua/gwc/p3/graph-binding-contract.json",
+   "language": "json",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": "agents/chatgpt-agent/agent-instructions.md",
+   "language": "markdown",
+   "sizeLines": 315,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "agents/dwc/agent-instructions.md",
+   "language": "markdown",
+   "sizeLines": 365,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "agents/dwc/capabilities.yaml",
+   "language": "yaml",
+   "sizeLines": 146,
+   "fileCategory": "config"
+  },
+  {
+   "path": "agents/shared/NOTIFICATION_CAPABILITY_BEHAVIOR.md",
+   "language": "markdown",
+   "sizeLines": 54,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/scrum-121-replayable-e2e-pilot/tasks/PILOT-121-A/evidence.json",
+   "type": "config",
+   "name": "SCRUM-121",
+   "filePath": ".task-me/runs/scrum-121-replayable-e2e-pilot/tasks/PILOT-121-A/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-121\" (evidence.json, 28 lines) Top-level keys: task_id, pilot_id, selected_route, excluded_operations, scope_hash.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/RUN-SUMMARY.md",
+   "type": "document",
+   "name": "SCRUM-175 Run Summary",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/RUN-SUMMARY.md",
+   "summary": "Markdown document \"SCRUM-175 Run Summary\" (report, 39 lines): The Jira issue asks for a deterministic upgrade of `intake_context.request-intake` from the current descriptor-only G0 context node into a typed intake contract that can normalize user requests into intent, outcome, constraints, exclusions, entry guards, and stable reason codes.",
+   "tags": [
+    "documentation",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-dag.mmd",
+   "type": "module",
+   "name": "task-dag",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-dag.mmd",
+   "summary": "Mermaid diagram source (task-dag.mmd) describing architecture or flow visually.",
+   "tags": [
+    "diagram",
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-index.yaml",
+   "type": "config",
+   "name": "task-index",
+   "filePath": ".task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-index.yaml",
+   "summary": "GWC task governance YAML (task-index.yaml, 13 lines). Top-level keys: schema_version, run_id, repository, protected_base_sha, tasks.",
+   "tags": [
+    "intake",
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.ua/analysis/SCRUM-118/accepted-snapshot-reference.json",
+   "type": "config",
+   "name": "SCRUM-118",
+   "filePath": ".ua/analysis/SCRUM-118/accepted-snapshot-reference.json",
+   "summary": "JSON data file \"SCRUM-118\" (accepted-snapshot-reference.json, 1 lines) Top-level keys: schema_version, artifact_type, task_id, target_repository, target_sha, source_contract_task.",
+   "tags": [
+    "json",
+    "scrum",
+    "ua"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.ua/extensions/planning-graph.json",
+   "type": "config",
+   "name": "planning graph",
+   "filePath": ".ua/extensions/planning-graph.json",
+   "summary": "JSON data file \"planning graph\" (planning-graph.json, 126 lines) Top-level keys: schema_version, generated_at, source, nodes, edges.",
+   "tags": [
+    "json",
+    "ua"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.ua/extensions/traceability-graph.json",
+   "type": "config",
+   "name": "traceability graph",
+   "filePath": ".ua/extensions/traceability-graph.json",
+   "summary": "JSON data file \"traceability graph\" (traceability-graph.json, 143 lines) Top-level keys: schema_version, generated_at, source, nodes, edges.",
+   "tags": [
+    "json",
+    "ua"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.ua/gwc/graph-snapshot.json",
+   "type": "config",
+   "name": "SCRUM-142",
+   "filePath": ".ua/gwc/graph-snapshot.json",
+   "summary": "JSON data file \"SCRUM-142\" (graph-snapshot.json, 70 lines) Top-level keys: artifact_type, base_sha, default_branch, generated_at, graph_edges, graph_nodes.",
+   "tags": [
+    "json",
+    "ua"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.ua/gwc/graph-summary.md",
+   "type": "document",
+   "name": "GWC UA-compatible Knowledge Graph Summary",
+   "filePath": ".ua/gwc/graph-summary.md",
+   "summary": "Markdown document \"GWC UA-compatible Knowledge Graph Summary\" (report, 34 lines): Task: `SCRUM-142` Run: `g1-scrum-142-20260726-1945` Repo: `nhatnguyenquang1838-coder/gwc` Default branch: `main` Base SHA: `76644885f4b25cb49a2a34bfea0e2ede941caa01`",
+   "tags": [
+    "documentation",
+    "ua"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.ua/gwc/p3/README.md",
+   "type": "document",
+   "name": "UA-Compatible P3 Graph Binding",
+   "filePath": ".ua/gwc/p3/README.md",
+   "summary": "Markdown document \"UA-Compatible P3 Graph Binding\" (document, 3 lines): Repo-derived contract only. Cytoscape v3 elements remain visual projection, not runtime authority.",
+   "tags": [
+    "documentation",
+    "ua"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.ua/gwc/p3/graph-binding-contract.json",
+   "type": "config",
+   "name": "SCRUM-97",
+   "filePath": ".ua/gwc/p3/graph-binding-contract.json",
+   "summary": "JSON data file \"SCRUM-97\" (graph-binding-contract.json, 10 lines) Top-level keys: schema_version, task_id, status, cytoscape_elements_shape, visual_edges_authoritative.",
+   "tags": [
+    "contract",
+    "json",
+    "ua"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:agents/chatgpt-agent/agent-instructions.md",
+   "type": "document",
+   "name": "ChatGPT Agent Instructions for GWC-Governed Work",
+   "filePath": "agents/chatgpt-agent/agent-instructions.md",
+   "summary": "Markdown document \"ChatGPT Agent Instructions for GWC-Governed Work\" (document, 315 lines): These instructions apply to ChatGPT-style agents operating through conversation, connectors, project context, or a trusted local checkout. They are an additive runtime overlay on the parent `AGENTS.md`.",
+   "tags": [
+    "agents",
+    "documentation",
+    "instructions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:agents/dwc/agent-instructions.md",
+   "type": "document",
+   "name": "DWC Repository Operations Contract",
+   "filePath": "agents/dwc/agent-instructions.md",
+   "summary": "Markdown document \"DWC Repository Operations Contract\" (document, 365 lines): This contract applies to the DWC runtime operating on `nhatnguyenquang1838-coder/gwc` through the verified `DWC` connector.",
+   "tags": [
+    "agents",
+    "documentation",
+    "instructions"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:agents/dwc/capabilities.yaml",
+   "type": "config",
+   "name": "capabilities",
+   "filePath": "agents/dwc/capabilities.yaml",
+   "summary": "capability declaration (capabilities.yaml, 146 lines). Top-level keys: agent, scope, capabilities.",
+   "tags": [
+    "agents",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:agents/shared/NOTIFICATION_CAPABILITY_BEHAVIOR.md",
+   "type": "document",
+   "name": "Notification Capability Behavior",
+   "filePath": "agents/shared/NOTIFICATION_CAPABILITY_BEHAVIOR.md",
+   "summary": "Markdown document \"Notification Capability Behavior\" (document, 54 lines): Define how agents consume GWC notification capability guidance without coupling execution to a specific notification provider.",
+   "tags": [
+    "agents",
+    "documentation",
+    "instructions"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/RUN-SUMMARY.md",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-dag.mmd",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-dag.mmd",
+   "target": "file:.task-me/runs/scrum-175-request-intake-m1-to-m4-20260731/task-index.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.ua/extensions/planning-graph.json",
+   "target": "file:.ua/extensions/traceability-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.ua/gwc/graph-snapshot.json",
+   "target": "file:.ua/gwc/graph-summary.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.ua/gwc/p3/README.md",
+   "target": "file:.ua/gwc/p3/graph-binding-contract.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:agents/dwc/agent-instructions.md",
+   "target": "file:agents/dwc/capabilities.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

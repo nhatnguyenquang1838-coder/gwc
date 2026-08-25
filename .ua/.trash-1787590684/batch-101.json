@@ -1,0 +1,163 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/node-architect/decision-rule.schema.json",
+   "language": "json",
+   "sizeLines": 24,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/g5-ci-checkpoint.schema.json",
+   "language": "json",
+   "sizeLines": 69,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+   "language": "json",
+   "sizeLines": 42,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-event.schema.json",
+   "language": "json",
+   "sizeLines": 61,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-graph.schema.json",
+   "language": "json",
+   "sizeLines": 39,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-history.schema.json",
+   "language": "json",
+   "sizeLines": 18,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/node-architect/decision-rule.schema.json",
+   "type": "config",
+   "name": "Canonical Decision Rule",
+   "filePath": "schemas/node-architect/decision-rule.schema.json",
+   "summary": "JSON Schema definition \"Canonical Decision Rule\" (decision-rule.schema.json, 24 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/g5-ci-checkpoint.schema.json",
+   "type": "config",
+   "name": "G5 CI Checkpoint",
+   "filePath": "schemas/node-architect/g5-ci-checkpoint.schema.json",
+   "summary": "JSON Schema definition \"G5 CI Checkpoint\" (g5-ci-checkpoint.schema.json, 69 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "checkpoint",
+    "g5",
+    "json",
+    "nodes",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+   "type": "config",
+   "name": "Runtime Catalog Taxonomy",
+   "filePath": "schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+   "summary": "JSON Schema definition \"Runtime Catalog Taxonomy\" (runtime-catalog-taxonomy.schema.json, 42 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "catalog",
+    "json",
+    "nodes",
+    "runtime",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-event.schema.json",
+   "type": "config",
+   "name": "GWC Runtime Event",
+   "filePath": "schemas/node-architect/runtime-event.schema.json",
+   "summary": "JSON Schema definition \"GWC Runtime Event\" (runtime-event.schema.json, 61 lines) Top-level keys: $id, $schema, additionalProperties, properties, required, allOf.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-graph.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Graph",
+   "filePath": "schemas/node-architect/runtime-graph.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Graph\" (runtime-graph.schema.json, 39 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-history.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime History",
+   "filePath": "schemas/node-architect/runtime-history.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime History\" (runtime-history.schema.json, 18 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:schemas/node-architect/decision-rule.schema.json",
+   "target": "file:schemas/node-architect/g5-ci-checkpoint.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/node-architect/g5-ci-checkpoint.schema.json",
+   "target": "file:schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/node-architect/runtime-catalog-taxonomy.schema.json",
+   "target": "file:schemas/node-architect/runtime-event.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/node-architect/runtime-event.schema.json",
+   "target": "file:schemas/node-architect/runtime-graph.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/node-architect/runtime-graph.schema.json",
+   "target": "file:schemas/node-architect/runtime-history.schema.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

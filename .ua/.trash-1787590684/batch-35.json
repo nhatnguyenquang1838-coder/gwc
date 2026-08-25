@@ -1,0 +1,81 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/design.md",
+   "language": "markdown",
+   "sizeLines": 169,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/requirements.md",
+   "language": "markdown",
+   "sizeLines": 101,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/tasks.md",
+   "language": "markdown",
+   "sizeLines": 77,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/design.md",
+   "type": "document",
+   "name": "Design Document",
+   "filePath": ".kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/design.md",
+   "summary": "Markdown document \"Design Document\" (specification, 169 lines): Implement SCRUM-177 by extending the existing `intake_context.repo-identity-check` descriptor in place. The goal is to turn repository identity into a typed, evidence-backed read-only boundary that deterministically validates repository identity, default branch, protected branch, and execution-mode",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/requirements.md",
+   "type": "document",
+   "name": "Requirements Document",
+   "filePath": ".kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/requirements.md",
+   "summary": "Markdown document \"Requirements Document\" (specification, 101 lines): SCRUM-177 advances `intake_context.repo-identity-check` from a descriptive read-only catalog node into a typed repository-identity boundary. The node must validate repository identity, default branch, protected branch, and execution mode assumptions while failing closed on mismatch.",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/tasks.md",
+   "type": "document",
+   "name": "Implementation Plan",
+   "filePath": ".kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/tasks.md",
+   "summary": "Markdown document \"Implementation Plan\" (specification, 77 lines): Implement SCRUM-177 in dependency order while keeping the change inside the existing `intake_context` family and preserving the current G0-only boundary. The plan should be small enough to review independently and should not introduce a parallel family or broader workflow surface.",
+   "tags": [
+    "documentation",
+    "intake",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/design.md",
+   "target": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/requirements.md",
+   "target": "file:.kiro/specs/scrum-177-intake-context-repo-identity-check-m1-to-m4/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

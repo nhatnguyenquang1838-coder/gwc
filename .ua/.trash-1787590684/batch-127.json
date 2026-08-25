@@ -1,0 +1,1566 @@
+{
+ "batchFiles": [
+  {
+   "path": "tests/test_node_catalog_failure_recovery.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_node_catalog_intake_context.py",
+   "language": "python",
+   "sizeLines": 544,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_node_catalog_package_export.py",
+   "language": "python",
+   "sizeLines": 79,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_node_catalog_scale_control.py",
+   "language": "python",
+   "sizeLines": 84,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_node_catalog_sync_projection.py",
+   "language": "python",
+   "sizeLines": 82,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_node_catalog_validation_quality.py",
+   "language": "python",
+   "sizeLines": 44,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_p3_backward_graph.py",
+   "language": "python",
+   "sizeLines": 217,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_p3_scenario_registry.py",
+   "language": "python",
+   "sizeLines": 19,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_p5_evaluation_adapter.py",
+   "language": "python",
+   "sizeLines": 220,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_power_distribution.py",
+   "language": "python",
+   "sizeLines": 181,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_power_help.py",
+   "language": "python",
+   "sizeLines": 25,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "language": "python",
+   "sizeLines": 85,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_runtime_registry_validation.py",
+   "language": "python",
+   "sizeLines": 102,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_scrum_150_cross_phase.py",
+   "language": "python",
+   "sizeLines": 38,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_stale_session_reconciliation.py",
+   "language": "python",
+   "sizeLines": 48,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_task_me_host_contract.py",
+   "language": "python",
+   "sizeLines": 9,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tests/test_node_catalog_failure_recovery.py",
+   "type": "module",
+   "name": "test_node_catalog_failure_recovery",
+   "filePath": "tests/test_node_catalog_failure_recovery.py",
+   "summary": "Python test module (test_node_catalog_failure_recovery.py, 62 lines) covering node catalog failure recovery. Defines: FailureRecoveryNodeCatalogTest.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_node_catalog_intake_context.py",
+   "type": "module",
+   "name": "test_node_catalog_intake_context",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Python test module (test_node_catalog_intake_context.py, 544 lines) covering node catalog intake context. Defines: load_validator, valid_node, IntakeContextNodeCatalogTests.",
+   "tags": [
+    "catalog",
+    "intake",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_node_catalog_intake_context.py:IntakeContextNodeCatalogTests",
+   "type": "class",
+   "name": "IntakeContextNodeCatalogTests",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Class IntakeContextNodeCatalogTests defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:load_validator",
+   "type": "function",
+   "name": "load_validator",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function load_validator defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:valid_node",
+   "type": "function",
+   "name": "valid_node",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function valid_node defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_accepts_typed_intake_contract",
+   "type": "function",
+   "name": "test_accepts_typed_intake_contract",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_accepts_typed_intake_contract defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:setUp",
+   "type": "function",
+   "name": "setUp",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function setUp defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_rejects_malformed_constraints",
+   "type": "function",
+   "name": "test_rejects_malformed_constraints",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_rejects_malformed_constraints defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_rejects_write_authority",
+   "type": "function",
+   "name": "test_rejects_write_authority",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_rejects_write_authority defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_accepts_typed_protected_base_contract",
+   "type": "function",
+   "name": "test_accepts_typed_protected_base_contract",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_accepts_typed_protected_base_contract defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_rejects_malformed_typed_fields",
+   "type": "function",
+   "name": "test_rejects_malformed_typed_fields",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_rejects_malformed_typed_fields defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_rejects_non_g0_gate",
+   "type": "function",
+   "name": "test_rejects_non_g0_gate",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_rejects_non_g0_gate defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_intake_context.py:test_accepts_string_reason_code",
+   "type": "function",
+   "name": "test_accepts_string_reason_code",
+   "filePath": "tests/test_node_catalog_intake_context.py",
+   "summary": "Function test_accepts_string_reason_code defined in tests/test_node_catalog_intake_context.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_node_catalog_package_export.py",
+   "type": "module",
+   "name": "test_node_catalog_package_export",
+   "filePath": "tests/test_node_catalog_package_export.py",
+   "summary": "Python test module (test_node_catalog_package_export.py, 79 lines) covering node catalog package export. Defines: PackageExportNodeCatalogTest.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_node_catalog_scale_control.py",
+   "type": "module",
+   "name": "test_node_catalog_scale_control",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Python test module (test_node_catalog_scale_control.py, 84 lines) covering node catalog scale control. Defines: ScaleControlTests.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_node_catalog_scale_control.py:ScaleControlTests",
+   "type": "class",
+   "name": "ScaleControlTests",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Class ScaleControlTests defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_catalog_exports_eighty_one_nodes",
+   "type": "function",
+   "name": "test_catalog_exports_eighty_one_nodes",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_catalog_exports_eighty_one_nodes defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_non_projection_authority_matches_gate",
+   "type": "function",
+   "name": "test_non_projection_authority_matches_gate",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_non_projection_authority_matches_gate defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_scale_permission_remains_false",
+   "type": "function",
+   "name": "test_scale_permission_remains_false",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_scale_permission_remains_false defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_exactly_nine_semantics",
+   "type": "function",
+   "name": "test_exactly_nine_semantics",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_exactly_nine_semantics defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_connector_backlog_is_trace_only",
+   "type": "function",
+   "name": "test_connector_backlog_is_trace_only",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_connector_backlog_is_trace_only defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_audit_projections_are_read_only",
+   "type": "function",
+   "name": "test_audit_projections_are_read_only",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_audit_projections_are_read_only defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_repository_family_passes",
+   "type": "function",
+   "name": "test_repository_family_passes",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_repository_family_passes defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_scale_control.py:test_gate_partition",
+   "type": "function",
+   "name": "test_gate_partition",
+   "filePath": "tests/test_node_catalog_scale_control.py",
+   "summary": "Function test_gate_partition defined in tests/test_node_catalog_scale_control.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_node_catalog_sync_projection.py",
+   "type": "module",
+   "name": "test_node_catalog_sync_projection",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Python test module (test_node_catalog_sync_projection.py, 82 lines) covering node catalog sync projection. Defines: SyncProjectionNodeCatalogTest.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_node_catalog_sync_projection.py:SyncProjectionNodeCatalogTest",
+   "type": "class",
+   "name": "SyncProjectionNodeCatalogTest",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Class SyncProjectionNodeCatalogTest defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_node_id_matches_file_name",
+   "type": "function",
+   "name": "test_node_id_matches_file_name",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_node_id_matches_file_name defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_validator_rejects_projection_authority_escalation",
+   "type": "function",
+   "name": "test_validator_rejects_projection_authority_escalation",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_validator_rejects_projection_authority_escalation defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_validator_rejects_production_gate",
+   "type": "function",
+   "name": "test_validator_rejects_production_gate",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_validator_rejects_production_gate defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_validator_accepts_real_family",
+   "type": "function",
+   "name": "test_validator_accepts_real_family",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_validator_accepts_real_family defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_required_projection_semantics_exist",
+   "type": "function",
+   "name": "test_required_projection_semantics_exist",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_required_projection_semantics_exist defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_family_has_exactly_nine_nodes",
+   "type": "function",
+   "name": "test_family_has_exactly_nine_nodes",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_family_has_exactly_nine_nodes defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_validator_rejects_canonical_authority_drift",
+   "type": "function",
+   "name": "test_validator_rejects_canonical_authority_drift",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_validator_rejects_canonical_authority_drift defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_node_catalog_sync_projection.py:test_nodes_are_audit_projection_and_read_only",
+   "type": "function",
+   "name": "test_nodes_are_audit_projection_and_read_only",
+   "filePath": "tests/test_node_catalog_sync_projection.py",
+   "summary": "Function test_nodes_are_audit_projection_and_read_only defined in tests/test_node_catalog_sync_projection.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_node_catalog_validation_quality.py",
+   "type": "module",
+   "name": "test_node_catalog_validation_quality",
+   "filePath": "tests/test_node_catalog_validation_quality.py",
+   "summary": "Python test module (test_node_catalog_validation_quality.py, 44 lines) covering node catalog validation quality. Defines: ValidationQualityNodeCatalogTest.",
+   "tags": [
+    "catalog",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_p3_backward_graph.py",
+   "type": "module",
+   "name": "test_p3_backward_graph",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Python test module (test_p3_backward_graph.py, 217 lines) covering p3 backward graph. Defines: BackwardCompilerTests, GuardAndRouteTests, ScenarioDecisionTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_p3_backward_graph.py:BackwardCompilerTests",
+   "type": "class",
+   "name": "BackwardCompilerTests",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Class BackwardCompilerTests defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tests/test_p3_backward_graph.py:GuardAndRouteTests",
+   "type": "class",
+   "name": "GuardAndRouteTests",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Class GuardAndRouteTests defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tests/test_p3_backward_graph.py:ScenarioDecisionTests",
+   "type": "class",
+   "name": "ScenarioDecisionTests",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Class ScenarioDecisionTests defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_missing_activation_fact_is_conditional",
+   "type": "function",
+   "name": "test_missing_activation_fact_is_conditional",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_missing_activation_fact_is_conditional defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_budget_exhaustion_returns_blocked_typed_decision",
+   "type": "function",
+   "name": "test_budget_exhaustion_returns_blocked_typed_decision",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_budget_exhaustion_returns_blocked_typed_decision defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_tied_routes_are_stable_under_input_reordering",
+   "type": "function",
+   "name": "test_tied_routes_are_stable_under_input_reordering",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_tied_routes_are_stable_under_input_reordering defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_authority_boundary_is_not_auto_promoted",
+   "type": "function",
+   "name": "test_authority_boundary_is_not_auto_promoted",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_authority_boundary_is_not_auto_promoted defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_unsafe_route_ranks_last",
+   "type": "function",
+   "name": "test_unsafe_route_ranks_last",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_unsafe_route_ranks_last defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_route_budget_fails_closed_with_typed_evidence",
+   "type": "function",
+   "name": "test_route_budget_fails_closed_with_typed_evidence",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_route_budget_fails_closed_with_typed_evidence defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_dense_route_budget_is_bounded",
+   "type": "function",
+   "name": "test_dense_route_budget_is_bounded",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_dense_route_budget_is_bounded defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_cycle_is_rejected",
+   "type": "function",
+   "name": "test_cycle_is_rejected",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_cycle_is_rejected defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_guard_can_compare_two_context_fields",
+   "type": "function",
+   "name": "test_guard_can_compare_two_context_fields",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_guard_can_compare_two_context_fields defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p3_backward_graph.py:test_guard_equality_is_type_strict",
+   "type": "function",
+   "name": "test_guard_equality_is_type_strict",
+   "filePath": "tests/test_p3_backward_graph.py",
+   "summary": "Function test_guard_equality_is_type_strict defined in tests/test_p3_backward_graph.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_p3_scenario_registry.py",
+   "type": "module",
+   "name": "test_p3_scenario_registry",
+   "filePath": "tests/test_p3_scenario_registry.py",
+   "summary": "Python test module (test_p3_scenario_registry.py, 19 lines) covering p3 scenario registry. Defines: ScenarioRegistryTests.",
+   "tags": [
+    "registry",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_p5_evaluation_adapter.py",
+   "type": "module",
+   "name": "test_p5_evaluation_adapter",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Python test module (test_p5_evaluation_adapter.py, 220 lines) covering p5 evaluation adapter. Defines: P5EvaluationAdapterTests.",
+   "tags": [
+    "adapter",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_p5_evaluation_adapter.py:P5EvaluationAdapterTests",
+   "type": "class",
+   "name": "P5EvaluationAdapterTests",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Class P5EvaluationAdapterTests defined in tests/test_p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p5_evaluation_adapter.py:test_overlay_renders_visual_only_p5_nodes_and_edges",
+   "type": "function",
+   "name": "test_overlay_renders_visual_only_p5_nodes_and_edges",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Function test_overlay_renders_visual_only_p5_nodes_and_edges defined in tests/test_p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p5_evaluation_adapter.py:test_registry_adapter_accepts_p5_overlay",
+   "type": "function",
+   "name": "test_registry_adapter_accepts_p5_overlay",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Function test_registry_adapter_accepts_p5_overlay defined in tests/test_p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p5_evaluation_adapter.py:test_validator_rejects_production_like_promotion",
+   "type": "function",
+   "name": "test_validator_rejects_production_like_promotion",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Function test_validator_rejects_production_like_promotion defined in tests/test_p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p5_evaluation_adapter.py:test_validator_rejects_projection_authority_leakage",
+   "type": "function",
+   "name": "test_validator_rejects_projection_authority_leakage",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Function test_validator_rejects_projection_authority_leakage defined in tests/test_p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_p5_evaluation_adapter.py:test_validator_accepts_the_bounded_record",
+   "type": "function",
+   "name": "test_validator_accepts_the_bounded_record",
+   "filePath": "tests/test_p5_evaluation_adapter.py",
+   "summary": "Function test_validator_accepts_the_bounded_record defined in tests/test_p5_evaluation_adapter.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_power_distribution.py",
+   "type": "module",
+   "name": "test_power_distribution",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Python test module (test_power_distribution.py, 181 lines) covering power distribution. Defines: _matches, GWCPowerDistributionTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_power_distribution.py:GWCPowerDistributionTests",
+   "type": "class",
+   "name": "GWCPowerDistributionTests",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Class GWCPowerDistributionTests defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:_matches",
+   "type": "function",
+   "name": "_matches",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function _matches defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_package_does_not_embed_task_evidence",
+   "type": "function",
+   "name": "test_package_does_not_embed_task_evidence",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_package_does_not_embed_task_evidence defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_auto_publish_has_standing_g5_policy_and_audit_boundary",
+   "type": "function",
+   "name": "test_auto_publish_has_standing_g5_policy_and_audit_boundary",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_auto_publish_has_standing_g5_policy_and_audit_boundary defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_entrypoints_and_runtime_root",
+   "type": "function",
+   "name": "test_entrypoints_and_runtime_root",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_entrypoints_and_runtime_root defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_recipe_has_fail_closed_boundaries",
+   "type": "function",
+   "name": "test_recipe_has_fail_closed_boundaries",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_recipe_has_fail_closed_boundaries defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_workflow_is_immutable_and_auto_publishes_main",
+   "type": "function",
+   "name": "test_workflow_is_immutable_and_auto_publishes_main",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_workflow_is_immutable_and_auto_publishes_main defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:setUpClass",
+   "type": "function",
+   "name": "setUpClass",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function setUpClass defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_required_dependency_inventory_exists_and_is_selected",
+   "type": "function",
+   "name": "test_required_dependency_inventory_exists_and_is_selected",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_required_dependency_inventory_exists_and_is_selected defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_power_distribution.py:test_neutral_config_validates_and_grants_no_external_write",
+   "type": "function",
+   "name": "test_neutral_config_validates_and_grants_no_external_write",
+   "filePath": "tests/test_power_distribution.py",
+   "summary": "Function test_neutral_config_validates_and_grants_no_external_write defined in tests/test_power_distribution.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_power_help.py",
+   "type": "module",
+   "name": "test_power_help",
+   "filePath": "tests/test_power_help.py",
+   "summary": "Python test module (test_power_help.py, 25 lines) covering power help. Defines: PowerHelpTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "type": "module",
+   "name": "test_runtime_catalog_taxonomy_kg",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Python test module (test_runtime_catalog_taxonomy_kg.py, 85 lines) covering runtime catalog taxonomy kg. Defines: taxonomy, RuntimeCatalogTaxonomyKgTests.",
+   "tags": [
+    "catalog",
+    "runtime",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_runtime_catalog_taxonomy_kg.py:RuntimeCatalogTaxonomyKgTests",
+   "type": "class",
+   "name": "RuntimeCatalogTaxonomyKgTests",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Class RuntimeCatalogTaxonomyKgTests defined in tests/test_runtime_catalog_taxonomy_kg.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_catalog_taxonomy_kg.py:taxonomy",
+   "type": "function",
+   "name": "taxonomy",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Function taxonomy defined in tests/test_runtime_catalog_taxonomy_kg.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_taxonomy_preserves_nine_families_and_81_runtime_nodes",
+   "type": "function",
+   "name": "test_taxonomy_preserves_nine_families_and_81_runtime_nodes",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Function test_taxonomy_preserves_nine_families_and_81_runtime_nodes defined in tests/test_runtime_catalog_taxonomy_kg.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_taxonomy_rejects_node_count_drift",
+   "type": "function",
+   "name": "test_taxonomy_rejects_node_count_drift",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Function test_taxonomy_rejects_node_count_drift defined in tests/test_runtime_catalog_taxonomy_kg.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_kg_projection_uses_canonical_relationships",
+   "type": "function",
+   "name": "test_kg_projection_uses_canonical_relationships",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Function test_kg_projection_uses_canonical_relationships defined in tests/test_runtime_catalog_taxonomy_kg.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_contract_forbids_renaming_81_nodes_as_gates",
+   "type": "function",
+   "name": "test_contract_forbids_renaming_81_nodes_as_gates",
+   "filePath": "tests/test_runtime_catalog_taxonomy_kg.py",
+   "summary": "Function test_contract_forbids_renaming_81_nodes_as_gates defined in tests/test_runtime_catalog_taxonomy_kg.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_runtime_registry_validation.py",
+   "type": "module",
+   "name": "test_runtime_registry_validation",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Python test module (test_runtime_registry_validation.py, 102 lines) covering runtime registry validation. Defines: RuntimeRegistryValidationTests.",
+   "tags": [
+    "registry",
+    "runtime",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_runtime_registry_validation.py:RuntimeRegistryValidationTests",
+   "type": "class",
+   "name": "RuntimeRegistryValidationTests",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Class RuntimeRegistryValidationTests defined in tests/test_runtime_registry_validation.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_registry_validation.py:test_visual_edges_are_non_executable",
+   "type": "function",
+   "name": "test_visual_edges_are_non_executable",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Function test_visual_edges_are_non_executable defined in tests/test_runtime_registry_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_registry_validation.py:test_scenario_count_is_not_graph_edge_count",
+   "type": "function",
+   "name": "test_scenario_count_is_not_graph_edge_count",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Function test_scenario_count_is_not_graph_edge_count defined in tests/test_runtime_registry_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_registry_validation.py:test_scenario_guards_and_route_policies_are_complete",
+   "type": "function",
+   "name": "test_scenario_guards_and_route_policies_are_complete",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Function test_scenario_guards_and_route_policies_are_complete defined in tests/test_runtime_registry_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_registry_validation.py:test_canonical_registries_pass_cross_registry_validation",
+   "type": "function",
+   "name": "test_canonical_registries_pass_cross_registry_validation",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Function test_canonical_registries_pass_cross_registry_validation defined in tests/test_runtime_registry_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_runtime_registry_validation.py:test_every_slot_has_maturity_and_provenance",
+   "type": "function",
+   "name": "test_every_slot_has_maturity_and_provenance",
+   "filePath": "tests/test_runtime_registry_validation.py",
+   "summary": "Function test_every_slot_has_maturity_and_provenance defined in tests/test_runtime_registry_validation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_scrum_150_cross_phase.py",
+   "type": "module",
+   "name": "test_scrum_150_cross_phase",
+   "filePath": "tests/test_scrum_150_cross_phase.py",
+   "summary": "Python test module (test_scrum_150_cross_phase.py, 38 lines) covering scrum 150 cross phase. Defines: Scrum150CrossPhaseTests.",
+   "tags": [
+    "scrum",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_stale_session_reconciliation.py",
+   "type": "module",
+   "name": "test_stale_session_reconciliation",
+   "filePath": "tests/test_stale_session_reconciliation.py",
+   "summary": "Python test module (test_stale_session_reconciliation.py, 48 lines) covering stale session reconciliation. Defines: decide, StaleSessionReconciliationTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_task_me_host_contract.py",
+   "type": "module",
+   "name": "test_task_me_host_contract",
+   "filePath": "tests/test_task_me_host_contract.py",
+   "summary": "Python test module (test_task_me_host_contract.py, 9 lines) covering task me host contract. Defines: TaskMeHostContractTests.",
+   "tags": [
+    "contract",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "class:tests/test_node_catalog_intake_context.py:IntakeContextNodeCatalogTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:load_validator",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:valid_node",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_accepts_typed_intake_contract",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:setUp",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_rejects_malformed_constraints",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_rejects_write_authority",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_accepts_typed_protected_base_contract",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_rejects_malformed_typed_fields",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_rejects_non_g0_gate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_intake_context.py",
+   "target": "function:tests/test_node_catalog_intake_context.py:test_accepts_string_reason_code",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "class:tests/test_node_catalog_scale_control.py:ScaleControlTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_catalog_exports_eighty_one_nodes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_non_projection_authority_matches_gate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_scale_permission_remains_false",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_exactly_nine_semantics",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_connector_backlog_is_trace_only",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_audit_projections_are_read_only",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_repository_family_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_scale_control.py",
+   "target": "function:tests/test_node_catalog_scale_control.py:test_gate_partition",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "class:tests/test_node_catalog_sync_projection.py:SyncProjectionNodeCatalogTest",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_node_id_matches_file_name",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_validator_rejects_projection_authority_escalation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_validator_rejects_production_gate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_validator_accepts_real_family",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_required_projection_semantics_exist",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_family_has_exactly_nine_nodes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_validator_rejects_canonical_authority_drift",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_node_catalog_sync_projection.py",
+   "target": "function:tests/test_node_catalog_sync_projection.py:test_nodes_are_audit_projection_and_read_only",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "class:tests/test_p3_backward_graph.py:BackwardCompilerTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "class:tests/test_p3_backward_graph.py:GuardAndRouteTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "class:tests/test_p3_backward_graph.py:ScenarioDecisionTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_missing_activation_fact_is_conditional",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_budget_exhaustion_returns_blocked_typed_decision",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_tied_routes_are_stable_under_input_reordering",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_authority_boundary_is_not_auto_promoted",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_unsafe_route_ranks_last",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_route_budget_fails_closed_with_typed_evidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_dense_route_budget_is_bounded",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_cycle_is_rejected",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_guard_can_compare_two_context_fields",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p3_backward_graph.py",
+   "target": "function:tests/test_p3_backward_graph.py:test_guard_equality_is_type_strict",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p5_evaluation_adapter.py",
+   "target": "class:tests/test_p5_evaluation_adapter.py:P5EvaluationAdapterTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p5_evaluation_adapter.py",
+   "target": "function:tests/test_p5_evaluation_adapter.py:test_overlay_renders_visual_only_p5_nodes_and_edges",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p5_evaluation_adapter.py",
+   "target": "function:tests/test_p5_evaluation_adapter.py:test_registry_adapter_accepts_p5_overlay",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p5_evaluation_adapter.py",
+   "target": "function:tests/test_p5_evaluation_adapter.py:test_validator_rejects_production_like_promotion",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p5_evaluation_adapter.py",
+   "target": "function:tests/test_p5_evaluation_adapter.py:test_validator_rejects_projection_authority_leakage",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_p5_evaluation_adapter.py",
+   "target": "function:tests/test_p5_evaluation_adapter.py:test_validator_accepts_the_bounded_record",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "class:tests/test_power_distribution.py:GWCPowerDistributionTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:_matches",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_package_does_not_embed_task_evidence",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_auto_publish_has_standing_g5_policy_and_audit_boundary",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_entrypoints_and_runtime_root",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_recipe_has_fail_closed_boundaries",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_workflow_is_immutable_and_auto_publishes_main",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:setUpClass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_required_dependency_inventory_exists_and_is_selected",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_power_distribution.py",
+   "target": "function:tests/test_power_distribution.py:test_neutral_config_validates_and_grants_no_external_write",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "target": "class:tests/test_runtime_catalog_taxonomy_kg.py:RuntimeCatalogTaxonomyKgTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "target": "function:tests/test_runtime_catalog_taxonomy_kg.py:taxonomy",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "target": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_taxonomy_preserves_nine_families_and_81_runtime_nodes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "target": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_taxonomy_rejects_node_count_drift",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "target": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_kg_projection_uses_canonical_relationships",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_catalog_taxonomy_kg.py",
+   "target": "function:tests/test_runtime_catalog_taxonomy_kg.py:test_contract_forbids_renaming_81_nodes_as_gates",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_registry_validation.py",
+   "target": "class:tests/test_runtime_registry_validation.py:RuntimeRegistryValidationTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_registry_validation.py",
+   "target": "function:tests/test_runtime_registry_validation.py:test_visual_edges_are_non_executable",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_registry_validation.py",
+   "target": "function:tests/test_runtime_registry_validation.py:test_scenario_count_is_not_graph_edge_count",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_registry_validation.py",
+   "target": "function:tests/test_runtime_registry_validation.py:test_scenario_guards_and_route_policies_are_complete",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_registry_validation.py",
+   "target": "function:tests/test_runtime_registry_validation.py:test_canonical_registries_pass_cross_registry_validation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_runtime_registry_validation.py",
+   "target": "function:tests/test_runtime_registry_validation.py:test_every_slot_has_maturity_and_provenance",
+   "type": "contains",
+   "weight": 0.9
+  }
+ ]
+}

@@ -1,0 +1,111 @@
+[
+  {
+    "order": 1,
+    "title": "Start Here: The Governing Documents",
+    "description": "AGENTS.md is the top-level instruction governance document and README.md introduces GWC (Governed Workflow Control), a Git-based system for governing AI-agent work through gates. Read these first to understand the repo's purpose and how everything else hangs off them.",
+    "nodeIds": [
+      "file:AGENTS.md",
+      "file:README.md"
+    ]
+  },
+  {
+    "order": 2,
+    "title": "Instruction Sources and Authority",
+    "description": "The instruction-source-registry defines which documents are authoritative and how conflicts resolve, while the DW Super App authority matrix fixes who owns each source of truth. Together they establish the precedence rules every other artifact obeys.",
+    "nodeIds": [
+      "file:governance/instruction-source-registry.yaml",
+      "file:docs/authority/dw-super-app-source-of-truth-authority-matrix.md"
+    ]
+  },
+  {
+    "order": 3,
+    "title": "The Gate Lifecycle Contract (G0-G6)",
+    "description": "The Gate Lifecycle Contract is the backbone of GWC: it defines the stages a task passes through from intake to post-merge verification. The gate-transition-map operationalizes it as a machine-readable map of legal transitions and their authorities.",
+    "nodeIds": [
+      "file:core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+      "file:core/task-lifecycle/gate-transition-map.yaml"
+    ]
+  },
+  {
+    "order": 4,
+    "title": "Agent Behavior and Operating Rules",
+    "description": "These contracts constrain how an agent may behave while executing governed work: semantic behavior expectations at G-gates plus runtime operating rules such as checkpoints and session discipline. The Local Agent Rule covers agents running directly on developer machines.",
+    "nodeIds": [
+      "file:core/Agent_Behavior_Semantic_Contract_v1.0.md",
+      "file:core/Agent_Operating_Runtime_Contract_v1.0.md",
+      "file:core/LOCAL_AGENT_RULE.md"
+    ]
+  },
+  {
+    "order": 5,
+    "title": "Human Control: Bypass and Gate Authority",
+    "description": "GWC keeps humans in command: the Human Bypass Contract defines the sanctioned escape hatch and its record schema, and the Gate Action Authority schema declares which actor (human or agent) may perform each gate action. These are the enforcement teeth behind the lifecycle.",
+    "nodeIds": [
+      "file:core/HUMAN_BYPASS_CONTRACT_v1.0.md",
+      "file:schemas/human-bypass.schema.json",
+      "file:schemas/gate-action-authority.schema.json"
+    ]
+  },
+  {
+    "order": 6,
+    "title": "Agent Routing: Instruction Packs per Agent",
+    "description": "Different agents receive tailored instruction packs: one for ChatGPT-driven work and one defining DWC repository operations, with consumer-facing guidance in the project-consumer doc. This is how GWC routes the right rules to whichever agent touches a repository.",
+    "nodeIds": [
+      "file:agents/chatgpt-agent/agent-instructions.md",
+      "file:agents/dwc/agent-instructions.md",
+      "file:docs/project-consumer-agent-instructions.md"
+    ]
+  },
+  {
+    "order": 7,
+    "title": "Project Profiles: Adapting Governance per Project",
+    "description": "Each governed project gets a profile: package.yaml bundles the instruction package, project-profile.yaml sets project-specific parameters, and project-instructions/project-extension layer project detail on top. Profiles let the same governance machinery serve heterogeneous projects.",
+    "nodeIds": [
+      "file:projects/gwc/package.yaml",
+      "file:projects/gwc/project-profile.yaml",
+      "file:projects/gwc/project-instructions.md",
+      "file:projects/gwc/project-extension.md"
+    ]
+  },
+  {
+    "order": 8,
+    "title": "Operational Runbooks and Interrupt Handling",
+    "description": "Runbooks translate contracts into operator procedures: the G0/G1 runbook is canonical for intake, and notification guidance tells agents when they may ping humans. The Interrupt Flow Contract plus its frame schema define safe pause/resume semantics mid-task.",
+    "nodeIds": [
+      "file:core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+      "file:core/runbooks/NOTIFICATION_CAPABILITY_GUIDANCE.md",
+      "file:core/INTERRUPT_FLOW_CONTRACT_v1.0.md"
+    ]
+  },
+  {
+    "order": 9,
+    "title": "Schemas: Typed Evidence Everywhere",
+    "description": "Every governance event produces typed JSON evidence validated against schemas in schemas/: runtime inputs for G0/G1 generation, CI observations, and recovery-decision records like approval expiry. Schemas make gate artifacts machine-checkable rather than prose-only.",
+    "nodeIds": [
+      "file:schemas/g01-runtime-input.schema.json",
+      "file:schemas/ci-observation.schema.json",
+      "file:schemas/approval-expiry-recovery-decision.schema.json"
+    ]
+  },
+  {
+    "order": 10,
+    "title": "Tooling and Validators",
+    "description": "Python tooling makes the contracts executable: generate_g01_runtime.py builds canonical G0/G1 context artifacts, while validators under tools/node_architect enforce runtime registry integrity and catalog taxonomy. If a rule can be checked by code, it lives here.",
+    "nodeIds": [
+      "file:tools/generate_g01_runtime.py",
+      "file:tools/node_architect/validate_runtime_registry.py",
+      "file:tools/node_architect/validate_runtime_catalog_taxonomy.py"
+    ]
+  },
+  {
+    "order": 11,
+    "title": "CI Enforcement and G5 Verification",
+    "description": "GitHub Actions workflows close the loop: validate-instructions guards the instruction packages on pull requests, build-packages builds them, and publish-power ships releases. The G5 CI Verification Contract defines what evidence CI must produce before a task counts as verified.",
+    "nodeIds": [
+      "file:.github/workflows/validate-instructions.yml",
+      "file:.github/workflows/build-packages.yml",
+      "file:.github/workflows/publish-power.yml",
+      "file:core/G5_CI_VERIFICATION_CONTRACT_v1.0.md"
+    ]
+  }
+]

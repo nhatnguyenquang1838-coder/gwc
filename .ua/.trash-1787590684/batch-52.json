@@ -1,0 +1,218 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/README.md",
+   "language": "markdown",
+   "sizeLines": 43,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 26,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/decisions.md",
+   "language": "markdown",
+   "sizeLines": 19,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/evidence.json",
+   "language": "json",
+   "sizeLines": 40,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 23,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 9,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/task.yaml",
+   "language": "yaml",
+   "sizeLines": 82,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 16,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/README.md",
+   "type": "document",
+   "name": "README",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/README.md",
+   "summary": "Markdown document \"README\" (document, 43 lines): Materialize approved registry entries and connect the full-flow v3 visualization to external registry/scenario data.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/coding-guide.md",
+   "type": "document",
+   "name": "coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/coding-guide.md",
+   "summary": "Markdown document \"coding guide\" (document, 26 lines): - `tools/node_architect/project_runtime_knowledge_graph.py` - `schemas/node-architect/runtime-catalog-taxonomy.schema.json` - `tests/test_runtime_catalog_taxonomy_kg.py` - `catalog.yaml`",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/decisions.md",
+   "type": "document",
+   "name": "decisions",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/decisions.md",
+   "summary": "Markdown document \"decisions\" (document, 19 lines): - Evidence used: protected-base GWC contracts, project profile/instructions and verified implementation/test paths. - Alternatives considered: broad rewrite; additive extension; defer. - Rule applied: `Reuse 鈫?Extend 鈫?Refactor 鈫?Replace`. - Decision: use additive extension and compatibility tests.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/evidence.json",
+   "type": "config",
+   "name": "SCRUM-104",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-104\" (evidence.json, 40 lines) Top-level keys: task_id, repository, base_sha, requirements, sources, confidence.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/impact-analysis.md",
+   "type": "document",
+   "name": "impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/impact-analysis.md",
+   "summary": "Markdown document \"impact analysis\" (document, 23 lines): - `tools/node_architect/project_runtime_knowledge_graph.py` - `schemas/node-architect/runtime-catalog-taxonomy.schema.json` - `tests/test_runtime_catalog_taxonomy_kg.py` - `catalog.yaml`",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/implementation-plan.md",
+   "type": "document",
+   "name": "implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/implementation-plan.md",
+   "summary": "Markdown document \"implementation plan\" (plan, 9 lines): 1. Review 77 proposed slots: keep, rename, merge, split, reject or defer. 2. Create canonical registry with explicit source_status and maturity. 3. Create initial source-backed scenario definitions. 4. Add schema and cross-registry validators. 5. Import v3 renderer as a data-driven view with thin",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/task.yaml",
+   "type": "config",
+   "name": "Build canonical registries, validators and v3 data binding",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/task.yaml",
+   "summary": "GWC task governance YAML \"Build canonical registries, validators and v3 data binding\" (task.yaml, 82 lines). Top-level keys: schema_version, task_id, title, slug, objective, repository.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "validation",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/test-plan.md",
+   "type": "document",
+   "name": "test plan",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/test-plan.md",
+   "summary": "Markdown document \"test plan\" (plan, 16 lines): - 81-slot invariant and family distribution. - No proposed slot presented as stable without promotion evidence. - Scenario references resolve to existing node/flow/green anchors. - Visual-only edges cannot enter runtime graph. - V3 loads full graph and dims inactive nodes without deleting them.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/tasks/SCRUM-104-build-registries-validators-v3-binding/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

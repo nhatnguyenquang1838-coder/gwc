@@ -1,0 +1,245 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/approval-expiry-recovery-decision.schema.json",
+   "language": "json",
+   "sizeLines": 46,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/base-drift-evaluation.schema.json",
+   "language": "json",
+   "sizeLines": 99,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/cas-mismatch-recovery-decision.schema.json",
+   "language": "json",
+   "sizeLines": 32,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/ci-observation.schema.json",
+   "language": "json",
+   "sizeLines": 25,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/crash-checkpoint-recovery-decision.schema.json",
+   "language": "json",
+   "sizeLines": 59,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/duplicate-agent-fencing-decision.schema.json",
+   "language": "json",
+   "sizeLines": 45,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/g01-human-review.schema.json",
+   "language": "json",
+   "sizeLines": 75,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/g01-runtime-input.schema.json",
+   "language": "json",
+   "sizeLines": 729,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/g1-decision-record.schema.json",
+   "language": "json",
+   "sizeLines": 456,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/g1-option-impact.schema.json",
+   "language": "json",
+   "sizeLines": 119,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/g1-preflight-report.schema.json",
+   "language": "json",
+   "sizeLines": 744,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/g5-ci-verification-evidence.schema.json",
+   "language": "json",
+   "sizeLines": 146,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/approval-expiry-recovery-decision.schema.json",
+   "type": "config",
+   "name": "Approval Expiry Recovery Decision",
+   "filePath": "schemas/approval-expiry-recovery-decision.schema.json",
+   "summary": "JSON Schema definition \"Approval Expiry Recovery Decision\" (approval-expiry-recovery-decision.schema.json, 46 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "approvals",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/base-drift-evaluation.schema.json",
+   "type": "config",
+   "name": "Base Drift Evaluation Result",
+   "filePath": "schemas/base-drift-evaluation.schema.json",
+   "summary": "JSON Schema definition \"Base Drift Evaluation Result\" (base-drift-evaluation.schema.json, 99 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/cas-mismatch-recovery-decision.schema.json",
+   "type": "config",
+   "name": "GWC CAS Mismatch Recovery Decision",
+   "filePath": "schemas/cas-mismatch-recovery-decision.schema.json",
+   "summary": "JSON Schema definition \"GWC CAS Mismatch Recovery Decision\" (cas-mismatch-recovery-decision.schema.json, 32 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/ci-observation.schema.json",
+   "type": "config",
+   "name": "GWC CI Observation",
+   "filePath": "schemas/ci-observation.schema.json",
+   "summary": "JSON Schema definition \"GWC CI Observation\" (ci-observation.schema.json, 25 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/crash-checkpoint-recovery-decision.schema.json",
+   "type": "config",
+   "name": "GWC Crash Checkpoint Recovery Decision",
+   "filePath": "schemas/crash-checkpoint-recovery-decision.schema.json",
+   "summary": "JSON Schema definition \"GWC Crash Checkpoint Recovery Decision\" (crash-checkpoint-recovery-decision.schema.json, 59 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "checkpoint",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/duplicate-agent-fencing-decision.schema.json",
+   "type": "config",
+   "name": "Duplicate Agent Fencing Decision",
+   "filePath": "schemas/duplicate-agent-fencing-decision.schema.json",
+   "summary": "JSON Schema definition \"Duplicate Agent Fencing Decision\" (duplicate-agent-fencing-decision.schema.json, 45 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "agents",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/g01-human-review.schema.json",
+   "type": "config",
+   "name": "G0/G1 Human Review Projection",
+   "filePath": "schemas/g01-human-review.schema.json",
+   "summary": "JSON Schema definition \"G0/G1 Human Review Projection\" (g01-human-review.schema.json, 75 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g0",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/g01-runtime-input.schema.json",
+   "type": "config",
+   "name": "g01 runtime input.schema",
+   "filePath": "schemas/g01-runtime-input.schema.json",
+   "summary": "JSON Schema definition \"g01 runtime input.schema\" (g01-runtime-input.schema.json, 729 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g0",
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:schemas/g1-decision-record.schema.json",
+   "type": "config",
+   "name": "g1 decision record.schema",
+   "filePath": "schemas/g1-decision-record.schema.json",
+   "summary": "JSON Schema definition \"g1 decision record.schema\" (g1-decision-record.schema.json, 456 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g1",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:schemas/g1-option-impact.schema.json",
+   "type": "config",
+   "name": "G1 Option Impact Projection",
+   "filePath": "schemas/g1-option-impact.schema.json",
+   "summary": "JSON Schema definition \"G1 Option Impact Projection\" (g1-option-impact.schema.json, 119 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g1",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/g1-preflight-report.schema.json",
+   "type": "config",
+   "name": "g1 preflight report.schema",
+   "filePath": "schemas/g1-preflight-report.schema.json",
+   "summary": "JSON Schema definition \"g1 preflight report.schema\" (g1-preflight-report.schema.json, 744 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g1",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:schemas/g5-ci-verification-evidence.schema.json",
+   "type": "config",
+   "name": "g5 ci verification evidence.schema",
+   "filePath": "schemas/g5-ci-verification-evidence.schema.json",
+   "summary": "JSON Schema definition \"g5 ci verification evidence.schema\" (g5-ci-verification-evidence.schema.json, 146 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "g5",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": []
+}

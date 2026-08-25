@@ -1,0 +1,210 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/01-source-inventory.json",
+   "language": "json",
+   "sizeLines": 136,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/02-traceability.json",
+   "language": "json",
+   "sizeLines": 114,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/03-evidence-graph.json",
+   "language": "json",
+   "sizeLines": 93,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/04-impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 33,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/07-validation-report.json",
+   "language": "json",
+   "sizeLines": 26,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/08-plan-validation.json",
+   "language": "json",
+   "sizeLines": 36,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json",
+   "language": "json",
+   "sizeLines": 23,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/10-restart-validation.json",
+   "language": "json",
+   "sizeLines": 20,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/01-source-inventory.json",
+   "type": "config",
+   "name": "01 source inventory",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/01-source-inventory.json",
+   "summary": "Task Me run artifact \"01 source inventory\" (01-source-inventory.json, 136 lines) Top-level keys: schema_version, run_id, repository, protected_base, scan_mode, task_me_skill.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/02-traceability.json",
+   "type": "config",
+   "name": "REQ-P1-01",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/02-traceability.json",
+   "summary": "Task Me run artifact \"REQ-P1-01\" (02-traceability.json, 114 lines) Top-level keys: schema_version, run_id, requirements, links, unresolved.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/03-evidence-graph.json",
+   "type": "config",
+   "name": "repo:gwc",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/03-evidence-graph.json",
+   "summary": "Task Me run artifact \"repo:gwc\" (03-evidence-graph.json, 93 lines) Top-level keys: schema_version, run_id, nodes, edges.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/04-impact-analysis.md",
+   "type": "document",
+   "name": "04 impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/04-impact-analysis.md",
+   "summary": "Markdown document \"04 impact analysis\" (document, 33 lines): The protected base already contains a mature governance contract surface, but the executable runtime is uneven. The highest-risk gap is not the absence of an adaptive compiler; it is the mismatch between declared authority/lifecycle behavior and the current executable state/registry surfaces.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/07-validation-report.json",
+   "type": "config",
+   "name": "07 validation report",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/07-validation-report.json",
+   "summary": "Task Me run artifact \"07 validation report\" (07-validation-report.json, 26 lines) Top-level keys: schema_version, run_id, outcome, checks, limitations, blocking_for_repository_execution.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/08-plan-validation.json",
+   "type": "config",
+   "name": "08 plan validation",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/08-plan-validation.json",
+   "summary": "Task Me run artifact \"08 plan validation\" (08-plan-validation.json, 36 lines) Top-level keys: schema_version, artifact_type, run_id, canonical_task_uid, repository, protected_base_sha.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json",
+   "type": "config",
+   "name": "SCRUM-95",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json",
+   "summary": "Task Me run artifact \"SCRUM-95\" (09-baseline-refresh.json, 23 lines) Top-level keys: schema_version, artifact_type, task_id, repository, previous_base_sha, current_base_sha.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/10-restart-validation.json",
+   "type": "config",
+   "name": "SCRUM-95",
+   "filePath": ".task-me/runs/gwc-scrum-95-20260725-r2/_shared/10-restart-validation.json",
+   "summary": "Task Me run artifact \"SCRUM-95\" (10-restart-validation.json, 20 lines) Top-level keys: schema_version, artifact_type, task_id, repository, target_run_id, current_base_sha.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/01-source-inventory.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/02-traceability.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/02-traceability.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/03-evidence-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/03-evidence-graph.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/04-impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/04-impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/07-validation-report.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/07-validation-report.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/08-plan-validation.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/08-plan-validation.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/09-baseline-refresh.json",
+   "target": "file:.task-me/runs/gwc-scrum-95-20260725-r2/_shared/10-restart-validation.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,410 @@
+{
+ "batchFiles": [
+  {
+   "path": "governance/instruction-source-registry.yaml",
+   "language": "yaml",
+   "sizeLines": 108,
+   "fileCategory": "config"
+  },
+  {
+   "path": "releases/changelog.d/2026-07-31-scrum-244-246-f8-recovery-m5.md",
+   "language": "markdown",
+   "sizeLines": 17,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "releases/changelog.d/scrum-115-canonical-scenarios-v3.md",
+   "language": "markdown",
+   "sizeLines": 4,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "schemas/runtime/storage-migration.schema.json",
+   "language": "json",
+   "sizeLines": 43,
+   "fileCategory": "config"
+  },
+  {
+   "path": "tests/test_authority_matrix_contract.py",
+   "language": "python",
+   "sizeLines": 23,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_base_drift_interrupt_flow.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_bmad_procedure_adapter.py",
+   "language": "python",
+   "sizeLines": 37,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_bounded_external_write.py",
+   "language": "python",
+   "sizeLines": 154,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_canonical_runtime_schema_contracts.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:governance/instruction-source-registry.yaml",
+   "type": "config",
+   "name": "instruction-source-registry",
+   "filePath": "governance/instruction-source-registry.yaml",
+   "summary": "registry definition (instruction-source-registry.yaml, 108 lines). Top-level keys: conflict_rule, registry_id, schema_version, sources, updated_at.",
+   "tags": [
+    "governance",
+    "instructions",
+    "registry",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:releases/changelog.d/2026-07-31-scrum-244-246-f8-recovery-m5.md",
+   "type": "document",
+   "name": "SCRUM-244/245/246 — failure_recovery M5 batch",
+   "filePath": "releases/changelog.d/2026-07-31-scrum-244-246-f8-recovery-m5.md",
+   "summary": "Markdown document \"SCRUM-244/245/246 — failure_recovery M5 batch\" (changelog entry, 17 lines): - `failure_recovery.approval-expiry-recovery` M5 decision utility, JSON Schema, and expiry/replay/checkpoint fixtures. - `failure_recovery.duplicate-agent-fencing` M5 decision utility, JSON Schema, and lease/fencing/race/stale-worker fixtures. - `failure_recovery.version-drift-rollback-routing` M5",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:releases/changelog.d/scrum-115-canonical-scenarios-v3.md",
+   "type": "document",
+   "name": "SCRUM-115",
+   "filePath": "releases/changelog.d/scrum-115-canonical-scenarios-v3.md",
+   "summary": "Markdown document \"SCRUM-115\" (changelog entry, 4 lines): - Materialize 14 canonical P3 scenarios while preserving the 116-scenario declared space. - Add typed scenario guards, deterministic route-decision digests, immutable decision history, registry validation, and projection-only Cytoscape v3 overlays.",
+   "tags": [
+    "changelog",
+    "documentation",
+    "release",
+    "releases",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/storage-migration.schema.json",
+   "type": "config",
+   "name": "GWC Storage Migration Contract",
+   "filePath": "schemas/runtime/storage-migration.schema.json",
+   "summary": "JSON Schema definition \"GWC Storage Migration Contract\" (storage-migration.schema.json, 43 lines) Top-level keys: $id, $schema, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_authority_matrix_contract.py",
+   "type": "module",
+   "name": "test_authority_matrix_contract",
+   "filePath": "tests/test_authority_matrix_contract.py",
+   "summary": "Python test module (test_authority_matrix_contract.py, 23 lines) covering authority matrix contract. Defines: test_authority_matrix_declares_projection_boundaries, test_authority_matrix_covers_provider_and_consumer_ownership, test_authority_matrix_has_single_owner_language.",
+   "tags": [
+    "contract",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_base_drift_interrupt_flow.py",
+   "type": "module",
+   "name": "test_base_drift_interrupt_flow",
+   "filePath": "tests/test_base_drift_interrupt_flow.py",
+   "summary": "Python test module (test_base_drift_interrupt_flow.py, 62 lines) covering base drift interrupt flow. Defines: BaseDriftInterruptFlowTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_bmad_procedure_adapter.py",
+   "type": "module",
+   "name": "test_bmad_procedure_adapter",
+   "filePath": "tests/test_bmad_procedure_adapter.py",
+   "summary": "Python test module (test_bmad_procedure_adapter.py, 37 lines) covering bmad procedure adapter. Defines: test_contract_validator_passes, test_procedure_registry_is_complete, test_scope_violation_rejects_before_side_effects, test_review_is_read_only_and_non_authoritative, test_ready_unpublished_provider_is_exactly_pinned.",
+   "tags": [
+    "adapter",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_bounded_external_write.py",
+   "type": "module",
+   "name": "test_bounded_external_write",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Python test module (test_bounded_external_write.py, 154 lines) covering bounded external write. Defines: intent, classify, BoundedExternalWriteTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_bounded_external_write.py:BoundedExternalWriteTests",
+   "type": "class",
+   "name": "BoundedExternalWriteTests",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Class BoundedExternalWriteTests defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:classify",
+   "type": "function",
+   "name": "classify",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function classify defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:intent",
+   "type": "function",
+   "name": "intent",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function intent defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_timeout_after_effect_passes_only_with_exact_matching_readback",
+   "type": "function",
+   "name": "test_timeout_after_effect_passes_only_with_exact_matching_readback",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_timeout_after_effect_passes_only_with_exact_matching_readback defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_human_takeover_packet_contains_replay_guards",
+   "type": "function",
+   "name": "test_human_takeover_packet_contains_replay_guards",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_human_takeover_packet_contains_replay_guards defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_intent_must_be_persisted_before_mutation",
+   "type": "function",
+   "name": "test_intent_must_be_persisted_before_mutation",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_intent_must_be_persisted_before_mutation defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_ambiguous_post_state_requires_human_and_forbids_repeat",
+   "type": "function",
+   "name": "test_ambiguous_post_state_requires_human_and_forbids_repeat",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_ambiguous_post_state_requires_human_and_forbids_repeat defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_scope_hash_mismatch_prevents_dispatch",
+   "type": "function",
+   "name": "test_scope_hash_mismatch_prevents_dispatch",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_scope_hash_mismatch_prevents_dispatch defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_duplicate_worker_observes_single_effect_without_second_mutation",
+   "type": "function",
+   "name": "test_duplicate_worker_observes_single_effect_without_second_mutation",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_duplicate_worker_observes_single_effect_without_second_mutation defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_idempotency_mismatch_is_ambiguous_not_pass",
+   "type": "function",
+   "name": "test_idempotency_mismatch_is_ambiguous_not_pass",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_idempotency_mismatch_is_ambiguous_not_pass defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_bounded_external_write.py:test_timeout_before_effect_is_retryable_only_after_zero_readback",
+   "type": "function",
+   "name": "test_timeout_before_effect_is_retryable_only_after_zero_readback",
+   "filePath": "tests/test_bounded_external_write.py",
+   "summary": "Function test_timeout_before_effect_is_retryable_only_after_zero_readback defined in tests/test_bounded_external_write.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_canonical_runtime_schema_contracts.py",
+   "type": "module",
+   "name": "test_canonical_runtime_schema_contracts",
+   "filePath": "tests/test_canonical_runtime_schema_contracts.py",
+   "summary": "Python test module (test_canonical_runtime_schema_contracts.py, 62 lines) covering canonical runtime schema contracts. Defines: load, CanonicalRuntimeSchemaTests.",
+   "tags": [
+    "contract",
+    "runtime",
+    "schema",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "class:tests/test_bounded_external_write.py:BoundedExternalWriteTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:classify",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:intent",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_timeout_after_effect_passes_only_with_exact_matching_readback",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_human_takeover_packet_contains_replay_guards",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_intent_must_be_persisted_before_mutation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_ambiguous_post_state_requires_human_and_forbids_repeat",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_scope_hash_mismatch_prevents_dispatch",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_duplicate_worker_observes_single_effect_without_second_mutation",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_idempotency_mismatch_is_ambiguous_not_pass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "function:tests/test_bounded_external_write.py:test_timeout_before_effect_is_retryable_only_after_zero_readback",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:releases/changelog.d/2026-07-31-scrum-244-246-f8-recovery-m5.md",
+   "target": "file:releases/changelog.d/scrum-115-canonical-scenarios-v3.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_authority_matrix_contract.py",
+   "target": "file:tests/test_base_drift_interrupt_flow.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_base_drift_interrupt_flow.py",
+   "target": "file:tests/test_bmad_procedure_adapter.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_bmad_procedure_adapter.py",
+   "target": "file:tests/test_bounded_external_write.py",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:tests/test_bounded_external_write.py",
+   "target": "file:tests/test_canonical_runtime_schema_contracts.py",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

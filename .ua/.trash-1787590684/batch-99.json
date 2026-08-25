@@ -1,0 +1,128 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/integration/bmad-permission-model.schema.json",
+   "language": "json",
+   "sizeLines": 151,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integration/bmad-procedure-registry.schema.json",
+   "language": "json",
+   "sizeLines": 140,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integration/bmad-procedure-request.schema.json",
+   "language": "json",
+   "sizeLines": 199,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integration/bmad-procedure-result.schema.json",
+   "language": "json",
+   "sizeLines": 220,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integration/dw-super-app-integration.schema.json",
+   "language": "json",
+   "sizeLines": 100,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/integration/bmad-permission-model.schema.json",
+   "type": "config",
+   "name": "bmad permission model.schema",
+   "filePath": "schemas/integration/bmad-permission-model.schema.json",
+   "summary": "JSON Schema definition \"bmad permission model.schema\" (bmad-permission-model.schema.json, 151 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/integration/bmad-procedure-registry.schema.json",
+   "type": "config",
+   "name": "bmad procedure registry.schema",
+   "filePath": "schemas/integration/bmad-procedure-registry.schema.json",
+   "summary": "JSON Schema definition \"bmad procedure registry.schema\" (bmad-procedure-registry.schema.json, 140 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "registry",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/integration/bmad-procedure-request.schema.json",
+   "type": "config",
+   "name": "bmad procedure request.schema",
+   "filePath": "schemas/integration/bmad-procedure-request.schema.json",
+   "summary": "JSON Schema definition \"bmad procedure request.schema\" (bmad-procedure-request.schema.json, 199 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/integration/bmad-procedure-result.schema.json",
+   "type": "config",
+   "name": "bmad procedure result.schema",
+   "filePath": "schemas/integration/bmad-procedure-result.schema.json",
+   "summary": "JSON Schema definition \"bmad procedure result.schema\" (bmad-procedure-result.schema.json, 220 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/integration/dw-super-app-integration.schema.json",
+   "type": "config",
+   "name": "DW SUPER APP Integration Topology and Provenance Contract",
+   "filePath": "schemas/integration/dw-super-app-integration.schema.json",
+   "summary": "JSON Schema definition \"DW SUPER APP Integration Topology and Provenance Contract\" (dw-super-app-integration.schema.json, 100 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:schemas/integration/bmad-permission-model.schema.json",
+   "target": "file:schemas/integration/bmad-procedure-registry.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/integration/bmad-procedure-registry.schema.json",
+   "target": "file:schemas/integration/bmad-procedure-request.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/integration/bmad-procedure-request.schema.json",
+   "target": "file:schemas/integration/bmad-procedure-result.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/integration/bmad-procedure-result.schema.json",
+   "target": "file:schemas/integration/dw-super-app-integration.schema.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

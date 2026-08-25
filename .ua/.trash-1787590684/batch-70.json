@@ -1,0 +1,212 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/README.md",
+   "language": "markdown",
+   "sizeLines": 45,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/schema-validation.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/side-effect-check.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  },
+  {
+   "path": "core/node-architect/node-catalog/validation_quality/validator-execution.node.json",
+   "language": "json",
+   "sizeLines": 11,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/README.md",
+   "type": "document",
+   "name": "validation_quality node family",
+   "filePath": "core/node-architect/node-catalog/validation_quality/README.md",
+   "summary": "Markdown document \"validation_quality node family\" (document, 45 lines): Task: `REVAMP-GWC-020` Batch: `batch-05-validation-quality` Family: `validation_quality` Planned nodes: 9 Authority boundary: `g3_required` / `G3_PR`",
+   "tags": [
+    "catalog",
+    "core",
+    "documentation",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json",
+   "type": "config",
+   "name": "Blocker Severity Classification",
+   "filePath": "core/node-architect/node-catalog/validation_quality/blocker-severity-classification.node.json",
+   "summary": "JSON data file \"Blocker Severity Classification\" (blocker-severity-classification.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json",
+   "type": "config",
+   "name": "CI Evidence Capture",
+   "filePath": "core/node-architect/node-catalog/validation_quality/ci-evidence-capture.node.json",
+   "summary": "JSON data file \"CI Evidence Capture\" (ci-evidence-capture.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "capture",
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json",
+   "type": "config",
+   "name": "Evidence Quality Check",
+   "filePath": "core/node-architect/node-catalog/validation_quality/evidence-quality-check.node.json",
+   "summary": "JSON data file \"Evidence Quality Check\" (evidence-quality-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json",
+   "type": "config",
+   "name": "G3 Pass Decision",
+   "filePath": "core/node-architect/node-catalog/validation_quality/g3-pass-decision.node.json",
+   "summary": "JSON data file \"G3 Pass Decision\" (g3-pass-decision.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "g3",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json",
+   "type": "config",
+   "name": "Reproducibility Check",
+   "filePath": "core/node-architect/node-catalog/validation_quality/reproducibility-check.node.json",
+   "summary": "JSON data file \"Reproducibility Check\" (reproducibility-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/schema-validation.node.json",
+   "type": "config",
+   "name": "Schema Validation",
+   "filePath": "core/node-architect/node-catalog/validation_quality/schema-validation.node.json",
+   "summary": "JSON Schema definition \"Schema Validation\" (schema-validation.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/side-effect-check.node.json",
+   "type": "config",
+   "name": "Side Effect Check",
+   "filePath": "core/node-architect/node-catalog/validation_quality/side-effect-check.node.json",
+   "summary": "JSON data file \"Side Effect Check\" (side-effect-check.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json",
+   "type": "config",
+   "name": "Unit Test Mapping",
+   "filePath": "core/node-architect/node-catalog/validation_quality/unit-test-mapping.node.json",
+   "summary": "JSON data file \"Unit Test Mapping\" (unit-test-mapping.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/node-architect/node-catalog/validation_quality/validator-execution.node.json",
+   "type": "config",
+   "name": "Validator Execution",
+   "filePath": "core/node-architect/node-catalog/validation_quality/validator-execution.node.json",
+   "summary": "JSON data file \"Validator Execution\" (validator-execution.node.json, 11 lines) Top-level keys: node_id, node_type, title, canonical, authority_boundary, gates.",
+   "tags": [
+    "catalog",
+    "core",
+    "json",
+    "nodes",
+    "validation"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

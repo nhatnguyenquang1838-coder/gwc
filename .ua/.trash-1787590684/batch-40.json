@@ -1,0 +1,132 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/01-source-inventory.json",
+   "language": "json",
+   "sizeLines": 19,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/02-traceability.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/03-evidence-graph.json",
+   "language": "json",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/04-impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 18,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/07-validation-report.json",
+   "language": "json",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/01-source-inventory.json",
+   "type": "config",
+   "name": "01 source inventory",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/01-source-inventory.json",
+   "summary": "Task Me run artifact \"01 source inventory\" (01-source-inventory.json, 19 lines) Top-level keys: repository, protected_base_sha, source_paths, excluded.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/02-traceability.json",
+   "type": "config",
+   "name": "SCRUM-147",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/02-traceability.json",
+   "summary": "Task Me run artifact \"SCRUM-147\" (02-traceability.json, 12 lines) Top-level keys: links, uncertainty.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/03-evidence-graph.json",
+   "type": "config",
+   "name": "durable-store",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/03-evidence-graph.json",
+   "summary": "Task Me run artifact \"durable-store\" (03-evidence-graph.json, 16 lines) Top-level keys: nodes, edges.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/04-impact-analysis.md",
+   "type": "document",
+   "name": "Shared impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/04-impact-analysis.md",
+   "summary": "Markdown document \"Shared impact analysis\" (document, 18 lines): - SCRUM-147 is the runtime correctness foundation: checkpoint revision/CAS, lease and fencing, crash boundaries, and replay/idempotency evidence. - SCRUM-148 is a parallel decision-engine lane: canonical scenario registry, strict typed guards, route classification/ranking, deterministic digests,",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/07-validation-report.json",
+   "type": "config",
+   "name": "07 validation report",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/07-validation-report.json",
+   "summary": "Task Me run artifact \"07 validation report\" (07-validation-report.json, 16 lines) Top-level keys: status, planner, runner, checks, not_run.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/01-source-inventory.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/02-traceability.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/02-traceability.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/03-evidence-graph.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/03-evidence-graph.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/04-impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/04-impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/_shared/07-validation-report.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

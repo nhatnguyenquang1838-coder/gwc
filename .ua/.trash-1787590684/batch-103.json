@@ -1,0 +1,415 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/runtime/adapter-contract.schema.json",
+   "language": "json",
+   "sizeLines": 62,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/decision-rule-registry.schema.json",
+   "language": "json",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/decision-rule.schema.json",
+   "language": "json",
+   "sizeLines": 43,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/durable-checkpoint.schema.json",
+   "language": "json",
+   "sizeLines": 60,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/durable-event.schema.json",
+   "language": "json",
+   "sizeLines": 52,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/durable-run.schema.json",
+   "language": "json",
+   "sizeLines": 47,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/flow-profile.schema.json",
+   "language": "json",
+   "sizeLines": 54,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/graph-revision.schema.json",
+   "language": "json",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/node-contract.schema.json",
+   "language": "json",
+   "sizeLines": 70,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/node-registry.schema.json",
+   "language": "json",
+   "sizeLines": 17,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/p3-backward-compiler-request.schema.json",
+   "language": "json",
+   "sizeLines": 14,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/p3-backward-compiler-result.schema.json",
+   "language": "json",
+   "sizeLines": 13,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/p3-route-decision.schema.json",
+   "language": "json",
+   "sizeLines": 13,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/p3-route-history.schema.json",
+   "language": "json",
+   "sizeLines": 14,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/pending-action.schema.json",
+   "language": "json",
+   "sizeLines": 50,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/profile-registry.schema.json",
+   "language": "json",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/routing-history.schema.json",
+   "language": "json",
+   "sizeLines": 41,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/runtime-graph.schema.json",
+   "language": "json",
+   "sizeLines": 39,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/scenario-contract.schema.json",
+   "language": "json",
+   "sizeLines": 254,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/runtime/scenario-registry.schema.json",
+   "language": "json",
+   "sizeLines": 53,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/runtime/adapter-contract.schema.json",
+   "type": "config",
+   "name": "GWC Node Adapter Request and Result",
+   "filePath": "schemas/runtime/adapter-contract.schema.json",
+   "summary": "JSON Schema definition \"GWC Node Adapter Request and Result\" (adapter-contract.schema.json, 62 lines) Top-level keys: $id, $schema, title, type, additionalProperties, required.",
+   "tags": [
+    "adapter",
+    "contract",
+    "json",
+    "runtime",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/decision-rule-registry.schema.json",
+   "type": "config",
+   "name": "Canonical Typed Decision Rule Registry",
+   "filePath": "schemas/runtime/decision-rule-registry.schema.json",
+   "summary": "JSON Schema definition \"Canonical Typed Decision Rule Registry\" (decision-rule-registry.schema.json, 16 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "registry",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/decision-rule.schema.json",
+   "type": "config",
+   "name": "Typed Runtime Decision Rule",
+   "filePath": "schemas/runtime/decision-rule.schema.json",
+   "summary": "JSON Schema definition \"Typed Runtime Decision Rule\" (decision-rule.schema.json, 43 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/durable-checkpoint.schema.json",
+   "type": "config",
+   "name": "GWC Durable Runtime Checkpoint",
+   "filePath": "schemas/runtime/durable-checkpoint.schema.json",
+   "summary": "JSON Schema definition \"GWC Durable Runtime Checkpoint\" (durable-checkpoint.schema.json, 60 lines) Top-level keys: $id, $schema, title, type, additionalProperties, required.",
+   "tags": [
+    "checkpoint",
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/durable-event.schema.json",
+   "type": "config",
+   "name": "GWC Durable Runtime Event",
+   "filePath": "schemas/runtime/durable-event.schema.json",
+   "summary": "JSON Schema definition \"GWC Durable Runtime Event\" (durable-event.schema.json, 52 lines) Top-level keys: $id, $schema, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/durable-run.schema.json",
+   "type": "config",
+   "name": "GWC Durable Runtime Run",
+   "filePath": "schemas/runtime/durable-run.schema.json",
+   "summary": "JSON Schema definition \"GWC Durable Runtime Run\" (durable-run.schema.json, 47 lines) Top-level keys: $id, $schema, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/flow-profile.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Flow Profile",
+   "filePath": "schemas/runtime/flow-profile.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Flow Profile\" (flow-profile.schema.json, 54 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/graph-revision.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Graph Revision",
+   "filePath": "schemas/runtime/graph-revision.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Graph Revision\" (graph-revision.schema.json, 28 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/node-contract.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Node Contract",
+   "filePath": "schemas/runtime/node-contract.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Node Contract\" (node-contract.schema.json, 70 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "contract",
+    "json",
+    "nodes",
+    "runtime",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/node-registry.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Node Registry",
+   "filePath": "schemas/runtime/node-registry.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Node Registry\" (node-registry.schema.json, 17 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "registry",
+    "runtime",
+    "schema"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/p3-backward-compiler-request.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/runtime/p3-backward-compiler-request.schema.json",
+   "filePath": "schemas/runtime/p3-backward-compiler-request.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/runtime/p3-backward-compiler-request.schema.json\" (p3-backward-compiler-request.schema.json, 14 lines) Top-level keys: $schema, $id, type, required, properties.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/p3-backward-compiler-result.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/runtime/p3-backward-compiler-result.schema.json",
+   "filePath": "schemas/runtime/p3-backward-compiler-result.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/runtime/p3-backward-compiler-result.schema.json\" (p3-backward-compiler-result.schema.json, 13 lines) Top-level keys: $schema, $id, type, required, properties.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/p3-route-decision.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/runtime/p3-route-decision.schema.json",
+   "filePath": "schemas/runtime/p3-route-decision.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/runtime/p3-route-decision.schema.json\" (p3-route-decision.schema.json, 13 lines) Top-level keys: $schema, $id, type, required, properties.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/p3-route-history.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/runtime/p3-route-history.schema.json",
+   "filePath": "schemas/runtime/p3-route-history.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/runtime/p3-route-history.schema.json\" (p3-route-history.schema.json, 14 lines) Top-level keys: $schema, $id, type, required, properties.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/pending-action.schema.json",
+   "type": "config",
+   "name": "GWC Pending External Action",
+   "filePath": "schemas/runtime/pending-action.schema.json",
+   "summary": "JSON Schema definition \"GWC Pending External Action\" (pending-action.schema.json, 50 lines) Top-level keys: $id, $schema, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/profile-registry.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Flow Profile Registry",
+   "filePath": "schemas/runtime/profile-registry.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Flow Profile Registry\" (profile-registry.schema.json, 16 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "registry",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/routing-history.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Routing History",
+   "filePath": "schemas/runtime/routing-history.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Routing History\" (routing-history.schema.json, 41 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/runtime-graph.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Graph Registry",
+   "filePath": "schemas/runtime/runtime-graph.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Graph Registry\" (runtime-graph.schema.json, 39 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/runtime/scenario-contract.schema.json",
+   "type": "config",
+   "name": "scenario contract.schema",
+   "filePath": "schemas/runtime/scenario-contract.schema.json",
+   "summary": "JSON Schema definition \"scenario contract.schema\" (scenario-contract.schema.json, 254 lines) Top-level keys: $id, $schema, additionalProperties, properties, required, title.",
+   "tags": [
+    "contract",
+    "json",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/runtime/scenario-registry.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Scenario Registry",
+   "filePath": "schemas/runtime/scenario-registry.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Scenario Registry\" (scenario-registry.schema.json, 53 lines) Top-level keys: $id, $schema, additionalProperties, properties, required, title.",
+   "tags": [
+    "json",
+    "registry",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

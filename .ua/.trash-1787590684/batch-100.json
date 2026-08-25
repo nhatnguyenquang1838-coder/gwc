@@ -1,0 +1,220 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/integrations/e2e-pilot-run.schema.json",
+   "language": "json",
+   "sizeLines": 49,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/g5-verification.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/github-evidence.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/jira-projection.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/p5-evaluation-run.schema.json",
+   "language": "json",
+   "sizeLines": 210,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/task-me-host-request.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/task-me-host-result.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/task-me-task-package.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/ua-host-request.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/ua-host-result.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/integrations/ua-snapshot.schema.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/integrations/e2e-pilot-run.schema.json",
+   "type": "config",
+   "name": "DW SUPER E2E Pilot Run",
+   "filePath": "schemas/integrations/e2e-pilot-run.schema.json",
+   "summary": "JSON Schema definition \"DW SUPER E2E Pilot Run\" (e2e-pilot-run.schema.json, 50 lines) Top-level keys: $schema, title, type, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/g5-verification.schema.json",
+   "type": "config",
+   "name": "g5 verification.schema",
+   "filePath": "schemas/integrations/g5-verification.schema.json",
+   "summary": "JSON Schema definition \"g5 verification.schema\" (g5-verification.schema.json, 1 lines) Top-level keys: $schema, type, required, properties.",
+   "tags": [
+    "g5",
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/github-evidence.schema.json",
+   "type": "config",
+   "name": "github evidence.schema",
+   "filePath": "schemas/integrations/github-evidence.schema.json",
+   "summary": "JSON Schema definition \"github evidence.schema\" (github-evidence.schema.json, 1 lines) Top-level keys: $schema, type, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/jira-projection.schema.json",
+   "type": "config",
+   "name": "jira projection.schema",
+   "filePath": "schemas/integrations/jira-projection.schema.json",
+   "summary": "JSON Schema definition \"jira projection.schema\" (jira-projection.schema.json, 1 lines) Top-level keys: $schema, type, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/p5-evaluation-run.schema.json",
+   "type": "config",
+   "name": "p5 evaluation run.schema",
+   "filePath": "schemas/integrations/p5-evaluation-run.schema.json",
+   "summary": "JSON Schema definition \"p5 evaluation run.schema\" (p5-evaluation-run.schema.json, 210 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:schemas/integrations/task-me-host-request.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/integrations/task-me-host-request.schema.json",
+   "filePath": "schemas/integrations/task-me-host-request.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/integrations/task-me-host-request.schema.json\" (task-me-host-request.schema.json, 1 lines) Top-level keys: $schema, $id, type, additionalProperties, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/task-me-host-result.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/integrations/task-me-host-result.schema.json",
+   "filePath": "schemas/integrations/task-me-host-result.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/integrations/task-me-host-result.schema.json\" (task-me-host-result.schema.json, 1 lines) Top-level keys: $schema, $id, type, additionalProperties, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/task-me-task-package.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/integrations/task-me-task-package.schema.json",
+   "filePath": "schemas/integrations/task-me-task-package.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/integrations/task-me-task-package.schema.json\" (task-me-task-package.schema.json, 1 lines) Top-level keys: $schema, $id, type, additionalProperties, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/ua-host-request.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/integrations/ua-host-request.schema.json",
+   "filePath": "schemas/integrations/ua-host-request.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/integrations/ua-host-request.schema.json\" (ua-host-request.schema.json, 1 lines) Top-level keys: $schema, $id, type, additionalProperties, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/ua-host-result.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/integrations/ua-host-result.schema.json",
+   "filePath": "schemas/integrations/ua-host-result.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/integrations/ua-host-result.schema.json\" (ua-host-result.schema.json, 1 lines) Top-level keys: $schema, $id, type, additionalProperties, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/integrations/ua-snapshot.schema.json",
+   "type": "config",
+   "name": "https://gwc.local/schemas/integrations/ua-snapshot.schema.json",
+   "filePath": "schemas/integrations/ua-snapshot.schema.json",
+   "summary": "JSON Schema definition \"https://gwc.local/schemas/integrations/ua-snapshot.schema.json\" (ua-snapshot.schema.json, 1 lines) Top-level keys: $schema, $id, type, additionalProperties, required, properties.",
+   "tags": [
+    "json",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

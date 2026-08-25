@@ -1,0 +1,211 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/README.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/decisions.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/evidence.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 15,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/task.yaml",
+   "language": "yaml",
+   "sizeLines": 19,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/README.md",
+   "type": "document",
+   "name": "SCRUM-146",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/README.md",
+   "summary": "Markdown document \"SCRUM-146\" (document, 7 lines): Close the P1–P5 recovery record only after the prerequisite acceptance evidence exists. The manifest must separate executable runtime proof, contract/validator proof, projection-only evidence, unverified evidence and accepted deferrals. The exact destination for the new canonical manifest is a",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/coding-guide.md",
+   "type": "document",
+   "name": "Coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/coding-guide.md",
+   "summary": "Markdown document \"Coding guide\" (document, 10 lines): - Reuse `resolve_g5_status.py`, `validate_g5_status.py`, `validate_github_g5_g6_jira_projection.py`, and `hash_integrity_artifacts.py`. - Keep exact SHA equality checks strict; reject stale PR head, merge/main mismatch, missing exact-SHA CI, and projection authority leakage. - Do not invent the new",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 7 lines): - Selected: build the closure record on existing G5/projection/hash validators. - Rejected: create a parallel evidence authority or use Jira status as gate approval. - Confidence: high for validator reuse; medium for the new manifest location, which must be discovered before implementation.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/evidence.json",
+   "type": "config",
+   "name": "SCRUM-146",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-146\" (evidence.json, 1 lines) Top-level keys: task_id, evidence, known_gaps.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/impact-analysis.md",
+   "type": "document",
+   "name": "Impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/impact-analysis.md",
+   "summary": "Markdown document \"Impact analysis\" (document, 7 lines): This is the final integration/evidence lane. It consumes exact branch, PR head, merge, main and CI evidence plus the three prerequisite acceptance records. It must not retroactively mark stale evidence as current and must not use Jira or projection state as gate authority. Any base/head drift",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/implementation-plan.md",
+   "summary": "Markdown document \"Implementation plan\" (plan, 15 lines): 1. Discover and verify the canonical manifest destination using existing package/export and evidence conventions; stop if no governed destination is found. 2. Collect exact P1–P5 refs and classify each claim with provenance and maturity; include known P5 final refs and stale-G3 mismatch as separate",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/task.yaml",
+   "type": "config",
+   "name": "Build exact-SHA P1-P5 evidence and closure manifest",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/task.yaml",
+   "summary": "GWC task governance YAML \"Build exact-SHA P1-P5 evidence and closure manifest\" (task.yaml, 19 lines). Top-level keys: task_id, title, objective, wave, requires, parallel_with.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/test-plan.md",
+   "type": "document",
+   "name": "Test plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/test-plan.md",
+   "summary": "Markdown document \"Test plan\" (plan, 12 lines): ```text python -m unittest discover -s tests -p 'test_g5_status_resolver.py' python -m unittest discover -s tests -p 'test_github_g5_g6_jira_projection.py' python -m unittest discover -s tests -p 'test_exact_state_capture.py' ```",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-146-exact-sha-closure-manifest/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

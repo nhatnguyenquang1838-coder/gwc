@@ -1,0 +1,102 @@
+{
+ "batchFiles": [
+  {
+   "path": "docs/base-drift-policy.md",
+   "language": "markdown",
+   "sizeLines": 95,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "docs/p3-backward-compiler-contract.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "docs/p3-scenario-routing-contract.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "docs/project-consumer-agent-instructions.md",
+   "language": "markdown",
+   "sizeLines": 222,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:docs/base-drift-policy.md",
+   "type": "document",
+   "name": "Base Drift Policy",
+   "filePath": "docs/base-drift-policy.md",
+   "summary": "Markdown document \"Base Drift Policy\" (guideline/contract, 95 lines): The base drift evaluator classifies protected-base SHA changes after approval so bounded work can continue safely without treating every base update as a hard block.",
+   "tags": [
+    "docs",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:docs/p3-backward-compiler-contract.md",
+   "type": "document",
+   "name": "P3 Backward Compiler Contract",
+   "filePath": "docs/p3-backward-compiler-contract.md",
+   "summary": "Markdown document \"P3 Backward Compiler Contract\" (guideline/contract, 3 lines): SCRUM-111 freezes compiler semantics. A compiler request binds task, repository, base SHA, graph revision, desired outcome, safe-failure outcome, authority boundaries and planning evidence. The compiler derives capabilities by walking predecessor dependencies, closes dependencies, applies profile",
+   "tags": [
+    "contract",
+    "docs",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:docs/p3-scenario-routing-contract.md",
+   "type": "document",
+   "name": "P3 Scenario Routing Contract",
+   "filePath": "docs/p3-scenario-routing-contract.md",
+   "summary": "Markdown document \"P3 Scenario Routing Contract\" (guideline/contract, 3 lines): SCRUM-112 freezes scenario routing semantics. Scenarios define activation source, safety class, retry semantics, authority impact and evidence needs. Typed guards fail closed on unsupported type/operator pairs. Routes classify as VALID_AUTO, VALID_HUMAN, CONDITIONAL, BLOCKED or UNSAFE. Ranking is",
+   "tags": [
+    "contract",
+    "docs",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:docs/project-consumer-agent-instructions.md",
+   "type": "document",
+   "name": "GWC Project Consumer Agent Instructions",
+   "filePath": "docs/project-consumer-agent-instructions.md",
+   "summary": "Markdown document \"GWC Project Consumer Agent Instructions\" (document, 222 lines): This document defines the minimum instruction pattern for any project repository that consumes GWC through a pinned submodule or generated governance package.",
+   "tags": [
+    "agents",
+    "docs",
+    "documentation",
+    "instructions"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:docs/base-drift-policy.md",
+   "target": "file:docs/p3-backward-compiler-contract.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:docs/p3-backward-compiler-contract.md",
+   "target": "file:docs/p3-scenario-routing-contract.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:docs/p3-scenario-routing-contract.md",
+   "target": "file:docs/project-consumer-agent-instructions.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,110 @@
+{
+ "batchFiles": [
+  {
+   "path": "schemas/node-architect/runtime-knowledge-graph.schema.json",
+   "language": "json",
+   "sizeLines": 53,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-node.schema.json",
+   "language": "json",
+   "sizeLines": 77,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-profile.schema.json",
+   "language": "json",
+   "sizeLines": 15,
+   "fileCategory": "config"
+  },
+  {
+   "path": "schemas/node-architect/runtime-scenario.schema.json",
+   "language": "json",
+   "sizeLines": 25,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:schemas/node-architect/runtime-knowledge-graph.schema.json",
+   "type": "config",
+   "name": "Runtime Knowledge Graph Projection",
+   "filePath": "schemas/node-architect/runtime-knowledge-graph.schema.json",
+   "summary": "JSON Schema definition \"Runtime Knowledge Graph Projection\" (runtime-knowledge-graph.schema.json, 53 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-node.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Node",
+   "filePath": "schemas/node-architect/runtime-node.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Node\" (runtime-node.schema.json, 77 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-profile.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Profile",
+   "filePath": "schemas/node-architect/runtime-profile.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Profile\" (runtime-profile.schema.json, 15 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:schemas/node-architect/runtime-scenario.schema.json",
+   "type": "config",
+   "name": "Canonical Runtime Scenario",
+   "filePath": "schemas/node-architect/runtime-scenario.schema.json",
+   "summary": "JSON Schema definition \"Canonical Runtime Scenario\" (runtime-scenario.schema.json, 25 lines) Top-level keys: $schema, $id, title, type, additionalProperties, required.",
+   "tags": [
+    "json",
+    "nodes",
+    "runtime",
+    "schema",
+    "schemas"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:schemas/node-architect/runtime-knowledge-graph.schema.json",
+   "target": "file:schemas/node-architect/runtime-node.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/node-architect/runtime-node.schema.json",
+   "target": "file:schemas/node-architect/runtime-profile.schema.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:schemas/node-architect/runtime-profile.schema.json",
+   "target": "file:schemas/node-architect/runtime-scenario.schema.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

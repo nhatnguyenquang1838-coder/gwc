@@ -1,0 +1,24 @@
+{
+  "issues": [],
+  "warnings": [],
+  "stats": {
+    "totalNodes": 1403,
+    "totalEdges": 812,
+    "totalLayers": 15,
+    "tourSteps": 11,
+    "nodeTypes": {
+      "pipeline": 3,
+      "config": 527,
+      "document": 251,
+      "resource": 7,
+      "module": 104,
+      "class": 60,
+      "function": 445,
+      "service": 6
+    },
+    "edgeTypes": {
+      "related": 307,
+      "contains": 505
+    }
+  }
+}

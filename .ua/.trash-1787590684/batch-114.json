@@ -1,0 +1,547 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-141/g1/preflight/g1-preflight-report.yaml",
+   "language": "yaml",
+   "sizeLines": 75,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-141/g2/approval-readback.yaml",
+   "language": "yaml",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-141/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 50,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-142/g0/context-snapshot.yaml",
+   "language": "yaml",
+   "sizeLines": 21,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml",
+   "language": "yaml",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 15,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml",
+   "language": "yaml",
+   "sizeLines": 10,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml",
+   "language": "yaml",
+   "sizeLines": 18,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-142/ua-refresh-report.md",
+   "language": "markdown",
+   "sizeLines": 67,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/closure-manifest.json",
+   "language": "json",
+   "sizeLines": 79,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/closure-manifest.md",
+   "language": "markdown",
+   "sizeLines": 23,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g0/context-snapshot.yaml",
+   "language": "yaml",
+   "sizeLines": 104,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g1/brainstorming/g1-options.yaml",
+   "language": "yaml",
+   "sizeLines": 44,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 52,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g1/intake/g1-intake-brief.yaml",
+   "language": "yaml",
+   "sizeLines": 120,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g1/preflight/g1-preflight-report.yaml",
+   "language": "yaml",
+   "sizeLines": 306,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-146/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 216,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/evidence/validation-report.json",
+   "language": "json",
+   "sizeLines": 23,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g0/context-snapshot.yaml",
+   "language": "yaml",
+   "sizeLines": 99,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g0/runtime-input.yaml",
+   "language": "yaml",
+   "sizeLines": 193,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g1/brainstorming/g1-options.yaml",
+   "language": "yaml",
+   "sizeLines": 28,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 39,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g1/intake/g1-intake-brief.yaml",
+   "language": "yaml",
+   "sizeLines": 114,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g1/preflight/g1-preflight-report.yaml",
+   "language": "yaml",
+   "sizeLines": 305,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 172,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-141/g1/preflight/g1-preflight-report.yaml",
+   "type": "config",
+   "name": "g1-preflight-report",
+   "filePath": ".gwc/tasks/SCRUM-141/g1/preflight/g1-preflight-report.yaml",
+   "summary": "GWC task governance YAML (g1-preflight-report.yaml, 75 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, repository_state, checks.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-141/g2/approval-readback.yaml",
+   "type": "config",
+   "name": "approval-readback",
+   "filePath": ".gwc/tasks/SCRUM-141/g2/approval-readback.yaml",
+   "summary": "GWC task governance YAML (approval-readback.yaml, 28 lines). Top-level keys: schema_version, artifact_type, task_id, repository, base_sha, working_branch.",
+   "tags": [
+    "approvals",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-141/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-141/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 50 lines). Top-level keys: schema_version, artifact_type, generated_at, task_id, repository, base_ref.",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-142/g0/context-snapshot.yaml",
+   "type": "config",
+   "name": "context-snapshot",
+   "filePath": ".gwc/tasks/SCRUM-142/g0/context-snapshot.yaml",
+   "summary": "GWC task governance YAML (context-snapshot.yaml, 21 lines). Top-level keys: task_id, run_id, status, execution_mode, repository, default_branch.",
+   "tags": [
+    "g0",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml",
+   "type": "config",
+   "name": "g1-options",
+   "filePath": ".gwc/tasks/SCRUM-142/g1/brainstorming/g1-options.yaml",
+   "summary": "GWC task governance YAML (g1-options.yaml, 10 lines). Top-level keys: task_id, run_id, options, selected.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/SCRUM-142/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 15 lines). Top-level keys: task_id, run_id, decision, scope_hash, branch, base_sha.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml",
+   "type": "config",
+   "name": "g1-intake-brief",
+   "filePath": ".gwc/tasks/SCRUM-142/g1/intake/g1-intake-brief.yaml",
+   "summary": "GWC task governance YAML (g1-intake-brief.yaml, 10 lines). Top-level keys: task_id, run_id, status, objective, base_sha, requested_command.",
+   "tags": [
+    "g1",
+    "gwc",
+    "intake",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml",
+   "type": "config",
+   "name": "g1-preflight-report",
+   "filePath": ".gwc/tasks/SCRUM-142/g1/preflight/g1-preflight-report.yaml",
+   "summary": "GWC task governance YAML (g1-preflight-report.yaml, 18 lines). Top-level keys: task_id, run_id, status, repo_evidence, risk.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-142/ua-refresh-report.md",
+   "type": "document",
+   "name": "SCRUM-142 — UA-compatible GWC Knowledge Graph Refresh Report",
+   "filePath": ".gwc/tasks/SCRUM-142/ua-refresh-report.md",
+   "summary": "Markdown document \"SCRUM-142 — UA-compatible GWC Knowledge Graph Refresh Report\" (report, 67 lines): - Repository: `nhatnguyenquang1838-coder/gwc` - Default branch: `main` - Latest recovered main SHA: `76644885f4b25cb49a2a34bfea0e2ede941caa01` - Jira task: `SCRUM-142` - Feeds: `SCRUM-106`",
+   "tags": [
+    "documentation",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/closure-manifest.json",
+   "type": "config",
+   "name": "SCRUM-146",
+   "filePath": ".gwc/tasks/SCRUM-146/closure-manifest.json",
+   "summary": "manifest \"SCRUM-146\" (closure-manifest.json, 79 lines) Top-level keys: artifact_type, schema_version, task_id, repository, protected_base_sha, working_branch.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/closure-manifest.md",
+   "type": "document",
+   "name": "P1-P5 Closure Manifest — SCRUM-146",
+   "filePath": ".gwc/tasks/SCRUM-146/closure-manifest.md",
+   "summary": "Markdown document \"P1-P5 Closure Manifest — SCRUM-146\" (document, 23 lines): Current state: `DRAFT_PR_OPEN_G3_PASS_PENDING_READY`. G0, G1, G2 and G3 are recorded as passed. PR #132 remains open as Draft pending the separate ready-for-review metadata transition.",
+   "tags": [
+    "documentation",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g0/context-snapshot.yaml",
+   "type": "config",
+   "name": "context-snapshot",
+   "filePath": ".gwc/tasks/SCRUM-146/g0/context-snapshot.yaml",
+   "summary": "GWC task governance YAML (context-snapshot.yaml, 104 lines). Top-level keys: schema_version, artifact_type, generated_at, project, repository, runtime_context.",
+   "tags": [
+    "g0",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g1/brainstorming/g1-options.yaml",
+   "type": "config",
+   "name": "g1-options",
+   "filePath": ".gwc/tasks/SCRUM-146/g1/brainstorming/g1-options.yaml",
+   "summary": "GWC task governance YAML (g1-options.yaml, 44 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options, recommended_option_id.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/SCRUM-146/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 52 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options_ref, preflight_ref.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g1/intake/g1-intake-brief.yaml",
+   "type": "config",
+   "name": "g1-intake-brief",
+   "filePath": ".gwc/tasks/SCRUM-146/g1/intake/g1-intake-brief.yaml",
+   "summary": "GWC task governance YAML (g1-intake-brief.yaml, 120 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, problem, desired_outcome.",
+   "tags": [
+    "g1",
+    "gwc",
+    "intake",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g1/preflight/g1-preflight-report.yaml",
+   "type": "config",
+   "name": "g1-preflight-report",
+   "filePath": ".gwc/tasks/SCRUM-146/g1/preflight/g1-preflight-report.yaml",
+   "summary": "GWC task governance YAML (g1-preflight-report.yaml, 306 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, repository_state, checks.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-146/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-146/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 216 lines). Top-level keys: schema_version, artifact_type, gate, task_id, repository, base_ref.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/evidence/validation-report.json",
+   "type": "config",
+   "name": "SCRUM-150",
+   "filePath": ".gwc/tasks/SCRUM-150/evidence/validation-report.json",
+   "summary": "JSON data file \"SCRUM-150\" (validation-report.json, 23 lines) Top-level keys: artifact_type, task_id, base_sha, working_branch, results, limitations.",
+   "tags": [
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g0/context-snapshot.yaml",
+   "type": "config",
+   "name": "context-snapshot",
+   "filePath": ".gwc/tasks/SCRUM-150/g0/context-snapshot.yaml",
+   "summary": "GWC task governance YAML (context-snapshot.yaml, 99 lines). Top-level keys: schema_version, artifact_type, generated_at, project, repository, runtime_context.",
+   "tags": [
+    "g0",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g0/runtime-input.yaml",
+   "type": "config",
+   "name": "runtime-input",
+   "filePath": ".gwc/tasks/SCRUM-150/g0/runtime-input.yaml",
+   "summary": "GWC task governance YAML (runtime-input.yaml, 193 lines). Top-level keys: schema_version, artifact_type, generated_at, project, repository, runtime.",
+   "tags": [
+    "g0",
+    "gwc",
+    "runtime",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g1/brainstorming/g1-options.yaml",
+   "type": "config",
+   "name": "g1-options",
+   "filePath": ".gwc/tasks/SCRUM-150/g1/brainstorming/g1-options.yaml",
+   "summary": "GWC task governance YAML (g1-options.yaml, 28 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options, recommended_option_id.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/SCRUM-150/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 39 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options_ref, preflight_ref.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g1/intake/g1-intake-brief.yaml",
+   "type": "config",
+   "name": "g1-intake-brief",
+   "filePath": ".gwc/tasks/SCRUM-150/g1/intake/g1-intake-brief.yaml",
+   "summary": "GWC task governance YAML (g1-intake-brief.yaml, 114 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, problem, desired_outcome.",
+   "tags": [
+    "g1",
+    "gwc",
+    "intake",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g1/preflight/g1-preflight-report.yaml",
+   "type": "config",
+   "name": "g1-preflight-report",
+   "filePath": ".gwc/tasks/SCRUM-150/g1/preflight/g1-preflight-report.yaml",
+   "summary": "GWC task governance YAML (g1-preflight-report.yaml, 305 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, repository_state, checks.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-150/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 172 lines). Top-level keys: schema_version, artifact_type, gate, task_id, repository, base_ref.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-141/g2/approval-readback.yaml",
+   "target": "file:.gwc/tasks/SCRUM-141/g2/execution-envelope.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-146/closure-manifest.json",
+   "target": "file:.gwc/tasks/SCRUM-146/closure-manifest.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-150/g0/context-snapshot.yaml",
+   "target": "file:.gwc/tasks/SCRUM-150/g0/runtime-input.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

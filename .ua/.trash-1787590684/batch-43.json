@@ -1,0 +1,211 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/README.md",
+   "language": "markdown",
+   "sizeLines": 6,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/decisions.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/evidence.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 11,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/task.yaml",
+   "language": "yaml",
+   "sizeLines": 16,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 11,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/README.md",
+   "type": "document",
+   "name": "SCRUM-148",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/README.md",
+   "summary": "Markdown document \"SCRUM-148\" (document, 6 lines): Complete the P3 scenario and performance lane by extending the existing registry-backed router. The scenario registry, typed guard evaluator and deterministic route ranking remain canonical; visualization/history edges must remain non-executable.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/coding-guide.md",
+   "type": "document",
+   "name": "Coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/coding-guide.md",
+   "summary": "Markdown document \"Coding guide\" (document, 10 lines): - Use `evaluate_guard`, `enumerate_routes`, `decide_scenario`, and `append_scenario_decision` in `tools/p3_backward_graph.py`; do not create a second router. - Keep scenario provenance and materialized-count checks in `tools/node_architect/validate_runtime_registry.py`. - Preserve deterministic",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 7 lines): - Selected: extend the existing P3 registry/compiler and validator. - Rejected: implement a standalone performance/router engine; it would create competing authority and violate the existing design. - Confidence: high for routing targets; exact budget configuration location is a bounded discovery",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/evidence.json",
+   "type": "config",
+   "name": "SCRUM-148",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-148\" (evidence.json, 1 lines) Top-level keys: task_id, evidence.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/impact-analysis.md",
+   "type": "document",
+   "name": "Impact analysis",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/impact-analysis.md",
+   "summary": "Markdown document \"Impact analysis\" (document, 7 lines): Direct impact is the scenario registry, backward graph compiler, runtime registry validator and focused P3 tests. SCRUM-149 consumes the resulting deterministic decisions. The principal risk is accidentally turning a projection edge or human/unsafe route into an executable path; this is a hard acceptance failure.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/implementation-plan.md",
+   "summary": "Markdown document \"Implementation plan\" (plan, 11 lines): 1. Inventory the declared 116-scenario space and current materialized records. 2. Identify covered/equivalent/deferred/missing combinations without changing the canonical router authority. 3. Add adversarial cycles, dense branches, tied routes and typed-guard failures to the existing bounded",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/task.yaml",
+   "type": "config",
+   "name": "Complete scenario coverage and bounded router performance",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/task.yaml",
+   "summary": "GWC task governance YAML \"Complete scenario coverage and bounded router performance\" (task.yaml, 16 lines). Top-level keys: task_id, title, objective, wave, requires, parallel_with.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/test-plan.md",
+   "type": "document",
+   "name": "Test plan",
+   "filePath": ".task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/test-plan.md",
+   "summary": "Markdown document \"Test plan\" (plan, 11 lines): ```text python -m unittest discover -s tests -p 'test_p3_scenario_registry.py' python -m unittest discover -s tests -p 'test_p3_backward_graph.py' python -m unittest discover -s tests -p 'test_runtime_registry_validation.py' ```",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-146-149-fastlane-20260728/tasks/SCRUM-148-scenario-coverage-router-budgets/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

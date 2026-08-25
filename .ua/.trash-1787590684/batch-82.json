@@ -1,0 +1,122 @@
+{
+ "batchFiles": [
+  {
+   "path": "examples/integrations/ua-host/complete-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/ua-host/fresh-request.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/ua-host/fresh-snapshot.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/ua-host/stale-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  },
+  {
+   "path": "examples/integrations/ua-host/tool-unavailable-result.json",
+   "language": "json",
+   "sizeLines": 1,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:examples/integrations/ua-host/complete-result.json",
+   "type": "config",
+   "name": "SCRUM-117",
+   "filePath": "examples/integrations/ua-host/complete-result.json",
+   "summary": "JSON data file \"SCRUM-117\" (complete-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/ua-host/fresh-request.json",
+   "type": "config",
+   "name": "SCRUM-117",
+   "filePath": "examples/integrations/ua-host/fresh-request.json",
+   "summary": "JSON data file \"SCRUM-117\" (fresh-request.json, 1 lines) Top-level keys: schema_version, task_id, run_id, target, ua, configuration_digest.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/ua-host/fresh-snapshot.json",
+   "type": "config",
+   "name": "fresh snapshot",
+   "filePath": "examples/integrations/ua-host/fresh-snapshot.json",
+   "summary": "JSON data file \"fresh snapshot\" (fresh-snapshot.json, 1 lines) Top-level keys: schema_version, snapshot_id, input_digest, generated_at, owner_root, target.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/ua-host/stale-result.json",
+   "type": "config",
+   "name": "SCRUM-117",
+   "filePath": "examples/integrations/ua-host/stale-result.json",
+   "summary": "JSON data file \"SCRUM-117\" (stale-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:examples/integrations/ua-host/tool-unavailable-result.json",
+   "type": "config",
+   "name": "SCRUM-117",
+   "filePath": "examples/integrations/ua-host/tool-unavailable-result.json",
+   "summary": "JSON data file \"SCRUM-117\" (tool-unavailable-result.json, 1 lines) Top-level keys: schema_version, status, task_id, run_id, idempotency_key, owner_root.",
+   "tags": [
+    "examples",
+    "json"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:examples/integrations/ua-host/complete-result.json",
+   "target": "file:examples/integrations/ua-host/fresh-request.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/ua-host/fresh-request.json",
+   "target": "file:examples/integrations/ua-host/fresh-snapshot.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/ua-host/fresh-snapshot.json",
+   "target": "file:examples/integrations/ua-host/stale-result.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:examples/integrations/ua-host/stale-result.json",
+   "target": "file:examples/integrations/ua-host/tool-unavailable-result.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

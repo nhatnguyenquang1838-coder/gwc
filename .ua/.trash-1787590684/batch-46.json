@@ -1,0 +1,211 @@
+{
+ "batchFiles": [
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/README.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md",
+   "language": "markdown",
+   "sizeLines": 14,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/decisions.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/evidence.json",
+   "language": "json",
+   "sizeLines": 9,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/impact-analysis.md",
+   "language": "markdown",
+   "sizeLines": 13,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md",
+   "language": "markdown",
+   "sizeLines": 16,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml",
+   "language": "yaml",
+   "sizeLines": 23,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/test-plan.md",
+   "language": "markdown",
+   "sizeLines": 17,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/README.md",
+   "type": "document",
+   "name": "SCRUM-150",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/README.md",
+   "summary": "Markdown document \"SCRUM-150\" (document, 10 lines): Implement a small, fail-closed cross-phase evidence validator and focused fixtures/tests. The validator consumes observed records; it must not execute providers, mutate checkpoints, write projections, approve gates, promote a candidate, or infer missing evidence.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md",
+   "type": "document",
+   "name": "Coding guide",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md",
+   "summary": "Markdown document \"Coding guide\" (document, 14 lines): - Keep the validator deterministic and side-effect free, following the style of `tools/validate_p5_evaluation.py` and the other `validate_*` modules. - Use explicit issue codes and locations; do not silently coerce missing facts into PASS. - Treat each dependency's source/base/head/merge/CI binding",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/decisions.md",
+   "type": "document",
+   "name": "Decisions",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/decisions.md",
+   "summary": "Markdown document \"Decisions\" (document, 12 lines): - Use one Task Me task folder because SCRUM-150 is one bounded integration regression, not four independently deliverable implementation tasks. - Add a composite validator rather than widening the existing P5 validator, which is intentionally scoped to the SCRUM-122–126 P5 chain. - Treat old",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/evidence.json",
+   "type": "config",
+   "name": "SCRUM-150",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/evidence.json",
+   "summary": "Task Me run artifact \"SCRUM-150\" (evidence.json, 9 lines) Top-level keys: task_id, repository, protected_base_sha, evidence_classes, planned_validators, planned_results.",
+   "tags": [
+    "json",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/impact-analysis.md",
+   "type": "document",
+   "name": "Task impact",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/impact-analysis.md",
+   "summary": "Markdown document \"Task impact\" (document, 13 lines): Direct files are a new validator, its focused test module, and cross-phase JSON fixtures. Existing runtime and gate validators are read-only dependencies.",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md",
+   "type": "document",
+   "name": "Implementation plan",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md",
+   "summary": "Markdown document \"Implementation plan\" (plan, 16 lines): 1. Define the smallest JSON record shape needed to join P2/P3/P4/P5 and exact G4/G5 evidence without duplicating their authorities. 2. Implement pure validation functions with stable issue codes. Reject missing dependency evidence, stale base/head/merge/CI bindings, duplicate effects, replay",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml",
+   "type": "config",
+   "name": "Run P2-to-P5 replay, authority and outcome regression",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml",
+   "summary": "GWC task governance YAML \"Run P2-to-P5 replay, authority and outcome regression\" (task.yaml, 23 lines). Top-level keys: task_id, title, objective, wave, requires, parallel_with.",
+   "tags": [
+    "scrum",
+    "task-me",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/test-plan.md",
+   "type": "document",
+   "name": "Test plan",
+   "filePath": ".task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/test-plan.md",
+   "summary": "Markdown document \"Test plan\" (plan, 17 lines): ```bash python3 -m unittest -v tests.test_scrum_150_cross_phase python3 tools/validate_scrum_150_cross_phase.py --suite --json python3 tools/validate_dw_super_e2e_pilot.py --root . --json python3 tools/validate_p5_evaluation.py --suite --json python3 tools/validate_github_g5_g6_jira_projection.py",
+   "tags": [
+    "documentation",
+    "scrum",
+    "task-me",
+    "tasks",
+    "tests"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/README.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/coding-guide.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/decisions.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/decisions.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/evidence.json",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/evidence.json",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/impact-analysis.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/impact-analysis.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/implementation-plan.md",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/task.yaml",
+   "target": "file:.task-me/runs/gwc-scrum-150-fastlane-20260728/tasks/SCRUM-150-cross-phase-replay-authority-outcome-regression/test-plan.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,83 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md",
+   "type": "document",
+   "name": "SCRUM-108 Design — bounded external-write runtime node",
+   "filePath": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md",
+   "summary": "Markdown document \"SCRUM-108 Design — bounded external-write runtime node\" (specification, 12 lines).",
+   "tags": [
+    "documentation",
+    "kiro",
+    "nodes",
+    "runtime",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md",
+   "type": "document",
+   "name": "SCRUM-108 Requirements — bounded external-write runtime node",
+   "filePath": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md",
+   "summary": "Markdown document \"SCRUM-108 Requirements — bounded external-write runtime node\" (specification, 12 lines).",
+   "tags": [
+    "documentation",
+    "kiro",
+    "nodes",
+    "runtime",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md",
+   "type": "document",
+   "name": "SCRUM-108 Tasks",
+   "filePath": ".kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md",
+   "summary": "Markdown document \"SCRUM-108 Tasks\" (specification, 7 lines): 1. Add `tools/node_architect/bounded_external_write.py` with immutable dataclasses, state enum, and classifier. 2. Add `tests/test_bounded_external_write.py` covering SCRUM-106 P2-BW scenario expectations. 3. Add changelog entry under",
+   "tags": [
+    "documentation",
+    "kiro",
+    "nodes",
+    "runtime",
+    "scrum"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/design.md",
+   "target": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/requirements.md",
+   "target": "file:.kiro/specs/scrum-108-bounded-external-write-runtime-node/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

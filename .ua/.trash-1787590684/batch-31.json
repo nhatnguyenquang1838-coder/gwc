@@ -1,0 +1,78 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/scrum-116-dw-superapp-topology/design.md",
+   "language": "markdown",
+   "sizeLines": 7,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-116-dw-superapp-topology/requirements.md",
+   "language": "markdown",
+   "sizeLines": 21,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/scrum-116-dw-superapp-topology/tasks.md",
+   "language": "markdown",
+   "sizeLines": 10,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/scrum-116-dw-superapp-topology/design.md",
+   "type": "document",
+   "name": "SCRUM-116 implementation design",
+   "filePath": ".kiro/specs/scrum-116-dw-superapp-topology/design.md",
+   "summary": "Markdown document \"SCRUM-116 implementation design\" (specification, 7 lines): Use a governed control-plane plus target-runtime ownership topology. Keep package code in `DW-SuperApps/.dw/powers`, thin host routing in DW-SuperApps host adapters, GWC gate artifacts in `.gwc/tasks/<task-id>/`, and selected target generated outputs in `.ua`, `.task-me` and `.bmad` roots.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-116-dw-superapp-topology/requirements.md",
+   "type": "document",
+   "name": "SCRUM-116 implementation requirements",
+   "filePath": ".kiro/specs/scrum-116-dw-superapp-topology/requirements.md",
+   "summary": "Markdown document \"SCRUM-116 implementation requirements\" (specification, 21 lines): Every generated artifact must resolve to exact source repository/ref/SHA, tool package/source commit, schema version, owner root and generation time.",
+   "tags": [
+    "documentation",
+    "kiro",
+    "scrum"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/scrum-116-dw-superapp-topology/tasks.md",
+   "type": "document",
+   "name": "SCRUM-116 implementation tasks",
+   "filePath": ".kiro/specs/scrum-116-dw-superapp-topology/tasks.md",
+   "summary": "Markdown document \"SCRUM-116 implementation tasks\" (specification, 10 lines): - [x] T1 Read exact protected-base plan and record G2 plan-read receipt. - [x] T2 Add topology/source-of-truth/ownership contract and denied-write rules. - [x] T3 Add provenance envelope schema and positive/rejected examples. - [x] T4 Add collision-control rules reusing",
+   "tags": [
+    "documentation",
+    "kiro",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/scrum-116-dw-superapp-topology/design.md",
+   "target": "file:.kiro/specs/scrum-116-dw-superapp-topology/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/scrum-116-dw-superapp-topology/requirements.md",
+   "target": "file:.kiro/specs/scrum-116-dw-superapp-topology/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,137 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-150/g2/approval-envelope.json",
+   "language": "json",
+   "sizeLines": 61,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g2/approval-readback.yaml",
+   "language": "yaml",
+   "sizeLines": 37,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g2/approval-request.yaml",
+   "language": "yaml",
+   "sizeLines": 68,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g2/execution-envelope.yaml",
+   "language": "yaml",
+   "sizeLines": 88,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-150/g2/plan-read-receipt.yaml",
+   "language": "yaml",
+   "sizeLines": 22,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g2/approval-envelope.json",
+   "type": "config",
+   "name": "SCRUM-150",
+   "filePath": ".gwc/tasks/SCRUM-150/g2/approval-envelope.json",
+   "summary": "JSON data file \"SCRUM-150\" (approval-envelope.json, 61 lines) Top-level keys: approval_id, authority_gate, task_id, issued_at, expires_at, scope_version.",
+   "tags": [
+    "approvals",
+    "envelope",
+    "g2",
+    "gwc",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g2/approval-readback.yaml",
+   "type": "config",
+   "name": "approval-readback",
+   "filePath": ".gwc/tasks/SCRUM-150/g2/approval-readback.yaml",
+   "summary": "GWC task governance YAML (approval-readback.yaml, 37 lines). Top-level keys: schema_version, artifact_type, approval_id, authority_gate, task_id, repository.",
+   "tags": [
+    "approvals",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g2/approval-request.yaml",
+   "type": "config",
+   "name": "approval-request",
+   "filePath": ".gwc/tasks/SCRUM-150/g2/approval-request.yaml",
+   "summary": "GWC task governance YAML (approval-request.yaml, 68 lines). Top-level keys: schema_version, artifact_type, approval_request_id, gate, repository, base_branch.",
+   "tags": [
+    "approvals",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g2/execution-envelope.yaml",
+   "type": "config",
+   "name": "execution-envelope",
+   "filePath": ".gwc/tasks/SCRUM-150/g2/execution-envelope.yaml",
+   "summary": "GWC task governance YAML (execution-envelope.yaml, 88 lines).",
+   "tags": [
+    "envelope",
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-150/g2/plan-read-receipt.yaml",
+   "type": "config",
+   "name": "plan-read-receipt",
+   "filePath": ".gwc/tasks/SCRUM-150/g2/plan-read-receipt.yaml",
+   "summary": "GWC task governance YAML (plan-read-receipt.yaml, 22 lines). Top-level keys: schema_version, artifact_type, task_id, canonical_task_uid, repository, base_sha.",
+   "tags": [
+    "g2",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-150/g2/approval-envelope.json",
+   "target": "file:.gwc/tasks/SCRUM-150/g2/approval-readback.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-150/g2/approval-readback.yaml",
+   "target": "file:.gwc/tasks/SCRUM-150/g2/approval-request.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-150/g2/approval-request.yaml",
+   "target": "file:.gwc/tasks/SCRUM-150/g2/execution-envelope.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-150/g2/execution-envelope.yaml",
+   "target": "file:.gwc/tasks/SCRUM-150/g2/plan-read-receipt.yaml",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

@@ -1,0 +1,221 @@
+{
+ "batchFiles": [
+  {
+   "path": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 194,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 199,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+   "language": "markdown",
+   "sizeLines": 407,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 146,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 68,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 267,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/HUMAN_BYPASS_CONTRACT_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 93,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/INTERRUPT_FLOW_CONTRACT_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 103,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 269,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/LOCAL_AGENT_RULE.md",
+   "language": "markdown",
+   "sizeLines": 105,
+   "fileCategory": "docs"
+  },
+  {
+   "path": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+   "language": "markdown",
+   "sizeLines": 125,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:core/Agent_Behavior_Semantic_Contract_v1.0.md",
+   "type": "document",
+   "name": "Agent Behavior Semantic Contract v1.0",
+   "filePath": "core/Agent_Behavior_Semantic_Contract_v1.0.md",
+   "summary": "Markdown document \"Agent Behavior Semantic Contract v1.0\" (guideline/contract, 194 lines): - Contract ID: `agent-behavior-semantic-contract` - Version: `1.0` - Lifecycle: `active` - Scope: agents consuming a GWC project package",
+   "tags": [
+    "agents",
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/Agent_Operating_Runtime_Contract_v1.0.md",
+   "type": "document",
+   "name": "Agent Operating Runtime Contract v1.0",
+   "filePath": "core/Agent_Operating_Runtime_Contract_v1.0.md",
+   "summary": "Markdown document \"Agent Operating Runtime Contract v1.0\" (guideline/contract, 199 lines): This contract converts project-level operating guides into centralized GWC behavior for ChatGPT-style agents, DWC, local coding agents, and project consumer agents.",
+   "tags": [
+    "agents",
+    "contract",
+    "core",
+    "documentation",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+   "type": "document",
+   "name": "E2E Draft PR Delivery Rule",
+   "filePath": "core/E2E_DRAFT_PR_DELIVERY_RULE.md",
+   "summary": "Markdown document \"E2E Draft PR Delivery Rule\" (document, 407 lines): Allow the agent to complete an approved coding task end-to-end and deliver a validated Draft Pull Request for final user review.",
+   "tags": [
+    "core",
+    "documentation"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:core/G5_CI_VERIFICATION_CONTRACT_v1.0.md",
+   "type": "document",
+   "name": "G5 CI Verification Contract v1.0",
+   "filePath": "core/G5_CI_VERIFICATION_CONTRACT_v1.0.md",
+   "summary": "Markdown document \"G5 CI Verification Contract v1.0\" (guideline/contract, 146 lines): This contract defines the read-only G5 status-verification runtime for GitHub Actions after a G4 merge. It turns the existing exact-SHA rule into an executable resolver, evidence bundle, and checkpoint protocol.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation",
+    "g5"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
+   "type": "document",
+   "name": "G5 Standing Automation Policy v1.0",
+   "filePath": "core/G5_STANDING_AUTOMATION_POLICY_v1.0.md",
+   "summary": "Markdown document \"G5 Standing Automation Policy v1.0\" (guideline/contract, 68 lines): - Document ID: `g5-standing-automation-policy` - Version: `1.0` - Lifecycle: `active` - Scope: `nhatnguyenquang1838-coder/gwc` - Related work: `SCRUM-143`, `SCRUM-151`",
+   "tags": [
+    "core",
+    "documentation",
+    "g5"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+   "type": "document",
+   "name": "GWC Gate Lifecycle Contract v1.1",
+   "filePath": "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+   "summary": "Markdown document \"GWC Gate Lifecycle Contract v1.1\" (guideline/contract, 267 lines): This contract defines the required entry evidence, permitted actions, exit evidence, and authority boundary for G0 through G6. It extends the existing G0/G1 artifact lifecycle without replacing it.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation",
+    "gates"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/HUMAN_BYPASS_CONTRACT_v1.0.md",
+   "type": "document",
+   "name": "HUMAN BYPASS Contract v1.0",
+   "filePath": "core/HUMAN_BYPASS_CONTRACT_v1.0.md",
+   "summary": "Markdown document \"HUMAN BYPASS Contract v1.0\" (guideline/contract, 93 lines): `HUMAN BYPASS` is a one-time operational handoff for one exact workflow step that the agent cannot execute through the verified tool route. It is not a policy override, gate skip, blanket approval, or substitute for evidence.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:core/INTERRUPT_FLOW_CONTRACT_v1.0.md",
+   "type": "document",
+   "name": "Interrupt Flow Contract v1.0",
+   "filePath": "core/INTERRUPT_FLOW_CONTRACT_v1.0.md",
+   "summary": "Markdown document \"Interrupt Flow Contract v1.0\" (guideline/contract, 103 lines): This contract defines the shared interrupt mechanism used by GWC runtime nodes when a workflow cannot safely continue on the current linear path without first refreshing evidence, authority, or repository state.",
+   "tags": [
+    "contract",
+    "core",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+   "type": "document",
+   "name": "Kiro Spec-Driven Delivery Rule v1.0",
+   "filePath": "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+   "summary": "Markdown document \"Kiro Spec-Driven Delivery Rule v1.0\" (specification, 269 lines): --- policy_id: KIRO_SPEC_DRIVEN_DELIVERY_RULE version: \"1.0\" status: active authoritative: false policy_scope: reusable_spec_planning_and_delivery applies_to: - feature_planning - non_trivial_implementation - ui_redesign - architecture_change - migration ---",
+   "tags": [
+    "core",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/LOCAL_AGENT_RULE.md",
+   "type": "document",
+   "name": "Local Agent Rule",
+   "filePath": "core/LOCAL_AGENT_RULE.md",
+   "summary": "Markdown document \"Local Agent Rule\" (document, 105 lines): This rule applies to an agent running on a user's local machine with access to a local filesystem, shell, repository checkout, Git, and worktrees.",
+   "tags": [
+    "agents",
+    "core",
+    "documentation"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+   "type": "document",
+   "name": "Runtime Catalog Knowledge Graph Contract v1.0",
+   "filePath": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
+   "summary": "Markdown document \"Runtime Catalog Knowledge Graph Contract v1.0\" (guideline/contract, 125 lines): This contract standardizes the language and graph shape for the GWC runtime catalog so agents can distinguish gates, capability families, runtime nodes, edge scenarios, and artifacts without inventing parallel terminology.",
+   "tags": [
+    "catalog",
+    "contract",
+    "core",
+    "documentation",
+    "runtime"
+   ],
+   "complexity": "moderate"
+  }
+ ],
+ "edges": []
+}

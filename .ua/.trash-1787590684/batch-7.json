@@ -1,0 +1,110 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md",
+   "language": "markdown",
+   "sizeLines": 99,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml",
+   "language": "yaml",
+   "sizeLines": 88,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv",
+   "language": "csv",
+   "sizeLines": 28,
+   "fileCategory": "data"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.json",
+   "language": "json",
+   "sizeLines": 0,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md",
+   "type": "document",
+   "name": "SCRUM-106 — P2 Scenario and Crash/Recovery Matrix (R2)",
+   "filePath": ".gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md",
+   "summary": "Markdown document \"SCRUM-106 — P2 Scenario and Crash/Recovery Matrix (R2)\" (document, 99 lines): - Run: `g1-scrum-106-r2-20260726-2310` - Current protected base: `c855336dc17f20115e640516107999b08e9d783e` - Matrix SHA-256: `e5af87d89e2e6bafeb43d2658d54f7b7cebc02e9d6c01f4ab9c4faec24c5d705` - Contract binding: `BOUND_TO_SCRUM-105_DURABLE_RUNTIME_CONTRACT_V0.1` - Coverage: **27 scenarios**, **6 crash boundaries**",
+   "tags": [
+    "documentation",
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml",
+   "type": "config",
+   "name": "g1-decision-record",
+   "filePath": ".gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml",
+   "summary": "GWC task governance YAML (g1-decision-record.yaml, 88 lines). Top-level keys: schema_version, artifact_type, generated_at, trace, options_ref, preflight_ref.",
+   "tags": [
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv",
+   "type": "resource",
+   "name": "p2-scenario-matrix",
+   "filePath": ".gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv",
+   "summary": "CSV data table (p2-scenario-matrix.csv, 28 rows/lines).",
+   "tags": [
+    "data",
+    "g1",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.json",
+   "type": "config",
+   "name": "SCRUM-106",
+   "filePath": ".gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.json",
+   "summary": "JSON data file \"SCRUM-106\" (p2-scenario-matrix.json, 1 lines) Top-level keys: schema_version, artifact_type, task_id, encoding, decoded_media_type, decoded_size_bytes.",
+   "tags": [
+    "g1",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.gwc/tasks/SCRUM-106/g1/decision/P2_SCENARIO_MATRIX.md",
+   "target": "file:.gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-106/g1/decision/g1-decision-record.yaml",
+   "target": "file:.gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.csv",
+   "target": "file:.gwc/tasks/SCRUM-106/g1/decision/p2-scenario-matrix.json",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}

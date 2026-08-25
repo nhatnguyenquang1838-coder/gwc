@@ -1,0 +1,1525 @@
+{
+ "batchFiles": [
+  {
+   "path": "tests/test_cas_mismatch_recovery.py",
+   "language": "python",
+   "sizeLines": 48,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "language": "python",
+   "sizeLines": 124,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_checkpoint_persist_replay.py",
+   "language": "python",
+   "sizeLines": 69,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_ci_run_capture_replay.py",
+   "language": "python",
+   "sizeLines": 45,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_crash_checkpoint_recovery.py",
+   "language": "python",
+   "sizeLines": 78,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_crash_replay_harness.py",
+   "language": "python",
+   "sizeLines": 76,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_durable_checkpoint_runtime.py",
+   "language": "python",
+   "sizeLines": 195,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_durable_runtime_contracts.py",
+   "language": "python",
+   "sizeLines": 168,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_dw_super_app_integration.py",
+   "language": "python",
+   "sizeLines": 55,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_dw_super_e2e_pilot.py",
+   "language": "python",
+   "sizeLines": 16,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_exact_state_capture.py",
+   "language": "python",
+   "sizeLines": 67,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_failure_recovery_m5_batch.py",
+   "language": "python",
+   "sizeLines": 152,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_fastlane_jira_projection_after_g5.py",
+   "language": "python",
+   "sizeLines": 88,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_fastlane_process_optimization.py",
+   "language": "python",
+   "sizeLines": 62,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_g01_decision_capture.py",
+   "language": "python",
+   "sizeLines": 185,
+   "fileCategory": "code"
+  },
+  {
+   "path": "tests/test_g01_human_review_contracts.py",
+   "language": "python",
+   "sizeLines": 132,
+   "fileCategory": "code"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:tests/test_cas_mismatch_recovery.py",
+   "type": "module",
+   "name": "test_cas_mismatch_recovery",
+   "filePath": "tests/test_cas_mismatch_recovery.py",
+   "summary": "Python test module (test_cas_mismatch_recovery.py, 48 lines) covering cas mismatch recovery. Defines: decide, CasMismatchRecoveryTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "type": "module",
+   "name": "test_chatgpt_agent_runbook_continuation",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Python test module (test_chatgpt_agent_runbook_continuation.py, 124 lines) covering chatgpt agent runbook continuation. Defines: ChatGPTArtifactContinuationTests.",
+   "tags": [
+    "agents",
+    "runbook",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_chatgpt_agent_runbook_continuation.py:ChatGPTArtifactContinuationTests",
+   "type": "class",
+   "name": "ChatGPTArtifactContinuationTests",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Class ChatGPTArtifactContinuationTests defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_connectors_use_fallback_instead_of_mandatory_onboarding",
+   "type": "function",
+   "name": "test_connectors_use_fallback_instead_of_mandatory_onboarding",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_connectors_use_fallback_instead_of_mandatory_onboarding defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_package_distributes_runbook_and_kiro_rule",
+   "type": "function",
+   "name": "test_package_distributes_runbook_and_kiro_rule",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_package_distributes_runbook_and_kiro_rule defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_all_gate_transitions_generate_next_artifact",
+   "type": "function",
+   "name": "test_all_gate_transitions_generate_next_artifact",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_all_gate_transitions_generate_next_artifact defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_real_authority_boundaries_remain_hard_stops",
+   "type": "function",
+   "name": "test_real_authority_boundaries_remain_hard_stops",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_real_authority_boundaries_remain_hard_stops defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_kiro_rule_requires_chatgpt_task_runtime_parity",
+   "type": "function",
+   "name": "test_kiro_rule_requires_chatgpt_task_runtime_parity",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_kiro_rule_requires_chatgpt_task_runtime_parity defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_root_routes_by_capability_without_identity_else_branch",
+   "type": "function",
+   "name": "test_root_routes_by_capability_without_identity_else_branch",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_root_routes_by_capability_without_identity_else_branch defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_connector_agent_recovers_artifacts_before_blocking",
+   "type": "function",
+   "name": "test_connector_agent_recovers_artifacts_before_blocking",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_connector_agent_recovers_artifacts_before_blocking defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_chatgpt_overlay_is_additive_to_root_governance",
+   "type": "function",
+   "name": "test_chatgpt_overlay_is_additive_to_root_governance",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_chatgpt_overlay_is_additive_to_root_governance defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_runbook_is_mandatory_boot_source",
+   "type": "function",
+   "name": "test_runbook_is_mandatory_boot_source",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function test_runbook_is_mandatory_boot_source defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_chatgpt_agent_runbook_continuation.py:setUpClass",
+   "type": "function",
+   "name": "setUpClass",
+   "filePath": "tests/test_chatgpt_agent_runbook_continuation.py",
+   "summary": "Function setUpClass defined in tests/test_chatgpt_agent_runbook_continuation.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_checkpoint_persist_replay.py",
+   "type": "module",
+   "name": "test_checkpoint_persist_replay",
+   "filePath": "tests/test_checkpoint_persist_replay.py",
+   "summary": "Python test module (test_checkpoint_persist_replay.py, 69 lines) covering checkpoint persist replay. Defines: item, CheckpointPersistReplayTests.",
+   "tags": [
+    "checkpoint",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_ci_run_capture_replay.py",
+   "type": "module",
+   "name": "test_ci_run_capture_replay",
+   "filePath": "tests/test_ci_run_capture_replay.py",
+   "summary": "Python test module (test_ci_run_capture_replay.py, 45 lines) covering ci run capture replay. Defines: observe, CiRunCaptureReplayTests.",
+   "tags": [
+    "capture",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_crash_checkpoint_recovery.py",
+   "type": "module",
+   "name": "test_crash_checkpoint_recovery",
+   "filePath": "tests/test_crash_checkpoint_recovery.py",
+   "summary": "Python test module (test_crash_checkpoint_recovery.py, 78 lines) covering crash checkpoint recovery. Defines: decide, CrashCheckpointRecoveryTests.",
+   "tags": [
+    "checkpoint",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_crash_replay_harness.py",
+   "type": "module",
+   "name": "test_crash_replay_harness",
+   "filePath": "tests/test_crash_replay_harness.py",
+   "summary": "Python test module (test_crash_replay_harness.py, 76 lines) covering crash replay harness. Defines: CrashReplayHarnessTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_durable_checkpoint_runtime.py",
+   "type": "module",
+   "name": "test_durable_checkpoint_runtime",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Python test module (test_durable_checkpoint_runtime.py, 195 lines) covering durable checkpoint runtime. Defines: binding, DurableCheckpointRuntimeTests.",
+   "tags": [
+    "checkpoint",
+    "runtime",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_durable_checkpoint_runtime.py:DurableCheckpointRuntimeTests",
+   "type": "class",
+   "name": "DurableCheckpointRuntimeTests",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Class DurableCheckpointRuntimeTests defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:binding",
+   "type": "function",
+   "name": "binding",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function binding defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:test_safe_takeover_after_expiry_blocks_old_owner",
+   "type": "function",
+   "name": "test_safe_takeover_after_expiry_blocks_old_owner",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function test_safe_takeover_after_expiry_blocks_old_owner defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:setUp",
+   "type": "function",
+   "name": "setUp",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function setUp defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:test_resume_rejects_stale_binding",
+   "type": "function",
+   "name": "test_resume_rejects_stale_binding",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function test_resume_rejects_stale_binding defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:test_suspend_state_is_checkpointed_before_wait",
+   "type": "function",
+   "name": "test_suspend_state_is_checkpointed_before_wait",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function test_suspend_state_is_checkpointed_before_wait defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:test_cas_advances_checkpoint_once_under_active_lease",
+   "type": "function",
+   "name": "test_cas_advances_checkpoint_once_under_active_lease",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function test_cas_advances_checkpoint_once_under_active_lease defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:test_active_lease_and_fencing_token_are_required",
+   "type": "function",
+   "name": "test_active_lease_and_fencing_token_are_required",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function test_active_lease_and_fencing_token_are_required defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_checkpoint_runtime.py:test_stale_expected_revision_is_rejected_without_overwrite",
+   "type": "function",
+   "name": "test_stale_expected_revision_is_rejected_without_overwrite",
+   "filePath": "tests/test_durable_checkpoint_runtime.py",
+   "summary": "Function test_stale_expected_revision_is_rejected_without_overwrite defined in tests/test_durable_checkpoint_runtime.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_durable_runtime_contracts.py",
+   "type": "module",
+   "name": "test_durable_runtime_contracts",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Python test module (test_durable_runtime_contracts.py, 168 lines) covering durable runtime contracts. Defines: load, validate, DurableRuntimeContractTests.",
+   "tags": [
+    "contract",
+    "runtime",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_durable_runtime_contracts.py:DurableRuntimeContractTests",
+   "type": "class",
+   "name": "DurableRuntimeContractTests",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Class DurableRuntimeContractTests defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_runtime_contracts.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Function validate defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_runtime_contracts.py:load",
+   "type": "function",
+   "name": "load",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Function load defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_runtime_contracts.py:test_pending_action_requires_readback_for_terminal_success",
+   "type": "function",
+   "name": "test_pending_action_requires_readback_for_terminal_success",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Function test_pending_action_requires_readback_for_terminal_success defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_runtime_contracts.py:test_storage_migration_is_not_production_authority",
+   "type": "function",
+   "name": "test_storage_migration_is_not_production_authority",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Function test_storage_migration_is_not_production_authority defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_runtime_contracts.py:test_side_effect_adapter_requires_readback_capability",
+   "type": "function",
+   "name": "test_side_effect_adapter_requires_readback_capability",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Function test_side_effect_adapter_requires_readback_capability defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_durable_runtime_contracts.py:test_run_event_and_checkpoint_positive_fixtures",
+   "type": "function",
+   "name": "test_run_event_and_checkpoint_positive_fixtures",
+   "filePath": "tests/test_durable_runtime_contracts.py",
+   "summary": "Function test_run_event_and_checkpoint_positive_fixtures defined in tests/test_durable_runtime_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_dw_super_app_integration.py",
+   "type": "module",
+   "name": "test_dw_super_app_integration",
+   "filePath": "tests/test_dw_super_app_integration.py",
+   "summary": "Python test module (test_dw_super_app_integration.py, 55 lines) covering dw super app integration. Defines: DwSuperAppIntegrationContractTests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_dw_super_e2e_pilot.py",
+   "type": "module",
+   "name": "test_dw_super_e2e_pilot",
+   "filePath": "tests/test_dw_super_e2e_pilot.py",
+   "summary": "Python test module (test_dw_super_e2e_pilot.py, 16 lines) covering dw super e2e pilot. Defines: rec, T.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_exact_state_capture.py",
+   "type": "module",
+   "name": "test_exact_state_capture",
+   "filePath": "tests/test_exact_state_capture.py",
+   "summary": "Python test module (test_exact_state_capture.py, 67 lines) covering exact state capture. Defines: ExactStateCaptureTests.",
+   "tags": [
+    "capture",
+    "tests"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_failure_recovery_m5_batch.py",
+   "type": "module",
+   "name": "test_failure_recovery_m5_batch",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Python test module (test_failure_recovery_m5_batch.py, 152 lines) covering failure recovery m5 batch. Defines: validate_schema, approval, fencing, version, ApprovalExpiryRecoveryM5Tests.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_failure_recovery_m5_batch.py:DuplicateAgentFencingM5Tests",
+   "type": "class",
+   "name": "DuplicateAgentFencingM5Tests",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Class DuplicateAgentFencingM5Tests defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tests/test_failure_recovery_m5_batch.py:VersionDriftRollbackRoutingM5Tests",
+   "type": "class",
+   "name": "VersionDriftRollbackRoutingM5Tests",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Class VersionDriftRollbackRoutingM5Tests defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "class:tests/test_failure_recovery_m5_batch.py:ApprovalExpiryRecoveryM5Tests",
+   "type": "class",
+   "name": "ApprovalExpiryRecoveryM5Tests",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Class ApprovalExpiryRecoveryM5Tests defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:approval",
+   "type": "function",
+   "name": "approval",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function approval defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:version",
+   "type": "function",
+   "name": "version",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function version defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:fencing",
+   "type": "function",
+   "name": "fencing",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function fencing defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:validate_schema",
+   "type": "function",
+   "name": "validate_schema",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function validate_schema defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:test_non_holder_is_fenced",
+   "type": "function",
+   "name": "test_non_holder_is_fenced",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function test_non_holder_is_fenced defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:test_replay_nonce_is_rejected",
+   "type": "function",
+   "name": "test_replay_nonce_is_rejected",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function test_replay_nonce_is_rejected defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:test_checkpoint_drift_regenerates_approval",
+   "type": "function",
+   "name": "test_checkpoint_drift_regenerates_approval",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function test_checkpoint_drift_regenerates_approval defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:test_duplicate_race_is_fenced",
+   "type": "function",
+   "name": "test_duplicate_race_is_fenced",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function test_duplicate_race_is_fenced defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:test_duplicate_side_effect_is_suppressed_not_repeated",
+   "type": "function",
+   "name": "test_duplicate_side_effect_is_suppressed_not_repeated",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function test_duplicate_side_effect_is_suppressed_not_repeated defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_failure_recovery_m5_batch.py:test_checkpoint_required_before_wait",
+   "type": "function",
+   "name": "test_checkpoint_required_before_wait",
+   "filePath": "tests/test_failure_recovery_m5_batch.py",
+   "summary": "Function test_checkpoint_required_before_wait defined in tests/test_failure_recovery_m5_batch.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "type": "module",
+   "name": "test_fastlane_jira_projection_after_g5",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Python test module (test_fastlane_jira_projection_after_g5.py, 88 lines) covering fastlane jira projection after g5. Defines: FastLaneJiraProjectionAfterG5Tests.",
+   "tags": [
+    "g5",
+    "tests"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "class:tests/test_fastlane_jira_projection_after_g5.py:FastLaneJiraProjectionAfterG5Tests",
+   "type": "class",
+   "name": "FastLaneJiraProjectionAfterG5Tests",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Class FastLaneJiraProjectionAfterG5Tests defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_fastlane_jira_projection_after_g5.py:test_e2e_rule_accepts_human_observed_ci_for_projection",
+   "type": "function",
+   "name": "test_e2e_rule_accepts_human_observed_ci_for_projection",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Function test_e2e_rule_accepts_human_observed_ci_for_projection defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_fastlane_jira_projection_after_g5.py:test_e2e_rule_requires_work_tracking_projection_after_g5_pass",
+   "type": "function",
+   "name": "test_e2e_rule_requires_work_tracking_projection_after_g5_pass",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Function test_e2e_rule_requires_work_tracking_projection_after_g5_pass defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_fastlane_jira_projection_after_g5.py:test_consumer_instructions_project_the_rule_to_project_agents",
+   "type": "function",
+   "name": "test_consumer_instructions_project_the_rule_to_project_agents",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Function test_consumer_instructions_project_the_rule_to_project_agents defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_fastlane_jira_projection_after_g5.py:setUpClass",
+   "type": "function",
+   "name": "setUpClass",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Function setUpClass defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_fastlane_jira_projection_after_g5.py:test_e2e_rule_fails_honestly_when_jira_projection_is_blocked",
+   "type": "function",
+   "name": "test_e2e_rule_fails_honestly_when_jira_projection_is_blocked",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Function test_e2e_rule_fails_honestly_when_jira_projection_is_blocked defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_fastlane_jira_projection_after_g5.py:test_external_work_tracking_never_grants_gwc_authority",
+   "type": "function",
+   "name": "test_external_work_tracking_never_grants_gwc_authority",
+   "filePath": "tests/test_fastlane_jira_projection_after_g5.py",
+   "summary": "Function test_external_work_tracking_never_grants_gwc_authority defined in tests/test_fastlane_jira_projection_after_g5.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_fastlane_process_optimization.py",
+   "type": "module",
+   "name": "test_fastlane_process_optimization",
+   "filePath": "tests/test_fastlane_process_optimization.py",
+   "summary": "Python test module (test_fastlane_process_optimization.py, 62 lines) covering fastlane process optimization. Defines: read, test_e2e_allows_autonomous_steps_after_g2_but_blocks_merge, test_fastlane_limits_g2_to_branch_files_pr_and_blocks_higher_gates, test_chatgpt_overlay_requires_auto_ready_when_supported_then_g4_token, test_dwc_contract_keeps_ready_for_review_as_g3_metadata_only.",
+   "tags": [
+    "tests",
+    "gwc"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_g01_decision_capture.py",
+   "type": "module",
+   "name": "test_g01_decision_capture",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Python test module (test_g01_decision_capture.py, 185 lines) covering g01 decision capture. Defines: DecisionCaptureTests.",
+   "tags": [
+    "capture",
+    "g0",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_g01_decision_capture.py:DecisionCaptureTests",
+   "type": "class",
+   "name": "DecisionCaptureTests",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Class DecisionCaptureTests defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_incomplete_plan_reference_blocks",
+   "type": "function",
+   "name": "test_incomplete_plan_reference_blocks",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_incomplete_plan_reference_blocks defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_accepted_explicit_decision_passes",
+   "type": "function",
+   "name": "test_accepted_explicit_decision_passes",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_accepted_explicit_decision_passes defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_plan_aware_preflight_without_plan_blocks",
+   "type": "function",
+   "name": "test_plan_aware_preflight_without_plan_blocks",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_plan_aware_preflight_without_plan_blocks defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_plan_aware_decision_copies_immutable_reference",
+   "type": "function",
+   "name": "test_plan_aware_decision_copies_immutable_reference",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_plan_aware_decision_copies_immutable_reference defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_cli_writes_decision_and_full_workspace_passes",
+   "type": "function",
+   "name": "test_cli_writes_decision_and_full_workspace_passes",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_cli_writes_decision_and_full_workspace_passes defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:implementation_plan",
+   "type": "function",
+   "name": "implementation_plan",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function implementation_plan defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_rejected_decision_is_not_pass",
+   "type": "function",
+   "name": "test_rejected_decision_is_not_pass",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_rejected_decision_is_not_pass defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_duplicate_option_ids_block",
+   "type": "function",
+   "name": "test_duplicate_option_ids_block",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_duplicate_option_ids_block defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:setUpClass",
+   "type": "function",
+   "name": "setUpClass",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function setUpClass defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_decision_capture.py:test_missing_selected_option_blocks",
+   "type": "function",
+   "name": "test_missing_selected_option_blocks",
+   "filePath": "tests/test_g01_decision_capture.py",
+   "summary": "Function test_missing_selected_option_blocks defined in tests/test_g01_decision_capture.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:tests/test_g01_human_review_contracts.py",
+   "type": "module",
+   "name": "test_g01_human_review_contracts",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Python test module (test_g01_human_review_contracts.py, 132 lines) covering g01 human review contracts. Defines: load_schema, validate, sample_impact, sample_human_review, G01HumanReviewContractTests.",
+   "tags": [
+    "contract",
+    "g0",
+    "tests"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "class:tests/test_g01_human_review_contracts.py:G01HumanReviewContractTests",
+   "type": "class",
+   "name": "G01HumanReviewContractTests",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Class G01HumanReviewContractTests defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "class"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:sample_impact",
+   "type": "function",
+   "name": "sample_impact",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function sample_impact defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:sample_human_review",
+   "type": "function",
+   "name": "sample_human_review",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function sample_human_review defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:validate",
+   "type": "function",
+   "name": "validate",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function validate defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:load_schema",
+   "type": "function",
+   "name": "load_schema",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function load_schema defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:test_g01_human_review_rejects_missing_authority_warning",
+   "type": "function",
+   "name": "test_g01_human_review_rejects_missing_authority_warning",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function test_g01_human_review_rejects_missing_authority_warning defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:test_g1_option_impact_rejects_synthetic_ua_nodes",
+   "type": "function",
+   "name": "test_g1_option_impact_rejects_synthetic_ua_nodes",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function test_g1_option_impact_rejects_synthetic_ua_nodes defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:test_g1_option_impact_requires_task_me_when_available",
+   "type": "function",
+   "name": "test_g1_option_impact_requires_task_me_when_available",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function test_g1_option_impact_requires_task_me_when_available defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:test_g1_option_impact_accepts_task_me_and_stale_ua",
+   "type": "function",
+   "name": "test_g1_option_impact_accepts_task_me_and_stale_ua",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function test_g1_option_impact_accepts_task_me_and_stale_ua defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "function:tests/test_g01_human_review_contracts.py:test_g01_human_review_accepts_authority_separated_projection",
+   "type": "function",
+   "name": "test_g01_human_review_accepts_authority_separated_projection",
+   "filePath": "tests/test_g01_human_review_contracts.py",
+   "summary": "Function test_g01_human_review_accepts_authority_separated_projection defined in tests/test_g01_human_review_contracts.py.",
+   "tags": [
+    "python",
+    "function"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "class:tests/test_chatgpt_agent_runbook_continuation.py:ChatGPTArtifactContinuationTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_connectors_use_fallback_instead_of_mandatory_onboarding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_package_distributes_runbook_and_kiro_rule",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_all_gate_transitions_generate_next_artifact",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_real_authority_boundaries_remain_hard_stops",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_kiro_rule_requires_chatgpt_task_runtime_parity",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_root_routes_by_capability_without_identity_else_branch",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_connector_agent_recovers_artifacts_before_blocking",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_chatgpt_overlay_is_additive_to_root_governance",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:test_runbook_is_mandatory_boot_source",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_chatgpt_agent_runbook_continuation.py",
+   "target": "function:tests/test_chatgpt_agent_runbook_continuation.py:setUpClass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "class:tests/test_durable_checkpoint_runtime.py:DurableCheckpointRuntimeTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:binding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:test_safe_takeover_after_expiry_blocks_old_owner",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:setUp",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:test_resume_rejects_stale_binding",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:test_suspend_state_is_checkpointed_before_wait",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:test_cas_advances_checkpoint_once_under_active_lease",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:test_active_lease_and_fencing_token_are_required",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_checkpoint_runtime.py",
+   "target": "function:tests/test_durable_checkpoint_runtime.py:test_stale_expected_revision_is_rejected_without_overwrite",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "class:tests/test_durable_runtime_contracts.py:DurableRuntimeContractTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "function:tests/test_durable_runtime_contracts.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "function:tests/test_durable_runtime_contracts.py:load",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "function:tests/test_durable_runtime_contracts.py:test_pending_action_requires_readback_for_terminal_success",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "function:tests/test_durable_runtime_contracts.py:test_storage_migration_is_not_production_authority",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "function:tests/test_durable_runtime_contracts.py:test_side_effect_adapter_requires_readback_capability",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_durable_runtime_contracts.py",
+   "target": "function:tests/test_durable_runtime_contracts.py:test_run_event_and_checkpoint_positive_fixtures",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "class:tests/test_failure_recovery_m5_batch.py:DuplicateAgentFencingM5Tests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "class:tests/test_failure_recovery_m5_batch.py:VersionDriftRollbackRoutingM5Tests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "class:tests/test_failure_recovery_m5_batch.py:ApprovalExpiryRecoveryM5Tests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:approval",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:version",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:fencing",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:validate_schema",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:test_non_holder_is_fenced",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:test_replay_nonce_is_rejected",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:test_checkpoint_drift_regenerates_approval",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:test_duplicate_race_is_fenced",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:test_duplicate_side_effect_is_suppressed_not_repeated",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_failure_recovery_m5_batch.py",
+   "target": "function:tests/test_failure_recovery_m5_batch.py:test_checkpoint_required_before_wait",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "class:tests/test_fastlane_jira_projection_after_g5.py:FastLaneJiraProjectionAfterG5Tests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "function:tests/test_fastlane_jira_projection_after_g5.py:test_e2e_rule_accepts_human_observed_ci_for_projection",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "function:tests/test_fastlane_jira_projection_after_g5.py:test_e2e_rule_requires_work_tracking_projection_after_g5_pass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "function:tests/test_fastlane_jira_projection_after_g5.py:test_consumer_instructions_project_the_rule_to_project_agents",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "function:tests/test_fastlane_jira_projection_after_g5.py:setUpClass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "function:tests/test_fastlane_jira_projection_after_g5.py:test_e2e_rule_fails_honestly_when_jira_projection_is_blocked",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_fastlane_jira_projection_after_g5.py",
+   "target": "function:tests/test_fastlane_jira_projection_after_g5.py:test_external_work_tracking_never_grants_gwc_authority",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "class:tests/test_g01_decision_capture.py:DecisionCaptureTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_incomplete_plan_reference_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_accepted_explicit_decision_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_plan_aware_preflight_without_plan_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_plan_aware_decision_copies_immutable_reference",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_cli_writes_decision_and_full_workspace_passes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:implementation_plan",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_rejected_decision_is_not_pass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_duplicate_option_ids_block",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:setUpClass",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_decision_capture.py",
+   "target": "function:tests/test_g01_decision_capture.py:test_missing_selected_option_blocks",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "class:tests/test_g01_human_review_contracts.py:G01HumanReviewContractTests",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:sample_impact",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:sample_human_review",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:validate",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:load_schema",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:test_g01_human_review_rejects_missing_authority_warning",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:test_g1_option_impact_rejects_synthetic_ua_nodes",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:test_g1_option_impact_requires_task_me_when_available",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:test_g1_option_impact_accepts_task_me_and_stale_ua",
+   "type": "contains",
+   "weight": 0.9
+  },
+  {
+   "source": "file:tests/test_g01_human_review_contracts.py",
+   "target": "function:tests/test_g01_human_review_contracts.py:test_g01_human_review_accepts_authority_separated_projection",
+   "type": "contains",
+   "weight": 0.9
+  }
+ ]
+}

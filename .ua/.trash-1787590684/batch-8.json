@@ -1,0 +1,217 @@
+{
+ "batchFiles": [
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/README.md",
+   "language": "markdown",
+   "sizeLines": 3,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/current-head-authority.md",
+   "language": "markdown",
+   "sizeLines": 1,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/current-head.txt",
+   "language": "txt",
+   "sizeLines": 1,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/delivery-record.yaml",
+   "language": "yaml",
+   "sizeLines": 20,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/head-binding-note.md",
+   "language": "markdown",
+   "sizeLines": 5,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/no-more-pre-pr-state.md",
+   "language": "markdown",
+   "sizeLines": 1,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/pr-body.md",
+   "language": "markdown",
+   "sizeLines": 40,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/pr-create-ready.json",
+   "language": "json",
+   "sizeLines": 6,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/pre-pr-head.json",
+   "language": "json",
+   "sizeLines": 6,
+   "fileCategory": "config"
+  },
+  {
+   "path": ".gwc/tasks/SCRUM-110/g3/validation-scope.json",
+   "language": "json",
+   "sizeLines": 12,
+   "fileCategory": "config"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/README.md",
+   "type": "document",
+   "name": "SCRUM-110 G3 Evidence",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/README.md",
+   "summary": "Markdown document \"SCRUM-110 G3 Evidence\" (document, 3 lines): GitHub PR metadata is authoritative for the exact current head SHA. Repository records in this folder preserve scope, validation mode and non-authorized boundaries; they do not grant merge authority.",
+   "tags": [
+    "documentation",
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/current-head-authority.md",
+   "type": "document",
+   "name": "current head authority",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/current-head-authority.md",
+   "summary": "Markdown document \"current head authority\" (document, 1 lines): The value in `current-head.txt` is informational only because writing it advances the branch. The authoritative exact PR head is read from GitHub after Draft PR creation.",
+   "tags": [
+    "documentation",
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/current-head.txt",
+   "type": "resource",
+   "name": "current-head",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/current-head.txt",
+   "summary": "Plain-text file (current-head.txt, 1 lines).",
+   "tags": [
+    "documentation",
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/delivery-record.yaml",
+   "type": "config",
+   "name": "delivery-record",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/delivery-record.yaml",
+   "summary": "GWC task governance YAML (delivery-record.yaml, 20 lines). Top-level keys: task_id, gate, workflow, approval_id, scope_hash, repository.",
+   "tags": [
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks",
+    "yaml"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/head-binding-note.md",
+   "type": "document",
+   "name": "SCRUM-110 G3 Head Binding",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/head-binding-note.md",
+   "summary": "Markdown document \"SCRUM-110 G3 Head Binding\" (document, 5 lines): The exact Draft PR head SHA is captured through GitHub authoritative PR readback after PR creation. This note avoids a self-referential commit hash inside the commit that creates it.",
+   "tags": [
+    "documentation",
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/no-more-pre-pr-state.md",
+   "type": "document",
+   "name": "no more pre pr state",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/no-more-pre-pr-state.md",
+   "summary": "Markdown document \"no more pre pr state\" (document, 1 lines): No additional repository state should be written before Draft PR creation. Exact head binding is performed by GitHub PR readback.",
+   "tags": [
+    "documentation",
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/pr-body.md",
+   "type": "document",
+   "name": "pr body",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/pr-body.md",
+   "summary": "Markdown document \"pr body\" (document, 40 lines): Implement SCRUM-110: crash/replay harness, deterministic recovery coverage, duplicate-worker protection, human takeover packets, and Cytoscape v3 durable run-history projection.",
+   "tags": [
+    "documentation",
+    "g3",
+    "gwc",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/pr-create-ready.json",
+   "type": "config",
+   "name": "SCRUM-110",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/pr-create-ready.json",
+   "summary": "JSON data file \"SCRUM-110\" (pr-create-ready.json, 6 lines) Top-level keys: task_id, status, authoritative_head_source, merge_authorized.",
+   "tags": [
+    "g3",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/pre-pr-head.json",
+   "type": "config",
+   "name": "SCRUM-110",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/pre-pr-head.json",
+   "summary": "JSON data file \"SCRUM-110\" (pre-pr-head.json, 6 lines) Top-level keys: task_id, pre_pr_head_sha, binding_method, note.",
+   "tags": [
+    "g3",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.gwc/tasks/SCRUM-110/g3/validation-scope.json",
+   "type": "config",
+   "name": "SCRUM-110",
+   "filePath": ".gwc/tasks/SCRUM-110/g3/validation-scope.json",
+   "summary": "JSON data file \"SCRUM-110\" (validation-scope.json, 12 lines) Top-level keys: task_id, delivery_record, branch, base_sha, pre_pr_head_sha, changed_file_count_before_record.",
+   "tags": [
+    "g3",
+    "gwc",
+    "json",
+    "scrum",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": []
+}

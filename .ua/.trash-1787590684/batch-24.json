@@ -1,0 +1,75 @@
+{
+ "batchFiles": [
+  {
+   "path": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md",
+   "language": "markdown",
+   "sizeLines": 41,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+   "language": "markdown",
+   "sizeLines": 13,
+   "fileCategory": "docs"
+  },
+  {
+   "path": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/tasks.md",
+   "language": "markdown",
+   "sizeLines": 12,
+   "fileCategory": "docs"
+  }
+ ],
+ "nodes": [
+  {
+   "id": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md",
+   "type": "document",
+   "name": "SCRUM-122 through SCRUM-126 Design - P5 Evaluation and Controlled Self-Improvement",
+   "filePath": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md",
+   "summary": "Markdown document \"SCRUM-122 through SCRUM-126 Design - P5 Evaluation and Controlled Self-Improvement\" (specification, 41 lines): The implementation reuses the existing durable history and Cytoscape projection surfaces rather than introducing a second routing engine. The base registry stays as-is; the new P5 layer is an additive overlay that explains how an evaluation run compares stable and candidate decisions, metrics and promotion state.",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+   "type": "document",
+   "name": "SCRUM-122 through SCRUM-126 Requirements - Evaluation and Controlled Self-Improvement",
+   "filePath": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+   "summary": "Markdown document \"SCRUM-122 through SCRUM-126 Requirements - Evaluation and Controlled Self-Improvement\" (specification, 13 lines): The P5 chain MUST define and implement a governed evaluation layer for planning, runtime, outcome and catalog-quality signals without introducing production authority.",
+   "tags": [
+    "documentation",
+    "kiro"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/tasks.md",
+   "type": "document",
+   "name": "SCRUM-122 through SCRUM-126 Tasks",
+   "filePath": ".kiro/specs/GWC-P5-evaluation-controlled-self-improvement/tasks.md",
+   "summary": "Markdown document \"SCRUM-122 through SCRUM-126 Tasks\" (specification, 12 lines): - [x] Read the live Jira dependency chain and existing viewer/validation seams. - [x] Decompose the work into a single P5 evaluation contract with one Kiro fallback package. - [ ] SCRUM-122: add planning, runtime, outcome and catalog-quality metrics and normalize their names. - [ ] SCRUM-123:",
+   "tags": [
+    "documentation",
+    "kiro",
+    "tasks"
+   ],
+   "complexity": "simple"
+  }
+ ],
+ "edges": [
+  {
+   "source": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/design.md",
+   "target": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+   "type": "related",
+   "weight": 0.5
+  },
+  {
+   "source": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/requirements.md",
+   "target": "file:.kiro/specs/GWC-P5-evaluation-controlled-self-improvement/tasks.md",
+   "type": "related",
+   "weight": 0.5
+  }
+ ]
+}
