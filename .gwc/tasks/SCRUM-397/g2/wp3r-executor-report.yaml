@@ -1,0 +1,38 @@
+approval_command: APPROVE G2 g2_scrum-397_wp3r_recovery_20260825_1434 488c0fc2e7331534 2026-08-25T17:00:00Z
+approval_request_id: g2_scrum-397_wp3r_recovery_20260825_1434
+artifact_type: g2-executor-report
+ci: CI_UNAVAILABLE_AT_CHECK
+defect_summary:
+  A: Python integer-valued binary64/JCS mismatch - RESOLVED
+  B: ASCII-digit validation - RESOLVED
+  C: lone-surrogate handling - RESOLVED
+  D: Node tokenizer resource limit merge - RESOLVED
+defects_addressed:
+- A
+- B
+- C
+- D
+evidence_integrity:
+  durable_validation_counts_must_match_actual_run: true
+  no_self_referential_terminal_sha: true
+  terminal_head_source: CONTROLLER_EXTERNAL_READBACK
+gate: G2_EXECUTION
+materialized_files_count: 9
+pre_correction_head: c05f99ce729035fa9119f98beec8c3038eb457bf
+protected_main_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+repository: nhatnguyenquang1838-coder/gwc
+run: SCRUM-397-WP3-CONFORMANCE-R2
+schema_version: '1.0'
+scope_audit: COMPLETED
+source_base_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+source_branch: fastlane/scrum-397-canonical-digest-wp2-refresh-r1
+status: COMPLETED
+task_id: SCRUM-397
+terminal_head_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+terminal_head_source: CONTROLLER_EXTERNAL_READBACK
+validation_counts:
+  bounded_unit_tests: 15
+  py_compile_node: passed
+  py_compile_python: passed
+work_package: WP3
+working_branch: fastlane/scrum-397-canonical-digest-wp3-conformance-r2

@@ -1,0 +1,55 @@
+additional_bindings: []
+artifact_type: g2-execution-envelope
+authorized_actions:
+- create_guarded_branch_or_worktree
+- modify_approved_files
+- run_sandboxed_validation
+- stage
+- create_commit
+- push_working_branch
+authorized_paths:
+  count: 9
+  paths:
+  - .gwc/tasks/SCRUM-397/g2/wp3r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-executor-report.yaml
+  - tests/conformance/canonical_digest/golden_vectors.yaml
+  - schemas/canonical-digest-golden-vector.schema.json
+  - tools/node_architect/canonical_digest/reference_canonicalizer.py
+  - tools/node_architect/canonical_digest/reference_canonicalizer.mjs
+  - tests/conformance/canonical_digest/test_python_conformance.py
+  - tests/conformance/canonical_digest/test_node_conformance.mjs
+excluded_actions:
+- open_or_update_draft_pr
+- mark_pr_ready_for_review
+- run_independent_review
+- merge_approved_pr
+- readback_branch_pr_diff_ci
+- verify_post_merge_ci
+- deploy_approved_release
+- reload_approved_runtime
+- production_data_read
+- production_data_write
+- production_config_change
+- credential_rotation
+- migration
+- terminal_commit
+- terminal_push
+- tag_protected_main
+- main_write
+g2:
+  command: APPROVE G2 g2_scrum-397_3eba5ba26a12cc6e 488c0fc2e7331534 2026-08-24T22:23:00Z
+  request_id: g2_scrum-397_3eba5ba26a12cc6e
+gate: G2_EXECUTION
+protected_main_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+repository: nhatnguyenquang1838-coder/gwc
+risk_class: R2
+run: SCRUM-397-WP3-CONFORMANCE-R2
+scenario: canonical-digest cross-runtime conformance
+schema_version: '1.0'
+scope_hash: sha256:488c0fc2e73315349737a08aa4c5fe99b618be83100d80d96d20de2e795521e3
+source_base_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+source_branch: fastlane/scrum-397-canonical-digest-wp2-refresh-r1
+task_id: SCRUM-397
+work_package: WP3
+working_branch: fastlane/scrum-397-canonical-digest-wp3-conformance-r2
