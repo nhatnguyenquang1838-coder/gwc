@@ -6,14 +6,15 @@ evidence_integrity:
   no_self_referential_terminal_sha: true
   pre_correction_head: c05f99ce729035fa9119f98beec8c3038eb457bf
   terminal_head_source: CONTROLLER_EXTERNAL_READBACK
-expires_at: '2026-08-24T22:23:00Z'
+expires_at: '2026-08-25T17:00:00Z'
+issued_at: '2026-08-25T14:34:00Z'
+issued_at_source: APPROVAL_REQUEST_ID_TIMESTAMP
 forbidden_effects: []
 g2:
   command: APPROVE G2 g2_scrum-397_wp3r_recovery_20260825_1434 488c0fc2e7331534 2026-08-25T17:00:00Z
   request_id: g2_scrum-397_wp3r_recovery_20260825_1434
   scope_hash: sha256:488c0fc2e73315349737a08aa4c5fe99b618be83100d80d96d20de2e795521e3
 gate: G2_EXECUTION
-issued_at: '2026-08-24T22:23:00Z'
 repository: nhatnguyenquang1838-coder/gwc
 run: SCRUM-397-WP3-CONFORMANCE-R2
 schema_version: '1.0'
