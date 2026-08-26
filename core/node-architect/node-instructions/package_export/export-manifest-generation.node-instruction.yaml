@@ -1,12 +1,13 @@
 schema_version: '1.0'
 artifact_type: node-instruction
-node_id: package_export.package-manifest-load
+node_id: package_export.export-manifest-generation
 gate:
 - G2_EXECUTION
-purpose: 'Load the approved project package manifest and preserve its stable entry
-  order before export. This node is a semantic instruction contract: it evaluates
-  entry conditions, records evidence, and emits a typed NEXT without ever granting
-  gate, merge, deploy, or production authority.'
+- G3_PR
+purpose: 'Generate deterministic export evidence with source identity, entry status,
+  byte counts, and SHA-256 values. This node is a semantic instruction contract: it
+  evaluates entry conditions, records evidence, and emits a typed NEXT without ever
+  granting gate, merge, deploy, or production authority.'
 entry_conditions:
 - GWC boot completed
 - agent task claim read back
@@ -14,15 +15,20 @@ entry_conditions:
 - gate authority validated independently
 - node-start evidence recorded
 inputs:
-- '{''source (inline package payload'': ''dict, YAML/JSON text, or bytes) XOR source_path
-  (read-only local path)''}'
-- '{''binding (external SourceBinding'': ''task_id, repository, package_path, source_ref,
-  source_sha, package_version)''}'
-- observed_source_sha (execution-only exact Git commit SHA; never stored in result)
-- closed input schema (schemas/project-package.schema.json)
+- task_id
+- run_id
+- gate
+- exact_revision
+- scope_hash
+- input_payload
+- source_path
+- target_path
+- manifest_ref
+- closed_schema
+- expected_hashes
 allowed_actions:
-- export_package_manifest_load
-- record_package_manifest_load_evidence
+- export_export_manifest_generation
+- record_export_manifest_generation_evidence
 - request_effect_readback
 - emit_next_route_decision
 forbidden_actions:

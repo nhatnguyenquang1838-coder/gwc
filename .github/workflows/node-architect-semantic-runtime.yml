@@ -35,6 +35,7 @@ jobs:
             tests/test_scrum_566_w7_w9_semantic_closure.py \
             tests/test_shadow_orchestrator.py \
             tests/test_shadow_81_qualification.py \
+            tests/test_scrum_566_agent_runtime_entrypoint.py \
             > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt

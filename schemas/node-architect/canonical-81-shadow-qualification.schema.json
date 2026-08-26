@@ -9,9 +9,12 @@
     "schema_version": {"const": "1.0"},
     "status": {"enum": ["PASS", "FAIL"]},
     "exact_revision": {"type": "string", "minLength": 1},
+    "replay_mode": {"const": "compatibility_replay"},
+    "replay_evidence_class": {"const": "HISTORICAL_ENVELOPE_COMPATIBILITY"},
+    "semantic_execution": {"const": false},
     "summary": {
       "type": "object",
-      "required": ["canonical_node_count", "adapter_bound_count", "route_bound_count", "replay_proven_count", "observed_live_count", "shadow_enabled_count", "semantic_source_resolved_count", "descriptor_only_count"],
+      "required": ["canonical_node_count", "adapter_bound_count", "route_bound_count", "replay_proven_count", "observed_live_count", "shadow_enabled_count", "semantic_source_resolved_count", "descriptor_only_count", "semantic_replay_proven_count"],
       "properties": {
         "canonical_node_count": {"type": "integer", "minimum": 0},
         "adapter_bound_count": {"type": "integer", "minimum": 0},
@@ -20,7 +23,8 @@
         "observed_live_count": {"type": "integer", "minimum": 0},
         "shadow_enabled_count": {"type": "integer", "minimum": 0},
         "semantic_source_resolved_count": {"type": "integer", "minimum": 0},
-        "descriptor_only_count": {"type": "integer", "minimum": 0}
+        "descriptor_only_count": {"type": "integer", "minimum": 0},
+        "semantic_replay_proven_count": {"type": "integer", "minimum": 0}
       },
       "additionalProperties": false
     },

@@ -38,11 +38,21 @@ def registry(count: int = 81) -> dict:
 
 def activation() -> dict:
     return {
-        "mode": "shadow_readonly",
-        "authority": "none",
+        "schema_version": "1.0",
+        "artifact_type": "shadow-runtime-activation",
         "enabled": True,
         "kill_switch_engaged": False,
+        "mode": "shadow_readonly",
+        "authority": "none",
+        "output_effect": "observe_only",
+        "decision_authority": False,
+        "automatic_gate_advance": False,
+        "fail_closed": True,
         "exact_revision_binding": True,
+        "canonical_population": "canonical_81",
+        "route_source": "tools/node_architect/canonical_shadow_route.py",
+        "adapter_source": "tools/node_architect/shadow_adapters.py",
+        "registry_source": "core/node-architect/node-registry.json",
     }
 
 
