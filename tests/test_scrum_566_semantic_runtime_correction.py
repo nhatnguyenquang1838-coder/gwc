@@ -5,6 +5,9 @@ from tools.node_architect.build_node_instruction_pack import build_node_instruct
 from tools.node_architect.shadow_adapters import execute_shadow_node
 
 
+SAFE_PATH = "tools/node_architect/scratch/foo.py"
+
+
 def _request() -> dict:
     return {
         "schema_version": "1.0",
@@ -16,10 +19,10 @@ def _request() -> dict:
         "scope_hash": "sha256:" + "a" * 64,
         "graph_revision": "graph-1",
         "policy_revision": "policy-1",
-        "allowed_paths": ["tools/node_architect/example.py"],
+        "allowed_paths": [SAFE_PATH],
         "prohibited_paths": [],
         "authorized_actions": ["modify_approved_files"],
-        "validation_commands": ["python -m pytest tests/test_example.py"],
+        "validation_commands": ["python -m pytest tests/scratch"],
         "idempotency_key": "scrum-566-idem-1",
     }
 
@@ -50,7 +53,7 @@ class MissingValidationProvider:
 
     def run(self, pack):
         return {
-            "changed_paths": ["tools/node_architect/example.py"],
+            "changed_paths": [SAFE_PATH],
             "recorded_actions": ["modify_approved_files"],
         }
 
