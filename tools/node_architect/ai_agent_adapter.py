@@ -94,15 +94,32 @@ class _ResultBuilder:
 
 def _semantic_pack_context(context: Mapping[str, Any]) -> dict[str, Any]:
     """Extract only meaning-bearing provider instruction context."""
-    return {
-        "g0_g1_decision_ref": str(context.get("g0_g1_decision_ref", "")),
-        "task_summary": str(context.get("task_summary", "")),
-        "objective": str(context.get("objective", "")),
-        "acceptance_criteria": tuple(map(str, context.get("acceptance_criteria", ()) or ())),
-        "gate_node_route": tuple(map(str, context.get("gate_node_route", ()) or ())),
-        "plan_refs": tuple(map(str, context.get("plan_refs", ()) or ())),
-        "semantic_input_digest": str(context.get("semantic_input_digest", "")),
-    }
+    scalar_fields = (
+        "head_sha",
+        "gate",
+        "requested_action",
+        "g0_g1_decision_ref",
+        "task_summary",
+        "objective",
+        "node_id",
+        "node_version",
+        "implementation_ref",
+        "profile_revision",
+        "node_registry_revision",
+        "provider_contract_revision",
+        "agent_boot_ref",
+        "agent_instruction_digest",
+        "semantic_input_digest",
+    )
+    result = {field: str(context.get(field, "")) for field in scalar_fields}
+    result.update(
+        {
+            "acceptance_criteria": tuple(map(str, context.get("acceptance_criteria", ()) or ())),
+            "gate_node_route": tuple(map(str, context.get("gate_node_route", ()) or ())),
+            "plan_refs": tuple(map(str, context.get("plan_refs", ()) or ())),
+        }
+    )
+    return result
 
 
 def execute(
@@ -176,7 +193,9 @@ def execute(
         builder.next_action = "escalate: out-of-scope change detected"
         return _persist(store, key, content_digest, builder)
 
-    # Validation evidence is mandatory. A provider omission is never PASS.
+    # Provider evidence is still mandatory at this adapter boundary. The W11
+    # Agent Host bridge adds a separate trusted validation runner and will not
+    # accept this self-report alone as live execution evidence.
     if "validation_passed" not in raw or not isinstance(raw.get("validation_passed"), bool):
         builder.findings.append("validation_evidence_missing: provider did not return boolean validation_passed")
         builder.terminal_outcome = FAIL_CLOSED
@@ -185,12 +204,12 @@ def execute(
 
     round_idx = 0
     valid = False
-    head_sha = pack.preprod_base_sha
+    head_sha = pack.head_sha or pack.preprod_base_sha
     while round_idx <= max_repair_rounds:
         builder.checkpoints.append({
             "id": f"repair-round-{round_idx}",
             "status": "executed",
-            "detail": f"validation pass {round_idx}",
+            "detail": f"provider validation report {round_idx}",
         })
         valid = raw["validation_passed"] is True
         if valid:
@@ -209,7 +228,7 @@ def execute(
         return _persist(store, key, content_digest, builder)
 
     builder.terminal_outcome = SUCCESS
-    builder.next_action = "proceed_to_g3: result schema-valid and scope-clean"
+    builder.next_action = "return_to_semantic_lifecycle_for_trusted_validation_and_readback"
     candidate = builder.to_dict()
     final_errors = validate_ai_agent_result(
         candidate,
