@@ -2,6 +2,21 @@ name: Build instruction packages
 
 on:
   pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'catalog.yaml'
+      - 'agents/**'
+      - 'core/**'
+      - 'governance/**'
+      - 'projects/**'
+      - 'schemas/**'
+      - 'templates/**'
+      - 'docs/project-consumer-agent-instructions.md'
+      - 'tools/build_project_package.py'
+      - 'tools/validate_instructions.py'
+      - 'requirements.txt'
+      - '.github/workflows/build-packages.yml'
   push:
     branches:
       - main
