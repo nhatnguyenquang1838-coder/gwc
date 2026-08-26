@@ -424,7 +424,20 @@ def verify_digest_chain_consistency(events: list[dict[str, Any]]) -> list[Verifi
                     VerificationResult(boundary=boundary, status="FAIL", reason=ReasonCode.DIGEST_CHAIN_MISMATCH, details={"error": "incomplete digest_chain"})
                 )
             else:
-                results.append(VerificationResult(boundary=boundary, status="PASS", reason=ReasonCode.OK, details={"mode": "v2_explicit"}))
+                # Enforce payload_digest cross-check (RED-2): the digest_chain's
+                # payload_digest MUST match the canonical event_digest of the record.
+                expected_payload = digest_chain.get("payload_digest")
+                if expected_payload is not None and expected_payload != event_digest:
+                    results.append(
+                        VerificationResult(
+                            boundary=boundary,
+                            status="FAIL",
+                            reason=ReasonCode.DIGEST_CHAIN_MISMATCH,
+                            details={"error": "payload_digest mismatch", "expected": expected_payload, "actual": event_digest},
+                        )
+                    )
+                else:
+                    results.append(VerificationResult(boundary=boundary, status="PASS", reason=ReasonCode.OK, details={"mode": "v2_explicit"}))
         else:
             results.append(
                 VerificationResult(boundary=boundary, status="FAIL", reason=ReasonCode.DIGEST_CHAIN_MISMATCH, details={"error": "v2 record missing event_digest"})
@@ -433,8 +446,13 @@ def verify_digest_chain_consistency(events: list[dict[str, Any]]) -> list[Verifi
     return results
 
 
-def verify_root_merkle(events: list[dict[str, Any]]) -> VerificationResult:
-    """Verify root Merkle proof: leaf = record_digest per sequence."""
+def verify_root_merkle(events: list[dict[str, Any]], expected_root: str | None = None) -> VerificationResult:
+    """Verify root Merkle proof: leaf = record_digest per sequence.
+
+    If ``expected_root`` is provided (from a signed checkpoint/bootstrap), the
+    computed root MUST match it — a tampered leaf changes the computed root and
+    therefore FAILs with ROOT_MERKLE_MISMATCH (RED-3 enforcement).
+    """
     record_digests = []
     for event in events:
         rd = event.get("record_digest")
@@ -442,8 +460,15 @@ def verify_root_merkle(events: list[dict[str, Any]]) -> VerificationResult:
             record_digests.append(rd)
 
     computed_root = compute_merkle_root(record_digests)
-    # In real implementation, compare against signed root in bootstrap or checkpoint
-    # For research: verify structure only
+
+    if expected_root is not None and computed_root != expected_root:
+        return VerificationResult(
+            boundary="root_merkle",
+            status="FAIL",
+            reason=ReasonCode.ROOT_MERKLE_MISMATCH,
+            details={"computed_root": computed_root, "expected_root": expected_root, "leaf_count": len(record_digests)},
+        )
+
     return VerificationResult(
         boundary="root_merkle",
         status="PASS",
