@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/canonical-81-shadow-qualification.schema.json",
+  "title": "Canonical 81 shadow qualification",
+  "type": "object",
+  "required": ["artifact_type", "schema_version", "status", "exact_revision", "summary", "gate_matrix", "adversarial_checks", "records", "errors", "qualification_digest"],
+  "properties": {
+    "artifact_type": {"const": "canonical-81-shadow-qualification"},
+    "schema_version": {"const": "1.0"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "exact_revision": {"type": "string", "minLength": 1},
+    "summary": {
+      "type": "object",
+      "required": ["canonical_node_count", "adapter_bound_count", "route_bound_count", "replay_proven_count", "observed_live_count", "shadow_enabled_count", "semantic_source_resolved_count", "descriptor_only_count"],
+      "properties": {
+        "canonical_node_count": {"type": "integer", "minimum": 0},
+        "adapter_bound_count": {"type": "integer", "minimum": 0},
+        "route_bound_count": {"type": "integer", "minimum": 0},
+        "replay_proven_count": {"type": "integer", "minimum": 0},
+        "observed_live_count": {"type": "integer", "minimum": 0},
+        "shadow_enabled_count": {"type": "integer", "minimum": 0},
+        "semantic_source_resolved_count": {"type": "integer", "minimum": 0},
+        "descriptor_only_count": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "gate_matrix": {"type": "object"},
+    "adversarial_checks": {"type": "object"},
+    "records": {"type": "array", "items": {"type": "object"}},
+    "replay_runs": {"type": "array", "items": {"type": "object"}},
+    "errors": {"type": "array", "items": {"type": "string"}},
+    "qualification_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}
