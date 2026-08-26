@@ -1,0 +1,112 @@
+name: Node Architect canonical-81 shadow qualification
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-81-qualification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run W6 focused qualification tests
+        run: |
+          PYTHONPATH=. python -m unittest -v tests.test_shadow_81_qualification tests.test_shadow_telemetry
+
+      - name: Materialize actual PR event for E1 live observation
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_ID: ${{ github.run_id }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          ACTION: ${{ github.event.action }}
+        run: |
+          python - <<'PY'
+          import json, os
+          event = {
+              "task_id": f"PR-{os.environ['PR_NUMBER']}",
+              "run_id": f"github-{os.environ['RUN_ID']}",
+              "gate": "G3_PR",
+              "exact_revision": os.environ["HEAD_SHA"],
+              "route_graph_revision": f"repo-bound:{os.environ['HEAD_SHA']}",
+              "scenario": "standard_pr_delivery",
+              "input_payload": {"event": "pull_request", "action": os.environ["ACTION"]},
+          }
+          with open("w6-e1-live-event.json", "w", encoding="utf-8") as handle:
+              json.dump(event, handle, sort_keys=True)
+          PY
+
+      - name: Run E1 live PR shadow observation
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PYTHONPATH=. python tools/node_architect/shadow_gate_observer.py w6-e1-live-event.json \
+            --root . --observed-revision "$HEAD_SHA" | tee w6-e1-live-output.json
+          PYTHONPATH=. python tools/node_architect/shadow_telemetry_from_output.py \
+            w6-e1-live-event.json w6-e1-live-output.json --ledger w6-e1-live-ledger.jsonl \
+            | tee w6-e1-live-summary.json
+
+      - name: Run E1 exact-head canary across all route packs and gate boundaries
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PYTHONPATH=. python tools/node_architect/run_shadow_e1_canary.py \
+            --root . --revision "$HEAD_SHA" \
+            --ledger w6-e1-canary-ledger.jsonl \
+            --output w6-e1-canary.json
+
+      - name: Run deterministic E0 canonical-81 qualification
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PYTHONPATH=. python tools/node_architect/run_shadow_e0_replay.py \
+            --root . --revision "$HEAD_SHA" \
+            --live-ledger w6-e1-live-ledger.jsonl \
+            --output canonical-81-shadow-qualification.json
+
+      - name: Validate final exact-81 closure invariants
+        run: |
+          python - <<'PY'
+          import json
+          from jsonschema import Draft202012Validator
+          report = json.load(open("canonical-81-shadow-qualification.json", encoding="utf-8"))
+          schema = json.load(open("schemas/node-architect/canonical-81-shadow-qualification.schema.json", encoding="utf-8"))
+          Draft202012Validator.check_schema(schema)
+          errors = sorted(Draft202012Validator(schema).iter_errors(report), key=lambda item: list(item.path))
+          if errors:
+              raise SystemExit("schema errors: " + "; ".join(error.message for error in errors))
+          summary = report["summary"]
+          for field in ("canonical_node_count", "adapter_bound_count", "route_bound_count", "replay_proven_count", "shadow_enabled_count"):
+              if summary[field] != 81:
+                  raise SystemExit(f"{field} must equal 81, got {summary[field]}")
+          if report["errors"]:
+              raise SystemExit("qualification errors: " + ",".join(report["errors"]))
+          if not all(report["adversarial_checks"].values()):
+              raise SystemExit("one or more adversarial checks failed")
+          canary = json.load(open("w6-e1-canary.json", encoding="utf-8"))
+          if set(canary["route_packs_seen"]) != {"RP-01", "RP-02", "RP-03", "RP-04", "RP-05", "RP-06"}:
+              raise SystemExit("E1 canary did not exercise all six route packs")
+          if canary["status"] != "PASS" or not canary["safe"]:
+              raise SystemExit("E1 canary safety failed")
+          print(json.dumps({"status": report["status"], "summary": summary, "canary_route_packs": canary["route_packs_seen"]}, sort_keys=True))
+          PY
+
+      - name: Upload W6 qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-architect-canonical-81-qualification-${{ github.run_id }}
+          path: |
+            canonical-81-shadow-qualification.json
+            w6-e1-live-event.json
+            w6-e1-live-output.json
+            w6-e1-live-ledger.jsonl
+            w6-e1-live-summary.json
+            w6-e1-canary.json
+            w6-e1-canary-ledger.jsonl
