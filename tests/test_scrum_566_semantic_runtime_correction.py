@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import importlib
+import importlib.util
+import json
+from pathlib import Path
+
 from tools.node_architect.ai_agent_adapter import execute
 from tools.node_architect.build_node_instruction_pack import build_node_instruction_pack
 from tools.node_architect.shadow_adapters import execute_shadow_node
@@ -98,3 +103,100 @@ def test_descriptor_only_node_cannot_claim_semantic_execution():
     result = execute_shadow_node(node, _event(), {})
     assert result["applicability"] == "BLOCKED"
     assert result["reason_code"] == "SEMANTIC_EVALUATOR_MISSING"
+
+
+def _semantic_resolver():
+    spec = importlib.util.find_spec("tools.node_architect.semantic_source_resolver")
+    assert spec is not None, "canonical semantic source resolver must exist"
+    return importlib.import_module("tools.node_architect.semantic_source_resolver").resolve_semantic_source
+
+
+def _write(path: Path, text: str = "# evaluator\n") -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def test_semantic_resolver_prefers_descriptor_evaluator_over_named_tool(tmp_path: Path):
+    descriptor = tmp_path / "core/node-catalog/example.node.json"
+    declared = "tools/node_architect/custom_evaluator.py"
+    _write(tmp_path / declared)
+    _write(tmp_path / "tools/node_architect/example_node.py")
+    _write(
+        descriptor,
+        json.dumps({"source_resolution": {"evaluator": declared}}),
+    )
+    node = {
+        "id": "repo_delivery.example-node",
+        "runtime_executable": True,
+        "provenance": {"source_path": "core/node-catalog/example.node.json"},
+    }
+
+    result = _semantic_resolver()(node, root=tmp_path)
+
+    assert result["status"] == "SOURCE_RESOLVED_EVALUATOR"
+    assert result["evaluator_path"] == declared
+    assert result["runtime_eligible"] is True
+
+
+def test_semantic_resolver_uses_named_tool_fallback(tmp_path: Path):
+    named = "tools/node_architect/timeout_recovery.py"
+    _write(tmp_path / named)
+    node = {
+        "id": "failure_recovery.timeout-recovery",
+        "runtime_executable": True,
+        "provenance": {},
+    }
+
+    result = _semantic_resolver()(node, root=tmp_path)
+
+    assert result["status"] == "NAMED_TOOL_PRESENT"
+    assert result["evaluator_path"] == named
+    assert result["runtime_eligible"] is True
+
+
+def test_semantic_resolver_descriptor_only_is_typed_and_ineligible(tmp_path: Path):
+    node = {
+        "id": "package_export.export-manifest-generation",
+        "runtime_executable": True,
+        "provenance": {"source_path": "core/node-catalog/export.node.json"},
+    }
+
+    result = _semantic_resolver()(node, root=tmp_path)
+
+    assert result["status"] == "DESCRIPTOR_ONLY"
+    assert result["reason_code"] == "SEMANTIC_EVALUATOR_MISSING"
+    assert result["runtime_eligible"] is False
+
+
+def test_semantic_resolver_rejects_descriptor_path_escape(tmp_path: Path):
+    descriptor = tmp_path / "core/node-catalog/escape.node.json"
+    _write(
+        descriptor,
+        json.dumps({"source_resolution": {"evaluator": "../../outside.py"}}),
+    )
+    node = {
+        "id": "repo_delivery.escape",
+        "runtime_executable": True,
+        "provenance": {"source_path": "core/node-catalog/escape.node.json"},
+    }
+
+    result = _semantic_resolver()(node, root=tmp_path)
+
+    assert result["status"] == "INVALID_SOURCE_BINDING"
+    assert result["reason_code"] == "SEMANTIC_EVALUATOR_PATH_UNSAFE"
+    assert result["runtime_eligible"] is False
+
+
+def test_semantic_resolver_runtime_disabled_is_ineligible(tmp_path: Path):
+    _write(tmp_path / "tools/node_architect/timeout_recovery.py")
+    node = {
+        "id": "failure_recovery.timeout-recovery",
+        "runtime_executable": False,
+        "provenance": {},
+    }
+
+    result = _semantic_resolver()(node, root=tmp_path)
+
+    assert result["status"] == "NOT_RUNTIME_EXECUTABLE"
+    assert result["reason_code"] == "NODE_NOT_RUNTIME_EXECUTABLE"
+    assert result["runtime_eligible"] is False
