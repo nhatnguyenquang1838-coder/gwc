@@ -101,6 +101,7 @@ def _semantic_pack_context(context: Mapping[str, Any]) -> dict[str, Any]:
         "acceptance_criteria": tuple(map(str, context.get("acceptance_criteria", ()) or ())),
         "gate_node_route": tuple(map(str, context.get("gate_node_route", ()) or ())),
         "plan_refs": tuple(map(str, context.get("plan_refs", ()) or ())),
+        "semantic_input_digest": str(context.get("semantic_input_digest", "")),
     }
 
 
