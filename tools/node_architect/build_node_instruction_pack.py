@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Build a typed instruction pack for the ai-task-execution node.
 
-Provider-neutral: composes a deterministic, serializable pack from the task,
-repository context, G0/G1 decision, file scope, gate/node route and validation
-plan. The pack is what gets handed to whatever AI implementation provider is
-plugged in (initially a custom/self-hosted runner; Hermes, Codex or another
-agent implement the same Provider protocol without graph changes).
+Provider-neutral: composes a deterministic, serializable pack from Agent boot,
+task/repository/gate identity, semantic node identity, authority scope and
+validation plan. Any meaning-bearing drift changes the content digest.
 """
 from __future__ import annotations
 
@@ -30,32 +28,48 @@ class InstructionPack:
     authorized_actions: tuple[str, ...]
     validation_commands: tuple[str, ...]
     idempotency_key: str
+    head_sha: str = ""
+    gate: str = ""
+    requested_action: str = ""
     g0_g1_decision_ref: str = ""
     task_summary: str = ""
     objective: str = ""
     acceptance_criteria: tuple[str, ...] = ()
     gate_node_route: tuple[str, ...] = ()
     plan_refs: tuple[str, ...] = ()
+    node_id: str = ""
+    node_version: str = ""
+    implementation_ref: str = ""
+    profile_revision: str = ""
+    node_registry_revision: str = ""
+    provider_contract_revision: str = ""
+    agent_boot_ref: str = ""
+    agent_instruction_digest: str = ""
     semantic_input_digest: str = ""
 
     @property
     def content_digest(self) -> str:
-        """Digest every meaning-bearing field of the provider instruction pack.
-
-        Idempotency is safe only when a semantic change changes this digest.
-        Lists whose order is not semantic are normalized; route, acceptance
-        criteria and plan refs preserve declared order because ordering can carry
-        execution meaning.
-        """
+        """Digest every meaning-bearing field of the provider instruction pack."""
         canonical = {
             "run_id": self.run_id,
             "task_id": self.task_id,
             "repository": self.repository,
             "preprod_base_sha": self.preprod_base_sha,
+            "head_sha": self.head_sha,
             "working_branch": self.working_branch,
             "scope_hash": self.scope_hash,
+            "gate": self.gate,
+            "requested_action": self.requested_action,
             "graph_revision": self.graph_revision,
             "policy_revision": self.policy_revision,
+            "profile_revision": self.profile_revision,
+            "node_registry_revision": self.node_registry_revision,
+            "node_id": self.node_id,
+            "node_version": self.node_version,
+            "implementation_ref": self.implementation_ref,
+            "provider_contract_revision": self.provider_contract_revision,
+            "agent_boot_ref": self.agent_boot_ref,
+            "agent_instruction_digest": self.agent_instruction_digest,
             "allowed_paths": sorted(self.allowed_paths),
             "prohibited_paths": sorted(self.prohibited_paths),
             "authorized_actions": sorted(self.authorized_actions),
@@ -79,15 +93,26 @@ class InstructionPack:
 def build_node_instruction_pack(
     request: Mapping[str, Any],
     *,
+    head_sha: str = "",
+    gate: str = "",
+    requested_action: str = "",
     g0_g1_decision_ref: str = "",
     task_summary: str = "",
     objective: str = "",
     acceptance_criteria: Sequence[str] = (),
     gate_node_route: Sequence[str] = (),
     plan_refs: Sequence[str] = (),
+    node_id: str = "",
+    node_version: str = "",
+    implementation_ref: str = "",
+    profile_revision: str = "",
+    node_registry_revision: str = "",
+    provider_contract_revision: str = "",
+    agent_boot_ref: str = "",
+    agent_instruction_digest: str = "",
     semantic_input_digest: str = "",
 ) -> InstructionPack:
-    """Compose a typed InstructionPack from a validated request + planning context."""
+    """Compose a typed InstructionPack from a validated request + runtime context."""
     return InstructionPack(
         run_id=str(request["run_id"]),
         task_id=str(request["task_id"]),
@@ -102,11 +127,22 @@ def build_node_instruction_pack(
         authorized_actions=tuple(map(str, request.get("authorized_actions", ()))),
         validation_commands=tuple(map(str, request.get("validation_commands", ()))),
         idempotency_key=str(request["idempotency_key"]),
+        head_sha=str(head_sha),
+        gate=str(gate),
+        requested_action=str(requested_action),
         g0_g1_decision_ref=str(g0_g1_decision_ref),
         task_summary=str(task_summary),
         objective=str(objective),
         acceptance_criteria=tuple(map(str, acceptance_criteria)),
         gate_node_route=tuple(map(str, gate_node_route)),
         plan_refs=tuple(map(str, plan_refs)),
+        node_id=str(node_id),
+        node_version=str(node_version),
+        implementation_ref=str(implementation_ref),
+        profile_revision=str(profile_revision),
+        node_registry_revision=str(node_registry_revision),
+        provider_contract_revision=str(provider_contract_revision),
+        agent_boot_ref=str(agent_boot_ref),
+        agent_instruction_digest=str(agent_instruction_digest),
         semantic_input_digest=str(semantic_input_digest),
     )
