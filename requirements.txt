@@ -1,2 +1,4 @@
 PyYAML==6.0.2
 jsonschema==4.23.0
+pytest==9.1.1
+cryptography==50.0.0
