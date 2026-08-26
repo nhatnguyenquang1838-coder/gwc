@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/moa-shadow-synthesis.schema.json",
+  "title": "Contradiction-preserving shadow MoA synthesis",
+  "type": "object",
+  "required": ["outcome", "evidence"],
+  "properties": {
+    "outcome": {
+      "enum": ["CONSENSUS", "CONTRADICTION_UNRESOLVED", "INSUFFICIENT_EVIDENCE"]
+    },
+    "evidence": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}
