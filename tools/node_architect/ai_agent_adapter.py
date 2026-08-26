@@ -1,23 +1,9 @@
 #!/usr/bin/env python3
 """Provider-neutral AI implementation-agent adapter (Node Architect node).
 
-This node lets the autonomous pre-prod runtime invoke an AI implementation agent
-for ONE Jira task, inside the exact G2 permission envelope derived from the
-SCRUM-272 standing policy / run-manifest.
-
-Design invariants (fail closed):
-  * No G3/G4/G5 authority is ever granted (no merge/deploy/release/prod/credential).
-  * Out-of-scope path/action, malformed provider output, provider timeout, duplicate
-    request (replay conflict) and unknown write all terminate in a typed FAIL_CLOSED
-    (or RECONCILED/REPLAY_CONFLICT) result; the node never silently proceeds.
-  * Bounded repair rounds only; every repair changes the head SHA and invalidates
-    prior CI/review/G4-readiness evidence (re-derived, never reused).
-  * No hidden manual fallback: if no provider is available the node returns FAIL_CLOSED.
-
-Providers are pluggable via the Provider protocol. `CustomRunnerProvider` is the
-default (custom/self-hosted runner); `DeterministicFakeProvider` is used by the
-tests to reproduce the contract in CI. Hermes, Codex or another agent implement
-the same protocol without any change to the graph.
+The adapter executes exactly one bounded instruction pack through a pluggable
+provider. It never grants later-gate authority and fails closed when provider,
+validation, scope or replay evidence is incomplete.
 """
 from __future__ import annotations
 
@@ -41,15 +27,9 @@ RECONCILED = "RECONCILED"
 
 
 class Provider(Protocol):
-    """Pluggable AI implementation-agent backend."""
-
     name: str
 
     def run(self, pack: InstructionPack) -> Mapping[str, Any]:
-        """Execute the pack and return the raw agent output (a mapping).
-
-        May raise ProviderUnavailable / ProviderTimeout, or return malformed data.
-        """
         ...
 
 
@@ -66,13 +46,11 @@ def _sha256(text: str) -> str:
 
 
 def _digest_paths(paths: Sequence[str]) -> str:
-    joined = "\n".join(sorted(paths))
-    return _sha256(joined)
+    return _sha256("\n".join(sorted(paths)))
 
 
 def _digest_validation(outputs: Sequence[str]) -> str:
-    joined = "\n".join(outputs)
-    return _sha256(joined)
+    return _sha256("\n".join(outputs))
 
 
 @dataclass
@@ -114,6 +92,18 @@ class _ResultBuilder:
         }
 
 
+def _semantic_pack_context(context: Mapping[str, Any]) -> dict[str, Any]:
+    """Extract only meaning-bearing provider instruction context."""
+    return {
+        "g0_g1_decision_ref": str(context.get("g0_g1_decision_ref", "")),
+        "task_summary": str(context.get("task_summary", "")),
+        "objective": str(context.get("objective", "")),
+        "acceptance_criteria": tuple(map(str, context.get("acceptance_criteria", ()) or ())),
+        "gate_node_route": tuple(map(str, context.get("gate_node_route", ()) or ())),
+        "plan_refs": tuple(map(str, context.get("plan_refs", ()) or ())),
+    }
+
+
 def execute(
     request: Mapping[str, Any],
     *,
@@ -123,24 +113,18 @@ def execute(
     max_repair_rounds: int = DEFAULT_MAX_REPAIR_ROUNDS,
     request_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Execute one AI-agent task inside the G2 envelope.
-
-    `root` is accepted for interface symmetry (an isolated workspace root); the
-    deterministic contract does not require real filesystem mutation. `idempotency_store`
-    is an injectable mapping so tests and the runtime share the same replay semantics.
-    """
+    """Execute one AI-agent task inside its exact bounded envelope."""
+    del root  # interface symmetry; filesystem/tool execution is provider-owned
     store: MutableMapping[str, Mapping[str, Any]] = idempotency_store if idempotency_store is not None else {}
+    context = request_context or {}
 
-    # 1. Validate request structurally via the pack builder (raises on missing fields).
     try:
-        pack = build_node_instruction_pack(request)
+        pack = build_node_instruction_pack(request, **_semantic_pack_context(context))
     except (KeyError, TypeError) as exc:
         return _fail_closed_dict(request, provider_name="none", findings=[f"malformed_request: {exc}"])
 
     content_digest = pack.content_digest
     key = pack.idempotency_key
-
-    # 2. Idempotency / replay: same key + same digest => prior result; diff digest => conflict.
     prior = store.get(key)
     if prior is not None:
         if prior.get("_content_digest") == content_digest:
@@ -163,7 +147,6 @@ def execute(
         provider=provider.name,
     )
 
-    # 3. Dispatch to provider (fail closed on unavailable / timeout).
     try:
         raw = provider.run(pack)
     except ProviderUnavailable as exc:
@@ -177,7 +160,6 @@ def execute(
         builder.next_action = "retry with longer budget or escalate"
         return _persist(store, key, content_digest, builder)
 
-    # 4. Validate raw output structure.
     if not isinstance(raw, Mapping):
         builder.findings.append("malformed_output: provider output is not a mapping")
         builder.terminal_outcome = MALFORMED_OUTPUT
@@ -186,8 +168,6 @@ def execute(
 
     changed = list(raw.get("changed_paths", []) or [])
     recorded = list(raw.get("recorded_actions", []) or [])
-
-    # 5. Scope envelope enforcement (fail closed on violation).
     scope_errors = _enforce_scope(changed, recorded, pack)
     if scope_errors:
         builder.findings.extend(scope_errors)
@@ -195,10 +175,15 @@ def execute(
         builder.next_action = "escalate: out-of-scope change detected"
         return _persist(store, key, content_digest, builder)
 
-    # 6. Run validation commands (sandboxed, simulated here). Bounded repair rounds.
+    # Validation evidence is mandatory. A provider omission is never PASS.
+    if "validation_passed" not in raw or not isinstance(raw.get("validation_passed"), bool):
+        builder.findings.append("validation_evidence_missing: provider did not return boolean validation_passed")
+        builder.terminal_outcome = FAIL_CLOSED
+        builder.next_action = "escalate: validation evidence missing"
+        return _persist(store, key, content_digest, builder)
+
     round_idx = 0
     valid = False
-    validation_outputs: list[str] = []
     head_sha = pack.preprod_base_sha
     while round_idx <= max_repair_rounds:
         builder.checkpoints.append({
@@ -206,17 +191,11 @@ def execute(
             "status": "executed",
             "detail": f"validation pass {round_idx}",
         })
-        # Simulated validation: the provider's validation_commands are recorded as
-        # evidence; a deterministic provider returns a pass marker in `validation`.
-        validation_outputs = [f"round={round_idx} head={head_sha}"]
-        valid = bool(raw.get("validation_passed", True))
+        valid = raw["validation_passed"] is True
         if valid:
-            # A repair changes the head SHA and invalidates prior evidence.
             head_sha = _derive_head(head_sha, round_idx, changed)
             break
         round_idx += 1
-        if round_idx > max_repair_rounds:
-            break
 
     builder.final_head_sha = head_sha
     builder.changed_paths = changed
@@ -228,7 +207,6 @@ def execute(
         builder.next_action = "escalate: validation failed after bounded repairs"
         return _persist(store, key, content_digest, builder)
 
-    # 7. Final schema + scope validation of the produced result (defence in depth).
     builder.terminal_outcome = SUCCESS
     builder.next_action = "proceed_to_g3: result schema-valid and scope-clean"
     candidate = builder.to_dict()
@@ -250,11 +228,6 @@ def execute(
 
 
 def _derive_head(base_sha: str, round_idx: int, changed: Sequence[str]) -> str:
-    """Deterministic, non-base head SHA reflecting a (repair) commit.
-
-    Every repair yields a NEW head SHA, so prior CI/review/G4-readiness evidence
-    (which is keyed on the head) is invalidated and must be re-derived.
-    """
     seed = f"{base_sha}:{round_idx}:{','.join(sorted(changed))}:{time.time_ns()}"
     return hashlib.sha1(seed.encode("utf-8")).hexdigest().ljust(40, "0")[:40]
 
@@ -314,18 +287,11 @@ def _persist(
     builder: _ResultBuilder,
 ) -> dict[str, Any]:
     result = builder.to_dict()
-    # Cache keyed by idempotency_key; store the content digest for replay detection.
     store[key] = {**result, "_content_digest": content_digest}
     return result
 
 
 class CustomRunnerProvider:
-    """Default provider: a custom/self-hosted runner that executes the pack.
-
-    In this MVP the runner is simulated (it raises if no runner is wired in), so the
-    node stays fail-closed unless a concrete runner is supplied via `run_fn`.
-    """
-
     name = "custom-runner"
 
     def __init__(self, run_fn: Callable[[InstructionPack], Mapping[str, Any]] | None = None) -> None:
@@ -338,8 +304,6 @@ class CustomRunnerProvider:
 
 
 class DeterministicFakeProvider:
-    """Test provider: replays a bounded fixture deterministically (AC-1..AC-5)."""
-
     name = "deterministic-fake"
 
     def __init__(
