@@ -1,0 +1,56 @@
+{
+  "version": "2.0",
+  "root_keys": [
+    {
+      "key_id": "gwc-root-1",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtHbUC3hNn1CE+MvOjhr1oW3hH1T7fy2t91dLciWpU0s=\n-----END PUBLIC KEY-----\n",
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_until": "2027-08-01T00:00:00Z",
+      "status": "active"
+    },
+    {
+      "key_id": "gwc-root-2",
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtHbUC3hNn1CE+MvOjhr1oW3hH1T7fy2t91dLciWpU0s=\n-----END PUBLIC KEY-----\n",
+      "valid_from": "2027-07-01T00:00:00Z",
+      "valid_until": "2028-08-01T00:00:00Z",
+      "status": "pending"
+    }
+  ],
+  "trust_window_overlap_days": 30,
+  "witness_threshold": 3,
+  "witness_set": [
+    "gwc-witness-1",
+    "gwc-witness-2",
+    "gwc-witness-3"
+  ],
+  "witness_keys": {
+    "gwc-witness-1": {
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtHbUC3hNn1CE+MvOjhr1oW3hH1T7fy2t91dLciWpU0s=\n-----END PUBLIC KEY-----\n",
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_until": "2027-08-01T00:00:00Z",
+      "status": "active"
+    },
+    "gwc-witness-2": {
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtHbUC3hNn1CE+MvOjhr1oW3hH1T7fy2t91dLciWpU0s=\n-----END PUBLIC KEY-----\n",
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_until": "2027-08-01T00:00:00Z",
+      "status": "active"
+    },
+    "gwc-witness-3": {
+      "public_key": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAtHbUC3hNn1CE+MvOjhr1oW3hH1T7fy2t91dLciWpU0s=\n-----END PUBLIC KEY-----\n",
+      "valid_from": "2026-08-01T00:00:00Z",
+      "valid_until": "2027-08-01T00:00:00Z",
+      "status": "active"
+    }
+  },
+  "chain_id": "gwc-main",
+  "genesis_prev_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "schema_compatibility": {
+    "supported_versions": [
+      "1.0",
+      "2.0"
+    ],
+    "dual_read_mode": true,
+    "v1_fallback": "implicit_digest_chain"
+  }
+}

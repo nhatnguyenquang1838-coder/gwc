@@ -5,15 +5,31 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "artifact_type", "task_id", "run_id", "node_id",
-    "repository", "branch", "base_sha", "head_sha", "scope_hash",
-    "sequence", "occurred_at", "idempotency_key", "payload",
-    "state_digest", "record_digest"
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "run_id",
+    "node_id",
+    "repository",
+    "branch",
+    "base_sha",
+    "head_sha",
+    "scope_hash",
+    "sequence",
+    "occurred_at",
+    "idempotency_key",
+    "payload",
+    "state_digest",
+    "record_digest"
   ],
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0", "2.0"],
+      "description": "Schema version: 1.0 for legacy records, 2.0 for new records with digest_chain"
+    },
     "artifact_type": {
-      "enum": ["node-start", "node-decision", "node-result", "node-readback", "checkpoint", "next-route-decision"]
+      "enum": ["node-start", "node-decision", "node-result", "node-readback", "checkpoint", "next-route-decision", "rollback-anchor"]
     },
     "task_id": {"type": "string", "minLength": 1},
     "run_id": {"type": "string", "minLength": 1},
@@ -29,12 +45,68 @@
     "payload": {"type": "object"},
     "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "decision_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-    "record_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+    "record_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "event_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["keyid", "sig"],
+        "properties": {
+          "keyid": {"type": "string", "minLength": 1},
+          "sig": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "witnesses": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "digest_chain": {
+      "type": "object",
+      "description": "Explicit digest chain linkage (v2+). Optional for v1 backward compatibility.",
+      "required": ["prev_hash", "chain_id", "sequence"],
+      "properties": {
+        "prev_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "chain_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "sequence": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    }
   },
   "allOf": [
     {
-      "if": {"properties": {"artifact_type": {"enum": ["node-decision", "next-route-decision"]}}},
-      "then": {"required": ["decision_digest"]}
+      "if": {
+        "properties": {
+          "artifact_type": {
+            "enum": ["node-decision", "next-route-decision"]
+          }
+        }
+      },
+      "then": {
+        "required": ["decision_digest"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": { "const": "2.0" }
+        }
+      },
+      "then": {
+        "required": ["digest_chain", "event_digest"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": { "const": "1.0" }
+        }
+      },
+      "then": {
+        "not": { "required": ["digest_chain"] }
+      }
     }
   ]
 }
