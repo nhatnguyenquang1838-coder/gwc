@@ -29,6 +29,7 @@ jobs:
               "run_id": f"github-{os.environ['RUN_ID']}",
               "gate": "G3_PR",
               "exact_revision": os.environ["HEAD_SHA"],
+              "route_graph_revision": f"repo-bound:{os.environ['HEAD_SHA']}",
               "scenario": "standard_pr_delivery",
               "input_payload": {"event": "pull_request", "action": os.environ["ACTION"]},
           }
@@ -41,6 +42,11 @@ jobs:
         run: |
           PYTHONPATH=. python tools/node_architect/shadow_gate_observer.py shadow-event.json \
             --root . --observed-revision "$HEAD_SHA" | tee shadow-output.json
+      - name: Emit append-only shadow telemetry
+        run: |
+          PYTHONPATH=. python tools/node_architect/shadow_telemetry_from_output.py \
+            shadow-event.json shadow-output.json --ledger shadow-ledger.jsonl \
+            | tee shadow-telemetry-summary.json
       - name: Upload shadow evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -49,3 +55,5 @@ jobs:
           path: |
             shadow-event.json
             shadow-output.json
+            shadow-ledger.jsonl
+            shadow-telemetry-summary.json

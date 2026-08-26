@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/shadow-comparison-record.schema.json",
+  "title": "Shadow vs authoritative comparison record",
+  "type": "object",
+  "required": ["classification", "identity_mismatches"],
+  "properties": {
+    "classification": {
+      "enum": [
+        "AGREEMENT",
+        "SHADOW_MORE_CONSERVATIVE",
+        "SHADOW_MORE_PERMISSIVE_DENIED",
+        "CONTRADICTION_UNRESOLVED",
+        "INSUFFICIENT_EVIDENCE",
+        "NOT_COMPARABLE"
+      ]
+    },
+    "identity_mismatches": {"type": "array", "items": {"type": "string"}},
+    "shadow_decision": {"type": "string"},
+    "authoritative_decision": {"type": "string"}
+  },
+  "additionalProperties": false
+}
