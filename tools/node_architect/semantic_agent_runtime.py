@@ -169,13 +169,45 @@ def _validate_authority(
     return None
 
 
+GATES = (
+    "G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR",
+    "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA",
+)
+
+
 def _next_contract_valid(binding: Mapping[str, Any], candidate: Any) -> bool:
+    """Validate a semantic NEXT against the declared contract.
+
+    Two legitimate forms are accepted:
+    1. an exact match with a declared next_route_contract table entry
+       (next node / next action hops);
+    2. a typed gate boundary: disposition declared in the table with a
+       non-empty ``next_gate`` and no next_node/next_action. A boundary NEXT
+       completes the node and never auto-advances or grants authority; crossing
+       the gate remains a separate authority decision.
+    Anything else (arbitrary next_node, unknown disposition, missing fields)
+    is rejected so the model/node cannot inject an undeclared NEXT.
+    """
     if not isinstance(candidate, Mapping):
         return False
     table = binding.get("next_route_contract")
     if not isinstance(table, Mapping):
         return False
-    return any(isinstance(value, Mapping) and dict(value) == dict(candidate) for value in table.values())
+    if any(isinstance(value, Mapping) and dict(value) == dict(candidate) for value in table.values()):
+        return True
+    declared_dispositions = {
+        str(value.get("disposition", ""))
+        for value in table.values() if isinstance(value, Mapping)
+    }
+    disposition = str(candidate.get("disposition") or "")
+    next_gate = str(candidate.get("next_gate") or "")
+    next_node = str(candidate.get("next_node") or "")
+    next_action = str(candidate.get("next_action") or "")
+    if disposition not in declared_dispositions:
+        return False
+    if next_node or next_action:
+        return False
+    return next_gate in GATES
 
 
 def _ledger(event: Mapping[str, Any], binding: Mapping[str, Any], evidence_root: Path) -> NodeEvidenceLedger:

@@ -31,11 +31,13 @@ jobs:
             tests/test_scrum_566_semantic_lifecycle.py \
             tests/test_scrum_566_agent_provider_bridge.py \
             tests/test_scrum_566_instruction_skill_wiring.py \
+            tests/test_scrum_566_agent_host_wiring.py \
             tests/test_scrum_566_w8_canonical_shadow_route.py \
             tests/test_scrum_566_w7_w9_semantic_closure.py \
+            tests/test_scrum_566_w10_w12_agent_runtime.py \
+            tests/test_scrum_566_w13_live_runtime_bridge.py \
             tests/test_shadow_orchestrator.py \
             tests/test_shadow_81_qualification.py \
-            tests/test_scrum_566_agent_runtime_entrypoint.py \
             > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt
