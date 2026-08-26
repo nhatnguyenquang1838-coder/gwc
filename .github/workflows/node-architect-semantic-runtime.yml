@@ -25,6 +25,7 @@ jobs:
           python -m pytest -vv \
             tests/test_scrum_566_semantic_runtime_correction.py \
             tests/test_scrum_566_semantic_dispatcher.py \
+            tests/test_scrum_566_semantic_lifecycle.py \
             > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt
