@@ -27,6 +27,7 @@ jobs:
             tests/test_scrum_566_semantic_dispatcher.py \
             tests/test_scrum_566_semantic_lifecycle.py \
             tests/test_scrum_566_agent_provider_bridge.py \
+            tests/test_scrum_566_w8_canonical_shadow_route.py \
             > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt
