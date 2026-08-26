@@ -2,6 +2,7 @@ name: Autonomous parent authority required
 
 on:
   pull_request:
+    branches: [pre-prod]
     types: [opened, reopened, synchronize, edited, ready_for_review]
 
 permissions:
