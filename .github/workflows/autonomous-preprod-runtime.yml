@@ -190,7 +190,7 @@ jobs:
           if-no-files-found: error
 
   contract-canary:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'pre-prod'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact PR head
@@ -519,6 +519,7 @@ jobs:
   autonomous-g4-evidence-required:
     if: >-
       github.event_name == 'pull_request' &&
+      github.event.pull_request.base.ref == 'pre-prod' &&
       github.event.action != 'closed' &&
       (startsWith(github.event.pull_request.head.ref, 'auto/') ||
        contains(github.event.pull_request.body || '', '<!-- GWC:AUTONOMOUS-RUN:EVIDENCE:BEGIN -->'))
