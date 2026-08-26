@@ -1,0 +1,19 @@
+schema_version: "1.0"
+artifact_type: g2-approval-readback
+task_id: SCRUM-397
+gate: G2
+subtask: baseline-ci-remediation-cryptography
+authority_source: "Human G2 exact approval on issue #392 Controller mailbox seq=41/42/43"
+exact_approval_command: "APPROVE G2 g2_scrum-397_g3_baseline_ci_cryptography_20260826_1616_9483f74540a13504 9483f74540a13504 2026-08-26T20:16:14Z"
+request_id: g2_scrum-397_g3_baseline_ci_cryptography_20260826_1616_9483f74540a13504
+scope_hash: sha256:9483f74540a135041b93eb15ab581ca0bf4275e89aff39c92c64ba6e169d30c6
+approved_at: "2026-08-26T16:50:21Z"
+expires_at: "2026-08-26T20:16:14Z"
+consumed_by: "Controller seq=43 COMMAND"
+exact_match: true
+unexpired_at_consume: true
+consumed_once: true
+starting_head_sha: 2d59ae4fa06a5a441e1192e7a851f5f87361b42b
+base_sha: f3bc1d449c48e5339800d65fff1a891b8154735e
+working_branch: fix/scrum-397-g3-baseline-ci-pytest-r1
+existing_pr: 526

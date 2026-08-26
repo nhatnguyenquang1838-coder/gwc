@@ -1,0 +1,26 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: SCRUM-397
+gate: G2
+subtask: baseline-ci-remediation-cryptography
+run_id: SCRUM-397-WP3-WP4-20260825-TC-RECOVERY-R1
+remediation_intent: "Second CI-only baseline remediation: install cryptography in Validate instructions before governance unittest discovery. Reuse existing branch fix/scrum-397-g3-baseline-ci-pytest-r1 and existing Draft PR #526 (retiggers via synchronize)."
+authorized_paths:
+  - .github/workflows/validate-instructions.yml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-cryptography-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-cryptography-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-cryptography-executor-report.yaml
+authorized_actions: [modify_approved_files, run_sandboxed_validation, stage, create_commit, push_working_branch]
+excluded_actions: [edit_requirements_txt, edit_scrum269_tests, mutate_scrum397_delivery_branch, open_new_pr, change_pr_metadata_or_state, mark_pr_ready_for_review, merge_approved_pr, protected_main_write, rebase, cherry_pick, force_push, wp5_execution, deploy_approved_release, reload_approved_runtime, production_config_change, production_data_read, production_data_write, migration, credential_rotation]
+bindings:
+  - key: pr_number
+    value: "526"
+risk_class: R2
+pre_commit_gate: "isolated Python-3.14-equivalent preflight (requirements.txt + pytest + cryptography) ran full governance unittest discovery: Ran 2602 tests in 11.615s -> OK. No further missing dependency."
+ci_evidence:
+  run_id: 32987159444
+  conclusion: failure
+  pytest_step: success
+  remaining_errors: 2
+  missing_dependency: cryptography
+  note: "cryptography==42.0.8 IS pinned in requirements.txt; CI failure was install-order/cache variance. Explicit CI-only install guarantees availability."
