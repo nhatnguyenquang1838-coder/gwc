@@ -2,6 +2,18 @@ name: Cross-platform LF and SHA parity
 
 on:
   pull_request:
+    paths:
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.github/workflows/line-ending-parity.yml'
+      - '.github/workflows/validate-instructions.yml'
+      - 'core/Coding_Project_Governance_v1.0.md'
+      - 'core/CROSS_PLATFORM_TEXT_NORMALIZATION_RULE_v1.0.md'
+      - 'projects/gwc/package.yaml'
+      - 'releases/changelog.d/2026-08-02-cross-platform-lf-normalization.md'
+      - 'SHA256SUMS.txt'
+      - 'tests/test_line_ending_policy.py'
+      - 'tools/validate_line_endings.py'
   workflow_dispatch:
 
 permissions:

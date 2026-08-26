@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   g5-retrospective-recovery:
-    if: github.event.issue.pull_request
+    if: >-
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, 'RETROSPECTIVE G5 RECOVERY EVIDENCE')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout protected base

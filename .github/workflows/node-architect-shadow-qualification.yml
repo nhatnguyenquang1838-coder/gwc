@@ -3,6 +3,13 @@ name: Node Architect canonical-81 shadow qualification
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'core/node-architect/**'
+      - 'schemas/node-architect/**'
+      - 'tools/node_architect/**'
+      - 'tests/test_shadow_81_qualification.py'
+      - 'tests/test_shadow_telemetry.py'
+      - '.github/workflows/node-architect-shadow-qualification.yml'
 
 permissions:
   contents: read
