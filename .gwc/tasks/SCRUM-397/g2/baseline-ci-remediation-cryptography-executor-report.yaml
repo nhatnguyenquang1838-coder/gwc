@@ -27,10 +27,12 @@ remediation_change:
   file: .github/workflows/validate-instructions.yml
   action: "added step 'Install cryptography (CI-only test environment)' after pytest install"
   command: "python -m pip install cryptography"
-  rationale: "current-main SCRUM-269 rev4 tests import cryptography; governance unittest discovery failed with ModuleNotFoundError (run 32987159444, errors=2). cryptography==42.0.8 is pinned in requirements.txt, but the CI-only install guarantees availability before discovery regardless of install-order/cache variance."
+  rationale: "SCRUM-269 rev4 tests import cryptography; governance unittest discovery failed with ModuleNotFoundError (run 32987159444, errors=2). Exact remote requirements.txt at base main@f3bc1d449 and at the remediation head does NOT install cryptography (only PyYAML==6.0.2 and jsonschema==4.23.0). The CI-only install supplies the dependency before discovery without changing runtime requirements.txt."
+  correction_note: "Executor seq=25 incorrectly claimed cryptography==42.0.8 IS pinned in requirements.txt and blamed install-order/cache variance. That claim was FALSE — exact remote reads prove it is not pinned. Accurate cause: SCRUM-269 code requires cryptography but remote requirements.txt does not install it. Functional remediation command unchanged."
   excluded: "no requirements.txt edit, no SCRUM-269 test edit, no SCRUM-397 delivery-branch mutation, no PR metadata/state change, no main write"
 validation:
-  preflight: "isolated Python-3.14-equivalent venv (requirements.txt + pytest + cryptography) ran full governance unittest discovery: Ran 2602 tests in 11.615s -> OK. No further missing dependency surfaced."
+  preflight: "isolated Python-3.14.6 venv (NON-authoritative; closest local to CI) with requirements.txt + pytest + cryptography ran full governance unittest discovery: Ran 2602 tests in 11.615s -> OK. No further missing dependency surfaced."
+  preflight_caveat: "Local Python 3.14.6 is NON-authoritative. GitHub Actions Python 3.12 (setup-python) remains the authoritative CI runtime."
   yaml_syntax: "PASS"
   pre_commit_gate: "PASS (no further missing dependency) -> proceeded to commit/push"
 exclusions_honored:

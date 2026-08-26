@@ -46,9 +46,10 @@ jobs:
         # Second baseline CI remediation (SCRUM-397 G2): current-main SCRUM-269
         # rev4 tests import cryptography, and the governance unittest discovery
         # step fails with ModuleNotFoundError when it is not present in the
-        # runner. cryptography IS pinned in requirements.txt, but the CI-only
-        # install guarantees it is available before discovery regardless of
-        # cache/install-order variation. This does NOT modify requirements.txt.
+        # runner. The exact requirements.txt at base main@f3bc1d449 and at the
+        # remediation head does NOT install cryptography (only PyYAML and
+        # jsonschema). The CI-only install supplies the dependency for
+        # governance discovery without changing runtime requirements.txt.
         run: python -m pip install cryptography
 
       - name: Validate LF and UTF-8 normalization

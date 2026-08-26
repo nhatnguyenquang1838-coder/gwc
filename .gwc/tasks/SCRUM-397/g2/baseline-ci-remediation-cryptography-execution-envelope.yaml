@@ -23,4 +23,6 @@ ci_evidence:
   pytest_step: success
   remaining_errors: 2
   missing_dependency: cryptography
-  note: "cryptography==42.0.8 IS pinned in requirements.txt; CI failure was install-order/cache variance. Explicit CI-only install guarantees availability."
+  accurate_cause: "SCRUM-269-imported code requires cryptography, but the exact remote requirements.txt at base main@f3bc1d449 and at the remediation head does NOT install it (only PyYAML==6.0.2 and jsonschema==4.23.0). The CI-only 'pip install cryptography' supplies the dependency for governance discovery without changing runtime requirements.txt."
+  correction_note: "Executor seq=25 incorrectly claimed cryptography IS pinned in requirements.txt / install-order cache variance. That claim was FALSE: exact remote reads prove it is not pinned. Accurate cause recorded here."
+preflight_caveat: "Local preflight used Python 3.14.6 which is NON-authoritative; GitHub Actions Python 3.12 remains authoritative for CI verdict."
