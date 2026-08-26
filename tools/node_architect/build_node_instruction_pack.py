@@ -36,6 +36,7 @@ class InstructionPack:
     acceptance_criteria: tuple[str, ...] = ()
     gate_node_route: tuple[str, ...] = ()
     plan_refs: tuple[str, ...] = ()
+    semantic_input_digest: str = ""
 
     @property
     def content_digest(self) -> str:
@@ -66,6 +67,7 @@ class InstructionPack:
             "acceptance_criteria": list(self.acceptance_criteria),
             "gate_node_route": list(self.gate_node_route),
             "plan_refs": list(self.plan_refs),
+            "semantic_input_digest": self.semantic_input_digest,
         }
         raw = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
         return "sha256:" + hashlib.sha256(raw.encode("utf-8")).hexdigest()
@@ -83,6 +85,7 @@ def build_node_instruction_pack(
     acceptance_criteria: Sequence[str] = (),
     gate_node_route: Sequence[str] = (),
     plan_refs: Sequence[str] = (),
+    semantic_input_digest: str = "",
 ) -> InstructionPack:
     """Compose a typed InstructionPack from a validated request + planning context."""
     return InstructionPack(
@@ -105,4 +108,5 @@ def build_node_instruction_pack(
         acceptance_criteria=tuple(map(str, acceptance_criteria)),
         gate_node_route=tuple(map(str, gate_node_route)),
         plan_refs=tuple(map(str, plan_refs)),
+        semantic_input_digest=str(semantic_input_digest),
     )
