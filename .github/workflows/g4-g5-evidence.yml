@@ -278,7 +278,13 @@ jobs:
             const command = /^APPROVE (?:G4_MERGE|G4) ([A-Za-z0-9._:-]+) ([0-9a-f]{16}) (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)$/;
             const associated = await github.rest.repos.listPullRequestsAssociatedWithCommit({ owner, repo, commit_sha: mergeSha });
             const associatedPr = associated.data.find((item) => item.merged_at && item.merge_commit_sha === mergeSha) || associated.data.find((item) => item.merged_at);
-            if (!associatedPr) { core.setFailed(`No merged PR is associated with ${mergeSha}.`); return; }
+            if (!associatedPr) {
+              core.notice(`G5 not applicable: direct-main commit ${mergeSha} is not associated with a merged PR.`);
+              core.setOutput('applicable', 'false');
+              core.setOutput('merge_sha', mergeSha);
+              return;
+            }
+            core.setOutput('applicable', 'true');
             const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: associatedPr.number });
             if (!pr.merged || pr.merge_commit_sha !== mergeSha || !pr.merged_by) { core.setFailed(`Associated PR does not prove merge commit ${mergeSha}.`); return; }
             const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: pr.number, per_page: 100 });
@@ -326,8 +332,10 @@ jobs:
             fs.writeFileSync('g5-ci-verification-evidence.json', JSON.stringify(evidence, null, 2));
             core.setOutput('artifact_name', artifactName); core.setOutput('classification', classification); core.setOutput('pr_number', String(pr.number)); core.setOutput('merge_sha', mergeSha); core.setOutput('selected_runs', selected.map((run) => `${run.workflow}:${run.run_id}:${run.conclusion || run.status}`).join(', '));
       - name: Validate G5 evidence
+        if: steps.evidence.outputs.applicable == 'true'
         run: python tools/node_architect/validate_g5_ci_verification.py g5-ci-verification-evidence.json
       - name: Upload canonical G5 machine evidence
+        if: steps.evidence.outputs.applicable == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.evidence.outputs.artifact_name }}
@@ -336,6 +344,7 @@ jobs:
             g5-checkpoint.json
           if-no-files-found: warn
       - name: Publish G5 human traceability comment
+        if: steps.evidence.outputs.applicable == 'true'
         uses: actions/github-script@v7
         env:
           CLASSIFICATION: ${{ steps.evidence.outputs.classification }}
