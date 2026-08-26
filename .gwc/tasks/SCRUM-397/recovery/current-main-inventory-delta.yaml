@@ -1,0 +1,53 @@
+schema_version: '1.0'
+artifact_type: current_main_inventory_delta
+task_id: SCRUM-397
+work_package: WP2-REFRESH-R1
+repository: nhatnguyenquang1838-coder/gwc
+baseline_main_sha: 938b8d67ff741eab027a1f2487d4a171444a5b25
+baseline_work_package: WP1
+current_main_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+delta_kind: additive_environment_drift_from_excluded_lane
+delta_scope: only SCRUM-397-relevant semantic digest consumers and collisions recorded; full diff is SCRUM-396 evidence
+incremental_new_producer_count: 1
+incremental_new_producer:
+  path: tools/node_architect/schema_compatibility_resolver.py
+  producer: schema_compatibility_resolver.py::payload_sha256
+  kind: actual new semantic digest producer (SHA-256 over a framed payload)
+  note: absent from old WP1 inventory
+relevant_new_paths:
+  - tests/conformance_vectors/jcs_vectors.json
+  - tests/conformance_vectors/verify_canonical_node.mjs
+  - tools/node_architect/schema_compatibility_resolver.py
+  - tools/node_architect/checkpoint_sqlite.py
+relevant_new_consumers:
+  - path: tools/node_architect/schema_compatibility_resolver.py::canonical_json
+    kind: semantic serialization helper
+    implementation: json.dumps(payload, sort_keys=True, separators=(',',':'), ensure_ascii=False)
+    note: produces a canonical-ish string for display/comparison; does NOT compute a digest; recorded as evidence of non-JCS semantic shape in the codebase
+  - path: tools/node_architect/schema_compatibility_resolver.py::payload_sha256
+    kind: actual new semantic digest producer
+    implementation: SHA-256 over framed payload
+    note: the only new digest-computing producer in tools/node_architect/ added by the drift; absent from old WP1 inventory
+  - path: tests/conformance_vectors/jcs_vectors.json
+    kind: collision/conformance evidence
+    profile_id_label: gwc-jcs-v1
+    canonicalization: sort_keys=True, separators=(',',':'), ensure_ascii=False, UTF-8 sha256
+    note: labels gwc-jcs-v1 but does NOT use RFC-8785/JCS UTF-16 code-unit ordering; recorded as evidence, not copied into scope, not a production digest producer
+  - path: tests/conformance_vectors/verify_canonical_node.mjs
+    kind: collision/conformance evidence
+    self_described_scope: NOT full RFC8785/JCS; sort_keys treated separately from UTF-16 ordering
+    note: different conformance assertion under a similar name; recorded as evidence, not a production digest producer
+  - path: tools/node_architect/checkpoint_sqlite.py
+    kind: store/pass-through helper
+    note: stores and pass-through state_digest/record_digest and serializes payload_json, but does NOT compute a digest itself; recorded as evidence of the broader node-architect module surface, not a new digest producer
+old_wp1_inventory_status: not retroactively applied; WP1 was produced against old main
+action: record_as_evidence_only; do not copy into WP2-REFRESH-R1 scope; do not treat as fresh authority evidence
+conclusions:
+  - The drift introduced exactly 1 new semantic digest producer in tools/node_architect/ (schema_compatibility_resolver.py::payload_sha256)
+  - The drift introduced a new semantic serialization helper (schema_compatibility_resolver.py::canonical_json) that is NOT a digest producer
+  - The drift introduced a gwc-jcs-v1-labeled artifact using non-JCS canonicalization (jcs_vectors.json), recorded as collision evidence
+  - The drift introduced a Node verifier framing itself as NOT full RFC8785/JCS (verify_canonical_node.mjs), recorded as collision evidence
+  - checkpoint_sqlite.py is a store/pass-through helper, not a new digest producer
+  - The drift does NOT modify existing SCRUM-397 contract paths
+  - WP2-REFRESH-R1 rebinds the profile/registry to current main while keeping gwc-jcs-v1=REJECTED
+  - Old WP2 artifacts are carried as design input only

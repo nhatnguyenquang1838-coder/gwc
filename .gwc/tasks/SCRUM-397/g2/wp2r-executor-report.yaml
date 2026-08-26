@@ -1,0 +1,94 @@
+schema_version: '1.0'
+artifact_type: g2-executor-report
+task_id: SCRUM-397
+work_package: WP2-REFRESH-R1
+run: SCRUM-397-WP2-REFRESH-R1-R2
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+approval_request_id: g2_scrum-397_0da263b2a7bfdef9
+approval_command: APPROVE G2 g2_scrum-397_0da263b2a7bfdef9 cdf885aafe372d88 2026-08-24T21:39:00Z
+status: PASS
+summary: >-
+  WP2-REFRESH-R1 evidence self-reference correction under consumed G2
+  g2_scrum-397_0da263b2a7bfdef9 (APPROVE G2 g2_scrum-397_0da263b2a7bfdef9
+  cdf885aafe372d88 2026-08-24T21:39:00Z).
+
+  Corrects durable executor report on 8fbd0bf8220b062ec3fadb89bc438549dae12a63
+  so it no longer embeds a stale/self-referential terminal SHA. Terminal exact
+  SHA is projected externally by Controller after remote push; the commit that
+  contains this report cannot truthfully contain its own final SHA.
+
+  Corrected durable validation count to 56 (47 schema + 9 evidence-integrity)
+  to match the actual corrected run instead of stale 47.
+
+  No normative profile/registry change; no SCRUM-396 write; no WP3/WP4 runtime
+  work; no PR/merge/deploy.
+source_base_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+pre_correction_head: 8fbd0bf8220b062ec3fadb89bc438549dae12a63
+terminal_head_source: CONTROLLER_EXTERNAL_READBACK
+terminal_head_sha: null
+materialized_files_count: 11
+authorized_paths_count: 11
+authorized_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/recovery/main-drift-assessment.yaml
+  - .gwc/tasks/SCRUM-397/recovery/current-main-inventory-delta.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - governance/digest-profile-registry.yaml
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - schemas/digest-envelope.schema.json
+  - tests/package_export/test_canonical_digest_profile.py
+validation_counts:
+  py_compile: 1
+  py_compile_result: PASS
+  bounded_unit_tests: 56
+  bounded_unit_tests_result: PASS
+  schema_schema_checks: 1
+  schema_schema_checks_result: PASS
+scope_audit: EXACT
+scope_audit_details: staged set == exactly the 11 authorized paths; 0 out-of-scope staged
+scope_hash: sha256:d1080a40a9446909e0ae627b291f9067e439040b92ca54440ff5b679b0d77858
+scope_hash_short: d1080a40a9446909
+correction_scope_hash: sha256:cdf885aafe372d88ecdc672875f664b5a4a4fe2e4e6aca4fed6cd1255ca454b5
+correction_scope_hash_short: cdf885aafe372d88
+drift_delta_count: 20
+drift_delta_note: exact GitHub compare 938b8d67... -> f2d08df4... contains 20 files
+drift_new_producer_count: 1
+drift_new_producer_note: schema_compatibility_resolver.py::payload_sha256 is the only new semantic digest producer added by the drift
+ci_status: CI_UNAVAILABLE_AT_CHECK
+ci_note: 0 statuses, 0 runs at terminal check time
+authorization:
+  g2_request_id: g2_scrum-397_0da263b2a7bfdef9
+  g2_token: 0da263b2a7bfdef9a718cf3cc70dd7974d47855a678162bbd9ef579f62d63037
+  g2_request_digest: sha256:20e3e2a279e66c9640a4d7288aa497f623c338a4d931d8b48ef96ac7b3b185ac
+  g2_command: APPROVE G2 g2_scrum-397_0da263b2a7bfdef9 cdf885aafe372d88 2026-08-24T21:39:00Z
+  g2_consumed: true
+  g2_kind: FIRST_SEEN | VALID | CONSUMED
+  authority_granted: true
+  g3_authority_granted: false
+  g4_authority_granted: false
+  g5_authority_granted: false
+  g6_authority_granted: false
+security:
+  canonicalization_never_grants_authority: true
+  registry_activation_fail_closed: true
+  gwc_jcs_v1_new_write_activation: BLOCKED_PENDING_WP3_WP4
+  historical_evidence_immutable: true
+  raw_byte_hashes_unchanged: true
+unresolved_bounded_collisions:
+  - collision: gwc-jcs-v1 normative identity ambiguity across main
+    bounded: true
+    fail_closed: true
+    gwc_jcs_v1_state: REJECTED
+    scrum_396_paths_read_only: true
+    resolution_owner: WP3/WP4 prerequisites (NOT this work package)
+    note: recorded as evidence only; not resolved here; not treated as fresh authority evidence
+forced_confirmation:
+  protected_main_before_push: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+  pre_correction_head_before_push: 8fbd0bf8220b062ec3fadb89bc438549dae12a63
+  g2_not_expired_before_push: 2026-08-24T21:39:00Z
+  terminal_head_sha_placeholder: null
+  terminal_head_sha_is_external: true

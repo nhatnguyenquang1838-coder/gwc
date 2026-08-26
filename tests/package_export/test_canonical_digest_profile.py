@@ -1,0 +1,625 @@
+#!/usr/bin/env python3
+"""Contract/schema tests for SCRUM-397 WP2 canonical digest profile + registry.
+
+Scope: WP2 ONLY. Validates that the committed normative artifacts conform to
+their JSON-Schema contracts and encode the exact WP2 normative contract:
+  - gwc-jcs-v1 profile (RFC-8785/JCS-compatible, strict input domain,
+    negative_zero_policy=reject, non-finite reject, non-string-key reject,
+    duplicate raw JSON key reject before semantic collapse, Unicode
+    normalization=none, SHA-256, domain separation + preimage framing,
+    bounded resource limits, deterministic error taxonomy).
+  - digest-profile-registry lifecycle EXACTLY NEW_WRITE_ALLOWED|VERIFY_ONLY|REJECTED,
+    fail-closed (gwc-jcs-v1 NOT activated for new writes).
+  - digest-envelope binding contract.
+
+Deliberately EXCLUDED (hard exclusions): cross-runtime reference verifier /
+golden corpus (WP3); shared runtime digest API / legacy verifier (WP4);
+consumer migration (WP5). This file validates schema/data conformance only.
+"""
+
+import json
+import sys
+import unittest
+from pathlib import Path
+
+import jsonschema
+import yaml
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+GOV = REPO_ROOT / "governance"
+SCHEMAS = REPO_ROOT / "schemas"
+
+# Canonical lifecycle states (normative closed set).
+LIFECYCLE_STATES = frozenset({"NEW_WRITE_ALLOWED", "VERIFY_ONLY", "REJECTED"})
+
+
+def _load_json(path: Path):
+    with path.open("r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def _load_yaml(path: Path):
+    with path.open("r", encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
+class ProfileSchemaTest(unittest.TestCase):
+    """gwc-jcs-v1 profile conformance to canonical-digest-profile.schema.json."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_schema_is_draft2020_12(self):
+        self.assertEqual(
+            self.schema["$schema"],
+            "https://json-schema.org/draft/2020-12/schema",
+        )
+
+    def test_profile_conforms_to_schema(self):
+        errors = sorted(self.validator.iter_errors(self.profile), key=str)
+        self.assertEqual([], [str(e) for e in errors])
+
+    def test_profile_id(self):
+        self.assertEqual(self.profile["profile_id"], "gwc-jcs-v1")
+
+    def test_status_is_definition_maturity_not_activation(self):
+        # status describes definition maturity only; registry is the sole
+        # activation authority (gwc-jcs-v1 lifecycle=REJECTED there).
+        self.assertEqual(self.profile["status"], "defined")
+
+    def test_specification_is_rfc8785_jcs(self):
+        self.assertEqual(self.profile["specification"], "RFC_8785_JCS_COMPATIBLE")
+
+    def test_strict_input_domain_policies(self):
+        d = self.profile["strict_input_domain"]
+        self.assertEqual(d["negative_zero_policy"], "reject")
+        self.assertEqual(d["non_finite_policy"], "reject")
+        self.assertEqual(d["non_string_key_policy"], "reject")
+        self.assertEqual(d["duplicate_raw_key_policy"], "reject_before_semantic_collapse")
+        self.assertEqual(d["unicode_normalization"], "none")
+        # Explicit invalid-Unicode policy (lone-surrogate rejection is NOT
+        # normalization; normalization remains none).
+        self.assertEqual(d["invalid_unicode_policy"], "reject_unpaired_surrogates")
+
+    def test_canonical_byte_contract_is_not_naive_json_dumps(self):
+        c = self.profile["canonical_byte_contract"]
+        self.assertEqual(c["standard"], "RFC_8785")
+        self.assertEqual(c["key_ordering"], "lexicographic_utf16_code_unit")
+        self.assertEqual(c["number_serialization"], "jcs_shortest_round_trip")
+        self.assertEqual(c["string_escaping"], "jcs_minimal")
+        self.assertEqual(c["utf8_encoding"], "strict_utf8")
+        self.assertEqual(c["unicode_normalization"], "none")
+
+    def test_hash_binding(self):
+        h = self.profile["hash_binding"]
+        self.assertEqual(h["algorithm"], "SHA-256")
+        self.assertEqual(h["hex_digest_lowercase"], True)
+        self.assertEqual(h["domain_separation"], "required")
+        self.assertEqual(h["preimage_framing"], "required")
+
+    def test_domain_separation_framing(self):
+        ds = self.profile["domain_separation"]
+        self.assertEqual(ds["scheme"], "gwc-domain-sep-v1")
+        # Explicit length-prefixed framing: u32be(domain_tag len) || tag ||
+        # u64be(preimage len) || preimage. No implicit-length field.
+        self.assertIn("u32be", ds["framing"])
+        self.assertIn("utf8_len(domain_tag)", ds["framing"])
+        self.assertIn("u64be", ds["framing"])
+        self.assertIn("byte_len(preimage)", ds["framing"])
+        # The framing_rule prose must describe explicit length-prefix framing
+        # and never allow user-supplied domain tags.
+        self.assertIn("length-prefixed", ds["framing_rule"])
+        self.assertIn("no implicit-length field", ds["framing_rule"])
+        self.assertIn("never user-supplied", ds["framing_rule"])
+
+    def test_resource_limits_bounded(self):
+        rl = self.profile["resource_limits"]
+        for key in ("max_preimage_bytes", "max_object_depth", "max_object_keys",
+                    "max_array_items", "max_string_bytes"):
+            self.assertGreaterEqual(rl[key], 1)
+        self.assertEqual(rl["limit_policy"], "reject_with_deterministic_error")
+
+    def test_error_taxonomy_deterministic(self):
+        et = self.profile["error_taxonomy"]
+        for code in ("DIGEST_NEGATIVE_ZERO_REJECTED", "DIGEST_NON_FINITE_REJECTED",
+                     "DIGEST_NON_STRING_KEY_REJECTED", "DIGEST_DUPLICATE_RAW_KEY_REJECTED",
+                     "DIGEST_INVALID_UNICODE_REJECTED", "DIGEST_RESOURCE_LIMIT_EXCEEDED",
+                     "DIGEST_DOMAIN_TAG_MISMATCH", "DIGEST_ENVELOPE_BINDING_MISMATCH"):
+            self.assertIn(code, et)
+        self.assertEqual(et["error_delivery"], "deterministic_and_replayable")
+
+    def test_envelope_binding_fields(self):
+        eb = self.profile["digest_envelope_binding"]
+        for field in ("profile_id", "hash_algorithm", "domain", "schema_ref",
+                      "preimage_framing_scheme", "hexdigest"):
+            self.assertIn(field, eb["binds"])
+        self.assertEqual(eb["schema"], "schemas/digest-envelope.schema.json")
+
+    def test_canonicalization_never_grants_authority(self):
+        g = self.profile["governance"]
+        self.assertTrue(g["canonicalization_never_grants_authority"])
+        self.assertTrue(g["registry_activation_fail_closed"])
+        self.assertEqual(g["gwc_jcs_v1_new_write_activation"], "BLOCKED_PENDING_WP3_WP4")
+        self.assertTrue(g["historical_evidence_immutable"])
+        self.assertTrue(g["raw_byte_hashes_unchanged"])
+
+
+class RegistrySchemaTest(unittest.TestCase):
+    """digest-profile-registry.yaml conformance + fail-closed semantics."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "digest-profile-registry.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.registry = _load_yaml(GOV / "digest-profile-registry.yaml")
+
+    def test_registry_conforms_to_schema(self):
+        errors = sorted(self.validator.iter_errors(self.registry), key=str)
+        self.assertEqual([], [str(e) for e in errors])
+
+    def test_lifecycle_states_exact_closed_set(self):
+        for entry in self.registry["entries"].values():
+            self.assertIn(entry["lifecycle_state"], LIFECYCLE_STATES)
+
+    def test_gwc_jcs_v1_fail_closed_not_new_write(self):
+        entry = self.registry["entries"]["gwc-jcs-v1"]
+        self.assertEqual(entry["lifecycle_state"], "REJECTED")
+        self.assertFalse(entry["new_write_allowed"])
+        self.assertEqual(entry["reason"], "NOT_ACTIVATED_PENDING_WP3_WP4")
+        self.assertEqual(entry["activation_policy"], "FAIL_CLOSED")
+
+    def test_legacy_metadata_verify_only_no_verifier(self):
+        entry = self.registry["entries"]["legacy-python-json-v1"]
+        self.assertEqual(entry["lifecycle_state"], "VERIFY_ONLY")
+        self.assertFalse(entry["new_write_allowed"])
+        self.assertTrue(entry["verify_only_allowed"])
+
+    def test_policy_fail_closed(self):
+        p = self.registry["policy"]
+        self.assertEqual(p["new_write_gate"], "registry_lifecycle_state_must_equal_NEW_WRITE_ALLOWED")
+        self.assertEqual(p["unknown_profile_policy"], "REJECTED")
+        self.assertTrue(p["fail_closed"])
+
+
+class EnvelopeSchemaTest(unittest.TestCase):
+    """digest-envelope.schema.json binding contract."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "digest-envelope.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+
+    def test_valid_envelope_passes(self):
+        env = {
+            "schema_version": "1.0",
+            "artifact_type": "digest-envelope",
+            "profile_id": "gwc-jcs-v1",
+            "hash_algorithm": "SHA-256",
+            "domain": "gwc.governance.evidence.canonical.v1",
+            "schema_ref": "schemas/canonical-digest-profile.schema.json",
+            "preimage_framing_scheme": "gwc-domain-sep-v1",
+            "hexdigest": "a" * 64,
+        }
+        self.assertTrue(self.validator.is_valid(env))
+
+    def test_envelope_rejects_missing_binding(self):
+        env = {
+            "schema_version": "1.0",
+            "artifact_type": "digest-envelope",
+            "profile_id": "gwc-jcs-v1",
+            "hash_algorithm": "SHA-256",
+            "domain": "gwc.governance.evidence.canonical.v1",
+            "schema_ref": "schemas/canonical-digest-profile.schema.json",
+            "preimage_framing_scheme": "gwc-domain-sep-v1",
+            # hexdigest missing -> invalid
+        }
+        self.assertFalse(self.validator.is_valid(env))
+
+    def test_envelope_rejects_bad_digest_shape(self):
+        env = {
+            "schema_version": "1.0",
+            "artifact_type": "digest-envelope",
+            "profile_id": "gwc-jcs-v1",
+            "hash_algorithm": "SHA-256",
+            "domain": "gwc.governance.evidence.canonical.v1",
+            "schema_ref": "schemas/canonical-digest-profile.schema.json",
+            "preimage_framing_scheme": "gwc-domain-sep-v1",
+            "hexdigest": "not-a-hex-digest",
+        }
+        self.assertFalse(self.validator.is_valid(env))
+
+    def test_envelope_rejects_unknown_framing(self):
+        env = {
+            "schema_version": "1.0",
+            "artifact_type": "digest-envelope",
+            "profile_id": "gwc-jcs-v1",
+            "hash_algorithm": "SHA-256",
+            "domain": "gwc.governance.evidence.canonical.v1",
+            "schema_ref": "schemas/canonical-digest-profile.schema.json",
+            "preimage_framing_scheme": "some-other-framing",
+            "hexdigest": "a" * 64,
+        }
+        self.assertFalse(self.validator.is_valid(env))
+
+
+class SchemaWellFormedTest(unittest.TestCase):
+    """All three schemas are well-formed Draft 2020-12 schemas."""
+
+    def test_schemas_well_formed(self):
+        for name in ("canonical-digest-profile.schema.json",
+                     "digest-profile-registry.schema.json",
+                     "digest-envelope.schema.json"):
+            schema = _load_json(SCHEMAS / name)
+            self.assertEqual(schema["$schema"], "https://json-schema.org/draft/2020-12/schema")
+            jsonschema.Draft202012Validator.check_schema(schema)
+
+
+class RegistryLifecycleNegativeTest(unittest.TestCase):
+    """Correction: registry schema must REJECT inconsistent lifecycle combinations."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "digest-profile-registry.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+
+    def _entry(self, lifecycle_state, new_write_allowed, verify_only_allowed):
+        return {
+            "schema_version": "1.0",
+            "artifact_type": "digest-profile-registry",
+            "registry_id": "gwc-digest-profile-registry",
+            "task": "SCRUM-397",
+            "work_package": "WP2",
+            "entries": {
+                "test-profile": {
+                    "profile_id": "test-profile",
+                    "lifecycle_state": lifecycle_state,
+                    "new_write_allowed": new_write_allowed,
+                    "verify_only_allowed": verify_only_allowed,
+                    "reason": "negative test",
+                    "domain": "gwc.test.domain",
+                    "schema_ref": None,
+                    "envelope_schema_ref": "schemas/digest-envelope.schema.json",
+                    "hash_algorithm": "SHA-256",
+                }
+            },
+            "policy": {
+                "new_write_gate": "registry_lifecycle_state_must_equal_NEW_WRITE_ALLOWED",
+                "verify_gate": "registry_lifecycle_state_in_NEW_WRITE_ALLOWED_OR_VERIFY_ONLY",
+                "unknown_profile_policy": "REJECTED",
+                "domain_binding_required": True,
+                "fail_closed": True,
+            },
+        }
+
+    def test_rejected_with_new_write_true_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("REJECTED", True, False)))
+
+    def test_new_write_allowed_with_new_write_false_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("NEW_WRITE_ALLOWED", False, True)))
+
+    def test_verify_only_with_new_write_true_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("VERIFY_ONLY", True, True)))
+
+    def test_rejected_with_verify_only_true_rejected_by_schema(self):
+        self.assertFalse(self.validator.is_valid(
+            self._entry("REJECTED", False, True)))
+
+    def test_valid_rejected_entry_passes(self):
+        self.assertTrue(self.validator.is_valid(
+            self._entry("REJECTED", False, False)))
+
+    def test_valid_verify_only_entry_passes(self):
+        self.assertTrue(self.validator.is_valid(
+            self._entry("VERIFY_ONLY", False, True)))
+
+    def test_valid_new_write_allowed_entry_passes(self):
+        self.assertTrue(self.validator.is_valid(
+            self._entry("NEW_WRITE_ALLOWED", True, True)))
+
+
+class EnvelopeBindingExactSetTest(unittest.TestCase):
+    """Correction: profile envelope-binding list must be EXACTLY the six
+    normative fields, unique, no extras."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_binding_list_exactly_six_unique(self):
+        binds = self.profile["digest_envelope_binding"]["binds"]
+        self.assertEqual(len(binds), 6)
+        self.assertEqual(len(set(binds)), 6)
+        self.assertEqual(set(binds), {
+            "profile_id", "hash_algorithm", "domain", "schema_ref",
+            "preimage_framing_scheme", "hexdigest",
+        })
+
+    def test_incomplete_binding_list_rejected(self):
+        bad = dict(self.profile)
+        bad["digest_envelope_binding"] = {
+            "binds": ["profile_id", "hash_algorithm", "domain_tag"],
+            "schema": "schemas/digest-envelope.schema.json",
+            "integrity_rule": "x",
+        }
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_extra_binding_field_rejected(self):
+        bad = dict(self.profile)
+        bad["digest_envelope_binding"] = {
+            "binds": ["profile_id", "hash_algorithm", "domain_tag", "schema_ref",
+                      "preimage_framing_scheme", "hexdigest", "extra_field"],
+            "schema": "schemas/digest-envelope.schema.json",
+            "integrity_rule": "x",
+        }
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_duplicate_binding_field_rejected(self):
+        bad = dict(self.profile)
+        bad["digest_envelope_binding"] = {
+            "binds": ["profile_id", "profile_id", "hash_algorithm", "domain_tag",
+                      "schema_ref", "preimage_framing_scheme"],
+            "schema": "schemas/digest-envelope.schema.json",
+            "integrity_rule": "x",
+        }
+        self.assertFalse(self.validator.is_valid(bad))
+
+
+
+class FinalTighteningNegativeTest(unittest.TestCase):
+    """FINAL_SCHEMA_TIGHTENING: status=active and ambiguous framing MUST NOT validate."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_status_active_rejected_by_schema(self):
+        # 'active' is an activation term; profile status must describe definition
+        # maturity only. Registry is the sole write/verify activation authority.
+        bad = dict(self.profile)
+        bad["status"] = "active"
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_status_defined_still_valid(self):
+        self.assertTrue(self.validator.is_valid(self.profile))
+
+    def test_old_implicit_domain_length_framing_rejected_by_schema(self):
+        # The old ambiguous framing with implicit domain-tag length must fail.
+        bad = dict(self.profile)
+        bad["domain_separation"] = dict(self.profile["domain_separation"])
+        bad["domain_separation"]["framing"] = (
+            "sha256(domain_tag || 0x00 || u64be(preimage_len) || preimage)"
+        )
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_explicit_length_prefixed_framing_valid(self):
+        self.assertEqual(
+            self.profile["domain_separation"]["framing"],
+            "sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )",
+        )
+        self.assertTrue(self.validator.is_valid(self.profile))
+
+
+
+class CrossArtifactBindingConsistencyTest(unittest.TestCase):
+    """CROSS_ARTIFACT_BINDING_MISMATCH guard: profile.digest_envelope_binding.binds
+    must match the digest-envelope schema's required set exactly, so field names
+    cannot drift between the profile artifact and the envelope schema."""
+
+    NORMATIVE_BINDS = {
+        "profile_id", "hash_algorithm", "domain", "schema_ref",
+        "preimage_framing_scheme", "hexdigest",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+        cls.envelope_schema = _load_json(SCHEMAS / "digest-envelope.schema.json")
+
+    def test_profile_binds_subset_of_envelope_required(self):
+        binds = set(self.profile["digest_envelope_binding"]["binds"])
+        required = set(self.envelope_schema["required"])
+        missing = binds - required
+        self.assertEqual(missing, set(),
+                         f"profile binds not present in envelope required: {missing}")
+
+    def test_envelope_required_contains_normative_binds(self):
+        required = set(self.envelope_schema["required"])
+        self.assertTrue(self.NORMATIVE_BINDS <= required,
+                        f"envelope schema missing normative bindings: {self.NORMATIVE_BINDS - required}")
+
+    def test_normative_set_exact_and_unique(self):
+        binds = set(self.profile["digest_envelope_binding"]["binds"])
+        self.assertEqual(binds, self.NORMATIVE_BINDS)
+
+    def test_domain_tag_should_not_be_a_binding(self):
+        # The actual envelope field is 'domain', not 'domain_tag'.
+        binds = set(self.profile["digest_envelope_binding"]["binds"])
+        self.assertNotIn("domain_tag", binds)
+        self.assertNotIn("domain_tag", set(self.envelope_schema["required"]))
+
+
+class InvalidUnicodePolicyTest(unittest.TestCase):
+    """INVALID_UNICODE_POLICY_EXPLICIT: schema must enforce the explicit policy."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = _load_json(SCHEMAS / "canonical-digest-profile.schema.json")
+        cls.validator = jsonschema.Draft202012Validator(cls.schema)
+        cls.profile = _load_yaml(GOV / "digest-profiles" / "gwc-jcs-v1.yaml")
+
+    def test_profile_carries_exact_policy(self):
+        self.assertEqual(
+            self.profile["strict_input_domain"]["invalid_unicode_policy"],
+            "reject_unpaired_surrogates",
+        )
+
+    def test_profile_carries_dedicated_error_code(self):
+        self.assertIn("DIGEST_INVALID_UNICODE_REJECTED",
+                      self.profile["error_taxonomy"])
+
+    def test_schema_rejects_missing_policy(self):
+        bad = dict(self.profile)
+        bad["strict_input_domain"] = dict(self.profile["strict_input_domain"])
+        del bad["strict_input_domain"]["invalid_unicode_policy"]
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_schema_rejects_altered_policy(self):
+        bad = dict(self.profile)
+        bad["strict_input_domain"] = dict(self.profile["strict_input_domain"])
+        bad["strict_input_domain"]["invalid_unicode_policy"] = "allow_any"
+        self.assertFalse(self.validator.is_valid(bad))
+
+    def test_normalization_still_none(self):
+        # Rejecting malformed/lone-surrogate Unicode is NOT normalization.
+        self.assertEqual(
+            self.profile["strict_input_domain"]["unicode_normalization"],
+            "none",
+        )
+
+
+class RecoveryEvidenceIntegrityTest(unittest.TestCase):
+    """Bounded evidence-integrity checks (WP2-REFRESH-R1): recovery evidence
+    must be internally consistent, carry no durable scrumn_ typo keys/tokens,
+    and the terminal executor-report must not remain in a pending/RUNNING state."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.repo_root = REPO_ROOT
+        cls.recovery = REPO_ROOT / ".gwc" / "tasks" / "SCRUM-397" / "recovery"
+        cls.main_drift = cls.recovery / "main-drift-assessment.yaml"
+        cls.inventory_delta = cls.recovery / "current-main-inventory-delta.yaml"
+        cls.executor_report = REPO_ROOT / ".gwc" / "tasks" / "SCRUM-397" / "g2" / "wp2r-executor-report.yaml"
+        with cls.main_drift.open("r", encoding="utf-8") as fh:
+            cls.main_drift_text = fh.read()
+        with cls.main_drift.open("r", encoding="utf-8") as fh:
+            cls.main_drift_doc = yaml.safe_load(fh)
+        with cls.inventory_delta.open("r", encoding="utf-8") as fh:
+            cls.inventory_delta_text = fh.read()
+        with cls.executor_report.open("r", encoding="utf-8") as fh:
+            cls.executor_report_doc = yaml.safe_load(fh)
+
+    def _typo_token_present(self, text):
+        import re
+        return bool(re.search(r"scrumn_\b|scrumn_397|scrumn_396", text))
+
+    def test_no_durable_scrumn_typo_in_drift_assessment(self):
+        self.assertFalse(
+            self._typo_token_present(self.main_drift_text),
+            "main-drift-assessment.yaml carries a durable scrumn_ typo key/token",
+        )
+
+    def test_durable_drift_keys_are_scrum_397(self):
+        doc = self.main_drift_doc
+        self.assertIn("semantic_overlap_with_scrum_397", doc)
+        collisions = doc.get("semantic_overlap_with_scrum_397", {})
+        collision_list = collisions.get("collisions", [])
+        for item in collision_list:
+            for key in item:
+                self.assertNotIn(
+                    "scrumn_", key,
+                    f"collision item key still carries scrumn_ typo: {key}",
+                )
+
+    def test_drift_path_count_matches_list(self):
+        doc = self.main_drift_doc
+        count = doc.get("drift_path_count")
+        paths = doc.get("drift_paths", [])
+        self.assertIsNotNone(count, "drift_path_count missing from recovery assessment")
+        self.assertIsInstance(count, int)
+        self.assertEqual(
+            count, len(paths),
+            f"drift_path_count={count} does not match drift_paths list length={len(paths)}",
+        )
+
+    def test_inventory_delta_classifies_new_digest_producers_accurately(self):
+        doc = yaml.safe_load(self.inventory_delta_text)
+        producers = doc.get("relevant_new_consumers", [])
+        producer_kinds = {p.get("kind") for p in producers if p.get("kind")}
+        self.assertIn("actual new semantic digest producer", producer_kinds)
+        self.assertIn("semantic serialization helper", producer_kinds)
+        self.assertIn("store/pass-through helper", producer_kinds)
+        self.assertIn("collision/conformance evidence", producer_kinds)
+        # checkpoint_sqlite.py must NOT be labeled a new digest producer.
+        checkpoint_entries = [p for p in producers if p.get("path", "").endswith("checkpoint_sqlite.py")]
+        for p in checkpoint_entries:
+            self.assertNotIn(
+                "new semantic digest producer", p.get("kind", ""),
+                "checkpoint_sqlite.py must not be classified as a new digest producer",
+            )
+
+    def test_inventory_delta_reports_exact_new_producer_count(self):
+        doc = yaml.safe_load(self.inventory_delta_text)
+        count = doc.get("incremental_new_producer_count")
+        self.assertIsNotNone(count)
+        self.assertEqual(count, 1)
+
+    def test_executor_report_is_pass_not_running(self):
+        doc = self.executor_report_doc
+        self.assertIn("status", doc)
+        self.assertNotEqual(doc["status"], "RUNNING")
+        self.assertNotEqual(doc["status"], "pending")
+
+    def test_executor_report_terminal_fields_not_pending(self):
+        doc = self.executor_report_doc
+        for field in ("materialized_files_count", "authorized_paths_count", "validation_counts"):
+            self.assertIn(field, doc, f"executor-report missing {field}")
+        mv = doc.get("materialized_files_count")
+        self.assertNotEqual(mv, "pending")
+        self.assertIsInstance(mv, int)
+        ap = doc.get("authorized_paths_count")
+        self.assertNotEqual(ap, "pending")
+        self.assertIsInstance(ap, int)
+        vc = doc.get("validation_counts")
+        self.assertIn("bounded_unit_tests", vc)
+        self.assertNotEqual(vc["bounded_unit_tests_result"], "pending")
+
+    def test_executor_report_scope_audit_is_exact(self):
+        doc = self.executor_report_doc
+        self.assertIn("scope_audit", doc)
+        self.assertEqual(doc["scope_audit"], "EXACT")
+
+    def test_executor_report_bound_collision_is_fail_closed(self):
+        doc = self.executor_report_doc
+        collisions = doc.get("unresolved_bounded_collisions", [])
+        self.assertIsInstance(collisions, list)
+        self.assertGreaterEqual(len(collisions), 1)
+        for c in collisions:
+            self.assertTrue(c.get("bounded", False))
+            self.assertTrue(c.get("fail_closed", False))
+        gwc_state = None
+        for c in collisions:
+            if c.get("gwc_jcs_v1_state"):
+                gwc_state = c["gwc_jcs_v1_state"]
+        self.assertEqual(gwc_state, "REJECTED")
+
+    def test_executor_report_terminal_not_self_referential_or_stale(self):
+        report = self.executor_report_doc
+        src = report["terminal_head_source"]
+        sha = report["terminal_head_sha"]
+        pre = report.get("pre_correction_head")
+        # Terminal exact SHA must be externally supplied by Controller after commit.
+        # A durable commit cannot truthfully contain its own final SHA.
+        self.assertEqual(src, "CONTROLLER_EXTERNAL_READBACK")
+        # sha must be a non-iterable, non-string placeholder (null/None) in the
+        # durable pre-readback state, not a hidden self-referential/SHA claim.
+        self.assertIsNone(sha, "expected terminal_head_sha=null before external readback")
+        self.assertNotIn("terminal_head_sha", str(sha))
+        # pre_correction_head must be the exact pre-write branch head, never a
+        # stale SCRUM-397 WP2R2 terminal SHA.
+        self.assertNotEqual(pre, "5d1876ca27325d46868da2640ffeb4104f76f400")
+        self.assertEqual(pre, "8fbd0bf8220b062ec3fadb89bc438549dae12a63")
+
+
+if __name__ == "__main__":
+    unittest.main()
+

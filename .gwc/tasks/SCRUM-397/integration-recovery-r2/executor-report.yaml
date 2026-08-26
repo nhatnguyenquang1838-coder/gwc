@@ -1,0 +1,6 @@
+schema_version: "1.0"
+artifact_type: integration-recovery-r2-executor-report
+executor: Hermes Mac
+executor_seq: 16
+state: REPLAY_COMPLETE_AWAITING_VALIDATION
+next_gate: VALIDATION_AND_PUSH
