@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/shadow-telemetry-event.schema.json",
+  "title": "Node Architect shadow telemetry event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id", "run_id", "gate", "exact_revision", "node_id", "node_version",
+    "route_pack", "graph_revision", "idempotency_key", "applicability",
+    "shadow_decision", "reason_code", "proposed_effects", "executed_effects",
+    "authority_granted", "event_digest"
+  ],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "gate": {"type": "string", "pattern": "^G[0-6](?:_[A-Z0-9_]+)?$"},
+    "exact_revision": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "minLength": 1},
+    "node_version": {"type": "string", "minLength": 1},
+    "route_pack": {"type": "string", "minLength": 1},
+    "graph_revision": {"type": "string", "minLength": 1},
+    "idempotency_key": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "maturity": {"type": ["string", "null"]},
+    "executability_level": {"type": ["string", "null"]},
+    "applicability": {"type": ["string", "null"]},
+    "shadow_decision": {"type": ["string", "null"]},
+    "reason_code": {"type": ["string", "null"]},
+    "result_digest": {"type": ["string", "null"]},
+    "proposed_effects": {"type": "array"},
+    "executed_effects": {"type": "array", "maxItems": 0},
+    "authority_granted": {"const": false},
+    "checkpoint": {"type": ["object", "null"]},
+    "event_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
