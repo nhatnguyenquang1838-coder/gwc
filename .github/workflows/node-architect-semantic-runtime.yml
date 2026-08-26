@@ -1,0 +1,20 @@
+name: Node Architect semantic runtime
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  semantic-runtime-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run semantic runtime corrective regression tests
+        run: |
+          python -m pytest -q tests/test_scrum_566_semantic_runtime_correction.py
