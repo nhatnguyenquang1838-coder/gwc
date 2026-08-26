@@ -11,7 +11,7 @@
   "fail_closed": true,
   "exact_revision_binding": true,
   "canonical_population": "canonical_81",
-  "route_source": "tools/node_architect/gate_node_routes.py",
+  "route_source": "tools/node_architect/canonical_shadow_route.py",
   "adapter_source": "tools/node_architect/shadow_adapters.py",
   "registry_source": "core/node-architect/node-registry.json"
 }
