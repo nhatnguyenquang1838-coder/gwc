@@ -1,6 +1,9 @@
 name: Node Architect semantic runtime
 
 on:
+  push:
+    branches:
+      - chatgpt/scrum-566-agent-runtime-corrective
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
