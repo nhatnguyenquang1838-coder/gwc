@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+import fcntl
 import hashlib
 import json
+import os
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -46,6 +48,7 @@ class NodeEvidenceLedger:
         self, *, root: Path, task_id: str, run_id: str, node_id: str,
         repository: str, branch: str, base_sha: str, head_sha: str,
         scope_hash: str, idempotency_key: str, occurred_at: str | None = None,
+        schema_version: str = "1.0",
     ) -> None:
         self.root = Path(root)
         self.task_id = _safe_segment(task_id, "task_id")
@@ -58,15 +61,17 @@ class NodeEvidenceLedger:
         self.scope_hash = scope_hash
         self.idempotency_key = idempotency_key
         self.occurred_at = occurred_at or utc_now()
+        self.schema_version = schema_version
         self.run_root = self.root / ".gwc" / "tasks" / self.task_id / "node-runtime" / self.run_id
         self.node_root = self.run_root / self.node_id
         self.events_path = self.run_root / "runtime-events.jsonl"
+        self._event_sequence = 1
 
     def _record(self, artifact_type: str, payload: Mapping[str, Any]) -> dict[str, Any]:
         if artifact_type not in RECORD_SEQUENCE:
             raise ValueError(f"unsupported artifact_type: {artifact_type}")
         record: dict[str, Any] = {
-            "schema_version": "1.0",
+            "schema_version": self.schema_version,
             "artifact_type": artifact_type,
             "task_id": self.task_id,
             "run_id": self.run_id,
@@ -87,9 +92,24 @@ class NodeEvidenceLedger:
         record["record_digest"] = digest_payload(record)
         return record
 
+    def _compute_prev_hash(self) -> str:
+        """Compute prev_hash from the last event in the events file."""
+        if not self.events_path.exists():
+            return "sha256:" + "0" * 64
+        last_event = None
+        with self.events_path.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    last_event = json.loads(line)
+        if last_event is None:
+            return "sha256:" + "0" * 64
+        # Use canonical JSON of the last event for prev_hash
+        return "sha256:" + hashlib.sha256(canonical_json(last_event).encode("utf-8")).hexdigest()
+
     def _event(self, record: Mapping[str, Any]) -> dict[str, Any]:
-        event = {
-            "schema_version": "1.0",
+        event: dict[str, Any] = {
+            "schema_version": self.schema_version,
             "artifact_type": "runtime-event",
             "event_type": record["artifact_type"],
             "task_id": self.task_id,
@@ -107,8 +127,32 @@ class NodeEvidenceLedger:
         }
         if "decision_digest" in record:
             event["decision_digest"] = record["decision_digest"]
+
+        # NEW: Add digest_chain for schema_version 2.0
+        if self.schema_version == "2.0":
+            prev_hash = self._compute_prev_hash()
+            event["digest_chain"] = {
+                "prev_hash": prev_hash,
+                "chain_id": "gwc-main",
+                "sequence": self._event_sequence,
+            }
+            self._event_sequence += 1
+
         event["event_digest"] = digest_payload(event)
         return event
+
+    @staticmethod
+    def _locked_write(path: Path, data: str) -> None:
+        """Write data to file with exclusive file locking."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "a") as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            try:
+                f.write(data + "\n")
+                f.flush()
+                os.fsync(f.fileno())
+            finally:
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
 
     @staticmethod
     def _write_json_idempotent(path: Path, payload: Mapping[str, Any]) -> None:
@@ -135,8 +179,8 @@ class NodeEvidenceLedger:
                 event.get("node_id"), event.get("sequence"), event.get("idempotency_key")
             ):
                 raise EvidenceConflict("conflicting runtime event for idempotency identity")
-        with self.events_path.open("a", encoding="utf-8") as handle:
-            handle.write(canonical_json(event) + "\n")
+        # Use locked write for concurrent safety
+        self._locked_write(self.events_path, canonical_json(event))
 
     def record(self, artifact_type: str, payload: Mapping[str, Any]) -> dict[str, Any]:
         record = self._record(artifact_type, payload)
