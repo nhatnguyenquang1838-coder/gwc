@@ -4,8 +4,8 @@
 This runtime composes existing route packs, the canonical semantic source
 resolver, explicit evaluator bindings, canonical readback adapters, and the
 existing NodeEvidenceLedger. It lazy-resolves one current node at a time and
-stops immediately on missing semantics, readback, graph safety, or evidence
-conflict. It never grants authority itself.
+stops immediately on missing semantics, readback, graph safety, provider block,
+or evidence conflict. It never grants authority itself.
 """
 from __future__ import annotations
 
@@ -56,6 +56,16 @@ def _terminal(
     }
 
 
+def _runtime_disposition_block_reason(semantic_result: Mapping[str, Any]) -> str | None:
+    nested = semantic_result.get("result")
+    if not isinstance(nested, Mapping):
+        return None
+    disposition = nested.get("runtime_disposition")
+    if disposition in (None, "CONTINUE"):
+        return None
+    return str(nested.get("reason_code") or "SEMANTIC_RUNTIME_DISPOSITION_BLOCKED")
+
+
 def _normalize_readback(
     node: Mapping[str, Any],
     semantic_result: Mapping[str, Any],
@@ -66,6 +76,12 @@ def _normalize_readback(
         return {
             "status": "NOT_RUN",
             "reason_code": str(semantic_result.get("reason_code") or "SEMANTIC_EXECUTION_BLOCKED"),
+        }
+    disposition_reason = _runtime_disposition_block_reason(semantic_result)
+    if disposition_reason is not None:
+        return {
+            "status": "NOT_RUN",
+            "reason_code": disposition_reason,
         }
     if handler is None:
         return {
@@ -254,6 +270,7 @@ def run_semantic_route_event(
         if semantic_result.get("semantic_execution") is True:
             semantic_executed.append(node_id)
 
+        disposition_reason = _runtime_disposition_block_reason(semantic_result)
         readback = _normalize_readback(
             node,
             semantic_result,
@@ -263,6 +280,8 @@ def run_semantic_route_event(
         blocked_reason: str | None = None
         if semantic_result.get("semantic_execution") is not True:
             blocked_reason = str(semantic_result.get("reason_code") or "SEMANTIC_EXECUTION_BLOCKED")
+        elif disposition_reason is not None:
+            blocked_reason = disposition_reason
         elif readback.get("status") != "VERIFIED":
             blocked_reason = str(readback.get("reason_code") or "SEMANTIC_READBACK_NOT_VERIFIED")
 
