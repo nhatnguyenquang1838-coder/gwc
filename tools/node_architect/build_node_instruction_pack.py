@@ -10,7 +10,8 @@ agent implement the same Provider protocol without graph changes).
 from __future__ import annotations
 
 import hashlib
-from dataclasses import asdict, dataclass, field
+import json
+from dataclasses import asdict, dataclass
 from typing import Any, Mapping, Sequence
 
 
@@ -38,27 +39,36 @@ class InstructionPack:
 
     @property
     def content_digest(self) -> str:
-        """Deterministic digest over the identity-bearing fields of the pack.
+        """Digest every meaning-bearing field of the provider instruction pack.
 
-        Used for idempotency/replay: same key + same digest => prior result;
-        same key + different digest => replay conflict.
+        Idempotency is safe only when a semantic change changes this digest.
+        Lists whose order is not semantic are normalized; route, acceptance
+        criteria and plan refs preserve declared order because ordering can carry
+        execution meaning.
         """
-        canonical = "|".join([
-            self.run_id,
-            self.task_id,
-            self.repository,
-            self.preprod_base_sha,
-            self.working_branch,
-            self.scope_hash,
-            self.graph_revision,
-            self.policy_revision,
-            ",".join(sorted(self.allowed_paths)),
-            ",".join(sorted(self.prohibited_paths)),
-            ",".join(sorted(self.authorized_actions)),
-            ",".join(sorted(self.validation_commands)),
-            self.idempotency_key,
-        ]).encode("utf-8")
-        return "sha256:" + hashlib.sha256(canonical).hexdigest()
+        canonical = {
+            "run_id": self.run_id,
+            "task_id": self.task_id,
+            "repository": self.repository,
+            "preprod_base_sha": self.preprod_base_sha,
+            "working_branch": self.working_branch,
+            "scope_hash": self.scope_hash,
+            "graph_revision": self.graph_revision,
+            "policy_revision": self.policy_revision,
+            "allowed_paths": sorted(self.allowed_paths),
+            "prohibited_paths": sorted(self.prohibited_paths),
+            "authorized_actions": sorted(self.authorized_actions),
+            "validation_commands": list(self.validation_commands),
+            "idempotency_key": self.idempotency_key,
+            "g0_g1_decision_ref": self.g0_g1_decision_ref,
+            "task_summary": self.task_summary,
+            "objective": self.objective,
+            "acceptance_criteria": list(self.acceptance_criteria),
+            "gate_node_route": list(self.gate_node_route),
+            "plan_refs": list(self.plan_refs),
+        }
+        raw = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        return "sha256:" + hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -74,10 +84,7 @@ def build_node_instruction_pack(
     gate_node_route: Sequence[str] = (),
     plan_refs: Sequence[str] = (),
 ) -> InstructionPack:
-    """Compose a typed InstructionPack from a validated request + planning context.
-
-    The function is pure: it does not touch the filesystem, git, or any provider.
-    """
+    """Compose a typed InstructionPack from a validated request + planning context."""
     return InstructionPack(
         run_id=str(request["run_id"]),
         task_id=str(request["task_id"]),
