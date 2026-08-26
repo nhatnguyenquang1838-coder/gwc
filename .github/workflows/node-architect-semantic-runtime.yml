@@ -22,7 +22,10 @@ jobs:
         shell: bash
         run: |
           set +e
-          python -m pytest -vv tests/test_scrum_566_semantic_runtime_correction.py > semantic-runtime-pytest.txt 2>&1
+          python -m pytest -vv \
+            tests/test_scrum_566_semantic_runtime_correction.py \
+            tests/test_scrum_566_semantic_dispatcher.py \
+            > semantic-runtime-pytest.txt 2>&1
           status=$?
           cat semantic-runtime-pytest.txt
           echo "exit_code=$status" >> "$GITHUB_OUTPUT"
