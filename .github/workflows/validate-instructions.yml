@@ -34,6 +34,14 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
+      - name: Install pytest (CI-only test environment)
+        # Baseline CI remediation (SCRUM-397 G2): current-main SCRUM-269
+        # tests import pytest, but requirements.txt does not pin it, so the
+        # governance unittest discovery step fails with ModuleNotFoundError.
+        # Install pytest in the CI-only environment before discovery.
+        # This does NOT modify runtime requirements.txt.
+        run: python -m pip install pytest
+
       - name: Validate LF and UTF-8 normalization
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}

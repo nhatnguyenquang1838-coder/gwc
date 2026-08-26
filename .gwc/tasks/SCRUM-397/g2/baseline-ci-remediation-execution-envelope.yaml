@@ -1,0 +1,40 @@
+schema_version: "1.0"
+artifact_type: g2-execution-envelope
+task_id: SCRUM-397
+gate: G2
+subtask: baseline-ci-remediation
+run_id: SCRUM-397-WP3-WP4-20260825-TC-RECOVERY-R1
+remediation_intent: "CI-only: install pytest in Validate instructions workflow before governance unittest discovery; do not edit requirements.txt, SCRUM-269 tests, SCRUM-397 delivery branch, protected main, WP5, deploy/release."
+authorized_paths:
+  - .github/workflows/validate-instructions.yml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-executor-report.yaml
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - credential_rotation
+  - deploy_approved_release
+  - mark_pr_ready_for_review
+  - merge_approved_pr
+  - migration
+  - open_or_update_draft_pr
+  - production_config_change
+  - production_data_write
+  - reload_approved_runtime
+  - run_independent_review
+  - verify_post_merge_ci
+base_sha: f3bc1d449c48e5339800d65fff1a891b8154735e
+working_branch: fix/scrum-397-g3-baseline-ci-pytest-r1
+scope_hash: sha256:5aee005d7eacced1b17f1f81ac7b1f375dfd756799e38380649fef4df68eec24
+expires_at: "2026-08-26T18:41:47Z"
+validation_plan:
+  - "python -m py_compile .github/workflows/validate-instructions.yml (YAML syntax via parse check)"
+  - "python -c 'import yaml; yaml.safe_load(open(\".github/workflows/validate-instructions.yml\"))'"
+  - "sandboxed: simulate governance unittest discovery with pytest installed (pip install pytest && python -m unittest discover -s tests -p test_*.py) in isolated venv"
+mutation_scope_guard: "Only the 4 authorized paths may be staged/committed/pushed; no other file touched."

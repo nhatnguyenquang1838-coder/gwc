@@ -1,0 +1,33 @@
+schema_version: "1.0"
+artifact_type: g2-approval-readback
+task_id: SCRUM-397
+gate: G2
+subtask: baseline-ci-remediation
+authority_source: "Human G2 exact approval on issue #392 Controller mailbox seq=35 / Executor ACK seq=19"
+approval:
+  gate: G2
+  request_id: g2_scrum-397_g3_baseline_ci_remediation_20260826_1441_5aee005d7eacced1
+  scope_hash: sha256:5aee005d7eacced1b17f1f81ac7b1f375dfd756799e38380649fef4df68eec24
+  scope_hash_short: 5aee005d7eacced1
+  exact_command: "APPROVE G2 g2_scrum-397_g3_baseline_ci_remediation_20260826_1441_5aee005d7eacced1 5aee005d7eacced1 2026-08-26T18:41:47Z"
+  received_at: "2026-08-26T14:57:50Z"
+  expires_at: "2026-08-26T18:41:47Z"
+  exact_match: true
+  unexpired_at_consume: true
+  consumed_once: true
+  consumed_by: "Controller seq=36 COMMAND"
+risk_class: R2
+base_ref: main
+base_sha: f3bc1d449c48e5339800d65fff1a891b8154735e
+working_branch: fix/scrum-397-g3-baseline-ci-pytest-r1
+authorized_paths:
+  - .github/workflows/validate-instructions.yml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-executor-report.yaml
+authority_granted: true
+pr_authorized: false
+g4_authorized: false
+wp5_authorized: false
+protected_main_write: false
+scrum397_delivery_branch_mutation: false

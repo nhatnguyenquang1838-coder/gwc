@@ -1,0 +1,48 @@
+schema_version: "1.0"
+artifact_type: g2-executor-report
+task_id: SCRUM-397
+gate: G2
+subtask: baseline-ci-remediation
+run_id: SCRUM-397-WP3-WP4-20260825-TC-RECOVERY-R1
+executor: Hermes Mac (DWA)
+base_sha: f3bc1d449c48e5339800d65fff1a891b8154735e
+working_branch: fix/scrum-397-g3-baseline-ci-pytest-r1
+authority:
+  gate: G2
+  request_id: g2_scrum-397_g3_baseline_ci_remediation_20260826_1441_5aee005d7eacced1
+  scope_hash: sha256:5aee005d7eacced1b17f1f81ac7b1f375dfd756799e38380649fef4df68eec24
+  approved_at: "2026-08-26T14:57:50Z"
+  expires_at: "2026-08-26T18:41:47Z"
+  consumed_by: "Controller seq=36 COMMAND"
+mutated_paths:
+  - .github/workflows/validate-instructions.yml
+evidence_files_created:
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/baseline-ci-remediation-executor-report.yaml
+remediation_change:
+  file: .github/workflows/validate-instructions.yml
+  action: "added step 'Install pytest (CI-only test environment)' after 'Install dependencies'"
+  command: "python -m pip install pytest"
+  rationale: "current-main SCRUM-269 tests import pytest; requirements.txt does not pin pytest -> governance unittest discovery failed with ModuleNotFoundError. CI-only install before discovery."
+  excluded: "no edit to requirements.txt, SCRUM-269 tests, SCRUM-397 delivery branch, protected main"
+validation:
+  yaml_syntax: "PASS (yaml.safe_load OK)"
+  baseline_reproduction:
+    command: "fresh venv, pip install -r requirements.txt only (no pytest)"
+    result: "FAILED: ModuleNotFoundError: No module named 'pytest' on SCRUM-269 test import"
+    conclusion: "EXACT match to PR #525 CI blocker (Validate instructions run 32978217840)"
+  post_remediation_local:
+    runner_env: "Local Python 3.9.6 (NOT representative of CI ubuntu-latest 3.12)"
+    caveat: "Local 3.9 runner cannot proxy CI: StrEnum (needs 3.11+), cryptography, and write_text(newline=) errors are environmental, not caused by this change."
+    authoritative_check: "GitHub Actions run on push (CI uses setup-python 3.12 + requirements.txt + this pytest install)"
+authoritative_result: "PENDING — awaits GitHub Actions 'Validate instructions' re-run after push to fix/scrum-397-g3-baseline-ci-pytest-r1"
+exclusions_honored:
+  - no_requirements_txt_edit
+  - no_scrum269_test_edit
+  - no_scrum397_delivery_branch_mutation
+  - no_protected_main_write
+  - no_pr_creation_or_update
+  - no_merge_or_rebase_or_force_push
+  - no_wp5_deploy_release
+outcome: TERMINAL_SUCCESS_BOUNDED_REMEDIATION_PUSHED_AWAITING_CI
