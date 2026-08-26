@@ -19,8 +19,9 @@ import base64
 import hashlib
 import json
 import sys
+import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from enum import Enum
 from pathlib import Path
 from typing import Any, Literal
@@ -80,6 +81,10 @@ class VerificationReport:
     results: list[VerificationResult]
     fixture_applied: FixtureType | None = None
     verified_at: str = field(default_factory=lambda: datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"))
+    # G3 L3 operational fields
+    quarantine: list[dict[str, Any]] = field(default_factory=list)  # L3.3 quarantine routing
+    timings: dict[str, float] = field(default_factory=dict)  # L3.5 SLO per-boundary latency (s)
+    lease_status: dict[str, str] = field(default_factory=dict)  # L3.4 lease TTL (STALLED/COMMITTED)
 
     def to_json(self) -> str:
         return json.dumps(
@@ -89,6 +94,9 @@ class VerificationReport:
                 "overall_status": self.overall_status,
                 "fixture_applied": self.fixture_applied.value if self.fixture_applied else None,
                 "verified_at": self.verified_at,
+                "quarantine": self.quarantine,
+                "timings": self.timings,
+                "lease_status": self.lease_status,
                 "results": [
                     {
                         "boundary": r.boundary,
@@ -583,26 +591,36 @@ def verify_ledger(
         events = apply_fixture(events, fixture)
 
     all_results: list[VerificationResult] = []
+    timings: dict[str, float] = {}
+
+    def _timed(label: str, fn) -> Any:
+        t0 = time.perf_counter()
+        res = fn()
+        timings[label] = time.perf_counter() - t0
+        return res
 
     # Boundary 1: prev_hash chain
-    all_results.extend(verify_prev_hash_chain(events))
+    all_results.extend(_timed("prev_hash_chain", lambda: verify_prev_hash_chain(events)))
 
     # Boundary 2: sequence monotonicity
-    all_results.extend(verify_sequence_monotonic(events))
+    all_results.extend(_timed("sequence_monotonic", lambda: verify_sequence_monotonic(events)))
 
     # Boundary 3: idempotency uniqueness
-    all_results.extend(verify_idempotency_keys(events))
+    all_results.extend(_timed("idempotency_unique", lambda: verify_idempotency_keys(events)))
 
     # Boundary 4: clock skew
-    all_results.extend(verify_clock_skew(events))
+    all_results.extend(_timed("clock_skew", lambda: verify_clock_skew(events)))
 
     # Boundary 5: digest_chain consistency (v2)
-    all_results.extend(verify_digest_chain_consistency(events))
+    all_results.extend(_timed("digest_chain_consistency", lambda: verify_digest_chain_consistency(events)))
 
     # Boundary 6: DSSE signatures
+    dsse_results = []
     for i, event in enumerate(events):
+        t0 = time.perf_counter()
         ok, reason, details = verify_dsse_signature(event, bootstrap)
-        all_results.append(
+        timings[f"dsse_signature[{i}]"] = time.perf_counter() - t0
+        dsse_results.append(
             VerificationResult(
                 boundary=f"dsse_signature[{i}]",
                 status="PASS" if ok else "FAIL",
@@ -610,12 +628,45 @@ def verify_ledger(
                 details=details,
             )
         )
+    all_results.extend(dsse_results)
 
     # Boundary 7: root Merkle proof
-    all_results.append(verify_root_merkle(events))
+    all_results.append(_timed("root_merkle", lambda: verify_root_merkle(events)))
 
     # Boundary 8: witness threshold
-    all_results.append(verify_witness_threshold(events, bootstrap))
+    all_results.append(_timed("witness_threshold", lambda: verify_witness_threshold(events, bootstrap)))
+
+    # G3-L3.3: quarantine routing — isolate FAIL results with reason + detected_at
+    quarantine: list[dict[str, Any]] = []
+    for r in all_results:
+        if r.status == "FAIL":
+            seq = r.details.get("sequence")
+            quarantine.append(
+                {
+                    "boundary": r.boundary,
+                    "reason": r.reason.value,
+                    "sequence": seq,
+                    "detected_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                }
+            )
+
+    # G3-L3.4: lease TTL — node execution lease 30 min; exceeded => STALLED
+    lease_status: dict[str, str] = {}
+    NODE_LEASE_TTL = timedelta(minutes=30)
+    now = datetime.now(timezone.utc)
+    for event in events:
+        seq = str(event.get("sequence"))
+        occured = event.get("occurred_at")
+        if not occured:
+            continue
+        try:
+            ts = datetime.fromisoformat(occured.replace("Z", "+00:00"))
+            if now - ts > NODE_LEASE_TTL:
+                lease_status[seq] = "STALLED"
+            else:
+                lease_status[seq] = "COMMITTED"
+        except ValueError:
+            lease_status[seq] = "UNKNOWN"
 
     overall = "PASS" if all(r.status == "PASS" for r in all_results) else "FAIL"
 
@@ -625,6 +676,9 @@ def verify_ledger(
         overall_status=overall,
         results=all_results,
         fixture_applied=fixture,
+        quarantine=quarantine,
+        timings=timings,
+        lease_status=lease_status,
     )
 
 
