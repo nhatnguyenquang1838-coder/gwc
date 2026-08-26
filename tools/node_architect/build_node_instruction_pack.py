@@ -170,6 +170,10 @@ def build_node_instruction_pack(
     instruction_bundle: Mapping[str, Any] | None = None,
 ) -> InstructionPack:
     """Compose a typed InstructionPack from a validated request + runtime context."""
+    if instruction_bundle is None:
+        carried_bundle = request.get("instruction_bundle")
+        if isinstance(carried_bundle, Mapping):
+            instruction_bundle = carried_bundle
     bundle_fields = _bundle_fields(instruction_bundle)
     # A materialized bundle is the authoritative repository instruction identity.
     if bundle_fields["instruction_bundle_digest"]:
