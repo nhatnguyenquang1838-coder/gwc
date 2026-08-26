@@ -30,6 +30,7 @@ REASON_PRECEDENCE = [
     "EXTERNAL_AUDIT_PRIVACY_BOUNDARY_INVALID",
     "EXTERNAL_AUDIT_PRIOR_BINDING_MISMATCH",
     "EXTERNAL_AUDIT_PRIOR_READBACK_MISMATCH",
+    "EVENT_SOURCE_BINDING_CONFLICT",
     "EXTERNAL_AUDIT_EVENT_READY",
     "EXTERNAL_AUDIT_EVENT_CURRENT",
 ]
@@ -40,14 +41,23 @@ _TARGET_RE = re.compile(r"^[a-z][a-z0-9_.-]{1,127}$")
 _DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _ZERO_DIGEST = "sha256:" + "0" * 64
 
+# SCRUM-533 v3.1 (NA81-F6-N03 successor) canonical event-source format:
+#   gwc.{system}.{projection_target}.v{schema_version}
+# Concrete first implementation: gwc.node-architect.external-audit-projection.v1.0
+# Optional key (backward compatible): when absent the projection renders exactly
+# as before; when present it is validated and participates in the canonical digest.
+_EVENT_SOURCE_RE = re.compile(r"^gwc\.[a-z0-9]+(?:[.-][a-z0-9]+)*\.v[0-9]+\.[0-9]+$")
+
 ALLOWED_CANONICAL_KEYS = {
     "event_id", "event_type", "task_id", "repository", "repository_head",
     "projection_target", "gate", "gate_outcome", "evidence_linkset_digest",
     "source_authority_digest", "privacy_boundary_digest", "projected_at",
+    "event_source",
 }
 IDEMPOTENT_KEYS = {
     "event_id", "task_id", "repository_head", "gate", "gate_outcome",
     "source_authority_digest", "evidence_linkset_digest", "privacy_boundary_digest",
+    "event_source",
 }
 
 
@@ -239,6 +249,24 @@ def project_external_audit_event(
             canonical_state[key] = value
     else:
         reasons.add("EXTERNAL_AUDIT_INPUT_INVALID")
+
+    # SCRUM-533 v3.1 (NA81-F6-N03 successor): event_source binding validation.
+    # Fail closed on (a) format violation, (b) caller-supplied inconsistency
+    # with the projection's own system/target/schema-version, or (c) a read-back
+    # whose bound event_source differs from the current one. Absent event_source
+    # is legacy-compatible and renders exactly as before.
+    supplied_source = canonical_state.get("event_source")
+    if supplied_source is not None:
+        if not isinstance(supplied_source, str) or not _EVENT_SOURCE_RE.fullmatch(supplied_source):
+            reasons.add("EVENT_SOURCE_BINDING_CONFLICT")
+        else:
+            # Derive the expected namespace from the projection's own identity.
+            # system := the emitting system (node-architect for this parent),
+            # target := projection_target, version := SCHEMA_VERSION. The first
+            # implementation binds gwc.node-architect.{projection_target}.v{SCHEMA_VERSION}.
+            expected = f"gwc.node-architect.{safe_target}.v{SCHEMA_VERSION}"
+            if supplied_source != expected:
+                reasons.add("EVENT_SOURCE_BINDING_CONFLICT")
 
     prior_binding_mismatch = False
     prior_readback_mismatch = False
