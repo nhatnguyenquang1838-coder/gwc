@@ -4,8 +4,9 @@
 The provider is deliberately a *node implementation*, never the route engine.
 Node input is digested into the bounded InstructionPack; the existing
 ``ai_agent_adapter`` enforces file/action scope, provider evidence, replay and
-later-gate non-authority. The bridge adds configured provider discovery plus a
-separate trusted validation runner before returning CONTINUE to the lifecycle.
+later-gate non-authority. Repository instructions, skills and the current Node
+Instruction Card are resolved by the Agent Host and supplied as one immutable
+bundle; model/node input cannot override that host-selected bundle.
 """
 from __future__ import annotations
 
@@ -14,6 +15,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, MutableMapping
 
+from .agent_instruction_bundle import InstructionBundleError, validate_agent_instruction_bundle
 from .ai_agent_adapter import DeterministicFakeProvider, Provider, SUCCESS, execute
 from .semantic_dispatcher import SemanticEvaluatorBinding
 from .trusted_validation_runner import TrustedValidationRunner
@@ -37,6 +39,8 @@ _PROVIDER_RESULT_FIELDS = (
     "recorded_actions",
     "g3_g4_g5_authority_granted",
 )
+
+_INSTRUCTION_BUNDLE_UNSET = object()
 
 
 class ProviderRegistry:
@@ -119,8 +123,15 @@ def build_agent_provider_binding(
     validation_root: str | Path | None = None,
     idempotency_store: MutableMapping[str, Mapping[str, Any]] | None = None,
     max_repair_rounds: int = 2,
+    instruction_bundle: Mapping[str, Any] | None | object = _INSTRUCTION_BUNDLE_UNSET,
 ) -> SemanticEvaluatorBinding:
-    """Build one explicit semantic binding for a bounded Agent provider node."""
+    """Build one explicit semantic binding for a bounded Agent provider node.
+
+    ``instruction_bundle`` is host-owned. Explicit ``None`` fails closed. The
+    omitted sentinel is retained only for historical unit-test/back-compat paths
+    and is never live-closure eligible; production Agent Host wiring must supply
+    a validated bundle.
+    """
     store = idempotency_store if idempotency_store is not None else {}
 
     if provider_name is not None:
@@ -130,8 +141,20 @@ def build_agent_provider_binding(
         resolved_provider = provider
         provider_resolution = "DIRECT_INJECTION" if resolved_provider is not None else "UNAVAILABLE"
 
-    provider_evidence_class, live_closure_eligible = _provider_class(resolved_provider, provider_resolution)
+    provider_evidence_class, provider_live_eligible = _provider_class(resolved_provider, provider_resolution)
     validation_commands = tuple(map(str, request.get("validation_commands", ()) or ()))
+
+    bundle_missing_explicitly = instruction_bundle is None
+    bundle_legacy_omitted = instruction_bundle is _INSTRUCTION_BUNDLE_UNSET
+    canonical_bundle: dict[str, Any] | None = None
+    bundle_error: str | None = None
+    if not bundle_missing_explicitly and not bundle_legacy_omitted:
+        try:
+            canonical_bundle = validate_agent_instruction_bundle(instruction_bundle)  # type: ignore[arg-type]
+        except InstructionBundleError as exc:
+            bundle_error = exc.reason_code
+
+    live_closure_eligible = provider_live_eligible and canonical_bundle is not None
 
     def handler(node_input: Mapping[str, Any]) -> Mapping[str, Any]:
         semantic_input_digest = _digest(dict(node_input))
@@ -140,9 +163,29 @@ def build_agent_provider_binding(
             "provider_resolution": provider_resolution,
             "provider_evidence_class": provider_evidence_class,
             "live_closure_eligible": live_closure_eligible,
+            "instruction_bundle_digest": canonical_bundle.get("bundle_digest") if canonical_bundle else None,
             "authority_granted": False,
             "executed_effects": [],
         }
+        if bundle_missing_explicitly:
+            return {
+                **common,
+                "runtime_disposition": "BLOCK",
+                "reason_code": "AGENT_INSTRUCTION_BUNDLE_MISSING",
+                "provider_result": {},
+                "trusted_validation_passed": False,
+                "validation_evidence": [],
+            }
+        if bundle_error is not None:
+            return {
+                **common,
+                "runtime_disposition": "BLOCK",
+                "reason_code": "AGENT_INSTRUCTION_BUNDLE_INVALID",
+                "instruction_bundle_error": bundle_error,
+                "provider_result": {},
+                "trusted_validation_passed": False,
+                "validation_evidence": [],
+            }
         if resolved_provider is None:
             return {
                 **common,
@@ -187,8 +230,15 @@ def build_agent_provider_binding(
                 "semantic_input_digest": semantic_input_digest,
             }
         )
+
+        provider_request = dict(request)
+        if canonical_bundle is not None:
+            # The immutable host bundle is carried outside model/node input so a
+            # provider cannot select or replace skills/instructions dynamically.
+            provider_request["instruction_bundle"] = canonical_bundle
+
         raw_result = execute(
-            request,
+            provider_request,
             provider=resolved_provider,
             idempotency_store=store,
             max_repair_rounds=max_repair_rounds,
