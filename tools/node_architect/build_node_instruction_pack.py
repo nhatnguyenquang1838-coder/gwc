@@ -2,8 +2,9 @@
 """Build a typed instruction pack for the ai-task-execution node.
 
 Provider-neutral: composes a deterministic, serializable pack from Agent boot,
-task/repository/gate identity, semantic node identity, authority scope and
-validation plan. Any meaning-bearing drift changes the content digest.
+task/repository/gate identity, semantic node identity, authority scope,
+validation plan, and the exact repository instruction/skill bundle. Any
+meaning-bearing drift changes the content digest.
 """
 from __future__ import annotations
 
@@ -11,6 +12,8 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass
 from typing import Any, Mapping, Sequence
+
+from .agent_instruction_bundle import validate_agent_instruction_bundle
 
 
 @dataclass(frozen=True)
@@ -46,6 +49,17 @@ class InstructionPack:
     agent_boot_ref: str = ""
     agent_instruction_digest: str = ""
     semantic_input_digest: str = ""
+    instruction_bundle_digest: str = ""
+    instruction_refs: tuple[str, ...] = ()
+    instruction_digests: tuple[str, ...] = ()
+    role_overlay_refs: tuple[str, ...] = ()
+    role_overlay_digests: tuple[str, ...] = ()
+    skill_refs: tuple[str, ...] = ()
+    skill_digests: tuple[str, ...] = ()
+    node_instruction_ref: str = ""
+    node_instruction_digest: str = ""
+    # (kind, repo ref, sha256 digest, actual UTF-8 content)
+    instruction_bundle: tuple[tuple[str, str, str, str], ...] = ()
 
     @property
     def content_digest(self) -> str:
@@ -70,6 +84,15 @@ class InstructionPack:
             "provider_contract_revision": self.provider_contract_revision,
             "agent_boot_ref": self.agent_boot_ref,
             "agent_instruction_digest": self.agent_instruction_digest,
+            "instruction_bundle_digest": self.instruction_bundle_digest,
+            "instruction_refs": list(self.instruction_refs),
+            "instruction_digests": list(self.instruction_digests),
+            "role_overlay_refs": list(self.role_overlay_refs),
+            "role_overlay_digests": list(self.role_overlay_digests),
+            "skill_refs": list(self.skill_refs),
+            "skill_digests": list(self.skill_digests),
+            "node_instruction_ref": self.node_instruction_ref,
+            "node_instruction_digest": self.node_instruction_digest,
             "allowed_paths": sorted(self.allowed_paths),
             "prohibited_paths": sorted(self.prohibited_paths),
             "authorized_actions": sorted(self.authorized_actions),
@@ -88,6 +111,39 @@ class InstructionPack:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+def _bundle_fields(instruction_bundle: Mapping[str, Any] | None) -> dict[str, Any]:
+    if instruction_bundle is None:
+        return {
+            "instruction_bundle_digest": "",
+            "instruction_refs": (),
+            "instruction_digests": (),
+            "role_overlay_refs": (),
+            "role_overlay_digests": (),
+            "skill_refs": (),
+            "skill_digests": (),
+            "node_instruction_ref": "",
+            "node_instruction_digest": "",
+            "instruction_bundle": (),
+        }
+    bundle = validate_agent_instruction_bundle(instruction_bundle)
+    artifacts = tuple(
+        (str(item["kind"]), str(item["ref"]), str(item["digest"]), str(item["content"]))
+        for item in bundle["artifacts"]
+    )
+    return {
+        "instruction_bundle_digest": str(bundle["bundle_digest"]),
+        "instruction_refs": tuple(map(str, bundle["instruction_refs"])),
+        "instruction_digests": tuple(map(str, bundle["instruction_digests"])),
+        "role_overlay_refs": tuple(map(str, bundle["role_overlay_refs"])),
+        "role_overlay_digests": tuple(map(str, bundle["role_overlay_digests"])),
+        "skill_refs": tuple(map(str, bundle["skill_refs"])),
+        "skill_digests": tuple(map(str, bundle["skill_digests"])),
+        "node_instruction_ref": str(bundle["node_instruction_ref"]),
+        "node_instruction_digest": str(bundle["node_instruction_digest"]),
+        "instruction_bundle": artifacts,
+    }
 
 
 def build_node_instruction_pack(
@@ -111,8 +167,17 @@ def build_node_instruction_pack(
     agent_boot_ref: str = "",
     agent_instruction_digest: str = "",
     semantic_input_digest: str = "",
+    instruction_bundle: Mapping[str, Any] | None = None,
 ) -> InstructionPack:
     """Compose a typed InstructionPack from a validated request + runtime context."""
+    bundle_fields = _bundle_fields(instruction_bundle)
+    # A materialized bundle is the authoritative repository instruction identity.
+    if bundle_fields["instruction_bundle_digest"]:
+        agent_instruction_digest = str(bundle_fields["instruction_bundle_digest"])
+        refs = bundle_fields["instruction_refs"]
+        if refs:
+            agent_boot_ref = str(refs[0])
+
     return InstructionPack(
         run_id=str(request["run_id"]),
         task_id=str(request["task_id"]),
@@ -145,4 +210,5 @@ def build_node_instruction_pack(
         agent_boot_ref=str(agent_boot_ref),
         agent_instruction_digest=str(agent_instruction_digest),
         semantic_input_digest=str(semantic_input_digest),
+        **bundle_fields,
     )
