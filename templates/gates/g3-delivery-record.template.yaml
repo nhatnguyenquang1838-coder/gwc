@@ -1,4 +1,4 @@
-schema_version: "1.0"
+schema_version: "1.1"
 artifact_type: g3-delivery-record
 gate: G3_PR
 task_id: task-example-g3-review
@@ -10,23 +10,23 @@ pull_request:
   number: 123
   url: https://github.com/example-org/example-repo/pull/123
   draft: true
-head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+implementation_head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 scope_hash: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 changed_paths:
   - src/example.py
 validation:
-  head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  implementation_head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   status: pass
   commands:
     - command: python -m pytest
       result: pass
-      evidence: local validation log for the exact PR head SHA
+      evidence: local validation log for the immutable implementation subject
 review:
   implementer_id: agent-implementer
   reviewer_id: agent-reviewer
   independence: independent
   mode: read-only
-  reviewed_head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  reviewed_implementation_head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   reviewed_scope_hash: sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
   reviewed_at: "2026-07-15T04:30:00Z"
   lanes:
@@ -44,12 +44,12 @@ review:
       applicable: true
       status: pass
       evidence:
-        - full diff reviewed at the exact head SHA
+        - full implementation diff reviewed at the implementation subject SHA
     - name: test
       applicable: true
       status: pass
       evidence:
-        - tests cover the changed behavior
+        - tests cover the changed behavior at the implementation subject
     - name: governance
       applicable: true
       status: pass
@@ -64,7 +64,7 @@ review:
       applicable: true
       status: pass
       evidence:
-        - required CI passed for the exact head SHA
+        - required current-tip CI is verified externally at G3 closure
   findings: []
   acceptance_criteria:
     - id: AC-1
@@ -75,12 +75,8 @@ review:
   stale: false
 ci:
   required: true
-  head_sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-  checks:
-    - name: validate-instructions
-      required: true
-      status: pass
-      evidence: https://github.com/example-org/example-repo/actions/runs/123
+  required_checks:
+    - validate-instructions
 residual_risks: []
 exclusions:
   - G4_MERGE
