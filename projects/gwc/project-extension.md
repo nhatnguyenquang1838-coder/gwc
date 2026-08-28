@@ -134,6 +134,29 @@ Jira, Slack, and Notion remain projection-only. Node instructions and route
 decisions never grant G2, G3, G4, G5, or G6 authority; authority comes from the
 validated gate/route authority source.
 
+## G3 subject/container evidence binding (SCRUM-615)
+
+For active G3 closure, the committed v1.1 `g3/delivery-record.yaml` binds the
+immutable implementation subject (`implementation_head_sha`) and implementation
+scope. It must not embed the SHA of the commit that contains the record itself.
+
+The exact current PR tip is a trusted runtime fact. Before G3 closure the runtime
+must independently verify all of the following:
+
+- the implementation subject is equal to or an ancestor of the current PR tip;
+- the aggregate `implementation_head_sha..current_pr_head` delta contains only
+  task-scoped G3 evidence under `.gwc/tasks/<task-id>/g3/**`;
+- every required CI check passes at the exact current PR tip.
+
+An evidence-only tip change invalidates and recomputes tip-level ancestry, delta,
+and CI evidence, but does not invalidate implementation validation or review
+when the implementation subject and scope are unchanged. Any non-evidence delta
+after the implementation subject invalidates the binding and returns to G2.
+
+Historical v1.0 G3 records remain immutable provenance and are never silently
+reinterpreted. A new active G3 closure under this repaired contract must
+materialize/migrate a v1.1 record and rerun the applicable G3 checks.
+
 ## Governance hardening (SCRUM-268)
 
 - The `g4-receipt-required` GitHub check is the repository-side enforcement
@@ -143,12 +166,12 @@ validated gate/route authority source.
   exact-head standing G4 receipt. A receipt for `auto/* -> pre-prod` never
   authorizes `pre-prod -> main`.
 - Gate artifacts under `.gwc/tasks/<task-id>/` are evidence projections and
-  must not silently invalidate the implementation binding. The deterministic
-  ordering is: finish implementation and validation at the approved base/head;
-  calculate and approve the implementation scope; write gate artifacts only as
-  task evidence; if an artifact commit changes the bound head, invalidate the
-  prior approval and rebind before any PR authority action. No stale token may
-  be reused.
+  must not silently widen or replace the implementation binding. For G3 v1.1,
+  implementation validation/review bind `implementation_head_sha`; later
+  evidence-only G3 commits are permitted only when trusted runtime validation
+  proves ancestry, the task-scoped evidence-only delta, and exact current-tip
+  CI. A non-evidence post-implementation delta invalidates the binding and
+  returns to G2. No stale token may be reused.
 - `calculate_gate_scope_identity` exposes `scope_hash` only when
   `outcome: READY`; a `BLOCKED` result has `scope_hash: null` and is never
   eligible for an approval command.
