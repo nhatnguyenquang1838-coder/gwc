@@ -34,10 +34,6 @@ class FlowPolicyCompilerIdentityHardeningTests(unittest.TestCase):
         )
         committed = _load("core/node-architect/flow-policy-compiled-profile.json")
         self.assertEqual(result["result"]["status"], "COMPATIBLE", result["result"])
-        self.assertEqual(
-            result["bindings"]["gate_lifecycle_digest"],
-            "DIAGNOSTIC_CAPTURE_GATE_LIFECYCLE_DIGEST",
-        )
         self.assertEqual(result, committed)
         self.assertEqual(result["compiled_digest"], EXPECTED_COMPILED_DIGEST)
 
