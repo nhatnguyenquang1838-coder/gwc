@@ -180,19 +180,29 @@ Pull Request only within a valid G3 boundary. G3 then uses three internal stages
 PR Assembly → Independent Review → Review Closure
 ```
 
-The task-scoped `g3/delivery-record.yaml` must identify:
+For active closure, the task-scoped v1.1 `g3/delivery-record.yaml` identifies:
 
-- repository, task, base SHA, working branch, Draft PR, and exact head SHA;
-- changed paths, validation evidence, required CI evidence, exclusions, and residual risks;
+- repository, task, base SHA, working branch, and Draft PR;
+- immutable `implementation_head_sha`, changed paths, and implementation scope hash;
+- implementation validation evidence, exclusions, and residual risks;
 - implementer and read-only reviewer identities;
 - reviewer independence as `independent` or the weaker `fresh-context` fallback;
 - applicable requirement, design, code, test, governance, delivery, and CI lanes;
 - acceptance-criteria evidence and findings classified as `BLOCKER`, `MAJOR`, `MINOR`, or `NIT`;
-- exact reviewed head SHA, scope hash, stale state, review decision, and final outcome.
+- exact reviewed implementation subject SHA, scope hash, stale state, review decision, and final outcome;
+- names of required CI checks, without embedding current-tip status or a self-referential container SHA.
 
-DWC must not allow the reviewer to modify the delivery during G3. Blocking findings return to G2 for separately authorized revision. Any new branch head SHA invalidates previous review evidence and requires another read-only review.
+DWC must not allow the reviewer to modify the delivery during G3. Blocking findings return to G2 for separately authorized revision. Implementation review/validation become stale when the implementation subject or scope changes, not merely because a task-scoped G3 evidence commit advances the PR tip.
 
-G3 may pass only when `tools/validate_g3_delivery.py` returns `PASS` for the current delivery record, the review and required CI evidence match the exact current head SHA, all applicable lanes and acceptance criteria are satisfied, no unresolved `BLOCKER` remains, and every `MAJOR` is resolved or explicitly accepted by a human for that exact head SHA.
+Before G3 may pass, DWC must obtain trusted runtime evidence for the exact current PR head and validate all of the following with `tools/validate_g3_delivery.py`:
+
+- `implementation_head_sha` is equal to or an ancestor of the exact current PR head;
+- every path in the aggregate `implementation_head_sha..current_pr_head` delta is under `.gwc/tasks/<task-id>/g3/**`;
+- every required CI check declared by the record passes at that exact current PR head.
+
+Any non-evidence post-implementation path invalidates the binding and returns to G2. An evidence-only new current tip recomputes ancestry/delta/CI evidence but does not invalidate unchanged implementation review/validation. Historical v1.0 records remain immutable provenance; a new active closure must materialize/migrate v1.1 rather than silently reinterpret v1.0.
+
+G3 may pass only when the v1.1 record validates, implementation review and validation match the implementation subject and scope, external ancestry/evidence-only-delta checks pass, required CI passes at the exact current PR head, all applicable lanes and acceptance criteria are satisfied, no unresolved `BLOCKER` remains, and every `MAJOR` is resolved or explicitly accepted by a human for that implementation subject SHA.
 
 The Draft PR remains the user review boundary. Reviewer `PASS` is evidence only and never grants merge, deployment, release, or production authority.
 
@@ -207,7 +217,7 @@ pr_number
 expected_head_sha
 ```
 
-Before invoking it, DWC must verify the latest PR head SHA equals `expected_head_sha`, required CI is `success` for that exact SHA, review closure and the G3 delivery record are non-stale, the PR is still Draft, and there is no scope drift. The connector must fail closed if any of those checks cannot be verified.
+Before invoking it, DWC must verify the latest PR head SHA equals `expected_head_sha`, required CI is `success` for that exact SHA, implementation review closure and the v1.1 G3 delivery record are non-stale, external ancestry/evidence-only-delta validation passes, the PR is still Draft, and there is no scope drift. The connector must fail closed if any of those checks cannot be verified.
 
 This action grants no merge permission. It must not mark another PR ready, change the PR base, enable auto-merge, merge, deploy, release, modify production configuration, access credentials, or access production data. If the tool is unavailable, DWC must record a `ready-for-review blocker` and wait for manual UI promotion before G4.
 
@@ -226,7 +236,7 @@ The default next-check interval is 3 minutes when supported. If the active runti
 
 A scheduled continuation is valid only when a concrete next run is visible or recorded. If there is no next run, including a UI state such as `Chưa lên lịch`, DWC must treat the schedule as inactive.
 
-If CI fails, DWC may inspect workflow logs and repair only repository-fixable failures within the active G2 scope. After every repair commit, DWC must record the new head SHA and treat prior CI, review, and G4-readiness evidence as stale. DWC must not merge, deploy, release, reload runtime, touch production configuration, handle credentials, run migrations, or access production data from a CI wait task unless a separate active approval covers that exact action.
+If CI fails, DWC may inspect workflow logs and repair only repository-fixable failures within the active G2 scope. A repair that changes implementation or another non-evidence path establishes a new implementation subject and makes prior implementation validation/review stale. A G3 evidence-only commit requires fresh external current-tip ancestry/delta/CI verification but does not stale unchanged implementation review/validation. DWC must not merge, deploy, release, reload runtime, touch production configuration, handle credentials, run migrations, or access production data from a CI wait task unless a separate active approval covers that exact action.
 
 ## Proactive gate transitions
 
