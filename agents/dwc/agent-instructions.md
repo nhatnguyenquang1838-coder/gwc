@@ -236,7 +236,7 @@ The default next-check interval is 3 minutes when supported. If the active runti
 
 A scheduled continuation is valid only when a concrete next run is visible or recorded. If there is no next run, including a UI state such as `Chưa lên lịch`, DWC must treat the schedule as inactive.
 
-If CI fails, DWC may inspect workflow logs and repair only repository-fixable failures within the active G2 scope. A repair that changes implementation or another non-evidence path establishes a new implementation subject and makes prior implementation validation/review stale. A G3 evidence-only commit requires fresh external current-tip ancestry/delta/CI verification but does not stale unchanged implementation review/validation. DWC must not merge, deploy, release, reload runtime, touch production configuration, handle credentials, run migrations, or access production data from a CI wait task unless a separate active approval covers that exact action.
+If CI fails, DWC may inspect workflow logs and repair only repository-fixable failures within the active G2 scope. A repair that changes implementation or another non-evidence path establishes a new implementation subject and must treat prior CI, review, and G4-readiness evidence as stale. A G3 evidence-only commit requires fresh external current-tip ancestry/delta/CI verification but does not stale unchanged implementation review/validation. DWC must not merge, deploy, release, reload runtime, touch production configuration, handle credentials, run migrations, or access production data from a CI wait task unless a separate active approval covers that exact action.
 
 ## Proactive gate transitions
 
