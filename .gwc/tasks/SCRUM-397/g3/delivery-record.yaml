@@ -1,0 +1,170 @@
+schema_version: "1.0"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-397
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+working_branch: fastlane/scrum-397-canonical-digest-integration-recovery-r2
+pull_request:
+  number: 525
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/525
+  draft: true
+head_sha: 4e0989cf0770637eabc90c20fa6757fb4f1f4089
+scope_hash: sha256:e37460758ed35b6a4ebf56f4bc6ec74ba8d747247670f4c16cb4d8441c2691f4
+changed_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/recovery/main-drift-assessment.yaml
+  - .gwc/tasks/SCRUM-397/recovery/current-main-inventory-delta.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - governance/digest-profile-registry.yaml
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - schemas/digest-envelope.schema.json
+  - tests/package_export/test_canonical_digest_profile.py
+  - .gwc/tasks/SCRUM-397/g2/wp3r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-executor-report.yaml
+  - tests/conformance/canonical_digest/golden_vectors.yaml
+  - schemas/canonical-digest-golden-vector.schema.json
+  - tools/node_architect/canonical_digest/reference_canonicalizer.py
+  - tools/node_architect/canonical_digest/reference_canonicalizer.mjs
+  - tests/conformance/canonical_digest/test_python_conformance.py
+  - tests/conformance/canonical_digest/test_node_conformance.mjs
+  - .gwc/tasks/SCRUM-397/g2/wp4-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-executor-report.yaml
+  - tools/node_architect/package_export/canonical_digest_api.py
+  - tools/node_architect/package_export/legacy_digest_verifier.py
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - tests/package_export/test_canonical_digest_api.py
+  - tests/package_export/test_legacy_digest_verifier.py
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/replay-manifest.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/validation-report.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g3/delivery-record.yaml
+validation:
+  head_sha: 4e0989cf0770637eabc90c20fa6757fb4f1f4089
+  status: pass
+  commands:
+    - command: "pytest tests/package_export/test_canonical_digest_api.py tests/package_export/test_legacy_digest_verifier.py tests/package_export/test_canonical_digest_profile.py tests/conformance/canonical_digest/test_python_conformance.py"
+      result: pass
+      evidence: "95 passed (canonical_digest_api, legacy_digest_verifier, profile, python conformance)"
+    - command: "node tests/conformance/canonical_digest/test_node_conformance.mjs"
+      result: pass
+      evidence: "11 passed (golden vectors, schema, reference exports, defects A-D)"
+    - command: "python -c \"import ast; ast.parse(open('tools/node_architect/package_export/deterministic_hash_verification.py').read())\""
+      result: pass
+      evidence: "overlap module parses; main + WP4 block present (bounded semantic reconciliation)"
+review:
+  implementer_id: "hermes-mac-dwa"
+  reviewer_id: "pending-controller-independent-review"
+  independence: independent
+  mode: read-only
+  reviewed_head_sha: 4e0989cf0770637eabc90c20fa6757fb4f1f4089
+  reviewed_scope_hash: sha256:e37460758ed35b6a4ebf56f4bc6ec74ba8d747247670f4c16cb4d8441c2691f4
+  reviewed_at: "2026-08-28T02:55:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "independent ChatGPT seven-lane review pending Controller release (seq=54); executor must not self-review"
+    - name: design
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "independent ChatGPT seven-lane review pending Controller release (seq=54)"
+    - name: code
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "independent ChatGPT seven-lane review pending Controller release (seq=54)"
+    - name: test
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "independent ChatGPT seven-lane review pending Controller release (seq=54)"
+    - name: governance
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "independent ChatGPT seven-lane review pending Controller release (seq=54)"
+    - name: delivery
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "independent ChatGPT seven-lane review pending Controller release (seq=54)"
+    - name: ci
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - "fresh exact-head/current-applicable CI pending; prior validate-instructions failure (pytest/cryptography) resolved on main via requirements.txt==pytest==9.1.1+cryptography==50.0.0"
+  findings:
+    - id: REV-1
+      severity: MINOR
+      category: governance
+      status: deferred
+      evidence: "G3 independent ChatGPT seven-lane review + fresh exact-head/current-applicable CI pending Controller release; executor did not self-review or mark PR Ready per seq=54"
+      recommendation: "Controller releases mark-ready only after fresh exact-head CI + independent ChatGPT review PASS"
+  acceptance_criteria:
+    - id: AC-1
+      result: not_verified
+      evidence:
+        - "independent ChatGPT review pending"
+  decision: blocked
+  stale: false
+ci:
+  required: true
+  head_sha: 4e0989cf0770637eabc90c20fa6757fb4f1f4089
+  checks:
+    - name: "Validate instructions"
+      required: true
+      status: pending
+      evidence: "Fresh run triggered by appended g3 delivery-record commit; prior run 32978217840 FAILURE (baseline pytest import) is STALE and superseded by requirements.txt==pytest==9.1.1+cryptography==50.0.0 on current main bad63d46; awaiting new result"
+    - name: "build (gwc/ds-mcp/rental-home/pm-skills)"
+      required: false
+      status: pass
+      evidence: "CheckRuns completed SUCCESS on prior head"
+    - name: "Cross-platform LF and SHA parity"
+      required: false
+      status: pass
+      evidence: "CheckRun completed SUCCESS on prior head"
+    - name: "Node Architect canonical-81 shadow qualification"
+      required: false
+      status: pass
+      evidence: "CheckRun completed SUCCESS on prior head"
+    - name: "Node Architect shadow observer"
+      required: false
+      status: pass
+      evidence: "CheckRun completed SUCCESS on prior head"
+    - name: "Autonomous parent authority required"
+      required: false
+      status: skipped
+      evidence: "Workflow triggers ONLY on pull_request branches:[pre-prod] at current main; PR #525 targets main -> not triggered, effectively skipped (per seq=49)"
+    - name: "Autonomous pre-prod runtime evidence"
+      required: false
+      status: skipped
+      evidence: "CheckRun SKIPPED"
+    - name: "G4 G5 evidence"
+      required: false
+      status: skipped
+      evidence: "CheckRuns SKIPPED (expected; G4 not authorized pre-merge)"
+residual_risks:
+  - "Overlap path deterministic_hash_verification.py reconciled via bounded semantic reconciliation (preserve main 187 lines + insert WP4 canonical-digest block); independent review should confirm behavior parity"
+  - "PR #526 (baseline-CI remediation) closed as obsolete/not-planned; its branch fix/scrum-397-g3-baseline-ci-pytest-r1 preserved; requirements.txt on main now supplies pytest+cryptography, making #526 functionally obsolete"
+  - "G3 independent ChatGPT review + fresh exact-head CI pending Controller release; executor did not self-review/mark-ready (seq=54)"
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - WP5_EXECUTION
+  - PROTECTED_MAIN_WRITE
+  - PR526_BRANCH_DELETE
+outcome: inconclusive
