@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g3-code-review-invocation",
+  "gate": "G3_PR",
+  "task_id": "SCRUM-615",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "pr_number": 529,
+  "head_sha": "321beed0db289c72b91898bc488eda813c1e10e5",
+  "scope_hash": "sha256:ab715204d009662f4af61f93835359d5d37fa2235495d4f8bb7b4bc241ab549b",
+  "implementer_id": "ChatGPT",
+  "reviewer": {
+    "reviewer_id": "Hermes Mac",
+    "kind": "agent",
+    "role": "code_reviewer",
+    "independence": "independent",
+    "access_mode": "read_only"
+  },
+  "invocation": {
+    "provider": "Slack Hermes runtime with durable GitHub PR result",
+    "invocation_id": "scrum-615-g3-independent-review-v2-5463034680",
+    "requested_at": "2026-08-29T14:43:04Z",
+    "completed_at": "2026-08-29T14:47:14Z",
+    "requested_head_sha": "321beed0db289c72b91898bc488eda813c1e10e5",
+    "completed_head_sha": "321beed0db289c72b91898bc488eda813c1e10e5",
+    "result_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/529#issuecomment-5463054221"
+  },
+  "result": "pass",
+  "findings": [
+    {
+      "id": "REV-1",
+      "severity": "NIT",
+      "status": "deferred",
+      "summary": "Trusted evidence_delta_paths are prefix-checked but not canonicalized for traversal or symlink representations; follow-up hardening is non-blocking."
+    }
+  ],
+  "write_actions": [],
+  "stale": false
+}
