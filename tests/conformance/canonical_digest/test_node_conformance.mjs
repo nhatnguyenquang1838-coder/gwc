@@ -18,51 +18,69 @@ const GOLDEN_VECTORS_PATH = join(REPO_ROOT, 'tests/conformance/canonical_digest/
 const SCHEMA_PATH = join(REPO_ROOT, 'schemas/canonical-digest-golden-vector.schema.json');
 const REF_CANON_PATH = join(REPO_ROOT, 'tools/node_architect/canonical_digest/reference_canonicalizer.mjs');
 
-// Minimal YAML subset loader
+// Minimal YAML subset loader — genuinely parses the golden vector list including
+// indented '- id:' object fields and a nested 'input:' mapping (C4).
 function parseSimpleYaml(text) {
   const lines = text.split('\n');
-  const doc = {};
+  const doc = { golden_vectors: [] };
+  let current = null;
   for (const raw of lines) {
-    const line = raw.trimEnd();
-    if (line === '') continue;
-    const kv = line.match(/^([A-Za-z0-9_]+):\s*(.*)/);
-    if (kv) {
-      const key = kv[1];
-      let val = kv[2].trim();
-      if (val === '') { doc[key] = ''; continue; }
-      if (val === 'true') { doc[key] = true; continue; }
-      if (val === 'false') { doc[key] = false; continue; }
-      if (val === 'null') { doc[key] = null; continue; }
-      if (!isNaN(Number(val)) && val !== '') { doc[key] = Number(val); continue; }
-      doc[key] = val;
+    const line = raw.replace(/\t/g, '  ');
+    // Top-level scalar key (e.g. version:, golden_vectors:)
+    const topKv = line.match(/^([A-Za-z0-9_]+):\s*(.*)$/);
+    if (topKv && !line.startsWith(' ') && !line.startsWith('-')) {
+      const key = topKv[1];
+      if (key === 'golden_vectors') continue; // list container
+      doc[key] = _parseScalar(topKv[2].trim());
       continue;
     }
-    const listItem = line.match(/^-\s+(.*)/);
+    // Vector list item start
+    const listItem = line.match(/^-\s+id:\s*(.*)$/);
     if (listItem) {
-      if (!doc.golden_vectors) doc.golden_vectors = [];
-      const item = listItem[1].trim();
-      if (item === 'true') doc.golden_vectors.push(true);
-      else if (item === 'false') doc.golden_vectors.push(false);
-      else if (item === 'null') doc.golden_vectors.push(null);
-      else if (!isNaN(Number(item)) && item !== '') doc.golden_vectors.push(Number(item));
-      else doc.golden_vectors.push(item);
+      current = { id: listItem[1].trim() };
+      doc.golden_vectors.push(current);
       continue;
     }
-    const nestedKv = line.match(/^([A-Za-z0-9_]+):\s*(.*)/);
-    if (nestedKv && doc.golden_vectors && doc.golden_vectors.length > 0) {
-      const last = doc.golden_vectors[doc.golden_vectors.length - 1];
-      if (last && typeof last === 'object' && !Array.isArray(last)) {
-        const nk = nestedKv[1];
-        let nv = nestedKv[2].trim();
-        if (nv === 'true') last[nk] = true;
-        else if (nv === 'false') last[nk] = false;
-        else if (nv === 'null') last[nk] = null;
-        else if (!isNaN(Number(nv)) && nv !== '') last[nk] = Number(nv);
-        else last[nk] = nv;
+    if (!current) continue;
+    // Nested field under the current vector (2-space indent)
+    const nestedKv = line.match(/^\s{2}([A-Za-z0-9_]+):\s*(.*)$/);
+    if (nestedKv) {
+      const nk = nestedKv[1];
+      const rest = nestedKv[2];
+      if (rest === '') {
+        // A nested mapping begins on following deeper-indented lines.
+        current[nk] = {};
+        current.__mapkey = nk;
+        continue;
       }
+      current[nk] = _parseScalar(rest.trim());
+      current.__mapkey = null;
+      continue;
     }
+    // Deeper-indented keys belonging to the nested mapping (e.g. input:)
+    const deepKv = line.match(/^\s{4}([^:\s][^:]*):\s*(.*)$/);
+    if (deepKv && current.__mapkey) {
+      current[current.__mapkey][deepKv[1]] = _parseScalar(deepKv[2].trim());
+      continue;
+    }
+    if (!line.startsWith(' ')) current.__mapkey = null;
   }
   return doc;
+}
+
+function _parseScalar(v) {
+  if (v === '' ) return '';
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  if (v === 'null') return null;
+  if (v.startsWith("'") && v.endsWith("'")) return v.slice(1, -1);
+  if (v.startsWith('"') && v.endsWith('"')) {
+    // Interpret \uXXXX escapes so corpus vectors carrying surrogate escapes
+    // (e.g. "\ud800") become real code units fed to the canonicalizer.
+    return v.slice(1, -1).replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  }
+  if (!isNaN(Number(v)) && v !== '') return Number(v);
+  return v;
 }
 
 function loadGoldenVectors() {
@@ -183,6 +201,79 @@ test('Defect D: canonicalization stays within budget on moderate input', () => {
 
 console.log('');
 console.log(`Results: ${passed} passed, ${failed} failed`);
+// --- C4: genuinely execute/validate the shared golden corpus from YAML ---
+const vectors = loadGoldenVectors();
+function findVector(id) {
+  return vectors.find(v => v && v.id === id);
+}
+function yamlInputToObject(input) {
+  const obj = {};
+  for (const [k, v] of Object.entries(input || {})) obj[k] = v;
+  return obj;
+}
+
+test('C4: CV-0008 (lone surrogate) is read from corpus and rejected', () => {
+  const v = findVector('CV-0008-lone-surrogate-uD800-rejected');
+  assert(v, 'CV-0008 present in corpus');
+  assert.strictEqual(v.expected_canonical_json, null);
+  const obj = yamlInputToObject(v.input);
+  assert.throws(() => ref.canonicalJsonText(obj), Error);
+});
+
+test('C4: CV-0010 (non-BMP UTF-16 ordering) matches corpus expected', () => {
+  const v = findVector('CV-0010-non-bmp-utf16-key-ordering');
+  assert(v, 'CV-0010 present in corpus');
+  const obj = yamlInputToObject(v.input);
+  const got = ref.canonicalJsonText(obj);
+  assert.strictEqual(got, v.expected_canonical_json);
+  assert.strictEqual(createHash('sha256').update(got).digest('hex'), v.expected_canonical_digest_sha256);
+});
+
+test('C4: CV-0011 (non-ASCII minimal) matches corpus expected', () => {
+  const v = findVector('CV-0011-non-ascii-minimal-serialization');
+  assert(v, 'CV-0011 present in corpus');
+  const obj = yamlInputToObject(v.input);
+  const got = ref.canonicalJsonText(obj);
+  assert.strictEqual(got, v.expected_canonical_json);
+});
+
+test('C4: CV-0012 (valid non-BMP pair preserved) matches corpus expected', () => {
+  const v = findVector('CV-0012-valid-non-bmp-surrogate-pair-preserved');
+  assert(v, 'CV-0012 present in corpus');
+  const obj = yamlInputToObject(v.input);
+  const got = ref.canonicalJsonText(obj);
+  assert.strictEqual(got, v.expected_canonical_json);
+});
+
+test('C4: CV-0013 (mixed BMP/non-BMP discriminator) matches corpus expected', () => {
+  const v = findVector('CV-0013-mixed-bmp-nonbmp-utf16-discriminator');
+  assert(v, 'CV-0013 present in corpus');
+  const obj = yamlInputToObject(v.input);
+  const got = ref.canonicalJsonText(obj);
+  assert.strictEqual(got, '{"\uD800\uDC00":"high","\uE000":"low"}');
+  assert.strictEqual(got, v.expected_canonical_json);
+});
+
+// --- C2: surrogate-pair validation must reject malformed pairs ---
+test('C2: isolated LOW surrogate rejected', () => {
+  assert.throws(() => ref.normalizeLoneSurrogate('A\uDC00B', { reject: true }), Error);
+  assert.throws(() => ref.canonicalJsonText({ k: 'x\uDC00y' }), Error);
+});
+test('C2: LOW+LOW (DC00 DC00) rejected as lone', () => {
+  assert.throws(() => ref.normalizeLoneSurrogate('\uDC00\uDC00', { reject: true }), Error);
+  assert.throws(() => ref.canonicalJsonText({ k: '\uD800\uDC00\uDC00' }), Error);
+});
+test('C2: valid HIGH+LOW pair preserved', () => {
+  assert.strictEqual(ref.canonicalJsonText({ astral: '\uD800\uDC00' }), '{"astral":"\uD800\uDC00"}');
+});
+
+// --- C3: invalid key Unicode rejected deterministically, not a raw crash ---
+test('C3: lone-surrogate key raises controlled error', () => {
+  assert.throws(() => ref.canonicalJsonText({ '\uD800': 'v' }), Error);
+});
+
+console.log('');
+
 if (failed > 0) {
   process.exit(1);
 }

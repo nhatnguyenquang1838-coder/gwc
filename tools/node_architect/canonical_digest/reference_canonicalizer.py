@@ -206,7 +206,7 @@ def _codepoint_from_surrogate_pair(lo: str, hi: str) -> int:
     """Reconstruct BMP/non-BMP codepoint from a well-formed surrogate pair."""
     lo_cp = ord(lo)
     hi_cp = ord(hi)
-    if not (_LONE_SURROGATE_LOW <= lo_cp <= _LONE_SURROGATE_HIGH - 1 and _LONE_SURROGATE_HIGH <= hi_cp <= 0xDFFF):
+    if not (_LONE_SURROGATE_LOW <= lo_cp <= 0xDBFF and 0xDC00 <= hi_cp <= 0xDFFF):
         raise ValueError("Not a valid surrogate pair")
     return 0x10000 + (lo_cp - 0xD800) * 0x400 + (hi_cp - 0xDC00)
 
@@ -216,6 +216,9 @@ def _normalize_lone_surrogate(s: str, *, reject: bool = False) -> str:
 
     If `reject` is False, replace lone surrogates with U+FFFD (replacement char).
     If `reject` is True, raise ValueError when any lone surrogate is present.
+
+    Valid surrogate pairs (high D800-DBFF + low DC00-DFFF) are preserved by
+    reconstructing the real non-BMP code point so the result is valid UTF-8.
 
     This is defect C's handling path: the implementation must choose one and
     must NOT crash on lone surrogates.
@@ -227,15 +230,20 @@ def _normalize_lone_surrogate(s: str, *, reject: bool = False) -> str:
     while i < n:
         cp = ord(s[i])
         if _LONE_SURROGATE_LOW <= cp <= _LONE_SURROGATE_HIGH:
-            # Look ahead for a valid surrogate pair (high surrogate 0xDC00-0xDFFF)
-            if i + 1 < n and 0xDC00 <= ord(s[i + 1]) <= 0xDFFF:
-                # Valid surrogate pair; keep both as-is
-                result.append(s[i])
-                result.append(s[i + 1])
+            # Valid pair requires HIGH surrogate (D800-DBFF) followed by LOW
+            # surrogate (DC00-DFFF). Any other surrogate occurrence (lone low,
+            # high not followed by low, or high+high) is a LONE surrogate.
+            if _LONE_SURROGATE_LOW <= cp <= 0xDBFF and i + 1 < n and 0xDC00 <= ord(s[i + 1]) <= 0xDFFF:
+                # Valid surrogate pair — recompose to the real non-BMP code point
+                # so the output is valid UTF-8 (not raw surrogate code units).
+                hi = ord(s[i])
+                lo = ord(s[i + 1])
+                codepoint = 0x10000 + (hi - 0xD800) * 0x400 + (lo - 0xDC00)
+                result.append(chr(codepoint))
                 i += 2
                 count += 1
                 continue
-            # Lone surrogate (no valid pair ahead)
+            # Lone surrogate.
             if reject:
                 raise ValueError("Lone surrogate present in input")
             result.append("\ufffd")
@@ -294,13 +302,15 @@ def _string_to_json(s: str, options: CanonicalizationOptions) -> str:
     """Emit a JSON string under gwc-jcs-v1 / JCS semantics.
 
     - invalid_unicode_policy=reject_unpaired_surrogates: a lone (unpaired)
-      surrogate raises; a valid surrogate pair (non-BMP) is preserved.
+      surrogate raises; a valid surrogate pair (non-BMP) is recomposed to the
+      real code point and preserved.
     - string_escaping=jcs_minimal: escape ONLY ``"``, ``\\`` and control
       characters; emit non-ASCII as raw UTF-8 (never \\uXXXX forms).
     """
-    # Raises ValueError on any lone surrogate; valid pairs pass through.
-    _normalize_lone_surrogate(s, reject=True)
-    return json.dumps(s, ensure_ascii=False, allow_nan=False)
+    # Raises ValueError on any lone surrogate; recomposes valid pairs to real
+    # code points so the result is valid UTF-8 (surrogate-safe).
+    normalized = _normalize_lone_surrogate(s, reject=True)
+    return json.dumps(normalized, ensure_ascii=False, allow_nan=False)
 
 
 def _array_to_json(a: List[Any], options: CanonicalizationOptions) -> str:
@@ -313,7 +323,31 @@ def _object_to_json(o: Dict[str, Any], options: CanonicalizationOptions) -> str:
     # (NOT Python code points) so non-BMP keys order identically to JS
     # runtimes. k.encode('utf-16-be') yields the big-endian code-unit bytes,
     # which compare in UTF-16 code-unit order.
-    keys: List[str] = sorted(o.keys(), key=lambda k: k.encode("utf-16-be"))
+    # C3: validate key Unicode BEFORE sorting. A lone-surrogate key must raise a
+    # controlled ValueError here, not a raw UnicodeEncodeError from .encode() during
+    # sort-key computation.
+    for k in o.keys():
+        _normalize_lone_surrogate(k, reject=True)
+
+    def _utf16_code_units(s: str) -> List[int]:
+        # Each Python character maps to 1 (BMP) or 2 (surrogate pair) UTF-16
+        # code units. We expand via ord() — surrogate chars are preserved as raw
+        # code units, so the comparison matches JS string ordering exactly and
+        # never raises on valid non-BMP pairs.
+        units: List[int] = []
+        for ch in s:
+            cp = ord(ch)
+            if cp >= 0x10000:
+                cp -= 0x10000
+                units.append(0xD800 + (cp >> 10))
+                units.append(0xDC00 + (cp & 0x3FF))
+            else:
+                units.append(cp)
+        return units
+
+    # RFC-8785/JCS: keys sorted lexicographically by UTF-16 code-unit order (NOT
+    # Python code points), so non-BMP keys order identically to JS runtimes.
+    keys: List[str] = sorted(o.keys(), key=_utf16_code_units)
     parts: List[str] = []
     for k in keys:
         parts.append(_emit_json_value(k, options) + ":" + _emit_json_value(o[k], options))

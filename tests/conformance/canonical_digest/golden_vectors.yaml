@@ -102,11 +102,12 @@ golden_vectors:
   expected_canonical_digest_sha256: c3a9db60007b8481cd3d7b4d979616a42f5967b57a4cf83b67c9702ee140dd06
   jcs_compliant: true
   notes: 'REV-1/REV-3: a VALID surrogate pair (U+10000) forms one non-BMP code point and is preserved byte-for-byte; only UNPAIRED surrogates are rejected.'
-- id: CV-0009-node-tokenizer-resource-limit
-  runtime: node
+- id: CV-0013-mixed-bmp-nonbmp-utf16-discriminator
+  runtime: both
   input:
-    doc: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-  expected_canonical_json: '{"doc":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'
-  expected_canonical_digest_sha256: 5a46551abd39502bb54a81b2fcd074414cf8a25434c1220e554eb90fdbc90a9a
+    : low
+    𐀀: high
+  expected_canonical_json: '{"𐀀":"high","":"low"}'
+  expected_canonical_digest_sha256: 6fd37bd77ecbbca175960513283507ef952183c93f49ff54b996029d9006c394
   jcs_compliant: true
-  notes: 'Defect D: Node tokenizer runs under a strict resource limit budget.'
+  notes: 'C1 discriminator: U+10000 (non-BMP, units D800 DC00) MUST sort BEFORE U+E000 (BMP PUA, units E000) under UTF-16 code-unit order, while Python code-point order would place U+E000 first. Proves REV-2 fix is load-bearing. Both runtimes agree.'

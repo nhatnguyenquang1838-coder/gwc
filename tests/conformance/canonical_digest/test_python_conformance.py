@@ -156,6 +156,33 @@ class TestDefectCLoneSurrogateHandling(unittest.TestCase):
         with self.assertRaises(ValueError):
             ref.canonical_json_text(inp)
 
+    def test_c2_isolated_low_surrogate_rejected(self):
+        # C2: an isolated LOW surrogate (DC00) with no preceding HIGH is a lone
+        # surrogate and must be rejected.
+        with self.assertRaises(ValueError):
+            ref._normalize_lone_surrogate("A\udc00B", reject=True)
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text({"k": "x\udc00y"})
+
+    def test_c2_low_low_pair_rejected(self):
+        # C2: LOW+LOW (DC00 DC00) is NOT a valid pair; both are lone surrogates.
+        with self.assertRaises(ValueError):
+            ref._normalize_lone_surrogate("\udc00\udc00", reject=True)
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text({"k": "\ud800\udc00\udc00"})
+
+    def test_c2_high_low_pair_preserved(self):
+        # C2: a valid HIGH+LOW pair is preserved (no raise). The reference
+        # recomposes the pair to the real non-BMP code point (valid UTF-8).
+        out = ref.canonical_json_text({"astral": "𐀀"})
+        self.assertEqual(out, '{"astral":"𐀀"}')
+
+    def test_c3_lone_surrogate_key_raises_controlled_error(self):
+        # C3: an object key containing a lone surrogate must raise a controlled
+        # ValueError (not a raw UnicodeEncodeError during sort-key computation).
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text({"\ud800": "v"})
+
 
 class TestGoldenVectorCorpusIntegrity(unittest.TestCase):
     def test_no_duplicate_vector_ids(self):

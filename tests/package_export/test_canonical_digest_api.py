@@ -100,6 +100,27 @@ class TestCanonicalizeFailClosed(unittest.TestCase):
         # never crash with UnicodeEncodeError.
         self._reject('{"s":"\ud800"}', api.DIGEST_INVALID_UNICODE_REJECTED)
 
+    def test_c2_malformed_low_low_surrogate_rejected(self):
+        # C2: a LOW+LOW sequence (DC00 DC00) is NOT a valid pair; both code
+        # units are lone surrogates and must be rejected deterministically.
+        self._reject('{"s":"\udc00\udc00"}', api.DIGEST_INVALID_UNICODE_REJECTED)
+        # Isolated LOW surrogate also rejected.
+        self._reject('{"s":"x\udc00y"}', api.DIGEST_INVALID_UNICODE_REJECTED)
+
+    def test_c2_valid_high_low_pair_preserved(self):
+        # C2: a VALID HIGH+LOW surrogate pair forms one non-BMP code point and
+        # is preserved byte-for-byte.
+        self.assertEqual(
+            api.canonicalize_gwc_jcs_v1('{"astral":"\U00010000"}'),
+            '{"astral":"\U00010000"}'.encode("utf-8"),
+        )
+
+    def test_c3_lone_surrogate_key_rejected_deterministic(self):
+        # C3: a lone-surrogate KEY must raise the controlled
+        # DIGEST_INVALID_UNICODE_REJECTED (not a raw UnicodeEncodeError during
+        # sort-key computation).
+        self._reject('{"\ud800":"v"}', api.DIGEST_INVALID_UNICODE_REJECTED)
+
     def test_resource_limit_exceeded(self):
         big = '{"big":"' + "x" * 5_000_000 + '"}'
         self._reject(big, api.DIGEST_RESOURCE_LIMIT_EXCEEDED)

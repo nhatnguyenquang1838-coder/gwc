@@ -120,8 +120,9 @@ export function normalizeLoneSurrogate(s, { reject = false } = {}) {
   while (i < n) {
     const cp = s.charCodeAt(i);
     if (cp >= LONE_SURROGATE_LOW && cp <= LONE_SURROGATE_HIGH) {
-      // Check for a valid surrogate pair (high surrogate 0xDC00-0xDFFF)
-      if (i + 1 < n) {
+      // Valid pair requires HIGH surrogate (D800-DBFF) followed by LOW (DC00-DFFF).
+      // Any other surrogate occurrence is a LONE surrogate.
+      if (cp <= 0xDBFF && i + 1 < n) {
         const next = s.charCodeAt(i + 1);
         if (next >= 0xDC00 && next <= 0xDFFF) {
           // Valid pair — keep as-is

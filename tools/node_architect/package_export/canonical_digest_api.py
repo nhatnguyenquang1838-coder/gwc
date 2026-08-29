@@ -201,9 +201,18 @@ def _js_number(value: float) -> str:
 
 def _escape_string(s: str, *, max_string_bytes: int) -> str:
     out = []
-    for ch in s:
-        cp = ord(ch)
+    i = 0
+    n = len(s)
+    while i < n:
+        cp = ord(s[i])
+        if 0xD800 <= cp <= 0xDBFF and i + 1 < n and 0xDC00 <= ord(s[i + 1]) <= 0xDFFF:
+            # Valid surrogate pair (non-BMP code point) — preserved as-is.
+            out.append(s[i])
+            out.append(s[i + 1])
+            i += 2
+            continue
         if 0xD800 <= cp <= 0xDFFF:
+            # Lone surrogate (isolated, or high not followed by low) — rejected.
             raise CanonicalDigestAPIError(DIGEST_INVALID_UNICODE_REJECTED)
         esc = _ESCAPES.get(cp)
         if esc is not None:
@@ -211,7 +220,8 @@ def _escape_string(s: str, *, max_string_bytes: int) -> str:
         elif cp < 0x20:
             out.append("\\u%04x" % cp)
         else:
-            out.append(ch)
+            out.append(s[i])
+        i += 1
     result = '"' + "".join(out) + '"'
     if len(result.encode("utf-8")) > max_string_bytes:
         raise CanonicalDigestAPIError(DIGEST_RESOURCE_LIMIT_EXCEEDED)
@@ -243,11 +253,29 @@ def _canonicalize_value(value, depth: int, limits: Dict[str, int]) -> str:
         if len(value) > limits["max_object_keys"]:
             raise CanonicalDigestAPIError(DIGEST_RESOURCE_LIMIT_EXCEEDED)
         members = []
+        # C3: validate every key's Unicode BEFORE sorting so a lone-surrogate key
+        # raises the controlled DIGEST_INVALID_UNICODE_REJECTED (not a raw
+        # UnicodeEncodeError from .encode() during sort-key computation).
+        for key in value:
+            _escape_string(key, max_string_bytes=limits["max_string_bytes"])
+
+        def _utf16_code_units(s: str) -> List[int]:
+            # Surrogate-safe UTF-16 code-unit expansion (see reference canonicalizer).
+            units: List[int] = []
+            for ch in s:
+                cp = ord(ch)
+                if cp >= 0x10000:
+                    cp -= 0x10000
+                    units.append(0xD800 + (cp >> 10))
+                    units.append(0xDC00 + (cp & 0x3FF))
+                else:
+                    units.append(cp)
+            return units
+
         # RFC-8785/JCS: keys sorted lexicographically by UTF-16 code-unit
         # order (NOT Python code points), so non-BMP keys order identically to
-        # JS runtimes. k.encode('utf-16-be') yields big-endian code-unit bytes
-        # comparing in UTF-16 code-unit order.
-        for key in sorted(value, key=lambda k: k.encode("utf-16-be")):
+        # JS runtimes.
+        for key in sorted(value, key=_utf16_code_units):
             members.append(
                 _escape_string(key, max_string_bytes=limits["max_string_bytes"])
                 + ":"
