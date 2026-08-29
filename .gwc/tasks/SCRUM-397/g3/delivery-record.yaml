@@ -7,11 +7,11 @@ base_ref: main
 base_sha: 668a8645a696e4cbf84124201a58d26bc833f0c1
 working_branch: fastlane/scrum-397-current-main-recovery-r3
 pull_request:
-  number: 525
-  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/525
+  number: 533
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/533
   draft: true
 implementation_head_sha: db19b3c77c9e6938f0a44e9a8c93238bf44bac0c
-scope_hash: sha256:2a1d3ffb95f08f7798e04805b46b7a571f798af1dbc1eba40e464d83a42fb940
+scope_hash: sha256:561526c974359a540652f17d5b504501db127e9f9b93cbb63617690592923c86
 changed_paths:
   - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
   - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
@@ -64,7 +64,7 @@ review:
   independence: independent
   mode: read-only
   reviewed_implementation_head_sha: db19b3c77c9e6938f0a44e9a8c93238bf44bac0c
-  reviewed_scope_hash: sha256:2a1d3ffb95f08f7798e04805b46b7a571f798af1dbc1eba40e464d83a42fb940
+  reviewed_scope_hash: sha256:561526c974359a540652f17d5b504501db127e9f9b93cbb63617690592923c86
   reviewed_at: "2026-08-29T17:00:00Z"
   lanes:
     - name: requirement
@@ -96,12 +96,12 @@ review:
       applicable: true
       status: not_reviewed
       evidence:
-        - delivery lane deferred; PR #525 referenced as documented delivery PR only, NOT opened/updated/closed in this bounded action
+        - NEW Draft PR #533 opened from bound branch fastlane/scrum-397-current-main-recovery-r3 @ 349a1b57 to main@668a8645; predecessor PR #525 referenced only, NOT mutated
     - name: ci
       applicable: true
       status: not_reviewed
       evidence:
-        - exact-tip CI deferred to follow-on promotion gate; required_checks not asserted at pre-closure
+        - exact-tip required-CI deferred to S4 (after Controller independent 7-lane review PASS)
   findings: []
   acceptance_criteria:
     - id: AC-1
@@ -113,24 +113,22 @@ review:
       evidence:
         - 35 paths byte-identical to source-provenance 4e0989cf; overlap with main drift = 0
     - id: AC-3
-      result: not_applicable
+      result: pass
       evidence:
-        - promotion PR-open / independent review / mark-Ready / close-#525 excluded from this bounded G2
+        - NEW Draft PR #533 opened (S1); independent 7-lane review (S3) and mark-Ready (S4) deferred to Controller-gated stages
   decision: blocked
   stale: false
 ci:
   required: false
   required_checks: []
 residual_risks:
-  - G3 promotion (Draft PR open, 7-lane independent review, exact-tip CI, mark-Ready) is a separate follow-on controller-gated action bound to the produced implementation head; not executed under this G2.
-  - PR #525 is referenced as the documented delivery PR but remains OPEN/Draft unchanged; no mutation performed on it.
+  - Independent seven-lane review (S3) is Controller-owned read-only; Executor supplies refs/evidence only and does NOT self-certify independence.
+  - G3 closure + mark-Ready (S4) only after Controller review PASS + exact-tip ancestry/evidence-only-delta/required-CI validation.
+  - PR #525 is predecessor-only and MUST NOT be mutated under this candidate.
 exclusions:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION_DATA
-  - G4_PR_OPEN
-  - G4_INDEPENDENT_REVIEW
-  - G4_MARK_READY
   - G4_CLOSE_PR_525
   - WP5_START
   - MAIN_WRITE
