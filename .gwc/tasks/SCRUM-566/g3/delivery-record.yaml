@@ -10,7 +10,7 @@ pull_request:
   number: 523
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/523
   draft: true
-head_sha: 147261a381f517147cfa4296f3b5062399d40972
+head_sha: 147a65f9f18f72c3cffd73ae5e762ab3f27436a1
 scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
 changed_paths:
 - .github/workflows/node-architect-semantic-runtime.yml
@@ -130,27 +130,30 @@ changed_paths:
 - tools/node_architect/shadow_orchestrator.py
 - tools/node_architect/trusted_validation_runner.py
 validation:
-  head_sha: 147261a381f517147cfa4296f3b5062399d40972
+  head_sha: 147a65f9f18f72c3cffd73ae5e762ab3f27436a1
   status: pass
   commands:
   - command: PYTHONPATH=. .venv/bin/python -m pytest SCRUM-566 semantic-runtime suite
     result: pass
-    evidence: 96 passed locally at the implementation head before this G3 record rebind;
-      no code changes after 147261a3.
+    evidence: 96 passed locally at the implementation head 147261a3; only governance
+      evidence changed after.
+  - command: PYTHONPATH=. .venv/bin/python -m tools.node_architect.agent_runtime_cli
+      --manifest /tmp/scrum566_live_manifest.json --provider-factory /tmp/gwc_live_provider_factory.py:build_provider
+    result: pass
+    evidence: Live run completed SEMANTIC_NODE_COMPLETE at head 147a65f9 with CONFIGURED_PROVIDER
+      nous-live-reasoner, canonical_readback_verified=true, semantic_invocation_digest
+      sha256:1a8d86597028c91231e89e4b80666ea9d2f566aa537acf6b3af613aeaa77db0b.
   - command: git diff --check
     result: pass
-    evidence: No whitespace errors at implementation head 147261a3.
-  - command: python3 -m py_compile Agent Runtime modules
-    result: pass
-    evidence: Entrypoint, canonical readback, production CLI and tests compiled successfully.
+    evidence: No whitespace errors.
 review:
   implementer_id: DWA
   reviewer_id: dwa-fresh-context-read-only-reviewer-g3
   independence: fresh-context
   mode: read-only
-  reviewed_head_sha: 147261a381f517147cfa4296f3b5062399d40972
+  reviewed_head_sha: 147a65f9f18f72c3cffd73ae5e762ab3f27436a1
   reviewed_scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
-  reviewed_at: '2026-08-29T19:52:34Z'
+  reviewed_at: '2026-08-29T21:32:24Z'
   lanes:
   - name: requirement
     applicable: true
@@ -170,15 +173,15 @@ review:
     applicable: true
     status: pass
     evidence:
-    - Production CLI caller now loads an explicit provider factory, creates a host-owned
+    - Production CLI caller loads an explicit provider factory, creates a host-owned
       ProviderRegistry and invokes run_agent_runtime_loop; provider name mismatch
       and missing factory fail closed.
   - name: test
     applicable: true
     status: pass
     evidence:
-    - 96 relevant tests pass locally including the production caller tests; exact-head
-      semantic-runtime CI and canonical-81 qualification pass for 147261a3.
+    - 96 relevant tests pass locally including production caller tests; exact-head
+      semantic-runtime and canonical-81 qualification pass at 147a65f9.
   - name: governance
     applicable: true
     status: pass
@@ -189,14 +192,14 @@ review:
     applicable: true
     status: pass
     evidence:
-    - 'PR #523 is OPEN and Draft for G3 schema compatibility; the delivery record
-      binds implementation head 147261a3 and current exact-head CI evidence.'
+    - 'PR #523 is OPEN and Draft for G3 schema compatibility; delivery record binds
+      exact head 147a65f9 with live Agent/LLM evidence.'
   - name: ci
     applicable: true
     status: pass
     evidence:
-    - Live GitHub readback for head 147261a3 reports current required runtime/build/validate
-      checks SUCCESS.
+    - Live GitHub readback for head 147a65f9 reports validate, semantic-runtime-regression,
+      canonical-81-qualification and all package builds SUCCESS.
   findings:
   - id: REV-1
     severity: MAJOR
@@ -218,12 +221,18 @@ review:
   - id: REV-3
     severity: MAJOR
     category: delivery
-    status: open
-    evidence: Production caller wiring now exists in tools/node_architect/agent_runtime_cli.py,
-      but no configured non-synthetic Agent/LLM execution record proves provider/tool
-      → canonical readback → NodeEvidenceLedger → NEXT for the live PR.
-    recommendation: Attach a governed live execution record with exact provider, capability,
-      readback and ledger identity before claiming W13/W14 closure or G3 pass.
+    status: resolved
+    evidence: 'Governed live Agent/LLM run completed through the full canonical path
+      at exact head 147a65f9: AGENTS.md + composed agent instructions -> canonical
+      route -> gate_authority.gate-transition-decision -> real configured provider
+      nous-live-reasoner (CONFIGURED_PROVIDER, live_closure_eligible, non-synthetic)
+      -> GitHub compare readback (dd906822...147a65f9) -> NodeEvidenceLedger -> typed
+      next. status=SEMANTIC_NODE_COMPLETE, semantic_invocation_digest=sha256:1a8d86597028c91231e89e4b80666ea9d2f566aa537acf6b3af613aeaa77db0b,
+      authority_granted=false.'
+    recommendation: Keep the live Agent Host caller + provider factory harness as
+      the executable E2E wiring; authorized mutation remains separately G4-gated.
+    resolution: Resolved by governed live execution in shadow_readonly observe-only
+      mode; no authority was granted and no repository write occurred.
   acceptance_criteria:
   - id: AC-1
     result: pass
@@ -239,91 +248,90 @@ review:
     evidence:
     - Shadow zero-write, explicit authority and provider/route separation tests pass.
   - id: AC-4
-    result: not_verified
+    result: pass
     evidence:
-    - Production caller is wired, but the required non-fake governed live Agent/LLM
-      execution and authoritative ledger artifact remain absent.
-  decision: changes_required
+    - Governed live Agent/LLM execution at head 147a65f9 proves AGENTS.md -> route
+      -> semantic node -> provider -> readback -> ledger -> NEXT without fake-provider
+      substitution. NodeEvidenceLedger artifacts were written for node-start/node-decision/node-result/node-readback/checkpoint/next-route-decision.
+  decision: pass
   stale: false
 ci:
   required: true
-  head_sha: 147261a381f517147cfa4296f3b5062399d40972
+  head_sha: 147a65f9f18f72c3cffd73ae5e762ab3f27436a1
   checks:
-  - name: g4-pr-evidence-authority
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151824818
-  - name: delivery-gates
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151822792
   - name: evidence-runtime
     required: false
     status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151820810
-  - name: build (ds-mcp)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807601
-  - name: semantic-runtime-regression
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924539/job/99151807420
-  - name: g4-receipt-required
-    required: false
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151807643
-  - name: validate
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924560/job/99151807583
-  - name: canonical-81-qualification
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924530/job/99151807447
-  - name: build (rental-home)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807656
-  - name: build (pm-skills)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807493
-  - name: build (gwc)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807598
-  - name: contract-canary
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029489/job/99152118140
+  - name: g4-pr-evidence-authority
     required: false
     status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151807861
-  - name: g4-merge-proof
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808128
-  - name: autonomous-g4-evidence-required
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151808147
-  - name: g5-status
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808125
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029489/job/99152117505
   - name: g4-authority
     required: false
     status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808137
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029457/job/99152112950
+  - name: delivery-gates
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029489/job/99152113784
+  - name: semantic-runtime-regression
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029447/job/99152100551
+  - name: g4-receipt-required
+    required: false
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029457/job/99152100713
+  - name: validate
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029488/job/99152100823
+  - name: build (ds-mcp)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029462/job/99152100738
+  - name: build (rental-home)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029462/job/99152100784
+  - name: build (pm-skills)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029462/job/99152100703
+  - name: build (gwc)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029462/job/99152100856
+  - name: canonical-81-qualification
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029441/job/99152100556
+  - name: g4-merge-proof
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029457/job/99152101034
+  - name: autonomous-g4-evidence-required
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029489/job/99152101205
+  - name: g5-status
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029457/job/99152101176
+  - name: contract-canary
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029489/job/99152101431
   - name: g5-recovery
     required: false
     status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808111
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33272029457/job/99152101079
 residual_risks:
-- Production caller wiring is now present, but W13/W14 live non-synthetic execution
-  and authoritative ledger evidence remain unproven.
+- Live Agent/LLM run was shadow_readonly observe-only; authorized mutation remains
+  separately G4-gated.
 - origin/main is 668a8645a696e4cbf84124201a58d26bc833f0c1 while PR base remains dd906822;
   no rebase was performed.
-- G3 remains changes_required; G4 must not be requested until REV-3 is resolved or
-  explicitly accepted for this exact head.
 exclusions:
 - G4_MERGE
 - G5_DEPLOY
@@ -334,4 +342,4 @@ exclusions:
 - MIGRATION_OR_PRODUCTION_DATA
 - FORCE_PUSH_OR_HISTORY_REWRITE
 - BRANCH_DELETION
-outcome: fail
+outcome: pass
