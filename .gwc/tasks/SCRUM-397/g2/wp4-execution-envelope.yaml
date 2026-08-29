@@ -1,0 +1,76 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+gate: G2_EXECUTION
+task_id: SCRUM-397
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+working_branch: fastlane/scrum-397-canonical-digest-wp4-shared-api-r3
+source_head_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+scope_version: 1
+risk_class: R2
+status: ACTIVE
+approval_id: g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69
+approval_command: APPROVE G2 g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69 38c324d5654ecd69 2026-08-25T22:33:56Z
+scope_hash: sha256:38c324d5654ecd69dcc03eaec3ddac981c4ed030b59b5a63d6326488c7f3d289
+scope_hash_16: 38c324d5654ecd69
+issued_at: '2026-08-25T18:33:56Z'
+expires_at: '2026-08-25T22:33:56Z'
+approved_at: '2026-08-25T18:52:56Z'
+approved_response_normalized: APPROVE G2 g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69 38c324d5654ecd69 2026-08-25T22:33:56Z
+authorized_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp4-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-executor-report.yaml
+  - tools/node_architect/package_export/canonical_digest_api.py
+  - tools/node_architect/package_export/legacy_digest_verifier.py
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - tests/package_export/test_canonical_digest_api.py
+  - tests/package_export/test_legacy_digest_verifier.py
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - callsite_migration
+  - registry_activation
+  - wp3_corpus_or_reference_path_edit
+  - protected_main_write
+  - pr_creation_or_update
+  - merge_or_auto_merge
+  - force_push
+  - branch_deletion
+  - base_change
+  - deploy_or_release
+  - production_data_or_config_change
+  - credential_or_secret_change
+  - migration
+  - scope_expansion
+  - start_WP5_before_WP3_and_WP4_terminal_pass
+  - reset_or_rebase_old_wp4
+  - mutate_old_wp4_worktree
+  - stale_r2_cleanup
+artifact_hashes:
+  change_plan: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+  mermaid: null
+  png: null
+  svg: null
+execution_policy:
+  replay_safe: true
+  exact_head_required: true
+  scope_hash_required: true
+  authority_grant_prohibited: true
+  g3_authority_granted: false
+  g4_authority_granted: false
+  g5_authority_granted: false
+  g6_authority_granted: false
+invalidation_conditions:
+  - protected main SHA changes
+  - source head changes before a guarded write
+  - scope hash changes
+  - approval expires
+  - approval command mismatch
+  - any file outside authorized paths is required

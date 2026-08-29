@@ -1,0 +1,9 @@
+schema_version: "1.0"
+artifact_type: integration-recovery-r2-execution-envelope
+task_id: SCRUM-397
+run_id: SCRUM-397-WP3-WP4-20260825-TC-RECOVERY-R1
+base_sha: f8e25602e1985f962d4e75c3623d4ce9dfb6adc2
+working_branch: fastlane/scrum-397-canonical-digest-integration-recovery-r2
+scope_hash: sha256:2116556f0aad64d3bf141e720a4a6704134141ec0ff98493c902fb55c502dead
+path_count: 35
+overlap_policy: BOUNDED_SEMANTIC_RECONCILIATION_NO_BLIND_OVERWRITE_OR_SKIP

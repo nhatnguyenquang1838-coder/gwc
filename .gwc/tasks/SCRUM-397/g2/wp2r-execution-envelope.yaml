@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+gate: G2_EXECUTION
+task_id: SCRUM-397
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+working_branch: fastlane/scrum-397-canonical-digest-wp2-refresh-r1
+head_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+risk_class: R2
+status: ACTIVE
+approval_id: g2_scrum-397_21045bb2e2c750c3
+approval_command: APPROVE G2 g2_scrum-397_21045bb2e2c750c3 d1080a40a9446909 2026-08-24T18:14:00Z
+scope_hash: sha256:d1080a40a9446909e0ae627b291f9067e439040b92ca54440ff5b679b0d77858
+scope_hash_16: d1080a40a9446909
+issued_at: '2026-08-24T16:14:00Z'
+expires_at: '2026-08-24T18:14:00Z'
+approved_at: '2026-08-24T16:23:04Z'
+approved_response_normalized: APPROVE G2 g2_scrum-397_21045bb2e2c750c3 d1080a40a9446909 2026-08-24T18:14:00Z
+authorized_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/recovery/main-drift-assessment.yaml
+  - .gwc/tasks/SCRUM-397/recovery/current-main-inventory-delta.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - governance/digest-profile-registry.yaml
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - schemas/digest-envelope.schema.json
+  - tests/package_export/test_canonical_digest_profile.py
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - run_independent_review
+  - merge_approved_pr
+  - readback_branch_pr_diff_ci
+  - verify_post_merge_ci
+  - deploy_approved_release
+  - reload_approved_runtime
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - migration
+artifact_hashes:
+  change_plan: sha256:d1080a40a9446909e0ae627b291f9067e439040b92ca54440ff5b679b0d77858
+  mermaid: null
+  png: null
+  svg: null
+execution_policy:
+  replay_safe: true
+  exact_head_required: true
+  scope_hash_required: true
+  authority_grant_prohibited: true
+  g3_authority_granted: false
+  g4_authority_granted: false
+  g5_authority_granted: false
+  g6_authority_granted: false
+invalidation_conditions:
+  - protected main SHA changes
+  - source head changes before a guarded write
+  - scope hash changes
+  - approval expires
+  - approval command mismatch
+  - any file outside authorized paths is required

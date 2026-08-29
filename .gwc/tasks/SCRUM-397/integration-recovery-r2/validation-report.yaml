@@ -1,0 +1,10 @@
+schema_version: "1.0"
+artifact_type: integration-recovery-r2-validation-report
+status: PENDING_VALIDATION
+planned_suites:
+  - tests/conformance/canonical_digest/test_python_conformance.py
+  - tests/conformance/canonical_digest/test_node_conformance.mjs
+  - tests/package_export/test_canonical_digest_api.py
+  - tests/package_export/test_legacy_digest_verifier.py
+  - tests/package_export/test_canonical_digest_profile.py
+overlap_targeted_validation: tools/node_architect/package_export/deterministic_hash_verification.py

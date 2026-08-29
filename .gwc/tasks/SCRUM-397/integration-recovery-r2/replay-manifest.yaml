@@ -1,0 +1,13 @@
+schema_version: "1.0"
+artifact_type: integration-recovery-r2-replay-manifest
+source_commits:
+  WP1: 556e3b68812be9c22b5a151b5361db7f917bcddb
+  WP2R: c05f99ce729035fa9119f98beec8c3038eb457bf
+  WP3: 27b2ee628dd1d8cff33f178f71760afec6ad9e1d
+  WP4: 85abd74790e5326e47f2b29b6a9ef32ace79a267
+overlap_resolution:
+  path: tools/node_architect/package_export/deterministic_hash_verification.py
+  method: bounded_semantic_reconciliation
+  main_blob: e4e28df0caf3d2aad5fa8c0bf4f25e6b45b9c520
+  wp4_blob: 107b10fbc789593eaefc3c4a0e03535a752a5121
+  result_blob: 107b10fbc789593eaefc3c4a0e03535a752a5121

@@ -1,0 +1,61 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+task_id: SCRUM-397
+work_package: WP2-REFRESH-R1
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+action: branch_worktree_file_commit_push
+approval_request_id: g2_scrum-397_21045bb2e2c750c3
+human_response: APPROVE G2 g2_scrum-397_21045bb2e2c750c3 d1080a40a9446909 2026-08-24T18:14:00Z
+approval_scope_hash: sha256:d1080a40a9446909e0ae627b291f9067e439040b92ca54440ff5b679b0d77858
+scope_hash_short: d1080a40a9446909
+approval_token: 21045bb2e2c750c34b3870569eb7ac7400bf4059a31689671ce066c154718e67
+approval_request_digest: sha256:110d3c1d5c6ce6cb13c769e54f7711495a8986d7ff45d57f7bfb337fad01f91e
+issued_at: '2026-08-24T16:14:00Z'
+expires_at: '2026-08-24T18:14:00Z'
+scoped_at: '2026-08-24T16:23:04Z'
+consumption_status: CONSUMED
+consumption_kind: FIRST_SEEN | VALID | CONSUMED
+actor_target:
+  type: agent
+  id: U0BLW98GENT
+  display_name: Hermes Mac
+base_ref: main
+base_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+head_sha_at_validation: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+working_branch: fastlane/scrum-397-canonical-digest-wp2-refresh-r1
+risk_class: R2
+authorized_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/recovery/main-drift-assessment.yaml
+  - .gwc/tasks/SCRUM-397/recovery/current-main-inventory-delta.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - governance/digest-profile-registry.yaml
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - schemas/digest-envelope.schema.json
+  - tests/package_export/test_canonical_digest_profile.py
+forbidden_effects:
+  - pr_creation_or_update
+  - merge_or_auto_merge
+  - force_push
+  - branch_deletion
+  - pr_base_change
+  - deploy_or_release
+  - production_data_or_config_change
+  - credential_or_secret_change
+  - migration
+  - scope_expansion
+  - scrum_396_write
+  - wp1_wp2_wp3_wp4_wp5_consumer_migration
+execution_authority_granted: true
+g3_authority_granted: false
+g4_authority_granted: false
+g5_authority_granted: false
+g6_authority_granted: false
+note: >-
+  WP2-REFRESH-R1 rebinds the canonical digest profile/registry to current
+  protected main after SCRUM-396 env drift. Existing WP2/WP3 artifacts are
+  carried as design input only, not as fresh authority evidence.

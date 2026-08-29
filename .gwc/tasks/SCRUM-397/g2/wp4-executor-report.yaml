@@ -1,0 +1,35 @@
+approval_command: APPROVE G2 g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69 38c324d5654ecd69 2026-08-25T22:33:56Z
+approval_request_id: g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69
+artifact_type: g2-executor-report
+ci: CI_UNAVAILABLE_AT_CHECK
+defect_summary:
+  WP4_SHARED_API: COMPLETED
+  WP4_LEGACY_VERIFIER: COMPLETED
+  WP4_REPO_ROOT_PATH_DEPTH: RESOLVED
+  WP4_LONE_SURROGATE_PREIMAGE: RESOLVED
+defects_addressed:
+  - REPO_ROOT parents[4] -> parents[3] (worktree-relative registry path)
+  - lone-surrogate in raw text preimage check -> DIGEST_INVALID_UNICODE_REJECTED
+evidence_integrity:
+  durable_validation_counts_must_match_actual_run: true
+  no_self_referential_terminal_sha: true
+  terminal_head_source: CONTROLLER_EXTERNAL_READBACK
+gate: G2_EXECUTION
+materialized_files_count: 8
+pre_correction_head: c05f99ce729035fa9119f98beec8c3038eb457bf
+protected_main_sha: f2d08df464c4e485d8a5bbc0df4579b1727ed32f
+repository: nhatnguyenquang1838-coder/gwc
+run: SCRUM-397-WP4-R3-20260825-1833
+schema_version: '1.0'
+scope_audit: COMPLETED
+source_base_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+source_branch: fastlane/scrum-397-canonical-digest-wp4-shared-api-r3
+status: COMPLETED
+task_id: SCRUM-397
+terminal_head_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+terminal_head_source: CONTROLLER_EXTERNAL_READBACK
+validation_counts:
+  bounded_unit_tests: 36
+  py_compile: passed
+work_package: WP4
+working_branch: fastlane/scrum-397-canonical-digest-wp4-shared-api-r3
