@@ -1,0 +1,93 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+status: ACTIVE
+activation_state: HUMAN_DIRECTED_HOTFIX_LATE_RECONCILIATION
+generated_at_utc: '2026-08-29T14:37:10Z'
+task_id: SCRUM-615
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+working_branch: hotfix/scrum-615-g3-external-pr-tip-binding
+risk_class: R3
+scope_hash: sha256:ab715204d009662f4af61f93835359d5d37fa2235495d4f8bb7b4bc241ab549b
+reconciliation:
+  mode: LATE_RECONCILIATION
+  historical_authority_claimed: false
+  prior_implementation_observed: true
+  note: >-
+    This envelope records the current bounded hotfix scope and remaining
+    validation/evidence work. It does not retroactively claim that this file
+    authorized commits created before materialization.
+scope:
+  files_write:
+  - agents/dwc/agent-instructions.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/node-architect/flow-policy-activation-registry.json
+  - core/node-architect/flow-policy-compiled-profile.json
+  - docs/superpowers/plans/2026-08-28-g3-external-pr-tip-binding.md
+  - docs/superpowers/specs/2026-08-28-g3-external-pr-tip-binding-design.md
+  - projects/gwc/project-extension.md
+  - projects/gwc/project-instructions.md
+  - schemas/g3-delivery-record.schema.json
+  - skills/gwc-g3/SKILL.md
+  - templates/gates/g3-delivery-record.template.yaml
+  - tests/test_flow_policy_compiler_identity_hardening.py
+  - tests/test_g3_delivery.py
+  - tests/test_gate_lifecycle_process_contract.py
+  - tools/validate_g3_delivery.py
+  - .gwc/tasks/SCRUM-615/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-615/g1/decision/g3-external-pr-tip-binding-decision.yaml
+  - .gwc/tasks/SCRUM-615/g2/execution-envelope.yaml
+  authorized_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+  excluded_actions:
+  - direct_main_write
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - migration_execution
+  - production_data_access
+  - force_push
+  - branch_deletion
+work_item:
+  provider: Atlassian Jira
+  id: SCRUM-615
+  claim_required: true
+  claim_verified: true
+  ai_agent: ChatGPT
+  claimed_at: '2026-08-28T15:47:00+07:00'
+  state: In Progress
+human_direction:
+  required_for_architecture_change: true
+  received: true
+  actor: user
+  received_in: current ChatGPT conversation
+  instruction: Hotfix governance theo A
+prerequisites:
+- id: CURRENT_G0_RECONCILIATION
+  status: READY
+  evidence: ../g0/context-snapshot.yaml
+- id: CURRENT_G1_DECISION_RECONCILIATION
+  status: PASS
+  evidence: ../g1/decision/g3-external-pr-tip-binding-decision.yaml
+- id: AGENT_TASK_CLAIM
+  status: PASS
+  evidence: Jira SCRUM-615 readback at current state
+- id: BASE_READBACK
+  status: PASS
+  evidence: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+invalidation_conditions:
+- protected main changes materially before G3 closure
+- scope changes beyond the 18 listed implementation/reconciliation paths
+- Jira AI Agent claim conflicts or is released
+- working branch changes unexpectedly
+warning: >-
+  G4 merge remains a separate Human authority boundary. This envelope does not
+  authorize protected-main write, merge, deployment, release, or production operations.
