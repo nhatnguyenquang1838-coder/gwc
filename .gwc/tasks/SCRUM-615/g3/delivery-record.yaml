@@ -1,0 +1,159 @@
+schema_version: "1.1"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-615
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+working_branch: hotfix/scrum-615-g3-external-pr-tip-binding
+pull_request:
+  number: 529
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/529
+  draft: true
+implementation_head_sha: 321beed0db289c72b91898bc488eda813c1e10e5
+scope_hash: sha256:ab715204d009662f4af61f93835359d5d37fa2235495d4f8bb7b4bc241ab549b
+changed_paths:
+  - .gwc/tasks/SCRUM-615/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-615/g1/decision/g3-external-pr-tip-binding-decision.yaml
+  - .gwc/tasks/SCRUM-615/g2/execution-envelope.yaml
+  - agents/dwc/agent-instructions.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  - core/node-architect/flow-policy-activation-registry.json
+  - core/node-architect/flow-policy-compiled-profile.json
+  - docs/superpowers/plans/2026-08-28-g3-external-pr-tip-binding.md
+  - docs/superpowers/specs/2026-08-28-g3-external-pr-tip-binding-design.md
+  - projects/gwc/project-extension.md
+  - projects/gwc/project-instructions.md
+  - schemas/g3-delivery-record.schema.json
+  - skills/gwc-g3/SKILL.md
+  - templates/gates/g3-delivery-record.template.yaml
+  - tests/test_flow_policy_compiler_identity_hardening.py
+  - tests/test_g3_delivery.py
+  - tests/test_gate_lifecycle_process_contract.py
+  - tools/validate_g3_delivery.py
+validation:
+  implementation_head_sha: 321beed0db289c72b91898bc488eda813c1e10e5
+  status: pass
+  commands:
+    - command: GitHub Actions / Validate instructions / run 33258269759
+      result: pass
+      evidence: exact workflow run completed SUCCESS for implementation subject 321beed0db289c72b91898bc488eda813c1e10e5
+    - command: GitHub Actions / Node Architect Flow Policy runtime E2E / run 33258269758
+      result: pass
+      evidence: exact workflow run completed SUCCESS for implementation subject 321beed0db289c72b91898bc488eda813c1e10e5
+    - command: GitHub Actions / Build instruction packages / run 33258269763
+      result: pass
+      evidence: exact workflow run completed SUCCESS for implementation subject 321beed0db289c72b91898bc488eda813c1e10e5
+    - command: GitHub Actions / Node Architect canonical-81 shadow qualification / run 33258269757
+      result: pass
+      evidence: exact workflow run completed SUCCESS for implementation subject 321beed0db289c72b91898bc488eda813c1e10e5
+review:
+  implementer_id: ChatGPT
+  reviewer_id: Hermes Mac
+  independence: independent
+  mode: read-only
+  reviewed_implementation_head_sha: 321beed0db289c72b91898bc488eda813c1e10e5
+  reviewed_scope_hash: sha256:ab715204d009662f4af61f93835359d5d37fa2235495d4f8bb7b4bc241ab549b
+  reviewed_at: "2026-08-29T14:47:14Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Jira SCRUM-615 acceptance criteria and current-time G0/G1 reconciliation match Option A.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Subject/container separation keeps current PR tip external and implementation subject immutable.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - validate_runtime_context enforces ancestry, G3-only evidence delta and external required CI.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - RED-to-GREEN contract tests cover v1.1, legacy migration, ancestry, evidence delta and CI failure modes.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - Canonical G3 semantics are aligned and Human G4 merge boundary is preserved.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR #529 contains the bounded 18-path implementation/reconciliation subject; SCRUM-397 delivery is untouched.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Exact-subject applicable CI runs 33258269759, 33258269758, 33258269763, 33258269757 and 33258269755 succeeded.
+  findings:
+    - id: REV-1
+      severity: NIT
+      category: code
+      status: deferred
+      evidence: evidence_delta_paths are trusted runtime facts but path prefix validation does not itself canonicalize traversal or symlink representations
+      recommendation: harden trusted runtime path normalization in a follow-up without blocking SCRUM-615
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - v1.1 committed record contains implementation_head_sha and no mandatory current-tip SHA.
+    - id: AC-2
+      result: pass
+      evidence:
+        - validator CLI accepts external current PR head.
+    - id: AC-3
+      result: pass
+      evidence:
+        - unverified implementation ancestry fails closed.
+    - id: AC-4
+      result: pass
+      evidence:
+        - non-G3 post-implementation delta fails closed.
+    - id: AC-5
+      result: pass
+      evidence:
+        - implementation review/validation bind subject while current-tip CI is external.
+    - id: AC-6
+      result: pass
+      evidence:
+        - evidence-only tip semantics preserve implementation review and recompute tip evidence.
+    - id: AC-7
+      result: pass
+      evidence:
+        - active legacy v1.0 closure requires explicit migration to v1.1.
+    - id: AC-8
+      result: pass
+      evidence:
+        - SCRUM-397 4e0989cf to 5437b7f2 regression is covered without recursive record commits.
+    - id: AC-9
+      result: pass
+      evidence:
+        - exact implementation-subject governance CI passed.
+    - id: AC-10
+      result: pass
+      evidence:
+        - PR remains Draft and no G4 merge authority is granted by this record.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  required_checks:
+    - Validate instructions
+    - Node Architect Flow Policy runtime E2E
+    - Build instruction packages
+    - Node Architect canonical-81 shadow qualification
+    - G4 G5 evidence
+residual_risks:
+  - Historical process gap is preserved honestly as current-time LATE_RECONCILIATION; no historical authority is claimed.
+  - REV-1 path-normalization NIT is deferred because evidence_delta_paths are trusted repository/runtime facts.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass
