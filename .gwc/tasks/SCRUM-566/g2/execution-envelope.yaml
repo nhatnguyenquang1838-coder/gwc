@@ -1,0 +1,98 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+activation_state: ACTIVE
+task_id: SCRUM-566
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+working_branch: chatgpt/scrum-566-agent-runtime-corrective
+risk_class: R2
+risk_digest: sha256:7c751b0c8e4c2bdb9ee2dfe5c8cff98d2361f11af94b69809d12ba5b63d64bdf
+bounded_read_scope:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- agents/chatgpt-agent/agent-instructions.md
+- .github/workflows/g4-g5-evidence.yml
+- tools/node_architect/agent_runtime_entrypoint.py
+- tools/node_architect/agent_provider_bridge.py
+- tools/node_architect/semantic_agent_runtime.py
+- tools/node_architect/canonical_readback.py
+bounded_write_scope:
+- .gwc/tasks/SCRUM-566/takeover/user-authorized-takeover.yaml
+- .gwc/tasks/SCRUM-566/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-566/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-566/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-566/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-566/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-566/g2/execution-envelope.yaml
+authorized_actions:
+- add_files
+- run_sandboxed_validation
+- stage_commit_push
+excluded_actions:
+- open_draft_pr
+- mark_pr_ready
+- merge
+- auto_merge
+- force_push
+- branch_deletion
+- protected_branch_write
+- deploy
+- release
+- production_data_change
+- production_config_change
+- g3_pr_promotion
+- g4_merge
+- g5_deploy
+- g6_production
+scope_hash: sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
+f1_artifact_digests:
+  takeover: sha256:b4c3ae590bf4d885f97cd5beb2cf4a12f7031715663317ef90fa5af07e9915ab
+  g0: sha256:91ca9f7a9a151782f357a0c6a450c503a554b77b02d051a225d228df9b80515f
+  g1_intake: sha256:e1dd99bb1ce7f02863903fa844ee8a0c2f70d7baaed2ae8ffea7d7aad272275c
+  g1_preflight: sha256:a34127c593a81a2b4069f545d864d409254735e921397903193f4c409e162051
+  g1_options: sha256:d26ea326fa24d518cded04c84df760a1a122f000a955aa0e0ab06e6c367d3519
+  g1_decision: sha256:c73fa357ec40bf58f740fef3c7d3c83ab4517e58208887e054d7746bc541ac7c
+f2_digests:
+  gate_state_resolution: sha256:6d94429eab576c00a0431b7907f302a99185ee3b673b64913c83f146d9d83f1e
+  authority_boundary_decision: sha256:57feb579dbf955a5f00515a39090b49786cba5ff8f71b0714efd716ca2dad380
+approval_request_ref:
+  gate: G2_EXECUTION
+  approval_id: G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z
+  scope_hash: sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
+  scope_hash_16: 07e3c8a8c1ff3b45
+  issued_at: '2026-08-29T17:38:21Z'
+  expires_at: '2026-08-30T17:37:21Z'
+  command: APPROVE G2 G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z 07e3c8a8c1ff3b45 2026-08-30T17:37:21Z
+approval_validation_ref:
+  outcome: VALID
+  approval_id: G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z
+  scope_hash: sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
+  scope_hash_16: 07e3c8a8c1ff3b45
+  task_id: SCRUM-566
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  working_branch: chatgpt/scrum-566-agent-runtime-corrective
+  risk_class: R2
+  authorized_actions:
+  - add_files
+  - run_sandboxed_validation
+  - stage_commit_push
+  received_at: '2026-08-29T17:47:48Z'
+  command: APPROVE G2 G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z 07e3c8a8c1ff3b45 2026-08-30T17:37:21Z
+  source: current_user_instruction
+checkpoint_id: scrum-566-g2-takeover-20260829T173821Z
+issued_at: '2026-08-29T17:38:21Z'
+expires_at: '2026-08-30T17:37:21Z'
+reason_code: G2_ENVELOPE_ACTIVE
+envelope_digest: sha256:b003186f534b3e81f113ff4fef1e5b98c78124071282336148365b25556b18ce
+exclusions:
+- G3_PR
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION
+execution_started: false

@@ -1,0 +1,63 @@
+schema_version: '1.0'
+artifact_type: g1-preflight-report
+generated_at: '2026-08-29T17:38:21Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-566
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: PR base SHA is exact and is an ancestor of current origin/main; no rebase
+    is performed.
+  evidence:
+  - dd906822b18509dd53ae99547d4e555088a610b4
+  - 668a8645a696e4cbf84124201a58d26bc833f0c1
+- id: PR-HEAD
+  status: PASS
+  code: EXACT_HEAD_VERIFIED
+  message: 'PR #523 head and local continuation head match.'
+  evidence:
+  - PR-523
+  - bbb05521c326a0f389991ba98f35ba6ea0736706
+- id: WORKTREE
+  status: PASS
+  code: WORKTREE_CLEAN
+  message: The bound worktree has no uncommitted changes before artifact generation.
+  evidence:
+  - /Users/mac/prj/gwc-wt-scrum566
+- id: TAKEOVER
+  status: PASS
+  code: USER_AUTHORIZED_TAKEOVER
+  message: Current user explicitly authorized DWA to take over from ChatGPT TaskController;
+    Jira claim overwrite remains excluded.
+  evidence:
+  - user-authorized-takeover/v1
+  - current_user_instruction
+- id: LOCAL-VALIDATION
+  status: PASS
+  code: EXACT_HEAD_TESTS_PASS
+  message: Relevant semantic runtime validation passed at the bound code head before
+    evidence generation.
+  evidence:
+  - 93 passed
+  - bbb05521c326a0f389991ba98f35ba6ea0736706
+- id: SCOPE-HASH
+  status: PASS
+  code: SCOPE_HASH_DERIVED
+  message: Canonical scope hash was derived with the closed action vocabulary and
+    exact artifact paths.
+  evidence:
+  - sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

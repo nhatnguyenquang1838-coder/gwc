@@ -1,0 +1,100 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-08-29T17:38:21Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-566
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Materialize exact formal G0-G2 evidence for the existing SCRUM-566 PR
+    continuation and bind the user-authorized takeover from ChatGPT TaskController
+    to DWA without rewriting the Jira claim.
+  why_now: The existing PR is OPEN and code/qualification checks pass, but task-scoped
+    G0-G3 artifacts are absent. A regenerated G2 must bind the current head and explicitly
+    include the takeover process scope before any formal evidence write.
+desired_outcome: A schema-valid, awaiting-approval G2 envelope with exact scope hash,
+  takeover evidence, bounded artifact paths, and explicit exclusions for G3/G4/G5/G6.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - DWA
+  - ChatGPT TaskController
+  - GWC maintainers
+  - 'PR #523 reviewers'
+scope:
+  in_scope:
+  - .gwc/tasks/SCRUM-566/takeover/user-authorized-takeover.yaml
+  - .gwc/tasks/SCRUM-566/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-566/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-566/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-566/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-566/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-566/g2/execution-envelope.yaml
+  non_goals:
+  - overwrite Jira AI Agent claim
+  - change PR code
+  - create a branch or PR
+  - merge/deploy/release
+  - production/config/data/secret/migration work
+constraints:
+- No GWC execution of the takeover process itself; GWC artifact generation is limited
+  to this explicit G2 package.
+- Same run/worktree/branch/PR continuation.
+- No reset, rebase, force-push, protected-branch write or authority inference.
+- Exact head and scope hash must be re-read before commit/push.
+assumptions:
+- The current PR head remains bbb05521c326a0f389991ba98f35ba6ea0736706 until the G2
+  artifact commit is authorized.
+- No active concurrent writer is present in the bound worktree at the time of execution.
+- Jira claim remains a projection and is not mutated by this takeover.
+risks:
+- id: RISK-1
+  description: origin/main advanced to 668a8645a696e4cbf84124201a58d26bc833f0c1 after the PR base; rebasing is explicitly excluded.
+  impact: medium
+  mitigation: Keep the PR base binding at dd906822 and stop on material head or scope drift.
+- id: RISK-2
+  description: A later commit changes the scope hash and invalidates this candidate envelope.
+  impact: high
+  mitigation: Re-read the live PR head and recompute the canonical scope hash before commit or push.
+- id: RISK-3
+  description: An active foreign writer on the same worktree would require an immediate takeover block.
+  impact: high
+  mitigation: Perform the liveness check immediately before any write-capable action.
+acceptance_criteria:
+- id: AC-1
+  statement: Takeover record binds user authorization, source/target agents, same
+    run/worktree/branch/PR and non-rewriting continuation.
+  verifiable: true
+- id: AC-2
+  statement: G0/G1 artifacts bind SCRUM-566, repository, PR base and exact current
+    branch head with a canonical READY scope hash.
+  verifiable: true
+- id: AC-3
+  statement: G2 is AWAITING_APPROVAL and authorizes only bounded artifact materialization,
+    validation, commit and push; merge/deploy/production actions remain excluded.
+  verifiable: true
+- id: AC-4
+  statement: No Jira claim overwrite, code mutation, branch creation, PR promotion
+    or merge occurs in this generation step.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - add_files
+  - run_sandboxed_validation
+  - stage_commit_push
+  downstream_non_goals:
+  - open_draft_pr
+  - mark_pr_ready
+  - merge
+  - deploy
+  - production_data_change
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+    - exact-head G3 delivery record
+    - independent read-only review
+    - required CI checks
+unresolved_questions: []
+status: READY

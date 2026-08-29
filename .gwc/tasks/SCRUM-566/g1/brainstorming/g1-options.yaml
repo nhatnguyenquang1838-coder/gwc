@@ -1,0 +1,40 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-08-29T17:38:21Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-566
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: User-authorized non-GWC takeover with formal G2 evidence scope
+  description: Record the takeover as a continuation contract, preserve Jira claim
+    metadata, and authorize only the exact task-scoped G0-G2 artifacts plus validation/commit/push.
+  benefits:
+  - Preserves same run/worktree/branch/PR
+  - Avoids false Jira ownership overwrite
+  - Binds takeover process into the canonical G2 scope
+  tradeoffs:
+  - Requires a formal evidence commit before G4 preparation
+  - Current origin/main drift remains recorded rather than reconciled by rebase
+  risks:
+  - Concurrent writer must be detected before execution
+  constraint_fit: FIT
+- id: OPT-2
+  title: Overwrite Jira AI Agent claim immediately
+  description: Replace the existing ChatGPT TaskController claim with DWA before materializing
+    evidence.
+  benefits:
+  - Jira projection would show DWA
+  tradeoffs:
+  - Changes external state and may hide an active execution owner
+  risks:
+  - Creates claim race and violates the explicit no-overwrite takeover rule
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the only option that preserves continuity and explicit
+  user authorization without overwriting the existing Jira projection.
+decision_required: true
+status: READY
