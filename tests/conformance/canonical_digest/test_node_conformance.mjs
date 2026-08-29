@@ -144,15 +144,26 @@ test('Defect B: validateAsciiDigitKeepsStrings passes', () => {
   assert.deepStrictEqual(rejected, []);
 });
 
-test('Defect C: does not crash on lone surrogate', () => {
-  const inp = { payload: '\ud800test' };
-  const result = ref.canonicalJsonText(inp);
-  assert.strictEqual(typeof result, 'string');
-  JSON.parse(result);
+test('Defect C: rejects lone surrogate (throws)', () => {
+  // REV-1/REV-3: gwc-jcs-v1 invalid_unicode_policy=reject_unpaired_surrogates.
+  assert.throws(() => ref.normalizeLoneSurrogate('\ud800', { reject: true }), Error);
+  assert.throws(() => ref.canonicalJsonText({ payload: '\ud800test' }), Error);
 });
 
-test('Defect C: lone surrogate reject throws', () => {
-  assert.throws(() => ref.normalizeLoneSurrogate('\ud800', { reject: true }), Error);
+test('REV-2/REV-3: valid non-BMP surrogate pair preserved', () => {
+  // U+10000 is one non-BMP code point from a valid surrogate pair.
+  assert.strictEqual(ref.canonicalJsonText({ astral: '\uD800\uDC00' }), '{"astral":"\uD800\uDC00"}');
+});
+
+test('REV-2/REV-3: non-BMP key ordering is UTF-16 code-unit order', () => {
+  // U+10000 (units D800 DC00) sorts before U+1D400 (units D835 DC00).
+  const got = ref.canonicalJsonText({ '\uD835\uDC00': 'v1', '\uD835\uDC01': 'v2', '\uD800\uDC00': 'v0' });
+  assert.strictEqual(got, '{"\uD800\uDC00":"v0","\uD835\uDC00":"v1","\uD835\uDC01":"v2"}');
+});
+
+test('REV-2/REV-3: non-ASCII string uses JCS-minimal raw UTF-8', () => {
+  // é (U+00E9) emitted raw, never \\u00E9.
+  assert.strictEqual(ref.canonicalJsonText({ msg: 'café' }), '{"msg":"café"}');
 });
 
 test('Defect D: resourceLimit is finite positive number', () => {

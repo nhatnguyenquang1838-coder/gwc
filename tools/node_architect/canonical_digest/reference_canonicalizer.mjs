@@ -120,10 +120,10 @@ export function normalizeLoneSurrogate(s, { reject = false } = {}) {
   while (i < n) {
     const cp = s.charCodeAt(i);
     if (cp >= LONE_SURROGATE_LOW && cp <= LONE_SURROGATE_HIGH) {
-      // Check for a valid surrogate pair
+      // Check for a valid surrogate pair (high surrogate 0xDC00-0xDFFF)
       if (i + 1 < n) {
         const next = s.charCodeAt(i + 1);
-        if (next >= LONE_SURROGATE_HIGH && next <= 0xDFFF) {
+        if (next >= 0xDC00 && next <= 0xDFFF) {
           // Valid pair — keep as-is
           result += s[i] + s[i + 1];
           i += 2;
@@ -167,13 +167,12 @@ export function emitJsonValue(value, options = {}) {
     return JSON.stringify(value);
   }
   if (typeof value === 'string') {
-    const normalized = normalizeLoneSurrogate(value, { reject: false });
-    const encoded = JSON.stringify(normalized);
-    if (ensureAscii) {
-      // Ensure ASCII: escape non-ASCII as \uXXXX.
-      return encoded;
-    }
-    return encoded;
+    // REV-1: reject_unpaired_surrogates — a lone surrogate throws (valid
+    // surrogate pairs are preserved as-is by normalizeLoneSurrogate).
+    // REV-2: jcs_minimal string serialization — escape only ", \ and control
+    // chars; emit non-ASCII as raw UTF-8 (ensureAscii=false).
+    const normalized = normalizeLoneSurrogate(value, { reject: true });
+    return JSON.stringify(normalized);
   }
   if (Array.isArray(value)) {
     const items = value.map(v => emitJsonValue(v, options));

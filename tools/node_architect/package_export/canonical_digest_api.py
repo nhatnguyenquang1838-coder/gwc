@@ -243,7 +243,11 @@ def _canonicalize_value(value, depth: int, limits: Dict[str, int]) -> str:
         if len(value) > limits["max_object_keys"]:
             raise CanonicalDigestAPIError(DIGEST_RESOURCE_LIMIT_EXCEEDED)
         members = []
-        for key in sorted(value, key=lambda k: tuple(ord(c) for c in k)):
+        # RFC-8785/JCS: keys sorted lexicographically by UTF-16 code-unit
+        # order (NOT Python code points), so non-BMP keys order identically to
+        # JS runtimes. k.encode('utf-16-be') yields big-endian code-unit bytes
+        # comparing in UTF-16 code-unit order.
+        for key in sorted(value, key=lambda k: k.encode("utf-16-be")):
             members.append(
                 _escape_string(key, max_string_bytes=limits["max_string_bytes"])
                 + ":"

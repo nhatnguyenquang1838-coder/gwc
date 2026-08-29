@@ -141,7 +141,7 @@ class CanonicalizationOptions:
         )
 
 
-DEFAULT_OPTIONS = CanonicalizationOptions(sort_keys=True, ensure_ascii=True)
+DEFAULT_OPTIONS = CanonicalizationOptions(sort_keys=True, ensure_ascii=False)
 
 
 # ---------------------------------------------------------------------------
@@ -227,8 +227,8 @@ def _normalize_lone_surrogate(s: str, *, reject: bool = False) -> str:
     while i < n:
         cp = ord(s[i])
         if _LONE_SURROGATE_LOW <= cp <= _LONE_SURROGATE_HIGH:
-            # Look ahead for a valid surrogate pair
-            if i + 1 < n and _LONE_SURROGATE_HIGH <= ord(s[i + 1]) <= 0xDFFF:
+            # Look ahead for a valid surrogate pair (high surrogate 0xDC00-0xDFFF)
+            if i + 1 < n and 0xDC00 <= ord(s[i + 1]) <= 0xDFFF:
                 # Valid surrogate pair; keep both as-is
                 result.append(s[i])
                 result.append(s[i + 1])
@@ -291,16 +291,16 @@ def _float_to_json(x: float) -> str:
 
 
 def _string_to_json(s: str, options: CanonicalizationOptions) -> str:
-    """Emit a JSON string. When ensure_ascii is True, non-ASCII codepoints
-    must be escaped as \\uXXXX (4-hex-digit) per JCS. Surrogate pairs in the
-    source must be preserved as-is (valid UTF-16 pairs). Lone surrogates are
-    handled by _normalize_lone_surrogate before emission (defect C)."""
-    # Normalize lone surrogates per current defect-C plan before JSON encoding
-    normalized = _normalize_lone_surrogate(s, reject=False)
-    encoded = json.dumps(normalized, ensure_ascii=options.ensure_ascii, allow_nan=False)
-    if options.ensure_ascii:
-        return encoded
-    return encoded
+    """Emit a JSON string under gwc-jcs-v1 / JCS semantics.
+
+    - invalid_unicode_policy=reject_unpaired_surrogates: a lone (unpaired)
+      surrogate raises; a valid surrogate pair (non-BMP) is preserved.
+    - string_escaping=jcs_minimal: escape ONLY ``"``, ``\\`` and control
+      characters; emit non-ASCII as raw UTF-8 (never \\uXXXX forms).
+    """
+    # Raises ValueError on any lone surrogate; valid pairs pass through.
+    _normalize_lone_surrogate(s, reject=True)
+    return json.dumps(s, ensure_ascii=False, allow_nan=False)
 
 
 def _array_to_json(a: List[Any], options: CanonicalizationOptions) -> str:
@@ -309,9 +309,11 @@ def _array_to_json(a: List[Any], options: CanonicalizationOptions) -> str:
 
 
 def _object_to_json(o: Dict[str, Any], options: CanonicalizationOptions) -> str:
-    # JCS: keys sorted lexicographically by UTF-16 code unit order (Python
-    # default sort of str achieves this for BMP/UTF-16-le code units).
-    keys: List[str] = sorted(o.keys())
+    # RFC-8785/JCS: keys sorted lexicographically by UTF-16 code-unit order
+    # (NOT Python code points) so non-BMP keys order identically to JS
+    # runtimes. k.encode('utf-16-be') yields the big-endian code-unit bytes,
+    # which compare in UTF-16 code-unit order.
+    keys: List[str] = sorted(o.keys(), key=lambda k: k.encode("utf-16-be"))
     parts: List[str] = []
     for k in keys:
         parts.append(_emit_json_value(k, options) + ":" + _emit_json_value(o[k], options))

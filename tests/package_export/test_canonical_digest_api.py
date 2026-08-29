@@ -109,6 +109,22 @@ class TestCanonicalizeFailClosed(unittest.TestCase):
             api.canonicalize_gwc_jcs_v1('{"b":1,"a":2}'), b'{"a":2,"b":1}'
         )
 
+    def test_review_2_non_bmp_key_ordering_utf16_code_units(self):
+        # REV-2: non-BMP keys ordered by UTF-16 code units, not Python code
+        # points. U+10000 (units D800 DC00) sorts before U+1D400 (D835 DC00).
+        raw = '{"\U0001D400":1,"\U0001D401":2,"\U00010000":0}'
+        self.assertEqual(
+            api.canonicalize_gwc_jcs_v1(raw),
+            '\u007b"\U00010000":0,"\U0001D400":1,"\U0001D401":2}'.encode("utf-8"),
+        )
+
+    def test_review_2_non_ascii_minimal_serialization(self):
+        # REV-2: jcs_minimal string serialization emits raw UTF-8, not \uXXXX.
+        self.assertEqual(
+            api.canonicalize_gwc_jcs_v1('{"msg":"café"}'),
+            '{"msg":"café"}'.encode("utf-8"),
+        )
+
 
 class TestCanonicalDigestFailClosed(unittest.TestCase):
     def test_gwc_jcs_v1_new_write_refused(self):

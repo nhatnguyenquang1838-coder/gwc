@@ -68,14 +68,40 @@ golden_vectors:
   expected_canonical_digest_sha256: 49c6efefc5e59b2203c657c4ea047abd424ee61c5884e42b9e90d2012a4e5220
   jcs_compliant: true
   notes: Unicode outside ASCII; Python should emit \uXXXX escape forms under JCS.
-- id: CV-0008-lone-surrogate-uD800
-  runtime: python
+- id: CV-0008-lone-surrogate-uD800-rejected
+  runtime: both
   input:
-    payload: ' lone surrogate test '
-  expected_canonical_json: '{"payload":" lone surrogate test "}'
-  expected_canonical_digest_sha256: 5ca9037eedc889ea577910471a5840dc17935ecc84ae6637759bbac3a8df9f48
+    payload: "\ud800"
+  expected_canonical_json: null
+  expected_canonical_digest_sha256: null
   jcs_compliant: true
-  notes: 'Defect C: lone surrogate handling. Python must handle gracefully, not crash.'
+  notes: 'REV-1/REV-3: gwc-jcs-v1 invalid_unicode_policy=reject_unpaired_surrogates. A lone (unpaired) surrogate MUST raise; it must NOT be normalized to U+FFFD. Both runtimes reject.'
+- id: CV-0010-non-bmp-utf16-key-ordering
+  runtime: both
+  input:
+    𝐀: v1
+    𝐁: v2
+    𐀀: v0
+  expected_canonical_json: '{"𐀀":"v0","𝐀":"v1","𝐁":"v2"}'
+  expected_canonical_digest_sha256: 6fdca90e42fe6122ebea49ec2e113fc9120b4232dcf6119444a23ab418a13c4a
+  jcs_compliant: true
+  notes: 'REV-2/REV-3: non-BMP keys are ordered by UTF-16 code units, NOT Python code points. U+10000 (units D800 DC00) sorts before U+1D400 (units D835 DC00); both runtimes agree.'
+- id: CV-0011-non-ascii-minimal-serialization
+  runtime: both
+  input:
+    msg: café
+  expected_canonical_json: '{"msg":"café"}'
+  expected_canonical_digest_sha256: 2f04918ce185d545be576aa2d308e911b86acd73cc5e094995b26eb689e0ae70
+  jcs_compliant: true
+  notes: 'REV-2/REV-3: string_escaping=jcs_minimal emits non-ASCII as raw UTF-8, never \uXXXX forms. Both runtimes produce identical bytes + digest.'
+- id: CV-0012-valid-non-bmp-surrogate-pair-preserved
+  runtime: both
+  input:
+    astral: 𐀀
+  expected_canonical_json: '{"astral":"𐀀"}'
+  expected_canonical_digest_sha256: c3a9db60007b8481cd3d7b4d979616a42f5967b57a4cf83b67c9702ee140dd06
+  jcs_compliant: true
+  notes: 'REV-1/REV-3: a VALID surrogate pair (U+10000) forms one non-BMP code point and is preserved byte-for-byte; only UNPAIRED surrogates are rejected.'
 - id: CV-0009-node-tokenizer-resource-limit
   runtime: node
   input:

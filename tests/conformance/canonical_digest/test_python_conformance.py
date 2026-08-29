@@ -77,11 +77,11 @@ class TestCanonicalJsonEquality(unittest.TestCase):
                 continue
 
             if expected is None:
-                with self.subTest(vector=vid, mode="error_case_no_crash"):
-                    try:
+                with self.subTest(vector=vid, mode="error_case_must_reject"):
+                    # REV-1/REV-3: null expected means the vector MUST raise
+                    # (e.g. lone surrogate rejection), not merely not crash.
+                    with self.assertRaises(ValueError):
                         ref.canonical_json_text(inp)
-                    except Exception as e:
-                        self.fail(f"reference crashed on error-case vector {vid}: {e}")
                 continue
 
             if "placeholder" in (expected or "").lower():
@@ -138,27 +138,23 @@ class TestDefectBASCIIDigitValidation(unittest.TestCase):
 
 
 class TestDefectCLoneSurrogateHandling(unittest.TestCase):
-    def test_lone_surrogate_normalization_replacement(self):
-        s = "\ud800test"
-        normalized = ref._normalize_lone_surrogate(s, reject=False)
-        self.assertNotEqual(normalized, s)
-        self.assertIn("\ufffd", normalized)
-
     def test_lone_surrogate_reject_raises(self):
+        # REV-1/REV-3: gwc-jcs-v1 invalid_unicode_policy=reject_unpaired_surrogates.
         s = "\ud800"
         with self.assertRaises(ValueError):
             ref._normalize_lone_surrogate(s, reject=True)
 
     def test_valid_surrogate_pair_preserved(self):
-        s = "normal"
-        normalized = ref._normalize_lone_surrogate(s, reject=False)
+        # REV-1: a VALID surrogate pair (U+10000) is one non-BMP code point.
+        s = "𐀀"
+        normalized = ref._normalize_lone_surrogate(s, reject=True)
         self.assertEqual(normalized, s)
 
-    def test_canonicalization_does_not_crash_on_lone_surrogate(self):
+    def test_canonicalization_rejects_lone_surrogate(self):
+        # REV-1/REV-3: lone surrogate must raise, never normalize to U+FFFD.
         inp = {"payload": "\ud800test"}
-        result = ref.canonical_json_text(inp)
-        self.assertIsInstance(result, str)
-        json.loads(result)
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text(inp)
 
 
 class TestGoldenVectorCorpusIntegrity(unittest.TestCase):
