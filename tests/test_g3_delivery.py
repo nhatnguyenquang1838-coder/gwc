@@ -29,13 +29,45 @@ class G3DeliveryRecordTests(unittest.TestCase):
     def issues(self, record: dict) -> list[str]:
         return MODULE.validate_record(record, self.schema)
 
-    def test_valid_template_passes(self) -> None:
+    def runtime_issues(
+        self,
+        record: dict,
+        *,
+        current_pr_head: str | None,
+        implementation_ancestor_verified: bool,
+        evidence_delta_paths: list[str],
+        ci_checks: dict[str, str],
+    ) -> list[str]:
+        validator = getattr(MODULE, "validate_runtime_context", None)
+        if validator is None:
+            return ["validate_runtime_context missing"]
+        return validator(
+            record,
+            current_pr_head=current_pr_head,
+            implementation_ancestor_verified=implementation_ancestor_verified,
+            evidence_delta_paths=evidence_delta_paths,
+            ci_checks=ci_checks,
+        )
+
+    def test_template_is_v11_implementation_subject_contract(self) -> None:
+        self.assertEqual("1.1", self.valid["schema_version"])
+        self.assertIn("implementation_head_sha", self.valid)
+        self.assertNotIn("head_sha", self.valid)
+        self.assertIn("implementation_head_sha", self.valid["validation"])
+        self.assertNotIn("head_sha", self.valid["validation"])
+        self.assertIn("reviewed_implementation_head_sha", self.valid["review"])
+        self.assertNotIn("reviewed_head_sha", self.valid["review"])
+        self.assertNotIn("head_sha", self.valid["ci"])
+
+    def test_valid_template_passes_subject_validation(self) -> None:
         self.assertEqual([], self.issues(copy.deepcopy(self.valid)))
 
-    def test_review_head_mismatch_fails(self) -> None:
+    def test_review_implementation_head_mismatch_fails(self) -> None:
         record = copy.deepcopy(self.valid)
-        record["review"]["reviewed_head_sha"] = "d" * 40
-        self.assertTrue(any("reviewed_head_sha" in issue for issue in self.issues(record)))
+        record["review"]["reviewed_implementation_head_sha"] = "d" * 40
+        self.assertTrue(
+            any("reviewed_implementation_head_sha" in issue for issue in self.issues(record))
+        )
 
     def test_stale_review_fails_pass_outcome(self) -> None:
         record = copy.deepcopy(self.valid)
@@ -85,7 +117,7 @@ class G3DeliveryRecordTests(unittest.TestCase):
         }]
         self.assertTrue(any("MAJOR" in issue for issue in self.issues(record)))
 
-    def test_major_with_exact_head_acceptance_passes(self) -> None:
+    def test_major_with_exact_implementation_head_acceptance_passes(self) -> None:
         record = copy.deepcopy(self.valid)
         record["review"]["findings"] = [{
             "id": "REV-3",
@@ -98,8 +130,8 @@ class G3DeliveryRecordTests(unittest.TestCase):
                 "actor": "human-owner",
                 "source": "task-comment",
                 "accepted_at": "2026-07-15T04:35:00Z",
-                "rationale": "accepted for this exact head",
-                "head_sha": record["head_sha"],
+                "rationale": "accepted for this exact implementation subject",
+                "implementation_head_sha": record["implementation_head_sha"],
             },
         }]
         self.assertEqual([], self.issues(record))
@@ -110,11 +142,6 @@ class G3DeliveryRecordTests(unittest.TestCase):
         issues = self.issues(record)
         self.assertTrue(any("duplicate" in issue for issue in issues))
         self.assertTrue(any("missing required lanes" in issue for issue in issues))
-
-    def test_ci_head_mismatch_fails(self) -> None:
-        record = copy.deepcopy(self.valid)
-        record["ci"]["head_sha"] = "e" * 40
-        self.assertTrue(any("ci.head_sha" in issue for issue in self.issues(record)))
 
     def test_unverified_acceptance_criterion_fails_pass_outcome(self) -> None:
         record = copy.deepcopy(self.valid)
@@ -129,6 +156,73 @@ class G3DeliveryRecordTests(unittest.TestCase):
         self.assertGreaterEqual(len(issues), 2)
         self.assertTrue(any("review.lanes.0.applicable" in issue for issue in issues))
         self.assertTrue(any("task_id" in issue for issue in issues))
+
+    def test_pass_requires_external_current_pr_head(self) -> None:
+        issues = self.runtime_issues(
+            copy.deepcopy(self.valid),
+            current_pr_head=None,
+            implementation_ancestor_verified=True,
+            evidence_delta_paths=[],
+            ci_checks={"validate-instructions": "pass"},
+        )
+        self.assertTrue(any("current PR head" in issue for issue in issues))
+
+    def test_evidence_only_tip_can_differ_from_implementation_subject(self) -> None:
+        record = copy.deepcopy(self.valid)
+        record["task_id"] = "SCRUM-397"
+        record["implementation_head_sha"] = "4e0989cf0770637eabc90c20fa6757fb4f1f4089"
+        record["validation"]["implementation_head_sha"] = record["implementation_head_sha"]
+        record["review"]["reviewed_implementation_head_sha"] = record["implementation_head_sha"]
+        issues = self.runtime_issues(
+            record,
+            current_pr_head="5437b7f20edfcb7b717e1b7b78d9514985927d7b",
+            implementation_ancestor_verified=True,
+            evidence_delta_paths=[".gwc/tasks/SCRUM-397/g3/delivery-record.yaml"],
+            ci_checks={"validate-instructions": "pass"},
+        )
+        self.assertEqual([], issues)
+
+    def test_non_evidence_tip_delta_fails_closed(self) -> None:
+        record = copy.deepcopy(self.valid)
+        record["task_id"] = "SCRUM-615"
+        issues = self.runtime_issues(
+            record,
+            current_pr_head="c" * 40,
+            implementation_ancestor_verified=True,
+            evidence_delta_paths=["src/example.py"],
+            ci_checks={"validate-instructions": "pass"},
+        )
+        self.assertTrue(any("evidence-only" in issue for issue in issues))
+
+    def test_unverified_ancestry_fails_closed(self) -> None:
+        issues = self.runtime_issues(
+            copy.deepcopy(self.valid),
+            current_pr_head="c" * 40,
+            implementation_ancestor_verified=False,
+            evidence_delta_paths=[
+                f".gwc/tasks/{self.valid['task_id']}/g3/delivery-record.yaml"
+            ],
+            ci_checks={"validate-instructions": "pass"},
+        )
+        self.assertTrue(any("ancestor" in issue for issue in issues))
+
+    def test_required_current_tip_ci_must_pass(self) -> None:
+        issues = self.runtime_issues(
+            copy.deepcopy(self.valid),
+            current_pr_head="c" * 40,
+            implementation_ancestor_verified=True,
+            evidence_delta_paths=[
+                f".gwc/tasks/{self.valid['task_id']}/g3/delivery-record.yaml"
+            ],
+            ci_checks={"validate-instructions": "fail"},
+        )
+        self.assertTrue(any("required CI check validate-instructions" in issue for issue in issues))
+
+    def test_legacy_v10_active_closure_requires_explicit_migration(self) -> None:
+        record = copy.deepcopy(self.valid)
+        record["schema_version"] = "1.0"
+        issues = self.issues(record)
+        self.assertTrue(any("legacy v1.0" in issue for issue in issues))
 
 
 if __name__ == "__main__":

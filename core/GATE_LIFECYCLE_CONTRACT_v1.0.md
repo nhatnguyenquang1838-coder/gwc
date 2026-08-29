@@ -181,7 +181,7 @@ apply before any write-capable action.
 
 **Entry:** G2 `PASS`, validation evidence exists, and complete diff review found no scope drift or prohibited changes.
 
-**Permitted actions:** create or update a Draft Pull Request, assemble the canonical `g3/delivery-record.yaml`, and invoke or record an independent read-only review. G3 does not authorize the reviewer to modify the delivery.
+**Permitted actions:** create or update a Draft Pull Request, assemble the canonical v1.1 `g3/delivery-record.yaml`, and invoke or record an independent read-only review. G3 does not authorize the reviewer to modify the delivery.
 
 G3 uses three internal stages without creating another gate:
 
@@ -191,36 +191,72 @@ G3.1 PR Assembly
 → G3.3 Review Closure
 ```
 
+#### G3 implementation subject and evidence container
+
+The committed v1.1 delivery record binds the immutable implementation subject,
+not the SHA of the commit containing the record itself:
+
+- `implementation_head_sha` identifies the implementation subject;
+- implementation validation binds that same subject;
+- independent review binds that same subject and scope hash;
+- required current-tip CI check names are declared in the record, while their
+  exact-tip statuses are trusted runtime evidence supplied at closure.
+
+The current PR tip is an external repository fact and MUST NOT be a mandatory
+self-referential field in the committed v1.1 record. Before G3 closure, trusted
+repository/runtime evidence must prove:
+
+1. `implementation_head_sha` is equal to or an ancestor of the exact current PR
+   head;
+2. the aggregate `implementation_head_sha..current_pr_head` changed-path set is
+   restricted to `.gwc/tasks/<task-id>/g3/**`;
+3. every required CI check declared by the record passes at the exact current PR
+   head.
+
+An evidence-only new PR head invalidates/recomputes tip-level ancestry, delta,
+and CI evidence. It does not invalidate implementation validation/review when
+the implementation subject and scope are unchanged. Any source, test, workflow,
+dependency, runtime, configuration, or unrelated governance path after the
+implementation subject is non-evidence drift, invalidates the binding, and
+returns to G2.
+
+Historical v1.0 delivery records remain immutable provenance. They are not
+silently reinterpreted; a new active G3 closure under this contract must
+materialize/migrate a v1.1 record.
+
 The review must:
 
 - identify the implementer and reviewer;
 - record `independent` only when the reviewer is separate from the implementer;
 - record `fresh-context` when independence is approximated by a new context rather than a separate reviewer;
 - evaluate the applicable requirement, design, code, test, governance, delivery, and CI lanes;
-- bind evidence to the exact PR head SHA and scope hash;
+- bind implementation evidence to `implementation_head_sha` and the scope hash;
 - classify findings as `BLOCKER`, `MAJOR`, `MINOR`, or `NIT`;
 - route blocking changes back to G2 for separately authorized revision;
-- become stale after any PR head change and require re-review.
+- become stale when the implementation subject or scope changes, or when trusted current-tip validation detects non-evidence drift.
 
-A reviewer that modifies the delivery loses reviewer independence. Another read-only review is then required for the new head SHA.
+A reviewer that modifies the delivery loses reviewer independence. Another read-only review is then required for the new implementation subject.
 
-**Exit:** `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and exact head SHA, records validation and CI evidence, contains a non-stale review decision, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions. Upon exit, the agent may mark the Draft PR ready for review when a supported connector action exists, the latest head SHA is still current, required CI is green, no unresolved blocker exists, and no scope drift is detected. The agent must then proactively generate the G4 merge approval request and present the approval command to the user.
+**Exit:** the v1.1 `delivery-record.yaml` is valid against `schemas/g3-delivery-record.schema.json`, identifies the Draft PR and immutable implementation subject, records implementation validation/review evidence, declares required CI checks, maps acceptance criteria to evidence, records findings and residual risks, and preserves G4/G5/G6 exclusions. `tools/validate_g3_delivery.py` must also pass with trusted external current PR head, verified ancestry, every post-implementation changed path, and exact-current-tip required CI results. Upon exit, the agent may mark the Draft PR ready for review when a supported connector action exists, the externally verified current PR head is still current, required CI is green, no unresolved blocker exists, and no scope drift is detected. The agent must then proactively generate the G4 merge approval request and present the approval command to the user.
 
 G3 may report `PASS` only when:
 
-- the Draft PR and latest head SHA match the delivery record;
-- the review covers the same head SHA and scope hash;
+- the Draft PR is open and its exact current head is externally verified;
+- the implementation subject and scope match the v1.1 delivery record;
+- the implementation subject is verified equal to or ancestor of current PR head;
+- the aggregate post-implementation delta is task-scoped G3 evidence only;
+- the review covers the same implementation subject and scope hash;
 - every applicable review lane passes;
 - no unresolved `BLOCKER` exists;
-- every `MAJOR` is resolved or has explicit human risk acceptance for the exact head SHA;
+- every `MAJOR` is resolved or has explicit human risk acceptance for the exact implementation subject SHA;
 - every acceptance criterion is passed or explicitly not applicable;
-- required validation and CI checks pass for the exact head SHA;
+- implementation validation passes for the implementation subject and required CI checks pass at the exact current PR head;
 - no material scope drift or prohibited change exists;
 - residual risks and exclusions are recorded.
 
 A schema-valid record with `outcome: fail` or `outcome: inconclusive` may retain unresolved findings so G3 can record `changes_required` or `blocked` and route the work back to G2. Validator `PASS` for such a record means the evidence is internally valid; it does not mean G3 passed.
 
-Review `PASS` is G3 evidence only. It never grants merge authority; G4 still requires explicit human approval for the exact PR head SHA.
+Review `PASS` is G3 evidence only. It never grants merge authority; G4 still requires the authority source selected by the active route for the exact current PR head SHA.
 
 #### G3 asynchronous CI continuation
 
@@ -238,11 +274,11 @@ For a ChatGPT chat connector, record repository, PR, expected head SHA, check-an
 
 If the ChatGPT chat connector cannot sleep and wake the current thread, it must use a manual checkpoint rather than create a scheduler task or automation. Other scheduled CI continuations remain inactive unless a concrete next run is visible or recorded.
 
-If CI fails, the agent may diagnose and repair only repository-fixable failures within the active G2 scope. Any repair commit changes the latest head SHA and invalidates prior CI, review, and G4-readiness evidence. G4 approval may be generated only after required checks pass for the latest head SHA.
+If CI fails, the agent may diagnose and repair only repository-fixable failures within the active G2 scope. Any repair that changes implementation or another non-evidence path creates a new implementation subject and invalidates prior implementation review/validation. An evidence-only G3 commit requires only fresh external ancestry/delta/CI verification. G4 approval may be generated only after required checks pass for the latest externally verified PR head.
 
 ### G4_MERGE
 
-**Entry:** G3 `PASS`, required CI checks pass, review requirements are satisfied, the Pull Request is ready for review, and explicit human approval is recorded for the exact PR head SHA.
+**Entry:** G3 `PASS`, required CI checks pass, review requirements are satisfied, the Pull Request is ready for review, and explicit human approval is recorded for the exact PR head SHA unless a higher-priority active canonical route supplies separately validated exact-head standing G4 authority for that action.
 
 **Permitted actions:** merge the approved PR using the authorized method.
 

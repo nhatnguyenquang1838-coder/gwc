@@ -18,8 +18,9 @@ G0 intake
 → automatic G2 execution for non-risk work
 → validation and full diff review
 → automatic G3 Draft PR assembly
-→ independent read-only review of the exact PR head
-→ G3 review closure after CI
+→ independent read-only review of the implementation subject
+→ exact-current-tip ancestry / evidence-delta / CI verification
+→ G3 review closure
 → user review
 → separate G4 merge decision
 → separate G5 deploy decision
@@ -165,11 +166,31 @@ Explicit user direction is required before DWC executes a change involving:
 An explicit user request to create the PR grants branch, implementation,
 validation, push, and Draft PR authority for the stated scope only.
 
-## G3 independent review
+## G3 independent review and evidence binding
 
-G3 extends the existing Draft PR delivery record; it does not create another gate. One read-only reviewer evaluates the applicable requirement, design, code, test, governance, delivery, and CI lanes and binds evidence to the exact PR head SHA and scope hash.
+G3 extends the existing Draft PR delivery record; it does not create another
+gate. One read-only reviewer evaluates the applicable requirement, design, code,
+test, governance, delivery, and CI lanes. For the canonical v1.1 record, review
+and implementation validation bind the immutable `implementation_head_sha` and
+scope hash, not the SHA of the later commit that contains the evidence record.
 
-`BLOCKER` findings return to G2. `MAJOR` findings require resolution or explicit human risk acceptance for the exact head SHA. Every new head SHA makes the prior review stale and requires re-review. A `fresh-context` fallback must be labelled as such and must not be represented as fully independent.
+The exact current PR head remains mandatory external runtime evidence. Before G3
+closure, trusted repository/runtime evidence must prove that the implementation
+subject is equal to or an ancestor of the current PR head, that the aggregate
+post-implementation delta contains only `.gwc/tasks/<task-id>/g3/**` evidence,
+and that every required CI check passes at the exact current PR head.
+
+An evidence-only new PR head recomputes current-tip ancestry, delta, and CI
+evidence but does not stale unchanged implementation validation/review. A
+non-evidence change after the implementation subject invalidates the binding and
+returns to G2. `BLOCKER` findings also return to G2. `MAJOR` findings require
+resolution or explicit human risk acceptance bound to the implementation subject
+SHA. A `fresh-context` fallback must be labelled as such and must not be
+represented as fully independent.
+
+Historical v1.0 delivery records remain immutable provenance. They are not
+silently reinterpreted; a new active G3 closure under the repaired contract must
+materialize/migrate a v1.1 record.
 
 Reviewer PASS is evidence only. It does not grant G4 merge authority.
 
@@ -184,7 +205,11 @@ Before Draft PR creation DWC must:
   scope drift;
 - record limitations honestly when a validation cannot be executed locally.
 
-Before G3 closure DWC must validate the canonical task-scoped `g3/delivery-record.yaml` with `tools/validate_g3_delivery.py` and verify that review, validation, and required CI evidence all match the exact current PR head SHA.
+Before G3 closure DWC must validate the canonical task-scoped
+`g3/delivery-record.yaml` with `tools/validate_g3_delivery.py` using the trusted
+external current PR head, verified implementation ancestry, post-implementation
+changed paths, and exact-current-tip required CI results. The committed v1.1
+record itself must not embed a required self-referential current-tip SHA.
 
 ## Permanent exclusions
 

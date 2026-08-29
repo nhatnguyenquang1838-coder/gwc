@@ -11,7 +11,7 @@ import unittest
 from tools.node_architect.compile_flow_policy_profile import compile_flow_policy_profile
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_COMPILED_DIGEST = "sha256:fecf6f30f1c23e44bd6d8bd0bd85777291023a0dfa8425e3d43985ca2cb730ac"
+EXPECTED_COMPILED_DIGEST = "sha256:af1ad99d4dbbf7aa878f3d17d879c54577372e1c6b4719ce40b5aae4c2f76533"
 
 
 def _load(path: str):

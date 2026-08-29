@@ -162,7 +162,7 @@ class GateLifecycleProcessContractTests(unittest.TestCase):
         self.assertIn("repository-fixable failures within the active G2 scope", gate_contract)
         self.assertIn("Any repair commit invalidates prior CI", agents)
         self.assertIn("prior CI, review, and G4-readiness evidence as stale", dwc)
-        self.assertIn("G4 approval may be generated only after required checks pass for the latest head SHA", gate_contract)
+        self.assertIn("G4 approval may be generated only after required checks pass for the latest externally verified PR head", gate_contract)
         self.assertIn("Invalidate prior CI, review, and G4-readiness evidence", e2e)
 
     def test_g5_post_merge_verification_requires_exact_sha_lookup(self) -> None:

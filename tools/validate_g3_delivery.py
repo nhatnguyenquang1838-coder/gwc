@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Validate a GWC G3 delivery record.
+"""Validate a GWC G3 delivery record and trusted current-PR-tip context.
+
+The committed v1.1 record binds the immutable implementation subject. The
+current PR tip, ancestry proof, evidence-only delta, and exact-tip CI results are
+runtime facts and are deliberately not embedded in the record.
 
 Exit codes:
   0: PASS
-  1: schema or semantic validation failed
+  1: schema, semantic, or runtime-context validation failed
   2: input/schema load or configuration error
 """
 
@@ -11,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -29,6 +34,10 @@ REQUIRED_LANES = {
     "ci",
 }
 REQUIRED_EXCLUSIONS = {"G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"}
+SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+LEGACY_ACTIVE_CLOSURE_ISSUE = (
+    "legacy v1.0 delivery record requires migration to v1.1 for active G3 closure"
+)
 
 
 def _load_yaml(path: Path) -> Any:
@@ -55,7 +64,7 @@ def _schema_issues(record: Any, schema: dict[str, Any]) -> list[str]:
 
 def _semantic_issues(record: dict[str, Any]) -> list[str]:
     issues: list[str] = []
-    head_sha = record["head_sha"]
+    implementation_head_sha = record["implementation_head_sha"]
     scope_hash = record["scope_hash"]
     review = record["review"]
     validation = record["validation"]
@@ -71,14 +80,16 @@ def _semantic_issues(record: dict[str, Any]) -> list[str]:
     ):
         issues.append("independent reviewer_id must differ from implementer_id")
 
-    if review["reviewed_head_sha"] != head_sha:
-        issues.append("review.reviewed_head_sha must match head_sha")
+    if review["reviewed_implementation_head_sha"] != implementation_head_sha:
+        issues.append(
+            "review.reviewed_implementation_head_sha must match implementation_head_sha"
+        )
     if review["reviewed_scope_hash"] != scope_hash:
         issues.append("review.reviewed_scope_hash must match scope_hash")
-    if validation["head_sha"] != head_sha:
-        issues.append("validation.head_sha must match head_sha")
-    if ci["head_sha"] != head_sha:
-        issues.append("ci.head_sha must match head_sha")
+    if validation["implementation_head_sha"] != implementation_head_sha:
+        issues.append(
+            "validation.implementation_head_sha must match implementation_head_sha"
+        )
 
     lane_names = [lane["name"] for lane in review["lanes"]]
     if len(lane_names) != len(set(lane_names)):
@@ -120,17 +131,15 @@ def _semantic_issues(record: dict[str, Any]) -> list[str]:
                 issues.append(
                     f"{finding['id']}: accepted_risk requires risk_acceptance evidence"
                 )
-            elif acceptance["head_sha"] != head_sha:
+            elif acceptance["implementation_head_sha"] != implementation_head_sha:
                 issues.append(
-                    f"{finding['id']}: risk acceptance head_sha must match head_sha"
+                    f"{finding['id']}: risk acceptance implementation_head_sha "
+                    "must match implementation_head_sha"
                 )
 
-    required_checks = [check for check in ci["checks"] if check["required"]]
+    required_checks = ci["required_checks"]
     if ci["required"] and not required_checks:
         issues.append("ci.required=true requires at least one required check")
-    for check in required_checks:
-        if check["status"] != "pass":
-            issues.append(f"required CI check {check['name']} must pass")
 
     exclusions = set(record["exclusions"])
     missing_exclusions = sorted(REQUIRED_EXCLUSIONS - exclusions)
@@ -174,10 +183,91 @@ def validate_record(
     record: Any,
     schema: dict[str, Any],
 ) -> list[str]:
+    if isinstance(record, dict) and record.get("schema_version") == "1.0":
+        return [LEGACY_ACTIVE_CLOSURE_ISSUE]
     issues = _schema_issues(record, schema)
     if issues or not isinstance(record, dict):
         return issues
     return _semantic_issues(record)
+
+
+def _evidence_prefix(task_id: str) -> str:
+    return f".gwc/tasks/{task_id}/g3/"
+
+
+def validate_runtime_context(
+    record: dict[str, Any],
+    *,
+    current_pr_head: str | None,
+    implementation_ancestor_verified: bool,
+    evidence_delta_paths: list[str],
+    ci_checks: dict[str, str],
+) -> list[str]:
+    """Validate trusted facts that cannot safely live in the committed record."""
+    issues: list[str] = []
+
+    if record.get("schema_version") == "1.0":
+        return [LEGACY_ACTIVE_CLOSURE_ISSUE]
+
+    if not current_pr_head or not SHA_RE.fullmatch(current_pr_head):
+        issues.append("current PR head must be supplied as a 40-hex SHA")
+        return issues
+
+    implementation_head_sha = record.get("implementation_head_sha")
+    if not isinstance(implementation_head_sha, str) or not SHA_RE.fullmatch(
+        implementation_head_sha
+    ):
+        issues.append("implementation_head_sha must be a 40-hex SHA")
+        return issues
+
+    if (
+        current_pr_head != implementation_head_sha
+        and not implementation_ancestor_verified
+    ):
+        issues.append(
+            "implementation head must be verified as an ancestor of the current PR head"
+        )
+
+    task_id = record.get("task_id")
+    if not isinstance(task_id, str) or not task_id:
+        issues.append("task_id is required for evidence-only delta validation")
+    else:
+        prefix = _evidence_prefix(task_id)
+        for path in evidence_delta_paths:
+            if not path.startswith(prefix) or path == prefix:
+                issues.append(
+                    f"post-implementation path {path!r} violates evidence-only "
+                    f"allowlist {prefix}**"
+                )
+
+    ci = record.get("ci")
+    if not isinstance(ci, dict):
+        issues.append("ci declaration is required")
+        return issues
+
+    required_checks = ci.get("required_checks", [])
+    if ci.get("required") and not required_checks:
+        issues.append("ci.required=true requires at least one required check")
+    for name in required_checks:
+        if ci_checks.get(name) != "pass":
+            issues.append(f"required CI check {name} must pass at current PR head")
+
+    return issues
+
+
+def _parse_ci_checks(values: list[str]) -> tuple[dict[str, str], list[str]]:
+    checks: dict[str, str] = {}
+    issues: list[str] = []
+    for value in values:
+        if "=" not in value:
+            issues.append(f"invalid --ci-check {value!r}; expected NAME=STATUS")
+            continue
+        name, status = value.split("=", 1)
+        if not name or not status:
+            issues.append(f"invalid --ci-check {value!r}; expected NAME=STATUS")
+            continue
+        checks[name] = status
+    return checks, issues
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -189,6 +279,28 @@ def _parser() -> argparse.ArgumentParser:
         default=Path(__file__).resolve().parents[1]
         / "schemas"
         / "g3-delivery-record.schema.json",
+    )
+    parser.add_argument(
+        "--current-pr-head",
+        help="Trusted current PR head SHA. Required for outcome=pass.",
+    )
+    parser.add_argument(
+        "--implementation-ancestor-verified",
+        action="store_true",
+        help="Assert trusted repository evidence verified implementation head ancestry.",
+    )
+    parser.add_argument(
+        "--evidence-delta-path",
+        action="append",
+        default=[],
+        help="Path changed after implementation head; repeat for each path.",
+    )
+    parser.add_argument(
+        "--ci-check",
+        action="append",
+        default=[],
+        metavar="NAME=STATUS",
+        help="Trusted current-tip CI result; repeat for each check.",
     )
     parser.add_argument("--json", action="store_true", dest="json_output")
     return parser
@@ -208,6 +320,25 @@ def main() -> int:
         return 2
 
     issues = validate_record(record, schema)
+    ci_checks, ci_arg_issues = _parse_ci_checks(args.ci_check)
+    issues.extend(ci_arg_issues)
+
+    if (
+        not issues
+        and isinstance(record, dict)
+        and record.get("schema_version") == "1.1"
+        and record.get("outcome") == "pass"
+    ):
+        issues.extend(
+            validate_runtime_context(
+                record,
+                current_pr_head=args.current_pr_head,
+                implementation_ancestor_verified=args.implementation_ancestor_verified,
+                evidence_delta_paths=args.evidence_delta_path,
+                ci_checks=ci_checks,
+            )
+        )
+
     report = {"status": "PASS" if not issues else "FAIL", "issues": issues}
     if args.json_output:
         print(json.dumps(report, indent=2))
