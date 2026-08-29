@@ -29,6 +29,7 @@ bounded_write_scope:
 - .gwc/tasks/SCRUM-566/g1/brainstorming/g1-options.yaml
 - .gwc/tasks/SCRUM-566/g1/decision/g1-decision-record.yaml
 - .gwc/tasks/SCRUM-566/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-566/g3/delivery-record.yaml
 authorized_actions:
 - add_files
 - run_sandboxed_validation
@@ -49,7 +50,7 @@ excluded_actions:
 - g4_merge
 - g5_deploy
 - g6_production
-scope_hash: sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
+scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
 f1_artifact_digests:
   takeover: sha256:b4c3ae590bf4d885f97cd5beb2cf4a12f7031715663317ef90fa5af07e9915ab
   g0: sha256:91ca9f7a9a151782f357a0c6a450c503a554b77b02d051a225d228df9b80515f
@@ -57,22 +58,23 @@ f1_artifact_digests:
   g1_preflight: sha256:a34127c593a81a2b4069f545d864d409254735e921397903193f4c409e162051
   g1_options: sha256:d26ea326fa24d518cded04c84df760a1a122f000a955aa0e0ab06e6c367d3519
   g1_decision: sha256:c73fa357ec40bf58f740fef3c7d3c83ab4517e58208887e054d7746bc541ac7c
+  g3_delivery_record: sha256:dc42c091230e7712f4a60cdf967a7257892937f7c4fb9eac6a768d1646dc1f54
 f2_digests:
-  gate_state_resolution: sha256:6d94429eab576c00a0431b7907f302a99185ee3b673b64913c83f146d9d83f1e
-  authority_boundary_decision: sha256:57feb579dbf955a5f00515a39090b49786cba5ff8f71b0714efd716ca2dad380
+  gate_state_resolution: sha256:ed7ac11be8013a32bb062cbb36c228a1fb41825468ea6d2c39d1d562de4cf45e
+  authority_boundary_decision: sha256:d988d13d0b8022224d4a32cd601db9469b785b82144428db93f293227dc41852
 approval_request_ref:
   gate: G2_EXECUTION
-  approval_id: G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z
-  scope_hash: sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
-  scope_hash_16: 07e3c8a8c1ff3b45
-  issued_at: '2026-08-29T17:38:21Z'
-  expires_at: '2026-08-30T17:37:21Z'
-  command: APPROVE G2 G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z 07e3c8a8c1ff3b45 2026-08-30T17:37:21Z
+  approval_id: G2_SCRUM-566_G3_SCOPE_R7_20260829T192210Z
+  scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
+  scope_hash_16: a518e2225e6ce8b7
+  issued_at: '2026-08-29T19:22:10Z'
+  expires_at: '2026-08-30T19:22:10Z'
+  command: APPROVE G2 G2_SCRUM-566_G3_SCOPE_R7_20260829T192210Z a518e2225e6ce8b7 2026-08-30T19:22:10Z
 approval_validation_ref:
   outcome: VALID
-  approval_id: G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z
-  scope_hash: sha256:07e3c8a8c1ff3b45f40cb21bfd6d87fa37c66d1f35d5fcf9a662caae7fe1c780
-  scope_hash_16: 07e3c8a8c1ff3b45
+  approval_id: G2_SCRUM-566_G3_SCOPE_R7_20260829T192210Z
+  scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
+  scope_hash_16: a518e2225e6ce8b7
   task_id: SCRUM-566
   repository: nhatnguyenquang1838-coder/gwc
   base_sha: dd906822b18509dd53ae99547d4e555088a610b4
@@ -82,14 +84,14 @@ approval_validation_ref:
   - add_files
   - run_sandboxed_validation
   - stage_commit_push
-  received_at: '2026-08-29T17:47:48Z'
-  command: APPROVE G2 G2_SCRUM-566_TAKEOVER_R2_20260829T173821Z 07e3c8a8c1ff3b45 2026-08-30T17:37:21Z
+  received_at: '2026-08-29T19:22:38Z'
+  command: APPROVE G2 G2_SCRUM-566_G3_SCOPE_R7_20260829T192210Z a518e2225e6ce8b7 2026-08-30T19:22:10Z
   source: current_user_instruction
-checkpoint_id: scrum-566-g2-takeover-20260829T173821Z
-issued_at: '2026-08-29T17:38:21Z'
-expires_at: '2026-08-30T17:37:21Z'
+checkpoint_id: scrum-566-g2-g3-scope-r7-20260829T192210Z
+issued_at: '2026-08-29T19:22:10Z'
+expires_at: '2026-08-30T19:22:10Z'
 reason_code: G2_ENVELOPE_ACTIVE
-envelope_digest: sha256:b003186f534b3e81f113ff4fef1e5b98c78124071282336148365b25556b18ce
+envelope_digest: sha256:2132344568329e1564abe8a3ca377d68efa95a248bb8a85a7f060d8ed03dc2b8
 exclusions:
 - G3_PR
 - G4_MERGE

@@ -1,0 +1,337 @@
+schema_version: '1.0'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-566
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+working_branch: chatgpt/scrum-566-agent-runtime-corrective
+pull_request:
+  number: 523
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/523
+  draft: true
+head_sha: 60aec4f969978b55891584eedd0270759cec369c
+scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
+changed_paths:
+- .github/workflows/node-architect-semantic-runtime.yml
+- .github/workflows/node-architect-shadow-qualification.yml
+- .gwc/tasks/SCRUM-566/g0/context-snapshot.yaml
+- .gwc/tasks/SCRUM-566/g1/brainstorming/g1-options.yaml
+- .gwc/tasks/SCRUM-566/g1/decision/g1-decision-record.yaml
+- .gwc/tasks/SCRUM-566/g1/intake/g1-intake-brief.yaml
+- .gwc/tasks/SCRUM-566/g1/preflight/g1-preflight-report.yaml
+- .gwc/tasks/SCRUM-566/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-566/takeover/user-authorized-takeover.yaml
+- core/node-architect/node-instructions/failure_recovery/approval-expiry-recovery.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/cas-mismatch-recovery.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/crash-checkpoint-recovery.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/duplicate-agent-fencing.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/lease-expiry-recovery.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/stale-session-reconciliation.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/timeout-recovery.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/unknown-write-reconciliation.node-instruction.yaml
+- core/node-architect/node-instructions/failure_recovery/version-drift-rollback-routing.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/approval-command-validation.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/approval-token-generation.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/authority-boundary-check.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/blocked-action-escalation.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/g2-execution-envelope-render.node-instruction.yaml
+- core/node-architect/node-instructions/gate_authority/scope-hash-calculation.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/context-gap-escalation.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/files-read-scope.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/files-write-scope.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/intake-card-render.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/protected-base-capture.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/repo-identity-check.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/request-intake.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/risk-classification.node-instruction.yaml
+- core/node-architect/node-instructions/intake_context/source-resolution.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/deterministic-hash-verification.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/export-failure-routing.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/export-manifest-generation.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/governance-tree-build.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/package-manifest-load.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/smoke-verification.node-instruction.yaml
+- core/node-architect/node-instructions/package_export/source-path-safety-check.node-instruction.yaml
+- core/node-architect/node-instructions/repo_delivery/branch-creation.node-instruction.yaml
+- core/node-architect/node-instructions/repo_delivery/ci-failure-repair.node-instruction.yaml
+- core/node-architect/node-instructions/repo_delivery/pr-blocker-check.node-instruction.yaml
+- core/node-architect/node-instructions/repo_delivery/ready-for-review-promotion.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/cas-write-guard.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/checkpoint-capture.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/checkpoint-expiry-cleanup.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/checkpoint-persist.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/lease-acquisition.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/lease-renewal.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/resume-token-validation.node-instruction.yaml
+- core/node-architect/node-instructions/runtime_checkpoint/state-reconciliation.node-instruction.yaml
+- core/node-architect/node-instructions/scale_control/catalog-cardinality-readiness.node-instruction.yaml
+- core/node-architect/node-instructions/scale_control/exact-head-readiness-check.node-instruction.yaml
+- core/node-architect/node-instructions/scale_control/independent-audit-handoff.node-instruction.yaml
+- core/node-architect/node-instructions/scale_control/rollout-progress-projection.node-instruction.yaml
+- core/node-architect/node-instructions/scale_control/workflow-run-observability.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/ds-admin-state-projection.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/external-audit-event-projection.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/projection-drift-detection.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/projection-evidence-linking.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/projection-failure-routing.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/projection-privacy-boundary-check.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/projection-reconcile-readback.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/projection-source-authority-check.node-instruction.yaml
+- core/node-architect/node-instructions/sync_projection/task-center-sync.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/blocker-severity-classification.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/evidence-quality-check.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/g3-pass-decision.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/reproducibility-check.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/schema-validation.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/side-effect-check.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/unit-test-mapping.node-instruction.yaml
+- core/node-architect/node-instructions/validation_quality/validator-execution.node-instruction.yaml
+- core/node-architect/shadow-runtime-activation.json
+- schemas/node-architect/canonical-81-shadow-qualification.schema.json
+- schemas/node-architect/semantic-implementation-registry.schema.json
+- tests/test_scrum_566_agent_host_wiring.py
+- tests/test_scrum_566_agent_provider_bridge.py
+- tests/test_scrum_566_agent_runtime_loop.py
+- tests/test_scrum_566_instruction_skill_wiring.py
+- tests/test_scrum_566_semantic_dispatcher.py
+- tests/test_scrum_566_semantic_lifecycle.py
+- tests/test_scrum_566_semantic_runtime_correction.py
+- tests/test_scrum_566_w10_w12_agent_runtime.py
+- tests/test_scrum_566_w13_live_runtime_bridge.py
+- tests/test_scrum_566_w7_w9_semantic_closure.py
+- tests/test_scrum_566_w8_canonical_shadow_route.py
+- tests/test_shadow_81_qualification.py
+- tests/test_shadow_orchestrator.py
+- tools/node_architect/agent_instruction_bundle.py
+- tools/node_architect/agent_provider_bridge.py
+- tools/node_architect/agent_runtime_entrypoint.py
+- tools/node_architect/ai_agent_adapter.py
+- tools/node_architect/build_node_instruction_pack.py
+- tools/node_architect/canonical_readback.py
+- tools/node_architect/canonical_shadow_route.py
+- tools/node_architect/gate_node_routes.py
+- tools/node_architect/instruction_contract_evaluator.py
+- tools/node_architect/live_runtime_bridge.py
+- tools/node_architect/run_shadow_e1_canary.py
+- tools/node_architect/semantic_agent_runtime.py
+- tools/node_architect/semantic_dispatcher.py
+- tools/node_architect/semantic_executability.py
+- tools/node_architect/semantic_implementation_registry.py
+- tools/node_architect/semantic_implementation_runtime.py
+- tools/node_architect/semantic_lifecycle.py
+- tools/node_architect/semantic_source_resolver.py
+- tools/node_architect/shadow_81_qualification.py
+- tools/node_architect/shadow_adapters.py
+- tools/node_architect/shadow_gate_observer.py
+- tools/node_architect/shadow_orchestrator.py
+- tools/node_architect/trusted_validation_runner.py
+validation:
+  head_sha: 60aec4f969978b55891584eedd0270759cec369c
+  status: pass
+  commands:
+  - command: PYTHONPATH=. .venv/bin/python -m pytest SCRUM-566 semantic-runtime suite
+    result: pass
+    evidence: 93 passed locally before governance-only G3 materialization; no code
+      files changed afterward.
+  - command: git diff --check
+    result: pass
+    evidence: No whitespace errors at implementation head before G3 artifact creation.
+  - command: python3 -m py_compile semantic runtime modules
+    result: pass
+    evidence: Entrypoint, canonical readback and host tests compiled successfully.
+review:
+  implementer_id: DWA
+  reviewer_id: dwa-fresh-context-read-only-reviewer-g3
+  independence: fresh-context
+  mode: read-only
+  reviewed_head_sha: 60aec4f969978b55891584eedd0270759cec369c
+  reviewed_scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
+  reviewed_at: '2026-08-29T19:25:57Z'
+  lanes:
+  - name: requirement
+    applicable: true
+    status: pass
+    evidence:
+    - Jira SCRUM-566 describes the canonical Agent Host → semantic node → provider/tool
+      → readback → ledger → NEXT target and explicitly rejects fixture-only closure.
+  - name: design
+    applicable: true
+    status: pass
+    evidence:
+    - Current implementation preserves one semantic lifecycle and separates route,
+      authority, provider, capability, readback and ledger responsibilities.
+    - Takeover is bound as same-run/same-worktree/same-branch/same-PR non-rewriting
+      continuation.
+  - name: code
+    applicable: true
+    status: pass
+    evidence:
+    - A→B typed NEXT propagation, registry-backed provider bridge, authoritative registry
+      requirement and fail-closed canonical readback are covered by the current focused
+      tests.
+  - name: test
+    applicable: true
+    status: pass
+    evidence:
+    - 93 relevant tests pass locally; exact-head semantic-runtime and canonical-81
+      workflows pass on the prior implementation head.
+  - name: governance
+    applicable: true
+    status: pass
+    evidence:
+    - G0/G1/G2/takeover artifacts are task-scoped and schema-valid; G2 excludes G3
+      promotion, G4 merge, G5 deploy and G6 production actions.
+  - name: delivery
+    applicable: true
+    status: pass
+    evidence:
+    - 'PR #523 is OPEN, currently Draft for G3 schema compatibility, and the record
+      binds the exact implementation head 60aec4f9.'
+  - name: ci
+    applicable: true
+    status: pass
+    evidence:
+    - 'Live GitHub readback at PR #523 reports validate, semantic-runtime-regression,
+      canonical-81-qualification, all package builds and Kilo Code Review SUCCESS.'
+  findings:
+  - id: REV-1
+    severity: MAJOR
+    category: code
+    status: resolved
+    evidence: The bounded loop now propagates next_node/next_action and handoff context;
+      focused transition test passes.
+    recommendation: Retain the A→B typed NEXT regression test.
+    resolution: Resolved in bbb05521 and covered by current local suite.
+  - id: REV-2
+    severity: MAJOR
+    category: code
+    status: resolved
+    evidence: Configured providers are routed through the canonical bridge contract
+      and authoritative execution requires registry resolution.
+    recommendation: Keep direct-injection providers limited to shadow/reasoner-only
+      paths.
+    resolution: Resolved in bbb05521 and verified by focused provider tests.
+  - id: REV-3
+    severity: MAJOR
+    category: delivery
+    status: open
+    evidence: No configured non-synthetic Agent/LLM execution record proves provider/tool
+      → canonical readback → NodeEvidenceLedger → NEXT for the live PR; current evidence
+      is tests, shadow qualification and injected external readback evidence.
+    recommendation: Attach a governed live execution record with exact provider, capability,
+      readback and ledger identity before claiming W13/W14 closure or G3 pass.
+  acceptance_criteria:
+  - id: AC-1
+    result: pass
+    evidence:
+    - Agent Host instruction/skill bundle and exact semantic route are covered by
+      host wiring tests.
+  - id: AC-2
+    result: pass
+    evidence:
+    - Canonical-81 qualification is SUCCESS and local registry closure remains 81/81.
+  - id: AC-3
+    result: pass
+    evidence:
+    - Shadow zero-write, explicit authority and provider/route separation tests pass.
+  - id: AC-4
+    result: not_verified
+    evidence:
+    - Required non-fake governed live Agent/LLM execution and authoritative ledger
+      artifact are not present in current readback.
+  decision: changes_required
+  stale: false
+ci:
+  required: true
+  head_sha: 60aec4f969978b55891584eedd0270759cec369c
+  checks:
+  - name: g4-authority
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142086094
+  - name: g5-recovery
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142082218
+  - name: g4-receipt-required
+    required: false
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142068097
+  - name: g4-merge-proof
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142068477
+  - name: g5-status
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142068454
+  - name: autonomous-g4-evidence-required
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137635953
+  - name: evidence-runtime
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137636236
+  - name: build (ds-mcp)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619237
+  - name: build (gwc)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619224
+  - name: build (rental-home)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619236
+  - name: build (pm-skills)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619128
+  - name: validate
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592139/job/99137619198
+  - name: semantic-runtime-regression
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592149/job/99137619164
+  - name: canonical-81-qualification
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592176/job/99137619258
+  - name: delivery-gates
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137619906
+  - name: g4-pr-evidence-authority
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137619760
+  - name: contract-canary
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137619668
+  - name: Kilo Code Review
+    required: true
+    status: pass
+    evidence: https://app.kilo.ai/code-reviews/8c2b12f7-28b1-470b-b435-9b18ef515446
+residual_risks:
+- W13/W14 live non-synthetic Agent/LLM execution remains unproven; shadow and fixture
+  evidence must not be over-claimed.
+- origin/main is 668a8645a696e4cbf84124201a58d26bc833f0c1 while PR base remains dd906822;
+  no rebase was performed.
+- G3 record is intentionally changes_required, so G4 authority must not be requested.
+exclusions:
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION_DATA
+- PROTECTED_MAIN_WRITE
+- DEPLOY_OR_RELEASE
+- PRODUCTION_CONFIG_OR_CREDENTIAL_CHANGE
+- MIGRATION_OR_PRODUCTION_DATA
+- FORCE_PUSH_OR_HISTORY_REWRITE
+- BRANCH_DELETION
+outcome: fail
