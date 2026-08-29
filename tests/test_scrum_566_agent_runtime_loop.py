@@ -112,7 +112,11 @@ def _authority() -> dict:
 class ReasoningProvider:
     name = "configured-llm-provider"
 
+    def __init__(self):
+        self.packs = []
+
     def run(self, pack):
+        self.packs.append(pack)
         return {
             "outcome": "PASS",
             "reason_code": "LLM_NODE_PASS",
@@ -134,11 +138,34 @@ class ConfiguredProvider:
 
     def run(self, pack):
         return {
-            "outcome": "PASS",
-            "reason_code": "LLM_NODE_PASS",
-            "tool_requests": [],
-            "next_contract_key": "pass",
+            "changed_paths": [],
+            "recorded_actions": [],
+            "validation_passed": True,
         }
+
+
+class BridgeContractProvider:
+    """Provider result shaped for the canonical adapter bridge contract."""
+
+    name = "bridge-production-reasoner"
+
+    def run(self, pack):
+        return {
+            "changed_paths": [],
+            "recorded_actions": [],
+            "validation_passed": True,
+        }
+
+
+class RecordingProvider(ConfiguredProvider):
+    """Read-only provider fixture for asserting multi-node loop routing."""
+
+    def __init__(self):
+        self.packs = []
+
+    def run(self, pack):
+        self.packs.append(pack)
+        return super().run(pack)
 
 
 def _host_kwargs(tmp_path: Path, provider, *, provider_registry=None) -> dict:
@@ -196,9 +223,80 @@ def _host_kwargs(tmp_path: Path, provider, *, provider_registry=None) -> dict:
 # --- Finding #1: production loop consumes next_route -----------------------
 
 
+def test_loop_propagates_typed_next_node_to_next_route(tmp_path: Path):
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    provider = RecordingProvider()
+    from tools.node_architect.agent_provider_bridge import ProviderRegistry
+
+    kwargs = _host_kwargs(
+        tmp_path,
+        provider,
+        provider_registry=ProviderRegistry({provider.name: provider}),
+    )
+    first = kwargs["implementation_registry"]["bindings"][0]
+    first["next_route_contract"]["pass"] = {
+        "disposition": "continue",
+        "reason": "to_readback",
+        "next_node": "repo_delivery.diff-readback",
+        "next_action": "post_write_readback",
+        "next_gate": None,
+    }
+    second = dict(first)
+    second["node_id"] = "repo_delivery.diff-readback"
+    second["entry_contract"] = list(first["entry_contract"]) + ["write_result"]
+    second["next_route_contract"] = {
+        "pass": {
+            "disposition": "stop",
+            "reason": "g2_boundary",
+            "next_node": None,
+            "next_action": None,
+            "next_gate": "G2_EXECUTION",
+        }
+    }
+    kwargs["implementation_registry"] = {"status": "PASS", "bindings": [first, second]}
+    seen = []
+    seen_handoffs = []
+
+    def resolver(**kw):
+        action = kw["context"]["requested_action"]
+        seen.append(action)
+        seen_handoffs.append("write_result" in kw["context"].get("context", {}))
+        node_id = (
+            "repo_delivery.scoped-file-write"
+            if action == "repository_write"
+            else "repo_delivery.diff-readback"
+        )
+        return {
+            "outcome": "ROUTE_SELECTED",
+            "reason_code": "ROUTE_SELECTED",
+            "route_id": f"route-{len(seen)}",
+            "current_node": node_id,
+            "node_instruction_ref": "core/node-architect/node-instructions/repo_delivery/scoped-file-write.node-instruction.yaml",
+            "profile_revision": "profile-r1",
+            "graph_revision": "graph-r1",
+            "decision_digest": "sha256:" + "d" * 64,
+            "authority_granted": False,
+            "write_authority_granted": False,
+        }
+
+    kwargs["route_resolver"] = resolver
+    out = host.run_agent_runtime_loop(kwargs, max_iterations=4)
+    assert out["loop_terminated"] == "gate_boundary"
+    assert out["iterations"] == 2
+    assert seen == ["repository_write", "post_write_readback"]
+    assert seen_handoffs == [False, True]
+    assert out["node_id"] == "repo_delivery.diff-readback"
+    assert [pack.node_id for pack in provider.packs] == [
+        "repo_delivery.scoped-file-write",
+        "repo_delivery.diff-readback",
+    ]
+
+
 def test_loop_single_node_reaches_gate_boundary_on_stop_disposition(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
     kwargs = _host_kwargs(tmp_path, ReasoningProvider())
+    kwargs["mode"] = "shadow_readonly"
+    kwargs["authority"] = None
     # The gate-boundary stop disposition is declared in the binding's contract,
     # not the route. Override the "pass" contract to a typed gate boundary so the
     # entrypoint surfaces it in next_route and the loop stops.
@@ -220,6 +318,8 @@ def test_loop_caps_iterations_on_continue_next_node(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
     # Resolver always returns the same continue disposition -> loop must cap.
     kwargs = _host_kwargs(tmp_path, ReasoningProvider())
+    kwargs["mode"] = "shadow_readonly"
+    kwargs["authority"] = None
     out = host.run_agent_runtime_loop(kwargs, max_iterations=4)
     assert out["loop_terminated"] == "iteration_limit"
     assert out["iterations"] == 4
@@ -241,6 +341,8 @@ def test_loop_terminates_when_event_blocked(tmp_path: Path):
             }
 
     kwargs["provider"] = MaliciousProvider()
+    kwargs["mode"] = "shadow_readonly"
+    kwargs["authority"] = None
     out = host.run_agent_runtime_loop(kwargs, max_iterations=4)
     assert out["loop_terminated"] == "event_blocked"
     assert out["status"] == "SEMANTIC_NODE_BLOCKED"
@@ -253,6 +355,8 @@ def test_loop_terminates_when_event_blocked(tmp_path: Path):
 def test_provider_evidence_class_recorded_not_live_closure_eligible(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
     kwargs = _host_kwargs(tmp_path, ReasoningProvider())
+    kwargs["mode"] = "shadow_readonly"
+    kwargs["authority"] = None
     out = host.run_agent_runtime_event(**kwargs)
     # ReasoningProvider is a direct-injection test reasoner (not a configured
     # registry provider and not the synthetic DeterministicFakeProvider), so it
@@ -278,6 +382,16 @@ def test_authoritative_provider_registry_requires_live_eligibility(tmp_path: Pat
     assert out["live_closure_eligible"] is False
 
 
+def test_authoritative_agent_host_requires_provider_registry(tmp_path: Path):
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    provider = ReasoningProvider()
+    kwargs = _host_kwargs(tmp_path, provider)
+    out = host.run_agent_runtime_event(**kwargs)
+    assert out["status"] == "AGENT_RUNTIME_BLOCKED"
+    assert out["reason_code"] == "AGENT_PROVIDER_REGISTRY_REQUIRED"
+    assert provider.packs == []
+
+
 def test_registered_live_eligible_provider_passes_gate(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
     from tools.node_architect.agent_provider_bridge import ProviderRegistry
@@ -288,3 +402,59 @@ def test_registered_live_eligible_provider_passes_gate(tmp_path: Path):
     assert out["provider_evidence_class"] == "CONFIGURED_PROVIDER"
     assert out["live_closure_eligible"] is True
     assert out["status"] == "SEMANTIC_NODE_COMPLETE"
+
+
+def test_registered_provider_uses_canonical_provider_bridge_contract(tmp_path: Path):
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    from tools.node_architect.agent_provider_bridge import ProviderRegistry
+
+    provider = BridgeContractProvider()
+    registry = ProviderRegistry({provider.name: provider})
+    kwargs = _host_kwargs(tmp_path, provider, provider_registry=registry)
+    out = host.run_agent_runtime_event(**kwargs)
+    assert out["status"] == "SEMANTIC_NODE_COMPLETE"
+    assert out["provider_evidence_class"] == "CONFIGURED_PROVIDER"
+    assert out["live_closure_eligible"] is True
+
+
+def test_host_default_readback_verifies_external_canonical_evidence(tmp_path: Path):
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    readback = _module("tools.node_architect.canonical_readback")
+    from tools.node_architect.agent_provider_bridge import ProviderRegistry
+
+    provider = BridgeContractProvider()
+    kwargs = _host_kwargs(tmp_path, provider, provider_registry=ProviderRegistry({provider.name: provider}))
+    kwargs["readback_handler"] = None
+    evidence = {"observed_state": "clean", "changed_paths": []}
+    kwargs["input_payload"]["canonical_readback"] = {
+        "status": "VERIFIED",
+        "source_kind": "canonical_external_readback",
+        "run_id": "host-run-566",
+        "event_id": "host-event-566",
+        "node_id": "repo_delivery.scoped-file-write",
+        "task_id": "SCRUM-566",
+        "repository": "nhatnguyenquang1838-coder/gwc",
+        "branch": "chatgpt/scrum-566-agent-runtime-corrective",
+        "base_sha": "a" * 40,
+        "head_sha": "b" * 40,
+        "scope_hash": "sha256:" + "c" * 64,
+        "evidence_refs": ["github://compare/SCRUM-566/host-event-566-1"],
+        "evidence": evidence,
+        "evidence_digest": readback.digest_evidence(evidence),
+    }
+    out = host.run_agent_runtime_event(**kwargs)
+    assert out["status"] == "SEMANTIC_NODE_COMPLETE"
+    assert out["canonical_readback_verified"] is True
+    assert out["readback"]["source_kind"] == "canonical_external_readback"
+
+
+def test_host_default_readback_fails_closed_without_external_evidence(tmp_path: Path):
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    from tools.node_architect.agent_provider_bridge import ProviderRegistry
+
+    provider = BridgeContractProvider()
+    kwargs = _host_kwargs(tmp_path, provider, provider_registry=ProviderRegistry({provider.name: provider}))
+    kwargs["readback_handler"] = None
+    out = host.run_agent_runtime_event(**kwargs)
+    assert out["status"] == "SEMANTIC_NODE_BLOCKED"
+    assert out["reason_code"] == "CANONICAL_READBACK_EVIDENCE_MISSING"

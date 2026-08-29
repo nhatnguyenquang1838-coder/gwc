@@ -16,15 +16,16 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Mapping, Sequence
 
 from .agent_instruction_bundle import InstructionBundleError, resolve_agent_instruction_bundle
 from .build_node_instruction_pack import build_node_instruction_pack
+from .canonical_readback import verify_canonical_readback
 from .live_runtime_bridge import LiveRuntimeState, build_live_runtime_event, dispatch_live_runtime_event
 from .ai_agent_adapter import DeterministicFakeProvider, Provider, SUCCESS, execute
 from .resolve_gate_node_route import resolve_gate_node_route
 from .semantic_implementation_registry import compile_semantic_implementation_registry
-from .agent_provider_bridge import ProviderRegistry
+from .agent_provider_bridge import ProviderRegistry, build_agent_provider_binding
 
 RouteResolver = Callable[..., Mapping[str, Any]]
 
@@ -130,6 +131,7 @@ def _provider_request(
     binding: Mapping[str, Any],
     capability_handlers: Mapping[str, Any],
     authority: Mapping[str, Any] | None = None,
+    validation_commands: Sequence[str] = (),
 ) -> dict[str, Any]:
     # File/path scope is an authority concern. It is carried from the resolved
     # authority when present; absent authority means a reasoner-only envelope
@@ -155,7 +157,7 @@ def _provider_request(
         "allowed_paths": allowed_paths,
         "prohibited_paths": prohibited_paths,
         "authorized_actions": sorted(map(str, capability_handlers.keys())),
-        "validation_commands": [],
+        "validation_commands": list(map(str, validation_commands)),
         "idempotency_key": f"agent-runtime:{event_id}:{binding.get('node_id', '')}",
         "route_id": str(route.get("route_id") or ""),
     }
@@ -173,8 +175,89 @@ def _provider_semantic_handler(
     binding: Mapping[str, Any],
     input_payload: Mapping[str, Any],
     capability_handlers: Mapping[str, Any],
+    provider_binding: Any | None = None,
 ) -> Callable[[Mapping[str, Any], Mapping[str, Any]], Mapping[str, Any]]:
     def handler(current_binding: Mapping[str, Any], event: Mapping[str, Any]) -> Mapping[str, Any]:
+        if provider_binding is not None:
+            bridge_input = {
+                "head_sha": str(canonical_state.get("head_sha") or ""),
+                "gate": gate,
+                "requested_action": requested_action,
+                "g0_g1_decision_ref": str(input_payload.get("g0_g1_decision_ref") or ""),
+                "task_summary": str(input_payload.get("task_summary") or ""),
+                "objective": str(input_payload.get("objective") or requested_action),
+                "node_id": str(current_binding.get("node_id") or ""),
+                "node_version": str(current_binding.get("node_version") or ""),
+                "implementation_ref": str(current_binding.get("implementation_ref") or ""),
+                "profile_revision": str(canonical_state.get("profile_revision") or ""),
+                "node_registry_revision": str(canonical_state.get("node_registry_revision") or ""),
+                "provider_contract_revision": str(getattr(provider, "contract_revision", "agent-reasoning-v1")),
+                "agent_boot_ref": str(bundle.get("instruction_refs", [""])[0] if bundle.get("instruction_refs") else ""),
+                "agent_instruction_digest": str(bundle.get("bundle_digest") or ""),
+                "acceptance_criteria": tuple(map(str, input_payload.get("acceptance_criteria", ()) or ())),
+                "gate_node_route": (f"{gate}:{current_binding.get('node_id', '')}",),
+                "plan_refs": tuple(map(str, input_payload.get("plan_refs", ()) or ())),
+            }
+            try:
+                bridged = provider_binding.handler(bridge_input)
+            except Exception as exc:
+                return {
+                    "outcome": "BLOCKED",
+                    "reason_code": "LLM_PROVIDER_BRIDGE_ERROR",
+                    "error": f"{type(exc).__name__}: {exc}",
+                    "requested_effects": [],
+                    "proposed_effects": [],
+                    "executed_effects": [],
+                    "next_contract": current_binding.get("next_route_contract", {}).get("blocked"),
+                    "authority_granted": False,
+                    "implementation_invoked": False,
+                    "semantic_execution": False,
+                }
+            if not isinstance(bridged, Mapping):
+                return {
+                    "outcome": "BLOCKED",
+                    "reason_code": "LLM_PROVIDER_BRIDGE_INVALID_RESULT",
+                    "requested_effects": [],
+                    "proposed_effects": [],
+                    "executed_effects": [],
+                    "next_contract": current_binding.get("next_route_contract", {}).get("blocked"),
+                    "authority_granted": False,
+                    "implementation_invoked": False,
+                    "semantic_execution": False,
+                }
+            if bridged.get("runtime_disposition") != "CONTINUE":
+                return {
+                    "outcome": "BLOCKED",
+                    "reason_code": str(bridged.get("reason_code") or "LLM_PROVIDER_BRIDGE_BLOCKED"),
+                    "provider_result": dict(bridged.get("provider_result") or {}),
+                    "requested_effects": [],
+                    "proposed_effects": [],
+                    "executed_effects": [],
+                    "next_contract": current_binding.get("next_route_contract", {}).get("blocked"),
+                    "authority_granted": False,
+                    "implementation_invoked": True,
+                    "semantic_execution": True,
+                }
+            provider_result = dict(bridged.get("provider_result") or {})
+            requested_effects = [
+                {"action": str(action), "side_effect_class": current_binding.get("side_effect_class") or "read_only"}
+                for action in provider_result.get("recorded_actions", []) or []
+                if str(action)
+            ]
+            return {
+                "outcome": "PASS",
+                "reason_code": "LLM_PROVIDER_SUCCESS",
+                "provider_result": provider_result,
+                "requested_effects": requested_effects,
+                "proposed_effects": [],
+                "executed_effects": [],
+                "next_contract": current_binding.get("next_route_contract", {}).get("pass"),
+                "authority_granted": False,
+                "implementation_invoked": True,
+                "semantic_execution": True,
+                "invocation_digest": _digest({"bridge": provider_result, "node": current_binding.get("node_id")}),
+            }
+
         # Bind the actual host-resolved instruction/skill bytes into the exact
         # provider replay identity. Model-supplied skill/instruction fields are
         # intentionally ignored.
@@ -320,6 +403,8 @@ def run_agent_runtime_event(
     route_context: Mapping[str, Any] | None = None,
     route_resolver: RouteResolver = resolve_gate_node_route,
     applicability_decision: Mapping[str, Any] | None = None,
+    validation_runner: Any | None = None,
+    validation_root: Path | str | None = None,
 ) -> dict[str, Any]:
     """Run one canonical Agent task event end-to-end through Node Architect."""
     repo_root = Path(root).resolve()
@@ -398,18 +483,7 @@ def run_agent_runtime_event(
         binding=binding,
         capability_handlers=capability_handlers,
         authority=authority,
-    )
-    llm_handler = _provider_semantic_handler(
-        provider=provider,
-        provider_request=provider_request,
-        bundle=bundle,
-        canonical_state=canonical_state,
-        gate=gate,
-        requested_action=requested_action,
-        route=route,
-        binding=binding,
-        input_payload=input_payload,
-        capability_handlers=capability_handlers,
+        validation_commands=tuple(map(str, input_payload.get("validation_commands", ()) or ())),
     )
     implementation_ref = str(binding.get("implementation_ref") or "")
     if not implementation_ref:
@@ -424,6 +498,13 @@ def run_agent_runtime_event(
     provider_evidence_class, live_closure_eligible, _resolved = _resolve_provider_gate(
         provider, provider_registry
     )
+    if mode == "authoritative" and provider_registry is None:
+        return _blocked(
+            "AGENT_PROVIDER_REGISTRY_REQUIRED",
+            node_id=node_id,
+            provider_evidence_class=provider_evidence_class,
+            live_closure_eligible=False,
+        )
     if provider_registry is not None and not live_closure_eligible:
         return _blocked(
             "AGENT_LIVE_CLOSURE_INELIGIBLE",
@@ -432,7 +513,44 @@ def run_agent_runtime_event(
             live_closure_eligible=False,
         )
 
+    provider_binding = None
+    if provider_registry is not None:
+        try:
+            provider_binding = build_agent_provider_binding(
+                node_id=node_id,
+                evaluator_path=implementation_ref,
+                request=provider_request,
+                provider_name=str(getattr(provider, "name", "")),
+                provider_registry=provider_registry,
+                validation_runner=validation_runner,
+                validation_root=validation_root,
+                instruction_bundle=bundle,
+            )
+        except Exception as exc:
+            return _blocked(
+                "AGENT_PROVIDER_BRIDGE_BUILD_ERROR",
+                node_id=node_id,
+                error=f"{type(exc).__name__}: {exc}",
+                provider_evidence_class=provider_evidence_class,
+                live_closure_eligible=live_closure_eligible,
+            )
+
+    llm_handler = _provider_semantic_handler(
+        provider=provider,
+        provider_request=provider_request,
+        bundle=bundle,
+        canonical_state=canonical_state,
+        gate=gate,
+        requested_action=requested_action,
+        route=route,
+        binding=binding,
+        input_payload=input_payload,
+        capability_handlers=capability_handlers,
+        provider_binding=provider_binding,
+    )
+
     runtime_state = state if isinstance(state, LiveRuntimeState) else LiveRuntimeState()
+    effective_readback_handler = readback_handler if readback_handler is not None else verify_canonical_readback
     result = dispatch_live_runtime_event(
         event=event,
         route_decision=route,
@@ -440,7 +558,7 @@ def run_agent_runtime_event(
         mode=mode,
         semantic_handlers={implementation_ref: llm_handler},
         capability_handlers=capability_handlers,
-        readback_handler=readback_handler,
+        readback_handler=effective_readback_handler,
         evidence_root=evidence_root,
         state=runtime_state,
         applicability_decision=applicability_decision,
@@ -478,9 +596,13 @@ def run_agent_runtime_loop(event_kwargs: Mapping[str, Any], *, max_iterations: i
     last: dict[str, Any] | None = None
     iterations = 0
     terminated = "iteration_limit"
+    current_kwargs = dict(event_kwargs)
+    if current_kwargs.get("state") is None:
+        current_kwargs["state"] = LiveRuntimeState()
+
     for i in range(1, max(1, int(max_iterations)) + 1):
-        run_kwargs = dict(event_kwargs)
-        base_event_id = str(run_kwargs.get("event_id") or "agent-runtime-event")
+        run_kwargs = dict(current_kwargs)
+        base_event_id = str(event_kwargs.get("event_id") or "agent-runtime-event")
         run_kwargs["event_id"] = f"{base_event_id}-{i}"
         last = run_agent_runtime_event(**run_kwargs)
         iterations = i
@@ -497,11 +619,44 @@ def run_agent_runtime_loop(event_kwargs: Mapping[str, Any], *, max_iterations: i
             break
         disposition = str(next_route.get("disposition") or "")
         if disposition == "stop":
-            terminated = "gate_boundary"
+            terminated = "gate_boundary" if next_route.get("next_gate") else "terminal"
             break
         if disposition == "continue" and next_route.get("next_node"):
-            # Real node hop: re-dispatch on the next node. Crossing the gate that
-            # the loop stops at remains a separate authority decision.
+            next_action = str(next_route.get("next_action") or "")
+            if not next_action:
+                terminated = "terminal"
+                break
+            # The canonical route profile is keyed by gate + requested_action.
+            # Carry the typed handoff into the next resolution; never let the
+            # provider select the next action or node.
+            next_context = dict(current_kwargs.get("route_context") or {})
+            next_context.update({
+                "transition_kind": "continue",
+                "previous_node": str(last.get("node_id") or ""),
+                "previous_event_id": run_kwargs["event_id"],
+                "next_node": str(next_route["next_node"]),
+            })
+            handoff = {
+                "previous_node": str(last.get("node_id") or ""),
+                "previous_event_id": run_kwargs["event_id"],
+                "status": status,
+                "reason_code": str(last.get("reason_code") or ""),
+                "executed_effects": list(last.get("executed_effects", []) or []),
+                "readback": dict(last.get("readback") or {}),
+                "evidence_summary": dict(last.get("evidence_summary") or {}),
+            }
+            next_payload = dict(current_kwargs.get("input_payload") or {})
+            next_payload.setdefault("previous_node_result", handoff)
+            next_registry = current_kwargs.get("implementation_registry")
+            next_binding = None
+            if isinstance(next_registry, Mapping):
+                next_binding = _binding_for(next_registry, str(next_route["next_node"]))
+            if next_binding is not None:
+                for field in next_binding.get("entry_contract", []) or []:
+                    next_payload.setdefault(str(field), handoff)
+            current_kwargs["requested_action"] = next_action
+            current_kwargs["route_context"] = next_context
+            current_kwargs["input_payload"] = next_payload
             continue
         terminated = "terminal"
         break

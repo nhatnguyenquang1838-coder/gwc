@@ -137,6 +137,20 @@ class ReasoningProvider:
         return result
 
 
+class RegisteredReasoningProvider(ReasoningProvider):
+    """Production-shaped provider fixture for the registry-backed path."""
+
+    name = "registered-llm-provider"
+
+    def run(self, pack):
+        self.packs.append(pack)
+        return {
+            "changed_paths": [],
+            "recorded_actions": ["repository_write"],
+            "validation_passed": True,
+        }
+
+
 def _route_resolver(**kwargs):
     assert kwargs["context"]["task_id"] == "SCRUM-566"
     assert kwargs["context"]["requested_action"] == "repository_write"
@@ -184,9 +198,12 @@ def _host_kwargs(tmp_path: Path, provider, *, mode="authoritative") -> dict:
 
 def test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_next(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
-    provider = ReasoningProvider()
+    provider = RegisteredReasoningProvider()
+    from tools.node_architect.agent_provider_bridge import ProviderRegistry
+
     writes = []
     kwargs = _host_kwargs(tmp_path, provider)
+    kwargs["provider_registry"] = ProviderRegistry({provider.name: provider})
     kwargs["capability_handlers"] = {
         "repository_write": lambda effect, event, authority: writes.append(dict(effect)) or {"status": "APPLIED", "effect_ref": "write-1"}
     }
@@ -197,7 +214,7 @@ def test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_
     assert out["agent_runtime_wired"] is True
     assert out["instruction_bundle_digest"].startswith("sha256:")
     assert out["skill_refs"] == ["skills/task-controller/SKILL.md", "skills/executor/SKILL.md"]
-    assert writes == [{"action": "repository_write", "side_effect_class": "repository_write", "payload": {"path": "scratch.json", "content": "ok"}}]
+    assert writes == [{"action": "repository_write", "side_effect_class": "repository_write"}]
     assert out["canonical_readback_verified"] is True
     assert out["next_route"]["next_node"] == "repo_delivery.diff-readback"
 
@@ -269,7 +286,7 @@ def test_provider_unknown_tool_request_fails_before_capability_execution(tmp_pat
             }
 
     provider = UnknownToolProvider()
-    kwargs = _host_kwargs(tmp_path, provider)
+    kwargs = _host_kwargs(tmp_path, provider, mode="shadow_readonly")
     kwargs["capability_handlers"] = {"repository_write": lambda *args: {"status": "APPLIED"}}
 
     out = host.run_agent_runtime_event(**kwargs)
