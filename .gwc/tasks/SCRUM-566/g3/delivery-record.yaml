@@ -10,8 +10,8 @@ pull_request:
   number: 523
   url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/523
   draft: true
-head_sha: 60aec4f969978b55891584eedd0270759cec369c
-scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
+head_sha: 147261a381f517147cfa4296f3b5062399d40972
+scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
 changed_paths:
 - .github/workflows/node-architect-semantic-runtime.yml
 - .github/workflows/node-architect-shadow-qualification.yml
@@ -21,6 +21,7 @@ changed_paths:
 - .gwc/tasks/SCRUM-566/g1/intake/g1-intake-brief.yaml
 - .gwc/tasks/SCRUM-566/g1/preflight/g1-preflight-report.yaml
 - .gwc/tasks/SCRUM-566/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-566/g3/delivery-record.yaml
 - .gwc/tasks/SCRUM-566/takeover/user-authorized-takeover.yaml
 - core/node-architect/node-instructions/failure_recovery/approval-expiry-recovery.node-instruction.yaml
 - core/node-architect/node-instructions/failure_recovery/cas-mismatch-recovery.node-instruction.yaml
@@ -93,6 +94,7 @@ changed_paths:
 - tests/test_scrum_566_agent_host_wiring.py
 - tests/test_scrum_566_agent_provider_bridge.py
 - tests/test_scrum_566_agent_runtime_loop.py
+- tests/test_scrum_566_agent_runtime_production_entrypoint.py
 - tests/test_scrum_566_instruction_skill_wiring.py
 - tests/test_scrum_566_semantic_dispatcher.py
 - tests/test_scrum_566_semantic_lifecycle.py
@@ -105,6 +107,7 @@ changed_paths:
 - tests/test_shadow_orchestrator.py
 - tools/node_architect/agent_instruction_bundle.py
 - tools/node_architect/agent_provider_bridge.py
+- tools/node_architect/agent_runtime_cli.py
 - tools/node_architect/agent_runtime_entrypoint.py
 - tools/node_architect/ai_agent_adapter.py
 - tools/node_architect/build_node_instruction_pack.py
@@ -127,27 +130,27 @@ changed_paths:
 - tools/node_architect/shadow_orchestrator.py
 - tools/node_architect/trusted_validation_runner.py
 validation:
-  head_sha: 60aec4f969978b55891584eedd0270759cec369c
+  head_sha: 147261a381f517147cfa4296f3b5062399d40972
   status: pass
   commands:
   - command: PYTHONPATH=. .venv/bin/python -m pytest SCRUM-566 semantic-runtime suite
     result: pass
-    evidence: 93 passed locally before governance-only G3 materialization; no code
-      files changed afterward.
+    evidence: 96 passed locally at the implementation head before this G3 record rebind;
+      no code changes after 147261a3.
   - command: git diff --check
     result: pass
-    evidence: No whitespace errors at implementation head before G3 artifact creation.
-  - command: python3 -m py_compile semantic runtime modules
+    evidence: No whitespace errors at implementation head 147261a3.
+  - command: python3 -m py_compile Agent Runtime modules
     result: pass
-    evidence: Entrypoint, canonical readback and host tests compiled successfully.
+    evidence: Entrypoint, canonical readback, production CLI and tests compiled successfully.
 review:
   implementer_id: DWA
   reviewer_id: dwa-fresh-context-read-only-reviewer-g3
   independence: fresh-context
   mode: read-only
-  reviewed_head_sha: 60aec4f969978b55891584eedd0270759cec369c
-  reviewed_scope_hash: sha256:a518e2225e6ce8b70fd3bdb0ef2c3867a8bace3f5df51c10689aa66a386913ae
-  reviewed_at: '2026-08-29T19:25:57Z'
+  reviewed_head_sha: 147261a381f517147cfa4296f3b5062399d40972
+  reviewed_scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
+  reviewed_at: '2026-08-29T19:52:34Z'
   lanes:
   - name: requirement
     applicable: true
@@ -167,15 +170,15 @@ review:
     applicable: true
     status: pass
     evidence:
-    - A→B typed NEXT propagation, registry-backed provider bridge, authoritative registry
-      requirement and fail-closed canonical readback are covered by the current focused
-      tests.
+    - Production CLI caller now loads an explicit provider factory, creates a host-owned
+      ProviderRegistry and invokes run_agent_runtime_loop; provider name mismatch
+      and missing factory fail closed.
   - name: test
     applicable: true
     status: pass
     evidence:
-    - 93 relevant tests pass locally; exact-head semantic-runtime and canonical-81
-      workflows pass on the prior implementation head.
+    - 96 relevant tests pass locally including the production caller tests; exact-head
+      semantic-runtime CI and canonical-81 qualification pass for 147261a3.
   - name: governance
     applicable: true
     status: pass
@@ -186,14 +189,14 @@ review:
     applicable: true
     status: pass
     evidence:
-    - 'PR #523 is OPEN, currently Draft for G3 schema compatibility, and the record
-      binds the exact implementation head 60aec4f9.'
+    - 'PR #523 is OPEN and Draft for G3 schema compatibility; the delivery record
+      binds implementation head 147261a3 and current exact-head CI evidence.'
   - name: ci
     applicable: true
     status: pass
     evidence:
-    - 'Live GitHub readback at PR #523 reports validate, semantic-runtime-regression,
-      canonical-81-qualification, all package builds and Kilo Code Review SUCCESS.'
+    - Live GitHub readback for head 147261a3 reports current required runtime/build/validate
+      checks SUCCESS.
   findings:
   - id: REV-1
     severity: MAJOR
@@ -216,9 +219,9 @@ review:
     severity: MAJOR
     category: delivery
     status: open
-    evidence: No configured non-synthetic Agent/LLM execution record proves provider/tool
-      → canonical readback → NodeEvidenceLedger → NEXT for the live PR; current evidence
-      is tests, shadow qualification and injected external readback evidence.
+    evidence: Production caller wiring now exists in tools/node_architect/agent_runtime_cli.py,
+      but no configured non-synthetic Agent/LLM execution record proves provider/tool
+      → canonical readback → NodeEvidenceLedger → NEXT for the live PR.
     recommendation: Attach a governed live execution record with exact provider, capability,
       readback and ledger identity before claiming W13/W14 closure or G3 pass.
   acceptance_criteria:
@@ -238,92 +241,89 @@ review:
   - id: AC-4
     result: not_verified
     evidence:
-    - Required non-fake governed live Agent/LLM execution and authoritative ledger
-      artifact are not present in current readback.
+    - Production caller is wired, but the required non-fake governed live Agent/LLM
+      execution and authoritative ledger artifact remain absent.
   decision: changes_required
   stale: false
 ci:
   required: true
-  head_sha: 60aec4f969978b55891584eedd0270759cec369c
+  head_sha: 147261a381f517147cfa4296f3b5062399d40972
   checks:
-  - name: g4-authority
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142086094
-  - name: g5-recovery
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142082218
-  - name: g4-receipt-required
-    required: false
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142068097
-  - name: g4-merge-proof
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142068477
-  - name: g5-status
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33268261672/job/99142068454
-  - name: autonomous-g4-evidence-required
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137635953
-  - name: evidence-runtime
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137636236
-  - name: build (ds-mcp)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619237
-  - name: build (gwc)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619224
-  - name: build (rental-home)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619236
-  - name: build (pm-skills)
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592143/job/99137619128
-  - name: validate
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592139/job/99137619198
-  - name: semantic-runtime-regression
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592149/job/99137619164
-  - name: canonical-81-qualification
-    required: true
-    status: pass
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592176/job/99137619258
-  - name: delivery-gates
-    required: false
-    status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137619906
   - name: g4-pr-evidence-authority
     required: false
     status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137619760
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151824818
+  - name: delivery-gates
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151822792
+  - name: evidence-runtime
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151820810
+  - name: build (ds-mcp)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807601
+  - name: semantic-runtime-regression
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924539/job/99151807420
+  - name: g4-receipt-required
+    required: false
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151807643
+  - name: validate
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924560/job/99151807583
+  - name: canonical-81-qualification
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924530/job/99151807447
+  - name: build (rental-home)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807656
+  - name: build (pm-skills)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807493
+  - name: build (gwc)
+    required: true
+    status: pass
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924525/job/99151807598
   - name: contract-canary
     required: false
     status: skipped
-    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33266592159/job/99137619668
-  - name: Kilo Code Review
-    required: true
-    status: pass
-    evidence: https://app.kilo.ai/code-reviews/8c2b12f7-28b1-470b-b435-9b18ef515446
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151807861
+  - name: g4-merge-proof
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808128
+  - name: autonomous-g4-evidence-required
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924534/job/99151808147
+  - name: g5-status
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808125
+  - name: g4-authority
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808137
+  - name: g5-recovery
+    required: false
+    status: skipped
+    evidence: https://github.com/nhatnguyenquang1838-coder/gwc/actions/runs/33271924531/job/99151808111
 residual_risks:
-- W13/W14 live non-synthetic Agent/LLM execution remains unproven; shadow and fixture
-  evidence must not be over-claimed.
+- Production caller wiring is now present, but W13/W14 live non-synthetic execution
+  and authoritative ledger evidence remain unproven.
 - origin/main is 668a8645a696e4cbf84124201a58d26bc833f0c1 while PR base remains dd906822;
   no rebase was performed.
-- G3 record is intentionally changes_required, so G4 authority must not be requested.
+- G3 remains changes_required; G4 must not be requested until REV-3 is resolved or
+  explicitly accepted for this exact head.
 exclusions:
 - G4_MERGE
 - G5_DEPLOY
