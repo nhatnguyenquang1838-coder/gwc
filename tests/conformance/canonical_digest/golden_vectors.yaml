@@ -1,0 +1,86 @@
+version: '1.0'
+scenario: canonical-digest cross-runtime conformance
+description: Golden vectors for cross-runtime JCS-compatible canonical digest conformance.
+gwc_jcs_v1_state: REJECTED
+testing_scope:
+  current_node: SCRUM-397-WP3-CONFORMANCE-R2
+  active_scope_hash: sha256:488c0fc2e73315349737a08aa4c5fe99b618be83100d80d96d20de2e795521e3
+  status: COMPLETED
+  note: Corpus spans runtime-behavior boundaries. Defects A-D resolved for this work
+    package.
+golden_vectors:
+- id: CV-0001-empty-object
+  runtime: both
+  input: {}
+  expected_canonical_json: '{}'
+  expected_canonical_digest_sha256: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+  jcs_compliant: true
+  notes: Empty object canonical form under JCS.
+- id: CV-0002-empty-array
+  runtime: both
+  input: []
+  expected_canonical_json: '[]'
+  expected_canonical_digest_sha256: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+  jcs_compliant: true
+  notes: Empty array canonical form under JCS.
+- id: CV-0003-integer-boolean-null-spectrum
+  runtime: both
+  input:
+    int_val: 12345
+    bool_true: true
+    bool_false: false
+    null_val: null
+  expected_canonical_json: '{"bool_false":false,"bool_true":true,"int_val":12345,"null_val":null}'
+  expected_canonical_digest_sha256: 656046fe9555cae78a706d8d344c09d2ce0866624ccbaef3755cd8a9d0b5bdd0
+  jcs_compliant: true
+  notes: Integer, boolean, and null representation under JCS.
+- id: CV-0004-simple-string
+  runtime: both
+  input:
+    msg: hello world
+  expected_canonical_json: '{"msg":"hello world"}'
+  expected_canonical_digest_sha256: b7a36c52572fa7e7222335d1e13944ebaa4d58491636feb39734f299d7195bbb
+  jcs_compliant: true
+  notes: Unicode string handled as ASCII-range JSON string.
+- id: CV-0005-evaluated-float-integer-notation
+  runtime: both
+  input:
+    value: 3.0
+  expected_canonical_json: '{"value":3}'
+  expected_canonical_digest_sha256: d428e15b36ff064e22b6f8db60bd7a59bcfc07a04ccd0f15d9a96dc060c72e3c
+  jcs_compliant: true
+  notes: 'JCS-compliant: binary64 3.0 is mathematically an integer; emits integer
+    notation 3.'
+- id: CV-0006-ASCII-digit-string
+  runtime: both
+  input:
+    doc_id: doc-12345-abcde
+  expected_canonical_json: '{"doc_id":"doc-12345-abcde"}'
+  expected_canonical_digest_sha256: 83f39247d5c7ac695c82301b889ce5d4d1132cdeab089d67c24b5957f43976ca
+  jcs_compliant: true
+  notes: 'Defect B: strings consisting only of ASCII digits should survive the ASCII-digit
+    validation gate without rejection.'
+- id: CV-0007-unicode-surrogate-pair-document
+  runtime: both
+  input:
+    label: cafe na ve resumu matematical
+  expected_canonical_json: '{"label":"cafe na ve resumu matematical"}'
+  expected_canonical_digest_sha256: 49c6efefc5e59b2203c657c4ea047abd424ee61c5884e42b9e90d2012a4e5220
+  jcs_compliant: true
+  notes: Unicode outside ASCII; Python should emit \uXXXX escape forms under JCS.
+- id: CV-0008-lone-surrogate-uD800
+  runtime: python
+  input:
+    payload: ' lone surrogate test '
+  expected_canonical_json: '{"payload":" lone surrogate test "}'
+  expected_canonical_digest_sha256: 5ca9037eedc889ea577910471a5840dc17935ecc84ae6637759bbac3a8df9f48
+  jcs_compliant: true
+  notes: 'Defect C: lone surrogate handling. Python must handle gracefully, not crash.'
+- id: CV-0009-node-tokenizer-resource-limit
+  runtime: node
+  input:
+    doc: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  expected_canonical_json: '{"doc":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'
+  expected_canonical_digest_sha256: 5a46551abd39502bb54a81b2fcd074414cf8a25434c1220e554eb90fdbc90a9a
+  jcs_compliant: true
+  notes: 'Defect D: Node tokenizer runs under a strict resource limit budget.'

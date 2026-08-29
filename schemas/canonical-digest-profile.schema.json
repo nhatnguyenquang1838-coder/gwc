@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://instruction-governance.local/schemas/canonical-digest-profile.schema.json",
+  "title": "Canonical Digest Profile (gwc-jcs-v1)",
+  "description": "Normative canonical digest profile definition for structured semantic digests. Contract/schema only; never grants authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_type",
+    "profile_id",
+    "status",
+    "specification",
+    "strict_input_domain",
+    "canonical_byte_contract",
+    "hash_binding",
+    "domain_separation",
+    "resource_limits",
+    "error_taxonomy",
+    "digest_envelope_binding",
+    "governance"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "profile_type": {"type": "string", "const": "canonical_digest_profile"},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "status": {"type": "string", "enum": ["defined", "deprecated"]},
+    "specification": {"type": "string", "const": "RFC_8785_JCS_COMPATIBLE"},
+    "task": {"type": "string"},
+    "work_package": {"type": "string"},
+    "description": {"type": "string"},
+    "strict_input_domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supported_values",
+        "negative_zero_policy",
+        "non_finite_policy",
+        "non_string_key_policy",
+        "duplicate_raw_key_policy",
+        "unicode_normalization",
+        "invalid_unicode_policy",
+        "unsupported_value_policy"
+      ],
+      "properties": {
+        "supported_values": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["null", "boolean", "number_IEEE754_double", "string", "array", "object"]}
+        },
+        "negative_zero_policy": {"type": "string", "const": "reject"},
+        "non_finite_policy": {"type": "string", "const": "reject"},
+        "non_string_key_policy": {"type": "string", "const": "reject"},
+        "duplicate_raw_key_policy": {"type": "string", "const": "reject_before_semantic_collapse"},
+        "unicode_normalization": {"type": "string", "const": "none"},
+        "invalid_unicode_policy": {"type": "string", "const": "reject_unpaired_surrogates"},
+        "unsupported_value_policy": {"type": "string", "const": "reject_with_deterministic_error"}
+      }
+    },
+    "canonical_byte_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standard",
+        "key_ordering",
+        "number_serialization",
+        "string_escaping",
+        "object_member_separator",
+        "key_value_separator",
+        "utf8_encoding",
+        "unicode_normalization",
+        "trailing_whitespace",
+        "newline"
+      ],
+      "properties": {
+        "standard": {"type": "string", "const": "RFC_8785"},
+        "key_ordering": {"type": "string", "const": "lexicographic_utf16_code_unit"},
+        "number_serialization": {"type": "string", "const": "jcs_shortest_round_trip"},
+        "string_escaping": {"type": "string", "const": "jcs_minimal"},
+        "object_member_separator": {"type": "string", "const": ","},
+        "key_value_separator": {"type": "string", "const": ":"},
+        "utf8_encoding": {"type": "string", "const": "strict_utf8"},
+        "unicode_normalization": {"type": "string", "const": "none"},
+        "invalid_unicode_note": {"type": "string"},
+        "trailing_whitespace": {"type": "string", "const": "forbidden"},
+        "newline": {"type": "string", "const": "none"}
+      }
+    },
+    "hash_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "hex_digest_lowercase", "domain_separation", "preimage_framing"],
+      "properties": {
+        "algorithm": {"type": "string", "const": "SHA-256"},
+        "hex_digest_lowercase": {"type": "boolean", "const": true},
+        "domain_separation": {"type": "string", "const": "required"},
+        "preimage_framing": {"type": "string", "const": "required"}
+      }
+    },
+    "domain_separation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "framing", "domain_tag_source", "framing_rule"],
+      "properties": {
+        "scheme": {"type": "string", "const": "gwc-domain-sep-v1"},
+        "framing": {"type": "string", "const": "sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )"},
+        "domain_tag_source": {"type": "string"},
+        "framing_rule": {"type": "string"}
+      }
+    },
+    "resource_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_preimage_bytes", "max_object_depth", "max_object_keys", "max_array_items", "max_string_bytes", "limit_policy"],
+      "properties": {
+        "max_preimage_bytes": {"type": "integer", "minimum": 1},
+        "max_object_depth": {"type": "integer", "minimum": 1},
+        "max_object_keys": {"type": "integer", "minimum": 1},
+        "max_array_items": {"type": "integer", "minimum": 1},
+        "max_string_bytes": {"type": "integer", "minimum": 1},
+        "limit_policy": {"type": "string", "const": "reject_with_deterministic_error"}
+      }
+    },
+    "error_taxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "DIGEST_INPUT_DOMAIN_VIOLATION",
+        "DIGEST_NEGATIVE_ZERO_REJECTED",
+        "DIGEST_NON_FINITE_REJECTED",
+        "DIGEST_NON_STRING_KEY_REJECTED",
+        "DIGEST_DUPLICATE_RAW_KEY_REJECTED",
+        "DIGEST_INVALID_UNICODE_REJECTED",
+        "DIGEST_UNICODE_NORMALIZATION_NONE",
+        "DIGEST_RESOURCE_LIMIT_EXCEEDED",
+        "DIGEST_DOMAIN_TAG_MISMATCH",
+        "DIGEST_ENVELOPE_BINDING_MISMATCH",
+        "error_delivery"
+      ],
+      "properties": {
+        "DIGEST_INPUT_DOMAIN_VIOLATION": {"type": "string"},
+        "DIGEST_NEGATIVE_ZERO_REJECTED": {"type": "string"},
+        "DIGEST_NON_FINITE_REJECTED": {"type": "string"},
+        "DIGEST_NON_STRING_KEY_REJECTED": {"type": "string"},
+        "DIGEST_DUPLICATE_RAW_KEY_REJECTED": {"type": "string"},
+        "DIGEST_INVALID_UNICODE_REJECTED": {"type": "string"},
+        "DIGEST_UNICODE_NORMALIZATION_NONE": {"type": "string"},
+        "DIGEST_RESOURCE_LIMIT_EXCEEDED": {"type": "string"},
+        "DIGEST_DOMAIN_TAG_MISMATCH": {"type": "string"},
+        "DIGEST_ENVELOPE_BINDING_MISMATCH": {"type": "string"},
+        "error_delivery": {"type": "string", "const": "deterministic_and_replayable"}
+      }
+    },
+    "digest_envelope_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["binds", "schema", "integrity_rule"],
+      "properties": {
+        "binds": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true,
+          "minItems": 6,
+          "maxItems": 6,
+          "allOf": [
+            {"contains": {"const": "profile_id"}},
+            {"contains": {"const": "hash_algorithm"}},
+            {"contains": {"const": "domain"}},
+            {"contains": {"const": "schema_ref"}},
+            {"contains": {"const": "preimage_framing_scheme"}},
+            {"contains": {"const": "hexdigest"}}
+          ]
+        },
+        "schema": {"type": "string"},
+        "integrity_rule": {"type": "string"}
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonicalization_never_grants_authority",
+        "registry_activation_fail_closed",
+        "gwc_jcs_v1_new_write_activation",
+        "historical_evidence_immutable",
+        "raw_byte_hashes_unchanged"
+      ],
+      "properties": {
+        "canonicalization_never_grants_authority": {"type": "boolean", "const": true},
+        "registry_activation_fail_closed": {"type": "boolean", "const": true},
+        "gwc_jcs_v1_new_write_activation": {"type": "string", "const": "BLOCKED_PENDING_WP3_WP4"},
+        "historical_evidence_immutable": {"type": "boolean", "const": true},
+        "raw_byte_hashes_unchanged": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

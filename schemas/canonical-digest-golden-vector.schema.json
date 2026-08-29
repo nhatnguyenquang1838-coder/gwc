@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CanonicalDigestGoldenVector",
+  "description": "A single golden-vector entry for cross-runtime canonical digest conformance.",
+  "type": "object",
+  "required": [
+    "id",
+    "runtime",
+    "input"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique test vector identifier."
+    },
+    "runtime": {
+      "type": "string",
+      "enum": [
+        "python",
+        "node",
+        "both"
+      ],
+      "description": "The runtime(s) this vector exercises."
+    },
+    "input": {
+      "description": "The input JSON document under test."
+    },
+    "expected_canonical_json": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Expected canonical JSON string, or null for error cases."
+    },
+    "expected_canonical_digest_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Expected canonical payload SHA-256, or null if not applicable."
+    },
+    "jcs_compliant": {
+      "type": "boolean",
+      "description": "Whether this vector is intended to be JCS-compliant."
+    },
+    "expected_behavior_on_both_runtimes": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
