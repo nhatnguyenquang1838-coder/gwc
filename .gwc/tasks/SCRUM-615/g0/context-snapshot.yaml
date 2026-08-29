@@ -1,0 +1,55 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-29T14:37:10Z'
+reconciliation:
+  mode: LATE_RECONCILIATION
+  historical_authority_claimed: false
+  note: >-
+    This artifact records current verified state only. SCRUM-615 implementation
+    began under explicit user hotfix direction before this formal task-scoped
+    artifact was materialized; this record does not backdate or retroactively
+    fabricate G0 evidence.
+project:
+  id: gwc
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+work_item:
+  provider: Atlassian Jira
+  id: SCRUM-615
+  status: In Progress
+  ai_agent: ChatGPT
+  claimed_at: '2026-08-28T15:47:00+07:00'
+  claim_verified: true
+active_lane: GWC Governance Hotfix
+blocked_work:
+- SCRUM-397 / PR #525
+constraints:
+- Implement Option A subject/container separation only.
+- Do not mutate SCRUM-397 delivery branch or PR content.
+- Draft PR / G3 completion only; G4 merge remains separate Human authority.
+- No deploy, release, production config/data, credential, migration, force-push, or history rewrite.
+applicable_policies:
+- path: AGENTS.md
+  ref: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+- path: projects/gwc/project-instructions.md
+  ref: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+- path: projects/gwc/project-extension.md
+  ref: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+- path: agents/dwc/agent-instructions.md
+  ref: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+existing_mechanisms:
+- schemas/g3-delivery-record.schema.json
+- tools/validate_g3_delivery.py
+- skills/gwc-g3/SKILL.md
+- task-scoped .gwc/tasks/<task-id>/g3 evidence
+status: READY
+blockers: []
