@@ -1,0 +1,137 @@
+schema_version: "1.1"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-397
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 668a8645a696e4cbf84124201a58d26bc833f0c1
+working_branch: fastlane/scrum-397-current-main-recovery-r3
+pull_request:
+  number: 525
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/525
+  draft: true
+implementation_head_sha: db19b3c77c9e6938f0a44e9a8c93238bf44bac0c
+scope_hash: sha256:2a1d3ffb95f08f7798e04805b46b7a571f798af1dbc1eba40e464d83a42fb940
+changed_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/executor-report.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/replay-manifest.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/validation-report.yaml
+  - .gwc/tasks/SCRUM-397/recovery/current-main-inventory-delta.yaml
+  - .gwc/tasks/SCRUM-397/recovery/main-drift-assessment.yaml
+  - governance/digest-profile-registry.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - schemas/canonical-digest-golden-vector.schema.json
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-envelope.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - tests/conformance/canonical_digest/golden_vectors.yaml
+  - tests/conformance/canonical_digest/test_node_conformance.mjs
+  - tests/conformance/canonical_digest/test_python_conformance.py
+  - tests/package_export/test_canonical_digest_api.py
+  - tests/package_export/test_canonical_digest_profile.py
+  - tests/package_export/test_legacy_digest_verifier.py
+  - tools/node_architect/canonical_digest/reference_canonicalizer.mjs
+  - tools/node_architect/canonical_digest/reference_canonicalizer.py
+  - tools/node_architect/package_export/canonical_digest_api.py
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - tools/node_architect/package_export/legacy_digest_verifier.py
+validation:
+  implementation_head_sha: db19b3c77c9e6938f0a44e9a8c93238bf44bac0c
+  status: pass
+  commands:
+    - command: git hash-object byte-identity check of 35 SOURCE_PROVENANCE paths vs 4e0989cf0770637eabc90c20fa6757fb4f1f4089
+      result: pass
+      evidence: all 35 replayed paths are byte-identical (git hash-object == source blob SHA) to source-provenance 4e0989cf; overlap with main drift f8e25602..668a8645 = 0
+    - command: bounded G3 record validation (tools/validate_g3_delivery.py --record)
+      result: pass
+      evidence: v1.1 schema + semantic validation passed for the immutable implementation subject db19b3c77c9e6938f0a44e9a8c93238bf44bac0c
+review:
+  implementer_id: DWA (Hermes Mac)
+  reviewer_id: ChatGPT
+  independence: independent
+  mode: read-only
+  reviewed_implementation_head_sha: db19b3c77c9e6938f0a44e9a8c93238bf44bac0c
+  reviewed_scope_hash: sha256:2a1d3ffb95f08f7798e04805b46b7a571f798af1dbc1eba40e464d83a42fb940
+  reviewed_at: "2026-08-29T17:00:00Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - requirement lane deferred to follow-on independent 7-lane review (excluded from bounded G2 g2_scrum-397_g3_current_main_recovery_20260829_1630_2a1d3ffb95f08f77)
+    - name: design
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - design lane deferred to follow-on independent 7-lane review
+    - name: code
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - code lane deferred to follow-on independent 7-lane review
+    - name: test
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - test lane deferred to follow-on independent 7-lane review
+    - name: governance
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - governance lane deferred to follow-on independent 7-lane review
+    - name: delivery
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - delivery lane deferred; PR #525 referenced as documented delivery PR only, NOT opened/updated/closed in this bounded action
+    - name: ci
+      applicable: true
+      status: not_reviewed
+      evidence:
+        - exact-tip CI deferred to follow-on promotion gate; required_checks not asserted at pre-closure
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - implementation subject committed as new head db19b3c77c9e6938f0a44e9a8c93238bf44bac0c (not the old divergent 4e0989cf)
+    - id: AC-2
+      result: pass
+      evidence:
+        - 35 paths byte-identical to source-provenance 4e0989cf; overlap with main drift = 0
+    - id: AC-3
+      result: not_applicable
+      evidence:
+        - promotion PR-open / independent review / mark-Ready / close-#525 excluded from this bounded G2
+  decision: blocked
+  stale: false
+ci:
+  required: false
+  required_checks: []
+residual_risks:
+  - G3 promotion (Draft PR open, 7-lane independent review, exact-tip CI, mark-Ready) is a separate follow-on controller-gated action bound to the produced implementation head; not executed under this G2.
+  - PR #525 is referenced as the documented delivery PR but remains OPEN/Draft unchanged; no mutation performed on it.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - G4_PR_OPEN
+  - G4_INDEPENDENT_REVIEW
+  - G4_MARK_READY
+  - G4_CLOSE_PR_525
+  - WP5_START
+  - MAIN_WRITE
+outcome: inconclusive
