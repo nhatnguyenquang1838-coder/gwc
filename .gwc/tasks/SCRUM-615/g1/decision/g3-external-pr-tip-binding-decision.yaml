@@ -1,0 +1,60 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+task_id: SCRUM-615
+generated_at: '2026-08-29T14:37:10Z'
+reconciliation:
+  mode: LATE_RECONCILIATION
+  historical_authority_claimed: false
+  note: >-
+    This current-state decision record captures the user-selected Option A and
+    verified repository design. It does not claim that formal G1 evidence existed
+    before earlier SCRUM-615 branch commits.
+decision: IMPLEMENT_OPTION_A_EXTERNAL_PR_TIP_BINDING
+status: PASS
+base_sha: bad63d466f3d1e40ee5184d75551c3abaa2f0617
+problem: >-
+  A committed G3 delivery record cannot require the SHA of the commit containing
+  itself without creating an infinite self-reference loop.
+reuse_extend_analysis:
+  current_mechanisms:
+  - schemas/g3-delivery-record.schema.json
+  - tools/validate_g3_delivery.py
+  - skills/gwc-g3/SKILL.md
+  - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  limitation: >-
+    The v1.0 contract conflates implementation subject identity with the mutable
+    PR evidence container/current tip.
+  smallest_compatible_improvement: >-
+    Extend the existing G3 contract to v1.1 so committed evidence binds an
+    immutable implementation subject while ancestry, evidence-only delta, and
+    exact-tip CI are trusted runtime facts.
+selected_option:
+  id: OPTION_A_SUBJECT_CONTAINER_SEPARATION
+  implementation_subject: implementation_head_sha
+  current_tip_source: external_trusted_repository_runtime
+  evidence_delta_allowlist: .gwc/tasks/<task-id>/g3/**
+  legacy_v1_0: immutable_provenance_requires_explicit_v1_1_migration
+non_goals:
+- No SCRUM-397 delivery mutation.
+- No new GWC gate.
+- No weakening of G4 Human merge authority.
+- No deployment or production changes.
+acceptance_criteria:
+- No committed G3 record embeds a mandatory self-referential current-tip SHA.
+- implementation_head_sha must be equal to or ancestor of externally verified current PR head.
+- Post-implementation aggregate delta must be task-scoped G3 evidence only.
+- Required exact-tip CI results are supplied and checked externally.
+- v1.0 active closure requires explicit migration to v1.1.
+- SCRUM-397 regression case is representable without recursive evidence commits.
+validation_strategy:
+- TDD RED contract assertions before implementation.
+- Full governance unit suite under Validate instructions.
+- Flow-policy digest regeneration and identity tests.
+- Exact PR-head CI verification.
+- Independent seven-lane read-only G3 review.
+human_direction:
+  source: current ChatGPT conversation
+  date: '2026-08-28'
+  instruction: Hotfix governance theo A
+  architecture_direction_received: true
+blockers: []
