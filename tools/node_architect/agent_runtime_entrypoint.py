@@ -21,10 +21,33 @@ from typing import Any, Callable, Mapping
 from .agent_instruction_bundle import InstructionBundleError, resolve_agent_instruction_bundle
 from .build_node_instruction_pack import build_node_instruction_pack
 from .live_runtime_bridge import LiveRuntimeState, build_live_runtime_event, dispatch_live_runtime_event
+from .ai_agent_adapter import DeterministicFakeProvider, Provider, SUCCESS, execute
 from .resolve_gate_node_route import resolve_gate_node_route
 from .semantic_implementation_registry import compile_semantic_implementation_registry
+from .agent_provider_bridge import ProviderRegistry
 
 RouteResolver = Callable[..., Mapping[str, Any]]
+
+
+def _resolve_provider_gate(provider: Any, provider_registry: Any) -> tuple[str, bool, Any]:
+    """Classify a provider and compute live-closure eligibility.
+
+    Mirrors ``agent_provider_bridge._provider_class`` so the Agent Host enforces
+    the same gate the W11 bridge applies: an authoritative provider must resolve
+    from a configured ``provider_registry`` to be live-closure eligible. Synthetic
+    and direct-injection providers are never live-eligible (reasoner/test only).
+    Returns ``(evidence_class, live_closure_eligible, resolved_provider)``.
+    """
+    if provider is None:
+        return "UNAVAILABLE", False, provider
+    if isinstance(provider, DeterministicFakeProvider) or getattr(provider, "name", "") == "deterministic-fake":
+        return "SYNTHETIC_TEST_ONLY", False, provider
+    if provider_registry is not None:
+        resolved = provider_registry.resolve(getattr(provider, "name", ""))
+        if resolved is not None:
+            return "CONFIGURED_PROVIDER", True, resolved
+        return "DIRECT_INJECTION", False, provider
+    return "DIRECT_INJECTION", False, provider
 
 _FORBIDDEN_PROVIDER_FIELDS = {
     "authority",
@@ -106,7 +129,17 @@ def _provider_request(
     route: Mapping[str, Any],
     binding: Mapping[str, Any],
     capability_handlers: Mapping[str, Any],
+    authority: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    # File/path scope is an authority concern. It is carried from the resolved
+    # authority when present; absent authority means a reasoner-only envelope
+    # (any write is out-of-scope downstream). The model never populates this.
+    if isinstance(authority, Mapping):
+        allowed_paths = list(authority.get("allowed_paths", []) or [])
+        prohibited_paths = list(authority.get("prohibited_paths", []) or [])
+    else:
+        allowed_paths = []
+        prohibited_paths = []
     return {
         "schema_version": "1.0",
         "run_id": run_id,
@@ -118,9 +151,9 @@ def _provider_request(
         "graph_revision": str(canonical_state.get("graph_revision") or ""),
         "policy_revision": str(canonical_state.get("policy_revision") or ""),
         # The LLM can request only capabilities exposed by the host. File/path
-        # scope remains a separate authority concern enforced downstream.
-        "allowed_paths": [],
-        "prohibited_paths": [],
+        # scope is derived from authority above; model output never sets it.
+        "allowed_paths": allowed_paths,
+        "prohibited_paths": prohibited_paths,
         "authorized_actions": sorted(map(str, capability_handlers.keys())),
         "validation_commands": [],
         "idempotency_key": f"agent-runtime:{event_id}:{binding.get('node_id', '')}",
@@ -272,6 +305,7 @@ def run_agent_runtime_event(
     role_overlay_refs: tuple[str, ...] | list[str],
     required_skill_names: tuple[str, ...] | list[str],
     provider: Any,
+    provider_registry: Any | None = None,
     mode: str,
     authority: Mapping[str, Any] | None,
     capability_handlers: Mapping[str, Any],
@@ -363,6 +397,7 @@ def run_agent_runtime_event(
         route=route,
         binding=binding,
         capability_handlers=capability_handlers,
+        authority=authority,
     )
     llm_handler = _provider_semantic_handler(
         provider=provider,
@@ -379,6 +414,23 @@ def run_agent_runtime_event(
     implementation_ref = str(binding.get("implementation_ref") or "")
     if not implementation_ref:
         return _blocked("AGENT_SEMANTIC_IMPLEMENTATION_REF_MISSING", node_id=node_id)
+
+    # Apply the provider live-closure gate (review finding #2): the Agent Host
+    # must not silently run a provider that is not live-closure eligible. When a
+    # configured provider_registry is supplied, an authoritative provider must
+    # resolve from it; synthetic/direct-injection providers are rejected. When
+    # no registry is configured (test/reasoner-only path), the gate is recorded
+    # but not enforced, preserving the existing test-only provider path.
+    provider_evidence_class, live_closure_eligible, _resolved = _resolve_provider_gate(
+        provider, provider_registry
+    )
+    if provider_registry is not None and not live_closure_eligible:
+        return _blocked(
+            "AGENT_LIVE_CLOSURE_INELIGIBLE",
+            node_id=node_id,
+            provider_evidence_class=provider_evidence_class,
+            live_closure_eligible=False,
+        )
 
     runtime_state = state if isinstance(state, LiveRuntimeState) else LiveRuntimeState()
     result = dispatch_live_runtime_event(
@@ -404,7 +456,60 @@ def run_agent_runtime_event(
         "skill_refs": list(bundle["skill_refs"]),
         "node_instruction_ref": bundle["node_instruction_ref"],
         "provider": str(getattr(provider, "name", type(provider).__name__)),
+        "provider_evidence_class": provider_evidence_class,
+        "live_closure_eligible": live_closure_eligible,
     }
 
 
-__all__ = ["run_agent_runtime_event"]
+def run_agent_runtime_loop(event_kwargs: Mapping[str, Any], *, max_iterations: int = 32) -> dict[str, Any]:
+    """Drive a canonical Agent task from one entry node to its gate boundary.
+
+    This is the missing production caller (review finding #1). It runs one
+    ``run_agent_runtime_event`` and re-dispatches on the typed ``next_route``
+    while the disposition is a real node hop (``continue`` + ``next_node``).
+    It stops at a gate boundary (``stop`` + ``next_gate``), a terminal/blocked
+    node, or the iteration cap — never silently auto-advancing a gate or
+    granting later-gate authority.
+
+    Each hop gets a distinct ``event_id`` (``<event_id>-<i>``) so the
+    NodeEvidenceLedger records every runtime hop without replay conflict. The
+    shared ``state`` (if any) carries fences/checkpoints across hops.
+    """
+    last: dict[str, Any] | None = None
+    iterations = 0
+    terminated = "iteration_limit"
+    for i in range(1, max(1, int(max_iterations)) + 1):
+        run_kwargs = dict(event_kwargs)
+        base_event_id = str(run_kwargs.get("event_id") or "agent-runtime-event")
+        run_kwargs["event_id"] = f"{base_event_id}-{i}"
+        last = run_agent_runtime_event(**run_kwargs)
+        iterations = i
+        status = str(last.get("status") or "")
+        if status == "SEMANTIC_NODE_BLOCKED":
+            terminated = "event_blocked"
+            break
+        if status == "SEMANTIC_NODE_NOT_APPLICABLE":
+            terminated = "terminal"
+            break
+        next_route = last.get("next_route") or {}
+        if not isinstance(next_route, Mapping):
+            terminated = "terminal"
+            break
+        disposition = str(next_route.get("disposition") or "")
+        if disposition == "stop":
+            terminated = "gate_boundary"
+            break
+        if disposition == "continue" and next_route.get("next_node"):
+            # Real node hop: re-dispatch on the next node. Crossing the gate that
+            # the loop stops at remains a separate authority decision.
+            continue
+        terminated = "terminal"
+        break
+    return {
+        **dict(last or {}),
+        "iterations": iterations,
+        "loop_terminated": terminated,
+    }
+
+
+__all__ = ["run_agent_runtime_event", "run_agent_runtime_loop"]
