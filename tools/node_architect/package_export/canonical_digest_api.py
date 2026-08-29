@@ -160,6 +160,18 @@ def _parse_constant(name):
     raise CanonicalDigestAPIError(DIGEST_NON_FINITE_REJECTED)
 
 
+def is_integer_valued_binary64(x: float) -> bool:
+    """True iff `x` is a finite float whose mathematical value is an integer.
+
+    Mirrors the reference canonicalizer's JCS integer-notation rule.
+    """
+    if not isinstance(x, float):
+        return False
+    if math.isnan(x) or math.isinf(x):
+        return False
+    return x == math.floor(x)
+
+
 def _shortest_digits(value: float):
     r = repr(value)
     m = _NUM_RE.match(r)
@@ -174,29 +186,49 @@ def _shortest_digits(value: float):
 
 
 def _js_number(value: float) -> str:
+    """Emit a finite double as ECMAScript/JSON shortest-round-trip text.
+
+    Matches Node ``JSON.stringify`` / RFC 8785 JCS ``jcs_shortest_round_trip``:
+    - non-finite rejected; negative zero rejected (C5b);
+    - shortest digits come from Python ``repr``, re-derived under the ES
+      fixed/exponential rule: fixed when decimal exponent e in [-6, 21),
+      exponential otherwise, with explicit '+' in the exponent;
+    - a fixed-form integer-valued double (e.g. 3.0) keeps JCS integer notation
+      (trailing '.0' stripped -> "3"); a large integer double whose ES form is
+      exponential (e.g. 1e21) stays "1e+21", matching Node.
+    """
     if value != value or value in (math.inf, -math.inf):
         raise CanonicalDigestAPIError(DIGEST_NON_FINITE_REJECTED)
-    if value == 0 and math.copysign(1.0, value) < 0:
+    if value == 0.0 and math.copysign(1.0, value) < 0:
         raise CanonicalDigestAPIError(DIGEST_NEGATIVE_ZERO_REJECTED)
-    if value == 0:
+    if value == 0.0:
         return "0"
-    if value == int(value) and abs(value) < 1e21:
-        return str(int(value))
-    sign, digits, e = _shortest_digits(value)
-    if abs(value) < 1e-6 or abs(value) >= 1e21:
-        s = digits[0]
-        if len(digits) > 1:
-            s += "." + digits[1:]
-        s += "e" + ("+" if e >= 0 else "-") + str(abs(e))
-    else:
-        pos = e + 1
-        if pos <= 0:
-            s = "0." + "0" * (-pos) + digits
-        elif pos >= len(digits):
-            s = digits + "0" * (pos - len(digits))
+    s = repr(value)
+    sign = ""
+    if s.startswith("-"):
+        sign = "-"
+        s = s[1:]
+    if "e" in s or "E" in s:
+        mant, exp = s.split("e") if "e" in s else s.split("E")
+        exp = int(exp)
+        digits = mant.replace(".", "")
+        if -6 <= exp < 21:
+            pos = exp + 1
+            if pos <= 0:
+                out = "0." + "0" * (-pos) + digits
+            elif pos >= len(digits):
+                out = digits + "0" * (pos - len(digits))
+            else:
+                out = digits[:pos] + "." + digits[pos:]
         else:
-            s = digits[:pos] + "." + digits[pos:]
-    return ("-" if sign else "") + s
+            out = digits[0]
+            if len(digits) > 1:
+                out += "." + digits[1:]
+            out += "e" + ("+" if exp >= 0 else "-") + str(abs(exp))
+        return sign + out
+    if s.endswith(".0"):
+        s = s[:-2]
+    return sign + s
 
 
 def _escape_string(s: str, *, max_string_bytes: int) -> str:

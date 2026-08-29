@@ -272,6 +272,42 @@ test('C3: lone-surrogate key raises controlled error', () => {
   assert.throws(() => ref.canonicalJsonText({ '\uD800': 'v' }), Error);
 });
 
+// --- C5: numeric JCS shortest-round-trip boundaries ---
+const NUM_CASES = [
+  ['1e+21', 1e21, '1e+21'],
+  ['1e-06', 1e-6, '0.000001'],
+  ['1e-07', 1e-7, '1e-7'],
+  ['2.951e20', 2.9514790517935283e20, '295147905179352830000'],
+  ['1e+22', 1e22, '1e+22'],
+  ['5e-324', 5e-324, '5e-324'],
+  ['max-double', 1.7976931348623157e308, '1.7976931348623157e+308'],
+  ['123.0', 123.0, '123'],
+  ['0.1+0.2', 0.1 + 0.2, '0.30000000000000004'],
+  ['1e+15', 1e15, '1000000000000000'],
+  ['1e+16', 1e16, '10000000000000000'],
+  ['1e-05', 1e-5, '0.00001'],
+  ['-2.951e20', -2.9514790517935283e20, '-295147905179352830000'],
+  ['3.0', 3.0, '3'],
+];
+for (const [name, val, want] of NUM_CASES) {
+  test('C5 numeric shortest: ' + name, () => {
+    assert.strictEqual(ref.canonicalJsonText({ v: val }), '{"v":' + want + '}');
+    // Cross-check against the authoritative Node JSON.stringify shortest form.
+    assert.strictEqual(JSON.stringify({ v: val }), '{"v":' + want + '}');
+  });
+}
+
+// C5b: negative zero rejected (gwc-jcs-v1 negative_zero_policy=reject)
+test('C5b: negative zero rejected (deterministic Error)', () => {
+  assert.throws(() => ref.canonicalJsonText({ z: -0 }), Error);
+  assert.throws(() => ref.canonicalJsonText(-0), Error);
+});
+// Non-finite must still be rejected.
+test('C5b: non-finite still rejected', () => {
+  assert.throws(() => ref.canonicalJsonText(NaN), Error);
+  assert.throws(() => ref.canonicalJsonText(Infinity), Error);
+});
+
 console.log('');
 
 if (failed > 0) {

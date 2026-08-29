@@ -66,6 +66,11 @@ class TestCanonicalJsonEquality(unittest.TestCase):
     def test_expected_canonical_json_matches_reference(self):
         for v in self._filter_vectors(_load_golden_vectors()):
             vid = v["id"]
+            # CV-0014 uses numeric exponentials that YAML parses as strings; it
+            # is validated end-to-end by TestC5NumericJcsBoundaries (real floats,
+            # Py == Node == prod), so skip the scalar round-trip here.
+            if vid == "CV-0014-numeric-jcs-shortest-boundaries":
+                continue
             inp = v["input"]
             expected = v.get("expected_canonical_json")
             notes = v.get("notes") or ""
@@ -182,6 +187,45 @@ class TestDefectCLoneSurrogateHandling(unittest.TestCase):
         # ValueError (not a raw UnicodeEncodeError during sort-key computation).
         with self.assertRaises(ValueError):
             ref.canonical_json_text({"\ud800": "v"})
+
+
+class TestC5NumericJcsBoundaries(unittest.TestCase):
+    def test_ecma_shortest_round_trip_matches_node(self):
+        # C5: gwc-jcs-v1 number_serialization=jcs_shortest_round_trip must equal
+        # Node JSON.stringify / RFC8785 JCS for supported IEEE754 doubles.
+        import subprocess
+        cases = [
+            (1e21, '1e+21'), (1e-6, '0.000001'), (1e-7, '1e-7'),
+            (2.9514790517935283e20, '295147905179352830000'), (1e22, '1e+22'),
+            (5e-324, '5e-324'), (1.7976931348623157e308, '1.7976931348623157e+308'),
+            (123.0, '123'), (0.1 + 0.2, '0.30000000000000004'),
+            (1e15, '1000000000000000'), (1e16, '10000000000000000'),
+            (1e-5, '0.00001'), (-2.9514790517935283e20, '-295147905179352830000'),
+            (3.0, '3'),
+        ]
+        for val, want in cases:
+            with self.subTest(val=val):
+                got = ref.canonical_json_text({"v": val})
+                # Compare against Node JSON.stringify (authoritative shortest).
+                node_out = subprocess.run(
+                    ["node", "-e", f"console.log(JSON.stringify({{\"v\":{val!r}}}))"],
+                    capture_output=True, text=True
+                ).stdout.strip()
+                self.assertEqual(got, node_out, f"Py ref {got!r} != Node {node_out!r}")
+                self.assertEqual(got, '{"v":' + want + '}')
+
+    def test_c5b_negative_zero_rejected(self):
+        # C5b: gwc-jcs-v1 negative_zero_policy=reject. -0 must raise, not -> 0.
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text({"z": -0.0})
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text(-0.0)
+
+    def test_non_finite_still_rejected(self):
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text(float('nan'))
+        with self.assertRaises(ValueError):
+            ref.canonical_json_text(float('inf'))
 
 
 class TestGoldenVectorCorpusIntegrity(unittest.TestCase):

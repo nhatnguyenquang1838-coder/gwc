@@ -146,6 +146,29 @@ class TestCanonicalizeFailClosed(unittest.TestCase):
             '{"msg":"café"}'.encode("utf-8"),
         )
 
+    def test_c5_numeric_jcs_shortest_boundaries(self):
+        # C5: number_serialization=jcs_shortest_round_trip must match Node
+        # JSON.stringify / RFC8785 JCS for supported IEEE754 doubles.
+        import subprocess
+        cases = [
+            (1e21, '1e+21'), (1e-6, '0.000001'), (1e-7, '1e-7'),
+            (2.9514790517935283e20, '295147905179352830000'), (1e22, '1e+22'),
+            (5e-324, '5e-324'), (1.7976931348623157e308, '1.7976931348623157e+308'),
+            (123.0, '123'), (0.1 + 0.2, '0.30000000000000004'),
+            (1e15, '1000000000000000'), (1e16, '10000000000000000'),
+            (1e-5, '0.00001'), (-2.9514790517935283e20, '-295147905179352830000'),
+            (3.0, '3'),
+        ]
+        for val, want in cases:
+            with self.subTest(val=val):
+                got = api.canonicalize_gwc_jcs_v1(json.dumps({"v": val})).decode("utf-8")
+                node_out = subprocess.run(
+                    ["node", "-e", f"console.log(JSON.stringify({{\"v\":{val!r}}}))"],
+                    capture_output=True, text=True
+                ).stdout.strip()
+                self.assertEqual(got, node_out, f"prod {got!r} != Node {node_out!r}")
+                self.assertEqual(got, '{"v":' + want + '}')
+
 
 class TestCanonicalDigestFailClosed(unittest.TestCase):
     def test_gwc_jcs_v1_new_write_refused(self):

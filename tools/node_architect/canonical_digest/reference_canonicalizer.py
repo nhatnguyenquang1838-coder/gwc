@@ -286,16 +286,58 @@ def _emit_json_value(value: Any, options: CanonicalizationOptions) -> str:
     raise TypeError(f"Unsupported JSON value type: {type(value)}")
 
 
+def _ecma_number(x: float) -> str:
+    """Emit a finite double as ECMAScript/JSON shortest-round-trip text.
+
+    Matches Node ``JSON.stringify`` / RFC 8785 JCS ``jcs_shortest_round_trip``:
+    - non-finite rejected by caller;
+    - negative zero rejected (C5b);
+    - shortest digits come from Python ``repr``, re-derived under the ES
+      fixed/exponential rule: fixed when decimal exponent e in [-6, 21),
+      exponential otherwise, with explicit '+' in the exponent;
+    - a fixed-form integer-valued double (e.g. 3.0) keeps JCS integer notation
+      (trailing '.0' stripped -> "3"); a large integer double whose ES form is
+      exponential (e.g. 1e21) stays "1e+21", matching Node.
+    """
+    if x != x or x in (math.inf, -math.inf):
+        raise ValueError("NaN/Infinity not allowed in JSON")
+    if x == 0.0 and math.copysign(1.0, x) < 0:
+        raise ValueError("Negative zero not allowed in JSON")
+    if x == 0.0:
+        return "0"
+    s = repr(x)
+    sign = ""
+    if s.startswith("-"):
+        sign = "-"
+        s = s[1:]
+    if "e" in s or "E" in s:
+        mant, exp = s.split("e") if "e" in s else s.split("E")
+        exp = int(exp)
+        digits = mant.replace(".", "")
+        if -6 <= exp < 21:
+            pos = exp + 1
+            if pos <= 0:
+                out = "0." + "0" * (-pos) + digits
+            elif pos >= len(digits):
+                out = digits + "0" * (pos - len(digits))
+            else:
+                out = digits[:pos] + "." + digits[pos:]
+        else:
+            out = digits[0]
+            if len(digits) > 1:
+                out += "." + digits[1:]
+            out += "e" + ("+" if exp >= 0 else "-") + str(abs(exp))
+        return sign + out
+    # Fixed form from Python repr (no exponent). JCS integer notation: strip a
+    # trailing ".0" so 3.0 -> "3", 123.0 -> "123". Non-integer fixed stays.
+    if s.endswith(".0"):
+        s = s[:-2]
+    return sign + s
+
+
 def _float_to_json(x: float) -> str:
-    """Emit a float. JCS-compliant: integer-valued binary64 emits integer notation."""
-    if math.isnan(x):
-        raise ValueError("NaN not allowed in JSON")
-    if math.isinf(x):
-        raise ValueError("Infinity not allowed in JSON")
-    if is_integer_valued_binary64(x):
-        return str(int(x))
-    # Non-integer finite float — use minimal round-trippable form.
-    return json.dumps(x, allow_nan=False)
+    """Emit a float per gwc-jcs-v1 / JCS: shortest round-trippable ECMAScript form."""
+    return _ecma_number(x)
 
 
 def _string_to_json(s: str, options: CanonicalizationOptions) -> str:

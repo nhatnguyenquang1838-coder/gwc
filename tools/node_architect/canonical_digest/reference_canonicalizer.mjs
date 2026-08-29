@@ -160,11 +160,13 @@ export function emitJsonValue(value, options = {}) {
   if (value === null) return 'null';
   if (typeof value === 'number') {
     if (!isFinite(value)) throw new Error('NaN/Infinity not allowed in JSON');
+    // C5b: reject negative zero (gwc-jcs-v1 negative_zero_policy=reject).
+    if (value === 0 && 1 / value < 0) throw new Error('Negative zero not allowed in JSON');
+    // JCS: integer-valued binary64 (incl. 3.0) -> integer notation; all other
+    // finite doubles use ECMAScript shortest round-trip (JSON.stringify).
     if (isIntegerValuedBinary64(value)) {
-      // JCS: integer-valued binary64 -> integer notation
       return String(Math.floor(value));
     }
-    // Non-integer finite number — use standard JSON serialization.
     return JSON.stringify(value);
   }
   if (typeof value === 'string') {

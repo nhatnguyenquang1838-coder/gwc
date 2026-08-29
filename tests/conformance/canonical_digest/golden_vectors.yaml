@@ -111,3 +111,35 @@ golden_vectors:
   expected_canonical_digest_sha256: 6fd37bd77ecbbca175960513283507ef952183c93f49ff54b996029d9006c394
   jcs_compliant: true
   notes: 'C1 discriminator: U+10000 (non-BMP, units D800 DC00) MUST sort BEFORE U+E000 (BMP PUA, units E000) under UTF-16 code-unit order, while Python code-point order would place U+E000 first. Proves REV-2 fix is load-bearing. Both runtimes agree.'
+
+- id: CV-0009-node-tokenizer-resource-limit
+  runtime: node
+  input:
+    doc: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  expected_canonical_json: '{"doc":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'
+  expected_canonical_digest_sha256: 5a46551abd39502bb54a81b2fcd074414cf8a25434c1220e554eb90fdbc90a9a
+  jcs_compliant: true
+  notes: 'Defect D: Node tokenizer runs under a strict resource limit budget. Restored by C6 (was replaced by CV-0013 in commit 8db); CV-0013 retained.'
+- id: CV-0014-numeric-jcs-shortest-boundaries
+  runtime: both
+  input:
+    a: 1e21
+    b: 1e-6
+    c: 1e-7
+    d: 2.9514790517935283e20
+    e: 1e-5
+    f: 1e16
+    g: 3.0
+    h: 0.1
+  expected_canonical_json: '{"a":1e+21,"b":0.000001,"c":1e-7,"d":295147905179352830000,"e":0.00001,"f":10000000000000000,"g":3,"h":0.1}'
+  expected_canonical_digest_sha256: null
+  jcs_compliant: true
+  notes: 'C5: number_serialization=jcs_shortest_round_trip. ECMAScript/Node JSON.stringify shortest form: 1e21->1e+21 (not full integer), 1e-6->0.000001, 1e-7->1e-7, 2.9514790517935283e20->295147905179352830000 (not exact int), 3.0->3 (integer notation). Py reference + production MUST match Node. digest not pinned (asserted in harness).'
+- id: CV-0015-negative-zero-rejected
+  runtime: both
+  input:
+    z: -0.0
+  expected_canonical_json: null
+  expected_canonical_digest_sha256: null
+  jcs_compliant: true
+  notes: 'C5b: gwc-jcs-v1 negative_zero_policy=reject. A negative-zero value MUST raise (deterministic ValueError/Error / DIGEST_NEGATIVE_ZERO_REJECTED), not canonicalize to 0. Both references + production reject.'
