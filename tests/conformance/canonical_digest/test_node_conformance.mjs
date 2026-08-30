@@ -254,6 +254,33 @@ test('C4: CV-0013 (mixed BMP/non-BMP discriminator) matches corpus expected', ()
   assert.strictEqual(got, v.expected_canonical_json);
 });
 
+// --- E3: Node corpus-driven execution of CV-0014 (numeric JCS boundaries) and
+//         CV-0015 (negative-zero rejection). E1 makes YAML scalars load as real
+//         IEEE754 doubles; E4 pins the CV-0014 canonical digest (Py==Node).
+test('E3: CV-0014 (numeric JCS shortest boundaries) read from corpus & verified', () => {
+  const v = findVector('CV-0014-numeric-jcs-shortest-boundaries');
+  assert(v, 'CV-0014 present in corpus');
+  // E1: YAML scalars must parse as numbers, not strings.
+  for (const [k, val] of Object.entries(v.input)) {
+    assert.strictEqual(typeof val, 'number', `CV-0014 input.${k} must be a number, got ${typeof val}`);
+  }
+  const obj = yamlInputToObject(v.input);
+  const got = ref.canonicalJsonText(obj);
+  assert.strictEqual(got, v.expected_canonical_json);
+  assert.strictEqual(
+    createHash('sha256').update(got).digest('hex'),
+    v.expected_canonical_digest_sha256
+  );
+});
+
+test('E3: CV-0015 (negative zero rejected) read from corpus & rejected', () => {
+  const v = findVector('CV-0015-negative-zero-rejected');
+  assert(v, 'CV-0015 present in corpus');
+  assert.strictEqual(v.expected_canonical_json, null, 'CV-0015 must expect rejection');
+  const obj = yamlInputToObject(v.input);
+  assert.throws(() => ref.canonicalJsonText(obj), Error, 'CV-0015 negative zero must reject');
+});
+
 // --- C2: surrogate-pair validation must reject malformed pairs ---
 test('C2: isolated LOW surrogate rejected', () => {
   assert.throws(() => ref.normalizeLoneSurrogate('A\uDC00B', { reject: true }), Error);

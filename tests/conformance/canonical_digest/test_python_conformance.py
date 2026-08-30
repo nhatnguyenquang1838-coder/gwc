@@ -66,11 +66,6 @@ class TestCanonicalJsonEquality(unittest.TestCase):
     def test_expected_canonical_json_matches_reference(self):
         for v in self._filter_vectors(_load_golden_vectors()):
             vid = v["id"]
-            # CV-0014 uses numeric exponentials that YAML parses as strings; it
-            # is validated end-to-end by TestC5NumericJcsBoundaries (real floats,
-            # Py == Node == prod), so skip the scalar round-trip here.
-            if vid == "CV-0014-numeric-jcs-shortest-boundaries":
-                continue
             inp = v["input"]
             expected = v.get("expected_canonical_json")
             notes = v.get("notes") or ""
