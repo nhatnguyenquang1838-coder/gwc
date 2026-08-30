@@ -3,6 +3,28 @@ artifact_type: node-instruction
 node_id: package_export.package-manifest-load
 gate:
 - G2_EXECUTION
+purpose: 'Load the approved project package manifest and preserve its stable entry
+  order before export. This node is a semantic instruction contract: it evaluates
+  entry conditions, records evidence, and emits a typed NEXT without ever granting
+  gate, merge, deploy, or production authority.'
+entry_conditions:
+- GWC boot completed
+- agent task claim read back
+- route decision selected this node
+- gate authority validated independently
+- node-start evidence recorded
+inputs:
+- '{''source (inline package payload'': ''dict, YAML/JSON text, or bytes) XOR source_path
+  (read-only local path)''}'
+- '{''binding (external SourceBinding'': ''task_id, repository, package_path, source_ref,
+  source_sha, package_version)''}'
+- observed_source_sha (execution-only exact Git commit SHA; never stored in result)
+- closed input schema (schemas/project-package.schema.json)
+allowed_actions:
+- export_package_manifest_load
+- record_package_manifest_load_evidence
+- request_effect_readback
+- emit_next_route_decision
 forbidden_actions:
 - grant_gate_authority
 - grant_g2_authority
@@ -23,6 +45,11 @@ forbidden_actions:
 - branch_deletion
 - history_rewrite
 - pr_base_change
+outputs:
+- export_decision
+- decision_digest
+- readback_result
+- next_route_decision
 evidence_required:
 - node-start
 - node-decision
@@ -42,20 +69,25 @@ retry:
   - run_id
   - node_id
   - scope_hash
-  replay_check: Validate that canonical node evidence and the source manifest digest match the last invocation; reject replayed manifests with stale source_sha without re-evaluation.
+  replay_check: Read canonical node evidence and the effect readback before repeating
+    the implementation; reject replay with stale scope_hash.
   max_attempts: 3
-  pending_reconciliation: Unknown or pending external state must route to checkpoint/reconciliation before retrying; never re-evaluate blindly.
+  pending_reconciliation: Unknown or pending external state must route to checkpoint/reconciliation
+    before retrying; never re-evaluate blindly.
 rollback:
   reversible: true
-  strategy: Package manifest load is a pure read-only tool; revert any downstream artifact references produced from a failed load and restore the prior evidence ledger entry.
-  reconciliation: Record rollback or no-op readback in the canonical node evidence ledger.
+  strategy: Reconcile current state against the approved scope and restore only reversible
+    task-scoped effects.
+  reconciliation: Record rollback or no-op readback in the canonical node evidence
+    ledger.
   human_required_when:
   - scope drift
   - authority mismatch
   - unknown external effect
   - irreversible effect
 authority_boundary:
-  statement: Node instructions constrain execution and do not grant G2, G3, G4, G5, or G6 authority. Package manifest load is execution-plane evidence only.
+  statement: Node instructions constrain execution and do not grant G2, G3, G4, G5,
+    or G6 authority.
   node_grants_gate_authority: false
   g2_authority_granted: false
   g3_authority_granted: false
@@ -78,53 +110,17 @@ mode_policy:
   evidence_required: true
   logs_required: true
   next_route_required: true
-purpose: >-
-  Acquire the canonical project package manifest (projects/gwc/package.yaml) via
-  a mutually-exclusive source XOR source_path evaluator argument, parse YAML via
-  yaml.safe_load as a JSON-compatible object, validate it against the closed
-  schemas/project-package.schema.json, and build deterministic entries preserving
-  declared instruction order for downstream entry-schema-validation. Resolve a
-  separate exact 40-hex Git source SHA as execution input. Produce a typed
-  ManifestLoadResult that is the sole LOADED signal. Fail closed on unknown
-  fields, missing or incomplete SourceBinding, ambiguous/missing source, stale
-  observed source SHA, package-version mismatch, duplicate entry identifiers, and
-  malformed payload. Never grants repository, PR, merge, deploy, or release
-  authority.
-entry_conditions:
-- G2 authority validated independently
-- route decision selected this node
-- closed input schema version resolved (schemas/project-package.schema.json)
-- exact 40-hex Git source SHA resolved
-inputs:
-- source (inline package payload: dict, YAML/JSON text, or bytes) XOR source_path (read-only local path)
-- binding (external SourceBinding: task_id, repository, package_path, source_ref, source_sha, package_version)
-- observed_source_sha (execution-only exact Git commit SHA; never stored in result)
-- closed input schema (schemas/project-package.schema.json)
-allowed_actions:
-- acquire_manifest_source
-- parse_yaml_safe_load
-- validate_manifest_against_closed_schema
-- resolve_source_sha_freshness
-- normalize_instructions_to_ordered_entries
-- report_load_result_and_errors
-- write node-start evidence
-- write node-result evidence
-- write node-readback evidence
-outputs:
-- ManifestLoadResult (schema_id, schema_version, outcome LOADED|BLOCKED, manifest_digest, binding, source_sha, entries, errors, authority_granted)
-- ordered LoadedEntry list sorted by declared instruction order
-- ordered ManifestError list sorted by (reason_code, json_path)
-- semantic_digest (sha256:) of the typed result
 next:
   pass:
     disposition: continue
-    reason: Manifest loaded; route to the next gate-sequenced node.
-    next_node: package_export.entry-schema-validation
-    next_action: proceed_to_entry_schema_validation
-    next_gate: G2_EXECUTION
+    reason: Node outcome passed; continue through the canonical route.
+    next_node: null
+    next_action: continue_to_next_node
+    next_gate: null
   blocked:
     disposition: stop
-    reason: Fail closed and report the stable blocker without invoking downstream effects or export.
+    reason: Fail closed and report the stable blocker without invoking downstream
+      effects.
     next_node: null
     next_action: stop_and_report_blocker
     next_gate: null

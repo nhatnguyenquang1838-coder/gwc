@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Node Architect semantic implementation registry",
+  "type": "object",
+  "required": ["schema_version", "artifact_type", "status", "node_registry_revision", "summary", "bindings", "errors", "registry_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "semantic-implementation-registry"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "node_registry_revision": {"type": "string", "minLength": 1},
+    "summary": {"type": "object"},
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "node_id", "node_version", "node_registry_revision", "implementation_kind",
+          "implementation_ref", "semantic_source_kind", "instruction_ref",
+          "instruction_digest", "implementation_callable_valid", "entry_contract",
+          "readback_contract", "side_effect_class", "authority_requirements",
+          "checkpoint_contract", "next_route_contract", "binding_digest"
+        ],
+        "properties": {
+          "node_id": {"type": "string", "pattern": "^[a-z0-9_]+\\.[a-z0-9-]+$"},
+          "node_version": {"type": "string", "minLength": 1},
+          "node_registry_revision": {"type": "string", "minLength": 1},
+          "implementation_kind": {"enum": ["canonical_route_callable", "semantic_tool_callable", "instruction_contract"]},
+          "implementation_ref": {"type": "string", "pattern": "^[^:]+:[A-Za-z_][A-Za-z0-9_]*$"},
+          "semantic_source_kind": {"type": "string", "minLength": 1},
+          "binding_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "errors": {"type": "array", "items": {"type": "string"}},
+    "registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,107 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+activation_state: ACTIVE
+task_id: SCRUM-566
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+working_branch: chatgpt/scrum-566-agent-runtime-corrective
+risk_class: R2
+risk_digest: sha256:7c751b0c8e4c2bdb9ee2dfe5c8cff98d2361f11af94b69809d12ba5b63d64bdf
+bounded_read_scope:
+- AGENTS.md
+- core/Coding_Project_Governance_v1.0.md
+- core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+- core/E2E_DRAFT_PR_DELIVERY_RULE.md
+- projects/gwc/project-profile.yaml
+- projects/gwc/project-instructions.md
+- agents/chatgpt-agent/agent-instructions.md
+- .github/workflows/g4-g5-evidence.yml
+- tools/node_architect/agent_runtime_entrypoint.py
+- tools/node_architect/agent_provider_bridge.py
+- tools/node_architect/semantic_agent_runtime.py
+- tools/node_architect/canonical_readback.py
+- tools/node_architect/agent_runtime_cli.py
+- tests/test_scrum_566_agent_runtime_production_entrypoint.py
+- tools/node_architect/agent_runtime_cli.py
+- tests/test_scrum_566_agent_runtime_production_entrypoint.py
+- tools/node_architect/agent_runtime_cli.py
+- tests/test_scrum_566_agent_runtime_production_entrypoint.py
+bounded_write_scope:
+- .gwc/tasks/SCRUM-566/takeover/user-authorized-takeover.yaml
+- .gwc/tasks/SCRUM-566/g2/execution-envelope.yaml
+- .gwc/tasks/SCRUM-566/g3/delivery-record.yaml
+- tools/node_architect/agent_runtime_entrypoint.py
+- tools/node_architect/agent_runtime_cli.py
+- tests/test_scrum_566_agent_runtime_production_entrypoint.py
+- .github/workflows/node-architect-semantic-runtime.yml
+authorized_actions:
+- add_files
+- run_sandboxed_validation
+- stage_commit_push
+excluded_actions:
+- open_draft_pr
+- mark_pr_ready
+- merge
+- auto_merge
+- force_push
+- branch_deletion
+- protected_branch_write
+- deploy
+- release
+- production_data_change
+- production_config_change
+- g3_pr_promotion
+- g4_merge
+- g5_deploy
+- g6_production
+scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
+f1_artifact_digests:
+  takeover: sha256:b4c3ae590bf4d885f97cd5beb2cf4a12f7031715663317ef90fa5af07e9915ab
+  g0: sha256:91ca9f7a9a151782f357a0c6a450c503a554b77b02d051a225d228df9b80515f
+  g1_intake: sha256:e1dd99bb1ce7f02863903fa844ee8a0c2f70d7baaed2ae8ffea7d7aad272275c
+  g1_preflight: sha256:a34127c593a81a2b4069f545d864d409254735e921397903193f4c409e162051
+  g1_options: sha256:d26ea326fa24d518cded04c84df760a1a122f000a955aa0e0ab06e6c367d3519
+  g1_decision: sha256:c73fa357ec40bf58f740fef3c7d3c83ab4517e58208887e054d7746bc541ac7c
+  g3_delivery_record: sha256:06cd907ff0325d4c64c234ff5682a1b6559a5d4251f53a46d1a006b9cd4f4d28
+f2_digests:
+  gate_state_resolution: sha256:c886bf963949b1bf7e71766658e8f18b7a26936d1ec3a48e02c626e482eb09fa
+  authority_boundary_decision: sha256:78b41056e6a3d3172a4a99272788ec995a799ec776cff73cc442d9d41dfeafbe
+approval_request_ref:
+  gate: G2_EXECUTION
+  approval_id: G2_SCRUM-566_LIVE_CALLER_R6_20260829T194440Z
+  scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
+  scope_hash_16: babc7209a0031c70
+  issued_at: '2026-08-29T19:44:40Z'
+  expires_at: '2026-08-30T19:44:40Z'
+  command: APPROVE G2 G2_SCRUM-566_LIVE_CALLER_R6_20260829T194440Z babc7209a0031c70
+    2026-08-30T19:44:40Z
+approval_validation_ref:
+  outcome: VALID
+  approval_id: G2_SCRUM-566_LIVE_CALLER_R6_20260829T194440Z
+  scope_hash: sha256:babc7209a0031c70c6f282633f78dd52577b60b40a1d627e32460c568c89a094
+  scope_hash_16: babc7209a0031c70
+  task_id: SCRUM-566
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  working_branch: chatgpt/scrum-566-agent-runtime-corrective
+  risk_class: R2
+  authorized_actions:
+  - add_files
+  - run_sandboxed_validation
+  - stage_commit_push
+  received_at: '2026-08-29T19:45:21Z'
+  command: APPROVE G2 G2_SCRUM-566_LIVE_CALLER_R6_20260829T194440Z babc7209a0031c70
+    2026-08-30T19:44:40Z
+  source: current_user_instruction
+checkpoint_id: scrum-566-g2-live-caller-r6-20260829T194440Z
+issued_at: '2026-08-29T19:44:40Z'
+expires_at: '2026-08-30T19:44:40Z'
+reason_code: G2_ENVELOPE_ACTIVE
+envelope_digest: sha256:233aebfe488be91f312bfad8d775f2650fcf752210c61fece51610ddce4de298
+exclusions:
+- G3_PR
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION
+execution_started: false

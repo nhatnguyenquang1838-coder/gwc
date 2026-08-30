@@ -1,0 +1,56 @@
+name: Node Architect semantic runtime
+
+on:
+  push:
+    branches:
+      - chatgpt/scrum-566-agent-runtime-corrective
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  semantic-runtime-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install pytest==8.3.5 jsonschema==4.25.1 PyYAML==6.0.2
+      - name: Run semantic runtime corrective regression tests
+        id: semantic_tests
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -vv \
+            tests/test_scrum_566_semantic_runtime_correction.py \
+            tests/test_scrum_566_semantic_dispatcher.py \
+            tests/test_scrum_566_semantic_lifecycle.py \
+            tests/test_scrum_566_agent_provider_bridge.py \
+            tests/test_scrum_566_instruction_skill_wiring.py \
+            tests/test_scrum_566_agent_host_wiring.py \
+            tests/test_scrum_566_agent_runtime_loop.py \
+            tests/test_scrum_566_agent_runtime_production_entrypoint.py \
+            tests/test_scrum_566_w8_canonical_shadow_route.py \
+            tests/test_scrum_566_w7_w9_semantic_closure.py \
+            tests/test_scrum_566_w10_w12_agent_runtime.py \
+            tests/test_scrum_566_w13_live_runtime_bridge.py \
+            tests/test_shadow_orchestrator.py \
+            tests/test_shadow_81_qualification.py \
+            > semantic-runtime-pytest.txt 2>&1
+          status=$?
+          cat semantic-runtime-pytest.txt
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Upload semantic runtime test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semantic-runtime-test-output-${{ github.run_id }}
+          path: semantic-runtime-pytest.txt
+      - name: Enforce semantic runtime test result
+        if: steps.semantic_tests.outputs.exit_code != '0'
+        run: exit 1

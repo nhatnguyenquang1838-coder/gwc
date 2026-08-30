@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Final canonical-81 shadow qualification across routes, gates, replay, and safety."""
+"""Final canonical-81 historical shadow qualification across routes, gates, replay, and safety.
+
+W6 replay evidence predates the semantic runtime. It therefore uses the
+explicit ``compatibility_replay`` path and is classified as historical envelope
+evidence only. It must never be interpreted as semantic/live execution proof.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -53,6 +58,22 @@ def _event(case_id: str, gate: str, scenario: str, revision: str) -> dict[str, A
         "scenario": scenario,
         "input_payload": {"qualification_case": case_id},
     }
+
+
+def _compatibility_replay(
+    event: dict[str, Any],
+    registry: dict[str, Any],
+    activation: dict[str, Any],
+    *,
+    observed_revision: str,
+) -> dict[str, Any]:
+    return run_shadow_event(
+        event,
+        registry,
+        activation,
+        observed_revision=observed_revision,
+        compatibility_replay=True,
+    )
 
 
 def _semantic_source(root: Path, node: dict[str, Any]) -> dict[str, Any]:
@@ -110,13 +131,15 @@ def build_qualification_report(
 
     for case_id, gate, scenario in REPLAY_CASES:
         event = _event(case_id, gate, scenario, revision)
-        first = run_shadow_event(event, registry, activation, observed_revision=revision)
-        second = run_shadow_event(event, registry, activation, observed_revision=revision)
+        first = _compatibility_replay(event, registry, activation, observed_revision=revision)
+        second = _compatibility_replay(event, registry, activation, observed_revision=revision)
         if first != second:
             deterministic = False
             errors.append(f"REPLAY_NON_DETERMINISTIC:{case_id}")
-        if first.get("status") != "SHADOW_EXECUTED":
+        if first.get("status") != "SHADOW_ENVELOPE_REPLAYED":
             errors.append(f"REPLAY_NOT_EXECUTED:{case_id}")
+        if first.get("semantic_execution") is not False:
+            safe = False
         selected: list[str] = []
         for result in first.get("results", []):
             if not isinstance(result, dict):
@@ -142,11 +165,13 @@ def build_qualification_report(
                 "route_pack": first.get("route_pack"),
                 "selected_node_ids": selected,
                 "output_digest": _digest(first),
+                "evidence_class": "HISTORICAL_ENVELOPE_COMPATIBILITY",
+                "semantic_execution": False,
             }
         )
 
     for case_id, gate, scenario in GATE_BOUNDARIES:
-        output = run_shadow_event(
+        output = _compatibility_replay(
             _event(case_id, gate, scenario, revision),
             registry,
             activation,
@@ -172,9 +197,9 @@ def build_qualification_report(
     kill_switch = dict(activation)
     kill_switch["kill_switch_engaged"] = True
     probe = _event("kill-switch", "G3_PR", "standard_pr_delivery", revision)
-    kill_output = run_shadow_event(probe, registry, kill_switch, observed_revision=revision)
-    drift_output = run_shadow_event(probe, registry, activation, observed_revision="drifted-" + revision)
-    unknown_output = run_shadow_event(
+    kill_output = _compatibility_replay(probe, registry, kill_switch, observed_revision=revision)
+    drift_output = _compatibility_replay(probe, registry, activation, observed_revision="drifted-" + revision)
+    unknown_output = _compatibility_replay(
         _event("unknown", "G3_PR", "unknown_scenario", revision),
         registry,
         activation,
@@ -221,6 +246,8 @@ def build_qualification_report(
                 "route_packs": route.get("route_packs", []),
                 "gates": route.get("gates", []),
                 "replay_proven": replay_proven,
+                "replay_evidence_class": "HISTORICAL_ENVELOPE_COMPATIBILITY" if replay_proven else None,
+                "semantic_replay_proven": False,
                 "observed_live": observed_live,
                 "shadow_enabled": adapter_bound and route_bound and replay_proven,
                 "semantic_source": semantic,
@@ -233,6 +260,7 @@ def build_qualification_report(
         "adapter_bound_count": sum(record["adapter_bound"] for record in records),
         "route_bound_count": sum(record["route_bound"] for record in records),
         "replay_proven_count": sum(record["replay_proven"] for record in records),
+        "semantic_replay_proven_count": 0,
         "observed_live_count": sum(record["observed_live"] for record in records),
         "shadow_enabled_count": sum(record["shadow_enabled"] for record in records),
         "semantic_source_resolved_count": sum(
@@ -247,6 +275,9 @@ def build_qualification_report(
         "schema_version": "1.0",
         "status": "PASS" if not errors else "FAIL",
         "exact_revision": revision,
+        "replay_mode": "compatibility_replay",
+        "replay_evidence_class": "HISTORICAL_ENVELOPE_COMPATIBILITY",
+        "semantic_execution": False,
         "summary": summary,
         "gate_matrix": gate_matrix,
         "adversarial_checks": adversarial_checks,

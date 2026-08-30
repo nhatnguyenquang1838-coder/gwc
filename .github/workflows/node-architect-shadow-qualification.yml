@@ -34,15 +34,40 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           RUN_ID: ${{ github.run_id }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          REPOSITORY: ${{ github.repository }}
           ACTION: ${{ github.event.action }}
         run: |
           python - <<'PY'
           import json, os
+          from pathlib import Path
+
+          def load_json(path):
+              with open(path, encoding="utf-8") as handle:
+                  return json.load(handle)
+
+          def revision(value):
+              if isinstance(value, dict):
+                  return str(value.get("revision_id", ""))
+              return str(value or "")
+
+          profile = load_json("core/node-architect/gate-node-route-profile.json")
+          graph = load_json("core/node-architect/runtime-graph-registry.json")
+          node_registry = load_json("core/node-architect/node-registry.json")
+          policy = load_json("core/node-architect/gate-applicability-policy-registry.json")
           event = {
               "task_id": f"PR-{os.environ['PR_NUMBER']}",
               "run_id": f"github-{os.environ['RUN_ID']}",
+              "repository": os.environ["REPOSITORY"],
+              "branch": os.environ["HEAD_REF"],
+              "base_sha": os.environ["BASE_SHA"],
               "gate": "G3_PR",
               "exact_revision": os.environ["HEAD_SHA"],
+              "profile_revision": str(profile.get("revision", "")),
+              "graph_revision": revision(graph.get("revision")),
+              "node_registry_revision": revision(node_registry.get("revision")),
+              "policy_revision": revision(policy.get("revision")),
               "route_graph_revision": f"repo-bound:{os.environ['HEAD_SHA']}",
               "scenario": "standard_pr_delivery",
               "input_payload": {"event": "pull_request", "action": os.environ["ACTION"]},
@@ -54,9 +79,14 @@ jobs:
       - name: Run E1 live PR shadow observation
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           PYTHONPATH=. python tools/node_architect/shadow_gate_observer.py w6-e1-live-event.json \
-            --root . --observed-revision "$HEAD_SHA" | tee w6-e1-live-output.json
+            --root . --observed-revision "$HEAD_SHA" \
+            --observed-repository "${GITHUB_REPOSITORY}" \
+            --observed-branch "$HEAD_REF" \
+            --observed-base-sha "$BASE_SHA" | tee w6-e1-live-output.json
           PYTHONPATH=. python tools/node_architect/shadow_telemetry_from_output.py \
             w6-e1-live-event.json w6-e1-live-output.json --ledger w6-e1-live-ledger.jsonl \
             | tee w6-e1-live-summary.json

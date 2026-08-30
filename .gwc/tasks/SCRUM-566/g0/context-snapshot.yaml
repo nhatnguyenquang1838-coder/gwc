@@ -1,0 +1,93 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-08-29T17:38:21Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: dd906822b18509dd53ae99547d4e555088a610b4
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- Continue on the existing branch and PR only; no new branch or PR.
+- Bind the formal evidence to PR base dd906822 and current branch head bbb05521c326a0f389991ba98f35ba6ea0736706.
+- origin/main is currently 668a8645a696e4cbf84124201a58d26bc833f0c1; do not rebase
+  or rewrite the continuation.
+- User-authorized takeover is non-GWC ownership evidence and does not overwrite the
+  Jira claim.
+- G2 authorizes only bounded task-artifact materialization, validation, commit and
+  push.
+- No G3 promotion, G4 merge, G5 deploy, G6 production, force-push, reset or rebase.
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: 045d390a832d93fd863707ccfc66e4aa5209453317c3a7b9aea462bdbabb51bc
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- id: PROJECT_INSTRUCTIONS
+  path: projects/gwc/project-instructions.md
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: c3ff5cb159213b64334a9bbe210a63b0e086608f9fa6cf7c55c136c608551a34
+- id: CHATGPT_AGENT_INSTRUCTIONS
+  path: agents/chatgpt-agent/agent-instructions.md
+  ref: dd906822b18509dd53ae99547d4e555088a610b4
+  source_sha: ab114587f6958abe67abe291444b90510bb2abe8e67c2979f52f00a562ed76f5
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 045d390a832d93fd863707ccfc66e4aa5209453317c3a7b9aea462bdbabb51bc
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: c3ff5cb159213b64334a9bbe210a63b0e086608f9fa6cf7c55c136c608551a34
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: ab114587f6958abe67abe291444b90510bb2abe8e67c2979f52f00a562ed76f5
+- path: 'PR #523 exact head'
+  required: true
+  status: AVAILABLE
+  source_sha: bbb05521c326a0f389991ba98f35ba6ea0736706
+- path: Jira SCRUM-566 readback
+  required: true
+  status: AVAILABLE
+  source_sha: 6395fa015192728a79514e7b5025cb2c5ac3a78b0bacadcb96d3107fe5807f0b
+status: READY
+blockers: []

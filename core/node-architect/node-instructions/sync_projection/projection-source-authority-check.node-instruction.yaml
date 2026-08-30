@@ -1,0 +1,142 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+node_id: sync_projection.projection-source-authority-check
+gate:
+- G2_EXECUTION
+purpose: 'Verify every projected field is derived from an allowed canonical source
+  and cannot become gate authority. This node is a semantic instruction contract:
+  it evaluates entry conditions, records evidence, and emits a typed NEXT without
+  ever granting gate, merge, deploy, or production authority.'
+entry_conditions:
+- GWC boot completed
+- agent task claim read back
+- route decision selected this node
+- gate authority validated independently
+- node-start evidence recorded
+inputs:
+- task_id
+- run_id
+- gate
+- exact_revision
+- scope_hash
+- input_payload
+- projection_target
+- canonical_state_ref
+- privacy_boundary
+- projection_scope
+allowed_actions:
+- project_projection_source_authority_check
+- record_projection_source_authority_check_evidence
+- request_effect_readback
+- emit_next_route_decision
+forbidden_actions:
+- grant_gate_authority
+- grant_g2_authority
+- grant_g3_authority
+- merge
+- auto_merge
+- deploy
+- redeploy
+- release
+- publish
+- runtime_reload
+- production_configuration
+- production_data
+- credential_change
+- secret_change
+- migration
+- force_push
+- branch_deletion
+- history_rewrite
+- pr_base_change
+outputs:
+- projection_decision
+- decision_digest
+- readback_result
+- next_route_decision
+evidence_required:
+- node-start
+- node-decision
+- node-result
+- node-readback
+- checkpoint
+- runtime-event
+- next-route-decision
+logs_required:
+- runtime-events.jsonl
+- decision_digest
+- state_digest
+- event_digest
+retry:
+  idempotency_key_fields:
+  - task_id
+  - run_id
+  - node_id
+  - scope_hash
+  replay_check: Read canonical node evidence and the effect readback before repeating
+    the implementation; reject replay with stale scope_hash.
+  max_attempts: 3
+  pending_reconciliation: Unknown or pending external state must route to checkpoint/reconciliation
+    before retrying; never re-evaluate blindly.
+rollback:
+  reversible: true
+  strategy: Reconcile current state against the approved scope and restore only reversible
+    task-scoped effects.
+  reconciliation: Record rollback or no-op readback in the canonical node evidence
+    ledger.
+  human_required_when:
+  - scope drift
+  - authority mismatch
+  - unknown external effect
+  - irreversible effect
+authority_boundary:
+  statement: Node instructions constrain execution and do not grant G2, G3, G4, G5,
+    or G6 authority.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes:
+  - normal
+  - fastlane
+  - e2e
+  - hotfix
+  - rescue
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: true
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true
+next:
+  pass:
+    disposition: continue
+    reason: Node outcome passed; continue through the canonical route.
+    next_node: null
+    next_action: continue_to_next_node
+    next_gate: null
+  blocked:
+    disposition: stop
+    reason: Fail closed and report the stable blocker without invoking downstream
+      effects.
+    next_node: null
+    next_action: stop_and_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Persist a checkpoint and reconcile the pending external state before continuation.
+    next_node: null
+    next_action: persist_checkpoint_and_wait
+    next_gate: null
+  retry:
+    disposition: retry
+    reason: Replay only after idempotency and readback reconciliation pass.
+    next_node: null
+    next_action: reconcile_then_retry
+    next_gate: null

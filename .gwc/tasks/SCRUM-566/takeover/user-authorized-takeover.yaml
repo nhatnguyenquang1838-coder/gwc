@@ -1,0 +1,24 @@
+schema: user-authorized-takeover/v1
+task_id: SCRUM-566
+source_agent: ChatGPT TaskController
+target_agent: DWA
+authorized_by: Nhat Nguyen Quang
+authorization_source: current_user_instruction
+authorization_text: override and take over; define takeover process per user instruction
+no_gwc: true
+repository: nhatnguyenquang1838-coder/gwc
+branch: chatgpt/scrum-566-agent-runtime-corrective
+worktree: /Users/mac/prj/gwc-wt-scrum566
+head_sha: bbb05521c326a0f389991ba98f35ba6ea0736706
+pr_number: 523
+same_run: true
+same_worktree: true
+same_branch: true
+same_pr: true
+non_rewriting: true
+jira_claim_overwrite: false
+prior_jira_claim: ChatGPT TaskController
+execution_owner: DWA
+concurrency_rule: stop if an active writer is detected on the same worktree or branch
+status: TAKEOVER_ACCEPTED
+recorded_at: '2026-08-29T17:38:21Z'

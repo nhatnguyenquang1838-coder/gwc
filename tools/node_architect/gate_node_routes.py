@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Source-backed gate/family route packs for Node Architect shadow execution."""
+"""Source-backed gate/family route packs for Node Architect execution."""
 from __future__ import annotations
 
-from typing import Any
+import heapq
+from typing import Any, Mapping
 
 FAMILY_GATE_BINDINGS = {
     "intake_context": ["G0_CONTEXT"],
@@ -59,6 +60,7 @@ def build_route_coverage(registry: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def nodes_for_event(registry: dict[str, Any], *, gate: str, scenario: str) -> list[str]:
+    """Legacy selection preserving registry order for shadow compatibility."""
     route_id = select_route_pack(scenario)
     if route_id is None:
         return []
@@ -76,3 +78,74 @@ def nodes_for_event(registry: dict[str, Any], *, gate: str, scenario: str) -> li
         if isinstance(node_id, str):
             selected.append(node_id)
     return selected
+
+
+def ordered_nodes_for_event(
+    registry: Mapping[str, Any],
+    *,
+    gate: str,
+    scenario: str,
+    graph: Mapping[str, Any],
+) -> list[str]:
+    """Return a deterministic semantic-runtime order independent of registry order.
+
+    Route-pack family order is the stable baseline. Runtime-executable graph edges
+    add real dependency constraints. Lexical node id is only a deterministic tie
+    break for nodes with no known dependency edge; it is not treated as semantic
+    dependency evidence. Visualization edges are ignored.
+    """
+    route_id = select_route_pack(scenario)
+    if route_id is None:
+        return []
+    pack_families = list(ROUTE_PACKS[route_id]["families"])
+    family_rank = {family: index for index, family in enumerate(pack_families)}
+
+    by_id: dict[str, Mapping[str, Any]] = {}
+    for raw in registry.get("nodes", []):
+        if not isinstance(raw, Mapping):
+            continue
+        node_id = raw.get("id")
+        family = raw.get("family")
+        if not isinstance(node_id, str) or not isinstance(family, str):
+            continue
+        if family not in family_rank:
+            continue
+        if gate not in FAMILY_GATE_BINDINGS.get(family, []):
+            continue
+        by_id[node_id] = raw
+
+    selected = set(by_id)
+    indegree = {node_id: 0 for node_id in selected}
+    outgoing: dict[str, set[str]] = {node_id: set() for node_id in selected}
+    for edge in graph.get("edges", []):
+        if not isinstance(edge, Mapping):
+            continue
+        if edge.get("edge_type") != "runtime" or edge.get("runtime_executable") is not True:
+            continue
+        source = edge.get("source")
+        target = edge.get("target")
+        if source not in selected or target not in selected or source == target:
+            continue
+        if target not in outgoing[source]:
+            outgoing[source].add(target)
+            indegree[target] += 1
+
+    def order_key(node_id: str) -> tuple[int, str]:
+        family = str(by_id[node_id].get("family", ""))
+        return (family_rank.get(family, len(family_rank)), node_id)
+
+    ready: list[tuple[int, str]] = [order_key(node_id) for node_id, degree in indegree.items() if degree == 0]
+    heapq.heapify(ready)
+    ordered: list[str] = []
+    while ready:
+        _, node_id = heapq.heappop(ready)
+        ordered.append(node_id)
+        for target in sorted(outgoing[node_id]):
+            indegree[target] -= 1
+            if indegree[target] == 0:
+                heapq.heappush(ready, order_key(target))
+
+    if len(ordered) != len(selected):
+        cyclic = sorted(node_id for node_id, degree in indegree.items() if degree > 0)
+        raise ValueError("ROUTE_RUNTIME_GRAPH_CYCLE:" + ",".join(cyclic))
+    return ordered

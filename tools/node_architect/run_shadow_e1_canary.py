@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Exercise all route packs and G0-G6 boundaries as an exact-head E1 canary."""
+"""Exercise all route packs and G0-G6 boundaries as a historical E1 shadow canary.
+
+This W6 qualification utility intentionally uses the explicit non-semantic
+compatibility replay path. It proves the legacy 81-node shadow envelope remains
+replayable and authority-free; it is not semantic/live runtime evidence.
+"""
 from __future__ import annotations
 
 import argparse
@@ -54,13 +59,21 @@ def run_canary(
             "scenario": scenario,
             "input_payload": {"canary": True},
         }
-        output = run_shadow_event(event, registry, activation, observed_revision=revision)
+        output = run_shadow_event(
+            event,
+            registry,
+            activation,
+            observed_revision=revision,
+            compatibility_replay=True,
+        )
         selected: list[str] = []
         route_pack = output.get("route_pack")
         if isinstance(route_pack, str):
             packs.add(route_pack)
         gates.add(gate)
         if expected_pack and route_pack != expected_pack:
+            safe = False
+        if output.get("semantic_execution") is not False:
             safe = False
         for item in output.get("results", []):
             if item.get("authority_granted") is not False or item.get("executed_effects") != []:
@@ -79,6 +92,8 @@ def run_canary(
                 "route_pack": route_pack,
                 "selected_node_count": len(selected),
                 "selected_node_ids": selected,
+                "evidence_class": "HISTORICAL_ENVELOPE_COMPATIBILITY",
+                "semantic_execution": False,
             }
         )
     required_packs = {item[0] for item in CANARY_CASES}
@@ -96,6 +111,9 @@ def run_canary(
         "artifact_type": "shadow-e1-canary",
         "status": status,
         "exact_revision": revision,
+        "replay_mode": "compatibility_replay",
+        "evidence_class": "HISTORICAL_ENVELOPE_COMPATIBILITY",
+        "semantic_execution": False,
         "route_packs_seen": sorted(packs),
         "gates_seen": sorted(gates),
         "safe": safe,

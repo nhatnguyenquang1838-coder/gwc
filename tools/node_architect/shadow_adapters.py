@@ -32,23 +32,43 @@ def build_adapter_registry(registry: dict[str, Any]) -> dict[str, dict[str, Any]
     return adapters
 
 
+def _blocked(node_id: str, reason_code: str, **extra: Any) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "node_id": node_id,
+        "applicability": "BLOCKED",
+        "outcome": "NOT_EXECUTED",
+        "reason_code": reason_code,
+        "executed_effects": [],
+        "proposed_effects": [],
+        "authority_granted": False,
+    }
+    result.update(extra)
+    return result
+
+
+def _source_resolution_kind(node: dict[str, Any]) -> str:
+    source = node.get("source_resolution")
+    if not isinstance(source, dict):
+        return ""
+    return str(source.get("kind") or source.get("status") or source.get("resolution") or "").upper()
+
+
 def execute_shadow_node(node: dict[str, Any], event: dict[str, Any], input_payload: dict[str, Any]) -> dict[str, Any]:
     node_id = node.get("id")
     if not isinstance(node_id, str) or not node_id:
         raise ValueError("node.id is required")
+
+    if node.get("runtime_executable") is False:
+        return _blocked(node_id, "NODE_NOT_RUNTIME_EXECUTABLE")
+
+    if _source_resolution_kind(node) == "DESCRIPTOR_ONLY":
+        return _blocked(node_id, "SEMANTIC_EVALUATOR_MISSING")
+
     required = ("task_id", "run_id", "gate", "exact_revision")
     missing = [field for field in required if not event.get(field)]
     if missing:
-        return {
-            "node_id": node_id,
-            "applicability": "BLOCKED",
-            "outcome": "INVALID_EVENT",
-            "reason_code": "SHADOW_EVENT_IDENTITY_MISSING",
-            "missing": missing,
-            "executed_effects": [],
-            "proposed_effects": [],
-            "authority_granted": False,
-        }
+        return _blocked(node_id, "SHADOW_EVENT_IDENTITY_MISSING", outcome="INVALID_EVENT", missing=missing)
+
     effect = node.get("effect_class", "read_only")
     proposed: list[dict[str, Any]] = []
     outcome = "OBSERVED"
