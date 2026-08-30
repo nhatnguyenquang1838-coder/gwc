@@ -14,7 +14,7 @@ implementation_head_sha: eaaa8fe85c36875570844562cfd552b2c3633ad6
 scope_hash: sha256:561526c974359a540652f17d5b504501db127e9f9b93cbb63617690592923c86
 changed_paths:
   - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
-  - .gwc/tasks/SCRUM-397/g2/wp1-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
   - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
   - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
   - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
