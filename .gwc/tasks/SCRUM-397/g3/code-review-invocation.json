@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g3-code-review-invocation",
+  "gate": "G3_PR",
+  "task_id": "SCRUM-397",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "pr_number": 533,
+  "head_sha": "eaaa8fe85c36875570844562cfd552b2c3633ad6",
+  "scope_hash": "sha256:561526c974359a540652f17d5b504501db127e9f9b93cbb63617690592923c86",
+  "implementer_id": "DWA (Hermes Mac)",
+  "reviewer": {
+    "reviewer_id": "ChatGPT",
+    "kind": "agent",
+    "role": "code_reviewer",
+    "independence": "independent",
+    "access_mode": "read_only"
+  },
+  "invocation": {
+    "provider": "ChatGPT GPT-5.6 Sol",
+    "invocation_id": "dw-taskcontroller:SCRUM-397:controller-seq78-s3-review",
+    "requested_at": "2026-08-30T13:26:19Z",
+    "completed_at": "2026-08-30T13:35:11Z",
+    "requested_head_sha": "eaaa8fe85c36875570844562cfd552b2c3633ad6",
+    "completed_head_sha": "eaaa8fe85c36875570844562cfd552b2c3633ad6",
+    "result_ref": "github_issue_comment:5404521259#controller-seq78"
+  },
+  "result": "pass",
+  "findings": [],
+  "write_actions": [],
+  "stale": false
+}

@@ -1,0 +1,145 @@
+version: '1.0'
+scenario: canonical-digest cross-runtime conformance
+description: Golden vectors for cross-runtime JCS-compatible canonical digest conformance.
+gwc_jcs_v1_state: REJECTED
+testing_scope:
+  current_node: SCRUM-397-WP3-CONFORMANCE-R2
+  active_scope_hash: sha256:488c0fc2e73315349737a08aa4c5fe99b618be83100d80d96d20de2e795521e3
+  status: COMPLETED
+  note: Corpus spans runtime-behavior boundaries. Defects A-D resolved for this work
+    package.
+golden_vectors:
+- id: CV-0001-empty-object
+  runtime: both
+  input: {}
+  expected_canonical_json: '{}'
+  expected_canonical_digest_sha256: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+  jcs_compliant: true
+  notes: Empty object canonical form under JCS.
+- id: CV-0002-empty-array
+  runtime: both
+  input: []
+  expected_canonical_json: '[]'
+  expected_canonical_digest_sha256: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
+  jcs_compliant: true
+  notes: Empty array canonical form under JCS.
+- id: CV-0003-integer-boolean-null-spectrum
+  runtime: both
+  input:
+    int_val: 12345
+    bool_true: true
+    bool_false: false
+    null_val: null
+  expected_canonical_json: '{"bool_false":false,"bool_true":true,"int_val":12345,"null_val":null}'
+  expected_canonical_digest_sha256: 656046fe9555cae78a706d8d344c09d2ce0866624ccbaef3755cd8a9d0b5bdd0
+  jcs_compliant: true
+  notes: Integer, boolean, and null representation under JCS.
+- id: CV-0004-simple-string
+  runtime: both
+  input:
+    msg: hello world
+  expected_canonical_json: '{"msg":"hello world"}'
+  expected_canonical_digest_sha256: b7a36c52572fa7e7222335d1e13944ebaa4d58491636feb39734f299d7195bbb
+  jcs_compliant: true
+  notes: Unicode string handled as ASCII-range JSON string.
+- id: CV-0005-evaluated-float-integer-notation
+  runtime: both
+  input:
+    value: 3.0
+  expected_canonical_json: '{"value":3}'
+  expected_canonical_digest_sha256: d428e15b36ff064e22b6f8db60bd7a59bcfc07a04ccd0f15d9a96dc060c72e3c
+  jcs_compliant: true
+  notes: 'JCS-compliant: binary64 3.0 is mathematically an integer; emits integer
+    notation 3.'
+- id: CV-0006-ASCII-digit-string
+  runtime: both
+  input:
+    doc_id: doc-12345-abcde
+  expected_canonical_json: '{"doc_id":"doc-12345-abcde"}'
+  expected_canonical_digest_sha256: 83f39247d5c7ac695c82301b889ce5d4d1132cdeab089d67c24b5957f43976ca
+  jcs_compliant: true
+  notes: 'Defect B: strings consisting only of ASCII digits should survive the ASCII-digit
+    validation gate without rejection.'
+- id: CV-0007-unicode-surrogate-pair-document
+  runtime: both
+  input:
+    label: cafe na ve resumu matematical
+  expected_canonical_json: '{"label":"cafe na ve resumu matematical"}'
+  expected_canonical_digest_sha256: 49c6efefc5e59b2203c657c4ea047abd424ee61c5884e42b9e90d2012a4e5220
+  jcs_compliant: true
+  notes: Unicode outside ASCII; Python should emit \uXXXX escape forms under JCS.
+- id: CV-0008-lone-surrogate-uD800-rejected
+  runtime: both
+  input:
+    payload: "\ud800"
+  expected_canonical_json: null
+  expected_canonical_digest_sha256: null
+  jcs_compliant: true
+  notes: 'REV-1/REV-3: gwc-jcs-v1 invalid_unicode_policy=reject_unpaired_surrogates. A lone (unpaired) surrogate MUST raise; it must NOT be normalized to U+FFFD. Both runtimes reject.'
+- id: CV-0010-non-bmp-utf16-key-ordering
+  runtime: both
+  input:
+    𝐀: v1
+    𝐁: v2
+    𐀀: v0
+  expected_canonical_json: '{"𐀀":"v0","𝐀":"v1","𝐁":"v2"}'
+  expected_canonical_digest_sha256: 6fdca90e42fe6122ebea49ec2e113fc9120b4232dcf6119444a23ab418a13c4a
+  jcs_compliant: true
+  notes: 'REV-2/REV-3: non-BMP keys are ordered by UTF-16 code units, NOT Python code points. U+10000 (units D800 DC00) sorts before U+1D400 (units D835 DC00); both runtimes agree.'
+- id: CV-0011-non-ascii-minimal-serialization
+  runtime: both
+  input:
+    msg: café
+  expected_canonical_json: '{"msg":"café"}'
+  expected_canonical_digest_sha256: 2f04918ce185d545be576aa2d308e911b86acd73cc5e094995b26eb689e0ae70
+  jcs_compliant: true
+  notes: 'REV-2/REV-3: string_escaping=jcs_minimal emits non-ASCII as raw UTF-8, never \uXXXX forms. Both runtimes produce identical bytes + digest.'
+- id: CV-0012-valid-non-bmp-surrogate-pair-preserved
+  runtime: both
+  input:
+    astral: 𐀀
+  expected_canonical_json: '{"astral":"𐀀"}'
+  expected_canonical_digest_sha256: c3a9db60007b8481cd3d7b4d979616a42f5967b57a4cf83b67c9702ee140dd06
+  jcs_compliant: true
+  notes: 'REV-1/REV-3: a VALID surrogate pair (U+10000) forms one non-BMP code point and is preserved byte-for-byte; only UNPAIRED surrogates are rejected.'
+- id: CV-0013-mixed-bmp-nonbmp-utf16-discriminator
+  runtime: both
+  input:
+    : low
+    𐀀: high
+  expected_canonical_json: '{"𐀀":"high","":"low"}'
+  expected_canonical_digest_sha256: 6fd37bd77ecbbca175960513283507ef952183c93f49ff54b996029d9006c394
+  jcs_compliant: true
+  notes: 'C1 discriminator: U+10000 (non-BMP, units D800 DC00) MUST sort BEFORE U+E000 (BMP PUA, units E000) under UTF-16 code-unit order, while Python code-point order would place U+E000 first. Proves REV-2 fix is load-bearing. Both runtimes agree.'
+
+- id: CV-0009-node-tokenizer-resource-limit
+  runtime: node
+  input:
+    doc: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  expected_canonical_json: '{"doc":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}'
+  expected_canonical_digest_sha256: 5a46551abd39502bb54a81b2fcd074414cf8a25434c1220e554eb90fdbc90a9a
+  jcs_compliant: true
+  notes: 'Defect D: Node tokenizer runs under a strict resource limit budget. Restored by C6 (was replaced by CV-0013 in commit 8db); CV-0013 retained.'
+- id: CV-0014-numeric-jcs-shortest-boundaries
+  runtime: both
+  input:
+    a: 1.0e+21
+    b: 1.0e-6
+    c: 1.0e-7
+    d: 2.9514790517935283e+20
+    e: 1.0e-5
+    f: 1.0e+16
+    g: 3.0
+    h: 0.1
+  expected_canonical_json: '{"a":1e+21,"b":0.000001,"c":1e-7,"d":295147905179352830000,"e":0.00001,"f":10000000000000000,"g":3,"h":0.1}'
+  expected_canonical_digest_sha256: 9873eb75fa9944b0ae1a032fc7a6aa86d2821c9809292ec63a9b82918b200dd1
+  jcs_compliant: true
+  notes: 'E1/E4: YAML scalars use explicit numeric forms (1.0e+21, 1.0e-6, 1.0e-7, 2.9514790517935283e+20, 1.0e-5, 1.0e+16) so PyYAML and Node loaders parse them as IEEE754 doubles, not strings. Canonical JSON is gwc-jcs-v1 jcs_shortest_round_trip (== Node JSON.stringify). Pinned SHA256 = 9873eb75fa9944b0ae1a032fc7a6aa86d2821c9809292ec63a9b82918b200dd1 (verified Py==Node). Shared golden corpus executes this vector (E2); not skipped.'
+- id: CV-0015-negative-zero-rejected
+  runtime: both
+  input:
+    z: -0.0
+  expected_canonical_json: null
+  expected_canonical_digest_sha256: null
+  jcs_compliant: true
+  notes: 'C5b: gwc-jcs-v1 negative_zero_policy=reject. A negative-zero value MUST raise (deterministic ValueError/Error / DIGEST_NEGATIVE_ZERO_REJECTED), not canonicalize to 0. Both references + production reject.'

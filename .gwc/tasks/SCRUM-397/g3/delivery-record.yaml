@@ -1,0 +1,140 @@
+schema_version: "1.1"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-397
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 668a8645a696e4cbf84124201a58d26bc833f0c1
+working_branch: fastlane/scrum-397-current-main-recovery-r3
+pull_request:
+  number: 533
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/533
+  draft: true
+implementation_head_sha: eaaa8fe85c36875570844562cfd552b2c3633ad6
+scope_hash: sha256:561526c974359a540652f17d5b504501db127e9f9b93cbb63617690592923c86
+changed_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp1-digest-callsite-inventory.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp1-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp2r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp3r-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-executor-report.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/executor-report.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/replay-manifest.yaml
+  - .gwc/tasks/SCRUM-397/integration-recovery-r2/validation-report.yaml
+  - .gwc/tasks/SCRUM-397/recovery/current-main-inventory-delta.yaml
+  - .gwc/tasks/SCRUM-397/recovery/main-drift-assessment.yaml
+  - governance/digest-profile-registry.yaml
+  - governance/digest-profiles/gwc-jcs-v1.yaml
+  - schemas/canonical-digest-golden-vector.schema.json
+  - schemas/canonical-digest-profile.schema.json
+  - schemas/digest-envelope.schema.json
+  - schemas/digest-profile-registry.schema.json
+  - tests/conformance/canonical_digest/golden_vectors.yaml
+  - tests/conformance/canonical_digest/test_node_conformance.mjs
+  - tests/conformance/canonical_digest/test_python_conformance.py
+  - tests/package_export/test_canonical_digest_api.py
+  - tests/package_export/test_canonical_digest_profile.py
+  - tests/package_export/test_legacy_digest_verifier.py
+  - tools/node_architect/canonical_digest/reference_canonicalizer.mjs
+  - tools/node_architect/canonical_digest/reference_canonicalizer.py
+  - tools/node_architect/package_export/canonical_digest_api.py
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - tools/node_architect/package_export/legacy_digest_verifier.py
+validation:
+  implementation_head_sha: eaaa8fe85c36875570844562cfd552b2c3633ad6
+  status: pass
+  commands:
+    - command: git hash-object byte-identity check of 35 SOURCE_PROVENANCE paths vs 4e0989cf0770637eabc90c20fa6757fb4f1f4089 (historical provenance at db19b3c77c9e6938f0a44e9a8c93238bf44bac0c)
+      result: pass
+      evidence: all 35 replayed paths are byte-identical (git hash-object == source blob SHA) to source-provenance 4e0989cf; overlap with main drift f8e25602..668a8645 = 0. Current rebind head eaaa8fe85c36875570844562cfd552b2c3633ad6 is a descendant of db19b3c preserving all 35 paths (3 evidence test files subsequently corrected under their own scoped G2 within the same 35-path set).
+    - command: bounded G3 record validation (tools/validate_g3_delivery.py --record)
+      result: pass
+      evidence: v1.1 schema + semantic validation passed for the rebind implementation subject eaaa8fe85c36875570844562cfd552b2c3633ad6
+review:
+  implementer_id: DWA (Hermes Mac)
+  reviewer_id: ChatGPT
+  independence: independent
+  mode: read-only
+  reviewed_implementation_head_sha: eaaa8fe85c36875570844562cfd552b2c3633ad6
+  reviewed_scope_hash: sha256:561526c974359a540652f17d5b504501db127e9f9b93cbb63617690592923c86
+  reviewed_at: "2026-08-30T13:35:11Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - G3 rebind only re-attaches the delivery record to implementation head eaaa8fe85c36875570844562cfd552b2c3633ad6; requirement scope (35-path canonical-digest recovery) unchanged.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Design unchanged; rebind preserves Option-A v1.1 replay structure and base provenance 668a8645.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Independent S3 re-review of eaaa8fe8 (C1-C5b + E1-E4) PASS across all 7 lanes (Controller seq78).
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - 374 Python tests (conformance + package_export) + 40 Node conformance tests pass; CV-0014/CV-0015 executed from shared corpus.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G3 record rebind preserves 35-path scope_hash 561526c9 and exclusions (G4_MERGE/G5_DEPLOY/G6_PRODUCTION_DATA/G4_CLOSE_PR_525/WP5_START/MAIN_WRITE).
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR #533 opened at eaaa8fe85c36875570844562cfd552b2c3633ad6; predecessor PR #525 referenced only, NOT mutated.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - "Required CI list validated at current tip: Validate instructions, Build instruction packages, Node Architect canonical-81 shadow qualification, Node Architect semantic runtime, G4 G5 evidence."
+  findings: []
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - implementation subject committed as new head eaaa8fe85c36875570844562cfd552b2c3633ad6 (descendant of db19b3c preserving 35-path scope).
+    - id: AC-2
+      result: pass
+      evidence:
+        - 35 paths preserved within overall scope_hash 561526c9; overlap with main drift = 0.
+    - id: AC-3
+      result: pass
+      evidence:
+        - Draft PR #533 rebound to eaaa8fe85c36875570844562cfd552b2c3633ad6; independent 7-lane review PASS (seq78); mark-Ready deferred to Controller-gated S4.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  required_checks:
+    - Validate instructions
+    - Build instruction packages
+    - Node Architect canonical-81 shadow qualification
+    - Node Architect semantic runtime
+    - G4 G5 evidence
+residual_risks:
+  - Independent seven-lane review (S3) PASS per Controller seq78; Executor does NOT self-certify beyond supplied refs/evidence.
+  - G3 mark-Ready (S4) deferred to Controller-gated stage after exact-tip ancestry/evidence-only-delta/required-CI validation.
+  - PR #525 is predecessor-only and MUST NOT be mutated under this candidate.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+  - G4_CLOSE_PR_525
+  - WP5_START
+  - MAIN_WRITE
+outcome: pass

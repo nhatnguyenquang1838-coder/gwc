@@ -1,0 +1,6 @@
+schema_version: "1.0"
+artifact_type: integration-recovery-r2-approval-readback
+human_approval: "APPROVE G2 g2_scrum-397_integration_recovery_r2_20260826T1320_2116556f0aad64d3 2116556f0aad64d3 2026-08-26T17:20:00Z"
+consumed_utc: "2026-08-26T13:22:09Z"
+request_id: g2_scrum-397_integration_recovery_r2_20260826T1320_2116556f0aad64d3
+scope_hash_full: sha256:2116556f0aad64d3bf141e720a4a6704134141ec0ff98493c902fb55c502dead

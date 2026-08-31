@@ -1,0 +1,57 @@
+schema_version: '1.0'
+artifact_type: g2-approval-readback
+task_id: SCRUM-397
+work_package: WP4
+repository: nhatnguyenquang1838-coder/gwc
+gate: G2_EXECUTION
+action: branch_worktree_file_commit_push
+approval_request_id: g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69
+human_response: APPROVE G2 g2_scrum-397_wp4r_recovery_20260825_1833_38c324d5654ecd69 38c324d5654ecd69 2026-08-25T22:33:56Z
+approval_scope_hash: sha256:38c324d5654ecd69dcc03eaec3ddac981c4ed030b59b5a63d6326488c7f3d289
+scope_hash_short: 38c324d5654ecd69
+implementation_plan_hash: sha256:83e6bc5413eebea4c054ee8d9a5b296a3d356f57f5df2afc52bb8ceb3c9d8806
+issued_at: '2026-08-25T18:33:56Z'
+issued_at_source: APPROVAL_REQUEST_ID_TIMESTAMP
+expires_at: '2026-08-25T22:33:56Z'
+validated_at: '2026-08-25T18:52:56Z'
+validation_outcome: VALID
+validation_reason: APPROVAL_VALID
+replay_status: CONSUMED
+actor_target:
+  type: agent
+  id: U0BLW98GENT
+  display_name: Hermes Mac
+base_ref: main
+base_sha: c05f99ce729035fa9119f98beec8c3038eb457bf
+head_sha_at_validation: c05f99ce729035fa9119f98beec8c3038eb457bf
+working_branch: fastlane/scrum-397-canonical-digest-wp4-shared-api-r3
+risk_class: R2
+authorized_paths:
+  - .gwc/tasks/SCRUM-397/g2/wp4-execution-envelope.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-approval-readback.yaml
+  - .gwc/tasks/SCRUM-397/g2/wp4-executor-report.yaml
+  - tools/node_architect/package_export/canonical_digest_api.py
+  - tools/node_architect/package_export/legacy_digest_verifier.py
+  - tools/node_architect/package_export/deterministic_hash_verification.py
+  - tests/package_export/test_canonical_digest_api.py
+  - tests/package_export/test_legacy_digest_verifier.py
+forbidden_effects:
+  - callsite_migration
+  - registry_activation
+  - wp3_corpus_or_reference_path_edit
+  - protected_main_write
+  - pr_creation_or_update
+  - merge_or_auto_merge
+  - force_push
+  - branch_deletion
+  - pr_base_change
+  - deploy_or_release
+  - production_data_or_config_change
+  - credential_or_secret_change
+  - migration
+  - scope_expansion
+execution_authority_granted: true
+g3_authority_granted: false
+g4_authority_granted: false
+g5_authority_granted: false
+g6_authority_granted: false

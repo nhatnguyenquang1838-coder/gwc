@@ -1,0 +1,121 @@
+schema_version: '1.0'
+profile_type: canonical_digest_profile
+profile_id: gwc-jcs-v1
+status: defined
+specification: RFC_8785_JCS_COMPATIBLE
+task: SCRUM-397
+work_package: WP2-REFRESH-R1
+
+description: >-
+  Normative canonical digest profile for structured semantic digests across the
+  GWC governance/evidence surfaces. Contract/schema/registry definition ONLY.
+  No runtime implementation, no legacy verifier, no consumer migration.
+
+# --- Strict supported input domain ---------------------------------------
+strict_input_domain:
+  supported_values:
+    - "null"
+    - boolean
+    - number_IEEE754_double
+    - string
+    - array
+    - object
+  negative_zero_policy: reject
+  non_finite_policy: reject
+  non_string_key_policy: reject
+  duplicate_raw_key_policy: reject_before_semantic_collapse
+  unicode_normalization: none
+  invalid_unicode_policy: reject_unpaired_surrogates
+  unsupported_value_policy: reject_with_deterministic_error
+
+# --- Canonical byte contract ---------------------------------------------
+# RFC-8785 / JCS-compatible deterministic UTF-8 semantics. This is NOT Python
+# json.dumps(sort_keys=True) renamed as JCS; key ordering, number serialization,
+# and string escaping follow the RFC-8785 canonical form (JCS) so bytes are
+# language-neutral and replay-stable across runtimes.
+canonical_byte_contract:
+  standard: RFC_8785
+  key_ordering: lexicographic_utf16_code_unit
+  number_serialization: jcs_shortest_round_trip
+  string_escaping: jcs_minimal
+  object_member_separator: ','
+  key_value_separator: ':'
+  utf8_encoding: strict_utf8
+  unicode_normalization: none
+  invalid_unicode_note: >-
+    unicode_normalization=none means valid Unicode is preserved byte-for-byte.
+    This is distinct from invalid_unicode_policy=reject_unpaired_surrogates:
+    malformed UTF-8 and lone/unpaired surrogate code units are REJECTED before
+    digest; that rejection is not a form of normalization.
+  trailing_whitespace: forbidden
+  newline: none
+
+# --- Hash binding ---------------------------------------------------------
+hash_binding:
+  algorithm: SHA-256
+  hex_digest_lowercase: true
+  domain_separation: required
+  preimage_framing: required
+
+# --- Domain separation + preimage framing --------------------------------
+domain_separation:
+  scheme: gwc-domain-sep-v1
+  framing: 'sha256( u32be(utf8_len(domain_tag)) || domain_tag_utf8 || u64be(byte_len(preimage)) || preimage )'
+  domain_tag_source: governance/digest-profile-registry.yaml (entry.domain)
+  framing_rule: >-
+    The exact bytes hashed MUST be the concatenation of: (1) the 4-byte
+    big-endian UTF-8 byte length of the domain tag, (2) the UTF-8 domain tag
+    bytes, (3) the 8-byte big-endian byte length of the canonical preimage,
+    (4) the canonical preimage bytes. Every framing component is explicitly
+    length-prefixed; there is no implicit-length field and no ambiguity between
+    domain tag and preimage. The domain tag is bound to the profile and is
+    never user-supplied.
+
+# --- Resource limits (measurable, bounded) -------------------------------
+resource_limits:
+  max_preimage_bytes: 1048576
+  max_object_depth: 64
+  max_object_keys: 100000
+  max_array_items: 100000
+  max_string_bytes: 1048576
+  limit_policy: reject_with_deterministic_error
+
+# --- Deterministic error taxonomy ----------------------------------------
+error_taxonomy:
+  DIGEST_INPUT_DOMAIN_VIOLATION: rejected_value_outside_supported_domain
+  DIGEST_NEGATIVE_ZERO_REJECTED: negative_zero_is_not_allowed
+  DIGEST_NON_FINITE_REJECTED: nan_or_infinity_is_not_allowed
+  DIGEST_NON_STRING_KEY_REJECTED: object_key_must_be_string
+  DIGEST_DUPLICATE_RAW_KEY_REJECTED: duplicate_raw_json_key_before_semantic_collapse
+  DIGEST_INVALID_UNICODE_REJECTED: invalid_unicode_or_unpaired_surrogate_rejected
+  DIGEST_UNICODE_NORMALIZATION_NONE: no_unicode_normalization_is_applied
+  DIGEST_RESOURCE_LIMIT_EXCEEDED: preimage_size_or_depth_or_cardinality_exceeded
+  DIGEST_DOMAIN_TAG_MISMATCH: domain_tag_not_bound_in_registry
+  DIGEST_ENVELOPE_BINDING_MISMATCH: envelope_fields_do_not_match_computed_digest
+  error_delivery: deterministic_and_replayable
+
+# --- Digest envelope binding ---------------------------------------------
+digest_envelope_binding:
+  binds:
+    - profile_id
+    - hash_algorithm
+    - domain
+    - schema_ref
+    - preimage_framing_scheme
+    - hexdigest
+  schema: schemas/digest-envelope.schema.json
+  integrity_rule: >-
+    An envelope is valid only when every bound field is present and consistent
+    with the profile/registry; a digest without its envelope binding is not a
+    governance-authentic digest. The field names here MUST match the envelope
+    schema's required set (profile_id, hash_algorithm, domain, schema_ref,
+    preimage_framing_scheme, hexdigest); the domain value is sourced from the
+    registry entry.domain.
+
+# --- Governance posture --------------------------------------------------
+governance:
+  canonicalization_never_grants_authority: true
+  registry_activation_fail_closed: true
+  gwc_jcs_v1_new_write_activation: BLOCKED_PENDING_WP3_WP4
+  historical_evidence_immutable: true
+  raw_byte_hashes_unchanged: true
