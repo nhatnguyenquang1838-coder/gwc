@@ -151,24 +151,32 @@ class PlanBoundRuntimeExecutor:
             raise PlanBoundRuntimeError(f"step {step_id!r} must be a mapping")
 
         # 4. Requested action must be declared and in allowed_actions.
-        # M4: fail-closed — None/missing/empty requested_action must NOT bypass
-        # authority revalidation when the step is effectful. A step is
-        # effectful when its allowed_actions include anything other than
-        # "read" (i.e. "read" alone = read-only; "write"/"apply"/"merge"/etc.
-        # = effectful). Read-only steps may proceed with requested_action=None.
+        # M4: fail-closed semantics:
+        #   - None/missing requested_action: tolerated ONLY for read-only steps
+        #     (effectful steps require an explicit requested_action for authority
+        #     revalidation).
+        #   - Empty requested_action: always rejected (caller-supplied but
+        #     semantically blank — cannot reach authority validation).
+        #   - Supplied requested_action (any non-empty value): MUST be
+        #     normalized and validated against step.allowed_actions for EVERY
+        #     step, including read-only steps. A read-only step with
+        #     requested_action="write" is a plan-allowlist violation regardless
+        #     of what the authority envelope says.
         allowed = tuple(_normalize_action(a) for a in step_raw.get("allowed_actions", ()))
         is_read_only = set(allowed) == {"read"} or step_raw.get("read_only") is True
-        if not is_read_only:
-            if requested_action is None:
+
+        if requested_action is None:
+            if not is_read_only:
                 raise PlanBoundRuntimeError(
                     f"requested_action missing in effectful plan step {step_id!r}: "
                     "authority revalidation cannot proceed"
                 )
-            if not requested_action:
-                raise PlanBoundRuntimeError(
-                    f"requested_action empty in effectful plan step {step_id!r}: "
-                    "authority revalidation cannot proceed"
-                )
+        elif not requested_action or not requested_action.strip():
+            raise PlanBoundRuntimeError(
+                f"requested_action empty in plan step {step_id!r}: "
+                "plan-allowlist validation cannot proceed"
+            )
+        else:
             norm_requested = _normalize_action(requested_action)
             if norm_requested not in allowed:
                 raise PlanBoundRuntimeError(

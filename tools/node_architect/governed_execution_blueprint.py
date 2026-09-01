@@ -214,16 +214,32 @@ class GovernedExecutionBlueprint:
         for item in topology:
             action = _text(item.get("action"), "topology.action")
             node_id = _text(item.get("node_id"), "topology.node_id")
+            # seq=13 M1: topology uses "edges" (preserved route semantics) or legacy "next".
+            edges_raw = item.get("edges")
             nxt = item.get("next")
-            # M1: next is now a list of all executable outgoing targets
-            # (or empty for terminal). Validate the list structure + bindings.
-            if not isinstance(nxt, list) or any(not isinstance(t, str) for t in nxt):
-                raise BlueprintValidationError("topology.next must be a list of strings")
-            for target in nxt:
-                if target not in known_actions:
+            if edges_raw is not None:
+                if not isinstance(edges_raw, Sequence) or isinstance(edges_raw, (str, bytes)):
+                    raise BlueprintValidationError("topology.edges must be a sequence")
+                for edge in edges_raw:
+                    if not isinstance(edge, Mapping):
+                        raise BlueprintValidationError("topology.edges items must be mappings")
+                    tgt = edge.get("target")
+                    if not isinstance(tgt, str) or not tgt:
+                        raise BlueprintValidationError("topology.edges target must be a non-empty string")
+                    if tgt not in known_actions:
+                        raise BlueprintValidationError(
+                            f"topology.edges target {tgt!r} for action {action!r} is not a bound node action"
+                        )
+            elif nxt is not None:
+                # Legacy scalar string fallback.
+                if not isinstance(nxt, str) or not nxt:
+                    raise BlueprintValidationError("topology.next must be a non-empty string")
+                if nxt not in known_actions:
                     raise BlueprintValidationError(
-                        f"topology.next target {target!r} for action {action!r} is not a bound node action"
+                        f"topology.next target {nxt!r} for action {action!r} is not a bound node action"
                     )
+            else:
+                raise BlueprintValidationError("topology entry must have 'edges' or 'next'")
             if action in seen_actions or action not in known_actions:
                 raise BlueprintValidationError(
                     f"topology action is ambiguous or unbound: {action}"
@@ -416,28 +432,69 @@ def produce_governed_blueprint(
             )
         )
 
-    # 5. Topology: ONE entry per bound node (dedupe — the blueprint contract
-    # rejects duplicate actions). ALL runtime_executable outgoing targets for a
-    # source are preserved deterministically as an ordered list; terminal
-    # targets are excluded from traversal. A sink node (no executable
-    # successors) carries an empty targets list and is marked terminal.
-    topology_by_action: dict[str, list[str]] = {}
-    for edge in edges:
-        if not edge.get("runtime_executable"):
+    # 5. Topology: preserve full compiled route semantics per source.
+    # Each source gets ONE topology entry whose "edges" list carries every
+    # route row from the compiled profile: target, kind, condition_id,
+    # runtime_executable, source/target gate. No silent first-target
+    # selection, no invented outcomes.
+    compiled_route_table: list[Mapping[str, Any]] = []
+    flow_profile_path = root / "core/node-architect/flow-policy-compiled-profile.json"
+    if flow_profile_path.exists():
+        flow_profile = json.loads(flow_profile_path.read_text(encoding="utf-8"))
+        compiled_route_table = list(flow_profile.get("compiled", {}).get("route_table", []))
+
+    # Index route rows by source for deterministic ordering.
+    edges_by_source: dict[str, list[Mapping[str, Any]]] = {}
+    for row in compiled_route_table:
+        src = row.get("source")
+        if not src or not isinstance(src, str):
             continue
-        src = edge["source"]
-        tgt = edge["target"]
-        if src not in topology_by_action:
-            topology_by_action[src] = []
-        if tgt not in topology_by_action[src] and tgt != src:
-            topology_by_action[src].append(tgt)
+        edges_by_source.setdefault(src, []).append(row)
+
+    # Fallback: if compiled profile is missing, derive from executable runtime-graph edges.
+    if not edges_by_source:
+        for edge in graph.get("edges", []):
+            src = edge.get("source")
+            if not src or not isinstance(src, str):
+                continue
+            edges_by_source.setdefault(src, []).append({
+                "source": src,
+                "target": edge.get("target"),
+                "kind": "continue" if edge.get("runtime_executable") else "human_required",
+                "condition_id": None,
+                "runtime_executable": bool(edge.get("runtime_executable")),
+                "source_gate": None,
+                "target_gate": None,
+            })
+
+    # Build one topology entry per bound node with preserved route semantics.
+    topology_list: list[Mapping[str, Any]] = []
     for node_id in bound_node_ids:
-        if node_id not in topology_by_action:
-            topology_by_action[node_id] = []
-    topology: list[Mapping[str, Any]] = [
-        {"action": node_id, "node_id": node_id, "next": nxt_list, "terminal": len(nxt_list) == 0}
-        for node_id, nxt_list in topology_by_action.items()
-    ]
+        route_rows = edges_by_source.get(node_id, [])
+        route_edges: list[Mapping[str, Any]] = []
+        for row in route_rows:
+            tgt = row.get("target")
+            if not isinstance(tgt, str) or not tgt:
+                continue
+            route_edges.append({
+                "target": tgt,
+                "kind": str(row.get("kind", "continue")),
+                "condition_id": row.get("condition_id"),
+                "runtime_executable": bool(row.get("runtime_executable", False)),
+                "source_gate": row.get("source_gate"),
+                "target_gate": row.get("target_gate"),
+            })
+        # Sort deterministically by target name for reproducibility.
+        route_edges.sort(key=lambda e: e["target"])
+        topology_list.append({
+            "action": node_id,
+            "node_id": node_id,
+            "edges": tuple(route_edges),
+            "terminal": not route_edges,
+        })
+
+    # Make topology immutable after construction to prevent post-validation mutation.
+    topology: tuple[Mapping[str, Any], ...] = tuple(topology_list)
 
     # 6. Source bindings from flow/policy registries + live gwc sha.
     flow_profile_path = root / "core/node-architect/flow-policy-compiled-profile.json"

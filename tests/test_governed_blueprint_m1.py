@@ -52,7 +52,7 @@ def _blueprint_payload() -> dict:
             }
         ],
         "topology": [
-            {"action": "validate", "node_id": "validation_quality.validator-execution", "next": []}
+            {"action": "validate", "node_id": "validation_quality.validator-execution", "edges": []}
         ],
         "authority_requirements": [
             {"action": "validate", "gate": "G3_PR", "required": True}
@@ -124,23 +124,25 @@ def test_producer_blueprint_survives_roundtrip():
 
 
 def test_producer_preserves_multi_target_topology():
-    """seq=11 M1: a source with >=2 executable outgoing targets must preserve
-    ALL targets deterministically in topology.next, not collapse to first."""
+    """seq=13 M1: a source with >=2 outgoing route rows must preserve
+    all route semantics deterministically in topology.edges, not collapse."""
     blueprint = produce_governed_blueprint(
         task_id="SCRUM-668",
         scenario="standard_real_run",
         repo_root=".",
     )
-    # Verify every topology entry has a list-based next
+    # Verify every topology entry has an edges sequence.
     for entry in blueprint.topology:
-        assert isinstance(entry["next"], list), \
-            f"topology.next must be a list, got {type(entry['next'])} for {entry['action']}"
-    # Verify at least one source preserves multi-target
-    multi_target_entries = [e for e in blueprint.topology if len(e["next"]) >= 2]
-    assert len(multi_target_entries) >= 1, \
-        "expected at least one source with >=2 preserved executable targets"
-    # Verify round-trip preserves all targets
+        assert "edges" in entry, \
+            f"topology entry missing 'edges' for {entry['action']}"
+        assert isinstance(entry["edges"], tuple), \
+            f"topology.edges must be tuple, got {type(entry['edges'])} for {entry['action']}"
+    # Verify at least one source preserves multi-route.
+    multi_route_entries = [e for e in blueprint.topology if len(e["edges"]) >= 2]
+    assert len(multi_route_entries) >= 1, \
+        "expected at least one source with >=2 preserved route rows"
+    # Verify round-trip preserves all route semantics.
     restored = GovernedExecutionBlueprint.from_dict(blueprint.to_dict())
     for orig, rest in zip(blueprint.topology, restored.topology):
-        assert orig["next"] == rest["next"], \
-            f"multi-target topology not preserved in round-trip: {orig['next']} != {rest['next']}"
+        assert orig["edges"] == rest["edges"], \
+            f"route semantics not preserved in round-trip: {orig['edges']} != {rest['edges']}"

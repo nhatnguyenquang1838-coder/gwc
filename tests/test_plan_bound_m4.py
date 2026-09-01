@@ -96,6 +96,27 @@ def test_matching_runtime_plan_digest_passes():
     assert result["step_id"] == "inspect"
 
 
+def test_read_only_step_rejects_write_requested_action_plan_allowlist():
+    """seq=12 M4: read-only step with requested_action="write" must be rejected
+    by plan-allowlist BEFORE authority validation, regardless of envelope."""
+    step = _plan_step("inspect", allowed_actions=("read",))
+    plan = _plan({"inspect": step})
+    authority = _authority(allowed_actions=["write", "read"], gate="G3_PR")
+    executor = PlanBoundRuntimeExecutor(plan=plan, authority=authority)
+    with pytest.raises(PlanBoundRuntimeError, match="undeclared"):
+        executor.execute_step("inspect", {}, authority=authority, requested_action="write")
+
+
+def test_effectful_step_rejects_whitespace_requested_action():
+    """seq=12 M4: requested_action='   ' (whitespace-only) fails closed."""
+    step = _plan_step("commit", allowed_actions=("commit",))
+    plan = _plan({"commit": step})
+    authority = _authority(allowed_actions=["commit"], gate="G3_PR")
+    executor = PlanBoundRuntimeExecutor(plan=plan, authority=authority)
+    with pytest.raises(PlanBoundRuntimeError, match="empty"):
+        executor.execute_step("commit", {}, authority=authority, requested_action="   ")
+
+
 def test_authority_revalidation_invokes_real_validator_allowed():
     """B2: an effectful action with a scope that authorizes it is revalidated
     by the GWC boundary check."""
@@ -171,3 +192,5 @@ def test_read_only_step_allows_none_requested_action():
     executor = PlanBoundRuntimeExecutor(plan=plan, authority=None)
     result = executor.execute_step("inspect", {}, authority=None, requested_action=None)
     assert result["step_id"] == "inspect"
+
+

@@ -47,7 +47,7 @@ def _blueprint() -> GovernedExecutionBlueprint:
             ),
         ),
         topology=(
-            {"action": "validate", "node_id": "validation_quality.validator-execution", "next": []},
+            {"action": "validate", "node_id": "validation_quality.validator-execution", "edges": []},
         ),
         authority_requirements=(
             {"action": "validate", "gate": "G3_PR", "required": True},
@@ -91,7 +91,7 @@ def test_blueprint_rejects_missing_node_instruction_binding():
 
 def test_blueprint_rejects_topology_action_without_node_binding():
     payload = _blueprint().to_dict()
-    payload["topology"].append({"action": "missing", "node_id": "ghost.node", "next": []})
+    payload["topology"].append({"action": "missing", "node_id": "ghost.node", "edges": []})
 
     with pytest.raises(BlueprintValidationError, match="topology"):
         GovernedExecutionBlueprint.from_dict(payload)
@@ -101,7 +101,7 @@ def test_blueprint_rejects_duplicate_or_ambiguous_actions():
     payload = _blueprint().to_dict()
     payload["topology"] = [
         payload["topology"][0],
-        {"action": "validate", "node_id": "validation_quality.validator-execution", "next": []},
+        {"action": "validate", "node_id": "validation_quality.validator-execution", "edges": []},
     ]
 
     with pytest.raises(BlueprintValidationError, match="ambiguous"):
