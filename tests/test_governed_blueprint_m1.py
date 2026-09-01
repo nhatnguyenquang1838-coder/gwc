@@ -1,0 +1,146 @@
+"""M1: W3 blueprint — implementation_plan_ref required + real producer.
+
+Fixes the W1-W7 review BLOCKER B7: GovernedExecutionBlueprint allowed
+``implementation_plan_ref=None`` while the canonical RuntimePlan (M0)
+requires a non-empty ``runtime_plan_ref``. M1 makes the field mandatory and
+adds a real producer that reads the live Node Architect registries
+(profile-registry, flow-policy-activation, node-registry, runbooks) so the
+blueprint is compiled from canonical repo sources, not hand-assembled.
+"""
+
+from __future__ import annotations
+
+import json
+
+import pytest
+
+from tools.node_architect.governed_execution_blueprint import (
+    BlueprintValidationError,
+    GovernedExecutionBlueprint,
+    produce_governed_blueprint,
+)
+
+
+def _blueprint_payload() -> dict:
+    return {
+        "blueprint_id": "blueprint.scrum-672",
+        "task_id": "SCRUM-672",
+        "scenario": "standard_pr_delivery",
+        "source_bindings": {
+            "gwc_sha": "0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72",
+            "flow_ref": "core/node-architect/profile-registry.json",
+            "flow_revision": "workflow-contract-v2-scrum392-policy-reconcile-20260811-r2",
+            "flow_digest": "sha256:" + "1" * 64,
+            "policy_ref": "core/node-architect/gate-applicability-policy-registry.json",
+            "policy_revision": "policy-contract-v2-20260811-r1",
+            "policy_digest": "sha256:" + "2" * 64,
+            "project_profile_ref": "projects/gwc/project-profile.yaml",
+        },
+        "runbooks": [
+            {"runbook_id": "standard-pr-delivery", "revision": "1.0.0", "digest": "sha256:" + "3" * 64}
+        ],
+        "nodes": [
+            {
+                "action": "validate",
+                "node_id": "validation_quality.validator-execution",
+                "node_instruction_ref": "core/node-architect/node-instructions/validation_quality/validator-execution.node-instruction.yaml",
+                "node_instruction_digest": "sha256:" + "4" * 64,
+                "implementation_ref": "tools/node_architect/validator_execution.py",
+                "route_profile_revision": "route-v1",
+                "graph_revision": "graph-v1",
+                "node_registry_revision": "nodes-v1",
+            }
+        ],
+        "topology": [
+            {"action": "validate", "node_id": "validation_quality.validator-execution", "next": []}
+        ],
+        "authority_requirements": [
+            {"action": "validate", "gate": "G3_PR", "required": True}
+        ],
+        "implementation_plan_ref": "implementation-plan/SCRUM-672/r1",
+    }
+
+
+def test_blueprint_requires_implementation_plan_ref():
+    """BLOCKER B7: implementation_plan_ref must be non-empty (W4 needs it)."""
+    payload = _blueprint_payload()
+    payload.pop("implementation_plan_ref")
+    with pytest.raises(BlueprintValidationError, match="implementation_plan_ref"):
+        GovernedExecutionBlueprint.from_dict(payload)
+
+
+def test_blueprint_rejects_empty_implementation_plan_ref():
+    payload = _blueprint_payload()
+    payload["implementation_plan_ref"] = ""
+    with pytest.raises(BlueprintValidationError, match="implementation_plan_ref"):
+        GovernedExecutionBlueprint.from_dict(payload)
+
+
+def test_blueprint_rejects_none_implementation_plan_ref():
+    payload = _blueprint_payload()
+    payload["implementation_plan_ref"] = None
+    with pytest.raises(BlueprintValidationError, match="implementation_plan_ref"):
+        GovernedExecutionBlueprint.from_dict(payload)
+
+
+def test_producer_reads_live_registries():
+    """Real producer: builds a blueprint from canonical repo registries."""
+    blueprint = produce_governed_blueprint(
+        task_id="SCRUM-668",
+        scenario="standard_real_run",
+        repo_root=".",
+    )
+    assert isinstance(blueprint, GovernedExecutionBlueprint)
+    assert blueprint.task_id == "SCRUM-668"
+    assert blueprint.scenario == "standard_real_run"
+    assert blueprint.implementation_plan_ref
+    assert blueprint.implementation_plan_ref.startswith("implementation-plan/")
+    # source_bindings carry live gwc SHA + flow/policy digest from registries
+    assert len(blueprint.source_bindings.get("gwc_sha", "")) == 40
+    assert blueprint.source_bindings["flow_digest"].startswith("sha256:")
+    assert blueprint.source_bindings["policy_digest"].startswith("sha256:")
+    # runbooks from live runbook registry (at least one)
+    assert len(blueprint.runbooks) >= 1
+    assert all(rb.digest.startswith("sha256:") for rb in blueprint.runbooks)
+    # nodes + topology from live node/graph registries
+    assert len(blueprint.nodes) >= 1
+    assert len(blueprint.topology) >= 1
+    # never grants authority
+    assert blueprint.authority_granted is False
+
+
+def test_producer_blueprint_is_deterministic():
+    first = produce_governed_blueprint(task_id="SCRUM-668", scenario="standard_real_run", repo_root=".")
+    second = produce_governed_blueprint(task_id="SCRUM-668", scenario="standard_real_run", repo_root=".")
+    assert first.blueprint_digest == second.blueprint_digest
+    assert first.to_dict() == second.to_dict()
+
+
+def test_producer_blueprint_survives_roundtrip():
+    blueprint = produce_governed_blueprint(task_id="SCRUM-668", scenario="standard_real_run", repo_root=".")
+    restored = GovernedExecutionBlueprint.from_dict(blueprint.to_dict())
+    assert restored.blueprint_digest == blueprint.blueprint_digest
+    assert restored.implementation_plan_ref == blueprint.implementation_plan_ref
+
+
+def test_producer_preserves_multi_target_topology():
+    """seq=11 M1: a source with >=2 executable outgoing targets must preserve
+    ALL targets deterministically in topology.next, not collapse to first."""
+    blueprint = produce_governed_blueprint(
+        task_id="SCRUM-668",
+        scenario="standard_real_run",
+        repo_root=".",
+    )
+    # Verify every topology entry has a list-based next
+    for entry in blueprint.topology:
+        assert isinstance(entry["next"], list), \
+            f"topology.next must be a list, got {type(entry['next'])} for {entry['action']}"
+    # Verify at least one source preserves multi-target
+    multi_target_entries = [e for e in blueprint.topology if len(e["next"]) >= 2]
+    assert len(multi_target_entries) >= 1, \
+        "expected at least one source with >=2 preserved executable targets"
+    # Verify round-trip preserves all targets
+    restored = GovernedExecutionBlueprint.from_dict(blueprint.to_dict())
+    for orig, rest in zip(blueprint.topology, restored.topology):
+        assert orig["next"] == rest["next"], \
+            f"multi-target topology not preserved in round-trip: {orig['next']} != {rest['next']}"
