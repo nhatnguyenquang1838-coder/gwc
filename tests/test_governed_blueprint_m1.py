@@ -146,3 +146,61 @@ def test_producer_preserves_multi_target_topology():
     for orig, rest in zip(blueprint.topology, restored.topology):
         assert orig["edges"] == rest["edges"], \
             f"route semantics not preserved in round-trip: {orig['edges']} != {rest['edges']}"
+
+
+def test_producer_fails_closed_when_compiled_route_semantics_missing():
+    """seq=14 M1: compiled Flow route table is canonical. When the compiled
+    profile is absent, the producer MUST fail closed — it must NOT fall back
+    to inventing continue/human_required semantics from the raw runtime graph."""
+    import pathlib
+
+    real_exists = pathlib.Path.exists
+
+    def _fake_exists(self):
+        if str(self).endswith("core/node-architect/flow-policy-compiled-profile.json"):
+            return False
+        return real_exists(self)
+
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(pathlib.Path, "exists", _fake_exists)
+    try:
+        with pytest.raises(BlueprintValidationError, match="compiled route semantics"):
+            produce_governed_blueprint(
+                task_id="SCRUM-668",
+                scenario="standard_real_run",
+                repo_root=".",
+            )
+    finally:
+        monkeypatch.undo()
+
+
+def test_producer_topology_entries_and_edge_mappings_deep_frozen():
+    """seq=14 M1: outer tuple immutability is insufficient — nested topology
+    entries and their edge mappings must be deep-frozen after construction
+    (no post-validation mutation of route semantics)."""
+    import types
+
+    blueprint = produce_governed_blueprint(
+        task_id="SCRUM-668",
+        scenario="standard_real_run",
+        repo_root=".",
+    )
+    entry = blueprint.topology[0]
+    # Nested topology entry itself must be immutable.
+    assert isinstance(entry, types.MappingProxyType), \
+        f"topology entry must be a mapping proxy, got {type(entry)}"
+    with pytest.raises(TypeError):
+        entry["action"] = "mutated"
+    with pytest.raises(TypeError):
+        entry["terminal"] = True
+    # Edge mappings inside the entry must be deep-frozen too.
+    edges = entry["edges"]
+    assert isinstance(edges, tuple)
+    if edges:
+        edge0 = edges[0]
+        assert isinstance(edge0, types.MappingProxyType), \
+            f"edge mapping must be a mapping proxy, got {type(edge0)}"
+        with pytest.raises(TypeError):
+            edge0["target"] = "mutated"
+        with pytest.raises(TypeError):
+            edge0["condition_id"] = "mutated"

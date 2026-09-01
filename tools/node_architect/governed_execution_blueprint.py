@@ -32,6 +32,28 @@ _REQUIRED_SOURCE_KEYS = frozenset(
 )
 
 
+def _deep_freeze(value: Any) -> Any:
+    """Recursively freeze nested mappings/sequences for post-construction
+    immutability (seq=14 M1: outer tuple alone is insufficient)."""
+    if isinstance(value, Mapping):
+        return MappingProxyType(
+            {str(key): _deep_freeze(item) for key, item in value.items()}
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(_deep_freeze(item) for item in value)
+    return value
+
+
+def _plain(value: Any) -> Any:
+    """Recursively convert frozen mappings/sequences back to JSON-safe
+    plain dicts/lists for serialization."""
+    if isinstance(value, Mapping):
+        return {str(key): _plain(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain(item) for item in value]
+    return value
+
+
 class BlueprintValidationError(ValueError):
     """Raised when a blueprint is missing or contradicts a required binding."""
 
@@ -206,7 +228,7 @@ class GovernedExecutionBlueprint:
 
         if not isinstance(self.topology, Sequence) or isinstance(self.topology, (str, bytes)):
             raise BlueprintValidationError("topology must be a sequence")
-        topology = tuple(dict(item) for item in self.topology)
+        topology = tuple(_deep_freeze(dict(item)) for item in self.topology)
         if not topology:
             raise BlueprintValidationError("blueprint topology must not be empty")
         known_actions = set(actions)
@@ -256,7 +278,7 @@ class GovernedExecutionBlueprint:
             self.authority_requirements, (str, bytes)
         ):
             raise BlueprintValidationError("authority_requirements must be a sequence")
-        authority = tuple(dict(item) for item in self.authority_requirements)
+        authority = tuple(_deep_freeze(dict(item)) for item in self.authority_requirements)
         for item in authority:
             _text(item.get("action"), "authority.action")
             _text(item.get("gate"), "authority.gate")
@@ -291,8 +313,8 @@ class GovernedExecutionBlueprint:
             "source_bindings": dict(sorted(self.source_bindings.items())),
             "runbooks": [item.to_dict() for item in self.runbooks],
             "nodes": [item.to_dict() for item in self.nodes],
-            "topology": [dict(item) for item in self.topology],
-            "authority_requirements": [dict(item) for item in self.authority_requirements],
+            "topology": [_plain(item) for item in self.topology],
+            "authority_requirements": [_plain(item) for item in self.authority_requirements],
             "implementation_plan_ref": self.implementation_plan_ref,
         }
         return payload
@@ -451,21 +473,16 @@ def produce_governed_blueprint(
             continue
         edges_by_source.setdefault(src, []).append(row)
 
-    # Fallback: if compiled profile is missing, derive from executable runtime-graph edges.
+    # Fallback: compiled route semantics are CANONICAL. There is NO fallback to
+    # the raw runtime graph — inventing continue/human_required semantics from
+    # raw edges when the compiled profile is absent would fabricate route
+    # meaning. Fail closed instead (seq=14 M1 correction).
     if not edges_by_source:
-        for edge in graph.get("edges", []):
-            src = edge.get("source")
-            if not src or not isinstance(src, str):
-                continue
-            edges_by_source.setdefault(src, []).append({
-                "source": src,
-                "target": edge.get("target"),
-                "kind": "continue" if edge.get("runtime_executable") else "human_required",
-                "condition_id": None,
-                "runtime_executable": bool(edge.get("runtime_executable")),
-                "source_gate": None,
-                "target_gate": None,
-            })
+        raise BlueprintValidationError(
+            "compiled route semantics missing: flow-policy-compiled-profile.json "
+            "has no compiled route_table; refusing to invent route semantics "
+            "from the raw runtime graph"
+        )
 
     # Build one topology entry per bound node with preserved route semantics.
     topology_list: list[Mapping[str, Any]] = []
