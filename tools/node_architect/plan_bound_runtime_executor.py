@@ -40,10 +40,13 @@ def _revalidate_authority(
 ) -> dict[str, Any]:
     """Invoke the canonical GWC authority boundary check (M4).
 
-    Returns ``{"allowed": bool, "reason_code": str}``. The envelope is
-    revalidated only when the boundary check does NOT hard-BLOCK the action —
-    task/repo/base+head SHA/scope/gate/expiry are all validated by the
-    canonical validator, never by ``authority_id`` presence alone.
+    Returns ``{"allowed": bool, "reason_code": str}``. The boundary evaluator
+    is deliberately authority-negative: ``REQUIRE_APPROVAL`` means the current
+    action still lacks executable authority and MUST fail closed. Only
+    ``ALLOW_PREPARATION`` is a non-blocking result here; it covers read-only or
+    otherwise automatic preparation semantics and never creates later-gate
+    authority. A separate exact approval/authority path must exist before an
+    effectful action can become executable.
     """
     from datetime import datetime, timezone
 
@@ -96,7 +99,7 @@ def _revalidate_authority(
         evaluated_at=evaluated_at,
         envelope_expires_at=envelope_expires_at,
     )
-    allowed = decision.get("decision") not in {"BLOCK", "NOT_APPLICABLE"}
+    allowed = decision.get("decision") == "ALLOW_PREPARATION"
     return {
         "allowed": allowed,
         "reason_code": str(decision.get("primary_reason_code", "AUTHORITY_BLOCKED")),
@@ -201,11 +204,11 @@ class PlanBoundRuntimeExecutor:
                     f"outcome {outcome!r} not declared in plan step {step_id!r} edges"
                 )
 
-        # 8. Authority revalidation — M4: invoke the canonical GWC authority
-        # boundary check. `authority_revalidated=True` ONLY when the boundary
-        # check confirms the envelope is valid and the action is in scope
-        # (decision is not a hard BLOCK). Absent authority + effectful action
-        # still fails closed.
+        # 8. Authority revalidation — invoke the canonical GWC authority
+        # boundary evaluator. It is authority-negative: REQUIRE_APPROVAL is a
+        # stop condition, not executable authority. Only ALLOW_PREPARATION may
+        # pass this adapter; effectful authority requires a separate exact
+        # approval-aware validation path rather than authority_id presence.
         authority_revalidated = False
         if isinstance(authority, Mapping) and authority.get("authority_id"):
             verdict = _revalidate_authority(authority, requested_action, runtime_plan_ref, step_id)
