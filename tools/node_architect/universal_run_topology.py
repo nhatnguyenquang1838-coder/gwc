@@ -157,9 +157,17 @@ def validate_node_allocation(
 
     stored_reasons = allocation.get("independent_boundary_reasons", [])
     _require(isinstance(stored_reasons, list), "INDEPENDENT_BOUNDARY_REASONS_INVALID")
-    effective_reasons = _normalize_boundary_reasons(
-        independent_boundary_reasons if independent_boundary_reasons is not None else stored_reasons
-    )
+    normalized_stored_reasons = _normalize_boundary_reasons(stored_reasons)
+    if independent_boundary_reasons is not None:
+        normalized_override = _normalize_boundary_reasons(independent_boundary_reasons)
+        if "content_digest" in allocation:
+            _require(
+                normalized_override == normalized_stored_reasons,
+                "INDEPENDENT_BOUNDARY_OVERRIDE_MISMATCH",
+            )
+        effective_reasons = normalized_override
+    else:
+        effective_reasons = normalized_stored_reasons
 
     if kind == "CONTROL":
         _require(_non_empty_string(allocation.get("control_justification")), "CONTROL_JUSTIFICATION_REQUIRED")
@@ -262,6 +270,8 @@ def materialize_child_run(
     reason = str(reason).upper()
     _require(reason in MATERIALIZATION_REASONS, "CHILD_MATERIALIZATION_REASON_UNKNOWN", reason)
     states = _normalize_generation_states(generation_states)
+    historical_child_refs = {state["child_run_ref"] for state in states}
+    _require(child_run_id not in historical_child_refs, "CHILD_RUN_REF_REUSED", child_run_id)
     active = [state for state in states if state["terminal_state"] == "OPEN"]
     _require(not active, "CHILD_RUN_ALREADY_ACTIVE", active[0]["child_run_ref"] if active else "")
 
@@ -273,7 +283,6 @@ def materialize_child_run(
         _require(states, "RERUN_PREDECESSOR_REQUIRED")
         latest = states[-1]
         _require(latest["terminal_state"] != "OPEN", "CHILD_RUN_ALREADY_ACTIVE", latest["child_run_ref"])
-        _require(child_run_id != latest["child_run_ref"], "CHILD_RUN_REF_REUSED", child_run_id)
         generation = latest["generation"] + 1
         rerun_of = latest["child_run_ref"]
 
