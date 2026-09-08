@@ -100,6 +100,7 @@ def create_run_manifest_revision(
             _non_empty_string(parent_run_ref) and _non_empty_string(invoking_node_allocation_ref),
             "CHILD_LINEAGE_INVALID",
         )
+        _require(run_id != parent_run_ref, "CHILD_PARENT_SELF_LOOP")
 
     record = _base_record(
         record_id=record_id,
@@ -228,16 +229,25 @@ def _normalize_generation_states(states: Sequence[Mapping[str, Any]]) -> list[di
         generation = state.get("generation")
         terminal_state = str(state.get("terminal_state", "")).upper()
         _require(_non_empty_string(child_ref), "CHILD_GENERATION_STATE_INVALID", "child_run_ref")
-        _require(isinstance(generation, int) and generation >= 1, "CHILD_GENERATION_STATE_INVALID", "generation")
+        if isinstance(generation, bool):
+            _require(False, "CHILD_GENERATION_STATE_INVALID", "generation")
+        if isinstance(generation, int):
+            normalized_generation = generation
+        elif isinstance(generation, float) and generation.is_integer():
+            normalized_generation = int(generation)
+        else:
+            _require(False, "CHILD_GENERATION_STATE_INVALID", "generation")
+            normalized_generation = 0
+        _require(normalized_generation >= 1, "CHILD_GENERATION_STATE_INVALID", "generation")
         _require(terminal_state in TERMINAL_STATES, "CHILD_GENERATION_STATE_INVALID", "terminal_state")
-        _require(generation not in generations, "CHILD_GENERATION_STATE_DUPLICATE", str(generation))
+        _require(normalized_generation not in generations, "CHILD_GENERATION_STATE_DUPLICATE", str(normalized_generation))
         _require(child_ref not in child_refs, "CHILD_RUN_REF_REUSED", str(child_ref))
-        generations.add(generation)
+        generations.add(normalized_generation)
         child_refs.add(str(child_ref))
         normalized.append(
             {
                 "child_run_ref": str(child_ref),
-                "generation": generation,
+                "generation": normalized_generation,
                 "terminal_state": terminal_state,
             }
         )
@@ -266,6 +276,7 @@ def materialize_child_run(
     _require(verify_record_digest(node_allocation), "NODE_ALLOCATION_DIGEST_INVALID")
     _require(node_allocation.get("run_id") == parent_run_id, "NODE_ALLOCATION_PARENT_MISMATCH")
     _require(_non_empty_string(child_run_id), "CHILD_RUN_REF_INVALID")
+    _require(child_run_id != parent_run_id, "CHILD_PARENT_SELF_LOOP")
 
     reason = str(reason).upper()
     _require(reason in MATERIALIZATION_REASONS, "CHILD_MATERIALIZATION_REASON_UNKNOWN", reason)

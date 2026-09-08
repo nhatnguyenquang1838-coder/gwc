@@ -45,7 +45,7 @@
       "then": {
         "properties": {
           "generation": {"minimum": 2},
-          "rerun_of": {"type": "string", "minLength": 1}
+          "rerun_of": {"type": "string", "minLength": 1, "pattern": "\\S"}
         }
       }
     }

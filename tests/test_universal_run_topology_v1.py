@@ -95,3 +95,31 @@ def test_20_schema_rejects_initial_generation_two():
 def test_21_schema_rejects_rerun_generation_one():
     value=copy.deepcopy(_rerun_receipt()); value.pop("content_digest"); value["generation"]=1; value=seal_immutable_record(value)
     with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,_receipt_schema())
+
+def test_22_child_manifest_rejects_parent_self_loop():
+    with pytest.raises(UniversalRunKernelError) as e: create_run_manifest_revision(record_id="RM-SELF",run_id="RUN-P",revision=1,run_kind="CHILD",parent_run_ref="RUN-P",invoking_node_allocation_ref="NA-1",created_at=TS,created_by=CREATED)
+    assert e.value.code=="CHILD_PARENT_SELF_LOOP"
+
+def test_23_child_materialization_rejects_parent_self_loop():
+    with pytest.raises(UniversalRunKernelError) as e: materialize_child_run(record_id="CM-SELF",parent_run_id="RUN-P",child_run_id="RUN-P",node_allocation=work_alloc(),created_at=TS,created_by=CREATED)
+    assert e.value.code=="CHILD_PARENT_SELF_LOOP"
+
+def test_24_schema_accepts_valid_initial_receipt():
+    jsonschema.validate(_initial_receipt(),_receipt_schema())
+
+def test_25_schema_accepts_valid_rerun_receipt():
+    jsonschema.validate(_rerun_receipt(),_receipt_schema())
+
+def test_26_schema_rejects_whitespace_only_rerun_of():
+    value=copy.deepcopy(_rerun_receipt()); value.pop("content_digest"); value["rerun_of"]="   "; value=seal_immutable_record(value)
+    with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,_receipt_schema())
+
+def test_27_integral_float_generation_is_normalized():
+    state=terminal_state(); state["generation"]=2.0
+    r=materialize_child_run(record_id="CM-FLOAT",parent_run_id="RUN-P",child_run_id="RUN-C2",node_allocation=work_alloc(),generation_states=[state],reason="RERUN_SUBTREE",created_at=TS,created_by=CREATED)
+    assert r["generation"]==3 and type(r["generation"]) is int
+
+def test_28_boolean_generation_is_rejected():
+    state=terminal_state(); state["generation"]=True
+    with pytest.raises(UniversalRunKernelError) as e: materialize_child_run(record_id="CM-BOOL",parent_run_id="RUN-P",child_run_id="RUN-C2",node_allocation=work_alloc(),generation_states=[state],reason="RERUN_SUBTREE",created_at=TS,created_by=CREATED)
+    assert e.value.code=="CHILD_GENERATION_STATE_INVALID"
