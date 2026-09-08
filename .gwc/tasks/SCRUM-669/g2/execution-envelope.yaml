@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-execution-envelope",
+  "activation_state": "AWAITING_APPROVAL",
+  "task_id": "SCRUM-669",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72",
+  "working_branch": "impl/scrum-669-universal-run-e3-topology",
+  "risk_class": "R2",
+  "risk_digest": "sha256:b5860d426d6f109a07e15a2dba54b116c09b4221debe2737514d44f56c6075b9",
+  "bounded_read_scope": [
+    "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+    "tests/test_universal_run_topology_v1.py"
+  ],
+  "bounded_write_scope": [
+    "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+    "tests/test_universal_run_topology_v1.py"
+  ],
+  "authorized_actions": [
+    "add_files",
+    "run_sandboxed_validation",
+    "stage_commit_push"
+  ],
+  "excluded_actions": [
+    "open_draft_pr",
+    "mark_pr_ready",
+    "merge",
+    "auto_merge",
+    "force_push",
+    "branch_deletion",
+    "protected_branch_write",
+    "deploy",
+    "release",
+    "production_data_change",
+    "production_config_change",
+    "g3_pr_promotion",
+    "g4_merge",
+    "g5_deploy",
+    "g6_production"
+  ],
+  "scope_hash": "sha256:7e219f45e9499fa741a7870e381fcbff72435102792f87587760a611dcd02378",
+  "f1_artifact_digests": {
+    "g1_scope": "sha256:28574e7974bc4508d6f13ee5effa94d7259c766e30c1bc5aad6c862ecc308fa3"
+  },
+  "f2_digests": {
+    "authority_reconciliation": "sha256:03b164dfa9ef4253f6ed03ca31902ca1350dd7164b7f1a7551db8497806ed17e",
+    "g1_scope_provenance": "sha256:28574e7974bc4508d6f13ee5effa94d7259c766e30c1bc5aad6c862ecc308fa3"
+  },
+  "approval_request_ref": {
+    "approval_id": "CP-20260908-SCRUM669-G2-F4-R1",
+    "authority_gate": "G2_EXECUTION",
+    "task_id": "SCRUM-669",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "protected_base": {
+      "ref": "main",
+      "sha": "0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72"
+    },
+    "continuation_base_sha": "14c94667f2176711709be84e10f8d7b3fa7208ad",
+    "working_branch": "impl/scrum-669-universal-run-e3-topology",
+    "g1_scope_hash": "sha256:28574e7974bc4508d6f13ee5effa94d7259c766e30c1bc5aad6c862ecc308fa3",
+    "authorized_paths": [
+      "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+      "tests/test_universal_run_topology_v1.py"
+    ],
+    "authorized_actions": [
+      "add_files",
+      "run_sandboxed_validation",
+      "stage_commit_push"
+    ],
+    "excluded_actions": [
+      "open_draft_pr",
+      "mark_pr_ready",
+      "merge",
+      "auto_merge",
+      "force_push",
+      "branch_deletion",
+      "protected_branch_write",
+      "deploy",
+      "release",
+      "production_data_change",
+      "production_config_change",
+      "g3_pr_promotion",
+      "g4_merge",
+      "g5_deploy",
+      "g6_production"
+    ],
+    "scope_hash": "sha256:7e219f45e9499fa741a7870e381fcbff72435102792f87587760a611dcd02378",
+    "scope_hash_16": "7e219f45e9499fa7",
+    "issued_at": "2026-09-08T01:56:56Z",
+    "expires_at": "2026-09-09T01:56:56Z",
+    "status": "AWAITING_APPROVAL",
+    "note": "F4 bounded correction; envelope materialization only until formal G2 token readback."
+  },
+  "approval_validation_ref": null,
+  "checkpoint_id": "scrum-669-f4-g2-envelope-20260908T015656Z",
+  "issued_at": "2026-09-08T01:56:56Z",
+  "expires_at": "2026-09-09T01:56:56Z",
+  "reason_code": "G2_ENVELOPE_AWAITING_APPROVAL",
+  "envelope_digest": "sha256:4d8748f50af61a81d47c055aaddc1f564bc0c0bbbc32ec682f51fe23b8c3ec56",
+  "exclusions": [
+    "G3_PR",
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION"
+  ],
+  "execution_started": false
+}
