@@ -23,10 +23,10 @@
     "content_digest"
   ],
   "properties": {
-    "record_id": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
+    "record_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
     "schema_id": {"const": "gwc.universal-run.node-allocation"},
     "schema_version": {"const": 1},
-    "run_id": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
+    "run_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
     "created_at": {"type": "string", "minLength": 1},
     "created_by": {"type": "object"},
     "lifecycle_profile": {
@@ -47,11 +47,11 @@
         "source_refs": {"type": "array", "items": {"type": "string"}}
       }
     },
-    "node_allocation_id": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
+    "node_allocation_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
     "kind": {"enum": ["WORK", "CONTROL"]},
     "requirement": {"enum": ["REQUIRED", "OPTIONAL", "CONDITIONAL"]},
-    "condition_ref": {"type": ["string", "null"], "pattern": "^\\S(?:.*\\S)?$"},
-    "control_justification": {"type": ["string", "null"], "pattern": "^\\S(?:.*\\S)?$"},
+    "condition_ref": {"type": ["string", "null"], "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "control_justification": {"type": ["string", "null"], "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
     "independent_boundary_reasons": {
       "type": "array",
       "uniqueItems": true,

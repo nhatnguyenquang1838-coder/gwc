@@ -46,6 +46,7 @@ def _non_empty_string(value: Any) -> bool:
 def _canonical_reference(value: Any, code: str, detail: str) -> str:
     _require(isinstance(value, str), code, detail)
     _require(bool(value) and value == value.strip(), code, detail)
+    _require("\r" not in value and "\n" not in value, code, detail)
     return value
 
 
@@ -201,9 +202,21 @@ def validate_node_allocation(
             "control_justification",
         )
         _require(not effective_reasons, "CONTROL_REQUIRES_WORK", ",".join(effective_reasons))
+    elif allocation.get("control_justification") is not None:
+        _canonical_reference(
+            allocation.get("control_justification"),
+            "CONTROL_JUSTIFICATION_INVALID",
+            "control_justification",
+        )
 
     if requirement == "CONDITIONAL":
         _canonical_reference(allocation.get("condition_ref"), "CONDITION_REF_REQUIRED", "condition_ref")
+    elif allocation.get("condition_ref") is not None:
+        _canonical_reference(
+            allocation.get("condition_ref"),
+            "CONDITION_REF_INVALID",
+            "condition_ref",
+        )
 
 
 def create_node_allocation(

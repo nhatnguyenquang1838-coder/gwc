@@ -171,3 +171,30 @@ def test_36_child_generation_rejects_padded_reference():
 def test_37_child_materialization_rejects_padded_ids():
     with pytest.raises(UniversalRunKernelError) as e: materialize_child_run(record_id="CM-ID-PAD",parent_run_id="RUN-P",child_run_id=" RUN-C2 ",node_allocation=work_alloc(),created_at=TS,created_by=CREATED)
     assert e.value.code=="CHILD_RUN_REF_INVALID"
+
+@pytest.mark.parametrize("value", [" padded ", "A\nB", "A\rB", "A\r\nB"])
+def test_38_optional_condition_ref_must_be_canonical(value):
+    with pytest.raises(UniversalRunKernelError): create_node_allocation(record_id="NA-COND-OPT",run_id="RUN-P",node_allocation_id="NODE-1",kind="WORK",requirement="REQUIRED",condition_ref=value,created_at=TS,created_by=CREATED)
+
+def test_39_optional_control_justification_must_be_canonical():
+    for value in (" padded ", "A\nB", "A\rB", "A\r\nB"):
+        with pytest.raises(UniversalRunKernelError): create_node_allocation(record_id="NA-CTRL-OPT",run_id="RUN-P",node_allocation_id="NODE-1",kind="WORK",requirement="REQUIRED",control_justification=value,created_at=TS,created_by=CREATED)
+
+def test_40_node_allocation_schema_rejects_embedded_line_terminators():
+    value=work_alloc(); schema=json.loads((SCHEMA_ROOT/"node-allocation.schema.json").read_text())
+    for field in ("condition_ref","control_justification"):
+        for invalid in ("A\nB", "A\rB", "A\r\nB"):
+            candidate=copy.deepcopy(value); candidate.pop("content_digest"); candidate[field]=invalid; candidate=seal_immutable_record(candidate)
+            with pytest.raises(jsonschema.ValidationError): jsonschema.validate(candidate,schema)
+
+def test_41_optional_references_allow_interior_spaces():
+    value=work_alloc(condition_ref="A B",control_justification="A B")
+    jsonschema.validate(value,json.loads((SCHEMA_ROOT/"node-allocation.schema.json").read_text()))
+    assert value["condition_ref"]=="A B" and value["control_justification"]=="A B"
+
+def test_42_manifest_schema_rejects_embedded_line_terminators():
+    child=create_run_manifest_revision(record_id="RM-SCHEMA-LT",run_id="RUN-C",revision=1,run_kind="CHILD",parent_run_ref="RUN-P",invoking_node_allocation_ref="NA-1",created_at=TS,created_by=CREATED)
+    schema=json.loads((SCHEMA_ROOT/"run-manifest-revision.schema.json").read_text())
+    for field in ("record_id","run_id","parent_run_ref","invoking_node_allocation_ref"):
+        candidate=copy.deepcopy(child); candidate.pop("content_digest"); candidate[field]="A\nB"; candidate=seal_immutable_record(candidate)
+        with pytest.raises(jsonschema.ValidationError): jsonschema.validate(candidate,schema)
