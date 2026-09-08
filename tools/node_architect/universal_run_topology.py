@@ -7,6 +7,7 @@ and digest verification primitives.
 from __future__ import annotations
 
 import copy
+import math
 from typing import Any, Iterable, Mapping, Sequence
 
 from tools.node_architect.universal_run_kernel import (
@@ -42,6 +43,26 @@ def _non_empty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+def _canonical_reference(value: Any, code: str, detail: str) -> str:
+    _require(isinstance(value, str), code, detail)
+    _require(bool(value) and value == value.strip(), code, detail)
+    return value
+
+
+def _normalize_revision(value: Any) -> int:
+    if isinstance(value, bool):
+        _require(False, "RUN_MANIFEST_REVISION_INVALID", "revision")
+    if isinstance(value, int):
+        revision = value
+    elif isinstance(value, float) and math.isfinite(value) and value.is_integer():
+        revision = int(value)
+    else:
+        _require(False, "RUN_MANIFEST_REVISION_INVALID", "revision")
+        revision = 0
+    _require(revision >= 1, "RUN_MANIFEST_REVISION_INVALID", "revision")
+    return revision
+
+
 def _base_record(
     *,
     record_id: str,
@@ -52,8 +73,8 @@ def _base_record(
     source_refs: Iterable[str] = (),
     predecessor_refs: Iterable[str] = (),
 ) -> dict[str, Any]:
-    _require(_non_empty_string(record_id), "RECORD_ENVELOPE_INVALID", "record_id")
-    _require(_non_empty_string(run_id), "RECORD_ENVELOPE_INVALID", "run_id")
+    record_id = _canonical_reference(record_id, "RECORD_ENVELOPE_INVALID", "record_id")
+    run_id = _canonical_reference(run_id, "RECORD_ENVELOPE_INVALID", "run_id")
     _require(_non_empty_string(created_at), "RECORD_ENVELOPE_INVALID", "created_at")
     _require(isinstance(created_by, Mapping), "RECORD_ENVELOPE_INVALID", "created_by")
     return {
@@ -91,14 +112,14 @@ def create_run_manifest_revision(
     """
     run_kind = str(run_kind).upper()
     _require(run_kind in RUN_KINDS, "RUN_KIND_UNKNOWN", run_kind)
-    _require(isinstance(revision, int) and revision >= 1, "RUN_MANIFEST_REVISION_INVALID")
+    revision = _normalize_revision(revision)
 
     if run_kind == "ROOT":
         _require(parent_run_ref is None and invoking_node_allocation_ref is None, "ROOT_LINEAGE_INVALID")
     else:
-        _require(
-            _non_empty_string(parent_run_ref) and _non_empty_string(invoking_node_allocation_ref),
-            "CHILD_LINEAGE_INVALID",
+        parent_run_ref = _canonical_reference(parent_run_ref, "CHILD_LINEAGE_INVALID", "parent_run_ref")
+        invoking_node_allocation_ref = _canonical_reference(
+            invoking_node_allocation_ref, "CHILD_LINEAGE_INVALID", "invoking_node_allocation_ref"
         )
         _require(run_id != parent_run_ref, "CHILD_PARENT_SELF_LOOP")
 
@@ -148,13 +169,16 @@ def validate_node_allocation(
     if "content_digest" in allocation:
         _require(verify_record_digest(allocation), "NODE_ALLOCATION_DIGEST_INVALID")
 
+    _canonical_reference(allocation.get("record_id"), "RECORD_ENVELOPE_INVALID", "record_id")
+    _canonical_reference(allocation.get("run_id"), "RECORD_ENVELOPE_INVALID", "run_id")
+
     kind = str(allocation.get("kind", "")).upper()
     requirement = str(allocation.get("requirement", "")).upper()
     policy = allocation.get("child_instance_policy")
     _require(kind in NODE_KINDS, "NODE_KIND_UNKNOWN", kind)
     _require(requirement in REQUIREMENT_KINDS, "NODE_REQUIREMENT_UNKNOWN", requirement)
     _require(policy == CHILD_INSTANCE_POLICY, "CHILD_INSTANCE_POLICY_UNSUPPORTED", str(policy))
-    _require(_non_empty_string(allocation.get("node_allocation_id")), "NODE_ALLOCATION_ID_INVALID")
+    _canonical_reference(allocation.get("node_allocation_id"), "NODE_ALLOCATION_ID_INVALID", "node_allocation_id")
 
     stored_reasons = allocation.get("independent_boundary_reasons", [])
     _require(isinstance(stored_reasons, list), "INDEPENDENT_BOUNDARY_REASONS_INVALID")
@@ -171,11 +195,15 @@ def validate_node_allocation(
         effective_reasons = normalized_stored_reasons
 
     if kind == "CONTROL":
-        _require(_non_empty_string(allocation.get("control_justification")), "CONTROL_JUSTIFICATION_REQUIRED")
+        _canonical_reference(
+            allocation.get("control_justification"),
+            "CONTROL_JUSTIFICATION_REQUIRED",
+            "control_justification",
+        )
         _require(not effective_reasons, "CONTROL_REQUIRES_WORK", ",".join(effective_reasons))
 
     if requirement == "CONDITIONAL":
-        _require(_non_empty_string(allocation.get("condition_ref")), "CONDITION_REF_REQUIRED")
+        _canonical_reference(allocation.get("condition_ref"), "CONDITION_REF_REQUIRED", "condition_ref")
 
 
 def create_node_allocation(
@@ -225,10 +253,11 @@ def _normalize_generation_states(states: Sequence[Mapping[str, Any]]) -> list[di
     child_refs: set[str] = set()
     for state in states:
         _require(isinstance(state, Mapping), "CHILD_GENERATION_STATE_INVALID")
-        child_ref = state.get("child_run_ref")
+        child_ref = _canonical_reference(
+            state.get("child_run_ref"), "CHILD_GENERATION_STATE_INVALID", "child_run_ref"
+        )
         generation = state.get("generation")
         terminal_state = str(state.get("terminal_state", "")).upper()
-        _require(_non_empty_string(child_ref), "CHILD_GENERATION_STATE_INVALID", "child_run_ref")
         if isinstance(generation, bool):
             _require(False, "CHILD_GENERATION_STATE_INVALID", "generation")
         if isinstance(generation, int):
@@ -274,8 +303,9 @@ def materialize_child_run(
     validate_node_allocation(node_allocation)
     _require(node_allocation.get("kind") == "WORK", "CONTROL_CHILD_MATERIALIZATION_FORBIDDEN")
     _require(verify_record_digest(node_allocation), "NODE_ALLOCATION_DIGEST_INVALID")
+    parent_run_id = _canonical_reference(parent_run_id, "CHILD_LINEAGE_INVALID", "parent_run_id")
+    child_run_id = _canonical_reference(child_run_id, "CHILD_RUN_REF_INVALID", "child_run_id")
     _require(node_allocation.get("run_id") == parent_run_id, "NODE_ALLOCATION_PARENT_MISMATCH")
-    _require(_non_empty_string(child_run_id), "CHILD_RUN_REF_INVALID")
     _require(child_run_id != parent_run_id, "CHILD_PARENT_SELF_LOOP")
 
     reason = str(reason).upper()

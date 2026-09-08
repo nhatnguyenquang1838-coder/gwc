@@ -20,10 +20,10 @@
     "content_digest"
   ],
   "properties": {
-    "record_id": {"type": "string", "minLength": 1},
+    "record_id": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
     "schema_id": {"const": "gwc.universal-run.run-manifest-revision"},
     "schema_version": {"const": 1},
-    "run_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
     "created_at": {"type": "string", "minLength": 1},
     "created_by": {"type": "object"},
     "lifecycle_profile": {
@@ -46,8 +46,8 @@
     },
     "revision": {"type": "integer", "minimum": 1},
     "run_kind": {"enum": ["ROOT", "CHILD"]},
-    "parent_run_ref": {"type": ["string", "null"]},
-    "invoking_node_allocation_ref": {"type": ["string", "null"]},
+    "parent_run_ref": {"type": ["string", "null"], "pattern": "^\\S(?:.*\\S)?$"},
+    "invoking_node_allocation_ref": {"type": ["string", "null"], "pattern": "^\\S(?:.*\\S)?$"},
     "content_digest": {
       "type": "object",
       "required": ["algorithm", "canonicalization", "value"],

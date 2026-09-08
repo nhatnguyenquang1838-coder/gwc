@@ -123,3 +123,51 @@ def test_28_boolean_generation_is_rejected():
     state=terminal_state(); state["generation"]=True
     with pytest.raises(UniversalRunKernelError) as e: materialize_child_run(record_id="CM-BOOL",parent_run_id="RUN-P",child_run_id="RUN-C2",node_allocation=work_alloc(),generation_states=[state],reason="RERUN_SUBTREE",created_at=TS,created_by=CREATED)
     assert e.value.code=="CHILD_GENERATION_STATE_INVALID"
+
+def test_29_manifest_revision_rejects_bool():
+    with pytest.raises(UniversalRunKernelError) as e: create_run_manifest_revision(record_id="RM-BOOL",run_id="RUN-P",revision=True,run_kind="ROOT",created_at=TS,created_by=CREATED)
+    assert e.value.code=="RUN_MANIFEST_REVISION_INVALID"
+
+def test_30_manifest_revision_normalizes_integral_float():
+    m=create_run_manifest_revision(record_id="RM-FLOAT",run_id="RUN-P",revision=2.0,run_kind="ROOT",created_at=TS,created_by=CREATED)
+    assert m["revision"]==2 and type(m["revision"]) is int
+
+def test_31_manifest_rejects_padded_lineage_reference():
+    with pytest.raises(UniversalRunKernelError) as e: create_run_manifest_revision(record_id="RM-PAD",run_id="RUN-C",revision=1,run_kind="CHILD",parent_run_ref=" RUN-P ",invoking_node_allocation_ref="NA-1",created_at=TS,created_by=CREATED)
+    assert e.value.code=="CHILD_LINEAGE_INVALID"
+
+def test_32_manifest_schema_rejects_whitespace_and_padded_references():
+    child=create_run_manifest_revision(record_id="RM-SCHEMA",run_id="RUN-C",revision=1,run_kind="CHILD",parent_run_ref="RUN-P",invoking_node_allocation_ref="NA-1",created_at=TS,created_by=CREATED)
+    schema=json.loads((SCHEMA_ROOT/"run-manifest-revision.schema.json").read_text())
+    for field,value in (("parent_run_ref","   "),("invoking_node_allocation_ref"," NA-1 ")):
+        candidate=copy.deepcopy(child); candidate.pop("content_digest"); candidate[field]=value; candidate=seal_immutable_record(candidate)
+        with pytest.raises(jsonschema.ValidationError): jsonschema.validate(candidate,schema)
+
+def test_33_node_allocation_rejects_noncanonical_references():
+    with pytest.raises(UniversalRunKernelError) as e: create_node_allocation(record_id="NA-RUN",run_id=" RUN-P ",node_allocation_id="NODE-1",kind="WORK",requirement="REQUIRED",created_at=TS,created_by=CREATED)
+    assert e.value.code=="RECORD_ENVELOPE_INVALID"
+    with pytest.raises(UniversalRunKernelError) as e: create_node_allocation(record_id="NA-ID",run_id="RUN-P",node_allocation_id=" NODE-1 ",kind="WORK",requirement="REQUIRED",created_at=TS,created_by=CREATED)
+    assert e.value.code=="NODE_ALLOCATION_ID_INVALID"
+    with pytest.raises(UniversalRunKernelError) as e: create_node_allocation(record_id="NA-COND",run_id="RUN-P",node_allocation_id="NODE-1",kind="WORK",requirement="CONDITIONAL",condition_ref=" ",created_at=TS,created_by=CREATED)
+    assert e.value.code=="CONDITION_REF_REQUIRED"
+    with pytest.raises(UniversalRunKernelError) as e: create_node_allocation(record_id="NA-CTRL",run_id="RUN-P",node_allocation_id="NODE-1",kind="CONTROL",requirement="REQUIRED",control_justification=" ",created_at=TS,created_by=CREATED)
+    assert e.value.code=="CONTROL_JUSTIFICATION_REQUIRED"
+
+def test_34_node_allocation_schema_rejects_noncanonical_references():
+    value=work_alloc(); schema=json.loads((SCHEMA_ROOT/"node-allocation.schema.json").read_text())
+    for field in ("run_id","node_allocation_id","condition_ref","control_justification"):
+        candidate=copy.deepcopy(value); candidate.pop("content_digest"); candidate[field]=" padded "; candidate=seal_immutable_record(candidate)
+        with pytest.raises(jsonschema.ValidationError): jsonschema.validate(candidate,schema)
+
+def test_35_nonpadded_references_remain_accepted():
+    manifest=create_run_manifest_revision(record_id="RM-VALID",run_id="RUN-C",revision=1,run_kind="CHILD",parent_run_ref="RUN-P",invoking_node_allocation_ref="NA-1",created_at=TS,created_by=CREATED)
+    allocation=create_node_allocation(record_id="NA-VALID",run_id="RUN-P",node_allocation_id="NODE-1",kind="CONTROL",requirement="REQUIRED",control_justification="valid justification",created_at=TS,created_by=CREATED)
+    assert manifest["parent_run_ref"]=="RUN-P" and allocation["control_justification"]=="valid justification"
+
+def test_36_child_generation_rejects_padded_reference():
+    with pytest.raises(UniversalRunKernelError) as e: materialize_child_run(record_id="CM-GEN-PAD",parent_run_id="RUN-P",child_run_id="RUN-C2",node_allocation=work_alloc(),generation_states=[terminal_state(" RUN-C1 ")],reason="RERUN_SUBTREE",created_at=TS,created_by=CREATED)
+    assert e.value.code=="CHILD_GENERATION_STATE_INVALID"
+
+def test_37_child_materialization_rejects_padded_ids():
+    with pytest.raises(UniversalRunKernelError) as e: materialize_child_run(record_id="CM-ID-PAD",parent_run_id="RUN-P",child_run_id=" RUN-C2 ",node_allocation=work_alloc(),created_at=TS,created_by=CREATED)
+    assert e.value.code=="CHILD_RUN_REF_INVALID"
