@@ -23,5 +23,31 @@
     "rerun_of":{"type":["string","null"]},
     "child_instance_policy":{"const":"SINGLE_ACTIVE"},
     "content_digest":{"type":"object","required":["algorithm","canonicalization","value"],"additionalProperties":false,"properties":{"algorithm":{"const":"sha256"},"canonicalization":{"const":"JCS"},"value":{"type":"string","pattern":"^[0-9a-f]{64}$"}}}
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["materialization_reason"],
+        "properties": {"materialization_reason": {"const": "INITIAL"}}
+      },
+      "then": {
+        "properties": {
+          "generation": {"const": 1},
+          "rerun_of": {"const": null}
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["materialization_reason"],
+        "properties": {"materialization_reason": {"const": "RERUN_SUBTREE"}}
+      },
+      "then": {
+        "properties": {
+          "generation": {"minimum": 2},
+          "rerun_of": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  ]
 }

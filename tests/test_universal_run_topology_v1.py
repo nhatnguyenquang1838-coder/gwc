@@ -70,3 +70,28 @@ def test_17_schema_malformed_records_fail_closed():
     for name,value in cases:
         schema=json.loads((SCHEMA_ROOT/name).read_text())
         with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,schema)
+
+def _receipt_schema():
+    return json.loads((SCHEMA_ROOT/"child-run-materialization-receipt.schema.json").read_text())
+
+def _initial_receipt():
+    return materialize_child_run(record_id="CM-F4-I",parent_run_id="RUN-P",child_run_id="RUN-C1",node_allocation=work_alloc(),created_at=TS,created_by=CREATED)
+
+def _rerun_receipt():
+    return materialize_child_run(record_id="CM-F4-R",parent_run_id="RUN-P",child_run_id="RUN-C2",node_allocation=work_alloc(),generation_states=[terminal_state()],reason="RERUN_SUBTREE",created_at=TS,created_by=CREATED)
+
+def test_18_schema_rejects_initial_with_rerun_of():
+    value=copy.deepcopy(_initial_receipt()); value.pop("content_digest"); value["rerun_of"]="RUN-OLD"; value=seal_immutable_record(value)
+    with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,_receipt_schema())
+
+def test_19_schema_rejects_rerun_without_rerun_of():
+    value=copy.deepcopy(_rerun_receipt()); value.pop("content_digest"); value["rerun_of"]=None; value=seal_immutable_record(value)
+    with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,_receipt_schema())
+
+def test_20_schema_rejects_initial_generation_two():
+    value=copy.deepcopy(_initial_receipt()); value.pop("content_digest"); value["generation"]=2; value=seal_immutable_record(value)
+    with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,_receipt_schema())
+
+def test_21_schema_rejects_rerun_generation_one():
+    value=copy.deepcopy(_rerun_receipt()); value.pop("content_digest"); value["generation"]=1; value=seal_immutable_record(value)
+    with pytest.raises(jsonschema.ValidationError): jsonschema.validate(value,_receipt_schema())
