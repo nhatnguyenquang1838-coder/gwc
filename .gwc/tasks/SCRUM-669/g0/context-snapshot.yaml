@@ -1,7 +1,6 @@
-# run_id: g1-scrum-669-20260908-1458
 schema_version: '1.0'
 artifact_type: g0-context-snapshot
-generated_at: '2026-09-08T14:58:16Z'
+generated_at: '2026-09-08T16:16:36Z'
 project:
   id: gwc
   name: GWC
@@ -14,12 +13,25 @@ repository:
   - main
   connector: GitHub
   write_enabled: true
+runtime_context:
+  agent_runtime_id: hermes
+  execution_mode: local_agent
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
 constraints:
-- G0/G1 canonical materialization only under authority SCRUM-669_G0_G1_RECONCILIATION_ONLY.
-- The current implementation subject is branch impl/scrum-669-universal-run-e3-topology at 758d2c3d29f9651735e433e49c75095b9c29ea7c; main remains unchanged.
-- The obsolete F4 G2 envelope and token are not reusable because the R1 correction scope changed and its G0/G1 artifacts were absent.
-- The next correction candidate is exactly topology.py, the child-run receipt schema, and the E3 topology test; no other E3 implementation path is authorized by this handoff.
-- No implementation edit, commit, push, PR, merge, deploy, production, credential, or force operation is authorized by this G0/G1 packet.
+- All governance artifacts must bind to main at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72.
+- The continuation subject is exactly d4e32d455e2f7bc5cb55a5c6caa89e7ab3069781.
+- Writable implementation scope is exactly four paths; receipt schema is read-only
+  validation-only.
+- The fresh scope hash must come from the canonical repository calculator.
+- G0/G1 PASS grants no implementation authority.
 applicable_policies:
 - id: AGENTS
   path: AGENTS.md
@@ -29,7 +41,7 @@ applicable_policies:
   path: core/Coding_Project_Governance_v1.0.md
   ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
   source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
-- id: GATE_LIFECYCLE_CONTRACT_v1.1
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
   path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
   ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
   source_sha: bc9150a7e7b82df464f472e5f0c8222cc8f480280cd6c072759d9560fe3bafd0

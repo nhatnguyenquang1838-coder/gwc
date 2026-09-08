@@ -1,7 +1,7 @@
-# run_id: g1-scrum-669-20260908-1458
+# run_id: g1-scrum-669-20260908-1616
 schema_version: '1.0'
 artifact_type: g1-options
-generated_at: '2026-09-08T14:58:16Z'
+generated_at: '2026-09-08T16:16:36Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -10,50 +10,50 @@ trace:
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
-  title: Reconcile G0/G1, then issue a fresh three-path G2 correction wave
+  title: Reconcile fresh G0/G1, then issue a four-path F5/F6 G2 wave
   description: >-
     Materialize and validate the five canonical G0/G1 artifacts, bind the fresh
-    scope hash to the current subject SHA and exactly three implementation paths,
-    then create a new AWAITING_APPROVAL G2 envelope only after G1 PASS. The
-    implementation remains blocked until the fresh executable token is issued.
+    scope hash to the current subject SHA and exactly four writable implementation
+    paths, retain the receipt schema as read-only validation evidence, then issue
+    a fresh executable G2 envelope only after G1 PASS.
   benefits:
-  - Resolves the current governance artifact blocker without fabricating implementation evidence.
-  - Includes the confirmed MAJOR self-loop fix and all confirmed R1 corrections in one bounded scope.
+  - Resolves stale governance evidence without fabricating implementation evidence.
+  - Covers the approved producer, two sibling semantic schemas, and regression tests.
   - Preserves same branch, subject SHA, and non-rewriting continuation lineage.
   tradeoffs:
-  - Requires a new G2 approval cycle before any code edit.
+  - Requires a fresh G2 approval/activation before any code edit.
   risks:
-  - The inherited self-loop remains open until the fresh implementation wave is executed and reviewed.
+  - The adversarial findings remain open until the authorized implementation wave is executed and reviewed.
   constraint_fit: FIT
 - id: OPT-2
-  title: Reuse the previous F4 G2 envelope
+  title: Reuse the previous three-path G2 envelope
   description: >-
-    Continue using CP-20260908-SCRUM669-G2-F4-R1 and its old scope hash while
-    adding topology.py implicitly.
+    Continue using the previous envelope and scope hash while implicitly adding
+    the two sibling schemas needed by the approved F5/F6 semantics.
   benefits:
   - Avoids preparing a new envelope.
   tradeoffs:
-  - The old envelope excludes topology.py and has no valid activation readback.
+  - The previous envelope is bound to an obsolete subject/scope and cannot authorize sibling-schema edits.
   risks:
-  - Violates the fresh Controller Handoff and would create a scope/authority mismatch.
+  - Violates exact scope binding and would create an authority mismatch.
   constraint_fit: NOT_FIT
 - id: OPT-3
-  title: Fix only schema and tests
+  title: Fix only runtime and tests
   description: >-
-    Leave tools/node_architect/universal_run_topology.py untouched and address
-    only the schema/test findings.
+    Leave both sibling semantic schemas untouched and address only runtime
+    normalization and regression coverage.
   benefits:
   - Smaller immediate diff.
   tradeoffs:
-  - Leaves the confirmed producer self-loop blocker unresolved.
+  - Leaves the confirmed schema/runtime parity blockers unresolved.
   risks:
-  - Fails the R1 contract disposition and cannot produce a clean review outcome.
+  - Fails the R1 adversarial disposition and cannot produce a clean review outcome.
   constraint_fit: NOT_FIT
 recommended_option_id: OPT-1
 recommendation_rationale: >-
-  OPT-1 is the only option that follows the fresh Controller Handoff, preserves
-  exact lineage, retires stale authority, and binds the necessary producer,
-  schema, and test correction surfaces without granting implementation authority
-  prematurely.
+  OPT-1 is the only option that follows the fresh Controller adjudication,
+  preserves exact lineage, retires stale authority, and binds the approved
+  producer/schema/test correction surfaces without granting implementation
+  authority before a fresh G2 envelope.
 decision_required: true
 status: READY

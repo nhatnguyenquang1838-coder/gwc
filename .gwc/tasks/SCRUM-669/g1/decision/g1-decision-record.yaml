@@ -1,7 +1,7 @@
-# run_id: g1-scrum-669-20260908-1458
+# run_id: g1-scrum-669-20260908-1616
 schema_version: '1.1'
 artifact_type: g1-decision-record
-generated_at: '2026-09-08T14:58:16Z'
+generated_at: '2026-09-08T16:16:36Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -14,19 +14,17 @@ status: ACCEPTED
 selected_option_id: OPT-1
 user_decision:
   actor: ChatGPT Controller (bound SCRUM-669 conversation)
-  decided_at: '2026-09-08T14:58:16Z'
+  decided_at: '2026-09-08T16:16:36Z'
   source: >-
-    Fresh Controller Handoff in the bound ChatGPT conversation authorized
-    SCRUM-669_G0_G1_RECONCILIATION_ONLY now and approved topology.py, the
-    child-run receipt schema, and the E3 topology test as the next G1 correction
-    scope candidate; it explicitly withheld implementation authority until a
-    fresh G2 executable token.
+    Explicit F5/F6 adjudication in the bound ChatGPT conversation approved the
+    fresh four-path writable scope, retained the receipt schema as read-only
+    validation evidence, and authorized G0/G1 reconciliation before a fresh G2
+    executable envelope. GPT transport was the Hermes In-App Browser only.
   explicit: true
 rationale: >-
-  Select the fresh reconciliation wave. It is the only option that resolves the
-  missing canonical G0/G1 evidence, preserves the exact implementation lineage,
-  retires the stale F4 authority, and binds the confirmed producer/schema/test
-  correction surfaces without editing code before fresh G2 approval.
+  Select the fresh reconciliation wave. It resolves stale governance evidence,
+  preserves exact subject lineage, binds the approved producer/sibling-schema/test
+  correction surfaces, and does not grant implementation authority before G2.
 rejected_option_ids:
 - OPT-2
 - OPT-3
@@ -37,7 +35,7 @@ acceptance_criteria_refs:
 - AC-4
 - AC-5
 - AC-6
-scope_hash: sha256:88348c48b147c0b38d5642c62732f903625f8d22a692293ec367639fecf637b1
+scope_hash: sha256:b54585aca4b9a9c801a02ee4365f73036222dc700bd582915b5aff60d492020e
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -54,20 +52,19 @@ implementation_plan_ref:
   plan_root: null
   plan_revision: null
   validation_evidence: >-
-    Protected-base tree inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
-    found no SCRUM-669-specific .kiro plan; existing unrelated plans were not
-    reused.
+    Protected-base inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+    found no SCRUM-669-specific .kiro plan; unrelated plans were not reused.
 subagent_distribution_plan:
   task_decomposition:
   - sub_task_id: SUB-TASK-1
-    description: Materialize and hash the canonical G0 context snapshot.
+    description: Materialize and validate fresh G0/G1 artifacts bound to the exact subject and protected base.
     dependencies: []
   - sub_task_id: SUB-TASK-2
-    description: Materialize the four G1 artifacts, including explicit plan applicability and exact three-path correction scope.
+    description: Calculate and bind the canonical four-path F5/F6 scope hash while retaining receipt-schema validation as read-only.
     dependencies:
     - SUB-TASK-1
   - sub_task_id: SUB-TASK-3
-    description: Run protected-base G0/G1 validation and preserve exact artifact/hash evidence before fresh G2 envelope materialization.
+    description: Reconcile the G2 action-vocabulary mismatch without expanding scope or fabricating authority.
     dependencies:
     - SUB-TASK-2
   agent_allocation:
@@ -75,15 +72,15 @@ subagent_distribution_plan:
     skill_id: dwa-gwc-governance
     agent_type: primary
   - sub_task_id: SUB-TASK-2
-    skill_id: dwa-gwc-governance
-    agent_type: primary
-  - sub_task_id: SUB-TASK-3
     skill_id: gwc-verification-evidence
     agent_type: validator
+  - sub_task_id: SUB-TASK-3
+    skill_id: dwa-gwc-governance
+    agent_type: primary
   execution_order:
   - SUB-TASK-1
   - SUB-TASK-2
   - SUB-TASK-3
   summary: >-
-    One same-lineage G0/G1 reconciliation sequence followed by validator
-    evidence; no implementation or downstream gate action is included.
+    One same-lineage G0/G1 reconciliation followed by canonical scope binding;
+    execution remains stopped at the G2 contract mismatch boundary.

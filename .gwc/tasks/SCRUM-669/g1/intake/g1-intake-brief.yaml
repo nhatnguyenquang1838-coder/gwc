@@ -1,7 +1,6 @@
-# run_id: g1-scrum-669-20260908-1458
 schema_version: '1.0'
 artifact_type: g1-intake-brief
-generated_at: '2026-09-08T14:58:16Z'
+generated_at: '2026-09-08T16:16:36Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -9,27 +8,22 @@ trace:
   base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
   g0_snapshot: ../../g0/context-snapshot.yaml
 problem:
-  statement: >-
-    SCRUM-669 E3 Recursive Node Architect requires a correction wave after
-    Independent Review R1 confirmed a major inherited self-loop gap in child-run
-    topology materialization, plus runtime/schema numeric-generation and
-    whitespace-rerun_of mismatches and insufficient positive receipt controls.
-  why_now: >-
-    The fresh Controller Handoff in the bound ChatGPT conversation confirmed the
-    findings, invalidated reuse of the old F4 G2 envelope, authorized only
-    canonical G0/G1 reconciliation now, and approved the three-path correction
-    scope as the next G1 candidate.
-desired_outcome: >-
-  Produce truthful, schema-valid G0/G1 artifacts with explicit implementation
-  plan applicability, validate them at the protected base, and prepare the
-  exact three-path correction scope for a fresh G2 envelope without performing
-  implementation edits or other downstream actions.
+  statement: SCRUM-669 E3 R1 on exact SHA d4e32d455e2f7bc5cb55a5c6caa89e7ab3069781
+    confirmed F5 revision numeric parity and F6 semantic-reference whitespace schema
+    parity findings after the first bounded correction wave.
+  why_now: The bound ChatGPT conversation explicitly approved F5 and F6 semantics,
+    rejected the prior five-path write scope as over-broad, and granted governance-only
+    authority to reconcile a fresh G0/G1/G2 packet.
+desired_outcome: Materialize truthful fresh G0/G1 artifacts and a new G2 envelope
+  bound to the current exact subject SHA, protected base, four writable implementation
+  paths, and one read-only receipt-schema validation path; do not edit code before
+  a fresh executable token.
 stakeholders:
   requester: Nhat Nguyen Quang
   affected:
   - GWC maintainers
   - SCRUM-669 controller/executor lineage
-  - future Universal Run / Node Architect consumers
+  - Universal Run and Node Architect consumers
   - independent reviewers
 scope:
   in_scope:
@@ -38,93 +32,98 @@ scope:
   - .gwc/tasks/SCRUM-669/g1/preflight/g1-preflight-report.yaml
   - .gwc/tasks/SCRUM-669/g1/brainstorming/g1-options.yaml
   - .gwc/tasks/SCRUM-669/g1/decision/g1-decision-record.yaml
-  - correction candidate scope binding for tools/node_architect/universal_run_topology.py
-  - correction candidate scope binding for schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json
-  - correction candidate scope binding for tests/test_universal_run_topology_v1.py
+  - bounded F5/F6 scope binding and validation evidence
   non_goals:
   - implementation edits before a fresh executable G2 token
-  - reuse of CP-20260908-SCRUM669-G2-F4-R1 or scope hash 7e219f45e9499fa7
-  - edits to Contract Freeze, main, or protected branches
-  - Draft PR, merge, deploy, production data/configuration, credentials, or force operations
+  - modifying the receipt schema beyond read-only validation
+  - PR creation or readiness promotion
+  - merge, deploy, production, credentials, force operations
+  - Contract Freeze or protected-main changes
 constraints:
-- All five artifacts must bind to the same protected base, task, repository, and trace.
-- The current subject SHA is 758d2c3d29f9651735e433e49c75095b9c29ea7c; main and origin/main are 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72.
-- 'The next implementation candidate is exactly three paths: topology.py, the child-run receipt schema, and the E3 topology test.'
-- The fresh G1 scope hash must be calculated by the repository canonical scope calculator, never guessed or copied from the obsolete envelope.
-- G0/G1 PASS does not grant implementation, PR, merge, deploy, or production authority.
+- All governance artifacts must bind to main at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72.
+- The continuation subject is exactly d4e32d455e2f7bc5cb55a5c6caa89e7ab3069781.
+- Writable implementation scope is exactly four paths; receipt schema is read-only
+  validation-only.
+- The fresh scope hash must come from the canonical repository calculator.
+- G0/G1 PASS grants no implementation authority.
 assumptions:
-- Jira SCRUM-669 remains In Progress with AI Agent=ChatGPT, Claimed At populated, and assignee Nhat Nguyen Quang.
-- The bound GPT conversation is the transport for the Controller Handoff; Slack is visibility-only.
-- No SCRUM-669-specific canonical Kiro plan exists in the protected-base .kiro tree, so implementation-plan applicability is not_applicable for this reconciliation packet.
+- Jira SCRUM-669 remains claimed In Progress with AI Agent=ChatGPT, Claimed At populated,
+  and assignee Nhat Nguyen Quang.
+- The bound ChatGPT conversation is the sole GPT transport; Slack is visibility-only.
+- No SCRUM-669-specific canonical Kiro plan exists in the protected-base tree.
 risks:
 - id: RISK-1
-  description: >-
-    Child-run topology accepts parent_run_ref equal to child_run_ref through the
-    producer path, creating a recursive self-loop.
-  impact: high
-  mitigation: >-
-    Keep the producer path in the next exact three-file G2 candidate and require
-    a fresh R1 review after the correction; do not downgrade the finding.
+  description: Revision runtime and Draft-07 integer semantics can diverge for bool
+    and integral-float values.
+  impact: medium
+  mitigation: Normalize integral floats to int, reject bool, and add focused runtime/schema
+    tests.
 - id: RISK-2
-  description: >-
-    JSON Schema numeric-integral semantics and Python bool/int runtime checks can
-    disagree for generation values.
+  description: Semantic reference schemas can accept whitespace-only values that runtime
+    rejects.
   impact: medium
-  mitigation: >-
-    Align schema and runtime behavior under the fresh G2 correction scope and
-    add exact regression controls.
+  mitigation: Encode non-whitespace parity in the two approved sibling schemas and
+    add positive/negative controls.
 - id: RISK-3
-  description: >-
-    Whitespace-only rerun_of and missing positive receipt tests can permit
-    invalid or weakly evidenced inputs.
-  impact: medium
-  mitigation: >-
-    Add matching schema/runtime rejection and positive acceptance assertions in
-    the fresh implementation wave.
+  description: The prior G2 envelope and G1 artifacts bind an obsolete subject and
+    scope.
+  impact: high
+  mitigation: Reconcile fresh G0/G1 artifacts and calculate a new scope hash from
+    current subject d4e32d45.
 - id: RISK-4
-  description: >-
-    The worktree contains unrelated dirty paths from other runs.
+  description: Shared worktree contains unrelated dirty paths.
   impact: medium
-  mitigation: >-
-    Write and later stage only the five explicitly authorized G0/G1 paths; never
-    use git add -A or clean/reset shared state.
+  mitigation: Write and stage only explicitly authorized governance paths, never clean/reset
+    or add all.
 acceptance_criteria:
 - id: AC-1
-  statement: All five SCRUM-669 G0/G1 artifacts are present and schema-valid.
+  statement: Fresh G0 and all four G1 artifacts are present and schema-valid.
   verifiable: true
 - id: AC-2
-  statement: All G1 artifacts use the identical project, repository, task, and protected-base trace.
+  statement: All fresh artifacts bind the same task, repository, protected base, branch,
+    and continuation subject.
   verifiable: true
 - id: AC-3
-  statement: The preflight and decision explicitly record implementation-plan applicability as not_applicable with matching evidence.
+  statement: F5/F6 semantics and exact four-path writable versus five-path read scope
+    are recorded in G1 evidence.
   verifiable: true
 - id: AC-4
-  statement: The fresh G1 scope hash is derived by tools/node_architect/scope_hash_calculation.py for the exact three-path correction candidate and current subject SHA.
+  statement: The fresh scope hash is calculated canonically for current subject d4e32d45
+    and the four writable paths.
   verifiable: true
 - id: AC-5
-  statement: Protected-base tools/validate_g01.py returns PASS for the SCRUM-669 workspace without requiring an old G2 artifact.
+  statement: Protected-base validate_g01.py returns PASS for the fresh task workspace.
   verifiable: true
 - id: AC-6
-  statement: No implementation file, protected branch, PR, merge, deploy, production, Jira claim, or Slack handoff is mutated by this G0/G1 reconciliation.
+  statement: No implementation path, main, PR, merge, deploy, Jira claim, or Slack
+    handoff is mutated by this reconciliation.
   verifiable: true
 delivery_lifecycle:
   authorized_actions:
-  - materialize_g0_g1_artifacts
-  - run_read_only_validation
-  - calculate_scope_identity
-  - materialize_fresh_g2_envelope_after_g1_pass
-  downstream_non_goals:
-  - modify_approved_files_before_fresh_g2_token
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
   - open_or_update_draft_pr
-  - merge_approved_pr
-  - deploy_approved_release
-  - production_data_write
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
   g3_metadata_completion:
-    ready_for_review_after_g3_pass: false
+    ready_for_review_after_g3_pass: true
     required_evidence:
-    - exact implementation subject SHA
-    - exact current branch and diff scope
-    - independent review evidence
-    - exact-current-tip CI evidence
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
 unresolved_questions: []
 status: READY
