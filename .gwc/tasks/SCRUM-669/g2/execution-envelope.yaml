@@ -8,12 +8,14 @@
   "base_sha": "0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72",
   "working_branch": "impl/scrum-669-universal-run-e3-topology",
   "risk_class": "R2",
-  "risk_digest": "sha256:b5860d426d6f109a07e15a2dba54b116c09b4221debe2737514d44f56c6075b9",
+  "risk_digest": "sha256:ee3da6a6c338864a6274e3155d488b466b3508f62ccd0d5bc8d5403e2590b5de",
   "bounded_read_scope": [
+    "tools/node_architect/universal_run_topology.py",
     "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
     "tests/test_universal_run_topology_v1.py"
   ],
   "bounded_write_scope": [
+    "tools/node_architect/universal_run_topology.py",
     "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
     "tests/test_universal_run_topology_v1.py"
   ],
@@ -39,16 +41,21 @@
     "g5_deploy",
     "g6_production"
   ],
-  "scope_hash": "sha256:7e219f45e9499fa741a7870e381fcbff72435102792f87587760a611dcd02378",
+  "scope_hash": "sha256:88348c48b147c0b38d5642c62732f903625f8d22a692293ec367639fecf637b1",
   "f1_artifact_digests": {
-    "g1_scope": "sha256:28574e7974bc4508d6f13ee5effa94d7259c766e30c1bc5aad6c862ecc308fa3"
+    "g0_context_snapshot": "sha256:888d47777a1fcbd3e4152af927dc6f50ec5c423d6dfb328dd76f0923c3916b77",
+    "g1_intake_brief": "sha256:4381a3c48376959f022a623732d39674ec426b50d6a764d68c7d77a0fb662f8e",
+    "g1_preflight_report": "sha256:6f9d7d8401167e24ac2dad40f2c2ebc6bfad0d72f24d5a6cea54b6244b51de40",
+    "g1_options": "sha256:dff96ac6a098bca6645a119c75a114ccbb4c0f4c5fa96b80eecf7f377b540509",
+    "g1_decision_record": "sha256:b2795f34d44868e44ac3c77464a053ef1985649da931ef6b492d346d1da2cf21",
+    "g1_scope": "sha256:88348c48b147c0b38d5642c62732f903625f8d22a692293ec367639fecf637b1"
   },
   "f2_digests": {
-    "authority_reconciliation": "sha256:03b164dfa9ef4253f6ed03ca31902ca1350dd7164b7f1a7551db8497806ed17e",
-    "g1_scope_provenance": "sha256:28574e7974bc4508d6f13ee5effa94d7259c766e30c1bc5aad6c862ecc308fa3"
+    "gate_state_resolution": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "authority_boundary_decision": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
   },
   "approval_request_ref": {
-    "approval_id": "CP-20260908-SCRUM669-G2-F4-R1",
+    "approval_id": "CP-20260908-SCRUM669-G2-E3-CORRECTION-R1",
     "authority_gate": "G2_EXECUTION",
     "task_id": "SCRUM-669",
     "repository": "nhatnguyenquang1838-coder/gwc",
@@ -56,10 +63,11 @@
       "ref": "main",
       "sha": "0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72"
     },
-    "continuation_base_sha": "14c94667f2176711709be84e10f8d7b3fa7208ad",
+    "continuation_base_sha": "758d2c3d29f9651735e433e49c75095b9c29ea7c",
     "working_branch": "impl/scrum-669-universal-run-e3-topology",
-    "g1_scope_hash": "sha256:28574e7974bc4508d6f13ee5effa94d7259c766e30c1bc5aad6c862ecc308fa3",
+    "g1_scope_hash": "sha256:88348c48b147c0b38d5642c62732f903625f8d22a692293ec367639fecf637b1",
     "authorized_paths": [
+      "tools/node_architect/universal_run_topology.py",
       "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
       "tests/test_universal_run_topology_v1.py"
     ],
@@ -85,19 +93,19 @@
       "g5_deploy",
       "g6_production"
     ],
-    "scope_hash": "sha256:7e219f45e9499fa741a7870e381fcbff72435102792f87587760a611dcd02378",
-    "scope_hash_16": "7e219f45e9499fa7",
-    "issued_at": "2026-09-08T01:56:56Z",
-    "expires_at": "2026-09-09T01:56:56Z",
+    "scope_hash": "sha256:88348c48b147c0b38d5642c62732f903625f8d22a692293ec367639fecf637b1",
+    "scope_hash_16": "88348c48b147c0b3",
+    "issued_at": "2026-09-08T15:04:35Z",
+    "expires_at": "2026-09-09T15:04:35Z",
     "status": "AWAITING_APPROVAL",
-    "note": "F4 bounded correction; envelope materialization only until formal G2 token readback."
+    "note": "Fresh E3 correction-wave envelope after G0/G1 PASS; no implementation execution until explicit G2 token readback."
   },
   "approval_validation_ref": null,
-  "checkpoint_id": "scrum-669-f4-g2-envelope-20260908T015656Z",
-  "issued_at": "2026-09-08T01:56:56Z",
-  "expires_at": "2026-09-09T01:56:56Z",
+  "checkpoint_id": "scrum-669-e3-correction-g2-envelope-20260908T150435Z",
+  "issued_at": "2026-09-08T15:04:35Z",
+  "expires_at": "2026-09-09T15:04:35Z",
   "reason_code": "G2_ENVELOPE_AWAITING_APPROVAL",
-  "envelope_digest": "sha256:4d8748f50af61a81d47c055aaddc1f564bc0c0bbbc32ec682f51fe23b8c3ec56",
+  "envelope_digest": "sha256:51c9788acc4f401a40ceda978dc57f6edcc296a316b83c44a119f9e37585eb37",
   "exclusions": [
     "G3_PR",
     "G4_MERGE",

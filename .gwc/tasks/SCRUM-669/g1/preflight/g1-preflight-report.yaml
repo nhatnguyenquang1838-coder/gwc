@@ -1,0 +1,101 @@
+# run_id: g1-scrum-669-20260908-1458
+schema_version: '1.1'
+artifact_type: g1-preflight-report
+generated_at: '2026-09-08T14:58:16Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-669
+  base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+- id: BASE-SHA
+  status: PASS
+  code: BASE_VERIFIED
+  message: origin/main and the protected base resolve to 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72.
+  evidence:
+  - origin/main=0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  - protected_base=0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+- id: REPOSITORY-IDENTITY
+  status: PASS
+  code: REPOSITORY_IDENTITY_VERIFIED
+  message: The active profile identifies nhatnguyenquang1838-coder/gwc with protected default branch main and write_enabled=true.
+  evidence:
+  - projects/gwc/project-profile.yaml
+  - repository=nhatnguyenquang1838-coder/gwc
+- id: JIRA-CLAIM
+  status: PASS
+  code: CLAIM_READBACK_VERIFIED
+  message: SCRUM-669 is In Progress, AI Agent=ChatGPT, Claimed At is populated, and assignee remains Nhat Nguyen Quang.
+  evidence:
+  - SCRUM-669
+  - status=In Progress
+  - customfield_10046=ChatGPT
+  - customfield_10047=2026-09-07T21:56:00.000+0700
+- id: GPT-HANDOFF
+  status: PASS
+  code: CONTROLLER_HANDOFF_VERIFIED
+  message: Fresh bound ChatGPT Handoff authorizes only G0/G1 canonical materialization now and approves the three-path implementation scope as the next G1 candidate.
+  evidence:
+  - bound ChatGPT conversation SCRUM-669
+  - authority=SCRUM-669_G0_G1_RECONCILIATION_ONLY
+  - subject_sha=758d2c3d29f9651735e433e49c75095b9c29ea7c
+- id: CORRECTION-SCOPE
+  status: PASS
+  code: SCOPE_CANDIDATE_BOUND
+  message: The next implementation candidate is exactly topology.py, the child-run receipt schema, and the E3 topology test; no other E3 path is included.
+  evidence:
+  - tools/node_architect/universal_run_topology.py
+  - schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json
+  - tests/test_universal_run_topology_v1.py
+- id: OLD-G2-DISPOSITION
+  status: PASS
+  code: OLD_AUTHORITY_RETIRED
+  message: The old F4 G2 envelope is retained only as provenance and is not reusable after the R1 scope delta.
+  evidence:
+  - CP-20260908-SCRUM669-G2-F4-R1
+  - scope_hash=sha256:7e219f45e9499fa741a7870e381fcbff72435102792f87587760a611dcd02378
+- id: WORKTREE-ISOLATION
+  status: PASS
+  code: ISOLATED_WORKTREE_VERIFIED
+  message: Work proceeds in the dedicated implementation worktree; unrelated dirty paths are excluded from the authorized five-file G0/G1 write set.
+  evidence:
+  - /Users/mac/prj/gwc.worktrees/scrum-669-e3-f4
+  - branch=impl/scrum-669-universal-run-e3-topology
+implementation_plan:
+  applicability: not_applicable
+  reason: >-
+    No SCRUM-669-specific canonical Kiro or project-approved implementation plan
+    exists in the protected-base .kiro tree for this E3 correction wave. The
+    current action is governance-only G0/G1 reconciliation; implementation
+    planning will be re-evaluated and bound before the fresh G2 envelope if the
+    correction implementation requires it.
+  source: plan_not_applicable
+  task_me_applicable: false
+  task_me_available: false
+  task_me_invoked: false
+  task_me_fallback_reason: null
+  canonical_task_uid: SCRUM-669
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  plan_root: null
+  requirements_path: null
+  design_path: null
+  tasks_path: null
+  plan_revision: null
+  validation_status: NOT_APPLICABLE
+  validation_evidence: >-
+    Protected-base tree inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+    found no SCRUM-669-specific .kiro plan; existing unrelated plans were not
+    reused.
+  generated_by: DWA
+  generated_at_utc: '2026-09-08T14:58:16Z'
+risk_class: R2
+required_gate: G2_HUMAN_DIRECTION
+blockers: []
+outcome: PASS

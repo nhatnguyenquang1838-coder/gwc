@@ -1,0 +1,106 @@
+# run_id: g1-scrum-669-20260908-1458
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-09-08T14:58:16Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- G0/G1 canonical materialization only under authority SCRUM-669_G0_G1_RECONCILIATION_ONLY.
+- The current implementation subject is branch impl/scrum-669-universal-run-e3-topology at 758d2c3d29f9651735e433e49c75095b9c29ea7c; main remains unchanged.
+- The obsolete F4 G2 envelope and token are not reusable because the R1 correction scope changed and its G0/G1 artifacts were absent.
+- The next correction candidate is exactly topology.py, the child-run receipt schema, and the E3 topology test; no other E3 implementation path is authorized by this handoff.
+- No implementation edit, commit, push, PR, merge, deploy, production, credential, or force operation is authorized by this G0/G1 packet.
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.1
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: bc9150a7e7b82df464f472e5f0c8222cc8f480280cd6c072759d9560fe3bafd0
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- id: PROJECT_EXTENSION
+  path: projects/gwc/project-extension.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: bac0b6b517d3b63970c706a30e37f448f9d25a2253502fb124c8934f77570768
+- id: CHATGPT_AGENT_ENTRYPOINT
+  path: agents/chatgpt-agent/agent-instructions.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: ab114587f6958abe67abe291444b90510bb2abe8e67c2979f52f00a562ed76f5
+- id: CHATGPT_GWC_BASE
+  path: agents/chatgpt-agent/gwc-governed-base.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: 5497e0a80e8f95ca12648e3f066c4365c5a0320d1f89ceacf6b5dc068d81cea9
+- id: G0_G1_OPERATIONAL_RUNBOOK
+  path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: 4905d7f48ac99ca1cdccdf954339ef64ad06ced59cafcb839b9cedc0a22f4cef
+- id: VALIDATE_G01
+  path: tools/validate_g01.py
+  ref: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bc9150a7e7b82df464f472e5f0c8222cc8f480280cd6c072759d9560fe3bafd0
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: bac0b6b517d3b63970c706a30e37f448f9d25a2253502fb124c8934f77570768
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: ab114587f6958abe67abe291444b90510bb2abe8e67c2979f52f00a562ed76f5
+- path: agents/chatgpt-agent/gwc-governed-base.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5497e0a80e8f95ca12648e3f066c4365c5a0320d1f89ceacf6b5dc068d81cea9
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 4905d7f48ac99ca1cdccdf954339ef64ad06ced59cafcb839b9cedc0a22f4cef
+- path: tools/validate_g01.py
+  required: true
+  status: AVAILABLE
+  source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+status: READY
+blockers: []
