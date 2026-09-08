@@ -1,7 +1,7 @@
-# run_id: g1-scrum-669-20260908-1616
+# run_id: g1-scrum-669-20260908-1659
 schema_version: '1.1'
 artifact_type: g1-decision-record
-generated_at: '2026-09-08T16:16:36Z'
+generated_at: '2026-09-08T16:59:20Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -14,17 +14,18 @@ status: ACCEPTED
 selected_option_id: OPT-1
 user_decision:
   actor: ChatGPT Controller (bound SCRUM-669 conversation)
-  decided_at: '2026-09-08T16:16:36Z'
+  decided_at: '2026-09-08T16:59:20Z'
   source: >-
-    Explicit F5/F6 adjudication in the bound ChatGPT conversation approved the
-    fresh four-path writable scope, retained the receipt schema as read-only
-    validation evidence, and authorized G0/G1 reconciliation before a fresh G2
-    executable envelope. GPT transport was the Hermes In-App Browser only.
+    Explicit adjudication in the bound ChatGPT conversation superseded the prior
+    implementation token and approved governance reconciliation for the revised
+    seven-probe RED-to-GREEN semantic contract, unchanged four-path write scope,
+    and read-only receipt-schema boundary.
   explicit: true
 rationale: >-
-  Select the fresh reconciliation wave. It resolves stale governance evidence,
-  preserves exact subject lineage, binds the approved producer/sibling-schema/test
-  correction surfaces, and does not grant implementation authority before G2.
+  Select the refresh wave. The prior token is superseded because the behavioral
+  acceptance contract expanded. This decision binds the revised seven probes and
+  sibling controls to the current subject without editing implementation before a
+  fresh G2 token.
 rejected_option_ids:
 - OPT-2
 - OPT-3
@@ -35,7 +36,9 @@ acceptance_criteria_refs:
 - AC-4
 - AC-5
 - AC-6
-scope_hash: sha256:b54585aca4b9a9c801a02ee4365f73036222dc700bd582915b5aff60d492020e
+- AC-7
+- AC-8
+scope_hash: sha256:94f403da7a29502644ac386ec067edd2aadd7f57207dd95b210abed13c3cdb49
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -52,19 +55,19 @@ implementation_plan_ref:
   plan_root: null
   plan_revision: null
   validation_evidence: >-
-    Protected-base inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
-    found no SCRUM-669-specific .kiro plan; unrelated plans were not reused.
+    Protected-base inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72 found
+    no SCRUM-669-specific .kiro plan; unrelated plans were not reused.
 subagent_distribution_plan:
   task_decomposition:
   - sub_task_id: SUB-TASK-1
-    description: Materialize and validate fresh G0/G1 artifacts bound to the exact subject and protected base.
+    description: Materialize and validate fresh G0/G1 artifacts bound to subject 7b96ee49.
     dependencies: []
   - sub_task_id: SUB-TASK-2
-    description: Calculate and bind the canonical four-path F5/F6 scope hash while retaining receipt-schema validation as read-only.
+    description: Bind seven RED-to-GREEN probes and sibling controls to the refreshed semantic acceptance contract.
     dependencies:
     - SUB-TASK-1
   - sub_task_id: SUB-TASK-3
-    description: Reconcile the G2 action-vocabulary mismatch without expanding scope or fabricating authority.
+    description: Recalculate scope, render a new G2 envelope, and validate exact remote governance readback.
     dependencies:
     - SUB-TASK-2
   agent_allocation:
@@ -82,5 +85,5 @@ subagent_distribution_plan:
   - SUB-TASK-2
   - SUB-TASK-3
   summary: >-
-    One same-lineage G0/G1 reconciliation followed by canonical scope binding;
-    execution remains stopped at the G2 contract mismatch boundary.
+    Governance-only refresh of the semantic contract and G2 packet; no
+    implementation action is authorized by this decision record.

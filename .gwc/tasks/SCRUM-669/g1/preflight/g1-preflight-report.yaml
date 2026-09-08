@@ -1,6 +1,6 @@
 schema_version: '1.1'
 artifact_type: g1-preflight-report
-generated_at: '2026-09-08T16:16:36Z'
+generated_at: '2026-09-08T16:59:20Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -134,9 +134,10 @@ checks:
 process_readback:
   process_id: governed-repository-delivery
   terminal_outcome: Materialize truthful fresh G0/G1 artifacts and a new G2 envelope
-    bound to the current exact subject SHA, protected base, four writable implementation
-    paths, and one read-only receipt-schema validation path; do not edit code before
-    a fresh executable token.
+    bound to current subject 7b96ee4949d76e812b068595cc5896eba0ee0022, the protected
+    base, the unchanged four writable implementation paths, the seven-probe semantic
+    contract, and one read-only receipt-schema validation path; do not edit code before
+    the fresh executable token.
   required_sources: *id001
   status: VERIFIED
 execution_feasibility:
@@ -315,4 +316,4 @@ implementation_plan:
   validation_evidence: Protected-base inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
     found no SCRUM-669-specific .kiro plan; unrelated plans were not reused.
   generated_by: DWA
-  generated_at_utc: '2026-09-08T16:16:36Z'
+  generated_at_utc: '2026-09-08T16:59:20Z'

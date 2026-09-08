@@ -1,7 +1,7 @@
-# run_id: g1-scrum-669-20260908-1616
+# run_id: g1-scrum-669-20260908-1659
 schema_version: '1.0'
 artifact_type: g1-options
-generated_at: '2026-09-08T16:16:36Z'
+generated_at: '2026-09-08T16:59:20Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -10,50 +10,48 @@ trace:
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
-  title: Reconcile fresh G0/G1, then issue a four-path F5/F6 G2 wave
+  title: Refresh G1/G2 semantic contract, then execute the bounded seven-probe F5/F6 wave
   description: >-
-    Materialize and validate the five canonical G0/G1 artifacts, bind the fresh
-    scope hash to the current subject SHA and exactly four writable implementation
-    paths, retain the receipt schema as read-only validation evidence, then issue
-    a fresh executable G2 envelope only after G1 PASS.
+    Reconcile the fresh current-subject G0/G1 packet, bind the seven RED-to-GREEN
+    probes and sibling controls as acceptance criteria, recalculate the canonical
+    four-path scope hash, and obtain a new executable G2 token before any edit.
   benefits:
-  - Resolves stale governance evidence without fabricating implementation evidence.
-  - Covers the approved producer, two sibling semantic schemas, and regression tests.
-  - Preserves same branch, subject SHA, and non-rewriting continuation lineage.
+  - Prevents the superseded token from authorizing the expanded behavioral contract.
+  - Covers runtime/schema parity, canonical references, padded self-loop rejection, and control/reference controls.
+  - Preserves the unchanged four-path write scope and receipt-schema read-only boundary.
   tradeoffs:
-  - Requires a fresh G2 approval/activation before any code edit.
+  - Requires a second governance reconciliation and fresh G2 token.
   risks:
-  - The adversarial findings remain open until the authorized implementation wave is executed and reviewed.
+  - Implementation remains blocked until the refreshed packet is remotely verified.
   constraint_fit: FIT
 - id: OPT-2
-  title: Reuse the previous three-path G2 envelope
+  title: Continue under the superseded G2 token
   description: >-
-    Continue using the previous envelope and scope hash while implicitly adding
-    the two sibling schemas needed by the approved F5/F6 semantics.
+    Reuse CP-20260908-SCRUM669-G2-F5F6-COMPAT-R1 despite the semantic contract
+    expanding from the prior approved behavior.
   benefits:
-  - Avoids preparing a new envelope.
+  - Avoids a governance refresh.
   tradeoffs:
-  - The previous envelope is bound to an obsolete subject/scope and cannot authorize sibling-schema edits.
+  - The token is explicitly superseded for implementation purposes.
   risks:
-  - Violates exact scope binding and would create an authority mismatch.
+  - Would execute an expanded behavior contract under stale authority.
   constraint_fit: NOT_FIT
 - id: OPT-3
-  title: Fix only runtime and tests
+  title: Expand the writable scope to include the receipt schema
   description: >-
-    Leave both sibling semantic schemas untouched and address only runtime
-    normalization and regression coverage.
+    Add child-run-materialization-receipt.schema.json to the write scope to fix
+    every observed reference-schema concern in one wave.
   benefits:
-  - Smaller immediate diff.
+  - Could address receipt-schema padding directly.
   tradeoffs:
-  - Leaves the confirmed schema/runtime parity blockers unresolved.
+  - Contradicts the approved read/validation-only boundary.
   risks:
-  - Fails the R1 adversarial disposition and cannot produce a clean review outcome.
+  - Out-of-scope authority expansion and stale-scope failure.
   constraint_fit: NOT_FIT
 recommended_option_id: OPT-1
 recommendation_rationale: >-
-  OPT-1 is the only option that follows the fresh Controller adjudication,
-  preserves exact lineage, retires stale authority, and binds the approved
-  producer/schema/test correction surfaces without granting implementation
-  authority before a fresh G2 envelope.
+  OPT-1 is the only option that honors GPT's supersession decision, refreshes the
+  semantic acceptance contract before implementation, keeps the exact four-path
+  write boundary, and preserves the receipt schema as read/validation-only.
 decision_required: true
 status: READY
