@@ -1,6 +1,6 @@
 schema_version: '1.0'
 artifact_type: g0-context-snapshot
-generated_at: '2026-09-08T16:59:20Z'
+generated_at: '2026-09-08T18:14:52Z'
 project:
   id: gwc
   name: GWC
@@ -27,7 +27,7 @@ runtime_context:
   - core/Agent_Response_Presentation_Contract_v1.0.md
 constraints:
 - All governance artifacts must bind to main at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72.
-- The continuation subject is exactly 7b96ee4949d76e812b068595cc5896eba0ee0022.
+- The continuation subject is exactly 605e87313b4592249574c6d8f9ed899d634f2966.
 - Writable implementation scope is exactly four paths; receipt schema is read-only
   validation-only.
 - The fresh scope hash must come from the canonical repository calculator.

@@ -1,7 +1,6 @@
-# run_id: g1-scrum-669-20260908-1659
 schema_version: '1.1'
 artifact_type: g1-decision-record
-generated_at: '2026-09-08T16:59:20Z'
+generated_at: '2026-09-08T18:14:52Z'
 trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
@@ -14,18 +13,16 @@ status: ACCEPTED
 selected_option_id: OPT-1
 user_decision:
   actor: ChatGPT Controller (bound SCRUM-669 conversation)
-  decided_at: '2026-09-08T16:59:20Z'
-  source: >-
-    Explicit adjudication in the bound ChatGPT conversation superseded the prior
-    implementation token and approved governance reconciliation for the revised
-    seven-probe RED-to-GREEN semantic contract, unchanged four-path write scope,
-    and read-only receipt-schema boundary.
+  decided_at: '2026-09-08T18:14:52Z'
+  source: Explicit adjudication in the bound ChatGPT conversation agreed to the F7
+    optional-reference and F8 single-line semantic correction contract, superseded
+    the prior implementation token, and approved governance reconciliation for the
+    unchanged four-path write scope and read-only receipt-schema boundary.
   explicit: true
-rationale: >-
-  Select the refresh wave. The prior token is superseded because the behavioral
-  acceptance contract expanded. This decision binds the revised seven probes and
-  sibling controls to the current subject without editing implementation before a
-  fresh G2 token.
+rationale: Select the refresh wave. The prior token is superseded because the behavioral
+  acceptance contract expanded. This decision binds the F7 optional-reference and
+  F8 single-line semantic corrections plus sibling controls to the current subject
+  without editing implementation before a fresh G2 token.
 rejected_option_ids:
 - OPT-2
 - OPT-3
@@ -38,7 +35,7 @@ acceptance_criteria_refs:
 - AC-6
 - AC-7
 - AC-8
-scope_hash: sha256:94f403da7a29502644ac386ec067edd2aadd7f57207dd95b210abed13c3cdb49
+scope_hash: sha256:7dc93b719ab5fa7d196e8d3ec3f6ab664423ba1a31fca77347f1c73b4cb84998
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -54,20 +51,21 @@ implementation_plan_ref:
   protected_base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
   plan_root: null
   plan_revision: null
-  validation_evidence: >-
-    Protected-base inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72 found
-    no SCRUM-669-specific .kiro plan; unrelated plans were not reused.
+  validation_evidence: Protected-base inspection at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+    found no SCRUM-669-specific .kiro plan; unrelated plans were not reused.
 subagent_distribution_plan:
   task_decomposition:
   - sub_task_id: SUB-TASK-1
-    description: Materialize and validate fresh G0/G1 artifacts bound to subject 7b96ee49.
+    description: Materialize and validate fresh G0/G1 artifacts bound to subject 605e87313b4592249574c6d8f9ed899d634f2966.
     dependencies: []
   - sub_task_id: SUB-TASK-2
-    description: Bind seven RED-to-GREEN probes and sibling controls to the refreshed semantic acceptance contract.
+    description: Bind F7 optional-reference and F8 single-line semantic controls to
+      the refreshed acceptance contract.
     dependencies:
     - SUB-TASK-1
   - sub_task_id: SUB-TASK-3
-    description: Recalculate scope, render a new G2 envelope, and validate exact remote governance readback.
+    description: Recalculate scope, render a new G2 envelope, and validate exact remote
+      governance readback.
     dependencies:
     - SUB-TASK-2
   agent_allocation:
@@ -84,6 +82,5 @@ subagent_distribution_plan:
   - SUB-TASK-1
   - SUB-TASK-2
   - SUB-TASK-3
-  summary: >-
-    Governance-only refresh of the semantic contract and G2 packet; no
+  summary: Governance-only refresh of the F7/F8 semantic contract and G2 packet; no
     implementation action is authorized by this decision record.
