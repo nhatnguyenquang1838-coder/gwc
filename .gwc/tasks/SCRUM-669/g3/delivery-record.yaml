@@ -41,12 +41,12 @@ validation:
       evidence: Exactly the four approved implementation paths changed; receipt schema is unchanged.
 review:
   implementer_id: DWA-Hermes
-  reviewer_id: GPT-bound-conversation-R1
+  reviewer_id: GPT-bound-conversation-G3
   independence: independent
   mode: read-only
   reviewed_implementation_head_sha: 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae
   reviewed_scope_hash: sha256:7dc93b719ab5fa7d196e8d3ec3f6ab664423ba1a31fca77347f1c73b4cb84998
-  reviewed_at: '2026-09-09T11:52:42Z'
+  reviewed_at: '2026-09-09T12:03:57Z'
   lanes:
     - name: requirement
       applicable: true
@@ -84,20 +84,21 @@ review:
       status: pass
       evidence:
         - Draft PR #566 is OPEN, isDraft=true, base main, and initially read back at implementation head 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae.
+        - Fresh G3 review verified current PR head a925ba1b08059b7631e3d6718e6565ad75ed7bc7 with an evidence-only delta limited to the committed G3 record.
         - No protected-main write, merge, force-push, or deployment was performed.
     - name: ci
       applicable: true
-      status: not_reviewed
+      status: pass
       evidence:
-        - Live PR #566 rollup has validate IN_PROGRESS at record creation; exact-head CI closure is pending.
-        - build (gwc), build (ds-mcp), build (rental-home), build (pm-skills), canonical-81-qualification, semantic-runtime-regression, and g4-receipt-required were observed SUCCESS; skipped G4/G5 jobs are not treated as pass evidence.
+        - Live PR #566 exact-head rollup has validate, build (gwc), semantic-runtime-regression, and canonical-81-qualification SUCCESS; all other applicable package and receipt checks are also SUCCESS.
+        - Skipped G4/G5 jobs are not treated as pass evidence because those later gates remain excluded.
   findings:
     - id: REV-1
       severity: BLOCKER
       category: ci
-      status: open
-      evidence: Required exact-head CI is not closed because the PR validate check was IN_PROGRESS when this record was assembled.
-      recommendation: Wait for exact-head CI completion, refresh the delivery record against the live PR head, and keep the Draft PR blocked from ready/merge until required checks pass.
+      status: resolved
+      evidence: Required exact-head CI completed successfully for PR head a925ba1b08059b7631e3d6718e6565ad75ed7bc7; the fresh bound-browser G3 review confirmed no remaining code, scope, or CI blocker.
+      recommendation: Closed after exact-head CI and current-tip evidence verification; retain later-gate exclusions.
   acceptance_criteria:
     - id: AC-1
       result: pass
@@ -131,7 +132,7 @@ review:
       result: not_applicable
       evidence:
         - AC-8 described the pre-implementation governance reconciliation non-goal; Draft PR creation is the explicitly authorized downstream G3 action.
-  decision: blocked
+  decision: pass
   stale: false
 ci:
   required: true
@@ -141,11 +142,11 @@ ci:
     - semantic-runtime-regression
     - canonical-81-qualification
 residual_risks:
-  - Exact-head CI is still running or not fully closed; this record is intentionally inconclusive and not a G3 PASS.
-  - Adding this evidence-only artifact will advance the PR head; the record must be refreshed against the resulting metadata head before G3 closure or G4 readiness.
+  - The G3 record commit itself advances the PR head; runtime current-tip validation and required CI must be rerun against that resulting evidence-only head before declaring G3 closure.
+  - G4_MERGE, G5_DEPLOY, and G6_PRODUCTION_DATA remain separately excluded and require their own authority.
   - The original shared checkout contains unrelated dirty paths; no such paths were staged or included in the PR.
 exclusions:
   - G4_MERGE
   - G5_DEPLOY
   - G6_PRODUCTION_DATA
-outcome: inconclusive
+outcome: pass
