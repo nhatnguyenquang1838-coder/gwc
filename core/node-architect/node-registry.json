@@ -599,7 +599,7 @@
       "provenance": {
         "discovery_basis": "plan",
         "source_path": "core/node-architect/node-catalog/gate_authority/scope-hash-calculation.node.json",
-        "source_sha": "cbad3c9f81989dc4a51f28c37a4b450ad881aeff6c23060dbe04f81817838c36"
+        "source_sha": "fbdf2750e622efc33ee29111ad9384c25b3feff5254fb42f4b4958f2f3cc9b27"
       },
       "reversibility": "reversible",
       "schema_version": "1.0.0",
