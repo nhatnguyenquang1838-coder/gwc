@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/lifecycle-transition.schema.json",
+  "title": "Universal Run lifecycle transition decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "lifecycle_profile", "current_gate", "current_state", "action", "edge_kind", "next_gate", "next_state", "explicit_outcome", "execution_performed"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "universal-lifecycle-transition"},
+    "lifecycle_profile": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"const": "gwc.universal-run"},
+        "version": {"const": 1}
+      }
+    },
+    "current_gate": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+    "current_state": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+    "action": {"enum": ["ADVANCE", "WAIT", "CONTINUE", "RETRY", "RERUN", "REPAIR", "REPLAN", "COMPLETE", "FAIL", "CANCEL"]},
+    "edge_kind": {"enum": ["FORWARD", "SAME_GATE", "NON_FORWARD"]},
+    "next_gate": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+    "next_state": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+    "explicit_outcome": {"type": ["string", "null"], "enum": [null, "INTEGRATED", "IN_PLACE", "NO_TRANSFER_REQUIRED", "DOMAIN_DEFINED"]},
+    "execution_performed": {"const": false}
+  }
+}

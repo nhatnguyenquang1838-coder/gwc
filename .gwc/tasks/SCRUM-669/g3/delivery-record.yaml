@@ -1,0 +1,152 @@
+schema_version: '1.1'
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-669
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+working_branch: impl/scrum-669-universal-run-e3-topology
+pull_request:
+  number: 566
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/566
+  draft: true
+implementation_head_sha: 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae
+scope_hash: sha256:7dc93b719ab5fa7d196e8d3ec3f6ab664423ba1a31fca77347f1c73b4cb84998
+changed_paths:
+  - tools/node_architect/universal_run_topology.py
+  - schemas/node-architect/universal-run/run-manifest-revision.schema.json
+  - schemas/node-architect/universal-run/node-allocation.schema.json
+  - tests/test_universal_run_topology_v1.py
+validation:
+  implementation_head_sha: 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae
+  status: pass
+  commands:
+    - command: /Users/mac/.hermes/hermes-agent/venv/bin/python -m pytest -q tests/test_universal_run_topology_v1.py tests/test_universal_run_kernel_v1.py
+      result: pass
+      evidence: 60 passed in 0.16s at implementation head 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae.
+    - command: /Users/mac/.hermes/hermes-agent/venv/bin/python -c 'json.load(...) for both implementation schemas and receipt schema'
+      result: pass
+      evidence: Both implementation schemas and the read-only receipt schema parse successfully.
+    - command: git diff --check 864550a26a0a8a15b41d71a62f085b0440b52fb3..7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae
+      result: pass
+      evidence: No whitespace errors reported.
+    - command: PYTHONPATH=tools /Users/mac/.hermes/hermes-agent/venv/bin/python tools/validate_g01.py --workspace .gwc/tasks/SCRUM-669 --gate G2_EXECUTION --json
+      result: pass
+      evidence: outcome=PASS, valid=true, issues=[] for the task-scoped G0/G1/G2 packet.
+    - command: PYTHONPATH=. /usr/bin/python3 tools/validate_gate_action.py /tmp/scrum669-g3-action-authority.json --root . --expected-base-sha 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72 --expected-head-sha 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae --observed-pr-state open
+      result: pass
+      evidence: GATE ACTION AUTHORITY VALIDATION PASSED; canonical G3 scope hash prefix bd259066ca51b107.
+    - command: git diff-tree --no-commit-id --name-only -r 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae
+      result: pass
+      evidence: Exactly the four approved implementation paths changed; receipt schema is unchanged.
+review:
+  implementer_id: DWA-Hermes
+  reviewer_id: GPT-bound-conversation-G3
+  independence: independent
+  mode: read-only
+  reviewed_implementation_head_sha: 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae
+  reviewed_scope_hash: sha256:7dc93b719ab5fa7d196e8d3ec3f6ab664423ba1a31fca77347f1c73b4cb84998
+  reviewed_at: '2026-09-09T12:03:57Z'
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Bound-browser Independent Review R1 returned PASS for SCRUM-669 and exact implementation SHA 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae.
+        - R1 reported no remaining material F7/F8 parity or contract issue.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - G1 decision binds the F7 optional-reference and F8 single-line contract to the unchanged four-path scope.
+        - R1 confirmed the exact four-path scope and receipt-schema read-only boundary.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - Exact commit parent is governance head 864550a26a0a8a15b41d71a62f085b0440b52fb3.
+        - Remote branch resolves exactly to the reviewed implementation SHA.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Focused topology and kernel regression command returned 60 passed.
+        - Runtime/schema boundary checks and git diff check passed.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - G0/G1/G2 validator returned PASS with no issues.
+        - Canonical G3 gate-action packet validation returned PASS.
+        - G4_MERGE, G5_DEPLOY, and G6_PRODUCTION_DATA remain excluded.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - Draft PR #566 is OPEN, isDraft=true, base main, and initially read back at implementation head 7d6cd0e99ef93d8e5a2ce72bb69058443a4504ae.
+        - Fresh G3 review verified current PR head a925ba1b08059b7631e3d6718e6565ad75ed7bc7 with an evidence-only delta limited to the committed G3 record.
+        - No protected-main write, merge, force-push, or deployment was performed.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Live PR #566 exact-head rollup has validate, build (gwc), semantic-runtime-regression, and canonical-81-qualification SUCCESS; all other applicable package and receipt checks are also SUCCESS.
+        - Skipped G4/G5 jobs are not treated as pass evidence because those later gates remain excluded.
+  findings:
+    - id: REV-1
+      severity: BLOCKER
+      category: ci
+      status: resolved
+      evidence: Required exact-head CI completed successfully for PR head a925ba1b08059b7631e3d6718e6565ad75ed7bc7; the fresh bound-browser G3 review confirmed no remaining code, scope, or CI blocker.
+      recommendation: Closed after exact-head CI and current-tip evidence verification; retain later-gate exclusions.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Task-scoped G0 and four G1 artifacts exist and validate through validate_g01.py.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Repository, protected base, working branch, implementation SHA, and exact four-path scope were independently read back.
+    - id: AC-3
+      result: pass
+      evidence:
+        - R1 confirmed the optional-reference and single-line semantic controls and preservation of prior revision controls.
+    - id: AC-4
+      result: pass
+      evidence:
+        - R1 confirmed padded-reference rejection, CR/LF/CRLF rejection, and ordinary interior-space acceptance across runtime/schema boundaries.
+    - id: AC-5
+      result: pass
+      evidence:
+        - Focused topology and kernel tests returned 60 passed; receipt schema blob is unchanged.
+    - id: AC-6
+      result: pass
+      evidence:
+        - G2 scope evidence records the canonical four-path scope hash sha256:7dc93b719ab5fa7d196e8d3ec3f6ab664423ba1a31fca77347f1c73b4cb84998.
+    - id: AC-7
+      result: pass
+      evidence:
+        - validate_g01.py returned outcome=PASS, valid=true, issues=[].
+    - id: AC-8
+      result: not_applicable
+      evidence:
+        - AC-8 described the pre-implementation governance reconciliation non-goal; Draft PR creation is the explicitly authorized downstream G3 action.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  required_checks:
+    - validate
+    - build (gwc)
+    - semantic-runtime-regression
+    - canonical-81-qualification
+residual_risks:
+  - The G3 record commit itself advances the PR head; runtime current-tip validation and required CI must be rerun against that resulting evidence-only head before declaring G3 closure.
+  - G4_MERGE, G5_DEPLOY, and G6_PRODUCTION_DATA remain separately excluded and require their own authority.
+  - The original shared checkout contains unrelated dirty paths; no such paths were staged or included in the PR.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass

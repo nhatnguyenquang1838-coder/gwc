@@ -1,0 +1,147 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-09-08T18:14:52Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-669
+  base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: SCRUM-669 E3 R1 on exact SHA 605e87313b4592249574c6d8f9ed899d634f2966
+    confirmed F5/F6 parity fixes, then Independent Review R1 found F7 optional-reference
+    runtime/schema parity and F8 embedded-line-terminator contract drift.
+  why_now: The bound ChatGPT conversation superseded the prior F5/F6 token because
+    the approved behavior contract now adds F7 optional-reference parity and F8 single-line
+    semantic-reference parity; governance-only authority is granted to reconcile fresh
+    G1/G2.
+desired_outcome: Materialize truthful fresh G0/G1 artifacts and a new G2 envelope
+  bound to current subject 605e87313b4592249574c6d8f9ed899d634f2966, the protected
+  base, the unchanged four writable implementation paths, the F7/F8 semantic correction
+  contract, and one read-only receipt-schema validation path; do not edit code before
+  the fresh executable token.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - GWC maintainers
+  - SCRUM-669 controller/executor lineage
+  - Universal Run and Node Architect consumers
+  - independent reviewers
+scope:
+  in_scope:
+  - .gwc/tasks/SCRUM-669/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-669/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-669/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-669/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-669/g1/decision/g1-decision-record.yaml
+  - bounded F7/F8 scope binding and validation evidence
+  non_goals:
+  - implementation edits before a fresh executable G2 token
+  - modifying the receipt schema beyond read-only validation
+  - PR creation or readiness promotion
+  - merge, deploy, production, credentials, force operations
+  - Contract Freeze or protected-main changes
+constraints:
+- All governance artifacts must bind to main at 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72.
+- The continuation subject is exactly 605e87313b4592249574c6d8f9ed899d634f2966.
+- Writable implementation scope is exactly four paths; receipt schema is read-only
+  validation-only.
+- The fresh scope hash must come from the canonical repository calculator.
+- G0/G1 PASS grants no implementation authority.
+assumptions:
+- Jira SCRUM-669 remains claimed In Progress with AI Agent=ChatGPT, Claimed At populated,
+  and assignee Nhat Nguyen Quang.
+- The bound ChatGPT conversation is the sole GPT transport; Slack is visibility-only.
+- No SCRUM-669-specific canonical Kiro plan exists in the protected-base tree.
+risks:
+- id: RISK-1
+  description: Revision runtime and Draft-07 integer semantics can diverge for bool
+    and integral-float values.
+  impact: medium
+  mitigation: Normalize integral floats to int, reject bool, and add focused runtime/schema
+    tests.
+- id: RISK-2
+  description: Semantic reference schemas can accept whitespace-only values that runtime
+    rejects.
+  impact: medium
+  mitigation: Encode non-whitespace parity in the two approved sibling schemas and
+    add positive/negative controls.
+- id: RISK-3
+  description: The prior G2 envelope and G1 artifacts bind an obsolete subject and
+    scope.
+  impact: high
+  mitigation: Reconcile fresh G0/G1 artifacts and calculate a new scope hash from
+    current subject 605e87313b4592249574c6d8f9ed899d634f2966.
+- id: RISK-4
+  description: Shared worktree contains unrelated dirty paths.
+  impact: medium
+  mitigation: Write and stage only explicitly authorized governance paths, never clean/reset
+    or add all.
+acceptance_criteria:
+- id: AC-1
+  statement: Fresh G0 and all four G1 artifacts are present and schema-valid.
+  verifiable: true
+- id: AC-2
+  statement: All fresh artifacts bind the same task, repository, protected base, branch,
+    and current continuation subject 605e87313b4592249574c6d8f9ed899d634f2966.
+  verifiable: true
+- id: AC-3
+  statement: 'The approved RED-to-GREEN contract is explicitly bound: revision bool
+    rejection, integral-float normalization, padded self-loop rejection, whitespace-only
+    lineage rejection, whitespace parity for node-allocation references, optional
+    non-null condition_ref/control_justification canonicality, and single-line semantic
+    refs.'
+  verifiable: true
+- id: AC-4
+  statement: 'Sibling controls are explicitly bound: invoking_node_allocation_ref=''
+    '' rejection, optional non-null condition_ref/control_justification rejection
+    when padded, CR/LF/CRLF rejection for semantic refs, ordinary interior spaces
+    accepted, padded identifier/reference rejection, and valid non-padded references
+    accepted.'
+  verifiable: true
+- id: AC-5
+  statement: Existing 28 E3 and 15 kernel baseline tests remain green, and receipt-schema
+    F4 regressions remain green without modifying the receipt schema.
+  verifiable: true
+- id: AC-6
+  statement: The canonical scope calculator is rerun against continuation subject
+    605e87313b4592249574c6d8f9ed899d634f2966 for the unchanged four writable paths
+    and canonical action set, recording its returned hash without assuming hash drift.
+  verifiable: true
+- id: AC-7
+  statement: Protected-base validate_g01.py returns PASS for the refreshed task workspace.
+  verifiable: true
+- id: AC-8
+  statement: No implementation path, receipt schema, main, PR, merge, deploy, Jira
+    claim, or Slack handoff is mutated by this governance reconciliation; the new
+    G2 binds F7 optional refs and F8 single-line CR/LF/CRLF parity.
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

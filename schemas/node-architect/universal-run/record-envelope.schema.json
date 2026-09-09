@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/record-envelope.schema.json",
+  "title": "Universal Run immutable logical record envelope",
+  "type": "object",
+  "required": ["record_id", "schema_id", "schema_version", "run_id", "created_at", "created_by", "provenance", "content_digest"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "schema_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": ["string", "integer"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "created_by": {"type": "object"},
+    "lifecycle_profile": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"const": "gwc.universal-run"},
+        "version": {"const": 1}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["predecessor_refs", "source_refs"],
+      "properties": {
+        "predecessor_refs": {"type": "array", "items": {"type": "string"}},
+        "source_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "content_digest": {
+      "type": "object",
+      "required": ["algorithm", "canonicalization", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonicalization": {"const": "JCS"},
+        "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

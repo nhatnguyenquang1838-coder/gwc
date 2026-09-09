@@ -1,0 +1,55 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-09-08T18:14:52Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-669
+  base_sha: 0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Refresh G1/G2 semantic contract, then execute the bounded F7/F8 correction
+    wave
+  description: Reconcile the fresh current-subject G0/G1 packet, bind the F7 optional-reference
+    and F8 single-line semantic contracts plus sibling controls as acceptance criteria,
+    recalculate the canonical four-path scope hash, and obtain a new executable G2
+    token before any edit.
+  benefits:
+  - Prevents the superseded token from authorizing the expanded behavioral contract.
+  - Covers optional-reference runtime/schema parity and embedded-line-terminator parity
+    without widening the write scope.
+  - Preserves the unchanged four-path write scope and receipt-schema read-only boundary.
+  tradeoffs:
+  - Requires a second governance reconciliation and fresh G2 token.
+  risks:
+  - Implementation remains blocked until the refreshed packet is remotely verified.
+  constraint_fit: FIT
+- id: OPT-2
+  title: Continue under the superseded G2 token
+  description: Reuse the superseded G2 token despite the F7/F8 semantic contract expanding
+    beyond its approved behavior.
+  benefits:
+  - Avoids a governance refresh.
+  tradeoffs:
+  - The token is explicitly superseded for implementation purposes.
+  risks:
+  - Would execute an expanded behavior contract under stale authority.
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Expand the writable scope to include the receipt schema
+  description: Add child-run-materialization-receipt.schema.json to the write scope
+    to fix every observed reference-schema concern in one wave.
+  benefits:
+  - Could address receipt-schema padding directly.
+  tradeoffs:
+  - Contradicts the approved read/validation-only boundary.
+  risks:
+  - Out-of-scope authority expansion and stale-scope failure.
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: OPT-1 is the only option that honors GPT's supersession
+  decision, refreshes the F7/F8 semantic acceptance contract before implementation,
+  keeps the exact four-path write boundary, and preserves the receipt schema as read/validation-only.
+decision_required: true
+status: READY
