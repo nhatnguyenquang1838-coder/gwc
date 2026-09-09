@@ -103,6 +103,7 @@ _REASON_PRECEDENCE: list[str] = [
     "SCOPE_PATH_INVALID",
     "SCOPE_PATH_OVERBROAD",
     "SCOPE_ACTION_CONFLICT",
+    "SCOPE_SELF_REFERENCE",
     "SCOPE_BINDING_REQUIRED",
     "SCOPE_UNKNOWN_SEMANTIC",
     "SCOPE_WRITE_SET_EMPTY",
@@ -221,6 +222,16 @@ def calculate_gate_scope_identity(
     # --- Rule 6: authorized/excluded conflict ----------------------------
     if set(norm_actions) & set(norm_excluded):
         reasons.append("SCOPE_ACTION_CONFLICT")
+
+    # --- Rule 6b: G4 evidence-container self-reference -------------------
+    # The semantic G4 approval subject is the content below the commit that
+    # materializes .gwc/tasks/<task-id>/g4/** evidence. Hashing that evidence
+    # back into merge_approved_pr scope creates an infinite head/hash loop.
+    # Fail closed and require subject/container validation instead.
+    if "merge_approved_pr" in norm_actions and isinstance(task_id, str) and task_id.strip():
+        g4_root = f".gwc/tasks/{task_id.strip()}/g4"
+        if any(path == g4_root or path.startswith(g4_root + "/") for path in norm_paths):
+            reasons.append("SCOPE_SELF_REFERENCE")
 
     # --- Rule 8: gate-specific binding requirements ----------------------
     if set(norm_actions) & _HEAD_BINDING_ACTIONS:
