@@ -1,0 +1,253 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-09-09T18:46:10Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-668
+  base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: Root Run GWC-UNIVERSAL-RUN-REVAMP must implement and certify the Contract
+    Freeze v1.1 universal recursive governed-run kernel across GWC and DW-SuperApps
+    while preserving SCRUM-668/SCRUM-725 evidence and legacy software-shaped semantics
+    without reinterpretation.
+  why_now: The user explicitly requested setup and completion of SCRUM-668 and all
+    child Jira work. Live Jira readback shows the parent still In Progress, W1-W7
+    are In Review, W8 is In Progress, W9 and SCRUM-746 are To Do, and SCRUM-725 is
+    In Progress. The accepted review chain provides the target semantics, but implementation
+    and certification evidence are incomplete.
+desired_outcome: Materialize and execute a bounded R0-R8 Child Run DAG. Each Child
+  Run must reach G6 accepted handoff; the Root must reach G3 through G6 with a durable
+  final HandoffReceipt. All evidence must bind exact refs, exact implementation tips,
+  current CI, independent reviews, and validator output. Stop at Human G4 for any
+  main merge and never modify Contract Freeze.
+stakeholders:
+  requester: Nhat Nguyen Quang
+  affected:
+  - nhatnguyenquang1838-coder/gwc
+  - nhatnguyenquang1838-coder/DW-SuperApps
+  - SCRUM-668
+  - SCRUM-669
+  - SCRUM-670
+  - SCRUM-671
+  - SCRUM-672
+  - SCRUM-673
+  - SCRUM-674
+  - SCRUM-675
+  - SCRUM-676
+  - SCRUM-677
+  - SCRUM-678
+  - SCRUM-725
+  - SCRUM-746
+  - Notion REV-GWC-CF-v1.1 and Universal Recursive Governed Run Model pages
+scope:
+  in_scope:
+  - R0 wrap runtime foundation with SCRUM-668/SCRUM-725 preservation and migration
+    handoff
+  - 'R1 universal Run kernel: run_id, lifecycle profile, immutable records, successor
+    lineage, logical RunStateStore'
+  - 'R2 universal G0-G6 lifecycle: seven positions, no silent skip, typed IN_PLACE/NO_TRANSFER_REQUIRED,
+    adversarial transitions'
+  - 'R3 recursive Node Architect: NodeDefinition, NodeAllocation, WORK/CONTROL promotion,
+    DAG, budgets, SINGLE_ACTIVE'
+  - 'R4 hierarchical RuntimePlan and recovery: immutable revisions, cursor, retry/rerun/replan/restart,
+    drift detection'
+  - 'R5 orthogonal Governance/Authority kernel: AuthorityDecisionReceipt, no self-grant,
+    stale fail-closed'
+  - 'R6 evidence/target/handoff: digest-bound Run Dossier, distinct G3/G5, ClosureReceipt,
+    HandoffReceipt'
+  - 'R7 compatibility/migration: namespaced legacy profiles, no reinterpretation,
+    provenance and strength'
+  - 'R8 universal certification: software, research/document, non-software fixtures,
+    fresh recovery and adversarial cases'
+  - user completion traceability C1-C15 mapped to exact Contract Freeze sections and
+    evidence
+  - Jira/GitHub/Notion projection reconciliation without treating projections as canonical
+    runtime truth
+  non_goals:
+  - modifying or self-updating Contract Freeze v1.1, Resolution Registry, Human Decision,
+    or published review passes
+  - rewriting historical SCRUM-668/SCRUM-725/W1-W7 evidence
+  - merging any branch into main without explicit Human G4 acceptance by Nhat
+  - deploy, release, production reload, production data/configuration, credentials,
+    secrets, or migration effects
+  - force-push, reset of shared worktrees, rebase, history rewrite, or deletion of
+    unrelated dirty paths
+  - using Jira/Slack/Notion status or percentage as canonical execution evidence
+  - silently mapping legacy G3_PR/G4_MERGE/G5_DEPLOY/G6_PRODUCTION_DATA to universal
+    G3-G6
+constraints:
+- Contract target is Notion Contract Freeze v1.1, lifecycle profile gwc.universal-run/1;
+  exact page snapshot sha256:a8207d15e12f4686a9ffbcfa155c3aaaa80cc884df9afdf9394688b207e4175c.
+- Human acceptance chain is Resolution Registry HUMAN_APPROVED_FOR_V1.1_INTEGRATION
+  plus HD-CF-v1.1-20260905 decision APPROVE; these do not grant repository, Jira,
+  merge, deploy, production, data, secret, or migration authority.
+- Source design refs are canonical Universal model sha256:a04d5562df44643594ede2cddd2de061d8746607ffb35374b72657fb651e6f6d,
+  Detailed Architecture sha256:888f6f1679e551b7a0352fb31373d455f33251099460785589b0d1ef5675eae7,
+  Deep Research sha256:fdb294581a5bcdc278626365ed873a6870864629f9dddbe7b546185cdb3dc6f8,
+  and SCRUM-668 design sha256:05f1128257b88b61b6059ed8273d550929e176ec38d124db48ce9a8abfddd557.
+- Freeze historical planning source gwc/main@0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  is provenance only; implementation must revalidate against current protected base
+  d5fadc412d89f32c96ca9a1fcfd985913dc97876.
+- C1-C15 are user completion identifiers; their semantics must be traceable to the
+  Contract Freeze, original design, Jira child acceptance, schemas, tests, exact refs
+  and durable evidence, not invented from Jira status.
+- Root coordination and each cross-repo Child Run require separate exact scope, branch/worktree,
+  evidence, and applicable gate authority.
+- Main merge is always Human G4; G5/G6 are separate and not implied by green CI or
+  G6 child handoff.
+- Existing shared /Users/mac/prj/gwc main is dirty and excluded from trusted analysis;
+  use exact-base isolated worktrees only.
+assumptions:
+- The user-provided goal is explicit Human direction for R3 architecture/security/migration
+  planning; it is not a G2 implementation token.
+- Jira remains a planning/projection surface; exact repository, PR, SHA, CI, validator
+  and Run Dossier evidence are canonical.
+- The stale acceptance-state marker at the bottom of the Contract Freeze page is retained
+  as source evidence and must not be self-repaired; any implementation packet must
+  flag it for readback if it affects authority.
+- SCRUM-746 is absorbed into G0/G1 universal Run provenance as defined by the SCRUM-668
+  amendment; it is not a parallel G0 store.
+- Existing legacy W1-W7 artifacts remain historical/provenance evidence until explicit
+  compatibility validation creates new universal records.
+risks:
+- id: RISK-1
+  description: Contract Freeze page contains a green human-accepted header and a stale
+    FREEZE_CANDIDATE acceptance-state marker.
+  impact: high
+  mitigation: Preserve both source facts, bind implementation to the accepted Resolution/Human
+    Decision refs, and stop before effect if authority interpretation becomes contradictory.
+- id: RISK-2
+  description: The Freeze historical base SHA differs from current protected origin/main.
+  impact: high
+  mitigation: Revalidate every source/schema/plan binding on d5fadc412d89f32c96ca9a1fcfd985913dc97876
+    and never use the historical SHA as the code base.
+- id: RISK-3
+  description: Root spans GWC and DW-SuperApps with independent governance and branches.
+  impact: high
+  mitigation: Use per-repository Child Runs and per-child G2/G3 evidence; never borrow
+    authority across repositories.
+- id: RISK-4
+  description: Existing Jira child statuses and historical W labels do not prove universal
+    G6 handoff.
+  impact: high
+  mitigation: Require exact child ClosureReceipt, HandoffReceipt, target validation,
+    PR/CI and Jira readback before terminal projection.
+- id: RISK-5
+  description: Cross-review is closed for agent disagreement but implementation has
+    not been independently reviewed on exact slice tips.
+  impact: high
+  mitigation: Run three independent architecture/AC/code/test reviews per slice and
+    fail closed on any BLOCKER/HIGH.
+- id: RISK-6
+  description: No source artifact currently defines labels C1-C15 by name.
+  impact: medium
+  mitigation: Materialize a traceability register that explicitly treats C1-C15 as
+    user completion identifiers and maps each to frozen clauses, Jira child scope,
+    schemas/tests and durable evidence; stop if Nhat supplies a conflicting canonical
+    definition.
+acceptance_criteria:
+- id: AC-1
+  statement: 'C1: Contract identity is verified as lifecycle profile gwc.universal-run/1
+    with exactly seven G0-G6 positions, no silent skip, and immutable record/digest
+    rules bound to Contract Freeze v1.1 sections 0-1 and 5.'
+  verifiable: true
+- id: AC-2
+  statement: 'C2: Run kernel proves stable run_id, ROOT/CHILD/ATOMIC ontology, immutable
+    manifests, successor lineage, and logical RunStateStore coordination under Contract
+    Freeze sections 1-2 and 18-19.'
+  verifiable: true
+- id: AC-3
+  statement: 'C3: G0 ContextSnapshot binds objective, consumer/parent, context, scope,
+    candidate target, constraints, authority/effect boundary, acceptance boundary
+    and atomic/recursive assumptions; blocking ambiguity fails closed.'
+  verifiable: true
+- id: AC-4
+  statement: 'C4: G1 freezes immutable RuntimePlan revision, exact TargetContract,
+    topology/DAG, budgets, typed edges, authority requirements and digest before G2
+    release; plan never grants authority.'
+  verifiable: true
+- id: AC-5
+  statement: 'C5: G2 execution emits bound ExecutionReceipt/OutputManifest, stable
+    semantic operation identity, exact readback and unknown-effect reconciliation
+    without duplicating effect.'
+  verifiable: true
+- id: AC-6
+  statement: 'C6: G3 VerificationAttestation is distinct from G4 TargetBindingReceipt
+    and G5 TargetValidationAttestation; G4 no-op uses explicit IN_PLACE or NO_TRANSFER_REQUIRED.'
+  verifiable: true
+- id: AC-7
+  statement: 'C7: Every terminal Run emits ClosureReceipt; every accepted Child Run
+    additionally emits digest-bound HandoffReceipt consumed by its parent/consumer
+    before parent completion.'
+  verifiable: true
+- id: AC-8
+  statement: 'C8: RunStateStore, lease/fencing/writer epoch, deterministic per-Run
+    serialization, and stale-writer rejection are proven with concurrent/adversarial
+    tests.'
+  verifiable: true
+- id: AC-9
+  statement: 'C9: Recovery/control proves RESTART_HOST, RESUME_RUN, RETRY_STEP, RERUN_STEP,
+    RERUN_SUBTREE, REPLAN_RUN, RESET_DERIVED_STATE and RESTART_AS_NEW_RUN with immutable
+    history and drift-triggered replan.'
+  verifiable: true
+- id: AC-10
+  statement: 'C10: Authority is orthogonal to lifecycle/plan/capability; AuthorityDecisionReceipt
+    is current scope-bound evidence; self-grant, stale, expired and mismatched authority
+    fail closed.'
+  verifiable: true
+- id: AC-11
+  statement: 'C11: Node Architect proves NodeDefinition/NodeAllocation, deterministic
+    WORK/CONTROL promotion, dependency DAG, recursion/resource budgets and SINGLE_ACTIVE
+    child generations.'
+  verifiable: true
+- id: AC-12
+  statement: 'C12: Compatibility adapters namespace legacy profiles and preserve original
+    meaning, provenance and evidence strength; gate-number-only reinterpretation fails
+    with LEGACY_SEMANTIC_REINTERPRETATION_PROHIBITED.'
+  verifiable: true
+- id: AC-13
+  statement: 'C13: The same kernel certifies software recursive, research/document
+    recursive, and party/non-software OBSERVED_STATE fixtures with G3/G4/G5/G6 evidence.'
+  verifiable: true
+- id: AC-14
+  statement: 'C14: Adversarial certification rejects illegal transitions/edges, self-authority,
+    immutable mutation, ledger/digest tamper, stale authority, stale fencing, projection
+    substitution and fabricated child handoff/dependency evidence.'
+  verifiable: true
+- id: AC-15
+  statement: 'C15: Root and all R0-R8 Child Runs have exact current implementation
+    refs, three independent architecture/AC reviews with BLOCKER/HIGH=NONE, validate_g01
+    PASS, required tests/E2E/adversarial fixtures PASS, accepted G6 handoffs, and
+    final Root HandoffReceipt; main merge remains Human G4.'
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

@@ -1,0 +1,75 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-09-09T18:46:10Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-668
+  base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: Execute an exact Contract-Freeze R0-R8 Child Run DAG with per-child authority
+    description: >-
+      Preserve SCRUM-668/SCRUM-725 and all legacy W1-W9 evidence, then implement
+      gwc.universal-run/1 through bounded cross-repository Child Runs. Map C1-C15
+      to frozen clauses and durable evidence, use separate G2/G3 packets per
+      implementation slice, require three independent exact-tip reviews, and stop
+      at Human G4 for main.
+    benefits:
+      - Preserves historical semantics and avoids gate-number reinterpretation.
+      - Matches the Contract Freeze recursive lifecycle and per-repository authority boundary.
+      - Makes every child G6 handoff and Root final HandoffReceipt independently auditable.
+      - Allows bounded recovery and replan without rewriting prior evidence.
+    tradeoffs:
+      - Requires multiple child plans, exact-head CI loops and cross-repository reconciliation.
+      - W8/W9 must be requalified under the universal kernel rather than accepted from legacy status.
+      - Main integration remains a deliberate Human G4 decision.
+    risks:
+      - Freeze page retains a stale acceptance-state marker that must remain flagged and unmodified.
+      - Current origin/main differs from the historical Freeze planning baseline.
+    constraint_fit: FIT
+    skills_distribution:
+      - skill_id: dwa-gwc-governance
+        description: Governed boot, task-scoped artifacts and gate authority.
+        is_required: true
+      - skill_id: governed-change-impact
+        description: UA graph plus repository scan for bounded impact.
+        is_required: true
+      - skill_id: gwc-verification-evidence
+        description: Exact-tip evidence, validators and adversarial verification.
+        is_required: true
+  - id: OPT-2
+    title: Reinterpret existing W1-W9 software gates as universal R0-R8
+    description: >-
+      Treat existing RuntimePlan/W1-W9 artifacts and Jira status as direct
+      universal lifecycle evidence without new profile-qualified records.
+    benefits:
+      - Appears shorter than a new recursive implementation.
+    tradeoffs:
+      - Conflicts with the Contract Freeze no-semantic-overlay and projection rules.
+      - Cannot prove Child G6 HandoffReceipt, target G5 or universal fixtures.
+    risks:
+      - Historical semantic corruption and false parent completion.
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: Implement only the GWC repository kernel and defer DW-SuperApps integration
+    description: >-
+      Build GWC schemas/runtime in isolation and treat the DW-SuperApps RuntimePlan
+      foundation as an optional later adapter.
+    benefits:
+      - Smaller first repository diff.
+    tradeoffs:
+      - Violates the cross-repository target and cannot certify the same kernel path.
+      - Leaves SCRUM-668 acceptance and child handoffs incomplete.
+    risks:
+      - Circular ownership, unverified adapters and non-recoverable cross-repo drift.
+    constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: >-
+  OPT-1 is the only option that satisfies the user's R0-R8 completion contract,
+  preserves historical SCRUM-668/SCRUM-725 semantics, respects Contract Freeze
+  v1.1, keeps authority orthogonal, and provides a verifiable path to Child G6
+  handoffs and Root G6 finalization without self-merging main.
+decision_required: true
+status: READY

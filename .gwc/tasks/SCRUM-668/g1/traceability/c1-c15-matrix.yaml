@@ -1,0 +1,180 @@
+schema_version: gwc.user-completion-traceability/1
+status: PLANNED
+root_run_id: GWC-UNIVERSAL-RUN-REVAMP
+base_repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+source_design:
+  normative_contract:
+    title: Contract Freeze v1.1
+    notion_page_id: 3d207c1c65b681b481c2f3247e10c1b2
+    snapshot_sha256: a8207d15e12f4686a9ffbcfa155c3aaaa80cc884df9afdf9394688b207e4175c
+  canonical_architecture:
+    notion_page_id: 3d207c1c65b681f48f08d657f6e56d32
+    snapshot_sha256: a04d5562df44643594ede2cddd2de061d8746607ffb35374b72657fb651e6f6d
+  detailed_design:
+    notion_page_id: 3d207c1c65b681bdbae5e5242fcedc18
+    snapshot_sha256: 888f6f1679e551b7a0352fb31373d455f33251099460785589b0d1ef5675eae7
+  research_acceptance:
+    notion_page_id: 3d207c1c65b681939144c290ff2ab7c6
+    snapshot_sha256: fdb294581a5bcdc278626365ed873a6870864629f9dddbe7b546185cdb3dc6f8
+  original_scrum_668_plan:
+    notion_page_id: 3ce07c1c65b6818cba80d9b843ef477a
+    snapshot_sha256: 05f1128257b88b61b6059ed8273d550929e176ec38d124db48ce9a8abfddd557
+  acceptance_chain:
+    - page_id: 3d207c1c65b681d2845df2bb33274ddd
+      role: Hermes R3 independent review
+    - page_id: 3d207c1c65b681c18828dc41a378314a
+      role: GPT R4 independent review
+    - page_id: 3d207c1c65b68179a2ebcc9f6e597a01
+      role: Resolution Registry
+    - page_id: 3d207c1c65b68134a623f321329e3b07
+      role: Human Decision
+  source_state_note: >-
+    The contract page contains accepted normative content and an older
+    acceptance-state marker. This matrix preserves that discrepancy as
+    provenance; no Contract Freeze mutation is authorized. Any implementation
+    gate that relies on current-head self-reference must fail closed if the
+    discrepancy changes a normative clause.
+
+mapping_basis:
+  c_ids: >-
+    C1-C15 are user completion identifiers from the current goal. The original
+    SCRUM-668 page defines R1-R14; this matrix maps the user's completion IDs
+    to exact Contract Freeze sections and SCRUM-668 requirements without
+    rewriting either source.
+  jira_mapping: >-
+    Jira keys below are projection anchors derived from live descriptions and
+    status. They do not redefine Jira issue semantics or substitute for Child
+    Run G0-G6 evidence.
+
+traceability:
+  - id: C1
+    requirement: Contract identity, version and fixed seven-position lifecycle
+    child_run: R2
+    contract_anchors: ['0', '0.1', '0.2', '0.3', '5.1', '5.2']
+    scrum668_requirements: ['R9', 'R14']
+    jira_projection: ['SCRUM-668', 'SCRUM-725', 'SCRUM-746']
+    required_evidence: [versioned schemas, illegal-transition tests, exact-tip review, G6 HandoffReceipt]
+    status: PLANNED
+  - id: C2
+    requirement: run_id, lifecycle profile, immutable records, successor lineage and RunStateStore contract
+    child_run: R1
+    contract_anchors: ['1.1', '1.2', '1.3', '1.4', '2.1', '2.2', '21']
+    scrum668_requirements: ['R1', 'R8', 'R14']
+    jira_projection: ['SCRUM-670', 'SCRUM-671']
+    required_evidence: [record-envelope tests, digest/sequence tests, lineage fixtures, fresh-recovery readback]
+    status: PLANNED
+  - id: C3
+    requirement: G0 ContextSnapshot is mandatory and trusted-source bound
+    child_run: R0
+    contract_anchors: ['6', '3.1', '3.2']
+    scrum668_requirements: ['R9', 'R14']
+    jira_projection: ['SCRUM-668', 'SCRUM-725']
+    required_evidence: [G0 artifact, source-baseline readback, observed-state strength checks]
+    status: PLANNED
+  - id: C4
+    requirement: G1 RuntimePlan, TargetContract and topology are immutable/digest-bound
+    child_run: R4
+    contract_anchors: ['4', '7', '7.1', '7.2', '7.3', '7.4']
+    scrum668_requirements: ['R1', 'R4', 'R5', 'R6', 'R12']
+    jira_projection: ['SCRUM-670', 'SCRUM-672', 'SCRUM-673', 'SCRUM-675']
+    required_evidence: [G1 artifacts, canonical digest tests, graph/semantic-step tests, replan provenance]
+    status: PLANNED
+  - id: C5
+    requirement: execution receipts, output manifests, effect idempotency and no silent step execution
+    child_run: R2
+    contract_anchors: ['5.4', '8', '10.1', '10.2', '19.3']
+    scrum668_requirements: ['R1', 'R3', 'R7', 'R8']
+    jira_projection: ['SCRUM-670', 'SCRUM-671']
+    required_evidence: [execution-receipt tests, idempotency/replay tests, current-step bounded materialization]
+    status: PLANNED
+  - id: C6
+    requirement: authority is orthogonal to gates and every effect has a decision receipt
+    child_run: R5
+    contract_anchors: ['0.2', '9', '9.1', '9.2', '9.3', '10.1']
+    scrum668_requirements: ['R2', 'R3', 'R8']
+    jira_projection: ['SCRUM-674', 'SCRUM-675']
+    required_evidence: [self-grant rejection, stale-authority rejection, AuthorityDecisionReceipt, adversarial tests]
+    status: PLANNED
+  - id: C7
+    requirement: distinct G3 verification, G4 binding, G5 validation and G6 Closure/HandoffReceipt
+    child_run: R6
+    contract_anchors: ['11', '12', '13', '14', '14.1', '14.2']
+    scrum668_requirements: ['R9', 'R14']
+    jira_projection: ['SCRUM-676', 'SCRUM-677', 'SCRUM-678']
+    required_evidence: [G3/G4/G5 distinct records, HandoffReceipt, target validation, child acceptance]
+    status: PLANNED
+  - id: C8
+    requirement: recursive Parent-Child materialization, composition, failure propagation and budgets
+    child_run: R3
+    contract_anchors: ['2.2', '2.4', '15', '15.1', '15.2', '15.4', '15.5', '15.6']
+    scrum668_requirements: ['R4', 'R8', 'R9']
+    jira_projection: ['SCRUM-668', 'SCRUM-725', 'SCRUM-746']
+    required_evidence: [ChildRunMaterializationReceipt, parent composition tests, failure propagation tests]
+    status: PLANNED
+  - id: C9
+    requirement: retry/rerun/replan/restart, cursor recovery, drift and unknown-effect safety
+    child_run: R4
+    contract_anchors: ['16', '16.1', '16.2', '16.3', '16.4', '16.5', '17', '18']
+    scrum668_requirements: ['R6', 'R8', 'R13', 'R14']
+    jira_projection: ['SCRUM-670', 'SCRUM-671', 'SCRUM-675']
+    required_evidence: [fresh-checkout recovery, drift fixtures, typed control receipts, no-rewrite continuation]
+    status: PLANNED
+  - id: C10
+    requirement: authority cannot self-grant and stale/invalid authority fails closed
+    child_run: R5
+    contract_anchors: ['9', '9.3', '20']
+    scrum668_requirements: ['R2', 'R13']
+    jira_projection: ['SCRUM-674', 'SCRUM-675']
+    required_evidence: [forged-context tests, stale decision tests, authority/state separation review]
+    status: PLANNED
+  - id: C11
+    requirement: NodeDefinition/Allocation, WORK/CONTROL promotion, DAG budgets and SINGLE_ACTIVE
+    child_run: R3
+    contract_anchors: ['2.3', '15.2', '19.1', '19.2']
+    scrum668_requirements: ['R4', 'R5', 'R9']
+    jira_projection: ['SCRUM-672', 'SCRUM-673', 'SCRUM-675']
+    required_evidence: [E1/E2 kernel tests, E3 topology tests, budget/fan-out tests, SINGLE_ACTIVE concurrency]
+    status: PLANNED
+  - id: C12
+    requirement: compatibility/migration is namespaced, provenance-bound and never reinterprets legacy semantics
+    child_run: R7
+    contract_anchors: ['22', '23', '23.1', '23.2']
+    scrum668_requirements: ['R13', 'R14']
+    jira_projection: ['SCRUM-668', 'SCRUM-725', 'SCRUM-676']
+    required_evidence: [legacy profile fixtures, translation provenance/strength, SCRUM-668/725 immutable readback]
+    status: PLANNED
+  - id: C13
+    requirement: universal certification across software, research and non-software fixtures
+    child_run: R8
+    contract_anchors: ['24', '24.1']
+    scrum668_requirements: ['R14']
+    jira_projection: ['SCRUM-677', 'SCRUM-678']
+    required_evidence: [three domain fixture runs, same-kernel assertions, fresh recovery, exact refs]
+    status: PLANNED
+  - id: C14
+    requirement: adversarial, recovery and failure-code certification passes
+    child_run: R8
+    contract_anchors: ['16.4', '18', '20', '24']
+    scrum668_requirements: ['R2', 'R3', 'R6', 'R8', 'R13', 'R14']
+    jira_projection: ['SCRUM-670', 'SCRUM-671', 'SCRUM-674', 'SCRUM-677', 'SCRUM-678']
+    required_evidence: [adversarial fixtures, failure-code matrix, three independent reviews with BLOCKER/HIGH none]
+    status: PLANNED
+  - id: C15
+    requirement: complete traceability, exact-tip verification, child/root G6 acceptance and no unauthorized main merge
+    child_run: R0-R8
+    contract_anchors: ['25', '26', '24.1', '15.5']
+    scrum668_requirements: ['R9', 'R14']
+    jira_projection: ['SCRUM-668', 'SCRUM-669', 'SCRUM-670', 'SCRUM-671', 'SCRUM-672', 'SCRUM-673', 'SCRUM-674', 'SCRUM-675', 'SCRUM-676', 'SCRUM-677', 'SCRUM-678', 'SCRUM-725', 'SCRUM-746']
+    required_evidence: [C1-C15 matrix, validate_g01 PASS, full test/E2E/adversarial pass, exact SHA/CI, root HandoffReceipt]
+    status: PLANNED
+
+jira_reconciliation:
+  source_readback_at: '2026-09-09T18:46:10Z'
+  root: SCRUM-668
+  child_projection_keys: [SCRUM-669, SCRUM-670, SCRUM-671, SCRUM-672, SCRUM-673, SCRUM-674, SCRUM-675, SCRUM-676, SCRUM-677, SCRUM-678, SCRUM-725, SCRUM-746]
+  rule: >-
+    No issue is marked Done from this matrix. Each key requires live status,
+    evidence links, and a corresponding Child Run G6 accepted handoff before
+    parent acceptance can be considered.
