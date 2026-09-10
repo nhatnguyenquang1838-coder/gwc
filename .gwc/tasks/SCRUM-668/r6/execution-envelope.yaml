@@ -50,9 +50,9 @@ f1_artifact_digests:
   g1_scope: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
 f2_digests:
   gate_state_resolution: sha256:49df60ce4a446ca03696d11e5b11c42ed8033e63345be2159fa8781785220210
-  authority_boundary_decision: sha256:9cd830b948b5a02aa0e614c1c47dc56da80fad6c45e4a7147ca0803c59d73a06
+  authority_boundary_decision: sha256:7b865b52db2cae154262ce206d2fec70b17e535c06239720e2c118cc521c71bc
 approval_request_ref:
-  approval_id: ANALYZER-HITL-SCRUM-668-R6-G2-20260910
+  approval_id: ANALYZER-HITL-SCRUM-668-R6-G2-HOTFIX-CLOSURE-20260910
   authority_gate: G2_EXECUTION
   task_id: SCRUM-668
   repository: nhatnguyenquang1838-coder/gwc
@@ -89,13 +89,21 @@ approval_request_ref:
   commit_before_handoff: true
   push_before_handoff: true
   decision: AGREE
-  scope: R6_C7_DOSSIER_2_PATHS
+  scope: R6_C7_DOSSIER_2_PATHS_PLUS_AUTHORIZED_INLINE_HOTFIX
   authority_source: ANALYZER_HITL_DELEGATED_BY_NHAT
   issued_at: '2026-09-10T19:15:00Z'
   expires_at: '2026-09-11T19:15:00Z'
   r6_scope_note: C7 distinct G3/G4/G5 records, G6 Closure/HandoffReceipt, target validation,
     child acceptance. Includes durable receipt append to RunLedger (EffectDecisionReceipt
     serialization per bmad/ua advisory).
+  hotfix_authority_citation:
+    commit: 4735be0186116ba0f442cefcdca92c536ccc7482
+    file: tools/node_architect/lease_acquisition.py
+    reason: 'pre-existing deterministic-digest flake: observed_at=_now() default made
+      decision_digest non-deterministic across second boundary'
+    human_authorization: 'Nhat clarify 2026-09-10: fix bugs inline in Universal scope,
+      analyzer-delegated (verified via clarify response)'
+    ci_result: validate SUCCESS after hotfix; full regression 209 passed
 approval_validation_ref:
   outcome: VALID
   status: VERIFIED
@@ -109,13 +117,13 @@ approval_validation_ref:
   - add_files
   - run_sandboxed_validation
   - stage_commit_push
-  evidence: analyzer-hitl-approved-r6
-  verified_at: '2026-09-10T19:15:00Z'
+  evidence: analyzer-hitl-hotfix-closure-approved-2026-09-10T19:35:00Z
+  verified_at: '2026-09-10T19:35:00Z'
 checkpoint_id: gwc-universal-run-revamp-r6-g2-20260910T1915Z
 issued_at: '2026-09-10T19:15:00Z'
 expires_at: '2026-09-11T19:15:00Z'
 reason_code: G2_ENVELOPE_ACTIVE
-envelope_digest: sha256:b7b62c2a5d9eba08a98bdbe7ac2c23c9852c5f7430d5c3d5eec88855c126ba6a
+envelope_digest: sha256:889c4ac8ff1bd39b58512b56ef9dbd59cafcfbf7ca9be7dd294089eab9e7f732
 exclusions:
 - G3_PR
 - G4_MERGE
