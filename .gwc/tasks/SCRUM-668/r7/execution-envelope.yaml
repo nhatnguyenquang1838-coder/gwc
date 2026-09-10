@@ -91,6 +91,12 @@ approval_request_ref:
   expires_at: '2026-09-11T19:45:00Z'
   r7_scope_note: C12 namespaced legacy compatibility, translation provenance, evidence-strength
     rules, never reinterprets legacy semantics.
+  g_r7_02_closure:
+    status: CLOSED
+    manifest: .gwc/tasks/SCRUM-668/universal_run_modules_manifest.yaml
+    manifest_digest: sha256:dd46562400489e0f58ebf9eabc6500ff012dd93cc4b9d5d32339a5c31439e50b
+    modules: 9
+    authority: ANALYZER-HITL closure 2026-09-10 (G-R7-02)
 approval_validation_ref:
   outcome: VALID
   status: VERIFIED
