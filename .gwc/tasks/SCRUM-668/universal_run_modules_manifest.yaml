@@ -1,0 +1,41 @@
+artifact_type: universal-run-modules-manifest
+manifest_digest: sha256:e427aed53285f41c58955c139947b2cdde170a0de3b4a1bb5eda8ca4a3bf2732
+modules:
+- name: universal_run_kernel
+  layer: kernel
+  child_run: E1
+  scope_hash: kernel-base
+- name: universal_run_topology
+  layer: topology
+  child_run: E3
+  scope_hash: topology-base
+- name: universal_run_context
+  layer: context
+  child_run: R1
+  scope_hash: r1-envelope-b955358e
+- name: universal_run_state
+  layer: state
+  child_run: R1
+  scope_hash: r1-envelope-b955358e
+- name: universal_run_lifecycle
+  layer: lifecycle
+  child_run: R2
+  scope_hash: r2-envelope-601c7959
+- name: universal_run_node
+  layer: node
+  child_run: R3
+  scope_hash: r3-envelope-f6baa22e
+- name: universal_run_plan
+  layer: plan
+  child_run: R4
+  scope_hash: r4-envelope-5965ea15
+- name: universal_run_authority
+  layer: authority
+  child_run: R5
+  scope_hash: r5-envelope-2f319878
+module_count: 8
+governance_note: 'Per @gwc G-R4-05 and @ua architecture reconciliation (R4 G3): per-release
+  envelope isolation is sufficient for R1-R4; this cumulative manifest binds the module
+  graph and scope hashes so later child runs (R6-R8) extend it.
+
+  '
