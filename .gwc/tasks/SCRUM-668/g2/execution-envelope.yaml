@@ -19,6 +19,7 @@ bounded_read_scope:
 - tools/node_architect/universal_run_kernel.py
 - tools/node_architect/universal_run_topology.py
 - tools/node_architect/semantic_lifecycle.py
+- .gwc/tasks/SCRUM-668/g2/execution-envelope.yaml
 bounded_write_scope:
 - tools/node_architect/universal_run_context.py
 - tools/node_architect/universal_run_state.py
@@ -27,6 +28,7 @@ bounded_write_scope:
 - tests/test_universal_run_context_v1.py
 - tests/test_universal_run_state_v1.py
 - tests/test_universal_run_r1_interop_v1.py
+- .gwc/tasks/SCRUM-668/g2/execution-envelope.yaml
 authorized_actions:
 - add_files
 - run_sandboxed_validation
@@ -57,16 +59,16 @@ f1_artifact_digests:
   g1_scope: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
 f2_digests:
   gate_state_resolution: sha256:49df60ce4a446ca03696d11e5b11c42ed8033e63345be2159fa8781785220210
-  authority_boundary_decision: sha256:d1c3922e19843a71aea65b84517e24a6ba9b93a61e49330aec304049e38d4bff
+  authority_boundary_decision: sha256:e7ff3b85632fb8e1880d8c17d85ff8f152478a08e4c4093e3db5b0d36224b1f2
 approval_request_ref:
-  approval_id: HUMAN-NHAT-SCRUM-668-R1-G2-COMMITPUSH-20260910
+  approval_id: HUMAN-NHAT-SCRUM-668-R1-G2-G01-FORMAL-CLOSURE-20260910
   authority_gate: G2_EXECUTION
   task_id: SCRUM-668
   repository: nhatnguyenquang1838-coder/gwc
   protected_base:
     ref: main
     sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
-  continuation_base_sha: 00cbcda8aee9104e67f1356fe58cb0cf0dcd2362
+  continuation_base_sha: 21cff67acefbbe3c3b38a346fb6004bd9f13547a
   working_branch: impl/GWC-UNIVERSAL-RUN-REVAMP
   g1_scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
   scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
@@ -79,6 +81,7 @@ approval_request_ref:
   - tests/test_universal_run_context_v1.py
   - tests/test_universal_run_state_v1.py
   - tests/test_universal_run_r1_interop_v1.py
+  - .gwc/tasks/SCRUM-668/g2/execution-envelope.yaml
   authorized_read_paths:
   - tools/node_architect/universal_run_context.py
   - tools/node_architect/universal_run_state.py
@@ -90,6 +93,7 @@ approval_request_ref:
   - tools/node_architect/universal_run_kernel.py
   - tools/node_architect/universal_run_topology.py
   - tools/node_architect/semantic_lifecycle.py
+  - .gwc/tasks/SCRUM-668/g2/execution-envelope.yaml
   canonical_scope_actions:
   - modify_approved_files
   - run_sandboxed_validation
@@ -103,10 +107,12 @@ approval_request_ref:
   commit_before_handoff: true
   push_before_handoff: true
   decision: AGREE
-  scope: BOUNDED_7_PATHS
-  authority_source: HUMAN_NHAT_CLARIFY
-  issued_at: '2026-09-10T16:30:31Z'
-  expires_at: '2026-09-11T16:30:31Z'
+  scope: BOUNDED_7_PATHS_PLUS_ENVELOPE
+  authority_source: HUMAN_NHAT_CLARIFY_G01_FORMAL_CLOSURE
+  issued_at: '2026-09-10T17:20:00Z'
+  expires_at: '2026-09-11T17:20:00Z'
+  g01_resolution: Envelope path formally added to bounded_read_scope and bounded_write_scope
+    per HUMAN authorization to close @gwc G-01
 approval_validation_ref:
   outcome: VALID
   status: VERIFIED
@@ -120,13 +126,13 @@ approval_validation_ref:
   - add_files
   - run_sandboxed_validation
   - stage_commit_push
-  evidence: human-clarify-readback
-  verified_at: '2026-09-10T16:30:31Z'
-checkpoint_id: gwc-universal-run-revamp-r1-g2-commitpush-20260910T1630Z
-issued_at: '2026-09-10T16:30:31Z'
-expires_at: '2026-09-11T16:30:31Z'
+  evidence: human-clarify-readback-g01-formal-closure
+  verified_at: '2026-09-10T17:20:00Z'
+checkpoint_id: gwc-universal-run-revamp-r1-g2-g01-closure-20260910T1720Z
+issued_at: '2026-09-10T17:20:00Z'
+expires_at: '2026-09-11T17:20:00Z'
 reason_code: G2_ENVELOPE_ACTIVE
-envelope_digest: sha256:b5b7504adfbbebcdfe7b4eef2bb7c8fd80aaa718d1ad45b45139e56e3491541d
+envelope_digest: sha256:b955358ef2f4713a231bab20c4bcb0f1ce3d302466740a3f08a32f0260916e1a
 exclusions:
 - G3_PR
 - G4_MERGE
