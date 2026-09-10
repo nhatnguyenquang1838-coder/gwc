@@ -1,5 +1,5 @@
 artifact_type: universal-run-modules-manifest
-manifest_digest: sha256:dd46562400489e0f58ebf9eabc6500ff012dd93cc4b9d5d32339a5c31439e50b
+manifest_digest: sha256:ee29edccbae5b53dd50cf64d53bf51f8c6f7e11d72f66db954ba95805b655a90
 modules:
 - name: universal_run_kernel
   layer: kernel
@@ -37,7 +37,11 @@ modules:
   layer: legacy
   child_run: R7
   scope_hash: r7-envelope-2b83ecbd
-module_count: 9
+- name: universal_run_certification
+  layer: certification
+  child_run: R8
+  scope_hash: r8-envelope-d4e833cc
+module_count: 10
 governance_note: 'Per @gwc G-R4-05 and @ua architecture reconciliation (R4 G3): per-release
   envelope isolation is sufficient for R1-R4; this cumulative manifest binds the module
   graph and scope hashes so later child runs (R6-R8) extend it.
