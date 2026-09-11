@@ -568,12 +568,16 @@ def replan_after_drift(
     target_contract_ref: str,
     node_allocations: list[str] | tuple[str, ...],
     drift_reason: str,
+    audit_log: ReplanAuditLog | None = None,
 ) -> PlanRevision:
     """Create a NEW immutable revision after material drift (Notion §9).
 
     Immutable Replan: material drift after G1 produces a new immutable revision
     with provenance (previous_digest -> frozen digest); it never mutates the
     frozen revision. Non-material drift is refused (no silent churn).
+
+    Wiring GAP 3: when an ``audit_log`` is supplied, the new revision is recorded
+    as an append-only, digest-bound audit entry so replan history is tamper-evident.
     """
     _require(isinstance(frozen, Mapping), "PLAN_FREEZE_REQUIRED")
     plan = frozen.get("plan")
@@ -591,6 +595,13 @@ def replan_after_drift(
         run_id=plan.run_id, revision=new_revision, target_contract_ref=target_contract_ref,
         node_allocations=nodes, previous_digest=plan.digest,
     )
+    if audit_log is not None:
+        audit_log.append(
+            run_id=plan.run_id,
+            from_digest=plan.digest,
+            to_revision=new_revision,
+            drift_reason=reason,
+        )
     return RuntimePlan(
         run_id=plan.run_id, revision=new_revision, target_contract_ref=target_contract_ref,
         node_allocations=nodes, previous_digest=plan.digest, digest=digest,

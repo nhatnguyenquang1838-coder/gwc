@@ -57,6 +57,7 @@ class RunDossier:
     g3_records: tuple[dict[str, Any], ...]
     g4_records: tuple[dict[str, Any], ...]
     g5_records: tuple[dict[str, Any], ...]
+    jira_ticket_reference: str | None = None
     dossier_digest: str = field(default_factory=str)
 
     def to_dict(self) -> dict[str, Any]:
@@ -66,6 +67,7 @@ class RunDossier:
             "g3_records": [copy.deepcopy(r) for r in self.g3_records],
             "g4_records": [copy.deepcopy(r) for r in self.g4_records],
             "g5_records": [copy.deepcopy(r) for r in self.g5_records],
+            "jira_ticket_reference": self.jira_ticket_reference,
             "dossier_digest": self.dossier_digest,
         }
 
@@ -76,6 +78,7 @@ class RunDossier:
             g3_records=tuple(data.get("g3_records", [])),
             g4_records=tuple(data.get("g4_records", [])),
             g5_records=tuple(data.get("g5_records", [])),
+            jira_ticket_reference=data.get("jira_ticket_reference"),
             dossier_digest=str(data.get("dossier_digest", "")),
         )
 
@@ -146,20 +149,39 @@ def create_run_dossier(
     g3_records: list[dict[str, Any]] | tuple[dict[str, Any], ...],
     g4_records: list[dict[str, Any]] | tuple[dict[str, Any], ...],
     g5_records: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+    jira_ticket_reference: str | None = None,
 ) -> RunDossier:
-    """Create an immutable Run Dossier with distinct G3/G4/G5 buckets (C7)."""
+    """Create an immutable Run Dossier with distinct G3/G4/G5 buckets (C7).
+
+    Wiring GAP 4: when ``jira_ticket_reference`` is supplied it must be non-empty
+    (governance traceability) and is folded into the dossier digest.
+    """
     _require(isinstance(run_id, str) and run_id.strip(), "RUN_ID_INVALID")
+    if jira_ticket_reference is not None:
+        _require(
+            isinstance(jira_ticket_reference, str) and jira_ticket_reference.strip(),
+            "JIRA_TICKET_REFERENCE_REQUIRED",
+            "jira_ticket_reference must be non-empty when provided",
+        )
     g3 = tuple(copy.deepcopy(r) for r in (g3_records or []))
     g4 = tuple(copy.deepcopy(r) for r in (g4_records or []))
     g5 = tuple(copy.deepcopy(r) for r in (g5_records or []))
-    digest = _sha256_digest(run_id, g3, g4, g5)
-    return RunDossier(run_id=run_id, g3_records=g3, g4_records=g4, g5_records=g5, dossier_digest=digest)
+    if jira_ticket_reference is None:
+        digest = _sha256_digest(run_id, g3, g4, g5)
+    else:
+        digest = _sha256_digest(run_id, g3, g4, g5, jira_ticket_reference)
+    return RunDossier(run_id=run_id, g3_records=g3, g4_records=g4, g5_records=g5,
+                      jira_ticket_reference=jira_ticket_reference, dossier_digest=digest)
 
 
 def validate_dossier(dossier: RunDossier) -> bool:
     """Verify dossier digest against its canonical records (C7)."""
     try:
-        expected = _sha256_digest(dossier.run_id, dossier.g3_records, dossier.g4_records, dossier.g5_records)
+        if dossier.jira_ticket_reference is None:
+            expected = _sha256_digest(dossier.run_id, dossier.g3_records, dossier.g4_records, dossier.g5_records)
+        else:
+            expected = _sha256_digest(dossier.run_id, dossier.g3_records, dossier.g4_records,
+                                      dossier.g5_records, dossier.jira_ticket_reference)
         return dossier.dossier_digest == expected
     except Exception:
         return False

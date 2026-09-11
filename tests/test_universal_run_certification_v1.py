@@ -174,3 +174,40 @@ class EvidenceRejectionTests(unittest.TestCase):
                                    expected_digest="sha256:" + "a" * 64)
         self.assertTrue(r["ok"])
         self.assertEqual(r["reason_code"], "EVIDENCE_VALID")
+
+
+class EvidenceWiringTests(unittest.TestCase):
+    """Wiring GAP 2: certify_fixture invokes validate_evidence_refs when evidence provided."""
+
+    def test_certify_fixture_rejects_missing_evidence(self):
+        from tools.node_architect.universal_run_certification import (
+            DomainFixture,
+            EvidenceRejectionError,
+            certify_fixture,
+        )
+        f = DomainFixture(domain="software", payload={"k": "v"})
+        with self.assertRaises(EvidenceRejectionError):
+            certify_fixture(f, run_id="RUN-P", evidence_refs=["evidence/missing.json"],
+                            available_evidence={"evidence/a.json": "sha256:" + "a" * 64})
+
+    def test_certify_fixture_accepts_valid_evidence(self):
+        from tools.node_architect.universal_run_certification import (
+            DomainFixture,
+            certify_fixture,
+        )
+        f = DomainFixture(domain="software", payload={"k": "v"})
+        r = certify_fixture(f, run_id="RUN-P", evidence_refs=["evidence/a.json"],
+                            available_evidence={"evidence/a.json": "sha256:" + "a" * 64},
+                            expected_evidence_digest="sha256:" + "a" * 64)
+        self.assertTrue(r["certified"])
+        self.assertEqual(r.get("evidence_reason_code"), "EVIDENCE_VALID")
+
+    def test_certify_fixture_without_evidence_unchanged(self):
+        from tools.node_architect.universal_run_certification import (
+            DomainFixture,
+            certify_fixture,
+        )
+        f = DomainFixture(domain="software", payload={"k": "v"})
+        r = certify_fixture(f)
+        self.assertTrue(r["certified"])
+        self.assertNotIn("evidence_reason_code", r)

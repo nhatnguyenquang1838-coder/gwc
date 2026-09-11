@@ -192,6 +192,8 @@ def evaluate_transition(
     action: str,
     target_gate: str | None = None,
     explicit_outcome: str | None = None,
+    recovery_attempt: int | None = None,
+    max_recovery_attempts: int | None = None,
 ) -> TransitionResult:
     """Pure evaluator: returns a typed outcome or raises a deterministic error.
 
@@ -240,6 +242,16 @@ def evaluate_transition(
         raise LifecycleStateMachineError(exc.code, exc.detail or "") from exc
 
     reason_codes = classify_noop(outcome)
+    # Wiring GAP 1: RETRY/RERUN/REPAIR are recovery attempts. When a caller
+    # supplies recovery bounds, enforce them via the bounded-primitive so the
+    # core transition cannot enter an unbounded lease-retry loop.
+    recovery_receipt: dict[str, Any] | None = None
+    if action in {"RETRY", "RERUN", "REPAIR"} and recovery_attempt is not None:
+        recovery_receipt = begin_recovery_attempt(
+            run_id=f"{current_gate}:{current_state}",
+            attempt=recovery_attempt,
+            max_attempts=max_recovery_attempts if max_recovery_attempts is not None else recovery_attempt,
+        )
     noop = NoOpOutcome(
         reason_code=reason_codes[0] if reason_codes else "NOOP_STATE_UNCHANGED",
         detail=f"edge_kind={outcome.get('edge_kind')} next={outcome.get('next_gate')}:{outcome.get('next_state')}",
@@ -261,6 +273,8 @@ def evaluate_transition(
         ),
         "noop_reason": noop.reason_code,
     }
+    if recovery_receipt is not None:
+        receipt["recovery"] = recovery_receipt
     return TransitionResult(outcome=outcome, noop=noop, receipt=receipt)
 
 

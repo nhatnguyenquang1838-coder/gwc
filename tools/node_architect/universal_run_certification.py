@@ -89,17 +89,42 @@ class DomainFixture:
         return {"domain": self.domain, "payload": copy.deepcopy(self.payload)}
 
 
-def certify_fixture(fixture: DomainFixture) -> dict[str, Any]:
-    """Certify one fixture through the same universal kernel (C13)."""
+def certify_fixture(
+    fixture: DomainFixture,
+    *,
+    run_id: str | None = None,
+    evidence_refs: list[str] | tuple[str, ...] | None = None,
+    available_evidence: Mapping[str, str] | None = None,
+    expected_evidence_digest: str | None = None,
+) -> dict[str, Any]:
+    """Certify one fixture through the same universal kernel (C13).
+
+    Wiring GAP 2: when the caller supplies evidence references, the fixture is
+    only certified after ``validate_evidence_refs`` proves every reference is
+    present and non-stale. Missing/stale evidence fails closed before the
+    certification result is produced.
+    """
     _require(isinstance(fixture, DomainFixture), "FIXTURE_INVALID")
     _require(fixture.domain in CERTIFICATION_DOMAINS, "CERTIFICATION_DOMAIN_UNKNOWN", str(fixture.domain))
+    evidence_reason: str | None = None
+    if evidence_refs is not None:
+        ev = validate_evidence_refs(
+            run_id=run_id or f"certify:{fixture.domain}",
+            evidence_refs=evidence_refs,
+            available=dict(available_evidence or {}),
+            expected_digest=expected_evidence_digest,
+        )
+        evidence_reason = ev["reason_code"]
     fixture_digest = _sha256_digest(KERNEL_REF, fixture.domain, fixture.payload)
-    return {
+    result = {
         "domain": fixture.domain,
         "kernel_ref": KERNEL_REF,
         "fixture_digest": fixture_digest,
         "certified": True,
     }
+    if evidence_reason is not None:
+        result["evidence_reason_code"] = evidence_reason
+    return result
 
 
 def certify_three_domains(*, fixtures: list[DomainFixture] | tuple[DomainFixture, ...]) -> dict[str, Any]:
