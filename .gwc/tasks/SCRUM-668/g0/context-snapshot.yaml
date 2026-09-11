@@ -1,0 +1,145 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-09-09T18:46:10Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+runtime_context:
+  agent_runtime_id: dwa
+  execution_mode: local_agent
+  selected_profile:
+    id: chatgpt
+    path: governance/agent-runtime-profiles/chatgpt.yaml
+  selected_connector: GitHub
+  connector_priority:
+  - GitHub
+  - DWC
+  - DW1
+  required_behavior_contracts:
+  - core/Agent_Behavior_Semantic_Contract_v1.0.md
+  - core/Agent_Response_Presentation_Contract_v1.0.md
+  - core/Agent_Operating_Runtime_Contract_v1.0.md
+  - AGENTS.md
+constraints:
+- Contract target is Notion Contract Freeze v1.1, lifecycle profile gwc.universal-run/1;
+  exact page snapshot sha256:a8207d15e12f4686a9ffbcfa155c3aaaa80cc884df9afdf9394688b207e4175c.
+- Human acceptance chain is Resolution Registry HUMAN_APPROVED_FOR_V1.1_INTEGRATION
+  plus HD-CF-v1.1-20260905 decision APPROVE; these do not grant repository, Jira,
+  merge, deploy, production, data, secret, or migration authority.
+- Source design refs are canonical Universal model sha256:a04d5562df44643594ede2cddd2de061d8746607ffb35374b72657fb651e6f6d,
+  Detailed Architecture sha256:888f6f1679e551b7a0352fb31373d455f33251099460785589b0d1ef5675eae7,
+  Deep Research sha256:fdb294581a5bcdc278626365ed873a6870864629f9dddbe7b546185cdb3dc6f8,
+  and SCRUM-668 design sha256:05f1128257b88b61b6059ed8273d550929e176ec38d124db48ce9a8abfddd557.
+- Freeze historical planning source gwc/main@0e752b04c9f40a04fe402a4f25fcb12c8b9b4d72
+  is provenance only; implementation must revalidate against current protected base
+  d5fadc412d89f32c96ca9a1fcfd985913dc97876.
+- C1-C15 are user completion identifiers; their semantics must be traceable to the
+  Contract Freeze, original design, Jira child acceptance, schemas, tests, exact refs
+  and durable evidence, not invented from Jira status.
+- Root coordination and each cross-repo Child Run require separate exact scope, branch/worktree,
+  evidence, and applicable gate authority.
+- Main merge is always Human G4; G5/G6 are separate and not implied by green CI or
+  G6 child handoff.
+- Existing shared /Users/mac/prj/gwc main is dirty and excluded from trusted analysis;
+  use exact-base isolated worktrees only.
+applicable_policies:
+- id: AGENTS
+  path: AGENTS.md
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- id: CODING_PROJECT_GOVERNANCE_v1.0
+  path: core/Coding_Project_Governance_v1.0.md
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: bc9150a7e7b82df464f472e5f0c8222cc8f480280cd6c072759d9560fe3bafd0
+- id: E2E_DRAFT_PR_DELIVERY_RULE
+  path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921
+- id: PROJECT_PROFILE
+  path: projects/gwc/project-profile.yaml
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- id: PROJECT_INSTRUCTIONS
+  path: projects/gwc/project-instructions.md
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: 0641a863470fad7a00f8a6a70e7d6843959db5e8b838af4e0f9be9c461859de4
+- id: PROJECT_EXTENSION
+  path: projects/gwc/project-extension.md
+  ref: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  source_sha: bac0b6b517d3b63970c706a30e37f448f9d25a2253502fb124c8934f77570768
+- id: NOTION_CONTRACT_FREEZE_v1.1
+  path: notion://3d207c1c65b681b481c2f3247e10c1b2
+  ref: REV-GWC-CF-v1.1/HD-CF-v1.1-20260905
+  source_sha: a8207d15e12f4686a9ffbcfa155c3aaaa80cc884df9afdf9394688b207e4175c
+sources:
+- path: AGENTS.md
+  required: true
+  status: AVAILABLE
+  source_sha: 37974b7aaf7ae8b18e40f206f339ccb56c05f5f54bd4d6662e34b3a63119be59
+- path: core/Coding_Project_Governance_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: bc9150a7e7b82df464f472e5f0c8222cc8f480280cd6c072759d9560fe3bafd0
+- path: core/E2E_DRAFT_PR_DELIVERY_RULE.md
+  required: true
+  status: AVAILABLE
+  source_sha: c4aae250932a1dfeef6ee3bd03f7509a569a0e4497cfbc17d93a2f433d8a0921
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: projects/gwc/project-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: 0641a863470fad7a00f8a6a70e7d6843959db5e8b838af4e0f9be9c461859de4
+- path: projects/gwc/project-extension.md
+  required: true
+  status: AVAILABLE
+  source_sha: bac0b6b517d3b63970c706a30e37f448f9d25a2253502fb124c8934f77570768
+- path: governance/agent-runtime-profiles/chatgpt.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: 050091551d2d70709d455723aee6b9d4ec07fe7f70c6406c4eceab1d356ca134
+- path: core/Agent_Behavior_Semantic_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 10dd851a670bf54a952cb736d64d2b3d06e134baec46cc50e7fc9f8e670dd215
+- path: core/Agent_Response_Presentation_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: e95c7529c4bbee6bfbe18028eb780832803759d29e63a5e11fa2ab39de024f2a
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5a2aba718df97ebee207a49072d4df1e6f5b787263c17a530c06738fead40ec2
+- path: agents/chatgpt-agent/agent-instructions.md
+  required: true
+  status: AVAILABLE
+  source_sha: ab114587f6958abe67abe291444b90510bb2abe8e67c2979f52f00a562ed76f5
+- path: agents/chatgpt-agent/gwc-governed-base.md
+  required: true
+  status: AVAILABLE
+  source_sha: 5497e0a80e8f95ca12648e3f066c4365c5a0320d1f89ceacf6b5dc068d81cea9
+- path: core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: 4905d7f48ac99ca1cdccdf954339ef64ad06ced59cafcb839b9cedc0a22f4cef
+status: READY
+blockers: []

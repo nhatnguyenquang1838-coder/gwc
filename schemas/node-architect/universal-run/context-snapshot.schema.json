@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/context-snapshot.schema.json",
+  "title": "Universal Run trusted G0 ContextSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id", "schema_id", "schema_version", "run_id", "created_at", "created_by",
+    "lifecycle_profile", "provenance", "objective", "consumer_or_parent_ref",
+    "context_refs", "scope", "candidate_target", "constraints",
+    "authority_effect_boundary", "acceptance_boundary", "execution_shape",
+    "source_bindings", "ambiguities", "blocked", "evidence_strength_ref", "content_digest"
+  ],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "schema_id": {"const": "gwc.universal-run.context-snapshot"},
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "created_at": {"type": "string", "minLength": 1},
+    "created_by": {"type": "object"},
+    "lifecycle_profile": {
+      "type": "object", "required": ["id", "version"], "additionalProperties": false,
+      "properties": {"id": {"const": "gwc.universal-run"}, "version": {"const": 1}}
+    },
+    "provenance": {
+      "type": "object", "required": ["predecessor_refs", "source_refs"], "additionalProperties": false,
+      "properties": {
+        "predecessor_refs": {"type": "array", "items": {"type": "string"}},
+        "source_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "objective": {"type": "string", "minLength": 1},
+    "consumer_or_parent_ref": {"type": "string", "minLength": 1},
+    "context_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "scope": {"type": "object", "minProperties": 1},
+    "candidate_target": {"type": "object", "minProperties": 1},
+    "constraints": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "authority_effect_boundary": {
+      "type": "object", "required": ["grants_authority", "effects"], "additionalProperties": true,
+      "properties": {
+        "grants_authority": {"const": false},
+        "effects": {"type": "array"}
+      }
+    },
+    "acceptance_boundary": {"type": "object"},
+    "execution_shape": {"enum": ["ATOMIC", "RECURSIVE"]},
+    "source_bindings": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "baseline_ref", "baseline_sha", "observed_at"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1},
+        "baseline_ref": {"type": "string", "minLength": 1},
+        "baseline_sha": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+        "observed_at": {"type": "string", "minLength": 1}
+      }
+    },
+    "ambiguities": {"type": "array", "items": {"type": "object"}},
+    "blocked": {"type": "boolean"},
+    "evidence_strength_ref": {
+      "type": "object", "required": ["kind", "ref"], "additionalProperties": true,
+      "properties": {"kind": {"type": "string", "minLength": 1}, "ref": {"type": "string", "minLength": 1}}
+    },
+    "content_digest": {
+      "type": "object", "required": ["algorithm", "canonicalization", "value"], "additionalProperties": false,
+      "properties": {
+        "algorithm": {"const": "sha256"}, "canonicalization": {"const": "JCS"},
+        "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"ambiguities": {"minItems": 1}}, "required": ["ambiguities"]},
+      "then": {"properties": {"blocked": {"const": true}}}
+    }
+  ]
+}

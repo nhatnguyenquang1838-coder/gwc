@@ -30,6 +30,14 @@ def _now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+# Deterministic fallback for observed_at when the caller omits it. Using a fixed
+# sentinel keeps decision_digest replay-stable for identical inputs (the
+# deterministic-digest contract); callers that need wall-clock observations pass
+# observed_at explicitly. Mirror of the well-known contract epoch used by
+# authority_boundary_check and gate_state_resolution.
+_DETERMINISTIC_OBSERVED_AT = "2026-01-01T00:00:00Z"
+
+
 _REQUIRED_BINDING = (
     "task_id",
     "run_id",
@@ -241,7 +249,7 @@ def decide_lease_acquisition(
         "side_effect_status": side_effect_status,
         "readback_status": readback_status,
         "duplicate_agent_detected": duplicate_agent_detected,
-        "observed_at": observed_at or _now(),
+        "observed_at": observed_at if observed_at is not None else _DETERMINISTIC_OBSERVED_AT,
         "outcome": outcome,
         "reason_code": reason,
         "advancement_allowed": advancement_allowed,

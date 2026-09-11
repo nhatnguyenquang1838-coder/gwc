@@ -1,0 +1,147 @@
+schema_version: '1.1'
+artifact_type: g1-decision-record
+generated_at: '2026-09-09T18:46:10Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-668
+  base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat Nguyen Quang
+  decided_at: '2026-09-09T18:46:10Z'
+  source: >-
+    Explicit current user goal requesting setup and completion of the
+    GWC-UNIVERSAL-RUN-REVAMP R0-R8 program, SCRUM-668 and all child Jira tasks,
+    with Contract Freeze v1.1 verification and Human G4 main-merge boundary.
+  explicit: true
+rationale: >-
+  Select the exact Contract-Freeze Child Run DAG. It is the only option that
+  preserves legacy semantics, separates projections from canonical evidence,
+  binds each Child Run to its own lifecycle and authority, and can prove C1-C15
+  plus root/child G6 handoffs on exact refs. This G1 decision grants no
+  implementation, merge, deploy, production, data, secret or migration authority.
+rejected_option_ids:
+  - OPT-2
+  - OPT-3
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+  - AC-5
+  - AC-6
+  - AC-7
+  - AC-8
+  - AC-9
+  - AC-10
+  - AC-11
+  - AC-12
+  - AC-13
+  - AC-14
+  - AC-15
+scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+implementation_plan_ref:
+  applicability: not_applicable
+  source: plan_not_applicable
+  canonical_task_uid: SCRUM-668
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  plan_root: null
+  plan_revision: null
+  validation_evidence: >-
+    Notion Contract Freeze v1.1 and accepted review chain were read back;
+    SCRUM-668 R1-R14 and the user-provided R0-R8/C1-C15 completion contract
+    were cross-mapped in this G1 packet.
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: 'R0: wrap SCRUM-668/SCRUM-725 foundation, preserve immutable legacy evidence and define migration handoff.'
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: 'R1: implement/certify Run identity, lifecycle profile, immutable records, lineage and logical RunStateStore.'
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-3
+      description: 'R2: implement/certify universal G0-G6 state machine, typed no-op outcomes and illegal-transition rejection.'
+      dependencies:
+        - SUB-TASK-2
+    - sub_task_id: SUB-TASK-4
+      description: 'R3: implement/certify NodeDefinition/NodeAllocation, WORK/CONTROL promotion, DAG budgets and SINGLE_ACTIVE.'
+      dependencies:
+        - SUB-TASK-3
+    - sub_task_id: SUB-TASK-5
+      description: 'R4: implement/certify hierarchical RuntimePlan revisions, cursor, recovery, retry/rerun/replan/restart and drift.'
+      dependencies:
+        - SUB-TASK-4
+    - sub_task_id: SUB-TASK-6
+      description: 'R5: implement/certify orthogonal authority issuance, AuthorityDecisionReceipt and stale/self-grant fail-closed enforcement.'
+      dependencies:
+        - SUB-TASK-5
+    - sub_task_id: SUB-TASK-7
+      description: 'R6: implement/certify Run Dossier evidence, target integration/validation, ClosureReceipt and HandoffReceipt.'
+      dependencies:
+        - SUB-TASK-6
+    - sub_task_id: SUB-TASK-8
+      description: 'R7: implement/certify namespaced legacy compatibility, translation provenance and evidence-strength rules.'
+      dependencies:
+        - SUB-TASK-7
+    - sub_task_id: SUB-TASK-9
+      description: 'R8: run three domain fixtures, fresh recovery, adversarial certification and Root/Child G6 handoff acceptance.'
+      dependencies:
+        - SUB-TASK-8
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: dwa-gwc-governance
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: gwc-verification-evidence
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-3
+      skill_id: test-driven-development
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-4
+      skill_id: governed-change-impact
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-5
+      skill_id: gwc-verification-evidence
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-6
+      skill_id: governance-bounded-implementation
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-7
+      skill_id: gwc-verification-evidence
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-8
+      skill_id: dwa-gwc-governance
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-9
+      skill_id: gwc-verification-evidence
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+    - SUB-TASK-4
+    - SUB-TASK-5
+    - SUB-TASK-6
+    - SUB-TASK-7
+    - SUB-TASK-8
+    - SUB-TASK-9
+  summary: >-
+    Root planning-only decomposition. Each SUB-TASK is a recursive Child Run
+    that requires its own G0-G6 evidence, exact repository scope and authority;
+    no child is terminal from Jira status alone. Existing SCRUM-670..678 are
+    projection anchors for W1-W9 and must be reconciled, not semantically
+    reinterpreted as universal gates.

@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/run-state-record.schema.json",
+  "title": "Universal Run logical RunStateRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id", "schema_id", "schema_version", "run_id", "created_at", "created_by",
+    "lifecycle_profile", "provenance", "run_manifest_ref", "run_manifest_digest",
+    "state_revision", "predecessor_state_ref", "predecessor_state_digest", "sequence",
+    "active_gate", "gate_states", "terminal_state", "execution_refs",
+    "future_contract_refs", "content_digest"
+  ],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "schema_id": {"const": "gwc.universal-run.run-state-record"},
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "created_by": {"type": "object"},
+    "lifecycle_profile": {
+      "type": "object", "required": ["id", "version"], "additionalProperties": false,
+      "properties": {"id": {"const": "gwc.universal-run"}, "version": {"const": 1}}
+    },
+    "provenance": {
+      "type": "object", "required": ["predecessor_refs", "source_refs"], "additionalProperties": false,
+      "properties": {
+        "predecessor_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "source_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "run_manifest_ref": {"type": "string", "minLength": 1},
+    "run_manifest_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run_manifest_run_id": {"type": "string", "minLength": 1},
+    "parent_run_ref": {"type": "string", "minLength": 1},
+    "child_run_ref": {"type": "string", "minLength": 1},
+    "state_revision": {"type": "integer", "minimum": 1},
+    "predecessor_state_ref": {"type": ["string", "null"]},
+    "predecessor_state_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "sequence": {"type": "integer", "minimum": 0},
+    "active_gate": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+    "gate_states": {
+      "type": "object", "additionalProperties": false,
+      "required": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"],
+      "properties": {
+        "G0": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "G1": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "G2": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "G3": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "G4": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "G5": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "G6": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]}
+      }
+    },
+    "terminal_state": {"enum": ["OPEN", "FAILED", "CANCELLED", "SUPERSEDED"]},
+    "execution_refs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["runtime_plan_ref", "runtime_plan_digest", "cursor_ref"],
+      "properties": {
+        "runtime_plan_ref": {"type": ["string", "null"]},
+        "runtime_plan_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "cursor_ref": {"type": ["string", "null"]}
+      }
+    },
+    "future_contract_refs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target_contract_ref", "closure_receipt_ref", "handoff_receipt_ref"],
+      "properties": {
+        "target_contract_ref": {"type": ["string", "null"]},
+        "closure_receipt_ref": {"type": ["string", "null"]},
+        "handoff_receipt_ref": {"type": ["string", "null"]}
+      }
+    },
+    "content_digest": {
+      "type": "object", "required": ["algorithm", "canonicalization", "value"], "additionalProperties": false,
+      "properties": {
+        "algorithm": {"const": "sha256"}, "canonicalization": {"const": "JCS"},
+        "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state_revision": {"const": 1}}, "required": ["state_revision"]},
+      "then": {"properties": {"predecessor_state_ref": {"const": null}, "predecessor_state_digest": {"const": null}}}
+    },
+    {
+      "if": {
+        "anyOf": [
+          {"required": ["parent_run_ref"]},
+          {"required": ["child_run_ref"]}
+        ]
+      },
+      "then": {"required": ["run_manifest_run_id", "parent_run_ref", "child_run_ref"]}
+    }
+  ]
+}

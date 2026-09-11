@@ -1,0 +1,125 @@
+schema_version: '1.0'
+artifact_type: g2-execution-envelope
+activation_state: ACTIVE
+task_id: SCRUM-668
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+working_branch: impl/GWC-UNIVERSAL-RUN-REVAMP
+risk_class: R3
+risk_digest: sha256:1967b32fe776f48965fb9ef4d87df9b1bca130f7b196924057992df5030354a3
+bounded_read_scope:
+- tools/node_architect/universal_run_legacy.py
+- tests/test_universal_run_legacy_v1.py
+- tools/node_architect/universal_run_kernel.py
+- tools/node_architect/universal_run_state.py
+- tools/node_architect/evidence_quality_check.py
+- tools/node_architect/blocker_severity_classification.py
+bounded_write_scope:
+- tools/node_architect/universal_run_legacy.py
+- tests/test_universal_run_legacy_v1.py
+authorized_actions:
+- add_files
+- run_sandboxed_validation
+- stage_commit_push
+excluded_actions:
+- open_draft_pr
+- mark_pr_ready
+- merge
+- auto_merge
+- force_push
+- branch_deletion
+- protected_branch_write
+- deploy
+- release
+- production_data_change
+- production_config_change
+- g3_pr_promotion
+- g4_merge
+- g5_deploy
+- g6_production
+scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
+f1_artifact_digests:
+  g0_context_snapshot: sha256:7517488faac6a3b58f8abf64d8057e3af26727aab74ae0186cb6bcf2fef777e5
+  g1_intake_brief: sha256:98594bbedc142b9d4bdbb6c650c4b3f1201e027fe69d0e698b836b2ee8ef3e42
+  g1_preflight_report: sha256:74b562eb2122529576a7505b62ec44986a334a14fd6b032c3c2261ad170ce51f
+  g1_options: sha256:c5db38ec09db7a250ef1f56ee5c9d029fb4039b0c3165f31734a0e94248d6c8d
+  g1_decision_record: sha256:931d573702ea5f6ddd6228888b9b457deca59fb25e576a59f71c6897515c0705
+  g1_scope: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
+f2_digests:
+  gate_state_resolution: sha256:49df60ce4a446ca03696d11e5b11c42ed8033e63345be2159fa8781785220210
+  authority_boundary_decision: sha256:ae31d1b0d4690afe83f4d7becb089161f007f64790cba61ef81e3393264d54c6
+approval_request_ref:
+  approval_id: ANALYZER-HITL-SCRUM-668-R7-G2-20260910
+  authority_gate: G2_EXECUTION
+  task_id: SCRUM-668
+  repository: nhatnguyenquang1838-coder/gwc
+  protected_base:
+    ref: main
+    sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  continuation_base_sha: 1fbcded7fa5d5323c0d1327333db74bd9f37c33b
+  working_branch: impl/GWC-UNIVERSAL-RUN-REVAMP
+  g1_scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
+  scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
+  scope_hash_16: c1f1c364d03a9551
+  authorized_paths:
+  - tools/node_architect/universal_run_legacy.py
+  - tests/test_universal_run_legacy_v1.py
+  authorized_read_paths:
+  - tools/node_architect/universal_run_legacy.py
+  - tests/test_universal_run_legacy_v1.py
+  - tools/node_architect/universal_run_kernel.py
+  - tools/node_architect/universal_run_state.py
+  - tools/node_architect/evidence_quality_check.py
+  - tools/node_architect/blocker_severity_classification.py
+  canonical_scope_actions:
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+  authorized_actions:
+  - add_files
+  - run_sandboxed_validation
+  - stage_commit_push
+  commit_before_handoff: true
+  push_before_handoff: true
+  decision: AGREE
+  scope: R7_C12_LEGACY_2_PATHS
+  authority_source: ANALYZER_HITL_DELEGATED_BY_NHAT
+  issued_at: '2026-09-10T19:45:00Z'
+  expires_at: '2026-09-11T19:45:00Z'
+  r7_scope_note: C12 namespaced legacy compatibility, translation provenance, evidence-strength
+    rules, never reinterprets legacy semantics.
+  g_r7_02_closure:
+    status: CLOSED
+    manifest: .gwc/tasks/SCRUM-668/universal_run_modules_manifest.yaml
+    manifest_digest: sha256:dd46562400489e0f58ebf9eabc6500ff012dd93cc4b9d5d32339a5c31439e50b
+    modules: 9
+    authority: ANALYZER-HITL closure 2026-09-10 (G-R7-02)
+approval_validation_ref:
+  outcome: VALID
+  status: VERIFIED
+  scope_hash: sha256:c1f1c364d03a95515570ed12b032220299853618cf641756a2f1fba4aa1be368
+  task_id: SCRUM-668
+  repository: nhatnguyenquang1838-coder/gwc
+  base_sha: d5fadc412d89f32c96ca9a1fcfd985913dc97876
+  working_branch: impl/GWC-UNIVERSAL-RUN-REVAMP
+  risk_class: R3
+  authorized_actions:
+  - add_files
+  - run_sandboxed_validation
+  - stage_commit_push
+  evidence: analyzer-hitl-approved-r7
+  verified_at: '2026-09-10T19:45:00Z'
+checkpoint_id: gwc-universal-run-revamp-r7-g2-20260910T1945Z
+issued_at: '2026-09-10T19:45:00Z'
+expires_at: '2026-09-11T19:45:00Z'
+reason_code: G2_ENVELOPE_ACTIVE
+envelope_digest: sha256:2b83ecbd73478ccea47fce4b76f7ed9655ca4e37e4b73173163e09fb405a426a
+exclusions:
+- G3_PR
+- G4_MERGE
+- G5_DEPLOY
+- G6_PRODUCTION
+execution_started: false
