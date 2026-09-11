@@ -141,3 +141,36 @@ class TestC14AdversarialFailureCodes(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EvidenceRejectionTests(unittest.TestCase):
+    """Hardening GAP 2: stale/missing evidence rejection reason codes."""
+
+    def test_missing_evidence_rejected(self):
+        from tools.node_architect.universal_run_certification import (
+            EvidenceRejectionError,
+            validate_evidence_refs,
+        )
+        with self.assertRaises(EvidenceRejectionError) as ctx:
+            validate_evidence_refs(run_id="RUN-P", evidence_refs=["evidence/a.json", "evidence/missing.json"],
+                                   available={"evidence/a.json": "sha256:" + "a" * 64})
+        self.assertEqual(ctx.exception.code, "EVIDENCE_MISSING")
+
+    def test_stale_evidence_rejected(self):
+        from tools.node_architect.universal_run_certification import (
+            EvidenceRejectionError,
+            validate_evidence_refs,
+        )
+        with self.assertRaises(EvidenceRejectionError) as ctx:
+            validate_evidence_refs(run_id="RUN-P", evidence_refs=["evidence/a.json"],
+                                   available={"evidence/a.json": "sha256:" + "a" * 64},
+                                   expected_digest="sha256:" + "b" * 64)
+        self.assertEqual(ctx.exception.code, "EVIDENCE_STALE")
+
+    def test_all_evidence_valid(self):
+        from tools.node_architect.universal_run_certification import validate_evidence_refs
+        r = validate_evidence_refs(run_id="RUN-P", evidence_refs=["evidence/a.json"],
+                                   available={"evidence/a.json": "sha256:" + "a" * 64},
+                                   expected_digest="sha256:" + "a" * 64)
+        self.assertTrue(r["ok"])
+        self.assertEqual(r["reason_code"], "EVIDENCE_VALID")

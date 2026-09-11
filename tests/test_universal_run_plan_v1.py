@@ -400,3 +400,38 @@ class HierarchicalPlanBindingTests(unittest.TestCase):
         with self.assertRaises(PlanFrozenError):
             R(frozen=frozen, target_contract_ref="TC-1", node_allocations=["A", "B"],
               drift_reason="COSMETIC")
+
+
+class ReplanAuditLogTests(unittest.TestCase):
+    """Hardening GAP 3: append-only immutable replan audit log."""
+
+    def test_replan_audit_log_append(self):
+        from tools.node_architect.universal_run_plan import (
+            ReplanAuditLog,
+            create_runtime_plan,
+        )
+        p = create_runtime_plan(run_id="RUN-P", revision=1, target_contract_ref="TC-1", node_allocations=["A"])
+        log = ReplanAuditLog()
+        entry = log.append(run_id="RUN-P", from_digest=p.digest, to_revision=2, drift_reason="MATERIAL_DRIFT")
+        self.assertTrue(entry["digest"].startswith("sha256:"))
+        self.assertEqual(len(log.entries()), 1)
+
+    def test_replan_audit_log_immutable(self):
+        from tools.node_architect.universal_run_plan import ReplanAuditLog
+        log = ReplanAuditLog()
+        e1 = log.append(run_id="RUN-P", from_digest="sha256:" + "a" * 64, to_revision=2, drift_reason="MATERIAL_DRIFT")
+        e2 = log.append(run_id="RUN-P", from_digest="sha256:" + "b" * 64, to_revision=3, drift_reason="MATERIAL_DRIFT")
+        # entries are immutable snapshots; appending does not mutate prior entries
+        self.assertEqual(log.entries()[0]["digest"], e1["digest"])
+        self.assertEqual(len(log.entries()), 2)
+
+    def test_replan_audit_log_fail_closed_on_gap(self):
+        from tools.node_architect.universal_run_plan import (
+            ReplanAuditLog,
+            ReplanAuditError,
+        )
+        log = ReplanAuditLog()
+        log.append(run_id="RUN-P", from_digest="sha256:" + "a" * 64, to_revision=2, drift_reason="MATERIAL_DRIFT")
+        # next entry must continue from revision 2; starting at 4 is a gap
+        with self.assertRaises(ReplanAuditError):
+            log.append(run_id="RUN-P", from_digest="sha256:" + "b" * 64, to_revision=4, drift_reason="MATERIAL_DRIFT")
