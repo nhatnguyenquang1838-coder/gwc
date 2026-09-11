@@ -435,3 +435,29 @@ class ReplanAuditLogTests(unittest.TestCase):
         # next entry must continue from revision 2; starting at 4 is a gap
         with self.assertRaises(ReplanAuditError):
             log.append(run_id="RUN-P", from_digest="sha256:" + "b" * 64, to_revision=4, drift_reason="MATERIAL_DRIFT")
+
+
+class ReplanAuditWiringTests(unittest.TestCase):
+    """Wiring GAP 3: replan_after_drift appends to ReplanAuditLog when provided."""
+
+    def _frozen(self):
+        from tools.node_architect.universal_run_plan import create_runtime_plan, freeze_plan_at_g1_exit
+        p = create_runtime_plan(run_id="RUN-P", revision=1, target_contract_ref="TC-1", node_allocations=["A"])
+        return freeze_plan_at_g1_exit(plan=p, lifecycle_position="G1")
+
+    def test_replan_appends_audit_entry(self):
+        from tools.node_architect.universal_run_plan import ReplanAuditLog, replan_after_drift
+        log = ReplanAuditLog()
+        new = replan_after_drift(frozen=self._frozen(), target_contract_ref="TC-1",
+                                 node_allocations=["A", "B"], drift_reason="MATERIAL_DRIFT",
+                                 audit_log=log)
+        self.assertEqual(new.revision, 2)
+        self.assertEqual(len(log.entries()), 1)
+        self.assertEqual(log.entries()[0]["to_revision"], 2)
+        self.assertEqual(log.entries()[0]["drift_reason"], "MATERIAL_DRIFT")
+
+    def test_replan_without_audit_log_unchanged(self):
+        from tools.node_architect.universal_run_plan import replan_after_drift
+        new = replan_after_drift(frozen=self._frozen(), target_contract_ref="TC-1",
+                                 node_allocations=["A", "B"], drift_reason="MATERIAL_DRIFT")
+        self.assertEqual(new.revision, 2)

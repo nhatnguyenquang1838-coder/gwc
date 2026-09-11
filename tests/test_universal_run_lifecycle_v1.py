@@ -284,3 +284,37 @@ class RecoveryAttemptBoundTests(unittest.TestCase):
         )
         with self.assertRaises(RecoveryAttemptError):
             begin_recovery_attempt(run_id="RUN-P", attempt=2, max_attempts=3, previous_attempt=3)
+
+
+class RecoveryAttemptWiringTests(unittest.TestCase):
+    """Wiring GAP 1: evaluate_transition invokes begin_recovery_attempt on RETRY/RERUN/REPAIR."""
+
+    def test_evaluate_transition_retry_bounded(self):
+        from tools.node_architect.universal_run_lifecycle import (
+            UNIVERSAL_PROFILE,
+            evaluate_transition,
+        )
+        r = evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="G2",
+                                current_state="FAILED", action="RETRY",
+                                recovery_attempt=1, max_recovery_attempts=3)
+        self.assertIn("recovery", r.receipt)
+
+    def test_evaluate_transition_retry_exceeds_bound(self):
+        from tools.node_architect.universal_run_lifecycle import (
+            RecoveryAttemptError,
+            UNIVERSAL_PROFILE,
+            evaluate_transition,
+        )
+        with self.assertRaises(RecoveryAttemptError):
+            evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="G2",
+                                current_state="FAILED", action="RETRY",
+                                recovery_attempt=4, max_recovery_attempts=3)
+
+    def test_evaluate_transition_advance_has_no_recovery(self):
+        from tools.node_architect.universal_run_lifecycle import (
+            UNIVERSAL_PROFILE,
+            evaluate_transition,
+        )
+        r = evaluate_transition(profile=UNIVERSAL_PROFILE, current_gate="G2",
+                                current_state="PASSED", action="ADVANCE")
+        self.assertNotIn("recovery", r.receipt)

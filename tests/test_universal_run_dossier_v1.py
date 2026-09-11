@@ -194,3 +194,24 @@ class JiraTicketReferenceTests(unittest.TestCase):
         )
         with self.assertRaises(DossierError):
             build_campaign_state(campaign_id="RP-CERT-001", jira_ticket_reference="")
+
+
+class JiraReferenceWiringTests(unittest.TestCase):
+    """Wiring GAP 4: create_run_dossier validates jira_ticket_reference when provided."""
+
+    def test_dossier_requires_nonempty_jira_reference(self):
+        from tools.node_architect.universal_run_dossier import DossierError, create_run_dossier
+        with self.assertRaises(DossierError):
+            create_run_dossier(run_id="RUN-P", g3_records=[], g4_records=[], g5_records=[],
+                               jira_ticket_reference="")
+
+    def test_dossier_with_jira_reference(self):
+        from tools.node_architect.universal_run_dossier import create_run_dossier
+        d = create_run_dossier(run_id="RUN-P", g3_records=[], g4_records=[], g5_records=[],
+                               jira_ticket_reference="SCRUM-668")
+        self.assertEqual(d.jira_ticket_reference, "SCRUM-668")
+
+    def test_dossier_without_jira_reference_unchanged(self):
+        from tools.node_architect.universal_run_dossier import create_run_dossier
+        d = create_run_dossier(run_id="RUN-P", g3_records=[], g4_records=[], g5_records=[])
+        self.assertIsNone(d.jira_ticket_reference)
