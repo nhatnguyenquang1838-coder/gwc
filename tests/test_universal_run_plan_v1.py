@@ -284,3 +284,119 @@ class TestC9DriftDetection(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HierarchicalPlanBindingTests(unittest.TestCase):
+    """Notion design §9: hierarchical RuntimePlan — parent RuntimePlan references
+    Child Run RuntimePlans; an immutable revision is frozen at G1 exit; material
+    drift after G1 must produce a NEW immutable revision with provenance (no
+    silent mutation)."""
+
+    def test_plan_frozen_at_g1_exit_is_immutable(self):
+        from tools.node_architect.universal_run_plan import freeze_plan_at_g1_exit as F
+
+        p = create_runtime_plan(run_id="RUN-P", revision=1,
+                                target_contract_ref="TC-1",
+                                node_allocations=["A", "B"])
+        r = F(plan=p, lifecycle_position="G1")
+        self.assertEqual(r["frozen_at"], "G1_EXIT")
+        self.assertTrue(r["immutable"])
+        self.assertEqual(r["plan_digest"], p.digest)
+        self.assertTrue(r["freeze_receipt"].startswith("sha256:"))
+
+    def test_plan_mutation_after_g1_is_forbidden(self):
+        from tools.node_architect.universal_run_plan import (
+            PlanFrozenError,
+            freeze_plan_at_g1_exit as F,
+            assert_plan_mutation_allowed as A,
+        )
+        p = create_runtime_plan(run_id="RUN-P", revision=1,
+                                target_contract_ref="TC-1", node_allocations=["A"])
+        frozen = F(plan=p, lifecycle_position="G1")
+        # allowed while still in G0/G1 (pre-freeze semantics)
+        self.assertTrue(A(frozen=None, lifecycle_position="G0")["ok"])
+        for pos in ("G2", "G3", "G4", "G5", "G6"):
+            with self.assertRaises(PlanFrozenError):
+                A(frozen=frozen, lifecycle_position=pos)
+
+    def test_freeze_requires_revision_at_least_1_and_valid_digest(self):
+        from tools.node_architect.universal_run_plan import (
+            PlanFrozenError,
+            freeze_plan_at_g1_exit as F,
+        )
+        p = create_runtime_plan(run_id="RUN-P", revision=1,
+                                target_contract_ref="TC-1", node_allocations=["A"])
+        bad = RuntimePlan(run_id=p.run_id, revision=p.revision,
+                          target_contract_ref=p.target_contract_ref,
+                          node_allocations=p.node_allocations,
+                          previous_digest=p.previous_digest, digest="sha256:" + "0" * 64)
+        with self.assertRaises(PlanFrozenError):
+            F(plan=bad, lifecycle_position="G1")
+
+    def test_parent_plan_propagates_digest_to_child_plan(self):
+        from tools.node_architect.universal_run_plan import propagate_plan_digest_to_child as P
+
+        parent = create_runtime_plan(run_id="RUN-P", revision=1,
+                                     target_contract_ref="TC-1", node_allocations=["A", "B"])
+        binding = P(parent_plan=parent, child_run_id="RUN-C1",
+                    invoking_node_allocation_ref="RUN-P:A")
+        self.assertEqual(binding["parent_plan_digest"], parent.digest)
+        self.assertEqual(binding["parent_run_id"], "RUN-P")
+        self.assertEqual(binding["child_run_id"], "RUN-C1")
+        self.assertEqual(binding["invoking_node_allocation_ref"], "RUN-P:A")
+        self.assertTrue(binding["binding_digest"].startswith("sha256:"))
+
+    def test_child_plan_binds_parent_digest_and_validates(self):
+        from tools.node_architect.universal_run_plan import (
+            validate_child_plan_binding as VB,
+            propagate_plan_digest_to_child as P,
+        )
+        parent = create_runtime_plan(run_id="RUN-P", revision=1,
+                                     target_contract_ref="TC-1", node_allocations=["A"])
+        binding = P(parent_plan=parent, child_run_id="RUN-C1",
+                    invoking_node_allocation_ref="RUN-P:A")
+        self.assertTrue(VB(parent_plan=parent, binding=binding)["ok"])
+        # drift: parent digest no longer matches binding -> fail-closed
+        drifted = create_plan_revision(previous=parent, run_id="RUN-P", revision=2,
+                                       target_contract_ref="TC-1", node_allocations=["A", "C"])
+        r = VB(parent_plan=drifted, binding=binding)
+        self.assertFalse(r["ok"])
+        self.assertEqual(r["reason_code"], "CHILD_PLAN_PARENT_DIGEST_DRIFT")
+
+    def test_child_plan_revision_requires_parent_digest_provenance(self):
+        from tools.node_architect.universal_run_plan import (
+            create_child_plan_revision as C,
+        )
+        parent = create_runtime_plan(run_id="RUN-P", revision=1,
+                                     target_contract_ref="TC-1", node_allocations=["A"])
+        child = C(parent_plan=parent, child_run_id="RUN-C1",
+                  revision=1, target_contract_ref="TC-1",
+                  invoking_node_allocation_ref="RUN-P:A", node_allocations=["X"])
+        self.assertEqual(child.parent_digest, parent.digest)
+        self.assertEqual(child.run_id, "RUN-C1")
+        self.assertTrue(child.digest.startswith("sha256:"))
+        # provenance chain: child revision references the parent plan digest
+        rec = child.to_dict()
+        self.assertEqual(rec["parent_plan_digest"], parent.digest)
+        self.assertEqual(rec["parent_run_id"], "RUN-P")
+
+    def test_drift_after_g1_creates_new_revision_not_mutation(self):
+        from tools.node_architect.universal_run_plan import (
+            freeze_plan_at_g1_exit as F,
+            replan_after_drift as R,
+            PlanFrozenError,
+        )
+        p = create_runtime_plan(run_id="RUN-P", revision=1,
+                                target_contract_ref="TC-1", node_allocations=["A"])
+        frozen = F(plan=p, lifecycle_position="G1")
+        new = R(frozen=frozen, target_contract_ref="TC-1", node_allocations=["A", "B"],
+                drift_reason="MATERIAL_DRIFT")
+        self.assertEqual(new.revision, 2)
+        self.assertEqual(new.previous_digest, p.digest)
+        self.assertNotEqual(new.digest, p.digest)
+        # original frozen plan is untouched
+        self.assertEqual(frozen["plan_digest"], p.digest)
+        # replan without material drift is refused (no silent churn)
+        with self.assertRaises(PlanFrozenError):
+            R(frozen=frozen, target_contract_ref="TC-1", node_allocations=["A", "B"],
+              drift_reason="COSMETIC")

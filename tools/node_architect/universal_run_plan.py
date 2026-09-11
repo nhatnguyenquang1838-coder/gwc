@@ -47,6 +47,20 @@ class DriftError(PlanArchitectureError):
         super().__init__("PLAN_DRIFT_DETECTED", detail)
 
 
+class PlanFrozenError(PlanArchitectureError):
+    """Typed error: a plan/revision frozen at G1 exit may not be mutated (Notion §9).
+
+    Post-G1 material drift must create a NEW immutable revision with provenance,
+    never silently mutate the frozen plan.
+    """
+
+    def __init__(self, detail: str = "") -> None:
+        super().__init__("PLAN_FROZEN_AFTER_G1", detail)
+
+
+MATERIAL_DRIFT_REASONS = ("MATERIAL_DRIFT",)
+
+
 def _require(condition: bool, code: str, detail: str = "") -> None:
     if not condition:
         raise PlanArchitectureError(code, detail)
@@ -152,6 +166,68 @@ def _compute_digest(
     return _sha256_digest(
         run_id, revision, target_contract_ref,
         tuple(sorted(node_allocations)), previous_digest,
+    )
+
+
+@dataclass(frozen=True)
+class ChildPlan:
+    """Immutable Child Run RuntimePlan bound to its parent plan digest (Notion §9).
+
+    The parent RuntimePlan REFERENCES child plans rather than embedding their
+    operations; the binding is digest-bound and provenance-carrying, so a child
+    plan revision can be validated against the exact parent revision it was
+    compiled from.
+    """
+
+    run_id: str
+    revision: int
+    target_contract_ref: str
+    node_allocations: tuple[str, ...]
+    previous_digest: str | None
+    parent_run_id: str
+    parent_digest: str
+    invoking_node_allocation_ref: str
+    digest: str = field(default_factory=str)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "run_id": self.run_id,
+            "revision": self.revision,
+            "target_contract_ref": self.target_contract_ref,
+            "node_allocations": list(self.node_allocations),
+            "previous_digest": self.previous_digest,
+            "parent_run_id": self.parent_run_id,
+            "parent_plan_digest": self.parent_digest,
+            "invoking_node_allocation_ref": self.invoking_node_allocation_ref,
+            "digest": self.digest,
+        }
+
+
+def _compute_child_digest(
+    *,
+    run_id: str,
+    revision: int,
+    target_contract_ref: str,
+    node_allocations: tuple[str, ...],
+    previous_digest: str | None,
+    parent_run_id: str,
+    parent_digest: str,
+    invoking_node_allocation_ref: str,
+) -> str:
+    return _sha256_digest(
+        "child-plan", run_id, revision, target_contract_ref,
+        tuple(sorted(node_allocations)), previous_digest,
+        parent_run_id, parent_digest, invoking_node_allocation_ref,
+    )
+
+
+def _compute_binding_digest(
+    *, parent_run_id: str, parent_digest: str, child_run_id: str,
+    invoking_node_allocation_ref: str,
+) -> str:
+    return _sha256_digest(
+        "plan-binding", parent_run_id, parent_digest, child_run_id,
+        invoking_node_allocation_ref,
     )
 
 
@@ -311,18 +387,237 @@ def detect_drift(
     }
 
 
+def freeze_plan_at_g1_exit(
+    *,
+    plan: PlanRevision,
+    lifecycle_position: str = "G1",
+) -> dict[str, Any]:
+    """Freeze the immutable RuntimePlan revision at successful G1 exit (Notion §9).
+
+    After G1 the plan revision for G2–G6 (plus the compiled child topology) is
+    immutable. Material drift later must produce a NEW revision, never mutate
+    this one. Fail-closed if the plan is not a valid digest-bound revision.
+    """
+    _require(isinstance(plan, PlanRevision), "PLAN_REQUIRED")
+    _require(isinstance(plan.revision, int) and plan.revision >= 1, "PLAN_REVISION_INVALID", str(plan.revision))
+    if not validate_plan_digest(plan):
+        raise PlanFrozenError(
+            f"run={plan.run_id} revision={plan.revision} digest invalid — cannot freeze"
+        )
+    return {
+        "run_id": plan.run_id,
+        "revision": plan.revision,
+        "plan_digest": plan.digest,
+        "frozen_at": "G1_EXIT",
+        "frozen_lifecycle_position": str(lifecycle_position),
+        "immutable": True,
+        "freeze_receipt": _sha256_digest("plan-freeze", plan.run_id, plan.revision, plan.digest),
+        "plan": plan,
+    }
+
+
+def assert_plan_mutation_allowed(
+    *,
+    frozen: Mapping[str, Any] | None,
+    lifecycle_position: str,
+) -> dict[str, Any]:
+    """Guard post-G1 plan mutation (Notion §9).
+
+    While no frozen revision exists (G0/G1 bootstrap/planning) mutation is
+    allowed. Once a plan is frozen at G1 exit, any G2–G6 mutation attempt
+    fail-closes with a typed PlanFrozenError; the correct path is a new
+    immutable revision via replan_after_drift().
+    """
+    pos = str(lifecycle_position).upper()
+    if frozen is None:
+        return {"ok": True, "lifecycle_position": pos, "plan_digest": None, "reason_code": "PRE_FREEZE_ALLOWED"}
+    frozen_digest = frozen.get("plan_digest")
+    if pos in ("G2", "G3", "G4", "G5", "G6"):
+        raise PlanFrozenError(
+            f"run={frozen.get('run_id')} plan frozen at G1 exit (digest={frozen_digest}); "
+            f"mutation at {pos} must create a new revision"
+        )
+    return {"ok": True, "lifecycle_position": pos, "plan_digest": frozen_digest, "reason_code": "PRE_FREEZE_ALLOWED"}
+
+
+def propagate_plan_digest_to_child(
+    *,
+    parent_plan: PlanRevision,
+    child_run_id: str,
+    invoking_node_allocation_ref: str,
+) -> dict[str, Any]:
+    """Propagate the parent RuntimePlan digest to a Child Run's G0 binding (Notion §9).
+
+    The parent plan REFERENCES child plans: the child receives the exact parent
+    revision digest it was compiled against, plus the invoking node allocation.
+    Fail-closed when the parent digest is not a valid digest-bound revision.
+    """
+    _require(isinstance(parent_plan, PlanRevision), "PLAN_PREVIOUS_REQUIRED")
+    _require(isinstance(child_run_id, str) and child_run_id.strip(), "RUN_ID_INVALID", "child_run_id")
+    _require(
+        isinstance(invoking_node_allocation_ref, str) and invoking_node_allocation_ref.strip(),
+        "INVOKING_NODE_ALLOCATION_REF_INVALID",
+    )
+    if not validate_plan_digest(parent_plan):
+        raise PlanArchitectureError(
+            "PLAN_PARENT_DIGEST_INVALID", f"run={parent_plan.run_id} revision={parent_plan.revision}"
+        )
+    return {
+        "parent_run_id": parent_plan.run_id,
+        "parent_plan_digest": parent_plan.digest,
+        "parent_plan_revision": parent_plan.revision,
+        "child_run_id": child_run_id,
+        "invoking_node_allocation_ref": invoking_node_allocation_ref,
+        "binding_digest": _compute_binding_digest(
+            parent_run_id=parent_plan.run_id, parent_digest=parent_plan.digest,
+            child_run_id=child_run_id, invoking_node_allocation_ref=invoking_node_allocation_ref,
+        ),
+    }
+
+
+def validate_child_plan_binding(
+    *,
+    parent_plan: PlanRevision,
+    binding: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate a child plan binding against the parent revision (Notion §9).
+
+    Fail-closed (ok=False, typed reason code) when the parent plan has drifted
+    away from the digest the child was bound to, or when the binding digest is
+    tampered with. It never raises on drift so callers can branch on the result.
+    """
+    _require(isinstance(parent_plan, PlanRevision), "PLAN_PREVIOUS_REQUIRED")
+    _require(isinstance(binding, Mapping), "PLAN_BINDING_REQUIRED")
+    expected_parent = binding.get("parent_plan_digest")
+    child_run_id = binding.get("child_run_id")
+    invoking = binding.get("invoking_node_allocation_ref")
+    recomputed = _compute_binding_digest(
+        parent_run_id=str(binding.get("parent_run_id")),
+        parent_digest=str(expected_parent),
+        child_run_id=str(child_run_id),
+        invoking_node_allocation_ref=str(invoking),
+    )
+    if binding.get("binding_digest") != recomputed:
+        return {
+            "ok": False,
+            "reason_code": "CHILD_PLAN_BINDING_DIGEST_INVALID",
+            "child_run_id": child_run_id,
+            "parent_plan_digest": parent_plan.digest,
+        }
+    if expected_parent != parent_plan.digest:
+        return {
+            "ok": False,
+            "reason_code": "CHILD_PLAN_PARENT_DIGEST_DRIFT",
+            "child_run_id": child_run_id,
+            "expected_parent_digest": expected_parent,
+            "parent_plan_digest": parent_plan.digest,
+        }
+    return {
+        "ok": True,
+        "reason_code": "CHILD_PLAN_BINDING_VALID",
+        "child_run_id": child_run_id,
+        "parent_plan_digest": parent_plan.digest,
+    }
+
+
+def create_child_plan_revision(
+    *,
+    parent_plan: PlanRevision,
+    child_run_id: str,
+    revision: int,
+    target_contract_ref: str,
+    invoking_node_allocation_ref: str,
+    node_allocations: list[str] | tuple[str, ...],
+) -> ChildPlan:
+    """Create an immutable Child Run plan revision bound to the parent digest (Notion §9).
+
+    The parent plan REFERENCES (does not embed) the child plan; the child
+    revision carries parent_run_id + parent_plan_digest as provenance.
+    """
+    _require(isinstance(parent_plan, PlanRevision), "PLAN_PREVIOUS_REQUIRED")
+    _require(isinstance(child_run_id, str) and child_run_id.strip(), "RUN_ID_INVALID", "child_run_id")
+    _require(isinstance(revision, int) and revision >= 1, "PLAN_REVISION_INVALID", str(revision))
+    _require(isinstance(target_contract_ref, str) and target_contract_ref.strip(), "TARGET_CONTRACT_REF_INVALID")
+    _require(
+        isinstance(invoking_node_allocation_ref, str) and invoking_node_allocation_ref.strip(),
+        "INVOKING_NODE_ALLOCATION_REF_INVALID",
+    )
+    nodes = tuple(sorted(set(node_allocations or [])))
+    _require(len(nodes) > 0, "PLAN_NODE_ALLOCATIONS_EMPTY")
+    if not validate_plan_digest(parent_plan):
+        raise PlanArchitectureError(
+            "PLAN_PARENT_DIGEST_INVALID", f"run={parent_plan.run_id} revision={parent_plan.revision}"
+        )
+    digest = _compute_child_digest(
+        run_id=child_run_id, revision=revision, target_contract_ref=target_contract_ref,
+        node_allocations=nodes, previous_digest=None,
+        parent_run_id=parent_plan.run_id, parent_digest=parent_plan.digest,
+        invoking_node_allocation_ref=invoking_node_allocation_ref,
+    )
+    return ChildPlan(
+        run_id=child_run_id, revision=revision, target_contract_ref=target_contract_ref,
+        node_allocations=nodes, previous_digest=None,
+        parent_run_id=parent_plan.run_id, parent_digest=parent_plan.digest,
+        invoking_node_allocation_ref=invoking_node_allocation_ref, digest=digest,
+    )
+
+
+def replan_after_drift(
+    *,
+    frozen: Mapping[str, Any],
+    target_contract_ref: str,
+    node_allocations: list[str] | tuple[str, ...],
+    drift_reason: str,
+) -> PlanRevision:
+    """Create a NEW immutable revision after material drift (Notion §9).
+
+    Immutable Replan: material drift after G1 produces a new immutable revision
+    with provenance (previous_digest -> frozen digest); it never mutates the
+    frozen revision. Non-material drift is refused (no silent churn).
+    """
+    _require(isinstance(frozen, Mapping), "PLAN_FREEZE_REQUIRED")
+    plan = frozen.get("plan")
+    _require(isinstance(plan, PlanRevision), "PLAN_FREEZE_REQUIRED")
+    reason = str(drift_reason).upper()
+    if reason not in MATERIAL_DRIFT_REASONS:
+        raise PlanFrozenError(
+            f"run={plan.run_id} drift_reason={drift_reason} is not material; "
+            "refusing to create a new revision (no silent churn)"
+        )
+    nodes = tuple(sorted(set(node_allocations or [])))
+    _require(len(nodes) > 0, "PLAN_NODE_ALLOCATIONS_EMPTY")
+    new_revision = plan.revision + 1
+    digest = _compute_digest(
+        run_id=plan.run_id, revision=new_revision, target_contract_ref=target_contract_ref,
+        node_allocations=nodes, previous_digest=plan.digest,
+    )
+    return RuntimePlan(
+        run_id=plan.run_id, revision=new_revision, target_contract_ref=target_contract_ref,
+        node_allocations=nodes, previous_digest=plan.digest, digest=digest,
+    )
+
+
 __all__ = [
+    "ChildPlan",
     "CursorRecoveryError",
     "DriftError",
+    "MATERIAL_DRIFT_REASONS",
     "PlanArchitectureError",
+    "PlanFrozenError",
     "PlanRevision",
     "RESTART_MODES",
     "RuntimePlan",
     "advance_cursor",
+    "assert_plan_mutation_allowed",
+    "create_child_plan_revision",
     "create_plan_revision",
     "create_runtime_plan",
     "detect_drift",
+    "freeze_plan_at_g1_exit",
+    "propagate_plan_digest_to_child",
     "recover_cursor",
+    "replan_after_drift",
     "restart_run",
+    "validate_child_plan_binding",
     "validate_plan_digest",
 ]

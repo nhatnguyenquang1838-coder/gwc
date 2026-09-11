@@ -295,3 +295,105 @@ class TestSchemaConformance(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ParentG3CompositionVerificationTests(unittest.TestCase):
+    """Notion design §3: Parent.G3 verifies the COMPOSITION/aggregate of accepted
+    child outputs. Parent must NOT treat child-local PASS as proof the whole
+    composition is valid."""
+
+    def test_composition_verification_requires_all_required_children_accepted(self):
+        from tools.node_architect.universal_run_node import CompositionVerificationError
+        from tools.node_architect.universal_run_node import verify_parent_composition as V
+
+        # one required child never reached accepted G6 handoff -> fail-closed
+        result = V(
+            parent_run_id="RUN-P",
+            acceptance_contract_ref="AC-P-1",
+            required_child_run_ids=["RUN-C1", "RUN-C2"],
+            child_results=[
+                {"child_run_id": "RUN-C1", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "a" * 64},
+                {"child_run_id": "RUN-C2", "terminal_state": "OPEN", "output_digest": None},
+            ],
+        )
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["reason_code"], "COMPOSITION_CHILD_NOT_ACCEPTED")
+        self.assertIn("RUN-C2", result["unaccepted_child_run_ids"])
+
+    def test_child_local_pass_is_not_composition_proof(self):
+        """A child-local PASS with all children accepted is NOT sufficient: the
+        composition must bind an aggregate digest over accepted child outputs."""
+        from tools.node_architect.universal_run_node import verify_parent_composition as V
+
+        r = V(
+            parent_run_id="RUN-P",
+            acceptance_contract_ref="AC-P-1",
+            required_child_run_ids=["RUN-C1", "RUN-C2"],
+            child_results=[
+                {"child_run_id": "RUN-C1", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "a" * 64},
+                {"child_run_id": "RUN-C2", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "b" * 64},
+            ],
+        )
+        # composition is produced deterministically from accepted child outputs
+        self.assertTrue(r["ok"])
+        self.assertEqual(r["reason_code"], "COMPOSITION_VERIFIED")
+        self.assertTrue(r["composition_digest"].startswith("sha256:"))
+        # aggregate digest must depend on the child output digests, not merely on
+        # a count of accepted children.
+        r2 = V(
+            parent_run_id="RUN-P",
+            acceptance_contract_ref="AC-P-1",
+            required_child_run_ids=["RUN-C1", "RUN-C2"],
+            child_results=[
+                {"child_run_id": "RUN-C1", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "a" * 64},
+                {"child_run_id": "RUN-C2", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "c" * 64},
+            ],
+        )
+        self.assertNotEqual(r["composition_digest"], r2["composition_digest"])
+
+    def test_composition_digest_is_deterministic_and_order_independent(self):
+        from tools.node_architect.universal_run_node import verify_parent_composition as V
+
+        a = {"child_run_id": "RUN-C1", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "a" * 64}
+        b = {"child_run_id": "RUN-C2", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "b" * 64}
+        r1 = V(parent_run_id="RUN-P", acceptance_contract_ref="AC-P-1",
+               required_child_run_ids=["RUN-C1", "RUN-C2"], child_results=[a, b])
+        r2 = V(parent_run_id="RUN-P", acceptance_contract_ref="AC-P-1",
+               required_child_run_ids=["RUN-C1", "RUN-C2"], child_results=[b, a])
+        self.assertEqual(r1["composition_digest"], r2["composition_digest"])
+
+    def test_composition_rejects_child_without_output_digest(self):
+        from tools.node_architect.universal_run_node import verify_parent_composition as V
+
+        r = V(
+            parent_run_id="RUN-P",
+            acceptance_contract_ref="AC-P-1",
+            required_child_run_ids=["RUN-C1"],
+            child_results=[{"child_run_id": "RUN-C1", "terminal_state": "ACCEPTED", "output_digest": None}],
+        )
+        self.assertFalse(r["ok"])
+        self.assertEqual(r["reason_code"], "COMPOSITION_OUTPUT_DIGEST_MISSING")
+
+    def test_composition_requires_acceptance_contract_ref(self):
+        from tools.node_architect.universal_run_node import (
+            CompositionVerificationError,
+            verify_parent_composition as V,
+        )
+        with self.assertRaises(CompositionVerificationError):
+            V(parent_run_id="RUN-P", acceptance_contract_ref="",
+              required_child_run_ids=["RUN-C1"], child_results=[])
+
+    def test_extra_unrequired_children_are_allowed_but_not_required(self):
+        from tools.node_architect.universal_run_node import verify_parent_composition as V
+
+        r = V(
+            parent_run_id="RUN-P",
+            acceptance_contract_ref="AC-P-1",
+            required_child_run_ids=["RUN-C1"],
+            child_results=[
+                {"child_run_id": "RUN-C1", "terminal_state": "ACCEPTED", "output_digest": "sha256:" + "a" * 64},
+                {"child_run_id": "RUN-C9", "terminal_state": "OPEN", "output_digest": None},
+            ],
+        )
+        self.assertTrue(r["ok"])
+        self.assertNotIn("RUN-C9", r["unaccepted_child_run_ids"])

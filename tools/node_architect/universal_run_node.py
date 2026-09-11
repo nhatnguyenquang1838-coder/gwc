@@ -49,6 +49,13 @@ class SingleActiveError(NodeArchitectureError):
         super().__init__("SINGLE_ACTIVE_VIOLATION", detail)
 
 
+class CompositionVerificationError(NodeArchitectureError):
+    """Typed error for parent-G3 composition verification violations (Notion §3)."""
+
+    def __init__(self, code: str, detail: str = "") -> None:
+        super().__init__(code, detail)
+
+
 def _require(condition: bool, code: str, detail: str = "") -> None:
     if not condition:
         raise NodeArchitectureError(code, detail)
@@ -306,8 +313,92 @@ def resolve_single_active(
     return {"run_id": run_id, "active_child_run_id": active_child_run_id or child_run_ids[0], "ok": True}
 
 
+def verify_parent_composition(
+    *,
+    parent_run_id: str,
+    acceptance_contract_ref: str,
+    required_child_run_ids: list[str] | tuple[str, ...],
+    child_results: list[Mapping[str, Any]] | tuple[Mapping[str, Any], ...],
+) -> dict[str, Any]:
+    """Notion design §3: Parent.G3 verifies the COMPOSITION/aggregate of accepted
+    child outputs; child-local PASS is never sufficient proof.
+
+    Fail-closed (no exception leaking partial state) when a required child is
+    missing, not ACCEPTED, or lacks an output digest. On success returns a
+    deterministic composition digest over the accepted required child outputs,
+    order-independent, so the same accepted inputs always yield the same
+    aggregate binding.
+    """
+    if not (isinstance(parent_run_id, str) and parent_run_id.strip()):
+        raise CompositionVerificationError("PARENT_RUN_ID_INVALID", str(parent_run_id))
+    if not (isinstance(acceptance_contract_ref, str) and acceptance_contract_ref.strip()):
+        raise CompositionVerificationError(
+            "ACCEPTANCE_CONTRACT_REF_INVALID", str(acceptance_contract_ref)
+        )
+
+    required = [str(c) for c in (required_child_run_ids or [])]
+    by_child: dict[str, Mapping[str, Any]] = {}
+    for res in (child_results or []):
+        if isinstance(res, Mapping) and res.get("child_run_id") is not None:
+            by_child[str(res["child_run_id"])] = res
+
+    unaccepted: list[str] = []
+    missing_digest: list[str] = []
+    accepted_pairs: list[tuple[str, str]] = []
+
+    for child_id in required:
+        res = by_child.get(child_id)
+        state = str(res.get("terminal_state")) if res else None
+        if res is None or state != "ACCEPTED":
+            unaccepted.append(child_id)
+            continue
+        output_digest = res.get("output_digest")
+        if not (isinstance(output_digest, str) and output_digest.strip()):
+            missing_digest.append(child_id)
+            continue
+        accepted_pairs.append((child_id, output_digest))
+
+    if unaccepted:
+        return {
+            "ok": False,
+            "reason_code": "COMPOSITION_CHILD_NOT_ACCEPTED",
+            "parent_run_id": parent_run_id,
+            "acceptance_contract_ref": acceptance_contract_ref,
+            "unaccepted_child_run_ids": sorted(unaccepted),
+            "missing_output_digest_child_run_ids": sorted(missing_digest),
+            "composition_digest": None,
+        }
+    if missing_digest:
+        return {
+            "ok": False,
+            "reason_code": "COMPOSITION_OUTPUT_DIGEST_MISSING",
+            "parent_run_id": parent_run_id,
+            "acceptance_contract_ref": acceptance_contract_ref,
+            "unaccepted_child_run_ids": [],
+            "missing_output_digest_child_run_ids": sorted(missing_digest),
+            "composition_digest": None,
+        }
+
+    # Deterministic, order-independent aggregate over accepted required outputs.
+    ordered = tuple(sorted(accepted_pairs, key=lambda p: p[0]))
+    composition_digest = _sha256_digest(
+        "parent-g3-composition", parent_run_id, acceptance_contract_ref, ordered
+    )
+    return {
+        "ok": True,
+        "reason_code": "COMPOSITION_VERIFIED",
+        "parent_run_id": parent_run_id,
+        "acceptance_contract_ref": acceptance_contract_ref,
+        "accepted_child_run_ids": [c for c, _ in ordered],
+        "unaccepted_child_run_ids": [],
+        "missing_output_digest_child_run_ids": [],
+        "composition_digest": composition_digest,
+    }
+
+
 __all__ = [
     "CHILD_INSTANCE_POLICY",
+    "CompositionVerificationError",
     "DAGBudgetError",
     "NODE_KINDS",
     "NodeAllocation",
@@ -320,4 +411,5 @@ __all__ = [
     "enforce_dag_budget",
     "promote_node",
     "resolve_single_active",
+    "verify_parent_composition",
 ]
