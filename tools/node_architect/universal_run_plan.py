@@ -597,6 +597,57 @@ def replan_after_drift(
     )
 
 
+class ReplanAuditError(PlanArchitectureError):
+    """Typed error when the replan audit log has a gap or is inconsistent (hardening GAP 3)."""
+
+    def __init__(self, detail: str = "") -> None:
+        super().__init__("REPLAN_AUDIT_GAP", detail)
+
+
+class ReplanAuditLog:
+    """Append-only immutable replan audit log (hardening GAP 3).
+
+    Each entry is a digest-bound immutable snapshot (from_digest -> to_revision with
+    drift_reason). Appending never mutates prior entries. Fail-closed on a revision
+    gap (next to_revision must continue from the last entry's to_revision).
+    """
+
+    def __init__(self) -> None:
+        self._entries: list[dict[str, Any]] = []
+
+    def append(
+        self,
+        *,
+        run_id: str,
+        from_digest: str,
+        to_revision: int,
+        drift_reason: str,
+    ) -> dict[str, Any]:
+        _require(isinstance(run_id, str) and run_id.strip(), "RUN_ID_INVALID", "run_id")
+        _require(isinstance(from_digest, str) and from_digest.startswith("sha256:"), "PLAN_DIGEST_INVALID")
+        _require(isinstance(to_revision, int) and to_revision >= 1, "PLAN_REVISION_INVALID", str(to_revision))
+        _require(isinstance(drift_reason, str) and drift_reason.strip(), "DRIFT_REASON_INVALID")
+        if self._entries:
+            last = self._entries[-1]
+            if to_revision != last["to_revision"] + 1:
+                raise ReplanAuditError(
+                    f"run={run_id} to_revision={to_revision} must continue from {last['to_revision']}"
+                )
+        entry = {
+            "run_id": run_id,
+            "from_digest": from_digest,
+            "to_revision": to_revision,
+            "drift_reason": drift_reason,
+            "digest": _sha256_digest("replan-audit", run_id, from_digest, to_revision, drift_reason),
+        }
+        self._entries.append(entry)
+        return entry
+
+    def entries(self) -> list[dict[str, Any]]:
+        return list(self._entries)
+
+
+
 __all__ = [
     "ChildPlan",
     "CursorRecoveryError",
@@ -605,6 +656,8 @@ __all__ = [
     "PlanArchitectureError",
     "PlanFrozenError",
     "PlanRevision",
+    "ReplanAuditError",
+    "ReplanAuditLog",
     "RESTART_MODES",
     "RuntimePlan",
     "advance_cursor",

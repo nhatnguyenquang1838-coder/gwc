@@ -255,3 +255,32 @@ class TestSchemaConformance(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RecoveryAttemptBoundTests(unittest.TestCase):
+    """Hardening GAP 1: bounded lease-retry via RECOVERY_ATTEMPT state (no infinite loop)."""
+
+    def test_recovery_attempt_state_exists(self):
+        from tools.node_architect.universal_run_lifecycle import RECOVERY_ATTEMPT_STATES
+        self.assertIn("RECOVERY_ATTEMPT", RECOVERY_ATTEMPT_STATES)
+
+    def test_recovery_attempt_bounded_by_max(self):
+        from tools.node_architect.universal_run_lifecycle import (
+            RecoveryAttemptError,
+            begin_recovery_attempt,
+        )
+        r = begin_recovery_attempt(run_id="RUN-P", attempt=1, max_attempts=3)
+        self.assertTrue(r["ok"])
+        self.assertEqual(r["attempt"], 1)
+        self.assertEqual(r["max_attempts"], 3)
+        # exceeding max -> fail-closed
+        with self.assertRaises(RecoveryAttemptError):
+            begin_recovery_attempt(run_id="RUN-P", attempt=4, max_attempts=3)
+
+    def test_recovery_attempt_monotonic(self):
+        from tools.node_architect.universal_run_lifecycle import (
+            RecoveryAttemptError,
+            begin_recovery_attempt,
+        )
+        with self.assertRaises(RecoveryAttemptError):
+            begin_recovery_attempt(run_id="RUN-P", attempt=2, max_attempts=3, previous_attempt=3)

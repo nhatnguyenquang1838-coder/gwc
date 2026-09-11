@@ -177,3 +177,20 @@ class TestRunLedgerDurableAppend(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class JiraTicketReferenceTests(unittest.TestCase):
+    """Hardening GAP 4: jira_ticket_reference in certification campaign state."""
+
+    def test_campaign_state_has_jira_ticket_reference(self):
+        from tools.node_architect.universal_run_dossier import build_campaign_state
+        state = build_campaign_state(campaign_id="RP-CERT-001", jira_ticket_reference="SCRUM-677")
+        self.assertEqual(state["jira_ticket_reference"], "SCRUM-677")
+
+    def test_campaign_state_requires_jira_ticket_reference(self):
+        from tools.node_architect.universal_run_dossier import (
+            DossierError,
+            build_campaign_state,
+        )
+        with self.assertRaises(DossierError):
+            build_campaign_state(campaign_id="RP-CERT-001", jira_ticket_reference="")

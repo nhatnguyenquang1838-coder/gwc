@@ -228,8 +228,33 @@ def append_receipt_to_ledger(
     return RunLedger(run_id=ledger.run_id, entries=tuple(ledger.entries) + (dict(copy.deepcopy(receipt)),))
 
 
+def build_campaign_state(
+    *,
+    campaign_id: str,
+    jira_ticket_reference: str,
+) -> dict[str, Any]:
+    """Build a certification campaign state with a Jira ticket reference (hardening GAP 4).
+
+    Fail-closed: jira_ticket_reference must be a non-empty string so every campaign
+    state is traceable to its governing Jira ticket (governance audit trail).
+    """
+    _require(isinstance(campaign_id, str) and campaign_id.strip(), "CAMPAIGN_ID_INVALID", "campaign_id")
+    _require(
+        isinstance(jira_ticket_reference, str) and jira_ticket_reference.strip(),
+        "JIRA_TICKET_REFERENCE_REQUIRED",
+        "jira_ticket_reference is required for governance traceability",
+    )
+    return {
+        "campaign_id": campaign_id,
+        "jira_ticket_reference": jira_ticket_reference,
+        "schema_version": 1,
+    }
+
+
+
 __all__ = [
     "ClosureReceipt",
+    "build_campaign_state",
     "DossierError",
     "HandoffReceipt",
     "RunDossier",

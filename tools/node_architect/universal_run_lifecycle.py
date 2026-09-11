@@ -289,8 +289,58 @@ class LifecycleStateMachine:
         )
 
 
+RECOVERY_ATTEMPT_STATES = ("RECOVERY_ATTEMPT",)
+
+
+class RecoveryAttemptError(LifecycleStateMachineError):
+    """Typed error when a lease-recovery attempt is invalid or exceeds its bound (hardening)."""
+
+    def __init__(self, detail: str = "") -> None:
+        super().__init__("RECOVERY_ATTEMPT_BOUND_EXCEEDED", detail)
+
+
+def begin_recovery_attempt(
+    *,
+    run_id: str,
+    attempt: int,
+    max_attempts: int,
+    previous_attempt: int | None = None,
+) -> dict[str, Any]:
+    """Begin a bounded lease-recovery attempt (hardening GAP 1).
+
+    Fail-closed: attempt must be >= 1, <= max_attempts, and strictly greater than
+    any previous_attempt (monotonic). Prevents an infinite lease-retry loop by
+    bounding recovery attempts before escalation to the Controller.
+    """
+    if not (isinstance(run_id, str) and run_id.strip()):
+        raise LifecycleStateMachineError("RUN_ID_INVALID", "run_id")
+    if not (isinstance(attempt, int) and attempt >= 1):
+        raise RecoveryAttemptError(f"run={run_id} attempt={attempt} invalid")
+    if not (isinstance(max_attempts, int) and max_attempts >= 1):
+        raise RecoveryAttemptError(f"run={run_id} max_attempts={max_attempts} invalid")
+    if attempt > max_attempts:
+        raise RecoveryAttemptError(
+            f"run={run_id} attempt={attempt} exceeds max_attempts={max_attempts}"
+        )
+    if previous_attempt is not None and attempt <= previous_attempt:
+        raise RecoveryAttemptError(
+            f"run={run_id} attempt={attempt} must exceed previous_attempt={previous_attempt}"
+        )
+    return {
+        "run_id": run_id,
+        "attempt": attempt,
+        "max_attempts": max_attempts,
+        "state": "RECOVERY_ATTEMPT",
+        "ok": True,
+    }
+
+
+
 __all__ = [
     "ACTIONS",
+    "RECOVERY_ATTEMPT_STATES",
+    "RecoveryAttemptError",
+    "begin_recovery_attempt",
     "EDGE_MATRIX",
     "LifecycleStateMachine",
     "LifecycleStateMachineError",

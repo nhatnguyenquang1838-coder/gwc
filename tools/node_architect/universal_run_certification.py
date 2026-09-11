@@ -166,10 +166,46 @@ class FailureCodeMatrix:
         }
 
 
+class EvidenceRejectionError(CertificationError):
+    """Typed error when evidence is missing or stale (hardening GAP 2)."""
+
+    def __init__(self, code: str, detail: str = "") -> None:
+        super().__init__(code, detail)
+
+
+def validate_evidence_refs(
+    *,
+    run_id: str,
+    evidence_refs: list[str] | tuple[str, ...],
+    available: Mapping[str, str],
+    expected_digest: str | None = None,
+) -> dict[str, Any]:
+    """Validate evidence references resolve to available artifacts (hardening GAP 2).
+
+    Fail-closed: every evidence_ref must exist in `available` (else EVIDENCE_MISSING)
+    and, when expected_digest is given, must match it (else EVIDENCE_STALE). Returns
+    EVIDENCE_VALID on success. Prevents stale/missing evidence from being accepted
+    at target validation.
+    """
+    _require(isinstance(run_id, str) and run_id.strip(), "RUN_ID_INVALID", "run_id")
+    refs = list(evidence_refs or [])
+    for ref in refs:
+        if ref not in available:
+            raise EvidenceRejectionError("EVIDENCE_MISSING", f"run={run_id} evidence_ref={ref} not available")
+        if expected_digest is not None and available[ref] != expected_digest:
+            raise EvidenceRejectionError(
+                "EVIDENCE_STALE", f"run={run_id} evidence_ref={ref} digest mismatch"
+            )
+    return {"run_id": run_id, "reason_code": "EVIDENCE_VALID", "ok": True, "validated": list(refs)}
+
+
+
 __all__ = [
     "CANONICAL_FAILURE_CODES",
     "CERTIFICATION_DOMAINS",
     "CertificationError",
+    "EvidenceRejectionError",
+    "validate_evidence_refs",
     "DomainFixture",
     "FailureCodeMatrix",
     "KERNEL_REF",
