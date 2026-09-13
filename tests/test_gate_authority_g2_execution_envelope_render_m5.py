@@ -30,8 +30,9 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
             "working_branch": "hermes/scrum-191-x",
             "paths": ["schemas/g2-execution-envelope.schema.json",
                       "tools/node_architect/g2_execution_envelope_render.py"],
-            "authorized_actions": ["create_working_branch", "add_files",
-                                    "run_sandboxed_validation", "stage_commit_push"],
+            "authorized_actions": ["create_guarded_branch_or_worktree", "modify_approved_files",
+                      "run_sandboxed_validation", "stage", "create_commit",
+                      "push_working_branch"],
         },
         scope_identity={"scope_hash": _SCOPE},
         # gate_state_resolution: canonical PASS / NO_DRIFT / not replay-conflicted,
@@ -69,8 +70,9 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
                 "head_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
                 "scope_hash": _SCOPE,
                 "working_branch": "hermes/scrum-191-x",
-                "authorized_actions": ["create_working_branch", "add_files",
-                                       "run_sandboxed_validation", "stage_commit_push"],
+                "authorized_actions": ["create_guarded_branch_or_worktree", "modify_approved_files",
+                      "run_sandboxed_validation", "stage", "create_commit",
+                      "push_working_branch"],
             },
         },
         # evidence_artifact_map: READY with no blocker reasons / missing / stale.
@@ -105,8 +107,9 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
             "base_sha": "54fcc4c5395d0b3dabfe0564d5b3f8ad8daa3337",
             "working_branch": "hermes/scrum-191-x",
             "risk_class": "R2",
-            "authorized_actions": ["create_working_branch", "add_files",
-                                   "run_sandboxed_validation", "stage_commit_push"],
+            "authorized_actions": ["create_guarded_branch_or_worktree", "modify_approved_files",
+                      "run_sandboxed_validation", "stage", "create_commit",
+                      "push_working_branch"],
             **approval_validation,
         }
     return base
@@ -135,6 +138,34 @@ class TestRenderingShape(unittest.TestCase):
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         errors = list(Draft202012Validator(schema).iter_errors(env))
         self.assertEqual(errors, [])
+
+    def test_noncanonical_actions_never_activate_v11(self):
+        canonical_actions = [
+            "create_guarded_branch_or_worktree",
+            "modify_approved_files",
+            "run_sandboxed_validation",
+            "stage",
+            "create_commit",
+            "push_working_branch",
+        ]
+        invalid_cases = [
+            ["create_working_branch", "add_files", "run_sandboxed_validation", "stage_commit_push"],
+            [canonical_actions[0], "invented_action"],
+            [canonical_actions[0], "create_working_branch"],
+            canonical_actions + [canonical_actions[-1]],
+        ]
+        for actions in invalid_cases:
+            kwargs = _base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE})
+            kwargs["bounded_write_scope"] = dict(kwargs["bounded_write_scope"])
+            kwargs["bounded_write_scope"]["authorized_actions"] = actions
+            kwargs["approval_validation"] = dict(kwargs["approval_validation"])
+            kwargs["approval_validation"]["authorized_actions"] = actions
+            kwargs["authority_boundary_decision"] = copy.deepcopy(kwargs["authority_boundary_decision"])
+            kwargs["authority_boundary_decision"]["scope_identity"]["authorized_actions"] = actions
+
+            env = render_g2_execution_envelope(**kwargs)
+
+            self.assertNotEqual(env["activation_state"], "ACTIVE", actions)
 
     def test_closed_schema_keys(self):
         env = render_g2_execution_envelope(**_base_kwargs())

@@ -28,9 +28,18 @@ _REASON_EVIDENCE_BLOCKED = "G2_ENVELOPE_EVIDENCE_BLOCKED"
 _REASON_GATE_STATE_IDENTITY = "G2_ENVELOPE_GATE_STATE_IDENTITY_MISMATCH"
 _REASON_AUTHORITY_IDENTITY = "G2_ENVELOPE_AUTHORITY_IDENTITY_MISMATCH"
 _REASON_EVIDENCE_IDENTITY = "G2_ENVELOPE_EVIDENCE_IDENTITY_MISMATCH"
+_REASON_ACTIONS_INVALID = "G2_ENVELOPE_AUTHORIZED_ACTIONS_INVALID"
 
 _SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
+_CANONICAL_ACTIONS = frozenset({
+    "create_guarded_branch_or_worktree",
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "stage",
+    "create_commit",
+    "push_working_branch",
+})
 
 
 @dataclass(frozen=True)
@@ -79,6 +88,15 @@ def _digest(*parts: Any) -> str:
     for p in parts:
         h.update(_canon(p).encode("utf-8"))
     return "sha256:" + h.hexdigest()
+
+
+def _canonical_actions_valid(actions: tuple[Any, ...]) -> bool:
+    return (
+        len(actions) == len(_CANONICAL_ACTIONS)
+        and all(isinstance(action, str) for action in actions)
+        and len(set(actions)) == len(_CANONICAL_ACTIONS)
+        and set(actions) == _CANONICAL_ACTIONS
+    )
 
 
 # Canonical blocker reason codes taken verbatim from the producer modules so the
@@ -306,6 +324,7 @@ def render_g2_execution_envelope(
 
     working_branch = str(bounded_write_scope.get("working_branch", ""))
     authorized_actions = tuple(bounded_write_scope.get("authorized_actions", []))
+    actions_valid = _canonical_actions_valid(authorized_actions)
     excluded = ["G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION"]
 
     inp = _EnvelopeInput(
@@ -380,6 +399,9 @@ def render_g2_execution_envelope(
         elif not binding_ok:
             activation_state = "BLOCKED"
             reason_code = _REASON_BINDING_MISMATCH
+        elif not actions_valid:
+            activation_state = "BLOCKED"
+            reason_code = _REASON_ACTIONS_INVALID
         elif not _gate_state_accepted(gate_state_resolution):
             activation_state = "BLOCKED"
             reason_code = _REASON_GATE_STATE_BLOCKED

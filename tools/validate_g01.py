@@ -37,6 +37,13 @@ GATE_ARTIFACTS: dict[str, str] = {
     "G6_PRODUCTION_DATA": "g6/production-approval.yaml",
 }
 G2_ENVELOPE_SCHEMA = "g2-execution-envelope.schema.json"
+LEGACY_UNVERSIONED_ACTIONS = frozenset({
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "stage",
+    "create_commit",
+    "push_working_branch",
+})
 NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
 BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
 IMPLEMENTATION_PLAN_REQUIRED_FIELDS = (
@@ -98,6 +105,51 @@ def _schema_issues(artifact_name: str, instance: Any, schema_path: Path) -> list
         location = ".".join(str(part) for part in error.path) or "<root>"
         issues.append(_issue("SCHEMA_VALIDATION_ERROR", artifact_name, location, error.message))
     return issues
+
+
+def _legacy_unversioned_g2_issues(artifact: Any) -> list[ValidationIssue]:
+    """Validate the explicit pre-versioned SCRUM-188 G2 artifact signature."""
+    if not isinstance(artifact, dict):
+        return [_issue(
+            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
+            "G2_EXECUTION",
+            "<root>",
+            "Historical unversioned G2 artifact must be a mapping.",
+        )]
+    required = {
+        "approval_id", "authority_gate", "scope_version", "task_id", "repository",
+        "base_sha", "working_branch", "authorized_actions", "scope_hash",
+    }
+    missing = sorted(required - set(artifact))
+    if missing:
+        return [_issue(
+            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
+            "G2_EXECUTION",
+            "<root>",
+            "Unversioned artifact is not the recognized historical G2 contract; missing "
+            + ", ".join(missing) + ".",
+        )]
+    actions = artifact["authorized_actions"]
+    if (
+        not isinstance(actions, list)
+        or len(actions) != len(LEGACY_UNVERSIONED_ACTIONS)
+        or len(set(actions)) != len(LEGACY_UNVERSIONED_ACTIONS)
+        or set(actions) != LEGACY_UNVERSIONED_ACTIONS
+    ):
+        return [_issue(
+            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
+            "G2_EXECUTION",
+            "authorized_actions",
+            "Historical unversioned G2 artifact must use the closed legacy action vocabulary.",
+        )]
+    if artifact["authority_gate"] != "G2_EXECUTION" or not isinstance(artifact["scope_version"], int):
+        return [_issue(
+            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
+            "G2_EXECUTION",
+            "<root>",
+            "Historical unversioned G2 identity markers are invalid.",
+        )]
+    return []
 
 
 def _implementation_plan_issues(
@@ -292,8 +344,8 @@ def _g2_plan_read_issues(
 
 
 def validate_gate_artifact(
-    repo_root: Path,
-    workspace: Path | str,
+    repo_root: Path | str | None = None,
+    workspace: Path | str | None = None,
     gate: str | dict[str, Any] | None = None,
     artifacts: dict[str, Any] | None = None,
 ) -> list[ValidationIssue]:
@@ -304,6 +356,10 @@ def validate_gate_artifact(
     adapter only supplies the repository root; all existing schema and semantic
     checks remain unchanged.
     """
+    if workspace is None:
+        return [_issue("GATE_ARTIFACT_INVALID", "gate", "workspace", "Workspace is required.")]
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parents[1]
     if isinstance(workspace, str) and (gate is None or isinstance(gate, dict)):
         legacy_workspace = Path(repo_root)
         legacy_gate = workspace
@@ -341,6 +397,11 @@ def validate_gate_artifact(
                 str(schema_path),
                 f"Required G2 envelope schema is missing: {schema_path}",
             )]
+        if "schema_version" not in artifact:
+            legacy_issues = _legacy_unversioned_g2_issues(artifact)
+            if legacy_issues:
+                return legacy_issues
+            return _g2_plan_read_issues(workspace, artifacts or {}, artifact)
         return _schema_issues(gate, artifact, schema_path) + _g2_plan_read_issues(
             workspace, artifacts or {}, artifact
         )

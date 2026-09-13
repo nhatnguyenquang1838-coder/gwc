@@ -3,8 +3,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
+import tempfile
 
 from jsonschema import Draft202012Validator, FormatChecker
+import yaml
 
 from tools.validate_g01 import validate_gate_artifact
 
@@ -82,10 +85,45 @@ def test_schema_rejects_mixed_and_unknown_action_vocabularies() -> None:
     assert _errors(schema, unknown)
 
 
-def test_validate_gate_artifact_supports_current_and_legacy_call_forms() -> None:
+def test_validate_gate_artifact_supports_current_and_legacy_keyword_call_forms() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     current = validate_gate_artifact(repo_root, repo_root, "G2_EXECUTION", {})
     legacy = validate_gate_artifact(repo_root, "G2_EXECUTION", {})
+    keyword = validate_gate_artifact(
+        workspace=repo_root,
+        gate="G2_EXECUTION",
+        artifacts={},
+    )
 
     assert [issue.code for issue in legacy] == [issue.code for issue in current]
-    assert legacy[0].code == "GATE_ARTIFACT_MISSING"
+    assert [issue.code for issue in keyword] == [issue.code for issue in current]
+    assert keyword[0].code == "GATE_ARTIFACT_MISSING"
+
+
+def test_historical_unversioned_scrum188_envelope_uses_explicit_compatibility() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    source = repo_root / ".gwc" / "tasks" / "SCRUM-188" / "g2" / "execution-envelope.yaml"
+    with tempfile.TemporaryDirectory(prefix="hermes-verify-") as directory:
+        workspace = Path(directory)
+        target = workspace / "g2" / "execution-envelope.yaml"
+        target.parent.mkdir(parents=True)
+        shutil.copyfile(source, target)
+
+        issues = validate_gate_artifact(repo_root, workspace, "G2_EXECUTION", {})
+
+    assert issues == []
+
+
+def test_unversioned_modern_envelope_does_not_bypass_strict_validation() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    envelope = _envelope("1.1", CANONICAL_ACTIONS)
+    envelope.pop("schema_version")
+    with tempfile.TemporaryDirectory(prefix="hermes-verify-") as directory:
+        workspace = Path(directory)
+        target = workspace / "g2" / "execution-envelope.yaml"
+        target.parent.mkdir(parents=True)
+        target.write_text(yaml.safe_dump(envelope), encoding="utf-8")
+
+        issues = validate_gate_artifact(repo_root, workspace, "G2_EXECUTION", {})
+
+    assert any(issue.code == "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID" for issue in issues)
