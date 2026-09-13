@@ -51,10 +51,12 @@
       "items": {
         "type": "string",
         "enum": [
-          "create_working_branch",
-          "add_files",
+          "create_guarded_branch_or_worktree",
+          "modify_approved_files",
           "run_sandboxed_validation",
-          "stage_commit_push"
+          "stage",
+          "create_commit",
+          "push_working_branch"
         ]
       }
     },

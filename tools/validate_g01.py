@@ -36,6 +36,7 @@ GATE_ARTIFACTS: dict[str, str] = {
     "G5_DEPLOY": "g5/deployment-approval.yaml",
     "G6_PRODUCTION_DATA": "g6/production-approval.yaml",
 }
+G2_ENVELOPE_SCHEMA = "g2-execution-envelope.schema.json"
 NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
 BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
 IMPLEMENTATION_PLAN_REQUIRED_FIELDS = (
@@ -291,6 +292,7 @@ def _g2_plan_read_issues(
 
 
 def validate_gate_artifact(
+    repo_root: Path,
     workspace: Path,
     gate: str,
     artifacts: dict[str, Any] | None = None,
@@ -312,7 +314,17 @@ def validate_gate_artifact(
     if not isinstance(artifact, dict) or not artifact:
         return [_issue("GATE_ARTIFACT_INVALID", gate, relative_path, "Gate artifact must be a non-empty YAML object.")]
     if gate == "G2_EXECUTION":
-        return _g2_plan_read_issues(workspace, artifacts or {}, artifact)
+        schema_path = repo_root / "schemas" / G2_ENVELOPE_SCHEMA
+        if not schema_path.is_file():
+            return [_issue(
+                "GATE_SCHEMA_MISSING",
+                gate,
+                str(schema_path),
+                f"Required G2 envelope schema is missing: {schema_path}",
+            )]
+        return _schema_issues(gate, artifact, schema_path) + _g2_plan_read_issues(
+            workspace, artifacts or {}, artifact
+        )
     return []
 
 
@@ -582,7 +594,7 @@ def validate_workspace(repo_root: Path, workspace: Path, gate: str | None = None
     if len(artifacts) == len(ARTIFACTS) and not any(issue.code == "SCHEMA_VALIDATION_ERROR" for issue in issues):
         issues.extend(_cross_artifact_issues(artifacts))
     if gate is not None:
-        issues.extend(validate_gate_artifact(workspace, gate, artifacts))
+        issues.extend(validate_gate_artifact(repo_root, workspace, gate, artifacts))
 
     return ValidationReport(outcome="PASS" if not issues else "BLOCKED", issues=issues)
 
