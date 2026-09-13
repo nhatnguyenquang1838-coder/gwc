@@ -9,6 +9,7 @@ import tempfile
 from jsonschema import Draft202012Validator, FormatChecker
 import yaml
 
+import tools.validate_g01 as validate_g01_module
 from tools.validate_g01 import validate_gate_artifact
 
 
@@ -127,3 +128,104 @@ def test_unversioned_modern_envelope_does_not_bypass_strict_validation() -> None
         issues = validate_gate_artifact(repo_root, workspace, "G2_EXECUTION", {})
 
     assert any(issue.code == "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID" for issue in issues)
+
+
+OBSERVED_LEGACY_PROFILE_PATHS = [
+    ".gwc/tasks/GWC-P1-FOLLOWUP-GRAPH-REVISION/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-104/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-108/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-109/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-115/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-116/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-117/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-118/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-138/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-139/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-140/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-143/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-185/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-186/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-188/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-190/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-191/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-192/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-208/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-230/g2/execution-envelope.yaml",
+    ".gwc/tasks/SCRUM-232/g2/execution-envelope.yaml",
+]
+
+
+def _legacy_issues(repo_root: Path, document: object) -> list[object]:
+    with tempfile.TemporaryDirectory(prefix="hermes-verify-") as directory:
+        workspace = Path(directory)
+        target = workspace / "g2" / "execution-envelope.yaml"
+        target.parent.mkdir(parents=True)
+        target.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+        return validate_gate_artifact(repo_root, workspace, "G2_EXECUTION", {})
+
+
+def test_legacy_registry_is_built_from_fourteen_observed_profiles() -> None:
+    registry = getattr(validate_g01_module, "LEGACY_UNVERSIONED_PROFILE_REGISTRY", ())
+    assert len(registry) == 14
+
+
+def test_all_observed_legacy_mapping_artifacts_validate() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    for relative_path in OBSERVED_LEGACY_PROFILE_PATHS:
+        source = repo_root / relative_path
+        document = yaml.safe_load(source.read_text(encoding="utf-8"))
+        assert _legacy_issues(repo_root, document) == [], relative_path
+
+
+def test_legacy_signature_rejects_foreign_or_malformed_identity() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    source = repo_root / ".gwc" / "tasks" / "SCRUM-188" / "g2" / "execution-envelope.yaml"
+    baseline = yaml.safe_load(source.read_text(encoding="utf-8"))
+    mutations = {
+        "task_id": "SCRUM-999",
+        "repository": "foreign/repository",
+        "base_sha": "not-a-sha",
+        "working_branch": "foreign/branch",
+        "scope_hash": "not-a-scope-hash",
+        "approval_id": "FOREIGN-APPROVAL",
+        "risk_class": "R9",
+        "scope_version": -1,
+        "scope_version_bool": True,
+        "missing_risk": None,
+        "extra_field": "unexpected",
+    }
+
+    for field, value in mutations.items():
+        document = dict(baseline)
+        if field == "scope_version_bool":
+            document["scope_version"] = value
+        elif field == "missing_risk":
+            document.pop("risk_class")
+        elif field == "extra_field":
+            document[field] = value
+        else:
+            document[field] = value
+        issues = _legacy_issues(repo_root, document)
+        assert [issue.code for issue in issues] == [
+            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID"
+        ], field
+
+
+def test_legacy_signature_rejects_unknown_mixed_and_duplicate_actions() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    source = repo_root / ".gwc" / "tasks" / "SCRUM-188" / "g2" / "execution-envelope.yaml"
+    baseline = yaml.safe_load(source.read_text(encoding="utf-8"))
+    actions = list(baseline["authorized_actions"])
+    invalid_action_lists = [
+        actions[:-1] + ["invented_action"],
+        [actions[0], "create_working_branch"],
+        actions + [actions[-1]],
+    ]
+
+    for invalid_actions in invalid_action_lists:
+        document = dict(baseline)
+        document["authorized_actions"] = invalid_actions
+        issues = _legacy_issues(repo_root, document)
+        assert [issue.code for issue in issues] == [
+            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID"
+        ]

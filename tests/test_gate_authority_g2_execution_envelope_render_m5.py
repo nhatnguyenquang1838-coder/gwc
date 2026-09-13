@@ -756,5 +756,56 @@ class TestS2RequiredInputIdentitySCRUM314(unittest.TestCase):
         self.assertNotEqual(a["envelope_digest"], b["envelope_digest"])
 
 
+class TestTopLevelEnvelopeIdentityFailClosed(unittest.TestCase):
+    """The envelope must reject malformed or foreign top-level identity."""
+
+    @staticmethod
+    def _accepted():
+        return _base_kwargs(approval_validation={"outcome": "VALID", "scope_hash": _SCOPE})
+
+    @staticmethod
+    def _set_binding(kw, *, task_id=None, base_sha=None):
+        if task_id is not None:
+            kw["task_id"] = task_id
+            kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+            kw["gate_state_resolution"]["task_id"] = task_id
+            kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+            kw["authority_boundary_decision"]["task_id"] = task_id
+            authority_scope = dict(kw["authority_boundary_decision"]["scope_identity"])
+            authority_scope["task_id"] = task_id
+            kw["authority_boundary_decision"]["scope_identity"] = authority_scope
+            kw["evidence_map"] = dict(kw["evidence_map"])
+            kw["evidence_map"]["task_id"] = task_id
+            kw["approval_validation"] = dict(kw["approval_validation"])
+            kw["approval_validation"]["task_id"] = task_id
+        if base_sha is not None:
+            kw["base_sha"] = base_sha
+            kw["gate_state_resolution"] = dict(kw["gate_state_resolution"])
+            kw["gate_state_resolution"]["current_base_sha"] = base_sha
+            kw["authority_boundary_decision"] = dict(kw["authority_boundary_decision"])
+            kw["authority_boundary_decision"]["current_base_sha"] = base_sha
+            authority_scope = dict(kw["authority_boundary_decision"]["scope_identity"])
+            authority_scope["base_sha"] = base_sha
+            kw["authority_boundary_decision"]["scope_identity"] = authority_scope
+            kw["evidence_map"] = dict(kw["evidence_map"])
+            kw["evidence_map"]["base_sha"] = base_sha
+            kw["approval_validation"] = dict(kw["approval_validation"])
+            kw["approval_validation"]["base_sha"] = base_sha
+
+    def test_blocked_when_top_level_base_sha_is_malformed(self):
+        kw = self._accepted()
+        self._set_binding(kw, base_sha="not-a-sha")
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+    def test_blocked_when_top_level_task_id_is_foreign(self):
+        kw = self._accepted()
+        self._set_binding(kw, task_id="OTHER-999")
+        env = render_g2_execution_envelope(**kw)
+        self.assertEqual(env["activation_state"], "BLOCKED")
+        self.assertEqual(env["reason_code"], "G2_ENVELOPE_BINDING_MISMATCH")
+
+
 if __name__ == "__main__":
     unittest.main()
