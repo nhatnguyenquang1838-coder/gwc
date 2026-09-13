@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import asdict, dataclass
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -44,6 +45,28 @@ LEGACY_UNVERSIONED_ACTIONS = frozenset({
     "create_commit",
     "push_working_branch",
 })
+
+# Exact historical compatibility registry.  The 14 structural profiles below
+# were generated from the 21 committed mapping artifacts in the G2 inventory;
+# the remaining 55 committed artifacts were parse failures or non-mappings and
+# are intentionally absent.  Each record fingerprint covers the complete YAML
+# mapping, so identity, scope, risk, approval, and action fields cannot drift.
+LEGACY_UNVERSIONED_PROFILE_REGISTRY = (
+    {"allowed_keys":["allowed_paths","approval_command","approved_at","base_sha","branch","excluded_actions","gate","scope_hash","status","task_id"],"paths":[".gwc/tasks/GWC-P1-FOLLOWUP-GRAPH-REVISION/g2/execution-envelope.yaml"],"profile_id":"profile-1","records":[{"fingerprint":"sha256:ff58d37f9916b6cba4cbde901e1ccc0580c599e972683b0c715dabae59a50d63","source_path":".gwc/tasks/GWC-P1-FOLLOWUP-GRAPH-REVISION/g2/execution-envelope.yaml","task_id":"GWC-P1-FOLLOWUP-GRAPH-REVISION"}]},
+    {"allowed_keys":["approved_modules","authorized_actions","base_ref","base_sha","excluded_actions","expected_head_sha","expires_at","gate","issued_at","repository","required_checks","risk_class","scope_hash","scope_version","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-104/g2/execution-envelope.yaml"],"profile_id":"profile-2","records":[{"fingerprint":"sha256:f071ba56bb16208b9979ad4d8702a713e587e0f8c8de6634896408165cdbb180","source_path":".gwc/tasks/SCRUM-104/g2/execution-envelope.yaml","task_id":"SCRUM-104"}]},
+    {"allowed_keys":["approval_command","approval_command_format","approval_id","approval_required","artifact_hashes","authority_gate","authorized_actions","base_ref","base_sha","excluded_actions","execution_mode","expires_at","gates_excluded_after_g2","issued_at","modules_or_files","notes","repository","risk_class","scope_hash","scope_hash_16","scope_version","source_instruction","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-108/g2/execution-envelope.yaml"],"profile_id":"profile-3","records":[{"fingerprint":"sha256:1e56e48415343087ec00a7d0354cdbe1fff06848533987a2f4ffa15df4442dcb","source_path":".gwc/tasks/SCRUM-108/g2/execution-envelope.yaml","task_id":"SCRUM-108"}]},
+    {"allowed_keys":["approval_id","approval_readback","approved_at","approved_command","authority_gate","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","issued_at","modules_or_files","repository","risk_class","scope_hash","scope_version","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-109/g2/execution-envelope.yaml"],"profile_id":"profile-4","records":[{"fingerprint":"sha256:72c8d21208ada6fbe3799ec10b49a9b0b92fbe3ee8be33f2552f9e616b031d33","source_path":".gwc/tasks/SCRUM-109/g2/execution-envelope.yaml","task_id":"SCRUM-109"}]},
+    {"allowed_keys":["approval_request_id","approved_modules","authorized_actions","base_ref","base_sha","excluded_actions","expected_head_sha","expires_at","gate","implementation_plan_ref","issued_at","repository","required_checks","risk_class","scope_hash","scope_version","selected_option_id","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-115/g2/execution-envelope.yaml"],"profile_id":"profile-5","records":[{"fingerprint":"sha256:2850f2d58ac57537d87eaf8cd310fc98a01237fe35ff876ee24f5825e07d56aa","source_path":".gwc/tasks/SCRUM-115/g2/execution-envelope.yaml","task_id":"SCRUM-115"}]},
+    {"allowed_keys":["approval_command_format","approval_id","approval_request_id","approval_required","approved_modules","artifact_hashes","authorized_actions","base_ref","base_sha","excluded_actions","execution_mode","expected_head_sha","expires_at","g0_context_ref","g1_decision_ref","gate","gates_excluded_after_g2","implementation_plan_ref","issued_at","notes","plan_read_precondition","repository","required_checks","risk_class","scope_hash","scope_hash_16","scope_version","selected_option_id","source_instruction","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-116/g2/execution-envelope.yaml"],"profile_id":"profile-6","records":[{"fingerprint":"sha256:f7cd4c9ddfe969f7693490e4c5103ad33bca7b86f3a9d86542c5b211cf645993","source_path":".gwc/tasks/SCRUM-116/g2/execution-envelope.yaml","task_id":"SCRUM-116"}]},
+    {"allowed_keys":["approval_request_id","approved_modules","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","gate","issued_at","repository","risk_class","scope_hash","scope_hash_16","status","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-117/g2/execution-envelope.yaml"],"profile_id":"profile-7","records":[{"fingerprint":"sha256:397e4415ccf13264f3adabcf2a05cdd5eb941042fce78b1bfdcbfdfdbc42d05b","source_path":".gwc/tasks/SCRUM-117/g2/execution-envelope.yaml","task_id":"SCRUM-117"}]},
+    {"allowed_keys":["accepted_scrum_117_contract_digest","approval_request_id","approved_modules","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","gate","issued_at","repository","risk_class","scope_hash","scope_hash_16","status","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-118/g2/execution-envelope.yaml"],"profile_id":"profile-8","records":[{"fingerprint":"sha256:94a83eea64f7480ea20f87df3f8f087b646f2394d21102c277dde213957e53c7","source_path":".gwc/tasks/SCRUM-118/g2/execution-envelope.yaml","task_id":"SCRUM-118"}]},
+    {"allowed_keys":["approval_id","approved_files","authority_gate","authorized_actions","base_sha","excluded_actions","expires_at","issued_at","repository","risk_class","scope_hash","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-138/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-139/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-140/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-143/g2/execution-envelope.yaml"],"profile_id":"profile-9","records":[{"fingerprint":"sha256:445330770fb2b3be911c230d238880f0d5acb74ccc7677b2b81aaa6d82bd681a","source_path":".gwc/tasks/SCRUM-138/g2/execution-envelope.yaml","task_id":"SCRUM-138"},{"fingerprint":"sha256:cfd9eeef8801c69e4424ce5cf20163e5af9eb78b772718c8f92b5f883cec9064","source_path":".gwc/tasks/SCRUM-139/g2/execution-envelope.yaml","task_id":"SCRUM-139"},{"fingerprint":"sha256:0d8a995f1553e1f38dcd55d1974744dae56da2e78901536415f230e6e8157b3a","source_path":".gwc/tasks/SCRUM-140/g2/execution-envelope.yaml","task_id":"SCRUM-140"},{"fingerprint":"sha256:093b00ab86b63b98d76db8fdcb197f10c1d978255917b28e689496b68cc4c48c","source_path":".gwc/tasks/SCRUM-143/g2/execution-envelope.yaml","task_id":"SCRUM-143"}]},
+    {"allowed_keys":["approval_command","approval_id","authority_gate","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","head_sha","issued_at","modules_or_files","prior_base_sha","prior_head_sha","project_profile","repository","risk_class","scope_hash","scope_hash_16","scope_version","task_id","work_item","working_branch"],"paths":[".gwc/tasks/SCRUM-185/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-186/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-188/g2/execution-envelope.yaml"],"profile_id":"profile-10","records":[{"fingerprint":"sha256:09e5ed212f84d032eac9110223cc443eb9bccc9df15b380014be9700624bc7bb","source_path":".gwc/tasks/SCRUM-185/g2/execution-envelope.yaml","task_id":"SCRUM-185"},{"fingerprint":"sha256:c950f7ad7241f4d69bc78afa0587ceb0ce605993bf76e23dcfe0001e1328349e","source_path":".gwc/tasks/SCRUM-186/g2/execution-envelope.yaml","task_id":"SCRUM-186"},{"fingerprint":"sha256:ebff839a232dab5d8056b0733a4abb1a996dc3efa279396fa5efbd14ce6aaa9e","source_path":".gwc/tasks/SCRUM-188/g2/execution-envelope.yaml","task_id":"SCRUM-188"}]},
+    {"allowed_keys":["approval_command","approval_id","authority_gate","authorized_actions","base_sha","excluded_actions","execution_policy","expires_at","governance","head_sha","issued_at","modules_or_files","prior_base_sha","prior_head_sha","repository","risk_class","scope_hash_16","scope_version","status","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-190/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-191/g2/execution-envelope.yaml",".gwc/tasks/SCRUM-192/g2/execution-envelope.yaml"],"profile_id":"profile-11","records":[{"fingerprint":"sha256:0f5741f51d932f81c8ef6c3eda8914125d489379692637ff752eb5f199167e79","source_path":".gwc/tasks/SCRUM-190/g2/execution-envelope.yaml","task_id":"SCRUM-190"},{"fingerprint":"sha256:43b9507100bfedeace2ceff12b8238e34e95100474a383f192584a8b7463ba65","source_path":".gwc/tasks/SCRUM-191/g2/execution-envelope.yaml","task_id":"SCRUM-191"},{"fingerprint":"sha256:8ac8897d7dc5890fde9aac7764a67e1f865cc7114fca57e81d9f4f28c1eb3bea","source_path":".gwc/tasks/SCRUM-192/g2/execution-envelope.yaml","task_id":"SCRUM-192"}]},
+    {"allowed_keys":["approval_command","approval_id","authority_gate","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","issued_at","modules_or_files","repository","risk_class","scope_hash","scope_hash_16","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-208/g2/execution-envelope.yaml"],"profile_id":"profile-12","records":[{"fingerprint":"sha256:4bc2cf345af550934aa46d2f957f6befb656539e23d88a7812dd8afd57804759","source_path":".gwc/tasks/SCRUM-208/g2/execution-envelope.yaml","task_id":"SCRUM-208"}]},
+    {"allowed_keys":["approval_command","approval_id","authority_gate","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","issued_at","modules_or_files","repository","risk_class","scope_hash","scope_hash_16","subtasks","supersede_reason","supersedes","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-230/g2/execution-envelope.yaml"],"profile_id":"profile-13","records":[{"fingerprint":"sha256:30edade5d8f93e55fb260d0fd087d492958ea4579d76b299e3407ec694a6ff5f","source_path":".gwc/tasks/SCRUM-230/g2/execution-envelope.yaml","task_id":"SCRUM-230"}]},
+    {"allowed_keys":["approval_command","approval_id","authority_gate","authorized_actions","base_ref","base_sha","excluded_actions","expires_at","issued_at","modules_or_files","repository","risk_class","scope_hash","scope_hash_16","subtasks","task_id","working_branch"],"paths":[".gwc/tasks/SCRUM-232/g2/execution-envelope.yaml"],"profile_id":"profile-14","records":[{"fingerprint":"sha256:e6d79bbd858a50df18d053fa083a553fefbf88e675aae7ef3a6da8aebb3be046","source_path":".gwc/tasks/SCRUM-232/g2/execution-envelope.yaml","task_id":"SCRUM-232"}]},
+)
 NON_EXECUTABLE_CAPABILITY_STATES = {"UNKNOWN", "HARD_BLOCKED"}
 BYPASS_ELIGIBLE = {"OPERATIONAL_ONLY", "MANUAL_CHECKPOINT_ONLY"}
 IMPLEMENTATION_PLAN_REQUIRED_FIELDS = (
@@ -107,49 +130,61 @@ def _schema_issues(artifact_name: str, instance: Any, schema_path: Path) -> list
     return issues
 
 
+def _legacy_canonical_value(value: Any) -> Any:
+    """Convert YAML values into the stable JSON form used by the registry."""
+    if isinstance(value, dict):
+        return {str(key): _legacy_canonical_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_legacy_canonical_value(item) for item in value]
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+    raise TypeError(f"unsupported legacy YAML value: {type(value).__name__}")
+
+
+def _legacy_mapping_fingerprint(artifact: dict[str, Any]) -> str | None:
+    """Return the exact registry fingerprint, or None for malformed values."""
+    try:
+        canonical = json.dumps(
+            _legacy_canonical_value(artifact),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    except (TypeError, ValueError):
+        return None
+    return "sha256:" + hashlib.sha256(canonical).hexdigest()
+
+
+def _legacy_profile_matches(artifact: dict[str, Any]) -> bool:
+    """Match only one of the observed, exact historical mapping profiles."""
+    fingerprint = _legacy_mapping_fingerprint(artifact)
+    if fingerprint is None:
+        return False
+    keys = frozenset(artifact.keys())
+    for profile in LEGACY_UNVERSIONED_PROFILE_REGISTRY:
+        if keys != frozenset(profile["allowed_keys"]):
+            continue
+        for record in profile["records"]:
+            if (
+                artifact.get("task_id") == record["task_id"]
+                and fingerprint == record["fingerprint"]
+            ):
+                return True
+    return False
+
+
 def _legacy_unversioned_g2_issues(artifact: Any) -> list[ValidationIssue]:
-    """Validate the explicit pre-versioned SCRUM-188 G2 artifact signature."""
-    if not isinstance(artifact, dict):
-        return [_issue(
-            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
-            "G2_EXECUTION",
-            "<root>",
-            "Historical unversioned G2 artifact must be a mapping.",
-        )]
-    required = {
-        "approval_id", "authority_gate", "scope_version", "task_id", "repository",
-        "base_sha", "working_branch", "authorized_actions", "scope_hash",
-    }
-    missing = sorted(required - set(artifact))
-    if missing:
-        return [_issue(
-            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
-            "G2_EXECUTION",
-            "<root>",
-            "Unversioned artifact is not the recognized historical G2 contract; missing "
-            + ", ".join(missing) + ".",
-        )]
-    actions = artifact["authorized_actions"]
-    if (
-        not isinstance(actions, list)
-        or len(actions) != len(LEGACY_UNVERSIONED_ACTIONS)
-        or len(set(actions)) != len(LEGACY_UNVERSIONED_ACTIONS)
-        or set(actions) != LEGACY_UNVERSIONED_ACTIONS
-    ):
-        return [_issue(
-            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
-            "G2_EXECUTION",
-            "authorized_actions",
-            "Historical unversioned G2 artifact must use the closed legacy action vocabulary.",
-        )]
-    if artifact["authority_gate"] != "G2_EXECUTION" or not isinstance(artifact["scope_version"], int):
-        return [_issue(
-            "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
-            "G2_EXECUTION",
-            "<root>",
-            "Historical unversioned G2 identity markers are invalid.",
-        )]
-    return []
+    """Validate only the explicit, observed pre-versioned G2 signatures."""
+    if isinstance(artifact, dict) and _legacy_profile_matches(artifact):
+        return []
+    return [_issue(
+        "G2_LEGACY_UNVERSIONED_SIGNATURE_INVALID",
+        "G2_EXECUTION",
+        "<root>",
+        "Unversioned artifact does not exactly match an observed historical G2 mapping profile.",
+    )]
 
 
 def _implementation_plan_issues(

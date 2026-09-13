@@ -32,6 +32,7 @@ _REASON_ACTIONS_INVALID = "G2_ENVELOPE_AUTHORIZED_ACTIONS_INVALID"
 
 _SHA256_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 _SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
+_TASK_ID_RE = re.compile(r"^SCRUM-[0-9]+$")
 _CANONICAL_ACTIONS = frozenset({
     "create_guarded_branch_or_worktree",
     "modify_approved_files",
@@ -96,6 +97,19 @@ def _canonical_actions_valid(actions: tuple[Any, ...]) -> bool:
         and all(isinstance(action, str) for action in actions)
         and len(set(actions)) == len(_CANONICAL_ACTIONS)
         and set(actions) == _CANONICAL_ACTIONS
+    )
+
+
+def _top_level_binding_shape_valid(*, task_id: object, repository: object,
+                                   base_sha: object) -> bool:
+    """Reject malformed modern envelope identity before it can activate."""
+    return (
+        isinstance(task_id, str)
+        and _TASK_ID_RE.fullmatch(task_id) is not None
+        and isinstance(repository, str)
+        and bool(repository)
+        and isinstance(base_sha, str)
+        and _SHA40_RE.fullmatch(base_sha) is not None
     )
 
 
@@ -361,6 +375,11 @@ def render_g2_execution_envelope(
     elif approval_validation is None:
         activation_state = "AWAITING_APPROVAL"
         reason_code = _REASON_AWAITING
+    elif not _top_level_binding_shape_valid(
+        task_id=task_id, repository=repository, base_sha=base_sha,
+    ):
+        activation_state = "BLOCKED"
+        reason_code = _REASON_BINDING_MISMATCH
     else:
         # ACTIVE requires (a) an exact, valid SCRUM-186 approval whose asserted
         # bindings match this envelope on every material axis, AND (b) each
