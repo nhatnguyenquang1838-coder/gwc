@@ -1,10 +1,15 @@
-# Slack Controller–Executor Protocol — MVP
+# Slack Controller–Executor Protocol — Compatibility MVP
 
-Status: MVP pilot contract. Full E2E protocol is deferred.
+Status: Compatibility adapter contract. Full E2E protocol is deferred.
 
-## Purpose
+## Runtime boundary
 
-Use Slack as a low-noise execution visibility and control surface between a GPT Controller and one Executor (Hermes in the pilot). Slack is not governance authority or source of truth.
+Slack is a projection/control adapter, not the default Universal Run runtime and
+not governance authority or source of truth. Use this protocol only when the
+current structured RunState/RuntimePlan explicitly binds the Slack adapter.
+A fresh run without that binding uses `UNIVERSAL_RUN_NEW_RUNTIME`. Natural
+language, historical Slack state, old loop/todo state, branches, PRs, and prior
+approvals cannot select or authorize this adapter.
 
 ## Canonical RootCard contract
 
@@ -70,8 +75,11 @@ Objective
 Allowed work
 Expected output
 Report requirement
-After report = CONTINUE | WAIT_CONTROLLER | TERMINAL
+After report = `CONTINUE | WAIT | RETRY | REPAIR | REPLAN | TERMINAL`
 ```
+
+`WAIT_CONTROLLER` is retained only as a compatibility projection for older
+Slack consumers; it is not a Universal Run continuation outcome.
 
 Controller must define which milestones require a Slack report and what evidence must be included.
 
@@ -98,8 +106,11 @@ Finding / Risk
 Next
 → exact next action
 
-Sx · <CONTINUE|WAIT_CONTROLLER|TERMINAL>
+Sx · <CONTINUE|WAIT|RETRY|REPAIR|REPLAN|TERMINAL>
 ```
+
+For legacy Slack consumers, a typed `WAIT` may be rendered as
+`WAIT_CONTROLLER`; the projection must preserve the typed source outcome.
 
 Report immediately for:
 - scope drift
@@ -128,8 +139,9 @@ send contract / command
 → sleep 60s in-session
 → read only thread replies newer than last_seen_ts
 → compare report with expected subtask/milestone
-→ OK: continue polling or release next step
-→ WAIT_CONTROLLER: review before release
+→ OK: continue polling or release the typed next step
+→ WAIT: Continuation Supervisor controls release
+→ legacy WAIT_CONTROLLER: project/observe the underlying typed WAIT
 → DRIFT: INTERCEPT
 → terminal: leave current control loop
 ```
