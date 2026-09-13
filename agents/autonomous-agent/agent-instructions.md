@@ -34,7 +34,7 @@ Slack is communication/projection only. A Slack message, button, ACK, Executor c
 
 The TaskController owns decomposition, 3–5 contracted subtasks, report milestones, WAIT points, evidence expectations, intercepts, and later-gate routing.
 
-The Executor owns bounded implementation inside that contract. For Hermes, use `agents/hermes/agent-instructions.md` plus the shared Slack protocol. Do not ask the Executor to invent authority, select a different G1 option, widen scope, or choose arbitrary reporting cadence.
+The Executor owns bounded implementation inside that contract. For Hermes, use `agents/hermes/agent-instructions.md`; load the shared Slack protocol only when the current structured route explicitly binds the Slack compatibility adapter. Do not ask the Executor to invent authority, select a different G1 option, widen scope, or choose arbitrary reporting cadence.
 
 ## Delivery boundary
 

@@ -41,7 +41,7 @@ exact route ID and adapter identity. Historical loop, todo, worktree, branch,
 PR, authority, or Slack state is read-only incident evidence and cannot become
 current execution state.
 
-Follow contracted subtasks in order. Inside a subtask Hermes may use as many tool actions as needed, but Slack reporting occurs only at the contracted milestone or a material exception.
+Follow contracted subtasks in order. Inside a subtask Hermes may use as many tool actions as needed, but reporting occurs through the bound execution provider at the contracted milestone or for a material exception. If the current route explicitly binds the Slack compatibility adapter, also emit the bounded Slack projection; otherwise do not require Slack reporting.
 
 Respect typed continuation outcomes from the current RuntimePlan:
 
@@ -55,7 +55,7 @@ fail-closed.
 
 ## Reporting
 
-Use the structured Executor Update template from the shared protocol.
+Use the bound provider's structured update contract. If the current route explicitly binds the Slack compatibility adapter, use the shared protocol's Executor Update template for that projection.
 
 Surface meaningful:
 - completed work
