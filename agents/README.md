@@ -4,11 +4,13 @@ This directory contains agent-specific overlays. Base repository governance rema
 
 ## Slack Controller–Executor MVP
 
-When ChatGPT is acting as Controller for a Slack-mediated Executor run, the following additive instruction chain is **mandatory**:
+When ChatGPT is acting as Controller for a Slack-mediated Executor run, it must first verify that the current structured `RunState`/`RuntimePlan` explicitly binds Slack, including a validated current `RunState`/`RuntimePlan` route ID and adapter identity. Only then is the following additive instruction chain mandatory:
 
 1. normal GWC boot and `agents/chatgpt-agent/agent-instructions.md`
 2. `agents/shared/slack-controller-executor-protocol.md`
 3. GPT Controller: `agents/chatgpt-agent/slack-controller-mvp.md`
+
+Natural-language Slack descriptions alone cannot select the compatibility route; otherwise use the bound execution provider and keep Slack optional projection.
 
 For Hermes Executor, load the bound execution-provider contract and applicable GWC instructions. Load `agents/shared/slack-controller-executor-protocol.md` only when the current structured `RunState`/`RuntimePlan` explicitly binds the Slack adapter; otherwise the bound execution provider is authoritative and Slack remains optional projection.
 

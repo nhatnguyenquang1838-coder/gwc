@@ -27,7 +27,7 @@ TaskController selects only a canonical DAG-ready + authorized task. It compiles
 
 `After report` is exactly `CONTINUE | WAIT | RETRY | REPAIR | REPLAN | TERMINAL`.
 
-The current structured `RunState`/`RuntimePlan` selects the route and provider. Slack is a control/visibility surface only when that binding explicitly selects the Slack compatibility adapter; otherwise the bound execution provider is authoritative and Slack is optional projection. RootCard is one root message per run; semantic milestone updates stay in its bound reporting surface. Poll active runs incrementally without posting polling chatter.
+The current structured `RunState`/`RuntimePlan` selects the route and provider. Slack is a control/visibility surface only when that binding explicitly selects the Slack compatibility adapter; otherwise the bound execution provider is authoritative and Slack is optional projection. For an explicitly bound Slack route, the current legacy adapter accepts only `CONTINUE | WAIT_CONTROLLER | TERMINAL`; `WAIT` may project to `WAIT_CONTROLLER`, while `RETRY`, `REPAIR`, and `REPLAN` remain typed and unsupported by that legacy adapter pending M2/R2 work. RootCard is one root message per run; semantic milestone updates stay in its bound reporting surface. Poll active runs incrementally without posting polling chatter.
 
 ## RootCard enforcement
 

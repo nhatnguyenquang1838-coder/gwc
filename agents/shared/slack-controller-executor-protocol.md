@@ -78,6 +78,14 @@ Report requirement
 After report = `CONTINUE | WAIT | RETRY | REPAIR | REPLAN | TERMINAL`
 ```
 
+These six values are the canonical Universal Run source outcomes. For an
+explicitly bound Slack adapter, the current legacy Slack adapter accepts only
+`CONTINUE | WAIT_CONTROLLER | TERMINAL`. A source `WAIT` may be projected to
+`WAIT_CONTROLLER`; `RETRY`, `REPAIR`, and `REPLAN` are not supported by the
+current legacy Slack adapter and must remain typed rather than being collapsed
+into another value. This is an unsupported compatibility projection requiring
+M2/R2 adapter work, not a change to the Universal Run source contract.
+
 `WAIT_CONTROLLER` is retained only as a compatibility projection for older
 Slack consumers; it is not a Universal Run continuation outcome.
 
