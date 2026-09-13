@@ -2,7 +2,11 @@
 from __future__ import annotations
 
 import copy
+import json
+from pathlib import Path
 import unittest
+
+from jsonschema import Draft202012Validator
 
 from tools.node_architect.g2_execution_envelope_render import (
     render_g2_execution_envelope,
@@ -109,6 +113,29 @@ def _base_kwargs(approval_request=None, approval_validation=None, bind=True):
 
 
 class TestRenderingShape(unittest.TestCase):
+    def test_serialized_renderer_output_validates_against_canonical_schema(self):
+        canonical_actions = [
+            "create_guarded_branch_or_worktree",
+            "modify_approved_files",
+            "run_sandboxed_validation",
+            "stage",
+            "create_commit",
+            "push_working_branch",
+        ]
+        kwargs = _base_kwargs(approval_validation={
+            "outcome": "VALID",
+            "scope_hash": _SCOPE,
+            "authorized_actions": canonical_actions,
+        })
+        kwargs["bounded_write_scope"] = dict(kwargs["bounded_write_scope"])
+        kwargs["bounded_write_scope"]["authorized_actions"] = canonical_actions
+        env = render_g2_execution_envelope(**kwargs)
+        self.assertEqual(env["schema_version"], "1.1")
+        schema_path = Path(__file__).resolve().parents[1] / "schemas" / "g2-execution-envelope.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        errors = list(Draft202012Validator(schema).iter_errors(env))
+        self.assertEqual(errors, [])
+
     def test_closed_schema_keys(self):
         env = render_g2_execution_envelope(**_base_kwargs())
         required = ["schema_version", "artifact_type", "activation_state",

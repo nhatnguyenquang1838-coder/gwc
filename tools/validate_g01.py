@@ -293,11 +293,30 @@ def _g2_plan_read_issues(
 
 def validate_gate_artifact(
     repo_root: Path,
-    workspace: Path,
-    gate: str,
+    workspace: Path | str,
+    gate: str | dict[str, Any] | None = None,
     artifacts: dict[str, Any] | None = None,
 ) -> list[ValidationIssue]:
-    """Fail closed when an applicable downstream gate artifact is absent or malformed."""
+    """Fail closed when an applicable downstream gate artifact is absent or malformed.
+
+    Accept both the current ``(repo_root, workspace, gate, artifacts)`` form and
+    the historical ``(workspace, gate, artifacts)`` form. The compatibility
+    adapter only supplies the repository root; all existing schema and semantic
+    checks remain unchanged.
+    """
+    if isinstance(workspace, str) and (gate is None or isinstance(gate, dict)):
+        legacy_workspace = Path(repo_root)
+        legacy_gate = workspace
+        legacy_artifacts = gate if isinstance(gate, dict) else artifacts
+        repo_root = Path(__file__).resolve().parents[1]
+        workspace = legacy_workspace
+        gate = legacy_gate
+        artifacts = legacy_artifacts
+
+    repo_root = Path(repo_root)
+    workspace = Path(workspace)
+    if not isinstance(gate, str):
+        return [_issue("GATE_SEQUENCE_INVALID", "gate", "gate", f"Unsupported downstream gate: {gate}")]
     relative_path = GATE_ARTIFACTS.get(gate)
     if relative_path is None:
         return [_issue("GATE_SEQUENCE_INVALID", gate, "gate", f"Unsupported downstream gate: {gate}")]

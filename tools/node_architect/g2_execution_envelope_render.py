@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-_SCHEMA_VERSION = "1.0"
+_SCHEMA_VERSION = "1.1"
 _ARTIFACT_TYPE = "g2-execution-envelope"
 
 _REASON_AWAITING = "G2_ENVELOPE_AWAITING_APPROVAL"
