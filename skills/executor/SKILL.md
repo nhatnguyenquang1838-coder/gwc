@@ -31,7 +31,7 @@ report requirements, and typed continuation outcome supplied by the current
 RunState/RuntimePlan. Do not infer authority from Slack, history, memory,
 buttons, prior approvals, or completion.
 
-Report at contracted milestones using the shared Executor Update structure. Immediately report scope drift, authority drift, plan-invalidating findings, evidence conflict, blocker, or failure. Tool chatter, internal planning, individual file operations, raw test/CI output, repetitive polling, and recovered transient retries remain silent.
+Report at contracted milestones through the bound execution provider using its current report contract. When the current structured route explicitly binds the Slack adapter, project those milestones through the shared Slack Executor Update structure. Immediately report scope drift, authority drift, plan-invalidating findings, evidence conflict, blocker, or failure. Tool chatter, internal planning, individual file operations, raw test/CI output, repetitive polling, and recovered transient retries remain silent.
 
 At `WAIT`, do not begin the next subtask unless the current Continuation
 Supervisor releases the typed outcome. `WAIT_CONTROLLER` is a Slack-only legacy

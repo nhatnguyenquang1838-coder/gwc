@@ -10,11 +10,7 @@ When ChatGPT is acting as Controller for a Slack-mediated Executor run, the foll
 2. `agents/shared/slack-controller-executor-protocol.md`
 3. GPT Controller: `agents/chatgpt-agent/slack-controller-mvp.md`
 
-For Hermes Executor, load:
-
-1. normal coding-agent/GWC bootstrap
-2. `agents/shared/slack-controller-executor-protocol.md`
-3. `agents/hermes/agent-instructions.md`
+For Hermes Executor, load the bound execution-provider contract and applicable GWC instructions. Load `agents/shared/slack-controller-executor-protocol.md` only when the current structured `RunState`/`RuntimePlan` explicitly binds the Slack adapter; otherwise the bound execution provider is authoritative and Slack remains optional projection.
 
 The MVP is intentionally slim: one Controller, one Executor, one RootCard/thread, 3–5 contracted subtasks, milestone-based reporting, in-session 60-second incremental polling, explicit `CONTINUE | WAIT_CONTROLLER | TERMINAL` behavior, and bounded intercepts.
 
@@ -24,7 +20,7 @@ Full E2E sequencing/replay/recovery/multi-executor logic is deferred until pilot
 
 ## Autonomous TaskController boot
 
-For autonomous delivery, load `agents/autonomous-agent/agent-instructions.md` and `skills/task-controller/SKILL.md`. The autonomous agent starts as TaskController and dispatches the bounded Executor through the existing Slack MVP rather than routing the claimed task to a generic E2E invocation.
+For autonomous delivery, load `agents/autonomous-agent/agent-instructions.md` and `skills/task-controller/SKILL.md`. The autonomous agent starts as TaskController and dispatches bounded work through the bound execution provider; it loads the Slack MVP only when the current structured route explicitly binds that Slack compatibility adapter.
 
 ## Independent G4 pre-prod audit
 

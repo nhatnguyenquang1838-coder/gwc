@@ -27,7 +27,7 @@ For Slack Controller monitoring, the 60-second cadence in `slack-controller-mvp.
 
 ## Autonomous TaskController mode
 
-When ChatGPT is the autonomous agent for an autonomous-to-pre-prod run, it starts as **TaskController** and MUST additionally load `agents/autonomous-agent/agent-instructions.md` and `skills/task-controller/SKILL.md`. The TaskController delegates bounded implementation through the existing Slack Controller–Executor protocol and `skills/executor/SKILL.md`; it does not replace Slack with a parallel protocol and Slack remains communication/projection only.
+When ChatGPT is the autonomous agent for an autonomous-to-pre-prod run, it starts as **TaskController** and MUST additionally load `agents/autonomous-agent/agent-instructions.md` and `skills/task-controller/SKILL.md`. The TaskController delegates bounded implementation through the bound execution provider. It may load and use `agents/shared/slack-controller-executor-protocol.md`, `agents/chatgpt-agent/slack-controller-mvp.md`, and the Slack-shaped portions of `skills/executor/SKILL.md` only when the current structured `RunState`/`RuntimePlan` explicitly binds the Slack adapter; otherwise Slack is not a required route or transport and remains optional projection only.
 
 After exact-head CI and independent G3, route to `G4_PREPROD_AUDIT_TRIGGER` and invoke a separate `agent-audit` with `skills/audit-guardrail/SKILL.md`. The audit receipt is read-only evidence with `merge_authority=false`; only the separately trusted standing G4 evaluator may make the pre-prod merge decision.
 ## Materialized governance contract surface

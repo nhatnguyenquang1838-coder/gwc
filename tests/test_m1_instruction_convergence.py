@@ -30,6 +30,9 @@ class M1InstructionConvergenceTests(unittest.TestCase):
         hermes = (ROOT / "agents/hermes/agent-instructions.md").read_text(encoding="utf-8")
         autonomous = (ROOT / "agents/autonomous-agent/agent-instructions.md").read_text(encoding="utf-8")
         executor = (ROOT / "skills/executor/SKILL.md").read_text(encoding="utf-8")
+        chatgpt = (ROOT / "agents/chatgpt-agent/agent-instructions.md").read_text(encoding="utf-8")
+        agent_index = (ROOT / "agents/README.md").read_text(encoding="utf-8")
+        task_controller = (ROOT / "skills/task-controller/SKILL.md").read_text(encoding="utf-8")
 
         for text in (agents, project, extension, hermes, autonomous, executor):
             self.assertIn("UNIVERSAL_RUN_NEW_RUNTIME", text)
@@ -46,6 +49,16 @@ class M1InstructionConvergenceTests(unittest.TestCase):
         self.assertIn("reporting occurs through the bound execution provider", hermes)
         self.assertIn("If the current route explicitly binds the Slack compatibility adapter", hermes)
         self.assertIn("Slack protocol is an explicit compatibility overlay", executor)
+        self.assertIn("Report at contracted milestones through the bound execution provider", executor)
+        self.assertIn("When the current structured route explicitly binds the Slack adapter", executor)
+        self.assertIn("bound execution provider", chatgpt)
+        self.assertNotIn("delegates bounded implementation through the existing Slack Controller–Executor protocol", chatgpt)
+        self.assertIn("bound execution provider", agent_index)
+        self.assertNotIn("dispatches the bounded Executor through the existing Slack MVP", agent_index)
+        self.assertIn("Slack protocol is a compatibility overlay", task_controller)
+        self.assertIn("only when the current structured `RunState`/`RuntimePlan` explicitly binds the Slack adapter", task_controller)
+        self.assertNotIn("After report` is exactly `CONTINUE | WAIT_CONTROLLER | TERMINAL", task_controller)
+        self.assertIn("After report` is exactly `CONTINUE | WAIT | RETRY | REPAIR | REPLAN | TERMINAL", task_controller)
 
     def test_historical_markers_do_not_enable_shadow_compatibility_replay(self):
         from tests.test_scrum_566_w8_canonical_shadow_route import (
@@ -81,7 +94,7 @@ class M1InstructionConvergenceTests(unittest.TestCase):
         self.assertEqual(out["route_pack"], "RP-03")
         self.assertEqual(out["selected_node_count"], 1)
         self.assertEqual(out["authoritative_effect"], "NONE")
-        self.assertFalse(out["authority_granted"])
+        self.assertIs(out["authority_granted"], False)
 
 
 if __name__ == "__main__":
