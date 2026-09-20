@@ -216,3 +216,9 @@ record itself must not embed a required self-referential current-tip SHA.
 DWC must never automatically push to `main`, merge, auto-merge, deploy, publish
 a release, change production configuration, rotate credentials, access
 production data, force-push, delete branches, or rewrite shared history.
+
+## Q0 live runtime qualification
+
+When GWC is being qualified live and runtime defects may be repaired in-line, use `core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md` and `core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md` as the canonical engineering/runbook sources. Runtime-fix receipts conform to `schemas/q0-live-fix-receipt.schema.json`.
+
+Do not duplicate those semantics here. In particular, a source fix or passing focused test is not `RUNTIME_FIXED` until the active runtime proves it loaded the candidate identity, the original incident replay passes with exact readback, and execution advances beyond the previous failure before baseline promotion. These rules do not grant repository, merge, deploy, runtime-reload, or production authority.

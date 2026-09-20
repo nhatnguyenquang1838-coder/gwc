@@ -697,3 +697,13 @@ exception is the exact validated `auto/* -> pre-prod` child merge. Promotion or
 merge to `main` always remains Human G4.
 
 CI success is evidence only. It never grants authority.
+
+## Q0 live qualification routing
+
+For Q0/live runtime qualification work that may discover and self-repair GWC runtime defects, agents MUST read and apply:
+
+- `core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md`;
+- `core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md`;
+- `schemas/q0-live-fix-receipt.schema.json` for machine-readable fix/load/replay evidence.
+
+These files own the Q0 branching, load-proof, stale-state invalidation, original-incident replay, baseline-promotion, and final clean-certification semantics. Routing surfaces MUST point to them rather than duplicate their rules. A changed Git HEAD alone is not runtime load proof. These contracts grant no gate authority.
