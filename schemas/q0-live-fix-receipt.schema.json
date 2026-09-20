@@ -14,7 +14,6 @@
     "q0_baseline_sha",
     "branch",
     "worktree",
-    "worktree_head",
     "incident",
     "status"
   ],
@@ -250,7 +249,8 @@
       "then": {
         "required": [
           "runtime_activation",
-          "loaded_surfaces"
+          "loaded_surfaces",
+          "worktree_head"
         ]
       }
     },

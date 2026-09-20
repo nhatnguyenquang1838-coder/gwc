@@ -101,6 +101,12 @@ verification:
   evidence_digest: <sha256|null>
 ```
 
+### Progressive receipt examples
+
+`FIX_IMPLEMENTED` records source-fix identity and incident evidence only. It MUST NOT require `worktree_head`, runtime activation, loaded surfaces, replay, invalidation/regeneration, or broader verification before those facts exist.
+
+`FIX_LOADED` is the first status that requires `worktree_head`, `runtime_activation`, and `loaded_surfaces`. `FIX_REPLAY_VERIFIED` additionally requires successful replay with exact readback and forward progress. `RUNTIME_FIXED` additionally requires invalidation/regeneration evidence plus broader regression and final exact readback.
+
 A changed Git HEAD is not load proof. Receipt evidence is progressive: `FIX_IMPLEMENTED` MUST NOT fabricate future runtime/replay/verification evidence; later statuses add only evidence actually observed.
 
 ## Stale-state invalidation

@@ -140,7 +140,7 @@ def test_runtime_fixed_requires_broader_regression_and_final_readback():
 
 def test_fix_implemented_allows_progressive_receipt_without_future_runtime_evidence():
     r = _receipt(status="FIX_IMPLEMENTED")
-    for key in ("runtime_activation", "loaded_surfaces", "invalidated", "regenerated", "replay", "verification"):
+    for key in ("worktree_head", "runtime_activation", "loaded_surfaces", "invalidated", "regenerated", "replay", "verification"):
         r.pop(key)
     jsonschema.validate(r, SCHEMA)
 
@@ -154,3 +154,14 @@ def test_fix_loaded_schema_requires_runtime_activation():
         pass
     else:
         raise AssertionError("FIX_LOADED without runtime activation was accepted")
+
+
+def test_fix_loaded_schema_requires_worktree_head():
+    r = _receipt(status="FIX_LOADED")
+    r.pop("worktree_head")
+    try:
+        jsonschema.validate(r, SCHEMA)
+    except jsonschema.ValidationError:
+        pass
+    else:
+        raise AssertionError("FIX_LOADED without worktree_head was accepted")
