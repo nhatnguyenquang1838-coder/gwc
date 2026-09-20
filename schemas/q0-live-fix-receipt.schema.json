@@ -14,12 +14,14 @@
     "q0_baseline_sha",
     "branch",
     "worktree",
+    "worktree_head",
     "runtime_activation",
     "loaded_surfaces",
     "invalidated",
     "regenerated",
     "incident",
     "replay",
+    "verification",
     "status"
   ],
   "properties": {
@@ -193,6 +195,46 @@
         "FIX_REPLAY_VERIFIED",
         "RUNTIME_FIXED"
       ]
+    },
+    "worktree_head": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "broader_regression",
+        "exact_readback",
+        "evidence_digest"
+      ],
+      "properties": {
+        "broader_regression": {
+          "enum": [
+            "NOT_RUN",
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "exact_readback": {
+          "enum": [
+            "NOT_RUN",
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence_digest": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
     }
   }
 }

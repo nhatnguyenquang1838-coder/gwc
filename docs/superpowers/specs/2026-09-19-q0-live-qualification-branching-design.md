@@ -10,7 +10,7 @@ Prior runtime fixes could be implemented and unit-tested without proof that the 
 
 ## Design
 
-Keep four identities separate: protected base, accepted Q0 baseline, current candidate fix, and final certified Q0 SHA. For each independent runtime defect, branch from the latest accepted Q0 SHA into an isolated worktree. A candidate becomes the next baseline only after source GREED, runtime load proof, original-incident replay, forward progress beyond the old failure, broader relevant regression, and exact readback.
+Keep four identities separate: protected base, accepted Q0 baseline, current candidate fix, and final certified Q0 SHA. For each independent runtime defect, branch from the latest accepted Q0 SHA into an isolated worktree. A candidate becomes the next baseline only after source GREEN, runtime load proof, original-incident replay, forward progress beyond the old failure, broader relevant regression, and exact readback.
 
 The runtime activation lifecycle is independent of the controller/conversation lifecycle. A long-lived controller may continue, but each material fix receives a new/rebound runtime activation with explicit loaded-source identity and stale-state invalidation.
 

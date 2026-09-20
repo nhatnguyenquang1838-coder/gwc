@@ -23,6 +23,7 @@ def _receipt(status="RUNTIME_FIXED", replay_result="PASS", state="NEXT_LEGAL_STA
         "q0_baseline_sha": "b" * 40,
         "branch": "fix/SCRUM-781-q0-03-producer-liveness",
         "worktree": "/worktrees/gwc/SCRUM-781/03-producer-liveness",
+        "worktree_head": sha,
         "runtime_activation": {
             "activation_id": "act-003",
             "process_or_session_id": "worker-003",
@@ -38,6 +39,7 @@ def _receipt(status="RUNTIME_FIXED", replay_result="PASS", state="NEXT_LEGAL_STA
         "regenerated": [{"artifact": "runtime_plan:r8", "digest": "sha256:" + "d" * 64}],
         "incident": {"fixture_digest": "sha256:" + "e" * 64, "previous_failure_state": "PLAN_PRECHECK"},
         "replay": {"result": replay_result, "exact_readback": replay_result == "PASS", "first_state_beyond_failure": state},
+        "verification": {"broader_regression": "PASS", "exact_readback": "PASS", "evidence_digest": "sha256:" + "f" * 64},
         "status": status,
     }
 
@@ -47,12 +49,16 @@ def validate_semantics(receipt):
     rank = {"FIX_IMPLEMENTED": 0, "FIX_LOADED": 1, "FIX_REPLAY_VERIFIED": 2, "RUNTIME_FIXED": 3}
     if rank[receipt["status"]] >= 1:
         assert receipt["runtime_activation"]["loaded_source_sha"] == receipt["candidate_fix_sha"]
+        assert receipt["worktree_head"] == receipt["candidate_fix_sha"]
     if rank[receipt["status"]] >= 2:
         assert receipt["replay"]["result"] == "PASS"
         assert receipt["replay"]["exact_readback"] is True
         assert receipt["replay"]["first_state_beyond_failure"]
     if rank[receipt["status"]] >= 3:
         assert receipt["regenerated"] or receipt["invalidated"] == []
+        assert receipt["verification"]["broader_regression"] == "PASS"
+        assert receipt["verification"]["exact_readback"] == "PASS"
+        assert receipt["verification"]["evidence_digest"]
 
 
 def test_runtime_fixed_receipt_requires_exact_loaded_candidate_identity():
@@ -108,3 +114,25 @@ def test_runbook_separates_fix_statuses():
 def test_runbook_requires_clean_final_certification_activation():
     assert "fresh clean source/worktree" in RUNBOOK
     assert "fresh runtime activation" in RUNBOOK
+
+
+def test_runtime_loaded_rejects_stale_worktree_head():
+    r = _receipt(status="FIX_LOADED")
+    r["worktree_head"] = "0" * 40
+    try:
+        validate_semantics(r)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("stale worktree head was accepted")
+
+
+def test_runtime_fixed_requires_broader_regression_and_final_readback():
+    r = _receipt()
+    r["verification"]["broader_regression"] = "FAIL"
+    try:
+        validate_semantics(r)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("RUNTIME_FIXED accepted failed broader regression")
