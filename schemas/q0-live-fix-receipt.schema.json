@@ -15,13 +15,7 @@
     "branch",
     "worktree",
     "worktree_head",
-    "runtime_activation",
-    "loaded_surfaces",
-    "invalidated",
-    "regenerated",
     "incident",
-    "replay",
-    "verification",
     "status"
   ],
   "properties": {
@@ -236,5 +230,114 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "FIX_LOADED",
+              "FIX_REPLAY_VERIFIED",
+              "RUNTIME_FIXED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "runtime_activation",
+          "loaded_surfaces"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "FIX_REPLAY_VERIFIED",
+              "RUNTIME_FIXED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "replay"
+        ],
+        "properties": {
+          "replay": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "result",
+              "exact_readback",
+              "first_state_beyond_failure"
+            ],
+            "properties": {
+              "result": {
+                "const": "PASS"
+              },
+              "exact_readback": {
+                "const": true
+              },
+              "first_state_beyond_failure": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "RUNTIME_FIXED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "invalidated",
+          "regenerated",
+          "verification"
+        ],
+        "properties": {
+          "verification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "broader_regression",
+              "exact_readback",
+              "evidence_digest"
+            ],
+            "properties": {
+              "broader_regression": {
+                "const": "PASS"
+              },
+              "exact_readback": {
+                "const": "PASS"
+              },
+              "evidence_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

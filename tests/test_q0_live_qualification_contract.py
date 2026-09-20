@@ -136,3 +136,21 @@ def test_runtime_fixed_requires_broader_regression_and_final_readback():
         pass
     else:
         raise AssertionError("RUNTIME_FIXED accepted failed broader regression")
+
+
+def test_fix_implemented_allows_progressive_receipt_without_future_runtime_evidence():
+    r = _receipt(status="FIX_IMPLEMENTED")
+    for key in ("runtime_activation", "loaded_surfaces", "invalidated", "regenerated", "replay", "verification"):
+        r.pop(key)
+    jsonschema.validate(r, SCHEMA)
+
+
+def test_fix_loaded_schema_requires_runtime_activation():
+    r = _receipt(status="FIX_LOADED")
+    r.pop("runtime_activation")
+    try:
+        jsonschema.validate(r, SCHEMA)
+    except jsonschema.ValidationError:
+        pass
+    else:
+        raise AssertionError("FIX_LOADED without runtime activation was accepted")

@@ -71,11 +71,11 @@ REPRODUCE_ORIGINAL_FAILURE
 Every runtime activation used for acceptance MUST record at least:
 
 ```yaml
-fix_commit_sha: <40-hex>
+candidate_fix_sha: <40-hex>
 fix_base_sha: <40-hex>
 q0_baseline_sha: <40-hex>
-active_branch: <branch>
-active_worktree: <absolute path or durable checkout identity>
+branch: <branch>
+worktree: <absolute path or durable checkout identity>
 worktree_head: <40-hex>
 runtime_activation:
   activation_id: <id>
@@ -93,10 +93,15 @@ incident:
   previous_failure_state: <state>
 replay:
   result: PASS|FAIL
+  exact_readback: true|false
   first_state_beyond_failure: <state|null>
+verification:
+  broader_regression: NOT_RUN|PASS|FAIL
+  exact_readback: NOT_RUN|PASS|FAIL
+  evidence_digest: <sha256|null>
 ```
 
-A changed Git HEAD is not load proof.
+A changed Git HEAD is not load proof. Receipt evidence is progressive: `FIX_IMPLEMENTED` MUST NOT fabricate future runtime/replay/verification evidence; later statuses add only evidence actually observed.
 
 ## Stale-state invalidation
 
