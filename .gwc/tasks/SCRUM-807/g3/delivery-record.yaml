@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.1",
+  "artifact_type": "g3-delivery-record",
+  "gate": "G3_PR",
+  "task_id": "SCRUM-807",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+  "working_branch": "fix/SCRUM-807-q0-branching-runbook",
+  "pull_request": {
+    "number": 579,
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/pull/579",
+    "draft": true
+  },
+  "implementation_head_sha": "170aa9200dc3fb75526504745c2132d1c208dfca",
+  "scope_hash": "sha256:e33d1ae80367ce4562fa7e47c40228734d584f60e5590429712f06d482f2ca6f",
+  "changed_paths": [
+    "AGENTS.md",
+    "core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md",
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "docs/superpowers/plans/2026-09-19-q0-live-qualification-branching.md",
+    "docs/superpowers/specs/2026-09-19-q0-live-qualification-branching-design.md",
+    "projects/gwc/project-instructions.md",
+    "schemas/q0-live-fix-receipt.schema.json",
+    "tests/test_q0_live_qualification_contract.py"
+  ],
+  "validation": {
+    "implementation_head_sha": "170aa9200dc3fb75526504745c2132d1c208dfca",
+    "status": "pass",
+    "commands": [
+      {
+        "command": "pytest -q tests/test_q0_live_qualification_contract.py",
+        "result": "pass",
+        "evidence": "Focused Q0 contract suite: 11 passed; schema and test semantics verified after progressive-receipt repair."
+      },
+      {
+        "command": "parse schemas/q0-live-fix-receipt.schema.json",
+        "result": "pass",
+        "evidence": "JSON Schema 2020-12 parsed successfully; progressive status rules present."
+      },
+      {
+        "command": "compare main@88fbcc3...170aa920",
+        "result": "pass",
+        "evidence": "8 approved paths only; no runtime implementation paths changed."
+      }
+    ]
+  },
+  "review": {
+    "implementer_id": "ChatGPT",
+    "reviewer_id": "ChatGPT-fresh-context",
+    "independence": "fresh-context",
+    "mode": "read-only",
+    "reviewed_implementation_head_sha": "170aa9200dc3fb75526504745c2132d1c208dfca",
+    "reviewed_scope_hash": "sha256:e33d1ae80367ce4562fa7e47c40228734d584f60e5590429712f06d482f2ca6f",
+    "reviewed_at": "2026-09-20T02:56:20Z",
+    "lanes": [
+      {
+        "name": "requirement",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "Approved design materialized: linear chained defect branches + SHA-based Q0 baseline.",
+          "Q0 self-fix lifecycle requires load proof, replay, forward progress and broader verification."
+        ]
+      },
+      {
+        "name": "design",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "Canonical branching strategy and runbook are separated from protected-main integration.",
+          "Progressive receipt semantics avoid fabricated future evidence."
+        ]
+      },
+      {
+        "name": "code",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "No runtime implementation path changed; 8 approved contract/routing paths only.",
+          "JSON schema uses status-conditional requirements for FIX_LOADED / FIX_REPLAY_VERIFIED / RUNTIME_FIXED."
+        ]
+      },
+      {
+        "name": "test",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "Focused contract suite: 11 passed.",
+          "Schema-fail-closed and progressive intermediate-status cases covered."
+        ]
+      },
+      {
+        "name": "governance",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "Protected main not mutated; guarded branch only.",
+          "G3 review is read-only and later gates remain excluded."
+        ]
+      },
+      {
+        "name": "delivery",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "Draft PR #579 binds implementation subject 170aa9200dc3fb75526504745c2132d1c208dfca.",
+          "Jira SCRUM-807 is In Review."
+        ]
+      },
+      {
+        "name": "ci",
+        "applicable": true,
+        "status": "pass",
+        "evidence": [
+          "Validate instructions run 35485228276: success at implementation head.",
+          "Build instruction packages run 35485228287: success at implementation head.",
+          "Node Architect semantic runtime run 35485228282: success at implementation head."
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "id": "REV-1",
+        "severity": "MAJOR",
+        "category": "design",
+        "status": "resolved",
+        "evidence": "Runbook used fix_commit_sha while branching/schema used candidate_fix_sha.",
+        "recommendation": "Use one canonical identity vocabulary across runbook/schema/branching.",
+        "resolution": "Resolved in 7243a75cce8685990b9619a0c7ec9560257d16ec."
+      },
+      {
+        "id": "REV-2",
+        "severity": "MAJOR",
+        "category": "governance",
+        "status": "resolved",
+        "evidence": "Initial schema required runtime/replay/verification evidence even at FIX_IMPLEMENTED.",
+        "recommendation": "Make receipt evidence progressive by lifecycle state.",
+        "resolution": "Resolved in 7243a75cce8685990b9619a0c7ec9560257d16ec with status-conditional schema rules."
+      },
+      {
+        "id": "REV-3",
+        "severity": "MINOR",
+        "category": "test",
+        "status": "resolved",
+        "evidence": "Negative tests only caught semantic AssertionError after schema was strengthened to fail earlier.",
+        "recommendation": "Accept schema-level ValidationError as valid fail-closed behavior.",
+        "resolution": "Resolved in 170aa9200dc3fb75526504745c2132d1c208dfca; focused suite 11/11 PASS."
+      }
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "AC-1",
+        "result": "pass",
+        "evidence": [
+          "Canonical branching contract defines linear chained defect branches and SHA-based Q0 baseline."
+        ]
+      },
+      {
+        "id": "AC-2",
+        "result": "pass",
+        "evidence": [
+          "Runbook defines reload/rebind, stale-state invalidation, LOAD_PROOF, original-incident replay, forward progress, broader verification and final clean certification."
+        ]
+      },
+      {
+        "id": "AC-3",
+        "result": "pass",
+        "evidence": [
+          "Receipt schema is progressive: FIX_IMPLEMENTED can omit future runtime evidence; later states require observed evidence."
+        ]
+      },
+      {
+        "id": "AC-4",
+        "result": "pass",
+        "evidence": [
+          "Focused contract suite 11 passed."
+        ]
+      },
+      {
+        "id": "AC-5",
+        "result": "pass",
+        "evidence": [
+          "AGENTS.md and projects/gwc/project-instructions.md route to canonical artifacts without duplicating full semantics."
+        ]
+      },
+      {
+        "id": "AC-6",
+        "result": "pass",
+        "evidence": [
+          "Exact base-to-head compare shows 8 approved paths and no runtime implementation path."
+        ]
+      }
+    ],
+    "decision": "pass",
+    "stale": false
+  },
+  "ci": {
+    "required": true,
+    "required_checks": [
+      "Validate instructions",
+      "Build instruction packages",
+      "Node Architect semantic runtime"
+    ]
+  },
+  "residual_risks": [
+    "Cross-field SHA equality (loaded_source_sha/worktree_head == candidate_fix_sha) requires semantic enforcement in the active runtime/agent; JSON Schema alone cannot express arbitrary cross-field equality."
+  ],
+  "exclusions": [
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION_DATA"
+  ],
+  "outcome": "pass"
+}
