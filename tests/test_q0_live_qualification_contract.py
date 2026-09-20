@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import unittest
 from pathlib import Path
 
 import jsonschema
@@ -165,3 +166,11 @@ def test_fix_loaded_schema_requires_worktree_head():
         pass
     else:
         raise AssertionError("FIX_LOADED without worktree_head was accepted")
+
+
+def load_tests(loader, tests, pattern):
+    suite = unittest.TestSuite()
+    for name, value in sorted(globals().items()):
+        if name.startswith("test_") and callable(value):
+            suite.addTest(unittest.FunctionTestCase(value, description=name))
+    return suite
