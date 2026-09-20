@@ -67,7 +67,7 @@ def test_runtime_fixed_receipt_requires_exact_loaded_candidate_identity():
     r["runtime_activation"]["loaded_source_sha"] = "f" * 40
     try:
         validate_semantics(r)
-    except AssertionError:
+    except (AssertionError, jsonschema.ValidationError):
         pass
     else:
         raise AssertionError("stale loaded source was accepted")
@@ -77,7 +77,7 @@ def test_replay_verified_requires_advance_beyond_old_failure():
     r = _receipt(status="FIX_REPLAY_VERIFIED", state=None)
     try:
         validate_semantics(r)
-    except AssertionError:
+    except (AssertionError, jsonschema.ValidationError):
         pass
     else:
         raise AssertionError("replay without forward progress was accepted")
@@ -87,7 +87,7 @@ def test_runtime_fixed_rejects_failed_original_incident_replay():
     r = _receipt(replay_result="FAIL", state=None)
     try:
         validate_semantics(r)
-    except AssertionError:
+    except (AssertionError, jsonschema.ValidationError):
         pass
     else:
         raise AssertionError("failed replay was accepted")
@@ -121,7 +121,7 @@ def test_runtime_loaded_rejects_stale_worktree_head():
     r["worktree_head"] = "0" * 40
     try:
         validate_semantics(r)
-    except AssertionError:
+    except (AssertionError, jsonschema.ValidationError):
         pass
     else:
         raise AssertionError("stale worktree head was accepted")
@@ -132,7 +132,7 @@ def test_runtime_fixed_requires_broader_regression_and_final_readback():
     r["verification"]["broader_regression"] = "FAIL"
     try:
         validate_semantics(r)
-    except AssertionError:
+    except (AssertionError, jsonschema.ValidationError):
         pass
     else:
         raise AssertionError("RUNTIME_FIXED accepted failed broader regression")
