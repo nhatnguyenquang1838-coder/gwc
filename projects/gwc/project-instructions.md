@@ -70,6 +70,19 @@ Speed or scope language such as `quick`, `simple`, `just do`, `skip ceremony`,
 `minor fix`, `hotfix`, or `rescue` does not disable GWC. It only selects a
 bounded workflow inside GWC.
 
+## Universal Run boot precedence
+
+For a fresh current structured run, `UNIVERSAL_RUN_NEW_RUNTIME` is the default
+execution runtime. Compatibility routes, including Slack Controller–Executor
+and `AUTONOMOUS_TO_PREPROD_HUMAN_TO_MAIN`, are explicit-only: select one only
+when the current `RunState`/`RuntimePlan` binds and validates its exact route ID
+and adapter identity.
+
+Natural-language intent, branch names, old loop/todo state, historical PRs,
+Slack history, and old authority receipts cannot select a route. Missing New
+Runtime behavior is a runtime defect to qualify and repair, not a reason to
+fall back to compatibility semantics.
+
 ## Agent-only task claim intake
 
 For agent-executed modifying work, task claim intake is mandatory before any
