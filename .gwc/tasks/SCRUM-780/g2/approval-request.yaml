@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "approval-request",
+  "approval_request_id": "dwo-login-auth-r1-scrum-780-g2-20260912",
+  "gate": "G2",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_branch": "main",
+  "base_sha": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+  "working_branch": "auto/SCRUM-780-na81-20260810",
+  "scope_hash": "sha256:73023fedf2a36fbaa572ecf705e49b75353098ea5bc74c44150bd3854402dad3",
+  "scope_hash_short": "73023fedf2a36fba",
+  "files_read": [
+    "AGENTS.md",
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+    "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+    "schemas/g2-execution-envelope.schema.json",
+    "schemas/approval-request.schema.json",
+    ".gwc/tasks/SCRUM-780/**",
+    "core/node-architect/**",
+    "tools/node_architect/**"
+  ],
+  "files_write": [
+    "resolve_gate_node_route.py",
+    "live_runtime_bridge.py",
+    "semantic_agent_runtime.py",
+    "tests/**",
+    ".gwc/tasks/SCRUM-780/**"
+  ],
+  "authorized_actions": [
+    "create_guarded_branch",
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "stage_commit_push"
+  ],
+  "excluded_actions": [
+    "open_draft_pr",
+    "mark_pr_ready",
+    "merge",
+    "auto_merge",
+    "force_push",
+    "branch_deletion",
+    "protected_branch_write",
+    "deploy",
+    "release",
+    "production_data_change",
+    "production_config_change",
+    "g3_pr_promotion",
+    "g4_merge",
+    "g5_deploy",
+    "g6_production"
+  ],
+  "expires_at": "2026-09-12T15:49:02Z",
+  "generated_command": "APPROVE G2 dwo-login-auth-r1-scrum-780-g2-20260912 73023fedf2a36fba 2026-09-12T15:49:02Z"
+}

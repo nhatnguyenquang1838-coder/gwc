@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-approval-candidate",
+  "generated_at": "2026-09-12T14:49:02Z",
+  "run_id": "DWO-LOGIN-AUTH-R1",
+  "task_id": "SCRUM-780",
+  "base_bindings": {
+    "gwc": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+    "application": "5c9720e2230da64660716e07ce8453575545ae23"
+  },
+  "scope_hash": "sha256:73023fedf2a36fbaa572ecf705e49b75353098ea5bc74c44150bd3854402dad3",
+  "status": "AWAITING_APPROVAL",
+  "authority_granted": false,
+  "approval_request_id": "dwo-login-auth-r1-scrum-780-g2-20260912",
+  "approval_command": "APPROVE G2 dwo-login-auth-r1-scrum-780-g2-20260912 73023fedf2a36fba 2026-09-12T15:49:02Z",
+  "approval_request_digest": "sha256:2a2a17c796fa8b0a64767d027db549d04083dbfbb831db37cd616127633d77c9",
+  "envelope_digest": "sha256:c62d77d6cb017f1ada40b628dcf31a5fa8c8c64cbbe969586570b4e311d9e2e1",
+  "envelope_file_digest": "sha256:3c8edf118bcb36a54ac1da1888a916711379d68f6880ef292c72a0e64dcfe35f",
+  "next_action": "WAIT_HUMAN_G2_APPROVAL"
+}

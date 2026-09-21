@@ -1,0 +1,70 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-09-12T21:36:03+07:00'
+trace:
+  project_id: SCRUM-780
+  repository: nhatnguyenquang1838-coder/DW-SuperApps
+  task_id: SCRUM-780
+  base_sha: 5c9720e2230da64660716e07ce8453575545ae23
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: DWO Login Auth v1 — SCRUM-780
+  why_now: Login auth v1 for DW-SuperApps
+desired_outcome: 'S3 execute: materialize task folder + validation'
+stakeholders:
+  requester: nhatnguyenquang1838-coder
+  affected:
+  - DW-SuperApps
+  - gwc
+scope:
+  in_scope:
+  - S3 materialize
+  - CR0-GWC-NODE-BINDING
+  non_goals:
+  - CR0 implementation
+  - G4 merge
+  - G5 deploy
+constraints:
+- read-only preflight
+- no CR0 implementation
+assumptions:
+- GPT Controller active
+- DWA executor ready
+risks:
+- id: RISK-01
+  description: CR0 binding gap
+  impact: high
+  mitigation: Controller release S3
+acceptance_criteria:
+- id: AC-01
+  statement: Task folder materialized
+  verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+  - create_guarded_branch
+  - modify_scoped_files
+  - run_sandboxed_validation
+  - push_working_branch
+  - open_or_update_draft_pr
+  - monitor_ci
+  - repair_repository_fixable_ci
+  - independent_g3_review
+  - mark_pr_ready_for_review_after_g3_pass
+  downstream_non_goals:
+  - merge
+  - auto_merge
+  - deploy
+  - release
+  - production_config_change
+  - credential_rotation
+  - production_data_access
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: true
+    required_evidence:
+    - g3_delivery_record_pass
+    - current_pr_head_sha_match
+    - required_ci_success
+    - review_closure_non_stale
+    - scope_drift_false
+unresolved_questions: []
+status: READY

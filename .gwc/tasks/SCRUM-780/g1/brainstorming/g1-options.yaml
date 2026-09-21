@@ -1,0 +1,28 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-09-12T21:36:03+07:00"
+trace:
+  project_id: SCRUM-780
+  repository: nhatnguyenquang1838-coder/DW-SuperApps
+  task_id: SCRUM-780
+  base_sha: "5c9720e2230da64660716e07ce8453575545ae23"
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: "OPT-01"
+    title: "DWA inline management"
+    description: "DWA manages goal/subgoals/loops inline per user preference"
+    benefits: ["Fast", "No extra skill overhead"]
+    tradeoffs: ["No formal skill definition"]
+    risks: ["RISK-01"]
+    constraint_fit: "FIT"
+  - id: "OPT-02"
+    title: "Skill-based management"
+    description: "Define a skill for goal/subgoals/loops"
+    benefits: ["Formal", "Reusable"]
+    tradeoffs: ["Slower setup"]
+    risks: ["RISK-01"]
+    constraint_fit: "NOT_FIT"
+recommended_option_id: "OPT-01"
+recommendation_rationale: "User chose DWA inline management per clarify"
+decision_required: true
+status: "READY"
