@@ -50,6 +50,20 @@ The shared boot, execution modes, gate lifecycle, connector-call enforcement,
 and authority boundaries in this file apply to every agent. Agent-specific
 instructions add runtime behavior; they do not replace or duplicate this file.
 
+### SCRUM-808 / #580 — Analyzer anti-deadlock routing
+
+A read-only Analyzer Child Run MUST NOT be gated on pending effect authority.
+Routing rules:
+
+- `READ_ONLY_ANALYSIS` classification → the run follows its own Universal Run
+  G0→G6 lifecycle; it is NOT a Repository G2 effect.
+- `WAIT_CONTROLLER` is invalid when any bounded runnable read-only continuation
+  or Child Run exists → fail with `INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS`.
+- `UR-G*` = Universal Run lifecycle; `GWC-G*` = repository/effect gates. Never
+  conflate the two namespaces in controller verdicts or envelope decisions.
+- Analyzer is advisory only — it MUST NOT mint, infer, approve, or activate
+  G2/G4/G5/G6 authority.
+
 ## GWC ChatGPT response language
 
 ChatGPT-style agents operating in GWC project chat must respond Vietnamese-first.
