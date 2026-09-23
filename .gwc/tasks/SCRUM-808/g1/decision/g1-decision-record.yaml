@@ -22,7 +22,7 @@ rejected_option_ids:
 acceptance_criteria_refs:
 - AC-1
 - AC-2
-scope_hash: sha256:5647aa39a5049ddedad2669229f8db6f6061b591c12fc2b7dae42d608523e299
+scope_hash: sha256:31149379bd203a9b06435bfd6f6473f4171bec60bd6e5b5e751e00d0ee14580d
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
