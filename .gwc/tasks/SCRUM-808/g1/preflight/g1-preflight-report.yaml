@@ -5,10 +5,10 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-808
-  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  base_sha: bb5a870bd2066a38bef75262aad1a87e2d08cba2
   g0_snapshot: ../../g0/context-snapshot.yaml
 repository_state:
-  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  base_sha: bb5a870bd2066a38bef75262aad1a87e2d08cba2
   base_ref: main
   profile_path: projects/gwc/project-profile.yaml
   connector: github
@@ -20,7 +20,7 @@ checks:
   code: BASE_COMMIT
   message: Base commit verified
   evidence:
-  - git rev-parse 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  - git rev-parse bb5a870bd2066a38bef75262aad1a87e2d08cba2
 - id: PF-002
   status: PASS
   code: JIRA_CLAIM

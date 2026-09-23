@@ -4,7 +4,7 @@ activation_state: AWAITING_APPROVAL
 task_id: SCRUM-808
 repository: nhatnguyenquang1838-coder/gwc
 base_ref: main
-base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+base_sha: bb5a870bd2066a38bef75262aad1a87e2d08cba2
 working_branch: auto/SCRUM-808-na81-20260923
 risk_class: R2
 risk_digest: sha256:19a7a1e5595eebd7162afb3f545cfc7d60d124412c5c90d7bc1ebaeb57222020
@@ -36,20 +36,24 @@ excluded_actions:
 - g4_merge
 - g5_deploy
 - g6_production
-scope_hash: sha256:31149379bd203a9b06435bfd6f6473f4171bec60bd6e5b5e751e00d0ee14580d
+scope_hash: sha256:21ed5456b8939861aa5123578d5f5743dc5769cf02f71ca4d285b1e7255732c1
 f1_artifact_digests:
-  core/GATE_LIFECYCLE_CONTRACT_v1.0.md: d34434ea78d60601b782f9abe59f5f5ebe802ff0f0391d163e370210c6a94f63
-  core/Agent_Operating_Runtime_Contract_v1.0.md: a52cd16b1118ff11ffcef7b06679949d0c00c1e07497c89cae521007f1ddfe20
+  core/GATE_LIFECYCLE_CONTRACT_v1.0.md: bcb4a3911eab481c8c88523f87dc4e2e81c892764c5a0cc52c12f3fee61cecda
+  core/Agent_Operating_Runtime_Contract_v1.0.md: bea4e477396533354ae5bab0ada3ddc17ad1a8937041b5b724b3de449422fee
 f2_digests:
   gate_state_resolution: sha256:59455df7dbe95a1f2b3d5852a4ac8b4e3ec77dc2f91563486a406b7ff72ea90b
   authority_boundary_decision: sha256:7325fa7ce3778019879feca836b95b5fdd8ed1c9e8875cd0d845bdcde507485d
 approval_request_ref:
   request_id: APPROVE_G2_A_SCRUM-808_20260923
-  scope_hash: sha256:31149379bd203a9b06435bfd6f6473f4171bec60bd6e5b5e751e00d0ee14580d
+  scope_hash: sha256:21ed5456b8939861aa5123578d5f5743dc5769cf02f71ca4d285b1e7255732c1
   issued_at: '2026-09-23T11:37:40Z'
   expires_at: '2026-09-24T11:37:40Z'
   reason_code: G2_EXECUTION_APPROVAL
-approval_validation_ref: null
+approval_validation_ref:
+  review_id: issuecomment-5795754182
+  verdict: CHANGES_REQUIRED
+  reviewer: analyzer
+  issues: 10
 checkpoint_id: chk-SCRUM-808-20260923
 issued_at: '2026-09-23T11:37:40Z'
 expires_at: '2026-09-24T11:37:40Z'

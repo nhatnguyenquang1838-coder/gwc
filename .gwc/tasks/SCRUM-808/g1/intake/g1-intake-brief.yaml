@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-808
-  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  base_sha: bb5a870bd2066a38bef75262aad1a87e2d08cba2
   g0_snapshot: ../../g0/context-snapshot.yaml
 problem:
   statement: Prevent read-only Analyzer Child Run deadlock behind effect authority
@@ -42,10 +42,50 @@ risks:
   mitigation: Bind exact authorized paths in G2 envelope
 acceptance_criteria:
 - id: AC-1
-  statement: 3 anti-deadlock invariants canonicalized in docs
+  statement: 'Action/effect class explicit before authority resolution (READ_ONLY_ANALYSIS
+    | REPOSITORY_EFFECT | RUNTIME_EFFECT | PRODUCTION_EFFECT)'
   verifiable: true
 - id: AC-2
-  statement: Regression tests prove Analyzer continues while G2-A pending
+  statement: READ_ONLY_ANALYSIS Child Run declared/instantiated without repository G2
+    authority when parent scope permits read-only analysis
+  verifiable: true
+- id: AC-3
+  statement: 'Pending G2/G4/G5/G6 effect authority cannot become activation predicate
+    for unrelated read-only work'
+  verifiable: true
+- id: AC-4
+  statement: 'WAIT_CONTROLLER fails closed when runnable bounded read-only work exists
+    (INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS)'
+  verifiable: true
+- id: AC-5
+  statement: Analyzer role, RACI, allowed/forbidden actions, typed output contract canonical
+  verifiable: true
+- id: AC-6
+  statement: 'Universal Run lifecycle vs repository/effect gates namespace-distinguishable
+    (UR-G* vs GWC-G*)'
+  verifiable: true
+- id: AC-7
+  statement: 'Parent/Child Run authority independent: Child analysis never widens repository/effect
+    authority'
+  verifiable: true
+- id: AC-8
+  statement: 'Regression reproduces SCRUM-781 deadlock: parent WAIT_CONTROLLER while
+    read-only Analyzer exists → Analyzer runnable + parent effect gate pending'
+  verifiable: true
+- id: AC-9
+  statement: Regression proves Analyzer cannot mutate repository or mint/activate G2
+  verifiable: true
+- id: AC-10
+  statement: TaskController continuation rejects invalid WAIT_CONTROLLER with runnable
+    read-only work
+  verifiable: true
+- id: AC-11
+  statement: Existing route/gate semantics backward-compatible; no protected-main merge/deploy
+    authority broadened
+  verifiable: true
+- id: AC-12
+  statement: Notion architecture/implementation/operating projections updated and linked
+    to SCRUM-808
   verifiable: true
 unresolved_questions: []
 status: READY

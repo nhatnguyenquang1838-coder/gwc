@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-808
-  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  base_sha: bb5a870bd2066a38bef75262aad1a87e2d08cba2
   g0_snapshot: ../../g0/context-snapshot.yaml
 options_ref: ../brainstorming/g1-options.yaml
 preflight_ref: ../preflight/g1-preflight-report.yaml
@@ -16,13 +16,13 @@ user_decision:
   decided_at: '2026-09-23T18:25:00Z'
   source: user directive
   explicit: true
-rationale: 'Nhật standing: delegate Analyzer review + approve on behalf for GWC gates'
+rationale: 'Analyzer is read-only advisory; human retains G2 authority per SCRUM-808/#580'
 rejected_option_ids:
 - OPT-1
 acceptance_criteria_refs:
 - AC-1
 - AC-2
-scope_hash: sha256:31149379bd203a9b06435bfd6f6473f4171bec60bd6e5b5e751e00d0ee14580d
+scope_hash: sha256:21ed5456b8939861aa5123578d5f5743dc5769cf02f71ca4d285b1e7255732c1
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []
@@ -37,7 +37,7 @@ subagent_distribution_plan:
   - sub_task_id: SUB-TASK-2
     description: Run validate_g01.py PASS
   - sub_task_id: SUB-TASK-3
-    description: DWA fanout analyzer independent review + G2-A approval
+    description: DWA fanout analyzer independent review only (advisory; no G2 authority)
   agent_allocation:
   - sub_task_id: SUB-TASK-1
     skill_id: dw-gwc-governance

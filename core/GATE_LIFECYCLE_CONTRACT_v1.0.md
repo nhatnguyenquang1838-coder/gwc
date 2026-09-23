@@ -439,9 +439,27 @@ These invariants prevent read-only Analyzer Child Run deadlock behind effect aut
 
 1. **READ_ONLY_ANALYSIS Child Run ≠ Repository G2 effect.** A child run whose only work is read-only analysis (inspection, evidence gathering, projection, recommendation) does not constitute a Repository G2 effect. It must not be treated as requiring G2 execution authority, repository write capability, or a gated effect graph. The gate lifecycle continues without a G2 effect packet for read-only analysis steps.
 
-2. **WAIT_CONTROLLER invalid if runnable read-only work exists.** When the only remaining delegated work is runnable read-only analysis, the Controller MUST NOT emit `WAIT_CONTROLLER` as a blocking verdict. `WAIT_CONTROLLER` is valid only when the next actionable step requires human/gate authority or a capability the Executor lacks. Read-only analysis that the Executor can perform is `CONTINUE`-eligible.
+2. **WAIT_CONTROLLER invalid if any bounded runnable read-only work exists.** When any bounded runnable read-only continuation/Child Run exists, the Controller MUST NOT emit `WAIT_CONTROLLER` as a blocking verdict. `WAIT_CONTROLLER` is valid only when the next actionable step requires human/gate authority or a capability the Executor lacks. Read-only analysis that the Executor can perform is `CONTINUE`-eligible.
 
-3. **UR-G* vs GWC-G* naming separation.** UR-G* references the Ultimate Responsibility gate authority chain (human approval boundaries). GWC-G* references the GWC gate lifecycle (G0–G6). These are distinct naming spaces and must not be conflated in controller verdicts, envelope decisions, or audit records. A GWC gate decision is never a UR authority delegation, and a UR approval is never a GWC gate transition.
+3. **UR-G* vs GWC-G* naming separation.** `UR-G0...UR-G6` = Universal Run lifecycle (recursive G0→G6 for Root and Child Runs). `GWC-G0_CONTEXT...GWC-G6_PRODUCTION_DATA` = repository/effect gates. These are distinct naming spaces and must not be conflated in controller verdicts, envelope decisions, or audit records. A GWC gate decision is never a UR authority delegation, and a UR approval is never a GWC gate transition.
+
+### Action/effect classifier
+
+Every delegated Child Run/action MUST be classified before authority resolution:
+
+| Class | Semantics |
+|---|---|
+| `READ_ONLY_ANALYSIS` | Inspection, evidence gathering, projection, recommendation. No repository/runtime/external mutation. |
+| `REPOSITORY_EFFECT` | Commit, branch, worktree, PR, merge, deploy, release. |
+| `RUNTIME_EFFECT` | Service restart, config reload, runtime state change. |
+| `PRODUCTION_EFFECT` | Production data, credential, migration, secret operation. |
+
+### Machine enforcement
+
+The runtime MUST enforce these invariants programmatically, not prose-only:
+
+- Classify action before authority resolution → `INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS` if `WAIT_CONTROLLER` emitted while any bounded `READ_ONLY_ANALYSIS` continuation exists.
+- Stable reason codes: `INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS` (primary), `READ_ONLY_CHILD_STRANDED_BEHIND_EFFECT_AUTHORITY` (secondary).
 
 ## Failure codes
 

@@ -5,7 +5,7 @@ trace:
   project_id: gwc
   repository: nhatnguyenquang1838-coder/gwc
   task_id: SCRUM-808
-  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  base_sha: bb5a870bd2066a38bef75262aad1a87e2d08cba2
   g0_snapshot: ../../g0/context-snapshot.yaml
 options:
 - id: OPT-1
@@ -19,18 +19,17 @@ options:
   - Human bottleneck
   constraint_fit: FIT
 - id: OPT-2
-  title: Delegate Analyzer review + approve on behalf
-  description: Analyzer reviews and approves G2-A on behalf of Nhật (standing delegation)
+  title: Delegate Analyzer review only (advisory)
+  description: Analyzer reviews read-only and reports findings; no approval or G2 authority. Human retains G2 authority.
   benefits:
-  - Faster
-  - Consistent review
+  - Independent review without authority delegation
+  - Consistent evidence gathering
   tradeoffs:
-  - Delegated authority trust boundary
+  - Human still must decide G2
   risks:
-  - Analyzer may miss context
-  constraint_fit: PARTIAL
+  - Analyzer context limits
+  constraint_fit: FIT
 recommended_option_id: OPT-2
-recommendation_rationale: 'Nhật standing: delegate Analyzer review + approve on behalf
-  for GWC gates'
+recommendation_rationale: 'Analyzer is read-only advisory; human retains G2 authority per SCRUM-808/#580'
 decision_required: true
 status: READY
