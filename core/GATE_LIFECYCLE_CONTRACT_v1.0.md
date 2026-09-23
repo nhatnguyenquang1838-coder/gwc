@@ -431,6 +431,18 @@ match, and runs from adjacent or superseded commits. A status that cannot cite
 the exact merge SHA and the exact run IDs is reported as
 `CONNECTOR_OBSERVABILITY_INCOMPLETE` or `SHA_MISMATCH`, never as `success`.
 
+
+
+## Read-only Analyzer Child Run anti-deadlock invariants (SCRUM-808)
+
+These invariants prevent read-only Analyzer Child Run deadlock behind effect authority:
+
+1. **READ_ONLY_ANALYSIS Child Run ≠ Repository G2 effect.** A child run whose only work is read-only analysis (inspection, evidence gathering, projection, recommendation) does not constitute a Repository G2 effect. It must not be treated as requiring G2 execution authority, repository write capability, or a gated effect graph. The gate lifecycle continues without a G2 effect packet for read-only analysis steps.
+
+2. **WAIT_CONTROLLER invalid if runnable read-only work exists.** When the only remaining delegated work is runnable read-only analysis, the Controller MUST NOT emit `WAIT_CONTROLLER` as a blocking verdict. `WAIT_CONTROLLER` is valid only when the next actionable step requires human/gate authority or a capability the Executor lacks. Read-only analysis that the Executor can perform is `CONTINUE`-eligible.
+
+3. **UR-G* vs GWC-G* naming separation.** UR-G* references the Ultimate Responsibility gate authority chain (human approval boundaries). GWC-G* references the GWC gate lifecycle (G0–G6). These are distinct naming spaces and must not be conflated in controller verdicts, envelope decisions, or audit records. A GWC gate decision is never a UR authority delegation, and a UR approval is never a GWC gate transition.
+
 ## Failure codes
 
 ```text

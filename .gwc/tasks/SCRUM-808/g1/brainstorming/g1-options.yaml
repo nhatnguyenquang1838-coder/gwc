@@ -1,0 +1,36 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-09-23T18:25:00Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-808
+  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Direct human G2-A approval
+  description: Nhật approves G2-A directly
+  benefits:
+  - Full human authority
+  tradeoffs:
+  - Slower cycle
+  risks:
+  - Human bottleneck
+  constraint_fit: FIT
+- id: OPT-2
+  title: Delegate Analyzer review + approve on behalf
+  description: Analyzer reviews and approves G2-A on behalf of Nhật (standing delegation)
+  benefits:
+  - Faster
+  - Consistent review
+  tradeoffs:
+  - Delegated authority trust boundary
+  risks:
+  - Analyzer may miss context
+  constraint_fit: PARTIAL
+recommended_option_id: OPT-2
+recommendation_rationale: 'Nhật standing: delegate Analyzer review + approve on behalf
+  for GWC gates'
+decision_required: true
+status: READY

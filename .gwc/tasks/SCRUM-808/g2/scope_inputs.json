@@ -1,0 +1,34 @@
+{
+  "additional_bindings": [
+    {
+      "key": "pr_number",
+      "value": "580"
+    }
+  ],
+  "authorized_actions": [
+    "modify_approved_files",
+    "create_guarded_branch_or_worktree",
+    "push_working_branch",
+    "run_sandboxed_validation"
+  ],
+  "authorized_paths": [
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/Agent_Operating_Runtime_Contract_v1.0.md",
+    ".gwc/tasks/SCRUM-808/**"
+  ],
+  "base_ref": "main",
+  "base_sha": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+  "excluded_actions": [
+    "merge_approved_pr",
+    "deploy_approved_release",
+    "production_data_write",
+    "production_config_change",
+    "migration",
+    "credential_rotation"
+  ],
+  "head_sha": null,
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "risk_class": "R2",
+  "task_id": "SCRUM-808",
+  "working_branch": "auto/SCRUM-808-na81-20260923"
+}

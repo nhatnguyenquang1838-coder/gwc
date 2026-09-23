@@ -1,0 +1,47 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-09-23T18:25:00Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+  protected_branches:
+  - main
+  connector: github
+  write_enabled: true
+constraints:
+- No merge to protected main without Human G4
+- Canonical docs edits require G2 authority
+applicable_policies:
+- id: GATE_LIFECYCLE_CONTRACT_v1.0
+  path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  ref: main
+  source_sha: ea3e44ac2d948b8439e9768bea4f5dda8474a34e914592130965083792a5ee48
+sources:
+- path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: d34434ea78d60601b782f9abe59f5f5ebe802ff0f0391d163e370210c6a94f63
+- path: core/Agent_Operating_Runtime_Contract_v1.0.md
+  required: true
+  status: AVAILABLE
+  source_sha: a52cd16b1118ff11ffcef7b06679949d0c00c1e07497c89cae521007f1ddfe20
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: dwa
+  execution_mode: local_agent
+  selected_profile:
+    id: default
+    path: ~/.hermes/profiles/default/
+  selected_connector: github
+  required_behavior_contracts:
+  - M1-M7_POLICY
+  - DEADLOCK_CHECK
+  - A2A_PROTOCOL
+  connector_priority:
+  - github
