@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "task_id": "SCRUM-808",
+  "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
+  "head_sha": "12d08270d5d29c1e9fede99a3055c6a5055b5aaa",
+  "working_branch": "auto/SCRUM-808-na81-20260923-v2",
+  "scope_hash": "sha256:a40b9d5c96aec5a8a47d663434fa3b43cb325f570b29544e806864ebb373a335",
+  "envelope_digest": "sha256:797bac071e5449c126c63b46ad02b3f7a8e47a8c4c28425b05e471d43c6ec57e",
+  "bounded_write_scope": [
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/Agent_Operating_Runtime_Contract_v1.0.md",
+    "AGENTS.md",
+    "core/node-architect/flow-policy-compiled-profile.json",
+    "core/node-architect/flow-policy-activation-registry.json",
+    "tests/test_flow_policy_compiler_identity_hardening.py",
+    "tests/test_scrum808_analyzer_anti_deadlock.py",
+    ".gwc/tasks/SCRUM-808/**"
+  ],
+  "review_ref": "issuecomment-5795754182",
+  "review_verdict": "CHANGES_REQUIRED"
+}
