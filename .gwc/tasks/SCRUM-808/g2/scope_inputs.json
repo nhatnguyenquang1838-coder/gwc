@@ -26,7 +26,7 @@
     "migration",
     "credential_rotation"
   ],
-  "head_sha": null,
+  "head_sha": "96edaa61d2b55b8929e1671d4ebaf4a728522053",
   "repository": "nhatnguyenquang1838-coder/gwc",
   "risk_class": "R2",
   "task_id": "SCRUM-808",
