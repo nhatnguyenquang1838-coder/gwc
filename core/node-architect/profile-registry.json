@@ -208,6 +208,131 @@
           }
         ]
       }
+    },
+    {
+      "artifact_type": "flow-profile",
+      "compatibility": {
+        "migration": "none",
+        "v1_compatible": true,
+        "v1_edge_kind_map": {
+          "conditional": "conditional",
+          "dependency": "continue",
+          "history": "continue",
+          "human_authority": "human_required",
+          "runtime": "continue"
+        }
+      },
+      "compiled": {
+        "projection_version": "2.0.0",
+        "workflow_digest": "sha256:PLACEHOLDER"
+      },
+      "graph_registry_ref": "gwc-runtime-graph-registry",
+      "green_targets": [
+        "runtime_qualification.q0-live-qualification",
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture"
+      ],
+      "id": "q0-live-qualification",
+      "node_registry_ref": "gwc-runtime-node-registry",
+      "pilot_nodes": [
+        "runtime_qualification.q0-live-qualification",
+        "runtime_checkpoint.checkpoint-persist",
+        "validation_quality.ci-evidence-capture"
+      ],
+      "policy_registry_ref": "gwc-gate-applicability-policy-registry",
+      "provenance": {
+        "source_path": "core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md",
+        "source_sha": "1c2135a27f80427b4a459b4eb82543463b5e55c60487f04166dab6bf9d150f75"
+      },
+      "registry_bindings": [
+        {
+          "digest": "sha256:782668f32c31a084bdb5b907986b31a9ebb9af2d4c8f3d42cc369fa09f986013",
+          "path": "core/node-architect/runtime-node-extension-registry.json",
+          "registry": "node-extension",
+          "registry_id": "gwc-runtime-node-extension-registry",
+          "revision": "scrum-781-q0-live-qualification",
+          "schema_version": "1.0.0"
+        }
+      ],
+      "revision": "scrum-781-q0-live-qualification-20260927",
+      "routes": [
+        {
+          "route_id": "q0-live-qualification-to-certification",
+          "nodes": [
+            "runtime_qualification.q0-live-qualification",
+            "runtime_checkpoint.checkpoint-persist",
+            "validation_quality.ci-evidence-capture"
+          ],
+          "edges": [
+            {
+              "kind": "runtime",
+              "runtime_executable": true,
+              "source": "runtime_qualification.q0-live-qualification",
+              "target": "runtime_checkpoint.checkpoint-persist"
+            }
+          ],
+          "entry_nodes": [
+            "runtime_qualification.q0-live-qualification"
+          ],
+          "gate_bindings": [
+            {
+              "gate": "G0_CONTEXT",
+              "policy_ref": "g0-context-required"
+            },
+            {
+              "gate": "G1_ALIGNMENT",
+              "policy_ref": "g1-alignment-required"
+            },
+            {
+              "gate": "G2_EXECUTION",
+              "policy_ref": "g2-execution-required"
+            },
+            {
+              "gate": "G3_PR",
+              "policy_ref": "g3-pr-required"
+            },
+            {
+              "gate": "G4_MERGE",
+              "policy_ref": "g4-merge-required"
+            },
+            {
+              "gate": "G5_DEPLOY",
+              "policy_ref": "g5-deploy-effect-driven"
+            },
+            {
+              "gate": "G6_PRODUCTION_DATA",
+              "policy_ref": "g6-production-effect-driven"
+            }
+          ],
+          "participants": [
+            {
+              "gate": "G2_EXECUTION",
+              "participant": "runtime_qualification.q0-live-qualification",
+              "participant_kind": "node"
+            },
+            {
+              "gate_neutral": true,
+              "participant": "runtime_checkpoint.checkpoint-persist",
+              "participant_kind": "node"
+            }
+          ],
+          "terminal_nodes": [
+            {
+              "node": "validation_quality.ci-evidence-capture",
+              "outcome": "CAMPAIGN_READY_RUNTIME_L3"
+            }
+          ]
+        }
+      ],
+      "scenario_registry_ref": "gwc-runtime-scenario-registry",
+      "schema_version": "1.0.0",
+      "version": "1.0.0",
+      "visibility": "candidate",
+      "workflow": {
+        "id": "q0-live-qualification-workflow",
+        "name": "Q0 Live Qualification",
+        "description": "Q0 live qualification: boot, activate baseline, load proof, execute live probes, self-repair runtime defects, certify CAMPAIGN_READY_RUNTIME/L3"
+      }
     }
   ],
   "provenance": "core/RUNTIME_CATALOG_KNOWLEDGE_GRAPH_CONTRACT_v1.0.md",
