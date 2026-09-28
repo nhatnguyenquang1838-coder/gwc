@@ -44,6 +44,18 @@ Any lower-priority statement that says G4 is "always human" or that E2E "never
 merges" is a generic default and MUST be interpreted under this route-precedence
 rule when a canonical route is active.
 
+### Fresh Universal Run boot precedence
+
+For a fresh current structured run with no explicit compatibility binding, the
+canonical runtime default is `UNIVERSAL_RUN_NEW_RUNTIME`. Compatibility routes are
+selected only when the current `RunState`/`RuntimePlan` explicitly binds and
+validates that exact route ID and adapter identity.
+
+The words `autonomous`, `continue`, `Human only merges main`, `pre-prod`, and
+historical branch, loop, todo, Slack, PR, or authority references have zero
+route-selection weight. A fresh run must not inherit any of those historical
+projections as current execution state.
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,
