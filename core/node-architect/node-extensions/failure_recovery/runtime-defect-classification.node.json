@@ -13,8 +13,14 @@
   "suspension": {
     "suspendable": true,
     "resume_metadata": [
-      "run_id", "q0_baseline_sha", "candidate_fix_sha", "fix_base_sha",
-      "branch", "worktree", "runtime_activation_id", "defect_classification"
+      "run_id",
+      "q0_baseline_sha",
+      "candidate_fix_sha",
+      "fix_base_sha",
+      "branch",
+      "worktree",
+      "runtime_activation_id",
+      "defect_classification"
     ]
   },
   "determinism": "external_state_dependent",
@@ -30,5 +36,11 @@
   "slot_review": {
     "decision": "keep",
     "rationale": "Q0 runtime defect classification (same vs independent root cause) is a distinct post-baseline capability per Notion §3."
+  },
+  "modes": [
+    "q0_live_qualification"
+  ],
+  "mode_opt_in": {
+    "q0_live_qualification": true
   }
 }

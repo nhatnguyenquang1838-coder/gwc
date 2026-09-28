@@ -297,7 +297,19 @@ def run_qualification_matrix(
     )
 
     # Certification requires: real Git head matches baseline AND no defects
-    certified = head_match and branch_match and defects_found == 0
+    # AND §10: loaded runtime identity digest == accepted Q0 baseline digest
+    loaded_identity_digest = _sha256(_canonical_json({
+        "git_head": actual_head,
+        "branch": actual_branch,
+        "source_root": source_root,
+    }))
+    baseline_identity_digest = _sha256(_canonical_json({
+        "git_head": q0_baseline_sha,
+        "branch": branch,
+        "source_root": source_root,
+    }))
+    identity_match = loaded_identity_digest == baseline_identity_digest
+    certified = head_match and branch_match and identity_match and defects_found == 0
     outcome = "CAMPAIGN_READY_RUNTIME_L3" if certified else "DEFECTS_FOUND"
     return QualificationReport(
         outcome=outcome,
