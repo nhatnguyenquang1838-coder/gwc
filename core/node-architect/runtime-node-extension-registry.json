@@ -6,7 +6,7 @@
   "baseline_registry_ref": "gwc-runtime-node-registry",
   "baseline_declared_slot_count": 81,
   "baseline_node_ids_digest": "sha256:21afecdd0d7742445d8a6a94d8734e50f5f24e78f407293d1b0ef54368d8ac9c",
-  "admitted_extension_count": 2,
+  "admitted_extension_count": 3,
   "extensions": [
     {
       "extension_slot": 82,
@@ -81,9 +81,9 @@
       "node": {
         "schema_version": "1.0.0",
         "artifact_type": "runtime-node",
-        "id": "runtime_qualification.q0-live-qualification",
+        "id": "validation_quality.live-runtime-qualification",
         "version": "1.0.0",
-        "family": "runtime_qualification",
+        "family": "validation_quality",
         "maturity": "candidate",
         "source_status": "canonical_explicit",
         "effect_class": "external_write",
@@ -106,38 +106,101 @@
         "determinism": "external_state_dependent",
         "evidence_contract": "q0-live-fix-receipt",
         "implementation_refs": [
-          "core/node-architect/node-catalog/runtime_qualification/q0-live-qualification.node.json",
-          "tools/node_architect/shadow_81_qualification.py",
+          "core/node-architect/node-extensions/validation_quality/live-runtime-qualification.node.json",
           "tools/node_architect/q0_live_qualification.py"
         ],
         "provenance": {
-          "source_path": "core/node-architect/node-catalog/runtime_qualification/q0-live-qualification.node.json",
-          "source_sha": "5a2f7ddc9179943056ea4391a66ff3301b6249ad907c2e557fc8987ee6cb546e",
-          "discovery_basis": "SCRUM-781 Q0 mode-design acceptance + G2 approval"
+          "source_path": "core/node-architect/node-extensions/validation_quality/live-runtime-qualification.node.json",
+          "source_sha": "cfb18962c5335d5c18bb4c5da4309aa51d7c3d5eb5510fe1bf244b42dad05618",
+          "discovery_basis": "SCRUM-781 Q0 mode-design acceptance + G2 approval; Notion §3 slot 83"
         },
         "slot_review": {
           "decision": "keep",
-          "rationale": "Q0 live qualification is a distinct post-baseline capability and must not repurpose an unrelated historical slot."
+          "rationale": "Q0 live runtime qualification is a distinct post-baseline capability; reuses validation_quality family per Notion §3."
         }
       },
       "route": {
         "route_id": "q0-live-qualification-to-certification",
         "nodes": [
-          "runtime_qualification.q0-live-qualification",
+          "validation_quality.live-runtime-qualification",
           "runtime_checkpoint.checkpoint-persist",
           "validation_quality.ci-evidence-capture"
         ],
         "edges": [
           {
-            "source": "runtime_qualification.q0-live-qualification",
+            "source": "validation_quality.live-runtime-qualification",
             "target": "runtime_checkpoint.checkpoint-persist",
             "edge_type": "runtime",
             "runtime_executable": true,
             "provenance": "SCRUM-781:q0-qualification-handoff"
           }
         ],
-        "terminal_gate": "G6_PRODUCTION_DATA",
-        "outcome": "CAMPAIGN_READY_RUNTIME_L3"
+        "terminal_gate": "G4_MERGE",
+        "outcome": "HUMAN_REQUIRED"
+      }
+    },
+    {
+      "extension_slot": 84,
+      "decision_task_id": "SCRUM-781",
+      "decision_scope_hash": "sha256:5827b5a80258d7ad0a224facd7d31b1fa53e485cdc7df5517e42e46c94031cf4",
+      "node": {
+        "schema_version": "1.0.0",
+        "artifact_type": "runtime-node",
+        "id": "failure_recovery.runtime-defect-classification",
+        "version": "1.0.0",
+        "family": "failure_recovery",
+        "maturity": "candidate",
+        "source_status": "canonical_explicit",
+        "effect_class": "external_write",
+        "authority_class": "delegated",
+        "reversibility": "compensatable",
+        "idempotency": "key_required",
+        "suspension": {
+          "suspendable": true,
+          "resume_metadata": [
+            "run_id",
+            "q0_baseline_sha",
+            "candidate_fix_sha",
+            "fix_base_sha",
+            "branch",
+            "worktree",
+            "runtime_activation_id",
+            "defect_classification"
+          ]
+        },
+        "determinism": "external_state_dependent",
+        "evidence_contract": "q0-live-fix-receipt",
+        "implementation_refs": [
+          "core/node-architect/node-extensions/failure_recovery/runtime-defect-classification.node.json",
+          "tools/node_architect/q0_live_qualification.py"
+        ],
+        "provenance": {
+          "source_path": "core/node-architect/node-extensions/failure_recovery/runtime-defect-classification.node.json",
+          "source_sha": "5d408adeba566a4b1c7093b5781ef8ea7e1885e847a931127a50d9d468ce2053",
+          "discovery_basis": "SCRUM-781 Q0 mode-design acceptance + G2 approval; Notion §3 slot 84"
+        },
+        "slot_review": {
+          "decision": "keep",
+          "rationale": "Q0 runtime defect classification (same vs independent root cause) is a distinct post-baseline capability per Notion §3."
+        }
+      },
+      "route": {
+        "route_id": "q0-defect-classification",
+        "nodes": [
+          "failure_recovery.runtime-defect-classification",
+          "runtime_checkpoint.checkpoint-persist"
+        ],
+        "edges": [
+          {
+            "source": "failure_recovery.runtime-defect-classification",
+            "target": "runtime_checkpoint.checkpoint-persist",
+            "edge_type": "runtime",
+            "runtime_executable": true,
+            "provenance": "SCRUM-781:q0-defect-classification-handoff"
+          }
+        ],
+        "terminal_gate": "G4_MERGE",
+        "outcome": "HUMAN_REQUIRED"
       }
     }
   ],

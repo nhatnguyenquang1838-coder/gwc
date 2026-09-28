@@ -228,14 +228,16 @@
       },
       "graph_registry_ref": "gwc-runtime-graph-registry",
       "green_targets": [
-        "runtime_qualification.q0-live-qualification",
+        "validation_quality.live-runtime-qualification",
+        "failure_recovery.runtime-defect-classification",
         "runtime_checkpoint.checkpoint-persist",
         "validation_quality.ci-evidence-capture"
       ],
       "id": "q0-live-qualification",
       "node_registry_ref": "gwc-runtime-node-registry",
       "pilot_nodes": [
-        "runtime_qualification.q0-live-qualification",
+        "validation_quality.live-runtime-qualification",
+        "failure_recovery.runtime-defect-classification",
         "runtime_checkpoint.checkpoint-persist",
         "validation_quality.ci-evidence-capture"
       ],
@@ -259,7 +261,7 @@
         {
           "route_id": "q0-live-qualification-to-certification",
           "nodes": [
-            "runtime_qualification.q0-live-qualification",
+            "validation_quality.live-runtime-qualification",
             "runtime_checkpoint.checkpoint-persist",
             "validation_quality.ci-evidence-capture"
           ],
@@ -267,12 +269,12 @@
             {
               "kind": "runtime",
               "runtime_executable": true,
-              "source": "runtime_qualification.q0-live-qualification",
+              "source": "validation_quality.live-runtime-qualification",
               "target": "runtime_checkpoint.checkpoint-persist"
             }
           ],
           "entry_nodes": [
-            "runtime_qualification.q0-live-qualification"
+            "validation_quality.live-runtime-qualification"
           ],
           "gate_bindings": [
             {
@@ -307,7 +309,7 @@
           "participants": [
             {
               "gate": "G2_EXECUTION",
-              "participant": "runtime_qualification.q0-live-qualification",
+              "participant": "validation_quality.live-runtime-qualification",
               "participant_kind": "node"
             },
             {

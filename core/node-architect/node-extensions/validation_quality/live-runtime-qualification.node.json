@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_type": "runtime-node",
+  "id": "validation_quality.live-runtime-qualification",
+  "version": "1.0.0",
+  "family": "validation_quality",
+  "maturity": "candidate",
+  "source_status": "canonical_explicit",
+  "effect_class": "external_write",
+  "authority_class": "delegated",
+  "reversibility": "compensatable",
+  "idempotency": "key_required",
+  "suspension": {
+    "suspendable": true,
+    "resume_metadata": [
+      "run_id", "q0_baseline_sha", "candidate_fix_sha", "fix_base_sha",
+      "branch", "worktree", "runtime_activation_id", "load_proof_ref"
+    ]
+  },
+  "determinism": "external_state_dependent",
+  "evidence_contract": "q0-live-fix-receipt",
+  "implementation_refs": [
+    "tools/node_architect/q0_live_qualification.py"
+  ],
+  "provenance": {
+    "source_path": "core/node-architect/node-extensions/validation_quality/live-runtime-qualification.node.json",
+    "source_sha": "PLACEHOLDER",
+    "discovery_basis": "SCRUM-781 Q0 mode-design acceptance + G2 approval; Notion §3 slot 83"
+  },
+  "slot_review": {
+    "decision": "keep",
+    "rationale": "Q0 live runtime qualification is a distinct post-baseline capability; reuses validation_quality family per Notion §3."
+  }
+}
