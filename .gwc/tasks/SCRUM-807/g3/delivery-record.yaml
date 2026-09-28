@@ -1,0 +1,171 @@
+schema_version: "1.1"
+artifact_type: g3-delivery-record
+gate: G3_PR
+task_id: SCRUM-807
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 88fbcc3fc34efd3190d0475d6771aad5e6ca90e4
+working_branch: fix/SCRUM-807-q0-branching-runbook
+pull_request:
+  number: 579
+  url: https://github.com/nhatnguyenquang1838-coder/gwc/pull/579
+  draft: true
+implementation_head_sha: af218581a16bd986867ce62959506342d5d5b0b4
+scope_hash: sha256:e33d1ae80367ce4562fa7e47c40228734d584f60e5590429712f06d482f2ca6f
+changed_paths:
+  - AGENTS.md
+  - core/engineering/Q0_LIVE_QUALIFICATION_BRANCHING_STRATEGY_v1.0.md
+  - core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md
+  - docs/superpowers/plans/2026-09-19-q0-live-qualification-branching.md
+  - docs/superpowers/specs/2026-09-19-q0-live-qualification-branching-design.md
+  - projects/gwc/project-instructions.md
+  - schemas/q0-live-fix-receipt.schema.json
+  - tests/test_q0_live_qualification_contract.py
+validation:
+  implementation_head_sha: af218581a16bd986867ce62959506342d5d5b0b4
+  status: pass
+  commands:
+    - command: GitHub Actions — Validate instructions run 35486898702
+      result: pass
+      evidence: Exact-head run succeeded at af218581a16bd986867ce62959506342d5d5b0b4; Run governance unit tests completed successfully and now executes the Q0 top-level contract cases through load_tests.
+    - command: GitHub Actions — Build instruction packages run 35486898695
+      result: pass
+      evidence: Exact-head package validation/build succeeded.
+    - command: GitHub Actions — Node Architect semantic runtime run 35486898701
+      result: pass
+      evidence: Exact-head semantic runtime regression workflow succeeded.
+    - command: GitHub connector structural contract readback
+      result: pass
+      evidence: FIX_IMPLEMENTED no longer requires future load/replay/verification evidence; FIX_LOADED requires worktree_head/runtime activation/loaded surfaces; replay and RUNTIME_FIXED conditions remain fail-closed.
+review:
+  implementer_id: ChatGPT
+  reviewer_id: ChatGPT-fresh-context-r2
+  independence: fresh-context
+  mode: read-only
+  reviewed_implementation_head_sha: af218581a16bd986867ce62959506342d5d5b0b4
+  reviewed_scope_hash: sha256:e33d1ae80367ce4562fa7e47c40228734d584f60e5590429712f06d482f2ca6f
+  reviewed_at: "2026-09-20T03:34:55Z"
+  lanes:
+    - name: requirement
+      applicable: true
+      status: pass
+      evidence:
+        - Approved Linear Chained Defect Branches + SHA-based Q0 Baseline remains intact.
+        - Runtime fix acceptance still requires observed load, replay, forward progress, broader regression, and exact readback.
+    - name: design
+      applicable: true
+      status: pass
+      evidence:
+        - Progressive receipt lifecycle is now internally consistent from FIX_IMPLEMENTED through RUNTIME_FIXED.
+        - worktree_head is first required with FIX_LOADED rather than fabricated at FIX_IMPLEMENTED.
+    - name: code
+      applicable: true
+      status: pass
+      evidence:
+        - No runtime implementation source path changed.
+        - Repair delta is limited to runbook, receipt schema, and contract test within the authorized write-set.
+    - name: test
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions run 35486898702 passed at exact implementation head.
+        - Governance unit test discovery now executes the Q0 function tests via load_tests.
+    - name: governance
+      applicable: true
+      status: pass
+      evidence:
+        - Old G4 receipt for head 287513df6877339e20c3018baa07601e6f704192 is treated as stale after implementation head changed.
+        - PR remained Draft during repair; merge/deploy authority was not inferred.
+    - name: delivery
+      applicable: true
+      status: pass
+      evidence:
+        - PR #579 is Draft for G3 assembly at implementation subject af218581a16bd986867ce62959506342d5d5b0b4.
+        - This v1.1 delivery record is emitted as task-scoped G3 evidence in native YAML syntax.
+    - name: ci
+      applicable: true
+      status: pass
+      evidence:
+        - Validate instructions, Build instruction packages, and Node Architect semantic runtime all succeeded on exact implementation head.
+  findings:
+    - id: REV-1
+      severity: MAJOR
+      category: design
+      status: resolved
+      evidence: Initial runbook used fix_commit_sha while branching/schema used candidate_fix_sha.
+      recommendation: Use one canonical identity vocabulary.
+      resolution: Resolved before current implementation subject; runbook/schema/branching use candidate_fix_sha consistently.
+    - id: REV-2
+      severity: MAJOR
+      category: governance
+      status: resolved
+      evidence: Initial receipt schema required future runtime evidence at FIX_IMPLEMENTED.
+      recommendation: Make receipt evidence progressive by lifecycle state.
+      resolution: Status-conditional schema rules added; later repaired so worktree_head is not globally required.
+    - id: REV-3
+      severity: MAJOR
+      category: test
+      status: resolved
+      evidence: Kilo review found worktree_head was still globally required and the progressive test did not remove it.
+      recommendation: Remove worktree_head from global required, require it at FIX_LOADED, and add coverage.
+      resolution: Resolved in bdec337669e23cf79870565c25494e5be5430607 with schema, runbook, and test updates.
+    - id: REV-4
+      severity: MINOR
+      category: test
+      status: resolved
+      evidence: Q0 top-level function tests were not executed by unittest discover in repository CI.
+      recommendation: Make the function test set discoverable by the existing governance CI.
+      resolution: Resolved in af218581a16bd986867ce62959506342d5d5b0b4 using load_tests; exact-head governance unit-test step passed.
+    - id: REV-5
+      severity: NIT
+      category: delivery
+      status: resolved
+      evidence: Prior delivery-record.yaml content was JSON despite YAML extension.
+      recommendation: Emit the active G3 record as native YAML.
+      resolution: This replacement record uses native YAML syntax.
+  acceptance_criteria:
+    - id: AC-1
+      result: pass
+      evidence:
+        - Canonical branching contract defines linear chained defect branches and SHA-based Q0 baseline.
+    - id: AC-2
+      result: pass
+      evidence:
+        - Runbook defines load proof, stale-state invalidation, original-incident replay, forward progress, broader verification, and final clean certification.
+    - id: AC-3
+      result: pass
+      evidence:
+        - FIX_IMPLEMENTED can omit worktree_head and future runtime/replay/verification evidence.
+        - FIX_LOADED requires worktree_head plus exact runtime load identity.
+    - id: AC-4
+      result: pass
+      evidence:
+        - Existing governance CI now executes Q0 contract function tests and passed at exact implementation head.
+    - id: AC-5
+      result: pass
+      evidence:
+        - AGENTS.md and projects/gwc/project-instructions.md route to canonical artifacts.
+    - id: AC-6
+      result: pass
+      evidence:
+        - Repair remained within authorized source/runbook/schema/test paths; no runtime engine path changed.
+    - id: AC-7
+      result: pass
+      evidence:
+        - Old exact-head G4 authority was invalidated rather than reused after head drift.
+  decision: pass
+  stale: false
+ci:
+  required: true
+  required_checks:
+    - Validate instructions
+    - Build instruction packages
+    - Node Architect semantic runtime
+residual_risks:
+  - Cross-field SHA equality such as loaded_source_sha/worktree_head == candidate_fix_sha requires semantic enforcement in the active runtime/agent; JSON Schema alone cannot express arbitrary cross-field equality.
+  - Kilo's prior review comment is bound to an older head; current G3 closure uses fresh-context review plus exact-head repository CI.
+exclusions:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION_DATA
+outcome: pass

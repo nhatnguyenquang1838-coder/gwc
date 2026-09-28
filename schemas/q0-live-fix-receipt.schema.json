@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-live-fix-receipt.schema.json",
+  "title": "Q0 Live Fix Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "task_id",
+    "defect_id",
+    "fix_base_sha",
+    "candidate_fix_sha",
+    "q0_baseline_sha",
+    "branch",
+    "worktree",
+    "incident",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "const": "q0-live-fix-receipt"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "defect_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fix_base_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "candidate_fix_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "q0_baseline_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "branch": {
+      "type": "string",
+      "pattern": "^fix/[A-Za-z0-9._/-]+$"
+    },
+    "worktree": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activation_id",
+        "process_or_session_id",
+        "source_root",
+        "loaded_source_sha"
+      ],
+      "properties": {
+        "activation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "process_or_session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "loaded_source_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "loaded_surfaces": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instructions",
+        "modules",
+        "controller_contract_digest"
+      ],
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "controller_contract_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "invalidated": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "regenerated": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact",
+          "digest"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "incident": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fixture_digest",
+        "previous_failure_state"
+      ],
+      "properties": {
+        "fixture_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "previous_failure_state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "exact_readback",
+        "first_state_beyond_failure"
+      ],
+      "properties": {
+        "result": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "exact_readback": {
+          "type": "boolean"
+        },
+        "first_state_beyond_failure": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "FIX_IMPLEMENTED",
+        "FIX_LOADED",
+        "FIX_REPLAY_VERIFIED",
+        "RUNTIME_FIXED"
+      ]
+    },
+    "worktree_head": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "broader_regression",
+        "exact_readback",
+        "evidence_digest"
+      ],
+      "properties": {
+        "broader_regression": {
+          "enum": [
+            "NOT_RUN",
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "exact_readback": {
+          "enum": [
+            "NOT_RUN",
+            "PASS",
+            "FAIL"
+          ]
+        },
+        "evidence_digest": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "FIX_LOADED",
+              "FIX_REPLAY_VERIFIED",
+              "RUNTIME_FIXED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "runtime_activation",
+          "loaded_surfaces",
+          "worktree_head"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "FIX_REPLAY_VERIFIED",
+              "RUNTIME_FIXED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "replay"
+        ],
+        "properties": {
+          "replay": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "result",
+              "exact_readback",
+              "first_state_beyond_failure"
+            ],
+            "properties": {
+              "result": {
+                "const": "PASS"
+              },
+              "exact_readback": {
+                "const": true
+              },
+              "first_state_beyond_failure": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "RUNTIME_FIXED"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "invalidated",
+          "regenerated",
+          "verification"
+        ],
+        "properties": {
+          "verification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "broader_regression",
+              "exact_readback",
+              "evidence_digest"
+            ],
+            "properties": {
+              "broader_regression": {
+                "const": "PASS"
+              },
+              "exact_readback": {
+                "const": "PASS"
+              },
+              "evidence_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
