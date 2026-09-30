@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "cr0-scope-freeze",
+  "run_id": "DWO-LOGIN-AUTH-R1",
+  "task_id": "SCRUM-780",
+  "node_id": "S3-CR0-G01-VALIDATION",
+  "generated_at": "2026-09-12T21:36:03+07:00",
+  "bindings": {
+    "gwc": {
+      "repository": "nhatnguyenquang1838-coder/gwc",
+      "base_ref": "main",
+      "base_sha": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+      "sha_source": "git ls-remote origin refs/heads/main"
+    },
+    "application": {
+      "repository": "nhatnguyenquang1838-coder/DW-SuperApps",
+      "base_ref": "main",
+      "base_sha": "5c9720e2230da64660716e07ce8453575545ae23",
+      "sha_source": "git ls-remote origin refs/heads/main"
+    }
+  },
+  "observed_cr0": {
+    "node_architect_file_count": 228,
+    "missing_wiring_files": [
+      "resolve_gate_node_route.py",
+      "live_runtime_bridge.py",
+      "semantic_agent_runtime.py"
+    ],
+    "implementation_status": "NOT_AUTHORIZED_IN_S3"
+  },
+  "current_write_envelope": {
+    "allow": [
+      ".gwc/tasks/SCRUM-780/**"
+    ],
+    "deny": [
+      "source implementation",
+      "tests outside task folder",
+      "git branch/commit/push/PR",
+      "Jira",
+      "Slack mutation",
+      "merge",
+      "deploy",
+      "G6"
+    ]
+  },
+  "proposed_g2_write_envelope": {
+    "candidate_paths": [
+      "resolve_gate_node_route.py",
+      "live_runtime_bridge.py",
+      "semantic_agent_runtime.py",
+      "tests/**"
+    ],
+    "requires_explicit_g2_authority": true
+  },
+  "red_plan": [
+    {
+      "id": "CR0-RED-001",
+      "assertion": "route resolution rejects missing or unbound gate-node mapping",
+      "status": "PLANNED_NOT_CREATED"
+    },
+    {
+      "id": "CR0-RED-002",
+      "assertion": "runtime bridge refuses execution without exact run/base/scope binding",
+      "status": "PLANNED_NOT_CREATED"
+    },
+    {
+      "id": "CR0-RED-003",
+      "assertion": "universal run state persists continuation without rewriting lineage",
+      "status": "PLANNED_NOT_CREATED"
+    }
+  ],
+  "g2_approval_candidate": {
+    "status": "CANDIDATE_ONLY",
+    "grants": [],
+    "entry_conditions": [
+      "Controller issues explicit G2 command",
+      "exact remote bases remain unchanged",
+      "scope hash and file envelope are re-read",
+      "RED tests are materialized and fail for the intended gap"
+    ],
+    "excluded": [
+      "G4_MERGE",
+      "G5_DEPLOY",
+      "G6_PRODUCTION"
+    ]
+  },
+  "scope_hash": "sha256:73023fedf2a36fbaa572ecf705e49b75353098ea5bc74c44150bd3854402dad3"
+}
