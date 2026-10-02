@@ -55,6 +55,8 @@ def _plan_and_state(m):
         run_id=RUN_ID, sequence=1, active_gate="UR.G1",
         execution_refs={}, future_contract_refs={},
     )
+    # UR.G1 transition already satisfied by the E53 cut-over receipt
+    run_state["gate_evidence"] = {"CUTOVER_RECEIPT": "E53"}
     return plan, run_state
 
 
@@ -349,6 +351,81 @@ def test_same_fingerprint_with_runnable_internal_work_cannot_stall_two_ticks():
     assert t2["noop_ok"] is False
     assert t2["liveness_defect"] is True
     assert t2["advice"] == "RUN_CONTROLLER_RECONCILER"
+
+
+# --- counter-only advance is fake progress — evidence gating ----------------
+
+def test_no_counter_only_advance_without_gate_evidence():
+    m = _m()
+    plan, _ = _plan_and_state(m)
+    # run_state already at UR.G2 but with NO verification evidence
+    rs = m.create_initial_run_state(
+        run_id=RUN_ID, sequence=2, active_gate="UR.G2",
+        execution_refs={}, future_contract_refs={},
+    )
+    result = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2,
+        plan=plan, run_state=rs,
+        history_controller={"seq": "C91", "status": "NEEDS_EXACT_HITL"},
+        executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY",
+        transport_available=False,
+        actor=f"dwa/default:{RUN_ID}",
+    )
+    assert result["runtime_progressed"] is False
+    assert result["typed_next"] == "AWAIT_GATE_EVIDENCE"
+    assert result["gate_advanced"] is False
+    assert result["evidence_gap"] == ["VERIFICATION_RECEIPT"]
+    # sequence must NOT move without evidence
+    assert result["successor_run_state"]["sequence"] == 2
+    assert result["successor_run_state"]["active_gate"] == "UR.G2"
+
+
+def test_gate_advance_requires_verification_receipt():
+    m = _m()
+    plan, _ = _plan_and_state(m)
+    rs = m.create_initial_run_state(
+        run_id=RUN_ID, sequence=2, active_gate="UR.G2",
+        execution_refs={}, future_contract_refs={},
+    )
+    rs["gate_evidence"] = {"VERIFICATION_RECEIPT": "VR-001"}
+    result = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2,
+        plan=plan, run_state=rs,
+        history_controller={"seq": "C91"},
+        executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY",
+        transport_available=False,
+        actor=f"dwa/default:{RUN_ID}",
+    )
+    assert result["runtime_progressed"] is True
+    assert result["gate_advanced"] is True
+    assert result["successor_run_state"]["sequence"] == 3
+    assert result["successor_run_state"]["active_gate"] == "UR.G3"
+
+
+def test_g3_to_g4_integrate_requires_integration_receipt():
+    m = _m()
+    plan, _ = _plan_and_state(m)
+    rs = m.create_initial_run_state(
+        run_id=RUN_ID, sequence=3, active_gate="UR.G3",
+        execution_refs={}, future_contract_refs={},
+    )
+    rs["gate_evidence"] = {}
+    result = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2,
+        plan=plan, run_state=rs,
+        history_controller={"seq": "C91"},
+        executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY",
+        transport_available=False,
+        actor=f"dwa/default:{RUN_ID}",
+    )
+    assert result["typed_next"] == "AWAIT_GATE_EVIDENCE"
+    assert "INTEGRATION_RECEIPT" in result["evidence_gap"]
 
 
 # --- no-readonly pingpong / no analyzer / no human reapproval ----------------

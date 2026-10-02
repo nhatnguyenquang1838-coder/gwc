@@ -171,17 +171,121 @@ def reconcile_controller_continuation(
 
     # Controller-owned internal transition: next_owner == CONTROLLER means
     # the transition stays inside the runtime; no transport call.
+    # Gate advancement is EVIDENCE-GATED: UR.G2 -> UR.G3 requires a
+    # verification receipt; UR.G3 -> UR.G4(u) requires an integration
+    # receipt.  Without the required evidence the sequence does NOT advance
+    # and the typed NEXT is AWAIT_GATE_EVIDENCE — counter-only advancement
+    # would be fake progress.
+    _GATE_DEPENDENCIES = {
+        "UR.G1": ("CUTOVER_RECEIPT",),
+        "UR.G2": ("VERIFICATION_RECEIPT",),
+        "UR.G3": ("INTEGRATION_RECEIPT",),
+        "UR.G4": ("ACCEPTANCE_RECEIPT",),
+        "UR.G5": ("TARGET_VALIDATION_RECEIPT",),
+        "UR.G6": (),
+    }
+    active_gate = str(run_state.get("active_gate") or "UR.G0")
+    required = _GATE_DEPENDENCIES.get(active_gate, ())
+    evidence = _as_cursor(run_state.get("gate_evidence") or {})
+    have_evidence = all(str(evidence.get(k, "")).strip() for k in required)
+
+    if active_gate in ("UR.G4", "UR.G5", "UR.G6"):
+        # terminal/late lanes: maintain state, no counter-only advance
+        sequence = int(run_state.get("sequence") or 0)
+        successor = {
+            "schema_id": "gwc.universal-run.run-state",
+            "run_id": run_state.get("run_id"),
+            "sequence": sequence,
+            "active_gate": active_gate,
+            "predecessor_sequence": run_state.get("sequence"),
+            "execution_refs": dict(run_state.get("execution_refs") or {}),
+            "future_contract_refs": dict(run_state.get("future_contract_refs") or {}),
+            "runtime_epoch": runtime_epoch,
+            "consumed_receipts": list(consumed),
+            "gate_evidence": dict(evidence),
+            "first_state_beyond_failure": FIRST_STATE_BEYOND_FAILURE,
+        }
+        successor["state_digest"] = _digest(successor)
+        return {
+            "runtime_epoch": runtime_epoch,
+            "runtime_progressed": False,
+            "control_loop_continue": True,
+            "next_owner": "CONTROLLER",
+            "typed_next": "AWAIT_GATE_EVIDENCE",
+            "executor_dispatch": False,
+            "controller_progression": True,
+            "needs_human": needs_human,
+            "requires_reapproval": requires_reapproval,
+            "analyzer_required": False,
+            "c91_classification": c91_classification,
+            "consumed_receipts": consumed,
+            "new_receipts_consumed": new_count,
+            "first_state_beyond_failure": successor["first_state_beyond_failure"],
+            "successor_run_state": successor,
+            "a2a_call_count": 0,
+            "transport_profile": str(transport_profile),
+            "not_polled_by_contract": bool(not_polled_by_contract),
+            "actor_owner": str(actor) or "CONTROLLER",
+            "evidence_gap": list(required),
+            "gate_advanced": False,
+        }
+
+    if not have_evidence:
+        sequence = int(run_state.get("sequence") or 0)
+        successor = {
+            "schema_id": "gwc.universal-run.run-state",
+            "run_id": run_state.get("run_id"),
+            "sequence": sequence,
+            "active_gate": active_gate,
+            "predecessor_sequence": run_state.get("sequence"),
+            "execution_refs": dict(run_state.get("execution_refs") or {}),
+            "future_contract_refs": dict(run_state.get("future_contract_refs") or {}),
+            "runtime_epoch": runtime_epoch,
+            "consumed_receipts": list(consumed),
+            "gate_evidence": dict(evidence),
+            "first_state_beyond_failure": FIRST_STATE_BEYOND_FAILURE,
+        }
+        successor["state_digest"] = _digest(successor)
+        return {
+            "runtime_epoch": runtime_epoch,
+            "runtime_progressed": False,
+            "control_loop_continue": True,
+            "next_owner": "CONTROLLER",
+            "typed_next": "AWAIT_GATE_EVIDENCE",
+            "executor_dispatch": False,
+            "controller_progression": True,
+            "needs_human": needs_human,
+            "requires_reapproval": requires_reapproval,
+            "analyzer_required": False,
+            "c91_classification": c91_classification,
+            "consumed_receipts": consumed,
+            "new_receipts_consumed": new_count,
+            "first_state_beyond_failure": successor["first_state_beyond_failure"],
+            "successor_run_state": successor,
+            "a2a_call_count": 0,
+            "transport_profile": str(transport_profile),
+            "not_polled_by_contract": bool(not_polled_by_contract),
+            "actor_owner": str(actor) or "CONTROLLER",
+            "evidence_gap": list(required),
+            "gate_advanced": False,
+        }
+
+    # evidence satisfied: sequence advances once AND gate moves one step
+    gate_order = ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]
+    idx = gate_order.index(active_gate) if active_gate in gate_order else 0
+    next_gate = gate_order[idx + 1] if idx + 1 < len(gate_order) else active_gate
     sequence = int(run_state.get("sequence") or 0) + 1
     successor = {
         "schema_id": "gwc.universal-run.run-state",
         "run_id": run_state.get("run_id"),
         "sequence": sequence,
-        "active_gate": "UR.G2",  # next valid Universal state after UR.G1
+        "active_gate": next_gate,
         "predecessor_sequence": run_state.get("sequence"),
         "execution_refs": dict(run_state.get("execution_refs") or {}),
         "future_contract_refs": dict(run_state.get("future_contract_refs") or {}),
         "runtime_epoch": runtime_epoch,
         "consumed_receipts": list(consumed),
+        "gate_evidence": dict(evidence),
         "first_state_beyond_failure": FIRST_STATE_BEYOND_FAILURE,
     }
     successor["state_digest"] = _digest(successor)
@@ -206,6 +310,8 @@ def reconcile_controller_continuation(
         "transport_profile": str(transport_profile),
         "not_polled_by_contract": bool(not_polled_by_contract),
         "actor_owner": str(actor) or "CONTROLLER",
+        "evidence_gap": [],
+        "gate_advanced": True,
     }
 
 
