@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-closure-receipt.schema.json",
+  "title": "Q0 ClosureReceipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "run_id", "gate", "closure_outcome", "acceptance_receipt_ref", "closed_at", "receipt_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"}, "artifact_type": {"const": "closure-receipt"},
+    "run_id": {"type": "string", "minLength": 1}, "gate": {"const": "UR.G6"},
+    "closure_outcome": {"const": "ACCEPTED"},
+    "acceptance_receipt_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "closed_at": {"type": "string", "format": "date-time"},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

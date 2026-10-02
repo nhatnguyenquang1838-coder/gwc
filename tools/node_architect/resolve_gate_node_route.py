@@ -10,8 +10,13 @@ from pathlib import Path
 import sys
 from typing import Any, Mapping
 
+from tools.node_architect.q0_qualification import (
+    Q0_WORKFLOW_MODE, q0_qualification_profile,
+    resolve_q0_qualification_node, validate_q0_route_context,
+)
+
 MATURITY = {"experimental": 0, "candidate": 0.5, "pilot": 1, "stable": 2}
-SUPPORTED_MODES = {"normal", "fastlane", "e2e", "hotfix", "rescue"}
+SUPPORTED_MODES = {"normal", "fastlane", "e2e", "hotfix", "rescue", "q0_live_qualification"}
 FAIL_CODES = {
     "NODE_CONTEXT_NOT_LOADED", "NODE_ROUTE_MISSING", "NODE_ROUTE_AMBIGUOUS",
     "NODE_CONTRACT_MISSING", "NODE_CONTRACT_INCOMPLETE",
@@ -286,6 +291,9 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
     profile_id = str(profile.get("profile_id", ""))
     profile_revision = str(profile.get("revision", ""))
     graph_revision = _graph_revision(graph_registry)
+    context_payload = context.get("context", {})
+    if not isinstance(context_payload, Mapping):
+        context_payload = {}
     common = dict(task_id=task_id, gate=gate, requested_action=action, mode=mode,
                   profile_id=profile_id, profile_revision=profile_revision,
                   graph_revision=graph_revision)
@@ -309,6 +317,34 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
     if str(profile.get("bound_node_registry_revision")) != _node_registry_revision(node_registry):
         return _blocked(reasons=["PROFILE_REVISION_DRIFT"], **common)
 
+    if mode == Q0_WORKFLOW_MODE:
+        q0_context = dict(context)
+        q0_context.update(dict(context_payload) if isinstance(context_payload, Mapping) else {})
+        q0_context.update({"workflow_mode": mode, "runtime_epoch": runtime_epoch,
+                           "task_id": task_id, "gate": gate, "requested_action": action})
+        q0_context.setdefault("q0_profile", q0_qualification_profile())
+        selected = resolve_q0_qualification_node(q0_context)
+        if not selected.get("permitted"):
+            return _blocked(reasons=[str(selected.get("reason_code"))], **common)
+        payload = _base_payload(
+            **common, route_id=selected["route_id"], current_node=selected["current_node"],
+            implementation={"kind":"python", "ref":selected["implementation_ref"]},
+            required_context=["runtime_epoch", "run_id", "q0_profile", "effect_class"],
+            loaded_context=["runtime_epoch", "run_id", "q0_profile", "effect_class"],
+            instruction_ref=selected["node_instruction_ref"],
+        )
+        payload.update({
+            "outcome": "ROUTE_SELECTED", "reason_code": "Q0_QUALIFICATION_NODE_SELECTED",
+            "reason_codes": ["Q0_QUALIFICATION_NODE_SELECTED"],
+            "instruction_digest": selected["profile_digest"],
+            "instruction_validated": True, "evidence_contract_valid": bool(selected.get("evidence_contract_valid")),
+            "log_contract_valid": bool(selected.get("log_contract_valid")), "next_route_contract_valid": True,
+            "mode_runtime_required": True, "next_node": None,
+            "next_action": selected["next_action"], "next_gate": None,
+        })
+        payload["decision_digest"] = _digest(payload)
+        return payload
+
     routes = [r for r in profile.get("routes", []) if r.get("gate") == gate and r.get("requested_action") == action]
     if not routes:
         return _blocked(reasons=["NODE_ROUTE_MISSING"], **common)
@@ -330,21 +366,33 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
     if len(loaded_context) != len(required_context):
         return _blocked(reasons=["NODE_CONTEXT_NOT_LOADED"], **route_common)
 
-    envelope = context_payload.get("g2_envelope", {})
-    approval = context_payload.get("approval_receipt", {})
-    claim = context_payload.get("task_claim", {})
-    envelope_invalid = not isinstance(envelope, Mapping) or any([
-        str(envelope.get("task_id", "")) != task_id,
-        str(envelope.get("authority_gate", "")) != gate,
-        str(envelope.get("repository", "")) != str(context.get("repository", "")),
-        str(envelope.get("base_sha", "")) != str(context.get("base_sha", "")),
-        str(envelope.get("working_branch", "")) != str(context.get("working_branch", "")),
-        str(envelope.get("scope_hash", "")) != str(context.get("scope_hash", "")),
-    ])
-    approval_invalid = not isinstance(approval, Mapping) or approval.get("status") not in {"VALID", "APPROVED", "PASS"}
-    claim_invalid = not isinstance(claim, Mapping) or not claim.get("agent")
-    if envelope_invalid or approval_invalid or claim_invalid:
-        return _blocked(reasons=["GATE_NODE_BINDING_MISMATCH"], **route_common)
+    if mode == Q0_WORKFLOW_MODE:
+        # Q0 is a Universal qualification profile, not the legacy delivery flow.
+        # Validate its run/profile identity and check any requested effect at
+        # its own boundary; never require a legacy G2 envelope/token for the
+        # qualification lifecycle itself.
+        q0_context = dict(context)
+        q0_context.update(dict(context_payload))
+        q0_context.update({"workflow_mode": mode, "runtime_epoch": runtime_epoch, "task_id": task_id, "gate": gate, "requested_action": action})
+        q0_route = validate_q0_route_context(q0_context)
+        if not q0_route.get("permitted"):
+            return _blocked(reasons=[str(q0_route.get("reason_code"))], **route_common)
+    else:
+        envelope = context_payload.get("g2_envelope", {})
+        approval = context_payload.get("approval_receipt", {})
+        claim = context_payload.get("task_claim", {})
+        envelope_invalid = not isinstance(envelope, Mapping) or any([
+            str(envelope.get("task_id", "")) != task_id,
+            str(envelope.get("authority_gate", "")) != gate,
+            str(envelope.get("repository", "")) != str(context.get("repository", "")),
+            str(envelope.get("base_sha", "")) != str(context.get("base_sha", "")),
+            str(envelope.get("working_branch", "")) != str(context.get("working_branch", "")),
+            str(envelope.get("scope_hash", "")) != str(context.get("scope_hash", "")),
+        ])
+        approval_invalid = not isinstance(approval, Mapping) or approval.get("status") not in {"VALID", "APPROVED", "PASS"}
+        claim_invalid = not isinstance(claim, Mapping) or not claim.get("agent")
+        if envelope_invalid or approval_invalid or claim_invalid:
+            return _blocked(reasons=["GATE_NODE_BINDING_MISMATCH"], **route_common)
 
     nodes = _node_map(node_registry)
     node = nodes.get(node_id)

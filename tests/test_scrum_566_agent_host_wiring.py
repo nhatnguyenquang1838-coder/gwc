@@ -196,6 +196,34 @@ def _host_kwargs(tmp_path: Path, provider, *, mode="authoritative") -> dict:
     }
 
 
+def test_q0_event_uses_profile_adapter_and_never_compiles_legacy_registry(tmp_path: Path):
+    from unittest.mock import patch
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    from tools.node_architect.q0_qualification import q0_qualification_profile
+    provider = RegisteredReasoningProvider()
+    kwargs = _host_kwargs(tmp_path, provider, mode="shadow_readonly")
+    kwargs.update({"gate":"UR.G2", "requested_action":"q0_execute_probe",
+                   "workflow_mode":"q0_live_qualification", "implementation_registry":None})
+    kwargs["canonical_state"].update({"task_id":"SCRUM-781", "branch":"fix/SCRUM-781-q0-canonical"})
+    kwargs["input_payload"] = {"run_id":"scrum781-q0-20260920T074727Z", "q0_profile":q0_qualification_profile(), "effect_class":"read_only"}
+    kwargs["route_context"] = {"task_id":"SCRUM-781", "requested_action":"q0_execute_probe",
+                                "run_id":"scrum781-q0-20260920T074727Z", "q0_profile":q0_qualification_profile(),
+                                "effect_class":"read_only"}
+    route = _route()
+    route.update({"current_node":"q0.qualification-campaign", "gate":"UR.G2",
+        "requested_action":"q0_execute_probe", "mode":"q0_live_qualification",
+        "workflow_mode":"q0_live_qualification",
+        "node_instruction_ref":"core/node-architect/node-instructions/q0/qualification-campaign.node-instruction.yaml",
+        "instruction_validated":True, "evidence_contract_valid":True, "log_contract_valid":True,
+        "next_route_contract_valid":True, "mode_runtime_required":True})
+    kwargs["route_resolver"] = lambda **_: route
+    with patch.object(host, "_q0_profile_implementation_registry", return_value={"status":"FAIL", "bindings":[], "errors":["test"]}) as q0_binding, \
+         patch.object(host, "compile_semantic_implementation_registry", side_effect=AssertionError("legacy registry must not run")):
+        result = host.run_agent_runtime_event(**kwargs)
+    assert result["reason_code"] == "AGENT_SEMANTIC_IMPLEMENTATION_REGISTRY_INVALID"
+    q0_binding.assert_called_once()
+
+
 def test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_next(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
     provider = RegisteredReasoningProvider()

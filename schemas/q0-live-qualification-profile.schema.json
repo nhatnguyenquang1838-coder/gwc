@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-live-qualification-profile.schema.json",
+  "title": "Q0 Live Qualification Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile_id", "revision", "workflow_mode", "runtime_epoch", "runtime_profile", "qualification_campaign", "mandatory_qualification_entries", "qualification_nodes", "completion_evidence", "real_workload", "defect_route", "legacy_fallback", "legacy_effect_gates_define_lifecycle", "effect_authority_is_orthogonal", "required_log_fields", "profile_digest"],
+  "properties": {
+    "profile_id": {"const": "gwc.q0-live-qualification"},
+    "revision": {"const": "1.0"},
+    "workflow_mode": {"const": "q0_live_qualification"},
+    "runtime_epoch": {"const": "UNIVERSAL_V2_DEVELOPMENT"},
+    "runtime_profile": {"type": "object", "const": {"id": "gwc.universal-run", "version": 1}},
+    "qualification_campaign": {"const": true},
+    "mandatory_qualification_entries": {"const": ["fresh_boot", "default_route", "runtime_plan", "node_allocation", "node_architect_seam", "effect_authority", "exact_readback", "typed_continuation", "restart_recovery", "self_fix_replay", "stale_state_fail_closed", "deterministic_replay", "recursive_plan_dag_complete"]},
+    "qualification_nodes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"],
+      "properties": {
+        "UR.G0": {"$ref": "#/$defs/node_g0"}, "UR.G1": {"$ref": "#/$defs/node_g1"},
+        "UR.G2": {"$ref": "#/$defs/node_g2"}, "UR.G3": {"$ref": "#/$defs/node_g3"},
+        "UR.G4": {"$ref": "#/$defs/node_g4"}, "UR.G5": {"$ref": "#/$defs/node_g5"},
+        "UR.G6": {"$ref": "#/$defs/node_g6"}
+      }
+    },
+    "completion_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"],
+      "properties": {
+        "UR.G0": {"const": ["UNDERSTANDING_RECEIPT"]},
+        "UR.G1": {"const": ["PLAN_RECEIPT"]},
+        "UR.G2": {"const": ["EXECUTION_RECEIPT"]},
+        "UR.G3": {"const": ["VERIFICATION_RECEIPT"]},
+        "UR.G4": {"const": ["INTEGRATION_RECEIPT", "integration_outcome"]},
+        "UR.G5": {"const": ["TARGET_VALIDATION_RECEIPT"]},
+        "UR.G6": {"const": ["Q0_ACCEPTANCE_RECEIPT", "CLOSURE_RECEIPT", "HANDOFF_RECEIPT"]}
+      }
+    },
+    "real_workload": {"const": "LOGIN_R00_PLUS"},
+    "defect_route": {"const": "GWC_RUNTIME_DEFECT_SELF_REMEDIATION"},
+    "legacy_fallback": {"const": false},
+    "legacy_effect_gates_define_lifecycle": {"const": false},
+    "effect_authority_is_orthogonal": {"const": true},
+    "required_log_fields": {"const": ["run_id", "runtime_epoch", "workflow_mode", "gate", "requested_action", "typed_next", "evidence_refs", "decision_digest"]},
+    "profile_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "node": {"type": "object", "additionalProperties": false, "required": ["node_id", "action"], "properties": {"node_id": {"type": "string", "minLength": 1}, "action": {"type": "string", "minLength": 1}}},
+    "node_g0": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_understand"}}}]},
+    "node_g1": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_plan_decompose"}}}]},
+    "node_g2": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_execute_probe"}}}]},
+    "node_g3": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_verify_evidence"}}}]},
+    "node_g4": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_integrate_candidate"}}}]},
+    "node_g5": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_validate_in_target"}}}]},
+    "node_g6": {"allOf": [{"$ref": "#/$defs/node"}, {"properties": {"node_id": {"const": "q0.qualification-campaign"}, "action": {"const": "q0_accept_and_handoff"}}}]}
+  }
+}

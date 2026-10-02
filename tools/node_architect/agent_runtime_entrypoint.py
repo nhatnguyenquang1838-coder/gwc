@@ -94,6 +94,45 @@ def _binding_for(registry: Mapping[str, Any], node_id: str) -> Mapping[str, Any]
     return matches[0] if len(matches) == 1 else None
 
 
+def _q0_profile_implementation_registry(route: Mapping[str, Any], *, root: Path) -> dict[str, Any]:
+    """Bind the Q0 campaign profile into the Agent Host's normal dispatch path."""
+    from .q0_qualification import Q0_WORKFLOW_MODE
+    from .semantic_implementation_registry import _binding_payload
+    from .validate_node_instruction import load_data, validate_instruction
+
+    descriptor_ref = "core/node-architect/q0/qualification-campaign.node.json"
+    instruction_ref = "core/node-architect/node-instructions/q0/qualification-campaign.node-instruction.yaml"
+    try:
+        descriptor = load_data(root / descriptor_ref)
+        card = load_data(root / instruction_ref)
+        schema = load_data(root / "schemas/node-architect/node-instruction.schema.json")
+        if route.get("node_instruction_ref") != instruction_ref:
+            return {"status": "FAIL", "bindings": [], "errors": ["Q0_INSTRUCTION_REF_MISMATCH"]}
+        node = {
+            "id": "q0.qualification-campaign", "version": "1.0.0", "family": "q0",
+            "effect_class": "read_only", "authority_class": "workflow",
+            "provenance": {"source_path": descriptor_ref},
+            "suspension": {"suspendable": True, "resume_metadata": ["run_id", "candidate_sha"]},
+        }
+        report = validate_instruction(
+            card=card, schema=schema, descriptor=descriptor, registry_node=node,
+            route=route, active_gate=str(route.get("gate", "")), mode=Q0_WORKFLOW_MODE,
+        )
+        if not report.valid:
+            return {"status": "FAIL", "bindings": [], "errors": list(report.reason_codes)}
+        implementation_ref = str((route.get("implementation") or {}).get("ref", ""))
+        binding = _binding_payload(
+            node=node, registry_revision=str(route.get("profile_revision", "q0-profile-1.0")),
+            card=card, implementation_kind="q0_profile_adapter",
+            implementation_ref=implementation_ref, semantic_source_kind="Q0_PROFILE_ADAPTER",
+            descriptor_ref=descriptor_ref,
+        )
+        return {"status": "PASS", "bindings": [binding], "errors": [],
+                "profile_digest": str(route.get("instruction_digest", ""))}
+    except Exception as exc:
+        return {"status": "FAIL", "bindings": [], "errors": [f"Q0_PROFILE_BINDING_INVALID:{type(exc).__name__}"]}
+
+
 def _route_context(
     *,
     canonical_state: Mapping[str, Any],
@@ -443,9 +482,13 @@ def run_agent_runtime_event(
     if not node_id:
         return _blocked("AGENT_ROUTE_NODE_MISSING")
 
-    registry = implementation_registry
-    if registry is None:
-        registry = compile_semantic_implementation_registry(node_registry, root=repo_root)
+    from .q0_qualification import Q0_WORKFLOW_MODE
+    if workflow_mode == Q0_WORKFLOW_MODE:
+        registry = _q0_profile_implementation_registry(route, root=repo_root)
+    else:
+        registry = implementation_registry
+        if registry is None:
+            registry = compile_semantic_implementation_registry(node_registry, root=repo_root)
     if not isinstance(registry, Mapping) or registry.get("status") != "PASS":
         return _blocked("AGENT_SEMANTIC_IMPLEMENTATION_REGISTRY_INVALID")
     binding = _binding_for(registry, node_id)

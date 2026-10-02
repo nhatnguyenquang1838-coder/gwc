@@ -200,3 +200,47 @@ that lane only:
   (protected `main`, merge/deploy/production/secrets/migrations/destructive
   operations) remain human authority.
 
+## Universal Q0 campaign lifecycle and result contracts
+
+`q0_live_qualification` is a workflow mode/profile of the Universal Runtime +
+Node Architect, not a separate runtime or a real product workload. Its parent
+campaign uses the namespaced Universal lifecycle; those gates are not aliases
+for legacy repository/effect gates:
+
+| Universal gate | Qualification completion evidence |
+|---|---|
+| `UR.G0 UNDERSTAND` | exact run/target/source context evidence |
+| `UR.G1 PLAN / DECOMPOSE` | immutable qualification plan/profile evidence |
+| `UR.G2 EXECUTE` | `EXECUTION_RECEIPT` or equivalent execution evidence |
+| `UR.G3 VERIFY` | `VERIFICATION_RECEIPT` |
+| `UR.G4 INTEGRATE` | `INTEGRATION_RECEIPT`, or valid explicit `IN_PLACE`, `NO_TRANSFER_REQUIRED`, or domain-defined outcome |
+| `UR.G5 VALIDATE IN TARGET` | `TARGET_VALIDATION_RECEIPT` bound to the integrated target identity |
+| `UR.G6 ACCEPT & HANDOFF` | `Q0_ACCEPTANCE_RECEIPT` + `CLOSURE_RECEIPT` + `HANDOFF_RECEIPT` |
+
+The Universal kernel (`universal_run_kernel.py` / `universal_run_lifecycle.py`)
+owns legal lifecycle edges. Continuation must not maintain a second gate-order
+state machine or advance by sequence increments alone. Missing evidence leaves
+the same gate/cursor and emits a typed evidence wait.
+
+Q0 certification is distinct from lifecycle progression and effect authority.
+A `Q0CertificationReceipt` may certify only a complete mandatory qualification
+matrix with no unresolved defects, exact candidate/loaded-source SHA equality,
+load proof bound to activation + runtime session/process + loaded profile digest
+and per-module/instruction SHA-256 identities, passing original-incident replay
+with exact readback and forward progress, passing broader regression, and a
+complete recursive plan/work DAG. Success is `CAMPAIGN_READY_RUNTIME / L3`
+bound to `certified_q0_sha`.
+
+Formal Q0 acceptance occurs at `UR.G6`, not `UR.G4`. A native
+`Q0AcceptanceRequest` / `Q0AcceptanceDecisionReceipt` binds the exact certified
+SHA, certification receipt, matrix digest, and `LOGIN_R00_PLUS` handoff target.
+`Nhat` is the human decision authority; `@approver` may only transport/capture
+the decision and is optional. Q0 acceptance does not authorize PR, merge,
+deployment, production configuration/data, or any other effect. Legacy
+approval-token artifacts remain isolated to their supported effect gates and
+cannot satisfy Universal lifecycle evidence.
+
+Only the conjunction of `CAMPAIGN_READY_RUNTIME / L3`, exact
+`certified_q0_sha`, and `Q0_ACCEPTED_AUTONOMOUS_HANDOFF` permits the real Login
+R00+ workload to start. Q0 qualification alone never starts that workload.
+

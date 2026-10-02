@@ -101,6 +101,32 @@ class TestGateNodeRouteResolution(unittest.TestCase):
         self.assertTrue(result["mode_runtime_required"])
         self.assertTrue(result["instruction_digest"].startswith("sha256:"))
 
+    def test_q0_profile_routes_universal_gate_without_legacy_approval_envelope(self):
+        from tools.node_architect.q0_qualification import q0_qualification_profile
+        ctx = context("q0_execute_probe", mode="q0_live_qualification")
+        ctx.update({"task_id":"SCRUM-781", "gate":"UR.G2", "runtime_epoch":"UNIVERSAL_V2_DEVELOPMENT",
+                    "run_id":"scrum781-q0-20260920T074727Z", "q0_profile":q0_qualification_profile(),
+                    "effect_class":"read_only"})
+        ctx["context"] = {}
+        result = self.resolve(ctx)
+        self.assertEqual(result["outcome"], "ROUTE_SELECTED")
+        self.assertEqual(result["current_node"], "q0.qualification-campaign")
+        self.assertEqual(result["workflow_mode"], "q0_live_qualification")
+        self.assertEqual(result["gate"], "UR.G2")
+        self.assertFalse(result["authority_granted"])
+        self.assertTrue(result["instruction_validated"])
+
+    def test_q0_branch_write_still_requires_orthogonal_effect_authority(self):
+        from tools.node_architect.q0_qualification import q0_qualification_profile
+        ctx = context("q0_execute_probe", mode="q0_live_qualification")
+        ctx.update({"task_id":"SCRUM-781", "gate":"UR.G2", "runtime_epoch":"UNIVERSAL_V2_DEVELOPMENT",
+                    "run_id":"scrum781-q0-20260920T074727Z", "q0_profile":q0_qualification_profile(),
+                    "effect_class":"branch_local_write"})
+        ctx["context"] = {}
+        result = self.resolve(ctx)
+        self.assertEqual(result["outcome"], "BLOCKED")
+        self.assertIn("Q0_EFFECT_AUTHORITY_REQUIRED", result["reason_codes"])
+
     def test_full_g2_repository_write_vertical_slice(self):
         first = self.resolve(context("resolve_execution_node"))
         self.assertEqual(first["current_node"], "gate_authority.gate-state-resolution")

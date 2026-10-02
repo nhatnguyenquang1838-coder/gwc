@@ -23,7 +23,7 @@
     "task_id": {"type": "string", "minLength": 1},
     "gate": {"type": "string", "minLength": 1},
     "requested_action": {"type": "string", "minLength": 1},
-    "workflow_mode": {"enum": ["normal", "fastlane", "e2e", "hotfix", "rescue"]},
+    "workflow_mode": {"enum": ["normal", "fastlane", "e2e", "hotfix", "rescue", "q0_live_qualification"]},
     "profile_id": {"type": "string"},
     "profile_revision": {"type": "string"},
     "graph_revision": {"type": "string"},

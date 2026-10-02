@@ -56,7 +56,7 @@ def _plan_and_state(m):
         execution_refs={}, future_contract_refs={},
     )
     # UR.G1 transition already satisfied by the E53 cut-over receipt
-    run_state["gate_evidence"] = {"CUTOVER_RECEIPT": "E53"}
+    run_state["gate_evidence"] = {"PLAN_RECEIPT": "P1", "CUTOVER_RECEIPT": "E53"}
     return plan, run_state
 
 
@@ -358,7 +358,7 @@ def test_same_fingerprint_with_runnable_internal_work_cannot_stall_two_ticks():
 def test_no_counter_only_advance_without_gate_evidence():
     m = _m()
     plan, _ = _plan_and_state(m)
-    # run_state already at UR.G2 but with NO verification evidence
+    # run_state already at UR.G2 but with NO execution evidence
     rs = m.create_initial_run_state(
         run_id=RUN_ID, sequence=2, active_gate="UR.G2",
         execution_refs={}, future_contract_refs={},
@@ -376,7 +376,7 @@ def test_no_counter_only_advance_without_gate_evidence():
     assert result["runtime_progressed"] is False
     assert result["typed_next"] == "AWAIT_GATE_EVIDENCE"
     assert result["gate_advanced"] is False
-    assert result["evidence_gap"] == ["VERIFICATION_RECEIPT"]
+    assert result["evidence_gap"] == ["EXECUTION_RECEIPT"]
     # sequence must NOT move without evidence
     assert result["successor_run_state"]["sequence"] == 2
     assert result["successor_run_state"]["active_gate"] == "UR.G2"
@@ -386,7 +386,7 @@ def test_gate_advance_requires_verification_receipt():
     m = _m()
     plan, _ = _plan_and_state(m)
     rs = m.create_initial_run_state(
-        run_id=RUN_ID, sequence=2, active_gate="UR.G2",
+        run_id=RUN_ID, sequence=3, active_gate="UR.G3",
         execution_refs={}, future_contract_refs={},
     )
     rs["gate_evidence"] = {"VERIFICATION_RECEIPT": "VR-001"}
@@ -402,15 +402,15 @@ def test_gate_advance_requires_verification_receipt():
     )
     assert result["runtime_progressed"] is True
     assert result["gate_advanced"] is True
-    assert result["successor_run_state"]["sequence"] == 3
-    assert result["successor_run_state"]["active_gate"] == "UR.G3"
+    assert result["successor_run_state"]["sequence"] == 4
+    assert result["successor_run_state"]["active_gate"] == "UR.G4"
 
 
-def test_g3_to_g4_integrate_requires_integration_receipt():
+def test_ur_g4_integrate_requires_integration_receipt():
     m = _m()
     plan, _ = _plan_and_state(m)
     rs = m.create_initial_run_state(
-        run_id=RUN_ID, sequence=3, active_gate="UR.G3",
+        run_id=RUN_ID, sequence=4, active_gate="UR.G4",
         execution_refs={}, future_contract_refs={},
     )
     rs["gate_evidence"] = {}
@@ -426,6 +426,71 @@ def test_g3_to_g4_integrate_requires_integration_receipt():
     )
     assert result["typed_next"] == "AWAIT_GATE_EVIDENCE"
     assert "INTEGRATION_RECEIPT" in result["evidence_gap"]
+
+
+def test_ur_g4_integrates_then_advances_to_ur_g5_without_acceptance_receipt():
+    m = _m()
+    plan, rs = _plan_and_state(m)
+    rs.update({"sequence": 6, "active_gate": "UR.G4", "gate_evidence": {"INTEGRATION_RECEIPT": "IR-4"}})
+    result = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2, plan=plan, run_state=rs,
+        history_controller={"seq":"C91"}, executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY", transport_available=False,
+    )
+    assert result["successor_run_state"]["active_gate"] == "UR.G5"
+    assert result["successor_run_state"]["sequence"] == 7
+
+
+def test_ur_g5_requires_target_validation_before_g6():
+    m = _m()
+    plan, rs = _plan_and_state(m)
+    rs.update({"sequence": 7, "active_gate": "UR.G5", "gate_evidence": {}})
+    held = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2, plan=plan, run_state=rs,
+        history_controller={"seq":"C91"}, executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY", transport_available=False,
+    )
+    assert held["typed_next"] == "AWAIT_GATE_EVIDENCE"
+    assert held["evidence_gap"] == ["TARGET_VALIDATION_RECEIPT"]
+    rs["gate_evidence"] = {"TARGET_VALIDATION_RECEIPT":"TV-5"}
+    advanced = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2, plan=plan, run_state=rs,
+        history_controller={"seq":"C91"}, executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY", transport_available=False,
+    )
+    assert advanced["successor_run_state"]["active_gate"] == "UR.G6"
+
+
+def test_g6_acceptance_is_terminal_only_with_q0_closure_and_handoff():
+    import tools.node_architect.q0_qualification as q0
+    m = _m()
+    plan, rs = _plan_and_state(m)
+    run_id = RUN_ID
+    sha = "a" * 40
+    acceptance = q0._sealed({"schema_version":"1.0", "artifact_type":"q0-acceptance-decision-receipt",
+        "run_id":run_id, "task_id":"SCRUM-781", "certified_q0_sha":sha,
+        "q0_certification_receipt_ref":"sha256:"+"b"*64, "qualification_matrix_digest":"sha256:"+"c"*64,
+        "target_handoff":"LOGIN_R00_PLUS", "decision":"ACCEPT",
+        "decision_authority":{"type":"human","id":"NHAT"}, "decided_by":{"type":"human","id":"NHAT"},
+        "captured_via":{"type":"direct_chat","id":"default"}, "decided_at":"2026-10-02T14:02:00Z",
+        "request_digest":"sha256:"+"d"*64, "consumed":True, "effect_authority_granted":False})
+    closure = q0._sealed({"schema_version":"1.0", "artifact_type":"closure-receipt", "run_id":run_id,
+        "gate":"UR.G6", "closure_outcome":"ACCEPTED", "acceptance_receipt_ref":acceptance["receipt_digest"], "closed_at":"2026-10-02T14:03:00Z"})
+    handoff = q0._sealed({"schema_version":"1.0", "artifact_type":"handoff-receipt", "run_id":run_id,
+        "target":"LOGIN_R00_PLUS", "certified_q0_sha":sha, "acceptance_receipt_ref":acceptance["receipt_digest"],
+        "closure_receipt_ref":closure["receipt_digest"], "status":"Q0_ACCEPTED_AUTONOMOUS_HANDOFF", "created_at":"2026-10-02T14:03:00Z"})
+    rs.update({"sequence": 8, "active_gate": "UR.G6", "gate_evidence": {"Q0_ACCEPTANCE_RECEIPT":acceptance, "CLOSURE_RECEIPT":closure, "HANDOFF_RECEIPT":handoff}})
+    result = m.reconcile_controller_continuation(
+        runtime_epoch=UNIVERSAL_V2, plan=plan, run_state=rs,
+        history_controller={"seq":"C91"}, executor_receipts={},
+        consumer_cursor={"consumed_receipts": ()},
+        transport_profile="A2A_GPT_EXCHANGE_ONLY", transport_available=False,
+    )
+    assert result["successor_run_state"]["terminal_state"] == "ACCEPTED"
+    assert result["typed_next"] == "Q0_ACCEPTED_AUTONOMOUS_HANDOFF"
 
 
 # --- no-readonly pingpong / no analyzer / no human reapproval ----------------
