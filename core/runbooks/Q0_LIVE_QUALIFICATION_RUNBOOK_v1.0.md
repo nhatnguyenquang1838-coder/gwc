@@ -173,4 +173,30 @@ Q0 MUST cover, when applicable:
 
 ## Authority boundary
 
-This runbook changes qualification semantics only. It grants no G2/G3/G4/G5/G6 authority. Branch creation, repository mutation, PR delivery, merge, runtime reload with external effect, deployment, production configuration, credentials, migrations, or production data remain governed by their applicable authority contracts.
+The runbook changes qualification semantics only. It grants no G2/G3/G4/G5/G6 authority. Branch creation, repository mutation, PR delivery, merge, runtime reload with external effect, deployment, production configuration, credentials, migrations, or production data remain governed by their applicable authority contracts.
+
+## UNIVERSAL_V2_DEVELOPMENT lane addendum
+
+When the Q0 lane selects `runtime_epoch = UNIVERSAL_V2_DEVELOPMENT` (SCRUM-781
+Q0 development branch, see AGENTS.md and
+`tools/node_architect/universal_run_epoch.py`), the following lane-local
+semantics supersede the generic per-defect branch/worktree wording above for
+that lane only:
+
+- ONE Q0 run -> ONE development branch -> ONE canonical writable worktree ->
+  additive immutable repair commits. A discovered defect produces an incident
+  identity, RED regression, bounded fix, additive commit, and replay evidence
+  on the same canonical lineage; it MUST NOT create a new defect branch or
+  worktree.
+- Missing or failing Universal v2 components are `GWC_RUNTIME_DEFECT` and
+  enter the self-fix loop; there is no fallback into the legacy GWC runtime.
+- Missing legacy G0/G1 artifacts are compatibility findings only and never
+  block Universal parent progress or trigger Human HITL.
+- `EFFECT_HOLD != CONTROL_LOOP_STOP`: a prohibited effect stops only that
+  effect while safe Controller-owned preparation/self-remediation continues.
+- Self-remediable Q0 defects proceed autonomously (reproduce -> RED -> fix ->
+  GREEN -> additive commit/push same branch -> reload -> replay -> exact
+  readback -> continue) without per-defect Human approval. Hard boundaries
+  (protected `main`, merge/deploy/production/secrets/migrations/destructive
+  operations) remain human authority.
+

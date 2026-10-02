@@ -44,6 +44,56 @@ Any lower-priority statement that says G4 is "always human" or that E2E "never
 merges" is a generic default and MUST be interpreted under this route-precedence
 rule when a canonical route is active.
 
+## UNIVERSAL_V2_DEVELOPMENT override — SCRUM-781 Q0 development lane
+
+This section is normative for any agent operating on the SCRUM-781 Q0
+development lane (branch prefix `fix/SCRUM-781-q0-`, run
+`scrum781-q0-*`), and it takes precedence over legacy GWC G0/G1/G2 gate,
+WAIT/HOLD, approval-loop, artifact, and per-defect-branch wording in this
+file and in legacy runbooks/policies for that lane. It does NOT grant any
+authority beyond the lane's own governing contract, and it does NOT weaken
+the hard safety boundaries below.
+
+- `runtime_epoch = UNIVERSAL_V2_DEVELOPMENT` is normative on this lane.
+- Universal Runtime v2 gates `UR.G0 .. UR.G6` are the only authoritative
+  lifecycle for the lane; they are NOT aliases for legacy
+  `G0_CONTEXT` / `G1_ALIGNMENT` / `G2_EXECUTION`.
+- Legacy G0/G1/G2 semantics, legacy WAIT/HOLD control, legacy NEXT, legacy
+  approval tokens, legacy plan-read receipts, and legacy per-defect branch
+  worktrees do not own the Universal cursor, do not emit authoritative NEXT,
+  do not trigger Human HITL, and do not block Universal parent progress.
+- Missing legacy G0/G1 task artifacts are `LEGACY_COMPATIBILITY_FINDING` /
+  `LEGACY_COMPATIBILITY_DEFECT` projections, NOT parent-run prerequisites.
+- Universal failure is `GWC_RUNTIME_DEFECT` -> Q0 self-remediation
+  (reproduce -> RED -> fix -> GREEN -> additive commit -> push same Q0
+  branch -> reload -> replay -> exact readback -> continue). There is NO
+  fallback from Universal v2 into the legacy runtime.
+- Controller liveness invariant: `EFFECT_HOLD != CONTROL_LOOP_STOP`. A
+  prohibited effect stops only that effect; the Controller continues every
+  safe development/preparation/remediation action it owns. A legacy policy
+  conflict with Universal v2 is classified
+  `LEGACY_POLICY_CONFLICT_WITH_UNIVERSAL_V2_DEVELOPMENT` and fixed on the
+  development branch itself, never surfaced as a generic HITL.
+- One Q0 run -> one development branch -> one canonical writable worktree ->
+  additive immutable repair commits. Once a SHA is used as evidence there is
+  no amend, rebase, or force-push.
+- Self-remediable Q0 defects, missing technical artifacts, implementation
+  planning, bug/test/runtime fixes, branch-local commit and push, and
+  isolated runtime reload/replay proceed autonomously on this lane with no
+  per-defect Human approval. Human involvement is reserved for genuine
+  hard boundaries: product/business decisions with multiple valid outcomes,
+  scope outside this lane, protected `main` mutation, merge/auto-merge,
+  production deployment/config/data, credentials/secrets, migrations or
+  destructive operations, and unresolved risk acceptance.
+
+Hard safety boundaries remain in force: no protected `main` mutation, no
+merge/auto-merge, no deployment/release/production runtime effect, no
+production config/data, no credentials/secrets, no migrations or destructive
+operations, no force-push/history rewrite, and no unrelated product scope.
+The canonical machine semantics for this override are implemented in
+`tools/node_architect/universal_run_epoch.py` and enforced at route
+resolution by `tools/node_architect/resolve_gate_node_route.py`.
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,

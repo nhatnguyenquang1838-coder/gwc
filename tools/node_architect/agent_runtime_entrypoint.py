@@ -116,6 +116,11 @@ def _route_context(
         "expected_profile_revision": str(canonical_state.get("profile_revision") or ""),
         "expected_graph_revision": str(canonical_state.get("graph_revision") or ""),
     })
+    # Universal Runtime v2 development lane: the host carries the resolved
+    # runtime epoch into canonical route resolution so the gate-node router
+    # can reject legacy unqualified gate routes for UNIVERSAL_V2_DEVELOPMENT.
+    if canonical_state.get("runtime_epoch"):
+        context.setdefault("runtime_epoch", str(canonical_state["runtime_epoch"]))
     # Canonical route resolution owns required-context validation. The Agent Host
     # supplies the immutable task/gate context; provider/model output never does.
     context.setdefault("context", dict(input_payload))

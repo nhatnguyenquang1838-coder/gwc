@@ -23,7 +23,17 @@ FAIL_CODES = {
     "MODE_BYPASSES_NODE_RUNTIME", "NODE_AUTHORITY_ESCALATION_ATTEMPT",
     "FLOW_PROFILE_BINDING_MISMATCH", "GATE_APPLICABILITY_BLOCKED",
     "POLICY_REGISTRY_BINDING_MISMATCH",
+    "UNIVERSAL_V2_LEGACY_ROUTE_FORBIDDEN",
 }
+
+# Universal Runtime v2 gates (namespaced) that are the ONLY lifecycle
+# vocabulary for the UNIVERSAL_V2_DEVELOPMENT development lane. Legacy
+# unqualified G0..G6 must not be routed as Universal parent gates.
+UNIVERSAL_V2_EPOCH = "UNIVERSAL_V2_DEVELOPMENT"
+UNIVERSAL_V2_GATES = frozenset(
+    {"UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"}
+)
+LEGACY_GATES = frozenset({"G0", "G1", "G2", "G3", "G4", "G5", "G6"})
 
 
 def _canonical(payload: Any) -> str:
@@ -279,6 +289,14 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
     common = dict(task_id=task_id, gate=gate, requested_action=action, mode=mode,
                   profile_id=profile_id, profile_revision=profile_revision,
                   graph_revision=graph_revision)
+
+    # Universal Runtime v2 gate: when the caller declares the
+    # UNIVERSAL_V2_DEVELOPMENT epoch, legacy unqualified gate routes are
+    # forbidden as a Universal parent route. Universal gates are namespaced
+    # (UR.G0..UR.G6) and have their own route vocabulary.
+    runtime_epoch = str(context.get("runtime_epoch", ""))
+    if runtime_epoch == UNIVERSAL_V2_EPOCH and gate in LEGACY_GATES:
+        return _blocked(reasons=["UNIVERSAL_V2_LEGACY_ROUTE_FORBIDDEN"], **common)
 
     if mode not in SUPPORTED_MODES:
         return _blocked(reasons=["MODE_BYPASSES_NODE_RUNTIME"], **common)
