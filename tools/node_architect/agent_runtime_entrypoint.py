@@ -94,10 +94,12 @@ def _binding_for(registry: Mapping[str, Any], node_id: str) -> Mapping[str, Any]
     return matches[0] if len(matches) == 1 else None
 
 
-def _q0_profile_implementation_registry(route: Mapping[str, Any], *, root: Path) -> dict[str, Any]:
+def _q0_profile_implementation_registry(
+    route: Mapping[str, Any], *, root: Path, node_registry_revision: str | None = None
+) -> dict[str, Any]:
     """Bind the Q0 campaign profile into the Agent Host's normal dispatch path."""
     from .q0_qualification import Q0_WORKFLOW_MODE
-    from .semantic_implementation_registry import _binding_payload
+    from .semantic_implementation_registry import _binding_payload, node_registry_revision as _node_registry_revision
     from .validate_node_instruction import load_data, validate_instruction
 
     descriptor_ref = "core/node-architect/q0/qualification-campaign.node.json"
@@ -106,6 +108,12 @@ def _q0_profile_implementation_registry(route: Mapping[str, Any], *, root: Path)
         descriptor = load_data(root / descriptor_ref)
         card = load_data(root / instruction_ref)
         schema = load_data(root / "schemas/node-architect/node-instruction.schema.json")
+        if node_registry_revision is None:
+            node_registry = load_data(root / "core/node-architect/node-registry.json")
+            node_registry_revision = _node_registry_revision(node_registry)
+        node_registry_revision = str(node_registry_revision or "")
+        if not node_registry_revision:
+            return {"status": "FAIL", "bindings": [], "errors": ["Q0_NODE_REGISTRY_REVISION_MISSING"]}
         if route.get("node_instruction_ref") != instruction_ref:
             return {"status": "FAIL", "bindings": [], "errors": ["Q0_INSTRUCTION_REF_MISMATCH"]}
         node = {
@@ -122,7 +130,7 @@ def _q0_profile_implementation_registry(route: Mapping[str, Any], *, root: Path)
             return {"status": "FAIL", "bindings": [], "errors": list(report.reason_codes)}
         implementation_ref = str((route.get("implementation") or {}).get("ref", ""))
         binding = _binding_payload(
-            node=node, registry_revision=str(route.get("profile_revision", "q0-profile-1.0")),
+            node=node, registry_revision=node_registry_revision,
             card=card, implementation_kind="q0_profile_adapter",
             implementation_ref=implementation_ref, semantic_source_kind="Q0_PROFILE_ADAPTER",
             descriptor_ref=descriptor_ref,
@@ -482,9 +490,12 @@ def run_agent_runtime_event(
     if not node_id:
         return _blocked("AGENT_ROUTE_NODE_MISSING")
 
-    from .q0_qualification import Q0_WORKFLOW_MODE
+    from .q0_qualification import Q0_RUNTIME_EPOCH, Q0_WORKFLOW_MODE
     if workflow_mode == Q0_WORKFLOW_MODE:
-        registry = _q0_profile_implementation_registry(route, root=repo_root)
+        registry = _q0_profile_implementation_registry(
+            route, root=repo_root,
+            node_registry_revision=str(canonical_state.get("node_registry_revision") or ""),
+        )
     else:
         registry = implementation_registry
         if registry is None:
@@ -514,6 +525,20 @@ def run_agent_runtime_event(
     except InstructionBundleError as exc:
         return _blocked(exc.reason_code, detail=exc.detail, node_id=node_id)
 
+    event_input_payload = dict(input_payload)
+    if workflow_mode == Q0_WORKFLOW_MODE:
+        runtime_epoch = str(canonical_state.get("runtime_epoch") or event_input_payload.get("runtime_epoch") or "")
+        supplied_mode = str(event_input_payload.get("workflow_mode") or "")
+        if runtime_epoch != Q0_RUNTIME_EPOCH:
+            return _blocked("AGENT_Q0_RUNTIME_EPOCH_MISMATCH", runtime_epoch=runtime_epoch)
+        if supplied_mode and supplied_mode != Q0_WORKFLOW_MODE:
+            return _blocked("AGENT_Q0_WORKFLOW_MODE_MISMATCH", workflow_mode=supplied_mode)
+        supplied_epoch = str(event_input_payload.get("runtime_epoch") or "")
+        if supplied_epoch and supplied_epoch != runtime_epoch:
+            return _blocked("AGENT_Q0_RUNTIME_EPOCH_MISMATCH", runtime_epoch=supplied_epoch)
+        event_input_payload["workflow_mode"] = Q0_WORKFLOW_MODE
+        event_input_payload["runtime_epoch"] = runtime_epoch
+
     event = build_live_runtime_event(
         canonical_state=canonical_state,
         event_id=event_id,
@@ -521,7 +546,7 @@ def run_agent_runtime_event(
         gate=gate,
         requested_action=requested_action,
         scenario=scenario,
-        input_payload=input_payload,
+        input_payload=event_input_payload,
     )
     provider_request = _provider_request(
         canonical_state=canonical_state,

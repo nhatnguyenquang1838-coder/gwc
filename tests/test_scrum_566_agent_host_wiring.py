@@ -224,6 +224,77 @@ def test_q0_event_uses_profile_adapter_and_never_compiles_legacy_registry(tmp_pa
     q0_binding.assert_called_once()
 
 
+def test_q0_host_routes_ur_g0_through_live_runtime_bridge(tmp_path: Path):
+    import json
+    q0_module = _module("tools.node_architect.q0_qualification")
+    resolver_module = _module("tools.node_architect.resolve_gate_node_route")
+
+    host = _module("tools.node_architect.agent_runtime_entrypoint")
+    root = Path(__file__).resolve().parents[1]
+    profile = json.loads((root / "core/node-architect/gate-node-route-profile.json").read_text())
+    nodes = json.loads((root / "core/node-architect/node-registry.json").read_text())
+    graph = json.loads((root / "core/node-architect/runtime-graph-registry.json").read_text())
+    q0_profile = q0_module.q0_qualification_profile()
+
+    class ReadOnlyQ0Provider:
+        name = "q0-live-runtime-readonly-test"
+
+        def __init__(self):
+            self.packs = []
+
+        def run(self, pack):
+            self.packs.append(pack)
+            return {
+                "outcome": "PASS", "reason_code": "Q0_READ_ONLY_HOST_PROBE",
+                "tool_requests": [], "next_contract_key": "pass",
+            }
+
+    provider = ReadOnlyQ0Provider()
+    kwargs = _host_kwargs(tmp_path, provider, mode="shadow_readonly")
+    q0_context = {
+        "task_id": "SCRUM-781", "requested_action": "q0_understand",
+        "run_id": "scrum781-q0-20260920T074727Z", "q0_profile": q0_profile,
+        "effect_class": "read_only", "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "available_connectors": ["GitHub.compare_commits"], "context": {},
+    }
+    kwargs.update({
+        "canonical_state": {
+            **_canonical_state(), "task_id": "SCRUM-781",
+            "repository": "nhatnguyenquang1838-coder/gwc",
+            "branch": "fix/SCRUM-781-q0-canonical",
+            "base_sha": "9c2c1b1ec50a2dd94f531db580da9db1521ce260",
+            "head_sha": "de23ffa8e54996015c827cb974ecff6b5c949757",
+            "profile_revision": profile["revision"],
+            "graph_revision": profile["bound_graph_revision"],
+            "node_registry_revision": nodes["revision"],
+            "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        },
+        "run_id": q0_context["run_id"], "event_id": "q0-host-ur-g0",
+        "gate": "UR.G0", "requested_action": "q0_understand",
+        "scenario": "q0_profile_boot_probe", "workflow_mode": "q0_live_qualification",
+        "input_payload": {
+            "run_id": q0_context["run_id"], "q0_profile": q0_profile,
+            "active_gate": "UR.G0", "gate_evidence": {}, "effect_class": "read_only",
+        },
+        "instruction_refs": ("AGENTS.md",), "role_overlay_refs": (),
+        "required_skill_names": (),
+        "authority": None, "root": root, "route_profile": profile,
+        "node_registry": nodes, "graph_registry": graph,
+        "implementation_registry": None, "route_context": q0_context,
+        "route_resolver": resolver_module.resolve_gate_node_route,
+    })
+
+    result = host.run_agent_runtime_event(**kwargs)
+
+    assert result["status"] == "SEMANTIC_NODE_COMPLETE", result
+    assert result["node_id"] == "q0.qualification-campaign"
+    assert result["authority_granted"] is False
+    assert result["executed_effects"] == []
+    assert result["live_agent_event"] is True
+    assert result["next_route"]["next_action"] == "q0_continue_universal_lifecycle"
+    assert provider.packs
+
+
 def test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_next(tmp_path: Path):
     host = _module("tools.node_architect.agent_runtime_entrypoint")
     provider = RegisteredReasoningProvider()

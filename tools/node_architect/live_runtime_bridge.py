@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,7 +16,11 @@ GATES = (
     "G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR",
     "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA",
 )
+UNIVERSAL_GATES = tuple(f"UR.G{index}" for index in range(7))
+Q0_WORKFLOW_MODE = "q0_live_qualification"
+Q0_RUNTIME_EPOCH = "UNIVERSAL_V2_DEVELOPMENT"
 CANONICAL_SOURCE_KIND = "canonical_agent_gate_state"
+_SHA256_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 def _digest(payload: Any) -> str:
@@ -44,7 +49,20 @@ def build_live_runtime_event(
     scenario: str,
     input_payload: Mapping[str, Any],
 ) -> dict[str, Any]:
-    if gate not in GATES:
+    workflow_mode = str(input_payload.get("workflow_mode") or "")
+    runtime_epoch = str(input_payload.get("runtime_epoch") or "")
+    q0_mode = workflow_mode == Q0_WORKFLOW_MODE
+    q0_profile = input_payload.get("q0_profile")
+    q0_profile_digest = q0_profile.get("profile_digest") if isinstance(q0_profile, Mapping) else None
+    if q0_mode:
+        if (
+            runtime_epoch != Q0_RUNTIME_EPOCH
+            or gate not in UNIVERSAL_GATES
+            or not isinstance(q0_profile_digest, str)
+            or not _SHA256_DIGEST_RE.fullmatch(q0_profile_digest)
+        ):
+            raise ValueError("unsupported gate")
+    elif gate not in GATES:
         raise ValueError("unsupported gate")
     head = str(canonical_state.get("head_sha") or "")
     event = {
@@ -73,6 +91,10 @@ def build_live_runtime_event(
         "live_agent_event": True,
         "synthetic": False,
     }
+    if q0_mode:
+        event["workflow_mode"] = Q0_WORKFLOW_MODE
+        event["runtime_epoch"] = Q0_RUNTIME_EPOCH
+        event["q0_profile_digest"] = q0_profile_digest
     event["event_digest"] = _digest({k: v for k, v in event.items() if k != "event_digest"})
     return event
 
@@ -116,18 +138,60 @@ def dispatch_live_runtime_event(
         return {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "SYNTHETIC_EVENT_NOT_LIVE_RUNTIME", "authority_granted": False, "executed_effects": []}
     if event.get("source_kind") != CANONICAL_SOURCE_KIND:
         return {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "PROJECTION_EVENT_NOT_CANONICAL_RUNTIME", "authority_granted": False, "executed_effects": []}
-    if event.get("gate") not in GATES:
+    workflow_mode = str(event.get("workflow_mode") or "")
+    q0_mode = workflow_mode == Q0_WORKFLOW_MODE
+    if q0_mode:
+        if (
+            event.get("runtime_epoch") != Q0_RUNTIME_EPOCH
+            or event.get("gate") not in UNIVERSAL_GATES
+            or not isinstance(event.get("q0_profile_digest"), str)
+            or not _SHA256_DIGEST_RE.fullmatch(str(event.get("q0_profile_digest")))
+        ):
+            return {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "LIVE_Q0_BINDING_INVALID", "authority_granted": False, "executed_effects": []}
+    elif event.get("gate") not in GATES:
         return {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "LIVE_GATE_INVALID", "authority_granted": False, "executed_effects": []}
 
     replay = _event_replay(state, event)
     if replay is not None:
         return dict(replay)
 
-    applicability = applicability_decision or {
-        "decision": "REQUIRED",
-        "policy_ref": event.get("policy_revision"),
-        "decision_digest": _digest({"gate": event.get("gate"), "decision": "REQUIRED", "policy": event.get("policy_revision")}),
-    }
+    if q0_mode:
+        profile_digest = str(event["q0_profile_digest"])
+        if applicability_decision is None:
+            applicability = {
+                "decision": "REQUIRED",
+                "policy_ref": f"q0-profile:{profile_digest}",
+                "workflow_mode": Q0_WORKFLOW_MODE,
+                "runtime_epoch": Q0_RUNTIME_EPOCH,
+                "profile_digest": profile_digest,
+                "decision_digest": _digest({
+                    "task_id": event.get("task_id"),
+                    "run_id": event.get("run_id"),
+                    "gate": event.get("gate"),
+                    "workflow_mode": Q0_WORKFLOW_MODE,
+                    "runtime_epoch": Q0_RUNTIME_EPOCH,
+                    "profile_digest": profile_digest,
+                    "decision": "REQUIRED",
+                }),
+            }
+        else:
+            applicability = dict(applicability_decision)
+            if (
+                applicability.get("decision") != "REQUIRED"
+                or applicability.get("workflow_mode") != Q0_WORKFLOW_MODE
+                or applicability.get("runtime_epoch") != Q0_RUNTIME_EPOCH
+                or applicability.get("profile_digest") != profile_digest
+                or not applicability.get("decision_digest")
+            ):
+                result = {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "Q0_APPLICABILITY_BINDING_INVALID", "authority_granted": False, "executed_effects": []}
+                state.event_results[str(event["event_id"])] = result
+                return dict(result)
+    else:
+        applicability = applicability_decision or {
+            "decision": "REQUIRED",
+            "policy_ref": event.get("policy_revision"),
+            "decision_digest": _digest({"gate": event.get("gate"), "decision": "REQUIRED", "policy": event.get("policy_revision")}),
+        }
     decision = applicability.get("decision")
     if decision == "NOT_APPLICABLE":
         result = {
@@ -152,6 +216,13 @@ def dispatch_live_runtime_event(
 
     if route_decision.get("outcome") != "ROUTE_SELECTED":
         result = {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "CANONICAL_ROUTE_NOT_SELECTED", "authority_granted": False, "executed_effects": []}
+        state.event_results[str(event["event_id"])] = result
+        return dict(result)
+    if q0_mode and (
+        route_decision.get("gate") != event.get("gate")
+        or route_decision.get("workflow_mode") != Q0_WORKFLOW_MODE
+    ):
+        result = {"status": "LIVE_RUNTIME_EVENT_REJECTED", "reason_code": "Q0_ROUTE_LIFECYCLE_MISMATCH", "authority_granted": False, "executed_effects": []}
         state.event_results[str(event["event_id"])] = result
         return dict(result)
     if any(route_decision.get(field) is True for field in (

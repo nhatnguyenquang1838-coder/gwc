@@ -87,6 +87,63 @@ def test_typed_live_event_contract_exists_for_every_g0_g6_boundary():
             assert event[field]
 
 
+def test_q0_universal_gate_event_preserves_ur_namespace():
+    bridge = _module("tools.node_architect.live_runtime_bridge")
+    event = bridge.build_live_runtime_event(
+        canonical_state=_state(task_id="SCRUM-781"), event_id="q0-ur-g0", run_id="scrum781-q0-20260920T074727Z",
+        gate="UR.G0", requested_action="q0_understand", scenario="q0_live_qualification",
+        input_payload={"workflow_mode":"q0_live_qualification", "runtime_epoch":"UNIVERSAL_V2_DEVELOPMENT",
+                       "q0_profile":{"profile_digest":"sha256:" + "5" * 64}},
+    )
+    assert event["gate"] == "UR.G0"
+    assert event["workflow_mode"] == "q0_live_qualification"
+    assert event["runtime_epoch"] == "UNIVERSAL_V2_DEVELOPMENT"
+    assert "authority_granted" not in event
+
+
+def test_q0_mode_rejects_legacy_gate_alias_and_wrong_epoch():
+    bridge = _module("tools.node_architect.live_runtime_bridge")
+    base = {
+        "canonical_state": _state(task_id="SCRUM-781"), "event_id": "q0-negative",
+        "run_id": "scrum781-q0-20260920T074727Z", "requested_action": "q0_understand",
+        "scenario": "q0_live_qualification",
+        "input_payload": {"workflow_mode":"q0_live_qualification", "runtime_epoch":"UNIVERSAL_V2_DEVELOPMENT",
+                          "q0_profile":{"profile_digest":"sha256:" + "5" * 64}},
+    }
+    for gate, payload in (("G2_EXECUTION", base["input_payload"]),
+                          ("UR.G0", {**base["input_payload"], "runtime_epoch":"UNIVERSAL_V1"})):
+        try:
+            bridge.build_live_runtime_event(**{**base, "gate":gate, "input_payload":payload})
+        except ValueError as exc:
+            assert str(exc) == "unsupported gate"
+        else:
+            raise AssertionError(f"Q0 accepted non-Universal binding gate={gate} payload={payload}")
+
+
+def test_q0_universal_gate_dispatch_uses_universal_lifecycle_not_legacy_gate_validation(tmp_path: Path):
+    bridge = _module("tools.node_architect.live_runtime_bridge")
+    event = bridge.build_live_runtime_event(
+        canonical_state=_state(task_id="SCRUM-781"), event_id="q0-dispatch-ur-g0", run_id="scrum781-q0-20260920T074727Z",
+        gate="UR.G0", requested_action="q0_understand", scenario="q0_live_qualification",
+        input_payload={"workflow_mode":"q0_live_qualification", "runtime_epoch":"UNIVERSAL_V2_DEVELOPMENT",
+                       "gate_context":{"gate":"UR.G0"},
+                       "q0_profile":{"profile_digest":"sha256:" + "5" * 64}},
+    )
+    binding = _binding(gate="UR.G0")
+    binding["authority_requirements"] = {"gate_authority_required": False}
+    route = _route(node_id=binding["node_id"])
+    route.update({"gate":"UR.G0", "workflow_mode":"q0_live_qualification"})
+    result = bridge.dispatch_live_runtime_event(
+        event=event, route_decision=route, implementation_registry={"bindings":[binding]},
+        mode="shadow_readonly", semantic_handlers={"fixture:handler":_semantic}, capability_handlers={},
+        readback_handler=lambda *args: {"status":"VERIFIED"}, evidence_root=tmp_path,
+        state=bridge.LiveRuntimeState(),
+    )
+    assert result["status"] == "SEMANTIC_NODE_COMPLETE", result
+    assert result["authority_granted"] is False
+    assert result["executed_effects"] == []
+
+
 def test_projection_only_event_is_rejected_as_runtime_evidence(tmp_path: Path):
     bridge = _module("tools.node_architect.live_runtime_bridge")
     event = bridge.build_live_runtime_event(
