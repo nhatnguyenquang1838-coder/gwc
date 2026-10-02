@@ -185,7 +185,12 @@ def reconcile_controller_continuation(
     _require(active_gate in GATE_EVIDENCE, "Q0_GATE_UNKNOWN", active_gate)
     evidence = _as_cursor(run_state.get("gate_evidence") or {})
     try:
-        complete_q0_gate(gate=active_gate, evidence=evidence)
+        complete_q0_gate(
+            gate=active_gate,
+            evidence=evidence,
+            run_id=str(run_state.get("run_id")),
+            runtime_plan_digest=str(plan.get("digest") or ""),
+        )
     except Q0QualificationError:
         required = GATE_EVIDENCE.get(active_gate, ())
         missing = [key for key in required if not evidence.get(key)]
@@ -255,7 +260,8 @@ def reconcile_controller_continuation(
 
     transition = advance_qualification_gate(
         current_gate=active_gate, current_state="ACTIVE", evidence=evidence,
-        sequence=sequence,
+        sequence=sequence, run_id=str(run_state.get("run_id")),
+        runtime_plan_digest=str(plan.get("digest") or ""),
     )
     successor = {
         "schema_id": "gwc.universal-run.run-state",

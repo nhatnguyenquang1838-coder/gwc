@@ -19,6 +19,7 @@ from typing import Any, Callable, Mapping
 
 from .agent_provider_bridge import ProviderRegistry
 from .agent_runtime_entrypoint import run_agent_runtime_loop
+from .universal_run_execution import execute_universal_run_node
 
 
 class AgentRuntimeCliError(ValueError):
@@ -84,7 +85,14 @@ def _load_manifest(path: Path) -> dict[str, Any]:
         raise AgentRuntimeCliError("manifest.event must be a JSON object")
     if not isinstance(provider_name, str) or not provider_name.strip():
         raise AgentRuntimeCliError("manifest.provider_name must be a non-empty string")
-    return {"provider_name": provider_name, "event": dict(event)}
+    universal_run = manifest.get("universal_run")
+    if universal_run is not None and not isinstance(universal_run, Mapping):
+        raise AgentRuntimeCliError("manifest.universal_run must be a JSON object")
+    return {
+        "provider_name": provider_name,
+        "event": dict(event),
+        "universal_run": dict(universal_run) if isinstance(universal_run, Mapping) else None,
+    }
 
 
 def _prepare_event(manifest: Mapping[str, Any], provider: Any) -> dict[str, Any]:
@@ -157,16 +165,29 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        result = run_agent_runtime_loop(
-            _prepare_event(manifest, provider),
-            max_iterations=args.max_iterations,
-        )
+        event_kwargs = _prepare_event(manifest, provider)
+        universal_run = manifest.get("universal_run")
+        if isinstance(universal_run, Mapping):
+            result = execute_universal_run_node(
+                **dict(universal_run),
+                event_kwargs=event_kwargs,
+                max_iterations=args.max_iterations,
+            )
+        else:
+            result = run_agent_runtime_loop(
+                event_kwargs,
+                max_iterations=args.max_iterations,
+            )
     except Exception as exc:  # noqa: BLE001
         result = _blocked("AGENT_RUNTIME_CALLER_ERROR", f"{type(exc).__name__}: {exc}")
 
     _write_result(args.output, result)
     print(json.dumps(dict(result), sort_keys=True))
-    return 0 if str(result.get("status", "")).startswith("SEMANTIC_NODE_") and result.get("status") != "SEMANTIC_NODE_BLOCKED" else 1
+    success = result.get("status") == "UNIVERSAL_RUN_NODE_COMPLETE" or (
+        str(result.get("status", "")).startswith("SEMANTIC_NODE_")
+        and result.get("status") != "SEMANTIC_NODE_BLOCKED"
+    )
+    return 0 if success else 1
 
 
 if __name__ == "__main__":

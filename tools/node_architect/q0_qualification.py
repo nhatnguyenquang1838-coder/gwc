@@ -191,7 +191,10 @@ def resolve_q0_qualification_node(context: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def complete_q0_gate(*, gate: str, evidence: Mapping[str, Any]) -> dict[str, Any]:
+def complete_q0_gate(
+    *, gate: str, evidence: Mapping[str, Any], run_id: str | None = None,
+    runtime_plan_digest: str | None = None,
+) -> dict[str, Any]:
     """Validate the completion evidence for one namespaced Universal gate."""
     _require(gate in GATE_EVIDENCE, "Q0_GATE_UNKNOWN", str(gate))
     values = dict(evidence or {})
@@ -202,6 +205,44 @@ def complete_q0_gate(*, gate: str, evidence: Mapping[str, Any]) -> dict[str, Any
         valid_outcome = outcome in {"INTEGRATED", "IN_PLACE", "NO_TRANSFER_REQUIRED", "DOMAIN_DEFINED"}
         _require(bool(receipt) or valid_outcome, "INTEGRATION_EVIDENCE_REQUIRED")
         return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "INTEGRATION_RECEIPT" if receipt else outcome}
+    if gate == "UR.G2":
+        receipt = values.get("EXECUTION_RECEIPT")
+        _require(bool(receipt), "EXECUTION_EVIDENCE_REQUIRED")
+        valid_refs = (
+            isinstance(receipt, Mapping)
+            and isinstance(receipt.get("evidence_refs"), Mapping)
+            and bool(receipt.get("evidence_refs"))
+            and all(isinstance(ref, str) and bool(ref.strip()) for ref in receipt.get("evidence_refs", {}).values())
+        )
+        expected_node_id = q0_qualification_profile()["qualification_nodes"]["UR.G2"]["node_id"]
+        valid_receipt = (
+            isinstance(receipt, Mapping)
+            and receipt.get("schema_id") == "gwc.universal-run.execution-receipt"
+            and receipt.get("artifact_type") == "universal-run-execution-receipt"
+            and receipt.get("gate") == "UR.G2"
+            and receipt.get("runtime_epoch") == Q0_RUNTIME_EPOCH
+            and receipt.get("route_id") == "UNIVERSAL_RUN_NEW_RUNTIME"
+            and receipt.get("host_status") == "SEMANTIC_NODE_COMPLETE"
+            and _valid_digest(receipt.get("runtime_plan_digest"))
+            and _valid_digest(receipt.get("host_result_digest"))
+            and isinstance(receipt.get("run_id"), str) and bool(receipt.get("run_id"))
+            and isinstance(receipt.get("node_id"), str) and receipt.get("node_id") == expected_node_id
+            and isinstance(receipt.get("node_allocation_id"), str)
+            and receipt.get("node_allocation_id") == f"{receipt.get('run_id')}:{expected_node_id}"
+            and isinstance(receipt.get("event_id"), str) and bool(receipt.get("event_id"))
+            and receipt.get("authority_granted") is False
+            and receipt.get("executed_effects") == []
+            and valid_refs
+            and _verify_seal(receipt, "receipt_digest")
+        )
+        _require(valid_receipt, "EXECUTION_RECEIPT_INVALID")
+        if not isinstance(receipt, Mapping):
+            raise Q0QualificationError("EXECUTION_RECEIPT_INVALID")
+        if run_id is not None:
+            _require(receipt.get("run_id") == run_id, "EXECUTION_RECEIPT_RUN_MISMATCH")
+        if runtime_plan_digest is not None:
+            _require(receipt.get("runtime_plan_digest") == runtime_plan_digest, "EXECUTION_RECEIPT_PLAN_MISMATCH")
+        return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "EXECUTION_RECEIPT"}
     if gate == "UR.G6":
         acceptance = values.get("Q0_ACCEPTANCE_RECEIPT")
         closure = values.get("CLOSURE_RECEIPT")
@@ -223,9 +264,15 @@ def complete_q0_gate(*, gate: str, evidence: Mapping[str, Any]) -> dict[str, Any
     return {"gate": gate, "gate_state": "PASSED", "evidence_kind": required[0]}
 
 
-def advance_qualification_gate(*, current_gate: str, current_state: str, evidence: Mapping[str, Any], sequence: int = 1) -> dict[str, Any]:
+def advance_qualification_gate(
+    *, current_gate: str, current_state: str, evidence: Mapping[str, Any], sequence: int = 1,
+    run_id: str | None = None, runtime_plan_digest: str | None = None,
+) -> dict[str, Any]:
     """Use the shared Universal kernel lifecycle to complete then advance one gate."""
-    complete_q0_gate(gate=current_gate, evidence=evidence)
+    complete_q0_gate(
+        gate=current_gate, evidence=evidence, run_id=run_id,
+        runtime_plan_digest=runtime_plan_digest,
+    )
     gate = current_gate.removeprefix("UR.")
     outcome = (evidence or {}).get("integration_outcome") if current_gate == "UR.G4" else None
     if current_gate == "UR.G4" and outcome is None and (evidence or {}).get("INTEGRATION_RECEIPT"):

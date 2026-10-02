@@ -108,3 +108,51 @@ def test_cli_rejects_factory_name_mismatch(tmp_path: Path, capsys):
     ])
     assert result == 1
     assert json.loads(capsys.readouterr().out)["reason_code"] == "AGENT_PROVIDER_NAME_MISMATCH"
+
+
+def test_cli_routes_universal_run_manifest_through_execution_adapter(tmp_path: Path, monkeypatch, capsys):
+    module = tmp_path / "universal_provider.py"
+    module.write_text(
+        "class Provider:\n"
+        "    name = 'production-provider'\n"
+        "    def run(self, pack): return {'terminal_outcome':'SUCCESS','changed_paths':[],'recorded_actions':[],'validation_passed':True,'next_action':'stop'}\n"
+        "def build_provider(): return Provider()\n",
+        encoding="utf-8",
+    )
+    manifest_path = _manifest(tmp_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    universal_run = {
+        "route_id": "UNIVERSAL_RUN_NEW_RUNTIME",
+        "runtime_plan": {"run_id": "RUN-Q0", "digest": "sha256:" + "a" * 64},
+        "run_state": {"run_id": "RUN-Q0", "active_gate": "UR.G2"},
+        "node_allocation": {"run_id": "RUN-Q0", "node_allocation_id": "RUN-Q0:q0.qualification-campaign"},
+        "evidence_root": str(tmp_path / "ledger"),
+        "parent_composition": None,
+    }
+    manifest["universal_run"] = universal_run
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    calls = {}
+
+    def fake_adapter(**kwargs):
+        calls.update(kwargs)
+        return {"status": "UNIVERSAL_RUN_NODE_COMPLETE", "authority_granted": False, "executed_effects": []}
+
+    def unexpected_loop(*args, **kwargs):
+        raise AssertionError("Q0 Universal Run manifest bypassed the execution adapter")
+
+    monkeypatch.setattr(agent_runtime_cli, "execute_universal_run_node", fake_adapter, raising=False)
+    monkeypatch.setattr(agent_runtime_cli, "run_agent_runtime_loop", unexpected_loop)
+    result = agent_runtime_cli.main([
+        "--manifest", str(manifest_path),
+        "--provider-factory", f"{module}:build_provider",
+        "--max-iterations", "5",
+    ])
+
+    assert result == 0
+    assert calls["route_id"] == "UNIVERSAL_RUN_NEW_RUNTIME"
+    assert calls["runtime_plan"] == universal_run["runtime_plan"]
+    assert calls["run_state"] == universal_run["run_state"]
+    assert calls["node_allocation"] == universal_run["node_allocation"]
+    assert calls["event_kwargs"]["provider"].name == "production-provider"
+    assert calls["max_iterations"] == 5
+    assert json.loads(capsys.readouterr().out)["status"] == "UNIVERSAL_RUN_NODE_COMPLETE"

@@ -18,6 +18,31 @@ def _sha(ch):
     return ch * 40
 
 
+def _execution_receipt(*, authority_granted: bool = False, node_id: str = "q0.qualification-campaign"):
+    run_id = "scrum781-q0-20260920T074727Z"
+    body = {
+        "schema_id": "gwc.universal-run.execution-receipt",
+        "artifact_type": "universal-run-execution-receipt",
+        "run_id": run_id,
+        "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "route_id": "UNIVERSAL_RUN_NEW_RUNTIME",
+        "runtime_plan_digest": "sha256:" + "a" * 64,
+        "node_allocation_id": f"{run_id}:{node_id}",
+        "node_id": node_id,
+        "gate": "UR.G2",
+        "sequence": 3,
+        "event_id": "q0-execution-test",
+        "host_status": "SEMANTIC_NODE_COMPLETE",
+        "host_result_digest": "sha256:" + "b" * 64,
+        "evidence_refs": {"node-result": ".gwc/node-result.json"},
+        "authority_granted": authority_granted,
+        "executed_effects": [],
+    }
+    raw = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    import hashlib
+    return {**body, "receipt_digest": "sha256:" + hashlib.sha256(raw).hexdigest()}
+
+
 def _matrix():
     body = {
         "mandatory_entries": ["fresh_boot", "default_route", "runtime_plan", "node_allocation", "node_architect_seam", "effect_authority", "exact_readback", "typed_continuation", "restart_recovery", "self_fix_replay", "stale_state_fail_closed", "deterministic_replay", "recursive_plan_dag_complete"],
@@ -104,11 +129,35 @@ def test_q0_acceptance_is_ur_g6_not_ur_g4():
     assert m.Q0_INTEGRATION_GATE == "UR.G4"
 
 
-def test_ur_g2_completion_requires_execution_evidence():
+def test_ur_g2_completion_requires_execution_receipt_with_bound_digest():
     m = _m()
     with pytest.raises(m.Q0QualificationError, match="EXECUTION_EVIDENCE_REQUIRED"):
         m.complete_q0_gate(gate="UR.G2", evidence={})
-    assert m.complete_q0_gate(gate="UR.G2", evidence={"EXECUTION_RECEIPT": "exec:1"})["gate_state"] == "PASSED"
+    with pytest.raises(m.Q0QualificationError, match="EXECUTION_RECEIPT_INVALID"):
+        m.complete_q0_gate(gate="UR.G2", evidence={"EXECUTION_RECEIPT": "exec:1"})
+    receipt = _execution_receipt()
+    assert m.complete_q0_gate(gate="UR.G2", evidence={"EXECUTION_RECEIPT": receipt})["gate_state"] == "PASSED"
+    invalid_authority_receipt = _execution_receipt(authority_granted=True)
+    with pytest.raises(m.Q0QualificationError, match="EXECUTION_RECEIPT_INVALID"):
+        m.complete_q0_gate(gate="UR.G2", evidence={"EXECUTION_RECEIPT": invalid_authority_receipt})
+    invalid_node_receipt = _execution_receipt(node_id="untrusted.node")
+    with pytest.raises(m.Q0QualificationError, match="EXECUTION_RECEIPT_INVALID"):
+        m.complete_q0_gate(gate="UR.G2", evidence={"EXECUTION_RECEIPT": invalid_node_receipt})
+
+
+def test_ur_g2_execution_receipt_binds_exact_run_and_plan():
+    m = _m()
+    receipt = _execution_receipt()
+    with pytest.raises(m.Q0QualificationError, match="EXECUTION_RECEIPT_RUN_MISMATCH"):
+        m.complete_q0_gate(
+            gate="UR.G2", evidence={"EXECUTION_RECEIPT": receipt},
+            run_id="another-run", runtime_plan_digest=receipt["runtime_plan_digest"],
+        )
+    with pytest.raises(m.Q0QualificationError, match="EXECUTION_RECEIPT_PLAN_MISMATCH"):
+        m.complete_q0_gate(
+            gate="UR.G2", evidence={"EXECUTION_RECEIPT": receipt},
+            run_id=receipt["run_id"], runtime_plan_digest="sha256:" + "f" * 64,
+        )
 
 
 def test_ur_g3_completion_requires_verification_receipt():
@@ -310,7 +359,7 @@ def test_q0_e2e_campaign_certify_accept_handoff_then_login_start():
     for gate, evidence in (
         ("UR.G0", {"UNDERSTANDING_RECEIPT":"g0"}),
         ("UR.G1", {"PLAN_RECEIPT":"g1"}),
-        ("UR.G2", {"EXECUTION_RECEIPT":"g2"}),
+        ("UR.G2", {"EXECUTION_RECEIPT": _execution_receipt()}),
         ("UR.G3", {"VERIFICATION_RECEIPT":"g3"}),
         ("UR.G4", {"integration_outcome":"IN_PLACE"}),
         ("UR.G5", {"TARGET_VALIDATION_RECEIPT":"g5"}),
