@@ -225,7 +225,8 @@ def execute_universal_run_node(
         runtime_plan=plan, run_state=run_state, node_allocation=node_allocation,
         route_id=route_id, node_id=node_id, event_kwargs=event_kwargs,
     )
-    _require(isinstance(max_iterations, int) and max_iterations >= 1, "AGENT_RUNTIME_ITERATION_LIMIT_INVALID")
+    if not isinstance(max_iterations, int) or isinstance(max_iterations, bool) or max_iterations < 1:
+        raise UniversalRunExecutionError("AGENT_RUNTIME_ITERATION_LIMIT_INVALID")
     canonical_state = event["canonical_state"]
     ledger = NodeEvidenceLedger(
         root=Path(evidence_root),
