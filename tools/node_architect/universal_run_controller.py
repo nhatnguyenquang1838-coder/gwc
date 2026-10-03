@@ -191,9 +191,11 @@ class UniversalController:
         )
 
     def assign_current_action(self) -> dict[str, Any]:
-        """Assign exactly one bounded action from the native active gate."""
+        """Return one typed action owned by the current native RunState actor."""
         gate = str(self.run_state["active_gate"])
         action = Q0_ACTIONS[gate]
+        owner = self.run_state.get("next_owner")
+        _require(owner in {"EXECUTOR", "CONTROLLER"}, "RUN_STATE_NEXT_OWNER_INVALID", str(owner))
         execution_refs = self.run_state["execution_refs"]
         source_binding = self.runtime_plan["source_binding"]
         identity = {
@@ -204,6 +206,10 @@ class UniversalController:
             "gate": gate,
             "action": action,
         }
+        if owner == "CONTROLLER":
+            typed_next = self.run_state.get("typed_next")
+            _require(isinstance(typed_next, str) and bool(typed_next), "RUN_STATE_CONTROLLER_TYPED_NEXT_REQUIRED")
+            identity["actor"] = "CONTROLLER"
         idempotency_key = "sha256:" + hashlib.sha256(_canonical_bytes(identity)).hexdigest()
         scope = {
             "repository": source_binding["repository"],
@@ -212,28 +218,55 @@ class UniversalController:
             "head_sha": execution_refs.get("candidate_sha"),
             "scope_hash": idempotency_key,
         }
-        body = {
-            "schema_id": "gwc.universal-run.executor-assignment.v2",
-            "schema_version": 2,
-            "runtime_protocol": self.profile["runtime_protocol"],
-            "runtime_epoch": self.profile["runtime_epoch"],
-            "runtime_profile_digest": self.profile["profile_digest"],
-            "run_id": self.run_state["run_id"],
-            "sequence": self.run_state["sequence"],
-            "gate": gate,
-            "action": action,
-            "actor": "EXECUTOR",
-            "node_id": self.node_allocation["provenance"]["source_refs"][0],
-            "node_allocation_id": self.node_allocation["node_allocation_id"],
-            "node_allocation_digest": self.node_allocation["content_digest"]["value"],
-            "runtime_plan_digest": self.runtime_plan["digest"],
-            "idempotency_key": idempotency_key,
-            "scope": scope,
-            "target": {"kind": "candidate-branch", "identity": scope["head_sha"]},
-            "authority_decision_ref": None,
-            "effect_authority": "NONE",
-            "evidence_requirements": list(GATE_EVIDENCE[gate]),
-        }
+        if owner == "EXECUTOR":
+            body = {
+                "schema_id": "gwc.universal-run.executor-assignment.v2",
+                "schema_version": 2,
+                "runtime_protocol": self.profile["runtime_protocol"],
+                "runtime_epoch": self.profile["runtime_epoch"],
+                "runtime_profile_digest": self.profile["profile_digest"],
+                "run_id": self.run_state["run_id"],
+                "sequence": self.run_state["sequence"],
+                "gate": gate,
+                "action": action,
+                "actor": "EXECUTOR",
+                "node_id": self.node_allocation["provenance"]["source_refs"][0],
+                "node_allocation_id": self.node_allocation["node_allocation_id"],
+                "node_allocation_digest": self.node_allocation["content_digest"]["value"],
+                "runtime_plan_digest": self.runtime_plan["digest"],
+                "idempotency_key": idempotency_key,
+                "scope": scope,
+                "target": {"kind": "candidate-branch", "identity": scope["head_sha"]},
+                "authority_decision_ref": None,
+                "effect_authority": "NONE",
+                "evidence_requirements": list(GATE_EVIDENCE[gate]),
+            }
+        else:
+            body = {
+                "schema_id": "gwc.universal-run.controller-local-action.v2",
+                "schema_version": 2,
+                "runtime_protocol": self.profile["runtime_protocol"],
+                "runtime_epoch": self.profile["runtime_epoch"],
+                "runtime_profile_digest": self.profile["profile_digest"],
+                "run_id": self.run_state["run_id"],
+                "sequence": self.run_state["sequence"],
+                "gate": gate,
+                "action": action,
+                "actor": "CONTROLLER",
+                "next_owner": "CONTROLLER",
+                "typed_next": typed_next,
+                "node_id": self.node_allocation["provenance"]["source_refs"][0],
+                "node_allocation_id": self.node_allocation["node_allocation_id"],
+                "node_allocation_digest": self.node_allocation["content_digest"]["value"],
+                "runtime_plan_digest": self.runtime_plan["digest"],
+                "idempotency_key": idempotency_key,
+                "scope": scope,
+                "target": {"kind": "candidate-branch", "identity": scope["head_sha"]},
+                "effect_authority": "NONE",
+                "evidence_requirements": list(GATE_EVIDENCE[gate]),
+                "authority_granted": False,
+                "executed_effects": [],
+            }
         self._assignment = {**body, "assignment_digest": "sha256:" + hashlib.sha256(_canonical_bytes(body)).hexdigest()}
         return dict(self._assignment)
     def consume_executor_receipt(
@@ -299,10 +332,16 @@ class UniversalController:
                 "executed_effects": [],
             }
         consumed = list(self.run_state.get("consumed_receipts", []))
+        _require(
+            self.run_state.get("next_owner") == "EXECUTOR",
+            "CONTROLLER_OWNER_EXECUTOR_RECEIPT_FORBIDDEN",
+            str(self.run_state.get("next_owner")),
+        )
         _require(receipt_digest not in consumed, "EXECUTOR_RECEIPT_CONSUMPTION_RECORD_MISSING")
 
         assignment = self._assignment
         _require(isinstance(assignment, Mapping), "EXECUTOR_ASSIGNMENT_NOT_ISSUED")
+        _require(assignment.get("actor") == "EXECUTOR", "EXECUTOR_ASSIGNMENT_ACTOR_MISMATCH")
         expected_fields = {
             "run_id": "run_id",
             "sequence": "sequence",
@@ -434,6 +473,236 @@ class UniversalController:
         self.run_state = successor
         self._assignment = None
         return decision
+    def complete_controller_owned_gate(
+        self,
+        *,
+        evidence: Mapping[str, Any],
+        expected_sequence: int | None = None,
+        transition_receipt_ref: str | None = None,
+    ) -> dict[str, Any]:
+        """Complete one Controller-owned gate from native Q0 evidence, never an Executor receipt."""
+        _require(isinstance(evidence, Mapping) and bool(evidence), "CONTROLLER_LOCAL_GATE_EVIDENCE_REQUIRED")
+        evidence_copy = copy.deepcopy(dict(evidence))
+        current_sequence = int(self.run_state["sequence"])
+        sequence = current_sequence if expected_sequence is None else expected_sequence
+        _require(isinstance(sequence, int) and not isinstance(sequence, bool) and sequence >= 1, "CONTROLLER_LOCAL_GATE_SEQUENCE_INVALID")
+        ledger = list(self.run_state.get("controller_local_completion_ledger", []))
+        _require(all(isinstance(item, Mapping) for item in ledger), "CONTROLLER_LOCAL_COMPLETION_LEDGER_INVALID")
+
+        sequence_entries = [item for item in ledger if item.get("sequence") == sequence]
+        if sequence == current_sequence:
+            gate = str(self.run_state["active_gate"])
+        else:
+            _require(len(sequence_entries) == 1, "CONTROLLER_LOCAL_COMPLETION_RECORD_MISSING")
+            gate = str(sequence_entries[0].get("gate", ""))
+        candidate_sha = str(self.runtime_plan["source_binding"]["pre_head_sha"])
+        evidence_digest = "sha256:" + hashlib.sha256(_canonical_bytes(evidence_copy)).hexdigest()
+        identity = {
+            "run_id": self.run_state["run_id"],
+            "runtime_plan_digest": self.runtime_plan["digest"],
+            "candidate_sha": candidate_sha,
+            "gate": gate,
+            "sequence": sequence,
+            "action": "complete_controller_owned_gate",
+            "actor": "CONTROLLER",
+        }
+        idempotency_key = "sha256:" + hashlib.sha256(_canonical_bytes(identity)).hexdigest()
+        prior_matches = [item for item in ledger if item.get("idempotency_key") == idempotency_key]
+        _require(len(prior_matches) <= 1, "CONTROLLER_LOCAL_COMPLETION_LEDGER_INVALID")
+        if prior_matches:
+            prior = prior_matches[0]
+            local_receipt = prior.get("receipt")
+            _require(isinstance(local_receipt, Mapping), "CONTROLLER_LOCAL_COMPLETION_RECORD_INVALID")
+            _require(
+                prior.get("run_id") == self.run_state["run_id"]
+                and prior.get("runtime_plan_digest") == self.runtime_plan["digest"]
+                and prior.get("candidate_sha") == candidate_sha
+                and prior.get("gate") == gate
+                and prior.get("sequence") == sequence
+                and local_receipt.get("idempotency_key") == idempotency_key
+                and local_receipt.get("receipt_digest") == _digest(local_receipt, "receipt_digest"),
+                "CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT",
+            )
+            _require(
+                local_receipt.get("evidence_digest") == evidence_digest,
+                "CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT",
+            )
+            if transition_receipt_ref is not None:
+                _require(
+                    transition_receipt_ref == prior.get("transition_ref"),
+                    "CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT",
+                )
+            return {
+                "schema_id": "gwc.universal-run.controller-decision.v2",
+                "runtime_protocol": self.profile["runtime_protocol"],
+                "run_id": self.run_state["run_id"],
+                "sequence": self.run_state["sequence"],
+                "active_gate": self.run_state["active_gate"],
+                "from_gate": gate,
+                "next_gate": prior["to_gate"],
+                "next_owner": prior["next_owner"],
+                "typed_next": prior["typed_next"],
+                "gate_advanced": False,
+                "idempotent_replay": True,
+                "consumed_receipt_digest": local_receipt["receipt_digest"],
+                "controller_local_completion_receipt": copy.deepcopy(dict(local_receipt)),
+                "transition_ref": prior["transition_ref"],
+                "transition_digest": prior.get("transition_digest"),
+                "successor_run_state": copy.deepcopy(self.run_state),
+                "authority_granted": False,
+                "executed_effects": [],
+            }
+
+        _require(sequence == current_sequence, "CONTROLLER_LOCAL_GATE_SEQUENCE_MISMATCH")
+        _require(self.run_state.get("active_gate") == gate, "CONTROLLER_LOCAL_GATE_MISMATCH")
+        _require(self.run_state.get("next_owner") == "CONTROLLER", "CONTROLLER_LOCAL_GATE_OWNER_MISMATCH")
+        assignment = self._assignment
+        _require(isinstance(assignment, Mapping), "CONTROLLER_LOCAL_ACTION_NOT_ISSUED")
+        _require(
+            assignment.get("actor") != "EXECUTOR",
+            "CONTROLLER_LOCAL_GATE_EXECUTOR_ASSIGNMENT_CONFLICT",
+        )
+        _require(
+            assignment.get("actor") == "CONTROLLER"
+            and assignment.get("run_id") == self.run_state["run_id"]
+            and assignment.get("sequence") == sequence
+            and assignment.get("gate") == gate
+            and assignment.get("action") == Q0_ACTIONS[gate]
+            and assignment.get("typed_next") == self.run_state.get("typed_next")
+            and assignment.get("runtime_plan_digest") == self.runtime_plan["digest"],
+            "CONTROLLER_LOCAL_GATE_ASSIGNMENT_BINDING_MISMATCH",
+        )
+
+        complete_q0_gate(
+            gate=gate,
+            evidence=evidence_copy,
+            run_id=self.run_state["run_id"],
+            runtime_plan_digest=self.runtime_plan["digest"],
+            candidate_sha=candidate_sha,
+        )
+        local_receipt_body = {
+            "schema_id": "gwc.universal-run.controller-local-completion-receipt.v2",
+            "schema_version": 2,
+            "runtime_protocol": self.profile["runtime_protocol"],
+            "runtime_epoch": self.profile["runtime_epoch"],
+            "run_id": self.run_state["run_id"],
+            "runtime_plan_digest": self.runtime_plan["digest"],
+            "candidate_sha": candidate_sha,
+            "sequence": sequence,
+            "gate": gate,
+            "action": "complete_controller_owned_gate",
+            "evidence": evidence_copy,
+            "evidence_digest": evidence_digest,
+            "idempotency_key": idempotency_key,
+            "pre_state_digest": self.run_state["state_digest"],
+            "authority_granted": False,
+            "executed_effects": [],
+        }
+        local_receipt = {
+            **local_receipt_body,
+            "receipt_digest": _digest(local_receipt_body, "receipt_digest"),
+        }
+        transition = advance_qualification_gate(
+            current_gate=gate,
+            current_state="ACTIVE",
+            evidence=evidence_copy,
+            sequence=sequence,
+            run_id=self.run_state["run_id"],
+            runtime_plan_digest=self.runtime_plan["digest"],
+            candidate_sha=candidate_sha,
+        )
+        pre_state = copy.deepcopy(self.run_state)
+        successor = copy.deepcopy(self.run_state)
+        successor.pop("state_digest", None)
+        successor["predecessor_sequence"] = sequence
+        successor["predecessor_state_digest"] = pre_state["state_digest"]
+        successor["sequence"] = sequence + int(transition["sequence_delta"])
+        successor["active_gate"] = transition["next_gate"]
+        successor["gate_evidence"] = evidence_copy
+        successor["evidence_gap"] = list(GATE_EVIDENCE[successor["active_gate"]])
+        typed_next = (
+            "MATERIALIZE_UR_G3_VERIFICATION_RECEIPT"
+            if successor["active_gate"] == "UR.G3"
+            else "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
+        )
+        next_owner = "EXECUTOR" if successor["active_gate"] == "UR.G3" else "CONTROLLER"
+        successor["typed_next"] = typed_next
+        successor["next_owner"] = next_owner
+        transition_ref = transition_receipt_ref or (
+            f"{successor['run_id']}:controller-local-transition:seq{sequence}-seq{successor['sequence']}:{idempotency_key}"
+        )
+        completion_record = {
+            "run_id": successor["run_id"],
+            "runtime_plan_digest": self.runtime_plan["digest"],
+            "candidate_sha": candidate_sha,
+            "idempotency_key": idempotency_key,
+            "receipt_digest": local_receipt["receipt_digest"],
+            "evidence_digest": evidence_digest,
+            "sequence": sequence,
+            "gate": gate,
+            "action": "complete_controller_owned_gate",
+            "to_gate": successor["active_gate"],
+            "typed_next": typed_next,
+            "next_owner": next_owner,
+            "transition_ref": transition_ref,
+            "receipt": local_receipt,
+        }
+        successor["controller_local_completion_ledger"] = ledger + [completion_record]
+        execution_refs = copy.deepcopy(dict(successor.get("execution_refs", {})))
+        execution_refs["cursor_ref"] = f"{successor['run_id']}:{successor['active_gate']}:seq{successor['sequence']}"
+        successor["execution_refs"] = execution_refs
+        successor["state_digest"] = _digest(successor, "state_digest")
+
+        transition_receipt = {
+            "schema_id": "gwc.universal-run.controller-transition-receipt.v2",
+            "schema_version": 2,
+            "run_id": successor["run_id"],
+            "runtime_plan_digest": self.runtime_plan["digest"],
+            "candidate_sha": candidate_sha,
+            "from_gate": gate,
+            "to_gate": successor["active_gate"],
+            "transition_ref": transition_ref,
+            "pre_state": {"sequence": sequence, "state_digest": pre_state["state_digest"]},
+            "consumed_receipt_digest": local_receipt["receipt_digest"],
+            "idempotency_key": idempotency_key,
+            "post_state": {"sequence": successor["sequence"], "state_digest": successor["state_digest"]},
+            "kernel_completion_receipt": transition["completion_receipt"],
+            "kernel_transition_receipt": transition["transition_receipt"],
+            "authority_granted": False,
+            "executed_effects": [],
+        }
+        transition_receipt["transition_digest"] = _digest(transition_receipt, "transition_digest")
+        subject = {
+            "runtime_epoch": self.profile["runtime_epoch"],
+            "actor": "CONTROLLER",
+            "next_owner": next_owner,
+            "typed_next": typed_next,
+            "run_id": successor["run_id"],
+            "sequence": successor["sequence"],
+            "transition_digest": transition_receipt["transition_digest"],
+        }
+        decision = {
+            "schema_id": "gwc.universal-run.controller-decision.v2",
+            "runtime_protocol": self.profile["runtime_protocol"],
+            "decision_subject": subject,
+            "decision_digest": "sha256:" + hashlib.sha256(_canonical_bytes(subject)).hexdigest(),
+            "from_gate": gate,
+            "next_gate": successor["active_gate"],
+            "next_owner": next_owner,
+            "typed_next": typed_next,
+            "gate_advanced": True,
+            "idempotent_replay": False,
+            "consumed_receipt_digest": local_receipt["receipt_digest"],
+            "controller_local_completion_receipt": local_receipt,
+            "transition_receipt": transition_receipt,
+            "successor_run_state": successor,
+            "authority_granted": False,
+            "executed_effects": [],
+        }
+        self.run_state = successor
+        self._assignment = None
+        return decision
+
     def record_historical_controller_evidence(
         self, raw_body: bytes | bytearray | str, *, expected_sha256: str
     ) -> dict[str, Any]:

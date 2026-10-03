@@ -29,6 +29,22 @@ def continue_from_native_state(
     if executor_receipt is not None:
         return controller.consume_executor_receipt(executor_receipt)
     assignment = controller.assign_current_action()
+    owner = assignment.get("actor")
+    if owner == "CONTROLLER":
+        return {
+            "runtime_epoch": profile["runtime_epoch"],
+            "run_id": run_state["run_id"],
+            "sequence": run_state["sequence"],
+            "active_gate": run_state["active_gate"],
+            "next_owner": "CONTROLLER",
+            "typed_next": assignment["typed_next"],
+            "assignment": assignment,
+            "mailbox_required": False,
+            "authority_granted": False,
+            "executed_effects": [],
+        }
+    if owner != "EXECUTOR":
+        raise ValueError("UNIVERSAL_ASSIGNMENT_ACTOR_INVALID")
     return {
         "runtime_epoch": profile["runtime_epoch"],
         "run_id": run_state["run_id"],

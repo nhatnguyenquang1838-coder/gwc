@@ -212,10 +212,256 @@ def _make_v2_binding():
             "cursor_ref": f"{run_id}:UR.G2:seq8",
         },
         "gate_evidence": {},
+        "typed_next": "EXECUTE_UNIVERSAL_ACTION",
+        "next_owner": "EXECUTOR",
+        "evidence_gap": ["EXECUTION_RECEIPT"],
         "consumed_receipts": [],
     }
     state = {**state_body, "state_digest": digest(state_body)}
     return profile, plan, state, allocation
+
+
+def _make_controller_owned_g4_binding():
+    import hashlib
+    import json
+
+    profile, plan, state, allocation = _make_v2_binding()
+    state_body = {key: value for key, value in state.items() if key != "state_digest"}
+    state_body.update({
+        "sequence": 10,
+        "predecessor_sequence": 9,
+        "predecessor_state_digest": state["state_digest"],
+        "active_gate": "UR.G4",
+        "typed_next": "CONTINUE_UNIVERSAL_LANE_REMEDIATION",
+        "next_owner": "CONTROLLER",
+        "evidence_gap": ["INTEGRATION_RECEIPT", "integration_outcome"],
+    })
+    refs = dict(state_body["execution_refs"])
+    refs["cursor_ref"] = f"{state['run_id']}:UR.G4:seq10"
+    state_body["execution_refs"] = refs
+    state = {
+        **state_body,
+        "state_digest": "sha256:" + hashlib.sha256(
+            json.dumps(state_body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+        ).hexdigest(),
+    }
+    return profile, plan, state, allocation
+
+
+def test_controller_owned_g4_does_not_emit_executor_assignment():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+
+    action = controller.assign_current_action()
+
+    assert action["actor"] == "CONTROLLER"
+    assert action["next_owner"] == "CONTROLLER"
+    assert action["typed_next"] == "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
+    assert action["action"] == "q0_integrate_candidate"
+    assert action["effect_authority"] == "NONE"
+    assert action["executed_effects"] == []
+    assert action["schema_id"] == "gwc.universal-run.controller-local-action.v2"
+
+
+def test_assign_current_action_honors_runstate_next_owner():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_v2_binding()
+    executor = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assert executor.assign_current_action()["actor"] == "EXECUTOR"
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assert controller.assign_current_action()["actor"] == "CONTROLLER"
+
+
+def test_controller_owned_g4_in_place_completes_without_integration_receipt():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+
+    decision = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+    successor = decision["successor_run_state"]
+
+    assert decision["gate_advanced"] is True
+    assert decision["next_gate"] == "UR.G5"
+    assert decision["next_owner"] == successor["next_owner"]
+    assert decision["idempotent_replay"] is False
+    assert successor["sequence"] == 11
+    assert successor["active_gate"] == "UR.G5"
+    assert successor["gate_evidence"] == {"integration_outcome": "IN_PLACE"}
+    assert successor["evidence_gap"] == ["TARGET_VALIDATION_RECEIPT"]
+    assert "INTEGRATION_RECEIPT" not in successor["gate_evidence"]
+    assert successor["consumed_receipts"] == state["consumed_receipts"]
+    assert state["active_gate"] == "UR.G4" and state["sequence"] == 10
+    assert decision["authority_granted"] is False
+    assert decision["executed_effects"] == []
+
+
+def test_controller_owned_g4_in_place_uses_canonical_complete_q0_gate():
+    import json
+    from pathlib import Path
+    import jsonschema
+
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    decision = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+    transition = decision["transition_receipt"]
+    schema_path = Path(__file__).resolve().parents[1] / "schemas/node-architect/universal-run/controller-transition-receipt.schema.json"
+    jsonschema.validate(transition, json.loads(schema_path.read_text()))
+
+    assert transition["from_gate"] == "UR.G4"
+    assert transition["to_gate"] == "UR.G5"
+    assert transition["kernel_completion_receipt"]["explicit_outcome"] == "IN_PLACE"
+    assert transition["authority_granted"] is False
+    assert transition["executed_effects"] == []
+
+
+def test_controller_owned_g4_transition_is_persisted_and_exactly_once(tmp_path):
+    import hashlib
+    import json
+    from tools.node_architect.universal_run_controller import (
+        UniversalController,
+        materialize_controller_transition_receipt,
+    )
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    decision = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+    path = tmp_path / "controller-local-g4-transition.json"
+
+    materialized = materialize_controller_transition_receipt(receipt=decision["transition_receipt"], path=path)
+    readback = path.read_bytes()
+    persisted = json.loads(readback)
+
+    assert persisted == decision["transition_receipt"]
+    assert hashlib.sha256(readback).hexdigest() == materialized["file_sha256"]
+    assert materialized["idempotent_replay"] is False
+    assert decision["successor_run_state"]["controller_local_completion_ledger"]
+
+
+def test_duplicate_controller_local_completion_is_idempotent():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    first = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+    restarted = UniversalController(
+        profile=profile, runtime_plan=plan,
+        run_state=first["successor_run_state"], node_allocation=allocation,
+    )
+
+    replay = restarted.complete_controller_owned_gate(
+        evidence={"integration_outcome": "IN_PLACE"}, expected_sequence=10
+    )
+
+    assert replay["idempotent_replay"] is True
+    assert replay["gate_advanced"] is False
+    assert replay["transition_ref"] == first["transition_receipt"]["transition_ref"]
+    assert replay["consumed_receipt_digest"] == first["controller_local_completion_receipt"]["receipt_digest"]
+    assert restarted.run_state["sequence"] == 11
+    assert restarted.run_state["active_gate"] == "UR.G5"
+
+
+def test_conflicting_same_identity_controller_local_completion_fails_closed():
+    import pytest
+    from tools.node_architect.universal_run_controller import UniversalController, UniversalControllerError
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    first = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+    restarted = UniversalController(
+        profile=profile, runtime_plan=plan,
+        run_state=first["successor_run_state"], node_allocation=allocation,
+    )
+
+    with pytest.raises(UniversalControllerError, match="CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT"):
+        restarted.complete_controller_owned_gate(
+            evidence={"integration_outcome": "INTEGRATED"}, expected_sequence=10
+        )
+
+    assert restarted.run_state["sequence"] == 11
+    assert restarted.run_state["active_gate"] == "UR.G5"
+
+
+def test_controller_owned_g4_rejects_conflicting_live_executor_assignment():
+    import pytest
+    from tools.node_architect.universal_run_controller import UniversalController, UniversalControllerError
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller._assignment = {"actor": "EXECUTOR", "gate": "UR.G4", "sequence": 10}
+
+    with pytest.raises(UniversalControllerError, match="CONTROLLER_LOCAL_GATE_EXECUTOR_ASSIGNMENT_CONFLICT"):
+        controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+
+
+def test_controller_owned_g4_completion_requires_controller_local_action_assignment():
+    import pytest
+    from tools.node_architect.universal_run_controller import UniversalController, UniversalControllerError
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+
+    with pytest.raises(UniversalControllerError, match="CONTROLLER_LOCAL_ACTION_NOT_ISSUED"):
+        controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
+
+
+def test_executor_cannot_advance_controller_owned_g4():
+    import pytest
+    from tools.node_architect.universal_run_controller import UniversalController, UniversalControllerError
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    receipt = _g2_executor_receipt(profile, assignment)
+
+    with pytest.raises(UniversalControllerError, match="CONTROLLER_OWNER_EXECUTOR_RECEIPT_FORBIDDEN"):
+        controller.consume_executor_receipt(receipt)
+
+    assert controller.run_state["sequence"] == 10
+    assert controller.run_state["active_gate"] == "UR.G4"
+
+
+def test_ur_g2_executor_receipt_flow_remains_green():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    decision = controller.consume_executor_receipt(_g2_executor_receipt(profile, assignment))
+
+    assert assignment["actor"] == "EXECUTOR"
+    assert decision["next_gate"] == "UR.G3"
+    assert decision["next_owner"] == "EXECUTOR"
+    assert decision["gate_advanced"] is True
+
+
+def test_continuation_does_not_build_executor_assignment_for_controller_owner():
+    from tools.node_architect.universal_run_continuation import continue_from_native_state
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    decision = continue_from_native_state(
+        profile=profile,
+        runtime_plan=plan,
+        run_state=state,
+        node_allocation=allocation,
+    )
+
+    assert decision["next_owner"] == "CONTROLLER"
+    assert decision["typed_next"] == "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
+    assert decision["assignment"]["actor"] == "CONTROLLER"
+    assert decision["assignment"]["action"] == "q0_integrate_candidate"
 
 
 def test_universal_controller_assigns_native_ur_action_without_mailbox_cursor():
@@ -356,6 +602,68 @@ def test_controller_consumes_receipt_with_durable_transition_binding_and_g3_next
     assert transition["executed_effects"] == []
     assert state["active_gate"] == "UR.G2" and state["sequence"] == 8
     assert controller.run_state["state_digest"] == successor["state_digest"]
+
+
+def test_ur_g3_verification_receipt_flow_remains_green():
+    import json
+    from tools.node_architect import q0_qualification
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    g2_assignment = controller.assign_current_action()
+    g2_receipt = _g2_executor_receipt(profile, g2_assignment)
+    g2_decision = controller.consume_executor_receipt(g2_receipt)
+    g3_state = g2_decision["successor_run_state"]
+    g3_controller = UniversalController(profile=profile, runtime_plan=plan, run_state=g3_state, node_allocation=allocation)
+    g3_assignment = g3_controller.assign_current_action()
+    g3_executor_receipt = _g2_executor_receipt(profile, g3_assignment)
+    candidate_sha = plan["source_binding"]["pre_head_sha"]
+    g2_receipt_bytes = (json.dumps(g2_receipt, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    verification_receipt = q0_qualification.create_q0_verification_receipt(
+        run_id=g2_receipt["run_id"],
+        runtime_plan_digest=plan["digest"],
+        candidate_sha=candidate_sha,
+        g2_execution_receipt=g2_receipt,
+        g2_execution_receipt_ref="fixture/q0/g2-execution-receipt.json",
+        g2_execution_receipt_bytes=g2_receipt_bytes,
+        controller_transition_receipt=g2_decision["transition_receipt"],
+        v2_isolation_evidence={
+            "candidate_sha": candidate_sha,
+            "result": "UNIVERSAL_V2_CORE_ISOLATED_GWC_V1_QUARANTINED",
+            "evidence_ref": "fixture/q0/v2-isolation-evidence.json",
+            "evidence_sha256": "a" * 64,
+        },
+        v1_quarantine_evidence={
+            "manifest_ref": "legacy/gwc-v1/runtime-quarantine-manifest.json",
+            "manifest_sha256": "b" * 64,
+            "archived_sources_verified": 16,
+            "fallback_forbidden": True,
+        },
+        regression_evidence={
+            "candidate_sha": candidate_sha,
+            "command": "pytest tests/test_universal_v2_core_isolation.py -q",
+            "exit_code": 0,
+            "tests_passed": 1,
+            "result_sha256": "c" * 64,
+        },
+        created_at="2026-10-03T00:00:00Z",
+    )
+
+    decision = g3_controller.consume_executor_receipt(
+        g3_executor_receipt,
+        evidence_artifacts={"VERIFICATION_RECEIPT": verification_receipt},
+    )
+
+    assert decision["gate_advanced"] is True
+    assert decision["from_gate"] == "UR.G3"
+    assert decision["next_gate"] == "UR.G4"
+    assert decision["next_owner"] == "CONTROLLER"
+    assert decision["consumed_receipt_digest"] == g3_executor_receipt["receipt_digest"]
+    assert decision["successor_run_state"]["gate_evidence"] == {"VERIFICATION_RECEIPT": verification_receipt}
+    assert decision["successor_run_state"]["consumed_receipts"][-1] == g3_executor_receipt["receipt_digest"]
+    assert decision["authority_granted"] is False
+    assert decision["executed_effects"] == []
 
 
 def test_controller_replays_exact_receipt_idempotently_after_reconstruction():
