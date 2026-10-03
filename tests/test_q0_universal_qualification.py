@@ -18,21 +18,28 @@ def _sha(ch):
     return ch * 40
 
 
-def _execution_receipt(*, authority_granted: bool = False, node_id: str = "q0.qualification-campaign"):
+def _execution_receipt(*, authority_granted: bool = False, node_id: str | None = None):
     run_id = "scrum781-q0-20260920T074727Z"
+    q0_profile = _m().q0_qualification_profile()
+    node_id = node_id or q0_profile["qualification_nodes"]["UR.G2"]["node_id"]
     body = {
-        "schema_id": "gwc.universal-run.execution-receipt",
-        "artifact_type": "universal-run-execution-receipt",
+        "schema_id": "gwc.universal-run.executor-action-receipt.v2",
+        "schema_version": 2,
+        "artifact_type": "executor-action-receipt",
+        "runtime_protocol": "gwc.universal.controller/v2",
         "run_id": run_id,
         "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "runtime_profile_digest": _m().load_universal_v2_default_profile()["profile_digest"],
         "route_id": "UNIVERSAL_RUN_NEW_RUNTIME",
         "runtime_plan_digest": "sha256:" + "a" * 64,
         "node_allocation_id": f"{run_id}:{node_id}",
         "node_id": node_id,
         "gate": "UR.G2",
+        "action": "q0_execute_probe",
         "sequence": 3,
+        "assignment_digest": "sha256:" + "c" * 64,
         "event_id": "q0-execution-test",
-        "host_status": "SEMANTIC_NODE_COMPLETE",
+        "host_status": "ACTION_COMPLETE",
         "host_result_digest": "sha256:" + "b" * 64,
         "evidence_refs": {"node-result": ".gwc/node-result.json"},
         "authority_granted": authority_granted,

@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/run-manifest-revision.schema.json",
+  "title": "Universal Run manifest revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "schema_id",
+    "schema_version",
+    "run_id",
+    "created_at",
+    "created_by",
+    "lifecycle_profile",
+    "provenance",
+    "revision",
+    "run_kind",
+    "parent_run_ref",
+    "invoking_node_allocation_ref",
+    "content_digest"
+  ],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "schema_id": {"const": "gwc.universal-run.run-manifest-revision"},
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "created_at": {"type": "string", "minLength": 1},
+    "created_by": {"type": "object"},
+    "lifecycle_profile": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"const": "gwc.universal-run"},
+        "version": {"const": 1}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["predecessor_refs", "source_refs"],
+      "additionalProperties": false,
+      "properties": {
+        "predecessor_refs": {"type": "array", "items": {"type": "string"}},
+        "source_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "revision": {"type": "integer", "minimum": 1},
+    "run_kind": {"enum": ["ROOT", "CHILD"]},
+    "parent_run_ref": {"type": ["string", "null"], "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "invoking_node_allocation_ref": {"type": ["string", "null"], "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "content_digest": {
+      "type": "object",
+      "required": ["algorithm", "canonicalization", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonicalization": {"const": "JCS"},
+        "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"run_kind": {"const": "ROOT"}}, "required": ["run_kind"]},
+      "then": {
+        "properties": {
+          "parent_run_ref": {"type": "null"},
+          "invoking_node_allocation_ref": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"run_kind": {"const": "CHILD"}}, "required": ["run_kind"]},
+      "then": {
+        "properties": {
+          "parent_run_ref": {"type": "string", "minLength": 1},
+          "invoking_node_allocation_ref": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  ]
+}

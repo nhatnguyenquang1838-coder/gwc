@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://gwc.dev/schemas/node-architect/universal-run/run-state-record.schema.json",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/run-state-record.schema.json",
   "title": "Universal Run logical RunStateRecord",
   "type": "object",
   "additionalProperties": false,
@@ -13,14 +13,14 @@
   ],
   "properties": {
     "record_id": {"type": "string", "minLength": 1},
-    "schema_id": {"const": "gwc.universal-run.run-state-record"},
-    "schema_version": {"const": 1},
+    "schema_id": {"const": "gwc.universal-run.run-state-record.v2"},
+    "schema_version": {"const": 2},
     "run_id": {"type": "string", "minLength": 1},
     "created_at": {"type": "string", "minLength": 1},
     "created_by": {"type": "object"},
     "lifecycle_profile": {
       "type": "object", "required": ["id", "version"], "additionalProperties": false,
-      "properties": {"id": {"const": "gwc.universal-run"}, "version": {"const": 1}}
+      "properties": {"id": {"const": "gwc.universal-run.v2"}, "version": {"const": 2}}
     },
     "provenance": {
       "type": "object", "required": ["predecessor_refs", "source_refs"], "additionalProperties": false,
@@ -38,18 +38,18 @@
     "predecessor_state_ref": {"type": ["string", "null"]},
     "predecessor_state_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
     "sequence": {"type": "integer", "minimum": 0},
-    "active_gate": {"enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]},
+    "active_gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
     "gate_states": {
       "type": "object", "additionalProperties": false,
-      "required": ["G0", "G1", "G2", "G3", "G4", "G5", "G6"],
+      "required": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"],
       "properties": {
-        "G0": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
-        "G1": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
-        "G2": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
-        "G3": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
-        "G4": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
-        "G5": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
-        "G6": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]}
+        "UR.G0": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "UR.G1": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "UR.G2": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "UR.G3": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "UR.G4": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "UR.G5": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]},
+        "UR.G6": {"enum": ["NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"]}
       }
     },
     "terminal_state": {"enum": ["OPEN", "FAILED", "CANCELLED", "SUPERSEDED"]},

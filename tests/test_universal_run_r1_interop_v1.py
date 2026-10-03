@@ -66,7 +66,7 @@ def _child_receipt():
     )
 
 
-def _gates(active: str = "G0") -> dict[str, str]:
+def _gates(active: str = "UR.G0") -> dict[str, str]:
     return {gate: ("ACTIVE" if gate == active else "NOT_STARTED") for gate in GATES}
 
 
@@ -75,14 +75,14 @@ def _state_kwargs(**overrides: Any) -> dict[str, Any]:
     value: dict[str, Any] = {
         "record_id": "RS-ROOT",
         "run_id": "RUN-ROOT",
-        "lifecycle_profile": {"id": "gwc.universal-run", "version": 1},
+        "lifecycle_profile": {"id": "gwc.universal-run.v2", "version": 2},
         "run_manifest_ref": manifest["record_id"],
         "run_manifest_digest": manifest["content_digest"]["value"],
         "state_revision": 1,
         "predecessor_state_ref": None,
         "predecessor_state_digest": None,
         "sequence": 0,
-        "active_gate": "G0",
+        "active_gate": "UR.G0",
         "gate_states": _gates(),
         "terminal_state": "OPEN",
         "execution_refs": {
@@ -114,7 +114,7 @@ def test_e3_manifest_and_child_receipt_are_bound_as_immutable_refs():
     assert verify_record_digest(receipt)
     state = _create(run_manifest_ref=manifest["record_id"], run_manifest_digest=manifest["content_digest"]["value"])
     assert state["run_manifest_ref"] == manifest["record_id"]
-    assert state["lifecycle_profile"] == {"id": "gwc.universal-run", "version": 1}
+    assert state["lifecycle_profile"] == {"id": "gwc.universal-run.v2", "version": 2}
 
 
 def test_child_run_state_cannot_bind_wrong_parent_manifest():
@@ -130,7 +130,7 @@ def test_child_run_state_cannot_bind_wrong_parent_manifest():
 
 def test_dw_runtime_plan_binding_is_provenance_not_lifecycle_authority():
     state = _create()
-    assert state["lifecycle_profile"] == {"id": "gwc.universal-run", "version": 1}
+    assert state["lifecycle_profile"] == {"id": "gwc.universal-run.v2", "version": 2}
     assert state["execution_refs"]["runtime_plan_ref"] == "dw:runtime-plan/RP-1"
     assert state.get("authority_granted", False) is False
 
@@ -156,8 +156,8 @@ def test_future_handoff_ref_presence_does_not_accept_run():
 def test_future_target_contract_ref_presence_does_not_pass_g4():
     with pytest.raises(UniversalRunKernelError):
         _create(
-            active_gate="G4",
-            gate_states=_gates("G4"),
+            active_gate="UR.G4",
+            gate_states=_gates("UR.G4"),
             future_contract_refs={"target_contract_ref": "future:target/1"},
             terminal_state="ACCEPTED",
         )

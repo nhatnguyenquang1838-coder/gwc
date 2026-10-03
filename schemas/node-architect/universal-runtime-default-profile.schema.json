@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-runtime-default-profile.schema.json",
+  "title": "Universal Runtime v2 default profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "runtime_family",
+    "runtime_protocol",
+    "runtime_epoch",
+    "lifecycle_profile",
+    "lifecycle_gates",
+    "default_entrypoint",
+    "controller_entrypoint",
+    "executor_entrypoint",
+    "q0_qualification_profile_ref",
+    "legacy_gwc_v1",
+    "profile_digest"
+  ],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-runtime.default-profile.v2"},
+    "schema_version": {"const": 2},
+    "runtime_family": {"const": "UNIVERSAL_V2"},
+    "runtime_protocol": {"const": "gwc.universal.controller/v2"},
+    "runtime_epoch": {"const": "UNIVERSAL_V2_DEVELOPMENT"},
+    "lifecycle_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"const": "gwc.universal-run.v2"},
+        "version": {"const": 2}
+      }
+    },
+    "lifecycle_gates": {
+      "const": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]
+    },
+    "default_entrypoint": {"const": "tools.node_architect.agent_runtime_cli:main"},
+    "controller_entrypoint": {"const": "tools.node_architect.universal_run_controller:UniversalController"},
+    "executor_entrypoint": {"const": "tools.node_architect.universal_run_execution:UniversalExecutor"},
+    "q0_qualification_profile_ref": {"const": "core/node-architect/q0-live-qualification-profile.json"},
+    "legacy_gwc_v1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["load_by_default", "authority", "fallback", "replay_policy"],
+      "properties": {
+        "load_by_default": {"const": false},
+        "authority": {"const": "NONE"},
+        "fallback": {"const": "GWC_RUNTIME_DEFECT"},
+        "replay_policy": {"const": "EXPLICIT_HISTORICAL_PROFILE_ONLY"}
+      }
+    },
+    "profile_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

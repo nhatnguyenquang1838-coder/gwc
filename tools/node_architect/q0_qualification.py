@@ -16,6 +16,7 @@ from typing import Any, Mapping
 
 from tools.node_architect.universal_run_kernel import UNIVERSAL_PROFILE, transition_lifecycle
 from tools.node_architect.universal_run_lifecycle import evaluate_transition
+from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
 
 Q0_WORKFLOW_MODE = "q0_live_qualification"
 Q0_RUNTIME_EPOCH = "UNIVERSAL_V2_DEVELOPMENT"
@@ -217,19 +218,23 @@ def complete_q0_gate(
         expected_node_id = q0_qualification_profile()["qualification_nodes"]["UR.G2"]["node_id"]
         valid_receipt = (
             isinstance(receipt, Mapping)
-            and receipt.get("schema_id") == "gwc.universal-run.execution-receipt"
-            and receipt.get("artifact_type") == "universal-run-execution-receipt"
+            and receipt.get("schema_id") == "gwc.universal-run.executor-action-receipt.v2"
+            and receipt.get("schema_version") == 2
+            and receipt.get("artifact_type") == "executor-action-receipt"
+            and receipt.get("runtime_protocol") == "gwc.universal.controller/v2"
+            and receipt.get("runtime_profile_digest") == load_universal_v2_default_profile()["profile_digest"]
             and receipt.get("gate") == "UR.G2"
             and receipt.get("runtime_epoch") == Q0_RUNTIME_EPOCH
             and receipt.get("route_id") == "UNIVERSAL_RUN_NEW_RUNTIME"
-            and receipt.get("host_status") == "SEMANTIC_NODE_COMPLETE"
+            and receipt.get("host_status") == "ACTION_COMPLETE"
             and _valid_digest(receipt.get("runtime_plan_digest"))
             and _valid_digest(receipt.get("host_result_digest"))
             and isinstance(receipt.get("run_id"), str) and bool(receipt.get("run_id"))
             and isinstance(receipt.get("node_id"), str) and receipt.get("node_id") == expected_node_id
-            and isinstance(receipt.get("node_allocation_id"), str)
-            and receipt.get("node_allocation_id") == f"{receipt.get('run_id')}:{expected_node_id}"
+            and isinstance(receipt.get("node_allocation_id"), str) and bool(receipt.get("node_allocation_id"))
+            and _valid_digest(receipt.get("assignment_digest"))
             and isinstance(receipt.get("event_id"), str) and bool(receipt.get("event_id"))
+            and not any(key in receipt for key in ("typed_next", "successor_run_state", "controller_decision", "next_gate"))
             and receipt.get("authority_granted") is False
             and receipt.get("executed_effects") == []
             and valid_refs
@@ -273,7 +278,7 @@ def advance_qualification_gate(
         gate=current_gate, evidence=evidence, run_id=run_id,
         runtime_plan_digest=runtime_plan_digest,
     )
-    gate = current_gate.removeprefix("UR.")
+    gate = current_gate
     outcome = (evidence or {}).get("integration_outcome") if current_gate == "UR.G4" else None
     if current_gate == "UR.G4" and outcome is None and (evidence or {}).get("INTEGRATION_RECEIPT"):
         outcome = "INTEGRATED"
@@ -288,7 +293,7 @@ def advance_qualification_gate(
     ).to_dict()
     return {
         "current_gate": current_gate,
-        "next_gate": "UR." + advanced["outcome"]["next_gate"],
+        "next_gate": advanced["outcome"]["next_gate"],
         "next_state": advanced["outcome"]["next_state"],
         "sequence_delta": 1,
         "transition_receipt": advanced["receipt"],

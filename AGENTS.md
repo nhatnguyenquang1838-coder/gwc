@@ -94,6 +94,15 @@ The canonical machine semantics for this override are implemented in
 `tools/node_architect/universal_run_epoch.py` and enforced at route
 resolution by `tools/node_architect/resolve_gate_node_route.py`.
 
+The Q0 Universal v2 boot default is machine-readable at
+`core/node-architect/universal-runtime-default-profile.json`. The production
+entrypoint `tools/node_architect/agent_runtime_cli.py` loads and validates that
+profile through `tools/node_architect/universal_runtime_profile.py`; missing or
+invalid V2 boot/profile components are `GWC_RUNTIME_DEFECT`, never a GWC v1
+fallback. The default profile names the native UniversalController and
+UniversalExecutor, and declares the `UR.G0..UR.G6` namespace and legacy-v1
+non-default policy.
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,

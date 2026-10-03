@@ -119,8 +119,8 @@ class NodeAllocation:
             reasons = []
         return {
             "record_id": self.record_id,
-            "schema_id": "gwc.universal-run.node-allocation",
-            "schema_version": 1,
+            "schema_id": "gwc.universal-run.node-allocation.v2",
+            "schema_version": 2,
             "run_id": self.run_id,
             "created_at": "2026-01-01T00:00:00Z",
             "created_by": {"profile": "dwa-hermes"},
