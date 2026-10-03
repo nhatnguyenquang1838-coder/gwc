@@ -167,13 +167,139 @@ def test_ur_g2_execution_receipt_binds_exact_run_and_plan():
         )
 
 
-def test_ur_g3_completion_requires_verification_receipt():
+def _g3_transition_receipt(g2_receipt):
     m = _m()
-    with pytest.raises(m.Q0QualificationError, match="VERIFICATION_RECEIPT_REQUIRED"):
-        m.complete_q0_gate(gate="UR.G3", evidence={})
-    assert m.complete_q0_gate(gate="UR.G3", evidence={"VERIFICATION_RECEIPT": "verify:1"})["gate_state"] == "PASSED"
+    body = {
+        "schema_id": "gwc.universal-run.controller-transition-receipt.v2",
+        "schema_version": 2,
+        "run_id": g2_receipt["run_id"],
+        "runtime_plan_digest": g2_receipt["runtime_plan_digest"],
+        "candidate_sha": _sha("a"),
+        "from_gate": "UR.G2",
+        "to_gate": "UR.G3",
+        "transition_ref": "scrum781-q0-20260920T074727Z:transition:8:9",
+        "pre_state": {"sequence": 8, "state_digest": "sha256:" + "1" * 64},
+        "consumed_receipt_digest": g2_receipt["receipt_digest"],
+        "idempotency_key": g2_receipt["event_id"],
+        "post_state": {"sequence": 9, "state_digest": "sha256:" + "2" * 64},
+        "kernel_completion_receipt": {"action": "COMPLETE", "result": "PASS"},
+        "kernel_transition_receipt": {"action": "ADVANCE", "result": "PASS"},
+        "authority_granted": False,
+        "executed_effects": [],
+    }
+    return {**body, "transition_digest": m._digest(body)}
 
 
+def _valid_g3_verification_receipt():
+    m = _m()
+    g2 = _execution_receipt()
+    g2_bytes = (json.dumps(g2, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    return m.create_q0_verification_receipt(
+        run_id=g2["run_id"],
+        runtime_plan_digest=g2["runtime_plan_digest"],
+        candidate_sha=_sha("a"),
+        g2_execution_receipt=g2,
+        g2_execution_receipt_ref="q0-c95/evidence/executor-receipts/executor-action-receipt.json",
+        g2_execution_receipt_bytes=g2_bytes,
+        controller_transition_receipt=_g3_transition_receipt(g2),
+        v2_isolation_evidence={
+            "candidate_sha": _sha("a"),
+            "result": "UNIVERSAL_V2_CORE_ISOLATED_GWC_V1_QUARANTINED",
+            "evidence_ref": "q0-c93/evidence/e56-isolation-handoff-evidence.json",
+            "evidence_sha256": "c" * 64,
+        },
+        v1_quarantine_evidence={
+            "manifest_ref": "legacy/gwc-v1/runtime-quarantine-manifest.json",
+            "manifest_sha256": "d" * 64,
+            "archived_sources_verified": 16,
+            "fallback_forbidden": True,
+        },
+        regression_evidence={
+            "candidate_sha": _sha("a"),
+            "command": "python -m pytest tests/test_universal_v2_core_isolation.py -q",
+            "exit_code": 0,
+            "tests_passed": 327,
+            "result_sha256": "e" * 64,
+        },
+        created_at="2026-10-03T00:00:00Z",
+    )
+
+
+def test_ur_g3_completion_rejects_untyped_truthy_evidence():
+    m = _m()
+    with pytest.raises(m.Q0QualificationError, match="VERIFICATION_RECEIPT_INVALID"):
+        m.complete_q0_gate(gate="UR.G3", evidence={"VERIFICATION_RECEIPT": "verify:1"})
+
+
+def test_ur_g3_verification_receipt_is_schema_sealed_and_exactly_bound():
+    import jsonschema
+
+    m = _m()
+    receipt = _valid_g3_verification_receipt()
+    schema = json.loads((ROOT / "schemas/q0-verification-receipt.schema.json").read_text())
+    jsonschema.validate(receipt, schema)
+    result = m.complete_q0_gate(
+        gate="UR.G3",
+        evidence={"VERIFICATION_RECEIPT": receipt},
+        run_id=receipt["run_id"],
+        runtime_plan_digest=receipt["runtime_plan_digest"],
+        candidate_sha=receipt["candidate_sha"],
+    )
+    assert result["gate_state"] == "PASSED"
+    assert receipt["g2_chain"]["executor_receipt_ref"] == "q0-c95/evidence/executor-receipts/executor-action-receipt.json"
+    assert receipt["g2_chain"]["controller_transition_receipt"]["transition_ref"] == "scrum781-q0-20260920T074727Z:transition:8:9"
+    assert receipt["authority_granted"] is False
+    assert receipt["executed_effects"] == []
+    assert receipt["target_validation_performed"] is False
+    assert receipt["certification_claimed"] is False
+
+
+def test_q0_verification_receipt_materializer_is_exact_and_idempotent(tmp_path):
+    import hashlib
+
+    m = _m()
+    receipt = _valid_g3_verification_receipt()
+    path = tmp_path / "ur-g3-verification-receipt.json"
+
+    written = m.materialize_q0_verification_receipt(receipt=receipt, path=path)
+    reread = path.read_bytes()
+    repeated = m.materialize_q0_verification_receipt(receipt=receipt, path=path)
+
+    assert written["path"] == str(path)
+    assert written["file_sha256"] == hashlib.sha256(reread).hexdigest()
+    assert json.loads(reread) == receipt
+    assert written["idempotent_replay"] is False
+    assert repeated["idempotent_replay"] is True
+    conflicting_body = {key: value for key, value in receipt.items() if key != "receipt_digest"}
+    conflicting_body["created_at"] = "2026-10-03T00:01:00Z"
+    conflicting = m._sealed(conflicting_body)
+    with pytest.raises(m.Q0QualificationError, match="Q0_VERIFICATION_RECEIPT_CONFLICT"):
+        m.materialize_q0_verification_receipt(receipt=conflicting, path=path)
+
+
+def test_ur_g3_verification_receipt_rejects_tampering_and_candidate_drift():
+    m = _m()
+    receipt = _valid_g3_verification_receipt()
+    body = {key: value for key, value in receipt.items() if key != "receipt_digest"}
+    body["candidate_sha"] = _sha("f")
+    body["v2_isolation"] = dict(body["v2_isolation"], candidate_sha=_sha("f"))
+    body["regression"] = dict(body["regression"], candidate_sha=_sha("f"))
+    chain = dict(body["g2_chain"])
+    transition = {key: value for key, value in chain["controller_transition_receipt"].items() if key != "transition_digest"}
+    transition["candidate_sha"] = _sha("f")
+    transition["transition_digest"] = m._digest(transition)
+    chain["controller_transition_receipt"] = transition
+    chain["controller_transition_digest"] = transition["transition_digest"]
+    body["g2_chain"] = chain
+    tampered = {**body, "receipt_digest": m._digest(body)}
+    with pytest.raises(m.Q0QualificationError, match="VERIFICATION_RECEIPT_CANDIDATE_MISMATCH"):
+        m.complete_q0_gate(
+            gate="UR.G3",
+            evidence={"VERIFICATION_RECEIPT": tampered},
+            run_id=receipt["run_id"],
+            runtime_plan_digest=receipt["runtime_plan_digest"],
+            candidate_sha=receipt["candidate_sha"],
+        )
 def test_ur_g4_completion_requires_integration_receipt_or_explicit_integration_outcome():
     m = _m()
     with pytest.raises(m.Q0QualificationError, match="INTEGRATION_EVIDENCE_REQUIRED"):
@@ -367,7 +493,7 @@ def test_q0_e2e_campaign_certify_accept_handoff_then_login_start():
         ("UR.G0", {"UNDERSTANDING_RECEIPT":"g0"}),
         ("UR.G1", {"PLAN_RECEIPT":"g1"}),
         ("UR.G2", {"EXECUTION_RECEIPT": _execution_receipt()}),
-        ("UR.G3", {"VERIFICATION_RECEIPT":"g3"}),
+        ("UR.G3", {"VERIFICATION_RECEIPT": _valid_g3_verification_receipt()}),
         ("UR.G4", {"integration_outcome":"IN_PLACE"}),
         ("UR.G5", {"TARGET_VALIDATION_RECEIPT":"g5"}),
     ):

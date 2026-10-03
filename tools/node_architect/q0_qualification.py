@@ -9,6 +9,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -194,7 +195,7 @@ def resolve_q0_qualification_node(context: Mapping[str, Any]) -> dict[str, Any]:
 
 def complete_q0_gate(
     *, gate: str, evidence: Mapping[str, Any], run_id: str | None = None,
-    runtime_plan_digest: str | None = None,
+    runtime_plan_digest: str | None = None, candidate_sha: str | None = None,
 ) -> dict[str, Any]:
     """Validate the completion evidence for one namespaced Universal gate."""
     _require(gate in GATE_EVIDENCE, "Q0_GATE_UNKNOWN", str(gate))
@@ -248,6 +249,16 @@ def complete_q0_gate(
         if runtime_plan_digest is not None:
             _require(receipt.get("runtime_plan_digest") == runtime_plan_digest, "EXECUTION_RECEIPT_PLAN_MISMATCH")
         return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "EXECUTION_RECEIPT"}
+    if gate == "UR.G3":
+        receipt = values.get("VERIFICATION_RECEIPT")
+        _require(isinstance(receipt, Mapping), "VERIFICATION_RECEIPT_INVALID")
+        verify_q0_verification_receipt(
+            receipt,
+            run_id=run_id,
+            runtime_plan_digest=runtime_plan_digest,
+            candidate_sha=candidate_sha,
+        )
+        return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "VERIFICATION_RECEIPT"}
     if gate == "UR.G6":
         acceptance = values.get("Q0_ACCEPTANCE_RECEIPT")
         closure = values.get("CLOSURE_RECEIPT")
@@ -269,14 +280,252 @@ def complete_q0_gate(
     return {"gate": gate, "gate_state": "PASSED", "evidence_kind": required[0]}
 
 
+def _validate_q0_g3_inputs(
+    *, run_id: str, runtime_plan_digest: str, candidate_sha: str,
+    g2_execution_receipt: Mapping[str, Any], g2_execution_receipt_ref: str,
+    g2_execution_receipt_bytes: bytes, controller_transition_receipt: Mapping[str, Any],
+    v2_isolation_evidence: Mapping[str, Any], v1_quarantine_evidence: Mapping[str, Any],
+    regression_evidence: Mapping[str, Any], created_at: str,
+) -> str:
+    _require(isinstance(g2_execution_receipt, Mapping), "EXECUTION_RECEIPT_INVALID")
+    _require(isinstance(controller_transition_receipt, Mapping), "CONTROLLER_TRANSITION_RECEIPT_INVALID")
+    _require(isinstance(v2_isolation_evidence, Mapping), "Q0_ISOLATION_EVIDENCE_INVALID")
+    _require(isinstance(v1_quarantine_evidence, Mapping), "Q0_V1_QUARANTINE_MANIFEST_INVALID")
+    _require(isinstance(regression_evidence, Mapping), "Q0_REGRESSION_EVIDENCE_INVALID")
+    _require(bool(run_id), "Q0_BINDING_REQUIRED")
+    _require(_valid_digest(runtime_plan_digest), "RUNTIME_PLAN_DIGEST_INVALID")
+    _require(_valid_sha(candidate_sha), "Q0_CANDIDATE_SHA_INVALID")
+    _require(isinstance(g2_execution_receipt_ref, str) and bool(g2_execution_receipt_ref.strip()), "EXECUTION_RECEIPT_REF_REQUIRED")
+    _require(isinstance(g2_execution_receipt_bytes, (bytes, bytearray)), "EXECUTION_RECEIPT_BYTES_REQUIRED")
+    try:
+        parsed_g2_receipt = json.loads(bytes(g2_execution_receipt_bytes).decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise Q0QualificationError("EXECUTION_RECEIPT_BYTES_INVALID", str(exc)) from exc
+    _require(parsed_g2_receipt == dict(g2_execution_receipt), "EXECUTION_RECEIPT_BYTES_MISMATCH")
+    g2_execution_receipt_file_sha256 = hashlib.sha256(bytes(g2_execution_receipt_bytes)).hexdigest()
+    complete_q0_gate(
+        gate="UR.G2",
+        evidence={"EXECUTION_RECEIPT": g2_execution_receipt},
+        run_id=run_id,
+        runtime_plan_digest=runtime_plan_digest,
+    )
+    transition = controller_transition_receipt
+    _require(transition.get("schema_id") == "gwc.universal-run.controller-transition-receipt.v2", "CONTROLLER_TRANSITION_RECEIPT_INVALID")
+    _require(transition.get("schema_version") == 2, "CONTROLLER_TRANSITION_RECEIPT_INVALID")
+    _require(transition.get("run_id") == run_id, "CONTROLLER_TRANSITION_RUN_MISMATCH")
+    _require(transition.get("runtime_plan_digest") == runtime_plan_digest, "CONTROLLER_TRANSITION_PLAN_MISMATCH")
+    _require(transition.get("candidate_sha") == candidate_sha, "CONTROLLER_TRANSITION_CANDIDATE_MISMATCH")
+    _require(transition.get("from_gate") == "UR.G2" and transition.get("to_gate") == "UR.G3", "CONTROLLER_TRANSITION_GATE_MISMATCH")
+    _require(transition.get("consumed_receipt_digest") == g2_execution_receipt.get("receipt_digest"), "CONTROLLER_TRANSITION_RECEIPT_MISMATCH")
+    _require(transition.get("idempotency_key") == g2_execution_receipt.get("event_id"), "CONTROLLER_TRANSITION_IDEMPOTENCY_MISMATCH")
+    _require(isinstance(transition.get("transition_ref"), str) and bool(transition["transition_ref"].strip()), "CONTROLLER_TRANSITION_REF_REQUIRED")
+    pre = transition.get("pre_state")
+    post = transition.get("post_state")
+    _require(isinstance(pre, Mapping) and isinstance(post, Mapping), "CONTROLLER_TRANSITION_STATE_BINDING_INVALID")
+    _require(isinstance(pre.get("sequence"), int) and post.get("sequence") == pre.get("sequence") + 1, "CONTROLLER_TRANSITION_SEQUENCE_INVALID")
+    _require(_valid_digest(pre.get("state_digest")) and _valid_digest(post.get("state_digest")), "CONTROLLER_TRANSITION_STATE_DIGEST_INVALID")
+    _require(_verify_seal(transition, "transition_digest"), "CONTROLLER_TRANSITION_DIGEST_INVALID")
+    _require(transition.get("authority_granted") is False and transition.get("executed_effects") == [], "CONTROLLER_TRANSITION_EFFECT_BOUNDARY_VIOLATION")
+    _require(isinstance(transition.get("kernel_completion_receipt"), Mapping) and isinstance(transition.get("kernel_transition_receipt"), Mapping), "CONTROLLER_KERNEL_RECEIPTS_REQUIRED")
+    _require(v2_isolation_evidence.get("candidate_sha") == candidate_sha, "Q0_ISOLATION_CANDIDATE_MISMATCH")
+    _require(v2_isolation_evidence.get("result") == "UNIVERSAL_V2_CORE_ISOLATED_GWC_V1_QUARANTINED", "Q0_V2_ISOLATION_REQUIRED")
+    _require(bool(v2_isolation_evidence.get("evidence_ref")) and re.fullmatch(r"[0-9a-f]{64}", str(v2_isolation_evidence.get("evidence_sha256", ""))) is not None, "Q0_ISOLATION_EVIDENCE_INVALID")
+    _require(bool(v1_quarantine_evidence.get("manifest_ref")), "Q0_V1_QUARANTINE_MANIFEST_REQUIRED")
+    _require(re.fullmatch(r"[0-9a-f]{64}", str(v1_quarantine_evidence.get("manifest_sha256", ""))) is not None, "Q0_V1_QUARANTINE_MANIFEST_INVALID")
+    _require(isinstance(v1_quarantine_evidence.get("archived_sources_verified"), int) and v1_quarantine_evidence["archived_sources_verified"] > 0, "Q0_V1_ARCHIVE_VERIFICATION_REQUIRED")
+    _require(v1_quarantine_evidence.get("fallback_forbidden") is True, "Q0_V1_FALLBACK_MUST_REMAIN_FORBIDDEN")
+    _require(regression_evidence.get("candidate_sha") == candidate_sha, "Q0_REGRESSION_CANDIDATE_MISMATCH")
+    _require(isinstance(regression_evidence.get("command"), str) and bool(regression_evidence["command"].strip()), "Q0_REGRESSION_COMMAND_REQUIRED")
+    _require(regression_evidence.get("exit_code") == 0, "Q0_REGRESSION_NOT_PASSING")
+    _require(isinstance(regression_evidence.get("tests_passed"), int) and regression_evidence["tests_passed"] > 0, "Q0_REGRESSION_TEST_COUNT_INVALID")
+    _require(re.fullmatch(r"[0-9a-f]{64}", str(regression_evidence.get("result_sha256", ""))) is not None, "Q0_REGRESSION_RESULT_SHA_INVALID")
+    _require(_parse_utc(created_at) is not None, "Q0_RECEIPT_TIMESTAMP_INVALID")
+    return g2_execution_receipt_file_sha256
+
+
+def create_q0_verification_receipt(
+    *, run_id: str, runtime_plan_digest: str, candidate_sha: str,
+    g2_execution_receipt: Mapping[str, Any], g2_execution_receipt_ref: str,
+    g2_execution_receipt_bytes: bytes, controller_transition_receipt: Mapping[str, Any],
+    v2_isolation_evidence: Mapping[str, Any], v1_quarantine_evidence: Mapping[str, Any],
+    regression_evidence: Mapping[str, Any], created_at: str,
+) -> dict[str, Any]:
+    """Create a sealed UR.G3 receipt only from exact-candidate evidence bindings."""
+    profile = load_universal_v2_default_profile()
+    qualification_profile = q0_qualification_profile()
+    g2_execution_receipt_file_sha256 = _validate_q0_g3_inputs(
+        run_id=run_id,
+        runtime_plan_digest=runtime_plan_digest,
+        candidate_sha=candidate_sha,
+        g2_execution_receipt=g2_execution_receipt,
+        g2_execution_receipt_ref=g2_execution_receipt_ref,
+        g2_execution_receipt_bytes=g2_execution_receipt_bytes,
+        controller_transition_receipt=controller_transition_receipt,
+        v2_isolation_evidence=v2_isolation_evidence,
+        v1_quarantine_evidence=v1_quarantine_evidence,
+        regression_evidence=regression_evidence,
+        created_at=created_at,
+    )
+    transition = controller_transition_receipt
+    receipt = {
+        "schema_id": "dw.gwc.q0.verification-receipt/v1",
+        "schema_version": 1,
+        "artifact_type": "q0-verification-receipt",
+        "run_id": run_id,
+        "gate": "UR.G3",
+        "runtime_epoch": Q0_RUNTIME_EPOCH,
+        "runtime_plan_digest": runtime_plan_digest,
+        "candidate_sha": candidate_sha,
+        "runtime_profile_digest": profile["profile_digest"],
+        "qualification_profile_digest": qualification_profile["profile_digest"],
+        "verification_action": "q0_verify_evidence",
+        "result": "PASS",
+        "g2_chain": {
+            "executor_receipt_ref": g2_execution_receipt_ref,
+            "executor_receipt_digest": g2_execution_receipt["receipt_digest"],
+            "executor_receipt_file_sha256": g2_execution_receipt_file_sha256,
+            "idempotency_key": g2_execution_receipt["event_id"],
+            "controller_transition_digest": transition["transition_digest"],
+            "transition_ref": transition["transition_ref"],
+            "controller_transition_receipt": copy.deepcopy(dict(transition)),
+            "pre_state_sequence": transition["pre_state"]["sequence"],
+            "pre_state_digest": transition["pre_state"]["state_digest"],
+            "post_state_sequence": transition["post_state"]["sequence"],
+            "post_state_digest": transition["post_state"]["state_digest"],
+        },
+        "v2_isolation": copy.deepcopy(dict(v2_isolation_evidence)),
+        "v1_quarantine": copy.deepcopy(dict(v1_quarantine_evidence)),
+        "regression": copy.deepcopy(dict(regression_evidence)),
+        "target_validation_performed": False,
+        "certification_claimed": False,
+        "authority_granted": False,
+        "executed_effects": [],
+        "created_at": created_at,
+    }
+    receipt = _sealed(receipt)
+    verify_q0_verification_receipt(
+        receipt,
+        run_id=run_id,
+        runtime_plan_digest=runtime_plan_digest,
+        candidate_sha=candidate_sha,
+    )
+    return receipt
+
+
+def verify_q0_verification_receipt(
+    receipt: Mapping[str, Any], *, run_id: str | None = None,
+    runtime_plan_digest: str | None = None, candidate_sha: str | None = None,
+) -> bool:
+    """Validate the closed UR.G3 evidence schema, seal, and exact runtime binding."""
+    _require(isinstance(receipt, Mapping), "VERIFICATION_RECEIPT_INVALID")
+    schema_path = Path(__file__).resolve().parents[2] / "schemas/q0-verification-receipt.schema.json"
+    try:
+        import jsonschema
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        jsonschema.validate(dict(receipt), schema)
+    except Exception as exc:
+        raise Q0QualificationError("VERIFICATION_RECEIPT_INVALID", str(exc)) from exc
+    _require(receipt.get("schema_id") == "dw.gwc.q0.verification-receipt/v1", "VERIFICATION_RECEIPT_INVALID")
+    _require(receipt.get("artifact_type") == "q0-verification-receipt" and receipt.get("gate") == "UR.G3", "VERIFICATION_RECEIPT_INVALID")
+    _require(receipt.get("runtime_epoch") == Q0_RUNTIME_EPOCH and receipt.get("verification_action") == "q0_verify_evidence", "VERIFICATION_RECEIPT_INVALID")
+    _require(receipt.get("runtime_profile_digest") == load_universal_v2_default_profile()["profile_digest"], "VERIFICATION_RECEIPT_PROFILE_MISMATCH")
+    _require(receipt.get("qualification_profile_digest") == q0_qualification_profile()["profile_digest"], "VERIFICATION_RECEIPT_PROFILE_MISMATCH")
+    _require(receipt.get("result") == "PASS" and _verify_seal(receipt, "receipt_digest"), "VERIFICATION_RECEIPT_DIGEST_INVALID")
+    _require(receipt.get("authority_granted") is False and receipt.get("executed_effects") == [], "VERIFICATION_RECEIPT_EFFECT_BOUNDARY_VIOLATION")
+    _require(receipt.get("target_validation_performed") is False and receipt.get("certification_claimed") is False, "VERIFICATION_RECEIPT_SCOPE_VIOLATION")
+    chain = receipt["g2_chain"]
+    transition = chain["controller_transition_receipt"]
+    _require(transition.get("transition_digest") == chain.get("controller_transition_digest"), "VERIFICATION_RECEIPT_TRANSITION_DIGEST_MISMATCH")
+    _require(_verify_seal(transition, "transition_digest"), "VERIFICATION_RECEIPT_TRANSITION_SEAL_INVALID")
+    _require(
+        transition.get("run_id") == receipt.get("run_id")
+        and transition.get("runtime_plan_digest") == receipt.get("runtime_plan_digest")
+        and transition.get("candidate_sha") == receipt.get("candidate_sha"),
+        "VERIFICATION_RECEIPT_TRANSITION_BINDING_MISMATCH",
+    )
+    _require(transition.get("transition_ref") == chain.get("transition_ref"), "VERIFICATION_RECEIPT_TRANSITION_REF_MISMATCH")
+    _require(transition.get("consumed_receipt_digest") == chain.get("executor_receipt_digest"), "VERIFICATION_RECEIPT_EXECUTION_CHAIN_MISMATCH")
+    _require(transition.get("idempotency_key") == chain.get("idempotency_key"), "VERIFICATION_RECEIPT_EXECUTION_CHAIN_MISMATCH")
+    pre = transition["pre_state"]
+    post = transition["post_state"]
+    _require(
+        pre.get("sequence") == chain.get("pre_state_sequence")
+        and pre.get("state_digest") == chain.get("pre_state_digest")
+        and post.get("sequence") == chain.get("post_state_sequence")
+        and post.get("state_digest") == chain.get("post_state_digest")
+        and post.get("sequence") == pre.get("sequence") + 1,
+        "VERIFICATION_RECEIPT_STATE_CHAIN_MISMATCH",
+    )
+    _require(receipt["v2_isolation"].get("candidate_sha") == receipt.get("candidate_sha"), "VERIFICATION_RECEIPT_ISOLATION_BINDING_MISMATCH")
+    _require(receipt["regression"].get("candidate_sha") == receipt.get("candidate_sha") and receipt["regression"].get("exit_code") == 0 and receipt["regression"].get("tests_passed", 0) > 0, "VERIFICATION_RECEIPT_REGRESSION_BINDING_MISMATCH")
+    _require(receipt["v1_quarantine"].get("fallback_forbidden") is True and receipt["v1_quarantine"].get("archived_sources_verified", 0) > 0, "VERIFICATION_RECEIPT_QUARANTINE_INVALID")
+    _require(_parse_utc(receipt.get("created_at")) is not None, "VERIFICATION_RECEIPT_TIMESTAMP_INVALID")
+    if run_id is not None:
+        _require(receipt.get("run_id") == run_id, "VERIFICATION_RECEIPT_RUN_MISMATCH")
+    if runtime_plan_digest is not None:
+        _require(receipt.get("runtime_plan_digest") == runtime_plan_digest, "VERIFICATION_RECEIPT_PLAN_MISMATCH")
+    if candidate_sha is not None:
+        _require(receipt.get("candidate_sha") == candidate_sha, "VERIFICATION_RECEIPT_CANDIDATE_MISMATCH")
+    return True
+
+
+def materialize_q0_verification_receipt(*, receipt: Mapping[str, Any], path: str | Path) -> dict[str, Any]:
+    """Create one immutable receipt file, or verify an exact idempotent replay."""
+    verify_q0_verification_receipt(receipt)
+    target = Path(path)
+    _require(not target.is_symlink(), "Q0_VERIFICATION_RECEIPT_PATH_SYMLINK")
+    payload = (json.dumps(dict(receipt), sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        _require(not target.is_symlink(), "Q0_VERIFICATION_RECEIPT_PATH_SYMLINK")
+        try:
+            existing = target.read_bytes()
+        except OSError as exc:
+            raise Q0QualificationError("Q0_VERIFICATION_RECEIPT_READBACK_FAILED", str(exc)) from exc
+        _require(existing == payload, "Q0_VERIFICATION_RECEIPT_CONFLICT")
+        idempotent_replay = True
+    except OSError as exc:
+        raise Q0QualificationError("Q0_VERIFICATION_RECEIPT_WRITE_FAILED", str(exc)) from exc
+    else:
+        try:
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+        except OSError as exc:
+            raise Q0QualificationError("Q0_VERIFICATION_RECEIPT_WRITE_FAILED", str(exc)) from exc
+        idempotent_replay = False
+    try:
+        readback = target.read_bytes()
+        decoded = json.loads(readback)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise Q0QualificationError("Q0_VERIFICATION_RECEIPT_READBACK_FAILED", str(exc)) from exc
+    _require(readback == payload and decoded == dict(receipt), "Q0_VERIFICATION_RECEIPT_READBACK_MISMATCH")
+    verify_q0_verification_receipt(
+        decoded,
+        run_id=receipt["run_id"],
+        runtime_plan_digest=receipt["runtime_plan_digest"],
+        candidate_sha=receipt["candidate_sha"],
+    )
+    return {
+        "path": str(target),
+        "file_sha256": hashlib.sha256(readback).hexdigest(),
+        "receipt_digest": receipt["receipt_digest"],
+        "idempotent_replay": idempotent_replay,
+    }
+
+
 def advance_qualification_gate(
     *, current_gate: str, current_state: str, evidence: Mapping[str, Any], sequence: int = 1,
     run_id: str | None = None, runtime_plan_digest: str | None = None,
+    candidate_sha: str | None = None,
 ) -> dict[str, Any]:
     """Use the shared Universal kernel lifecycle to complete then advance one gate."""
     complete_q0_gate(
         gate=current_gate, evidence=evidence, run_id=run_id,
-        runtime_plan_digest=runtime_plan_digest,
+        runtime_plan_digest=runtime_plan_digest, candidate_sha=candidate_sha,
     )
     gate = current_gate
     outcome = (evidence or {}).get("integration_outcome") if current_gate == "UR.G4" else None

@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/controller-transition-receipt.schema.json",
+  "title": "Universal Runtime v2 Controller Transition Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "run_id",
+    "runtime_plan_digest",
+    "candidate_sha",
+    "from_gate",
+    "to_gate",
+    "transition_ref",
+    "pre_state",
+    "consumed_receipt_digest",
+    "idempotency_key",
+    "post_state",
+    "kernel_completion_receipt",
+    "kernel_transition_receipt",
+    "authority_granted",
+    "executed_effects",
+    "transition_digest"
+  ],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.controller-transition-receipt.v2"},
+    "schema_version": {"const": 2},
+    "run_id": {"type": "string", "minLength": 1},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "from_gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
+    "to_gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
+    "transition_ref": {"type": "string", "minLength": 1},
+    "pre_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "state_digest"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "consumed_receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "post_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "state_digest"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 2},
+        "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "kernel_completion_receipt": {"type": "object"},
+    "kernel_transition_receipt": {"type": "object"},
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "transition_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

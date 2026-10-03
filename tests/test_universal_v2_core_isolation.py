@@ -128,7 +128,7 @@ def test_all_active_universal_run_schemas_are_v2_and_ur_namespaced():
 
     root = Path(__file__).resolve().parents[1]
     schema_paths = sorted((root / "schemas/node-architect/universal-run").glob("*.schema.json"))
-    assert len(schema_paths) == 8
+    assert len(schema_paths) == 9
     for path in schema_paths:
         schema = json.loads(path.read_text(encoding="utf-8"))
         assert "/universal-run/v2/" in schema["$id"], path.name
@@ -289,16 +289,11 @@ def test_q0_g2_accepts_only_native_v2_executor_receipt():
     assert completion["gate_state"] == "PASSED"
 
 
-def test_controller_consumes_executor_receipt_and_advances_native_state_only():
+def _g2_executor_receipt(profile, assignment):
     import hashlib
     import json
 
-    from tools.node_architect.universal_run_controller import UniversalController
-
-    profile, plan, state, allocation = _make_v2_binding()
-    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
-    assignment = controller.assign_current_action()
-    receipt_body = {
+    body = {
         "schema_id": "gwc.universal-run.executor-action-receipt.v2",
         "schema_version": 2,
         "artifact_type": "executor-action-receipt",
@@ -310,6 +305,7 @@ def test_controller_consumes_executor_receipt_and_advances_native_state_only():
         "sequence": assignment["sequence"],
         "gate": assignment["gate"],
         "action": assignment["action"],
+        "actor": "EXECUTOR",
         "node_id": assignment["node_id"],
         "node_allocation_id": assignment["node_allocation_id"],
         "runtime_plan_digest": assignment["runtime_plan_digest"],
@@ -317,25 +313,142 @@ def test_controller_consumes_executor_receipt_and_advances_native_state_only():
         "event_id": assignment["idempotency_key"],
         "host_status": "ACTION_COMPLETE",
         "host_result_digest": "sha256:" + "d" * 64,
-        "evidence_refs": {"executor_receipt": "q0-c93/evidence/executor-receipt.json"},
+        "evidence_refs": {"executor_receipt": "q0-c96/evidence/executor-receipt.json"},
         "authority_granted": False,
         "executed_effects": [],
     }
-    receipt = {
-        **receipt_body,
+    return {
+        **body,
         "receipt_digest": "sha256:" + hashlib.sha256(
-            json.dumps(receipt_body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+            json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
         ).hexdigest(),
     }
 
+
+def test_controller_consumes_receipt_with_durable_transition_binding_and_g3_next():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    receipt = _g2_executor_receipt(profile, assignment)
+
     decision = controller.consume_executor_receipt(receipt)
+    successor = decision["successor_run_state"]
+    transition = decision["transition_receipt"]
 
     assert "typed_next" not in receipt
-    assert decision["typed_next"] == "CONTINUE_UNIVERSAL_LANE_REMEDIATION"
-    assert decision["successor_run_state"]["active_gate"] == "UR.G3"
-    assert decision["successor_run_state"]["sequence"] == 9
+    assert decision["typed_next"] == "MATERIALIZE_UR_G3_VERIFICATION_RECEIPT"
+    assert decision["next_owner"] == "EXECUTOR"
+    assert decision["idempotent_replay"] is False
+    assert successor["active_gate"] == "UR.G3"
+    assert successor["sequence"] == 9
+    assert successor["typed_next"] == "MATERIALIZE_UR_G3_VERIFICATION_RECEIPT"
+    assert successor["evidence_gap"] == ["VERIFICATION_RECEIPT"]
+    assert transition["from_gate"] == "UR.G2"
+    assert transition["to_gate"] == "UR.G3"
+    assert transition["pre_state"]["sequence"] == 8
+    assert transition["pre_state"]["state_digest"] == state["state_digest"]
+    assert transition["consumed_receipt_digest"] == receipt["receipt_digest"]
+    assert transition["post_state"]["sequence"] == 9
+    assert transition["post_state"]["state_digest"] == successor["state_digest"]
+    assert transition["authority_granted"] is False
+    assert transition["executed_effects"] == []
     assert state["active_gate"] == "UR.G2" and state["sequence"] == 8
-    assert controller.run_state["active_gate"] == "UR.G3"
+    assert controller.run_state["state_digest"] == successor["state_digest"]
+
+
+def test_controller_replays_exact_receipt_idempotently_after_reconstruction():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    receipt = _g2_executor_receipt(profile, assignment)
+    first = controller.consume_executor_receipt(receipt)
+    first_state = controller.run_state
+
+    replay = controller.consume_executor_receipt(receipt)
+    restarted = UniversalController(profile=profile, runtime_plan=plan, run_state=first_state, node_allocation=allocation)
+    replay_after_restart = restarted.consume_executor_receipt(receipt)
+
+    assert replay["idempotent_replay"] is True
+    assert replay_after_restart["idempotent_replay"] is True
+    assert replay["transition_ref"] == first["transition_receipt"]["transition_ref"]
+    assert replay_after_restart["transition_ref"] == replay["transition_ref"]
+    assert controller.run_state["sequence"] == 9
+    assert restarted.run_state["state_digest"] == first_state["state_digest"]
+
+
+def test_controller_rejects_different_receipt_under_consumed_idempotency_key():
+    import hashlib
+    import json
+    import pytest
+
+    from tools.node_architect.universal_run_controller import UniversalController, UniversalControllerError
+
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    receipt = _g2_executor_receipt(profile, assignment)
+    controller.consume_executor_receipt(receipt)
+    conflicting_body = {key: value for key, value in receipt.items() if key != "receipt_digest"}
+    conflicting_body["host_result_digest"] = "sha256:" + "e" * 64
+    conflicting = {
+        **conflicting_body,
+        "receipt_digest": "sha256:" + hashlib.sha256(
+            json.dumps(conflicting_body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+        ).hexdigest(),
+    }
+    before = controller.run_state["state_digest"]
+
+    with pytest.raises(UniversalControllerError, match="EXECUTOR_RECEIPT_IDEMPOTENCY_CONFLICT"):
+        controller.consume_executor_receipt(conflicting)
+
+    assert controller.run_state["state_digest"] == before
+    assert controller.run_state["sequence"] == 9
+
+
+def test_controller_transition_receipt_schema_and_materializer_are_exactly_once(tmp_path):
+    import hashlib
+    import json
+    from pathlib import Path
+    import pytest
+
+    from tools.node_architect.universal_run_controller import (
+        UniversalController,
+        UniversalControllerError,
+        materialize_controller_transition_receipt,
+    )
+    import jsonschema
+
+    profile, plan, state, allocation = _make_v2_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    assignment = controller.assign_current_action()
+    transition = controller.consume_executor_receipt(_g2_executor_receipt(profile, assignment))["transition_receipt"]
+    schema = json.loads((Path(__file__).resolve().parents[1] / "schemas/node-architect/universal-run/controller-transition-receipt.schema.json").read_text())
+    jsonschema.validate(transition, schema)
+    path = tmp_path / "controller-transition-receipt.json"
+
+    written = materialize_controller_transition_receipt(receipt=transition, path=path)
+    reread = path.read_bytes()
+    replay = materialize_controller_transition_receipt(receipt=transition, path=path)
+
+    assert json.loads(reread) == transition
+    assert written["file_sha256"] == hashlib.sha256(reread).hexdigest()
+    assert written["transition_digest"] == transition["transition_digest"]
+    assert written["idempotent_replay"] is False
+    assert replay["idempotent_replay"] is True
+    conflicting_body = {key: value for key, value in transition.items() if key != "transition_digest"}
+    conflicting_body["transition_ref"] += ":different"
+    conflicting = {
+        **conflicting_body,
+        "transition_digest": "sha256:" + hashlib.sha256(
+            json.dumps(conflicting_body, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+        ).hexdigest(),
+    }
+    with pytest.raises(UniversalControllerError, match="CONTROLLER_TRANSITION_RECEIPT_CONFLICT"):
+        materialize_controller_transition_receipt(receipt=conflicting, path=path)
 
 
 def test_universal_executor_emits_actor_receipt_without_controller_fields(tmp_path):

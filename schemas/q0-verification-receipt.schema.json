@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-verification-receipt.schema.json",
+  "title": "Q0 Universal Runtime UR.G3 Verification Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "artifact_type",
+    "run_id",
+    "gate",
+    "runtime_epoch",
+    "runtime_plan_digest",
+    "candidate_sha",
+    "runtime_profile_digest",
+    "qualification_profile_digest",
+    "verification_action",
+    "result",
+    "g2_chain",
+    "v2_isolation",
+    "v1_quarantine",
+    "regression",
+    "target_validation_performed",
+    "certification_claimed",
+    "authority_granted",
+    "executed_effects",
+    "created_at",
+    "receipt_digest"
+  ],
+  "properties": {
+    "schema_id": {"const": "dw.gwc.q0.verification-receipt/v1"},
+    "schema_version": {"const": 1},
+    "artifact_type": {"const": "q0-verification-receipt"},
+    "run_id": {"type": "string", "minLength": 1},
+    "gate": {"const": "UR.G3"},
+    "runtime_epoch": {"const": "UNIVERSAL_V2_DEVELOPMENT"},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "runtime_profile_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "qualification_profile_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "verification_action": {"const": "q0_verify_evidence"},
+    "result": {"const": "PASS"},
+    "g2_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor_receipt_ref",
+        "executor_receipt_digest",
+        "executor_receipt_file_sha256",
+        "idempotency_key",
+        "controller_transition_digest",
+        "transition_ref",
+        "controller_transition_receipt",
+        "pre_state_sequence",
+        "pre_state_digest",
+        "post_state_sequence",
+        "post_state_digest"
+      ],
+      "properties": {
+        "executor_receipt_ref": {"type": "string", "minLength": 1},
+        "executor_receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "executor_receipt_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "idempotency_key": {"type": "string", "minLength": 1},
+        "controller_transition_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "transition_ref": {"type": "string", "minLength": 1},
+        "controller_transition_receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id", "schema_version", "run_id", "runtime_plan_digest", "candidate_sha",
+            "from_gate", "to_gate", "transition_ref", "pre_state", "consumed_receipt_digest",
+            "idempotency_key", "post_state", "kernel_completion_receipt", "kernel_transition_receipt",
+            "authority_granted", "executed_effects", "transition_digest"
+          ],
+          "properties": {
+            "schema_id": {"const": "gwc.universal-run.controller-transition-receipt.v2"},
+            "schema_version": {"const": 2},
+            "run_id": {"type": "string", "minLength": 1},
+            "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "from_gate": {"const": "UR.G2"},
+            "to_gate": {"const": "UR.G3"},
+            "transition_ref": {"type": "string", "minLength": 1},
+            "pre_state": {
+              "type": "object", "additionalProperties": false,
+              "required": ["sequence", "state_digest"],
+              "properties": {
+                "sequence": {"type": "integer", "minimum": 1},
+                "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+              }
+            },
+            "consumed_receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+            "idempotency_key": {"type": "string", "minLength": 1},
+            "post_state": {
+              "type": "object", "additionalProperties": false,
+              "required": ["sequence", "state_digest"],
+              "properties": {
+                "sequence": {"type": "integer", "minimum": 2},
+                "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+              }
+            },
+            "kernel_completion_receipt": {"type": "object"},
+            "kernel_transition_receipt": {"type": "object"},
+            "authority_granted": {"const": false},
+            "executed_effects": {"const": []},
+            "transition_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        },
+        "pre_state_sequence": {"type": "integer", "minimum": 1},
+        "pre_state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "post_state_sequence": {"type": "integer", "minimum": 2},
+        "post_state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "v2_isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_sha", "result", "evidence_ref", "evidence_sha256"],
+      "properties": {
+        "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "result": {"const": "UNIVERSAL_V2_CORE_ISOLATED_GWC_V1_QUARANTINED"},
+        "evidence_ref": {"type": "string", "minLength": 1},
+        "evidence_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "v1_quarantine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_ref", "manifest_sha256", "archived_sources_verified", "fallback_forbidden"],
+      "properties": {
+        "manifest_ref": {"type": "string", "minLength": 1},
+        "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "archived_sources_verified": {"type": "integer", "minimum": 1},
+        "fallback_forbidden": {"const": true}
+      }
+    },
+    "regression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_sha", "command", "exit_code", "tests_passed", "result_sha256"],
+      "properties": {
+        "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "command": {"type": "string", "minLength": 1},
+        "exit_code": {"const": 0},
+        "tests_passed": {"type": "integer", "minimum": 1},
+        "result_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "target_validation_performed": {"const": false},
+    "certification_claimed": {"const": false},
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "created_at": {"type": "string", "minLength": 1},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}
