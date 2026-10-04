@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/recovery-replan-cursor-activation-authorization.schema.json",
+  "title": "Universal V2 recovery-replan cursor activation authorization",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id", "schema_version", "decision", "authorized_action", "authority_ref",
+    "controller_sequence", "controller_body_sha256", "run_id", "runtime_plan_digest",
+    "candidate_sha", "expected_incident_checkpoint_file_sha256", "incident_sequence",
+    "incident_gate", "recovery_sequence", "recovery_gate", "next_owner", "typed_next",
+    "recovery_replan_receipt_digest", "stale_evidence_invalidation_digest",
+    "authority_granted", "executed_effects", "authorization_digest"
+  ],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.recovery-replan-cursor-activation-authorization.v2"},
+    "schema_version": {"const": 2},
+    "decision": {"const": "AUTHORIZE"},
+    "authorized_action": {"const": "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN_CURSOR_ACTIVATION"},
+    "authority_ref": {"type": "string", "minLength": 1},
+    "controller_sequence": {"type": "integer", "minimum": 1},
+    "controller_body_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run_id": {"type": "string", "minLength": 1},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "expected_incident_checkpoint_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "incident_sequence": {"const": 14},
+    "incident_gate": {"const": "UR.G5"},
+    "recovery_sequence": {"const": 15},
+    "recovery_gate": {"const": "UR.G2"},
+    "next_owner": {"const": "EXECUTOR"},
+    "typed_next": {"const": "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE"},
+    "recovery_replan_receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "stale_evidence_invalidation_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "authorization_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

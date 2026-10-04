@@ -255,3 +255,278 @@ def test_authorized_recovery_preserves_corrupt_bytes_and_logical_cursor(tmp_path
     )
     assert replay["idempotent_replay"] is True
     assert replay["logical_cursor_changed"] is False
+
+
+def _recovery_activation_fixture(tmp_path):
+    from test_universal_v2_core_isolation import _make_recovery_replan_inputs
+    from tools.node_architect.universal_run_controller import create_recovery_replan_cursor_state
+    from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
+
+    profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    successor = create_recovery_replan_cursor_state(
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation, incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2", recovery_provenance=provenance,
+    )
+    state = {
+        "schema_id": "gwc.universal-run.run-state.v2", "schema_version": 2,
+        "run_id": plan["run_id"], "sequence": 14, "predecessor_sequence": 13,
+        "active_gate": "UR.G5", "runtime_epoch": plan["runtime_epoch"],
+        "runtime_plan_digest": plan["digest"], "node_allocation_id": allocation["node_allocation_id"],
+        "execution_refs": {
+            "branch": plan["source_binding"]["branch"],
+            "node_allocation_id": allocation["node_allocation_id"],
+            "node_allocation_ref": "fixture://allocation#record_id=" + allocation["record_id"],
+            "candidate_sha": plan["source_binding"]["pre_head_sha"],
+            "runtime_plan_digest": plan["digest"],
+            "qualification_profile_digest": plan["qualification_profile_digest"],
+        },
+        "gate_evidence": {"readiness": "STALE_R6"}, "typed_next": "CONTINUE_UNIVERSAL_LANE_REMEDIATION",
+        "next_owner": "CONTROLLER", "evidence_gap": [], "consumed_receipts": [],
+        "state_digest": "sha256:" + "0" * 64,
+    }
+    document = {
+        "schema_id": "gwc.universal-run.run-state-checkpoint.v2", "schema_version": 2,
+        "run_id": state["run_id"], "runtime_plan": plan, "node_allocation": allocation,
+        "run_state": state, "sequence": 14, "active_gate": "UR.G5", "next_owner": "CONTROLLER",
+    }
+    checkpoint = tmp_path / "official-fixture.json"
+    old_bytes = (json.dumps(document, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode()
+    checkpoint.write_bytes(old_bytes)
+    auth = {
+        "schema_id": "gwc.universal-run.recovery-replan-cursor-activation-authorization.v2",
+        "schema_version": 2, "decision": "AUTHORIZE",
+        "authorized_action": "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN_CURSOR_ACTIVATION",
+        "authority_ref": "controller-comment:5747944812:seq109",
+        "controller_sequence": 109,
+        "controller_body_sha256": "a17f8349ed7a51d62b5ad5d4f629d04a744b93fd61b1508787eb7cfa5c18b26d",
+        "run_id": plan["run_id"], "runtime_plan_digest": plan["digest"],
+        "candidate_sha": plan["source_binding"]["pre_head_sha"],
+        "expected_incident_checkpoint_file_sha256": hashlib.sha256(old_bytes).hexdigest(),
+        "incident_sequence": 14, "incident_gate": "UR.G5",
+        "recovery_sequence": 15, "recovery_gate": "UR.G2",
+        "next_owner": "EXECUTOR", "typed_next": "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE",
+        "recovery_replan_receipt_digest": receipt["receipt_digest"],
+        "stale_evidence_invalidation_digest": invalidation["manifest_digest"],
+        "authority_granted": False, "executed_effects": [],
+    }
+    auth["authorization_digest"] = _digest(auth, "authorization_digest")
+    return profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth
+
+
+def test_duplicate_recovery_replan_activation_is_idempotent(tmp_path):
+    from tools.node_architect.universal_run_controller import UniversalController
+    from tools.node_architect.universal_run_persistence import persist_recovery_replan_cursor_activation
+    from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    archive = tmp_path / "archive" / "seq14-corrupt.json"
+    generation = tmp_path / "generations" / "seq15-r7.json"
+    activation_receipt = tmp_path / "activation-receipt.json"
+    result = persist_recovery_replan_cursor_activation(
+        checkpoint_path=checkpoint,
+        expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+        archive_path=archive, generation_path=generation, activation_receipt_path=activation_receipt,
+        recovery_cursor_state=successor, authorization=auth, profile=profile,
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation,
+    )
+
+    assert archive.read_bytes() == old_bytes
+    installed = json.loads(checkpoint.read_text())["run_state"]
+    assert installed == successor
+    assert installed["sequence"] == 15 and installed["active_gate"] == "UR.G2"
+    assert installed["next_owner"] == "EXECUTOR"
+    assert installed["authority_granted"] is False and installed["executed_effects"] == []
+    UniversalController(profile=load_universal_v2_default_profile(), runtime_plan=plan,
+                        run_state=installed, node_allocation=allocation)
+    assert json.loads(generation.read_text())["run_state"] == successor
+    assert json.loads(activation_receipt.read_text())["receipt_digest"]
+    assert result["idempotent_replay"] is False
+    replay = persist_recovery_replan_cursor_activation(
+        checkpoint_path=checkpoint,
+        expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+        archive_path=archive, generation_path=generation, activation_receipt_path=activation_receipt,
+        recovery_cursor_state=successor, authorization=auth, profile=profile,
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation,
+    )
+    assert replay["idempotent_replay"] is True
+
+
+def test_recovery_replan_activation_requires_exact_controller_authorization(tmp_path):
+    from tools.node_architect.universal_run_persistence import CheckpointPersistenceError, persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    auth["typed_next"] = "EXECUTE_UR_G5"
+    auth["authorization_digest"] = _digest(auth, "authorization_digest")
+    with pytest.raises(CheckpointPersistenceError):
+        persist_recovery_replan_cursor_activation(
+            checkpoint_path=checkpoint,
+            expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+            archive_path=tmp_path / "archive" / "seq14.json",
+            generation_path=tmp_path / "generation.json", activation_receipt_path=tmp_path / "receipt.json",
+            recovery_cursor_state=successor, authorization=auth, profile=profile,
+            runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+            stale_evidence_invalidation_record=invalidation,
+        )
+    assert checkpoint.read_bytes() == old_bytes
+    assert not (tmp_path / "archive" / "seq14.json").exists()
+
+
+def test_recovery_replan_activation_cas_binds_incident_checkpoint_sha(tmp_path):
+    from tools.node_architect.universal_run_persistence import CheckpointPersistenceError, persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    with pytest.raises(CheckpointPersistenceError):
+        persist_recovery_replan_cursor_activation(
+            checkpoint_path=checkpoint, expected_incident_checkpoint_file_sha256="f" * 64,
+            archive_path=tmp_path / "archive" / "seq14.json", generation_path=tmp_path / "generation.json",
+            activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+            authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+            recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+        )
+    assert checkpoint.read_bytes() == old_bytes
+    assert not (tmp_path / "archive" / "seq14.json").exists()
+
+
+def test_recovery_replan_activation_archives_corrupt_seq14_before_install(tmp_path, monkeypatch):
+    from tools.node_architect import universal_run_persistence as persistence
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    archive = tmp_path / "archive" / "seq14.json"
+    original_replace = persistence.os.replace
+    def guarded_replace(source, destination):
+        assert archive.read_bytes() == old_bytes
+        return original_replace(source, destination)
+    monkeypatch.setattr(persistence.os, "replace", guarded_replace)
+    persistence.persist_recovery_replan_cursor_activation(
+        checkpoint_path=checkpoint, expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+        archive_path=archive, generation_path=tmp_path / "generation.json",
+        activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+        authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+        recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+    )
+
+
+def test_recovery_replan_activation_rejects_r7_candidate_or_receipt_mismatch(tmp_path):
+    from tools.node_architect.universal_run_persistence import CheckpointPersistenceError, persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    receipt["new_candidate_sha"] = "f" * 40
+    receipt["receipt_digest"] = _digest(receipt, "receipt_digest")
+    auth["recovery_replan_receipt_digest"] = receipt["receipt_digest"]
+    auth["authorization_digest"] = _digest(auth, "authorization_digest")
+    with pytest.raises(CheckpointPersistenceError):
+        persist_recovery_replan_cursor_activation(
+            checkpoint_path=checkpoint,
+            expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+            archive_path=tmp_path / "archive" / "seq14.json", generation_path=tmp_path / "generation.json",
+            activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+            authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+            recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+        )
+    assert checkpoint.read_bytes() == old_bytes
+
+
+def test_conflicting_recovery_replan_activation_fails_closed(tmp_path):
+    from tools.node_architect.universal_run_persistence import CheckpointPersistenceError, persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    archive = tmp_path / "archive" / "seq14.json"
+    archive.parent.mkdir()
+    archive.write_bytes(b"conflicting pre-existing archive")
+    with pytest.raises(CheckpointPersistenceError):
+        persist_recovery_replan_cursor_activation(
+            checkpoint_path=checkpoint,
+            expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+            archive_path=archive, generation_path=tmp_path / "generation.json",
+            activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+            authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+            recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+        )
+    assert checkpoint.read_bytes() == old_bytes
+    assert archive.read_bytes() == b"conflicting pre-existing archive"
+
+
+def test_recovery_replan_activation_installs_seq15_ur_g2_generation(tmp_path):
+    from tools.node_architect.universal_run_persistence import persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    generation = tmp_path / "generation.json"
+    persist_recovery_replan_cursor_activation(
+        checkpoint_path=checkpoint,
+        expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+        archive_path=tmp_path / "archive" / "seq14.json", generation_path=generation,
+        activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+        authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+        recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+    )
+    assert json.loads(generation.read_text())["run_state"]["sequence"] == 15
+    assert json.loads(generation.read_text())["run_state"]["active_gate"] == "UR.G2"
+    assert json.loads(checkpoint.read_text())["run_state"]["next_owner"] == "EXECUTOR"
+
+
+def test_recovery_replan_activation_readback_is_exact_and_controller_valid(tmp_path):
+    from tools.node_architect.universal_run_controller import UniversalController
+    from tools.node_architect.universal_run_persistence import persist_recovery_replan_cursor_activation
+    from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    persist_recovery_replan_cursor_activation(
+        checkpoint_path=checkpoint,
+        expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+        archive_path=tmp_path / "archive" / "seq14.json", generation_path=tmp_path / "generation.json",
+        activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+        authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+        recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+    )
+    installed = json.loads(checkpoint.read_text())["run_state"]
+    assert installed == successor
+    assert installed["state_digest"] == _digest(installed, "state_digest")
+    controller = UniversalController(profile=load_universal_v2_default_profile(), runtime_plan=plan,
+                                     run_state=installed, node_allocation=allocation)
+    assert controller.assign_current_action()["actor"] == "EXECUTOR"
+
+
+def test_recovery_replan_activation_does_not_execute_ur_g2(tmp_path):
+    from tools.node_architect.universal_run_persistence import persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    result = persist_recovery_replan_cursor_activation(
+        checkpoint_path=checkpoint,
+        expected_incident_checkpoint_file_sha256=hashlib.sha256(old_bytes).hexdigest(),
+        archive_path=tmp_path / "archive" / "seq14.json", generation_path=tmp_path / "generation.json",
+        activation_receipt_path=tmp_path / "receipt.json", recovery_cursor_state=successor,
+        authorization=auth, profile=profile, runtime_plan=plan, node_allocation=allocation,
+        recovery_replan_receipt=receipt, stale_evidence_invalidation_record=invalidation,
+    )
+    installed = json.loads(checkpoint.read_text())["run_state"]
+    assert result["idempotent_replay"] is False
+    assert installed["active_gate"] == "UR.G2" and installed["typed_next"] == "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE"
+    assert installed["authority_granted"] is False and installed["executed_effects"] == []
+    assert installed["consumed_receipts"] == [] and installed["evidence_gap"] == ["EXECUTION_RECEIPT"]
+
+
+def test_recovery_replan_activation_repairs_missing_receipt_after_installed_checkpoint(tmp_path):
+    from tools.node_architect.universal_run_persistence import persist_recovery_replan_cursor_activation
+
+    profile, plan, allocation, receipt, invalidation, successor, checkpoint, old_bytes, auth = _recovery_activation_fixture(tmp_path)
+    archive = tmp_path / "archive" / "seq14.json"
+    generation = tmp_path / "generation.json"
+    activation_receipt = tmp_path / "receipt.json"
+    kwargs = {
+        "checkpoint_path": checkpoint,
+        "expected_incident_checkpoint_file_sha256": hashlib.sha256(old_bytes).hexdigest(),
+        "archive_path": archive, "generation_path": generation,
+        "activation_receipt_path": activation_receipt, "recovery_cursor_state": successor,
+        "authorization": auth, "profile": profile, "runtime_plan": plan,
+        "node_allocation": allocation, "recovery_replan_receipt": receipt,
+        "stale_evidence_invalidation_record": invalidation,
+    }
+    first = persist_recovery_replan_cursor_activation(**kwargs)
+    activation_receipt.unlink()
+    replay = persist_recovery_replan_cursor_activation(**kwargs)
+    assert first["idempotent_replay"] is False
+    assert replay["idempotent_replay"] is True
+    assert json.loads(activation_receipt.read_text())["checkpoint_readback_file_sha256"] == hashlib.sha256(checkpoint.read_bytes()).hexdigest()

@@ -791,4 +791,121 @@ class UniversalController:
         }
 
 
-__all__ = ["UniversalController", "UniversalControllerError"]
+def create_recovery_replan_cursor_state(
+    *, runtime_plan: Mapping[str, Any], node_allocation: Mapping[str, Any],
+    recovery_replan_receipt: Mapping[str, Any], stale_evidence_invalidation_record: Mapping[str, Any],
+    incident_checkpoint_identity: Mapping[str, Any], requested_restart_gate: str,
+    recovery_provenance: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Build and validate a fresh V2 cursor without trusting a corrupt incident digest.
+
+    This pure operation never reads or writes the official checkpoint; recovery
+    provenance is separate from ordinary predecessor-chain evidence.
+    """
+    _require(isinstance(runtime_plan, Mapping), "RECOVERY_REPLAN_PLAN_INVALID")
+    _require(runtime_plan.get("schema_id") == "gwc.universal-run.runtime-plan.v2"
+             and runtime_plan.get("schema_version") == 2, "RECOVERY_REPLAN_PLAN_SCHEMA_INVALID")
+    _require(runtime_plan.get("revision") == 7, "RECOVERY_REPLAN_PLAN_REVISION_INVALID")
+    _require(runtime_plan.get("digest") == _digest(runtime_plan, "digest"), "RECOVERY_REPLAN_PLAN_DIGEST_INVALID")
+    run_id = runtime_plan.get("run_id")
+    source = runtime_plan.get("source_binding")
+    _require(isinstance(run_id, str) and bool(run_id), "RECOVERY_REPLAN_RUN_ID_REQUIRED")
+    if not isinstance(source, Mapping):
+        raise UniversalControllerError("RECOVERY_REPLAN_SOURCE_BINDING_INVALID")
+    candidate_sha = source.get("pre_head_sha")
+    branch = source.get("branch")
+    _require(isinstance(candidate_sha, str) and len(candidate_sha) == 40
+             and all(c in "0123456789abcdef" for c in candidate_sha), "RECOVERY_REPLAN_CANDIDATE_INVALID")
+    _require(isinstance(branch, str) and bool(branch), "RECOVERY_REPLAN_SOURCE_BINDING_INVALID")
+    _require(requested_restart_gate == "UR.G2", "RECOVERY_REPLAN_GATE_INVALID")
+    _require(isinstance(node_allocation, Mapping), "RECOVERY_REPLAN_ALLOCATION_INVALID")
+    try:
+        validate_node_allocation(node_allocation)
+    except Exception as exc:
+        code = getattr(exc, "code", "RECOVERY_REPLAN_ALLOCATION_INVALID")
+        raise UniversalControllerError(code, str(exc)) from exc
+    allocation_id = node_allocation.get("node_allocation_id")
+    _require(node_allocation.get("run_id") == run_id, "RECOVERY_REPLAN_ALLOCATION_RUN_MISMATCH")
+    _require(allocation_id in runtime_plan.get("node_allocations", []), "RECOVERY_REPLAN_ALLOCATION_NOT_IN_PLAN")
+    source_refs = node_allocation.get("provenance", {}).get("source_refs", [])
+    _require(bool(source_refs) and source_refs[0] == "q0.qualification-campaign",
+             "RECOVERY_REPLAN_ALLOCATION_NODE_MISMATCH")
+
+    receipt = recovery_replan_receipt
+    _require(isinstance(receipt, Mapping)
+             and receipt.get("schema_id") == "gwc.universal-run.replan-control-receipt.v2"
+             and receipt.get("receipt_type") == "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN"
+             and receipt.get("recovery_strategy") == "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN",
+             "RECOVERY_REPLAN_RECEIPT_INVALID")
+    _require(receipt.get("receipt_digest") == _digest(receipt, "receipt_digest"),
+             "RECOVERY_REPLAN_RECEIPT_DIGEST_INVALID")
+    _require(receipt.get("run_id") == run_id
+             and receipt.get("to_plan", {}).get("digest") == runtime_plan.get("digest")
+             and receipt.get("new_candidate_sha") == candidate_sha
+             and receipt.get("activation_status") == "NOT_ACTIVATED"
+             and receipt.get("authority_granted") is False
+             and receipt.get("executed_effects") == [], "RECOVERY_REPLAN_RECEIPT_BINDING_MISMATCH")
+
+    invalidation = stale_evidence_invalidation_record
+    _require(isinstance(invalidation, Mapping)
+             and invalidation.get("schema_id") == "gwc.universal-run.invalidated-evidence-manifest.v2"
+             and invalidation.get("schema_version") == 2, "RECOVERY_REPLAN_INVALIDATION_INVALID")
+    _require(invalidation.get("manifest_digest") == _digest(invalidation, "manifest_digest"),
+             "RECOVERY_REPLAN_INVALIDATION_DIGEST_INVALID")
+    _require(invalidation.get("run_id") == run_id
+             and invalidation.get("to_plan", {}).get("digest") == runtime_plan.get("digest")
+             and invalidation.get("to_plan", {}).get("candidate_sha") == candidate_sha,
+             "RECOVERY_REPLAN_INVALIDATION_BINDING_MISMATCH")
+
+    incident = incident_checkpoint_identity
+    if not isinstance(incident, Mapping):
+        raise UniversalControllerError("RECOVERY_REPLAN_INCIDENT_IDENTITY_MISMATCH")
+    _require(incident.get("run_id") == run_id
+             and incident.get("sequence") == 14
+             and incident.get("active_gate") == "UR.G5", "RECOVERY_REPLAN_INCIDENT_IDENTITY_MISMATCH")
+    incident_sha = incident.get("checkpoint_file_sha256")
+    _require(isinstance(incident_sha, str) and len(incident_sha) == 64
+             and all(c in "0123456789abcdef" for c in incident_sha), "RECOVERY_REPLAN_INCIDENT_SHA_INVALID")
+    _require(isinstance(recovery_provenance, Mapping) and bool(recovery_provenance),
+             "RECOVERY_REPLAN_PROVENANCE_REQUIRED")
+    from .q0_qualification import q0_qualification_profile
+    q0_profile = q0_qualification_profile()
+    allocation_ref = f"recovery-replan://{run_id}/node-allocation#record_id={node_allocation.get('record_id')}"
+    successor_sequence = incident["sequence"] + 1
+    state: dict[str, Any] = {
+        "schema_id": "gwc.universal-run.run-state.v2", "schema_version": 2,
+        "run_id": run_id, "sequence": successor_sequence, "predecessor_sequence": incident["sequence"],
+        "active_gate": "UR.G2", "runtime_epoch": runtime_plan["runtime_epoch"],
+        "runtime_plan_digest": runtime_plan["digest"], "node_allocation_id": allocation_id,
+        "node_allocation_ref": allocation_ref,
+        "execution_refs": {
+            "branch": branch, "node_allocation_id": allocation_id, "node_allocation_ref": allocation_ref,
+            "base_sha": source.get("base_sha"), "candidate_sha": candidate_sha,
+            "qualification_profile_digest": q0_profile["profile_digest"],
+            "runtime_plan_digest": runtime_plan["digest"],
+            "cursor_ref": f"{run_id}:UR.G2:seq{successor_sequence}",
+        },
+        "gate_evidence": {}, "typed_next": "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE",
+        "next_owner": "EXECUTOR", "evidence_gap": ["EXECUTION_RECEIPT"],
+        "consumed_receipts": [], "authority_granted": False, "executed_effects": [],
+        "recovery_provenance": {
+            "kind": "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN",
+            "incident_checkpoint_file_sha256": incident_sha,
+            "incident_sequence": 14, "incident_gate": "UR.G5",
+            "runtime_plan_digest": runtime_plan["digest"], "candidate_sha": candidate_sha,
+            "recovery_replan_receipt_digest": receipt["receipt_digest"],
+            "stale_evidence_invalidation_digest": invalidation["manifest_digest"],
+            "activation_identity": dict(recovery_provenance),
+        },
+    }
+    state["state_digest"] = _digest(state, "state_digest")
+    try:
+        UniversalController(profile=load_universal_v2_default_profile(), runtime_plan=runtime_plan,
+                            run_state=state, node_allocation=node_allocation)
+    except Exception as exc:
+        code = getattr(exc, "code", "RECOVERY_REPLAN_CURSOR_VALIDATION_FAILED")
+        raise UniversalControllerError(code, str(exc)) from exc
+    return state
+
+
+__all__ = ["UniversalController", "UniversalControllerError", "create_recovery_replan_cursor_state"]

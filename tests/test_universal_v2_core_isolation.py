@@ -128,7 +128,7 @@ def test_all_active_universal_run_schemas_are_v2_and_ur_namespaced():
 
     root = Path(__file__).resolve().parents[1]
     schema_paths = sorted((root / "schemas/node-architect/universal-run").glob("*.schema.json"))
-    assert len(schema_paths) == 13
+    assert len(schema_paths) == 15
     for path in schema_paths:
         schema = json.loads(path.read_text(encoding="utf-8"))
         assert "/universal-run/v2/" in schema["$id"], path.name
@@ -1257,3 +1257,147 @@ def test_controller_owned_g4_keeps_provenance_outside_gate_evidence():
     assert local_receipt["completion_metadata"]["controller_seq"] == 106
     assert local_receipt["evidence_digest"] != local_receipt["completion_metadata_digest"]
     assert decision["authority_granted"] is False and decision["executed_effects"] == []
+
+
+def _make_recovery_replan_inputs():
+    import copy
+    import hashlib
+    import json
+
+    from tools.node_architect.q0_qualification import q0_qualification_profile
+    from tools.node_architect.universal_run_controller import _digest
+    from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
+
+    profile, plan, _state, allocation = _make_v2_binding()
+    plan = copy.deepcopy(plan)
+    plan["revision"] = 7
+    plan["source_binding"]["pre_head_sha"] = "2508dbd9877141e67816db5480300ed36c1184e5"
+    plan.pop("digest", None)
+    plan["digest"] = _digest(plan, "digest")
+    allocation = copy.deepcopy(allocation)
+    receipt = {
+        "schema_id": "gwc.universal-run.replan-control-receipt.v2",
+        "schema_version": 2,
+        "receipt_type": "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN",
+        "recovery_strategy": "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN",
+        "run_id": plan["run_id"],
+        "to_plan": {"digest": plan["digest"], "revision": 7},
+        "new_candidate_sha": plan["source_binding"]["pre_head_sha"],
+        "activation_status": "NOT_ACTIVATED",
+        "authority_granted": False,
+        "executed_effects": [],
+    }
+    receipt["receipt_digest"] = _digest(receipt, "receipt_digest")
+    invalidation = {
+        "schema_id": "gwc.universal-run.invalidated-evidence-manifest.v2",
+        "schema_version": 2,
+        "run_id": plan["run_id"],
+        "to_plan": {"digest": plan["digest"], "candidate_sha": plan["source_binding"]["pre_head_sha"], "revision": 7},
+        "invalidated_for_r7_qualification_only": [{"evidence_key": "R6_G5_READINESS_PROJECTION", "gate": "UR.G5"}],
+    }
+    invalidation["manifest_digest"] = _digest(invalidation, "manifest_digest")
+    incident = {
+        "run_id": plan["run_id"],
+        "sequence": 14,
+        "active_gate": "UR.G5",
+        "checkpoint_file_sha256": "4e7988c188c3eb7fc7705610ada702f2be909addd5cb872c4d37b359e73221bb",
+    }
+    provenance = {"activation_id": "test-recovery-activation", "source": "typed-controller-command"}
+    return profile, plan, allocation, receipt, invalidation, incident, provenance
+
+
+def test_recovery_replan_cursor_binds_exact_r7_candidate_and_starts_ur_g2():
+    from tools.node_architect.universal_run_controller import create_recovery_replan_cursor_state
+
+    profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    state = create_recovery_replan_cursor_state(
+        runtime_plan=plan,
+        node_allocation=allocation,
+        recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation,
+        incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2",
+        recovery_provenance=provenance,
+    )
+
+    assert state["run_id"] == plan["run_id"]
+    assert state["runtime_plan_digest"] == plan["digest"]
+    assert state["execution_refs"]["candidate_sha"] == plan["source_binding"]["pre_head_sha"]
+    assert state["sequence"] == 15
+    assert state["active_gate"] == "UR.G2"
+    assert state["next_owner"] == "EXECUTOR"
+    assert state["typed_next"] == "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE"
+
+
+def test_recovery_replan_cursor_sequence_is_incident_plus_one():
+    from tools.node_architect.universal_run_controller import create_recovery_replan_cursor_state
+
+    _profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    state = create_recovery_replan_cursor_state(
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation, incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2", recovery_provenance=provenance,
+    )
+    assert state["sequence"] == incident["sequence"] + 1 == 15
+
+
+def test_recovery_replan_cursor_does_not_trust_corrupt_seq14_state_digest():
+    from tools.node_architect.universal_run_controller import create_recovery_replan_cursor_state
+
+    _profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    incident.update({"stored_state_digest": "sha256:" + "9" * 64, "recomputed_state_digest": "sha256:" + "8" * 64})
+    state = create_recovery_replan_cursor_state(
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation, incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2", recovery_provenance=provenance,
+    )
+    assert state.get("predecessor_state_digest") is None
+    assert state["recovery_provenance"]["incident_checkpoint_file_sha256"] == incident["checkpoint_file_sha256"]
+
+
+def test_recovery_replan_cursor_drops_stale_r6_gate_and_receipt_evidence():
+    from tools.node_architect.universal_run_controller import create_recovery_replan_cursor_state
+
+    _profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    state = create_recovery_replan_cursor_state(
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation, incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2", recovery_provenance=provenance,
+    )
+    assert state["gate_evidence"] == {}
+    assert state["consumed_receipts"] == []
+
+
+def test_recovery_replan_cursor_has_no_inherited_g5_or_effect_authority():
+    from tools.node_architect.universal_run_controller import create_recovery_replan_cursor_state
+
+    _profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    state = create_recovery_replan_cursor_state(
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation, incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2", recovery_provenance=provenance,
+    )
+    assert state["authority_granted"] is False
+    assert state["executed_effects"] == []
+    assert state["evidence_gap"] == ["EXECUTION_RECEIPT"]
+    assert not any("g5" in key.lower() or "certif" in key.lower() for key in state)
+
+
+def test_recovery_replan_cursor_validates_with_universal_controller():
+    from tools.node_architect.universal_run_controller import UniversalController, create_recovery_replan_cursor_state
+    from tools.node_architect.universal_runtime_profile import load_universal_v2_default_profile
+
+    _profile, plan, allocation, receipt, invalidation, incident, provenance = _make_recovery_replan_inputs()
+    state = create_recovery_replan_cursor_state(
+        runtime_plan=plan, node_allocation=allocation, recovery_replan_receipt=receipt,
+        stale_evidence_invalidation_record=invalidation, incident_checkpoint_identity=incident,
+        requested_restart_gate="UR.G2", recovery_provenance=provenance,
+    )
+    controller = UniversalController(
+        profile=load_universal_v2_default_profile(), runtime_plan=plan,
+        run_state=state, node_allocation=allocation,
+    )
+    assignment = controller.assign_current_action()
+    assert assignment["actor"] == "EXECUTOR"
+    assert assignment["gate"] == "UR.G2"
+    assert state["typed_next"] == "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE"

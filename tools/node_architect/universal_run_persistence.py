@@ -415,3 +415,223 @@ def persist_same_sequence_checkpoint_recovery(
     finally:
         os.close(lock_fd)
         lock.unlink(missing_ok=True)
+
+
+def _verify_recovery_replan_activation_authorization(
+    authorization: Mapping[str, Any], *, expected_checkpoint_sha: str,
+    runtime_plan: Mapping[str, Any], successor: Mapping[str, Any],
+    recovery_replan_receipt: Mapping[str, Any], invalidation: Mapping[str, Any],
+) -> None:
+    _require(isinstance(authorization, Mapping), "RECOVERY_REPLAN_AUTHORIZATION_REQUIRED")
+    _require(authorization.get("schema_id") == "gwc.universal-run.recovery-replan-cursor-activation-authorization.v2"
+             and authorization.get("decision") == "AUTHORIZE"
+             and authorization.get("authorized_action") == "IMMUTABLE_INTEGRITY_RECOVERY_REPLAN_CURSOR_ACTIVATION",
+             "RECOVERY_REPLAN_AUTHORIZATION_REQUIRED")
+    _require(authorization.get("authorization_digest") == _digest(authorization, "authorization_digest"),
+             "RECOVERY_REPLAN_AUTHORIZATION_DIGEST_INVALID")
+    _validate_schema(authorization, "recovery-replan-cursor-activation-authorization.schema.json",
+                     "RECOVERY_REPLAN_AUTHORIZATION_SCHEMA_INVALID")
+    expected = {
+        "run_id": successor.get("run_id"),
+        "runtime_plan_digest": runtime_plan.get("digest"),
+        "candidate_sha": runtime_plan.get("source_binding", {}).get("pre_head_sha"),
+        "expected_incident_checkpoint_file_sha256": expected_checkpoint_sha,
+        "incident_sequence": 14, "incident_gate": "UR.G5",
+        "recovery_sequence": successor.get("sequence"),
+        "recovery_gate": successor.get("active_gate"),
+        "next_owner": successor.get("next_owner"), "typed_next": successor.get("typed_next"),
+        "recovery_replan_receipt_digest": recovery_replan_receipt.get("receipt_digest"),
+        "stale_evidence_invalidation_digest": invalidation.get("manifest_digest"),
+    }
+    for key, value in expected.items():
+        _require(authorization.get(key) == value, "RECOVERY_REPLAN_AUTHORIZATION_BINDING_MISMATCH", key)
+    _require(authorization.get("authority_granted") is False and authorization.get("executed_effects") == [],
+             "RECOVERY_REPLAN_AUTHORITY_ESCALATION")
+    _require(bool(authorization.get("authority_ref")) and bool(authorization.get("controller_body_sha256")),
+             "RECOVERY_REPLAN_AUTHORITY_PROVENANCE_REQUIRED")
+
+
+def persist_recovery_replan_cursor_activation(
+    *, checkpoint_path: str | Path, expected_incident_checkpoint_file_sha256: str,
+    archive_path: str | Path, generation_path: str | Path, activation_receipt_path: str | Path,
+    recovery_cursor_state: Mapping[str, Any], authorization: Mapping[str, Any] | None,
+    profile: Mapping[str, Any], runtime_plan: Mapping[str, Any], node_allocation: Mapping[str, Any],
+    recovery_replan_receipt: Mapping[str, Any], stale_evidence_invalidation_record: Mapping[str, Any],
+) -> dict[str, Any]:
+    """CAS-install one authorized immutable recovery generation, archiving incident bytes first.
+
+    The function is an implementation capability; callers remain responsible for
+    invoking it only on the exact checkpoint and under a current typed Controller
+    authorization. Tests exercise it against disposable checkpoints only.
+    """
+    from .universal_run_controller import UniversalController
+
+    cp_path = Path(checkpoint_path)
+    archive = Path(archive_path)
+    generation = Path(generation_path)
+    receipt_path = Path(activation_receipt_path)
+    if authorization is None:
+        raise CheckpointPersistenceError("RECOVERY_REPLAN_AUTHORIZATION_REQUIRED")
+    auth = authorization
+    _require(not cp_path.is_symlink(), "CHECKPOINT_PATH_SYMLINK")
+    _require(not archive.is_symlink() and not generation.is_symlink() and not receipt_path.is_symlink(),
+             "PERSISTENCE_PATH_SYMLINK")
+    _require(recovery_cursor_state.get("state_digest") == _digest(recovery_cursor_state, "state_digest"),
+             "RECOVERY_REPLAN_STATE_DIGEST_INVALID")
+    successor = dict(recovery_cursor_state)
+    _require(successor.get("run_id") == runtime_plan.get("run_id")
+             and successor.get("runtime_plan_digest") == runtime_plan.get("digest")
+             and successor.get("sequence") == 15 and successor.get("active_gate") == "UR.G2"
+             and successor.get("next_owner") == "EXECUTOR"
+             and successor.get("typed_next") == "EXECUTE_Q0_R7_UR_G2_REPLAY_PROBE",
+             "RECOVERY_REPLAN_STATE_BINDING_MISMATCH")
+    _require(recovery_replan_receipt.get("receipt_digest") == _digest(recovery_replan_receipt, "receipt_digest")
+             and recovery_replan_receipt.get("run_id") == successor.get("run_id")
+             and recovery_replan_receipt.get("to_plan", {}).get("digest") == runtime_plan.get("digest")
+             and recovery_replan_receipt.get("new_candidate_sha") == runtime_plan.get("source_binding", {}).get("pre_head_sha"),
+             "RECOVERY_REPLAN_RECEIPT_BINDING_MISMATCH")
+    _require(stale_evidence_invalidation_record.get("manifest_digest") == _digest(stale_evidence_invalidation_record, "manifest_digest")
+             and stale_evidence_invalidation_record.get("run_id") == successor.get("run_id")
+             and stale_evidence_invalidation_record.get("to_plan", {}).get("digest") == runtime_plan.get("digest")
+             and stale_evidence_invalidation_record.get("to_plan", {}).get("candidate_sha") == runtime_plan.get("source_binding", {}).get("pre_head_sha"),
+             "RECOVERY_REPLAN_INVALIDATION_BINDING_MISMATCH")
+    _verify_recovery_replan_activation_authorization(
+        auth, expected_checkpoint_sha=expected_incident_checkpoint_file_sha256,
+        runtime_plan=runtime_plan, successor=successor,
+        recovery_replan_receipt=recovery_replan_receipt,
+        invalidation=stale_evidence_invalidation_record,
+    )
+    try:
+        UniversalController(profile=profile, runtime_plan=runtime_plan, run_state=successor,
+                            node_allocation=node_allocation)
+    except Exception as exc:
+        code = getattr(exc, "code", "RECOVERY_REPLAN_STATE_VALIDATION_FAILED")
+        raise CheckpointPersistenceError(code, str(exc)) from exc
+
+    intended = make_checkpoint_document(run_state=successor, runtime_plan=runtime_plan,
+                                       node_allocation=node_allocation)
+    payload = (json.dumps(intended, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    if not cp_path.exists():
+        raise CheckpointPersistenceError("INCIDENT_CHECKPOINT_READ_FAILED", str(cp_path))
+    try:
+        current_bytes = cp_path.read_bytes()
+    except OSError as exc:
+        raise CheckpointPersistenceError("INCIDENT_CHECKPOINT_READ_FAILED", str(exc)) from exc
+    current_sha = _file_sha(current_bytes)
+
+    def build_activation_receipt(archive_sha: str, generation_sha: str, installed_sha: str) -> dict[str, Any]:
+        value: dict[str, Any] = {
+            "schema_id": "gwc.universal-run.recovery-replan-cursor-activation-receipt.v2",
+            "schema_version": 2,
+            "activation_result": "INSTALLED",
+            "authorization_digest": auth["authorization_digest"],
+            "checkpoint_ref": str(cp_path),
+            "prior_checkpoint_file_sha256": expected_incident_checkpoint_file_sha256,
+            "corrupt_incident_archive_ref": str(archive),
+            "corrupt_incident_archive_file_sha256": archive_sha,
+            "recovery_generation_ref": str(generation),
+            "recovery_generation_file_sha256": generation_sha,
+            "checkpoint_readback_file_sha256": installed_sha,
+            "run_id": successor["run_id"],
+            "runtime_plan_digest": runtime_plan["digest"],
+            "candidate_sha": runtime_plan["source_binding"]["pre_head_sha"],
+            "sequence": successor["sequence"], "active_gate": successor["active_gate"],
+            "next_owner": successor["next_owner"], "typed_next": successor["typed_next"],
+            "state_digest": successor["state_digest"],
+            "authority_granted": False, "executed_effects": [],
+        }
+        value["receipt_digest"] = _digest(value, "receipt_digest")
+        _validate_schema(value, "recovery-replan-cursor-activation-receipt.schema.json",
+                         "RECOVERY_REPLAN_ACTIVATION_RECEIPT_SCHEMA_INVALID")
+        return value
+
+    if current_bytes == payload:
+        archive_bytes = archive.read_bytes() if archive.is_file() else b""
+        generation_bytes = generation.read_bytes() if generation.is_file() else b""
+        _require(_file_sha(archive_bytes) == expected_incident_checkpoint_file_sha256,
+                 "RECOVERY_REPLAN_ARCHIVE_READBACK_MISMATCH")
+        _require(generation_bytes == payload, "RECOVERY_REPLAN_GENERATION_READBACK_MISMATCH")
+        installed_sha = _file_sha(current_bytes)
+        if receipt_path.exists():
+            receipt = _load_json(receipt_path, "RECOVERY_REPLAN_ACTIVATION_RECEIPT_INVALID")
+            _require(receipt.get("receipt_digest") == _digest(receipt, "receipt_digest")
+                     and receipt.get("authorization_digest") == auth.get("authorization_digest")
+                     and receipt.get("checkpoint_readback_file_sha256") == installed_sha,
+                     "RECOVERY_REPLAN_ACTIVATION_RECEIPT_BINDING_MISMATCH")
+            receipt_sha = _file_sha(receipt_path.read_bytes())
+        else:
+            receipt = build_activation_receipt(_file_sha(archive_bytes), _file_sha(generation_bytes), installed_sha)
+            receipt_bytes = (json.dumps(receipt, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+            receipt_sha, _ = _write_immutable(receipt_path, receipt_bytes,
+                                              conflict_code="RECOVERY_REPLAN_ACTIVATION_RECEIPT_CONFLICT")
+        return {"idempotent_replay": True, "checkpoint_file_sha256": installed_sha,
+                "activation_receipt_file_sha256": receipt_sha,
+                "generation_file_sha256": _file_sha(generation_bytes),
+                "archive_file_sha256": _file_sha(archive_bytes)}
+    _require(current_sha == expected_incident_checkpoint_file_sha256,
+             "NATIVE_CHECKPOINT_CAS_CONFLICT")
+    try:
+        incident = json.loads(current_bytes)
+    except json.JSONDecodeError as exc:
+        raise CheckpointPersistenceError("INCIDENT_CHECKPOINT_JSON_INVALID", str(exc)) from exc
+    incident_state = incident.get("run_state") if isinstance(incident, Mapping) else None
+    _require(isinstance(incident_state, Mapping)
+             and incident_state.get("run_id") == successor.get("run_id")
+             and incident_state.get("sequence") == 14
+             and incident_state.get("active_gate") == "UR.G5",
+             "RECOVERY_REPLAN_INCIDENT_CURSOR_MISMATCH")
+
+    lock = cp_path.with_name(cp_path.name + ".recovery-replan.lock")
+    try:
+        lock_fd = os.open(lock, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError as exc:
+        raise CheckpointPersistenceError("RECOVERY_REPLAN_ALREADY_IN_PROGRESS") from exc
+    except OSError as exc:
+        raise CheckpointPersistenceError("RECOVERY_REPLAN_LOCK_FAILED", str(exc)) from exc
+    try:
+        _require(cp_path.read_bytes() == current_bytes, "NATIVE_CHECKPOINT_CAS_CONFLICT")
+        archive_sha, _ = _write_immutable(archive, current_bytes,
+                                         conflict_code="RECOVERY_REPLAN_ARCHIVE_CONFLICT")
+        _require(archive_sha == expected_incident_checkpoint_file_sha256,
+                 "RECOVERY_REPLAN_ARCHIVE_HASH_MISMATCH")
+        generation_sha, _ = _write_immutable(generation, payload,
+                                              conflict_code="RECOVERY_REPLAN_GENERATION_CONFLICT")
+        _require(cp_path.read_bytes() == current_bytes, "NATIVE_CHECKPOINT_CAS_CONFLICT")
+        fd, temp_name = tempfile.mkstemp(prefix=cp_path.name + ".", suffix=".tmp", dir=cp_path.parent)
+        temp = Path(temp_name)
+        try:
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(payload); stream.flush(); os.fsync(stream.fileno())
+            _require(cp_path.read_bytes() == current_bytes, "NATIVE_CHECKPOINT_CAS_CONFLICT")
+            os.replace(temp, cp_path)
+            dir_fd = os.open(cp_path.parent, os.O_RDONLY)
+            try:
+                os.fsync(dir_fd)
+            finally:
+                os.close(dir_fd)
+        finally:
+            temp.unlink(missing_ok=True)
+        readback = cp_path.read_bytes()
+        _require(readback == payload, "RECOVERY_REPLAN_CHECKPOINT_READBACK_MISMATCH")
+        decoded = _load_json(cp_path, "RECOVERY_REPLAN_CHECKPOINT_READBACK_INVALID")
+        readback_state = decoded.get("run_state")
+        _require(isinstance(readback_state, Mapping), "RECOVERY_REPLAN_CHECKPOINT_READBACK_INVALID")
+        _require(readback_state == successor, "RECOVERY_REPLAN_STATE_READBACK_MISMATCH")
+        _require(readback_state.get("state_digest") == _digest(readback_state, "state_digest"),
+                 "RECOVERY_REPLAN_STATE_READBACK_DIGEST_INVALID")
+        try:
+            UniversalController(profile=profile, runtime_plan=runtime_plan, run_state=readback_state,
+                                node_allocation=node_allocation)
+        except Exception as exc:
+            code = getattr(exc, "code", "RECOVERY_REPLAN_READBACK_VALIDATION_FAILED")
+            raise CheckpointPersistenceError(code, str(exc)) from exc
+        receipt = build_activation_receipt(archive_sha, generation_sha, _file_sha(readback))
+        receipt_bytes = (json.dumps(receipt, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+        receipt_sha, _ = _write_immutable(receipt_path, receipt_bytes,
+                                          conflict_code="RECOVERY_REPLAN_ACTIVATION_RECEIPT_CONFLICT")
+        return {"idempotent_replay": False, "checkpoint_file_sha256": _file_sha(readback),
+                "activation_receipt_file_sha256": receipt_sha,
+                "generation_file_sha256": generation_sha, "archive_file_sha256": archive_sha}
+    finally:
+        os.close(lock_fd)
+        lock.unlink(missing_ok=True)
