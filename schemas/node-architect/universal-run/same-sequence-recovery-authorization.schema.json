@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/same-sequence-recovery-authorization.schema.json",
+  "title": "Universal Runtime v2 exact Controller authorization for physical same-sequence recovery",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "decision", "authorized_action", "authority_ref", "controller_sequence", "controller_body_sha256", "run_id", "runtime_plan_digest", "candidate_sha", "sequence", "active_gate", "next_owner", "typed_next", "expected_checkpoint_file_sha256", "successor_snapshot_digest", "transition_digest", "authority_granted", "executed_effects", "authorization_digest"],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.same-sequence-recovery-authorization.v2"},
+    "schema_version": {"const": 2},
+    "decision": {"const": "AUTHORIZE"},
+    "authorized_action": {"const": "NONREWRITE_SAME_SEQ_CHECKPOINT_RECOVERY"},
+    "authority_ref": {"type": "string", "minLength": 1},
+    "controller_sequence": {"type": "integer", "minimum": 1},
+    "controller_body_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run_id": {"type": "string", "minLength": 1},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "candidate_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "active_gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
+    "next_owner": {"enum": ["CONTROLLER", "EXECUTOR"]},
+    "typed_next": {"type": "string", "minLength": 1},
+    "expected_checkpoint_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "successor_snapshot_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "transition_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "authorization_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/controller-persistence-intent.schema.json",
+  "title": "Universal Runtime v2 pre-persist provenance and CAS intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "writer_api_identity", "checkpoint_ref", "prior_generation", "cas", "successor_snapshot", "transition_receipt", "intended_checkpoint_file_sha256", "intended_run_id", "intended_sequence", "intended_gate", "intended_owner", "intended_typed_next", "intended_checkpoint_document", "intent_digest"],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.controller-persistence-intent.v2"},
+    "schema_version": {"const": 2},
+    "writer_api_identity": {"type": "string", "minLength": 1},
+    "checkpoint_ref": {"type": "string", "minLength": 1},
+    "prior_generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkpoint_file_sha256", "checkpoint_sequence", "checkpoint_state_digest", "state_digest_valid", "generation_or_cas_revision", "checkpoint_envelope_digest_valid"],
+      "properties": {
+        "checkpoint_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "checkpoint_sequence": {"type": ["integer", "null"]},
+        "checkpoint_state_digest": {"type": ["string", "null"]},
+        "state_digest_valid": {"type": "boolean"},
+        "generation_or_cas_revision": {"type": ["string", "integer"]},
+        "checkpoint_envelope_digest_valid": {"type": "boolean"}
+      }
+    },
+    "cas": {"type": "object", "required": ["expected_current_file_sha256", "compare_and_swap"], "properties": {"expected_current_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "compare_and_swap": {"const": true}}},
+    "successor_snapshot": {"type": "object", "required": ["path", "file_sha256", "snapshot_digest", "successor_state_digest"]},
+    "transition_receipt": {"type": "object", "required": ["path", "file_sha256", "transition_digest", "transition_ref"]},
+    "intended_checkpoint_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "intended_run_id": {"type": "string", "minLength": 1},
+    "intended_sequence": {"type": "integer", "minimum": 1},
+    "intended_gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
+    "intended_owner": {"enum": ["CONTROLLER", "EXECUTOR"]},
+    "intended_typed_next": {"type": "string", "minLength": 1},
+    "intended_checkpoint_document": {"type": "object"},
+    "intent_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

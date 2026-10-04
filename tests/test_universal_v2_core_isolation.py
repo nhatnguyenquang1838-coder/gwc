@@ -128,7 +128,7 @@ def test_all_active_universal_run_schemas_are_v2_and_ur_namespaced():
 
     root = Path(__file__).resolve().parents[1]
     schema_paths = sorted((root / "schemas/node-architect/universal-run").glob("*.schema.json"))
-    assert len(schema_paths) == 9
+    assert len(schema_paths) == 13
     for path in schema_paths:
         schema = json.loads(path.read_text(encoding="utf-8"))
         assert "/universal-run/v2/" in schema["$id"], path.name
@@ -327,9 +327,10 @@ def test_controller_owned_g4_in_place_uses_canonical_complete_q0_gate():
 def test_controller_owned_g4_transition_is_persisted_and_exactly_once(tmp_path):
     import hashlib
     import json
-    from tools.node_architect.universal_run_controller import (
-        UniversalController,
-        materialize_controller_transition_receipt,
+    from tools.node_architect.universal_run_controller import UniversalController
+    from tools.node_architect.universal_run_persistence import (
+        materialize_controller_successor_snapshot,
+        materialize_successor_bound_transition_receipt,
     )
 
     profile, plan, state, allocation = _make_controller_owned_g4_binding()
@@ -337,12 +338,22 @@ def test_controller_owned_g4_transition_is_persisted_and_exactly_once(tmp_path):
     controller.assign_current_action()
     decision = controller.complete_controller_owned_gate(evidence={"integration_outcome": "IN_PLACE"})
     path = tmp_path / "controller-local-g4-transition.json"
+    snapshot = materialize_controller_successor_snapshot(
+        successor_run_state=decision["successor_run_state"],
+        runtime_plan_digest=plan["digest"],
+        candidate_sha=plan["source_binding"]["pre_head_sha"],
+        transition_ref=decision["transition_receipt"]["transition_ref"],
+        path=tmp_path / "controller-local-g4-successor.json",
+    )
 
-    materialized = materialize_controller_transition_receipt(receipt=decision["transition_receipt"], path=path)
+    materialized = materialize_successor_bound_transition_receipt(
+        transition=decision["transition_receipt"], snapshot=snapshot, path=path
+    )
     readback = path.read_bytes()
     persisted = json.loads(readback)
 
-    assert persisted == decision["transition_receipt"]
+    assert persisted == materialized["transition"]
+    assert persisted["successor_state_digest"] == decision["successor_run_state"]["state_digest"]
     assert hashlib.sha256(readback).hexdigest() == materialized["file_sha256"]
     assert materialized["idempotent_replay"] is False
     assert decision["successor_run_state"]["controller_local_completion_ledger"]
@@ -728,24 +739,38 @@ def test_controller_transition_receipt_schema_and_materializer_are_exactly_once(
         UniversalControllerError,
         materialize_controller_transition_receipt,
     )
+    from tools.node_architect.universal_run_persistence import (
+        materialize_controller_successor_snapshot,
+        materialize_successor_bound_transition_receipt,
+    )
     import jsonschema
 
     profile, plan, state, allocation = _make_v2_binding()
     controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
     assignment = controller.assign_current_action()
-    transition = controller.consume_executor_receipt(_g2_executor_receipt(profile, assignment))["transition_receipt"]
+    decision = controller.consume_executor_receipt(_g2_executor_receipt(profile, assignment))
+    transition = decision["transition_receipt"]
+    snapshot = materialize_controller_successor_snapshot(
+        successor_run_state=decision["successor_run_state"],
+        runtime_plan_digest=plan["digest"],
+        candidate_sha=plan["source_binding"]["pre_head_sha"],
+        transition_ref=transition["transition_ref"],
+        path=tmp_path / "controller-g2-successor.json",
+    )
+    path = tmp_path / "controller-transition-receipt.json"
+    bound_transition = materialize_successor_bound_transition_receipt(
+        transition=transition, snapshot=snapshot, path=path
+    )
+    transition = bound_transition["transition"]
     schema = json.loads((Path(__file__).resolve().parents[1] / "schemas/node-architect/universal-run/controller-transition-receipt.schema.json").read_text())
     jsonschema.validate(transition, schema)
-    path = tmp_path / "controller-transition-receipt.json"
-
-    written = materialize_controller_transition_receipt(receipt=transition, path=path)
     reread = path.read_bytes()
     replay = materialize_controller_transition_receipt(receipt=transition, path=path)
 
     assert json.loads(reread) == transition
-    assert written["file_sha256"] == hashlib.sha256(reread).hexdigest()
-    assert written["transition_digest"] == transition["transition_digest"]
-    assert written["idempotent_replay"] is False
+    assert bound_transition["file_sha256"] == hashlib.sha256(reread).hexdigest()
+    assert bound_transition["transition_digest"] == transition["transition_digest"]
+    assert bound_transition["idempotent_replay"] is False
     assert replay["idempotent_replay"] is True
     conflicting_body = {key: value for key, value in transition.items() if key != "transition_digest"}
     conflicting_body["transition_ref"] += ":different"
@@ -1164,3 +1189,71 @@ def test_fresh_process_cli_boots_v2_and_never_imports_legacy(tmp_path):
     assert output["runtime_protocol"] == "gwc.universal.controller/v2"
     assert output["authority_granted"] is False
     assert output["executed_effects"] == []
+
+
+def test_controller_owned_g4_rejects_extra_control_fields_in_gate_evidence():
+    import pytest
+    from tools.node_architect.universal_run_controller import UniversalController, UniversalControllerError
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    with pytest.raises(UniversalControllerError, match="CONTROLLER_LOCAL_GATE_EVIDENCE_NONCANONICAL"):
+        controller.complete_controller_owned_gate(evidence={
+            "integration_outcome": "IN_PLACE",
+            "candidate_sha": plan["source_binding"]["pre_head_sha"],
+            "assignment_digest": "sha256:" + "a" * 64,
+        })
+
+
+def test_controller_local_idempotency_key_binds_canonical_evidence_digest():
+    import hashlib
+    import json
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    evidence = {"integration_outcome": "IN_PLACE"}
+    decision = controller.complete_controller_owned_gate(evidence=evidence)
+    receipt = decision["controller_local_completion_receipt"]
+    evidence_digest = "sha256:" + hashlib.sha256(
+        json.dumps(evidence, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    identity = {
+        "run_id": state["run_id"],
+        "runtime_plan_digest": plan["digest"],
+        "candidate_sha": plan["source_binding"]["pre_head_sha"],
+        "gate": "UR.G4",
+        "sequence": state["sequence"],
+        "action": "complete_controller_owned_gate",
+        "actor": "CONTROLLER",
+        "evidence_digest": evidence_digest,
+        "completion_metadata_digest": "sha256:" + hashlib.sha256(b"{}").hexdigest(),
+    }
+    expected = "sha256:" + hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    assert receipt["idempotency_key"] == expected
+
+
+def test_controller_owned_g4_keeps_provenance_outside_gate_evidence():
+    from tools.node_architect.universal_run_controller import UniversalController
+
+    profile, plan, state, allocation = _make_controller_owned_g4_binding()
+    controller = UniversalController(profile=profile, runtime_plan=plan, run_state=state, node_allocation=allocation)
+    controller.assign_current_action()
+    decision = controller.complete_controller_owned_gate(
+        evidence={"integration_outcome": "IN_PLACE"},
+        completion_metadata={
+            "controller_seq": 106,
+            "controller_body_sha256": "a" * 64,
+            "assignment_digest": "sha256:" + "b" * 64,
+        },
+    )
+    local_receipt = decision["controller_local_completion_receipt"]
+    assert decision["successor_run_state"]["gate_evidence"] == {"integration_outcome": "IN_PLACE"}
+    assert local_receipt["evidence"] == {"integration_outcome": "IN_PLACE"}
+    assert local_receipt["completion_metadata"]["controller_seq"] == 106
+    assert local_receipt["evidence_digest"] != local_receipt["completion_metadata_digest"]
+    assert decision["authority_granted"] is False and decision["executed_effects"] == []

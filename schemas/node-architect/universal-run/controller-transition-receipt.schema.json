@@ -56,6 +56,14 @@
     "kernel_transition_receipt": {"type": "object"},
     "authority_granted": {"const": false},
     "executed_effects": {"const": []},
+    "successor_snapshot_ref": {"type": "string", "minLength": 1},
+    "successor_snapshot_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "successor_snapshot_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "successor_state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
     "transition_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
-  }
+  },
+  "allOf": [{
+    "if": {"required": ["successor_snapshot_ref"]},
+    "then": {"required": ["successor_snapshot_file_sha256", "successor_snapshot_digest", "successor_state_digest"]}
+  }]
 }

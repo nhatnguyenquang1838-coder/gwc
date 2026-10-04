@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/same-sequence-recovery-receipt.schema.json",
+  "title": "Universal Runtime v2 same-sequence integrity recovery receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_id", "schema_version", "recovery_intent_digest", "authorization_digest", "checkpoint_ref", "prior_checkpoint_file_sha256", "corrupt_checkpoint_archive_ref", "corrupt_checkpoint_archive_file_sha256", "generation_ref", "generation_file_sha256", "checkpoint_readback_file_sha256", "run_id", "sequence", "active_gate", "next_owner", "typed_next", "state_digest", "logical_cursor_changed", "authority_granted", "executed_effects", "receipt_digest"],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.same-sequence-recovery-receipt.v2"},
+    "schema_version": {"const": 2},
+    "recovery_intent_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "authorization_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "checkpoint_ref": {"type": "string", "minLength": 1},
+    "prior_checkpoint_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "corrupt_checkpoint_archive_ref": {"type": "string", "minLength": 1},
+    "corrupt_checkpoint_archive_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "generation_ref": {"type": "string", "minLength": 1},
+    "generation_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checkpoint_readback_file_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run_id": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "active_gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
+    "next_owner": {"enum": ["CONTROLLER", "EXECUTOR"]},
+    "typed_next": {"type": "string", "minLength": 1},
+    "state_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "logical_cursor_changed": {"const": false},
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

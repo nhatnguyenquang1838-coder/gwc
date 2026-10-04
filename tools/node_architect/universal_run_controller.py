@@ -58,6 +58,14 @@ def materialize_controller_transition_receipt(
 ) -> dict[str, Any]:
     """Persist one immutable Controller transition receipt with exact readback."""
     _require(isinstance(receipt, Mapping), "CONTROLLER_TRANSITION_RECEIPT_INVALID")
+    _require(
+        isinstance(receipt.get("successor_snapshot_ref"), str)
+        and bool(receipt.get("successor_snapshot_ref"))
+        and isinstance(receipt.get("successor_snapshot_file_sha256"), str)
+        and isinstance(receipt.get("successor_snapshot_digest"), str)
+        and isinstance(receipt.get("successor_state_digest"), str),
+        "CONTROLLER_SUCCESSOR_SNAPSHOT_REQUIRED",
+    )
     schema_path = Path(__file__).resolve().parents[2] / "schemas/node-architect/universal-run/controller-transition-receipt.schema.json"
     try:
         import jsonschema
@@ -69,6 +77,31 @@ def materialize_controller_transition_receipt(
     target = Path(path)
     _require(not target.is_symlink(), "CONTROLLER_TRANSITION_RECEIPT_PATH_SYMLINK")
     payload = (json.dumps(dict(receipt), sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
+    if target.exists():
+        _require(target.read_bytes() == payload, "CONTROLLER_TRANSITION_RECEIPT_CONFLICT")
+    snapshot_path = Path(str(receipt["successor_snapshot_ref"]))
+    try:
+        snapshot_bytes = snapshot_path.read_bytes()
+        snapshot = json.loads(snapshot_bytes)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise UniversalControllerError("CONTROLLER_SUCCESSOR_SNAPSHOT_READBACK_FAILED", str(exc)) from exc
+    _require(hashlib.sha256(snapshot_bytes).hexdigest() == receipt["successor_snapshot_file_sha256"], "CONTROLLER_SUCCESSOR_SNAPSHOT_FILE_HASH_MISMATCH")
+    _require(isinstance(snapshot, Mapping) and snapshot.get("snapshot_digest") == _digest(snapshot, "snapshot_digest"), "CONTROLLER_SUCCESSOR_SNAPSHOT_DIGEST_INVALID")
+    snapshot_state = snapshot.get("successor_run_state")
+    post_state = receipt.get("post_state")
+    _require(
+        isinstance(snapshot_state, Mapping)
+        and snapshot_state.get("state_digest") == _digest(snapshot_state, "state_digest")
+        and snapshot.get("snapshot_digest") == receipt["successor_snapshot_digest"]
+        and snapshot_state.get("state_digest") == receipt["successor_state_digest"]
+        and isinstance(post_state, Mapping)
+        and post_state.get("sequence") == snapshot_state.get("sequence")
+        and post_state.get("state_digest") == snapshot_state.get("state_digest")
+        and snapshot.get("run_id") == receipt.get("run_id")
+        and snapshot.get("runtime_plan_digest") == receipt.get("runtime_plan_digest")
+        and snapshot.get("transition_ref") == receipt.get("transition_ref"),
+        "CONTROLLER_SUCCESSOR_SNAPSHOT_BINDING_MISMATCH",
+    )
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
@@ -479,10 +512,13 @@ class UniversalController:
         evidence: Mapping[str, Any],
         expected_sequence: int | None = None,
         transition_receipt_ref: str | None = None,
+        completion_metadata: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Complete one Controller-owned gate from native Q0 evidence, never an Executor receipt."""
+        """Complete one Controller-owned gate from canonical evidence, separating metadata."""
         _require(isinstance(evidence, Mapping) and bool(evidence), "CONTROLLER_LOCAL_GATE_EVIDENCE_REQUIRED")
+        _require(completion_metadata is None or isinstance(completion_metadata, Mapping), "CONTROLLER_LOCAL_COMPLETION_METADATA_INVALID")
         evidence_copy = copy.deepcopy(dict(evidence))
+        completion_metadata_copy = copy.deepcopy(dict(completion_metadata or {}))
         current_sequence = int(self.run_state["sequence"])
         sequence = current_sequence if expected_sequence is None else expected_sequence
         _require(isinstance(sequence, int) and not isinstance(sequence, bool) and sequence >= 1, "CONTROLLER_LOCAL_GATE_SEQUENCE_INVALID")
@@ -495,8 +531,16 @@ class UniversalController:
         else:
             _require(len(sequence_entries) == 1, "CONTROLLER_LOCAL_COMPLETION_RECORD_MISSING")
             gate = str(sequence_entries[0].get("gate", ""))
+        if gate == "UR.G4":
+            allowed_evidence_shapes = ({"integration_outcome"}, {"INTEGRATION_RECEIPT"})
+            _require(
+                set(evidence_copy) in allowed_evidence_shapes,
+                "CONTROLLER_LOCAL_GATE_EVIDENCE_NONCANONICAL",
+                "UR.G4 evidence must contain only integration_outcome or only INTEGRATION_RECEIPT; provenance belongs in completion_metadata",
+            )
         candidate_sha = str(self.runtime_plan["source_binding"]["pre_head_sha"])
         evidence_digest = "sha256:" + hashlib.sha256(_canonical_bytes(evidence_copy)).hexdigest()
+        completion_metadata_digest = "sha256:" + hashlib.sha256(_canonical_bytes(completion_metadata_copy)).hexdigest()
         identity = {
             "run_id": self.run_state["run_id"],
             "runtime_plan_digest": self.runtime_plan["digest"],
@@ -505,9 +549,22 @@ class UniversalController:
             "sequence": sequence,
             "action": "complete_controller_owned_gate",
             "actor": "CONTROLLER",
+            "evidence_digest": evidence_digest,
+            "completion_metadata_digest": completion_metadata_digest,
         }
         idempotency_key = "sha256:" + hashlib.sha256(_canonical_bytes(identity)).hexdigest()
         prior_matches = [item for item in ledger if item.get("idempotency_key") == idempotency_key]
+        if not prior_matches and sequence != current_sequence and sequence_entries:
+            prior_for_sequence = sequence_entries[0]
+            same_command = (
+                prior_for_sequence.get("run_id") == self.run_state["run_id"]
+                and prior_for_sequence.get("runtime_plan_digest") == self.runtime_plan["digest"]
+                and prior_for_sequence.get("candidate_sha") == candidate_sha
+                and prior_for_sequence.get("gate") == gate
+                and prior_for_sequence.get("sequence") == sequence
+                and prior_for_sequence.get("action") == "complete_controller_owned_gate"
+            )
+            _require(not same_command, "CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT")
         _require(len(prior_matches) <= 1, "CONTROLLER_LOCAL_COMPLETION_LEDGER_INVALID")
         if prior_matches:
             prior = prior_matches[0]
@@ -524,7 +581,8 @@ class UniversalController:
                 "CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT",
             )
             _require(
-                local_receipt.get("evidence_digest") == evidence_digest,
+                local_receipt.get("evidence_digest") == evidence_digest
+                and local_receipt.get("completion_metadata_digest") == completion_metadata_digest,
                 "CONTROLLER_LOCAL_COMPLETION_IDEMPOTENCY_CONFLICT",
             )
             if transition_receipt_ref is not None:
@@ -593,6 +651,8 @@ class UniversalController:
             "action": "complete_controller_owned_gate",
             "evidence": evidence_copy,
             "evidence_digest": evidence_digest,
+            "completion_metadata": completion_metadata_copy,
+            "completion_metadata_digest": completion_metadata_digest,
             "idempotency_key": idempotency_key,
             "pre_state_digest": self.run_state["state_digest"],
             "authority_granted": False,
@@ -638,6 +698,7 @@ class UniversalController:
             "idempotency_key": idempotency_key,
             "receipt_digest": local_receipt["receipt_digest"],
             "evidence_digest": evidence_digest,
+            "completion_metadata_digest": completion_metadata_digest,
             "sequence": sequence,
             "gate": gate,
             "action": "complete_controller_owned_gate",
