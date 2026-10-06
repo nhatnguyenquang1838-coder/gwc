@@ -10,8 +10,8 @@
     ".task-architect/",
     ".task-me/runs/"
   ],
-  "evidence_digest": "sha256:83fe0347f72d3dfd8c61fd6f4fdbdeaa65b9c27716ab5dc65bcac73a501d6a72",
-  "scope_hash": "sha256:83fe0347f72d3dfd8c61fd6f4fdbdeaa65b9c27716ab5dc65bcac73a501d6a72",
+  "evidence_digest": "sha256:e41a30aad9940901afb2df8d8e97fd256912e9697ac17c4be8be5f64e08611b4",
+  "scope_hash": "sha256:e41a30aad9940901afb2df8d8e97fd256912e9697ac17c4be8be5f64e08611b4",
   "created_by": "@hermes",
   "created_at_utc": "2026-10-06T01:30:00Z",
   "authority_granted": false,
@@ -21,11 +21,10 @@
     "base_ref": "main",
     "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
     "working_branch": "fix/SCRUM-781-q0-canonical",
-    "head_sha": "2f837e7ce6d7678e3e9d78f1f2ee739c9c13e094",
+    "head_sha": "8677d141ffceb7bbaa87bc4d163a8546a4e4287a",
     "risk_class": "R0",
     "authorized_actions": ["create_commit", "modify_approved_files", "stage"],
     "excluded_actions": ["deploy_approved_release", "merge_approved_pr", "migration", "production_config_change", "reload_approved_runtime"],
     "additional_bindings": []
-  },
-  "head_sha": "2f837e7ce6d7678e3e9d78f1f2ee739c9c13e094"
+  }
 }
