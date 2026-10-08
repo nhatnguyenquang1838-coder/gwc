@@ -61,7 +61,10 @@ jobs:
           from taskcontroller.interaction.github_continuation_store import GitHubContinuationStore
           from taskcontroller.interaction.github_mailbox_v2 import GitHubMailboxRepository
           from taskcontroller.interaction.github_rest_transport import GitHubRestIssueCommentTransport
-          from taskcontroller.interaction.mailbox_v2 import canonical_digest
+          from taskcontroller.interaction.mailbox_v2 import (
+              MailboxV2ValidationError,
+              canonical_digest,
+          )
           from taskcontroller.runtime.high_integrity_session import (
               WAIT_EXECUTOR_AUTHORITY_ACTION,
               materialize_controller_transition,
@@ -277,16 +280,20 @@ jobs:
 
           ledger = AuditFacade("/tmp/scrum781-e9-controller-recovery.sqlite3")
           try:
-              receipt = materialize_controller_transition(
-                  continuation_store=store,
-                  repository=repository,
-                  ledger=ledger,
-                  checkpoint=checkpoint,
-                  request=request,
-                  state_version=0,
-                  prepared_at=prepared_at,
-                  committed_at=committed_at,
-              )
+              try:
+                  receipt = materialize_controller_transition(
+                      continuation_store=store,
+                      repository=repository,
+                      ledger=ledger,
+                      checkpoint=checkpoint,
+                      request=request,
+                      state_version=0,
+                      prepared_at=prepared_at,
+                      committed_at=committed_at,
+                  )
+              except MailboxV2ValidationError as exc:
+                  print("MAILBOX_V2_SCHEMA_ERRORS=" + json.dumps(exc.errors, sort_keys=True))
+                  raise
           finally:
               ledger.close()
 
