@@ -1,4 +1,4 @@
-name: SCRUM-781 consume G2 and dispatch Executor
+name: SCRUM-781 event-driven Executor dispatch
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: scrum-781-consume-g2-dispatch
+  group: scrum-781-event-driven-dispatch
   cancel-in-progress: false
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: nhatnguyenquang1838-coder/DW-SuperApps
-          ref: 8663779c62ca00340c257af92e66e2b616e9154a
+          ref: 75404cfeb57f6742b60f9136aeeefd41c66b5eef
           path: dw-superapps
           persist-credentials: false
 
@@ -51,8 +51,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r dw-superapps/requirements-dev.txt
 
-      - name: Validate approval and canonically dispatch E9 seq2
+      - name: Canonically redispatch E9 as event-driven execution
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PYTHONPATH: ${{ github.workspace }}/dw-superapps
-        run: python transport/.github/scripts/scrum781_e9_dispatch.py
+        run: python transport/.github/scripts/scrum781_e9_event_redispatch.py
