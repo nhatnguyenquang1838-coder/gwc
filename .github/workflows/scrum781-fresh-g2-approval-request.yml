@@ -1,4 +1,4 @@
-name: SCRUM-781 fresh G2 approval request
+name: SCRUM-781 consume G2 and dispatch Executor
 
 on:
   pull_request:
@@ -10,16 +10,30 @@ permissions:
   issues: write
 
 concurrency:
-  group: scrum-781-fresh-g2-approval-request
+  group: scrum-781-consume-g2-dispatch
   cancel-in-progress: false
 
 jobs:
-  materialize:
+  dispatch:
     if: github.head_ref == 'ops/SCRUM-781-g2-approval-request-20261008'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout exact SCRUM-781 authority generator source
+      - name: Checkout transport runner
+        uses: actions/checkout@v4
+        with:
+          path: transport
+          persist-credentials: false
+
+      - name: Checkout canonical TaskController release
+        uses: actions/checkout@v4
+        with:
+          repository: nhatnguyenquang1838-coder/DW-SuperApps
+          ref: 8663779c62ca00340c257af92e66e2b616e9154a
+          path: dw-superapps
+          persist-credentials: false
+
+      - name: Checkout exact SCRUM-781 execution source
         uses: actions/checkout@v4
         with:
           repository: nhatnguyenquang1838-coder/gwc
@@ -32,199 +46,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install schema validator
-        run: python -m pip install jsonschema
+      - name: Install TaskController dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r dw-superapps/requirements-dev.txt
 
-      - name: Generate, validate, and materialize fresh G2 request
+      - name: Validate approval and canonically dispatch E9 seq2
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          python - <<'PY'
-          from __future__ import annotations
-
-          import hashlib
-          import importlib.util
-          import json
-          import os
-          import urllib.parse
-          import urllib.request
-          from pathlib import Path
-
-          from jsonschema import Draft202012Validator
-
-          REPOSITORY = "nhatnguyenquang1838-coder/gwc"
-          ISSUE = 575
-          TASK_ID = "SCRUM-781"
-          RUN_ID = "scrum781-q0-20260920T074727Z"
-          MAIN_SHA = "414002f92d48083e7133236346b26e3a2a047e33"
-          HEAD_SHA = "f6fd4121e492b61e8e0781614cd4b627d99ad979"
-          HEAD_REF = "fix/SCRUM-781-q0-canonical"
-          SCOPE_HASH = "sha256:4e98635e0fe78961fe96b0194eebdbcdca9a90f1ff55cec186dc17f69936681f"
-          ISSUED_AT = "2026-10-08T10:24:04Z"
-          EXPIRES_AT = "2026-10-08T14:24:04Z"
-          MARKER = "dw:taskcontroller:fresh-g2-approval-request:scrum781-q0-20261008"
-
-          token = os.environ["GITHUB_TOKEN"]
-
-          def gh(method: str, path: str, payload=None):
-              req = urllib.request.Request(
-                  "https://api.github.com" + path,
-                  method=method,
-                  headers={
-                      "Authorization": f"Bearer {token}",
-                      "Accept": "application/vnd.github+json",
-                      "X-GitHub-Api-Version": "2022-11-28",
-                      "User-Agent": "scrum781-g2-approval-materializer",
-                  },
-                  data=(
-                      json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
-                      if payload is not None
-                      else None
-                  ),
-              )
-              with urllib.request.urlopen(req, timeout=30) as response:
-                  return json.loads(response.read().decode("utf-8"))
-
-          owner, repo = REPOSITORY.split("/", 1)
-          main_ref = gh("GET", f"/repos/{owner}/{repo}/git/ref/heads/main")
-          head_path = urllib.parse.quote(HEAD_REF, safe="")
-          head_ref = gh("GET", f"/repos/{owner}/{repo}/git/ref/heads/{head_path}")
-          if main_ref["object"]["sha"] != MAIN_SHA:
-              raise SystemExit(
-                  f"AUTHORITY_BINDING_DRIFT: main={main_ref['object']['sha']} expected={MAIN_SHA}"
-              )
-          if head_ref["object"]["sha"] != HEAD_SHA:
-              raise SystemExit(
-                  f"AUTHORITY_BINDING_DRIFT: head={head_ref['object']['sha']} expected={HEAD_SHA}"
-              )
-
-          root = Path("canonical-gwc")
-          module_path = root / "tools/node_architect/approval_token_generation.py"
-          spec = importlib.util.spec_from_file_location("approval_token_generation", module_path)
-          module = importlib.util.module_from_spec(spec)
-          assert spec and spec.loader
-          spec.loader.exec_module(module)
-
-          request = module.generate_approval_request(
-              task_id=TASK_ID,
-              repository=REPOSITORY,
-              gate="G2_EXECUTION",
-              action="modify_approved_files",
-              scope_identity={
-                  "scope_hash": SCOPE_HASH,
-                  "base_sha": MAIN_SHA,
-                  "head_sha": HEAD_SHA,
-                  "branch": HEAD_REF,
-                  "pr_number": None,
-                  "environment": None,
-              },
-              authority_boundary_decision={
-                  "decision": "REQUIRE_APPROVAL",
-                  "requested_action": "modify_approved_files",
-              },
-              actor_target={
-                  "type": "user",
-                  "id": "USER",
-                  "display_name": "Human Approver",
-              },
-              issued_at=ISSUED_AT,
-              expires_at=EXPIRES_AT,
-          )
-
-          schema_path = root / "schemas/node-architect/gate-authority/approval-token-generation.schema.json"
-          schema = json.loads(schema_path.read_text(encoding="utf-8"))
-          Draft202012Validator.check_schema(schema)
-          errors = sorted(
-              Draft202012Validator(schema).iter_errors(request),
-              key=lambda e: list(e.absolute_path),
-          )
-          if errors:
-              raise SystemExit(
-                  "APPROVAL_SCHEMA_INVALID: "
-                  + " | ".join(
-                      f"{'.'.join(map(str, e.absolute_path)) or '$'}: {e.message}"
-                      for e in errors
-                  )
-              )
-
-          if request["scope_hash"] != SCOPE_HASH:
-              raise SystemExit("APPROVAL_SCOPE_MISMATCH")
-          if request["scope_hash_short"] != "4e98635e0fe78961":
-              raise SystemExit("APPROVAL_SCOPE_SHORT_MISMATCH")
-          if request["bindings"]["base_sha"] != MAIN_SHA:
-              raise SystemExit("APPROVAL_BASE_MISMATCH")
-          if request["bindings"]["head_sha"] != HEAD_SHA:
-              raise SystemExit("APPROVAL_HEAD_MISMATCH")
-          if request["authority_granted"] is not False or request["consumed"] is not False:
-              raise SystemExit("APPROVAL_REQUEST_MUST_NOT_GRANT_AUTHORITY")
-
-          request_sha256 = hashlib.sha256(
-              json.dumps(
-                  request,
-                  ensure_ascii=False,
-                  sort_keys=True,
-                  separators=(",", ":"),
-              ).encode("utf-8")
-          ).hexdigest()
-
-          existing = gh("GET", f"/repos/{owner}/{repo}/issues/{ISSUE}/comments?per_page=100")
-          matches = [
-              item for item in existing
-              if MARKER in (item.get("body") or "")
-          ]
-          if matches:
-              raise SystemExit(
-                  "APPROVAL_REQUEST_REPLAY_CONFLICT: marker already exists"
-              )
-
-          body = (
-              f"<!-- {MARKER} -->\n"
-              f"# SCRUM-781 — Fresh G2 Approval Request\n\n"
-              f"- run_id: \`{RUN_ID}\`\n"
-              f"- taskcontroller_state: \`E9 / WAIT_CONTROLLER / RESOLVE_EXECUTION_AUTHORITY\`\n"
-              f"- scope_hash: \`{SCOPE_HASH}\`\n"
-              f"- exact_main: \`{MAIN_SHA}\`\n"
-              f"- exact_head: \`{HEAD_REF}@{HEAD_SHA}\`\n"
-              f"- request_sha256: \`{request_sha256}\`\n"
-              f"- authority_granted: \`false\`\n"
-              f"- consumed: \`false\`\n\n"
-              "## Canonical request\n\n"
-              "\`\`\`json\n"
-              + json.dumps(request, ensure_ascii=False, sort_keys=True, indent=2)
-              + "\n\`\`\`\n"
-          )
-          created = gh(
-              "POST",
-              f"/repos/{owner}/{repo}/issues/{ISSUE}/comments",
-              {"body": body},
-          )
-
-          readback = gh(
-              "GET",
-              f"/repos/{owner}/{repo}/issues/comments/{created['id']}",
-          )
-          if readback.get("body") != body:
-              raise SystemExit("APPROVAL_REQUEST_READBACK_MISMATCH")
-          if readback.get("user", {}).get("login") != "github-actions[bot]":
-              raise SystemExit("APPROVAL_REQUEST_WRITER_UNTRUSTED")
-
-          print(
-              json.dumps(
-                  {
-                      "status": "FRESH_G2_APPROVAL_REQUEST_MATERIALIZED",
-                      "comment_id": created["id"],
-                      "approval_request_id": request["approval_request_id"],
-                      "approval_command": request["approval_command"],
-                      "request_digest": request["request_digest"],
-                      "request_sha256": request_sha256,
-                      "expires_at": request["expires_at"],
-                      "scope_hash": request["scope_hash"],
-                      "base_sha": request["bindings"]["base_sha"],
-                      "head_sha": request["bindings"]["head_sha"],
-                      "authority_granted": request["authority_granted"],
-                      "consumed": request["consumed"],
-                  },
-                  sort_keys=True,
-              )
-          )
-          PY
+          PYTHONPATH: ${{ github.workspace }}/dw-superapps
+        run: python transport/.github/scripts/scrum781_e9_dispatch.py
