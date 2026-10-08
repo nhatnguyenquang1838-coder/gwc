@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: nhatnguyenquang1838-coder/DW-SuperApps
-          ref: 0990c5e6d9846a5ac8c3180180dbe86b4326bec1
+          ref: 8663779c62ca00340c257af92e66e2b616e9154a
           path: dw-superapps
           persist-credentials: false
 
@@ -79,7 +79,7 @@ jobs:
           EXECUTOR_MAILBOX = f"github://{REPOSITORY}/issues/{ISSUE}#scrum781-executor-v2-e5"
           EXECUTOR = "20260923_175734_bea63d"
           EXACT_HEAD = "f6fd4121e492b61e8e0781614cd4b627d99ad979"
-          RUNTIME_SHA = "0990c5e6d9846a5ac8c3180180dbe86b4326bec1"
+          RUNTIME_SHA = "8663779c62ca00340c257af92e66e2b616e9154a"
 
           token = os.environ["GITHUB_TOKEN"]
           transport = GitHubRestIssueCommentTransport(token)
@@ -180,6 +180,7 @@ jobs:
           source_paths = [
               "controllers/taskcontroller.yaml",
               "taskcontroller/runtime/high_integrity_session.py",
+              "taskcontroller/interaction/github_mailbox_v2.py",
           ]
           sources = []
           for rel in source_paths:
