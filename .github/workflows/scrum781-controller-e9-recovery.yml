@@ -1,0 +1,328 @@
+name: SCRUM-781 Controller E9 recovery
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: scrum-781-controller-e9-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: github.head_ref == 'ops/SCRUM-781-controller-e9-recovery-20261008'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout canonical TaskController release
+        uses: actions/checkout@v4
+        with:
+          repository: nhatnguyenquang1838-coder/DW-SuperApps
+          ref: 0990c5e6d9846a5ac8c3180180dbe86b4326bec1
+          path: dw-superapps
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install TaskController dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r dw-superapps/requirements-dev.txt
+
+      - name: Canonically materialize E9 and hold at authority resolution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PYTHONPATH: ${{ github.workspace }}/dw-superapps
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          from taskcontroller.audit.facade import AuditFacade
+          from taskcontroller.controlplane.request_compiler import BoundedMailboxRequest
+          from taskcontroller.interaction.continuation import (
+              CONTINUATION_MANIFEST_KIND,
+              ControllerContinuation,
+              recover_continuation,
+          )
+          from taskcontroller.interaction.github_continuation_store import GitHubContinuationStore
+          from taskcontroller.interaction.github_mailbox_v2 import GitHubMailboxRepository
+          from taskcontroller.interaction.github_rest_transport import GitHubRestIssueCommentTransport
+          from taskcontroller.interaction.mailbox_v2 import canonical_digest
+          from taskcontroller.runtime.high_integrity_session import (
+              WAIT_EXECUTOR_AUTHORITY_ACTION,
+              materialize_controller_transition,
+              recover_high_integrity_session,
+          )
+
+          REPOSITORY = "nhatnguyenquang1838-coder/gwc"
+          ISSUE = 575
+          RUN_ID = "scrum781-q0-20260920T074727Z"
+          OLD_MAILBOX = f"github://{REPOSITORY}/issues/{ISSUE}#scrum781-controller-v2-e8"
+          NEW_MAILBOX = f"github://{REPOSITORY}/issues/{ISSUE}#scrum781-controller-v2-e9"
+          EXECUTOR_MAILBOX = f"github://{REPOSITORY}/issues/{ISSUE}#scrum781-executor-v2-e5"
+          EXECUTOR = "20260923_175734_bea63d"
+          EXACT_HEAD = "f6fd4121e492b61e8e0781614cd4b627d99ad979"
+          RUNTIME_SHA = "0990c5e6d9846a5ac8c3180180dbe86b4326bec1"
+
+          token = os.environ["GITHUB_TOKEN"]
+          transport = GitHubRestIssueCommentTransport(token)
+          repository = GitHubMailboxRepository(transport)
+          store = GitHubContinuationStore(
+              transport,
+              repository=REPOSITORY,
+              issue_number=ISSUE,
+          )
+
+          previous = recover_continuation(store, RUN_ID)
+          if previous is None:
+              raise SystemExit("RECOVERY_PRECONDITION_FAILED: continuation missing")
+          expected = {
+              "controller_epoch": 8,
+              "controller_seq": 2,
+              "phase": "WAIT_EXECUTOR",
+              "next_action": "POLL_EXECUTOR",
+              "controller_mailbox_ref": OLD_MAILBOX,
+              "executor_mailbox_ref": EXECUTOR_MAILBOX,
+              "executor_actor": EXECUTOR,
+              "exact_head_sha": EXACT_HEAD,
+              "expected_executor_seq": 2,
+              "last_seen_executor_seq": 1,
+          }
+          for key, value in expected.items():
+              if getattr(previous, key) != value:
+                  raise SystemExit(
+                      f"RECOVERY_PRECONDITION_FAILED: {key}={getattr(previous, key)!r}, expected {value!r}"
+                  )
+
+          now = datetime.now(timezone.utc).replace(microsecond=0)
+          prepared_at = now.isoformat().replace("+00:00", "Z")
+          committed_at = (now + timedelta(seconds=1)).isoformat().replace("+00:00", "Z")
+          observed_at = (now + timedelta(seconds=2)).isoformat().replace("+00:00", "Z")
+          lease_expires_at = (now + timedelta(minutes=15)).isoformat().replace("+00:00", "Z")
+
+          checkpoint = ControllerContinuation(
+              run_id=RUN_ID,
+              controller_epoch=9,
+              phase="WAIT_EXECUTOR",
+              status="ACTIVE",
+              next_action="POLL_EXECUTOR",
+              controller_mailbox_ref=NEW_MAILBOX,
+              controller_seq=1,
+              executor_actor=EXECUTOR,
+              executor_mailbox_ref=EXECUTOR_MAILBOX,
+              expected_executor_seq=2,
+              last_seen_executor_seq=1,
+              wakeup_binding="mailbox-v2-only",
+              exact_head_sha=EXACT_HEAD,
+              updated_at=prepared_at,
+              human_root_ref=f"github://{REPOSITORY}/issues/{ISSUE}",
+          )
+
+          root = Path("dw-superapps")
+          source_paths = [
+              "controllers/taskcontroller.yaml",
+              "taskcontroller/runtime/high_integrity_session.py",
+          ]
+          sources = []
+          for rel in source_paths:
+              raw = (root / rel).read_bytes()
+              sources.append(
+                  {
+                      "repository": "nhatnguyenquang1838-coder/DW-SuperApps",
+                      "commit_sha": RUNTIME_SHA,
+                      "path": rel,
+                      "blob_digest": "sha256:" + hashlib.sha256(raw).hexdigest(),
+                  }
+              )
+          sources.sort(key=lambda x: (x["repository"], x["commit_sha"], x["path"], x["blob_digest"]))
+          source_digest = canonical_digest(
+              {
+                  "manifest_version": "dw-source-manifest-json/v1",
+                  "runtime_ref": f"nhatnguyenquang1838-coder/DW-SuperApps@{RUNTIME_SHA}",
+                  "sources": sources,
+              }
+          )
+          boundary_digest = canonical_digest(
+              {
+                  "run_id": RUN_ID,
+                  "controller_epoch": 9,
+                  "mode": "TRANSPORT_REPAIR",
+                  "allowed_actions": ["read_exact_source"],
+                  "denied_effects": "all-repository-and-executor-effects",
+              }
+          )
+          contract_digest = canonical_digest(
+              {
+                  "contract_id": "scrum781-q0-e9-controller-recovery",
+                  "run_id": RUN_ID,
+                  "boundary_digest": boundary_digest,
+                  "source_digest": source_digest,
+                  "runtime_sha": RUNTIME_SHA,
+              }
+          )
+          standards = {
+              "profile_id": "dw.taskcontroller.gwc.controller-recovery",
+              "version": "1",
+              "digest": canonical_digest(
+                  {
+                      "profile_id": "dw.taskcontroller.gwc.controller-recovery",
+                      "version": "1",
+                      "runtime_sha": RUNTIME_SHA,
+                  }
+              ),
+          }
+          denied = [
+              "create_guarded_branch_or_worktree",
+              "modify_approved_files",
+              "run_sandboxed_validation",
+              "stage",
+              "create_commit",
+              "push_working_branch",
+              "open_or_update_draft_pr",
+              "mark_pr_ready_for_review",
+              "merge_approved_pr",
+              "deploy_approved_release",
+              "production_config_change",
+              "production_data_write",
+              "migration",
+              "credential_rotation",
+              "branch_deletion",
+              "force_push",
+          ]
+          scope = {
+              "allowed_actions": ["read_exact_source"],
+              "denied_actions": denied,
+              "writable_targets": [],
+              "source_roots": [
+                  f"nhatnguyenquang1838-coder/DW-SuperApps@{RUNTIME_SHA}",
+                  f"{REPOSITORY}@{EXACT_HEAD}",
+              ],
+              "max_children": 0,
+              "max_parallel": 1,
+              "max_depth": 0,
+              "replan_required_when": [],
+              "time_budget_seconds": 300,
+              "token_budget": None,
+          }
+          request = BoundedMailboxRequest(
+              message_id="scrum781-q0-v2-e9-controller-recovery-1",
+              run_id=RUN_ID,
+              node_id="SCRUM-781-Q0-CONTROLLER-RECOVERY",
+              seq=1,
+              correlation_id=RUN_ID,
+              contract_id="scrum781-q0-e9-controller-recovery",
+              plan_version="controller-recovery-v1",
+              contract_digest=contract_digest,
+              boundary_digest=boundary_digest,
+              source_digest=source_digest,
+              source_manifest_ref="scrum781-q0-v2-e9-controller-recovery-source-v1",
+              objective=(
+                  "Rebind SCRUM-781 Controller to the canonical TaskController release "
+                  "and fail closed at execution-authority resolution without Executor or repository effects."
+              ),
+              scope=scope,
+              acceptance_criteria=(
+                  "E9 Controller mailbox event and cursor are canonically materialized.",
+                  "Continuation is canonically recovered to WAIT_CONTROLLER / RESOLVE_EXECUTION_AUTHORITY.",
+                  "No execution authority or repository/Git effect is granted.",
+              ),
+              source_refs=tuple(sources),
+              evidence_refs=(
+                  f"github://nhatnguyenquang1838-coder/DW-SuperApps/commit/{RUNTIME_SHA}",
+                  f"github://{REPOSITORY}/issues/{ISSUE}#issuecomment-6044604052",
+                  f"github://{REPOSITORY}/issues/{ISSUE}#issuecomment-6044609091",
+              ),
+              standards_profile=standards,
+              standards_profile_ref="dw.taskcontroller.gwc.controller-recovery/v1",
+              recipient_capability="taskcontroller.executor",
+              agent_instance=EXECUTOR,
+              attempt_id="scrum781-q0-v2-e9-controller-recovery-attempt-1",
+              attempt_number=1,
+              lease_generation=4,
+              fencing_token="scrum781-q0-v2-e9-controller-recovery-fence-4",
+              lease_expires_at=lease_expires_at,
+              idempotency_key="scrum781-q0-v2-e9-controller-recovery-1",
+              producer_namespace="controller",
+              producer_actor_id="chatgpt-controller",
+              authority_constraints={
+                  "denied_actions": denied,
+                  "writable_targets": [],
+              },
+              payload={
+                  "controller_contract_mode": "TRANSPORT_REPAIR",
+                  "execution_authority_active": False,
+                  "typed_next": "RESOLVE_EXECUTION_AUTHORITY",
+                  "taskcontroller_runtime_ref": (
+                      f"nhatnguyenquang1838-coder/DW-SuperApps@{RUNTIME_SHA}"
+                  ),
+                  "supersedes_controller_mailbox_ref": OLD_MAILBOX,
+                  "supersedes_continuation_record_seq": 19,
+                  "executor_wakeup_allowed": False,
+              },
+          )
+
+          ledger = AuditFacade("/tmp/scrum781-e9-controller-recovery.sqlite3")
+          try:
+              receipt = materialize_controller_transition(
+                  continuation_store=store,
+                  repository=repository,
+                  ledger=ledger,
+                  checkpoint=checkpoint,
+                  request=request,
+                  state_version=0,
+                  prepared_at=prepared_at,
+                  committed_at=committed_at,
+              )
+          finally:
+              ledger.close()
+
+          recovery = recover_high_integrity_session(
+              continuation_store=store,
+              repository=repository,
+              run_id=RUN_ID,
+              observed_at=observed_at,
+              active_lease=None,
+          )
+          final = recovery.checkpoint
+          if final.controller_epoch != 9:
+              raise SystemExit(f"RECOVERY_READBACK_FAILED: epoch={final.controller_epoch}")
+          if final.controller_seq != 1:
+              raise SystemExit(f"RECOVERY_READBACK_FAILED: seq={final.controller_seq}")
+          if final.phase != "WAIT_CONTROLLER":
+              raise SystemExit(f"RECOVERY_READBACK_FAILED: phase={final.phase}")
+          if final.next_action != WAIT_EXECUTOR_AUTHORITY_ACTION:
+              raise SystemExit(f"RECOVERY_READBACK_FAILED: next_action={final.next_action}")
+          if final.controller_mailbox_ref != NEW_MAILBOX:
+              raise SystemExit("RECOVERY_READBACK_FAILED: mailbox mismatch")
+
+          latest = store.latest_receipt(RUN_ID, CONTINUATION_MANIFEST_KIND)
+          if latest is None:
+              raise SystemExit("RECOVERY_READBACK_FAILED: latest continuation receipt missing")
+
+          print(
+              json.dumps(
+                  {
+                      "status": "SCRUM781_E9_RECOVERED",
+                      "runtime_sha": RUNTIME_SHA,
+                      "materialized": receipt.to_dict(),
+                      "final_checkpoint": final.to_dict(),
+                      "latest_continuation_receipt": latest.to_dict(),
+                  },
+                  sort_keys=True,
+              )
+          )
+          PY
