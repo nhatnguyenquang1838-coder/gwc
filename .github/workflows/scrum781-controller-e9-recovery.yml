@@ -93,23 +93,6 @@ jobs:
           previous = recover_continuation(store, RUN_ID)
           if previous is None:
               raise SystemExit("RECOVERY_PRECONDITION_FAILED: continuation missing")
-          expected = {
-              "controller_epoch": 8,
-              "controller_seq": 2,
-              "phase": "WAIT_EXECUTOR",
-              "next_action": "POLL_EXECUTOR",
-              "controller_mailbox_ref": OLD_MAILBOX,
-              "executor_mailbox_ref": EXECUTOR_MAILBOX,
-              "executor_actor": EXECUTOR,
-              "exact_head_sha": EXACT_HEAD,
-              "expected_executor_seq": 2,
-              "last_seen_executor_seq": 1,
-          }
-          for key, value in expected.items():
-              if getattr(previous, key) != value:
-                  raise SystemExit(
-                      f"RECOVERY_PRECONDITION_FAILED: {key}={getattr(previous, key)!r}, expected {value!r}"
-                  )
 
           now = datetime.now(timezone.utc).replace(microsecond=0)
           prepared_at = now.isoformat().replace("+00:00", "Z")
@@ -117,23 +100,81 @@ jobs:
           observed_at = (now + timedelta(seconds=2)).isoformat().replace("+00:00", "Z")
           lease_expires_at = (now + timedelta(minutes=15)).isoformat().replace("+00:00", "Z")
 
-          checkpoint = ControllerContinuation(
-              run_id=RUN_ID,
-              controller_epoch=9,
-              phase="WAIT_EXECUTOR",
-              status="ACTIVE",
-              next_action="POLL_EXECUTOR",
-              controller_mailbox_ref=NEW_MAILBOX,
-              controller_seq=1,
-              executor_actor=EXECUTOR,
-              executor_mailbox_ref=EXECUTOR_MAILBOX,
-              expected_executor_seq=2,
-              last_seen_executor_seq=1,
-              wakeup_binding="mailbox-v2-only",
-              exact_head_sha=EXACT_HEAD,
-              updated_at=prepared_at,
-              human_root_ref=f"github://{REPOSITORY}/issues/{ISSUE}",
-          )
+          if (
+              previous.controller_epoch == 9
+              and previous.controller_seq == 1
+              and previous.controller_mailbox_ref == NEW_MAILBOX
+              and previous.phase == "WAIT_CONTROLLER"
+              and previous.next_action == WAIT_EXECUTOR_AUTHORITY_ACTION
+          ):
+              print(
+                  json.dumps(
+                      {
+                          "status": "SCRUM781_E9_ALREADY_RECOVERED",
+                          "runtime_sha": RUNTIME_SHA,
+                          "final_checkpoint": previous.to_dict(),
+                      },
+                      sort_keys=True,
+                  )
+              )
+              raise SystemExit(0)
+
+          if previous.controller_epoch == 8:
+              expected = {
+                  "controller_seq": 2,
+                  "phase": "WAIT_EXECUTOR",
+                  "next_action": "POLL_EXECUTOR",
+                  "controller_mailbox_ref": OLD_MAILBOX,
+                  "executor_mailbox_ref": EXECUTOR_MAILBOX,
+                  "executor_actor": EXECUTOR,
+                  "exact_head_sha": EXACT_HEAD,
+                  "expected_executor_seq": 2,
+                  "last_seen_executor_seq": 1,
+              }
+              for key, value in expected.items():
+                  if getattr(previous, key) != value:
+                      raise SystemExit(
+                          f"RECOVERY_PRECONDITION_FAILED: {key}={getattr(previous, key)!r}, expected {value!r}"
+                      )
+              checkpoint = ControllerContinuation(
+                  run_id=RUN_ID,
+                  controller_epoch=9,
+                  phase="WAIT_EXECUTOR",
+                  status="ACTIVE",
+                  next_action="POLL_EXECUTOR",
+                  controller_mailbox_ref=NEW_MAILBOX,
+                  controller_seq=1,
+                  executor_actor=EXECUTOR,
+                  executor_mailbox_ref=EXECUTOR_MAILBOX,
+                  expected_executor_seq=2,
+                  last_seen_executor_seq=1,
+                  wakeup_binding="mailbox-v2-only",
+                  exact_head_sha=EXACT_HEAD,
+                  updated_at=prepared_at,
+                  human_root_ref=f"github://{REPOSITORY}/issues/{ISSUE}",
+              )
+          elif (
+              previous.controller_epoch == 9
+              and previous.controller_seq == 1
+              and previous.controller_mailbox_ref == NEW_MAILBOX
+              and previous.phase == "WAIT_EXECUTOR"
+              and previous.next_action == "POLL_EXECUTOR"
+              and previous.executor_mailbox_ref == EXECUTOR_MAILBOX
+              and previous.executor_actor == EXECUTOR
+              and previous.exact_head_sha == EXACT_HEAD
+              and previous.expected_executor_seq == 2
+              and previous.last_seen_executor_seq == 1
+          ):
+              snapshot = repository.read(NEW_MAILBOX)
+              if snapshot.events:
+                  raise SystemExit(
+                      "RECOVERY_PRECONDITION_FAILED: partial E9 unexpectedly contains mailbox event(s)"
+                  )
+              checkpoint = previous
+          else:
+              raise SystemExit(
+                  "RECOVERY_PRECONDITION_FAILED: latest continuation is neither E8 source state nor resumable/final E9"
+              )
 
           root = Path("dw-superapps")
           source_paths = [
@@ -217,7 +258,6 @@ jobs:
               "max_children": 0,
               "max_parallel": 1,
               "max_depth": 0,
-              "replan_required_when": [],
               "time_budget_seconds": 300,
               "token_budget": None,
           }
