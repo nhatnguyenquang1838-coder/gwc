@@ -202,6 +202,7 @@ contract_digest = canonical_digest({
 })
 
 approval = copy.deepcopy(old_payload["approval"])
+approval.pop("protocol", None)
 approval.update({
     "approval_request_id": APPROVAL_ID,
     "approval_request_digest": APPROVAL_DIGEST,
@@ -245,7 +246,14 @@ payload = {
         "remote_head": HEAD_SHA,
         "worktree_clean": "EXECUTOR_MUST_VERIFY",
     },
-    "completion_report": copy.deepcopy(old_payload["completion_report"]),
+    "completion_report": {
+        **{
+            key: value
+            for key, value in copy.deepcopy(old_payload["completion_report"]).items()
+            if key != "mailbox_ref"
+        },
+        "mailbox_target_ref": EXEC_MBX,
+    },
     "executor_wakeup_allowed": True,
 }
 
