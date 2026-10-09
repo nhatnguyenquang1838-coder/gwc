@@ -1,0 +1,72 @@
+name: SCRUM-781 Q0 Full EXECUTE R2
+on:
+  push:
+    branches: [fix/SCRUM-781-q0-fresh-20261010-r1]
+    paths: [.github/workflows/scrum781-q0-execute-r2.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: scrum781-q0-execute-r2-single-controller
+  cancel-in-progress: false
+
+jobs:
+  controller-executor:
+    name: Canonical Controller EXECUTE + real engineering progress
+    if: github.ref_name == 'fix/SCRUM-781-q0-fresh-20261010-r1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout canonical branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Checkout canonical TaskController runtime
+        uses: actions/checkout@v4
+        with:
+          repository: nhatnguyenquang1838-coder/DW-SuperApps
+          ref: 43072dd240658077920dee69f23c45e5ff34d923
+          path: dw-control
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install required runtime and tests
+        run: python -m pip install -r requirements.txt
+
+      - name: Preflight complete EXECUTE contract and standing policy (no remote writes)
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/dw-control
+          Q0_EXECUTE_DRY_RUN: '1'
+        run: python scripts/scrum781_q0_execute_dispatch.py
+
+      - name: Materialize canonical EXECUTE successor (event + cursor + continuation)
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/dw-control
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/scrum781_q0_execute_dispatch.py
+
+      - name: Executor consumes native command, implements regression, runs Q0 tests, pushes additive commit
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/dw-control
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/scrum781_q0_execute_worker.py
+
+      - name: Upload execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrum781-q0-execute-r2-evidence
+          path: |
+            ${{ runner.temp }}/scrum781-q0-execute-r2
+            ${{ runner.temp }}/scrum781-q0-engineering
+          retention-days: 90
+          if-no-files-found: warn
