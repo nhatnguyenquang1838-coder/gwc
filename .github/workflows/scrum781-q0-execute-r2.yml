@@ -2,7 +2,10 @@ name: SCRUM-781 Q0 Full EXECUTE R2
 on:
   push:
     branches: [fix/SCRUM-781-q0-fresh-20261010-r1]
-    paths: [.github/workflows/scrum781-q0-execute-r2.yml]
+    paths:
+      - .github/workflows/scrum781-q0-execute-r2.yml
+      - scripts/scrum781_q0_execute_dispatch.py
+      - scripts/scrum781_q0_execute_worker.py
   workflow_dispatch:
 
 permissions:
