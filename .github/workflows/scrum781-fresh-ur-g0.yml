@@ -5,6 +5,7 @@ on:
       - fix/SCRUM-781-q0-fresh-20261010-r1
     paths:
       - .github/workflows/scrum781-fresh-ur-g0.yml
+      - scripts/scrum781_fresh_ur_g0_boot.py
   workflow_dispatch:
 
 permissions:
