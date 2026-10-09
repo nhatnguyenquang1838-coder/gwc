@@ -140,7 +140,7 @@ def test_c91_missing_legacy_artifacts_does_not_stop_native_controller():
         if focused.returncode or suites.returncode:
             raise RuntimeError("HISTORICAL_REPLAY_REGRESSION_FAILED")
         run("git","add",str(regression.relative_to(ROOT)),check=True)
-        if run("git","diff","--cached","--quiet").returncode:
+        if run("git","diff","--cached","--quiet").returncode == 0:
             raise RuntimeError("EXPECTED_NEW_REPLAY_REGRESSION_NOT_ADDED")
         run("git","config","user.name","github-actions[bot]",check=True)
         run("git","config","user.email","41898282+github-actions[bot]@users.noreply.github.com",check=True)
