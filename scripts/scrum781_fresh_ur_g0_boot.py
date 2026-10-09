@@ -175,7 +175,7 @@ def main(argv=None) -> int:
         "terminal_state": initial["terminal_state"],
         "execution_refs": {
             "runtime_plan_ref": f"native://{RUN}/runtime-plan.json",
-            "runtime_plan_digest": plan["digest"],
+            "runtime_plan_digest": plan["digest"].split(":", 1)[1],
             "cursor_ref": cursor_ref,
         },
         "future_contract_refs": {"target_contract_ref": None, "closure_receipt_ref": None, "handoff_receipt_ref": None},
