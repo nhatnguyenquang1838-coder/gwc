@@ -1,0 +1,51 @@
+name: SCRUM-781 Fresh UR.G0 V2 Boot
+on:
+  push:
+    branches:
+      - fix/SCRUM-781-q0-fresh-20261010-r1
+    paths:
+      - .github/workflows/scrum781-fresh-ur-g0.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: scrum781-fresh-ur-g0-r1
+  cancel-in-progress: false
+
+jobs:
+  native-fresh-boot:
+    name: Native UR.G0 source-bound boot
+    if: github.ref_name == 'fix/SCRUM-781-q0-fresh-20261010-r1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact GWC source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install JSON Schema validator
+        run: python -m pip install 'jsonschema>=4,<5'
+
+      - name: Native GWC V2 UR.G0 boot (no Executor effects)
+        run: |
+          python scripts/scrum781_fresh_ur_g0_boot.py \
+            --output "$RUNNER_TEMP/scrum781-fresh-ur-g0" \
+            --expected-head "$GITHUB_SHA"
+
+      - name: Upload immutable G0 evidence artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrum781-fresh-ur-g0-evidence
+          path: ${{ runner.temp }}/scrum781-fresh-ur-g0/
+          retention-days: 90
+          if-no-files-found: warn
