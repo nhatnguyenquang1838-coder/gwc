@@ -178,7 +178,7 @@ def main(argv=None) -> int:
             "runtime_plan_digest": plan["digest"],
             "cursor_ref": cursor_ref,
         },
-        "future_contract_refs": [],
+        "future_contract_refs": {"target_contract_ref": None, "closure_receipt_ref": None, "handoff_receipt_ref": None},
     }
     logical_state = seal_immutable_record(logical_body)
     _schema_validate(logical_state, "run-state-record.schema.json")
