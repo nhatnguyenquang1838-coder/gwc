@@ -168,7 +168,7 @@ def main() -> int:
         "contract_digest": contract_digest,
         "boundary_digest": canonical_digest(scope),
         "source_digest": canonical_digest({"sources": [source]}),
-        "source_manifest_ref": f"github://{REPOSITORY}/blob/{observed}/{path}",
+        "source_manifest_ref": "gwc.scrum781.fresh-q0-source-r1",
         "objective": "Execute bounded read-only Q0 source/profile/route qualification on the fresh run; return gaps to Controller. No edits or authority.",
         "scope": scope, "acceptance_criteria": plan_body["acceptance_criteria"][:3],
         "source_refs": [source],
