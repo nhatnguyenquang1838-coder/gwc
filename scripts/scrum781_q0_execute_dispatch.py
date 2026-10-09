@@ -168,7 +168,7 @@ def main():
     store = GitHubContinuationStore(transport,repository=REPO,issue_number=ISSUE)
     prev = recover_continuation(store,RUN)
     events = mailbox.read(CONTROL).events
-    if (prev is not None and prev.controller_seq == 3 and len(events) == 3:
+    if (prev is not None and prev.controller_seq == 3 and len(events) == 3):
         from taskcontroller.interaction.mailbox_repository import MailboxActorCursor
         from taskcontroller.runtime.high_integrity_session import resume_controller_event_v2
         if (prev.executor_actor != ACTOR or prev.controller_mailbox_ref != CONTROL
