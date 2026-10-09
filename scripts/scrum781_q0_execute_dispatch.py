@@ -168,6 +168,57 @@ def main():
     store = GitHubContinuationStore(transport,repository=REPO,issue_number=ISSUE)
     prev = recover_continuation(store,RUN)
     events = mailbox.read(CONTROL).events
+    if (prev is not None and prev.controller_seq == 3 and len(events) == 3:
+        from taskcontroller.interaction.mailbox_repository import MailboxActorCursor
+        from taskcontroller.runtime.high_integrity_session import resume_controller_event_v2
+        if (prev.executor_actor != ACTOR or prev.controller_mailbox_ref != CONTROL
+            or prev.executor_mailbox_ref != EXECUTOR or prev.next_action != "AWAIT_EXECUTOR_EVENT"
+            or events[-1].logical_seq != 3
+            or events[-1].envelope.to_dict()["payload"].get("controller_contract_mode")!="EXECUTE"):
+            fail("ACTIVE_EXECUTE_CONTINUATION_INVALID")
+        historical_sha = prev.exact_head_sha
+        ancestry = subprocess.run(
+            ["git","merge-base","--is-ancestor",historical_sha,sha],cwd=ROOT,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        if ancestry.returncode != 0:
+            fail("CURRENT_BRANCH_NOT_DESCENDANT_OF_EXECUTE_BINDING")
+        observed_events = mailbox.read(EXECUTOR).events
+        if len(observed_events) <= prev.last_seen_executor_seq:
+            print(json.dumps({"status":"EXECUTE_CONTINUATION_CURRENT_NO_NEW_EVENT",
+                "run_id":RUN,"controller_seq":prev.controller_seq,
+                "executor_observed":prev.last_seen_executor_seq}))
+            return 0
+        if len(observed_events) != prev.last_seen_executor_seq+1:
+            fail("EXECUTOR_EVENT_GAP_OR_CONCURRENT_WRITER")
+        if prev.last_seen_executor_seq == 0:
+            cursor = MailboxActorCursor.initial(
+                EXECUTOR,run_id=RUN,node_id="SCRUM-781",actor_namespace="executor")
+        else:
+            cursor = mailbox.read_cursor(EXECUTOR,RUN,"SCRUM-781","executor")
+            if cursor.last_logical_seq != prev.last_seen_executor_seq:
+                fail("EXECUTOR_CURSOR_DRIFT")
+        outcome = resume_controller_event_v2(
+            continuation_store=store,repository=mailbox,
+            checkpoint=prev,cursor=cursor,
+            correlation_id=events[-1].envelope.to_dict()["correlation_id"],
+            expected_identity=events[-1].envelope.execution_identity,
+            observed_at=timestamp)
+        if (outcome.poll.status!="PROGRESS_AVAILABLE"
+            or outcome.checkpoint.last_seen_executor_seq != len(observed_events)
+            or outcome.checkpoint.next_action != "AWAIT_EXECUTOR_EVENT"):
+            fail("EVENT_DRIVEN_RESUME_STATE_INVALID")
+        exact_write(folder,"controller-resume-executor-progress.json",{
+            "run_id":RUN,"source_sha":sha,
+            "outcome":outcome.poll.status,
+            "controller_checkpoint":outcome.checkpoint.to_dict(),
+            "progress_outcome":outcome.poll.progress_outcome.to_dict(),
+            "observed_event_ids":list(outcome.poll.observed_event_ids),
+            "method":"resume_controller_event_v2",
+            "periodic_polling":False})
+        print(json.dumps({"status":"CONTROLLER_EVENT_DRIVEN_RESUME_PASS",
+            "run_id":RUN,"observed_executor_seq":outcome.checkpoint.last_seen_executor_seq,
+            "source_sha":sha}))
+        return 0
     if (prev is None or prev.controller_seq != 2
         or prev.executor_actor != ACTOR
         or len(events)!=2 or events[-1].logical_seq != 2
