@@ -1,0 +1,274 @@
+{
+  "schema_id": "gwc.scrum781.q0-execution-plan.v2",
+  "version": 2,
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "parent_task": "SCRUM-781",
+  "depends_on": [
+    "SCRUM-787",
+    "SCRUM-796"
+  ],
+  "workflow_mode": "q0_live_qualification",
+  "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+  "current_gate": "UR.G2",
+  "contract_mode": "EXECUTE",
+  "owner": "CONTROLLER",
+  "recipient": "q0-actions-engineering",
+  "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+  "source_repo": "nhatnguyenquang1838-coder/gwc",
+  "goal": "Recover and qualify GWC Universal V2 against original DWO-LOGIN-AUTH-R1 failures, autonomously fixing branch-local defects and proving runtime reload+replay, to CAMPAIGN_READY_RUNTIME/L3 and draft PR for human G6 acceptance; no DWO workaround or Login implementation.",
+  "authority_basis": {
+    "kind": "standing_q0_autonomous_development_policy",
+    "canonical_source": "AGENTS.md#UNIVERSAL_V2_DEVELOPMENT override — SCRUM-781 Q0 development lane",
+    "issuing_basis": "Existing repo policy permits branch-local remediation, TDD, additive commits/push, runtime reload/replay, no per-defect human approval. User reiterated continuous Executor implementation on 2026-10-10.",
+    "not_a_new_grant": true,
+    "separate_authority_required": [
+      "protected-main-write",
+      "merge",
+      "deploy",
+      "production-runtime",
+      "production-config-data",
+      "secrets-credentials",
+      "migrations",
+      "destructive-effects",
+      "force-push",
+      "unrelated-product-scope",
+      "G6-human-acceptance"
+    ]
+  },
+  "scope": {
+    "allowed_actions": [
+      "read_exact_source",
+      "create_guarded_branch_or_worktree",
+      "modify_approved_files",
+      "run_sandboxed_validation",
+      "stage",
+      "create_commit",
+      "push_working_branch",
+      "open_or_update_draft_pr"
+    ],
+    "denied_actions": [
+      "mark_pr_ready_for_review",
+      "merge_approved_pr",
+      "deploy_approved_release",
+      "production_config_change",
+      "production_data_write",
+      "migration",
+      "credential_rotation",
+      "branch_deletion",
+      "force_push"
+    ],
+    "writable_targets": [
+      "tools/node_architect/**",
+      "core/node-architect/**",
+      "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+      "tests/**",
+      "scripts/scrum781_*.py",
+      ".gwc/tasks/SCRUM-781/**"
+    ],
+    "source_roots": [
+      "tools/node_architect",
+      "core/node-architect",
+      "tests",
+      "scripts",
+      ".gwc/tasks/SCRUM-781"
+    ],
+    "max_children": 0,
+    "max_parallel": 1,
+    "max_depth": 0
+  },
+  "integration_ceiling": "draft_pr_only",
+  "implementation_mode": "continuous_tdd_self_remediation",
+  "recursive_plan": {
+    "id": "F0-Q0-QUALIFY",
+    "atomic": false,
+    "children": [
+      {
+        "id": "F1-PLAN-IDENTITY",
+        "atomic": false,
+        "depends_on": [],
+        "children": [
+          {
+            "id": "F2-PRECHECK-SOURCE",
+            "atomic": true,
+            "depends_on": [],
+            "package": "P1",
+            "action": "Check exact source/branch/RuntimePlan and restore source-bound native state and load identities."
+          },
+          {
+            "id": "F2-PRECHECK-DAG",
+            "atomic": true,
+            "depends_on": [
+              "F2-PRECHECK-SOURCE"
+            ],
+            "package": "P1",
+            "action": "Validate recursive G1 DAG complete to deterministic atomic frontier, cycle-free, no stale plan."
+          }
+        ]
+      },
+      {
+        "id": "F1-REPRODUCE-FIX",
+        "atomic": false,
+        "depends_on": [
+          "F1-PLAN-IDENTITY"
+        ],
+        "children": [
+          {
+            "id": "F2-INCIDENT-RED",
+            "atomic": true,
+            "depends_on": [
+              "F2-PRECHECK-DAG"
+            ],
+            "package": "P2",
+            "action": "Reproduce DWO-LOGIN-AUTH-R1 original failure and add failing RED regression."
+          },
+          {
+            "id": "F2-MINIMAL-FIX",
+            "atomic": true,
+            "depends_on": [
+              "F2-INCIDENT-RED"
+            ],
+            "package": "P3",
+            "action": "Implement bounded fix in same worktree; RED→GREEN→refactor, tests, additive commit+push."
+          }
+        ]
+      },
+      {
+        "id": "F1-LOAD-REPLAY",
+        "atomic": false,
+        "depends_on": [
+          "F1-REPRODUCE-FIX"
+        ],
+        "children": [
+          {
+            "id": "F2-LOAD-PROOF",
+            "atomic": true,
+            "depends_on": [
+              "F2-MINIMAL-FIX"
+            ],
+            "package": "P4",
+            "action": "Reload process/modules/instructions, invalidate/recreate stale runtime derivatives; exact load proof."
+          },
+          {
+            "id": "F2-REPLAY-ADVANCE",
+            "atomic": true,
+            "depends_on": [
+              "F2-LOAD-PROOF"
+            ],
+            "package": "P4",
+            "action": "Replay original incident, verify exact readback and forward progress beyond original failure."
+          }
+        ]
+      },
+      {
+        "id": "F1-CERTIFY-HANDOFF",
+        "atomic": false,
+        "depends_on": [
+          "F1-LOAD-REPLAY"
+        ],
+        "children": [
+          {
+            "id": "F2-REGRESSION-MATRIX",
+            "atomic": true,
+            "depends_on": [
+              "F2-REPLAY-ADVANCE"
+            ],
+            "package": "P5",
+            "action": "Run comprehensive regression, certify mandatory Q0 matrix and L3; repeat bounded fix loop on defects."
+          },
+          {
+            "id": "F2-DRAFT-HANDOFF",
+            "atomic": true,
+            "depends_on": [
+              "F2-REGRESSION-MATRIX"
+            ],
+            "package": "P6",
+            "action": "Push additive evidence, draft PR, request human G6 Q0 acceptance; do not merge/deploy."
+          }
+        ]
+      }
+    ]
+  },
+  "work_packages": [
+    {
+      "id": "P1",
+      "objective": "Canonical source recovery, native Q0 G2 plan precheck, recursive DAG/authority exact validation.",
+      "permitted": [
+        "read",
+        "test",
+        "branch-local defect repair"
+      ]
+    },
+    {
+      "id": "P2",
+      "objective": "Reproduce original DWO login controller failure from canonical SCRUM-781 fixture; failing RED test.",
+      "permitted": [
+        "test",
+        "branch-local fixture and regression writes"
+      ]
+    },
+    {
+      "id": "P3",
+      "objective": "Implement minimal source fix; focused GREEN, refactor, repeat, commit/push same Q0 branch.",
+      "permitted": [
+        "branch-local edit",
+        "test",
+        "commit",
+        "push"
+      ]
+    },
+    {
+      "id": "P4",
+      "objective": "Reload GWC fixed identity, invalidate stale state, regenerate artifacts; replay original incident beyond prior failure.",
+      "permitted": [
+        "isolated runtime reload",
+        "evidence writes",
+        "test"
+      ]
+    },
+    {
+      "id": "P5",
+      "objective": "Broader regression, full mandatory qualification matrix + recursive DAG, no unresolved defects.",
+      "permitted": [
+        "tests",
+        "evidence",
+        "bounded same-branch fixes"
+      ]
+    },
+    {
+      "id": "P6",
+      "objective": "Build Q0 L3 evidence and Draft PR; handoff G6 to human decision.",
+      "permitted": [
+        "push working branch",
+        "draft PR",
+        "reports"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "Same fresh run and same canonical branch/worktree, no new defect branches and no legacy fallback",
+    "Recursive G1 plan F0→F1→F2 complete, acyclic, atomic-frontier verified with exact RuntimePlan digest",
+    "Reproduce original SCRUM-781 DWO login failure and RED regression before fix",
+    "One or more bounded same-branch fixes followed by focused GREEN, no routine RED/GREEN WAIT_CONTROLLER",
+    "Post-fix runtime reload proof includes exact SHA, process/session and loaded profile/module/instruction identities",
+    "Dependent stale controller/runtime/authority artifacts invalidated and regenerated after changed SHA",
+    "Original incident replay exact-readback and progress beyond old failure",
+    "All mandatory Q0 qualification matrix entries PASS with broader regression and no unresolved defects",
+    "Q0 certified CAMPAIGN_READY_RUNTIME/L3 and Draft PR submitted for separately authorized G6 acceptance"
+  ],
+  "continue_until": [
+    "ALL_ACCEPTANCE_CRITERIA_PASS",
+    "CAMPAIGN_READY_RUNTIME_L3_EVIDENCED",
+    "DRAFT_PR_READY",
+    "REQUIRES_HUMAN_G6_ACCEPTANCE"
+  ],
+  "stop_conditions": [
+    "SOURCE_OR_BASE_DRIFT",
+    "WRITE_SCOPE_EXPANSION_REQUIRED",
+    "DESTRUCTIVE_OR_PRODUCTION_AUTHORITY_REQUIRED",
+    "APPROVED_PLAN_PROVEN_INVALID",
+    "EXTERNAL_DEPENDENCY_PERMISSION_BLOCKER",
+    "UNRESOLVED_PRODUCT_DECISION"
+  ],
+  "recovery_policy": "On routine test/lint/RED/GREEN failure, fix and rerun in scope; on native GWC_RUNTIME_DEFECT, reproduce→RED→minimal_fix→GREEN→reload→replay→readback. Only hard boundaries pause.",
+  "limitations": "TaskController transport delivery does not itself create a continuous Hermes agent or human acceptance."
+}
