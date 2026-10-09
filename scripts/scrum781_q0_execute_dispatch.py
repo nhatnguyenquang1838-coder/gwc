@@ -148,7 +148,7 @@ def main():
     folder = Path(os.environ.get("RUNNER_TEMP","/tmp")) / "scrum781-q0-execute-r2"
     folder.mkdir(parents=True,exist_ok=True)
     exact_write(folder,"execution-plan.json",plan)
-    exact_write(folder,"execute-controller-command-preview.json",envelope.to_dict())
+    exact_write(folder,"execute-controller-command-preflight.json" if os.environ.get("Q0_EXECUTE_DRY_RUN")=="1" else "execute-controller-command-preview.json",envelope.to_dict())
     exact_write(folder,"execution-policy-binding.json",{
         "run_id":RUN,"repo":REPO,"source_sha":sha,"plan_digest":plan_digest,
         "standing_policy_digest":policy_digest,"contract_validation":receipt.to_dict(),
