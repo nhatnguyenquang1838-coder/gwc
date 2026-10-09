@@ -115,16 +115,16 @@ def main():
     contract_identity = {"run":RUN,"sha":sha,"plan_digest":plan_digest,
                          "approval_digest":policy_digest,"scope":scope}
     contract_digest = canonical_digest(contract_identity)
-    fence = canonical_digest({"run":RUN,"attempt":2,"contract":contract_digest})
+    fence = canonical_digest({"run":RUN,"attempt":3,"contract":contract_digest})
     request = {
-        "message_id":"scrum781-q0-execute-correction-r2",
-        "run_id":RUN,"node_id":"SCRUM-781","seq":2,
-        "correlation_id":RUN+"-q0-execute-r2",
-        "contract_id":RUN+"-q0-execute","plan_version":"q0-g1-r2",
+        "message_id":"scrum781-q0-execute-correction-r3",
+        "run_id":RUN,"node_id":"SCRUM-781","seq":3,
+        "correlation_id":RUN+"-q0-execute-r3",
+        "contract_id":RUN+"-q0-execute","plan_version":"q0-g1-r3",
         "contract_digest":contract_digest,
         "boundary_digest":canonical_digest(scope),
         "source_digest":canonical_digest({"sources":[source]}),
-        "source_manifest_ref":"gwc.scrum781.q0-execute-source-r2",
+        "source_manifest_ref":"gwc.scrum781.q0-execute-source-r3",
         "objective":"Execute full Q0 GWC runtime remediation/certification end-to-end on the same development branch. Continue through RED/GREEN, fixes, reload, replay, regressions, additive push, Draft PR.",
         "scope":scope,"acceptance_criteria":plan["acceptance_criteria"],
         "source_refs":[source],
@@ -132,9 +132,9 @@ def main():
         "standards_profile_ref":"gwc.q0-autonomous-development/v2",
         "recipient_capability":"taskcontroller.executor",
         "agent_instance":ACTOR,
-        "attempt_id":"scrum781-q0-execute-attempt2","attempt_number":2,"lease_generation":2,
+        "attempt_id":"scrum781-q0-execute-attempt3","attempt_number":3,"lease_generation":3,
         "fencing_token":fence,"lease_expires_at":expires,
-        "idempotency_key":canonical_digest({"run":RUN,"seq":2,"contract_digest":contract_digest}),
+        "idempotency_key":canonical_digest({"run":RUN,"seq":3,"contract_digest":contract_digest}),
         "producer_namespace":"controller","producer_actor_id":"chatgpt-controller",
         "evidence_refs":[f"github://{REPO}/issues/{ISSUE}","jira://SCRUM-781","jira://SCRUM-787","jira://SCRUM-796"],
         "authority_constraints":{"denied_actions":scope["denied_actions"],"writable_targets":scope["writable_targets"]},
@@ -168,16 +168,16 @@ def main():
     store = GitHubContinuationStore(transport,repository=REPO,issue_number=ISSUE)
     prev = recover_continuation(store,RUN)
     events = mailbox.read(CONTROL).events
-    if (prev is None or prev.controller_seq != 1
-        or prev.executor_actor != "q0-actions-readonly"
-        or len(events)!=1 or events[0].logical_seq != 1
-        or events[0].envelope.to_dict()["payload"].get("controller_contract_mode") != "PLAN"
+    if (prev is None or prev.controller_seq != 2
+        or prev.executor_actor != ACTOR
+        or len(events)!=2 or events[-1].logical_seq != 2
+        or events[-1].envelope.to_dict()["payload"].get("controller_contract_mode") != "EXECUTE"
         or mailbox.read(EXECUTOR).events):
         fail("PREDECESSOR_EVENT_DRIFT_OR_CONCURRENT_EXECUTION")
     checkpoint=ControllerContinuation(
-        run_id=RUN,controller_epoch=2,phase="WAIT_EXECUTOR",status="ACTIVE",
+        run_id=RUN,controller_epoch=3,phase="WAIT_EXECUTOR",status="ACTIVE",
         next_action="AWAIT_EXECUTOR_EVENT",controller_mailbox_ref=CONTROL,
-        controller_seq=2,executor_actor=ACTOR,executor_mailbox_ref=EXECUTOR,
+        controller_seq=3,executor_actor=ACTOR,executor_mailbox_ref=EXECUTOR,
         expected_executor_seq=1,last_seen_executor_seq=0,
         wakeup_binding="github-actions-q0-engineering-consumer",
         exact_head_sha=sha,updated_at=timestamp,
@@ -186,17 +186,23 @@ def main():
     try:
         result=materialize_controller_transition(
             continuation_store=store,repository=mailbox,ledger=ledger,
-            checkpoint=checkpoint,request=request,state_version=2,
+            checkpoint=checkpoint,request=request,state_version=3,
             prepared_at=timestamp,committed_at=timestamp,actor="chatgpt-controller",
         )
     finally:
         ledger.close()
     data=result.to_dict()
     exact_write(folder,"execute-mailbox-materialization.json",data)
-    if (data["continuation"]["controller_seq"]!=2
+    verified = mailbox.read(CONTROL)
+    exact_event = verified.events[-1]
+    # Runtime adds checkpoint_id; the persisted envelope digest is canonical.
+    if (data["continuation"]["controller_seq"]!=3
         or data["authority_granted"] is not False
-        or mailbox.read(CONTROL).last_event_seq!=1
-        or data["envelope_digest"]!=envelope.digest()):
+        or verified.last_event_seq!=2
+        or exact_event.logical_seq!=3
+        or exact_event.envelope.to_dict()["payload"].get("controller_contract_mode")!="EXECUTE"
+        or exact_event.envelope.to_dict()["logical_contract"]["source_digest"]!=request["source_digest"]
+        or data["envelope_digest"]!=exact_event.envelope_digest):
         fail("EXECUTE_EVENT_EXACT_READBACK_INVALID")
     print(json.dumps({"result":"EXECUTE_COMMAND_MATERIALIZED",
         "run_id":RUN,"source_sha":sha,
