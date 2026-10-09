@@ -165,7 +165,7 @@ def main(argv=None) -> int:
             "source_refs": [f"github://{REPO}/issues/{ISSUE}", observed_sha],
         },
         "run_manifest_ref": f"native://{RUN}/run-manifest.json#record_id={root_id}",
-        "run_manifest_digest": "sha256:" + manifest["content_digest"]["value"],
+        "run_manifest_digest": manifest["content_digest"]["value"],
         "state_revision": 1,
         "predecessor_state_ref": None,
         "predecessor_state_digest": None,
