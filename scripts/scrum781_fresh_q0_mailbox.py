@@ -195,7 +195,11 @@ def main() -> int:
     if args.dry_run:
         from taskcontroller.runtime.high_integrity_session import validate_materialization_request
         from taskcontroller.controlplane.request_compiler import compile_bounded_mailbox_request
-        env = compile_bounded_mailbox_request(validate_materialization_request(payload))
+        try:
+            env = compile_bounded_mailbox_request(validate_materialization_request(payload))
+        except Exception as exc:
+            print(json.dumps({"dry_run_error": str(exc), "schema_errors": getattr(exc, "errors", None)}, default=str))
+            raise
         write_once(evidence, "q0-controller-command-preview.json", env.to_dict())
         print(json.dumps({"status": "DRY_RUN_VALID", "gate": "UR.G2", "plan_receipt": plan_receipt["receipt_digest"]}))
         return 0
