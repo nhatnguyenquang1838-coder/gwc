@@ -69,8 +69,14 @@ def main():
 
     head=run("git","rev-parse","HEAD",check=True).stdout.strip()
     branch=run("git","branch","--show-current",check=True).stdout.strip()
-    if head!=ep["expected_head_sha"] or branch!=BRANCH:
-        raise RuntimeError("GUARDED_EXECUTOR_SOURCE_HEAD_DRIFT")
+    if branch!=BRANCH:
+        raise RuntimeError("GUARDED_EXECUTOR_BRANCH_DRIFT")
+    if head!=ep["expected_head_sha"]:
+        progress_count=len(repo.read(EXECUTOR).events)
+        if progress_count<1 or subprocess.run(
+            ["git","merge-base","--is-ancestor",ep["expected_head_sha"],head],
+            cwd=ROOT).returncode:
+            raise RuntimeError("GUARDED_EXECUTOR_SOURCE_HEAD_DRIFT")
     if "tests/**" not in payload["logical_contract"]["scope"]["writable_targets"]:
         raise RuntimeError("REGRESSION_TARGET_NOT_AUTHORIZED")
 
