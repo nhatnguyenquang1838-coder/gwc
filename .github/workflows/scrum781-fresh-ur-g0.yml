@@ -8,11 +8,12 @@ on:
       - scripts/scrum781_fresh_ur_g0_boot.py
       - scripts/scrum781_fresh_taskcontroller_preflight.py
       - scripts/scrum781_fresh_g0_to_g1.py
+      - scripts/scrum781_fresh_q0_mailbox.py
   workflow_dispatch:
 
 permissions:
   contents: read
-  issues: read
+  issues: write
 
 concurrency:
   group: scrum781-fresh-ur-g0-r1
@@ -50,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: nhatnguyenquang1838-coder/DW-SuperApps
-          ref: 1f41967d995129dff73ce2742afb5a2102b34c36
+          ref: 43072dd240658077920dee69f23c45e5ff34d923
           path: dw-control
           persist-credentials: false
 
@@ -70,6 +71,25 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           python scripts/scrum781_fresh_g0_to_g1.py \
+            --artifact-dir "$RUNNER_TEMP/scrum781-fresh-ur-g0" \
+            --expected-head "$GITHUB_SHA"
+
+      - name: Dry-run native Controller G1 and typed read-only mailbox spec
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/dw-control
+        run: |
+          mkdir -p "$RUNNER_TEMP/scrum781-q0-dryrun"
+          cp "$RUNNER_TEMP/scrum781-fresh-ur-g0/"*.json "$RUNNER_TEMP/scrum781-q0-dryrun/"
+          python scripts/scrum781_fresh_q0_mailbox.py \
+            --artifact-dir "$RUNNER_TEMP/scrum781-q0-dryrun" \
+            --expected-head "$GITHUB_SHA" --dry-run
+
+      - name: Publish native fresh Controller mailbox event + exact readback
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/dw-control
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/scrum781_fresh_q0_mailbox.py \
             --artifact-dir "$RUNNER_TEMP/scrum781-fresh-ur-g0" \
             --expected-head "$GITHUB_SHA"
 
