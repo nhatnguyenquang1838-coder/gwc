@@ -64,11 +64,12 @@ def main():
     # Match existing standing authority verbatim: no Controller self-grant.
     policy = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     policy_section = policy.split("## UNIVERSAL_V2_DEVELOPMENT override — SCRUM-781 Q0 development lane",1)[1].split("## Agent-specific routing",1)[0]
+    normalized_policy = " ".join(policy_section.split())
     for required in (
         "Self-remediable Q0 defects", "same Q0", "no per-defect Human approval",
         "no merge/auto-merge", "no deployment", "no credentials/secrets",
     ):
-        if required not in policy_section:
+        if required not in normalized_policy:
             fail("STANDING_Q0_AUTHORITY_POLICY_DRIFT:" + required)
     policy_digest = "sha256:" + hashlib.sha256(policy_section.encode()).hexdigest()
     plan_digest = "sha256:" + hashlib.sha256(PLAN_PATH.read_bytes()).hexdigest()
