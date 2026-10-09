@@ -7,6 +7,7 @@ on:
       - .github/workflows/scrum781-fresh-ur-g0.yml
       - scripts/scrum781_fresh_ur_g0_boot.py
       - scripts/scrum781_fresh_taskcontroller_preflight.py
+      - scripts/scrum781_fresh_g0_to_g1.py
   workflow_dispatch:
 
 permissions:
@@ -63,6 +64,14 @@ jobs:
             --output "$RUNNER_TEMP/scrum781-fresh-ur-g0/taskcontroller-mailbox-preflight.json" \
             --expected-gwc-head "$GITHUB_SHA" \
             --taskcontroller-source-sha 1f41967d995129dff73ce2742afb5a2102b34c36
+
+      - name: Complete Controller-owned G0 and verify native G1
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python scripts/scrum781_fresh_g0_to_g1.py \
+            --artifact-dir "$RUNNER_TEMP/scrum781-fresh-ur-g0" \
+            --expected-head "$GITHUB_SHA"
 
       - name: Upload immutable G0 evidence artifacts
         if: always()
