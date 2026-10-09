@@ -55,12 +55,12 @@ def main():
     if not token:raise RuntimeError("MISSING_GITHUB_TOKEN")
     repo=GitHubMailboxRepository(GitHubRestIssueCommentTransport(token))
     snap=repo.read(CONTROL)
-    if len(snap.events)!=2 or snap.last_event_seq!=1:
+    if len(snap.events)!=3 or snap.last_event_seq!=2:
         raise RuntimeError("EXECUTE_MAILBOX_EVENT_NOT_NEWEST")
-    event=snap.events[1]
+    event=snap.events[2]
     payload=event.envelope.to_dict()
     ep=payload["payload"]
-    if (payload["seq"]!=2 or ep.get("controller_contract_mode")!="EXECUTE"
+    if (payload["seq"]!=3 or ep.get("controller_contract_mode")!="EXECUTE"
         or not ep.get("execution_authority_active")
         or ep.get("merge_deploy_production_allowed") is not False
         or ep.get("periodic_polling_allowed") is not False
@@ -75,14 +75,14 @@ def main():
         raise RuntimeError("REGRESSION_TARGET_NOT_AUTHORIZED")
     signal=WakeupSignal(
         run_id=RUN,sender="controller",recipient=ACTOR,mailbox_ref=CONTROL,
-        seq=2,updated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"))
+        seq=3,updated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"))
     consumed=bootstrap_executor_v2(
         repo,signal,executor_actor=ACTOR,
         validation_policy=V2ExecutorValidationPolicy(
             capability_id="taskcontroller.executor",instance_id=ACTOR,
-            attempt_id="scrum781-q0-execute-attempt2",lease_generation=2,
+            attempt_id="scrum781-q0-execute-attempt3",lease_generation=3,
             fencing_token=payload["execution_identity"]["fencing_token"],
-            last_seen_event_seq=0),
+            last_seen_event_seq=1),
     )
     if consumed.event.event_id!=event.event_id:
         raise RuntimeError("EXECUTOR_EVENT_READBACK_DRIFT")
