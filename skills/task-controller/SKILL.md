@@ -1,7 +1,7 @@
 ---
 name: task-controller
 description: Boot and operate a bounded autonomous task through the bound execution provider: resolve DAG/authority, compile the selected G1 option plus exact G2 boundary into a bounded Executor contract, maintain a canonical RootCard, monitor milestone reports, intercept drift, and route later gates.
-when_to_use: Use when an autonomous agent starts a governed task, delegates bounded work through the current execution provider, or resumes an active Controller run.
+when_to_use: Use only when TaskController working mode was explicitly selected by the user, an authorized parent run, or an existing current TaskController binding. Starting a governed/autonomous task or invoking Node Architect never implicitly activates this skill.
 version: 0.2.1
 project: gwc
 owner: GWC
