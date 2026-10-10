@@ -22,7 +22,7 @@ Full E2E sequencing/replay/recovery/multi-executor logic is deferred until pilot
 
 ## Autonomous TaskController boot
 
-For autonomous delivery, load `agents/autonomous-agent/agent-instructions.md` and `skills/task-controller/SKILL.md`. The autonomous agent starts as TaskController and dispatches bounded work through the bound execution provider; it loads the Slack MVP only when the current structured route explicitly binds that Slack compatibility adapter.
+For autonomous delivery, load `agents/autonomous-agent/agent-instructions.md`. Load `skills/task-controller/SKILL.md` only when an authorized current run explicitly selects TaskController working mode. In that selected mode, the autonomous agent acts as TaskController and dispatches bounded work through the bound execution provider; it loads the Slack MVP only when the current structured route explicitly binds that Slack compatibility adapter.
 
 ## Independent G4 pre-prod audit
 
