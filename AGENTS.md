@@ -56,6 +56,11 @@ historical branch, loop, todo, Slack, PR, or authority references have zero
 route-selection weight. A fresh run must not inherit any of those historical
 projections as current execution state.
 
+## Working-mode independence
+
+**TASKCONTROLLER_OPTIONAL / NODE_ARCHITECT_CONTROLLER_AGNOSTIC:** GWC v2 and Node Architect run under their native lifecycle, authority, task-claim, node-routing and validation contracts without a TaskController working-mode binding. TaskController, its mailbox/v2 transport, Controller–Executor separation, continuation, Slack RootCard and human-plane procedure are applied **only** when explicitly selected by the user or an authorized parent/run binding. An autonomous governed task, node DAG, delegation requirement, or installed TaskController skill does not imply activation. A TaskController selection adds orchestration and cannot replace GWC gate authority or bypass Node Architect runtime. Working mode is independent from execution capability mode (`local_agent` or `chat_connector_only`).
+
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,
