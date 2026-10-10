@@ -1,0 +1,47 @@
+name: SCRUM-781 Fresh Controller Stale-Lease Recovery
+on:
+  push:
+    branches: [fix/SCRUM-781-q0-fresh-20261010-r1]
+    paths: [.github/workflows/scrum781-q0-controller-recovery.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: scrum781-q0-controller-recovery-r1
+  cancel-in-progress: false
+
+jobs:
+  recover-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: nhatnguyenquang1838-coder/DW-SuperApps
+          ref: 94dd433a35fedac86af27eaa4ccfc5f4a17a5cc2
+          path: dw-control
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Recover exactly one stale #595 controller continuation via native guard
+        env:
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/dw-control
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/scrum781_q0_controller_recover_20261010.py
+      - name: Evidence exact readback artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrum781-q0-controller-recovery-evidence
+          path: ${{ runner.temp }}/scrum781-q0-controller-recovery/
+          retention-days: 90
+          if-no-files-found: warn
