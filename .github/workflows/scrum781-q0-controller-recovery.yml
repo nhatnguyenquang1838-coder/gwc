@@ -2,7 +2,9 @@ name: SCRUM-781 Fresh Controller Stale-Lease Recovery
 on:
   push:
     branches: [fix/SCRUM-781-q0-fresh-20261010-r1]
-    paths: [.github/workflows/scrum781-q0-controller-recovery.yml]
+    paths:
+      - .github/workflows/scrum781-q0-controller-recovery.yml
+      - scripts/scrum781_q0_controller_recover_20261010.py
   workflow_dispatch:
 
 permissions:
