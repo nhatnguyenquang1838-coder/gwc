@@ -44,6 +44,10 @@ Any lower-priority statement that says G4 is "always human" or that E2E "never
 merges" is a generic default and MUST be interpreted under this route-precedence
 rule when a canonical route is active.
 
+## Working-mode independence
+
+**TASKCONTROLLER_OPTIONAL / NODE_ARCHITECT_CONTROLLER_AGNOSTIC:** GWC v2 and Node Architect run under their native lifecycle, authority, task-claim, node-routing and validation contracts without a TaskController working-mode binding. TaskController, its mailbox/v2 transport, Controller–Executor separation, continuation, Slack RootCard and human-plane procedure are applied **only** when explicitly selected by the user or an authorized parent/run binding. An autonomous governed task, node DAG, delegation requirement, or installed TaskController skill does not imply activation. A TaskController selection adds orchestration and cannot replace GWC gate authority or bypass Node Architect runtime. Working mode is independent from execution capability mode (`local_agent` or `chat_connector_only`).
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,
