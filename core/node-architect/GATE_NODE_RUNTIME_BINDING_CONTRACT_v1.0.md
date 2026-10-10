@@ -3,6 +3,8 @@
 ## 1. Purpose
 
 GWC gates are the authority plane. Node Architect nodes are the execution plane.
+
+**NODE_ARCHITECT_CONTROLLER_AGNOSTIC:** Node selection, DAG routing, node execution, retry, evidence, validation and continuation operate without TaskController activation or TaskController mailbox/continuation artifacts. TaskController is an optional, explicitly selected working mode / orchestration adapter; it must not redefine GWC gate authority or Node Architect runtime stages. A node that needs agent delegation may request a delegation capability without implicitly selecting TaskController. Native GWC authority/claim/gate/node requirements remain mandatory regardless of working mode.
 A validated gate artifact may authorize an action, but it does not identify the
 executable node. A route decision may identify a node, but it never grants
 authority. Both must be valid before an execution action occurs.
