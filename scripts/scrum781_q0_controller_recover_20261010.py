@@ -18,7 +18,8 @@ from taskcontroller.interaction.continuation import recover_continuation
 from taskcontroller.interaction.github_continuation_store import GitHubContinuationStore
 from taskcontroller.interaction.github_mailbox_v2 import GitHubMailboxRepository
 from taskcontroller.interaction.github_rest_transport import GitHubRestIssueCommentTransport
-from taskcontroller.runtime.high_integrity_session import recover_high_integrity_session
+from taskcontroller.interaction.mailbox_repository import MailboxActorCursor
+from taskcontroller.runtime.high_integrity_session import resume_controller_event_v2
 
 RUN="scrum781-q0-fresh-20261010-r1"
 REPO="nhatnguyenquang1838-coder/gwc"
@@ -91,14 +92,27 @@ def main():
         raise RuntimeError("ATTEMPT_NOT_EXPIRED: cannot quarantine live execution")
     before=checkpoint.to_dict()
     if checkpoint.phase=="WAIT_EXECUTOR":
-        result=recover_high_integrity_session(
+        # For a progressed continuation, recover_high_integrity_session's
+        # recover_v2_dispatch predicate incorrectly expects the original
+        # dispatch checkpoint_id. Use the public native one-shot stale-lease
+        # guard in resume_controller_event_v2, not a handcrafted transition.
+        source=ctr.events[-1].envelope
+        producer_cursor=mailbox.read_cursor(EXECUTOR,RUN,"SCRUM-781","executor")
+        if (producer_cursor.last_logical_seq!=2
+            or producer_cursor.last_event_seq!=1):
+            raise RuntimeError("EXECUTOR_ACK_CURSOR_DRIFT")
+        result=resume_controller_event_v2(
             continuation_store=store,repository=mailbox,
-            run_id=RUN,observed_at=now)
+            checkpoint=checkpoint,cursor=producer_cursor,
+            correlation_id=source.to_dict()["correlation_id"],
+            expected_identity=source.execution_identity,
+            observed_at=now)
         after=result.checkpoint
         if (after.phase!="WAIT_CONTROLLER"
             or after.next_action!="RESOLVE_EXECUTION_AUTHORITY"
             or after.controller_seq!=3
-            or after.last_seen_executor_seq!=2):
+            or after.last_seen_executor_seq!=2
+            or result.poll.status!="NO_NEW_RESULT"):
             raise RuntimeError("STALE_GUARD_DID_NOT_HOLD_EFFECTS")
     elif checkpoint.phase=="WAIT_CONTROLLER" and checkpoint.next_action=="RESOLVE_EXECUTION_AUTHORITY":
         after=checkpoint
