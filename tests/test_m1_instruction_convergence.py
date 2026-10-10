@@ -68,6 +68,19 @@ class M1InstructionConvergenceTests(unittest.TestCase):
         self.assertNotIn("After report` is exactly `CONTINUE | WAIT_CONTROLLER | TERMINAL", task_controller)
         self.assertIn("After report` is exactly `CONTINUE | WAIT | RETRY | REPAIR | REPLAN | TERMINAL", task_controller)
 
+    def test_taskcontroller_is_explicit_optional_working_mode_after_main_sync(self):
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        skill = (ROOT / "skills/task-controller/SKILL.md").read_text(encoding="utf-8")
+        autonomous = (ROOT / "agents/autonomous-agent/agent-instructions.md").read_text(encoding="utf-8")
+        chatgpt = (ROOT / "agents/chatgpt-agent/agent-instructions.md").read_text(encoding="utf-8")
+        agent_index = (ROOT / "agents/README.md").read_text(encoding="utf-8")
+        self.assertIn("TASKCONTROLLER_OPTIONAL / NODE_ARCHITECT_CONTROLLER_AGNOSTIC", agents)
+        self.assertIn("Use only when TaskController working mode was explicitly selected", skill)
+        self.assertNotIn("Use when an autonomous agent starts a governed task", skill)
+        self.assertIn("autonomous delivery alone does not activate TaskController", autonomous)
+        self.assertIn("explicitly selects TaskController working mode", chatgpt)
+        self.assertIn("only when an authorized current run explicitly selects TaskController", agent_index)
+
     def test_historical_markers_do_not_enable_shadow_compatibility_replay(self):
         from tests.test_scrum_566_w8_canonical_shadow_route import (
             _activation,
