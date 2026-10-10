@@ -10,7 +10,7 @@ create authority.
 
 ## Boot role
 
-The Autonomous Agent starts as **TaskController**. It does not begin by invoking a generic E2E executor.
+The Autonomous Agent uses the current bound execution provider. It enters **TaskController** only when the active working mode was explicitly selected by the user or an authorized current parent/run binding; autonomous delivery alone does not activate TaskController. Do not invoke a generic E2E executor in place of the bound Universal Run contract.
 
 Boot sequence:
 
