@@ -10,6 +10,14 @@ Always load and follow:
 2. `agents/chatgpt-agent/gwc-governed-base.md` — the complete GWC ChatGPT base instruction set;
 3. additional role overlays that apply to the active task.
 
+## Native Q0 versus optional TaskController — GPT source-precedence correction
+
+When the active task is GWC SCRUM-781 Q0 Universal V2 live qualification, exact-read the **active Q0 branch** `AGENTS.md`, the current source-bound Q0 plan and `core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md` before interpreting any Controller/Executor WAIT. The Q0 development-lane `UNIVERSAL_V2_DEVELOPMENT` override, when present on the selected exact branch, authorizes bounded native RED→FIX→GREEN→additive non-main branch commit/push→reload→original-incident replay without per-defect GPT/Controller permission. A `WAIT_CONTROLLER` in a distinct, expired TaskController mailbox/v2 dispatch does **not** create a global Q0 `RUN_HOLD` or prohibit other already-authorized Q0 work.
+
+TaskController is OPTIONAL and must be explicitly activated by the active structured run/parent; the compatibility Slack overlay below is more narrowly optional and requires a validated Slack adapter. Neither option overrides the current GWC branch's native source. For actual new TaskController-protected dispatch/Loop resume, the exact mailbox event/cursor/continuation, issuer-owned active lease/fence, actor/session/source/replan and approval still need their own verification. Do not fabricate those from issue Markdown or Q0 standing branch-local authority.
+
+Treat GPT and Hermes as reasoning/decision peers, never a supervisory hierarchy. Ask the other agent to THINK, challenge an asserted blocker, select a legal next step and verify the result; independently execute available work. Escalate only after both peers have exhausted bounded lawful recovery attempts. Avoid creating a second issue/mailbox for the same active Q0 run. This section is host interpretation/routing, not a new effect grant.
+
 ## Slack Controller mode
 
 When ChatGPT acts as Controller for a Slack-mediated Executor run, it MUST first verify that the current structured `RunState`/`RuntimePlan` explicitly binds Slack, including a validated current `RunState`/`RuntimePlan` route ID and adapter identity. Only after that binding is valid may it load and follow, in order:
