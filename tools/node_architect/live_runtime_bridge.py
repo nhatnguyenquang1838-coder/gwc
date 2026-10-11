@@ -11,10 +11,16 @@ from typing import Any, Mapping
 
 from .semantic_agent_runtime import RuntimeExecutionState, execute_semantic_node_lifecycle, resume_checkpoint
 
-GATES = (
+# Preserve the explicit legacy bridge while admitting canonical Universal
+# Runtime v2 gates. Short human-facing G0..G6 spellings are normalized only at
+# event construction; canonical typed events always carry UR.G0..UR.G6.
+LEGACY_GATES = (
     "G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR",
     "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA",
 )
+UNIVERSAL_GATES = tuple(f"UR.G{i}" for i in range(7))
+_UNIVERSAL_SHORT = {f"G{i}": f"UR.G{i}" for i in range(7)}
+GATES = LEGACY_GATES + UNIVERSAL_GATES
 CANONICAL_SOURCE_KIND = "canonical_agent_gate_state"
 
 
@@ -44,6 +50,7 @@ def build_live_runtime_event(
     scenario: str,
     input_payload: Mapping[str, Any],
 ) -> dict[str, Any]:
+    gate = _UNIVERSAL_SHORT.get(gate, gate)
     if gate not in GATES:
         raise ValueError("unsupported gate")
     head = str(canonical_state.get("head_sha") or "")
@@ -225,4 +232,4 @@ def resume_live_runtime_event(
     )
 
 
-__all__ = ["GATES", "LiveRuntimeState", "build_live_runtime_event", "dispatch_live_runtime_event", "resume_live_runtime_event"]
+__all__ = ["GATES", "LEGACY_GATES", "UNIVERSAL_GATES", "LiveRuntimeState", "build_live_runtime_event", "dispatch_live_runtime_event", "resume_live_runtime_event"]

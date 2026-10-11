@@ -81,6 +81,31 @@ class TestGateNodeRouteResolution(unittest.TestCase):
             root=root,
         )
 
+    def test_native_node_resolution_without_taskcontroller_binding(self):
+        # Native Node Architect routing must not require Controller mailboxes.
+        ctx = context("repository_write")
+        self.assertNotIn("taskcontroller", ctx)
+        self.assertNotIn("mailbox_ref", ctx)
+        result = self.resolve(ctx)
+        self.assertEqual(result["outcome"], "ROUTE_SELECTED")
+        self.assertTrue(result["instruction_validated"])
+        self.assertFalse(result["authority_granted"])
+
+    def test_optional_taskcontroller_metadata_does_not_change_node_route(self):
+        direct = context("repository_write")
+        controlled = copy.deepcopy(direct)
+        controlled["working_mode"] = "taskcontroller"
+        controlled["taskcontroller"] = {
+            "activated": True,
+            "controller_mailbox_ref": "github://example.invalid/issues/1#controller",
+            "executor_mailbox_ref": "github://example.invalid/issues/1#executor",
+        }
+        direct_result = self.resolve(direct)
+        controlled_result = self.resolve(controlled)
+        for field in ("outcome", "current_node", "next_node", "authority_granted"):
+            self.assertEqual(direct_result[field], controlled_result[field])
+        self.assertEqual(direct_result["outcome"], "ROUTE_SELECTED")
+
     def test_profile_schema(self):
         Draft202012Validator(self.profile_schema).validate(self.profile)
 

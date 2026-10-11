@@ -202,3 +202,45 @@ def test_route_decision_cannot_grant_node_authority(tmp_path: Path):
     )
     assert out["status"] == "LIVE_RUNTIME_EVENT_REJECTED"
     assert out["reason_code"] == "ROUTE_AUTHORITY_ESCALATION_REJECTED"
+
+
+def test_scrum781_universal_v2_live_bridge_accepts_canonical_and_short_gates():
+    bridge = _module("tools.node_architect.live_runtime_bridge")
+    for i in range(7):
+        gate = f"UR.G{i}"
+        assert gate in bridge.GATES
+        full = bridge.build_live_runtime_event(
+            canonical_state=_state(), event_id=f"v2-full-{i}", run_id="scrum781-v2",
+            gate=gate, requested_action="observe", scenario="standard_pr_delivery",
+            input_payload={"gate_context": {"gate": gate}},
+        )
+        alias = bridge.build_live_runtime_event(
+            canonical_state=_state(), event_id=f"v2-short-{i}", run_id="scrum781-v2",
+            gate=f"G{i}", requested_action="observe", scenario="standard_pr_delivery",
+            input_payload={"gate_context": {"gate": f"G{i}"}},
+        )
+        assert full["gate"] == alias["gate"] == gate
+        assert full["live_agent_event"] is True
+        assert full["synthetic"] is False
+
+
+def test_scrum781_universal_v2_live_bridge_keeps_legacy_only_by_explicit_name(tmp_path):
+    bridge = _module("tools.node_architect.live_runtime_bridge")
+    assert "G0_CONTEXT" in bridge.LEGACY_GATES
+    for i in range(7):
+        event = bridge.build_live_runtime_event(
+            canonical_state=_state(), event_id=f"scrum781-dispatch-{i}",
+            run_id="scrum781-v2", gate=f"UR.G{i}", requested_action="observe",
+            scenario="standard_pr_delivery", input_payload={"gate_context": {}},
+        )
+        out = bridge.dispatch_live_runtime_event(
+            event=event, route_decision=_route(), implementation_registry={"bindings": []},
+            mode="shadow_readonly", semantic_handlers={}, capability_handlers={},
+            readback_handler=lambda *args: {"status": "VERIFIED"},
+            evidence_root=tmp_path, state=bridge.LiveRuntimeState(),
+            applicability_decision={"decision": "NOT_APPLICABLE", "policy_ref": "v2",
+                "decision_digest": "sha256:" + "d" * 64},
+        )
+        assert out["status"] == "LIVE_GATE_NOT_APPLICABLE"
+        assert out["authority_granted"] is False
+        assert out["executed_effects"] == []
