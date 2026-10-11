@@ -44,6 +44,19 @@ Any lower-priority statement that says G4 is "always human" or that E2E "never
 merges" is a generic default and MUST be interpreted under this route-precedence
 rule when a canonical route is active.
 
+### Fresh Universal Run boot precedence
+
+For a fresh current structured run with no explicit compatibility binding, the
+canonical runtime default is `UNIVERSAL_RUN_NEW_RUNTIME`. Compatibility routes are
+selected only when the current `RunState`/`RuntimePlan` explicitly binds and
+validates that exact route ID and adapter identity. Existing explicitly pinned
+Q0 runtime epochs and verified native-route bindings are not silently replaced.
+
+The words `autonomous`, `continue`, `Human only merges main`, `pre-prod`, and
+historical branch, loop, todo, Slack, PR, or authority references have zero
+route-selection weight. A fresh run must not inherit any of those historical
+projections as current execution state.
+
 ## Working-mode independence
 
 **TASKCONTROLLER_OPTIONAL / NODE_ARCHITECT_CONTROLLER_AGNOSTIC:** GWC v2 and Node Architect run under their native lifecycle, authority, task-claim, node-routing and validation contracts without a TaskController working-mode binding. TaskController, its mailbox/v2 transport, Controller–Executor separation, continuation, Slack RootCard and human-plane procedure are applied **only** when explicitly selected by the user or an authorized parent/run binding. An autonomous governed task, node DAG, delegation requirement, or installed TaskController skill does not imply activation. A TaskController selection adds orchestration and cannot replace GWC gate authority or bypass Node Architect runtime. Working mode is independent from execution capability mode (`local_agent` or `chat_connector_only`).
