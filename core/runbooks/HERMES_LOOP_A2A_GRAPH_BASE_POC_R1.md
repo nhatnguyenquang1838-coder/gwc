@@ -95,3 +95,40 @@ No-progress means a qualified **engineering work cycle** actually tried one lawf
 ## Non-goals in base
 
 No RED→FIX→GREEN implementation; no general multi-agent fanout; no GWC Child Run creation; no protected merge/deploy/production; no unauthorized Q0 plan mutation; no starting original DWO Login feature. Continue Q0 P1 original-failure recovery separately. Link to this source from Q0 runbook; do not drive runtime from #595 comments.
+
+## Self-repair extension review — gated behind base execution proof
+
+**Authoritative machine-readable proposal:** [Hermes Loop Self-Repair Workflow R1](../node-architect/hermes-loop-self-repair-workflow-r1.json). This is a child **execution subgraph**, not a new GWC Child Run; Q0 `max_children=0` and one-writer constraints remain in force. Integrates at Base Graph `verify_task` on `genuine_recoverable_failure`; exits only to `persist_progress` after original replay progresses beyond failure, or to `evaluate_blocker` when no legal local next action remains. Merely ending a graph invocation or reaching a green unit test does not mean a task or Q0 completed.
+
+```mermaid
+flowchart TD
+  V[Base verify_task] -->|Recoverable verified failure| C[classify_failure]
+  C -->|missing incident evidence| S[recover_source]
+  S -->|source bound| R[capture_red]
+  C -->|reproducible| R
+  R -->|authentic RED| A[analyze_cause]
+  A --> P[plan_minimal_fix]
+  P -->|in existing Q0 scope| F[apply_fix]
+  F --> G[focused_green]
+  G -->|PASS| B[broader_tests]
+  G -->|recoverable failure| A
+  B -->|PASS| K[commit_readback]
+  B -->|recoverable failure| A
+  K --> L[runtime_reload]
+  L --> LP[load_proof]
+  LP -->|identity match| I[invalidate_derivatives]
+  LP -->|mismatch; legal retry| L
+  I --> RR[replay_original]
+  RR -->|passes beyond original boundary| OUT[Base persist_progress]
+  RR -->|recoverable repeat| A
+  RR -->|missing authentic fixture| S
+  S -->|no legal source| D[Base evaluate_blocker]
+  P -->|authority exceeded| D
+  RR -->|no legal recovery| D
+```
+
+**Mandatory repair invariant**: authentic original-failure RED (fixture provenance, source SHA, test invocation/signature) → scoped fix in the existing one-writer worktree → focused GREEN + broader regression → additive commit/push with exact remote readback → runtime process/session reload and loaded profile/module/instruction identity → invalidate/regenerate dependent derivative state → replay authentic original fixture with exact readback past old failure boundary. Repair is `FIX_IMPLEMENTED` on GREEN at most; do not report `RUNTIME_FIXED` until full sequence. Synthetic fault injection qualifies *adapter mechanics only*, never SCRUM-781 original-incident certification.
+
+**Early-unlock policy:** A budgeted tick ending, stale cursor, or initial RED is not deadlock. The base `evaluate_blocker` only requests Controller unlock after a genuine bounded recovery work cycle establishes no runnable legal alternative and a Controller-owned decision is needed; dedupe by canonical run/task/consumed seq/blocker fingerprint. Continue other lawful actions where available, but respect genuine `RUN_HOLD`. Controller returns source-bound NEXT/authority and the Executor resumes the same run/task/checkpoint. The external wake adapter must have an observed delivery receipt; a posted comment is not delivery.
+
+**Release gates:** (i) Base B1–B9 live host E2E PASS, then (ii) Self-repair SR1–SR12 with authentic fixture and exact load/replay PASS, then (iii) Q0 full campaign verification and independent G6 acceptance. Document/JSON static checks alone do not pass either live gate. LangGraph is optional backend; no fallback to GWC legacy runtime, no protected-main merge/deploy authority added here.
