@@ -222,7 +222,6 @@
     "One genuine deadlock produces one durable Controller handoff and one pointer wake",
     "Verified unlock resumes same task/thread without a new Q0 run",
     "Terminal task completion produces one separate Controller wake",
-    "Invalid actor/plan digest or real RUN_HOLD fails closed",
-    "Base workflow 9/9 passes before any self-repair work starts"
+    "Invalid actor/plan digest or real RUN_HOLD fails closed"
   ]
 }
