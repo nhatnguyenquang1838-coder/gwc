@@ -175,6 +175,12 @@ Q0 MUST cover, when applicable:
 
 The runbook changes qualification semantics only. It grants no G2/G3/G4/G5/G6 authority. Branch creation, repository mutation, PR delivery, merge, runtime reload with external effect, deployment, production configuration, credentials, migrations, or production data remain governed by their applicable authority contracts.
 
+## Hermes Loop × A2A × LangGraph base POC (design proposal)
+
+For SCRUM-781 Q0 host-engine integration, consult [Hermes Loop A2A Graph Base POC R1](HERMES_LOOP_A2A_GRAPH_BASE_POC_R1.md) and the [Node Architect base workflow template](../node-architect/hermes-loop-a2a-base-workflow-r1.json). **One workflow is a collection of typed Node Architect execution nodes** compiled from a source-bound RuntimePlan. First qualify the **base** (C/E observation, task selection, deterministic execution, evidence, checkpoint, terminal/deadlock wake, same-task resume); **only after base 9/9 AC** add self-repair as a separate subgraph.
+
+The proposal does not change the active Q0 `UR.G2` cursor, `max_children=0`, `max_parallel=1`, original DWO fixture requirement or existing authority. It is neither an approved RuntimePlan revision nor a claim of a qualified live Hermes/LangGraph adapter. Native Q0 work continues under its current plan; no second Q0 executor/worktree is created by this document.
+
 ## UNIVERSAL_V2_DEVELOPMENT lane addendum
 
 When the Q0 lane selects `runtime_epoch = UNIVERSAL_V2_DEVELOPMENT` (SCRUM-781
