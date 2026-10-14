@@ -83,7 +83,8 @@ def reconcile(q0_root: Path = ROOT, protected_main_root: Path | None = None) -> 
     )):
         raise SourceBindingError("Q0_FIXTURE_BINDING_INVALID")
     plan_digest = sha256(plan_raw)
-    if source.get("runtimeplan_sha256") != plan_digest:
+    plan_digest_hex = plan_digest.split(":", 1)[1]
+    if source.get("runtimeplan_sha256") != plan_digest_hex:
         raise SourceBindingError("Q0_IMMUTABLE_PLAN_DIGEST_DRIFT")
     if (fixture.get("incident", {}).get("provenance_class")
             != "RECONSTRUCTED_SOURCE_BOUND"):
