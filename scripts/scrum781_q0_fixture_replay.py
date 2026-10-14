@@ -101,7 +101,9 @@ def verify_replay(fixture: dict[str, Any], actual: dict) -> None:
     for key, expected in fixture["replay"]["expected"].items():
         if key not in actual or actual[key] != expected:
             raise FixtureError("Q0_FIXTURE_REPLAY_MISMATCH:" + key)
-    if actual.get("authority_granted") is True or actual.get("executed_effects"):\n        raise FixtureError("Q0_FIXTURE_UNAUTHORIZED_EFFECT_CLAIM")\n    if actual.get("needs_exact_hitl") or not actual.get("advance_beyond_old_failure"):
+    if actual.get("authority_granted") is True or actual.get("executed_effects"):
+        raise FixtureError("Q0_FIXTURE_UNAUTHORIZED_EFFECT_CLAIM")
+    if actual.get("needs_exact_hitl") or not actual.get("advance_beyond_old_failure"):
         raise FixtureError("Q0_FIXTURE_DID_NOT_ADVANCE")
 
 
