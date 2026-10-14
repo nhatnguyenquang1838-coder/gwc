@@ -90,3 +90,18 @@ def test_langgraph_backend_is_optional_but_fail_closed_when_missing():
         result = run_fixture(fixture, engine="langgraph", executor=synthetic_contract_response)
         assert result["checkpoint_class"] == "EPHEMERAL_MECHANICS_ONLY"
         assert result["q0_l3_qualified"] is False
+
+def test_baseline_rebinding_fails_closed():
+    fixture, _ = load_fixture(DEFAULT_FIXTURE)
+    fixture["source_binding"]["baseline_sha"] = "a" * 40
+    with pytest.raises(FixtureError, match="SOURCE_BINDING_INVALID"):
+        validate_fixture(fixture)
+
+
+def test_observed_authority_claim_fails_closed():
+    fixture, _ = load_fixture(DEFAULT_FIXTURE)
+    def unexpected_effect(**_kwargs):
+        return {**synthetic_contract_response(), "authority_granted": True}
+    with pytest.raises(FixtureError, match="UNAUTHORIZED_EFFECT_CLAIM"):
+        run_fixture(fixture, executor=unexpected_effect)
+
