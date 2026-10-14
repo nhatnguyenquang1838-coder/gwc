@@ -107,9 +107,23 @@ def verify_replay(fixture: dict[str, Any], actual: dict) -> None:
         raise FixtureError("Q0_FIXTURE_DID_NOT_ADVANCE")
 
 
-def run_fixture(fixture: dict[str, Any], *, root: Path = ROOT,
-                engine: str = "native", executor: Callable[..., dict] | None = None,
-                thread_id: str | None = None) -> dict:
+def build_langgraph_graph(fixture: dict[str, Any], *, root: Path = ROOT,
+                          executor: Callable[..., dict] | None = None,
+                          checkpointer: Any = None,
+                          interrupt_before: list[str] | None = None):
+    """Build the source-bound Q0 graph with an injectable checkpoint backend.
+
+    The default remains ephemeral MemorySaver. Tests may inject a persisted
+    checkpointer and static interrupt boundary; neither grants GWC authority.
+    """
+    try:
+        from langgraph.graph import StateGraph, START, END
+        if checkpointer is None:
+            from langgraph.checkpoint.memory import MemorySaver
+            checkpointer = MemorySaver()
+    except ImportError as exc:
+        raise FixtureError("LANGGRAPH_BACKEND_UNAVAILABLE") from exc
+
     def validate(_: FixtureState) -> FixtureState:
         validate_fixture(fixture, root=root)
         return {"validated": True}
@@ -121,27 +135,36 @@ def run_fixture(fixture: dict[str, Any], *, root: Path = ROOT,
         verify_replay(fixture, state["actual"])
         return {"verified": True}
 
+    graph = StateGraph(FixtureState)
+    graph.add_node("validate", validate)
+    graph.add_node("replay", replay)
+    graph.add_node("verify", verify)
+    graph.add_edge(START, "validate")
+    graph.add_edge("validate", "replay")
+    graph.add_edge("replay", "verify")
+    graph.add_edge("verify", END)
+    return graph.compile(
+        checkpointer=checkpointer,
+        interrupt_before=list(interrupt_before or ()),
+    )
+
+
+def run_fixture(fixture: dict[str, Any], *, root: Path = ROOT,
+                engine: str = "native", executor: Callable[..., dict] | None = None,
+                thread_id: str | None = None) -> dict:
     if engine == "native":
-        validate({})
-        state = replay({})
-        verify(state)
+        validate_fixture(fixture, root=root)
+        actual = execute_replay(fixture, executor=executor)
+        verify_replay(fixture, actual)
+        state: FixtureState = {"actual": actual, "verified": True}
         checkpoint = "NONE"
     elif engine == "langgraph":
-        try:
-            from langgraph.graph import StateGraph, START, END
-            from langgraph.checkpoint.memory import MemorySaver
-        except ImportError as exc:
-            raise FixtureError("LANGGRAPH_BACKEND_UNAVAILABLE") from exc
-        graph = StateGraph(FixtureState)
-        graph.add_node("validate", validate)
-        graph.add_node("replay", replay)
-        graph.add_node("verify", verify)
-        graph.add_edge(START, "validate")
-        graph.add_edge("validate", "replay")
-        graph.add_edge("replay", "verify")
-        graph.add_edge("verify", END)
-        compiled = graph.compile(checkpointer=MemorySaver())
-        state = compiled.invoke({}, {"configurable": {"thread_id": thread_id or RUN_ID + ":c91-e52"}})
+        compiled = build_langgraph_graph(
+            fixture, root=root, executor=executor
+        )
+        state = compiled.invoke(
+            {}, {"configurable": {"thread_id": thread_id or RUN_ID + ":c91-e52"}}
+        )
         checkpoint = "EPHEMERAL_MECHANICS_ONLY"
     else:
         raise FixtureError("Q0_FIXTURE_ENGINE_UNKNOWN")
