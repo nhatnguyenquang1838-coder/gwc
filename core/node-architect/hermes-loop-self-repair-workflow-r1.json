@@ -1,0 +1,186 @@
+{
+  "schema_id": "gwc.node-architect.self-repair-workflow.v1",
+  "workflow_id": "hermes-loop-self-repair-r1",
+  "status": "PROPOSAL_NOT_RUNTIME_ADMITTED",
+  "extends": "core/node-architect/hermes-loop-a2a-base-workflow-r1.json",
+  "binding": {
+    "run_id": "scrum781-q0-fresh-20261010-r1",
+    "gate": "UR.G2",
+    "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    "plan_ref": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "original_incident_fixture": "SOURCE_BOUND_REQUIRED",
+    "max_parallel": 1,
+    "max_children": 0
+  },
+  "entry": {
+    "from": "verify_task",
+    "when": "genuine_recoverable_failure",
+    "to": "classify_failure"
+  },
+  "nodes": [
+    {
+      "id": "classify_failure",
+      "routes": {
+        "reproducible": "capture_red",
+        "missing_evidence": "recover_source",
+        "scope_violation": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "recover_source",
+      "routes": {
+        "verified": "capture_red",
+        "legal_next": "recover_source",
+        "exhausted": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "capture_red",
+      "routes": {
+        "authentic_red": "analyze_cause",
+        "unreproduced": "recover_source",
+        "unsafe": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "analyze_cause",
+      "routes": {
+        "ready": "plan_minimal_fix"
+      }
+    },
+    {
+      "id": "plan_minimal_fix",
+      "routes": {
+        "within_existing_scope": "apply_fix",
+        "out_of_scope": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "apply_fix",
+      "routes": {
+        "effect_recorded": "focused_green"
+      }
+    },
+    {
+      "id": "focused_green",
+      "routes": {
+        "pass": "broader_tests",
+        "recoverable_fail": "analyze_cause",
+        "blocked": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "broader_tests",
+      "routes": {
+        "pass": "commit_readback",
+        "recoverable_fail": "analyze_cause",
+        "blocked": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "commit_readback",
+      "routes": {
+        "verified": "runtime_reload",
+        "drift": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "runtime_reload",
+      "routes": {
+        "reloaded": "load_proof"
+      }
+    },
+    {
+      "id": "load_proof",
+      "routes": {
+        "identity_matches": "invalidate_derivatives",
+        "mismatch": "runtime_reload",
+        "blocked": "evaluate_blocker"
+      }
+    },
+    {
+      "id": "invalidate_derivatives",
+      "routes": {
+        "completed": "replay_original"
+      }
+    },
+    {
+      "id": "replay_original",
+      "routes": {
+        "progress_beyond_original_failure": "persist_progress",
+        "recoverable_fail": "analyze_cause",
+        "missing_fixture": "recover_source",
+        "blocked": "evaluate_blocker"
+      }
+    }
+  ],
+  "exit": {
+    "to_base": "persist_progress",
+    "on_blocker": "evaluate_blocker"
+  },
+  "evidence_contract": {
+    "red": [
+      "source_sha",
+      "fixture_digest",
+      "exact_test_command",
+      "failure_signature"
+    ],
+    "fix": [
+      "diff_ref",
+      "scope_check",
+      "single_writer",
+      "fixed_sha"
+    ],
+    "green": [
+      "tested_sha",
+      "focused_test_receipt",
+      "broader_test_receipt"
+    ],
+    "commit": [
+      "additive_commit_sha",
+      "remote_sha",
+      "exact_readback"
+    ],
+    "load": [
+      "runtime_process_session",
+      "loaded_sha",
+      "profile_digest",
+      "module_and_instruction_digests"
+    ],
+    "replay": [
+      "original_fixture_digest",
+      "readback_ref",
+      "advanced_beyond_failure"
+    ],
+    "deadlock": [
+      "bounded_recovery_attempts",
+      "exhausted_legal_frontier",
+      "blocker_owner",
+      "dedupe_key"
+    ]
+  },
+  "invariants": [
+    "Never synthesize the original DWO incident fixture",
+    "RED precedes bounded fix and GREEN; exact loaded fixed identity precedes replay",
+    "Do not mark RUNTIME_FIXED on GREEN alone",
+    "All in-scope recoverable failures remain local; no intermediate GPT wake",
+    "A resource-budget yield does not imply deadlock",
+    "Only genuine Controller-owned deadlock may escalate before task completion",
+    "No additional Child Run or parallel executor; no force push, merge or deployment",
+    "LangGraph checkpoints are projections, not canonical GWC/C-E receipts"
+  ],
+  "acceptance": [
+    "SR1 authentic RED + fixture provenance",
+    "SR2 bounded fix/single writer",
+    "SR3 focused GREEN + broader regression exact SHA",
+    "SR4 additive commit and remote exact readback",
+    "SR5 process and loaded module/instruction proof",
+    "SR6 dependent stale artifacts regenerated",
+    "SR7 original incident replay beyond previous failure",
+    "SR8 recoverable faults do not wake GPT",
+    "SR9 deadlock unlock dedupes and resumes same task",
+    "SR10 crash and duplicate tick idempotent",
+    "SR11 invalid actor/digest/authority fail closed",
+    "SR12 Universal gate and Q0 acceptance not inferred from graph"
+  ]
+}
