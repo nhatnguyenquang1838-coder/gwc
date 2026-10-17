@@ -82,3 +82,17 @@ def test_legacy_envelope_requires_historical_schema_and_never_current_activation
         "schema_version": historical["properties"]["schema_version"],
         "authorized_actions": historical["properties"]["authorized_actions"]
     }}).is_valid(fresh)
+
+
+def test_actual_committed_legacy_envelope_historical_readback_only():
+    import yaml
+    from jsonschema import Draft202012Validator
+    old_schema = json.loads((ROOT / "schemas/historical/g2-execution-envelope-v1.0.schema.json").read_text())
+    old_path = ROOT / ".gwc/tasks/SCRUM-668/g2/execution-envelope.yaml"
+    persisted = yaml.safe_load(old_path.read_text())
+    assert persisted["schema_version"] == "1.0"
+    assert {"add_files", "stage_commit_push"} <= set(persisted["authorized_actions"])
+    assert list(Draft202012Validator(old_schema).iter_errors(persisted)) == []
+    assert list(Draft202012Validator(SCHEMA).iter_errors(persisted)) != []
+    # Readback of legacy ACTIVE is not a new approval or an executable capability.
+    assert persisted["activation_state"] == "ACTIVE"
