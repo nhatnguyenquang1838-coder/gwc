@@ -18,6 +18,7 @@ from typing import Any, Mapping
 from tools.node_architect.approval_token_generation import generate_approval_request
 from tools.node_architect.authority_boundary_check import (
     ACTION_TO_MINIMUM_GATE,
+    SCOPE_IDENTITY_KEYS,
     _finish,
     check_authority_boundary,
 )
@@ -188,7 +189,11 @@ def prepare_g2_approval(
     denied = check_authority_boundary(
         task_id=task_id, repository=repository,
         requested_action=requested_action, gate_state_resolution=state,
-        scope_identity=scope_identity,
+        # This evaluator intentionally accepts a closed *compact* scope
+        # identity. Keep exact values from the already-validated full source
+        # record, without inventing a gate-status or changing its scope hash.
+        scope_identity={k: v for k, v in scope_identity.items()
+                        if k in SCOPE_IDENTITY_KEYS},
         gate_policy=gate_policy or {"action_map": ACTION_TO_MINIMUM_GATE},
         risk_class="R2", production_scope_applicable=False,
         manual_g5_action=False, event_id_or_idempotency_key=event_id_or_idempotency_key,
