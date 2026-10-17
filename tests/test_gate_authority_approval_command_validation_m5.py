@@ -385,3 +385,51 @@ def _load_validation_schema():
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestScrum841G2ProducerConsumerIdentity(unittest.TestCase):
+    """Real generated command -> canonical validation; no synthetic VALID object."""
+
+    def test_real_command_carries_exact_scope_identity_when_observed(self):
+        req = _request()
+        rb = _readback(
+            working_branch=REQUEST_KWARGS["scope_identity"]["branch"],
+            risk_class="R2",
+            authorized_actions=["modify_approved_files", "run_sandboxed_validation"],
+        )
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="scrum841-real-command")
+        self.assertEqual(res["outcome"], "VALID")
+        for key, value in {
+            "task_id": req["task_id"], "repository": req["repository"],
+            "base_sha": req["bindings"]["base_sha"],
+            "head_sha": req["bindings"]["head_sha"],
+            "scope_hash": req["scope_hash"], "working_branch": rb["working_branch"],
+            "risk_class": rb["risk_class"],
+            "authorized_actions": rb["authorized_actions"],
+        }.items():
+            self.assertEqual(res[key], value)
+        self.assertFalse(res["execution_authority_granted"])
+
+    def test_valid_human_command_with_incomplete_scope_is_not_activatable(self):
+        req = _request()
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=_readback(),
+            event_id_or_idempotency_key="scrum841-incomplete")
+        self.assertEqual(res["outcome"], "VALID")
+        self.assertNotIn("risk_class", res)
+        self.assertNotIn("authorized_actions", res)
+        self.assertFalse(res["execution_authority_granted"])
+
+    def test_bad_actor_cannot_acquire_scope_bindings(self):
+        req = _request()
+        rb = _readback(working_branch=REQUEST_KWARGS["scope_identity"]["branch"],
+                       risk_class="R2", authorized_actions=["modify_approved_files"],
+                       current_actor={"type": "user", "id": "foreign"})
+        res = validate_approval_command(
+            approval_request=req, human_response=req["approval_command"],
+            current_readback=rb, event_id_or_idempotency_key="scrum841-wrong-actor")
+        self.assertNotEqual(res["outcome"], "VALID")
+        self.assertNotIn("authorized_actions", res)
