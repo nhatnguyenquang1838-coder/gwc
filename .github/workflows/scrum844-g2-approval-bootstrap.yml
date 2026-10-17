@@ -9,6 +9,10 @@ on:
       - 'tools/node_architect/g2_execution_envelope_render.py'
       - 'tests/test_scrum844_g2_approval_preparation.py'
       - 'schemas/gate-approval-request.schema.json'
+      - 'schemas/g2-execution-envelope.schema.json'
+      - 'tools/validate_gate_action.py'
+      - 'tools/node_architect/scope_hash_calculation.py'
+      - 'tests/test_scrum809_g2_action_vocabulary.py'
       - '.github/workflows/scrum844-g2-approval-bootstrap.yml'
   workflow_dispatch:
 
@@ -28,6 +32,7 @@ jobs:
       - name: Run real source bound approval preparation and upstream regressions
         run: |
           python -m pytest -q \
+            tests/test_scrum809_g2_action_vocabulary.py \
             tests/test_scrum844_g2_approval_preparation.py \
             tests/test_gate_authority_authority_boundary_check_m5.py \
             tests/test_gate_authority_gate_state_resolution_m5.py \
