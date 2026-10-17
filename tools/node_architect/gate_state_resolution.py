@@ -355,7 +355,7 @@ def _entry_shape_valid(entry: object) -> bool:
     return _string_list(entry.get("reason_codes"))
 
 
-def _map_valid(evidence_map: object, task_id: str) -> bool:
+def _map_valid(evidence_map: object, task_id: str, *, entry_gate: str | None = None) -> bool:
     required = {
         "schema_version",
         "artifact_type",
@@ -406,6 +406,15 @@ def _map_valid(evidence_map: object, task_id: str) -> bool:
         _public_requirements(task_id),
         key=lambda item: (str(item["gate"]), str(item["artifact_role"])),
     )
+    if entry_gate is not None:
+        if entry_gate != "G2_EXECUTION":
+            return False
+        # Stage-scoped evidence must prove prerequisites G0/G1 and G2,
+        # never future G3/G4/G5/G6 deliverables.
+        expected_requirements = [
+            requirement for requirement in expected_requirements
+            if requirement["gate"] in ("G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION")
+        ]
     actual_requirements = evidence_map.get("requirements")
     if not isinstance(actual_requirements, list):
         return False
@@ -538,6 +547,7 @@ def _analyze_evidence(
     evidence_map: Mapping[str, object],
     scope_identity: Mapping[str, object],
     production_scope: bool,
+    entry_gate: str | None = None,
 ) -> dict[str, object]:
     entries = evidence_map["entries"]
     requirements = evidence_map["requirements"]
@@ -592,6 +602,10 @@ def _analyze_evidence(
     policy = _requirement_policy(str(evidence_map["task_id"]))
 
     for gate in GATE_ORDER:
+        if entry_gate == "G2_EXECUTION" and gate in ("G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"):
+            evaluations.append({"gate": gate, "status": "NOT_APPLICABLE",
+                                "reason_codes": ["GATE_STATE_G6_NOT_APPLICABLE"] if gate == "G6_PRODUCTION_DATA" else []})
+            continue
         if gate == "G6_PRODUCTION_DATA" and not production_scope:
             evaluations.append({
                 "gate": gate,
@@ -797,6 +811,7 @@ def resolve_gate_state(
     event_id_or_idempotency_key: str,
     prior_resolution: dict[str, object] | None = None,
     observed_at: str | None = None,
+    entry_gate: str | None = None,
 ) -> dict[str, object]:
     semantic_input = {
         "task_id": task_id,
@@ -808,6 +823,8 @@ def resolve_gate_state(
         "task_projection": _strip_observation_fields(task_projection),
         "event_id_or_idempotency_key": event_id_or_idempotency_key,
     }
+    if entry_gate is not None:
+        semantic_input["entry_gate"] = entry_gate
     resolution_digest = _digest(semantic_input)
     scope_hash = scope_identity.get("scope_hash") if isinstance(scope_identity, Mapping) else None
     output = _empty_resolution(
@@ -828,7 +845,8 @@ def resolve_gate_state(
         or not isinstance(current_base_sha, str)
         or not SHA_PATTERN.match(current_base_sha)
         or not _scope_valid(scope_identity)
-        or not _map_valid(evidence_map, task_id)
+        or not _map_valid(evidence_map, task_id, entry_gate=entry_gate)
+        or entry_gate not in (None, "G2_EXECUTION")
         or not _transition_valid(transition_map)
         or not isinstance(event_id_or_idempotency_key, str)
         or not event_id_or_idempotency_key
@@ -849,7 +867,8 @@ def resolve_gate_state(
         binding_mismatches.append("prior")
 
     production_scope = bool(set(scope_identity["authorized_actions"]) & PRODUCTION_ACTIONS)
-    analysis = _analyze_evidence(evidence_map, scope_identity, production_scope)
+    analysis = _analyze_evidence(evidence_map, scope_identity, production_scope,
+                                 entry_gate=entry_gate)
     output.update({
         "gate_evaluations": analysis["evaluations"],
         "canonical_evidence_refs": analysis["refs"],
@@ -862,8 +881,8 @@ def resolve_gate_state(
 
     first_gate = analysis["first_gate"]
     if first_gate is None:
-        current_gate = "G6_PRODUCTION_DATA"
-        gate_status = "PASS" if production_scope else "NOT_APPLICABLE"
+        current_gate = "G2_EXECUTION" if entry_gate == "G2_EXECUTION" else "G6_PRODUCTION_DATA"
+        gate_status = "PASS" if entry_gate == "G2_EXECUTION" or production_scope else "NOT_APPLICABLE"
         next_gate = None
         if production_scope:
             output["last_passed_gate"] = current_gate

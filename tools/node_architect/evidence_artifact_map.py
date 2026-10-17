@@ -183,7 +183,8 @@ def _sort_reasons(reasons: set[str]) -> list[str]:
 
 
 def _requirements_for(
-    *, task_id: str, current_gate: str | None, current_action: str | None
+    *, task_id: str, current_gate: str | None, current_action: str | None,
+    include_prerequisites: bool = False,
 ) -> tuple[list[dict[str, object]], bool]:
     """Return the exact current gate/action requirements and whether filtered."""
     filtered = current_gate is not None or current_action is not None
@@ -200,8 +201,12 @@ def _requirements_for(
     )
     requirements: list[dict[str, object]] = []
     for requirement in _GATE_REQUIREMENTS:
-        if selected_gate is not None and requirement["gate"] != selected_gate:
-            continue
+        if selected_gate is not None:
+            if include_prerequisites and selected_gate == "G2_EXECUTION":
+                if requirement["gate"] not in ("G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION"):
+                    continue
+            elif requirement["gate"] != selected_gate:
+                continue
         target = requirement["target"].replace("<task-id>", task_id or "<task-id>")
         requirements.append(
             {
@@ -225,6 +230,7 @@ def build_gate_evidence_artifact_map(
     mapped_at: str | None = None,
     current_gate: str | None = None,
     current_action: str | None = None,
+    include_prerequisites: bool = False,
     scope_hash: str | None = None,
     scope_identity: Mapping[str, object] | None = None,
     observed_base_sha: str | None = None,
@@ -277,7 +283,8 @@ def build_gate_evidence_artifact_map(
         reasons.add("EVIDENCE_BINDING_MISMATCH")
 
     requirements, filtered = _requirements_for(
-        task_id=task_id, current_gate=current_gate, current_action=current_action
+        task_id=task_id, current_gate=current_gate, current_action=current_action,
+        include_prerequisites=include_prerequisites,
     )
     if (current_gate is not None and current_gate not in GATES) or (
         current_action is not None
