@@ -84,6 +84,12 @@ def _make_action_map() -> dict[str, str]:
             "branch", "worktree", "file", "files", "modify_file", "modify_approved_files",
             "commit", "push", "branch_creation", "worktree_creation", "repository_write",
             "branch_worktree_file_commit_push",
+            # Schema-defined G2 operations: keep the boundary vocabulary
+            # compatible with schemas/g2-execution-envelope.schema.json.
+            # This does not grant authority; approval and source scope remain
+            # mandatory, and no G3+ action is introduced.
+            "create_working_branch", "add_files", "run_sandboxed_validation",
+            "stage_commit_push",
         },
         "G3_PR": {
             "draft_pr", "create_draft_pr", "open_or_update_draft_pr", "ready_for_review",
