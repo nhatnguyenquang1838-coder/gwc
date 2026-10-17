@@ -28,9 +28,24 @@ def load_module() -> Any:
 
 
 M = load_module()
+
+
+def load_protected_base_producer() -> Any:
+    path = ROOT / "tools/node_architect/protected_base_capture.py"
+    spec = importlib.util.spec_from_file_location("protected_base_capture", path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+PRODUCER = load_protected_base_producer()
 SCHEMA = json.loads((ROOT / "schemas/risk-classification.schema.json").read_text(encoding="utf-8"))
 Draft202012Validator.check_schema(SCHEMA)
 VALIDATOR = Draft202012Validator(SCHEMA)
+PRODUCER_SCHEMA = json.loads((ROOT / "schemas/protected-base-capture.schema.json").read_text(encoding="utf-8"))
+Draft202012Validator.check_schema(PRODUCER_SCHEMA)
+PRODUCER_VALIDATOR = Draft202012Validator(PRODUCER_SCHEMA)
 
 
 def upstreams(*, raw_text: str = "Implement schema contract", signals: list[str] | None = None) -> dict[str, dict[str, Any]]:
@@ -48,11 +63,12 @@ def upstreams(*, raw_text: str = "Implement schema contract", signals: list[str]
             "artifact_type": "repo-identity", "repository": REPO, "base_sha": BASE,
             "outcome": "ACCEPTED", "identity_match": True, "decision_digest": DIGEST,
         },
-        "protected_base_snapshot": {
-            "artifact_type": "protected-base-capture", "repository": REPO, "base_sha": BASE,
-            "protected_base_sha": BASE, "verified_sha": BASE, "readback_status": "VERIFIED",
-            "drift_state": "NONE", "outcome": "ACCEPTED", "decision_digest": DIGEST,
-        },
+        # Use the actual producer contract. It never emits a synthetic base_sha.
+        "protected_base_snapshot": PRODUCER.render_protected_base_capture(
+            task_id=TASK, repository=REPO, protected_base_sha=BASE,
+            evidence_source="github:exact-base-readback", verified_sha=BASE,
+            captured_at="2026-08-10T00:00:00Z",
+        ),
     }
 
 
@@ -172,6 +188,75 @@ class RiskClassificationTests(unittest.TestCase):
         artifact = self.classify(protected_base_snapshot=protected)
         self.assertEqual(("BLOCKED", "RISK_SOURCE_STALE"), (artifact["outcome"], artifact["reason_code"]))
         self.assert_schema(artifact)
+
+    def test_real_producer_consumer_integration_no_fake_base_sha(self) -> None:
+        protected = upstreams()["protected_base_snapshot"]
+        self.assertNotIn("base_sha", protected)
+        self.assertEqual([], [e.message for e in PRODUCER_VALIDATOR.iter_errors(protected)])
+        self.assertEqual("ACCEPTED", protected["outcome"])
+        result = self.classify()
+        self.assertEqual(("ACCEPTED", "R2"), (result["outcome"], result["risk_level"]))
+        self.assertEqual("G2_HUMAN_DIRECTION", result["required_gate"])
+        self.assertEqual(protected["decision_digest"], result["source_bindings"]["protected_base_capture"])
+        self.assert_schema(result)
+
+    def test_producer_protected_base_mismatch_stays_stale(self) -> None:
+        other = "b" * 40
+        facts = upstreams()
+        facts["protected_base_snapshot"] = PRODUCER.render_protected_base_capture(
+            task_id=TASK, repository=REPO, protected_base_sha=other,
+            evidence_source="github:other-base-readback", verified_sha=other,
+        )
+        self.assertEqual("ACCEPTED", facts["protected_base_snapshot"]["outcome"])
+        result = self.classify(facts=facts)
+        self.assertEqual(("BLOCKED", "RISK_SOURCE_STALE"), (result["outcome"], result["reason_code"]))
+        self.assert_schema(result)
+
+    def test_missing_canonical_protected_base_sha_fails_closed(self) -> None:
+        facts = upstreams()
+        facts["protected_base_snapshot"].pop("protected_base_sha")
+        result = self.classify(facts=facts)
+        self.assertEqual(("BLOCKED", "RISK_SOURCE_STALE"), (result["outcome"], result["reason_code"]))
+        self.assert_schema(result)
+
+    def test_real_producer_readback_mismatch_fails_closed(self) -> None:
+        facts = upstreams()
+        facts["protected_base_snapshot"] = PRODUCER.render_protected_base_capture(
+            task_id=TASK, repository=REPO, protected_base_sha=BASE,
+            evidence_source="github:readback", verified_sha="b" * 40,
+        )
+        self.assertNotEqual("ACCEPTED", facts["protected_base_snapshot"]["outcome"])
+        result = self.classify(facts=facts)
+        self.assertNotEqual("ACCEPTED", result["outcome"])
+        self.assertIsNone(result["risk_level"])
+        self.assert_schema(result)
+
+    def test_real_producer_drift_fails_closed(self) -> None:
+        facts = upstreams()
+        facts["protected_base_snapshot"] = PRODUCER.render_protected_base_capture(
+            task_id=TASK, repository=REPO, protected_base_sha=BASE,
+            evidence_source="github:readback", verified_sha=BASE,
+            prior_capture={"protected_base_sha": "b" * 40},
+        )
+        self.assertEqual("DRIFTED", facts["protected_base_snapshot"]["drift_state"])
+        result = self.classify(facts=facts)
+        self.assertEqual(("BLOCKED", "RISK_SOURCE_STALE"), (result["outcome"], result["reason_code"]))
+        self.assert_schema(result)
+
+    def test_wrong_protected_base_repository_not_accepted(self) -> None:
+        facts = upstreams()
+        facts["protected_base_snapshot"]["repository"] = "another/repository"
+        result = self.classify(facts=facts)
+        self.assertEqual(("HUMAN_REQUIRED", "RISK_SCOPE_AMBIGUOUS"), (result["outcome"], result["reason_code"]))
+        self.assert_schema(result)
+
+    def test_spoofed_legacy_base_sha_cannot_override_protected_base(self) -> None:
+        facts = upstreams()
+        facts["protected_base_snapshot"]["base_sha"] = BASE
+        facts["protected_base_snapshot"]["protected_base_sha"] = "b" * 40
+        result = self.classify(facts=facts)
+        self.assertEqual(("BLOCKED", "RISK_SOURCE_STALE"), (result["outcome"], result["reason_code"]))
+        self.assert_schema(result)
 
 
 if __name__ == "__main__":
