@@ -48,7 +48,7 @@ EXPIRES = "2026-10-17T09:00:00Z"
 
 
 def make_input():
-    scope = GS.scope(head_sha=BASE)
+    scope = GS.scope(head_sha=BASE, authorized_actions=['run_sandboxed_validation'])
     # Deliberately no G2, G3, G4 artifacts. All 5 early entries are source-bound.
     early = [x for x in GS.candidates() if x["gate"] in ("G0_CONTEXT", "G1_ALIGNMENT")]
     evidence = build_gate_evidence_artifact_map(
@@ -78,7 +78,7 @@ def make_input():
     return dict(
         task_id=TASK, repository=REPO, current_base_sha=BASE,
         scope_identity=scope, evidence_map=evidence, transition_map=GS.tmap(),
-        risk_profile=risk, requested_action="modify_approved_files",
+        risk_profile=risk, requested_action="run_sandboxed_validation",
         actor_target={"type": "user", "id": "approval-reviewer"},
         issued_at=ISSUED, expires_at=EXPIRES,
         event_id_or_idempotency_key="scrum844-g01-ready-01",
@@ -118,7 +118,7 @@ class G2BootstrapIntegration(unittest.TestCase):
         inputs = make_input()
         res = prepare_g2_approval(**inputs)
         native = check_authority_boundary(
-            task_id=TASK, repository=REPO, requested_action="modify_approved_files",
+            task_id=TASK, repository=REPO, requested_action="run_sandboxed_validation",
             gate_state_resolution=res["gate_state_resolution"],
             scope_identity={k: v for k, v in inputs["scope_identity"].items()
                             if k in SCOPE_IDENTITY_KEYS},
@@ -184,11 +184,23 @@ class G2BootstrapIntegration(unittest.TestCase):
                 elif case == "excluded":
                     # Scope identity is source hash bound; an approved action
                     # cannot be smuggled in via an untrusted mutated list.
-                    kw["scope_identity"]["excluded_actions"] = ["modify_approved_files"]
+                    kw["scope_identity"]["excluded_actions"] = ["run_sandboxed_validation"]
                 else:
-                    kw["gate_policy"] = {"action_map": {"modify_approved_files": "G0_CONTEXT"}}
+                    kw["gate_policy"] = {"action_map": {"run_sandboxed_validation": "G0_CONTEXT"}}
                 with self.assertRaises(G2PreparationBlocked):
                     prepare_g2_approval(**kw)
+
+    def test_scrum809_action_vocabulary_mismatch_fails_closed(self):
+        kw = make_input()
+        # Valid scope calculator accepts this G2 action, but the current
+        # execution-envelope schema cannot represent it. This is SCRUM-809,
+        # not a reason to bypass the schema or invent translated authority.
+        kw["scope_identity"] = GS.scope(
+            head_sha=BASE, authorized_actions=["modify_approved_files"])
+        kw["requested_action"] = "modify_approved_files"
+        with self.assertRaisesRegex(G2PreparationBlocked,
+                                    "G2_PREP_ACTION_VOCABULARY_MISMATCH"):
+            prepare_g2_approval(**kw)
 
     def test_foreign_scope_or_changed_base_denied(self):
         for variant in ("base", "task", "hash", "risk"):
