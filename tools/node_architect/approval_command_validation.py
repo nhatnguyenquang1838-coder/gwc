@@ -220,22 +220,22 @@ def validate_approval_command(
     # Their values must be present in observed scope readback, not invented.
     g2_scope_binding = {}
     if resp_gate == "G2_EXECUTION":
+        # Missing evidence is not filled with guessed PASS/READY values. The
+        # validator may say VALID for the human command, while the envelope
+        # must remain BLOCKED until complete trusted readback is available.
         risk_class = rb.get("risk_class")
-        authorized_actions = rb.get("authorized_actions")
-        if (risk_class not in ("R0", "R1", "R2", "R3")
-                or not isinstance(authorized_actions, list)
-                or not authorized_actions
-                or any(not isinstance(a, str) or not a for a in authorized_actions)
-                or len(set(authorized_actions)) != len(authorized_actions)
-                or not isinstance(rb.get("working_branch"), str)
-                or rb["working_branch"] != req_bindings.get("branch")):
-            return _blocked(REASON_BINDING_MISMATCH, event_id_or_idempotency_key,
-                            approval_request.get("approval_request_id", ""), validated_at)
-        g2_scope_binding = {
-            "risk_class": risk_class,
-            "authorized_actions": authorized_actions,
-            "working_branch": rb["working_branch"],
-        }
+        actions = rb.get("authorized_actions")
+        if (risk_class in ("R0", "R1", "R2", "R3")
+                and isinstance(actions, list) and actions
+                and all(isinstance(a, str) and a for a in actions)
+                and len(actions) == len(set(actions))
+                and rb.get("working_branch") == req_bindings.get("branch")
+                and isinstance(rb.get("working_branch"), str)):
+            g2_scope_binding = {
+                "risk_class": risk_class,
+                "authorized_actions": actions,
+                "working_branch": rb["working_branch"],
+            }
 
     consumption_key = event_id_or_idempotency_key
     digest = _digest(approval_request.get("approval_request_id", ""), resp_scope_short,
