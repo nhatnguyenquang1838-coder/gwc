@@ -35,7 +35,7 @@ _RISK_PRODUCER_KEYS = frozenset(
     ("request_intake", "source_resolution", "repo_identity", "protected_base_capture")
 )
 _AUTHORITY_FLAGS = (
-    "authority_granted", "write_authority_granted", "commit_authority_granted",
+    "write_authority_granted", "commit_authority_granted",
     "push_authority_granted", "pr_authority_granted", "merge_authority_granted",
     "deployment_authority_granted", "production_authority_granted",
 )
