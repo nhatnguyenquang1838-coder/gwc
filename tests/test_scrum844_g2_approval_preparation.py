@@ -66,19 +66,26 @@ def make_input():
         else:
             item["repository"] = REPO
             item["base_sha"] = BASE
+    risk_policy = build_default_policy()
     risk = render_risk_classification(
         task_id=TASK, repository=REPO, base_sha=BASE,
         request_intake=facts["request_intake"],
         source_resolution=facts["source_resolution"],
         repo_identity=facts["repo_identity"],
         protected_base_snapshot=facts["protected_base_snapshot"],
-        policy=build_default_policy(), classified_at=ISSUED,
+        policy=risk_policy, classified_at=ISSUED,
     )
     assert risk["outcome"] == "ACCEPTED" and risk["risk_level"] == "R2"
     return dict(
         task_id=TASK, repository=REPO, current_base_sha=BASE,
         scope_identity=scope, evidence_map=evidence, transition_map=GS.tmap(),
-        risk_profile=risk, requested_action="run_sandboxed_validation",
+        risk_profile=risk, risk_producers={
+            "request_intake": facts["request_intake"],
+            "source_resolution": facts["source_resolution"],
+            "repo_identity": facts["repo_identity"],
+            "protected_base_capture": facts["protected_base_snapshot"],
+        }, risk_policy=risk_policy,
+        requested_action="run_sandboxed_validation",
         actor_target={"type": "user", "id": "approval-reviewer"},
         issued_at=ISSUED, expires_at=EXPIRES,
         event_id_or_idempotency_key="scrum844-g01-ready-01",
@@ -150,6 +157,18 @@ class G2BootstrapIntegration(unittest.TestCase):
                 kw["risk_profile"][field] = bad
                 with self.assertRaises(G2PreparationBlocked):
                     prepare_g2_approval(**kw)
+
+    def test_forged_risk_digest_with_valid_shape_is_rejected(self):
+        kw = make_input()
+        kw["risk_profile"]["decision_digest"] = "sha256:" + "b" * 64
+        with self.assertRaisesRegex(G2PreparationBlocked, "G2_PREP_RISK_SOURCE_MISMATCH"):
+            prepare_g2_approval(**kw)
+
+    def test_changed_risk_policy_digest_is_rejected(self):
+        kw = make_input()
+        kw["risk_policy"]["digest"] = "sha256:" + "e" * 64
+        with self.assertRaisesRegex(G2PreparationBlocked, "G2_PREP_RISK_SOURCE_MISMATCH"):
+            prepare_g2_approval(**kw)
 
     def test_early_evidence_missing_or_stale_denied(self):
         for variant in ("missing_g1", "stale_g0", "broken_digest"):
