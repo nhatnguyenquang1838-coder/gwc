@@ -1,4 +1,6 @@
 agents/.DS_Store
+.DS_Store
+.kilo/kilo.jsonc
 agents/pets/
 dist/
 
