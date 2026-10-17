@@ -1,4 +1,4 @@
-﻿# Implementation Plan
+# Implementation Plan
 
 1. Define stable ID and independent semantic version fields.
 2. Separate effect, authority, reversibility, idempotency, suspension and determinism dimensions.

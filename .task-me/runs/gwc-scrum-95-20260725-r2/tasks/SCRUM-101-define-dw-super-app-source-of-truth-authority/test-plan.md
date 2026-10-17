@@ -1,4 +1,4 @@
-﻿# Test Plan
+# Test Plan
 
 - Every state-changing operation resolves to exactly one authority owner.
 - Jira and external projections cannot grant G0-G6 authority.

@@ -1,4 +1,4 @@
-﻿# Design Document
+# Design Document
 
 ## Overview
 

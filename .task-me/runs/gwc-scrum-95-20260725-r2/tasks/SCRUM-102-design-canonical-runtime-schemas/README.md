@@ -1,4 +1,4 @@
-﻿# SCRUM-102 鈥?Design canonical node, scenario, profile and history schemas
+# SCRUM-102 鈥?Design canonical node, scenario, profile and history schemas
 
 ## Objective
 

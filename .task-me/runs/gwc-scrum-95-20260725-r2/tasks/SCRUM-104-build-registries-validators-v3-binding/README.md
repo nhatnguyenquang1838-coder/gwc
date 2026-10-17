@@ -1,4 +1,4 @@
-﻿# SCRUM-104 鈥?Build canonical registries, validators and v3 data binding
+# SCRUM-104 鈥?Build canonical registries, validators and v3 data binding
 
 ## Objective
 

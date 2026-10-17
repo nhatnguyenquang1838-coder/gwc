@@ -1,4 +1,4 @@
-﻿# Impact Analysis 鈥?SCRUM-100
+# Impact Analysis 鈥?SCRUM-100
 
 ## Direct surfaces
 

@@ -1,4 +1,4 @@
-﻿# SCRUM-101 鈥?Define DW SUPER APP source-of-truth and authority matrix
+# SCRUM-101 鈥?Define DW SUPER APP source-of-truth and authority matrix
 
 ## Objective
 

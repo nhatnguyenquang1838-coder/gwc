@@ -1,4 +1,4 @@
-﻿# SCRUM-103 鈥?Resolve lifecycle, authority-validator, workspace and package blockers
+# SCRUM-103 鈥?Resolve lifecycle, authority-validator, workspace and package blockers
 
 ## Objective
 

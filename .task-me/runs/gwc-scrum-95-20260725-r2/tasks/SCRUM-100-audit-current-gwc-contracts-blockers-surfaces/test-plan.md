@@ -1,4 +1,4 @@
-﻿# Test Plan
+# Test Plan
 
 - Path existence checks for every cited file.
 - Cross-check audit statements against current tests and schemas.
