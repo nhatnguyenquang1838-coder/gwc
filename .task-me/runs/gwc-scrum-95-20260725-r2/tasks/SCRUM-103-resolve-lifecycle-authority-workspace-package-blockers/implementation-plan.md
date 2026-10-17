@@ -1,4 +1,4 @@
-﻿# Implementation Plan
+# Implementation Plan
 
 1. Write failing tests for confirmed current blockers.
 2. Extend the existing mechanism rather than replace it.

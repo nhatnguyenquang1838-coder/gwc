@@ -1,4 +1,4 @@
-﻿# Implementation Plan
+# Implementation Plan
 
 1. Build a table of declared behavior versus executable enforcement.
 2. Classify each finding as implemented, partial, contract-only, proposed or stale.

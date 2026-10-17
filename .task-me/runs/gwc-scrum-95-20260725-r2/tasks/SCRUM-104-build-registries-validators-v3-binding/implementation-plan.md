@@ -1,4 +1,4 @@
-﻿# Implementation Plan
+# Implementation Plan
 
 1. Review 77 proposed slots: keep, rename, merge, split, reject or defer.
 2. Create canonical registry with explicit source_status and maturity.

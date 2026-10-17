@@ -1,4 +1,4 @@
-﻿# Test Plan
+# Test Plan
 
 - Schema meta-validation.
 - Positive and negative fixtures for every contract.

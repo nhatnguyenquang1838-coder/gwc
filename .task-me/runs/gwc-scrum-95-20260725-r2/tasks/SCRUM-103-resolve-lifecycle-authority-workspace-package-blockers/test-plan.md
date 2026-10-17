@@ -1,4 +1,4 @@
-﻿# Test Plan
+# Test Plan
 
 - Lifecycle transition positive/negative tests.
 - Authority mismatch and expired approval tests.
