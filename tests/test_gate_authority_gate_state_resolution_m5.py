@@ -37,6 +37,39 @@ def resolve(**o):
  d=dict(task_id=TASK,repository=REPO,current_base_sha=BASE,scope_identity=scope(),evidence_map=emap(),transition_map=tmap(),task_projection=None,event_id_or_idempotency_key="event-1",prior_resolution=None,observed_at="2026-08-04T13:50:00Z"); d.update(o); return resolve_gate_state(**d)
 
 class GateStateResolutionTests(unittest.TestCase):
+
+ def test_g2_entry_is_not_blocked_by_future_g3_g4_evidence(self):
+  actual = [x for x in candidates() if x["gate"] in {"G0_CONTEXT","G1_ALIGNMENT","G2_EXECUTION"}]
+  m = build_gate_evidence_artifact_map(
+   task_id=TASK,repository=REPO,base_sha=BASE,head_sha=HEAD,
+   evidence_candidates=actual,policy_revision="gate-transition-map@1.0.1",
+   current_gate="G2_EXECUTION",current_action="modify_approved_files",
+   include_prerequisites=True)
+  self.assertEqual(m["outcome"],"READY")
+  self.assertFalse(any(x["gate"] in {"G3_PR","G4_MERGE"} for x in m["requirements"]))
+  out=resolve(evidence_map=m,entry_gate="G2_EXECUTION")
+  self.assertEqual((out["current_gate"],out["gate_status"]),("G2_EXECUTION","PASS"))
+  self.assertNotIn("GATE_STATE_REQUIRED_EVIDENCE_MISSING",out["reason_codes"])
+  self.assertFalse(out["execution_authority_granted"])
+
+ def test_g2_entry_missing_g1_fails_closed(self):
+  actual = [x for x in candidates() if x["gate"] in {"G0_CONTEXT","G2_EXECUTION"}]
+  m=build_gate_evidence_artifact_map(
+   task_id=TASK,repository=REPO,base_sha=BASE,head_sha=HEAD,
+   evidence_candidates=actual,policy_revision="gate-transition-map@1.0.1",
+   current_gate="G2_EXECUTION",include_prerequisites=True)
+  out=resolve(evidence_map=m,entry_gate="G2_EXECUTION")
+  self.assertEqual(out["gate_status"],"BLOCKED")
+  self.assertIn("GATE_STATE_REQUIRED_EVIDENCE_MISSING",out["reason_codes"])
+
+ def test_g2_only_evidence_cannot_skip_g0_g1(self):
+  m=build_gate_evidence_artifact_map(
+   task_id=TASK,repository=REPO,base_sha=BASE,head_sha=HEAD,
+   evidence_candidates=[x for x in candidates() if x["gate"]=="G2_EXECUTION"],
+   policy_revision="gate-transition-map@1.0.1",current_gate="G2_EXECUTION")
+  out=resolve(evidence_map=m,entry_gate="G2_EXECUTION")
+  self.assertEqual(out["primary_reason_code"],"GATE_STATE_INPUT_INVALID")
+
  def test_happy_schema_flags_and_order(self):
   out=resolve(); self.assertEqual((out["current_gate"],out["gate_status"],out["last_passed_gate"]),("G6_PRODUCTION_DATA","NOT_APPLICABLE","G5_DEPLOY")); self.assertEqual(GATE_ORDER[0],"G0_CONTEXT"); self.assertEqual(GATE_ORDER[-1],"G6_PRODUCTION_DATA")
   schema=json.loads((ROOT/"schemas/gate-state-resolution.schema.json").read_text()); Draft202012Validator.check_schema(schema); self.assertEqual(list(Draft202012Validator(schema).iter_errors(out)),[])
