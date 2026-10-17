@@ -15,7 +15,7 @@ import unittest
 from jsonschema import Draft202012Validator
 
 from tools.node_architect.authority_boundary_check import (
-    ACTION_TO_MINIMUM_GATE, check_authority_boundary,
+    ACTION_TO_MINIMUM_GATE, SCOPE_IDENTITY_KEYS, check_authority_boundary,
 )
 from tools.node_architect.evidence_artifact_map import build_gate_evidence_artifact_map
 from tools.node_architect.g2_approval_preparation import (
@@ -120,7 +120,8 @@ class G2BootstrapIntegration(unittest.TestCase):
         native = check_authority_boundary(
             task_id=TASK, repository=REPO, requested_action="modify_approved_files",
             gate_state_resolution=res["gate_state_resolution"],
-            scope_identity=inputs["scope_identity"],
+            scope_identity={k: v for k, v in inputs["scope_identity"].items()
+                            if k in SCOPE_IDENTITY_KEYS},
             gate_policy={"action_map": ACTION_TO_MINIMUM_GATE},
             risk_class="R2", production_scope_applicable=False,
             manual_g5_action=False,
