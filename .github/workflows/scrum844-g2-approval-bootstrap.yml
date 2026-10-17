@@ -10,6 +10,7 @@ on:
       - 'tests/test_scrum844_g2_approval_preparation.py'
       - 'schemas/gate-approval-request.schema.json'
       - 'schemas/g2-execution-envelope.schema.json'
+      - 'schemas/historical/g2-execution-envelope-v1.0.schema.json'
       - 'tools/validate_gate_action.py'
       - 'tools/node_architect/scope_hash_calculation.py'
       - 'tests/test_scrum809_g2_action_vocabulary.py'
