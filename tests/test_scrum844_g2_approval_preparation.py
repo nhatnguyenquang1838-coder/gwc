@@ -215,8 +215,10 @@ class G2BootstrapIntegration(unittest.TestCase):
             head_sha=BASE, authorized_actions=["modify_approved_files"])
         kw["requested_action"] = "modify_approved_files"
         result = prepare_g2_approval(**kw)
-        assert result["activation_state"] == "AWAITING_APPROVAL" if "activation_state" in result else True
-        assert result.get("write_authority_granted") is not True
+        assert result["status"] == "AWAITING_HUMAN_APPROVAL"
+        assert result["pending_g2_envelope"]["activation_state"] == "AWAITING_APPROVAL"
+        assert result["pending_g2_envelope"]["execution_started"] is False
+        assert result["authority_boundary_decision"]["write_authority_granted"] is False
 
     def test_foreign_scope_or_changed_base_denied(self):
         for variant in ("base", "task", "hash", "risk"):
