@@ -8,6 +8,7 @@ on:
       - 'tools/node_architect/authority_boundary_check.py'
       - 'tools/node_architect/g2_execution_envelope_render.py'
       - 'tests/test_scrum844_g2_approval_preparation.py'
+      - 'schemas/gate-approval-request.schema.json'
       - '.github/workflows/scrum844-g2-approval-bootstrap.yml'
   workflow_dispatch:
 
