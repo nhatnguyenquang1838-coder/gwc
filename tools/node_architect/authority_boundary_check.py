@@ -88,8 +88,12 @@ def _make_action_map() -> dict[str, str]:
             # compatible with schemas/g2-execution-envelope.schema.json.
             # This does not grant authority; approval and source scope remain
             # mandatory, and no G3+ action is introduced.
-            "create_working_branch", "add_files", "run_sandboxed_validation",
-            "stage_commit_push",
+            "create_guarded_branch_or_worktree", "modify_approved_files",
+            "run_sandboxed_validation", "stage", "create_commit",
+            "push_working_branch",
+            # Historical aliases remain recognized for fail-closed interpretation;
+            # executable G2 envelopes use the closed canonical schema vocabulary.
+            "create_working_branch", "add_files", "stage_commit_push",
         },
         "G3_PR": {
             "draft_pr", "create_draft_pr", "open_or_update_draft_pr", "ready_for_review",
