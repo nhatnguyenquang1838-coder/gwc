@@ -822,8 +822,9 @@ def resolve_gate_state(
         "transition_map": _strip_observation_fields(transition_map),
         "task_projection": _strip_observation_fields(task_projection),
         "event_id_or_idempotency_key": event_id_or_idempotency_key,
-        "entry_gate": entry_gate,
     }
+    if entry_gate is not None:
+        semantic_input["entry_gate"] = entry_gate
     resolution_digest = _digest(semantic_input)
     scope_hash = scope_identity.get("scope_hash") if isinstance(scope_identity, Mapping) else None
     output = _empty_resolution(
