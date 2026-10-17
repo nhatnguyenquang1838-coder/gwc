@@ -50,7 +50,8 @@ class GateStateResolutionTests(unittest.TestCase):
   out=resolve(evidence_map=m,entry_gate="G2_EXECUTION")
   self.assertEqual((out["current_gate"],out["gate_status"]),("G2_EXECUTION","PASS"))
   self.assertNotIn("GATE_STATE_REQUIRED_EVIDENCE_MISSING",out["reason_codes"])
-  self.assertFalse(out["execution_authority_granted"])
+  self.assertFalse(out["authority_granted"])
+  self.assertFalse(out["write_authority_granted"])
 
  def test_g2_entry_missing_g1_fails_closed(self):
   actual = [x for x in candidates() if x["gate"] in {"G0_CONTEXT","G2_EXECUTION"}]
