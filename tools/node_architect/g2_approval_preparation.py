@@ -29,6 +29,7 @@ from tools.node_architect.gate_state_resolution import (
     _map_valid,
     resolve_gate_state,
 )
+from tools.node_architect.risk_classification import render_risk_classification
 
 _DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
 _EARLY = ("G0_CONTEXT", "G1_ALIGNMENT")
@@ -61,6 +62,8 @@ def prepare_g2_approval(
     evidence_map: dict[str, Any],
     transition_map: dict[str, Any],
     risk_profile: dict[str, Any],
+    risk_producers: dict[str, Any],
+    risk_policy: dict[str, Any],
     requested_action: str,
     actor_target: dict[str, str],
     issued_at: str,
@@ -79,7 +82,8 @@ def prepare_g2_approval(
     """
     _require(isinstance(scope_identity, dict) and isinstance(evidence_map, dict),
              "G2_PREP_INPUT_INVALID")
-    _require(isinstance(risk_profile, dict) and isinstance(transition_map, dict),
+    _require(isinstance(risk_profile, dict) and isinstance(transition_map, dict)
+             and isinstance(risk_producers, dict) and isinstance(risk_policy, dict),
              "G2_PREP_INPUT_INVALID")
     _require(isinstance(actor_target, dict) and bool(actor_target.get("id")),
              "G2_PREP_ACTOR_MISSING")
@@ -114,6 +118,26 @@ def prepare_g2_approval(
         and _RISK_PRODUCER_KEYS <= set(risk_profile["source_bindings"])
         and all(risk_profile.get(k) is False for k in _AUTHORITY_FLAGS),
         "G2_PREP_RISK_NOT_ACCEPTED",
+    )
+    # Verify risk from its real four canonical producer outputs and a validated
+    # policy rather than trusting a caller-supplied ACCEPTED/R2 label/digest.
+    _require(_RISK_PRODUCER_KEYS <= set(risk_producers),
+             "G2_PREP_RISK_PRODUCERS_MISSING")
+    recomputed_risk = render_risk_classification(
+        task_id=task_id, repository=repository, base_sha=current_base_sha,
+        request_intake=risk_producers["request_intake"],
+        source_resolution=risk_producers["source_resolution"],
+        repo_identity=risk_producers["repo_identity"],
+        protected_base_snapshot=risk_producers["protected_base_capture"],
+        policy=risk_policy, classified_at=risk_profile.get("classified_at"),
+    )
+    _require(
+        recomputed_risk.get("outcome") == "ACCEPTED"
+        and recomputed_risk.get("risk_level") == "R2"
+        and recomputed_risk.get("decision_digest") == risk_profile["decision_digest"]
+        and recomputed_risk.get("source_bindings") == risk_profile["source_bindings"]
+        and recomputed_risk.get("policy_provenance") == risk_profile.get("policy_provenance"),
+        "G2_PREP_RISK_SOURCE_MISMATCH",
     )
     _require(_map_valid(evidence_map, task_id), "G2_PREP_EVIDENCE_MAP_INVALID")
     _require(
