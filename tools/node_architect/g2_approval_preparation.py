@@ -247,7 +247,8 @@ def prepare_g2_approval(
     )
     _require(
         pending.get("activation_state") == "AWAITING_APPROVAL"
-        and pending.get("authority_granted") is False,
+        and pending.get("execution_started") is False
+        and pending.get("approval_validation_ref") is None,
         "G2_PREP_PENDING_ENVELOPE_UNSAFE",
     )
     return {
