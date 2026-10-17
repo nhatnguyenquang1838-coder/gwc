@@ -44,3 +44,41 @@ def test_authorized_and_excluded_are_distinct_contracts():
     assert not (CANONICAL_G2 & set(SCHEMA["properties"]["excluded_actions"]["items"]["enum"]))
     assert "open_or_update_draft_pr" not in CANONICAL_G2
     assert "merge_approved_pr" not in CANONICAL_G2
+
+
+def test_v11_is_exact_current_contract_and_v10_is_historical_only():
+    from tools.node_architect.g2_execution_envelope_render import _SCHEMA_VERSION
+    historical = json.loads((ROOT / "schemas/historical/g2-execution-envelope-v1.0.schema.json").read_text())
+    assert _SCHEMA_VERSION == "1.1"
+    assert SCHEMA["properties"]["schema_version"] == {"const": "1.1"}
+    assert historical["properties"]["schema_version"] == {"const": "1.0"}
+    old_actions = set(historical["properties"]["authorized_actions"]["items"]["enum"])
+    assert old_actions == {"create_working_branch", "add_files", "run_sandboxed_validation", "stage_commit_push"}
+    assert set(SCHEMA["properties"]["authorized_actions"]["items"]["enum"]) == CANONICAL_G2
+
+
+def test_legacy_envelope_requires_historical_schema_and_never_current_activation():
+    historical = json.loads((ROOT / "schemas/historical/g2-execution-envelope-v1.0.schema.json").read_text())
+    original = json.loads((ROOT / "schemas/g2-execution-envelope.schema.json").read_text())
+    def minimal_versioned(schema, version, action):
+        # Exact version/action validation is independent of envelope content validity.
+        return {"schema_version": version, "authorized_actions": [action]}
+    for name in ("create_working_branch", "add_files", "stage_commit_push"):
+        old = minimal_versioned(historical, "1.0", name)
+        assert Draft202012Validator({"properties": {
+            "schema_version": historical["properties"]["schema_version"],
+            "authorized_actions": historical["properties"]["authorized_actions"]
+        }}).is_valid(old)
+        assert not Draft202012Validator({"properties": {
+            "schema_version": original["properties"]["schema_version"],
+            "authorized_actions": original["properties"]["authorized_actions"]
+        }}).is_valid(old)
+    fresh = minimal_versioned(original, "1.1", "modify_approved_files")
+    assert Draft202012Validator({"properties": {
+        "schema_version": original["properties"]["schema_version"],
+        "authorized_actions": original["properties"]["authorized_actions"]
+    }}).is_valid(fresh)
+    assert not Draft202012Validator({"properties": {
+        "schema_version": historical["properties"]["schema_version"],
+        "authorized_actions": historical["properties"]["authorized_actions"]
+    }}).is_valid(fresh)
