@@ -213,6 +213,30 @@ def validate_approval_command(
             return _fail(REASON_ALREADY_CONSUMED, event_id_or_idempotency_key,
                          approval_request.get("approval_request_id", ""), validated_at)
 
+    # Bind validation evidence to exact request/readback identity. These fields
+    # are carried only after the human command, actor, target, expiry and replay
+    # checks above pass. They are evidence, never a standalone authority grant.
+    # G2 consumers require risk/actions in addition to request-level bindings.
+    # Their values must be present in observed scope readback, not invented.
+    g2_scope_binding = {}
+    if resp_gate == "G2_EXECUTION":
+        # Missing evidence is not filled with guessed PASS/READY values. The
+        # validator may say VALID for the human command, while the envelope
+        # must remain BLOCKED until complete trusted readback is available.
+        risk_class = rb.get("risk_class")
+        actions = rb.get("authorized_actions")
+        if (risk_class in ("R0", "R1", "R2", "R3")
+                and isinstance(actions, list) and actions
+                and all(isinstance(a, str) and a for a in actions)
+                and len(actions) == len(set(actions))
+                and rb.get("working_branch") == req_bindings.get("branch")
+                and isinstance(rb.get("working_branch"), str)):
+            g2_scope_binding = {
+                "risk_class": risk_class,
+                "authorized_actions": actions,
+                "working_branch": rb["working_branch"],
+            }
+
     consumption_key = event_id_or_idempotency_key
     digest = _digest(approval_request.get("approval_request_id", ""), resp_scope_short,
                      resp_expires, consumption_key)
@@ -220,6 +244,12 @@ def validate_approval_command(
         "schema_version": "1.0",
         "artifact_type": "gate-approval-validation",
         "approval_request_ref": approval_request.get("approval_request_id", ""),
+        "task_id": approval_request.get("task_id"),
+        "repository": approval_request.get("repository"),
+        "base_sha": req_bindings.get("base_sha"),
+        "head_sha": req_bindings.get("head_sha"),
+        "scope_hash": approval_request.get("scope_hash"),
+        **g2_scope_binding,
         "outcome": "VALID",
         "approval_valid": True,
         "consumption_key": consumption_key,
