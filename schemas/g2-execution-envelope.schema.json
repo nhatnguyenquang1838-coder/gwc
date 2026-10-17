@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://gwc.local/schemas/g2-execution-envelope.schema.json",
   "title": "GWC G2 Execution Envelope",
-  "description": "Closed, bounded G2 execution envelope rendered from approved F1 scope artifacts and F2 authority decisions. The renderer may produce DRAFT/AWAITING_APPROVAL/ACTIVE but never executes the envelope.",
+  "description": "Closed, bounded G2 execution envelope rendered from approved F1 scope artifacts and F2 authority decisions. The renderer may produce DRAFT/AWAITING_APPROVAL/ACTIVE but never executes the envelope. Version 1.1; historical v1.0 is read-only at schemas/historical/g2-execution-envelope-v1.0.schema.json.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -32,8 +32,7 @@
   ],
   "properties": {
     "schema_version": {
-      "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+$"
+      "const": "1.1"
     },
     "artifact_type": {
       "const": "g2-execution-envelope"
