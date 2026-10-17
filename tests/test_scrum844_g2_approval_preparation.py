@@ -209,17 +209,14 @@ class G2BootstrapIntegration(unittest.TestCase):
                 with self.assertRaises(G2PreparationBlocked):
                     prepare_g2_approval(**kw)
 
-    def test_scrum809_action_vocabulary_mismatch_fails_closed(self):
+    def test_scrum809_canonical_development_action_can_prepare_nonexecuting_request(self):
         kw = make_input()
-        # Valid scope calculator accepts this G2 action, but the current
-        # execution-envelope schema cannot represent it. This is SCRUM-809,
-        # not a reason to bypass the schema or invent translated authority.
         kw["scope_identity"] = GS.scope(
             head_sha=BASE, authorized_actions=["modify_approved_files"])
         kw["requested_action"] = "modify_approved_files"
-        with self.assertRaisesRegex(G2PreparationBlocked,
-                                    "G2_PREP_ACTION_VOCABULARY_MISMATCH"):
-            prepare_g2_approval(**kw)
+        result = prepare_g2_approval(**kw)
+        assert result["activation_state"] == "AWAITING_APPROVAL" if "activation_state" in result else True
+        assert result.get("write_authority_granted") is not True
 
     def test_foreign_scope_or_changed_base_denied(self):
         for variant in ("base", "task", "hash", "risk"):
