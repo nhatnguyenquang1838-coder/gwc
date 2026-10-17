@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from pathlib import Path
 from typing import Any, Mapping
 
 from tools.node_architect.approval_token_generation import generate_approval_request
@@ -181,6 +182,25 @@ def prepare_g2_approval(
         }
         and "GATE_STATE_REQUIRED_EVIDENCE_MISSING" in state.get("reason_codes", []),
         "G2_PREP_CANONICAL_G01_NOT_PASS",
+    )
+
+    # The G2 envelope has a separate, closed action vocabulary. SCRUM-809
+    # tracks mismatches between this schema and scope-authority producers.
+    # Never issue an actionable approval for a scope the eventual envelope
+    # cannot represent. Inspect the SAME checkout's canonical schema.
+    try:
+        envelope_schema = json.loads((
+            Path(__file__).resolve().parents[2]
+            / "schemas/g2-execution-envelope.schema.json"
+        ).read_text(encoding="utf-8"))
+        allowed_actions = envelope_schema["properties"]["authorized_actions"]["items"]["enum"]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise G2PreparationBlocked("G2_PREP_ENVELOPE_SCHEMA_UNAVAILABLE") from exc
+    _require(
+        isinstance(allowed_actions, list)
+        and all(isinstance(item, str) for item in allowed_actions)
+        and set(scope_identity["authorized_actions"]) <= set(allowed_actions),
+        "G2_PREP_ACTION_VOCABULARY_MISMATCH",
     )
 
     # Verify that ordinary execution remains BLOCKED *solely* because the
