@@ -197,7 +197,7 @@ def prepare_g2_approval(
     _require(denied.get("decision") == "BLOCK"
              and denied.get("reason_codes") == ["AUTHORITY_GATE_INSUFFICIENT"]
              and denied.get("prohibited") is False,
-             "G2_PREP_PRECHECK_REJECTED")
+             "G2_PREP_PRECHECK_REJECTED:" + str(denied.get("reason_codes")))
 
     # SOURCE-DEFINED canonical PREPARATION decision: never replace the actual
     # G2 BLOCKED gate state. No authority flag is set, and the normal execution
