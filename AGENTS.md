@@ -341,6 +341,15 @@ route-specific trusted standing/derived authority already satisfies the exact
 G2 action, resolve and use that authority instead of requesting a redundant
 Human G2 token.
 
+For the source-defined **G1-to-G2 approval bootstrap** when the full gate
+resolver sees `G2_EXECUTION/BLOCKED` only because the G2 envelope does not
+exist yet, use `tools/node_architect/g2_approval_preparation.py` with canonical
+G0/G1, risk-policy/producer, scope and evidence-map inputs. This read-only
+producer yields a bounded approval request plus **non-executable**
+`AWAITING_APPROVAL` envelope; it never grants G2 write authority. Keep native
+execution checks unchanged and reject any scope whose actions do not match
+`schemas/g2-execution-envelope.schema.json`.
+
 ### G2_EXECUTION — guarded branch only
 
 G2 requires:
