@@ -1,0 +1,50 @@
+task_id: SCRUM-842
+gate: G2_EXECUTION
+status: EXECUTED
+approval_id: APPROVE_G2_EXECUTION_842_R2_20261018
+scope_hash: sha256:58ef910a35edf1aac5bc67d5b634928d6d0208c4d9a18f53103b7996ce6f961a
+scope_hash_16: 58ef910a35edf1aa
+base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+working_branch: hermes/SCRUM-842-loop-scheduled-operation-r1
+risk_class: R1
+mode: INTEGRATE_AND_HARNESS_ONLY
+hermes_core_modified: false
+hard_scope_boundary: "Hermes core out-of-scope read-only reference; no LoopManager/scheduler core edit. If core change required -> BLOCKER + STOP."
+implemented_files:
+  - core/node-architect/scrum842-loop-scheduled-operation-r1.json
+  - schemas/node-architect/scrum842-loop-scheduled-operation.schema.json
+  - tools/node_architect/loop_scheduled_operation_harness.py
+  - tools/node_architect/loop_settlement_reconciler.py
+  - tests/test_loop_scheduled_operation_harness.py
+task_artifacts:
+  - .gwc/tasks/SCRUM-842/g0/context-snapshot.yaml
+  - .gwc/tasks/SCRUM-842/g1/intake/g1-intake-brief.yaml
+  - .gwc/tasks/SCRUM-842/g1/brainstorming/g1-options.yaml
+  - .gwc/tasks/SCRUM-842/g1/preflight/g1-preflight-report.yaml
+  - .gwc/tasks/SCRUM-842/g1/decision/g1-decision-record.yaml
+  - .gwc/tasks/SCRUM-842/g2/approval-request.json
+  - .gwc/tasks/SCRUM-842/g2/approval-request-rebind.json
+  - .gwc/tasks/SCRUM-842/g2/execution-envelope.yaml
+  - .gwc/tasks/SCRUM-842/g2/execution-record.yaml
+validation:
+  command: "PYTHONPATH=. <sandbox-py3.11>/bin/python -m pytest tests/test_loop_scheduled_operation_harness.py tests/test_m1_m7_agent_workflow.py tests/test_m1_m7_host_request_receipts.py tests/test_checkpoint_store_m1_m7_workflow.py tests/test_agent_runtime_entrypoint_m1_m7.py tests/test_agent_runtime_cli_m1_m7_dispatch.py tests/test_node_evidence_ledger_m1_m7.py -q"
+  result: "51 passed (13 new harness + 38 SCRUM-841 regression) in ~0.75s"
+  no_langgraph_ci_mode: "6 passed, 7 skipped (parity with SCRUM-841 optional-dependency guard)"
+  tdd: "RED: 3 failed / 10 skipped (harness absent) -> GREEN: 13 passed; per-behavior RED observed before implementation"
+q0_preserved:
+  status: UNTOUCHED
+  files: "6 untracked Q0 files at /Users/mac/.hermes/cache/scratch/scrum781-q0-9a9611-verify-rdamf4wz/q0/workflows/q0-loop-agent/** (outside worktree, not adopted)"
+merge_authorized: false
+pr_opened: false
+exclusions_respected:
+  - open_or_update_draft_pr
+  - mark_pr_ready_for_review
+  - run_independent_review
+  - merge_approved_pr
+  - deploy_approved_release
+  - reload_approved_runtime
+  - production_data_read
+  - production_data_write
+  - production_config_change
+  - credential_rotation
+  - migration

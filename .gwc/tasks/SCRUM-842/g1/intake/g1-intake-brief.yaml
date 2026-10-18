@@ -1,0 +1,108 @@
+schema_version: "1.0"
+artifact_type: g1-intake-brief
+generated_at: "2026-10-18T06:52:07Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-842
+  base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: "Hermes Loop scheduled operation activity: on each firing Hermes emits a bound operation envelope with stable tick/activity ID and invokes/resumes the same persistent LangGraph run; graph returns a structured verdict; Hermes host validates the verdict + exact readback then invokes native LoopManager settlement exactly once. Scheduler state stays native; browser bindings stay out of graph checkpoints."
+  why_now: "SCRUM-841 froze the LangGraph M1-M7 workflow contract (PR #606 head 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26). SCRUM-842 operationalizes that contract as a native Loop scheduled operation via an integration/harness layer, without touching Hermes core."
+desired_outcome: "A bounded integration/harness layer (outside Hermes core) that wires the frozen LangGraph M1-M7 workflow into the native Hermes Loop schedule, preserving native scheduling/cadence and fire/complete/abandon lifecycle, with exact verdict + readback validation and exactly-once native LoopManager settlement."
+stakeholders:
+  requester: Nhat
+  affected:
+    - Hermes host operator
+    - GWC governance reviewer
+    - NousResearch/hermes-agent maintainers
+scope:
+  in_scope:
+    - "Integration/harness layer OUTSIDE Hermes core that calls/resumes the frozen LangGraph M1-M7 workflow."
+    - "Bound operation envelope emission with stable tick/activity ID on each Loop firing."
+    - "Structured verdict validation + exact readback by the Hermes host."
+    - "Exactly-once native LoopManager settlement invocation."
+    - "Preservation of native Loop scheduling/cadence and fire/complete/abandon lifecycle."
+    - "Preservation of the six untracked Q0 files."
+  non_goals:
+    - "No modification of Hermes core modules (LoopManager internals, scheduler core)."
+    - "No M1-M7 logic changes; SCRUM-842 is separate from the LangGraph workflow."
+    - "No browser bindings inside graph checkpoints."
+    - "No G2 claim, no code, no branch/worktree, no commit/push in this preparation phase."
+constraints:
+  - "PREPARATION ONLY: no code, no branch/worktree, no commit/push, no G2 claim."
+  - "HARD SCOPE BOUNDARY: INTEGRATE + HARNESS ONLY; Hermes core is out-of-scope read-only reference; if a core change is required, record a BLOCKER and STOP."
+  - "Separate G2 authority required before any code; exact paths/actions must be documented."
+  - "Dependency: SCRUM-841 frozen contract at head 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26."
+assumptions:
+  - "The frozen SCRUM-841 LangGraph M1-M7 workflow contract is authoritative and will not change during SCRUM-842."
+  - "Native Loop scheduling/cadence and fire/complete/abandon lifecycle are preserved by the host."
+  - "The integration/harness layer can be authored entirely outside Hermes core."
+risks:
+  - id: RISK-1
+    description: "A required behavior turns out to need a Hermes core change (LoopManager internals or scheduler core)."
+    impact: high
+    mitigation: "Record a BLOCKER and STOP; do not propose core edits. Escalate to Nhat for a separate core-scoped task."
+  - id: RISK-2
+    description: "Verdict/readback validation mismatch causes duplicate or missed LoopManager settlement."
+    impact: high
+    mitigation: "Enforce exactly-once settlement with a stable tick/activity ID and exact readback validation in the harness."
+  - id: RISK-3
+    description: "Harness layer accidentally couples to graph checkpoints or browser bindings."
+    impact: medium
+    mitigation: "Keep scheduler state native and browser bindings out of graph checkpoints per the frozen contract."
+  - id: RISK-4
+    description: "Scope creep into M1-M7 logic or Hermes core during implementation."
+    impact: medium
+    mitigation: "Enforce the hard scope boundary in G2 authorized paths/actions and review gates."
+acceptance_criteria:
+  - id: AC-1
+    statement: "A bounded integration/harness layer exists outside Hermes core that calls/resumes the frozen LangGraph M1-M7 workflow."
+    verifiable: true
+  - id: AC-2
+    statement: "On each Loop firing, a bound operation envelope with stable tick/activity ID is emitted and the same persistent LangGraph run is invoked/resumed."
+    verifiable: true
+  - id: AC-3
+    statement: "The Hermes host validates the structured verdict and exact readback before settlement."
+    verifiable: true
+  - id: AC-4
+    statement: "Native LoopManager settlement is invoked exactly once per firing."
+    verifiable: true
+  - id: AC-5
+    statement: "Native Loop scheduling/cadence and fire/complete/abandon lifecycle are preserved; scheduler state remains native."
+    verifiable: true
+  - id: AC-6
+    statement: "No Hermes core module (LoopManager internals, scheduler core) is modified; the six untracked Q0 files are preserved."
+    verifiable: true
+  - id: AC-7
+    statement: "No M1-M7 logic is changed and no browser bindings are placed inside graph checkpoints."
+    verifiable: true
+delivery_lifecycle:
+  authorized_actions:
+    - create_guarded_branch_or_worktree
+    - modify_approved_files
+    - run_sandboxed_validation
+    - stage
+    - create_commit
+    - push_working_branch
+  downstream_non_goals:
+    - open_or_update_draft_pr
+    - mark_pr_ready_for_review
+    - run_independent_review
+    - merge_approved_pr
+    - deploy_approved_release
+    - reload_approved_runtime
+    - production_data_read
+    - production_data_write
+    - production_config_change
+    - credential_rotation
+    - migration
+  g3_metadata_completion:
+    ready_for_review_after_g3_pass: false
+    required_evidence:
+      - "tools/validate_g01.py exit 0"
+      - "G2 execution envelope with exact scope_hash"
+      - "Integration/harness layer tests passing"
+unresolved_questions: []
+status: READY

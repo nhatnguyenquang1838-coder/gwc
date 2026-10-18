@@ -1,0 +1,74 @@
+schema_version: "1.0"
+artifact_type: g1-decision-record
+generated_at: "2026-10-18T06:52:07Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-842
+  base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: Nhat
+  decided_at: "2026-10-18T06:52:07Z"
+  source: "G0/G1 preparation directive + hard scope boundary (INTEGRATE + HARNESS ONLY)"
+  explicit: true
+rationale: "OPT-1 (integration/harness layer outside Hermes core) is the only option satisfying the hard scope boundary while delivering the scheduled operation activity. Hermes core is out-of-scope read-only reference; if a core change is required, record a BLOCKER and STOP."
+rejected_option_ids:
+  - OPT-2
+  - OPT-3
+acceptance_criteria_refs:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+  - AC-5
+  - AC-6
+  - AC-7
+scope_hash: sha256:4c474d4cca114a6393d59b5040706cb48ed8fd19ee000bc3cf2ee47ed83b7a20
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+    - G4_MERGE
+    - G5_DEPLOY
+    - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+    - sub_task_id: SUB-TASK-1
+      description: "Author the integration/harness layer outside Hermes core that calls/resumes the frozen LangGraph M1-M7 workflow."
+      dependencies: []
+    - sub_task_id: SUB-TASK-2
+      description: "Implement bound operation envelope emission with stable tick/activity ID on each Loop firing."
+      dependencies:
+        - SUB-TASK-1
+    - sub_task_id: SUB-TASK-3
+      description: "Implement structured verdict + exact readback validation and exactly-once native LoopManager settlement."
+      dependencies:
+        - SUB-TASK-2
+    - sub_task_id: SUB-TASK-4
+      description: "Run sandboxed validation and verify no Hermes core modification and preservation of the six untracked Q0 files."
+      dependencies:
+        - SUB-TASK-3
+  agent_allocation:
+    - sub_task_id: SUB-TASK-1
+      skill_id: hermes-agent
+      agent_type: primary
+    - sub_task_id: SUB-TASK-2
+      skill_id: hermes-agent
+      agent_type: primary
+    - sub_task_id: SUB-TASK-3
+      skill_id: hermes-agent
+      agent_type: specialist
+    - sub_task_id: SUB-TASK-4
+      skill_id: gwc-gated-delivery
+      agent_type: validator
+  execution_order:
+    - SUB-TASK-1
+    - SUB-TASK-2
+    - SUB-TASK-3
+    - SUB-TASK-4
+  summary: "Single-lane integration/harness implementation outside Hermes core, validated for scope boundary compliance before any G2 execution."
