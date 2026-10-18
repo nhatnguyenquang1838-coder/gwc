@@ -101,4 +101,43 @@ outside this correction and must retain their manifest hashes.
 **Open:** canonical qualified typed observer; native C/E admission;
 response-to-graph/M7 end-to-end acceptance. Browser exchange evidence never
 becomes typed C/E, M7 PASS, LOAD_PROOF, original-incident replay or Q0 L3.
+## Follow-up review of `0210270450b41eb74f6d6534db5b9e0ae23ec182`
+
+Controller returned `ACCEPT_WITH_CORRECTIONS / HOST_BRIDGE_LEVEL_2_PARTIAL`
+for marker `DWA-REVIEW-8b94842f00e54db7`. A new HOST_COORDINATION request was
+reserved and invoked through the real bridge; its stage and Send actions were
+claimed durably and executed once each using the existing Desktop tools. Actual
+same-page user marker, the completed assistant acknowledgement of that exact
+marker, and `Response complete` were read back. SQLite history confirms:
+`EXCHANGE_REQUESTED -> MESSAGE_SENT_VERIFIED -> CONTROLLER_ACTION_REQUIRED`.
+No resend, synthetic firing or manual native settlement was performed.
+
+**Important correction to the earlier receipt claim:** Desktop tools currently
+expose rendered text, not independently identified UI user/assistant turns.
+The old R1 terminal receipt remains immutable historical evidence under its
+original parser; it is NOT strong UI-turn verification. The new bridge now
+fails closed on a completed text-only response with
+`HOST_UI_TURN_IDENTITY_UNAVAILABLE`, `strong_receipt_verified=false`, and
+`workflow_resume_allowed=false`. It preserves marker/response correlation as
+observational evidence, not production-quality receipt acceptance. It does not
+accept an invented structured-turn schema to manufacture a stronger result.
+Current durable receipt:
+`$HERMES_HOME/cache/scratch/scrum781-task-aware-review-r1/3926191c93f475aa0c35c3efddce056e3a155f8a/bridge-correction-receipt-with-boundary-limit.json`.
+
+The second follow-up correction was also reproduced RED and repaired: the
+wrapper emits browser exchange requests only for frozen M7's actual
+`WAIT / M7_SETTLEMENT_REQUESTED` outcome with a settlement request, never HOLD,
+BLOCKED or unrelated WAIT. Frozen activity code is unchanged.
+Focused correction/affected-consumer result is now **45 PASS + 5 subtests PASS**.
+These two added assertions directly cover the review findings, not coverage work.
+
+**Browser acceptance remains bounded/partial.** The exact current message is not
+sent again. Owner: Hermes host capability/integration owner, coordinated by DWA.
+Release trigger: an independently verified, supported UI-turn-boundary/identity
+receipt contract, without Hermes core/plugin edits or another browser transport.
+No production-quality `CONTROLLER_RESPONSE_VERIFIED`, graph resume, M7 PASS or
+native admission is claimed for this text-only fallback. Controller review of
+any later source delta is separate from its accepted-with-corrections verdict on
+`0210270`; no review is transferred to an unreviewed SHA.
+
 **Parent:** `UR.G2 / M1_HOLD / RUN_NOT_COMPLETE`.

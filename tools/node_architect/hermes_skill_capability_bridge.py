@@ -93,9 +93,17 @@ class HermesSkillBridge:
             before=self.outbox.read(request)
             if before['status']=='CONTROLLER_RESPONSE_VERIFIED':
                 return before
-            self.outbox.record(request,{**base,'status':'CONTROLLER_RESPONSE_VERIFIED',
+            # Desktop preview currently exposes rendered text, not stable UI
+            # turn identities. Preserve the correlation as observational data,
+            # never upgrade that fallback into a strong terminal receipt or a
+            # graph-resume permission. No invented UI-turn schema is accepted.
+            self.outbox.record(request,{**base,'status':'CONTROLLER_ACTION_REQUIRED',
+                'reason':'HOST_UI_TURN_IDENTITY_UNAVAILABLE',
+                'receipt_strength':'RENDERED_TEXT_CORRELATION_ONLY',
+                'response_complete_observed':True,
                 'response_to_marker':request['marker'],'response_text':response,
-                'assistant_turn_ref':'same-page-assistant-after:'+request['marker']},
+                'assistant_turn_ref':'rendered-assistant-after:'+request['marker'],
+                'strong_receipt_verified':False,'workflow_resume_allowed':False},
                 expected_status=before['status'],expected_receipt_digest=digest(before['receipt']))
         return self.outbox.read(request)
 

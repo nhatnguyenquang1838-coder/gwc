@@ -88,7 +88,12 @@ def build_task_graph(context):
         # Preserve settlement/mailbox semantics. A separate host request is data
         # only and is emitted solely when M7 was actually reached.
         report = (state.get('inputs') or {}).get('controller_report')
-        if isinstance(report,str) and report.strip():
+        result['controller_exchange_requests'] = []
+        exchange_allowed = (result.get('current_activity') == 'M7' and
+                            result.get('status') == 'WAIT' and
+                            result.get('reason_code') == 'M7_SETTLEMENT_REQUESTED' and
+                            bool(result.get('settlement_requests')))
+        if exchange_allowed and isinstance(report,str) and report.strip():
             result['controller_exchange_requests'] = [make_exchange_request(c,report,lane='M7')]
         return result
     graph.add_node('M7',m7);graph.add_edge('M7',END)
