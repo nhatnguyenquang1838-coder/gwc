@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "scrum841-m1-m7-workflow",
+  "workflow_id": "scrum841-m1-m7-agent-workflow-r1",
+  "task_id": "SCRUM-841",
+  "engine": "langgraph",
+  "source_ref": "user-authored recurring instruction session 20260913_014203_39adb6 message 182113",
+  "source_sha256": "sha256:6fa893e8224f824e562945cca8b7d66d382d060b1308bd0dbd481fdd612fa9c3",
+  "runtime_plan_digest": "sha256:04c6eda7000e819b9080146b07dde2441a1ea9e6dec5eadd4701ceb09fa6b233",
+  "allowed_activities": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"],
+  "activity_text": {
+    "M1": "M1 exact-read Controller+Executor mailbox. Classify CLEAR/PENDING/WAIT/CONFLICT/BLOCKED.",
+    "M2": "M2 validate protocol, cursor, continuation, base/SHA/scope/artifacts and deadlock predicate.",
+    "M3": "M3 when PENDING/WAIT run read-only Red Team mailbox validation; run Analyzer only after Controller declares a typed read-only child contract—otherwise record ANALYZER_NOT_DECLARED.",
+    "M4": "M4 if reviews conflict with Controller or block workflow, use one bound Controller exchange to reconcile; do not mint authority.",
+    "M5": "M5 execute one clear typed authorized action only.",
+    "M6": "M6 independently verify exact artifacts/validators/repository or remote evidence.",
+    "M7": "M7 patch/readback the single Executor mailbox and send one bound Controller notification when canonical protocol allows; report G1–G6."
+  },
+  "edges": [
+    {"from": "M1", "to": "M2"},
+    {"from": "M2", "to": "M3"},
+    {"from": "M3", "to": "M4"},
+    {"from": "M4", "to": "M5"},
+    {"from": "M5", "to": "M6"},
+    {"from": "M6", "to": "M7"}
+  ],
+  "trigger_model": "A",
+  "trigger_owner": "hermes_native_loop_host",
+  "graph_owns_scheduler_state": false,
+  "graph_performs_external_io": false,
+  "graph_grants_authority": false,
+  "graph_settles_native_loop": false,
+  "graph_performs_checkpoint_io": false,
+  "max_children": 0,
+  "max_parallel": 1,
+  "allowed_host_request_types": ["controller_exchange", "host_action_request", "native_loop_settlement_request"],
+  "forbidden_checkpoint_keys": ["browser_url", "browser_session", "dom_refs", "screenshots", "composer_contents", "send_control_state", "same:N", "SAME:XX", "secrets"]
+}

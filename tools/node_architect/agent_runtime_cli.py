@@ -84,6 +84,15 @@ def _load_manifest(path: Path) -> dict[str, Any]:
         raise AgentRuntimeCliError("manifest.event must be a JSON object")
     if not isinstance(provider_name, str) or not provider_name.strip():
         raise AgentRuntimeCliError("manifest.provider_name must be a non-empty string")
+    if "m1_m7_workflow_selection" in event:
+        raise AgentRuntimeCliError("AGENT_RUNTIME_WORKFLOW_SELECTION_INJECTION")
+    selection = manifest.get("workflow_selection")
+    if selection is not None:
+        if not isinstance(selection, Mapping) or selection.get("workflow_id") != "scrum841-m1-m7-agent-workflow-r1":
+            raise AgentRuntimeCliError("WORKFLOW_SELECTION_INVALID")
+        if not isinstance(selection.get("operation_envelope"), Mapping) or not isinstance(selection.get("inputs"), Mapping):
+            raise AgentRuntimeCliError("WORKFLOW_SELECTION_INVALID")
+        return {"provider_name": provider_name, "event": dict(event), "workflow_selection": dict(selection)}
     return {"provider_name": provider_name, "event": dict(event)}
 
 
@@ -93,6 +102,9 @@ def _prepare_event(manifest: Mapping[str, Any], provider: Any) -> dict[str, Any]
     event["provider_registry"] = ProviderRegistry({str(provider.name): provider})
     event.setdefault("readback_handler", None)
     event.setdefault("state", None)
+    selection = manifest.get("workflow_selection")
+    if isinstance(selection, Mapping):
+        event["m1_m7_workflow_selection"] = dict(selection)
     return event
 
 
