@@ -265,3 +265,17 @@ def test_ur_g6_completion_rejects_receipt_binding_mismatch():
     bad_evidence = dict(evidence, HANDOFF_RECEIPT=tampered)
     with pytest.raises(m.Q0QualificationError, match="Q0_G6_RECEIPT_BINDING_MISMATCH"):
         m.complete_q0_gate(gate="UR.G6", evidence=bad_evidence)
+
+
+# --- materialize_q0_verification_receipt symlink fail-closed -----------------
+def test_materialize_q0_verification_receipt_rejects_symlink_target(tmp_path):
+    """materialize_q0_verification_receipt: a symlink at the target path must
+    fail closed with Q0_VERIFICATION_RECEIPT_PATH_SYMLINK (never follow a
+    symlink when writing an immutable receipt)."""
+    m = _m()
+    receipt = _verification_receipt()
+    real = tmp_path / "real-receipt.json"
+    link = tmp_path / "receipt-link.json"
+    link.symlink_to(real)
+    with pytest.raises(m.Q0QualificationError, match="Q0_VERIFICATION_RECEIPT_PATH_SYMLINK"):
+        m.materialize_q0_verification_receipt(receipt=receipt, path=link)
