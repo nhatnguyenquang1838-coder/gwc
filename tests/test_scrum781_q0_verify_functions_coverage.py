@@ -394,3 +394,80 @@ def test_create_q0_verification_receipt_rejects_regression_not_passing():
     reg["exit_code"] = 1
     with pytest.raises(m.Q0QualificationError, match="Q0_REGRESSION_NOT_PASSING"):
         m.create_q0_verification_receipt(**_verification_inputs(regression_evidence=reg))
+
+
+# --- validate_q0_route_context / resolve_q0_qualification_node branches ------
+def _q0_ctx(**overrides):
+    m = _m()
+    ctx = {
+        "workflow_mode": "q0_live_qualification",
+        "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "task_id": "SCRUM-781",
+        "run_id": "scrum781-q0-native-route-1",
+        "gate": "UR.G0",
+        "requested_action": "q0_understand",
+        "q0_profile": m.q0_qualification_profile(),
+        "effect_class": "read_only",
+    }
+    ctx.update(overrides)
+    return ctx
+
+
+def test_validate_q0_route_context_rejects_missing_run_binding():
+    """validate_q0_route_context: a missing run_id must fail closed with
+    Q0_RUN_BINDING_REQUIRED."""
+    m = _m()
+    ctx = _q0_ctx(run_id="")
+    assert m.validate_q0_route_context(ctx)["reason_code"] == "Q0_RUN_BINDING_REQUIRED"
+
+
+def test_validate_q0_route_context_rejects_unknown_gate():
+    """validate_q0_route_context: a non-Universal gate must fail closed with
+    Q0_UNIVERSAL_GATE_REQUIRED."""
+    m = _m()
+    ctx = _q0_ctx(gate="G2_EXECUTION")
+    assert m.validate_q0_route_context(ctx)["reason_code"] == "Q0_UNIVERSAL_GATE_REQUIRED"
+
+
+def test_validate_q0_route_context_read_only_route_is_permitted_no_authority():
+    """validate_q0_route_context: a read-only effect class is permitted but
+    never grants authority."""
+    m = _m()
+    ctx = _q0_ctx(effect_class="read_only")
+    result = m.validate_q0_route_context(ctx)
+    assert result["permitted"] is True
+    assert result["reason_code"] == "Q0_READ_ONLY_ROUTE"
+    assert result["authority_granted"] is False
+
+
+def test_validate_q0_route_context_branch_effect_requires_exact_authority():
+    """validate_q0_route_context: a branch-local write is permitted only with an
+    exact q0_effect_authority_decision; otherwise fails closed with
+    Q0_EFFECT_AUTHORITY_REQUIRED."""
+    m = _m()
+    ctx = _q0_ctx(effect_class="branch_local_write", requested_action="modify_q0_code")
+    assert m.validate_q0_route_context(ctx)["reason_code"] == "Q0_EFFECT_AUTHORITY_REQUIRED"
+    ctx["q0_effect_authority_decision"] = {
+        "status": "AUTHORIZED", "task_id": "SCRUM-781",
+        "run_id": ctx["run_id"], "action": "modify_q0_code",
+        "branch": "fix/SCRUM-781-q0-canonical", "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+    }
+    result = m.validate_q0_route_context(ctx)
+    assert result["permitted"] is True
+    assert result["reason_code"] == "Q0_BRANCH_EFFECT_AUTHORIZED"
+    assert result["authority_granted"] is False
+
+
+def test_validate_q0_route_context_rejects_external_effect_out_of_scope():
+    """validate_q0_route_context: an external effect class must fail closed with
+    Q0_EXTERNAL_EFFECT_OUT_OF_SCOPE."""
+    m = _m()
+    ctx = _q0_ctx(effect_class="external_effect")
+    assert m.validate_q0_route_context(ctx)["reason_code"] == "Q0_EXTERNAL_EFFECT_OUT_OF_SCOPE"
+
+
+def test_complete_q0_gate_rejects_unknown_gate():
+    """complete_q0_gate: an unknown gate must fail closed with Q0_GATE_UNKNOWN."""
+    m = _m()
+    with pytest.raises(m.Q0QualificationError, match="Q0_GATE_UNKNOWN"):
+        m.complete_q0_gate(gate="UR.G9", evidence={})
