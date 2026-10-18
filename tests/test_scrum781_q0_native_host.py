@@ -2,8 +2,10 @@
 
 The old host fixture now verifies quarantine. These positive assertions retain
 its node/provider/no-effect/continuation coverage at the profile's native actor
-entrypoints. The CLI boundary is tested separately: actor success is NOT enough
-for G0 completion when the CLI cannot supply understanding evidence.
+entrypoints. Executor-owned G0 fixtures below are synthetic actor-contract probes,
+not the real Q0 boot: its source producer assigns G0/G1 to CONTROLLER. The CLI
+must expose those Controller-local actions without loading a provider/Executor;
+an Executor actor success alone still cannot complete G0 without gate evidence.
 """
 from __future__ import annotations
 
@@ -131,6 +133,65 @@ def test_q0_native_g0_actor_success_without_understanding_does_not_advance(tmp_p
         controller.consume_executor_receipt(receipt)
     assert controller.run_state == before
     assert len(provider.packs) == 1
+
+
+@pytest.mark.parametrize("with_factory", [False, True])
+@pytest.mark.parametrize("gate,typed_next,action", [
+    ("UR.G0", "Q0_UNDERSTAND", "q0_understand"),
+    ("UR.G1", "Q0_PLAN_DECOMPOSE", "q0_plan_decompose"),
+])
+def test_native_cli_controller_owned_assignment_never_loads_provider_or_dispatches_executor(
+    tmp_path, monkeypatch, capsys, with_factory, gate, typed_next, action,
+):
+    from tools.node_architect import agent_runtime_cli
+    from tools.node_architect.universal_run_execution import UniversalExecutor
+
+    _, native_manifest = _native_g0_fixture()
+    body = {k: v for k, v in native_manifest["run_state"].items() if k != "state_digest"}
+    body.update(active_gate=gate, next_owner="CONTROLLER", typed_next=typed_next)
+    body["execution_refs"] = {**body["execution_refs"], "cursor_ref": f"{body['run_id']}:{gate}:seq1"}
+    body["evidence_gap"] = ["UNDERSTANDING_RECEIPT" if gate == "UR.G0" else "PLAN_RECEIPT"]
+    native_manifest["run_state"] = _sealed(body, "state_digest")
+    evidence_root = tmp_path / "must-not-exist"
+    manifest = tmp_path / "controller-owned.json"
+    manifest.write_text(json.dumps({
+        "provider_name": "unit-provider", "event": {"event_id": "unit-controller-local"},
+        "universal_run": {**native_manifest, "evidence_root": str(evidence_root)},
+    }))
+    original = manifest.read_bytes()
+    calls = []
+
+    def forbidden_factory(*args, **kwargs):
+        calls.append("provider_factory")
+        raise AssertionError("Controller-local action must not load a provider")
+
+    def forbidden_execute(*args, **kwargs):
+        calls.append("executor")
+        raise AssertionError("Controller-local action must not enter Executor")
+
+    monkeypatch.setattr(agent_runtime_cli, "_load_factory", forbidden_factory)
+    monkeypatch.setattr(UniversalExecutor, "execute", forbidden_execute)
+    argv = ["--manifest", str(manifest)]
+    if with_factory:
+        argv += ["--provider-factory", "unit:must_not_load"]
+    code = agent_runtime_cli.main(argv)
+    result = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert code == 1
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "CONTROLLER_LOCAL_ACTION_REQUIRED", result
+    local = result["controller_action"]
+    assert local["schema_id"] == "gwc.universal-run.controller-local-action.v2"
+    assert local["actor"] == local["next_owner"] == "CONTROLLER"
+    assert local["gate"] == gate and local["action"] == action
+    assert local["typed_next"] == typed_next
+    assert local["effect_authority"] == "NONE"
+    assert local["authority_granted"] is False and local["executed_effects"] == []
+    assert result["authority_granted"] is False and result["executed_effects"] == []
+    assert result["legacy_fallback"] is False
+    assert "executor_receipt" not in result and "controller_decision" not in result
+    assert calls == []
+    assert manifest.read_bytes() == original
+    assert not evidence_root.exists()
 
 
 def test_q0_native_cli_g0_does_not_confuse_actor_success_with_gate_completion(tmp_path, monkeypatch, capsys):

@@ -173,11 +173,6 @@ def main(argv: list[str] | None = None) -> int:
             args.output,
         )
 
-    if not args.provider_factory:
-        return _emit(
-            _blocked("GWC_RUNTIME_DEFECT", "Universal V2 requires a configured provider factory.", profile=profile),
-            args.output,
-        )
     if args.max_iterations < 1:
         return _emit(
             _blocked("GWC_RUNTIME_DEFECT", "max_iterations must be positive.", profile=profile),
@@ -185,6 +180,31 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     try:
+        controller = None
+        assignment = None
+        if manifest.get("workflow_selection") is None:
+            if not isinstance(universal_run, Mapping):
+                raise AgentRuntimeCliError("native manifest must be a JSON object")
+            # Resolve native ownership before loading any provider. Controller
+            # local actions are not Executor assignments and grant no effects.
+            from .universal_run_controller import UniversalController
+
+            controller = UniversalController.from_manifest(profile=profile, manifest=universal_run)
+            assignment = controller.assign_current_action()
+            if assignment["actor"] == "CONTROLLER":
+                result = _blocked(
+                    "CONTROLLER_LOCAL_ACTION_REQUIRED",
+                    "Native assignment is Controller-owned; no provider or Executor dispatch performed.",
+                    profile=profile,
+                )
+                result["controller_action"] = assignment
+                return _emit(result, args.output)
+
+        if not args.provider_factory:
+            return _emit(
+                _blocked("GWC_RUNTIME_DEFECT", "Universal V2 requires a configured provider factory.", profile=profile),
+                args.output,
+            )
         provider = _load_factory(args.provider_factory)()
         if not isinstance(getattr(provider, "name", None), str) or not provider.name:
             raise AgentRuntimeCliError("configured provider must expose a non-empty name")
@@ -197,13 +217,11 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(dict(result), sort_keys=True, ensure_ascii=False))
             return 0 if str(result.get("status", "")).startswith("SEMANTIC_NODE_") and result.get("status") != "SEMANTIC_NODE_BLOCKED" else 1
 
-        # Imports are deliberately lazy and V2-only. Missing components become a
-        # runtime defect; there is no import or execution fallback to GWC v1.
-        from .universal_run_controller import UniversalController
+        if controller is None or assignment is None:
+            raise AgentRuntimeCliError("native assignment unavailable")
+        # Imports remain lazy and V2-only; there is no legacy fallback.
         from .universal_run_execution import UniversalExecutor
 
-        controller = UniversalController.from_manifest(profile=profile, manifest=universal_run)
-        assignment = controller.assign_current_action()
         executor = UniversalExecutor()
         receipt = executor.execute(
             assignment=assignment,
