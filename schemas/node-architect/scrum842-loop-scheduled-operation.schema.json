@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/scrum842-loop-scheduled-operation.schema.json",
+  "title": "SCRUM-842 Loop scheduled operation manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "operation_id",
+    "task_id",
+    "engine",
+    "source_ref",
+    "hosted_workflow_id",
+    "hosted_workflow_manifest_ref",
+    "hosted_workflow_profile_ref",
+    "hosted_workflow_activity_source_sha256",
+    "envelope_fields",
+    "trigger_model",
+    "trigger_owner",
+    "graph_owns_scheduler_state",
+    "graph_performs_external_io",
+    "graph_grants_authority",
+    "graph_settles_native_loop",
+    "graph_performs_checkpoint_io",
+    "exactly_once_settlement",
+    "native_loop_owner",
+    "settlement_requested_settlement",
+    "settlement_idempotency_key_template",
+    "max_children",
+    "max_parallel",
+    "allowed_host_request_types",
+    "forbidden_checkpoint_keys"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "scrum842-loop-scheduled-operation"},
+    "operation_id": {"const": "scrum842-loop-scheduled-operation-r1"},
+    "task_id": {"const": "SCRUM-842"},
+    "engine": {"const": "integration-harness"},
+    "source_ref": {"type": "string", "minLength": 1},
+    "hosted_workflow_id": {"const": "scrum841-m1-m7-agent-workflow-r1"},
+    "hosted_workflow_manifest_ref": {"type": "string", "minLength": 1},
+    "hosted_workflow_profile_ref": {"type": "string", "minLength": 1},
+    "hosted_workflow_activity_source_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "envelope_fields": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "task_id", "repository", "run_id", "operation_id", "activity_id",
+          "base_sha", "head_sha", "working_branch", "scope_hash",
+          "runtime_plan_digest", "protocol_version", "continuation_ref", "cursor"
+        ]
+      }
+    },
+    "trigger_model": {"const": "A"},
+    "trigger_owner": {"const": "hermes_native_loop_host"},
+    "graph_owns_scheduler_state": {"const": false},
+    "graph_performs_external_io": {"const": false},
+    "graph_grants_authority": {"const": false},
+    "graph_settles_native_loop": {"const": false},
+    "graph_performs_checkpoint_io": {"const": false},
+    "exactly_once_settlement": {"const": true},
+    "native_loop_owner": {"const": "hermes_host"},
+    "settlement_requested_settlement": {"const": "complete"},
+    "settlement_idempotency_key_template": {"type": "string", "minLength": 1},
+    "max_children": {"const": 0},
+    "max_parallel": {"const": 1},
+    "allowed_host_request_types": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["controller_exchange", "host_action_request", "native_loop_settlement_request"]}
+    },
+    "forbidden_checkpoint_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -1,0 +1,94 @@
+schema_version: "1.0"
+artifact_type: g0-context-snapshot
+generated_at: "2026-10-18T06:52:07Z"
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  protected_branches:
+    - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+  - "PREPARATION ONLY: no code, no branch/worktree, no commit/push, no G2 claim."
+  - "SCRUM-842 is Hermes Loop scheduled operation activity ONLY; preserve native Loop scheduling/cadence and fire/complete/abandon lifecycle."
+  - "Separate from LangGraph workflow; no M1-M7 logic in SCRUM-842 scope."
+  - "Trigger model A: on each firing Hermes emits a bound operation envelope with stable tick/activity ID and invokes/resumes the same persistent LangGraph run; graph returns structured verdict; Hermes host validates verdict + exact readback then invokes native LoopManager settlement exactly once."
+  - "Scheduler state native; browser bindings out of graph checkpoints."
+  - "Targets NousResearch/hermes-agent only; exact paths/actions + separate G2 authority required before code."
+  - "HARD SCOPE BOUNDARY: SCRUM-842 is INTEGRATE + HARNESS ONLY. Do NOT modify Hermes core (NousResearch/hermes-agent core modules, LoopManager internals, scheduler core). Scope = adapter/harness/integration layer OUTSIDE core that calls/resumes the LangGraph workflow and validates verdict + readback. Hermes core is OUT-OF-SCOPE (read-only reference). If a core change is required, record a BLOCKER and STOP - do not propose core edits."
+  - "Preserve six untracked Q0 files."
+  - "Dependency: SCRUM-841 (LangGraph M1-M7 workflow contract) is FROZEN via PR #606 head 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26."
+applicable_policies:
+  - id: coding-project-governance
+    path: core/Coding_Project_Governance_v1.0.md
+    ref: main
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - id: gate-lifecycle-contract
+    path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    ref: main
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - id: agent-operating-runtime-contract
+    path: core/Agent_Operating_Runtime_Contract_v1.0.md
+    ref: main
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+sources:
+  - path: AGENTS.md
+    required: true
+    status: AVAILABLE
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - path: core/Coding_Project_Governance_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - path: core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    required: true
+    status: AVAILABLE
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - path: core/node-architect/scrum841-m1-m7-agent-workflow-r1.json
+    required: true
+    status: AVAILABLE
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - path: core/node-architect/scrum841-m1-m7-runtime-profile-r1.json
+    required: true
+    status: AVAILABLE
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  - path: projects/gwc/project-profile.yaml
+    required: true
+    status: AVAILABLE
+    source_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+status: READY
+blockers: []
+runtime_context:
+  agent_runtime_id: hermes-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+contextual_discovery:
+  historical_context:
+    - id: SCRUM-841
+      description: LangGraph M1-M7 workflow contract, FROZEN via PR #606 head 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26; SCRUM-842 depends on this frozen contract.
+      link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/606
+  downstream_impact:
+    - target: hermes-agent
+      impact_type: NON_BREAKING
+      description: SCRUM-842 adds native Loop scheduled operation activity to the Hermes host via an integration/harness layer; no M1-M7 logic change and no Hermes core modification.
+  stakeholder_reach:
+    - persona: Hermes host operator
+      impact: Native Loop scheduling/cadence and fire/complete/abandon lifecycle preserved; integration/harness layer only.
+    - persona: GWC governance reviewer
+      impact: Separate G2 authority required before any code; exact paths/actions documented; Hermes core is out-of-scope read-only reference.

@@ -1,0 +1,112 @@
+schema_version: "1.0"
+artifact_type: g1-preflight-report
+generated_at: "2026-10-18T06:52:07Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-842
+  base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  g0_snapshot: ../../g0/context-snapshot.yaml
+repository_state:
+  base_ref: main
+  base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  profile_path: projects/gwc/project-profile.yaml
+  connector: GitHub
+checks:
+  - id: G0_READY
+    status: PASS
+    code: G0_READY
+    message: "G0 context snapshot is READY with no blockers and all required sources available."
+    evidence:
+      - "g0/context-snapshot.yaml status=READY, blockers=[]"
+  - id: SCOPE_BOUNDARY
+    status: PASS
+    code: SCOPE_BOUNDARY
+    message: "Hard scope boundary enforced: INTEGRATE + HARNESS ONLY; Hermes core is out-of-scope read-only reference."
+    evidence:
+      - "g0/context-snapshot.yaml constraints HARD SCOPE BOUNDARY"
+      - "g1/intake/g1-intake-brief.yaml scope.non_goals"
+  - id: DEPENDENCY_FROZEN
+    status: PASS
+    code: DEPENDENCY_FROZEN
+    message: "SCRUM-841 LangGraph M1-M7 workflow contract is FROZEN at head 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26."
+    evidence:
+      - "core/node-architect/scrum841-m1-m7-agent-workflow-r1.json"
+      - "core/node-architect/scrum841-m1-m7-runtime-profile-r1.json"
+  - id: G2_AUTHORITY_REQUIRED
+    status: PASS
+    code: G2_AUTHORITY_REQUIRED
+    message: "Separate G2 authority is required before any code; exact paths/actions documented in the proposed scope."
+    evidence:
+      - "g1/decision/g1-decision-record.yaml scope_hash"
+      - "proposed G2 execution envelope"
+process_readback:
+  process_id: g1-scrum842-20261018-1352
+  terminal_outcome: "G1_ALIGNMENT PASS via tools/validate_g01.py --gate G2_EXECUTION exit 0"
+  required_sources:
+    - AGENTS.md
+    - core/Coding_Project_Governance_v1.0.md
+    - core/GATE_LIFECYCLE_CONTRACT_v1.0.md
+    - core/node-architect/scrum841-m1-m7-agent-workflow-r1.json
+    - core/node-architect/scrum841-m1-m7-runtime-profile-r1.json
+  status: VERIFIED
+execution_feasibility:
+  outcome: EXECUTABLE
+  route_steps:
+    - id: STEP-1
+      name: "G2 execution envelope materialization"
+      gate: G2_EXECUTION
+      actor: human_authorized_agent
+      action_class: materialize_g2_envelope
+      capability_required: G2_EXECUTION authority
+      capability_status: VERIFIED
+      primary_route: "Human G2 approval of the proposed scope_hash, then materialize g2/execution-envelope.yaml"
+      fallback_routes: []
+      continuation: "On approval, proceed to integration/harness layer implementation under G2 scope."
+      expected_evidence: "g2/execution-envelope.yaml with exact scope_hash"
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-2
+      name: "Integration/harness layer implementation"
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: modify_approved_files
+      capability_required: G2_EXECUTION authority
+      capability_status: VERIFIED
+      primary_route: "Author integration/harness layer outside Hermes core within authorized paths/actions."
+      fallback_routes: []
+      continuation: "On completion, run sandboxed validation and stage/commit within G2 scope."
+      expected_evidence: "Integration/harness layer files + tests passing"
+      bypass_eligibility: FORBIDDEN
+    - id: STEP-3
+      name: "Verdict + readback validation and exactly-once settlement"
+      gate: G2_EXECUTION
+      actor: agent
+      action_class: run_sandboxed_validation
+      capability_required: G2_EXECUTION authority
+      capability_status: VERIFIED
+      primary_route: "Validate structured verdict + exact readback; invoke native LoopManager settlement exactly once."
+      fallback_routes: []
+      continuation: "On pass, prepare G3 delivery record and present approval command; STOP before G4."
+      expected_evidence: "Verdict/readback validation evidence + exactly-once settlement receipt"
+      bypass_eligibility: FORBIDDEN
+  continuation_coverage: COMPLETE
+  human_bypass_required: false
+risk_class: R1
+required_gate: G2_HUMAN_DIRECTION
+runtime_context:
+  agent_runtime_id: hermes-agent
+  execution_mode: local_agent
+  selected_profile:
+    id: gwc
+    path: projects/gwc/project-profile.yaml
+  selected_connector: GitHub
+  connector_priority:
+    - GitHub
+    - DWC
+    - DW1
+  required_behavior_contracts:
+    - core/Agent_Behavior_Semantic_Contract_v1.0.md
+    - core/Agent_Operating_Runtime_Contract_v1.0.md
+    - core/Agent_Response_Presentation_Contract_v1.0.md
+blockers: []
+outcome: PASS
