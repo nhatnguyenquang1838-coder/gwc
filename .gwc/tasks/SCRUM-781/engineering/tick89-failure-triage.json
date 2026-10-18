@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "evidence_class": "ENGINEERING_FAILURE_TRIAGE_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 89,
+  "source_head": "719a15e0678ce0f6a90728ffe2939008249bd434",
+  "collected_at": "2026-10-18T14:42:27.679934+00:00",
+  "native_preflight": "ENGINEERING_PREFLIGHT_PASS",
+  "total_open_failures": 21,
+  "classification_counts": {
+    "AUTHORITY_APPROVAL_REQUIRED_NEEDS_FIXTURE_TRIAGE": 1,
+    "DOCUMENT_LITERAL_ASSERTION_DRIFT_NEEDS_TRIAGE": 3,
+    "LEGACY_GATE_FIXTURE_REJECTED_BY_V2": 16,
+    "LEGACY_HOST_POSITIVE_EXPECTATION_VS_V2_QUARANTINE": 1
+  },
+  "rows": [
+    {
+      "module": "tests.test_plan_bound_m4",
+      "test": "test_authority_revalidation_invokes_real_validator_allowed",
+      "source_ref": "tests/test_plan_bound_m4.py:120",
+      "failure_signature": "tools.node_architect.plan_bound_runtime_executor.PlanBoundRuntimeError: authority revalidation failed: AUTHORITY_APPROVAL_REQUIRED",
+      "classification": "AUTHORITY_APPROVAL_REQUIRED_NEEDS_FIXTURE_TRIAGE",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_fastlane_process_optimization",
+      "test": "test_chatgpt_overlay_requires_auto_ready_when_supported_then_g4_token",
+      "source_ref": "tests/test_fastlane_process_optimization.py:30",
+      "failure_signature": "AssertionError: assert 'metadata transition from Draft to Ready for review after G3 `PASS`' in '# ChatGPT Agent Instructions — Composed Entrypoint\\n\\nThis is the mandatory ChatGPT instruction entrypoint for GWC.\\n...low the higher-priority instruction. Role overlays may specialize behavior and cadence but must not grant authority.\\n'",
+      "classification": "DOCUMENT_LITERAL_ASSERTION_DRIFT_NEEDS_TRIAGE",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_fastlane_process_optimization",
+      "test": "test_e2e_allows_autonomous_steps_after_g2_but_blocks_merge",
+      "source_ref": "tests/test_fastlane_process_optimization.py:10",
+      "failure_signature": "AssertionError: assert 'After valid approval, the agent may proceed without requesting confirmation' in '# E2E Draft PR Delivery Rule\\n\\n## Purpose\\n\\nAllow the agent to complete an approved coding task end-to-end and deli...ta.\\n- Expand scope silently.\\n- Use stale CI or route-authority evidence.\\n- Claim success without matching evidence.'",
+      "classification": "DOCUMENT_LITERAL_ASSERTION_DRIFT_NEEDS_TRIAGE",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_fastlane_process_optimization",
+      "test": "test_g5_exact_sha_fallback_blocks_pr_only_false_pending",
+      "source_ref": "tests/test_fastlane_process_optimization.py:45",
+      "failure_signature": "AssertionError: assert 'fall back to a known `run_id`' in '# ChatGPT Agent Instructions — Composed Entrypoint\\n\\nThis is the mandatory ChatGPT instruction entrypoint for GWC.\\n...low the higher-priority instruction. Role overlays may specialize behavior and cadence but must not grant authority.\\n'",
+      "classification": "DOCUMENT_LITERAL_ASSERTION_DRIFT_NEEDS_TRIAGE",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_agent_runtime_entrypoint_m1_m7",
+      "test": "test_selected_m1_m7_runs_inside_canonical_host_and_holds_without_observer",
+      "source_ref": "tests/test_agent_runtime_entrypoint_m1_m7.py:56",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": false,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_host_wiring",
+      "test": "test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_next",
+      "source_ref": "tests/test_scrum_566_agent_host_wiring.py:298",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_host_wiring",
+      "test": "test_llm_cannot_inject_route_or_authority",
+      "source_ref": "tests/test_scrum_566_agent_host_wiring.py:348",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_host_wiring",
+      "test": "test_provider_unknown_tool_request_fails_before_capability_execution",
+      "source_ref": "tests/test_scrum_566_agent_host_wiring.py:374",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_host_wiring",
+      "test": "test_shadow_agent_host_runs_same_llm_semantics_but_never_executes_tool",
+      "source_ref": "tests/test_scrum_566_agent_host_wiring.py:329",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_authoritative_agent_host_requires_provider_registry",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:385",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_authoritative_provider_registry_requires_live_eligibility",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:369",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_host_default_readback_fails_closed_without_external_evidence",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:451",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_host_default_readback_verifies_external_canonical_evidence",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:420",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_loop_caps_iterations_on_continue_next_node",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:317",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_loop_propagates_typed_next_node_to_next_route",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:226",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_loop_single_node_reaches_gate_boundary_on_stop_disposition",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:295",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_loop_terminates_when_event_blocked",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:328",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_provider_evidence_class_recorded_not_live_closure_eligible",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:355",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_registered_live_eligible_provider_passes_gate",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:395",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_runtime_loop",
+      "test": "test_registered_provider_uses_canonical_provider_bridge_contract",
+      "source_ref": "tests/test_scrum_566_agent_runtime_loop.py:407",
+      "failure_signature": "ValueError: UNIVERSAL_GATE_INVALID",
+      "classification": "LEGACY_GATE_FIXTURE_REJECTED_BY_V2",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    },
+    {
+      "module": "tests.test_scrum_566_agent_host_wiring",
+      "test": "test_q0_host_routes_ur_g0_through_live_runtime_bridge",
+      "source_ref": "tests/test_scrum_566_agent_host_wiring.py:227",
+      "failure_signature": "AssertionError: {'status': 'BLOCKED', 'reason_code': 'USE_UNIVERSAL_V2_EXECUTOR', 'authority_granted': False, 'executed_effects': [], ...}\nassert 'BLOCKED' == 'SEMANTIC_NODE_COMPLETE'\n  \n  - SEMANTIC_NODE_COMPLETE\n  + BLOCKED",
+      "classification": "LEGACY_HOST_POSITIVE_EXPECTATION_VS_V2_QUARANTINE",
+      "reproduced_in_prior_q0_baseline": true,
+      "closed": false
+    }
+  ],
+  "source_sha256": {
+    "AGENTS.md": "d1c1a099000963478e60f9fba135103a190a2c8c1b92d30bae51774789905433",
+    "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "core/node-architect/universal-runtime-default-profile.json": "09ba2777aed85a499ff86a7951dae959e99795233d97e4902655c3e27ff60df8",
+    "tools/node_architect/live_runtime_bridge.py": "c62c890190631ae1e88d01ac592cdf9b8571c07ebcee18cf8fdcf0c4da266b53",
+    "tools/node_architect/agent_runtime_entrypoint.py": "00759cd353a1d7965ade56891e6757520f0ac292f0a427766b04102b45de1073",
+    "tests/test_scrum_566_agent_host_wiring.py": "199b7d5cccbfde83d38046a797a6c6954db7ffaef028242cb5fe67459abcdd0e"
+  },
+  "focused_diagnosis": {
+    "test": "tests/test_scrum_566_agent_host_wiring.py::test_q0_host_routes_ur_g0_through_live_runtime_bridge",
+    "fresh_result": "1 failed: expected SEMANTIC_NODE_COMPLETE, actual BLOCKED/USE_UNIVERSAL_V2_EXECUTOR",
+    "call_chain": [
+      "tests/test_scrum_566_agent_host_wiring.py:287 invokes legacy agent_runtime_entrypoint.run_agent_runtime_event",
+      "tools/node_architect/agent_runtime_entrypoint.py:764 builds compatibility event; line850 calls dispatch_live_runtime_event",
+      "tools/node_architect/live_runtime_bridge.py:83-87 deliberately blocks compatibility dispatch",
+      "core/node-architect/universal-runtime-default-profile.json:20-22 selects native CLI/UniversalController/UniversalExecutor"
+    ],
+    "conclusion": "Positive fixture still targets the quarantined compatibility host; do not change production bridge to satisfy it. This is not proof of a native executor failure.",
+    "verification": {
+      "evidence_class": "ISOLATED_SOURCE_IMPORT_NOT_LIVE_QUALIFICATION",
+      "code_head": "719a15e0678ce0f6a90728ffe2939008249bd434",
+      "classes": {
+        "UniversalController": {
+          "module": "tools.node_architect.universal_run_controller",
+          "source_ref": "tools/node_architect/universal_run_controller.py",
+          "source_sha256": "952b5c5ea894d7c37d6b6994b70401d5881b3e7dcc7992b7b00434e75a94703d"
+        },
+        "UniversalExecutor": {
+          "module": "tools.node_architect.universal_run_execution",
+          "source_ref": "tools/node_architect/universal_run_execution.py",
+          "source_sha256": "2959356ab4a67fc98cff4ff04d7dee3c617cb5a0801bc22a928768534c65c97c"
+        }
+      },
+      "legacy_entrypoint_loaded": false,
+      "effects_executed": [],
+      "native_RunState_or_NodeAllocation_created": false
+    },
+    "not_proven": [
+      "live Q0 admission",
+      "native RunState/NodeAllocation",
+      "original DWO replay",
+      "LOAD_PROOF",
+      "Q0 L3"
+    ]
+  },
+  "next_bounded_action": {
+    "owner": "DWA",
+    "action": "Port the positive Q0 host fixture to the canonical native V2 entrypoint while retaining an explicit negative compatibility-host assertion. Preserve equivalent provider/route/readback assertions; do not delete them or restore v1 fallback merely to obtain GREEN.",
+    "allowed_paths": [
+      "tests/**",
+      "tools/node_architect/**"
+    ],
+    "boundary": "No typed C/E reads, browser wakeup polling, native gate receipts, protected-main, production or Hermes core changes."
+  },
+  "native_settlement": "Owned by normal native post-turn lifecycle; not manually called",
+  "protected_runtime_effects": []
+}
