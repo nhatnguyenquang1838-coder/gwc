@@ -54,8 +54,14 @@ for authority, wake GPT periodically, create an issuer/lease, or infer qualifica
 
 On each ACTUAL firing: bind the exact native session, live owner, counter and
 worktree; read AGENTS.md UNIVERSAL_V2_DEVELOPMENT and the source-bound Q0 plan.
-Run the versioned read-only CLI in this repository:
-  python scripts/scrum781_engineering_loop.py inspect --session {session_id} --tick <ACTUAL_NATIVE_COUNTER>
+Run the versioned host workflow CLI in this repository BEFORE selecting work:
+  python scripts/scrum781_engineering_loop.py workflow --session {session_id} --tick <ACTUAL_NATIVE_COUNTER>
+The existing inspect --tick entrypoint routes to the same workflow for compatibility.
+Require actual graph verdict and durable checkpoint readback. Keep M1 HOLD when
+observer qualification is unavailable; do not replace it with browser evidence.
+Prioritize host-admission/wiring repair, not unrelated test coverage. Any independent
+Controller exchange requires explicit user authorization or a qualified semantic
+handoff; native timer movement alone never authorizes browser sends.
 Substitute only this genuine firing's verified native counter; never guess one.
 Treat its result as preflight data, never authority. If it reports FIRING_IN_FLIGHT,
 only the owner of this exact genuine firing may continue; never clear another tick.

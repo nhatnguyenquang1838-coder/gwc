@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Read-only native Engineering Loop inspection / resume-prompt preparation.
+"""Q0 host preflight and M1-M7 workflow entrypoint outside Hermes core.
 
-No native writes, resume, firing, C/E reads, effects, qualifications or leases.
+inspect without --tick and prepare remain read-only. An owned inspect --tick
+also invokes M1-M7 and persists its exact-head scratch checkpoint. workflow
+supports an explicit user call without manufacturing a native firing.
+No scheduler writes, resume, C/E reads, qualifications or leases.
 """
 from __future__ import annotations
 import argparse
@@ -101,15 +104,37 @@ def inspect(args: argparse.Namespace) -> dict:
                 repository_root=ROOT, controller_url=args.controller_url) if args.command == 'prepare' else None}
 
 
+def workflow(args: argparse.Namespace) -> dict:
+    """Host preflight then actual M1-M7 invocation; never grants admission."""
+    preflight_args = argparse.Namespace(**vars(args))
+    preflight_args.command = 'inspect'
+    preflight = inspect(preflight_args)
+    if preflight.get('outcome') != 'ENGINEERING_PREFLIGHT_PASS':
+        raise ValueError(preflight.get('reason_code', 'WORKFLOW_PREFLIGHT_BLOCKED'))
+    from tools.node_architect.task_context_binding import bind_from_plan
+    from tools.node_architect.task_m1_m7_runner import run_task_workflow
+    home = Path(os.environ.get('HERMES_HOME', str(Path.home()/'.hermes'))).resolve()
+    trigger = f'native-tick-{args.tick}' if args.tick is not None else 'explicit-user-request'
+    path = home/'cache/scratch/q0-m1-m7-host'/args.session/preflight['code_head']/'checkpoint.sqlite'
+    context = bind_from_plan(ROOT, plan_ref=PLAN_REF, conversation_url=args.controller_url,
+                             session_id=args.session, checkpoint_ref=path, skill_ref='dwa-gpt-exchange')
+    if context['repository']['head_sha'] != preflight['code_head']:
+        raise ValueError('WORKFLOW_SOURCE_CHANGED_AFTER_PREFLIGHT')
+    result = run_task_workflow(context, host_capabilities={},
+                               invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
+    return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),
+            'trigger': 'NATIVE_OWNER_FIRING' if args.tick is not None else 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('inspect','prepare'))
+    parser.add_argument('command', choices=('inspect','prepare','workflow'))
     parser.add_argument('--session', default=os.environ.get('HERMES_SESSION_ID'))
     parser.add_argument('--tick', type=int, help='inspect only: actual owner firing counter; never creates a firing')
     parser.add_argument('--controller-url', default='https://chatgpt.com/g/g-p-6a622940beac81918180ce69e50ef83c-dw-super/c/6ad380a6-c280-83ec-bb3f-75cef495e848')
     args = parser.parse_args()
     try:
-        result = inspect(args)
+        result = workflow(args) if args.command == 'workflow' or (args.command == 'inspect' and args.tick is not None) else inspect(args)
     except (ValueError, OSError, sqlite3.Error, KeyError, subprocess.CalledProcessError) as exc:
         print(json.dumps({'outcome':'BLOCKED','reason_code':str(exc),'native_state_modified':False}, indent=2))
         return 2
