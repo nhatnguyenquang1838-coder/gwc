@@ -5,11 +5,23 @@ from pathlib import Path
 
 import pytest
 
-from tools.node_architect.m1_m7_agent_workflow import (
-    M1_M7_SOURCE_SHA256,
-    WorkflowContractError,
-    build_m1_m7_graph,
-    load_m1_m7_contracts,
+try:
+    from tools.node_architect.m1_m7_agent_workflow import (
+        M1_M7_SOURCE_SHA256,
+        WorkflowContractError,
+        build_m1_m7_graph,
+        load_m1_m7_contracts,
+    )
+    _M1M7_AVAILABLE = True
+except ImportError:  # langgraph is an optional isolated dependency (P7)
+    M1_M7_SOURCE_SHA256 = "sha256:" + "0" * 64
+    WorkflowContractError = None  # type: ignore[assignment,misc]
+    build_m1_m7_graph = None  # type: ignore[assignment,misc]
+    load_m1_m7_contracts = None  # type: ignore[assignment,misc]
+    _M1M7_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(
+    not _M1M7_AVAILABLE, reason="langgraph backend not installed (optional isolated dependency)"
 )
 
 REPOSITORY = "nhatnguyenquang1838-coder/gwc"

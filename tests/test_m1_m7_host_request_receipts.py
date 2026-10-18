@@ -7,9 +7,21 @@ settlement requests only under a qualified protocol capability.
 """
 from __future__ import annotations
 
-from tools.node_architect.m1_m7_agent_workflow import (
-    M1_M7_SOURCE_SHA256,
-    build_m1_m7_graph,
+import pytest
+
+try:
+    from tools.node_architect.m1_m7_agent_workflow import (
+        M1_M7_SOURCE_SHA256,
+        build_m1_m7_graph,
+    )
+    _M1M7_AVAILABLE = True
+except ImportError:  # langgraph is an optional isolated dependency (P7)
+    M1_M7_SOURCE_SHA256 = "sha256:" + "0" * 64
+    build_m1_m7_graph = None  # type: ignore[assignment,misc]
+    _M1M7_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(
+    not _M1M7_AVAILABLE, reason="langgraph backend not installed (optional isolated dependency)"
 )
 
 REPOSITORY = "nhatnguyenquang1838-coder/gwc"

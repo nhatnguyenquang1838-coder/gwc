@@ -10,7 +10,19 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from tools.node_architect.m1_m7_agent_workflow import load_m1_m7_contracts
+import pytest
+
+try:
+    from tools.node_architect.m1_m7_agent_workflow import load_m1_m7_contracts
+    _M1M7_AVAILABLE = True
+except ImportError:  # langgraph is an optional isolated dependency (P7)
+    load_m1_m7_contracts = None  # type: ignore[assignment,misc]
+    _M1M7_AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(
+    not _M1M7_AVAILABLE, reason="langgraph backend not installed (optional isolated dependency)"
+)
+
 from tools.node_architect.agent_runtime_entrypoint import _run_selected_m1_m7_workflow
 
 ROOT = Path(__file__).resolve().parents[1]
