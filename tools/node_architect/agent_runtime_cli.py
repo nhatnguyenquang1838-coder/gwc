@@ -91,16 +91,44 @@ def _load_manifest(path: Path) -> dict[str, Any]:
     universal_run = manifest.get("universal_run")
     if universal_run is not None and not isinstance(universal_run, Mapping):
         raise AgentRuntimeCliError("manifest.universal_run must be a JSON object")
-    return {
+    if "m1_m7_workflow_selection" in event:
+        raise AgentRuntimeCliError("AGENT_RUNTIME_WORKFLOW_SELECTION_INJECTION")
+    result = {
         "provider_name": provider_name,
         "event": dict(event),
         "universal_run": dict(universal_run) if isinstance(universal_run, Mapping) else None,
     }
+    selection = manifest.get("workflow_selection")
+    if selection is not None:
+        if not isinstance(selection, Mapping) or selection.get("workflow_id") != "scrum841-m1-m7-agent-workflow-r1":
+            raise AgentRuntimeCliError("WORKFLOW_SELECTION_INVALID")
+        if not isinstance(selection.get("operation_envelope"), Mapping) or not isinstance(selection.get("inputs"), Mapping):
+            raise AgentRuntimeCliError("WORKFLOW_SELECTION_INVALID")
+        result["workflow_selection"] = dict(selection)
+    return result
 
 
-def _prepare_event(manifest: Mapping[str, Any], _provider: Any) -> dict[str, Any]:
-    """Return only caller event data; runtime authority is host/controller-owned."""
-    return dict(manifest["event"])
+def _prepare_event(manifest: Mapping[str, Any], provider: Any) -> dict[str, Any]:
+    """Keep V2 default unchanged; opt in to the inner workflow explicitly."""
+    event = dict(manifest["event"])
+    selection = manifest.get("workflow_selection")
+    if isinstance(selection, Mapping):
+        event["m1_m7_workflow_selection"] = dict(selection)
+    return event
+
+
+def run_agent_runtime_loop(event_kwargs: Mapping[str, Any], *, max_iterations: int = 32) -> dict[str, Any]:
+    """Explicit data-only graph harness; never enter the quarantined v1 host."""
+    from .loop_scheduled_operation_harness import invoke_or_resume
+    selection = event_kwargs["m1_m7_workflow_selection"]
+    result = invoke_or_resume(
+        event_kwargs.get("root", Path(__file__).resolve().parents[2]),
+        operation_envelope=selection["operation_envelope"], inputs=selection["inputs"],
+        checkpoint_store_ref=selection.get("checkpoint_store_ref"),
+        checkpoint_expected_revision=selection.get("checkpoint_expected_revision"),
+    )
+    verdict = result["verdict"]
+    return {**result, "status": "SEMANTIC_NODE_BLOCKED" if verdict["status"] == "BLOCKED" else "SEMANTIC_NODE_SUSPENDED", "reason_code": verdict["reason_code"], "executed_effects": [], "authority_granted": False}
 
 
 def _write_result(path: Path | None, result: Mapping[str, Any]) -> None:
@@ -135,7 +163,7 @@ def main(argv: list[str] | None = None) -> int:
         return _emit(_blocked("GWC_RUNTIME_DEFECT", str(exc), profile=profile), args.output)
 
     universal_run = manifest.get("universal_run")
-    if not isinstance(universal_run, Mapping):
+    if not isinstance(universal_run, Mapping) and manifest.get("workflow_selection") is None:
         return _emit(
             _blocked(
                 "GWC_RUNTIME_DEFECT",
@@ -163,6 +191,11 @@ def main(argv: list[str] | None = None) -> int:
         if provider.name != manifest["provider_name"]:
             raise AgentRuntimeCliError("manifest/provider factory identity mismatch")
         event = _prepare_event(manifest, provider)
+        if manifest.get("workflow_selection") is not None:
+            result = run_agent_runtime_loop(event, max_iterations=args.max_iterations)
+            _write_result(args.output, result)
+            print(json.dumps(dict(result), sort_keys=True, ensure_ascii=False))
+            return 0 if str(result.get("status", "")).startswith("SEMANTIC_NODE_") and result.get("status") != "SEMANTIC_NODE_BLOCKED" else 1
 
         # Imports are deliberately lazy and V2-only. Missing components become a
         # runtime defect; there is no import or execution fallback to GWC v1.

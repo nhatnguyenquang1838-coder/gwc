@@ -103,6 +103,10 @@ fallback. The default profile names the native UniversalController and
 UniversalExecutor, and declares the `UR.G0..UR.G6` namespace and legacy-v1
 non-default policy.
 
+## Working-mode independence
+
+**TASKCONTROLLER_OPTIONAL / NODE_ARCHITECT_CONTROLLER_AGNOSTIC:** GWC v2 and Node Architect run under their native lifecycle, authority, task-claim, node-routing and validation contracts without a TaskController working-mode binding. TaskController, its mailbox/v2 transport, Controller–Executor separation, continuation, Slack RootCard and human-plane procedure are applied **only** when explicitly selected by the user or an authorized parent/run binding. An autonomous governed task, node DAG, delegation requirement, or installed TaskController skill does not imply activation. A TaskController selection adds orchestration and cannot replace GWC gate authority or bypass Node Architect runtime. Working mode is independent from execution capability mode (`local_agent` or `chat_connector_only`).
+
 ## Agent-specific routing
 
 The shared boot, execution modes, gate lifecycle, connector-call enforcement,
@@ -395,6 +399,15 @@ agent must not wait for the user to ask for the next step. When canonical
 route-specific trusted standing/derived authority already satisfies the exact
 G2 action, resolve and use that authority instead of requesting a redundant
 Human G2 token.
+
+For the source-defined **G1-to-G2 approval bootstrap** when the full gate
+resolver sees `G2_EXECUTION/BLOCKED` only because the G2 envelope does not
+exist yet, use `tools/node_architect/g2_approval_preparation.py` with canonical
+G0/G1, risk-policy/producer, scope and evidence-map inputs. This read-only
+producer yields a bounded approval request plus **non-executable**
+`AWAITING_APPROVAL` envelope; it never grants G2 write authority. Keep native
+execution checks unchanged and reject any scope whose actions do not match
+`schemas/g2-execution-envelope.schema.json`.
 
 ### G2_EXECUTION — guarded branch only
 

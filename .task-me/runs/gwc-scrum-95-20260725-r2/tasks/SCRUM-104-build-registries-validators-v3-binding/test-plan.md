@@ -1,4 +1,4 @@
-﻿# Test Plan
+# Test Plan
 
 - 81-slot invariant and family distribution.
 - No proposed slot presented as stable without promotion evidence.

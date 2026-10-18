@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-approval-request",
+  "approval_id": "APPROVE_G2_EXECUTION_842_20261018",
+  "authority_gate": "G2_EXECUTION",
+  "task_id": "SCRUM-842",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26",
+  "working_branch": "hermes/SCRUM-842-loop-scheduled-operation-r1",
+  "head_sha": null,
+  "risk_class": "R1",
+  "authorized_actions": [
+    "create_guarded_branch_or_worktree",
+    "modify_approved_files",
+    "run_sandboxed_validation",
+    "stage",
+    "create_commit",
+    "push_working_branch"
+  ],
+  "excluded_actions": [
+    "open_or_update_draft_pr",
+    "mark_pr_ready_for_review",
+    "run_independent_review",
+    "merge_approved_pr",
+    "deploy_approved_release",
+    "reload_approved_runtime",
+    "production_data_read",
+    "production_data_write",
+    "production_config_change",
+    "credential_rotation",
+    "migration"
+  ],
+  "authorized_paths": [
+    ".gwc/tasks/SCRUM-842/**"
+  ],
+  "scope_hash": "sha256:4c474d4cca114a6393d59b5040706cb48ed8fd19ee000bc3cf2ee47ed83b7a20",
+  "scope_hash_16": "4c474d4cca114a63",
+  "issued_at": "2026-10-18T08:29:52Z",
+  "expires_at": "2026-10-19T08:29:52Z",
+  "approval_command": "APPROVE G2_EXECUTION APPROVE_G2_EXECUTION_842_20261018 4c474d4cca114a63 2026-10-19T08:29:52Z",
+  "g1_scope_hash": "sha256:4c474d4cca114a6393d59b5040706cb48ed8fd19ee000bc3cf2ee47ed83b7a20",
+  "notes": "G2 for SCRUM-842 integrate+harness layer outside Hermes core. Hermes core out-of-scope read-only. base_sha = frozen SCRUM-841 head 092b10aa (now merged to main)."
+}

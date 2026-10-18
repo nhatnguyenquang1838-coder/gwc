@@ -1,4 +1,4 @@
-﻿# Observable Decisions 鈥?SCRUM-103
+# Observable Decisions 鈥?SCRUM-103
 
 ## Decision 1
 

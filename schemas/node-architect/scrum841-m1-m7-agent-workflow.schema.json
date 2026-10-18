@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/scrum841-m1-m7-agent-workflow.schema.json",
+  "title": "SCRUM-841 M1-M7 LangGraph workflow manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "workflow_id", "task_id", "engine", "source_ref", "source_sha256", "runtime_plan_digest", "allowed_activities", "activity_text", "edges", "trigger_model", "trigger_owner", "graph_owns_scheduler_state", "graph_performs_external_io", "graph_grants_authority", "graph_settles_native_loop", "graph_performs_checkpoint_io", "max_children", "max_parallel", "allowed_host_request_types", "forbidden_checkpoint_keys"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "artifact_type": {"const": "scrum841-m1-m7-workflow"},
+    "workflow_id": {"const": "scrum841-m1-m7-agent-workflow-r1"},
+    "task_id": {"const": "SCRUM-841"},
+    "engine": {"const": "langgraph"},
+    "source_ref": {"type": "string", "minLength": 1},
+    "source_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "allowed_activities": {"const": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"]},
+    "activity_text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"],
+      "properties": {
+        "M1": {"const": "M1 exact-read Controller+Executor mailbox. Classify CLEAR/PENDING/WAIT/CONFLICT/BLOCKED."},
+        "M2": {"const": "M2 validate protocol, cursor, continuation, base/SHA/scope/artifacts and deadlock predicate."},
+        "M3": {"const": "M3 when PENDING/WAIT run read-only Red Team mailbox validation; run Analyzer only after Controller declares a typed read-only child contract—otherwise record ANALYZER_NOT_DECLARED."},
+        "M4": {"const": "M4 if reviews conflict with Controller or block workflow, use one bound Controller exchange to reconcile; do not mint authority."},
+        "M5": {"const": "M5 execute one clear typed authorized action only."},
+        "M6": {"const": "M6 independently verify exact artifacts/validators/repository or remote evidence."},
+        "M7": {"const": "M7 patch/readback the single Executor mailbox and send one bound Controller notification when canonical protocol allows; report G1–G6."}
+      }
+    },
+    "edges": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to"],
+        "properties": {"from": {"enum": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"]}, "to": {"enum": ["M1", "M2", "M3", "M4", "M5", "M6", "M7"]}}
+      }
+    },
+    "trigger_model": {"const": "A"},
+    "trigger_owner": {"const": "hermes_native_loop_host"},
+    "graph_owns_scheduler_state": {"const": false},
+    "graph_performs_external_io": {"const": false},
+    "graph_grants_authority": {"const": false},
+    "graph_settles_native_loop": {"const": false},
+    "graph_performs_checkpoint_io": {"const": false},
+    "max_children": {"const": 0},
+    "max_parallel": {"const": 1},
+    "allowed_host_request_types": {"type": "array", "uniqueItems": true, "items": {"enum": ["controller_exchange", "host_action_request", "native_loop_settlement_request"]}},
+    "forbidden_checkpoint_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

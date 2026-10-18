@@ -1,0 +1,50 @@
+schema_version: "1.0"
+artifact_type: g1-options
+generated_at: "2026-10-18T06:52:07Z"
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: SCRUM-842
+  base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+  - id: OPT-1
+    title: "Integration/harness layer outside Hermes core"
+    description: "Author a bounded adapter/harness/integration layer outside Hermes core that calls/resumes the frozen LangGraph M1-M7 workflow, validates verdict + exact readback, and invokes native LoopManager settlement exactly once. Hermes core remains a read-only reference."
+    benefits:
+      - "Respects the hard scope boundary (INTEGRATE + HARNESS ONLY)."
+      - "Preserves native Loop scheduling/cadence and fire/complete/abandon lifecycle."
+      - "Keeps Hermes core stable and independently governed."
+      - "Uses the frozen SCRUM-841 contract as-is with no M1-M7 logic change."
+    tradeoffs:
+      - "Requires a clean interface seam between the harness and the native Loop host."
+      - "Verdict/readback validation must be implemented in the harness layer."
+    risks:
+      - "RISK-1: a required behavior may turn out to need a core change; then record a BLOCKER and STOP."
+      - "RISK-2: verdict/readback mismatch could cause duplicate or missed settlement; mitigated by exactly-once settlement with stable tick/activity ID."
+    constraint_fit: FIT
+  - id: OPT-2
+    title: "Modify Hermes core directly"
+    description: "Implement the scheduled operation activity by modifying Hermes core modules (LoopManager internals, scheduler core)."
+    benefits:
+      - "Potentially more direct integration with native Loop internals."
+    tradeoffs:
+      - "Violates the hard scope boundary directive from Nhat."
+      - "Requires a separate core-scoped task and separate G2 authority."
+    risks:
+      - "RISK-1: out-of-scope core modification; must be rejected and routed to a separate task."
+    constraint_fit: NOT_FIT
+  - id: OPT-3
+    title: "Defer / no-op"
+    description: "Do not implement SCRUM-842 now; keep the frozen SCRUM-841 contract without operationalizing it into the native Loop schedule."
+    benefits:
+      - "No risk of scope violation."
+    tradeoffs:
+      - "The scheduled operation activity is not delivered; SCRUM-842 remains unfulfilled."
+    risks:
+      - "RISK-4: the intended Loop scheduled operation capability is not realized."
+    constraint_fit: PARTIAL
+recommended_option_id: OPT-1
+recommendation_rationale: "OPT-1 is the only option that satisfies the hard scope boundary (INTEGRATE + HARNESS ONLY, Hermes core out-of-scope read-only reference) while delivering the scheduled operation activity. OPT-2 violates the boundary and OPT-3 does not deliver."
+decision_required: true
+status: READY

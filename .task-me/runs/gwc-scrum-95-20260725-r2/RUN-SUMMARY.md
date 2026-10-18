@@ -1,4 +1,4 @@
-﻿# Task-Me Run Summary
+# Task-Me Run Summary
 
 ## Run
 

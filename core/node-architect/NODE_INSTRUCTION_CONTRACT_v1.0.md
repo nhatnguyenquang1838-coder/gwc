@@ -14,6 +14,8 @@ G3, G4, G5, or G6 authority.
 ## 2. Runtime invariant
 
 ```text
+NODE_ARCHITECT_CONTROLLER_AGNOSTIC: TaskController is an optional orchestration working mode and is never required for Node Architect node instruction selection, execution or validation. Native node-runtime stages remain mandatory in every mode.
+
 MODE_DOES_NOT_BYPASS_NODE_RUNTIME
 ```
 

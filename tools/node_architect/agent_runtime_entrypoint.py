@@ -215,6 +215,212 @@ def _provider_request(
     }
 
 
+def _prepare_m1_m7_checkpoint(
+    *, root: Path, selection: Mapping[str, Any], operation: Mapping[str, Any]
+) -> tuple[Path, int, dict[str, Any], dict[str, Any] | None]:
+    """Read/reconcile the same-run checkpoint before replaying graph work."""
+    from .checkpoint_store import CheckpointInput, load_store, reconcile_unknown_outcome, replay_checkpoint, validate_readback
+    run_id = operation.get("run_id")
+    if not isinstance(run_id, str) or not run_id or any(ch not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-" for ch in run_id):
+        raise ValueError("CHECKPOINT_RUN_ID_INVALID")
+    expected_ref = f".gwc/tasks/SCRUM-841/g2/checkpoints/{run_id}.json"
+    checkpoint_ref = selection.get("checkpoint_store_ref", expected_ref)
+    if checkpoint_ref != expected_ref:
+        raise ValueError("CHECKPOINT_STORE_PATH_NOT_RUN_BOUND")
+    path = (root / checkpoint_ref).resolve()
+    allowed_root = (root / ".gwc/tasks/SCRUM-841/g2/checkpoints").resolve()
+    if not path.is_relative_to(allowed_root):
+        raise ValueError("CHECKPOINT_STORE_PATH_OUTSIDE_SCOPE")
+    exists = path.exists()
+    store = load_store(path)
+    expected_revision = selection.get("checkpoint_expected_revision")
+    actual_revision = int(store.get("revision", 0))
+    if expected_revision is None and not exists:
+        expected_revision = 0
+    if not isinstance(expected_revision, int) or expected_revision < 0 or expected_revision != actual_revision:
+        raise ValueError("CHECKPOINT_CAS_REVISION_MISMATCH")
+    if not exists:
+        return path, expected_revision, store, None
+    node_id = "scrum841-m1-m7-workflow"
+    record = replay_checkpoint(store, "SCRUM-841", run_id, node_id)
+    if not isinstance(record, Mapping):
+        raise ValueError("CHECKPOINT_UNKNOWN_OUTCOME_REQUIRES_RECONCILIATION")
+    binding = {
+        "task_id": operation.get("task_id"), "repository": operation.get("repository"),
+        "branch": operation.get("working_branch"), "base_sha": operation.get("base_sha"),
+        "head_sha": operation.get("head_sha"), "scope_hash": operation.get("scope_hash"),
+    }
+    if any(record.get(key) != value for key, value in binding.items()):
+        raise ValueError("CHECKPOINT_BINDING_DRIFT")
+    item = CheckpointInput(
+        task_id="SCRUM-841", run_id=run_id, node_id=node_id,
+        repository=str(operation["repository"]), branch=str(operation["working_branch"]),
+        base_sha=str(operation["base_sha"]), head_sha=str(operation["head_sha"]),
+        scope_hash=str(operation["scope_hash"]), state=dict(record.get("state") or {}),
+        expected_revision=expected_revision, graph_revision="scrum841-m1-m7-agent-workflow-r1",
+    )
+    if reconcile_unknown_outcome(store, item).get("outcome") != "KNOWN_STATE":
+        raise ValueError("CHECKPOINT_UNKNOWN_OUTCOME_REQUIRES_RECONCILIATION")
+    validate_readback(store, item)
+    return path, expected_revision, store, dict(record.get("state") or {})
+
+
+def _run_selected_m1_m7_workflow(
+    *,
+    selection: Mapping[str, Any],
+    canonical_state: Mapping[str, Any],
+    current_binding: Mapping[str, Any],
+    root: Path,
+) -> dict[str, Any]:
+    """Run the explicit inner graph inside the already-resolved canonical host node."""
+    allowed_selection_keys = {
+        "workflow_id", "operation_envelope", "inputs", "prior_host_action_requests",
+        "prior_controller_exchange_requests", "prior_settlement_requests",
+        "checkpoint_store_ref", "checkpoint_expected_revision",
+    }
+    if set(selection) - allowed_selection_keys or selection.get("workflow_id") != "scrum841-m1-m7-agent-workflow-r1":
+        return {"outcome": "BLOCKED", "reason_code": "WORKFLOW_SELECTION_INVALID", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+    operation = selection.get("operation_envelope")
+    inputs = selection.get("inputs")
+    if not isinstance(operation, Mapping) or not isinstance(inputs, Mapping):
+        return {"outcome": "BLOCKED", "reason_code": "WORKFLOW_OPERATION_ENVELOPE_INVALID", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+    try:
+        from .m1_m7_agent_workflow import build_m1_m7_graph, load_m1_m7_contracts
+        manifest, profile = load_m1_m7_contracts(root)
+        exact = {
+            "task_id": "task_id", "repository": "repository", "base_sha": "base_sha",
+            "head_sha": "head_sha", "working_branch": "branch", "scope_hash": "scope_hash",
+        }
+        if any(operation.get(op_key) != canonical_state.get(state_key) for op_key, state_key in exact.items()):
+            return {"outcome": "BLOCKED", "reason_code": "WORKFLOW_CANONICAL_STATE_MISMATCH", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+        graph = build_m1_m7_graph(workflow_manifest=manifest, runtime_profile=profile, activity_source_sha256=manifest["source_sha256"])
+        initial: dict[str, Any] = {
+            "operation_envelope": dict(operation), "inputs": dict(inputs),
+            "host_action_requests": [], "settlement_requests": [],
+            "child_dispatch_requests": [], "controller_exchange_requests": [],
+            "activity_results": {}, "authority_granted": False, "executed_effects": [],
+        }
+        for key in ("prior_host_action_requests", "prior_controller_exchange_requests", "prior_settlement_requests"):
+            if key in selection:
+                initial[key] = selection[key]
+        checkpoint_path, expected_revision, checkpoint_store, prior_projection = _prepare_m1_m7_checkpoint(
+            root=root, selection=selection, operation=operation
+        )
+        if prior_projection is not None:
+            initial["checkpoint_projection"] = prior_projection
+            initial["activity_results"] = dict(prior_projection.get("activity_results") or {})
+            initial["mailbox_classification"] = prior_projection.get("mailbox_classification")
+            prior_keys = list(prior_projection.get("idempotency_keys") or [])
+            if prior_keys:
+                initial["host_action_requests"] = [{"idempotency_key": key} for key in prior_keys]
+            controller_keys = list(prior_projection.get("controller_exchange_idempotency_keys") or [])
+            if controller_keys:
+                initial["controller_exchange_requests"] = [{"idempotency_key": key} for key in controller_keys]
+            settlement_keys = list(prior_projection.get("settlement_idempotency_keys") or [])
+            if settlement_keys:
+                initial["settlement_requests"] = [{"idempotency_key": key} for key in settlement_keys]
+            resumed_inputs = dict(initial["inputs"])
+            for input_key, persisted in (
+                ("prior_host_action_requests", initial["host_action_requests"]),
+                ("prior_controller_exchange_requests", initial["controller_exchange_requests"]),
+                ("prior_settlement_requests", initial["settlement_requests"]),
+            ):
+                existing = resumed_inputs.get(input_key, [])
+                existing = existing if isinstance(existing, list) else []
+                seen = {item.get("idempotency_key") for item in existing if isinstance(item, Mapping)}
+                resumed_inputs[input_key] = existing + [item for item in persisted if isinstance(item, Mapping) and item.get("idempotency_key") not in seen]
+            initial["inputs"] = resumed_inputs
+        raw = graph.invoke(initial)
+        prior_checkpoint = initial.get("checkpoint_projection")
+        prior_checkpoint = prior_checkpoint if isinstance(prior_checkpoint, Mapping) else {}
+        activity_results = raw.get("activity_results")
+        activity_results = activity_results if isinstance(activity_results, Mapping) else dict(prior_checkpoint.get("activity_results") or {})
+        def _idempotency_values(state_key: str, projection_key: str) -> list[str]:
+            values: list[str] = list(prior_checkpoint.get(projection_key) or [])
+            for source in (initial.get(state_key, []), raw.get(state_key, [])):
+                if isinstance(source, list):
+                    for item in source:
+                        key = item.get("idempotency_key") if isinstance(item, Mapping) else None
+                        if isinstance(key, str) and key:
+                            values.append(key)
+            return list(dict.fromkeys(values))
+        projection = {
+            key: operation[key] for key in (
+                "task_id", "repository", "run_id", "operation_id", "activity_id",
+                "base_sha", "head_sha", "working_branch", "scope_hash",
+                "runtime_plan_digest", "protocol_version", "continuation_ref", "cursor",
+            ) if key in operation
+        }
+        projection.update({
+            "current_activity": raw.get("current_activity") or prior_checkpoint.get("current_activity") or "M1",
+            "mailbox_classification": raw.get("mailbox_classification") or prior_checkpoint.get("mailbox_classification"),
+            "activity_results": dict(activity_results),
+            "receipt_refs": list(dict.fromkeys(
+                value.get("readback_digest") for value in activity_results.values()
+                if isinstance(value, Mapping) and value.get("readback_digest")
+            )),
+            "idempotency_keys": _idempotency_values("host_action_requests", "idempotency_keys"),
+            "controller_exchange_idempotency_keys": _idempotency_values("controller_exchange_requests", "controller_exchange_idempotency_keys"),
+            "settlement_idempotency_keys": _idempotency_values("settlement_requests", "settlement_idempotency_keys"),
+        })
+        if isinstance(prior_checkpoint.get("gate_readout"), Mapping):
+            projection["gate_readout"] = dict(prior_checkpoint["gate_readout"])
+        from .checkpoint_store import CheckpointInput, digest_payload, load_store, persist_to_file, replay_checkpoint, validate_readback
+        exists = checkpoint_path.exists()
+        item = CheckpointInput(
+            task_id=str(operation["task_id"]), run_id=str(operation["run_id"]),
+            node_id="scrum841-m1-m7-workflow", repository=str(operation["repository"]),
+            branch=str(operation["working_branch"]), base_sha=str(operation["base_sha"]),
+            head_sha=str(operation["head_sha"]), scope_hash=str(operation["scope_hash"]),
+            state=dict(projection), expected_revision=expected_revision,
+            graph_revision=str(manifest["workflow_id"]),
+        )
+        prior_record = replay_checkpoint(checkpoint_store, item.task_id, item.run_id, item.node_id)
+        if prior_record is not None and prior_record.get("state_digest") == digest_payload(item.state):
+            checkpoint_result = {"outcome": "IDEMPOTENT_REPLAY", "revision": prior_record.get("revision"), "state_digest": prior_record.get("state_digest"), "store_path": str(checkpoint_path)}
+        else:
+            persist_to_file(checkpoint_path, item)
+            checkpoint_result = {**validate_readback(load_store(checkpoint_path), item), "store_path": str(checkpoint_path)}
+    except (ImportError, ModuleNotFoundError) as exc:
+        return {"outcome": "BLOCKED", "reason_code": "LANGGRAPH_BACKEND_UNAVAILABLE", "error": f"{type(exc).__name__}: {exc}", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+    except Exception as exc:
+        return {"outcome": "BLOCKED", "reason_code": "M1_M7_GRAPH_OR_CHECKPOINT_ERROR", "error": f"{type(exc).__name__}: {exc}", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+
+    graph_status = str(raw.get("status") or "BLOCKED")
+    outcome = "WAIT" if graph_status in {"HOLD", "WAIT"} else "BLOCKED" if graph_status in {"BLOCKED", "FAIL"} else "PASS" if graph_status == "CONTINUE" else "BLOCKED"
+    next_table = current_binding.get("next_route_contract")
+    if not isinstance(next_table, Mapping):
+        return {"outcome": "BLOCKED", "reason_code": "M1_M7_NEXT_CONTRACT_MISSING", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+    next_key = "pending" if outcome == "WAIT" else "pass" if outcome == "PASS" else "blocked"
+    next_contract = next_table.get(next_key)
+    if not isinstance(next_contract, Mapping):
+        next_contract = next_table.get("blocked")
+    if not isinstance(next_contract, Mapping):
+        return {"outcome": "BLOCKED", "reason_code": "M1_M7_NEXT_CONTRACT_INVALID", "requested_effects": [], "proposed_effects": [], "executed_effects": [], "authority_granted": False}
+    public = {
+        key: raw[key] for key in (
+            "status", "reason_code", "current_activity", "mailbox_classification",
+            "activity_results", "host_action_requests", "controller_exchange_requests",
+            "settlement_requests", "checkpoint_projection", "child_dispatch_requests",
+        ) if key in raw
+    }
+    return {
+        "outcome": outcome,
+        "reason_code": str(raw.get("reason_code") or "M1_M7_RESULT_UNTYPED"),
+        "provider": "langgraph:scrum841-m1-m7-agent-workflow-r1",
+        "requested_effects": [],
+        "proposed_effects": [],
+        "executed_effects": [],
+        "authority_granted": False,
+        "implementation_invoked": True,
+        "semantic_execution": True,
+        "next_contract": dict(next_contract),
+        "workflow_result": public,
+        "checkpoint_persistence": checkpoint_result,
+        "invocation_digest": _digest({"selection": selection, "result": public, "checkpoint": checkpoint_result}),
+    }
+
+
 def _provider_semantic_handler(
     *,
     provider: Any,
@@ -228,8 +434,17 @@ def _provider_semantic_handler(
     input_payload: Mapping[str, Any],
     capability_handlers: Mapping[str, Any],
     provider_binding: Any | None = None,
+    workflow_root: Path | None = None,
 ) -> Callable[[Mapping[str, Any], Mapping[str, Any]], Mapping[str, Any]]:
     def handler(current_binding: Mapping[str, Any], event: Mapping[str, Any]) -> Mapping[str, Any]:
+        selection = input_payload.get("_scrum841_workflow_selection")
+        if selection is not None:
+            return _run_selected_m1_m7_workflow(
+                selection=selection,
+                canonical_state=canonical_state,
+                current_binding=current_binding,
+                root=workflow_root or Path("."),
+            )
         if provider_binding is not None:
             bridge_input = {
                 "head_sha": str(canonical_state.get("head_sha") or ""),
@@ -457,9 +672,16 @@ def run_agent_runtime_event(
     applicability_decision: Mapping[str, Any] | None = None,
     validation_runner: Any | None = None,
     validation_root: Path | str | None = None,
+    m1_m7_workflow_selection: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run one canonical Agent task event end-to-end through Node Architect."""
     repo_root = Path(root).resolve()
+    if m1_m7_workflow_selection is not None:
+        if not isinstance(m1_m7_workflow_selection, Mapping) or m1_m7_workflow_selection.get("workflow_id") != "scrum841-m1-m7-agent-workflow-r1":
+            return _blocked("WORKFLOW_SELECTION_INVALID")
+        if "_scrum841_workflow_selection" in input_payload:
+            return _blocked("WORKFLOW_SELECTION_INPUT_INJECTION")
+        input_payload = {**dict(input_payload), "_scrum841_workflow_selection": dict(m1_m7_workflow_selection)}
     context = _route_context(
         canonical_state=canonical_state,
         gate=gate,
@@ -620,6 +842,7 @@ def run_agent_runtime_event(
         input_payload=input_payload,
         capability_handlers=capability_handlers,
         provider_binding=provider_binding,
+        workflow_root=repo_root,
     )
 
     runtime_state = state if isinstance(state, LiveRuntimeState) else LiveRuntimeState()

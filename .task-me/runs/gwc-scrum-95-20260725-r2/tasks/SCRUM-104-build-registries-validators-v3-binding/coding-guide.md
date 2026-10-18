@@ -1,4 +1,4 @@
-﻿# Coding Guide 鈥?SCRUM-104
+# Coding Guide 鈥?SCRUM-104
 
 ## Verified paths
 

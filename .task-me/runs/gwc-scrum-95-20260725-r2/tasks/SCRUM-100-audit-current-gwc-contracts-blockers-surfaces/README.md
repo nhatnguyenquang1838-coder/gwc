@@ -1,4 +1,4 @@
-﻿# SCRUM-100 鈥?Audit current GWC contracts, blockers and executable surfaces
+# SCRUM-100 鈥?Audit current GWC contracts, blockers and executable surfaces
 
 ## Objective
 

@@ -1,4 +1,4 @@
-﻿# Run Impact Analysis
+# Run Impact Analysis
 
 ## Executive finding
 

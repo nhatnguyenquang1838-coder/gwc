@@ -1,0 +1,53 @@
+schema_version: "1.1"
+artifact_type: g2-execution-envelope
+activation_state: DRAFT
+task_id: SCRUM-842
+repository: nhatnguyenquang1838-coder/gwc
+base_ref: main
+base_sha: 092b10aac3e4188e5fe4722f9e4ebc81c4c5fb26
+working_branch: hermes/SCRUM-842-loop-scheduled-operation-r1
+risk_class: R1
+risk_digest: sha256:4c474d4cca114a6393d59b5040706cb48ed8fd19ee000bc3cf2ee47ed83b7a20
+bounded_read_scope:
+  - core/node-architect/scrum841-m1-m7-agent-workflow-r1.json
+  - core/node-architect/scrum841-m1-m7-runtime-profile-r1.json
+bounded_write_scope:
+  - .gwc/tasks/SCRUM-842/**
+authorized_actions:
+  - create_guarded_branch_or_worktree
+  - modify_approved_files
+  - run_sandboxed_validation
+  - stage
+  - create_commit
+  - push_working_branch
+excluded_actions:
+  - open_draft_pr
+  - mark_pr_ready
+  - merge
+  - auto_merge
+  - force_push
+  - branch_deletion
+  - protected_branch_write
+  - deploy
+  - release
+  - production_data_change
+  - production_config_change
+  - g3_pr_promotion
+  - g4_merge
+  - g5_deploy
+  - g6_production
+scope_hash: sha256:4c474d4cca114a6393d59b5040706cb48ed8fd19ee000bc3cf2ee47ed83b7a20
+f1_artifact_digests: {}
+f2_digests: {}
+approval_request_ref: null
+checkpoint_id: scrum842-g01-20261018-1352
+issued_at: "2026-10-18T06:52:07Z"
+expires_at: "2026-10-19T06:52:07Z"
+reason_code: G2_ENVELOPE_DRAFT_PROPOSED
+envelope_digest: sha256:4c474d4cca114a6393d59b5040706cb48ed8fd19ee000bc3cf2ee47ed83b7a20
+exclusions:
+  - G3_PR
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+execution_started: false

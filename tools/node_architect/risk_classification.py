@@ -226,7 +226,15 @@ def _upstream_failure(
         artifact = artifacts.get(name)
         if not isinstance(artifact, Mapping) or artifact.get("artifact_type") != expected_type:
             return "RISK_UNCLASSIFIED", None
-        if artifact.get("repository") != repository or artifact.get("base_sha") != base_sha:
+        if artifact.get("repository") != repository:
+            return "RISK_SCOPE_AMBIGUOUS", None
+        # protected-base-capture has its own canonical SHA field; it does not
+        # emit base_sha. Compare the producer's actual typed contract rather
+        # than requiring a synthetic field added by a test fixture.
+        if name == "protected_base_snapshot":
+            if artifact.get("protected_base_sha") != base_sha:
+                return "RISK_SOURCE_STALE", None
+        elif artifact.get("base_sha") != base_sha:
             return "RISK_SCOPE_AMBIGUOUS", None
         outcome = artifact.get("outcome")
         if outcome != "ACCEPTED":

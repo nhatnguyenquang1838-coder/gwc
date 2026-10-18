@@ -6,9 +6,17 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "artifact_type", "approval_request_ref", "outcome",
-    "approval_valid", "consumption_key", "reason_codes", "primary_reason_code",
-    "replay_status", "validation_digest", "validated_at"
+    "schema_version",
+    "artifact_type",
+    "approval_request_ref",
+    "outcome",
+    "approval_valid",
+    "consumption_key",
+    "reason_codes",
+    "primary_reason_code",
+    "replay_status",
+    "validation_digest",
+    "validated_at"
   ],
   "$defs": {
     "sha40": {
@@ -25,25 +33,117 @@
     }
   },
   "properties": {
-    "schema_version": {"const": "1.0"},
-    "artifact_type": {"const": "gate-approval-validation"},
-    "approval_request_ref": {"type": "string", "minLength": 1},
-    "outcome": {"type": "string", "enum": ["VALID", "INVALID", "BLOCKED"]},
-    "approval_valid": {"type": "boolean"},
-    "consumption_key": {"type": ["string", "null"], "minLength": 1},
+    "schema_version": {
+      "const": "1.0"
+    },
+    "artifact_type": {
+      "const": "gate-approval-validation"
+    },
+    "approval_request_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "VALID",
+        "INVALID",
+        "BLOCKED"
+      ]
+    },
+    "approval_valid": {
+      "type": "boolean"
+    },
+    "consumption_key": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
     "reason_codes": {
       "type": "array",
-      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9_]*$"
+      },
       "minItems": 1
     },
-    "primary_reason_code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
-    "replay_status": {"type": "string", "enum": ["FIRST_SEEN", "IDEMPOTENT_REPLAY", "REPLAY_CONFLICT"]},
-    "validation_digest": {"$ref": "#/$defs/scope_hash"},
-    "validated_at": {"type": "string", "format": "date-time"},
-    "event_id_or_idempotency_key": {"type": ["string", "null"], "minLength": 1},
-    "execution_authority_granted": {"const": false},
-    "merge_authority_granted": {"const": false},
-    "deployment_authority_granted": {"const": false},
-    "production_authority_granted": {"const": false}
+    "primary_reason_code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "replay_status": {
+      "type": "string",
+      "enum": [
+        "FIRST_SEEN",
+        "IDEMPOTENT_REPLAY",
+        "REPLAY_CONFLICT"
+      ]
+    },
+    "validation_digest": {
+      "$ref": "#/$defs/scope_hash"
+    },
+    "validated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event_id_or_idempotency_key": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "execution_authority_granted": {
+      "const": false
+    },
+    "merge_authority_granted": {
+      "const": false
+    },
+    "deployment_authority_granted": {
+      "const": false
+    },
+    "production_authority_granted": {
+      "const": false
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$"
+    },
+    "base_sha": {
+      "$ref": "#/$defs/sha40"
+    },
+    "head_sha": {
+      "$ref": "#/$defs/sha40"
+    },
+    "scope_hash": {
+      "$ref": "#/$defs/scope_hash"
+    },
+    "working_branch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "risk_class": {
+      "enum": [
+        "R0",
+        "R1",
+        "R2",
+        "R3"
+      ]
+    },
+    "authorized_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
   }
 }
