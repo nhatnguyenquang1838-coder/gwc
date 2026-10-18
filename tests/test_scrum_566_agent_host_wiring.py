@@ -224,7 +224,9 @@ def test_q0_event_uses_profile_adapter_and_never_compiles_legacy_registry(tmp_pa
     q0_binding.assert_called_once()
 
 
-def test_q0_host_routes_ur_g0_through_live_runtime_bridge(tmp_path: Path):
+def test_q0_host_rejects_ur_g0_through_quarantined_live_runtime_bridge(tmp_path: Path):
+    # This compatibility host must reject Q0. Native positive coverage lives in
+    # test_scrum781_q0_native_host.py; do not reopen the v1 bridge for this fixture.
     import json
     q0_module = _module("tools.node_architect.q0_qualification")
     resolver_module = _module("tools.node_architect.resolve_gate_node_route")
@@ -286,13 +288,12 @@ def test_q0_host_routes_ur_g0_through_live_runtime_bridge(tmp_path: Path):
 
     result = host.run_agent_runtime_event(**kwargs)
 
-    assert result["status"] == "SEMANTIC_NODE_COMPLETE", result
-    assert result["node_id"] == "q0.qualification-campaign"
+    assert result["status"] == "BLOCKED", result
+    assert result["reason_code"] == "USE_UNIVERSAL_V2_EXECUTOR"
     assert result["authority_granted"] is False
     assert result["executed_effects"] == []
-    assert result["live_agent_event"] is True
-    assert result["next_route"]["next_action"] == "q0_continue_universal_lifecycle"
-    assert provider.packs
+    assert "next_route" not in result
+    assert provider.packs == []
 
 
 def test_agent_host_wires_actual_instructions_skills_provider_tool_readback_and_next(tmp_path: Path):
