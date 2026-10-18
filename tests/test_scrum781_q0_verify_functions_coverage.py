@@ -279,3 +279,36 @@ def test_materialize_q0_verification_receipt_rejects_symlink_target(tmp_path):
     link.symlink_to(real)
     with pytest.raises(m.Q0QualificationError, match="Q0_VERIFICATION_RECEIPT_PATH_SYMLINK"):
         m.materialize_q0_verification_receipt(receipt=receipt, path=link)
+
+
+# --- can_start_login_r00 fail-closed branches --------------------------------
+def test_can_start_login_r00_rejects_handoff_binding_mismatch():
+    """can_start_login_r00: the handoff must bind the exact certified_q0_sha
+    and run_id. A cross-bound handoff must fail closed with
+    Q0_HANDOFF_BINDING_MISMATCH."""
+    m = _m()
+    bundle = _acceptance_bundle()
+    cert = m.certify_q0_runtime(**_cert_inputs())
+    # Break the handoff->certified_q0_sha binding.
+    tampered = dict(bundle["handoff"])
+    tampered["certified_q0_sha"] = _sha("b")
+    tampered["receipt_digest"] = m._digest({k: v for k, v in tampered.items() if k != "receipt_digest"})
+    bad = dict(bundle, handoff=tampered)
+    with pytest.raises(m.Q0QualificationError, match="Q0_HANDOFF_BINDING_MISMATCH"):
+        m.can_start_login_r00(certification=cert, acceptance=bad)
+
+
+def test_can_start_login_r00_rejects_closure_binding_mismatch():
+    """can_start_login_r00: the closure must bind the exact run_id and the
+    handoff's closure_receipt_ref. A cross-bound closure must fail closed with
+    Q0_CLOSURE_BINDING_MISMATCH."""
+    m = _m()
+    bundle = _acceptance_bundle()
+    cert = m.certify_q0_runtime(**_cert_inputs())
+    # Break the closure->run_id binding.
+    tampered = dict(bundle["closure"])
+    tampered["run_id"] = "other-run"
+    tampered["receipt_digest"] = m._digest({k: v for k, v in tampered.items() if k != "receipt_digest"})
+    bad = dict(bundle, closure=tampered)
+    with pytest.raises(m.Q0QualificationError, match="Q0_CLOSURE_BINDING_MISMATCH"):
+        m.can_start_login_r00(certification=cert, acceptance=bad)
