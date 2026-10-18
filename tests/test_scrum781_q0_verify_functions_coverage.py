@@ -312,3 +312,85 @@ def test_can_start_login_r00_rejects_closure_binding_mismatch():
     bad = dict(bundle, closure=tampered)
     with pytest.raises(m.Q0QualificationError, match="Q0_CLOSURE_BINDING_MISMATCH"):
         m.can_start_login_r00(certification=cert, acceptance=bad)
+
+
+# --- create_q0_verification_receipt fail-closed branches ---------------------
+def _verification_inputs(**overrides):
+    m = _m()
+    g2 = _execution_receipt()
+    g2_bytes = (json.dumps(g2, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    d = dict(
+        run_id=g2["run_id"],
+        runtime_plan_digest=g2["runtime_plan_digest"],
+        candidate_sha=_sha("a"),
+        g2_execution_receipt=g2,
+        g2_execution_receipt_ref="q0-native-verify/executor-receipts/executor-action-receipt.json",
+        g2_execution_receipt_bytes=g2_bytes,
+        controller_transition_receipt=_g3_transition_receipt(g2),
+        v2_isolation_evidence={
+            "candidate_sha": _sha("a"),
+            "result": "UNIVERSAL_V2_CORE_ISOLATED_GWC_V1_QUARANTINED",
+            "evidence_ref": "q0-native-verify/e56-isolation-handoff-evidence.json",
+            "evidence_sha256": "c" * 64,
+        },
+        v1_quarantine_evidence={
+            "manifest_ref": "legacy/gwc-v1/runtime-quarantine-manifest.json",
+            "manifest_sha256": "d" * 64,
+            "archived_sources_verified": 16,
+            "fallback_forbidden": True,
+        },
+        regression_evidence={
+            "candidate_sha": _sha("a"),
+            "command": "python -m pytest tests/test_universal_v2_core_isolation.py -q",
+            "exit_code": 0,
+            "tests_passed": 327,
+            "result_sha256": "e" * 64,
+        },
+        created_at="2026-10-03T00:00:00Z",
+    )
+    d.update(overrides)
+    return d
+
+
+def test_create_q0_verification_receipt_rejects_transition_receipt_mismatch():
+    """create_q0_verification_receipt: the controller transition receipt must
+    consume the exact g2 execution receipt digest. A mismatch must fail closed
+    with CONTROLLER_TRANSITION_RECEIPT_MISMATCH."""
+    m = _m()
+    g2 = _execution_receipt()
+    transition = _g3_transition_receipt(g2)
+    transition["consumed_receipt_digest"] = "sha256:" + "9" * 64  # wrong g2 digest
+    with pytest.raises(m.Q0QualificationError, match="CONTROLLER_TRANSITION_RECEIPT_MISMATCH"):
+        m.create_q0_verification_receipt(**_verification_inputs(controller_transition_receipt=transition))
+
+
+def test_create_q0_verification_receipt_rejects_v2_isolation_required():
+    """create_q0_verification_receipt: v2 isolation evidence must prove the
+    Universal V2 core is isolated and GWC v1 quarantined. A non-isolated result
+    must fail closed with Q0_V2_ISOLATION_REQUIRED."""
+    m = _m()
+    iso = dict(_verification_inputs()["v2_isolation_evidence"])
+    iso["result"] = "NOT_ISOLATED"
+    with pytest.raises(m.Q0QualificationError, match="Q0_V2_ISOLATION_REQUIRED"):
+        m.create_q0_verification_receipt(**_verification_inputs(v2_isolation_evidence=iso))
+
+
+def test_create_q0_verification_receipt_rejects_v1_fallback_not_forbidden():
+    """create_q0_verification_receipt: v1 quarantine evidence must keep the
+    legacy fallback forbidden. A fallback_allowed manifest must fail closed with
+    Q0_V1_FALLBACK_MUST_REMAIN_FORBIDDEN."""
+    m = _m()
+    q = dict(_verification_inputs()["v1_quarantine_evidence"])
+    q["fallback_forbidden"] = False
+    with pytest.raises(m.Q0QualificationError, match="Q0_V1_FALLBACK_MUST_REMAIN_FORBIDDEN"):
+        m.create_q0_verification_receipt(**_verification_inputs(v1_quarantine_evidence=q))
+
+
+def test_create_q0_verification_receipt_rejects_regression_not_passing():
+    """create_q0_verification_receipt: broader regression must pass (exit_code 0).
+    A non-zero exit must fail closed with Q0_REGRESSION_NOT_PASSING."""
+    m = _m()
+    reg = dict(_verification_inputs()["regression_evidence"])
+    reg["exit_code"] = 1
+    with pytest.raises(m.Q0QualificationError, match="Q0_REGRESSION_NOT_PASSING"):
+        m.create_q0_verification_receipt(**_verification_inputs(regression_evidence=reg))
