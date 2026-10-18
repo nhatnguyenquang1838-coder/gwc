@@ -11,6 +11,59 @@ from .task_context_binding import validate_task_context, digest, require, ACTIVI
 from .controller_exchange_adapter import make_exchange_request
 
 
+def reconcile_source_head(old_context,new_context,*,repository_root,reason):
+    """Explicit source-only additive transition while the graph is held at M1.
+
+    Never rebinds a URL/session/plan, replays effects, updates native scheduler
+    state or edits an old invocation. Preserves the prior row in an audit table.
+    """
+    import copy
+    import subprocess
+    old=validate_task_context(old_context);new=validate_task_context(new_context)
+    require(isinstance(reason,str) and bool(reason.strip()),'SOURCE_RECONCILE_REASON_REQUIRED')
+    comparison=copy.deepcopy(new)
+    comparison['repository']['head_sha']=old['repository']['head_sha']
+    require(comparison==old,'SOURCE_RECONCILE_NON_HEAD_DRIFT')
+    before=old['repository']['head_sha'];after=new['repository']['head_sha']
+    require(before!=after,'SOURCE_RECONCILE_UNCHANGED_HEAD')
+    root=Path(repository_root).resolve()
+    def git(*args):
+        return subprocess.run(['git','-C',str(root),*args],capture_output=True,text=True)
+    branch=git('branch','--show-current');head=git('rev-parse','HEAD')
+    require(branch.returncode==0 and head.returncode==0 and branch.stdout.strip()==new['repository']['branch'] and
+            head.stdout.strip()==after and root==Path(new['repository']['worktree']).resolve(), 'SOURCE_RECONCILE_GIT_BINDING_REQUIRED')
+    require(git('merge-base','--is-ancestor',before,after).returncode==0,'SOURCE_RECONCILE_NON_ADDITIVE_HEAD')
+    with sqlite3.connect(old['workflow']['checkpoint_ref'],timeout=10) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT context_digest,state FROM workflow WHERE run=?',(old['run']['id'],)).fetchone()
+        if row is None:
+            raise ValueError('SOURCE_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        require(row[0]==digest(old),'SOURCE_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        state=json.loads(row[1]);verdict=state['verdict']
+        require(verdict=={'current_activity':'M1','status':'HOLD','reason_code':'OBSERVER_UNQUALIFIED'} and
+                not state.get('graph_state',{}).get('executed_effects'), 'SOURCE_RECONCILE_M1_HOLD_REQUIRED')
+        for target in [state['checkpoint_projection'],state.get('graph_state',{}).get('operation_envelope',{})]:
+            for key in ('base_sha','head_sha'):
+                if key in target:
+                    require(target[key]==before,'SOURCE_RECONCILE_PROJECTION_MISMATCH')
+                    target[key]=after
+        receipt={'operation':'SOURCE_HEAD_RECONCILIATION','old_context_digest':digest(old),
+                 'new_context_digest':digest(new),'old_head':before,'new_head':after,
+                 'reason':reason,'run_id':old['run']['id'],'session_id':old['executor']['session_id'],
+                 'typed_ce_admitted':False,'native_state_modified':False,'prior_state_digest':digest(json.loads(row[1]))}
+        db.execute('CREATE TABLE IF NOT EXISTS source_reconciliations (key TEXT PRIMARY KEY, prior_state TEXT, receipt TEXT)')
+        db.execute('INSERT INTO source_reconciliations VALUES (?,?,?)',(digest(receipt),row[1],json.dumps(receipt,sort_keys=True)))
+        cur=db.execute('UPDATE workflow SET context_digest=?,state=? WHERE run=? AND context_digest=? AND state=?',
+                       (digest(new),json.dumps(state,sort_keys=True),old['run']['id'],row[0],row[1]))
+        require(cur.rowcount==1,'SOURCE_RECONCILE_CAS_CONFLICT')
+        db.commit()
+    with sqlite3.connect(old['workflow']['checkpoint_ref'],timeout=10) as reader:
+        require(reader.execute('SELECT context_digest FROM workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),
+                'SOURCE_RECONCILE_DURABLE_READBACK_FAILED')
+    return {**receipt,'checkpoint_readback':'PASS'}
+
+
+
 def build_task_graph(context):
     from langgraph.graph import END, START, StateGraph
     from . import m1_m7_agent_workflow as activity

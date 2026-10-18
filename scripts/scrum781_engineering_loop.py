@@ -104,7 +104,20 @@ def inspect(args: argparse.Namespace) -> dict:
                 repository_root=ROOT, controller_url=args.controller_url) if args.command == 'prepare' else None}
 
 
-def workflow(args: argparse.Namespace) -> dict:
+def select_workflow_checkpoint(root,run_id):
+    """Keep the existing run checkpoint even when source HEAD advances."""
+    root=Path(root)
+    candidates=[]
+    for path in sorted(root.glob('*/checkpoint.sqlite')):
+        with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True) as db:
+            if db.execute('SELECT 1 FROM workflow WHERE run=?',(run_id,)).fetchone():
+                candidates.append(path)
+    if len(candidates)>1:
+        raise ValueError('WORKFLOW_CHECKPOINT_SELECTION_AMBIGUOUS')
+    return candidates[0] if candidates else root/'run-checkpoint'/'checkpoint.sqlite'
+
+
+def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
     """Host preflight then actual M1-M7 invocation; never grants admission."""
     preflight_args = argparse.Namespace(**vars(args))
     preflight_args.command = 'inspect'
@@ -115,14 +128,18 @@ def workflow(args: argparse.Namespace) -> dict:
     from tools.node_architect.task_m1_m7_runner import run_task_workflow
     home = Path(os.environ.get('HERMES_HOME', str(Path.home()/'.hermes'))).resolve()
     trigger = f'native-tick-{args.tick}' if args.tick is not None else 'explicit-user-request'
-    path = home/'cache/scratch/q0-m1-m7-host'/args.session/preflight['code_head']/'checkpoint.sqlite'
+    path = select_workflow_checkpoint(home/'cache/scratch/q0-m1-m7-host'/args.session,preflight['run_id'])
     context = bind_from_plan(ROOT, plan_ref=PLAN_REF, conversation_url=args.controller_url,
                              session_id=args.session, checkpoint_ref=path, skill_ref='dwa-gpt-exchange')
     if context['repository']['head_sha'] != preflight['code_head']:
         raise ValueError('WORKFLOW_SOURCE_CHANGED_AFTER_PREFLIGHT')
-    result = run_task_workflow(context, host_capabilities={},
+    if host_capabilities is None:
+        from tools.node_architect.hermes_skill_capability_bridge import resolve_installed_hermes_skills
+        host_capabilities=resolve_installed_hermes_skills(context,home=home,host_session_id=args.session)
+    result = run_task_workflow(context, host_capabilities=host_capabilities,
                                invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
     return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),
+            'capability_binding':host_capabilities.get('capability_binding',{'status':'HOST_INJECTED'}),
             'trigger': 'NATIVE_OWNER_FIRING' if args.tick is not None else 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'}
 
 

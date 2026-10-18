@@ -18,6 +18,16 @@ def test_workflow_invokes_real_graph_and_reads_checkpoint(tmp_path, monkeypatch)
     assert result['trigger'] == 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'
 
 
+def test_existing_checkpoint_is_not_replaced_when_head_changes(tmp_path):
+    import sqlite3
+    root=tmp_path/'host';old=root/'old'
+    old.mkdir(parents=True)
+    p=old/'checkpoint.sqlite'
+    with sqlite3.connect(p) as db:
+        db.execute('CREATE TABLE workflow (run TEXT PRIMARY KEY)');db.execute('INSERT INTO workflow VALUES (?)',('run',))
+    assert cli.select_workflow_checkpoint(root,'run')==p
+
+
 def test_preflight_denial_never_invokes_graph(tmp_path, monkeypatch):
     monkeypatch.setenv('HERMES_HOME', str(tmp_path))
     monkeypatch.setattr(cli, 'inspect', lambda args: {'outcome': 'BLOCKED', 'reason_code': 'HOST_OWNER_UNVERIFIED'})

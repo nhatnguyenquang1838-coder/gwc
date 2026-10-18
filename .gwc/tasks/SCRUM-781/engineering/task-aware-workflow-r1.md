@@ -50,8 +50,10 @@ and settlement logic is preserved.
   **not yet a qualified host service**. Empty capability registry holds M1.
 - Canonical typed observer read/verify producer is still unavailable; this repair
   does not create one or certify a homemade receipt.
-- Native firing acceptance is pending while scheduler is paused. No simulated
-  tick, manual fire/settle or false tick-100 evidence is created.
+- Historical status at packet creation: native firing acceptance was pending while
+  paused. This is superseded by actual native100 evidence, not a replay:
+  `native100-workflow-supplement-r1.json`. The invocation row was read again during
+  R1 correction; M1 HOLD and checkpoint PASS, M2–M7 NOT_REACHED.
 - M2–M7 and verified response-to-graph end-to-end remain unproven. No L3,
   LOAD_PROOF, authentic original incident replay, or Q0 closure claim.
 - Existing 16 legacy failures remain outside this bounded repair; no unchanged

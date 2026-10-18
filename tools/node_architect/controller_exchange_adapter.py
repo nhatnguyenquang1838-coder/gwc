@@ -70,8 +70,10 @@ class ExchangeOutbox:
         require(json.loads(row[0]) == request,'EXCHANGE_REQUEST_DRIFT')
         return {'request':json.loads(row[0]),'status':row[1], 'receipt':json.loads(row[2]) if row[2] else None}
 
-    def record(self, request, receipt):
+    def record(self, request, receipt, *, expected_status=None, expected_receipt_digest=None, reconciliation=None):
         prior = self.read(request)
+        expected_status = prior['status'] if expected_status is None else expected_status
+        expected_receipt_digest = digest(prior['receipt']) if expected_receipt_digest is None else expected_receipt_digest
         require(receipt.get('status') in OUTCOMES,'EXCHANGE_OUTCOME_INVALID')
         require(receipt.get('typed_ce_admitted',False) is False and receipt.get('authority_granted',False) is False,'BROWSER_NOT_AUTHORITY')
         if receipt['status'] in {'MESSAGE_SENT_VERIFIED','CONTROLLER_RESPONSE_VERIFIED'}:
@@ -86,12 +88,40 @@ class ExchangeOutbox:
             require(receipt.get('response_to_marker') == request['marker'] and
                     isinstance(receipt.get('response_text'),str) and bool(receipt['response_text'].strip())
                     and isinstance(receipt.get('assistant_turn_ref'),str) and bool(receipt['assistant_turn_ref']), 'CONTROLLER_RESPONSE_READBACK_REQUIRED')
-        if prior['status'] == 'CONTROLLER_RESPONSE_VERIFIED':
-            require(prior['receipt'] == receipt, 'EXCHANGE_TERMINAL_RECEIPT_IMMUTABLE')
-            return
         with self._db() as db:
-            db.execute('UPDATE exchange SET status=?,receipt=? WHERE key=?',
-                       (receipt['status'],json.dumps(receipt,sort_keys=True),request['request_digest']))
+            db.execute('BEGIN IMMEDIATE')
+            current = db.execute('SELECT status,receipt FROM exchange WHERE key=?',(request['request_digest'],)).fetchone()
+            require(current is not None,'EXCHANGE_NOT_RESERVED')
+            old_status, old_json = current
+            old_receipt = json.loads(old_json) if old_json else None
+            require(old_status == expected_status and digest(old_receipt) == expected_receipt_digest,'OUTBOX_CAS_CONFLICT')
+            if old_receipt == receipt:
+                return
+            if old_status == 'CONTROLLER_RESPONSE_VERIFIED':
+                raise ValueError('EXCHANGE_TERMINAL_RECEIPT_IMMUTABLE')
+            if old_status == 'TRANSPORT_BLOCKED':
+                require(isinstance(reconciliation,dict) and
+                        reconciliation.get('request_digest') == request['request_digest'] and
+                        reconciliation.get('conversation_url') == request['conversation_url'] and
+                        reconciliation.get('marker') == request['marker'] and
+                        reconciliation.get('session_id') == request['session_id'] and
+                        reconciliation.get('prior_receipt_digest') == digest(old_receipt) and
+                        reconciliation.get('outcome') == 'EXACT_RECONCILIATION_VERIFIED' and
+                        bool(reconciliation.get('evidence_ref')), 'OUTBOX_RECOVERY_RECONCILIATION_REQUIRED')
+                allowed = {'MESSAGE_SENT_VERIFIED','CONTROLLER_ACTION_REQUIRED'}
+            else:
+                allowed = {
+                    'EXCHANGE_REQUESTED':{'MESSAGE_SENT_VERIFIED','TRANSPORT_BLOCKED'},
+                    'MESSAGE_SENT_VERIFIED':{'CONTROLLER_RESPONSE_VERIFIED','CONTROLLER_ACTION_REQUIRED'},
+                    'CONTROLLER_ACTION_REQUIRED':{'CONTROLLER_RESPONSE_VERIFIED'},
+                }.get(old_status,set())
+            require(receipt['status'] in allowed,'OUTBOX_TRANSITION_FORBIDDEN')
+            db.execute('CREATE TABLE IF NOT EXISTS exchange_history (id INTEGER PRIMARY KEY, key TEXT, old_status TEXT, new_status TEXT, receipt TEXT, reconciliation TEXT)')
+            cur = db.execute('UPDATE exchange SET status=?,receipt=? WHERE key=? AND status=? AND receipt IS ?',
+                       (receipt['status'],json.dumps(receipt,sort_keys=True),request['request_digest'],old_status,old_json))
+            require(cur.rowcount == 1,'OUTBOX_CAS_CONFLICT')
+            db.execute('INSERT INTO exchange_history(key,old_status,new_status,receipt,reconciliation) VALUES (?,?,?,?,?)',
+                       (request['request_digest'],old_status,receipt['status'],json.dumps(receipt,sort_keys=True),json.dumps(reconciliation)))
 
 
 def resume_host_exchange(context, request, outbox, capabilities):
@@ -101,9 +131,12 @@ def resume_host_exchange(context, request, outbox, capabilities):
     prior = outbox.read(request)
     if prior['status'] == 'CONTROLLER_RESPONSE_VERIFIED':
         return prior
-    reader = capabilities.get(c['capabilities']['controller_exchange']['skill_ref']+'.read')
+    reader = capabilities.get('controller_exchange.read') or capabilities.get(c['capabilities']['controller_exchange']['skill_ref']+'.read')
     require(callable(reader),'HOST_SKILL_READ_CAPABILITY_UNAVAILABLE')
-    outbox.record(request,reader(request))
+    receipt = reader(request)
+    if receipt.get('status') == 'HOST_ACTION_REQUIRED':
+        return receipt
+    outbox.record(request,receipt,expected_status=prior['status'],expected_receipt_digest=digest(prior['receipt']))
     return outbox.read(request)
 
 
@@ -116,14 +149,19 @@ def execute_host_exchange(context, request, outbox, capabilities):
     c = validate_task_context(context)
     require(request['task_context_digest'] == digest(c),'EXCHANGE_CONTEXT_DRIFT')
     skill = c['capabilities']['controller_exchange']['skill_ref']
-    provider = capabilities.get(skill)
+    provider = capabilities.get('controller_exchange.send_read_verify') or capabilities.get(skill)
     require(callable(provider), 'HOST_SKILL_CAPABILITY_UNAVAILABLE')
     if not outbox.reserve(request):
         return {'status':'DUPLICATE_SEND_DETECTED','prior':outbox.read(request),'typed_ce_admitted':False}
     try:
         receipt = provider(request)
-        outbox.record(request,receipt)
+        if receipt.get('status') == 'HOST_ACTION_REQUIRED':
+            return receipt
+        outbox.record(request,receipt,expected_status='EXCHANGE_REQUESTED',expected_receipt_digest=digest(None))
     except Exception:
-        outbox.record(request,{'status':'TRANSPORT_BLOCKED','reason':'HOST_CALL_UNVERIFIED','typed_ce_admitted':False})
+        current = outbox.read(request)
+        if current['status'] == 'EXCHANGE_REQUESTED':
+            outbox.record(request,{'status':'TRANSPORT_BLOCKED','reason':'HOST_CALL_UNVERIFIED','typed_ce_admitted':False},
+                          expected_status='EXCHANGE_REQUESTED', expected_receipt_digest=digest(current['receipt']))
         raise
     return outbox.read(request)
