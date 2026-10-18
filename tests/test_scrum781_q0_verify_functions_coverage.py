@@ -1,5 +1,6 @@
 """Real native coverage for q0_qualification functions that previously had
-zero test coverage: verify_q0_verification_receipt and verify_q0_certification.
+zero test coverage: verify_q0_verification_receipt and verify_q0_certification,
+plus the UR.G6 receipt-binding fail-closed branch.
 
 These drive the actual module functions with real sealed receipts. They are
 native engineering tests; they never claim LOAD_PROOF, original replay, L3, or
@@ -218,3 +219,49 @@ def test_verify_q0_certification_rejects_identity_drift():
     cert = m.certify_q0_runtime(**_cert_inputs())
     cert["certified_q0_sha"] = _sha("b")  # drifts from candidate_sha
     assert m.verify_q0_certification(cert) is False
+
+
+# --- complete_q0_gate UR.G6 receipt-binding fail-closed ----------------------
+def _acceptance_bundle():
+    m = _m()
+    cert = m.certify_q0_runtime(**_cert_inputs())
+    req = m.create_q0_acceptance_request(
+        run_id=cert["run_id"], task_id=cert["task_id"],
+        certified_q0_sha=cert["certified_q0_sha"],
+        q0_certification_receipt_ref=cert["receipt_digest"],
+        qualification_matrix_digest=cert["qualification_matrix_digest"],
+        target_handoff="LOGIN_R00_PLUS",
+        decision_authority={"type": "human", "id": "NHAT"},
+        captured_via={"type": "direct_chat", "id": "default"},
+        issued_at="2026-10-02T14:01:00Z", expires_at="2026-10-02T15:01:00Z",
+    )
+    receipt = m.decide_q0_acceptance(
+        request=req, decision="ACCEPT", actor={"type": "human", "id": "NHAT"},
+        decided_at="2026-10-02T14:02:00Z", current_certified_q0_sha=cert["certified_q0_sha"],
+    )
+    return m.create_q0_accepted_handoff(certification=cert, acceptance=receipt, created_at="2026-10-02T14:03:00Z")
+
+
+def test_ur_g6_completion_rejects_receipt_binding_mismatch():
+    """complete_q0_gate UR.G6: the acceptance/closure/handoff receipts must be
+    mutually bound (acceptance_receipt_ref, closure_receipt_ref, certified_q0_sha,
+    run_id). A cross-bound handoff must fail closed with
+    Q0_G6_RECEIPT_BINDING_MISMATCH."""
+    m = _m()
+    bundle = _acceptance_bundle()
+    evidence = {
+        "Q0_ACCEPTANCE_RECEIPT": bundle["acceptance"],
+        "CLOSURE_RECEIPT": bundle["closure"],
+        "HANDOFF_RECEIPT": bundle["handoff"],
+    }
+    # Valid bundle passes.
+    assert m.complete_q0_gate(gate="UR.G6", evidence=evidence)["gate_state"] == "PASSED"
+    # Break the handoff->acceptance binding: handoff points at a different
+    # acceptance receipt digest than the one supplied. Re-seal so the tamper
+    # passes the seal check and reaches the binding-mismatch branch.
+    tampered = dict(bundle["handoff"])
+    tampered["acceptance_receipt_ref"] = "sha256:" + "9" * 64
+    tampered["receipt_digest"] = m._digest({k: v for k, v in tampered.items() if k != "receipt_digest"})
+    bad_evidence = dict(evidence, HANDOFF_RECEIPT=tampered)
+    with pytest.raises(m.Q0QualificationError, match="Q0_G6_RECEIPT_BINDING_MISMATCH"):
+        m.complete_q0_gate(gate="UR.G6", evidence=bad_evidence)
