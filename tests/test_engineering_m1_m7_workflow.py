@@ -20,6 +20,7 @@ def capabilities(c,counts):
         counts['execute']+=1
         return {'exit_code':0,'result':'REAL_HOST_FIXTURE_RESULT','source_head':ctx['repository']['head_sha'],'stdout_digest':'sha256:'+'c'*64,'artifact_ref':'fixture-artifact','executed_effects':[]}
     return {'engineering.communication_read_once':read,'engineering.validate_context':lambda ctx:True,
+            'engineering.execution_ready':lambda ctx,item:True,
             'engineering.execute':execute,'engineering.verify_result':lambda ctx,item,result:result['exit_code']==0}
 
 
@@ -63,6 +64,19 @@ def test_missing_host_firing_admission_holds_before_work_claim(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='explicit-source-check')
     assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
     assert counts['execute']==0
+
+
+@pytest.mark.parametrize('admission',['missing','none','non_callable'])
+def test_absent_callable_admission_cannot_execute_or_claim_work(tmp_path,admission):
+    import sqlite3
+    c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    if admission=='missing':caps.pop('engineering.execution_ready')
+    else:caps['engineering.execution_ready']=None if admission=='none' else True
+    r=run_task_workflow(c,host_capabilities=caps,invocation_key='unadmitted-source-check')
+    assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
+    assert counts=={'read':1,'execute':0}
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==0
 
 
 def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
