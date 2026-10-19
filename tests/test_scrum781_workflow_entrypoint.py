@@ -10,7 +10,7 @@ def test_workflow_invokes_real_graph_and_reads_checkpoint(tmp_path, monkeypatch)
         'outcome': 'ENGINEERING_PREFLIGHT_PASS', 'run_id': 'scrum781-q0-fresh-20261010-r1',
         'code_head': cli.build_q0_operation(cli.ROOT, activity_id='test')[0]['head_sha'], 'native_loop': {'ticks_fired': 99}})
     result = cli.workflow(argparse.Namespace(command='workflow', session='test-session', tick=None,
-        controller_url='https://chatgpt.com/c/fixture'))
+        workflow_mode='PROTECTED_TYPED_CE', controller_url='https://chatgpt.com/c/fixture'))
     assert result['workflow']['verdict'] == {
         'status': 'HOLD', 'reason_code': 'OBSERVER_UNQUALIFIED', 'current_activity': 'M1'}
     assert result['workflow']['checkpoint_readback'] == 'PASS'

@@ -2,9 +2,10 @@
 """Q0 host preflight and M1-M7 workflow entrypoint outside Hermes core.
 
 inspect without --tick and prepare remain read-only. An owned inspect --tick
-also invokes M1-M7 and persists its exact-head scratch checkpoint. workflow
-supports an explicit user call without manufacturing a native firing.
-No scheduler writes, resume, C/E reads, qualifications or leases.
+routes explicitly to the engineering graph: one-shot human communication read,
+source-bound allowlisted validation, durable checkpoint and host exchange request.
+workflow supports explicit user calls without manufacturing a native firing.
+No scheduler writes, typed C/E reads, qualifications or leases.
 """
 from __future__ import annotations
 import argparse
@@ -110,11 +111,35 @@ def select_workflow_checkpoint(root,run_id):
     candidates=[]
     for path in sorted(root.glob('*/checkpoint.sqlite')):
         with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True) as db:
-            if db.execute('SELECT 1 FROM workflow WHERE run=?',(run_id,)).fetchone():
+            tables={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if any(table in tables and db.execute('SELECT 1 FROM '+table+' WHERE run=?',(run_id,)).fetchone()
+                   for table in ['workflow','engineering_workflow']):
                 candidates.append(path)
     if len(candidates)>1:
         raise ValueError('WORKFLOW_CHECKPOINT_SELECTION_AMBIGUOUS')
     return candidates[0] if candidates else root/'run-checkpoint'/'checkpoint.sqlite'
+
+
+def configure_engineering_context(context):
+    """Q0 adapter policy is task-specific; the engineering graph is generic."""
+    from tools.node_architect.task_context_binding import digest as context_digest
+    ref='core/node-architect/q0-engineering-coordination-route-r1.json'
+    raw=(ROOT/ref).read_bytes()
+    if raw != subprocess.check_output(['git','-C',str(ROOT),'show',context['repository']['head_sha']+':'+ref]):
+        raise ValueError('ENGINEERING_ROUTE_SOURCE_DRIFT')
+    route=json.loads(raw)
+    if route['runtime_epoch']!=context['run']['runtime_epoch'] or route['workflow_mode']!='Q0_ENGINEERING_COORDINATION':
+        raise ValueError('ENGINEERING_ROUTE_PLAN_MISMATCH')
+    context['workflow']['mode']=route['workflow_mode']
+    context['communication']={'issue_ref':f"github://{context['repository']['name']}/issues/{route['communication_issue']}",
+                              'allowed_authors':[context['repository']['name'].split('/')[0]]}
+    items=[]
+    for item in route['work_items']:
+        hashes={path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in item['read_paths']}
+        items.append({**item,'input_digest':context_digest(hashes)})
+    context['engineering']={'intent_ref':route['intent_ref'],'intent_body_sha256':route['intent_body_sha256'],
+                            'route_policy_ref':ref,'route_policy_digest':context_digest(route),'work_items':items}
+    return context
 
 
 def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
@@ -133,9 +158,25 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
                              session_id=args.session, checkpoint_ref=path, skill_ref='dwa-gpt-exchange')
     if context['repository']['head_sha'] != preflight['code_head']:
         raise ValueError('WORKFLOW_SOURCE_CHANGED_AFTER_PREFLIGHT')
-    if host_capabilities is None:
-        from tools.node_architect.hermes_skill_capability_bridge import resolve_installed_hermes_skills
-        host_capabilities=resolve_installed_hermes_skills(context,home=home,host_session_id=args.session)
+    mode=getattr(args,'workflow_mode','Q0_ENGINEERING_COORDINATION')
+    if mode=='Q0_ENGINEERING_COORDINATION':
+        context=configure_engineering_context(context)
+        if host_capabilities is None:
+            from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+            def guard():
+                current=inspect(preflight_args)
+                return (current['live_desktop_owner_verified'] and current['code_head']==preflight['code_head'] and
+                        current['native_loop']['status']=='active' and
+                        current['outcome']=='ENGINEERING_PREFLIGHT_PASS')
+            host_capabilities=local_engineering_capabilities(context,guard=guard,
+                artifact_directory=path.parent/'engineering-results',
+                allowed_commands=[['-m','scripts.scrum781_q0_login_fixture','--engine','native']])
+    elif mode=='PROTECTED_TYPED_CE':
+        context['workflow']['mode']='PROTECTED_TYPED_CE'
+        if host_capabilities is None:
+            from tools.node_architect.hermes_skill_capability_bridge import resolve_installed_hermes_skills
+            host_capabilities=resolve_installed_hermes_skills(context,home=home,host_session_id=args.session)
+    else:raise ValueError('TASK_WORKFLOW_MODE_INVALID')
     result = run_task_workflow(context, host_capabilities=host_capabilities,
                                invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
     return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),
@@ -148,6 +189,7 @@ def main() -> int:
     parser.add_argument('command', choices=('inspect','prepare','workflow'))
     parser.add_argument('--session', default=os.environ.get('HERMES_SESSION_ID'))
     parser.add_argument('--tick', type=int, help='inspect only: actual owner firing counter; never creates a firing')
+    parser.add_argument('--workflow-mode',choices=('Q0_ENGINEERING_COORDINATION','PROTECTED_TYPED_CE'),default='Q0_ENGINEERING_COORDINATION')
     parser.add_argument('--controller-url', default='https://chatgpt.com/g/g-p-6a622940beac81918180ce69e50ef83c-dw-super/c/6ad380a6-c280-83ec-bb3f-75cef495e848')
     args = parser.parse_args()
     try:

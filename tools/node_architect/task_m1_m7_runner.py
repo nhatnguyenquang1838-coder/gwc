@@ -101,7 +101,12 @@ def build_task_graph(context):
 
 
 def run_task_workflow(context, *, host_capabilities, report='', coordination_authorized=False, invocation_key=None):
-    c = validate_task_context(context);graph,profile = build_task_graph(c)
+    c = validate_task_context(context)
+    if c['workflow'].get('mode','PROTECTED_TYPED_CE') == 'Q0_ENGINEERING_COORDINATION':
+        from .engineering_m1_m7_workflow import run_engineering_workflow
+        return run_engineering_workflow(c,host_capabilities=host_capabilities,
+                    invocation_key=invocation_key or 'explicit-user:'+digest(c))
+    graph,profile = build_task_graph(c)
     operation = {k:profile[k] for k in ('task_id','repository','run_id','base_sha','working_branch','scope_hash','runtime_plan_digest')}
     operation.update(head_sha=operation['base_sha'],operation_id=c['run']['id']+':generic-m1-m7',
                      activity_id='task-workflow',protocol_version='dw.taskcontroller.continuation/v1',continuation_ref='',cursor={})
@@ -145,7 +150,8 @@ def run_task_workflow(context, *, host_capabilities, report='', coordination_aut
         db.execute('INSERT OR REPLACE INTO workflow VALUES (?,?,?)',(c['run']['id'],digest(c),encoded))
         require(db.execute('SELECT state FROM workflow WHERE run=?',(c['run']['id'],)).fetchone()[0] == encoded,'TASK_CHECKPOINT_READBACK_FAILED')
         coordination = make_exchange_request(c,report,lane='HOST_COORDINATION') if coordination_authorized and report else None
-        result = {'task_context_digest':digest(c),'verdict':state['verdict'], 'checkpoint_readback':'PASS',
+        result = {'workflow_identity':'protected-typed-m1-m7/v1','evidence_namespace':'PROTECTED_TYPED_CE',
+                  'task_context_digest':digest(c),'verdict':state['verdict'], 'checkpoint_readback':'PASS',
                   'checkpoint_ref':str(path),'activity_results':state['activity_results'],
                   'graph_requests':raw.get('controller_exchange_requests',[]), 'coordination_request':coordination,
                   'host_admission':'QUALIFIED_HOST_OBSERVATION' if qualified else 'OBSERVER_UNQUALIFIED',

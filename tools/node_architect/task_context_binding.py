@@ -37,6 +37,7 @@ def validate_task_context(context):
     require(re.fullmatch(r'[0-9a-f]{40}', c['repository'].get('head_sha','')), 'TASK_HEAD_INVALID')
     require(re.fullmatch(r'sha256:[0-9a-f]{64}',c['run'].get('runtime_plan_digest','')), 'TASK_PLAN_DIGEST_INVALID')
     require(c['workflow'].get('id') == 'generic-m1-m7' and tuple(c['workflow'].get('activities',[])) == ACTIVITIES, 'TASK_TOPOLOGY_INVALID')
+    require(c['workflow'].get('mode','PROTECTED_TYPED_CE') in {'PROTECTED_TYPED_CE','Q0_ENGINEERING_COORDINATION'}, 'TASK_WORKFLOW_MODE_INVALID')
     u = urlsplit(c['controller'].get('conversation_url',''))
     require(u.scheme == 'https' and u.netloc == 'chatgpt.com' and '/c/' in u.path and not u.query and not u.fragment, 'CONTROLLER_URL_INVALID')
     require(c['controller'].get('interaction_mode') == 'hermes_skill', 'CONTROLLER_MODE_INVALID')
