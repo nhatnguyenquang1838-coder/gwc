@@ -65,6 +65,34 @@ class SlackTaskControllerTests(unittest.TestCase):
         )
         self.assertEqual(result["outcome"], "WAIT_CONTROLLER")
 
+    def test_wait_controller_rejected_when_runnable_read_only_child_exists(self):
+        """SCRUM-808 anti-deadlock: WAIT_CONTROLLER must be rejected
+        when a runnable READ_ONLY_ANALYSIS child run exists."""
+        child_runs = [
+            {"run_id": "analyzer-r1", "run_type": "READ_ONLY_ANALYSIS", "status": "READY"},
+        ]
+        result = mod.controller_next_action(
+            {"subtask_id": "S2", "status": "DONE", "after_report": "WAIT_CONTROLLER"},
+            expected_subtask_id="S2",
+            child_runs=child_runs,
+        )
+        self.assertEqual(result["outcome"], "INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS")
+        self.assertEqual(result["action"], "CONTINUE_READ_ONLY")
+        self.assertEqual(result["reason_code"], "INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS")
+        self.assertEqual(result["runnable_read_only_count"], 1)
+
+    def test_wait_controller_allowed_when_no_read_only_child(self):
+        """WAIT_CONTROLLER is valid when no runnable read-only work exists."""
+        child_runs = [
+            {"run_id": "executor-r1", "run_type": "REPOSITORY_EFFECT", "status": "RUNNING"},
+        ]
+        result = mod.controller_next_action(
+            {"subtask_id": "S2", "status": "DONE", "after_report": "WAIT_CONTROLLER"},
+            expected_subtask_id="S2",
+            child_runs=child_runs,
+        )
+        self.assertEqual(result["outcome"], "WAIT_CONTROLLER")
+
     def test_material_drift_intercepts(self):
         result = mod.controller_next_action(
             {"subtask_id": "S1", "status": "RUNNING", "after_report": "CONTINUE", "scope_drift": True},

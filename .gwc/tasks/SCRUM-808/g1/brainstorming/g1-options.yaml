@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g1-options",
+  "generated_at": "2026-09-23T19:00:00Z",
+  "trace": {
+    "project_id": "gwc",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "task_id": "SCRUM-808",
+    "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
+    "g0_snapshot": "../../g0/context-snapshot.yaml"
+  },
+  "options": [
+    {
+      "id": "OPT-1",
+      "title": "Direct human G2-A approval",
+      "description": "Nhật approves G2-A directly",
+      "benefits": [
+        "Full human authority"
+      ],
+      "tradeoffs": [
+        "Slower cycle"
+      ],
+      "risks": [
+        "Human bottleneck"
+      ],
+      "constraint_fit": "FIT"
+    },
+    {
+      "id": "OPT-2",
+      "title": "Delegate Analyzer review only (advisory)",
+      "description": "Analyzer reviews read-only and reports findings; no approval or G2 authority. Human retains G2 authority.",
+      "benefits": [
+        "Independent review without authority delegation",
+        "Consistent evidence gathering"
+      ],
+      "tradeoffs": [
+        "Human still must decide G2"
+      ],
+      "risks": [
+        "Analyzer context limits"
+      ],
+      "constraint_fit": "FIT"
+    }
+  ],
+  "recommended_option_id": "OPT-2",
+  "recommendation_rationale": "Analyzer is read-only advisory; human retains G2 authority per SCRUM-808/#580",
+  "decision_required": true,
+  "status": "READY"
+}

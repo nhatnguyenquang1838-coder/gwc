@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-execution-envelope",
+  "activation_state": "AWAITING_APPROVAL",
+  "task_id": "SCRUM-808",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
+  "working_branch": "auto/SCRUM-808-na81-20260923-v2",
+  "risk_class": "R2",
+  "risk_digest": "sha256:19a7a1e5595eebd7162afb3f545cfc7d60d124412c5c90d7bc1ebaeb572220",
+  "bounded_read_scope": [
+    ".gwc/tasks/SCRUM-808/**",
+    "core/**"
+  ],
+  "bounded_write_scope": [
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/Agent_Operating_Runtime_Contract_v1.0.md",
+    "AGENTS.md",
+    "core/node-architect/flow-policy-compiled-profile.json",
+    "core/node-architect/flow-policy-activation-registry.json",
+    "tests/test_flow_policy_compiler_identity_hardening.py",
+    "tests/test_scrum808_analyzer_anti_deadlock.py",
+    ".gwc/tasks/SCRUM-808/**"
+  ],
+  "authorized_actions": [
+    "modify_approved_files",
+    "create_guarded_branch_or_worktree",
+    "push_working_branch",
+    "run_sandboxed_validation"
+  ],
+  "excluded_actions": [
+    "open_draft_pr",
+    "mark_pr_ready",
+    "merge",
+    "auto_merge",
+    "force_push",
+    "branch_deletion",
+    "protected_branch_write",
+    "deploy",
+    "release",
+    "production_data_change",
+    "production_config_change",
+    "g3_pr_promotion",
+    "g4_merge",
+    "g5_deploy",
+    "g6_production"
+  ],
+  "scope_hash": "sha256:a40b9d5c96aec5a8a47d663434fa3b43cb325f570b29544e806864ebb373a335",
+  "f1_artifact_digests": {
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md": "bcb4a3911eab481c8c88523f87dc4e2e81c892764c5a0cc52c12f3fee61cecda",
+    "core/Agent_Operating_Runtime_Contract_v1.0.md": "bea4e477396533354ae5bab0ada3ddc17ad1a8937041b5b724b3de449422fee8",
+    "AGENTS.md": "18922cbcb844af1aae94d9b138984725610165717e0df58ee88ef5af8e56a03c"
+  },
+  "f2_digests": {
+    "gate_state_resolution": "sha256:59455df7dbe95a1f2b3d5852a4ac8b4e3ec77dc2f91563486a406b7ff72ea90b",
+    "authority_boundary_decision": "sha256:7325fa7ce3778019879feca836b95b5fdd8ed1c9e8875cd0d845bdcde507485d"
+  },
+  "approval_request_ref": {
+    "request_id": "APPROVE_G2_A_SCRUM-808_20260923",
+    "scope_hash": "sha256:a40b9d5c96aec5a8a47d663434fa3b43cb325f570b29544e806864ebb373a335",
+    "issued_at": "2026-09-23T19:00:00Z",
+    "expires_at": "2026-09-24T19:00:00Z",
+    "reason_code": "G2_EXECUTION_APPROVAL"
+  },
+  "approval_validation_ref": {
+    "review_id": "issuecomment-5795754182",
+    "verdict": "CHANGES_REQUIRED",
+    "reviewer": "analyzer",
+    "issues": 10
+  },
+  "checkpoint_id": "chk-SCRUM-808-20260923-v2",
+  "issued_at": "2026-09-23T19:00:00Z",
+  "expires_at": "2026-09-24T19:00:00Z",
+  "reason_code": "G2_ENVELOPE_AWAITING_APPROVAL",
+  "envelope_digest": "sha256:797bac071e5449c126c63b46ad02b3f7a8e47a8c4c28425b05e471d43c6ec57e",
+  "exclusions": [
+    "G3_PR",
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION"
+  ],
+  "execution_started": false
+}

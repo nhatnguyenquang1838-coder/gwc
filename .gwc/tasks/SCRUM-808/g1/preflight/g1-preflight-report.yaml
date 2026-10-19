@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g1-preflight-report",
+  "generated_at": "2026-09-23T19:00:00Z",
+  "trace": {
+    "project_id": "gwc",
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "task_id": "SCRUM-808",
+    "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
+    "g0_snapshot": "../../g0/context-snapshot.yaml"
+  },
+  "repository_state": {
+    "base_sha": "bb5a870bd2066a38bef75262aad1a87e2d08cba2",
+    "base_ref": "main",
+    "profile_path": "projects/gwc/project-profile.yaml",
+    "connector": "github"
+  },
+  "risk_class": "R2",
+  "required_gate": "G2_HUMAN_DIRECTION",
+  "checks": [
+    {
+      "id": "PF-001",
+      "status": "PASS",
+      "code": "BASE_COMMIT",
+      "message": "Base commit verified",
+      "evidence": [
+        "git rev-parse bb5a870bd2066a38bef75262aad1a87e2d08cba2"
+      ]
+    },
+    {
+      "id": "PF-002",
+      "status": "PASS",
+      "code": "JIRA_CLAIM",
+      "message": "SCRUM-808 claimed + In Progress",
+      "evidence": [
+        "customfield_10046=Hermes",
+        "transition 21"
+      ]
+    },
+    {
+      "id": "PF-003",
+      "status": "PASS",
+      "code": "SCOPE_IDENTIFIED",
+      "message": "Authorized paths = 4 core docs + regression tests + flow policy",
+      "evidence": [
+        "git diff --stat"
+      ]
+    }
+  ],
+  "blockers": [],
+  "outcome": "PASS"
+}

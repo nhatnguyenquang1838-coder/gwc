@@ -243,7 +243,12 @@ def compile_executor_contract(*, task_id: str, repository: str, base_sha: str, b
     return {**contract, "contract_digest": canonical_digest(contract)}
 
 
-def controller_next_action(report: Mapping[str, Any], *, expected_subtask_id: str) -> dict[str, Any]:
+def controller_next_action(
+    report: Mapping[str, Any],
+    *,
+    expected_subtask_id: str,
+    child_runs: Sequence[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Classify one semantic Executor milestone report; tool chatter is outside this contract."""
     if any(report.get(flag) is True for flag in INTERCEPT_FLAGS):
         return {"outcome": "INTERCEPT", "action": "WAIT", "reason_code": "TASK_CONTROLLER_MATERIAL_DRIFT"}
@@ -254,6 +259,19 @@ def controller_next_action(report: Mapping[str, Any], *, expected_subtask_id: st
         return {"outcome": "TERMINAL", "action": "SAFE_STOP", "reason_code": "TASK_CONTROLLER_EXECUTOR_BLOCKED"}
     after = str(report.get("after_report", "")).upper()
     if after == "WAIT_CONTROLLER":
+        # SCRUM-808 anti-deadlock: reject WAIT_CONTROLLER if any runnable READ_ONLY_ANALYSIS child exists
+        runnable_read_only = [
+            c for c in (child_runs or [])
+            if str(c.get("run_type", "")).upper() == "READ_ONLY_ANALYSIS"
+            and str(c.get("status", "")).upper() in {"RUNNING", "READY", "DECLARED"}
+        ]
+        if runnable_read_only:
+            return {
+                "outcome": "INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS",
+                "action": "CONTINUE_READ_ONLY",
+                "reason_code": "INVALID_WAIT_CONTROLLER_RUNNABLE_WORK_EXISTS",
+                "runnable_read_only_count": len(runnable_read_only),
+            }
         return {"outcome": "WAIT_CONTROLLER", "action": "REVIEW_EVIDENCE", "reason_code": "TASK_CONTROLLER_REVIEW_REQUIRED"}
     if after == "TERMINAL":
         return {"outcome": "TERMINAL", "action": "VERIFY_TERMINAL_EVIDENCE", "reason_code": "TASK_CONTROLLER_EXECUTOR_TERMINAL"}
