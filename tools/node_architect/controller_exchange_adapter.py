@@ -166,11 +166,21 @@ class ExchangeOutbox:
                        (request['request_digest'],old_status,receipt['status'],json.dumps(receipt,sort_keys=True),json.dumps(reconciliation)))
 
 
-def resume_host_exchange(context, request, outbox, capabilities):
-    """Read/verify a pending response without invoking send again."""
+def resume_host_exchange(context, request, outbox, capabilities, *, phase='response',
+                         inventory=None, dispatch_failure=None, idle_confirmed=False,
+                         composer_empty_confirmed=False):
+    """Resume an existing exchange: type only a proven uninvoked stage, or read a pending response."""
     c = validate_task_context(context)
     require(request['task_context_digest'] == digest(c), 'EXCHANGE_CONTEXT_DRIFT')
     prior = outbox.read(request)
+    if phase == 'stage':
+        require(prior['status']=='EXCHANGE_REQUESTED' and prior['receipt'] is None,
+                'HOST_SEND_STATE_BLOCKED')
+        resume = capabilities.get('controller_exchange.resume_stage')
+        require(callable(resume),'HOST_SKILL_STAGE_RESUME_UNAVAILABLE')
+        return resume(request,inventory,dispatch_failure=dispatch_failure,
+                      idle_confirmed=idle_confirmed,composer_empty_confirmed=composer_empty_confirmed)
+    require(phase=='response','HOST_RESUME_PHASE_INVALID')
     if prior['status'] == 'CONTROLLER_RESPONSE_VERIFIED':
         return prior
     reader = capabilities.get('controller_exchange.read') or capabilities.get(c['capabilities']['controller_exchange']['skill_ref']+'.read')

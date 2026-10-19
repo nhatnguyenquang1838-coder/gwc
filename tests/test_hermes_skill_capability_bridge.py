@@ -34,10 +34,22 @@ def test_bridge_stage_is_durably_at_most_once(tmp_path):
     p=tmp_path/'SKILL.md';p.write_text('---\nname: dwa-gpt-exchange\n---\n')
     c=context();b=ExchangeOutbox(tmp_path/'outbox');r=make_exchange_request(c,'review',lane='HOST_COORDINATION');b.reserve(r)
     registry=resolve_hermes_skills(c,skill_path=p,host_session_id='session',preview={'url':c['controller']['conversation_url']},outbox=b)
-    inventory={'url':r['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'fixture-composer'}]}
+    inventory={'url':r['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'fixture-composer','value':'','disabled':False}]}
     registry['bridge'].stage(r,inventory,composer_empty_confirmed=True,idle_confirmed=True)
     with pytest.raises(ValueError,match='HOST_ACTION_ALREADY_CLAIMED'):
         registry['bridge'].stage(r,inventory,composer_empty_confirmed=True,idle_confirmed=True)
+
+
+def test_bridge_stage_fails_closed_when_composer_value_is_unknown(tmp_path):
+    p=tmp_path/'SKILL.md';p.write_text('---\nname: dwa-gpt-exchange\n---\n')
+    c=context();box=ExchangeOutbox(tmp_path/'outbox');r=make_exchange_request(c,'review',lane='HOST_COORDINATION');box.reserve(r)
+    registry=resolve_hermes_skills(c,skill_path=p,host_session_id='session',preview={'url':c['controller']['conversation_url']},outbox=box)
+    inventory={'url':r['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'fixture-composer','disabled':False}]}
+    with pytest.raises(ValueError,match='HOST_COMPOSER_VALUE_UNKNOWN'):
+        registry['bridge'].stage(r,inventory,composer_empty_confirmed=False,idle_confirmed=True)
+    with box._db() as db:
+        table=db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='host_actions'").fetchone()
+        assert table is None
 
 
 def test_m7_hold_cannot_emit_browser_exchange():

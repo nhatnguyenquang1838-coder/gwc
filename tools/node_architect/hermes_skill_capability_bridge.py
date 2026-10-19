@@ -52,10 +52,48 @@ class HermesSkillBridge:
         require(self.outbox.read(request)['status']=='EXCHANGE_REQUESTED','HOST_SEND_STATE_BLOCKED')
         require(inventory.get('url')==request['conversation_url'],'HOST_URL_MISMATCH')
         require('elements' in inventory,'HOST_FRESH_INVENTORY_REQUIRED')
-        require(idle_confirmed and composer_empty_confirmed,'HOST_COMPOSER_OR_LIVENESS_UNKNOWN')
+        require(idle_confirmed,'HOST_GPT_NOT_IDLE')
         boxes=[e for e in inventory['elements'] if e.get('role')=='textbox' and e.get('label')=='Ask ChatGPT']
         require(len(boxes)==1 and not boxes[0].get('disabled',False),'HOST_COMPOSER_UNAVAILABLE')
+        if 'value' in boxes[0]:
+            require(boxes[0]['value']=='','HOST_COMPOSER_NOT_EMPTY')
+        else:
+            require(composer_empty_confirmed,'HOST_COMPOSER_VALUE_UNKNOWN')
         self._claim_action(request,'STAGE')
+        return {'status':'HOST_ACTION_REQUIRED','tool':'drive_preview',
+                'arguments':{'action':'type','ref':boxes[0]['ref'],'text':request['marker']+'\n'+request['report'],'submit':False}}
+
+    def resume_stage(self,request,inventory,*,dispatch_failure=None,idle_confirmed=False,
+                     composer_empty_confirmed=False):
+        """Resume a claimed but uninvoked type action after an explicit tool-schema rejection."""
+        self._bound(request)
+        state=self.outbox.read(request)
+        require(state['status']=='EXCHANGE_REQUESTED' and state['receipt'] is None,'HOST_SEND_STATE_BLOCKED')
+        require(isinstance(dispatch_failure,dict) and
+                dispatch_failure.get('request_digest')==request['request_digest'] and
+                dispatch_failure.get('tool')=='functions.tool_call' and
+                dispatch_failure.get('action')=='type' and
+                dispatch_failure.get('error_code')=='CALL_ITEM_NAME_REQUIRED' and
+                dispatch_failure.get('browser_action_invoked') is False,
+                'HOST_STAGE_RECOVERY_EVIDENCE_INVALID')
+        require(inventory.get('url')==request['conversation_url'],'HOST_URL_MISMATCH')
+        require('elements' in inventory,'HOST_FRESH_INVENTORY_REQUIRED')
+        require(idle_confirmed,'HOST_GPT_NOT_IDLE')
+        boxes=[e for e in inventory['elements'] if e.get('role')=='textbox' and e.get('label')=='Ask ChatGPT']
+        require(len(boxes)==1 and not boxes[0].get('disabled',False),'HOST_COMPOSER_UNAVAILABLE')
+        if 'value' in boxes[0]:
+            require(boxes[0]['value']=='','HOST_COMPOSER_NOT_EMPTY')
+        else:
+            require(composer_empty_confirmed,'HOST_COMPOSER_VALUE_UNKNOWN')
+        with self.outbox._db() as db:
+            db.execute('BEGIN IMMEDIATE')
+            current=db.execute('SELECT status FROM exchange WHERE key=?',(request['request_digest'],)).fetchone()
+            require(current is not None and current[0]=='EXCHANGE_REQUESTED','HOST_SEND_STATE_BLOCKED')
+            require(db.execute('SELECT 1 FROM host_actions WHERE key=? AND phase=?',(request['request_digest'],'STAGE')).fetchone() is not None,'HOST_STAGE_CLAIM_REQUIRED')
+            require(db.execute('SELECT 1 FROM host_actions WHERE key=? AND phase=?',(request['request_digest'],'SEND')).fetchone() is None,'HOST_SEND_ALREADY_CLAIMED')
+            db.execute('CREATE TABLE IF NOT EXISTS host_actions (key TEXT, phase TEXT, PRIMARY KEY(key,phase))')
+            cur=db.execute('INSERT OR IGNORE INTO host_actions VALUES (?,?)',(request['request_digest'],'TYPE_REPLAY'))
+            require(cur.rowcount==1,'HOST_TYPE_REPLAY_ALREADY_CLAIMED')
         return {'status':'HOST_ACTION_REQUIRED','tool':'drive_preview',
                 'arguments':{'action':'type','ref':boxes[0]['ref'],'text':request['marker']+'\n'+request['report'],'submit':False}}
 
@@ -139,5 +177,6 @@ def resolve_hermes_skills(context,*,skill_path,host_session_id,preview,outbox):
     return {'bridge':bridge,'capability_binding':metadata,
             'controller_exchange.send_read_verify':bridge.send_read_verify,
             'controller_exchange.read':bridge.read,
+            'controller_exchange.resume_stage':bridge.resume_stage,
             name.group(1).strip():bridge.send_read_verify,
             name.group(1).strip()+'.read':bridge.read}

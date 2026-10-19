@@ -62,6 +62,69 @@ def test_shared_response_reconciliation_binds_weak_receipt_to_exact_request():
     assert observation['workflow_resume_allowed'] is False
 
 
+def test_resume_host_exchange_recovers_stage_after_pre_invocation_tool_rejection(tmp_path):
+    from tools.node_architect.hermes_skill_capability_bridge import resolve_hermes_skills
+    c=context();req=make_exchange_request(c,'Exact reserved report',lane='HOST_COORDINATION')
+    box=ExchangeOutbox(tmp_path/'box.sqlite');assert box.reserve(req)
+    skill=tmp_path/'SKILL.md';skill.write_text('---\nname: dwa-gpt-exchange\n---\n')
+    registry=resolve_hermes_skills(c,skill_path=skill,host_session_id='session',
+        preview={'url':c['controller']['conversation_url']},outbox=box)
+    inventory={'url':req['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'fresh-composer','value':'','disabled':False}]}
+    registry['bridge'].stage(req,inventory,composer_empty_confirmed=True,idle_confirmed=True)
+    failure={'request_digest':req['request_digest'],'tool':'functions.tool_call','action':'type',
+        'error_code':'CALL_ITEM_NAME_REQUIRED','browser_action_invoked':False}
+    action=resume_host_exchange(c,req,box,registry,phase='stage',inventory=inventory,
+        dispatch_failure=failure,idle_confirmed=True)
+    assert action['tool']=='drive_preview'
+    assert action['arguments']=={'action':'type','ref':'fresh-composer','text':req['marker']+'\n'+req['report'],'submit':False}
+    assert box.read(req)['status']=='EXCHANGE_REQUESTED'
+    with box._db() as db:
+        phases=db.execute('SELECT phase FROM host_actions WHERE key=? ORDER BY phase',(req['request_digest'],)).fetchall()
+    assert phases==[('STAGE',),('TYPE_REPLAY',)]
+
+
+def test_resume_host_exchange_requires_matching_pre_invocation_failure_and_is_one_shot(tmp_path):
+    from tools.node_architect.hermes_skill_capability_bridge import resolve_hermes_skills
+    c=context();req=make_exchange_request(c,'Exact reserved report',lane='HOST_COORDINATION')
+    box=ExchangeOutbox(tmp_path/'box.sqlite');assert box.reserve(req)
+    skill=tmp_path/'SKILL.md';skill.write_text('---\nname: dwa-gpt-exchange\n---\n')
+    registry=resolve_hermes_skills(c,skill_path=skill,host_session_id='session',
+        preview={'url':c['controller']['conversation_url']},outbox=box)
+    inventory={'url':req['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'composer','value':'','disabled':False}]}
+    registry['bridge'].stage(req,inventory,composer_empty_confirmed=True,idle_confirmed=True)
+    failure={'request_digest':req['request_digest'],'tool':'functions.tool_call','action':'type',
+        'error_code':'CALL_ITEM_NAME_REQUIRED','browser_action_invoked':True}
+    with pytest.raises(ValueError,match='HOST_STAGE_RECOVERY_EVIDENCE_INVALID'):
+        resume_host_exchange(c,req,box,registry,phase='stage',inventory=inventory,
+            dispatch_failure=failure,idle_confirmed=True)
+    failure['browser_action_invoked']=False
+    action=resume_host_exchange(c,req,box,registry,phase='stage',inventory=inventory,
+        dispatch_failure=failure,idle_confirmed=True)
+    assert action['arguments']['text']==req['marker']+'\n'+req['report']
+    with pytest.raises(ValueError,match='HOST_TYPE_REPLAY_ALREADY_CLAIMED'):
+        resume_host_exchange(c,req,box,registry,phase='stage',inventory=inventory,
+            dispatch_failure=failure,idle_confirmed=True)
+
+
+def test_resume_host_exchange_fails_closed_when_composer_value_is_unknown(tmp_path):
+    from tools.node_architect.hermes_skill_capability_bridge import resolve_hermes_skills
+    c=context();req=make_exchange_request(c,'Exact reserved report',lane='HOST_COORDINATION')
+    box=ExchangeOutbox(tmp_path/'box.sqlite');assert box.reserve(req)
+    skill=tmp_path/'SKILL.md';skill.write_text('---\nname: dwa-gpt-exchange\n---\n')
+    registry=resolve_hermes_skills(c,skill_path=skill,host_session_id='session',
+        preview={'url':c['controller']['conversation_url']},outbox=box)
+    empty={'url':req['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'composer','value':'','disabled':False}]}
+    registry['bridge'].stage(req,empty,composer_empty_confirmed=True,idle_confirmed=True)
+    unknown={'url':req['conversation_url'],'elements':[{'role':'textbox','label':'Ask ChatGPT','ref':'fresh-composer','disabled':False}]}
+    failure={'request_digest':req['request_digest'],'tool':'functions.tool_call','action':'type',
+        'error_code':'CALL_ITEM_NAME_REQUIRED','browser_action_invoked':False}
+    with pytest.raises(ValueError,match='HOST_COMPOSER_VALUE_UNKNOWN'):
+        resume_host_exchange(c,req,box,registry,phase='stage',inventory=unknown,
+            dispatch_failure=failure,idle_confirmed=True)
+    with box._db() as db:
+        assert db.execute('SELECT 1 FROM host_actions WHERE key=? AND phase=?',(req['request_digest'],'TYPE_REPLAY')).fetchone() is None
+
+
 @pytest.mark.parametrize('field,value',[
     ('session_id','other-session'),('run_id','other-run'),('conversation_url','https://chatgpt.com/c/other'),
     ('response_to_marker','DWA-REVIEW-OTHER'),('assistant_turn_ref',''),('evidence_class','UNVERIFIED'),
