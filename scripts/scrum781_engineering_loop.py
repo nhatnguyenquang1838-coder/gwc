@@ -171,6 +171,7 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             host_capabilities=local_engineering_capabilities(context,guard=guard,
                 artifact_directory=path.parent/'engineering-results',
                 allowed_commands=[['-m','scripts.scrum781_q0_login_fixture','--engine','native']])
+            host_capabilities['engineering.execution_ready']=lambda c,item:args.tick is not None and guard()
     elif mode=='PROTECTED_TYPED_CE':
         context['workflow']['mode']='PROTECTED_TYPED_CE'
         if host_capabilities is None:

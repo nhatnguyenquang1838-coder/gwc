@@ -48,18 +48,36 @@ Canonical writable repository: {repository_root}
 Controller strategy remains coordination; bound GPT URL: {controller_url}
 
 This scheduler advances independently authorized GWC Universal v2 Q0 engineering.
-C/E polling and dispatch remain BLOCKED. It is NOT MAILBOX_OBSERVER or a
-Controller-wakeup poller. Do not poll typed C/E/continuation, scan issue history
+Typed machine C/E polling and dispatch remain BLOCKED unless separately admitted.
+This engineering workflow is not MAILBOX_OBSERVER or a Controller-wakeup poller.
+Do not poll typed C/E/continuation, scan issue history
 for authority, wake GPT periodically, create an issuer/lease, or infer qualification.
 
 On each ACTUAL firing: bind the exact native session, live owner, counter and
 worktree; read AGENTS.md UNIVERSAL_V2_DEVELOPMENT and the source-bound Q0 plan.
 Run the versioned host workflow CLI in this repository BEFORE selecting work:
-  python scripts/scrum781_engineering_loop.py workflow --session {session_id} --tick <ACTUAL_NATIVE_COUNTER>
+  python scripts/scrum781_engineering_loop.py inspect --session {session_id} --tick <ACTUAL_NATIVE_COUNTER> --workflow-mode Q0_ENGINEERING_COORDINATION
 The existing inspect --tick entrypoint routes to the same workflow for compatibility.
-Require actual graph verdict and durable checkpoint readback. Keep M1 HOLD when
-observer qualification is unavailable; do not replace it with browser evidence.
-Prioritize host-admission/wiring repair, not unrelated test coverage. Any independent
+Engineering M1 owns the one-shot #595 read inside the host workflow; do not read
+the issue collection a second time outside it. Filter communication/v2 by exact
+run and author, validate latest command/source/seq/reply, and keep typed bodies
+opaque. Do not use #608 or create a replacement mailbox. Human consumption is
+LOCAL_ONLY, persisted after validation/processing, never typed C/E admission.
+Require actual graph verdict, selected work/result and durable checkpoint readback.
+Engineering identity is generic-engineering-m1-m7/v1. PROTECTED_TYPED_CE remains
+separate, unchanged and fail-closed; missing typed observation is not a global
+engineering HOLD. Never substitute human communication for protected evidence.
+Prioritize the RuntimePlan's DWO Login reproduction or real Q0 defect, not
+unrelated coverage. The CLI's executed/verified work is this firing's one bounded
+action. For a real source defect, RED→FIX→GREEN under the current source policy.
+When M7 returns a pending report/exchange request, use #595 for the next actual
+communication seq, exact-read the material report and fulfill the SAME reserved
+HOST_COORDINATION request through the installed dwa-gpt-exchange skill/outbox.
+Use its stored TaskContext, marker and URL; no duplicate reservation/stage/send.
+Persist delivery/readback with truthful receipt strength. No protected M7 or
+native settlement claim. A pending browser effect does not block unrelated
+authorized engineering. If no new/ready work exists, checkpoint NO_MATERIAL_CHANGE
+silently; no routine reports or GPT wakeups. Any independent
 Controller exchange requires explicit user authorization or a qualified semantic
 handoff; native timer movement alone never authorizes browser sends.
 Substitute only this genuine firing's verified native counter; never guess one.
@@ -72,8 +90,8 @@ Take one bounded ready engineering action permitted by the current plan: diagnos
 and repair a Q0-relevant failure with RED→GREEN, verify source/reload evidence,
 or resolve provenance of the original incident. Do not rerun unchanged audits
 or tests as progress. Preserve six foreign untracked files and a single writer.
-Keep M1–M7 identities/topology unchanged. Do not change M1 HOLD to PASS or use
-browser text as typed C/E evidence. A graph observer HOLD blocks C/E effects,
+Keep frozen protected M1–M7 identities/topology unchanged. Do not change M1 HOLD to PASS
+in protected mode or use browser text as typed C/E evidence. A protected HOLD blocks C/E effects,
 not independently authorized native engineering. Never claim LOAD_PROOF, original
 replay, L3 or native gate receipts from unit tests or scheduler counters.
 

@@ -57,6 +57,14 @@ def test_prohibited_effect_does_not_reach_executor(tmp_path):
     assert counts['execute']==0
 
 
+def test_missing_host_firing_admission_holds_before_work_claim(tmp_path):
+    c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    caps['engineering.execution_ready']=lambda ctx,item:False
+    r=run_task_workflow(c,host_capabilities=caps,invocation_key='explicit-source-check')
+    assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
+    assert counts['execute']==0
+
+
 def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
     from copy import deepcopy
     import subprocess,sqlite3

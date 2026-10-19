@@ -73,7 +73,8 @@ The host-parser missing-module RED was also observed, followed by a concrete
 historical-source-coupling RED and repair (validate the selected current command,
 not obsolete source references as authority).
 
-Focused affected-consumer tests: **54 PASS + 5 subtests PASS** before source commit.
+Focused affected-consumer tests: **56 PASS + 5 subtests PASS** after the route,
+host, prompt-routing and genuine-firing admission corrections.
 Coverage includes two bindings, strict protected mode, duplicate invocation/work,
 unknown/crashed effect no-repeat, real scratch-Git additive reconciliation,
 prohibited-effect rejection even if listed in a candidate scope, and human/typed

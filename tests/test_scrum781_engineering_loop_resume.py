@@ -73,6 +73,12 @@ class EngineeringResumeTests(unittest.TestCase):
         self.assertIn('prepare', result.stdout)
         self.assertIn('inspect', result.stdout)
 
+    def test_prompt_routes_engineering_read_inside_graph_not_protected_observer(self):
+        prompt=engineering_prompt(run_id=RUN,session_id=SID,repository_root=Path('repo'),controller_url='https://chatgpt.com/c/example')
+        self.assertIn('--workflow-mode Q0_ENGINEERING_COORDINATION',prompt)
+        self.assertIn('Engineering M1 owns the one-shot #595 read',prompt)
+        self.assertIn('PROTECTED_TYPED_CE',prompt)
+
     def test_prompt_does_not_ask_to_poll_or_resume(self):
         prompt = engineering_prompt(run_id=RUN, session_id=SID,
                                     repository_root=Path('repo'), controller_url='https://chatgpt.com/c/example')

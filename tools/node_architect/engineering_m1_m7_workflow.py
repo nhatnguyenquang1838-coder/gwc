@@ -101,6 +101,9 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             return outcome(s,'M5','WAIT','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
         execute=host_capabilities.get('engineering.execute')
         if not callable(execute):return outcome(s,'M5','WAIT','ENGINEERING_HOST_EXECUTOR_REQUIRED')
+        ready=host_capabilities.get('engineering.execution_ready')
+        if callable(ready) and ready(c,item) is not True:
+            return outcome(s,'M5','WAIT','ENGINEERING_GENUINE_FIRING_REQUIRED')
         with _connect(path) as db:
             db.execute('BEGIN IMMEDIATE')
             row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
