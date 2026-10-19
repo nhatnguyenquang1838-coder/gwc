@@ -41,6 +41,48 @@ def make_exchange_request(context, report, *, lane):
     return body
 
 
+def reconcile_controller_response(request, exchange_state):
+    """Validate a response receipt against its exact outbox request identity.
+
+    Rendered-text correlation is retained as advisory evidence only. This
+    helper never emits typed NEXT, grants authority or permits graph resume.
+    M7 and M8 share this validator so neither path can accept a response using
+    only a boolean `response_complete_observed` flag.
+    """
+    require(isinstance(exchange_state,dict),'CONTROLLER_RESPONSE_STATE_INVALID')
+    status=exchange_state.get('status');receipt=exchange_state.get('receipt')
+    require(status in {'CONTROLLER_ACTION_REQUIRED','CONTROLLER_RESPONSE_VERIFIED'} and
+            isinstance(receipt,dict),'CONTROLLER_RESPONSE_NOT_COMPLETE')
+    require(receipt.get('status')==status,'CONTROLLER_RESPONSE_STATUS_MISMATCH')
+    for key in ['request_digest','conversation_url','marker','task_id','run_id','session_id']:
+        require(receipt.get(key)==request.get(key),'CONTROLLER_RESPONSE_IDENTITY_MISMATCH')
+    require(receipt.get('response_to_marker')==request.get('marker') and
+            isinstance(receipt.get('response_text'),str) and bool(receipt['response_text'].strip()) and
+            isinstance(receipt.get('user_turn_ref'),str) and bool(receipt['user_turn_ref']) and
+            isinstance(receipt.get('assistant_turn_ref'),str) and bool(receipt['assistant_turn_ref']) and
+            receipt.get('response_complete_observed') is True and
+            receipt.get('evidence_class')=='BROWSER_EXCHANGE_VERIFIED',
+            'CONTROLLER_RESPONSE_CORRELATION_INCOMPLETE')
+    require(receipt.get('authority_granted') is False and receipt.get('typed_ce_admitted') is False and
+            receipt.get('workflow_resume_allowed') is False,'CONTROLLER_RESPONSE_AUTHORITY_WIDENING')
+    if status=='CONTROLLER_ACTION_REQUIRED':
+        require(receipt.get('receipt_strength')=='RENDERED_TEXT_CORRELATION_ONLY' and
+                receipt.get('strong_receipt_verified') is False,
+                'CONTROLLER_RESPONSE_WEAK_RECEIPT_INVALID')
+        classification='RENDERED_TEXT_CORRELATED_WEAK'
+    else:
+        require(receipt.get('strong_receipt_verified') is True,
+                'CONTROLLER_RESPONSE_STRONG_RECEIPT_REQUIRED')
+        classification='STRONG_CONTROLLER_RESPONSE_VERIFIED'
+    return {'classification':classification,'request_digest':request['request_digest'],
+            'response_to_marker':request['marker'],'response_sha256':digest(receipt['response_text']),
+            'receipt_strength':receipt.get('receipt_strength'),
+            'user_turn_ref':receipt['user_turn_ref'],'assistant_turn_ref':receipt['assistant_turn_ref'],
+            'evidence_class':'HUMAN_COORDINATION_OBSERVATION_NOT_TYPED_NEXT',
+            'authority_granted':False,'typed_ce_admitted':False,
+            'workflow_resume_allowed':False}
+
+
 class ExchangeOutbox:
     def __init__(self, path):
         self.path = Path(path);self.path.parent.mkdir(parents=True,exist_ok=True)

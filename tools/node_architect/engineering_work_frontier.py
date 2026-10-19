@@ -91,6 +91,29 @@ def build_recovery_decision_packet(*,run_id,goal,runtime_plan,frontier):
              'release_condition':['immutable_successor_G1_plan','explicit_human_acceptance_target_decision'],
              'boundary':'A controlled failure does not reproduce the original DWO incident and does not close F2-INCIDENT-RED.'}
         ],
+        'g1_revision_candidate':{
+            'candidate_id':'Q0-CONTROLLED-FAILURE-CAMPAIGN-CANDIDATE',
+            'status':'CANDIDATE_ONLY_NOT_ACTIVATED',
+            'goal':'Qualify GWC Universal V2 against a controlled, reproducible runtime failure without claiming the original DWO incident was reproduced.',
+            'dependencies':[
+                {'id':'CF-PRECHECK','depends_on':[],'objective':'Bind exact source/runtime identity and validate the recursive dependency DAG.','evidence':['source SHA','RuntimePlan digest','acyclic atomic frontier report']},
+                {'id':'CF-RED','depends_on':['CF-PRECHECK'],'objective':'Select a permitted controlled failure scenario and demonstrate a genuine failing RED.','evidence':['scenario provenance','input/state digest','failing command and error boundary']},
+                {'id':'CF-FIX','depends_on':['CF-RED'],'objective':'Repair the bounded GWC runtime defect with RED→GREEN on the same branch.','evidence':['minimal source diff','focused GREEN logs','additive commit and remote SHA']},
+                {'id':'CF-LOAD','depends_on':['CF-FIX'],'objective':'Reload the exact fixed source identity and prove the active runtime loaded it.','evidence':['commit SHA','process/session identity','loaded module/profile digest','regenerated dependent digests']},
+                {'id':'CF-REPLAY','depends_on':['CF-LOAD'],'objective':'Replay the controlled failure and prove forward progress beyond the prior failure boundary.','evidence':['scenario/input digest','replay result','readback beyond prior boundary']},
+                {'id':'CF-CERTIFY','depends_on':['CF-REPLAY'],'objective':'Run the qualification matrix and prepare a draft evidence handoff.','evidence':['matrix results','regression logs','draft certification dossier']}
+            ],
+            'acceptance_criteria':[
+                {'id':'CF-AC-01','statement':'Controlled scenario is explicitly distinguished from DWO-LOGIN-AUTH-R1.','evidence':['scenario provenance record','original_incident_replayed=false']},
+                {'id':'CF-AC-02','statement':'A genuine RED is observed before the minimal runtime fix and focused GREEN after it.','evidence':['red log','diff','green log']},
+                {'id':'CF-AC-03','statement':'Runtime reload proves the exact source commit and loaded module/profile identities.','evidence':['commit SHA','process/session','loaded identities','artifact digests']},
+                {'id':'CF-AC-04','statement':'Controlled replay advances beyond its prior failure boundary and the required matrix passes.','evidence':['replay readback','matrix results','regression logs']}
+            ],
+            'evidence_requirements':['immutable scenario/input digest','source-bound RED/GREEN logs','exact load proof','controlled replay readback','qualification matrix'],
+            'requires_human_decision':True,
+            'activation_condition':'An explicit human decision changing the acceptance target plus a validated immutable successor G1 RuntimePlan.',
+            'boundary':'This candidate does not change the current RuntimePlan, activate execution, close F2-INCIDENT-RED, or qualify the original DWO incident.'
+        },
         'recommended_action':'WAIT_FOR_TRACE_OR_HUMAN_G1_DECISION',
         'decision_owner':'original trace holder for option A; human for acceptance-target change in option B',
         'proposal_only':True,
@@ -120,3 +143,34 @@ def classify_controller_observation(response_text):
         owner='DWA must review the exact correlated response'
     return {'disposition':disposition,'planning_state':planning_state,'owner':owner,
             'typed_next':False,'authority_granted':False,'acceptance_target_changed':False}
+
+
+def terminal_blocker_identity(*,run_id,runtime_plan_digest,activity,reason_code,work,frontier):
+    """Stable identity for one blocker across additive source-head changes."""
+    rows=[]
+    for row in (frontier or {}).get('items',[]):
+        if row.get('status') in {'BLOCKED_EXTERNAL_EVIDENCE','BLOCKED_AUTHORITY','WAIT_INPUT'}:
+            item=row.get('work') or {}
+            rows.append({'id':row.get('id'),'status':row.get('status'),
+                         'plan_node_id':item.get('plan_node_id'),
+                         'missing_inputs':sorted(item.get('missing_inputs',[])),
+                         'missing_external_evidence':sorted(item.get('missing_external_evidence',[]))})
+    selected=work or {}
+    return digest({'run_id':run_id,'runtime_plan_digest':runtime_plan_digest,
+                   'activity':activity,'reason_code':reason_code,
+                   'work_id':selected.get('id'),'work_action':selected.get('action'),
+                   'blocked_dependencies':sorted(rows,key=lambda x:(x.get('id') or '',x.get('status') or ''))})
+
+
+def controller_dispatch_required(activity,reason_code):
+    """True only for terminal blockers whose owner is Controller/human planning.
+
+    DWA/native-owner work such as executing an admitted host action, acquiring a
+    genuine firing, reconciling an interrupted execution, or repairing a local
+    verifier must not generate a Controller ping.
+    """
+    return ((activity=='M2' and reason_code=='ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED') or
+            (activity=='M3' and reason_code in {'ENGINEERING_FRONTIER_WAIT_INPUT','NO_MATERIAL_CHANGE'}) or
+            (activity=='M4' and reason_code=='ENGINEERING_EXTERNAL_DEPENDENCY') or
+            (activity=='M5' and reason_code in {'ENGINEERING_EFFECT_AUTHORITY_REQUIRED',
+                                                 'ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED'}))

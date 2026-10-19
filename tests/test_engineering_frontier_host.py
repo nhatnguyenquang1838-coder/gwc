@@ -98,3 +98,54 @@ def test_source_bound_host_frontier_loads_real_policy_and_trace_status(tmp_path)
     (tmp_path/'code.py').write_text('# drift\n')
     with pytest.raises(ValueError,match='ENGINEERING_FRONTIER_SOURCE_DRIFT'):
         read_source_bound_frontier(c,profile_ref='profile.json',guard=lambda:True)
+
+
+def test_local_verifier_accepts_only_bound_terminal_bridge_suite_artifact(tmp_path):
+    import json,hashlib
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c,request,git=agent_fixture(tmp_path)
+    caps=local_engineering_capabilities(c,guard=lambda:True,
+        artifact_directory=tmp_path/'validation-results',
+        allowed_commands=[['-m','pytest','tests/test_engineering_m1_m7_workflow.py','-q']])
+    argv=['-m','pytest','tests/test_engineering_m1_m7_workflow.py','-q']
+    item={'id':'bridge-validation','action':'run_sandboxed_validation','argv':argv,
+          'verification_profile':'Q0_TERMINAL_RESULT_SUITE','required_test_files':['tests/test_engineering_m1_m7_workflow.py'],
+          'minimum_tests_passed':1,'expected_result':'Q0_TERMINAL_RESULT_SUITE_PASS'}
+    stdout='.................... [100%]\n20 passed in 0.42s\n'
+    artifact=tmp_path/'validation-results'/'bridge.json';artifact.parent.mkdir(parents=True)
+    payload={'argv':argv,'source_head':c['repository']['head_sha'],'exit_code':0,'stdout':stdout,'stderr':'','input_hashes':{}}
+    artifact.write_text(json.dumps(payload,sort_keys=True))
+    result={'artifact_ref':str(artifact),'artifact_digest':digest(payload),'stdout_digest':digest(stdout),'exit_code':0,'source_head':c['repository']['head_sha'],'result':'Q0_TERMINAL_RESULT_SUITE_PASS','executed_effects':[]}
+    assert caps['engineering.verify_result'](c,item,result) is True
+    bad=dict(payload);bad['argv']=['-c','print("not tests")'];artifact.write_text(json.dumps(bad,sort_keys=True))
+    bad_result={**result,'artifact_digest':digest(bad)}
+    assert caps['engineering.verify_result'](c,item,bad_result) is False
+
+
+def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_path):
+    import hashlib,subprocess
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c,_,git=agent_fixture(tmp_path)
+    files=['tests/test_engineering_m1_m7_workflow.py','tests/test_engineering_work_frontier.py',
+           'tests/test_engineering_frontier_host.py','tests/test_controller_exchange_adapter.py',
+           'tests/test_exchange_outbox_transitions.py']
+    for path in files:
+        target=tmp_path/path;target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text('def test_fixture_passes():\n    assert True\n')
+    git('add','tests');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','validation suite inputs')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    argv=['-m','pytest',*files,'-q']
+    item={'id':'bridge-validation','action':'run_sandboxed_validation','argv':argv,
+          'verification_profile':'Q0_TERMINAL_RESULT_SUITE','required_test_files':files,
+          'minimum_tests_passed':5,'expected_result':'Q0_TERMINAL_RESULT_SUITE_PASS',
+          'read_paths':files,'input_digest':digest({p:hashlib.sha256((tmp_path/p).read_bytes()).hexdigest() for p in files})}
+    item['fingerprint']=digest(item)
+    caps=local_engineering_capabilities(c,guard=lambda:True,
+        artifact_directory=tmp_path/'validation-results',allowed_commands=[argv])
+    result=caps['engineering.execute'](c,item)
+    assert result['exit_code']==0 and result['result']=='Q0_TERMINAL_RESULT_SUITE_PASS'
+    assert caps['engineering.verify_result'](c,item,result) is True
+    changed={**result,'source_head':'f'*40}
+    assert caps['engineering.verify_result'](c,item,changed) is False

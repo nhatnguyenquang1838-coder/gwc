@@ -64,7 +64,7 @@ def test_unbound_frontier_does_not_enter_effect_path(tmp_path):
 
 
 def test_exhausted_frontier_yields_decision_packet_without_mutating_plan():
-    from tools.node_architect.engineering_work_frontier import build_recovery_decision_packet
+    from tools.node_architect.engineering_work_frontier import build_recovery_decision_packet,terminal_blocker_identity
     plan={'id':'F0-Q0-QUALIFY','atomic':False,'children':[
         {'id':'F2-INCIDENT-RED','atomic':True,'depends_on':[],'children':[]},
         {'id':'F2-AGENT-INTEGRATION','atomic':True,'depends_on':[],'children':[]}]}
@@ -88,3 +88,39 @@ def test_exhausted_frontier_yields_decision_packet_without_mutating_plan():
     assert replan['requires_human_decision'] is True
     assert 'does not reproduce the original DWO incident' in replan['boundary']
     assert packet['recommended_action']=='WAIT_FOR_TRACE_OR_HUMAN_G1_DECISION'
+    candidate=packet['g1_revision_candidate']
+    assert candidate['status']=='CANDIDATE_ONLY_NOT_ACTIVATED'
+    assert candidate['dependencies'] and candidate['acceptance_criteria'] and candidate['evidence_requirements']
+    dependency_ids={d['id'] for d in candidate['dependencies']}
+    seen=set()
+    for dependency in candidate['dependencies']:
+        assert set(dependency['depends_on'])<=seen
+        assert dependency['evidence'] and dependency['objective']
+        seen.add(dependency['id'])
+    assert len(dependency_ids)==len(candidate['dependencies'])
+    assert len({ac['id'] for ac in candidate['acceptance_criteria']})==len(candidate['acceptance_criteria'])
+    assert all(ac['evidence'] and ac['statement'] for ac in candidate['acceptance_criteria'])
+    assert candidate['requires_human_decision'] is True
+    identity=terminal_blocker_identity(run_id='run-Q0',runtime_plan_digest='sha256:'+('b'*64),
+        activity='M3',reason_code='ENGINEERING_FRONTIER_WAIT_INPUT',work=None,frontier=projection)
+    changed_source={**projection,'source_head':'c'*40}
+    changed_source['items']=[{**projection['items'][0],'fingerprint':'sha256:'+('d'*64)},projection['items'][1]]
+    same=terminal_blocker_identity(run_id='run-Q0',runtime_plan_digest='sha256:'+('b'*64),
+        activity='M3',reason_code='ENGINEERING_FRONTIER_WAIT_INPUT',work=None,frontier=changed_source)
+    assert identity==same
+    changed_blocker={**projection,'items':[{'id':'different','status':'BLOCKED_EXTERNAL_EVIDENCE',
+        'work':{'id':'different','missing_external_evidence':['different trace']}},projection['items'][1]]}
+    different=terminal_blocker_identity(run_id='run-Q0',runtime_plan_digest='sha256:'+('b'*64),
+        activity='M3',reason_code='ENGINEERING_FRONTIER_WAIT_INPUT',work=None,frontier=changed_blocker)
+    assert identity!=different
+
+
+def test_only_controller_owned_terminal_blockers_are_dispatched():
+    from tools.node_architect.engineering_work_frontier import controller_dispatch_required
+    assert controller_dispatch_required('M2','ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED') is True
+    assert controller_dispatch_required('M3','ENGINEERING_FRONTIER_WAIT_INPUT') is True
+    assert controller_dispatch_required('M4','ENGINEERING_EXTERNAL_DEPENDENCY') is True
+    assert controller_dispatch_required('M5','ENGINEERING_EFFECT_AUTHORITY_REQUIRED') is True
+    assert controller_dispatch_required('M5','ENGINEERING_HOST_ACTION_REQUIRED') is False
+    assert controller_dispatch_required('M5','ENGINEERING_GENUINE_FIRING_REQUIRED') is False
+    assert controller_dispatch_required('M6','ENGINEERING_EXECUTION_RESULT_NOT_VERIFIED') is False

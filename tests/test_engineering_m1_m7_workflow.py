@@ -56,6 +56,7 @@ def test_prohibited_effect_does_not_reach_executor(tmp_path):
     r=run_task_workflow(c,host_capabilities=capabilities(c,counts),invocation_key='forbidden')
     assert r['verdict']['reason_code']=='ENGINEERING_EFFECT_AUTHORITY_REQUIRED'
     assert counts['execute']==0
+    assert len(r['graph_requests'])==1  # A real effect-authority blocker is routed to Controller.
 
 
 def test_missing_host_firing_admission_holds_before_work_claim(tmp_path):
@@ -64,6 +65,7 @@ def test_missing_host_firing_admission_holds_before_work_claim(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='explicit-source-check')
     assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
     assert counts['execute']==0
+    assert r['graph_requests']==[]  # Native-owner firing admission is not a Controller-planning blocker.
 
 
 @pytest.mark.parametrize('admission',['missing','none','non_callable'])
@@ -230,5 +232,75 @@ def test_m8_does_not_create_second_request_while_m7_exchange_is_pending(tmp_path
     assert second['terminal_exchange_request'] is None
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     assert box.read(original)['status']=='EXCHANGE_REQUESTED'
+    with sqlite3.connect(box.path) as db:
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+
+
+def test_m7_uses_shared_marker_response_reconciliation_before_next_request(tmp_path):
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);base=c['engineering']['work_items'][0]
+    second={**base,'id':'login-probe-second','priority':2,'input_digest':'sha256:'+'e'*64}
+    c['engineering']['work_items']=[base,second]
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='m7-response-one')
+    request=first['graph_requests'][0]
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
+    binding_fields={k:request[k] for k in ['conversation_url','request_digest','marker','task_id','run_id','session_id']}
+    browser_base={**binding_fields,'user_turn_ref':'user:'+request['marker'],
+                  'assistant_turn_ref':'assistant:'+request['marker'],
+                  'evidence_class':'BROWSER_EXCHANGE_VERIFIED','authority_granted':False,'typed_ce_admitted':False}
+    box.record(request,{**browser_base,'status':'MESSAGE_SENT_VERIFIED'})
+    box.record(request,{**browser_base,'status':'CONTROLLER_ACTION_REQUIRED',
+        'response_to_marker':request['marker'],'response_text':'ACK: SEARCH_EXHAUSTED / WAIT_EXTERNAL_EVIDENCE',
+        'response_complete_observed':True,'receipt_strength':'RENDERED_TEXT_CORRELATION_ONLY',
+        'strong_receipt_verified':False,'workflow_resume_allowed':False})
+    second_result=run_task_workflow(c,host_capabilities=caps,invocation_key='m7-response-two')
+    observation=second_result['controller_response_observation']
+    assert observation['request_digest']==request['request_digest']
+    assert observation['classification']=='RENDERED_TEXT_CORRELATED_WEAK'
+    assert observation['authority_granted'] is False and observation['typed_ce_admitted'] is False
+    assert observation['workflow_resume_allowed'] is False
+    assert second_result['verdict']['reason_code']=='ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED'
+
+
+def test_m4_external_dependency_dispatches_terminal_result_to_controller(tmp_path):
+    c=binding(tmp_path);c['engineering']['work_items'][0]['external_dependency']='controller-owned dependency'
+    counts={'read':0,'execute':0}
+    r=run_task_workflow(c,host_capabilities=capabilities(c,counts),invocation_key='m4-controller-blocker')
+    assert r['activity_results']['M4']['reason_code']=='ENGINEERING_EXTERNAL_DEPENDENCY'
+    assert r['terminal']['activity']=='M4'
+    assert len(r['graph_requests'])==1
+    assert r['graph_requests'][0]['lane']=='HOST_COORDINATION'
+    assert 'controller-owned dependency' in r['graph_requests'][0]['report']
+    assert r['authority_granted'] is False and r['typed_ce_admitted'] is False
+
+
+def test_terminal_request_dedup_is_stable_across_additive_source_head(tmp_path):
+    import copy,subprocess,sqlite3
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);c['repository']['worktree']=str(tmp_path);c['engineering']['work_items']=[]
+    (tmp_path/'plan.json').write_text('{"plan":"frozen"}\n')
+    def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
+    git('init','-b',c['repository']['branch']);git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    def frontier(ctx):
+        return {'source_head':ctx['repository']['head_sha'],'runtime_plan_digest':ctx['run']['runtime_plan_digest'],
+                'authority_granted':False,'selected_work':None,'items':[
+                    {'id':'trace','status':'BLOCKED_EXTERNAL_EVIDENCE','work':{
+                        'id':'trace','plan_node_id':'F2-INCIDENT-RED',
+                        'missing_external_evidence':['authentic original trace']}}]}
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=frontier
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-head-one')
+    original=first['terminal_exchange_request'];identity=first['terminal']['blocker_identity']
+    git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-m','additive source change')
+    newer=copy.deepcopy(c);newer['repository']['head_sha']=git('rev-parse','HEAD')
+    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='fixture additive commit preserving same blocker')
+    second=run_task_workflow(newer,host_capabilities=caps,invocation_key='terminal-head-two')
+    assert second['terminal']['blocker_identity']==identity
+    assert second['terminal_exchange_request']==original
+    assert second['graph_requests']==[original]
+    assert second['terminal_exchange_status']=='EXCHANGE_REQUESTED'
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     with sqlite3.connect(box.path) as db:
         assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1

@@ -19,12 +19,17 @@
       "priority": 2,
       "plan_node_id": "F0-Q0-QUALIFY",
       "plan_relation": "CONDITIONAL_RUNTIME_DEFECT_REPAIR_UNDER_EXISTING_RECOVERY_POLICY",
-      "action": "modify_approved_files",
-      "objective": "Dispatch every pre-M7 terminal engineering result through one durable HOST_COORDINATION request; correlate any exact-marker Controller response as advisory evidence only; build a proposal-only recovery decision packet when the frozen frontier has no READY work. Preserve prior VERIFIED agent-work receipt; do not mutate RuntimePlan, acceptance target, typed C/E, authority, or original-incident status.",
+      "action": "run_sandboxed_validation",
+      "objective": "On a genuine native firing, validate the terminal-result/outbox/response-reconciliation implementation as an exact-head bounded test suite; do not reimplement source already committed. Preserve prior VERIFIED work, exercise both M7 and M8 response paths and source-independent blocker dedup; no typed authority or acceptance-target change.",
       "depends_on": [],
-      "read_paths": ["tools/node_architect/engineering_m1_m7_workflow.py", "tools/node_architect/engineering_work_frontier.py", "tools/node_architect/controller_exchange_adapter.py", "tools/node_architect/task_context_binding.py", "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json"],
-      "write_paths": ["tools/node_architect/engineering_m1_m7_workflow.py", "tools/node_architect/engineering_work_frontier.py", "tests/test_engineering_m1_m7_workflow.py", "tests/test_engineering_work_frontier.py"],
-      "acceptance": "RED before fix; M3 WAIT emits exact source/plan-bound terminal and decision proposal; same terminal reuses the existing outbox marker with no duplicate send; exact-marker response is persisted/classified without typed NEXT or graph resume; G1 replan remains proposal-only and human-owned; prior VERIFIED agent integration is not rerun or demoted."
+      "argv": ["-m", "pytest", "tests/test_engineering_m1_m7_workflow.py", "tests/test_engineering_work_frontier.py", "tests/test_engineering_frontier_host.py", "tests/test_controller_exchange_adapter.py", "tests/test_exchange_outbox_transitions.py", "-q"],
+      "expected_result": "Q0_TERMINAL_RESULT_SUITE_PASS",
+      "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+      "minimum_tests_passed": 30,
+      "required_test_files": ["tests/test_engineering_m1_m7_workflow.py", "tests/test_engineering_work_frontier.py", "tests/test_engineering_frontier_host.py", "tests/test_controller_exchange_adapter.py", "tests/test_exchange_outbox_transitions.py"],
+      "read_paths": ["tools/node_architect/engineering_m1_m7_workflow.py", "tools/node_architect/engineering_work_frontier.py", "tools/node_architect/controller_exchange_adapter.py", "tools/node_architect/engineering_host_adapter.py", "tools/node_architect/task_context_binding.py", "scripts/scrum781_engineering_loop.py", "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json", "tests/test_engineering_m1_m7_workflow.py", "tests/test_engineering_work_frontier.py", "tests/test_engineering_frontier_host.py", "tests/test_controller_exchange_adapter.py", "tests/test_exchange_outbox_transitions.py"],
+      "write_paths": [],
+      "acceptance": "A genuine native firing executes the exact allowlisted regression suite against current source; artifact/log bind to exact HEAD and input digests; all required test modules are in argv; actual test summary has at least 30 passing tests and zero failures; immutable execution/verification artifact is read back; no source effect is claimed by this validation item."
     }
   ]
 }

@@ -80,12 +80,29 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         path.write_text(encoded)
         try:observed=json.loads(result.stdout)
         except ValueError:observed={}
-        return {'exit_code':result.returncode,'result':observed.get('result','HOST_PROCESS_FAILED'),
+        outcome=observed.get('result','HOST_PROCESS_FAILED')
+        if item.get('verification_profile')=='Q0_TERMINAL_RESULT_SUITE':
+            summary=re.search(r'(?m)(\d+) passed(?:,\s*\d+ subtests?)? in [0-9.]+s\s*$',result.stdout)
+            if (result.returncode==0 and summary is not None and
+                    int(summary.group(1))>=item.get('minimum_tests_passed',1) and
+                    not re.search(r'(?m)^\d+ (?:failed|error|errors)\b',result.stdout) and
+                    all(test_path in argv for test_path in item.get('required_test_files',[]))):
+                outcome=item.get('expected_result')
+        return {'exit_code':result.returncode,'result':outcome,
                 'source_head':c['repository']['head_sha'],'stdout_digest':digest(result.stdout),
                 'artifact_ref':str(path),'artifact_digest':digest(payload),'observed':observed,'executed_effects':[]}
     def verify(c,item,result):
         raw=json.loads(Path(result['artifact_ref']).read_text())
         if digest(raw)!=result['artifact_digest'] or digest(raw['stdout'])!=result['stdout_digest']:return False
+        if item.get('verification_profile')=='Q0_TERMINAL_RESULT_SUITE':
+            if raw.get('argv')!=item.get('argv') or raw.get('source_head')!=c['repository']['head_sha'] or result.get('source_head')!=c['repository']['head_sha'] or raw.get('exit_code')!=0:return False
+            if not all(path in raw['argv'] for path in item.get('required_test_files',[])):return False
+            summary=re.search(r'(?m)(\d+) passed(?:,\s*\d+ subtests?)? in [0-9.]+s\s*$',raw['stdout'])
+            if summary is None or int(summary.group(1))<item.get('minimum_tests_passed',1):return False
+            if re.search(r'(?m)^\d+ (?:failed|error|errors)\b',raw['stdout']):return False
+            return (validate(c) and result['exit_code']==0 and
+                    result.get('result')==item.get('expected_result') and
+                    result.get('executed_effects')==[])
         observed=json.loads(raw['stdout']) if raw['exit_code']==0 else {}
         return (validate(c) and raw['source_head']==c['repository']['head_sha'] and result['exit_code']==raw['exit_code']==0 and
                 observed.get('result')==item['expected_result'] and
