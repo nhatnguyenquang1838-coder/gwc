@@ -8,6 +8,14 @@
 - Authority: non-authoritative relative to system, platform, developer, and
   canonical core policy
 
+## Universal Run boot precedence
+
+`UNIVERSAL_RUN_NEW_RUNTIME` is the default for a fresh current structured run.
+Compatibility routes are explicit-only and require the current
+`RunState`/`RuntimePlan` to bind and validate their exact route ID and adapter
+identity. Natural-language intent, old branch/loop/todo/PR state, Slack history,
+and historical authority receipts have zero route-selection weight.
+
 ## Automatic gate policy
 
 When higher-priority DWC runtime instructions are active for this project:
