@@ -110,3 +110,34 @@ def test_executor_crash_is_not_retried_on_another_invocation(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='after-crash')
     assert counts['execute']==1
     assert r['verdict']['reason_code']=='ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED'
+
+
+def test_terminal_result_dispatches_when_no_ready_work_remains(tmp_path):
+    """RC1 repair: a non-PASS halt before M7 must still emit a structured
+    ENGINEERING_TERMINAL_RESULT instead of vanishing into END with no blocker
+    payload for the Controller. The verdict stays WAIT; only the evidence is new."""
+    c=binding(tmp_path);c['engineering']['work_items']=[]  # nothing left to do
+    r=run_task_workflow(c,host_capabilities=capabilities(c,{'read':0,'execute':0}),invocation_key='terminal')
+    assert r['verdict']['status']=='WAIT'
+    assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
+    # M8 is the terminal dispatch node that absorbs the M3 halt; the original
+    # halt activity is preserved inside the terminal payload.
+    assert r['verdict']['current_activity']=='M8'
+    assert r['terminal']['kind']=='ENGINEERING_TERMINAL_RESULT'
+    assert r['terminal']['activity']=='M3'
+    assert r['terminal']['source_head']==c['repository']['head_sha']
+    assert r['terminal']['runtime_plan_digest']==c['run']['runtime_plan_digest']
+    assert r['terminal']['work_id'] is None
+    assert 'duplicate_guard' in r['terminal']
+
+
+def test_terminal_result_preserves_blocked_reason_code(tmp_path):
+    """M8 is a dispatch node, not a gate: a blocked verdict must not be
+    converted to PASS by attaching a terminal payload."""
+    c=binding(tmp_path);c['engineering']['work_items'][0]['action']='deploy_approved_release'
+    c['runtime_plan']['scope']['allowed_actions'].append('deploy_approved_release')
+    r=run_task_workflow(c,host_capabilities=capabilities(c,{'read':0,'execute':0}),invocation_key='blocked')
+    assert r['verdict']['reason_code']=='ENGINEERING_EFFECT_AUTHORITY_REQUIRED'
+    assert r['terminal']['activity']=='M5'
+    assert r['terminal']['reason_code']=='ENGINEERING_EFFECT_AUTHORITY_REQUIRED'
+    assert r['terminal']['blocker']

@@ -26,6 +26,7 @@ class EngineeringState(TypedDict,total=False):
     controller_exchange_requests:list
     work_frontier:dict
     host_action_request:dict
+    terminal:dict
 
 
 def _connect(path):
@@ -166,12 +167,49 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             db.execute('CREATE TABLE IF NOT EXISTS engineering_exchange_contexts (digest TEXT PRIMARY KEY, context TEXT)')
             db.execute('INSERT OR IGNORE INTO engineering_exchange_contexts VALUES (?,?)',(digest(c),json.dumps(c,sort_keys=True)))
         box.reserve(request)
-        return outcome(s,'M7','WAIT','ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED',controller_exchange_requests=[request])
+        return outcome(s,'M7','WAIT','ENGINE_HOST_REPORT_AND_EXCHANGE_REQUIRED',
+                        controller_exchange_requests=[request],
+                        terminal={'kind':'ENGINEERING_TERMINAL_RESULT','activity':'M7',
+                                  'reason_code':'ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED',
+                                  'blocker':'Controller must consume the reserved HOST_COORDINATION exchange',
+                                  'frontier_digest':digest(s.get('work_frontier') or {}),
+                                  'work_id':s.get('work',{}).get('id'),
+                                  'duplicate_guard':digest({'run':run,'activity':'M7','reason_code':'ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED'})})
     graph:Any=StateGraph(EngineeringState)
     for name,handler in zip(ACTIVITIES,[m1,m2,m3,m4,m5,m6,m7]):graph.add_node(name,handler)
     graph.add_edge(START,'M1')
-    for a,b in zip(ACTIVITIES,ACTIVITIES[1:]):graph.add_conditional_edges(a,lambda s,n=b:n if s['status']=='PASS' else END,{b:b,END:END})
+    for a,b in zip(ACTIVITIES,ACTIVITIES[1:]):graph.add_conditional_edges(a,lambda s,n=b:n if s['status']=='PASS' else 'M8',{b:b,'M8':'M8',END:END})
     graph.add_edge('M7',END)
+    def m8(s):
+        # Terminal engineering result for every non-PASS halt before M7.
+        # M3 WAIT (no READY work) previously fell straight to END and the
+        # Controller never received a structured blocker; M7 still dispatches
+        # its own exchange request and is unchanged.
+        frontier=s.get('work_frontier') or {}
+        blocker={
+            'M3':'No READY work remains on the frozen plan frontier; all candidates classified READY/VERIFIED/BLOCKED_EXTERNAL_EVIDENCE/BLOCKED_AUTHORITY/WAIT_INPUT',
+            'M4':'Selected work has an unresolved external dependency',
+            'M5':'Effect authority or genuine firing admission not granted for the selected work',
+            'M6':'Execution result not verified against exact source head and artifact binding',
+        }.get(s['current_activity'],'Engineering halted before M7 without a selected work result')
+        terminal={'kind':'ENGINEERING_TERMINAL_RESULT','activity':s['current_activity'],
+                  'reason_code':s['reason_code'],'status':s['status'],
+                  'blocker':blocker,
+                  'frontier':frontier,
+                  'source_head':c['repository']['head_sha'],
+                  'runtime_plan_digest':c['run']['runtime_plan_digest'],
+                  'work_id':(s.get('work') or {}).get('id'),
+                  'duplicate_guard':digest({'run':run,'activity':s['current_activity'],
+                                             'reason_code':s['reason_code'],'source_head':c['repository']['head_sha']})}
+        # M8 is a result-dispatch node, NOT a gate. It must preserve the
+        # original WAIT status and reason_code so the Controller still sees
+        # ENGINEERING_EFFECT_AUTHORITY_REQUIRED / ENGINEERING_GENUINE_FIRING_REQUIRED
+        # / ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED as the verdict, with the
+        # structured terminal payload attached as evidence. Marking it PASS would
+        # silently convert a blocked gate into a passed one.
+        return outcome(s,'M8',s['status'],s['reason_code'],terminal=terminal)
+    graph.add_node('M8',m8)
+    graph.add_edge('M8',END)
     try:state=graph.compile().invoke({'activity_results':{}})
     except Exception:
         # Invocation remains reserved after an unexpected interruption; never replay effects blindly.
@@ -190,6 +228,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             'work':state.get('work'),'execution':state.get('execution'),
             'work_frontier':state.get('work_frontier'),'host_action_request':state.get('host_action_request'),
             'communication_consumption':{'cursor':consumed,'newly_consumed':newly_consumed,'is_typed_cursor':False},
+            'terminal':state.get('terminal'),
             'pending_controller_exchange_requests':state['pending_controller_exchange_requests'],
             'graph_requests':state.get('controller_exchange_requests',[]),'invocation_replayed':False,
             'typed_ce_admitted':False,'authority_granted':False,'native_tick_settled':False,
