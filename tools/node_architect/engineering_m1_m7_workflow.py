@@ -27,6 +27,7 @@ class EngineeringState(TypedDict,total=False):
     work_frontier:dict
     host_action_request:dict
     terminal:dict
+    pre_effect_failure:dict
     terminal_exchange_request:dict
     terminal_exchange_status:str
     terminal_digest:str
@@ -134,21 +135,66 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             return outcome(s,'M5','WAIT','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
         execute=host_capabilities.get('engineering.execute')
         if not callable(execute):return outcome(s,'M5','WAIT','ENGINEERING_HOST_EXECUTOR_REQUIRED')
+        preflight=host_capabilities.get('engineering.preflight')
+        if not callable(preflight):return outcome(s,'M5','WAIT','ENGINEERING_HOST_PREFLIGHT_REQUIRED')
         ready=host_capabilities.get('engineering.execution_ready')
         if not callable(ready) or ready(c,item) is not True:
             return outcome(s,'M5','WAIT','ENGINEERING_GENUINE_FIRING_REQUIRED')
+        def prior_result(row):
+            if not row:return None
+            status,result=row
+            if status in {'EXECUTED','VERIFIED'}:
+                return outcome(s,'M5','PASS','ENGINEERING_PRIOR_EXECUTION_REUSED',execution=json.loads(result))
+            if status=='PRE_EFFECT_VALIDATION_FAILED':
+                return outcome(s,'M5','WAIT','ENGINEERING_PRE_EFFECT_REPAIR_REQUIRED',pre_effect_failure=json.loads(result))
+            return outcome(s,'M5','WAIT','ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED')
         with _connect(path) as db:
             db.execute('BEGIN IMMEDIATE')
             row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
-            if row:
-                if row[0] in {'EXECUTED','VERIFIED'}:
-                    return outcome(s,'M5','PASS','ENGINEERING_PRIOR_EXECUTION_REUSED',execution=json.loads(row[1]))
-                return outcome(s,'M5','WAIT','ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED')
-            db.execute('INSERT INTO engineering_work VALUES (?,?,?,NULL)',(run,item['fingerprint'],'IN_FLIGHT'));db.commit()
-        try:r=execute(c,item)
+            previous=prior_result(row)
+            if previous:return previous
+            db.commit()
+        try:
+            prepared=preflight(c,item)
         except Exception as exc:
-            with _connect(path) as db:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',('UNKNOWN',json.dumps({'exception_type':type(exc).__name__}),run,item['fingerprint']))
-            return outcome(s,'M5','WAIT','ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED')
+            message=str(exc).strip().splitlines()[0][:160] if str(exc).strip() else type(exc).__name__
+            failure={'classification':'PRE_EFFECT_VALIDATION_FAILED','reason_code':message,
+                     'exception_type':type(exc).__name__,'effect_started':False,
+                     'subprocess_started':False,'recovery_action':'REPAIR_PREFLIGHT_AND_USE_NEW_FINGERPRINT'}
+            with _connect(path) as db:
+                db.execute('BEGIN IMMEDIATE')
+                row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
+                previous=prior_result(row)
+                if previous:return previous
+                db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
+                           (run,item['fingerprint'],'PRE_EFFECT_VALIDATION_FAILED',json.dumps(failure,sort_keys=True)))
+                db.commit()
+            return outcome(s,'M5','WAIT','ENGINEERING_PRE_EFFECT_VALIDATION_FAILED',pre_effect_failure=failure)
+        with _connect(path) as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
+            previous=prior_result(row)
+            if previous:return previous
+            db.execute('INSERT INTO engineering_work VALUES (?,?,?,NULL)',(run,item['fingerprint'],'IN_FLIGHT'))
+            db.commit()
+        try:
+            r=execute(c,item,prepared)
+        except Exception as exc:
+            if getattr(exc,'pre_effect_validation_failed',False) is True:
+                message=getattr(exc,'reason_code',None) or type(exc).__name__
+                failure={'classification':'PRE_EFFECT_VALIDATION_FAILED','reason_code':str(message)[:160],
+                         'exception_type':type(exc).__name__,'effect_started':False,
+                         'subprocess_started':False,'recovery_action':'REPAIR_PREFLIGHT_AND_USE_NEW_FINGERPRINT'}
+                status='PRE_EFFECT_VALIDATION_FAILED';reason='ENGINEERING_PRE_EFFECT_VALIDATION_FAILED'
+                detail=failure
+            else:
+                status='UNKNOWN';reason='ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED'
+                detail={'classification':'EFFECT_OUTCOME_UNKNOWN','exception_type':type(exc).__name__,
+                        'effect_started':True,'subprocess_started':'MAY_HAVE_STARTED'}
+            with _connect(path) as db:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',(status,json.dumps(detail,sort_keys=True),run,item['fingerprint']))
+            if status=='PRE_EFFECT_VALIDATION_FAILED':
+                return outcome(s,'M5','WAIT',reason,pre_effect_failure=detail)
+            return outcome(s,'M5','WAIT',reason)
         with _connect(path) as db:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',('EXECUTED',json.dumps(r,sort_keys=True),run,item['fingerprint']))
         return outcome(s,'M5','PASS','ACTUAL_HOST_VALIDATION_EXECUTED',execution=r)
     def m6(s):
@@ -207,6 +253,9 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             'M5':'Effect authority or genuine firing admission not granted for the selected work',
             'M6':'Execution result not verified against exact source head and artifact binding',
         }.get(s['current_activity'],'Engineering halted before M7 without a selected work result')
+        if s['current_activity']=='M5' and s['reason_code'] in {
+                'ENGINEERING_PRE_EFFECT_VALIDATION_FAILED','ENGINEERING_PRE_EFFECT_REPAIR_REQUIRED'}:
+            blocker='Pre-effect validation failed; no task subprocess started. Repair the source/input binding and use a new fingerprint.'
         terminal={'kind':'ENGINEERING_TERMINAL_RESULT','activity':s['current_activity'],
                   'reason_code':s['reason_code'],'status':s['status'],
                   'blocker':blocker,
@@ -218,6 +267,8 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                   'external_dependency':(s.get('work') or {}).get('external_dependency'),
                   'duplicate_guard':digest({'run':run,'activity':s['current_activity'],
                                              'reason_code':s['reason_code'],'source_head':c['repository']['head_sha']})}
+        if s.get('pre_effect_failure') is not None:
+            terminal['pre_effect_failure']=s['pre_effect_failure']
         from .engineering_work_frontier import controller_dispatch_required,terminal_blocker_identity
         blocker_identity=terminal_blocker_identity(run_id=run,
             runtime_plan_digest=c['run']['runtime_plan_digest'],activity=s['current_activity'],

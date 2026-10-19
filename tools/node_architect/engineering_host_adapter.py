@@ -61,29 +61,52 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         # Typed rows stay opaque. Only the filtered human command is persisted.
         selected=select_human_communication([row for page in json.loads(raw) for row in page],c)
         return selected
-    def execute(c,item):
-        require(validate(c),'ENGINEERING_SOURCE_OR_OWNER_CHANGED')
-        argv=tuple(item.get('argv',[]));require(argv in {tuple(a) for a in allowed_commands},'ENGINEERING_COMMAND_NOT_ALLOWLISTED')
-        hashes={}
-        for ref in item['read_paths']:
-            path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_SOURCE_PATH_ESCAPE')
-            data=path.read_bytes();require(data==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
-            hashes[ref]=hashlib.sha256(data).hexdigest()
-        policy_ref=item.get('_source_policy_ref')
-        policy_sha256=None
-        if policy_ref:
-            policy_path=(root/policy_ref).resolve();require(policy_path.is_relative_to(root),'ENGINEERING_POLICY_PATH_ESCAPE')
-            policy_raw=policy_path.read_bytes()
-            require(policy_raw==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
-            policy_sha256=hashlib.sha256(policy_raw).hexdigest()
-            require(policy_sha256==item.get('_source_policy_sha256') and hashes==item.get('_source_input_hashes'),
-                    'ENGINEERING_INPUT_BINDINGS_DRIFT')
-            input_binding={'policy_sha256':policy_sha256,'input_hashes':hashes}
-        else:
-            input_binding=hashes
-        require(digest(input_binding)==item['input_digest'],'ENGINEERING_INPUT_DIGEST_DRIFT')
-        require(item['action'] in c['runtime_plan']['scope']['allowed_actions'] and item['action']=='run_sandboxed_validation','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
-        require(validate(c),'ENGINEERING_EFFECT_REVALIDATION_FAILED')
+    class EngineeringPreEffectValidationError(ValueError):
+        pre_effect_validation_failed=True
+        def __init__(self,reason_code):
+            self.reason_code=str(reason_code)[:160]
+            super().__init__(self.reason_code)
+
+    def preflight(c,item):
+        """Validate source, policy and command bindings without starting the task subprocess."""
+        try:
+            require(validate(c),'ENGINEERING_SOURCE_OR_OWNER_CHANGED')
+            argv=tuple(item.get('argv',[]));require(argv in {tuple(a) for a in allowed_commands},'ENGINEERING_COMMAND_NOT_ALLOWLISTED')
+            hashes={}
+            for ref in item['read_paths']:
+                path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_SOURCE_PATH_ESCAPE')
+                data=path.read_bytes();require(data==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
+                hashes[ref]=hashlib.sha256(data).hexdigest()
+            policy_ref=item.get('_source_policy_ref')
+            policy_sha256=None
+            if policy_ref:
+                policy_path=(root/policy_ref).resolve();require(policy_path.is_relative_to(root),'ENGINEERING_POLICY_PATH_ESCAPE')
+                policy_raw=policy_path.read_bytes()
+                require(policy_raw==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
+                policy_sha256=hashlib.sha256(policy_raw).hexdigest()
+                require(policy_sha256==item.get('_source_policy_sha256') and hashes==item.get('_source_input_hashes'),
+                        'ENGINEERING_INPUT_BINDINGS_DRIFT')
+                input_binding={'policy_sha256':policy_sha256,'input_hashes':hashes}
+            else:
+                input_binding=hashes
+            require(digest(input_binding)==item['input_digest'],'ENGINEERING_INPUT_DIGEST_DRIFT')
+            require(item['action'] in c['runtime_plan']['scope']['allowed_actions'] and item['action']=='run_sandboxed_validation','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
+            require(validate(c),'ENGINEERING_EFFECT_REVALIDATION_FAILED')
+            return {'argv':list(argv),'source_head':c['repository']['head_sha'],'input_hashes':hashes,
+                    'input_policy_ref':policy_ref,'input_policy_sha256':policy_sha256,
+                    'input_digest':item['input_digest']}
+        except EngineeringPreEffectValidationError:
+            raise
+        except Exception as exc:
+            reason=str(exc).strip().splitlines()[0] if str(exc).strip() else type(exc).__name__
+            raise EngineeringPreEffectValidationError(reason) from exc
+
+    def execute(c,item,prepared=None):
+        if prepared is None:prepared=preflight(c,item)
+        current=preflight(c,item)
+        if current!=prepared:raise EngineeringPreEffectValidationError('ENGINEERING_PREFLIGHT_BINDING_CHANGED')
+        argv=tuple(prepared['argv']);hashes=prepared['input_hashes']
+        policy_ref=prepared['input_policy_ref'];policy_sha256=prepared['input_policy_sha256']
         result=subprocess.run([sys.executable,*argv],cwd=root,capture_output=True,text=True,timeout=90)
         artifacts.mkdir(parents=True,exist_ok=True)
         payload={'argv':list(argv),'source_head':c['repository']['head_sha'],'exit_code':result.returncode,
@@ -126,7 +149,7 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                 observed.get('q0_l3_qualified') is False and observed.get('authentic_dwo_login_replay') is False and
                 observed.get('executed_effects')==[])
     return {'engineering.communication_read_once':read_once,'engineering.validate_context':validate,
-            'engineering.execute':execute,'engineering.verify_result':verify}
+        'engineering.preflight':preflight,'engineering.execute':execute,'engineering.verify_result':verify}
 
 
 def read_source_bound_frontier(context,*,profile_ref,guard):

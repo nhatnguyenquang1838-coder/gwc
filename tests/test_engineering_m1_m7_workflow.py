@@ -16,12 +16,14 @@ def capabilities(c,counts):
     def read(ctx):
         counts['read']+=1
         return {'seq':43,'run_id':ctx['run']['id'],'kind':'CORRECTION','from':'GPT','to':'Hermes','issue_ref':ctx['communication']['issue_ref'],'comment_id':123,'body_sha256':'a'*64,'comment_url':'https://github.com/owner/repo/issues/1#issuecomment-123','evidence_class':'HUMAN_COMMUNICATION_ONLY'}
-    def execute(ctx,item):
+    def preflight(ctx,item):return {'prepared':True,'fingerprint':item['fingerprint']}
+    def execute(ctx,item,prepared=None):
         counts['execute']+=1
         return {'exit_code':0,'result':'REAL_HOST_FIXTURE_RESULT','source_head':ctx['repository']['head_sha'],'stdout_digest':'sha256:'+'c'*64,'artifact_ref':'fixture-artifact','executed_effects':[]}
     return {'engineering.communication_read_once':read,'engineering.validate_context':lambda ctx:True,
             'engineering.execution_ready':lambda ctx,item:True,
-            'engineering.execute':execute,'engineering.verify_result':lambda ctx,item,result:result['exit_code']==0}
+            'engineering.preflight':preflight,'engineering.execute':execute,
+            'engineering.verify_result':lambda ctx,item,result:result['exit_code']==0}
 
 
 @pytest.mark.parametrize('task',['TASK-A','TASK-B'])
@@ -103,8 +105,9 @@ def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
 
 
 def test_executor_crash_is_not_retried_on_another_invocation(tmp_path):
+    import sqlite3
     c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
-    def crash(ctx,item):
+    def crash(ctx,item,prepared=None):
         counts['execute']+=1
         raise RuntimeError('fixture interruption')
     caps['engineering.execute']=crash
@@ -112,6 +115,31 @@ def test_executor_crash_is_not_retried_on_another_invocation(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='after-crash')
     assert counts['execute']==1
     assert r['verdict']['reason_code']=='ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED'
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT status FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()[0]=='UNKNOWN'
+
+
+def test_preflight_failure_is_recorded_as_no_effect_and_repairable_not_unknown(tmp_path):
+    import json,sqlite3
+    c=binding(tmp_path);counts={'read':0,'execute':0,'preflight':0};caps=capabilities(c,counts)
+    def fail_preflight(ctx,item):
+        counts['preflight']+=1
+        raise ValueError('ENGINEERING_INPUT_DIGEST_DRIFT')
+    caps['engineering.preflight']=fail_preflight
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='preflight-failure')
+    assert first['activity_results']['M5']['reason_code']=='ENGINEERING_PRE_EFFECT_VALIDATION_FAILED'
+    assert counts=={'read':1,'execute':0,'preflight':1}
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
+    detail=json.loads(result)
+    assert status=='PRE_EFFECT_VALIDATION_FAILED'
+    assert detail['effect_started'] is False and detail['reason_code']=='ENGINEERING_INPUT_DIGEST_DRIFT'
+    assert first['terminal']['pre_effect_failure']==detail
+    assert first['terminal']['controller_dispatch_required'] is False
+    assert first['graph_requests']==[]
+    retry=run_task_workflow(c,host_capabilities=caps,invocation_key='same-fingerprint')
+    assert retry['verdict']['reason_code']=='ENGINEERING_PRE_EFFECT_REPAIR_REQUIRED'
+    assert counts=={'read':2,'execute':0,'preflight':1}
 
 
 def test_terminal_result_dispatches_when_no_ready_work_remains(tmp_path):

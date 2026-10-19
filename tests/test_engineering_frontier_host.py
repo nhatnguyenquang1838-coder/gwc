@@ -151,6 +151,33 @@ def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_pat
     assert caps['engineering.verify_result'](c,item,changed) is False
 
 
+def test_local_preflight_classifies_input_digest_drift_before_execution(tmp_path,monkeypatch):
+    import hashlib
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c,_,_=agent_fixture(tmp_path)
+    path='tools/repair.py';argv=['-c','print("preflight-only")']
+    item={'id':'preflight-check','action':'run_sandboxed_validation','argv':argv,
+          'read_paths':[path],'input_digest':digest({path:hashlib.sha256((tmp_path/path).read_bytes()).hexdigest()})}
+    item['input_digest']='sha256:'+'0'*64
+    import subprocess,sys
+    calls={'run':0};real_run=subprocess.run
+    def forbidden_run(command,*args,**kwargs):
+        if command and command[0]==sys.executable:
+            calls['run']+=1
+            raise AssertionError('task subprocess must not start on preflight failure')
+        return real_run(command,*args,**kwargs)
+    monkeypatch.setattr('tools.node_architect.engineering_host_adapter.subprocess.run',forbidden_run)
+    caps=local_engineering_capabilities(c,guard=lambda:True,
+        artifact_directory=tmp_path/'validation-results',allowed_commands=[argv])
+    preflight=caps.get('engineering.preflight')
+    assert callable(preflight)
+    with pytest.raises(ValueError,match='ENGINEERING_INPUT_DIGEST_DRIFT') as caught:
+        preflight(c,item)
+    assert getattr(caught.value,'pre_effect_validation_failed',False) is True
+    assert calls['run']==0
+
+
 def test_source_bound_frontier_input_digest_is_accepted_by_host_executor(tmp_path):
     import json,hashlib,subprocess
     from tools.node_architect.engineering_host_adapter import read_source_bound_frontier,local_engineering_capabilities
