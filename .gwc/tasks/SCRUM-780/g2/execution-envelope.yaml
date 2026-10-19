@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "g2-execution-envelope",
+  "activation_state": "AWAITING_APPROVAL",
+  "task_id": "SCRUM-780",
+  "repository": "nhatnguyenquang1838-coder/gwc",
+  "base_ref": "main",
+  "base_sha": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4",
+  "working_branch": "auto/SCRUM-780-na81-20260810",
+  "risk_class": "R1",
+  "risk_digest": "sha256:e0ba9992dd8933c3c33306e0fb1ec676f97cf47d1141fd07704e8894e6d417a2",
+  "bounded_read_scope": [
+    "AGENTS.md",
+    "core/GATE_LIFECYCLE_CONTRACT_v1.0.md",
+    "core/runbooks/GATE_G0_G1_OPERATIONAL_RUNBOOK_v1.0.md",
+    "core/KIRO_SPEC_DRIVEN_DELIVERY_RULE_v1.0.md",
+    "schemas/g2-execution-envelope.schema.json",
+    "schemas/approval-request.schema.json",
+    ".gwc/tasks/SCRUM-780/**",
+    "core/node-architect/**",
+    "tools/node_architect/**"
+  ],
+  "bounded_write_scope": [
+    "resolve_gate_node_route.py",
+    "live_runtime_bridge.py",
+    "semantic_agent_runtime.py",
+    "tests/**",
+    ".gwc/tasks/SCRUM-780/**"
+  ],
+  "authorized_actions": [
+    "create_working_branch",
+    "add_files",
+    "run_sandboxed_validation",
+    "stage_commit_push"
+  ],
+  "excluded_actions": [
+    "open_draft_pr",
+    "mark_pr_ready",
+    "merge",
+    "auto_merge",
+    "force_push",
+    "branch_deletion",
+    "protected_branch_write",
+    "deploy",
+    "release",
+    "production_data_change",
+    "production_config_change",
+    "g3_pr_promotion",
+    "g4_merge",
+    "g5_deploy",
+    "g6_production"
+  ],
+  "scope_hash": "sha256:73023fedf2a36fbaa572ecf705e49b75353098ea5bc74c44150bd3854402dad3",
+  "f1_artifact_digests": {
+    ".gwc/tasks/SCRUM-780/g0/context-snapshot.yaml": "sha256:1f19a736be2ab1abe91edb4c6b5eb0344bca95e870d8de25e72cda691e069b12",
+    ".gwc/tasks/SCRUM-780/g1/intake/g1-intake-brief.yaml": "sha256:f66ba8ea95e13c8916bc17248fcd88de5876643471e5074a9fc5bd12eb7fa1e3",
+    ".gwc/tasks/SCRUM-780/g1/brainstorming/g1-options.yaml": "sha256:d7be556c75b31ef2297fbd5eb759c52afc4e5e6e0270f07c43f9924e71f9ee0e",
+    ".gwc/tasks/SCRUM-780/g1/decision/g1-decision-record.yaml": "sha256:dc20ddd094229348873624909d92b53267eb5cc04f9a63bc09329e9b714e6b72",
+    ".gwc/tasks/SCRUM-780/g1/preflight/g1-preflight-report.yaml": "sha256:283d5f1c31cfb72ce767670d40bd9256100553f41bd58e626a8c19536a9f4a1b"
+  },
+  "f2_digests": {
+    "cr0_scope_freeze": "sha256:9a4bf99a048c68587f643a4403907a44f4a7334d679a3b3b573f5352d91824d2",
+    "g1_scope_hash": "sha256:73023fedf2a36fbaa572ecf705e49b75353098ea5bc74c44150bd3854402dad3",
+    "g1_decision": "sha256:dc20ddd094229348873624909d92b53267eb5cc04f9a63bc09329e9b714e6b72"
+  },
+  "approval_request_ref": {
+    "path": ".gwc/tasks/SCRUM-780/g2/approval-request.yaml",
+    "approval_request_id": "dwo-login-auth-r1-scrum-780-g2-20260912",
+    "digest": "sha256:2a2a17c796fa8b0a64767d027db549d04083dbfbb831db37cd616127633d77c9"
+  },
+  "approval_validation_ref": {
+    "status": "PENDING_HUMAN_APPROVAL",
+    "command": "APPROVE G2 dwo-login-auth-r1-scrum-780-g2-20260912 73023fedf2a36fba 2026-09-12T15:49:02Z",
+    "scope_hash": "sha256:73023fedf2a36fbaa572ecf705e49b75353098ea5bc74c44150bd3854402dad3"
+  },
+  "checkpoint_id": "g2-scrum-780-20260912-1449",
+  "issued_at": "2026-09-12T14:49:02Z",
+  "expires_at": "2026-09-12T15:49:02Z",
+  "reason_code": "G2_ENVELOPE_AWAITING_APPROVAL",
+  "exclusions": [
+    "G3_PR",
+    "G4_MERGE",
+    "G5_DEPLOY",
+    "G6_PRODUCTION"
+  ],
+  "execution_started": false,
+  "envelope_digest": "sha256:c62d77d6cb017f1ada40b628dcf31a5fa8c8c64cbbe969586570b4e311d9e2e1"
+}
