@@ -27,6 +27,10 @@ class EngineeringState(TypedDict,total=False):
     work_frontier:dict
     host_action_request:dict
     terminal:dict
+    terminal_exchange_request:dict
+    terminal_exchange_status:str
+    terminal_digest:str
+    controller_response_observation:dict
 
 
 def _connect(path):
@@ -185,7 +189,10 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         # M3 WAIT (no READY work) previously fell straight to END and the
         # Controller never received a structured blocker; M7 still dispatches
         # its own exchange request and is unchanged.
-        frontier=s.get('work_frontier') or {}
+        frontier=s.get('work_frontier') or {
+            'source_head':c['repository']['head_sha'],
+            'runtime_plan_digest':c['run']['runtime_plan_digest'],
+            'items':[],'selected_work':None,'authority_granted':False}
         blocker={
             'M3':'No READY work remains on the frozen plan frontier; all candidates classified READY/VERIFIED/BLOCKED_EXTERNAL_EVIDENCE/BLOCKED_AUTHORITY/WAIT_INPUT',
             'M4':'Selected work has an unresolved external dependency',
@@ -201,13 +208,107 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                   'work_id':(s.get('work') or {}).get('id'),
                   'duplicate_guard':digest({'run':run,'activity':s['current_activity'],
                                              'reason_code':s['reason_code'],'source_head':c['repository']['head_sha']})}
+        decision_packet=None
+        if s['current_activity']=='M3' and frontier.get('selected_work') is None:
+            from .engineering_work_frontier import build_recovery_decision_packet
+            plan=c.get('runtime_plan',{})
+            decision_packet=build_recovery_decision_packet(
+                run_id=run,goal=c['task']['objective'],runtime_plan=plan,frontier=frontier)
+            terminal['decision_packet']=decision_packet
+        terminal_digest=digest(terminal)
+        terminal_exchange_request=None
+        terminal_exchange_status=None
+        response_observation=None
+        controller_exchange_requests=[]
+        # M3 exhaustion is a Controller-planning handoff, not protected M7.
+        # Reserve the exact deterministic request once; on later invocations
+        # resume/read that same outbox record and never stage/send it again.
+        if decision_packet is not None:
+            box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
+            prior=old.get('terminal_exchange_request')
+            prior_terminal_digest=old.get('terminal_digest')
+            if prior:
+                prior_state=box.read(prior)
+                terminal_exchange_status=prior_state['status']
+                receipt=prior_state.get('receipt') or {}
+                response_complete=(receipt.get('response_complete_observed') is True and
+                    receipt.get('response_to_marker')==prior['marker'] and
+                    receipt.get('request_digest')==prior['request_digest'])
+                if prior_terminal_digest==terminal_digest:
+                    terminal_exchange_request=prior
+                    if response_complete:
+                        from .engineering_work_frontier import classify_controller_observation
+                        disposition=classify_controller_observation(receipt.get('response_text',''))
+                        decision_packet['controller_disposition_observation']=disposition
+                        response_observation={
+                            'classification':'RENDERED_TEXT_CORRELATED_WEAK',
+                            'request_digest':prior['request_digest'],
+                            'response_to_marker':prior['marker'],
+                            'response_sha256':digest(receipt.get('response_text','')),
+                            'receipt_strength':receipt.get('receipt_strength'),
+                            'assistant_turn_ref':receipt.get('assistant_turn_ref'),
+                            'evidence_class':'HUMAN_COORDINATION_OBSERVATION_NOT_TYPED_NEXT',
+                            'disposition_observation':disposition,
+                            'authority_granted':False,'typed_ce_admitted':False,
+                            'workflow_resume_allowed':False}
+                    else:
+                        controller_exchange_requests=[prior]
+                elif not response_complete:
+                    # One materially unchanged blocker has only one outstanding
+                    # Controller request, even if the source head advanced.
+                    terminal_exchange_request=prior
+                    controller_exchange_requests=[prior]
+                else:
+                    prior=None
+            if not prior:
+                active_pending=None
+                for outstanding in old.get('pending_controller_exchange_requests',[]):
+                    outstanding_state=box.read(outstanding)
+                    outstanding_receipt=outstanding_state.get('receipt') or {}
+                    completed=(outstanding_state['status']=='CONTROLLER_RESPONSE_VERIFIED' or
+                        (outstanding_receipt.get('response_complete_observed') is True and
+                         outstanding_receipt.get('response_to_marker')==outstanding['marker'] and
+                         outstanding_receipt.get('request_digest')==outstanding['request_digest']))
+                    if not completed:
+                        active_pending=outstanding
+                        terminal_exchange_status=outstanding_state['status']
+                        break
+                if active_pending:
+                    # Do not create a second browser request while any exact
+                    # same-run Controller exchange is unresolved. Preserve and
+                    # surface the original request/marker for its owner.
+                    terminal['blocked_by_pending_exchange_marker']=active_pending['marker']
+                    controller_exchange_requests=[active_pending]
+                else:
+                    report=(f"{c['task']['id']} Q0 terminal engineering result; run {run}; "
+                            f"session {c['executor']['session_id']}; source {c['repository']['head_sha']}; "
+                            f"terminal {terminal_digest}. No READY work remains. Proposal only: "
+                            f"{json.dumps(decision_packet,sort_keys=True,separators=(',',':'))}. "
+                            "No typed C/E admission, authority, plan mutation, original replay, LOAD_PROOF or L3 claim. "
+                            "Please review and return a source-bound disposition; any acceptance-target change still requires an explicit human-approved immutable G1 revision.")
+                    request=make_exchange_request(c,report,lane='HOST_COORDINATION')
+                    with _connect(path) as db:
+                        db.execute('CREATE TABLE IF NOT EXISTS engineering_exchange_contexts (digest TEXT PRIMARY KEY, context TEXT)')
+                        db.execute('INSERT OR IGNORE INTO engineering_exchange_contexts VALUES (?,?)',
+                                   (request['task_context_digest'],json.dumps(c,sort_keys=True)))
+                    box.reserve(request)
+                    terminal_exchange_request=request
+                    terminal_exchange_status=box.read(request)['status']
+                    controller_exchange_requests=[request]
+        if response_observation is not None:
+            terminal['controller_response_observation']=response_observation
         # M8 is a result-dispatch node, NOT a gate. It must preserve the
         # original WAIT status and reason_code so the Controller still sees
         # ENGINEERING_EFFECT_AUTHORITY_REQUIRED / ENGINEERING_GENUINE_FIRING_REQUIRED
         # / ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED as the verdict, with the
         # structured terminal payload attached as evidence. Marking it PASS would
         # silently convert a blocked gate into a passed one.
-        return outcome(s,'M8',s['status'],s['reason_code'],terminal=terminal)
+        return outcome(s,'M8',s['status'],s['reason_code'],terminal=terminal,
+                       terminal_exchange_request=terminal_exchange_request,
+                       terminal_exchange_status=terminal_exchange_status,
+                       terminal_digest=terminal_digest,
+                       controller_response_observation=response_observation,
+                       controller_exchange_requests=controller_exchange_requests)
     graph.add_node('M8',m8)
     graph.add_edge('M8',END)
     try:state=graph.compile().invoke({'activity_results':{}})
@@ -220,7 +321,18 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         consumed={k:state['communication'][k] for k in ['seq','comment_id','body_sha256','comment_url']}
         newly_consumed=consumed!=old.get('consumed_human_command',{})
     state['consumed_human_command']=consumed
-    pending={r['request_digest']:r for r in old.get('pending_controller_exchange_requests',[])}
+    pending={}
+    if old.get('pending_controller_exchange_requests'):
+        box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
+        for request in old.get('pending_controller_exchange_requests',[]):
+            prior=box.read(request)
+            receipt=prior.get('receipt') or {}
+            response_processed=(prior['status']=='CONTROLLER_RESPONSE_VERIFIED' or
+                (receipt.get('response_complete_observed') is True and
+                 receipt.get('response_to_marker')==request['marker'] and
+                 receipt.get('request_digest')==request['request_digest']))
+            if not response_processed:
+                pending[request['request_digest']]=request
     pending.update({r['request_digest']:r for r in state.get('controller_exchange_requests',[])})
     state['pending_controller_exchange_requests']=list(pending.values())
     result={'workflow_identity':IDENTITY,'evidence_namespace':'ENGINEERING_COORDINATION_NOT_PROTECTED_CE',
@@ -229,6 +341,11 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             'work_frontier':state.get('work_frontier'),'host_action_request':state.get('host_action_request'),
             'communication_consumption':{'cursor':consumed,'newly_consumed':newly_consumed,'is_typed_cursor':False},
             'terminal':state.get('terminal'),
+            'terminal_exchange_request':state.get('terminal_exchange_request'),
+            'terminal_exchange_status':state.get('terminal_exchange_status'),
+            'terminal_digest':state.get('terminal_digest'),
+            'controller_response_observation':state.get('controller_response_observation'),
+            'decision_packet':(state.get('terminal') or {}).get('decision_packet'),
             'pending_controller_exchange_requests':state['pending_controller_exchange_requests'],
             'graph_requests':state.get('controller_exchange_requests',[]),'invocation_replayed':False,
             'typed_ce_admitted':False,'authority_granted':False,'native_tick_settled':False,

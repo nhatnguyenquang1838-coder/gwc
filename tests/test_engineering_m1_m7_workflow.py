@@ -141,3 +141,94 @@ def test_terminal_result_preserves_blocked_reason_code(tmp_path):
     assert r['terminal']['activity']=='M5'
     assert r['terminal']['reason_code']=='ENGINEERING_EFFECT_AUTHORITY_REQUIRED'
     assert r['terminal']['blocker']
+
+
+def test_m8_reserves_one_host_coordination_request_and_reuses_it(tmp_path):
+    import sqlite3, json
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    frontier={'source_head':c['repository']['head_sha'],
+              'runtime_plan_digest':c['run']['runtime_plan_digest'],
+              'authority_granted':False,'selected_work':None,
+              'items':[{'id':'trace','status':'BLOCKED_EXTERNAL_EVIDENCE',
+                        'work':{'id':'trace','plan_node_id':'F2-INCIDENT-RED',
+                                'missing_external_evidence':['authentic original trace']}}]}
+    caps['engineering.work_frontier']=lambda ctx:frontier
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-one')
+    assert len(first['graph_requests'])==1
+    req=first['graph_requests'][0]
+    assert req['lane']=='HOST_COORDINATION'
+    assert req['authority_granted'] is False and req['typed_ce_admitted'] is False
+    assert first['terminal']['decision_packet']['proposal_only'] is True
+    assert first['terminal']['decision_packet']['plan_mutated'] is False
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
+    assert box.read(req)['status']=='EXCHANGE_REQUESTED'
+    assert first['terminal_exchange_status']=='EXCHANGE_REQUESTED'
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        rows=db.execute('SELECT state FROM engineering_workflow WHERE run=?',(c['run']['id'],)).fetchone()
+        state=json.loads(rows[0])
+        assert state['terminal']['kind']=='ENGINEERING_TERMINAL_RESULT'
+        assert state['terminal_exchange_request']==req
+        assert state['terminal_exchange_status']=='EXCHANGE_REQUESTED'
+    with sqlite3.connect(box.path) as outbox_db:
+        assert outbox_db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    second=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-two')
+    assert second['graph_requests']==[req]
+    assert second['terminal_exchange_status']=='EXCHANGE_REQUESTED'
+    assert box.read(req)['status']=='EXCHANGE_REQUESTED'
+    assert counts['read']==2 and counts['execute']==0
+
+
+def test_m8_correlates_response_as_observation_without_resuming_or_granting_authority(tmp_path):
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    frontier={'source_head':c['repository']['head_sha'],
+              'runtime_plan_digest':c['run']['runtime_plan_digest'],
+              'authority_granted':False,'selected_work':None,'items':[]}
+    caps['engineering.work_frontier']=lambda ctx:frontier
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='response-one')
+    req=first['graph_requests'][0]
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
+    base={k:req[k] for k in ['conversation_url','request_digest','marker','task_id','run_id','session_id']}
+    base.update(user_turn_ref='user:'+req['marker'],evidence_class='BROWSER_EXCHANGE_VERIFIED',
+                authority_granted=False,typed_ce_admitted=False)
+    box.record(req,{**base,'status':'MESSAGE_SENT_VERIFIED'})
+    box.record(req,{**base,'status':'CONTROLLER_ACTION_REQUIRED',
+                    'response_to_marker':req['marker'],'response_text':'ACK #56 — SEARCH_EXHAUSTED / WAIT_EXTERNAL_EVIDENCE. No acceptance target changed.',
+                    'assistant_turn_ref':'assistant:'+req['marker'],
+                    'response_complete_observed':True,'strong_receipt_verified':False,
+                    'workflow_resume_allowed':False,'receipt_strength':'RENDERED_TEXT_CORRELATION_ONLY'})
+    second=run_task_workflow(c,host_capabilities=caps,invocation_key='response-two')
+    observation=second['terminal']['controller_response_observation']
+    assert observation['classification']=='RENDERED_TEXT_CORRELATED_WEAK'
+    assert observation['response_to_marker']==req['marker']
+    assert observation['authority_granted'] is False and observation['typed_ce_admitted'] is False
+    assert observation['workflow_resume_allowed'] is False
+    assert observation['disposition_observation']['disposition']=='SEARCH_EXHAUSTED_WAIT_EXTERNAL_EVIDENCE'
+    assert observation['disposition_observation']['planning_state']=='WAIT_EXTERNAL_INPUT'
+    assert observation['disposition_observation']['acceptance_target_changed'] is False
+    assert second['decision_packet']['controller_disposition_observation']==observation['disposition_observation']
+    assert second['graph_requests']==[]
+    assert second['pending_controller_exchange_requests']==[]
+    assert second['verdict']['status']=='WAIT'
+    assert counts['execute']==0
+
+
+def test_m8_does_not_create_second_request_while_m7_exchange_is_pending(tmp_path):
+    import sqlite3
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='work-and-m7')
+    original=first['graph_requests'][0]
+    assert original['lane']=='HOST_COORDINATION'
+    second=run_task_workflow(c,host_capabilities=caps,invocation_key='m3-after-m7')
+    assert second['verdict']['current_activity']=='M8'
+    assert second['terminal']['blocked_by_pending_exchange_marker']==original['marker']
+    assert second['graph_requests']==[original]
+    assert second['terminal_exchange_request'] is None
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
+    assert box.read(original)['status']=='EXCHANGE_REQUESTED'
+    with sqlite3.connect(box.path) as db:
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1

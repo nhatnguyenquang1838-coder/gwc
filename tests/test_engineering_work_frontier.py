@@ -1,5 +1,6 @@
 """Plan-bound frontier continuation without protected admission or fake evidence."""
 import pytest
+import json
 from test_engineering_m1_m7_workflow import binding,capabilities
 from tools.node_architect.task_m1_m7_runner import run_task_workflow
 from tools.node_architect.task_context_binding import digest
@@ -60,3 +61,30 @@ def test_unbound_frontier_does_not_enter_effect_path(tmp_path):
     with pytest.raises(ValueError,match='ENGINEERING_FRONTIER_BINDING_INVALID'):
         run_task_workflow(c,host_capabilities=caps,invocation_key='continue')
     assert counts['execute']==1
+
+
+def test_exhausted_frontier_yields_decision_packet_without_mutating_plan():
+    from tools.node_architect.engineering_work_frontier import build_recovery_decision_packet
+    plan={'id':'F0-Q0-QUALIFY','atomic':False,'children':[
+        {'id':'F2-INCIDENT-RED','atomic':True,'depends_on':[],'children':[]},
+        {'id':'F2-AGENT-INTEGRATION','atomic':True,'depends_on':[],'children':[]}]}
+    projection={'source_head':'a'*40,'runtime_plan_digest':'sha256:'+'b'*64,
+        'authority_granted':False,'selected_work':None,'items':[
+            {'id':'original-dwo-incident-reproduction','status':'BLOCKED_EXTERNAL_EVIDENCE',
+             'work':{'id':'original-dwo-incident-reproduction','missing_external_evidence':['original trace']}},
+            {'id':'engineering-agent-work-receipt-integration','status':'VERIFIED',
+             'work':{'id':'engineering-agent-work-receipt-integration'}}]}
+    before=json.loads(json.dumps(plan))
+    packet=build_recovery_decision_packet(run_id='run-Q0',goal='qualify original DWO failure',
+                                           runtime_plan=plan,frontier=projection)
+    assert packet['schema_id']=='gwc.q0.recovery-decision-proposal/v1'
+    assert packet['proposal_only'] is True and packet['authority_granted'] is False
+    assert packet['plan_root_id']=='F0-Q0-QUALIFY' and packet['plan_root_atomic'] is False
+    assert packet['plan_mutated'] is False and plan==before
+    assert packet['completed_work_ids']==['engineering-agent-work-receipt-integration']
+    assert packet['blocked_dependencies'][0]['id']=='original-dwo-incident-reproduction'
+    assert {o['id'] for o in packet['alternatives']}=={'RECOVER_ORIGINAL_TRACE','PROPOSE_G1_ACCEPTANCE_REPLAN'}
+    replan=next(o for o in packet['alternatives'] if o['id']=='PROPOSE_G1_ACCEPTANCE_REPLAN')
+    assert replan['requires_human_decision'] is True
+    assert 'does not reproduce the original DWO incident' in replan['boundary']
+    assert packet['recommended_action']=='WAIT_FOR_TRACE_OR_HUMAN_G1_DECISION'
