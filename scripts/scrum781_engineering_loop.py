@@ -172,6 +172,9 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
                 artifact_directory=path.parent/'engineering-results',
                 allowed_commands=[['-m','scripts.scrum781_q0_login_fixture','--engine','native']])
             host_capabilities['engineering.execution_ready']=lambda c,item:args.tick is not None and guard()
+            from tools.node_architect.engineering_host_adapter import read_source_bound_frontier
+            host_capabilities['engineering.work_frontier']=lambda c:read_source_bound_frontier(
+                c,profile_ref='core/node-architect/q0-engineering-frontier-r1.json',guard=guard)
     elif mode=='PROTECTED_TYPED_CE':
         context['workflow']['mode']='PROTECTED_TYPED_CE'
         if host_capabilities is None:

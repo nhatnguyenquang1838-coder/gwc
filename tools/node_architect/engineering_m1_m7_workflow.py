@@ -24,6 +24,8 @@ class EngineeringState(TypedDict,total=False):
     work:dict
     execution:dict
     controller_exchange_requests:list
+    work_frontier:dict
+    host_action_request:dict
 
 
 def _connect(path):
@@ -86,6 +88,20 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                 key=digest(item);row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
                 if not row or row[0]!='VERIFIED':
                     return outcome(s,'M3','PASS','PLAN_PRIORITIZED_WORK_SELECTED',work={**item,'fingerprint':key})
+        frontier=host_capabilities.get('engineering.work_frontier')
+        if callable(frontier):
+            projection=frontier(c)
+            require(projection.get('source_head')==c['repository']['head_sha'] and
+                    projection.get('runtime_plan_digest')==c['run']['runtime_plan_digest'] and
+                    projection.get('authority_granted') is False,'ENGINEERING_FRONTIER_BINDING_INVALID')
+            item=projection.get('selected_work')
+            if item:
+                key=digest(item)
+                with _connect(path) as db:
+                    row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
+                if not row or row[0]!='VERIFIED':
+                    return outcome(s,'M3','PASS','PLAN_DRIVEN_FRONTIER_SELECTED',work={**item,'fingerprint':key},work_frontier=projection)
+            return outcome(s,'M3','WAIT','ENGINEERING_FRONTIER_WAIT_INPUT',work_frontier=projection)
         return outcome(s,'M3','WAIT','NO_MATERIAL_CHANGE')
     def m4(s):
         # Conflicts are scoped to the selected work, not a protected C/E global HOLD.
@@ -95,8 +111,20 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         return outcome(s,'M4','PASS','SELECTED_WORK_SCOPE_RECONCILED')
     def m5(s):
         item=s['work'];allowed=c.get('runtime_plan',{}).get('scope',{}).get('allowed_actions',[])
-        # This implementation admits only source-bound read-only validation.
-        # Commits/writes/deploys need their own governing effect path, not this probe executor.
+        if item.get('action')=='modify_approved_files':
+            from .engineering_work_frontier import work_within_scope
+            if not work_within_scope(c,item):return outcome(s,'M5','WAIT','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
+            ready=host_capabilities.get('engineering.execution_ready')
+            if not callable(ready) or ready(c,item) is not True:
+                return outcome(s,'M5','WAIT','ENGINEERING_GENUINE_FIRING_REQUIRED')
+            request={'type':'ENGINEERING_HOST_ACTION_REQUEST','run_id':run,'session_id':c['executor']['session_id'],
+                     'source_head':c['repository']['head_sha'],'task_context_digest':binding,
+                     'runtime_plan_digest':c['run']['runtime_plan_digest'],'work_fingerprint':item['fingerprint'],
+                     'work':item,'executor':'CURRENT_HERMES_AGENT','authority_granted':False,'effect_executed':False}
+            request['request_digest']=digest(request)
+            return outcome(s,'M5','WAIT','ENGINEERING_HOST_ACTION_REQUIRED',host_action_request=request)
+        # Sandbox execution remains allowlisted; branch-local agent work is a
+        # bound request, not an automatic shell writer or a completed effect.
         if item.get('action')!='run_sandboxed_validation' or item['action'] not in allowed:
             return outcome(s,'M5','WAIT','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
         execute=host_capabilities.get('engineering.execute')
@@ -160,6 +188,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     result={'workflow_identity':IDENTITY,'evidence_namespace':'ENGINEERING_COORDINATION_NOT_PROTECTED_CE',
             'verdict':{k:state[k] for k in ['status','reason_code','current_activity']},'activity_results':state['activity_results'],
             'work':state.get('work'),'execution':state.get('execution'),
+            'work_frontier':state.get('work_frontier'),'host_action_request':state.get('host_action_request'),
             'communication_consumption':{'cursor':consumed,'newly_consumed':newly_consumed,'is_typed_cursor':False},
             'pending_controller_exchange_requests':state['pending_controller_exchange_requests'],
             'graph_requests':state.get('controller_exchange_requests',[]),'invocation_replayed':False,

@@ -1,0 +1,30 @@
+{
+  "schema_id": "gwc.engineering-frontier-policy/v1",
+  "runtime_plan_ref": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+  "notice": "Source-bound work candidates under the existing Q0 recovery policy, not a new RuntimePlan or effect authority.",
+  "items": [
+    {
+      "id": "original-dwo-incident-reproduction",
+      "priority": 1,
+      "plan_node_id": "F2-INCIDENT-RED",
+      "action": "run_sandboxed_validation",
+      "missing_inputs": ["An exact original-trace-bound reproducer command/adapter; never substitute the reconstructed probe"],
+      "read_paths": ["core/node-architect/scrum781-q0-fresh-execution-plan-r2.json", ".gwc/tasks/SCRUM-781/evidence/native105-original-trace-recovery-v1.json"],
+      "evidence_requirements": [
+        {"path": ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json", "field": "incident.original_trace_status", "equals": "RECOVERED", "name": "Validated actual original DWO trace, run identity, failing input/state and immutable locator"}
+      ]
+    },
+    {
+      "id": "engineering-agent-work-receipt-integration",
+      "priority": 2,
+      "plan_node_id": "F0-Q0-QUALIFY",
+      "plan_relation": "CONDITIONAL_RUNTIME_DEFECT_REPAIR_UNDER_EXISTING_RECOVERY_POLICY",
+      "action": "modify_approved_files",
+      "objective": "Implement verified completion/readback for agent-owned branch-local engineering requests. A data-only request is not execution or completion. Preserve source/run/owner/action/path guards and at-most-once work lifecycle; no shell writer or authority bypass.",
+      "depends_on": [],
+      "read_paths": ["tools/node_architect/engineering_m1_m7_workflow.py", "tools/node_architect/engineering_host_adapter.py", "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json"],
+      "write_paths": ["tools/node_architect/engineering_m1_m7_workflow.py", "tools/node_architect/engineering_host_adapter.py", "tests/test_engineering_work_frontier.py", "tests/test_engineering_frontier_host.py"],
+      "acceptance": "RED before fix; exact source/owner and scope at each effect; immutable execution/verification evidence; no VERIFIED work from request generation alone; affected tests, additive commit/push and source reconciliation."
+    }
+  ]
+}

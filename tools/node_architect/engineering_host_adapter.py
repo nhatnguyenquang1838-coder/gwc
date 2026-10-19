@@ -94,3 +94,40 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
                 observed.get('executed_effects')==[])
     return {'engineering.communication_read_once':read_once,'engineering.validate_context':validate,
             'engineering.execute':execute,'engineering.verify_result':verify}
+
+
+def read_source_bound_frontier(context,*,profile_ref,guard):
+    """One local source read, never another communication poll or effect grant."""
+    import sqlite3
+    from .engineering_work_frontier import project_frontier
+    require(guard() is True,'ENGINEERING_HOST_OWNER_UNVERIFIED')
+    root=Path(context['repository']['worktree']).resolve();head=context['repository']['head_sha']
+    require(subprocess.check_output(['git','-C',str(root),'rev-parse','HEAD'],text=True).strip()==head,'ENGINEERING_FRONTIER_SOURCE_DRIFT')
+    def source(ref):
+        path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_FRONTIER_PATH_ESCAPE')
+        data=path.read_bytes()
+        require(data==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]),'ENGINEERING_FRONTIER_SOURCE_DRIFT')
+        return data
+    policy_raw=source(profile_ref);policy=json.loads(policy_raw);items=[]
+    require(policy.get('runtime_plan_ref',context['run']['runtime_plan_ref'])==context['run']['runtime_plan_ref'],'ENGINEERING_FRONTIER_PLAN_DRIFT')
+    for declared in policy['items']:
+        item=dict(declared);hashes={ref:hashlib.sha256(source(ref)).hexdigest() for ref in item.get('read_paths',[])}
+        missing=list(item.get('missing_external_evidence',[]))
+        for need in item.get('evidence_requirements',[]):
+            raw=source(need['path']);hashes[need['path']]=hashlib.sha256(raw).hexdigest()
+            value=json.loads(raw)
+            for part in need['field'].split('.'):value=value.get(part,{}) if isinstance(value,dict) else None
+            if value!=need['equals']:missing.append(need['name'])
+        item['missing_external_evidence']=missing
+        item['input_digest']=digest({'policy_sha256':hashlib.sha256(policy_raw).hexdigest(),'input_hashes':hashes})
+        items.append(item)
+    cp=Path(context['workflow']['checkpoint_ref']);verified=[]
+    if cp.is_file():
+        with sqlite3.connect(cp.as_uri()+'?mode=ro',uri=True) as db:
+            if db.execute("SELECT 1 FROM sqlite_master WHERE name='engineering_work'").fetchone():
+                verified=[r[0] for r in db.execute('SELECT fingerprint FROM engineering_work WHERE run=? AND status=?',(context['run']['id'],'VERIFIED'))]
+    require(guard() is True,'ENGINEERING_HOST_OWNER_UNVERIFIED')
+    result=project_frontier(context,items,verified_fingerprints=verified)
+    for item in context.get('engineering',{}).get('work_items',[]):
+        if digest(item) in verified:result['items'].append({'id':item['id'],'status':'VERIFIED','fingerprint':digest(item),'work':item})
+    return result
