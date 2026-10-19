@@ -69,13 +69,27 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
             path=(root/ref).resolve();require(path.is_relative_to(root),'ENGINEERING_SOURCE_PATH_ESCAPE')
             data=path.read_bytes();require(data==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+ref]),'ENGINEERING_INPUT_SOURCE_DRIFT')
             hashes[ref]=hashlib.sha256(data).hexdigest()
-        require(digest(hashes)==item['input_digest'],'ENGINEERING_INPUT_DIGEST_DRIFT')
+        policy_ref=item.get('_source_policy_ref')
+        policy_sha256=None
+        if policy_ref:
+            policy_path=(root/policy_ref).resolve();require(policy_path.is_relative_to(root),'ENGINEERING_POLICY_PATH_ESCAPE')
+            policy_raw=policy_path.read_bytes()
+            require(policy_raw==subprocess.check_output(['git','-C',str(root),'show',c['repository']['head_sha']+':'+policy_ref]),'ENGINEERING_POLICY_SOURCE_DRIFT')
+            policy_sha256=hashlib.sha256(policy_raw).hexdigest()
+            require(policy_sha256==item.get('_source_policy_sha256') and hashes==item.get('_source_input_hashes'),
+                    'ENGINEERING_INPUT_BINDINGS_DRIFT')
+            input_binding={'policy_sha256':policy_sha256,'input_hashes':hashes}
+        else:
+            input_binding=hashes
+        require(digest(input_binding)==item['input_digest'],'ENGINEERING_INPUT_DIGEST_DRIFT')
         require(item['action'] in c['runtime_plan']['scope']['allowed_actions'] and item['action']=='run_sandboxed_validation','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
         require(validate(c),'ENGINEERING_EFFECT_REVALIDATION_FAILED')
         result=subprocess.run([sys.executable,*argv],cwd=root,capture_output=True,text=True,timeout=90)
         artifacts.mkdir(parents=True,exist_ok=True)
         payload={'argv':list(argv),'source_head':c['repository']['head_sha'],'exit_code':result.returncode,
-                 'stdout':result.stdout,'stderr':result.stderr,'input_hashes':hashes}
+                 'stdout':result.stdout,'stderr':result.stderr,'input_hashes':hashes,
+                 'input_policy_ref':policy_ref,'input_policy_sha256':policy_sha256 if policy_ref else None,
+                 'input_digest':item['input_digest']}
         path=artifacts/(item['fingerprint'].split(':')[-1]+'.json');encoded=json.dumps(payload,sort_keys=True)
         path.write_text(encoded)
         try:observed=json.loads(result.stdout)
@@ -96,6 +110,8 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         if digest(raw)!=result['artifact_digest'] or digest(raw['stdout'])!=result['stdout_digest']:return False
         if item.get('verification_profile')=='Q0_TERMINAL_RESULT_SUITE':
             if raw.get('argv')!=item.get('argv') or raw.get('source_head')!=c['repository']['head_sha'] or result.get('source_head')!=c['repository']['head_sha'] or raw.get('exit_code')!=0:return False
+            if raw.get('input_digest')!=item.get('input_digest') or raw.get('input_policy_ref')!=item.get('_source_policy_ref'):return False
+            if item.get('_source_policy_ref') and raw.get('input_policy_sha256')!=item.get('_source_policy_sha256'):return False
             if not all(path in raw['argv'] for path in item.get('required_test_files',[])):return False
             summary=re.search(r'(?m)(\d+) passed(?:,\s*\d+ subtests?)? in [0-9.]+s\s*$',raw['stdout'])
             if summary is None or int(summary.group(1))<item.get('minimum_tests_passed',1):return False
@@ -125,7 +141,7 @@ def read_source_bound_frontier(context,*,profile_ref,guard):
         data=path.read_bytes()
         require(data==subprocess.check_output(['git','-C',str(root),'show',head+':'+ref]),'ENGINEERING_FRONTIER_SOURCE_DRIFT')
         return data
-    policy_raw=source(profile_ref);policy=json.loads(policy_raw);items=[]
+    policy_raw=source(profile_ref);policy=json.loads(policy_raw);policy_sha256=hashlib.sha256(policy_raw).hexdigest();items=[]
     require(policy.get('runtime_plan_ref',context['run']['runtime_plan_ref'])==context['run']['runtime_plan_ref'],'ENGINEERING_FRONTIER_PLAN_DRIFT')
     for declared in policy['items']:
         item=dict(declared);hashes={ref:hashlib.sha256(source(ref)).hexdigest() for ref in item.get('read_paths',[])}
@@ -136,7 +152,10 @@ def read_source_bound_frontier(context,*,profile_ref,guard):
             for part in need['field'].split('.'):value=value.get(part,{}) if isinstance(value,dict) else None
             if value!=need['equals']:missing.append(need['name'])
         item['missing_external_evidence']=missing
-        item['input_digest']=digest({'policy_sha256':hashlib.sha256(policy_raw).hexdigest(),'input_hashes':hashes})
+        item['_source_policy_ref']=profile_ref
+        item['_source_policy_sha256']=policy_sha256
+        item['_source_input_hashes']=hashes
+        item['input_digest']=digest({'policy_sha256':policy_sha256,'input_hashes':hashes})
         items.append(item)
     cp=Path(context['workflow']['checkpoint_ref']);verified=[]
     if cp.is_file():

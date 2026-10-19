@@ -149,3 +149,35 @@ def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_pat
     assert caps['engineering.verify_result'](c,item,result) is True
     changed={**result,'source_head':'f'*40}
     assert caps['engineering.verify_result'](c,item,changed) is False
+
+
+def test_source_bound_frontier_input_digest_is_accepted_by_host_executor(tmp_path):
+    import json,hashlib,subprocess
+    from tools.node_architect.engineering_host_adapter import read_source_bound_frontier,local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c,_,git=agent_fixture(tmp_path)
+    files=['tests/test_engineering_m1_m7_workflow.py','tests/test_engineering_work_frontier.py',
+           'tests/test_engineering_frontier_host.py','tests/test_controller_exchange_adapter.py',
+           'tests/test_exchange_outbox_transitions.py']
+    for path in files:
+        target=tmp_path/path;target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text('def test_fixture_passes():\n    assert True\n')
+    argv=['-m','pytest',*files,'-q']
+    item={'id':'bridge-validation','priority':2,'plan_node_id':'ROOT',
+          'action':'run_sandboxed_validation','objective':'Validate terminal result path',
+          'argv':argv,'expected_result':'Q0_TERMINAL_RESULT_SUITE_PASS',
+          'verification_profile':'Q0_TERMINAL_RESULT_SUITE','minimum_tests_passed':5,
+          'required_test_files':files,'read_paths':files,'write_paths':[]}
+    profile={'runtime_plan_ref':c['run']['runtime_plan_ref'],'items':[item]}
+    (tmp_path/'validation-profile.json').write_text(json.dumps(profile))
+    git('add','tests','validation-profile.json')
+    git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','bind terminal validation profile')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    projection=read_source_bound_frontier(c,profile_ref='validation-profile.json',guard=lambda:True)
+    selected=projection['selected_work'];assert selected['id']=='bridge-validation'
+    selected={**selected,'fingerprint':digest(selected)}
+    caps=local_engineering_capabilities(c,guard=lambda:True,
+        artifact_directory=tmp_path/'validation-results',allowed_commands=[argv])
+    result=caps['engineering.execute'](c,selected)
+    assert result['exit_code']==0 and result['result']=='Q0_TERMINAL_RESULT_SUITE_PASS'
+    assert caps['engineering.verify_result'](c,selected,result) is True
