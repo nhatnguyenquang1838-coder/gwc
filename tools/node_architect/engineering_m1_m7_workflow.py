@@ -140,34 +140,70 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         ready=host_capabilities.get('engineering.execution_ready')
         if not callable(ready) or ready(c,item) is not True:
             return outcome(s,'M5','WAIT','ENGINEERING_GENUINE_FIRING_REQUIRED')
+        def result_data(row):
+            if not row or not row[1]:return {}
+            try:data=json.loads(row[1])
+            except (TypeError,ValueError):return {}
+            return data if isinstance(data,dict) else {}
+        def pre_effect_history(row):
+            if not row or row[0]!='PRE_EFFECT_VALIDATION_FAILED':return None
+            data=result_data(row)
+            if data.get('effect_started') is not False or data.get('subprocess_started') is not False:return None
+            history=data.get('attempt_history')
+            if isinstance(history,list):return history
+            # Upgrade a pre-history row without dropping its original failure evidence.
+            return [{'attempt':1,'phase':'PREFLIGHT','status':'PRE_EFFECT_VALIDATION_FAILED',
+                     'reason_code':data.get('reason_code','LEGACY_PRE_EFFECT_VALIDATION_FAILED'),
+                     'exception_type':data.get('exception_type'),'effect_started':False,
+                     'subprocess_started':False}]
         def prior_result(row):
             if not row:return None
             status,result=row
             if status in {'EXECUTED','VERIFIED'}:
-                return outcome(s,'M5','PASS','ENGINEERING_PRIOR_EXECUTION_REUSED',execution=json.loads(result))
-            if status=='PRE_EFFECT_VALIDATION_FAILED':
-                return outcome(s,'M5','WAIT','ENGINEERING_PRE_EFFECT_REPAIR_REQUIRED',pre_effect_failure=json.loads(result))
+                saved=result_data(row);execution=saved.get('execution',saved)
+                return outcome(s,'M5','PASS','ENGINEERING_PRIOR_EXECUTION_REUSED',execution=execution)
+            if status=='PRE_EFFECT_VALIDATION_FAILED' and pre_effect_history(row) is not None:
+                return None
             return outcome(s,'M5','WAIT','ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED')
+        def pre_effect_failure(exc,history,attempt,phase):
+            message=getattr(exc,'reason_code',None)
+            if not message:
+                lines=str(exc).strip().splitlines();message=lines[0] if lines else type(exc).__name__
+            message=str(message)[:160]
+            entry={'attempt':attempt,'phase':phase,'status':'PRE_EFFECT_VALIDATION_FAILED',
+                   'reason_code':message,'exception_type':type(exc).__name__,
+                   'effect_started':False,'subprocess_started':False}
+            return {'classification':'PRE_EFFECT_VALIDATION_FAILED','reason_code':message,
+                    'exception_type':type(exc).__name__,'effect_started':False,
+                    'subprocess_started':False,
+                    'recovery_action':'REVALIDATE_SAME_FINGERPRINT_AFTER_PREFLIGHT_REPAIR',
+                    'current_attempt':attempt,'attempt_history':[*(history or []),entry]}
+        def next_attempt(history):
+            return max((entry.get('attempt',0) for entry in history or []),default=0)+1
         with _connect(path) as db:
             db.execute('BEGIN IMMEDIATE')
             row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
             previous=prior_result(row)
             if previous:return previous
+            history=pre_effect_history(row) if row else []
             db.commit()
         try:
             prepared=preflight(c,item)
         except Exception as exc:
-            message=str(exc).strip().splitlines()[0][:160] if str(exc).strip() else type(exc).__name__
-            failure={'classification':'PRE_EFFECT_VALIDATION_FAILED','reason_code':message,
-                     'exception_type':type(exc).__name__,'effect_started':False,
-                     'subprocess_started':False,'recovery_action':'REPAIR_PREFLIGHT_AND_USE_NEW_FINGERPRINT'}
             with _connect(path) as db:
                 db.execute('BEGIN IMMEDIATE')
                 row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
                 previous=prior_result(row)
                 if previous:return previous
-                db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
-                           (run,item['fingerprint'],'PRE_EFFECT_VALIDATION_FAILED',json.dumps(failure,sort_keys=True)))
+                current_history=pre_effect_history(row) if row else []
+                failure=pre_effect_failure(exc,current_history or [],next_attempt(current_history),'PREFLIGHT')
+                if row:
+                    updated=db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=? AND status=?',
+                        ('PRE_EFFECT_VALIDATION_FAILED',json.dumps(failure,sort_keys=True),run,item['fingerprint'],'PRE_EFFECT_VALIDATION_FAILED')).rowcount
+                    require(updated==1,'ENGINEERING_PRE_EFFECT_FAILURE_CAS_FAILED')
+                else:
+                    db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
+                        (run,item['fingerprint'],'PRE_EFFECT_VALIDATION_FAILED',json.dumps(failure,sort_keys=True)))
                 db.commit()
             return outcome(s,'M5','WAIT','ENGINEERING_PRE_EFFECT_VALIDATION_FAILED',pre_effect_failure=failure)
         with _connect(path) as db:
@@ -175,27 +211,53 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             row=db.execute('SELECT status,result FROM engineering_work WHERE run=? AND fingerprint=?',(run,item['fingerprint'])).fetchone()
             previous=prior_result(row)
             if previous:return previous
-            db.execute('INSERT INTO engineering_work VALUES (?,?,?,NULL)',(run,item['fingerprint'],'IN_FLIGHT'))
+            history=pre_effect_history(row) if row else []
+            attempt=next_attempt(history)
+            pass_entry={'attempt':attempt,'phase':'PREFLIGHT','status':'PREFLIGHT_PASSED',
+                        'prepared_digest':digest(prepared),'effect_started':False,'subprocess_started':False}
+            flight={'classification':'IN_FLIGHT','current_attempt':attempt,'effect_started':True,
+                    'subprocess_started':'MAY_HAVE_STARTED','attempt_history':[*(history or []),pass_entry]}
+            if row:
+                updated=db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=? AND status=?',
+                    ('IN_FLIGHT',json.dumps(flight,sort_keys=True),run,item['fingerprint'],'PRE_EFFECT_VALIDATION_FAILED')).rowcount
+                require(updated==1,'ENGINEERING_EXECUTION_CLAIM_CAS_FAILED')
+            else:
+                db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
+                    (run,item['fingerprint'],'IN_FLIGHT',json.dumps(flight,sort_keys=True)))
             db.commit()
+        history=[*(history or []),pass_entry]
         try:
             r=execute(c,item,prepared)
         except Exception as exc:
             if getattr(exc,'pre_effect_validation_failed',False) is True:
-                message=getattr(exc,'reason_code',None) or type(exc).__name__
-                failure={'classification':'PRE_EFFECT_VALIDATION_FAILED','reason_code':str(message)[:160],
-                         'exception_type':type(exc).__name__,'effect_started':False,
-                         'subprocess_started':False,'recovery_action':'REPAIR_PREFLIGHT_AND_USE_NEW_FINGERPRINT'}
+                detail=pre_effect_failure(exc,history,attempt,'EXECUTION_BOUNDARY_REVALIDATION')
                 status='PRE_EFFECT_VALIDATION_FAILED';reason='ENGINEERING_PRE_EFFECT_VALIDATION_FAILED'
-                detail=failure
             else:
-                status='UNKNOWN';reason='ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED'
+                unknown={'attempt':attempt,'phase':'EXECUTION','status':'EFFECT_OUTCOME_UNKNOWN',
+                         'exception_type':type(exc).__name__,'effect_started':True,
+                         'subprocess_started':'MAY_HAVE_STARTED'}
                 detail={'classification':'EFFECT_OUTCOME_UNKNOWN','exception_type':type(exc).__name__,
-                        'effect_started':True,'subprocess_started':'MAY_HAVE_STARTED'}
-            with _connect(path) as db:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',(status,json.dumps(detail,sort_keys=True),run,item['fingerprint']))
-            if status=='PRE_EFFECT_VALIDATION_FAILED':
-                return outcome(s,'M5','WAIT',reason,pre_effect_failure=detail)
+                        'effect_started':True,'subprocess_started':'MAY_HAVE_STARTED',
+                        'current_attempt':attempt,'attempt_history':[ *history,unknown]}
+                status='UNKNOWN';reason='ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED'
+            with _connect(path) as db:
+                db.execute('BEGIN IMMEDIATE')
+                updated=db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=? AND status=?',
+                    (status,json.dumps(detail,sort_keys=True),run,item['fingerprint'],'IN_FLIGHT')).rowcount
+                require(updated==1,'ENGINEERING_EXECUTION_RESULT_CAS_FAILED')
+                db.commit()
+            if status=='PRE_EFFECT_VALIDATION_FAILED':return outcome(s,'M5','WAIT',reason,pre_effect_failure=detail)
             return outcome(s,'M5','WAIT',reason)
-        with _connect(path) as db:db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=?',('EXECUTED',json.dumps(r,sort_keys=True),run,item['fingerprint']))
+        executed={'attempt':attempt,'phase':'EXECUTION','status':'EXECUTED',
+                  'effect_started':True,'subprocess_started':True}
+        record={'classification':'EXECUTED','current_attempt':attempt,'effect_started':True,
+                'subprocess_started':True,'attempt_history':[ *history,executed],'execution':r}
+        with _connect(path) as db:
+            db.execute('BEGIN IMMEDIATE')
+            updated=db.execute('UPDATE engineering_work SET status=?,result=? WHERE run=? AND fingerprint=? AND status=?',
+                ('EXECUTED',json.dumps(record,sort_keys=True),run,item['fingerprint'],'IN_FLIGHT')).rowcount
+            require(updated==1,'ENGINEERING_EXECUTION_RESULT_CAS_FAILED')
+            db.commit()
         return outcome(s,'M5','PASS','ACTUAL_HOST_VALIDATION_EXECUTED',execution=r)
     def m6(s):
         verify=host_capabilities.get('engineering.verify_result');r=s['execution']
@@ -255,7 +317,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         }.get(s['current_activity'],'Engineering halted before M7 without a selected work result')
         if s['current_activity']=='M5' and s['reason_code'] in {
                 'ENGINEERING_PRE_EFFECT_VALIDATION_FAILED','ENGINEERING_PRE_EFFECT_REPAIR_REQUIRED'}:
-            blocker='Pre-effect validation failed; no task subprocess started. Repair the source/input binding and use a new fingerprint.'
+            blocker='Pre-effect validation failed; no task subprocess started. Repair the source/environment, then revalidate the same fingerprint; preserve the prior failure entry and claim atomically only after preflight passes.'
         terminal={'kind':'ENGINEERING_TERMINAL_RESULT','activity':s['current_activity'],
                   'reason_code':s['reason_code'],'status':s['status'],
                   'blocker':blocker,

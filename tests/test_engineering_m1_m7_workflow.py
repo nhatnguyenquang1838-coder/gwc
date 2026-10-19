@@ -119,13 +119,14 @@ def test_executor_crash_is_not_retried_on_another_invocation(tmp_path):
         assert db.execute('SELECT status FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()[0]=='UNKNOWN'
 
 
-def test_preflight_failure_is_recorded_as_no_effect_and_repairable_not_unknown(tmp_path):
+def test_preflight_failure_is_recorded_as_no_effect_and_retryable_on_same_fingerprint(tmp_path):
     import json,sqlite3
     c=binding(tmp_path);counts={'read':0,'execute':0,'preflight':0};caps=capabilities(c,counts)
-    def fail_preflight(ctx,item):
+    def preflight(ctx,item):
         counts['preflight']+=1
-        raise ValueError('ENGINEERING_INPUT_DIGEST_DRIFT')
-    caps['engineering.preflight']=fail_preflight
+        if counts['preflight']==1:raise ValueError('ENGINEERING_INPUT_DIGEST_DRIFT')
+        return {'prepared':True,'fingerprint':item['fingerprint']}
+    caps['engineering.preflight']=preflight
     first=run_task_workflow(c,host_capabilities=caps,invocation_key='preflight-failure')
     assert first['activity_results']['M5']['reason_code']=='ENGINEERING_PRE_EFFECT_VALIDATION_FAILED'
     assert counts=={'read':1,'execute':0,'preflight':1}
@@ -137,9 +138,58 @@ def test_preflight_failure_is_recorded_as_no_effect_and_repairable_not_unknown(t
     assert first['terminal']['pre_effect_failure']==detail
     assert first['terminal']['controller_dispatch_required'] is False
     assert first['graph_requests']==[]
-    retry=run_task_workflow(c,host_capabilities=caps,invocation_key='same-fingerprint')
-    assert retry['verdict']['reason_code']=='ENGINEERING_PRE_EFFECT_REPAIR_REQUIRED'
-    assert counts=={'read':2,'execute':0,'preflight':1}
+    retry=run_task_workflow(c,host_capabilities=caps,invocation_key='same-fingerprint-recovery')
+    assert retry['activity_results']['M5']['status']=='PASS'
+    assert retry['activity_results']['M6']['status']=='PASS'
+    assert counts=={'read':2,'execute':1,'preflight':2}
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
+    record=json.loads(result);history=record['attempt_history']
+    assert status=='VERIFIED'
+    assert history[0]['status']=='PRE_EFFECT_VALIDATION_FAILED'
+    assert history[0]['reason_code']=='ENGINEERING_INPUT_DIGEST_DRIFT'
+    assert history[1]['status']=='PREFLIGHT_PASSED' and history[1]['effect_started'] is False
+    assert history[2]['status']=='EXECUTED'
+
+
+def test_same_fingerprint_pre_effect_recovery_claim_is_atomic(tmp_path):
+    import json,sqlite3,threading
+    c=binding(tmp_path);counts={'read':0,'execute':0,'preflight':0};caps=capabilities(c,counts)
+    def fail_once(ctx,item):
+        counts['preflight']+=1
+        raise ValueError('ENGINEERING_INPUT_DIGEST_DRIFT')
+    caps['engineering.preflight']=fail_once
+    run_task_workflow(c,host_capabilities=caps,invocation_key='preflight-failure')
+    barrier=threading.Barrier(2);started=threading.Event();release=threading.Event();any_done=threading.Event();lock=threading.Lock()
+    def recovered_preflight(ctx,item):
+        with lock:counts['preflight']+=1
+        barrier.wait(timeout=5)
+        return {'prepared':True,'fingerprint':item['fingerprint']}
+    def slow_execute(ctx,item,prepared=None):
+        with lock:counts['execute']+=1
+        started.set()
+        assert release.wait(timeout=5)
+        return {'exit_code':0,'result':'REAL_HOST_FIXTURE_RESULT','source_head':ctx['repository']['head_sha'],
+                'stdout_digest':'sha256:'+'c'*64,'artifact_ref':'fixture-artifact','executed_effects':[]}
+    caps['engineering.preflight']=recovered_preflight;caps['engineering.execute']=slow_execute
+    results={}
+    def worker(key):
+        results[key]=run_task_workflow(c,host_capabilities=caps,invocation_key=key)
+        any_done.set()
+    threads=[threading.Thread(target=worker,args=(f'recovery-{n}',)) for n in range(2)]
+    for thread in threads:thread.start()
+    assert started.wait(timeout=5)
+    assert any_done.wait(timeout=5)  # the losing invocation must observe IN_FLIGHT and return
+    release.set()
+    for thread in threads:thread.join(timeout=5);assert not thread.is_alive()
+    assert counts['execute']==1
+    assert sorted(r['activity_results']['M5']['reason_code'] for r in results.values())==[
+        'ACTUAL_HOST_VALIDATION_EXECUTED','ENGINEERING_EXECUTION_RECONCILIATION_REQUIRED']
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        status,result=db.execute('SELECT status,result FROM engineering_work WHERE run=?',(c['run']['id'],)).fetchone()
+    record=json.loads(result);history=record['attempt_history']
+    assert status=='VERIFIED'
+    assert [item['status'] for item in history]==['PRE_EFFECT_VALIDATION_FAILED','PREFLIGHT_PASSED','EXECUTED']
 
 
 def test_terminal_result_dispatches_when_no_ready_work_remains(tmp_path):
