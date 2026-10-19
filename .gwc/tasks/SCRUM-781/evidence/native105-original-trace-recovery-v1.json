@@ -1,0 +1,128 @@
+{
+  "format_id": "local-only.q0-original-trace-recovery/v1",
+  "artifact_type": "bounded-original-incident-source-investigation",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "native_tick": 105,
+  "source_head_at_investigation": "2d4f35d0336f74c17f44639818b8a4b81ac03d93",
+  "incident_id": "DWO-LOGIN-AUTH-R1",
+  "work_item": "F2-INCIDENT-RED / ORIGINAL_DWO_TRACE_RECOVERY",
+  "result": "ORIGINAL_INCIDENT_TRACE_NOT_FOUND",
+  "result_scope": "No original failure payload recovered from the exact three committed inputs and five live Jira description responses below. This is not a global absence claim.",
+  "source_count": 8,
+  "sources": [
+    {
+      "id": 1,
+      "kind": "exact_git_bytes",
+      "path": ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json",
+      "sha256": "d2c5a5eda73bc684f31203da56bd41a3b93fadf21ed9ffa4ef57879a223e32cf",
+      "observations": {"original_trace_status": "MISSING", "provenance_class": "RECONSTRUCTED_REQUIREMENTS_BOUND", "authentic_incident_replay": false, "original_failure_reproduced": false},
+      "classification": "REQUIREMENTS_ORACLE_NOT_ORIGINAL_TRACE"
+    },
+    {
+      "id": 2,
+      "kind": "exact_git_bytes",
+      "path": ".gwc/tasks/SCRUM-781/engineering/tick92-incident-provenance.json",
+      "sha256": "edfaf6eaeb8033987bf78865fc182c7d381cf8d1c5ac63a2dfaf4dd0a861d18f",
+      "classification": "HISTORICAL_RECONSTRUCTED_PROVENANCE_INVESTIGATION",
+      "repeated_tests_or_audits": false
+    },
+    {
+      "id": 3,
+      "kind": "exact_git_bytes",
+      "path": ".gwc/tasks/SCRUM-781/evidence/q0-dwo-source-provenance-scan-v1.json",
+      "sha256": "a986b51b9cff6c302032165370fb9c2ece8f532300eea73dbd1d392ac65d3fd5",
+      "classification": "HISTORICAL_SEARCH_LEDGER_NOT_CURRENT_GLOBAL_ABSENCE",
+      "use": "Avoid repeating already inventoried GitHub issue, fixture and Actions scans. Broaden instead to live Jira provenance and linked scope definitions.",
+      "historical_sources_requeried": false
+    },
+    {
+      "id": 4,
+      "kind": "live_jira_description_excerpt",
+      "issue": "SCRUM-781",
+      "issue_id": "10846",
+      "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-781",
+      "updated_returned": "2026-10-12 03:30:00 +07",
+      "excerpt": "Q0 is the GWC runtime recovery/certification gate for SCRUM-780. Goal: use failed DWO-LOGIN-AUTH-R1 evidence to find, fix, load, replay-verify, and certify GWC runtime/control defects before Login R00 execution.",
+      "classification": "RECOVERY_ACCEPTANCE_REQUIREMENT_NOT_FAILURE_PAYLOAD"
+    },
+    {
+      "id": 5,
+      "kind": "live_jira_description_excerpt",
+      "issue": "SCRUM-780",
+      "issue_id": "10845",
+      "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-780",
+      "updated_returned": "2026-09-18 01:43:09 +07",
+      "excerpt": "Historical baseline only: `SCRUM-677 / TC-RP-001` (Done; local-only login simulation)",
+      "classification": "PLANNING_SCOPE_AND_BASELINE_LOCATORS_NOT_FAILURE_PAYLOAD",
+      "planning_baselines": {"gwc": "88fbcc3fc34efd3190d0475d6771aad5e6ca90e4", "DW-SuperApps": "5c9720e2230da64660716e07ce8453575545ae23"}
+    },
+    {
+      "id": 6,
+      "kind": "live_jira_description_excerpt",
+      "issue": "SCRUM-677",
+      "issue_id": "10710",
+      "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-677",
+      "excerpt": "no Supabase sign-in, OAuth, session, middleware, redirects, protected routes, logout, production deploy, or production data.",
+      "classification": "TC_RP_001_LOGIN_UX_PROVING_SCOPE_NOT_ORIGINAL_DWO_AUTH_FAILURE",
+      "rejection_reason": "The linked historical workload's declared scope excludes the auth/session/protected-route effects required by DWO-LOGIN-AUTH-R1; a related Login label is not original-incident identity. No underlying execution receipt from this issue was recovered in this firing."
+    },
+    {
+      "id": 7,
+      "kind": "live_jira_description_excerpt",
+      "issue": "SCRUM-787",
+      "issue_id": "10852",
+      "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-787",
+      "excerpt": "Q0 Plan Precheck projection.",
+      "classification": "PLANNING_PREREQUISITE_NOT_INCIDENT_TRACE_PRODUCER"
+    },
+    {
+      "id": 8,
+      "kind": "live_jira_description_excerpt",
+      "issue": "SCRUM-796",
+      "issue_id": "10861",
+      "url": "https://nhatnguyenquang1838.atlassian.net/browse/SCRUM-796",
+      "excerpt": "Additive Q0/F2 runtime-qualification sub-goal for SCRUM-781. This does not replace Q0 and does not start Login.",
+      "classification": "RECURSIVE_PLANNING_PREREQUISITE_NOT_INCIDENT_TRACE_PRODUCER"
+    }
+  ],
+  "new_information_this_firing": [
+    "Live Jira descriptions explicitly distinguish original auth campaign from historical TC-RP-001 Login UX proving work.",
+    "RuntimePlan dependencies SCRUM-787/SCRUM-796 describe plan validation rather than an original trace producer.",
+    "No original failure boundary, failing input/state snapshot, raw execution trace or recoverable original fixture locator was supplied by these retrieved descriptions."
+  ],
+  "retrieval_limits": {
+    "jira_comments": "NOT_SEARCHED_THIS_FIRING",
+    "jira_attachments": "UNKNOWN: attachment field requested but not exposed by curated MCP result; omission is not proof of no attachments",
+    "notion_pages": "NOT_REFETCHED: manifest declares architecture/requirements oracles, not observed runtime",
+    "historical_github_search": "PRIOR_COMMITTED_LEDGER_ONLY_NOT_RERUN",
+    "unindexed_deleted_or_external_host_traces": "NOT_EXCLUDED",
+    "no_global_absence_claim": true,
+    "raw_mcp_response_captured": false,
+    "excerpt_not_full_response": true
+  },
+  "blocked_action": "Reproduce and replay the authentic original DWO-LOGIN-AUTH-R1 failure",
+  "missing_evidence": ["original execution/run identity", "source-bound failing input and pre-failure state", "observed error/trace and exact failing boundary", "immutable sanitized artifact locator and digest"],
+  "evidence_producer": {
+    "role": "Original DWO execution host or Controller trace exporter",
+    "exact_actor_and_artifact_path": "NOT_VERIFIED",
+    "producer_required_authority": "Existing read/export scope for the actual original artifact; production, credentials and new effects remain separately protected",
+    "no_new_human_approval_requested": true,
+    "qualification_release_trigger": "An actual sanitized source-bound original trace is located and validated; never relabel reconstructed requirements as recovered history"
+  },
+  "next_independent_work": {
+    "owner": "DWA",
+    "action": "Repair plan-driven engineering frontier/evidence-producer routing under current Q0 scope, so an exhausted reconstructed probe does not cause permanent M3 NO_MATERIAL_CHANGE; retain original-trace dependency as a scoped blocker.",
+    "authority_source": "Live AGENTS.md UNIVERSAL_V2_DEVELOPMENT override and source-bound Q0 RuntimePlan R2",
+    "no_silent_plan_or_route_mutation": true
+  },
+  "evidence_class": "SOURCE_INVESTIGATION_NOT_NATIVE_GATE_RECEIPT",
+  "typed_ce_admitted": false,
+  "authority_granted": false,
+  "authentic_original_failure_reproduced": false,
+  "authentic_original_replay": false,
+  "load_proof": false,
+  "q0_l3_qualified": false,
+  "tests_rerun": false,
+  "production_effects": []
+}
