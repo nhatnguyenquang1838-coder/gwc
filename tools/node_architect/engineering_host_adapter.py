@@ -174,6 +174,7 @@ def read_source_bound_frontier(context,*,profile_ref,guard):
             value=json.loads(raw)
             for part in need['field'].split('.'):value=value.get(part,{}) if isinstance(value,dict) else None
             if value!=need['equals']:missing.append(need['name'])
+        item['_stable_fingerprint']=digest({k:v for k,v in item.items() if not k.startswith('_')})
         item['missing_external_evidence']=missing
         item['_source_policy_ref']=profile_ref
         item['_source_policy_sha256']=policy_sha256

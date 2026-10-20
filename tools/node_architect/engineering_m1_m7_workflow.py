@@ -84,6 +84,17 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             db.execute('CREATE TABLE IF NOT EXISTS engineering_reported (run TEXT,digest TEXT,PRIMARY KEY(run,digest))')
             db.execute('INSERT OR IGNORE INTO engineering_reported VALUES (?,?)',(run,result_digest))
 
+    def _fingerprint(item):
+        # The frontier reader pins a stable identity before injecting evidence
+        # hashes; fall back to the full item digest for host-supplied items.
+        return item.get('_stable_fingerprint') or digest(item)
+    def _is_verified(item):
+        key=_fingerprint(item)
+        with _connect(path) as db:
+            row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
+            if row is None:
+                row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',(run,digest(item))).fetchone()
+        return bool(row) and row[0]=='VERIFIED'
     def m1(s):
         read=host_capabilities.get('engineering.communication_read_once')
         if not callable(read):return outcome(s,'M1','WAIT','ENGINEERING_COMMUNICATION_READER_REQUIRED')
@@ -130,8 +141,8 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         with _connect(path) as db:
             for item in items:
                 require(item.get('input_digest') and item.get('id'),'ENGINEERING_WORK_SOURCE_BINDING_REQUIRED')
-                key=digest(item);row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
-                if not row or row[0]!='VERIFIED':
+                key=_fingerprint(item)
+                if not _is_verified(item):
                     return outcome(s,'M3','PASS','PLAN_PRIORITIZED_WORK_SELECTED',work={**item,'fingerprint':key})
         frontier=host_capabilities.get('engineering.work_frontier')
         if callable(frontier):
@@ -141,10 +152,8 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                     projection.get('authority_granted') is False,'ENGINEERING_FRONTIER_BINDING_INVALID')
             item=projection.get('selected_work')
             if item:
-                key=digest(item)
-                with _connect(path) as db:
-                    row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',(run,key)).fetchone()
-                if not row or row[0]!='VERIFIED':
+                key=_fingerprint(item)
+                if not _is_verified(item):
                     return outcome(s,'M3','PASS','PLAN_DRIVEN_FRONTIER_SELECTED',work={**item,'fingerprint':key},work_frontier=projection)
             return outcome(s,'M3','WAIT','ENGINEERING_FRONTIER_WAIT_INPUT',work_frontier=projection)
         return outcome(s,'M3','WAIT','NO_MATERIAL_CHANGE')
