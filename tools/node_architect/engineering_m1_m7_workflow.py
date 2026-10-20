@@ -648,6 +648,35 @@ def reconcile_engineering_route_metadata(old_context,new_context,*,repository_ro
     return receipt
 
 
+def invalidate_engineering_work(checkpoint_ref,run,fingerprint,*,reason):
+    """Mark a work row INVALID when its evidence does not support the result.
+
+    The row and its artifact are preserved; the correction is recorded so the
+    frontier re-selects the work instead of trusting a false verification.
+    """
+    import datetime
+    require(isinstance(reason,str) and bool(reason.strip()),'WORK_INVALIDATION_REASON_REQUIRED')
+    with _connect(checkpoint_ref) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',
+                       (run,fingerprint)).fetchone()
+        require(row is not None,'WORK_INVALIDATION_NOT_FOUND')
+        require(row[0]!='INVALID','WORK_INVALIDATION_ALREADY_INVALID')
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_work_corrections '
+                   '(key TEXT PRIMARY KEY, run TEXT, fingerprint TEXT, prior_status TEXT, reason TEXT, at TEXT)')
+        receipt={'run':run,'fingerprint':fingerprint,'prior_status':row[0],'new_status':'INVALID','reason':reason}
+        db.execute('INSERT OR REPLACE INTO engineering_work_corrections VALUES (?,?,?,?,?,?)',
+                   (digest(receipt),run,fingerprint,row[0],reason,
+                    datetime.datetime.now(datetime.timezone.utc).isoformat()))
+        db.execute('UPDATE engineering_work SET status=? WHERE run=? AND fingerprint=?',
+                   ('INVALID',run,fingerprint))
+        db.commit()
+    with _connect(checkpoint_ref) as reader:
+        require(reader.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',
+                               (run,fingerprint)).fetchone()[0]=='INVALID','WORK_INVALIDATION_READBACK_FAILED')
+    return receipt
+
+
 def reconcile_interrupted_invocation(checkpoint_ref,run,invocation_key,*,reason):
     """Release an owner's interrupted invocation that never produced a result.
 

@@ -265,6 +265,23 @@ def test_worktree_relocation_rejects_same_repo_path_on_different_host(tmp_path):
         reconcile_engineering_worktree_relocation(c,moved,reason='fixture')
 
 
+def test_false_verification_can_be_invalidated_and_reselected(tmp_path):
+    """A verified row whose evidence does not support the result can be invalidated."""
+    import sqlite3
+    from tools.node_architect.engineering_m1_m7_workflow import invalidate_engineering_work
+    c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='invalidate-one')
+    fp=first['work']['fingerprint']
+    receipt=invalidate_engineering_work(c['workflow']['checkpoint_ref'],c['run']['id'],fp,
+                                        reason='fixture: relabelled green suite is not a RED')
+    assert receipt['prior_status']=='VERIFIED' and receipt['new_status']=='INVALID'
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT status FROM engineering_work WHERE run=? AND fingerprint=?',
+                          (c['run']['id'],fp)).fetchone()[0]=='INVALID'
+    again=run_task_workflow(c,host_capabilities=caps,invocation_key='invalidate-two')
+    assert again['work']['fingerprint']==fp  # re-selected, not trusted
+
+
 def test_route_metadata_reconciliation_rejects_non_additive_delta(tmp_path):
     """A route delta that changes existing keys or work_items must fail closed."""
     import copy,json,subprocess,sqlite3
