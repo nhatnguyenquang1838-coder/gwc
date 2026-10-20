@@ -318,6 +318,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                                      'result_digest':result_digest,
                                      'work_id':(s.get('work') or {}).get('id')})
         _mark_reported(result_digest)
+        _telemetry('M7','ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED','WAIT',result_digest,True)
         request=make_exchange_request(c,report,lane='HOST_COORDINATION')
         with _connect(path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS engineering_exchange_contexts (digest TEXT PRIMARY KEY, context TEXT)')
