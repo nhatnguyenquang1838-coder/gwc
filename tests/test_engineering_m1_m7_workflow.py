@@ -184,12 +184,19 @@ def test_worktree_relocation_requires_explicit_reconciliation(tmp_path):
     c['engineering']['work_items']=old_route['work_items']
     counts={'read':0,'execute':0};caps=capabilities(c,counts)
     run_task_workflow(c,host_capabilities=caps,invocation_key='reloc-one')
-    # A second linked worktree of the same repository, same branch and HEAD.
+    # A second checkout of the same repository on the same branch and HEAD.
     linked=tmp_path.parent/'relocated-worktree'
-    git('worktree','add','-q','--detach',str(linked),'HEAD')
+    subprocess.check_output(['git','clone','-q',str(tmp_path),str(linked)],text=True)
+    git('checkout','-q','-B','fix/test',cwd=linked)
     newer=copy.deepcopy(c);newer['repository']['worktree']=str(linked)
     with pytest.raises(ValueError,match='ENGINEERING_RECONCILE_NON_HEAD_DRIFT'):
         reconcile_engineering_source_head(c,newer,repository_root=linked,reason='fixture')
+    # A detached checkout cannot satisfy a context that declares a branch.
+    detached=tmp_path.parent/'detached-wt'
+    git('worktree','add','-q','--detach',str(detached),'HEAD')
+    detached_ctx=copy.deepcopy(newer);detached_ctx['repository']['worktree']=str(detached)
+    with pytest.raises(ValueError,match='WORKTREE_RELOCATION_BRANCH_MISMATCH'):
+        reconcile_engineering_worktree_relocation(c,detached_ctx,reason='fixture')
     # A non-worktree delta must still fail closed.
     drifted=copy.deepcopy(newer);drifted['repository']['branch']='fix/other'
     with pytest.raises(ValueError,match='WORKTREE_RELOCATION_CONTEXT_DRIFT'):
@@ -231,6 +238,30 @@ def test_worktree_relocation_accepts_standalone_clone_of_same_repository(tmp_pat
     receipt=reconcile_engineering_worktree_relocation(c,newer,reason='canonical relocation')
     assert receipt['new_worktree']==str(linked.resolve())
     assert receipt['head_unchanged'] is True
+
+
+def test_worktree_relocation_rejects_same_repo_path_on_different_host(tmp_path):
+    """Owner/repo equality alone must not merge two distinct Git hosts."""
+    import copy,json,subprocess
+    from tools.node_architect.task_context_binding import digest as ctx_digest
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_worktree_relocation
+    origin=tmp_path/'origin';origin.mkdir()
+    def git(*args,cwd=None):return subprocess.check_output(['git','-C',str(cwd or origin),*args],text=True).strip()
+    git('init','-b','fix/test');(origin/'route.json').write_text(json.dumps({'workflow_mode':'Q0_ENGINEERING_COORDINATION'}))
+    git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    a=tmp_path/'clone-a';b=tmp_path/'clone-b'
+    for path in (a,b):
+        subprocess.check_output(['git','clone','-q',str(origin),str(path)],text=True)
+        git('checkout','-q','-B','fix/test',cwd=path)
+    git('remote','set-url','origin','https://host-a.example.com/owner/repo.git',cwd=a)
+    git('remote','set-url','origin','https://host-b.example.com/owner/repo.git',cwd=b)
+    c=binding(origin);c['repository']={'name':'owner/repo','branch':'fix/test',
+        'head_sha':git('rev-parse','HEAD'),'worktree':str(a)}
+    c['engineering']['route_policy_digest']=ctx_digest({'workflow_mode':'Q0_ENGINEERING_COORDINATION'})
+    counts={'read':0,'execute':0};run_task_workflow(c,host_capabilities=capabilities(c,counts),invocation_key='host-one')
+    moved=copy.deepcopy(c);moved['repository']['worktree']=str(b)
+    with pytest.raises(ValueError,match='WORKTREE_RELOCATION_REPOSITORY_MISMATCH'):
+        reconcile_engineering_worktree_relocation(c,moved,reason='fixture')
 
 
 def test_route_metadata_reconciliation_rejects_non_additive_delta(tmp_path):

@@ -595,6 +595,9 @@ def reconcile_engineering_worktree_relocation(old_context,new_context,*,reason):
     require(equivalent==old,'WORKTREE_RELOCATION_CONTEXT_DRIFT')
     def git(root,*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
     require(git(new_wt,'rev-parse','HEAD')==new['repository']['head_sha'],'WORKTREE_RELOCATION_GIT_BINDING_REQUIRED')
+    declared=new['repository'].get('branch') or ''
+    actual=git(new_wt,'branch','--show-current')
+    require(declared==actual,'WORKTREE_RELOCATION_BRANCH_MISMATCH')
     head_unchanged=old['repository']['head_sha']==new['repository']['head_sha']
     if not head_unchanged:
         subprocess.run(['git','-C',str(new_wt),'merge-base','--is-ancestor',
@@ -608,13 +611,20 @@ def reconcile_engineering_worktree_relocation(old_context,new_context,*,reason):
             # repository has a distinct common dir; require one repository
             # identity before accepting the move.
             def origin(root):
-                url=git(root,'remote','get-url','origin')
+                try:
+                    url=git(root,'remote','get-url','origin')
+                except subprocess.CalledProcessError:
+                    url=str(Path(root).resolve())
                 if url.startswith('/'):
-                    return str(Path(url).resolve())
-                # Normalize https/ssh/scp-style URLs to owner/repo.
-                tail=url.split('://',1)[-1].replace(':','/',1) if '://' in url else url.replace(':','/',1)
+                    return 'file://'+str(Path(url).resolve())
+                # Keep the host: distinct Git hosts are distinct repositories
+                # even when owner/repo coincide. Normalize user and .git only.
+                tail=url.split('://',1)[-1] if '://' in url else url
+                tail=tail.replace(':','/',1) if ':' in tail.split('/')[0] else tail
                 parts=[part for part in tail.strip('/').split('/') if part]
-                return '/'.join(parts[-2:]).removesuffix('.git')
+                host=parts[0].split('@')[-1].lower()
+                repo='/'.join(parts[-2:]).removesuffix('.git')
+                return host+'/'+repo
             require(origin(old_wt)==origin(new_wt),'WORKTREE_RELOCATION_REPOSITORY_MISMATCH')
     with _connect(old['workflow']['checkpoint_ref']) as db:
         db.execute('BEGIN IMMEDIATE')
