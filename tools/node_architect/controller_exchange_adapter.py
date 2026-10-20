@@ -5,10 +5,12 @@ restarting the runner is not permission to resend. The trusted host performs
 actual UI observation through its installed skill; this module does no browser I/O.
 """
 from __future__ import annotations
+import datetime
 import json
 import sqlite3
 from pathlib import Path
 from .task_context_binding import validate_task_context, digest, require
+from .exchange_deadlock import detect_exchange_stall, DEFAULT_THRESHOLD
 
 OUTCOMES = {'MESSAGE_SENT_VERIFIED','CONTROLLER_RESPONSE_VERIFIED','TRANSPORT_BLOCKED',
             'DUPLICATE_SEND_DETECTED','CONTROLLER_ACTION_REQUIRED'}
@@ -157,6 +159,32 @@ class ExchangeOutbox:
     def _db(self):
         return sqlite3.connect(str(self.path), timeout=10)
 
+    def note_attempt(self, request, status=None):
+        """Record one host attempt for this request (append-only, no authority)."""
+        prior = self.read(request)
+        status = status or prior['status']
+        with self._db() as db:
+            db.execute('CREATE TABLE IF NOT EXISTS exchange_attempts '
+                       '(id INTEGER PRIMARY KEY, key TEXT NOT NULL, marker TEXT NOT NULL, '
+                       'status TEXT NOT NULL, context_digest TEXT, at TEXT NOT NULL)')
+            db.execute('INSERT INTO exchange_attempts(key,marker,status,context_digest,at) VALUES (?,?,?,?,?)',
+                       (request['request_digest'], request['marker'], status,
+                        request.get('task_context_digest',''),
+                        datetime.datetime.now(datetime.timezone.utc).isoformat()))
+        return status
+
+    def stall(self, request, *, threshold=DEFAULT_THRESHOLD):
+        """Classify repeated identical unresolved attempts for the same request."""
+        with self._db() as db:
+            try:
+                rows = db.execute('SELECT key,marker,status FROM exchange_attempts '
+                                  'WHERE key=? ORDER BY id DESC LIMIT 12',
+                                  (request['request_digest'],)).fetchall()
+            except sqlite3.Error:
+                rows = []
+        return detect_exchange_stall(
+            [{'request_digest':k,'marker':m,'status':s} for k,m,s in rows], threshold=threshold)
+
     def reserve(self, request):
         from jsonschema import Draft202012Validator
         require(Draft202012Validator(EXCHANGE_REQUEST_SCHEMA).is_valid(request),'EXCHANGE_REQUEST_SCHEMA_INVALID')
@@ -268,6 +296,17 @@ def execute_host_exchange(context, request, outbox, capabilities):
     skill = c['capabilities']['controller_exchange']['skill_ref']
     provider = capabilities.get('controller_exchange.send_read_verify') or capabilities.get(skill)
     require(callable(provider), 'HOST_SKILL_CAPABILITY_UNAVAILABLE')
+    # Exchange-mode deadlock guard: the same request left unresolved for
+    # `threshold` consecutive attempts must not be re-sent. One escalation per
+    # stall_key; the host reports it instead of waking the Controller again.
+    exchange_stall = outbox.stall(request) if outbox.read(request)['status'] in {
+        'EXCHANGE_REQUESTED','MESSAGE_SENT_VERIFIED','CONTROLLER_ACTION_REQUIRED'} else None
+    if exchange_stall and exchange_stall.get('stalled'):
+        outbox.note_attempt(request)
+        return {'status':'EXCHANGE_STALL_SUPPRESSED','reason_code':'EXCHANGE_STALL_ESCALATION_REQUIRED',
+                'stall':exchange_stall,'prior':outbox.read(request),
+                'typed_ce_admitted':False,'authority_granted':False}
+    outbox.note_attempt(request)
     if not outbox.reserve(request):
         return {'status':'DUPLICATE_SEND_DETECTED','prior':outbox.read(request),'typed_ce_admitted':False}
     try:
