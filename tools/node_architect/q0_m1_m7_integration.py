@@ -86,9 +86,27 @@ FRONTIER_R3_REF = 'core/node-architect/q0-controlled-failure-frontier-r3.json'
 
 
 def resolve_frontier_ref(root: Path | str) -> str:
-    """Pick the frontier that matches the active plan (R3 campaign vs R2 lane)."""
+    """Pick the frontier that matches the active plan (R3 campaign vs R2 lane).
+
+    A route may declare `active_frontier_ref` to bind an explicit successor
+    projection for the same plan (for example the CF-RED -> CF-FIX -> CF-LOAD
+    candidates that the R3 projection omitted). The declared frontier must
+    reference the same RuntimePlan; drift fails closed.
+    """
     root = Path(root).resolve()
     plan = resolve_active_plan(root)
+    route_path = root / ROUTE_REF
+    if route_path.exists():
+        route = json.loads(route_path.read_text())
+        declared = route.get('active_frontier_ref')
+        if declared:
+            path = root / declared
+            if not path.exists():
+                raise ValueError('Q0_FRONTIER_SOURCE_MISSING')
+            policy = json.loads(path.read_text())
+            if policy.get('runtime_plan_ref') != plan:
+                raise ValueError('Q0_FRONTIER_PLAN_DRIFT')
+            return declared
     ref = FRONTIER_R3_REF if 'controlled-failure' in plan else FRONTIER_R2_REF
     path = root / ref
     if not path.exists():
