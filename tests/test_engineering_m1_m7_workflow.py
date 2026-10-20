@@ -2,6 +2,7 @@
 import pytest
 from test_task_context_binding import context
 from tools.node_architect.task_m1_m7_runner import run_task_workflow
+from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
 
 
 def binding(tmp_path,task='TASK-A'):
@@ -611,3 +612,55 @@ def test_terminal_blocker_identity_is_stable_but_each_firing_reports(tmp_path):
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     with sqlite3.connect(box.path) as db:
         assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
+
+
+def test_accepted_child_terminal_parks_worker_without_rescheduling(tmp_path):
+    """R2/R3: an accepted child parks this worker; parent stays open."""
+    import copy,subprocess,sqlite3,json
+    from tools.node_architect.engineering_m1_m7_workflow import (
+        park_idle_terminal, build_child_terminal_receipt, record_child_terminal_acceptance)
+    c=binding(tmp_path);c['repository']['worktree']=str(tmp_path);c['engineering']['work_items']=[]
+    c['engineering']['child_run']='scrum781-q0-fresh-20261010-r1'
+    (tmp_path/'plan.json').write_text('{"plan":"frozen"}\n')
+    def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
+    git('init','-b',c['repository']['branch']);git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    def frontier(ctx):
+        return {'source_head':ctx['repository']['head_sha'],'runtime_plan_digest':ctx['run']['runtime_plan_digest'],
+                'authority_granted':False,'selected_work':None,'items':[]}
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=frontier
+    r=run_task_workflow(c,host_capabilities=caps,invocation_key='park-one')
+    assert r['activity_results']['M3']['status']=='WAIT'
+    assert r['activity_results']['M3']['reason_code']=='ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED'
+    assert r['terminal']['activity']=='M3'
+    # Durable, append-only/idempotent receipt.
+    assert r['terminal']['child_run']=='scrum781-q0-fresh-20261010-r1'
+    assert r['terminal']['receipt']['child_status']=='TERMINAL_LOCAL_EVIDENCE'
+    assert r['terminal']['receipt']['parent_status']=='RUN_NOT_COMPLETE'
+    assert r['terminal']['receipt']['authority_granted'] is False
+    assert r['terminal']['receipt']['typed_ce_admitted'] is False
+    assert r['terminal']['receipt']['native_certification_claimed'] is False
+    assert r['terminal']['receipt']['l3_claimed'] is False
+    assert r['terminal']['receipt']['load_proof_claimed'] is False
+    # No Controller request is reserved while parked: silence is the state.
+    assert r['graph_requests']==[]
+    # Second firing re-reads the same parked state without re-recording.
+    r2=run_task_workflow(c,host_capabilities=caps,invocation_key='park-two')
+    assert r2['activity_results']['M3']['reason_code']=='ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED'
+    assert r2['terminal']['recorded'] is False and r2['terminal']['duplicate_guard'] is True
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_child_terminal').fetchone()[0]==1
+    # An additive source change keeps the same parked identity.
+    git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-m','additive')
+    newer=copy.deepcopy(c);newer['repository']['head_sha']=git('rev-parse','HEAD')
+    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='additive source change preserves parked child')
+    r3=run_task_workflow(newer,host_capabilities=caps,invocation_key='park-three')
+    assert r3['terminal']['source_head']==newer['repository']['head_sha']
+    assert r3['terminal']['child_run']=='scrum781-q0-fresh-20261010-r1'
+
+
+def test_child_terminal_receipt_requires_explicit_child_run(tmp_path):
+    from tools.node_architect.engineering_m1_m7_workflow import park_idle_terminal, build_child_terminal_receipt
+    c=binding(tmp_path);c['repository']['worktree']=str(tmp_path);c['engineering']['work_items']=[]
+    assert park_idle_terminal(c,c['workflow']['checkpoint_ref'],{'items':[]}) is None
+    assert build_child_terminal_receipt(c,{'items':[]})['child_run'] is None

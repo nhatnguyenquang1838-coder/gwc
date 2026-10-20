@@ -41,8 +41,83 @@ def _connect(path):
     db.execute('CREATE TABLE IF NOT EXISTS engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)')
     db.execute('CREATE TABLE IF NOT EXISTS engineering_invocations (run TEXT, key TEXT, binding TEXT, result TEXT, PRIMARY KEY(run,key))')
     db.execute('CREATE TABLE IF NOT EXISTS engineering_work (run TEXT, fingerprint TEXT, status TEXT, result TEXT, PRIMARY KEY(run,fingerprint))')
+    db.execute('CREATE TABLE IF NOT EXISTS engineering_child_terminal (child_run TEXT PRIMARY KEY, receipt TEXT)')
     db.commit()
     return db
+
+
+def park_idle_terminal(context,checkpoint_path,frontier):
+    """R2/R4 durable child-terminal handoff (SCRUM-845).
+
+    If the source-bound child campaign was accepted at LOCAL_EVIDENCE strength,
+    park this worker: persist an append-only/idempotent terminal receipt, keep
+    the parent open at RUN_NOT_COMPLETE, and record an explicit NEXT owner plus
+    WAIT_AUTHORITY. No new TDD, no reselection of completed work, no duplicate
+    Controller request, no authority, no native LOAD_PROOF/L3/G6 conversion.
+    """
+    import json
+    child_run=(context.get('engineering') or {}).get('child_run') or context['run'].get('child_run')
+    if not child_run:
+        return None
+    with _connect(checkpoint_path) as db:
+        row=db.execute('SELECT receipt FROM engineering_child_terminal WHERE child_run=?',(child_run,)).fetchone()
+        if row:
+            return json.loads(row[0])
+        return None
+
+
+def build_child_terminal_receipt(context,frontier):
+    """One-shot durable terminal handoff payload for an accepted child run.
+
+    Parent status is intentionally NOT promoted: it stays UR.G2/RUN_NOT_COMPLETE.
+    NEXT owner is explicit and single; WAIT_AUTHORITY is recorded once with a
+    source-bound reason. This is a state reducer, not an effect or approval.
+    """
+    import json
+    child_run=(context.get('engineering') or {}).get('child_run') or context['run'].get('child_run')
+    items=(frontier or {}).get('items',[])
+    blocked=[{'id':r.get('id'),'status':r.get('status')} for r in items
+             if r.get('status') in {'BLOCKED_EXTERNAL_EVIDENCE','BLOCKED_AUTHORITY','WAIT_INPUT'}]
+    return {
+        'schema_id':'gwc.q0.child-terminal-handoff/v1',
+        'child_run':child_run,
+        'parent_run':context['run']['id'],
+        'child_status':'TERMINAL_LOCAL_EVIDENCE',
+        'parent_status':'RUN_NOT_COMPLETE',
+        'source_head':context['repository']['head_sha'],
+        'runtime_plan_digest':context['run']['runtime_plan_digest'],
+        'frontier_digest':digest(frontier or {}),
+        'blocked_dependencies':blocked,
+        'next_owner':'Controller (GPT) for the parent run; human for any acceptance-target change',
+        'wait_authority':'WAIT_AUTHORITY — no new task is eligible without a separately authorized new run/G1; the old terminal child must never silently reactivate',
+        'authority_granted':False,
+        'typed_ce_admitted':False,
+        'native_certification_claimed':False,
+        'l3_claimed':False,
+        'load_proof_claimed':False,
+        'duplicate_guard':digest({'child_run':child_run,'activity':'ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED'}),
+    }
+
+
+def record_child_terminal_acceptance(checkpoint_path,child_run,receipt):
+    """Append-only/idempotent durable terminal receipt for an accepted child.
+
+    Never promotes the child to certified, never changes the parent status, and
+    never grants typed C/E, merge, deploy or human UR.G6.
+    """
+    import json
+    with _connect(checkpoint_path) as db:
+        db.execute('BEGIN IMMEDIATE')
+        existing=db.execute('SELECT receipt FROM engineering_child_terminal WHERE child_run=?',(child_run,)).fetchone()
+        if existing:
+            require(json.loads(existing[0])==receipt,'ENGINEERING_TERMINAL_RECEIPT_DRIFT')
+            return {'recorded':False,'duplicate_guard':True}
+        db.execute('INSERT INTO engineering_child_terminal VALUES (?,?)',(child_run,json.dumps(receipt,sort_keys=True)))
+        db.commit()
+    with _connect(checkpoint_path) as db:
+        require(db.execute('SELECT receipt FROM engineering_child_terminal WHERE child_run=?',(child_run,)).fetchone()[0]==json.dumps(receipt,sort_keys=True),
+                'ENGINEERING_TERMINAL_RECEIPT_READBACK_FAILED')
+    return {'recorded':True,'duplicate_guard':False}
 
 
 def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invocation_key:str):
@@ -156,6 +231,27 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                 key=_fingerprint(item)
                 if not _is_verified(item):
                     return outcome(s,'M3','PASS','PLAN_DRIVEN_FRONTIER_SELECTED',work={**item,'fingerprint':key},work_frontier=projection)
+            # R3: a previously accepted terminal child parks this worker.
+            # This is a stable, source-bound idle state — not a halt, not a
+            # new exchange request, not permission to stop the native /loop.
+            park=park_idle_terminal(c,path,projection)
+            already_persisted = park is not None
+            if park is None and c.get('engineering',{}).get('child_run'):
+                park=record_child_terminal_acceptance(path,c['engineering']['child_run'],
+                                                       build_child_terminal_receipt(c,projection))
+            if park:
+                if already_persisted:
+                    park={'recorded':False,'duplicate_guard':True,
+                          'child_run':c['engineering']['child_run'],
+                          'activity':'M3','reason_code':'ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED',
+                          'receipt':park}
+                else:
+                    park={'recorded':True,'duplicate_guard':False,
+                          'child_run':c['engineering']['child_run'],
+                          'activity':'M3','reason_code':'ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED',
+                          'receipt':build_child_terminal_receipt(c,projection)}
+                return outcome(s,'M3','WAIT','ENGINEERING_CHILD_PARKED_TERMINAL_ACCEPTED',
+                               work_frontier=projection,terminal=park)
             return outcome(s,'M3','WAIT','ENGINEERING_FRONTIER_WAIT_INPUT',work_frontier=projection)
         return outcome(s,'M3','WAIT','NO_MATERIAL_CHANGE')
     def m4(s):
@@ -411,6 +507,13 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                   'external_dependency':(s.get('work') or {}).get('external_dependency'),
                   'duplicate_guard':digest({'run':run,'activity':s['current_activity'],
                                              'reason_code':s['reason_code'],'source_head':c['repository']['head_sha']})}
+        # R2/R3: an accepted child parks this worker with its own durable
+        # terminal payload. Preserve it verbatim instead of overwriting it
+        # with the generic M8 blocker shape.
+        prior_terminal=s.get('terminal')
+        if isinstance(prior_terminal,dict) and prior_terminal.get('child_run'):
+            terminal={**prior_terminal,'frontier':frontier,'source_head':c['repository']['head_sha'],
+                      'runtime_plan_digest':c['run']['runtime_plan_digest']}
         if s.get('pre_effect_failure') is not None:
             terminal['pre_effect_failure']=s['pre_effect_failure']
         from .engineering_work_frontier import controller_dispatch_required,terminal_blocker_identity

@@ -13,8 +13,35 @@ from pathlib import Path
 from .task_context_binding import require,digest
 
 
+DISPOSITION_KINDS = {'CONTROLLER_DISPOSITION'}
+DISPOSITION_ACTOR_LABELS = {
+    'from': {'GPT Controller', 'GPT', 'Controller'},
+    'to': {'Hermes Mac', 'Hermes', 'DWA', 'Executor'},
+}
+
+
+def _disposition_actor_ok(fields):
+    """Advisory dispositions use looser human actor labels than commands.
+
+    A disposition is passive correlation evidence, never an executable
+    directive, so the strict `GPT -> Hermes` command actor contract is not
+    required. What IS required is that the label pair is one of the known
+    Controller/Executor aliases; an unknown or spoofed label fails closed.
+    """
+    return (fields.get('from') in DISPOSITION_ACTOR_LABELS['from']
+            and fields.get('to') in DISPOSITION_ACTOR_LABELS['to'])
+
+
 def select_human_communication(comments,context):
-    selected=[];issue_ref=context['communication']['issue_ref'];run=context['run']['id']
+    """Filter typed history and bind the latest executable human command.
+
+    Advisory Controller dispositions (CONTROLLER_DISPOSITION) are ingested
+    through a SEPARATE, strictly validated path and are NEVER promoted to
+    executable commands. They are returned under ``dispositions`` so a caller
+    can persist provenance without ever treating ACK text as an authority,
+    typed C/E admission, or a graph-resume signal (SCRUM-845 R1).
+    """
+    selected=[];dispositions=[];issue_ref=context['communication']['issue_ref'];run=context['run']['id']
     authors=context['communication'].get('allowed_authors',[context['repository']['name'].split('/')[0]])
     for comment in comments:
         body=comment.get('body','');header=body.split('\n\n',1)[0]
@@ -31,12 +58,28 @@ def select_human_communication(comments,context):
         if fields['kind']=='CORRECTION' and not fields['source_ref'] and fields['reply_to'].startswith(
                 'https://github.com/'+issue_ref.removeprefix('github://')+'#issuecomment-'):
             fields['source_ref']=issue_ref
-        selected.append({**fields,'seq':int(fields['seq']),'run_id':run,'issue_ref':issue_ref,
-                         'comment_id':comment['id'],'comment_url':comment['html_url'],'author':comment['user']['login'],
-                         'body_sha256':hashlib.sha256(body.encode()).hexdigest(),'body':body,
-                         'evidence_class':'HUMAN_COMMUNICATION_ONLY'})
-    require(selected,'HUMAN_COMMUNICATION_NOT_FOUND')
+        row={**fields,'seq':int(fields['seq']),'run_id':run,'issue_ref':issue_ref,
+             'comment_id':comment['id'],'comment_url':comment['html_url'],'author':comment['user']['login'],
+             'body_sha256':hashlib.sha256(body.encode()).hexdigest(),'body':body}
+        if fields['kind'] in DISPOSITION_KINDS:
+            # R1 strict advisory framing: every disposition must carry its
+            # own source_ref, a known actor alias pair, and a reply_to bound
+            # to this exact issue. A malformed or spoofed disposition is
+            # dropped (fail-closed), never silently promoted to a command.
+            require(fields['source_ref']==issue_ref,'DISPOSITION_SOURCE_BINDING_INVALID')
+            require(_disposition_actor_ok(fields),'DISPOSITION_ACTOR_LABEL_INVALID')
+            issue_url='https://github.com/'+issue_ref.removeprefix('github://')
+            require(fields['reply_to'].startswith(issue_url+'#issuecomment-'),'DISPOSITION_REPLY_BINDING_INVALID')
+            require(comment['html_url']==issue_url+'#issuecomment-'+str(comment['id']),'DISPOSITION_COMMENT_IDENTITY_MISMATCH')
+            row['evidence_class']='CONTROLLER_DISPOSITION_ADVISORY'
+            row['authority_granted']=False;row['typed_ce_admitted']=False;row['workflow_resume_allowed']=False
+            dispositions.append(row)
+            continue
+        row['evidence_class']='HUMAN_COMMUNICATION_ONLY'
+        selected.append(row)
     require(len({r['seq'] for r in selected})==len(selected),'HUMAN_COMMUNICATION_DUPLICATE_SEQ')
+    require(len({r['seq'] for r in dispositions})==len(dispositions),'DISPOSITION_DUPLICATE_SEQ')
+    require(selected,'HUMAN_COMMUNICATION_NOT_FOUND')
     commands=[r for r in selected if r['kind'] in {'COMMAND','CORRECTION'}]
     require(commands,'HUMAN_COMMAND_NOT_FOUND');result=max(commands,key=lambda r:r['seq'])
     require(all(result[k] for k in ['from','to','source_ref','reply_to']),'HUMAN_COMMUNICATION_FIELD_REQUIRED')
@@ -45,7 +88,8 @@ def select_human_communication(comments,context):
     issue_url='https://github.com/'+issue_ref.removeprefix('github://')
     require(result['reply_to'].startswith(issue_url+'#issuecomment-'),'HUMAN_COMMUNICATION_REPLY_BINDING_INVALID')
     require(result['comment_url']==issue_url+'#issuecomment-'+str(result['comment_id']),'HUMAN_COMMENT_IDENTITY_MISMATCH')
-    return {**result,'latest_communication_seq':max(r['seq'] for r in selected)}
+    return {**result,'latest_communication_seq':max(r['seq'] for r in selected+dispositions),
+            'dispositions':sorted(dispositions,key=lambda r:r['seq'])}
 
 
 def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_commands):
