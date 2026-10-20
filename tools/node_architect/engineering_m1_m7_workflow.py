@@ -268,15 +268,19 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         with _connect(path) as db:db.execute('UPDATE engineering_work SET status=? WHERE run=? AND fingerprint=?',('VERIFIED',run,s['work']['fingerprint']))
         return outcome(s,'M6','PASS','ACTUAL_EXECUTION_ARTIFACT_VERIFIED')
     def m7(s):
-        report=f"{c['task']['id']} engineering coordination; run {run}; session {c['executor']['session_id']}; source {c['repository']['head_sha']}. Actual work {s['work']['id']}: {s['execution']['result']}; artifact {s['execution']['artifact_ref']}. Human command seq {s['communication']['seq']}. Protected typed C/E remains separately gated. No original replay, LOAD_PROOF or Q0 L3 claimed. Please review result and return the smallest source-bound NEXT."
+        report=f"{c['task']['id']} engineering coordination; run {run}; firing {invocation_key or 'explicit'}; session {c['executor']['session_id']}; source {c['repository']['head_sha']}. Actual work {s['work']['id']}: {s['execution']['result']}; artifact {s['execution']['artifact_ref']}. Human command seq {s['communication']['seq']}. Protected typed C/E remains separately gated. No original replay, LOAD_PROOF or Q0 L3 claimed. Please review result and return the smallest source-bound NEXT."
         box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
         response_observation=None
+        backlog=[]
+        # Mandatory per-firing report: an unresolved earlier request is backlog
+        # for its own owner and never suppresses this firing's response.
         for pending in old.get('pending_controller_exchange_requests',[]):
             prior_state=box.read(pending)
             try:
                 response_observation=reconcile_controller_response(pending,prior_state)
             except ValueError:
-                return outcome(s,'M7','WAIT','ENGINEERING_PRIOR_EXCHANGE_PENDING',controller_exchange_requests=[pending])
+                backlog.append(pending['marker'])
+                continue
             prior_receipt=prior_state.get('receipt') or {}
             from .engineering_work_frontier import classify_controller_observation
             disposition=classify_controller_observation(prior_receipt['response_text'])
@@ -288,6 +292,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         box.reserve(request)
         return outcome(s,'M7','WAIT','ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED',
                         controller_exchange_requests=[request],
+                        backlog_pending_exchange_markers=backlog,
                         controller_response_observation=response_observation,
                         terminal={'kind':'ENGINEERING_TERMINAL_RESULT','activity':'M7',
                                   'reason_code':'ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED',
@@ -336,6 +341,11 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             runtime_plan_digest=c['run']['runtime_plan_digest'],activity=s['current_activity'],
             reason_code=s['reason_code'],work=s.get('work'),frontier=frontier)
         terminal['blocker_identity']=blocker_identity
+        # Every real firing must report to the Controller. Dedupe by blocker
+        # identity *plus* the firing key so a repeat of the same blocker on a
+        # later tick still produces its own response instead of being silenced.
+        dispatch_identity=digest({'blocker_identity':blocker_identity,
+                                  'firing':invocation_key or 'explicit'})
         controller_required=controller_dispatch_required(s['current_activity'],s['reason_code'])
         terminal['controller_dispatch_required']=controller_required
         decision_packet=None
@@ -360,7 +370,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                            '(blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, '
                            'request_source_head TEXT NOT NULL, response_observation TEXT)')
                 row=db.execute('SELECT request,request_source_head FROM engineering_terminal_dispatches '
-                               'WHERE blocker_identity=?',(blocker_identity,)).fetchone()
+                               'WHERE blocker_identity=?',(dispatch_identity,)).fetchone()
             if row:
                 request=json.loads(row[0]);terminal_exchange_request=request
                 terminal['outbox_request_source_head']=row[1]
@@ -389,19 +399,25 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                         response_observation={**response_observation,'disposition_observation':disposition}
                         with _connect(path) as db:
                             db.execute('UPDATE engineering_terminal_dispatches SET response_observation=? '
-                                       'WHERE blocker_identity=?',(json.dumps(response_observation,sort_keys=True),blocker_identity))
+                                       'WHERE blocker_identity=?',(json.dumps(response_observation,sort_keys=True),dispatch_identity))
                         if decision_packet is not None:
                             decision_packet['controller_disposition_observation']=disposition
                         terminal['controller_response_observation']=response_observation
             else:
                 active_pending=None
+                # Response is mandatory per firing. An unresolved earlier request
+                # stays open as backlog for its own owner; it no longer suppresses
+                # this firing's report.
                 for outstanding in old.get('pending_controller_exchange_requests',[]):
                     outstanding_state=box.read(outstanding)
-                    try:reconcile_controller_response(outstanding,outstanding_state)
+                    try:
+                        observed=reconcile_controller_response(outstanding,outstanding_state)
                     except ValueError:
-                        active_pending=outstanding
-                        terminal_exchange_status=outstanding_state['status']
-                        break
+                        terminal.setdefault('backlog_pending_exchange_markers',[]).append(outstanding['marker'])
+                    else:
+                        from .engineering_work_frontier import classify_controller_observation
+                        response_observation={**observed,
+                            'disposition_observation':classify_controller_observation(outstanding_state['receipt']['response_text'])}
                 if active_pending:
                     # Do not create a second browser request while any exact
                     # same-run Controller exchange is unresolved. Preserve and
@@ -409,12 +425,14 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                     terminal['blocked_by_pending_exchange_marker']=active_pending['marker']
                     controller_exchange_requests=[active_pending]
                 else:
-                    report=(f"{c['task']['id']} Q0 terminal engineering result; run {run}; "
+                    report=(f"{c['task']['id']} Q0 terminal engineering result; run {run}; firing {invocation_key or 'explicit'}; "
                             f"session {c['executor']['session_id']}; source {c['repository']['head_sha']}; "
                             f"terminal {terminal_digest}; blocker_identity {blocker_identity}. "
                             f"Result: {json.dumps(terminal,sort_keys=True,separators=(',',':'))}. "
                             "No typed C/E admission, authority, plan mutation, original replay, LOAD_PROOF or L3 claim. "
                             "Please review and return the smallest source-bound disposition; an acceptance-target change still requires an explicit human-approved immutable G1 revision.")
+                    if response_observation is not None and decision_packet is not None:
+                        decision_packet['controller_disposition_observation']=response_observation.get('disposition_observation')
                     request=make_exchange_request(c,report,lane='HOST_COORDINATION')
                     with _connect(path) as db:
                         db.execute('BEGIN IMMEDIATE')
@@ -425,13 +443,13 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                                    '(blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, '
                                    'request_source_head TEXT NOT NULL, response_observation TEXT)')
                         existing=db.execute('SELECT request,request_source_head FROM engineering_terminal_dispatches '
-                                             'WHERE blocker_identity=?',(blocker_identity,)).fetchone()
+                                             'WHERE blocker_identity=?',(dispatch_identity,)).fetchone()
                         if existing:
                             request=json.loads(existing[0])
                         else:
                             db.execute('INSERT INTO engineering_terminal_dispatches '
                                        '(blocker_identity,request,request_source_head,response_observation) VALUES (?,?,?,NULL)',
-                                       (blocker_identity,json.dumps(request,sort_keys=True),c['repository']['head_sha']))
+                                       (dispatch_identity,json.dumps(request,sort_keys=True),c['repository']['head_sha']))
                     box.reserve(request)
                     terminal_exchange_request=request
                     terminal_exchange_status=box.read(request)['status']

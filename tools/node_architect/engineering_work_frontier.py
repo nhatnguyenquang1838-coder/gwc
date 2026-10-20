@@ -163,14 +163,10 @@ def terminal_blocker_identity(*,run_id,runtime_plan_digest,activity,reason_code,
 
 
 def controller_dispatch_required(activity,reason_code):
-    """True only for terminal blockers whose owner is Controller/human planning.
+    """True for every halt: each real firing reports to the Controller.
 
-    DWA/native-owner work such as executing an admitted host action, acquiring a
-    genuine firing, reconciling an interrupted execution, or repairing a local
-    verifier must not generate a Controller ping.
+    Response to the Controller is mandatory on every turn, including a
+    no-material-change or host-action halt. The dispatch carries the exact
+    blocker so the Controller can decide; it grants no authority.
     """
-    return ((activity=='M2' and reason_code=='ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED') or
-            (activity=='M3' and reason_code in {'ENGINEERING_FRONTIER_WAIT_INPUT','NO_MATERIAL_CHANGE'}) or
-            (activity=='M4' and reason_code=='ENGINEERING_EXTERNAL_DEPENDENCY') or
-            (activity=='M5' and reason_code in {'ENGINEERING_EFFECT_AUTHORITY_REQUIRED',
-                                                 'ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED'}))
+    return True

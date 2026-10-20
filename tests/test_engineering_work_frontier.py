@@ -115,12 +115,16 @@ def test_exhausted_frontier_yields_decision_packet_without_mutating_plan():
     assert identity!=different
 
 
-def test_only_controller_owned_terminal_blockers_are_dispatched():
+def test_every_terminal_blocker_is_dispatched_to_the_controller():
+    """Controller response is mandatory on every firing, not only planning halts."""
     from tools.node_architect.engineering_work_frontier import controller_dispatch_required
-    assert controller_dispatch_required('M2','ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED') is True
-    assert controller_dispatch_required('M3','ENGINEERING_FRONTIER_WAIT_INPUT') is True
-    assert controller_dispatch_required('M4','ENGINEERING_EXTERNAL_DEPENDENCY') is True
-    assert controller_dispatch_required('M5','ENGINEERING_EFFECT_AUTHORITY_REQUIRED') is True
-    assert controller_dispatch_required('M5','ENGINEERING_HOST_ACTION_REQUIRED') is False
-    assert controller_dispatch_required('M5','ENGINEERING_GENUINE_FIRING_REQUIRED') is False
-    assert controller_dispatch_required('M6','ENGINEERING_EXECUTION_RESULT_NOT_VERIFIED') is False
+    for activity,reason in (
+            ('M2','ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED'),
+            ('M3','ENGINEERING_FRONTIER_WAIT_INPUT'),
+            ('M4','ENGINEERING_EXTERNAL_DEPENDENCY'),
+            ('M5','ENGINEERING_EFFECT_AUTHORITY_REQUIRED'),
+            ('M5','ENGINEERING_HOST_ACTION_REQUIRED'),
+            ('M5','ENGINEERING_GENUINE_FIRING_REQUIRED'),
+            ('M6','ENGINEERING_EXECUTION_RESULT_NOT_VERIFIED'),
+            ('M6','NO_MATERIAL_CHANGE')):
+        assert controller_dispatch_required(activity,reason) is True

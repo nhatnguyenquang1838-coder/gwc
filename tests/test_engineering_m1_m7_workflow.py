@@ -67,7 +67,8 @@ def test_missing_host_firing_admission_holds_before_work_claim(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='explicit-source-check')
     assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
     assert counts['execute']==0
-    assert r['graph_requests']==[]  # Native-owner firing admission is not a Controller-planning blocker.
+    # Every firing reports to the Controller, including a native-owner admission halt.
+    assert len(r['graph_requests'])==1
 
 
 @pytest.mark.parametrize('admission',['missing','none','non_callable'])
@@ -331,8 +332,8 @@ def test_preflight_failure_is_recorded_as_no_effect_and_retryable_on_same_finger
     assert status=='PRE_EFFECT_VALIDATION_FAILED'
     assert detail['effect_started'] is False and detail['reason_code']=='ENGINEERING_INPUT_DIGEST_DRIFT'
     assert first['terminal']['pre_effect_failure']==detail
-    assert first['terminal']['controller_dispatch_required'] is False
-    assert first['graph_requests']==[]
+    assert first['terminal']['controller_dispatch_required'] is True
+    assert len(first['graph_requests'])==1
     retry=run_task_workflow(c,host_capabilities=caps,invocation_key='same-fingerprint-recovery')
     assert retry['activity_results']['M5']['status']=='PASS'
     assert retry['activity_results']['M6']['status']=='PASS'
@@ -418,7 +419,7 @@ def test_terminal_result_preserves_blocked_reason_code(tmp_path):
     assert r['terminal']['blocker']
 
 
-def test_m8_reserves_one_host_coordination_request_and_reuses_it(tmp_path):
+def test_m8_reserves_a_host_coordination_request_per_firing(tmp_path):
     import sqlite3, json
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
     c=binding(tmp_path);c['engineering']['work_items']=[]
@@ -449,7 +450,10 @@ def test_m8_reserves_one_host_coordination_request_and_reuses_it(tmp_path):
     with sqlite3.connect(box.path) as outbox_db:
         assert outbox_db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-two')
-    assert second['graph_requests']==[req]
+    # Same blocker, later firing: a fresh request is reserved for that firing
+    # (mandatory per-turn response) while the first stays open for its owner.
+    assert len(second['graph_requests'])==1
+    assert second['graph_requests'][0]['marker']!=req['marker']
     assert second['terminal_exchange_status']=='EXCHANGE_REQUESTED'
     assert box.read(req)['status']=='EXCHANGE_REQUESTED'
     assert counts['read']==2 and counts['execute']==0
@@ -485,13 +489,15 @@ def test_m8_correlates_response_as_observation_without_resuming_or_granting_auth
     assert observation['disposition_observation']['planning_state']=='WAIT_EXTERNAL_INPUT'
     assert observation['disposition_observation']['acceptance_target_changed'] is False
     assert second['decision_packet']['controller_disposition_observation']==observation['disposition_observation']
-    assert second['graph_requests']==[]
-    assert second['pending_controller_exchange_requests']==[]
+    # The correlated response is recorded AND this firing still reports its own result.
+    assert len(second['graph_requests'])==1
+    assert second['graph_requests'][0]['marker']!=req['marker']
+    assert [r['marker'] for r in second['pending_controller_exchange_requests']]==[second['graph_requests'][0]['marker']]
     assert second['verdict']['status']=='WAIT'
     assert counts['execute']==0
 
 
-def test_m8_does_not_create_second_request_while_m7_exchange_is_pending(tmp_path):
+def test_m8_reports_each_firing_while_prior_exchange_is_pending(tmp_path):
     import sqlite3
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
     c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
@@ -500,13 +506,14 @@ def test_m8_does_not_create_second_request_while_m7_exchange_is_pending(tmp_path
     assert original['lane']=='HOST_COORDINATION'
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='m3-after-m7')
     assert second['verdict']['current_activity']=='M8'
-    assert second['terminal']['blocked_by_pending_exchange_marker']==original['marker']
-    assert second['graph_requests']==[original]
-    assert second['terminal_exchange_request'] is None
+    assert original['marker'] in second['terminal']['backlog_pending_exchange_markers']
+    assert len(second['graph_requests'])==1
+    assert second['graph_requests'][0]['marker']!=original['marker']
+    assert second['terminal_exchange_request']['marker']==second['graph_requests'][0]['marker']
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     assert box.read(original)['status']=='EXCHANGE_REQUESTED'
     with sqlite3.connect(box.path) as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
 
 
 def test_m7_uses_shared_marker_response_reconciliation_before_next_request(tmp_path):
@@ -548,7 +555,7 @@ def test_m4_external_dependency_dispatches_terminal_result_to_controller(tmp_pat
     assert r['authority_granted'] is False and r['typed_ce_admitted'] is False
 
 
-def test_terminal_request_dedup_is_stable_across_additive_source_head(tmp_path):
+def test_terminal_blocker_identity_is_stable_but_each_firing_reports(tmp_path):
     import copy,subprocess,sqlite3
     from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
@@ -571,9 +578,11 @@ def test_terminal_request_dedup_is_stable_across_additive_source_head(tmp_path):
     reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='fixture additive commit preserving same blocker')
     second=run_task_workflow(newer,host_capabilities=caps,invocation_key='terminal-head-two')
     assert second['terminal']['blocker_identity']==identity
-    assert second['terminal_exchange_request']==original
-    assert second['graph_requests']==[original]
+    # Same blocker, new firing: the response obligation is per-turn, so the
+    # second firing reserves its own request while the blocker identity stays stable.
+    assert second['terminal_exchange_request']['marker']!=original['marker']
+    assert second['graph_requests']==[second['terminal_exchange_request']]
     assert second['terminal_exchange_status']=='EXCHANGE_REQUESTED'
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     with sqlite3.connect(box.path) as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
