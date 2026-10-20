@@ -206,6 +206,33 @@ def test_worktree_relocation_requires_explicit_reconciliation(tmp_path):
         assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
 
 
+def test_worktree_relocation_accepts_standalone_clone_of_same_repository(tmp_path):
+    """A standalone clone may relocate into a linked worktree of the same repo."""
+    import copy,json,subprocess,sqlite3
+    from tools.node_architect.task_context_binding import digest as ctx_digest
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_worktree_relocation
+    origin=tmp_path/'origin';origin.mkdir()
+    def git(*args,cwd=None):return subprocess.check_output(['git','-C',str(cwd or origin),*args],text=True).strip()
+    git('init','-b','fix/test')
+    (origin/'route.json').write_text(json.dumps({'workflow_mode':'Q0_ENGINEERING_COORDINATION'}))
+    git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    standalone=tmp_path/'standalone'
+    subprocess.check_output(['git','clone','-q',str(origin),str(standalone)],text=True)
+    git('checkout','-q','-B','fix/test',cwd=standalone)
+    linked=origin.parent/'linked-wt'
+    subprocess.check_output(['git','clone','-q',str(origin),str(linked)],text=True)
+    git('checkout','-q','-B','fix/test',cwd=linked)
+    c=binding(origin);c['repository']={'name':'fixture/repo','branch':'fix/test',
+        'head_sha':git('rev-parse','HEAD'),'worktree':str(standalone)}
+    c['engineering']['route_policy_digest']=ctx_digest({'workflow_mode':'Q0_ENGINEERING_COORDINATION'})
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    run_task_workflow(c,host_capabilities=caps,invocation_key='standalone-one')
+    newer=copy.deepcopy(c);newer['repository']['worktree']=str(linked)
+    receipt=reconcile_engineering_worktree_relocation(c,newer,reason='canonical relocation')
+    assert receipt['new_worktree']==str(linked.resolve())
+    assert receipt['head_unchanged'] is True
+
+
 def test_route_metadata_reconciliation_rejects_non_additive_delta(tmp_path):
     """A route delta that changes existing keys or work_items must fail closed."""
     import copy,json,subprocess,sqlite3

@@ -603,7 +603,14 @@ def reconcile_engineering_worktree_relocation(old_context,new_context,*,reason):
         def common_dir(root):
             value=Path(git(root,'rev-parse','--git-common-dir'))
             return (value if value.is_absolute() else (Path(root)/value)).resolve()
-        require(common_dir(old_wt)==common_dir(new_wt),'WORKTREE_RELOCATION_REPOSITORY_MISMATCH')
+        if common_dir(old_wt)!=common_dir(new_wt):
+            # A standalone clone relocating into a linked worktree of the same
+            # repository has a distinct common dir; require one repository
+            # identity before accepting the move.
+            def origin(root):
+                url=git(root,'remote','get-url','origin')
+                return str(Path(url).resolve()) if url.startswith('/') else url
+            require(origin(old_wt)==origin(new_wt),'WORKTREE_RELOCATION_REPOSITORY_MISMATCH')
     with _connect(old['workflow']['checkpoint_ref']) as db:
         db.execute('BEGIN IMMEDIATE')
         row=db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
