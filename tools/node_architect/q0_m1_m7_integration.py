@@ -11,6 +11,25 @@ import subprocess
 from typing import Any
 
 PLAN_REF = 'core/node-architect/scrum781-q0-fresh-execution-plan-r2.json'
+ROUTE_REF = 'core/node-architect/q0-engineering-coordination-route-r1.json'
+
+
+def resolve_active_plan(root: Path | str) -> str:
+    """Resolve the active RuntimePlan: an approved successor G1 wins over R2.
+
+    The coordination route may declare a human-approved successor plan (Option B
+    Controlled Failure Campaign). Only an approved successor whose file exists is
+    used; otherwise the lane stays on the R2 plan.
+    """
+    root = Path(root).resolve()
+    route_path = root / ROUTE_REF
+    if route_path.exists():
+        route = json.loads(route_path.read_text())
+        successor = route.get('approved_successor_g1') or {}
+        ref = successor.get('successor_plan_ref')
+        if ref and successor.get('human_approved') is True and (root / ref).exists():
+            return ref
+    return PLAN_REF
 
 
 def _git(root: Path, *args: str) -> str:
@@ -27,8 +46,9 @@ def build_q0_operation(root: Path | str, *, activity_id: str) -> tuple[dict, dic
     if not activity_id or any(char not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for char in activity_id):
         raise ValueError('ACTIVITY_ID_INVALID')
     head = _git(root, 'rev-parse', 'HEAD')
-    source = subprocess.check_output(['git', '-C', str(root), 'show', f'{head}:{PLAN_REF}'])
-    if (root / PLAN_REF).read_bytes() != source:
+    plan_ref = resolve_active_plan(root)
+    source = subprocess.check_output(['git', '-C', str(root), 'show', f'{head}:{plan_ref}'])
+    if (root / plan_ref).read_bytes() != source:
         raise ValueError('Q0_PLAN_SOURCE_DRIFT')
     plan = json.loads(source)
     branch = _git(root, 'branch', '--show-current')
