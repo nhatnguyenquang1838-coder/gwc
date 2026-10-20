@@ -1,0 +1,347 @@
+{
+ "P1_scope_reconciliation": {
+  "changed_files": 182,
+  "matched": {
+   "count": 134,
+   "paths": [
+    ".gwc/tasks/SCRUM-781/activation/cf-plan-activation.json",
+    ".gwc/tasks/SCRUM-781/engineering/correction43-engineering-workflow-r1.md",
+    ".gwc/tasks/SCRUM-781/engineering/hermes-skill-capability-bridge-r1.md",
+    ".gwc/tasks/SCRUM-781/engineering/native100-workflow-supplement-r1.json",
+    ".gwc/tasks/SCRUM-781/engineering/task-aware-workflow-r1.md",
+    ".gwc/tasks/SCRUM-781/engineering/tick100-route-context-coverage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick89-failure-triage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick90-fixture-migration.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick91-controller-owner-guard.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick92-incident-provenance.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick93-authority-revalidation-repair.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick94-doc-drift-repair.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick95-matrix-coverage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick96-verify-functions-coverage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick97-g6-binding-coverage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick98-can-start-login-coverage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick98-materializer-symlink-coverage.json",
+    ".gwc/tasks/SCRUM-781/engineering/tick99-g3-input-validation-coverage.json",
+    ".gwc/tasks/SCRUM-781/evidence/cf-load-replay-certify-r1.json",
+    ".gwc/tasks/SCRUM-781/evidence/cf-red-prefix-runtime-r1.json",
+    ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
+    ".gwc/tasks/SCRUM-781/evidence/native105-original-trace-recovery-v1.json",
+    ".gwc/tasks/SCRUM-781/evidence/q0-dwo-source-provenance-scan-v1.json",
+    ".gwc/tasks/SCRUM-781/evidence/q0-langgraph-sqlite-resume-evidence-v1.json",
+    ".gwc/tasks/SCRUM-781/evidence/q0-qualification-matrix-coverage-audit-v1.json",
+    ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json",
+    ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/scenarios-v1.json",
+    ".gwc/tasks/SCRUM-781/fixtures/q0-c91-e52-reconstructed-v1.json",
+    "core/node-architect/node-instructions/q0/qualification-campaign.node-instruction.yaml",
+    "core/node-architect/q0-controlled-failure-frontier-r3.json",
+    "core/node-architect/q0-engineering-coordination-route-r1.json",
+    "core/node-architect/q0-engineering-frontier-r1.json",
+    "core/node-architect/q0-live-qualification-profile.json",
+    "core/node-architect/q0/qualification-campaign.node.json",
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+    "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "core/node-architect/universal-runtime-default-profile.json",
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "scripts/scrum781_cf_load_replay_certify.py",
+    "scripts/scrum781_cf_red_evidence.py",
+    "scripts/scrum781_engineering_loop.py",
+    "scripts/scrum781_fresh_g0_to_g1.py",
+    "scripts/scrum781_fresh_q0_mailbox.py",
+    "scripts/scrum781_fresh_taskcontroller_preflight.py",
+    "scripts/scrum781_fresh_ur_g0_boot.py",
+    "scripts/scrum781_q0_controller_recover_20261010.py",
+    "scripts/scrum781_q0_execute_dispatch.py",
+    "scripts/scrum781_q0_execute_worker.py",
+    "scripts/scrum781_q0_fixture_replay.py",
+    "scripts/scrum781_q0_login_fixture.py",
+    "scripts/scrum781_q0_source_reconcile.py",
+    "tests/fixtures/legacy/gwc-v1/c91-controller-comment.md",
+    "tests/q0_langgraph_checkpoint_resume_worker.py",
+    "tests/test_agent_runtime_entrypoint_m1_m7.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_engineering_host_adapter.py",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "tests/test_fastlane_process_optimization.py",
+    "tests/test_g2-execution-library.py",
+    "tests/test_gate_node_route_resolution.py",
+    "tests/test_hermes_skill_capability_bridge.py",
+    "tests/test_loop_scheduled_operation_harness.py",
+    "tests/test_m1_m7_agent_workflow.py",
+    "tests/test_plan_bound_m4.py",
+    "tests/test_q0_live_qualification_contract.py",
+    "tests/test_q0_plan_resolution.py",
+    "tests/test_q0_universal_qualification.py",
+    "tests/test_scrum781_engineering_loop_resume.py",
+    "tests/test_scrum781_m1_m7_integration_safety.py",
+    "tests/test_scrum781_q0_execution_contract.py",
+    "tests/test_scrum781_q0_fixture_replay.py",
+    "tests/test_scrum781_q0_historical_replay.py",
+    "tests/test_scrum781_q0_langgraph_checkpoint_resume.py",
+    "tests/test_scrum781_q0_login_fixture.py",
+    "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+    "tests/test_scrum781_q0_native_host.py",
+    "tests/test_scrum781_q0_source_reconcile.py",
+    "tests/test_scrum781_q0_verify_functions_coverage.py",
+    "tests/test_scrum781_workflow_entrypoint.py",
+    "tests/test_scrum_566_agent_host_wiring.py",
+    "tests/test_scrum_566_agent_runtime_production_entrypoint.py",
+    "tests/test_scrum_566_w13_live_runtime_bridge.py",
+    "tests/test_stable_json.py",
+    "tests/test_task_context_binding.py",
+    "tests/test_task_m1_m7_runner.py",
+    "tests/test_task_source_head_reconciliation.py",
+    "tests/test_universal_run_context_v1.py",
+    "tests/test_universal_run_continuation_v2.py",
+    "tests/test_universal_run_epoch_v2.py",
+    "tests/test_universal_run_execution.py",
+    "tests/test_universal_run_kernel_v1.py",
+    "tests/test_universal_run_legacy_v1.py",
+    "tests/test_universal_run_lifecycle_v1.py",
+    "tests/test_universal_run_persistence.py",
+    "tests/test_universal_run_r1_interop_v1.py",
+    "tests/test_universal_run_state_v1.py",
+    "tests/test_universal_v2_core_isolation.py",
+    "tools/node_architect/agent_runtime_cli.py",
+    "tools/node_architect/agent_runtime_entrypoint.py",
+    "tools/node_architect/controller_exchange_adapter.py",
+    "tools/node_architect/engineering_host_adapter.py",
+    "tools/node_architect/engineering_m1_m7_workflow.py",
+    "tools/node_architect/engineering_work_frontier.py",
+    "tools/node_architect/hermes_skill_capability_bridge.py",
+    "tools/node_architect/legacy_live_runtime_bridge.py",
+    "tools/node_architect/live_runtime_bridge.py",
+    "tools/node_architect/loop_scheduled_operation_harness.py",
+    "tools/node_architect/loop_settlement_reconciler.py",
+    "tools/node_architect/m1_m7_agent_workflow.py",
+    "tools/node_architect/q0_engineering_loop.py",
+    "tools/node_architect/q0_m1_m7_integration.py",
+    "tools/node_architect/q0_qualification.py",
+    "tools/node_architect/resolve_gate_node_route.py",
+    "tools/node_architect/stable_json.py",
+    "tools/node_architect/task_context_binding.py",
+    "tools/node_architect/task_m1_m7_runner.py",
+    "tools/node_architect/universal_run_continuation.py",
+    "tools/node_architect/universal_run_controller.py",
+    "tools/node_architect/universal_run_epoch.py",
+    "tools/node_architect/universal_run_execution.py",
+    "tools/node_architect/universal_run_kernel.py",
+    "tools/node_architect/universal_run_legacy.py",
+    "tools/node_architect/universal_run_lifecycle.py",
+    "tools/node_architect/universal_run_node.py",
+    "tools/node_architect/universal_run_persistence.py",
+    "tools/node_architect/universal_run_plan.py",
+    "tools/node_architect/universal_run_state.py",
+    "tools/node_architect/universal_run_topology.py",
+    "tools/node_architect/universal_runtime_profile.py",
+    "tools/node_architect/universal_runtime_transport.py",
+    "tools/node_architect/validate_node_instruction.py"
+   ]
+  },
+  "unmatched": {
+   "count": 48,
+   "paths": [
+    ".github/workflows/scrum781-fresh-ur-g0.yml",
+    ".github/workflows/scrum781-q0-controller-recovery.yml",
+    ".github/workflows/scrum781-q0-execute-r2.yml",
+    ".gwc/envelope.json",
+    "AGENTS.md",
+    "legacy/gwc-v1/runtime-quarantine-manifest.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/context-snapshot.schema.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/lifecycle-transition.schema.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/node-allocation.schema.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/record-envelope.schema.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/run-manifest-revision.schema.json",
+    "legacy/gwc-v1/schemas/node-architect/universal-run/run-state-record.schema.json",
+    "legacy/gwc-v1/sources/tests/test_scrum_566_agent_runtime_production_entrypoint.py",
+    "legacy/gwc-v1/sources/tests/test_scrum_566_w13_live_runtime_bridge.py",
+    "legacy/gwc-v1/sources/tests/test_universal_run_continuation_v2.py",
+    "legacy/gwc-v1/sources/tests/test_universal_run_execution.py",
+    "legacy/gwc-v1/sources/tests/test_universal_run_legacy_v1.py",
+    "legacy/gwc-v1/sources/tools/node_architect/agent_runtime_entrypoint.py",
+    "legacy/gwc-v1/sources/tools/node_architect/live_runtime_bridge.py",
+    "legacy/gwc-v1/sources/tools/node_architect/universal_run_continuation.py",
+    "legacy/gwc-v1/sources/tools/node_architect/universal_run_legacy.py",
+    "schemas/node-architect/gate-node-route-decision.schema.json",
+    "schemas/node-architect/node-instruction.schema.json",
+    "schemas/node-architect/universal-run/child-run-materialization-receipt.schema.json",
+    "schemas/node-architect/universal-run/context-snapshot.schema.json",
+    "schemas/node-architect/universal-run/controller-persistence-intent.schema.json",
+    "schemas/node-architect/universal-run/controller-successor-snapshot.schema.json",
+    "schemas/node-architect/universal-run/controller-transition-receipt.schema.json",
+    "schemas/node-architect/universal-run/executor-action-receipt.schema.json",
+    "schemas/node-architect/universal-run/lifecycle-transition.schema.json",
+    "schemas/node-architect/universal-run/node-allocation.schema.json",
+    "schemas/node-architect/universal-run/record-envelope.schema.json",
+    "schemas/node-architect/universal-run/recovery-replan-cursor-activation-authorization.schema.json",
+    "schemas/node-architect/universal-run/recovery-replan-cursor-activation-receipt.schema.json",
+    "schemas/node-architect/universal-run/run-manifest-revision.schema.json",
+    "schemas/node-architect/universal-run/run-state-record.schema.json",
+    "schemas/node-architect/universal-run/same-sequence-recovery-authorization.schema.json",
+    "schemas/node-architect/universal-run/same-sequence-recovery-receipt.schema.json",
+    "schemas/node-architect/universal-runtime-default-profile.schema.json",
+    "schemas/q0-acceptance-decision-receipt.schema.json",
+    "schemas/q0-acceptance-request.schema.json",
+    "schemas/q0-certification-receipt.schema.json",
+    "schemas/q0-closure-receipt.schema.json",
+    "schemas/q0-handoff-receipt.schema.json",
+    "schemas/q0-live-qualification-profile.schema.json",
+    "schemas/q0-verification-receipt.schema.json",
+    "scripts/q0_e2e_closure.py"
+   ],
+   "top_level_groups": {
+    ".github/workflows": 3,
+    ".gwc/envelope.json": 1,
+    "AGENTS.md": 1,
+    "legacy/gwc-v1": 17,
+    "schemas/node-architect": 18,
+    "schemas/q0-acceptance-decision-receipt.schema.json": 1,
+    "schemas/q0-acceptance-request.schema.json": 1,
+    "schemas/q0-certification-receipt.schema.json": 1,
+    "schemas/q0-closure-receipt.schema.json": 1,
+    "schemas/q0-handoff-receipt.schema.json": 1,
+    "schemas/q0-live-qualification-profile.schema.json": 1,
+    "schemas/q0-verification-receipt.schema.json": 1,
+    "scripts/q0_e2e_closure.py": 1
+   }
+  },
+  "writable_targets": [
+   "tools/node_architect/**",
+   "core/node-architect/**",
+   "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+   "tests/**",
+   "scripts/scrum781_*.py",
+   ".gwc/tasks/SCRUM-781/**"
+  ]
+ },
+ "P2_deterministic_replay": {
+  "boundary": "same source + same suites replayed twice; not an original DWO replay",
+  "deterministic": true,
+  "result_digest": "sha256:db55a0cad4d1076b2510585214af98f0af82932bccd2d9d9c9411f9f397a378a",
+  "runs": [
+   {
+    "exit_code": 0,
+    "summary": "78 passed"
+   },
+   {
+    "exit_code": 0,
+    "summary": "78 passed"
+   }
+  ],
+  "source_head": "683d4a17c79a7f3ea74a70fe4be4a1ab40c84bbc"
+ },
+ "P3_qualification_matrix": {
+  "counts": {
+   "NOT_ASSESSED": 0,
+   "PARTIAL": 4,
+   "PASS": 7
+  },
+  "criteria_count": 11,
+  "human_g6": "NOT_ACCEPTED",
+  "l3_certification": "NOT_CLAIMED",
+  "native_load_proof": "ABSENT",
+  "original_dwo_replay": "NOT_REPRODUCED",
+  "rows": [
+   {
+    "criterion": "R3 is exact SHA/digest-bound to the explicit Human Option B decision; legacy R2 remains immutable and original DWO NOT_REPRODUCED.",
+    "evidence": [
+     "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+     ".gwc/tasks/SCRUM-781/activation/cf-plan-activation.json"
+    ],
+    "index": 0,
+    "status": "PASS"
+   },
+   {
+    "criterion": "Single existing Q0 run, session and branch; native owner explicitly reconciles old source/context/checkpoint before any replan work is selected.",
+    "evidence": [
+     "engineering_workflow",
+     "engineering_source_reconciliations"
+    ],
+    "index": 1,
+    "status": "PASS"
+   },
+   {
+    "criterion": "Recursive controlled-failure G1 CF-PRECHECK\u2192CF-RED\u2192CF-FIX\u2192CF-LOAD\u2192CF-REPLAY\u2192CF-CERTIFY DAG complete, unique, acyclic and atomic.",
+    "evidence": [
+     "core/node-architect/q0-controlled-failure-frontier-r3.json"
+    ],
+    "index": 2,
+    "status": "PASS"
+   },
+   {
+    "criterion": "Controlled scenario is reproducible in isolated non-production environment, with input/prestate, actual failing command, error boundary and genuine RED evidenced before fix.",
+    "evidence": [
+     ".gwc/tasks/SCRUM-781/evidence/cf-red-prefix-runtime-r1.json"
+    ],
+    "index": 3,
+    "status": "PASS"
+   },
+   {
+    "criterion": "Minimal actual runtime fix follows RED on the same working branch; focused GREEN and negative regressions PASS with exact additive commit/push/readback.",
+    "evidence": [
+     "commit 4a775eb1",
+     "tests/test_stable_json.py"
+    ],
+    "index": 4,
+    "status": "PASS"
+   },
+   {
+    "criterion": "Fresh runtime activation proves exact committed fix SHA and loaded modules/instructions/profile digests; invalidate/regenerate only stale dependent state.",
+    "evidence": [
+     ".gwc/tasks/SCRUM-781/evidence/cf-load-replay-certify-r1.json"
+    ],
+    "index": 5,
+    "status": "PARTIAL"
+   },
+   {
+    "criterion": "Controlled replay uses exact frozen scenario, reaches legal state beyond observed failure boundary, and passes deterministic replay/idempotency checks.",
+    "evidence": [
+     ".gwc/tasks/SCRUM-781/evidence/cf-load-replay-certify-r1.json"
+    ],
+    "index": 6,
+    "status": "PARTIAL"
+   },
+   {
+    "criterion": "Complete mandatory Universal Q0 qualification matrix and clean target validation; native certification contracts must explicitly accept controlled scenario target before any L3 claim.",
+    "evidence": [
+     ".gwc/tasks/SCRUM-781/evidence/cf-load-replay-certify-r1.json"
+    ],
+    "index": 7,
+    "status": "PARTIAL"
+   },
+   {
+    "criterion": "Original DWO-LOGIN-AUTH-R1 remains NOT_REPRODUCED/BLOCKED_EXTERNAL_EVIDENCE, not reused as authentic RED/replay proof or declared repaired.",
+    "evidence": [
+     "DWO-LOGIN-AUTH-R1 kept NOT_REPRODUCED; no reconstructed trace used as proof"
+    ],
+    "index": 8,
+    "status": "PASS"
+   },
+   {
+    "criterion": "All new source and evidence within authorized Q0 branch-local scope; no protected typed C/E, merge, deploy, production, secrets, migration or destructive effects.",
+    "evidence": [
+     ".gwc/tasks/SCRUM-781/evidence/q0-e2e-closure-r1.json#P1_scope_reconciliation"
+    ],
+    "index": 9,
+    "status": "PARTIAL"
+   },
+   {
+    "criterion": "Draft PR plus exact evidence handoff; formal Q0 UR.G6/human acceptance separately authorized and not inferred from this target-change approval.",
+    "evidence": [
+     "https://github.com/nhatnguyenquang1838-coder/gwc/pull/609",
+     "q0-e2e-closure-r1.json"
+    ],
+    "index": 10,
+    "status": "PASS"
+   }
+  ]
+ },
+ "ack": 77,
+ "claim_boundary": "local engineering evidence; no native LOAD_PROOF, no original DWO replay, no L3, no gate receipt",
+ "run_id": "scrum781-q0-fresh-20261010-r1",
+ "schema_id": "gwc.q0.e2e-closure/v1",
+ "source_head": "683d4a17c79a7f3ea74a70fe4be4a1ab40c84bbc"
+}
