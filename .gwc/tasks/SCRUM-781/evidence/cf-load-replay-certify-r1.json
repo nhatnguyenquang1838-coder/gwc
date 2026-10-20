@@ -5,7 +5,7 @@
   "suites": {
    "q0": {
     "exit_code": 0,
-    "summary": "78 passed in 7.62s"
+    "summary": "78 passed in 7.72s"
    }
   }
  },
@@ -32,7 +32,7 @@
     "path": "scripts/scrum781_engineering_loop.py"
    }
   ],
-  "head": "ecc8ccfe23dbf6b83d0da790f612b78d71399ae4",
+  "head": "f00203d7cfcd7cf5002a827b430d7d280640ef51",
   "loaded_module": "/Users/mac/prj/DW-SuperApps/worktrees/gwc/SCRUM-781-q0-fresh-20261010-r1/tools/node_architect/stable_json.py",
   "loaded_module_sha256": "42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
   "result": "CF_LOAD_LOCAL_IDENTITY_MATCH"
@@ -55,6 +55,6 @@
  "authority_granted": false,
  "scenario": ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
  "schema_id": "gwc.q0.cf.load-replay-certify/v1",
- "source_head": "ecc8ccfe23dbf6b83d0da790f612b78d71399ae4",
+ "source_head": "f00203d7cfcd7cf5002a827b430d7d280640ef51",
  "typed_ce_admitted": false
 }

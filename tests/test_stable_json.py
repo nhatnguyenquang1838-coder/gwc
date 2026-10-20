@@ -25,13 +25,32 @@ def test_naive_read_of_a_partially_written_file_raises(tmp_path):
 
 
 def test_read_json_survives_an_atomic_rewrite_window(tmp_path):
+    """Read while the writer is mid-rewrite, not after it finished."""
     from tools.node_architect.stable_json import read_json
 
     target = tmp_path / "route.json"
-    target.write_text("")  # writer truncated, rewrite pending
-    thread = _rewrite_later(target, {"route": "ok"})
-    thread.join()
-    assert read_json(target) == {"route": "ok"}
+    target.write_text(json.dumps({"route": "before"}))
+    stop = threading.Event()
+
+    def writer() -> None:
+        payload = json.dumps({"route": "after", "filler": "x" * 2000})
+        for _ in range(60):
+            if stop.is_set():
+                return
+            target.write_text("")       # truncate window a reader can observe
+            target.write_text(payload)
+            time.sleep(0.002)
+
+    thread = threading.Thread(target=writer, daemon=True)
+    thread.start()
+    try:
+        observed = []
+        for _ in range(40):
+            observed.append(read_json(target, attempts=6, delay=0.02)["route"])
+    finally:
+        stop.set()
+        thread.join(timeout=5)
+    assert observed and set(observed) <= {"before", "after"}
 
 
 def test_read_json_retries_within_the_same_call(tmp_path, monkeypatch):
