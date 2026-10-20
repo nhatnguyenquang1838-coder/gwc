@@ -44,6 +44,20 @@ def resolve_active_plan(root: Path | str) -> str:
     if not route_path.exists():
         return PLAN_REF
     route = json.loads(route_path.read_text())
+    child = route.get('child_activation') or {}
+    if child:
+        status = child.get('activation_status')
+        ref = child.get('plan_ref')
+        receipt_ref = child.get('activation_receipt_ref')
+        checkpoint_ref = child.get('checkpoint_ref')
+        if status != 'ACTIVATED':
+            raise ValueError('Q0_CHILD_ACTIVATION_PENDING')
+        if not ref or not receipt_ref or not checkpoint_ref:
+            raise ValueError('Q0_CHILD_ACTIVATION_INVALID')
+        from .first_run_activation import verify_first_run_receipt
+        verify_first_run_receipt(repository_root=root, receipt_ref=receipt_ref,
+                                 checkpoint_ref=checkpoint_ref)
+        return ref
     successor = route.get('approved_successor_g1') or {}
     if not successor:
         return PLAN_REF

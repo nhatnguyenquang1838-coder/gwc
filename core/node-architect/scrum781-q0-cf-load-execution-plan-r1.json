@@ -1,0 +1,365 @@
+{
+ "schema_id": "gwc.scrum781.q0-execution-plan.v3",
+ "version": 1,
+ "run_id": "scrum781-q0-cf-load-r1",
+ "parent_task": "SCRUM-781",
+ "depends_on": [
+  "SCRUM-787",
+  "SCRUM-796"
+ ],
+ "workflow_mode": "q0_live_qualification",
+ "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+ "current_gate": "UR.G2",
+ "contract_mode": "EXECUTE",
+ "owner": "CONTROLLER",
+ "recipient": "q0-actions-engineering",
+ "branch": "fix/SCRUM-781-q0-cf-load-r1",
+ "source_repo": "nhatnguyenquang1838-coder/gwc",
+ "goal": "Qualify GWC Universal V2 against an actual controlled, reproducible runtime failure through source-bound RED\u2192minimal FIX\u2192GREEN\u2192LOAD_PROOF\u2192REPLAY\u2192qualification matrix. Historic DWO-LOGIN-AUTH-R1 remains NOT_REPRODUCED; no original replay claim or Login implementation.",
+ "authority_basis": {
+  "kind": "standing_q0_autonomous_development_policy",
+  "canonical_source": "AGENTS.md#UNIVERSAL_V2_DEVELOPMENT override \u2014 SCRUM-781 Q0 development lane",
+  "issuing_basis": "Existing repo policy permits branch-local remediation, TDD, additive commits/push, runtime reload/replay, no per-defect human approval. User reiterated continuous Executor implementation on 2026-10-10.",
+  "not_a_new_grant": true,
+  "separate_authority_required": [
+   "protected-main-write",
+   "merge",
+   "deploy",
+   "production-runtime",
+   "production-config-data",
+   "secrets-credentials",
+   "migrations",
+   "destructive-effects",
+   "force-push",
+   "unrelated-product-scope",
+   "G6-human-acceptance"
+  ]
+ },
+ "scope": {
+  "allowed_actions": [
+   "read_exact_source",
+   "create_guarded_branch_or_worktree",
+   "modify_approved_files",
+   "run_sandboxed_validation",
+   "stage",
+   "create_commit",
+   "push_working_branch",
+   "open_or_update_draft_pr"
+  ],
+  "denied_actions": [
+   "mark_pr_ready_for_review",
+   "merge_approved_pr",
+   "deploy_approved_release",
+   "production_config_change",
+   "production_data_write",
+   "migration",
+   "credential_rotation",
+   "branch_deletion",
+   "force_push"
+  ],
+  "writable_targets": [
+   "tools/node_architect/**",
+   "core/node-architect/**",
+   "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+   "tests/**",
+   "scripts/scrum781_*.py",
+   ".gwc/tasks/SCRUM-781/**"
+  ],
+  "source_roots": [
+   "tools/node_architect",
+   "core/node-architect",
+   "tests",
+   "scripts",
+   ".gwc/tasks/SCRUM-781"
+  ],
+  "max_children": 0,
+  "max_parallel": 1,
+  "max_depth": 0
+ },
+ "integration_ceiling": "draft_pr_only",
+ "implementation_mode": "continuous_tdd_self_remediation",
+ "recursive_plan": {
+  "id": "F0-Q0-QUALIFY",
+  "atomic": false,
+  "children": [
+   {
+    "id": "F1-PLAN-IDENTITY",
+    "atomic": false,
+    "depends_on": [],
+    "children": [
+     {
+      "id": "CF-PRECHECK",
+      "atomic": true,
+      "depends_on": [],
+      "package": "P1",
+      "action": "Exact-read successor G1 plan and approved target, reconcile single native owner/branch/checkpoint without replaying old work, validate full DAG, confirm controlled scenario test boundaries.",
+      "evidence_requirements": [
+       "plan source SHA/digest",
+       "human Option B decision pointer",
+       "owner/session/checkpoint identity",
+       "acyclic atomic DAG and effective route readback"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "F1-REPRODUCE-FIX",
+    "atomic": false,
+    "depends_on": [
+     "F1-PLAN-IDENTITY"
+    ],
+    "children": [
+     {
+      "id": "CF-RED",
+      "atomic": true,
+      "depends_on": [
+       "CF-PRECHECK"
+      ],
+      "package": "P2",
+      "action": "Select reproducible, sandbox-isolated GWC Universal V2 runtime failure scenario with genuine observed failing pre-fix boundary; freeze input/prestate/command/log digests before fix.",
+      "evidence_requirements": [
+       "approved nonproduction scenario provenance",
+       "exact command/input/prestate",
+       "genuine RED exit and log",
+       "failure-boundary digest",
+       "original_DWO_failure_not_reproduced=true"
+      ]
+     },
+     {
+      "id": "CF-FIX",
+      "atomic": true,
+      "depends_on": [
+       "CF-RED"
+      ],
+      "package": "P3",
+      "action": "Apply minimal authorized same-branch runtime fix after RED; run focused GREEN+negative regression and additively commit/push source with exact readback.",
+      "evidence_requirements": [
+       "RED-to-diff causality",
+       "minimal diff and scope validation",
+       "focused GREEN/negative tests",
+       "exact Git parent+new head"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "F1-LOAD-REPLAY",
+    "atomic": false,
+    "depends_on": [
+     "F1-REPRODUCE-FIX"
+    ],
+    "children": [
+     {
+      "id": "CF-LOAD",
+      "atomic": true,
+      "depends_on": [
+       "CF-FIX"
+      ],
+      "package": "P4",
+      "action": "Reload/recreate isolated runtime from committed fix SHA; invalidate only stale derivatives; capture loaded profile/module/instruction identities and load proof.",
+      "evidence_requirements": [
+       "runtime activation ID/process/session",
+       "source HEAD and loaded exact SHA",
+       "loaded module/instruction hashes",
+       "stale derivatives invalidated/regenerated"
+      ]
+     },
+     {
+      "id": "CF-REPLAY",
+      "atomic": true,
+      "depends_on": [
+       "CF-LOAD"
+      ],
+      "package": "P4",
+      "action": "Replay SAME controlled failing input/prestate on freshly loaded fixed runtime; demonstrate readback beyond prior failure boundary and deterministic idempotency.",
+      "evidence_requirements": [
+       "identical frozen scenario/input digest",
+       "old error boundary reference",
+       "new process/loaded identity",
+       "verified next legal state",
+       "replay and idempotency logs"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "F1-CERTIFY-HANDOFF",
+    "atomic": false,
+    "depends_on": [
+     "F1-LOAD-REPLAY"
+    ],
+    "children": [
+     {
+      "id": "CF-CERTIFY",
+      "atomic": true,
+      "depends_on": [
+       "CF-REPLAY"
+      ],
+      "package": "P5/P6",
+      "action": "Run required Universal Q0 matrix from clean activation, document controlled-vs-original limitation, certify controlled campaign only under qualified successor evidence contract and create Draft PR for separately governed G6.",
+      "evidence_requirements": [
+       "13-entry Q0 matrix and regression",
+       "clean activation load-proof",
+       "full source/evidence readback",
+       "original DWO NOT_REPRODUCED disclaimer",
+       "draft PR / no merge",
+       "human G6 decision boundary"
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "work_packages": [
+  {
+   "id": "P1",
+   "objective": "Human-approved G1 successor plan, exact source/route identity, checkpoint/ownership reconciliation, acyclic atomic CF frontier.",
+   "permitted": [
+    "read_exact_source",
+    "sandboxed planning validation",
+    "branch-local bounded fixes"
+   ]
+  },
+  {
+   "id": "P2",
+   "objective": "Capture genuine controlled runtime RED in isolated non-production sandbox; freeze scenario/prestate and observed error.",
+   "permitted": [
+    "sandboxed validation",
+    "versioned scenario evidence"
+   ]
+  },
+  {
+   "id": "P3",
+   "objective": "Minimal real runtime fix after RED, focused GREEN and negatives, additive commit/push on same Q0 branch.",
+   "permitted": [
+    "branch-local edit",
+    "test",
+    "commit",
+    "push"
+   ]
+  },
+  {
+   "id": "P4",
+   "objective": "Isolated load-proof exact fixed runtime and replay same controlled incident beyond prior error boundary.",
+   "permitted": [
+    "isolated runtime load",
+    "evidence writes",
+    "sandbox replay"
+   ]
+  },
+  {
+   "id": "P5",
+   "objective": "Mandatory Q0 matrix/regressions, explicit distinction controlled-vs-original and no false L3 claim.",
+   "permitted": [
+    "tests",
+    "readback",
+    "bounded same-branch repairs"
+   ]
+  },
+  {
+   "id": "P6",
+   "objective": "Draft evidence handoff/PR; independent qualified native certification and separate Human UR.G6 acceptance.",
+   "permitted": [
+    "push working branch",
+    "draft PR",
+    "evidence reports"
+   ]
+  }
+ ],
+ "acceptance_criteria": [
+  "R3 is exact SHA/digest-bound to the explicit Human Option B decision; legacy R2 remains immutable and original DWO NOT_REPRODUCED.",
+  "Single existing Q0 run, session and branch; native owner explicitly reconciles old source/context/checkpoint before any replan work is selected.",
+  "Recursive controlled-failure G1 CF-PRECHECK\u2192CF-RED\u2192CF-FIX\u2192CF-LOAD\u2192CF-REPLAY\u2192CF-CERTIFY DAG complete, unique, acyclic and atomic.",
+  "Controlled scenario is reproducible in isolated non-production environment, with input/prestate, actual failing command, error boundary and genuine RED evidenced before fix.",
+  "Minimal actual runtime fix follows RED on the same working branch; focused GREEN and negative regressions PASS with exact additive commit/push/readback.",
+  "Fresh runtime activation proves exact committed fix SHA and loaded modules/instructions/profile digests; invalidate/regenerate only stale dependent state.",
+  "Controlled replay uses exact frozen scenario, reaches legal state beyond observed failure boundary, and passes deterministic replay/idempotency checks.",
+  "Complete mandatory Universal Q0 qualification matrix and clean target validation; native certification contracts must explicitly accept controlled scenario target before any L3 claim.",
+  "Original DWO-LOGIN-AUTH-R1 remains NOT_REPRODUCED/BLOCKED_EXTERNAL_EVIDENCE, not reused as authentic RED/replay proof or declared repaired.",
+  "All new source and evidence within authorized Q0 branch-local scope; no protected typed C/E, merge, deploy, production, secrets, migration or destructive effects.",
+  "Draft PR plus exact evidence handoff; formal Q0 UR.G6/human acceptance separately authorized and not inferred from this target-change approval."
+ ],
+ "continue_until": [
+  "CONTROLLED_FAILURE_CAMPAIGN_EVIDENCED",
+  "MANDATORY_MATRIX_PASS",
+  "DRAFT_PR_READY",
+  "REQUIRES_SEPARATE_UR_G6_HUMAN_ACCEPTANCE"
+ ],
+ "stop_conditions": [
+  "SOURCE_OR_BASE_DRIFT",
+  "WRITE_SCOPE_EXPANSION_REQUIRED",
+  "DESTRUCTIVE_OR_PRODUCTION_AUTHORITY_REQUIRED",
+  "APPROVED_PLAN_PROVEN_INVALID",
+  "EXTERNAL_DEPENDENCY_PERMISSION_BLOCKER",
+  "UNRESOLVED_PRODUCT_DECISION",
+  "G1_SUCCESSOR_NOT_BOUND_TO_NATIVE_RUNTIME",
+  "UNRECONCILED_PREDECESSOR_CHECKPOINT",
+  "CERTIFICATION_CONTRACT_STILL_REQUIRES_AUTHENTIC_ORIGINAL_INCIDENT"
+ ],
+ "recovery_policy": "Under standing UNIVERSAL_V2_DEVELOPMENT scope, investigate actual controlled runtime defects through genuine RED\u2192minimal fix\u2192GREEN\u2192source readback\u2192fresh LOAD_PROOF\u2192same-input replay; no false original incident claims. Failure to reconcile plan/checkpoint or certify controlled target holds only affected effect, not safe planning. Typed C/E, protected effects, G6 acceptance remain separately gated.",
+ "limitations": "Approved alternative qualification target DOES NOT reproduce, fix or replay historical DWO failure. Older Q0 native certificate/profile code still may require authentic original trace; CF-CERTIFY must validate/update the authorized native evidence contract before controlled-target L3 can be claimed. No new effect/merge/deploy/production authority granted.",
+ "g1_revision": {
+  "revision": "R3",
+  "kind": "IMMUTABLE_SUCCESSOR_ACCEPTANCE_REPLAN",
+  "status": "HUMAN_APPROVED_PENDING_NATIVE_ACTIVATION",
+  "supersedes_ref": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+  "reason": "Original DWO trace unlocated after bounded recovery; human approved distinct controlled-failure qualification target.",
+  "human_decision": {
+   "exact_text": "APPROVE OPTION B \u2014 Replan Q0 sang Controlled Failure Campaign, gi\u1eef original DWO NOT_REPRODUCED.",
+   "channel": "bound ChatGPT conversation",
+   "recorded_date": "2026-10-20",
+   "context_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6281823173",
+   "scope": "ACCEPTANCE_TARGET_CHANGE_AND_G1_SUCCESSOR_PLAN_ONLY",
+   "not_effect_authority": true
+  },
+  "implementation_ceiling": "same Q0 branch / Draft PR; no protected C/E or G6 acceptance",
+  "native_activation": "PENDING_EXACT_PLAN_DIGEST_AND_CHECKPOINT_RECONCILIATION",
+  "prior_native_checkpoint": "MUST_PRESERVE_AND_RECONCILE_BY_HERMES_SINGLE_WRITER"
+ },
+ "acceptance_target": {
+  "id": "Q0_CONTROLLED_FAILURE_CAMPAIGN",
+  "approved_by_human": true,
+  "source_mode": "CONTROLLED_SANDBOX_RUNTIME_FAILURE",
+  "historical_incident": {
+   "id": "DWO-LOGIN-AUTH-R1",
+   "status": "NOT_REPRODUCED",
+   "original_trace_status": "NOT_FOUND_WITHIN_INSPECTED_SOURCES",
+   "original_f2_result": "BLOCKED_EXTERNAL_EVIDENCE",
+   "original_acceptance_satisfied": false,
+   "disposition": "PRESERVE_R2_IMMUTABLE_NO_RETROACTIVE_PASS"
+  },
+  "no_claims": [
+   "ORIGINAL_DWO_REPLAY_PASS",
+   "ORIGINAL_INCIDENT_FIXED",
+   "LEGACY_F2_PASS",
+   "Q0_L3_CERTIFIED_WITHOUT_UPDATED_NATIVE_CONTRACT",
+   "TYPED_CE_AUTHORIZED"
+  ]
+ },
+ "plan_activation_guard": {
+  "default_active_runtime_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "successor_plan_ref": "core/node-architect/scrum781-q0-cf-load-execution-plan-r1.json",
+  "initial_status": "PENDING_FIRST_RUN_ACTIVATION",
+  "do_not_silently_mutate": [
+   "tools/node_architect/q0_m1_m7_integration.py::PLAN_REF",
+   "existing native checkpoint or consumed-cursor",
+   "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json"
+  ],
+  "requirements": [
+   "single DWA writer exact readback of R3 SHA/digest and human decision",
+   "reconcile source/head, plan, existing verified/UNKNOWN statuses in SAME checkpoint without erase/retry",
+   "native route/binder migration with fail-closed checksum and test",
+   "controlled-specific scenario and per-step evidence producer",
+   "valid updated certification target contract before any L3 claim"
+  ],
+  "first_atomic_work_id": "CF-PRECHECK",
+  "human_target_change_approved": true
+ },
+ "parent_run_ref": "scrum781-q0-fresh-20261010-r1",
+ "parent_terminal_evidence": ".gwc/tasks/SCRUM-781/evidence/q0-e2e-closure-r1.json",
+ "successor_of": {
+  "plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+  "reason": "Controller COMMAND #89 (B2) \u2014 distinct child first-run activation for CF_LOAD"
+ }
+}

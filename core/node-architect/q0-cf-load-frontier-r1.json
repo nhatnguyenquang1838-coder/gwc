@@ -1,0 +1,184 @@
+{
+ "schema_id": "gwc.q0.engineering-frontier/v1",
+ "runtime_plan_ref": "core/node-architect/scrum781-q0-cf-load-execution-plan-r1.json",
+ "runtime_plan_digest": "sha256:e198be367c6dbc8d384fdb6b1159e29e25fc699447d38bcabffe200a9d851c8e",
+ "binding_of_record": ".gwc/tasks/SCRUM-781/evidence/cf-provenance-reconciliation-r1.json",
+ "authority_granted": false,
+ "typed_ce_admitted": false,
+ "note": "Child-run frontier for scrum781-q0-cf-load-r1 (Controller COMMAND #89 / B2). Binds the corrected CF provenance and the CF-LOAD native boundary; grants no authority.",
+ "items": [
+  {
+   "id": "CF-PRECHECK",
+   "plan_node_id": "CF-PRECHECK",
+   "objective": "Bind exact source/runtime identity and validate the recursive DAG.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_PRECHECK_VALIDATED",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 1,
+   "depends_on": [],
+   "write_paths": [],
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1
+  },
+  {
+   "id": "CF-RED",
+   "plan_node_id": "CF-RED",
+   "objective": "Verify the approved nonproduction controlled scenario and its source-exact failing pre-fix boundary without replaying completed work.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "scripts.scrum781_cf_provenance_verify",
+    "--phase",
+    "red"
+   ],
+   "expected_result": "CF_PROVENANCE_VERIFIED",
+   "read_paths": [
+    ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
+    ".gwc/tasks/SCRUM-781/evidence/cf-red-prefix-runtime-r1.json",
+    ".gwc/tasks/SCRUM-781/evidence/cf-provenance-reconciliation-r1.json"
+   ],
+   "evidence_requirements": [
+    {
+     "path": ".gwc/tasks/SCRUM-781/evidence/cf-provenance-reconciliation-r1.json",
+     "field": "source_exact_red_reexecution.input_sha256",
+     "equals": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "name": "source_exact_red_reexecution"
+    },
+    {
+     "path": ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
+     "field": "id",
+     "equals": "CF-SCENARIO-STABLE-JSON-READ",
+     "name": "approved_scenario_identity"
+    }
+   ],
+   "priority": 2,
+   "depends_on": [
+    "CF-PRECHECK"
+   ],
+   "write_paths": []
+  },
+  {
+   "id": "CF-FIX",
+   "plan_node_id": "CF-FIX",
+   "objective": "Verify the minimal fix identity for the same scenario: verified fix commit, module digest and fail-closed semantics.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "scripts.scrum781_cf_provenance_verify",
+    "--phase",
+    "fix"
+   ],
+   "expected_result": "CF_PROVENANCE_VERIFIED",
+   "read_paths": [
+    ".gwc/tasks/SCRUM-781/evidence/cf-provenance-reconciliation-r1.json",
+    "tools/node_architect/stable_json.py"
+   ],
+   "evidence_requirements": [
+    {
+     "path": ".gwc/tasks/SCRUM-781/evidence/cf-provenance-reconciliation-r1.json",
+     "field": "verified_fix.current_module_matches_fix",
+     "equals": true,
+     "name": "verified_fix_identity"
+    }
+   ],
+   "priority": 3,
+   "depends_on": [
+    "CF-RED"
+   ],
+   "write_paths": []
+  },
+  {
+   "id": "CF-LOAD",
+   "plan_node_id": "CF-LOAD",
+   "objective": "Native runtime activation proving the exact candidate identity (LOAD_PROOF).",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_stable_json.py",
+    "-q"
+   ],
+   "expected_result": "CF_LOAD_NATIVE_PROOF",
+   "read_paths": [
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md",
+    "tools/node_architect/stable_json.py"
+   ],
+   "priority": 4,
+   "depends_on": [
+    "CF-FIX"
+   ],
+   "write_paths": [],
+   "missing_external_evidence": [
+    "native_runtime_activation_authority"
+   ]
+  },
+  {
+   "id": "CF-REPLAY",
+   "plan_node_id": "CF-REPLAY",
+   "objective": "Replay the frozen controlled scenario on the activated fixed runtime and prove forward progress.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_stable_json.py",
+    "-q"
+   ],
+   "expected_result": "CF_REPLAY_ADVANCED",
+   "read_paths": [
+    ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json"
+   ],
+   "priority": 5,
+   "depends_on": [
+    "CF-LOAD"
+   ],
+   "write_paths": [],
+   "missing_external_evidence": [
+    "native_runtime_activation_authority"
+   ]
+  },
+  {
+   "id": "CF-CERTIFY",
+   "plan_node_id": "CF-CERTIFY",
+   "objective": "Qualification matrix and L3 certification on the activated runtime (separately guarded).",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_stable_json.py",
+    "-q"
+   ],
+   "expected_result": "CF_CERTIFIED",
+   "read_paths": [
+    "core/runbooks/Q0_LIVE_QUALIFICATION_RUNBOOK_v1.0.md"
+   ],
+   "priority": 6,
+   "depends_on": [
+    "CF-REPLAY"
+   ],
+   "write_paths": [],
+   "missing_external_evidence": [
+    "native_runtime_activation_authority",
+    "l3_certification_authority"
+   ]
+  }
+ ]
+}
