@@ -6,5 +6,6 @@
  "checkpoint_receipt_digest": "sha256:af6ce9d0778709af2e430aebded83a6a5dfdeac843125c63e4b364b747a1ce06",
  "activated_at": "2026-10-20T08:35:19.871314+00:00",
  "authority": "human-approved OPTION_B (route approved_successor_g1)",
- "authority_granted": false
+ "authority_granted": false,
+ "checkpoint_ref": "/Users/mac/.hermes/cache/scratch/q0-m1-m7-host/20261014_021304_0dc728/3926191c93f475aa0c35c3efddce056e3a155f8a/checkpoint.sqlite"
 }

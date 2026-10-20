@@ -64,6 +64,20 @@ def resolve_active_plan(root: Path | str) -> str:
             receipt.get('plan_digest') != _sha256_file(plan_path) or
             not receipt.get('checkpoint_receipt_digest')):
         raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    checkpoint_ref = receipt.get('checkpoint_ref')
+    if not checkpoint_ref:
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    checkpoint_path = Path(checkpoint_ref)
+    if not checkpoint_path.is_absolute():
+        checkpoint_path = root / checkpoint_ref
+    if not checkpoint_path.exists():
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    import sqlite3
+    with sqlite3.connect('file:' + str(checkpoint_path) + '?mode=ro', uri=True) as db:
+        row = db.execute('SELECT plan_digest,generation FROM engineering_plan_activation WHERE plan_ref=?',
+                         (ref,)).fetchone()
+    if row is None or row[0] != receipt['plan_digest'] or int(row[1]) < 1:
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
     return ref
 
 
