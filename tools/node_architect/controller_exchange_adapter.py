@@ -104,7 +104,8 @@ def reconcile_exchange_request_context(request, old_context, new_context, outbox
     equivalent=copy.deepcopy(new)
     equivalent['repository']['worktree']=old_wt
     equivalent['repository']['head_sha']=old['repository']['head_sha']
-    equivalent.setdefault('engineering',{})['route_policy_digest']=old_route
+    if old.get('engineering') is not None and new.get('engineering') is not None:
+        equivalent['engineering']['route_policy_digest']=old_route
     require(equivalent==old,'EXCHANGE_CONTEXT_REBIND_DRIFT')
     if old_route!=new_route:
         require(repository_root is not None and route_ref,'EXCHANGE_CONTEXT_REBIND_ROUTE_EVIDENCE_REQUIRED')
