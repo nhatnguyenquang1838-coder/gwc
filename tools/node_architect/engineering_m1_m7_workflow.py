@@ -648,6 +648,33 @@ def reconcile_engineering_route_metadata(old_context,new_context,*,repository_ro
     return receipt
 
 
+def reconcile_interrupted_invocation(checkpoint_ref,run,invocation_key,*,reason):
+    """Release an owner's interrupted invocation that never produced a result.
+
+    Only a row with a NULL result may be released: it records no verified work.
+    The release itself is written to engineering_source_reconciliations so the
+    interruption stays auditable.
+    """
+    require(isinstance(reason,str) and bool(reason.strip()),'INVOCATION_RECONCILE_REASON_REQUIRED')
+    with _connect(checkpoint_ref) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT binding,result FROM engineering_invocations WHERE run=? AND key=?',
+                       (run,invocation_key)).fetchone()
+        require(row is not None,'INVOCATION_RECONCILE_NOT_FOUND')
+        require(row[1] is None,'INVOCATION_RECONCILE_HAS_RESULT')
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+        receipt={'kind':'INTERRUPTED_INVOCATION_RELEASED','run':run,'invocation_key':invocation_key,
+                 'binding':row[0],'reason':reason}
+        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',
+                   (digest(receipt),json.dumps(receipt),None))
+        db.execute('DELETE FROM engineering_invocations WHERE run=? AND key=?',(run,invocation_key))
+        db.commit()
+    with _connect(checkpoint_ref) as reader:
+        require(reader.execute('SELECT 1 FROM engineering_invocations WHERE run=? AND key=?',
+                               (run,invocation_key)).fetchone() is None,'INVOCATION_RECONCILE_READBACK_FAILED')
+    return receipt
+
+
 def reconcile_engineering_plan_transition(old_context,new_context,*,reason,repository_root,
                                           activation_receipt_ref):
     """Advance the SAME checkpoint from the predecessor plan to an ACTIVATED successor.

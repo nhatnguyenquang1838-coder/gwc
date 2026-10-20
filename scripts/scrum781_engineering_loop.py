@@ -16,6 +16,7 @@ from pathlib import Path
 import sqlite3
 import subprocess
 import sys
+import time
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,17 @@ from tools.node_architect.q0_engineering_loop import assess_engineering_resume, 
 
 def digest(value: Any) -> str:
     return 'sha256:' + hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def _read_json(path, attempts=6, delay=0.15):
+    """Read a JSON file that another process may be atomically rewriting."""
+    last=None
+    for _ in range(attempts):
+        try:
+            return json.loads(path.read_text())
+        except (json.JSONDecodeError, OSError) as exc:
+            last=exc; time.sleep(delay)
+    raise last
 
 
 def find_session_leases(value: Any, session_id: str) -> list[dict]:
@@ -45,7 +57,7 @@ def inspect(args: argparse.Namespace) -> dict:
         raise ValueError('SESSION_ENV_BINDING_MISMATCH')
     home = Path(os.environ.get('HERMES_HOME', str(Path.home()/'.hermes'))).resolve()
     operation, _ = build_q0_operation(ROOT, activity_id='engineering-resume-inspection')
-    plan = json.loads((ROOT / resolve_active_plan(ROOT)).read_text())
+    plan = _read_json(ROOT / resolve_active_plan(ROOT))
     required = {'modify_approved_files', 'run_sandboxed_validation', 'stage', 'create_commit', 'push_working_branch'}
     agents = subprocess.check_output(['git', '-C', str(ROOT), 'show', 'HEAD:AGENTS.md'], text=True)
     contract_current = (required <= set(plan['scope']['allowed_actions'])
@@ -61,7 +73,7 @@ def inspect(args: argparse.Namespace) -> dict:
     if not states['loop'] or not session:
         raise ValueError('NATIVE_SESSION_OR_LOOP_NOT_FOUND')
     leases_path = home/'runtime/active_sessions.json'
-    leases = find_session_leases(json.loads(leases_path.read_text()), args.session) if leases_path.exists() else []
+    leases = find_session_leases(_read_json(leases_path), args.session) if leases_path.exists() else []
     owner_verified = len(leases) == 1 and session[1] == 'desktop' and session[2] in (None, '', 'default')
     if owner_verified:
         pid = leases[0].get('pid')
@@ -74,7 +86,7 @@ def inspect(args: argparse.Namespace) -> dict:
     loop = states['loop']
     if args.tick is not None and (args.command != 'inspect' or args.tick != loop['ticks_fired'] or not loop['awaiting_response']):
         raise ValueError('TICK_BINDING_MISMATCH')
-    browser_binding = json.loads((home/'loop-checkpoints'/operation['run_id']/'browser-report39-039e1f6-delivery.json').read_text())
+    browser_binding = _read_json(home/'loop-checkpoints'/operation['run_id']/'browser-report39-039e1f6-delivery.json')
     if (browser_binding.get('session_id') != args.session
             or browser_binding.get('run_id') != operation['run_id']
             or browser_binding.get('conversation_url') != args.controller_url
@@ -200,7 +212,9 @@ def main() -> int:
     args = parser.parse_args()
     try:
         result = workflow(args) if args.command == 'workflow' or (args.command == 'inspect' and args.tick is not None) else inspect(args)
-    except (ValueError, OSError, sqlite3.Error, KeyError, subprocess.CalledProcessError) as exc:
+    except (ValueError, OSError, sqlite3.Error, KeyError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:
+        if os.environ.get('DWA_TRACE'):
+            import traceback; traceback.print_exc()
         print(json.dumps({'outcome':'BLOCKED','reason_code':str(exc),'native_state_modified':False}, indent=2))
         return 2
     print(json.dumps(result, indent=2))

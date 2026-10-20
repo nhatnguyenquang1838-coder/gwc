@@ -26,12 +26,21 @@
    "priority": 1,
    "depends_on": [],
    "write_paths": [],
-   "input_digest": "sha256:54dcac75ced5fda00daaa0723cfbda649933151857a4525d1597583290194841"
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1,
+   "input_digest": "sha256:65cbae3caccc3ba7a41435f1268df8f701d8b6a028bd294512662ef49dd0cb90"
   },
   {
    "id": "CF-RED",
    "plan_node_id": "CF-RED",
-   "objective": "Demonstrate a genuine controlled failure (RED) with exact evidence.",
+   "objective": "Demonstrate a genuine controlled failure with exact evidence.",
    "action": "run_sandboxed_validation",
    "argv": [
     "-m",
@@ -52,7 +61,16 @@
     "CF-PRECHECK"
    ],
    "write_paths": [],
-   "input_digest": "sha256:2f332e7b58c000c20b987fc7c5ad35514d571107f71372150955b7a86b9655de"
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1,
+   "input_digest": "sha256:5bb116955073d8e16e3ca5e27cc30ee39b90511bda5cbcf892718f6b70c73918"
   },
   {
    "id": "CF-FIX",
@@ -78,7 +96,16 @@
     "CF-RED"
    ],
    "write_paths": [],
-   "input_digest": "sha256:23fa933baba8eb6c97502da45d0ecd60e242b83e79dd0aa66fa50086eb8788fc"
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1,
+   "input_digest": "sha256:086cce37fffaab965e197c40f068301bb09b854549bc8cee9349dfc7d55077f1"
   },
   {
    "id": "CF-LOAD",
@@ -104,7 +131,16 @@
     "CF-FIX"
    ],
    "write_paths": [],
-   "input_digest": "sha256:83377e8ed185b3b761da4843d0b8fbbbc808d11ff94cfcc72bc257b855aa1b31"
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1,
+   "input_digest": "sha256:36280bfda0ee9ea11d6c5a61dec6a835a07c2f82ffe5d33ee5e65699c6c3df95"
   },
   {
    "id": "CF-REPLAY",
@@ -130,7 +166,16 @@
     "CF-LOAD"
    ],
    "write_paths": [],
-   "input_digest": "sha256:098dd1a788d13d917f041d61955ace89096322197f6f6e0bda874fa229f0bce5"
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1,
+   "input_digest": "sha256:c1202972aa31f5ceab06169873526535ea0e2f3096396c3bdaabcb241402f3a5"
   },
   {
    "id": "CF-CERTIFY",
@@ -156,7 +201,16 @@
     "CF-REPLAY"
    ],
    "write_paths": [],
-   "input_digest": "sha256:ef678dd47b7b59800db263fa50847598f11d08239b2a156f652173b18e87e62d"
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py"
+   ],
+   "minimum_tests_passed": 1,
+   "input_digest": "sha256:31139cbd8eb82731a3dd00cddaa78f945abe6b00a4daebdbc1efd8d48e304354"
   }
  ]
 }
