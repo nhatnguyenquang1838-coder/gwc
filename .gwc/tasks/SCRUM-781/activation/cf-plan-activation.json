@@ -1,0 +1,10 @@
+{
+ "schema_id": "gwc.q0.plan-activation/v1",
+ "run_id": "scrum781-q0-fresh-20261010-r1",
+ "plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+ "plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+ "checkpoint_receipt_digest": "sha256:af6ce9d0778709af2e430aebded83a6a5dfdeac843125c63e4b364b747a1ce06",
+ "activated_at": "2026-10-20T08:35:19.871314+00:00",
+ "authority": "human-approved OPTION_B (route approved_successor_g1)",
+ "authority_granted": false
+}
