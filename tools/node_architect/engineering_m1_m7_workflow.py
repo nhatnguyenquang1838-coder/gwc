@@ -314,7 +314,9 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         require(r.get('source_head')==c['repository']['head_sha'] and r.get('artifact_ref') and r.get('stdout_digest') and
                 r.get('executed_effects')==[],'ENGINEERING_RESULT_BINDING_INVALID')
         with _connect(path) as db:db.execute('UPDATE engineering_work SET status=? WHERE run=? AND fingerprint=?',('VERIFIED',run,s['work']['fingerprint']))
-        return outcome(s,'M6','PASS','ACTUAL_EXECUTION_ARTIFACT_VERIFIED')
+        result=outcome(s,'M6','PASS','ACTUAL_EXECUTION_ARTIFACT_VERIFIED')
+        result['work_rounds']=s.get('work_rounds',0)+1
+        return result
     def m7(s):
         report=f"{c['task']['id']} engineering coordination; run {run}; firing {invocation_key or 'explicit'}; session {c['executor']['session_id']}; source {c['repository']['head_sha']}. Actual work {s['work']['id']}: {s['execution']['result']}; artifact {s['execution']['artifact_ref']}. Human command seq {s['communication']['seq']}. Protected typed C/E remains separately gated. No original replay, LOAD_PROOF or Q0 L3 claimed. Please review result and return the smallest source-bound NEXT."
         box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
@@ -367,7 +369,17 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     graph:Any=StateGraph(EngineeringState)
     for name,handler in zip(ACTIVITIES,[m1,m2,m3,m4,m5,m6,m7]):graph.add_node(name,handler)
     graph.add_edge(START,'M1')
-    for a,b in zip(ACTIVITIES,ACTIVITIES[1:]):graph.add_conditional_edges(a,lambda s,n=b:n if s['status']=='PASS' else 'M8',{b:b,'M8':'M8',END:END})
+    def _advance(nxt):
+        return lambda s:{nxt:nxt,'M8':'M8'}[nxt if s['status']=='PASS' else 'M8']
+    for a,b in (('M1','M2'),('M2','M3'),('M4','M5'),('M5','M6')):
+        graph.add_conditional_edges(a,_advance(b),{b:b,'M8':'M8'})
+    # M3 either selects the next READY item or ends the firing: once any item
+    # completed in this invocation, an exhausted frontier is a report, not a halt.
+    graph.add_conditional_edges('M3',lambda s:({ 'M4':'M4','M7':'M7'}[ 'M4' if s['status']=='PASS' else 'M7']
+        if s['status']=='PASS' or s.get('work_rounds') else 'M8'),{'M4':'M4','M7':'M7','M8':'M8'})
+    # M6 loops back to M3 until the executable frontier is exhausted (bounded).
+    graph.add_conditional_edges('M6',lambda s:('M3' if s['status']=='PASS' and s.get('work_rounds',0)<5
+        else ('M7' if s['status']=='PASS' else 'M8')),{'M3':'M3','M7':'M7','M8':'M8'})
     graph.add_edge('M7',END)
     def m8(s):
         # Terminal engineering result for every non-PASS halt before M7.

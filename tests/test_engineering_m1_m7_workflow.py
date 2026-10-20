@@ -539,14 +539,18 @@ def test_m8_records_telemetry_without_a_second_request_while_exchange_pending(tm
     assert ('m3-after-m7',0) in rows
 
 
-def test_m7_uses_shared_marker_response_reconciliation_before_next_request(tmp_path):
+def test_one_firing_completes_the_ready_package_and_reports_once(tmp_path):
+    """A firing advances every READY item instead of stopping after the first."""
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
     c=binding(tmp_path);base=c['engineering']['work_items'][0]
     second={**base,'id':'login-probe-second','priority':2,'input_digest':'sha256:'+'e'*64}
     c['engineering']['work_items']=[base,second]
     counts={'read':0,'execute':0};caps=capabilities(c,counts)
     first=run_task_workflow(c,host_capabilities=caps,invocation_key='m7-response-one')
-    request=first['graph_requests'][0]
+    assert counts['execute']==2
+    requests=first['graph_requests']
+    assert len(requests)==1  # one Controller report for the whole firing
+    request=requests[0]
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     binding_fields={k:request[k] for k in ['conversation_url','request_digest','marker','task_id','run_id','session_id']}
     browser_base={**binding_fields,'user_turn_ref':'user:'+request['marker'],
@@ -557,13 +561,11 @@ def test_m7_uses_shared_marker_response_reconciliation_before_next_request(tmp_p
         'response_to_marker':request['marker'],'response_text':'ACK: SEARCH_EXHAUSTED / WAIT_EXTERNAL_EVIDENCE',
         'response_complete_observed':True,'receipt_strength':'RENDERED_TEXT_CORRELATION_ONLY',
         'strong_receipt_verified':False,'workflow_resume_allowed':False})
-    second_result=run_task_workflow(c,host_capabilities=caps,invocation_key='m7-response-two')
-    observation=second_result['controller_response_observation']
-    assert observation['request_digest']==request['request_digest']
-    assert observation['classification']=='RENDERED_TEXT_CORRELATED_WEAK'
-    assert observation['authority_granted'] is False and observation['typed_ce_admitted'] is False
-    assert observation['workflow_resume_allowed'] is False
-    assert second_result['verdict']['reason_code']=='ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED'
+    followup=run_task_workflow(c,host_capabilities=caps,invocation_key='m7-response-two')
+    state=box.read(request)
+    assert state['status']=='CONTROLLER_ACTION_REQUIRED'
+    assert followup['authority_granted'] is False and followup['typed_ce_admitted'] is False
+    assert followup['verdict']['reason_code'] in {'NO_MATERIAL_CHANGE','ENGINEERING_FRONTIER_WAIT_INPUT','ENGINEERING_HOST_REPORT_AND_EXCHANGE_REQUIRED'}
 
 
 def test_m4_external_dependency_dispatches_terminal_result_to_controller(tmp_path):
