@@ -97,8 +97,28 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         if r['seq']==previous.get('seq'):
             require(r['body_sha256']==previous['body_sha256'] and r['comment_id']==previous['comment_id'],'ENGINEERING_COMMUNICATION_REVISION_DRIFT')
         return outcome(s,'M1','PASS','HUMAN_COMMUNICATION_READ_NOT_TYPED_ADMISSION',communication=r)
+    def _successor_intent_approved(s,body_sha):
+        """A human-approved successor G1 binds the new intent command."""
+        try:
+            from .q0_m1_m7_integration import ROUTE_REF, ACTIVATION_RECEIPT_REF, resolve_active_plan
+            root=Path(c['repository']['worktree'])
+            route=json.loads((root/ROUTE_REF).read_text())
+            succ=route.get('approved_successor_g1') or {}
+            if succ.get('human_approved') is not True or not (root/ACTIVATION_RECEIPT_REF).exists():
+                return False
+            resolve_active_plan(root)
+        except (ValueError,OSError,KeyError):
+            return False
+        with _connect(path) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_intent_reconciliations '
+                       '(run TEXT, body_sha256 TEXT, intent_ref TEXT, PRIMARY KEY(run,body_sha256))')
+            db.execute('INSERT OR IGNORE INTO engineering_intent_reconciliations VALUES (?,?,?)',
+                       (run,body_sha,s['communication'].get('comment_url')))
+        return True
     def m2(s):
         if c.get('engineering',{}).get('intent_body_sha256') not in (None,s['communication']['body_sha256']):
+            if _successor_intent_approved(s,s['communication']['body_sha256']):
+                return outcome(s,'M2','PASS','ENGINEERING_INTENT_BOUND_TO_HUMAN_APPROVED_SUCCESSOR')
             return outcome(s,'M2','WAIT','ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED')
         validator=host_capabilities.get('engineering.validate_context')
         if not callable(validator) or validator(c) is not True:
