@@ -214,8 +214,31 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             from tools.node_architect.hermes_skill_capability_bridge import resolve_installed_hermes_skills
             host_capabilities=resolve_installed_hermes_skills(context,home=home,host_session_id=args.session)
     else:raise ValueError('TASK_WORKFLOW_MODE_INVALID')
-    result = run_task_workflow(context, host_capabilities=host_capabilities,
-                               invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
+    try:
+        result = run_task_workflow(context, host_capabilities=host_capabilities,
+                                   invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
+    except ValueError as exc:
+        if str(exc) != 'ENGINEERING_CHECKPOINT_CONTEXT_DRIFT':
+            raise
+        # An additive host-tooling commit advanced HEAD. Reconcile the SAME run
+        # explicitly (head-only + ancestor + exact git binding), then retry once.
+        from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
+        old = json.loads(json.dumps(context))
+        with sqlite3.connect(str(path)) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_firing_telemetry '
+                       '(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,'
+                       'source_head TEXT,result_digest TEXT,request_created INTEGER,'
+                       'PRIMARY KEY(run,firing))')
+            row = db.execute('SELECT source_head FROM engineering_firing_telemetry '
+                             'WHERE run=? ORDER BY rowid DESC LIMIT 1',(preflight['run_id'],)).fetchone()
+        previous_head = row[0] if row else None
+        if not previous_head:
+            raise
+        old['repository']['head_sha'] = previous_head
+        reconcile_engineering_source_head(old, context, repository_root=ROOT,
+            reason=f'additive host-tooling commit {context["repository"]["head_sha"][:12]}; no campaign work/evidence changed')
+        result = run_task_workflow(context, host_capabilities=host_capabilities,
+                                   invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
     return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),
             'capability_binding':host_capabilities.get('capability_binding',{'status':'HOST_INJECTED'}),
             'trigger': 'NATIVE_OWNER_FIRING' if args.tick is not None else 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'}
