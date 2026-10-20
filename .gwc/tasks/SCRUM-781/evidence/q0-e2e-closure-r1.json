@@ -1,8 +1,8 @@
 {
  "P1_scope_reconciliation": {
-  "changed_files": 182,
+  "changed_files": 183,
   "matched": {
-   "count": 134,
+   "count": 135,
    "paths": [
     ".gwc/tasks/SCRUM-781/activation/cf-plan-activation.json",
     ".gwc/tasks/SCRUM-781/engineering/correction43-engineering-workflow-r1.md",
@@ -27,6 +27,7 @@
     ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
     ".gwc/tasks/SCRUM-781/evidence/native105-original-trace-recovery-v1.json",
     ".gwc/tasks/SCRUM-781/evidence/q0-dwo-source-provenance-scan-v1.json",
+    ".gwc/tasks/SCRUM-781/evidence/q0-e2e-closure-r1.json",
     ".gwc/tasks/SCRUM-781/evidence/q0-langgraph-sqlite-resume-evidence-v1.json",
     ".gwc/tasks/SCRUM-781/evidence/q0-qualification-matrix-coverage-audit-v1.json",
     ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json",
@@ -231,7 +232,7 @@
     "summary": "78 passed"
    }
   ],
-  "source_head": "683d4a17c79a7f3ea74a70fe4be4a1ab40c84bbc"
+  "source_head": "a3d7b61e2ae45e0358446e73a618f8fd9d7ab336"
  },
  "P3_qualification_matrix": {
   "counts": {
@@ -343,5 +344,5 @@
  "claim_boundary": "local engineering evidence; no native LOAD_PROOF, no original DWO replay, no L3, no gate receipt",
  "run_id": "scrum781-q0-fresh-20261010-r1",
  "schema_id": "gwc.q0.e2e-closure/v1",
- "source_head": "683d4a17c79a7f3ea74a70fe4be4a1ab40c84bbc"
+ "source_head": "a3d7b61e2ae45e0358446e73a618f8fd9d7ab336"
 }
