@@ -157,6 +157,55 @@ def test_additive_route_metadata_requires_explicit_route_reconciliation(tmp_path
         assert db.execute('SELECT count(*) FROM engineering_source_reconciliations').fetchone()[0]>=1
 
 
+def test_worktree_relocation_requires_explicit_reconciliation(tmp_path):
+    """Moving the same run to a canonical linked worktree is a worktree-only delta.
+
+    The HEAD-only helper must refuse it (worktree differs). An explicit
+    relocation reconciliation must advance the same checkpoint, keep every
+    invocation/work row, and refuse any other context delta.
+    """
+    import copy,json,subprocess,sqlite3
+    from tools.node_architect.task_context_binding import digest as ctx_digest
+    from tools.node_architect.engineering_m1_m7_workflow import (
+        reconcile_engineering_source_head, reconcile_engineering_worktree_relocation)
+    def git(*args,cwd=None):return subprocess.check_output(['git','-C',str(cwd or tmp_path),*args],text=True).strip()
+    git('init','-b','fix/test')
+    (tmp_path/'route.json').write_text(json.dumps({
+        'workflow_mode':'Q0_ENGINEERING_COORDINATION','runtime_epoch':'UNIVERSAL_V2_DEVELOPMENT',
+        'intent_ref':'intent-1','intent_body_sha256':'s',
+        'work_items':[{'id':'login-probe','priority':1,'action':'run_sandboxed_validation',
+                       'input_digest':'sha256:'+'b'*64,'provenance':'RECONSTRUCTED_REQUIREMENTS_BOUND'}]}))
+    git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    route_ref='route.json';old_route=json.loads(git('show','HEAD:'+route_ref))
+    c=binding(tmp_path);c['repository']['worktree']=str(tmp_path);c['repository']['branch']='fix/test'
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    c['engineering']['route_policy_ref']=route_ref
+    c['engineering']['route_policy_digest']=ctx_digest(old_route)
+    c['engineering']['work_items']=old_route['work_items']
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    run_task_workflow(c,host_capabilities=caps,invocation_key='reloc-one')
+    # A second linked worktree of the same repository, same branch and HEAD.
+    linked=tmp_path.parent/'relocated-worktree'
+    git('worktree','add','-q','--detach',str(linked),'HEAD')
+    newer=copy.deepcopy(c);newer['repository']['worktree']=str(linked)
+    with pytest.raises(ValueError,match='ENGINEERING_RECONCILE_NON_HEAD_DRIFT'):
+        reconcile_engineering_source_head(c,newer,repository_root=linked,reason='fixture')
+    # A non-worktree delta must still fail closed.
+    drifted=copy.deepcopy(newer);drifted['repository']['branch']='fix/other'
+    with pytest.raises(ValueError,match='WORKTREE_RELOCATION_CONTEXT_DRIFT'):
+        reconcile_engineering_worktree_relocation(c,drifted,reason='fixture')
+    receipt=reconcile_engineering_worktree_relocation(c,newer,reason='canonical relocation')
+    assert receipt['worktree_relocation'] is True
+    assert receipt['old_worktree']==str(tmp_path.resolve())
+    assert receipt['new_worktree']==str(linked.resolve())
+    assert receipt['head_unchanged'] is True
+    r=run_task_workflow(newer,host_capabilities=caps,invocation_key='reloc-two')
+    assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
+    with sqlite3.connect(newer['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
+        assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
+
+
 def test_route_metadata_reconciliation_rejects_non_additive_delta(tmp_path):
     """A route delta that changes existing keys or work_items must fail closed."""
     import copy,json,subprocess,sqlite3

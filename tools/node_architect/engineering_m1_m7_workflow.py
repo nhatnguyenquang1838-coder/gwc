@@ -571,3 +571,53 @@ def reconcile_engineering_route_metadata(old_context,new_context,*,repository_ro
         require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),
                 'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
     return receipt
+
+
+def reconcile_engineering_worktree_relocation(old_context,new_context,*,reason):
+    """Explicit relocation of the SAME run to another linked worktree.
+
+    A canonical worktree move changes only ``repository.worktree``. The
+    HEAD-only helper refuses it, so this path binds the relocation explicitly:
+    every other context field must stay byte-identical, the new worktree must
+    be the active checkout of the recorded branch/HEAD, and both paths must
+    share one git common directory when the prior path still exists. All
+    invocations, work rows, outbox rows and UNKNOWN statuses are preserved;
+    nothing is erased, retried or replanned.
+    """
+    import copy,subprocess
+    old=validate_task_context(old_context);new=validate_task_context(new_context)
+    require(isinstance(reason,str) and bool(reason.strip()),'WORKTREE_RELOCATION_REASON_REQUIRED')
+    old_wt=Path(old['repository']['worktree']).resolve();new_wt=Path(new['repository']['worktree']).resolve()
+    require(old_wt!=new_wt,'WORKTREE_RELOCATION_UNCHANGED_WORKTREE')
+    equivalent=copy.deepcopy(new)
+    equivalent['repository']['worktree']=old['repository']['worktree']
+    equivalent['repository']['head_sha']=old['repository']['head_sha']
+    require(equivalent==old,'WORKTREE_RELOCATION_CONTEXT_DRIFT')
+    def git(root,*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
+    require(git(new_wt,'rev-parse','HEAD')==new['repository']['head_sha'],'WORKTREE_RELOCATION_GIT_BINDING_REQUIRED')
+    head_unchanged=old['repository']['head_sha']==new['repository']['head_sha']
+    if not head_unchanged:
+        subprocess.run(['git','-C',str(new_wt),'merge-base','--is-ancestor',
+                        old['repository']['head_sha'],new['repository']['head_sha']],check=True)
+    if old_wt.exists():
+        def common_dir(root):
+            value=Path(git(root,'rev-parse','--git-common-dir'))
+            return (value if value.is_absolute() else (Path(root)/value)).resolve()
+        require(common_dir(old_wt)==common_dir(new_wt),'WORKTREE_RELOCATION_REPOSITORY_MISMATCH')
+    with _connect(old['workflow']['checkpoint_ref']) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+        if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+        receipt={'old_context_digest':digest(old),'new_context_digest':digest(new),
+                 'old_head':old['repository']['head_sha'],'new_head':new['repository']['head_sha'],
+                 'head_unchanged':head_unchanged,'reason':reason,'worktree_relocation':True,
+                 'old_worktree':str(old_wt),'new_worktree':str(new_wt)}
+        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt),row[1]))
+        db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',
+                   (digest(new),old['run']['id'],digest(old)));db.commit()
+    with _connect(old['workflow']['checkpoint_ref']) as reader:
+        require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),
+                'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
+    return receipt
