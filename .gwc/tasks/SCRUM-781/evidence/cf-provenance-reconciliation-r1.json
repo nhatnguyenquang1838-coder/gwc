@@ -1,0 +1,80 @@
+{
+  "schema_id": "gwc.q0.cf.provenance-reconciliation/v1",
+  "parent_task": "SCRUM-781",
+  "child_run_id": "scrum781-q0-cf-load-r1",
+  "child_branch": "fix/SCRUM-781-q0-cf-load-r1",
+  "decision_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6294303484",
+  "decision_kind": "CONTROLLER_COMMAND_OPTION_B",
+  "source_head_observed": "38e200a8b7b43144b7463830e639b4fd1f07ac56",
+  "scenario": {
+    "id": "CF-SCENARIO-STABLE-JSON-READ",
+    "ref": ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
+    "sha256": "sha256:cd1f4a280cab83ed453ddfd9b2bdd84e6fb6187ce322fa9e9347db3906768cb2",
+    "defect": "P1 host read of a JSON file inside its truncate-then-write window",
+    "distinct_from_original_incident": true,
+    "original_dwo_login_auth_r1": "NOT_REPRODUCED"
+  },
+  "existing_red_artifact": {
+    "ref": ".gwc/tasks/SCRUM-781/evidence/cf-red-prefix-runtime-r1.json",
+    "sha256": "sha256:e14cf6a424d9a3dfe23ea6077689138aef7eba7f51a1aab1c712f9a3ad5f5cc1",
+    "status": "PARTIAL_MISBOUND_PRESERVED",
+    "mismatches": [
+      {
+        "field": "fix.commit",
+        "declared": "20239524ea0ad2023d9580f692e11d5bd5badecb",
+        "observed": "commit does not contain tools/node_architect/stable_json.py",
+        "subject": "fix(Q0): CF frontier items use the suite verification profile",
+        "verified_instead": "4a775eb1db21af6143dad7758608909f410cb651"
+      },
+      {
+        "field": "source_exact_reproduction.pre_fix_file_sha256",
+        "declared": "sha256:9430df9051295c97317a0fd63740cc4ae388ced873e4193f55213421ce04b2d7",
+        "observed": "sha256:75c9ebb0d8c07ba8f659532a3a2cab0633a47f9731894307462f2746e01994ea",
+        "at_commit": "91ca8e92543cd021ade0a867a2dc290d0e79332b",
+        "path": "core/node-architect/q0-engineering-coordination-route-r1.json"
+      }
+    ],
+    "preserved": true,
+    "rewritten": false
+  },
+  "source_exact_red_reexecution": {
+    "commit": "91ca8e92543cd021ade0a867a2dc290d0e79332b",
+    "method": "isolated detached git worktree at the pre-fix commit; route file truncated to zero bytes; exact failing statement executed",
+    "failing_statement": "route=json.loads((root/ROUTE_REF).read_text())",
+    "statement_locus": "tools/node_architect/engineering_m1_m7_workflow.py:106",
+    "input_file": "core/node-architect/q0-engineering-coordination-route-r1.json",
+    "input_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "error_boundary": "json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+    "exit_code_observed": 1,
+    "genuine_red": true,
+    "github_actions_environment": false,
+    "native_local_environment": true
+  },
+  "verified_fix": {
+    "commit": "4a775eb1db21af6143dad7758608909f410cb651",
+    "subject": "fix(Q0-P1): fail closed on partially written JSON instead of a bare decode error",
+    "module": "tools/node_architect/stable_json.py",
+    "module_sha256": "sha256:42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
+    "current_module_matches_fix": true,
+    "ancestor_of_head": true,
+    "fail_closed_marker": "STABLE_JSON_UNREADABLE",
+    "retry_semantics": "bounded retry"
+  },
+  "dag_status": {
+    "CF-PRECHECK": "VERIFIED (prior run, unchanged)",
+    "CF-RED": "READY_WITH_CORRECTED_BINDING",
+    "CF-FIX": "VERIFIED",
+    "CF-LOAD": "BLOCKED_EXTERNAL_EVIDENCE (native runtime activation authority not held)",
+    "CF-REPLAY": "WAIT_INPUT (requires CF-LOAD activation)",
+    "CF-CERTIFY": "WAIT_INPUT (L3 separately guarded)"
+  },
+  "frontier_gap_diagnosis": {
+    "observed": "core/node-architect/q0-controlled-failure-frontier-r3.json declares only CF-PRECHECK and blocked_next.CF-RED=SCENARIO_REQUIRED",
+    "cause": "frontier policy projection item list was never extended after the scenario/RED artifacts landed; project_frontier() only sees declared items",
+    "not_a_plan_gap": true,
+    "runtime_plan_modified": false
+  },
+  "authority_granted": false,
+  "typed_ce_admitted": false,
+  "claim_boundary": "provenance reconciliation only; no native LOAD_PROOF, no L3, no gate receipt, no merge/deploy/production effect"
+}
