@@ -83,28 +83,46 @@ def reconcile_controller_response(request, exchange_state):
             'workflow_resume_allowed':False}
 
 
-def reconcile_exchange_request_context(request, old_context, new_context, outbox, *, reason):
+def reconcile_exchange_request_context(request, old_context, new_context, outbox, *, reason,
+                                       repository_root=None, route_ref=None):
     """Rebind a reserved exchange request after a worktree-only context move.
 
     The request payload, ``request_digest`` and ``marker`` stay immutable — only
     a separate reconciliation row records that the same reservation now belongs
-    to the relocated context. Any delta other than ``repository.worktree`` (plus
-    an ancestor-only head advance) fails closed.
+    to the relocated context. Allowed deltas: ``repository.worktree``, an
+    ancestor-only head advance, and an additive route-metadata change proven
+    against ``route_ref`` at both heads. Anything else fails closed.
     """
-    import copy
+    import copy,subprocess
     old=validate_task_context(old_context);new=validate_task_context(new_context)
     require(isinstance(reason,str) and bool(reason.strip()),'EXCHANGE_CONTEXT_REBIND_REASON_REQUIRED')
     require(request.get('task_context_digest')==digest(old),'EXCHANGE_CONTEXT_REBIND_PRIOR_MISMATCH')
     old_wt=str(old['repository']['worktree']);new_wt=str(new['repository']['worktree'])
     require(old_wt!=new_wt,'EXCHANGE_CONTEXT_REBIND_UNCHANGED_WORKTREE')
+    old_route=(old.get('engineering') or {}).get('route_policy_digest')
+    new_route=(new.get('engineering') or {}).get('route_policy_digest')
     equivalent=copy.deepcopy(new)
     equivalent['repository']['worktree']=old_wt
     equivalent['repository']['head_sha']=old['repository']['head_sha']
+    equivalent.setdefault('engineering',{})['route_policy_digest']=old_route
     require(equivalent==old,'EXCHANGE_CONTEXT_REBIND_DRIFT')
+    if old_route!=new_route:
+        require(repository_root is not None and route_ref,'EXCHANGE_CONTEXT_REBIND_ROUTE_EVIDENCE_REQUIRED')
+        root=Path(repository_root).resolve()
+        def git(*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
+        def route_at(sha):return json.loads(git('show',sha+':'+route_ref))
+        old_r=route_at(old['repository']['head_sha']);new_r=route_at(new['repository']['head_sha'])
+        require(old_r.get('work_items')==new_r.get('work_items'),'EXCHANGE_CONTEXT_REBIND_WORK_ITEMS_CHANGED')
+        for key in ('workflow_mode','runtime_epoch','communication_issue','intent_ref','intent_body_sha256'):
+            require(old_r.get(key)==new_r.get(key),'EXCHANGE_CONTEXT_REBIND_POLICY_KEY_CHANGED')
+        for key,value in old_r.items():
+            if key=='work_items':continue
+            require(key in new_r and new_r[key]==value,'EXCHANGE_CONTEXT_REBIND_ROUTE_NOT_ADDITIVE')
     receipt={'request_digest':request['request_digest'],'marker':request['marker'],
              'old_context_digest':digest(old),'new_context_digest':digest(new),
              'reason':reason,'context_rebound':True,
              'old_worktree':old_wt,'new_worktree':new_wt,
+             'route_metadata_additive':old_route!=new_route,
              'single_writer':True,'authority_granted':False,'typed_ce_admitted':False}
     require(outbox.read(request)['request']==request,'EXCHANGE_REQUEST_DRIFT')
     with outbox._db() as db:
