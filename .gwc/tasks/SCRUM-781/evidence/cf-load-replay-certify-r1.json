@@ -1,0 +1,60 @@
+{
+ "CF_CERTIFY": {
+  "claim_boundary": "local suites only; no native gate receipt, no L3",
+  "result": "CF_CERTIFIED_LOCAL_SUITES_GREEN",
+  "suites": {
+   "q0": {
+    "exit_code": 0,
+    "summary": "78 passed in 7.62s"
+   }
+  }
+ },
+ "CF_LOAD": {
+  "claim_boundary": "local source/loaded identity only; not a native LOAD_PROOF",
+  "committed_module_sha256": "42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
+  "files": [
+   {
+    "disk_sha256": "42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
+    "head_sha256": "42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
+    "match": true,
+    "path": "tools/node_architect/stable_json.py"
+   },
+   {
+    "disk_sha256": "01033f88fef3e1182151385109eb88aa91a0725f7911df690e8ae8d1b5400c86",
+    "head_sha256": "01033f88fef3e1182151385109eb88aa91a0725f7911df690e8ae8d1b5400c86",
+    "match": true,
+    "path": "tools/node_architect/engineering_m1_m7_workflow.py"
+   },
+   {
+    "disk_sha256": "233b10bd78c958c11b61300feb0c37acb22219aeff99276766b4a277b9bef14f",
+    "head_sha256": "233b10bd78c958c11b61300feb0c37acb22219aeff99276766b4a277b9bef14f",
+    "match": true,
+    "path": "scripts/scrum781_engineering_loop.py"
+   }
+  ],
+  "head": "ecc8ccfe23dbf6b83d0da790f612b78d71399ae4",
+  "loaded_module": "/Users/mac/prj/DW-SuperApps/worktrees/gwc/SCRUM-781-q0-fresh-20261010-r1/tools/node_architect/stable_json.py",
+  "loaded_module_sha256": "42f968725ec014bc13a42b8c1e1c521b27ccf2116f296ac08eb670067f6c48ef",
+  "result": "CF_LOAD_LOCAL_IDENTITY_MATCH"
+ },
+ "CF_REPLAY": {
+  "control": {
+   "aborts": 79,
+   "ok": 71
+  },
+  "failure_reproduced_in_control": true,
+  "fixed": {
+   "aborts": 0,
+   "ok": 150
+  },
+  "fixed_arm_aborts": 0,
+  "iterations": 150,
+  "note": "the control arm is the pre-fix read path; a zero-abort control would mean the window was not exercised",
+  "result": "CF_REPLAY_ADVANCED"
+ },
+ "authority_granted": false,
+ "scenario": ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
+ "schema_id": "gwc.q0.cf.load-replay-certify/v1",
+ "source_head": "ecc8ccfe23dbf6b83d0da790f612b78d71399ae4",
+ "typed_ce_admitted": false
+}
