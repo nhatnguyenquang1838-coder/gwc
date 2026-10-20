@@ -221,6 +221,33 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             'trigger': 'NATIVE_OWNER_FIRING' if args.tick is not None else 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'}
 
 
+def _attach_stall(result: dict, args) -> dict:
+    """Classify repeated identical WAIT firings; never escalates by itself."""
+    from tools.node_architect.loop_stall_detector import detect_stall
+    verdict = (result.get("workflow") or {}).get("verdict") or {}
+    if verdict.get("status") != "WAIT":
+        result["stall"] = {"stalled": False, "stage": "NOT_APPLICABLE", "escalate": False}
+        return result
+    rows = []
+    checkpoint = result.get("workflow_checkpoint")
+    if checkpoint and Path(checkpoint).is_file():
+        try:
+            with sqlite3.connect(checkpoint) as db:
+                cur = db.execute(
+                    "SELECT firing, activity, reason_code, status, source_head "
+                    "FROM engineering_firing_telemetry WHERE run=? ORDER BY rowid DESC LIMIT 12",
+                    (result.get("run_id"),),
+                )
+                cols = ("firing", "activity", "reason_code", "status", "source_head")
+                rows = [dict(zip(cols, row)) for row in cur.fetchall()]
+        except sqlite3.Error:
+            rows = []
+    result["stall"] = detect_stall(rows)
+    if result["stall"].get("stalled"):
+        result["outcome"] = "ENGINEERING_STALL_ESCALATION_REQUIRED"
+    return result
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=('inspect','prepare','workflow'))
@@ -238,6 +265,7 @@ def main() -> int:
             import traceback; traceback.print_exc()
         print(json.dumps({'outcome':'BLOCKED','reason_code':str(exc),'native_state_modified':False}, indent=2))
         return 2
+    result = _attach_stall(result, args)
     print(json.dumps(result, indent=2))
     return 0 if result['outcome'] != 'BLOCKED' else 2
 
