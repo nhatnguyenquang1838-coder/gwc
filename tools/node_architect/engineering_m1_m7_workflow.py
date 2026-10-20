@@ -613,6 +613,45 @@ def reconcile_engineering_source_head(old_context,new_context,*,repository_root,
     return receipt
 
 
+def reconcile_engineering_conversation_binding(old_context,new_context,*,reason):
+    """Bind the SAME run to a new Controller conversation (session rotation).
+
+    Only ``controller.conversation_url`` may change. Everything else must stay
+    byte-identical, the new URL must be a ChatGPT conversation in the same GPT
+    project, and every invocation/work/outbox row is preserved. Rotation is a
+    transport relocation, never new authority.
+    """
+    import copy
+    from urllib.parse import urlsplit
+    old=validate_task_context(old_context);new=validate_task_context(new_context)
+    require(isinstance(reason,str) and bool(reason.strip()),'CONVERSATION_REBIND_REASON_REQUIRED')
+    old_url=str(old['controller'].get('conversation_url') or '')
+    new_url=str(new['controller'].get('conversation_url') or '')
+    require(old_url!=new_url,'CONVERSATION_REBIND_UNCHANGED_URL')
+    equivalent=copy.deepcopy(new)
+    equivalent['controller']['conversation_url']=old_url
+    require(equivalent==old,'CONVERSATION_REBIND_CONTEXT_DRIFT')
+    old_parts=urlsplit(old_url);new_parts=urlsplit(new_url)
+    require(new_parts.scheme=='https' and new_parts.hostname=='chatgpt.com','CONVERSATION_REBIND_URL_INVALID')
+    require(new_parts.path.startswith(old_parts.path.split('/c/')[0]),'CONVERSATION_REBIND_PROJECT_MISMATCH')
+    require('/c/' in new_parts.path and new_parts.path!=old_parts.path,'CONVERSATION_REBIND_URL_INVALID')
+    with _connect(old['workflow']['checkpoint_ref']) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+        if row is None:raise ValueError('CONVERSATION_REBIND_PRIOR_CONTEXT_MISMATCH')
+        require(row[0]==digest(old),'CONVERSATION_REBIND_PRIOR_CONTEXT_MISMATCH')
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+        receipt={'kind':'CONTROLLER_SESSION_ROTATED','old_context_digest':digest(old),
+                 'new_context_digest':digest(new),'old_conversation_url':old_url,'new_conversation_url':new_url,
+                 'reason':reason}
+        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt),row[1]))
+        db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',(digest(new),old['run']['id'],digest(old)))
+        db.commit()
+    with _connect(old['workflow']['checkpoint_ref']) as reader:
+        require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),'CONVERSATION_REBIND_DURABLE_READBACK_FAILED')
+    return receipt
+
+
 def reconcile_engineering_route_metadata(old_context,new_context,*,repository_root,reason,route_ref):
     """Explicit additive route-metadata continuation (e.g. human-approved G1 successor).
 

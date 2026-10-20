@@ -128,6 +128,30 @@ def select_workflow_checkpoint(root,run_id):
     return candidates[0] if candidates else root/'run-checkpoint'/'checkpoint.sqlite'
 
 
+DEFAULT_CONTROLLER_URL = ("https://chatgpt.com/g/g-p-6a622940beac81918180ce69e50ef83c-dw-super"
+                        "/c/6ad380a6-c280-83ec-bb3f-75cef495e848")
+
+
+def _resolve_controller_url(session):
+    """Prefer the loop's bound Controller URL over a compiled-in default.
+
+    The Controller conversation can be rotated when a chat reaches its length
+    limit; a hardcoded literal would then rebuild a stale TaskContext and every
+    firing would fail ENGINEERING_CHECKPOINT_CONTEXT_DRIFT.
+    """
+    import os,sqlite3,re
+    home=Path(os.environ.get('HERMES_HOME') or Path.home()/'.hermes')
+    try:
+        db=sqlite3.connect('file:'+str(home/'state.db')+'?mode=ro',uri=True)
+        row=db.execute('SELECT value FROM state_meta WHERE key=?',('loop:'+session,)).fetchone()
+        if row:
+            match=re.search(r'bound GPT URL:\s*(\S+)',json.loads(row[0]).get('prompt',''))
+            if match:return match.group(1)
+    except Exception:
+        pass
+    return DEFAULT_CONTROLLER_URL
+
+
 def configure_engineering_context(context):
     """Q0 adapter policy is task-specific; the engineering graph is generic."""
     from tools.node_architect.task_context_binding import digest as context_digest
@@ -203,8 +227,10 @@ def main() -> int:
     parser.add_argument('--session', default=os.environ.get('HERMES_SESSION_ID'))
     parser.add_argument('--tick', type=int, help='inspect only: actual owner firing counter; never creates a firing')
     parser.add_argument('--workflow-mode',choices=('Q0_ENGINEERING_COORDINATION','PROTECTED_TYPED_CE'),default='Q0_ENGINEERING_COORDINATION')
-    parser.add_argument('--controller-url', default='https://chatgpt.com/g/g-p-6a622940beac81918180ce69e50ef83c-dw-super/c/6ad380a6-c280-83ec-bb3f-75cef495e848')
+    parser.add_argument('--controller-url', default=None)
     args = parser.parse_args()
+    if getattr(args, 'controller_url', None) in (None, ''):
+        args.controller_url = _resolve_controller_url(args.session)
     try:
         result = workflow(args) if args.command == 'workflow' or (args.command == 'inspect' and args.tick is not None) else inspect(args)
     except (ValueError, OSError, sqlite3.Error, KeyError, subprocess.CalledProcessError, json.JSONDecodeError) as exc:

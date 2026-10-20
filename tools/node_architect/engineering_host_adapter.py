@@ -25,6 +25,12 @@ def select_human_communication(comments,context):
             match=re.search(r'^'+key+r':\s*(.+)$',header,re.M)
             fields[key]=match.group(1).strip() if match else ''
         require(fields['seq'].isdigit(),'HUMAN_COMMUNICATION_SEQ_INVALID')
+        # A correction that targets a comment in this issue inherits the
+        # source_ref it corrects; requiring the field verbatim would reject a
+        # valid correction whose reply_to already binds it to this issue.
+        if fields['kind']=='CORRECTION' and not fields['source_ref'] and fields['reply_to'].startswith(
+                'https://github.com/'+issue_ref.removeprefix('github://')+'#issuecomment-'):
+            fields['source_ref']=issue_ref
         selected.append({**fields,'seq':int(fields['seq']),'run_id':run,'issue_ref':issue_ref,
                          'comment_id':comment['id'],'comment_url':comment['html_url'],'author':comment['user']['login'],
                          'body_sha256':hashlib.sha256(body.encode()).hexdigest(),'body':body,
