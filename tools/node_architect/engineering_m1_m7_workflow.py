@@ -609,7 +609,12 @@ def reconcile_engineering_worktree_relocation(old_context,new_context,*,reason):
             # identity before accepting the move.
             def origin(root):
                 url=git(root,'remote','get-url','origin')
-                return str(Path(url).resolve()) if url.startswith('/') else url
+                if url.startswith('/'):
+                    return str(Path(url).resolve())
+                # Normalize https/ssh/scp-style URLs to owner/repo.
+                tail=url.split('://',1)[-1].replace(':','/',1) if '://' in url else url.replace(':','/',1)
+                parts=[part for part in tail.strip('/').split('/') if part]
+                return '/'.join(parts[-2:]).removesuffix('.git')
             require(origin(old_wt)==origin(new_wt),'WORKTREE_RELOCATION_REPOSITORY_MISMATCH')
     with _connect(old['workflow']['checkpoint_ref']) as db:
         db.execute('BEGIN IMMEDIATE')
