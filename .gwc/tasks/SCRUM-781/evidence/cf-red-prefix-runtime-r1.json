@@ -1,0 +1,57 @@
+{
+ "claim_boundary": "local engineering evidence only; no native LOAD_PROOF, L3 or gate receipt",
+ "defect": "P1 host read of a JSON file inside its truncate-then-write window",
+ "fix": {
+  "commit": "20239524ea0ad2023d9580f692e11d5bd5badecb",
+  "module": "tools/node_architect/stable_json.py"
+ },
+ "is_genuine_red": true,
+ "observed_note": "the tick 175/176/177 BLOCKED outputs were overwritten by later successful runs of the same checkpoint files, so they are not claimed as preserved evidence; the reproduction below is the preserved RED",
+ "observed_runtime_failures": [
+  {
+   "artifact": "/Users/mac/.hermes/loop-checkpoints/scrum781-q0-fresh-20261010-r1/native175-cli-actual.json",
+   "native_state_modified": false,
+   "outcome": "ENGINEERING_PREFLIGHT_PASS",
+   "present": true,
+   "reason_code": "ENGINEERING_ONLY_NO_CE_ADMISSION",
+   "sha256": "sha256:ac24ceab97d58722770f6a2c1a42f01984db8d7cd47b10184dcbecd6763c717a"
+  },
+  {
+   "artifact": "/Users/mac/.hermes/loop-checkpoints/scrum781-q0-fresh-20261010-r1/native176-cli-actual.json",
+   "native_state_modified": false,
+   "outcome": "ENGINEERING_PREFLIGHT_PASS",
+   "present": true,
+   "reason_code": "ENGINEERING_ONLY_NO_CE_ADMISSION",
+   "sha256": "sha256:ca26f8e3e9243fb3dff791ab8d3d9fed482257533e04221150fcddfe1eca07d2"
+  },
+  {
+   "artifact": "/Users/mac/.hermes/loop-checkpoints/scrum781-q0-fresh-20261010-r1/native177-cli-actual.json",
+   "native_state_modified": false,
+   "outcome": "ENGINEERING_PREFLIGHT_PASS",
+   "present": true,
+   "reason_code": "ENGINEERING_ONLY_NO_CE_ADMISSION",
+   "sha256": "sha256:3b8d75fd5126559f5e5f64b98d531404e573cb3e3ba8f700b2c30343dbf98177"
+  }
+ ],
+ "scenario": ".gwc/tasks/SCRUM-781/evidence/cf-scenario-stable-json-r1.json",
+ "schema_id": "gwc.q0.cf.red/v1",
+ "source_exact_reproduction": {
+  "error_boundary": "json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+  "executed_statement": "route=json.loads((root/ROUTE_REF).read_text())",
+  "exit_code": 3,
+  "failed": true,
+  "input": {
+   "content": "",
+   "file": "core/node-architect/q0-engineering-coordination-route-r1.json",
+   "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "pre_fix_commit": "91ca8e92543cd021ade0a867a2dc290d0e79332b",
+  "pre_fix_file_sha256": "sha256:9430df9051295c97317a0fd63740cc4ae388ced873e4193f55213421ce04b2d7",
+  "stderr_tail": [
+   "               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+   "  File \"/Users/mac/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/decoder.py\", line 355, in raw_decode",
+   "    raise JSONDecodeError(\"Expecting value\", s, err.value) from None",
+   "json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
+  ]
+ }
+}

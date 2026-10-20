@@ -1,0 +1,177 @@
+{
+  "format_id": "local-only.q0-regression-test-evidence/v1",
+  "format_version": 1,
+  "artifact_type": "q0-regression-test-evidence",
+  "classification": "TEST_AND_LOCAL_RUNTIME_MECHANICS_ONLY",
+  "notice": "This is a sanitized engineering-evidence artifact, not the canonical q0-verification-receipt schema, not a native GWC gate receipt, and not LOAD_PROOF.",
+  "controller_command": {
+    "seq": 23,
+    "url": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6176417690",
+    "sha256": "68d509f1614172a1178ce3fc7c1efa11988150e1e1e7f4449539a035f51bb403"
+  },
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "task_id": "SCRUM-781",
+  "materialized_evidence_path": ".gwc/tasks/SCRUM-781/evidence/q0-langgraph-sqlite-resume-evidence-v1.json",
+  "current_gate": "UR.G2",
+  "gate_advanced": false,
+  "certification_claimed": false,
+  "artifact_grants_authority": false,
+  "runtime_production_effects": [],
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "parent_sha": "b7751fd64a2f207c397cd7058ad8ae3facbc39f7",
+    "protected_main_sha_observed": "d665a5d127e48beffcbcc0347dc731d4a9c0679c",
+    "runtime_plan_path": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "runtime_plan_sha256_hex": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "base_drift_disposition": "INFORMATIONAL_ONLY; Q0 remained bound to its branch; no rebase or RuntimePlan rewrite"
+  },
+  "implementation": {
+    "commit_url": "https://github.com/nhatnguyenquang1838-coder/gwc/commit/22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "remote_head_readback": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "implementation_tree_clean_before_evidence_write": true,
+    "changed_paths": [
+      {
+        "path": "scripts/scrum781_q0_fixture_replay.py",
+        "github_blob_sha": "55690331a68ecedd424f6808326d2747081f7967",
+        "sha256": "b54241e47a43c752dd8b7cd0a4b750addca3c9044cf362c87dff3724b40dcd28"
+      },
+      {
+        "path": "tests/q0_langgraph_checkpoint_resume_worker.py",
+        "github_blob_sha": "a4765bb63b04a569d8a27c21075ebbbb9ec6e227",
+        "sha256": "f4f0edc65715b85c968c48e7d641737edcb5ac67f306eceebc979329067e5fa5"
+      },
+      {
+        "path": "tests/test_scrum781_q0_langgraph_checkpoint_resume.py",
+        "github_blob_sha": "7aa7e5bedccfe6ed71d63d78be91cccd0fbedde3",
+        "sha256": "ba4f91a9489807fe212570f983da61e5932ac8d3b97eeea31df4830fd7e9dc42"
+      }
+    ],
+    "dependency_manifests_changed": false,
+    "global_host_configuration_changed": false
+  },
+  "fixture_binding": {
+    "path": ".gwc/tasks/SCRUM-781/fixtures/q0-c91-e52-reconstructed-v1.json",
+    "fixture_id": "SCRUM-781-Q0-C91-E52-RECONSTRUCTED-V1",
+    "fixture_digest": "sha256:6cb31b328edc2a567eef6acf20b17eb0b217ae41372f3e69519884a83b02fe13",
+    "runtimeplan_sha256_hex": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "provenance_class": "RECONSTRUCTED_SOURCE_BOUND",
+    "original_trace_status": "MISSING"
+  },
+  "test_runs": [
+    {
+      "environment": {
+        "python": "3.14.7",
+        "pytest": "9.1.1",
+        "langgraph": "1.2.15",
+        "langgraph_checkpoint_sqlite": "3.1.2",
+        "scope": "isolated environment under $HERMES_HOME/cache/scratch; optional packages not installed globally or added to the repository"
+      },
+      "command": "python -m pytest -q tests/test_scrum781_q0_langgraph_checkpoint_resume.py tests/test_scrum781_q0_fixture_replay.py tests/test_scrum781_q0_source_reconcile.py",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "exit_code": 0,
+      "result": "22 passed in 66.48s",
+      "stdout_sha256": "4c8d5df0c32d5f9aced456d69885f8cbeeef98980a70ea9a632bc24b35e639e3",
+      "stdout_log_ref": "$HERMES_HOME/cache/scratch/scrum781-q0-langgraph-ptv_2_w2/head-22ef367-sqlite-suite.stdout.log",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "environment": {
+        "python": "3.9.6",
+        "pytest": "8.4.2",
+        "langgraph_available": false
+      },
+      "command": "/usr/bin/python3 -m pytest -q tests/test_scrum781_q0_langgraph_checkpoint_resume.py tests/test_scrum781_q0_fixture_replay.py tests/test_scrum781_q0_source_reconcile.py",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "exit_code": 0,
+      "result": "19 passed, 3 skipped in 3.98s",
+      "skip_classification": "OPTIONAL_LANGGRAPH_BACKEND_UNAVAILABLE; module probe returned langgraph=None; test code uses pytest.importorskip",
+      "stdout_sha256": "26a22e7a16d83ae6f6f1cc9cac7cb0fe4fab8fd29ee974679cc28889a5a7da76"
+    }
+  ],
+  "ci_evidence": {
+    "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "github_actions_query": "GET repos/nhatnguyenquang1838-coder/gwc/actions/runs?head_sha=22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "workflow_run_count": 0,
+    "status": "NO_GITHUB_ACTIONS_RUN_FOUND_FOR_CANDIDATE_SHA"
+  },
+  "native_replay_cli": {
+    "command": "/usr/bin/python3 -m scripts.scrum781_q0_fixture_replay --engine native",
+    "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "exit_code": 0,
+    "result": "RECONSTRUCTED_SUBCASE_PASS",
+    "observed_outcome": "UNIVERSAL_CONTINUES",
+    "fixture_digest": "sha256:6cb31b328edc2a567eef6acf20b17eb0b217ae41372f3e69519884a83b02fe13",
+    "incident_provenance": "RECONSTRUCTED_SOURCE_BOUND",
+    "authentic_dwo_login_replay": false,
+    "q0_l3_qualified": false,
+    "native_gate_receipt": null,
+    "stdout_sha256": "4d09f05d4a0c020aa9dc7200bfaa2340502254d5ee5e38b24776c0d5f421126b",
+    "stdout_log_ref": "$HERMES_HOME/cache/scratch/scrum781-q0-langgraph-ptv_2_w2/head-22ef367-native-replay.stdout.log"
+  },
+  "checkpoint_resume_evidence": {
+    "method": "file-backed SQLite SqliteSaver; fresh worker process for each phase; same thread_id",
+    "checkpoint_namespace": "root namespace; checkpoint_ns is the empty string",
+    "thread_id": "scrum781-q0-fresh-20261010-r1:sqlite-resume:6cb31b328edc2a56",
+    "observed_local_path_ref": "$HERMES_HOME/cache/scratch/scrum781-q0-langgraph-ptv_2_w2/tmp/pytest-of-<local-user>/pytest-5/test_sqlite_resume_reinitializ0/q0-langgraph-checkpoints.sqlite",
+    "path_redacted_for_host_privacy": true,
+    "checkpoint_database_committed": false,
+    "checkpoint_database_bytes": 28672,
+    "checkpoint_database_sha256": "0fc1877e45a01d0a824082b513907bad57ebd377ce0f999c45d78984d633fd94",
+    "checkpoint_database_observed": {
+      "checkpoints_rows": 5,
+      "writes_rows": 6,
+      "thread_ids": ["scrum781-q0-fresh-20261010-r1:sqlite-resume:6cb31b328edc2a56"],
+      "checkpoint_namespaces": [""]
+    },
+    "invocation_ledger_local_path_ref": "$HERMES_HOME/cache/scratch/scrum781-q0-langgraph-ptv_2_w2/tmp/pytest-of-<local-user>/pytest-5/test_sqlite_resume_reinitializ0/q0-replay-invocation-ledger.sqlite",
+    "invocation_ledger_path_redacted_for_host_privacy": true,
+    "invocation_ledger_committed": false,
+    "invocation_ledger_bytes": 12288,
+    "invocation_ledger_sha256": "abbcf0043f4504b9a6b3826d77e9f04b7e64668924948872f7898a73bebd89a3",
+    "invocation_count": 1,
+    "per_phase_records": [
+      {
+        "phase": "pause",
+        "status": "CHECKPOINT_PAUSED_BEFORE_REPLAY",
+        "validated": true,
+        "pending_next": ["replay"],
+        "adapter_call_count": 0
+      },
+      {
+        "phase": "resume",
+        "status": "PERSISTED_CHECKPOINT_RESUMED",
+        "fresh_python_process": true,
+        "same_thread_id": true,
+        "verified": true,
+        "semantic_state_equals_native": true,
+        "adapter_call_count": 1,
+        "authority_granted_value": null,
+        "authority_granted_claimed": false,
+        "executed_effects_value": null,
+        "executed_effects_claimed": false
+      },
+      {
+        "phase": "terminal-noop",
+        "status": "TERMINAL_CHECKPOINT_NOOP",
+        "fresh_python_process": true,
+        "next": [],
+        "adapter_call_count": 1
+      }
+    ],
+    "per_phase_basis": "Asserted by the versioned regression test/worker; read-only database extraction confirmed 5 checkpoint rows, 6 write rows, one root thread, and invocation ledger calls=1. `pytest -q` captured worker JSON, so the durable test summary is this sanitized projection rather than raw stdout."
+  },
+  "limits": {
+    "not_a_q0_verification_receipt": true,
+    "not_load_proof": true,
+    "not_authentic_dwo_replay": true,
+    "not_exactly_once_protected_effect_proof_across_arbitrary_crash_points": true,
+    "not_g5_or_l3_certification": true,
+    "not_native_gwc_authority": true,
+    "no_gate_transition": true,
+    "original_dwo_trace_missing": true,
+    "sqlite_is_ephemeral_test_storage_only": true
+  },
+  "next_same_run_action": "Bounded DWO-LOGIN-AUTH-R1 producer/consumer provenance recovery from SCRUM-780, GWC PR #574, and DW-SuperApps #126 as historical leads; classify any recovered candidate honestly as authentic only with independently verified trace/digest, otherwise RECONSTRUCTED."
+}

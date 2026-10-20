@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "evidence_class": "Q0_BRANCH_CLI_OWNER_GUARD_REPAIR_NOT_NATIVE_GATE_RECEIPT",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "session_id": "20261014_021304_0dc728",
+  "tick": 91,
+  "parent_head": "efb63dbd6b7b846a580cc771cd13784867352c81",
+  "authority_source": "AGENTS.md UNIVERSAL_V2_DEVELOPMENT + source-bound Q0 plan: tools/node_architect/**, tests/**, .gwc/tasks/SCRUM-781/**; branch-local remediation/commit/push only.",
+  "finding_correction": {
+    "prior_evidence": ".gwc/tasks/SCRUM-781/engineering/tick90-fixture-migration.json#new_open_finding",
+    "prior_id": "Q0_NATIVE_CLI_G0_EVIDENCE_INGESTION_GAP",
+    "disposition": "NARROWED_NOT_CANONICAL_G0_BOOT_DIAGNOSIS",
+    "reason": "Tick90 exercised explicitly synthetic EXECUTOR-owned G0 state. Actual source boot/G0 producer assigns G0 and G1 to CONTROLLER. Therefore forwarding understanding evidence into the Executor CLI is not the source-derived canonical repair."
+  },
+  "source_contract": [
+    {
+      "ref": "scripts/scrum781_fresh_ur_g0_boot.py:135-151",
+      "fact": "Fresh boot sets next_owner CONTROLLER, typed_next Q0_UNDERSTAND and checks the Controller-local assignment."
+    },
+    {
+      "ref": "scripts/scrum781_fresh_g0_to_g1.py:71-89",
+      "fact": "Producer validates source/boot/run/gate/Controller assignment before producing understanding."
+    },
+    {
+      "ref": "scripts/scrum781_fresh_g0_to_g1.py:92-145",
+      "fact": "Producer seals source-bound understanding receipt and uses complete_q0_gate plus advance_qualification_gate."
+    },
+    {
+      "ref": "scripts/scrum781_fresh_g0_to_g1.py:147-169",
+      "fact": "Successor G1 remains Controller-owned; script is fresh-run-only, not an authorized current-run replay."
+    },
+    {
+      "ref": "tools/node_architect/universal_run_controller.py:226-304",
+      "fact": "Native assignment uses RunState owner and emits distinct Controller-local versus Executor assignment schemas."
+    }
+  ],
+  "bounded_repair": "CLI resolves validated native assignment ownership before loading provider; Controller action returns BLOCKED/CONTROLLER_LOCAL_ACTION_REQUIRED with the source-generated local action, no Executor dispatch or state advance. Explicit M1-M7 workflow_selection path remains separate and unchanged.",
+  "red": {
+    "result": "4 failed",
+    "reason": "No-factory Controller cases incorrectly reported missing provider; factory-supplied cases invoked a forbidden provider loader."
+  },
+  "green": {
+    "new_controller_cases": 4,
+    "coverage": [
+      "G0 and G1, factory absent/present",
+      "Zero provider factory and Executor calls",
+      "No manifest mutation or evidence-root writes",
+      "No executor receipt or Controller decision",
+      "Preserves gate/action/owner/typed_next with effect authority NONE and false/empty effects"
+    ]
+  },
+  "regression": {
+    "related_result": "67 passed, 1 pre-existing legacy fixture failed",
+    "executable_suite_result": "3722 passed, 20 failed, 7 skipped, 576 subtests passed",
+    "new_failure_ids": [],
+    "full_repo_pass_claimed": false,
+    "excluded_unchanged_markdown_document": "tests/test_g2-execution-library.py"
+  },
+  "fresh_process_synthetic_probe": {
+    "fresh_process_exit": 1,
+    "fresh_process_result": {
+      "authority_granted": false,
+      "controller_action": {
+        "action": "q0_understand",
+        "actor": "CONTROLLER",
+        "assignment_digest": "sha256:19d54736516bbe9739577633dd596366fddeebdb4bbc642e11c17ff7db5742f4",
+        "authority_granted": false,
+        "effect_authority": "NONE",
+        "evidence_requirements": [
+          "UNDERSTANDING_RECEIPT"
+        ],
+        "executed_effects": [],
+        "gate": "UR.G0",
+        "idempotency_key": "sha256:4271fbd7721dd8d0f96b6eb41217d8a5732cf4cc1c129373f94f0d9fa026082d",
+        "next_owner": "CONTROLLER",
+        "node_allocation_digest": "fe1eeafce2df6dca4c7228f9586066cc0572fad9bbfc303c89d9cd3769fbd495",
+        "node_allocation_id": "test-only-q0-native-host-g0:q0.qualification-campaign:r1",
+        "node_id": "q0.qualification-campaign",
+        "run_id": "test-only-q0-native-host-g0",
+        "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+        "runtime_plan_digest": "sha256:329a292cbaa309ba0e1afb0314542065403db7a7d631171ed1a63d7808e94572",
+        "runtime_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+        "runtime_protocol": "gwc.universal.controller/v2",
+        "schema_id": "gwc.universal-run.controller-local-action.v2",
+        "schema_version": 2,
+        "scope": {
+          "base_sha": "cccccccccccccccccccccccccccccccccccccccc",
+          "branch": "fix/SCRUM-781-q0-unit-fixture",
+          "head_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "repository": "nhatnguyenquang1838-coder/gwc",
+          "scope_hash": "sha256:4271fbd7721dd8d0f96b6eb41217d8a5732cf4cc1c129373f94f0d9fa026082d"
+        },
+        "sequence": 1,
+        "target": {
+          "identity": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "kind": "candidate-branch"
+        },
+        "typed_next": "Q0_UNDERSTAND"
+      },
+      "executed_effects": [],
+      "legacy_fallback": false,
+      "message": "Native assignment is Controller-owned; no provider or Executor dispatch performed.",
+      "reason_code": "CONTROLLER_LOCAL_ACTION_REQUIRED",
+      "runtime_family": "UNIVERSAL_V2",
+      "runtime_profile_digest": "sha256:c724c6b036a9c0cfae5a5738554d6ee1fc075fa81b6b09e132761cc18df33881",
+      "runtime_protocol": "gwc.universal.controller/v2",
+      "status": "BLOCKED"
+    },
+    "exact_output_readback": true,
+    "provider_missing_but_not_loaded": true,
+    "no_receipts_written": true,
+    "synthetic_only_not_live_admission": true
+  },
+  "implementation_paths": [
+    "tools/node_architect/agent_runtime_cli.py",
+    "tests/test_scrum781_q0_native_host.py"
+  ],
+  "source_sha256": {
+    "AGENTS.md": "d1c1a099000963478e60f9fba135103a190a2c8c1b92d30bae51774789905433",
+    "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "scripts/scrum781_fresh_ur_g0_boot.py": "9a696c3efaa9e7f71fea7a4f00e3ff0df9cb1745d1fe76e1929a850237b5977f",
+    "scripts/scrum781_fresh_g0_to_g1.py": "89539df3d0b67746f6e4c239c3ca2a0f7c60b2e4a82d1a5d7409edd400ce5e6a",
+    "tools/node_architect/universal_run_controller.py": "952b5c5ea894d7c37d6b6994b70401d5881b3e7dcc7992b7b00434e75a94703d",
+    "tools/node_architect/agent_runtime_cli.py": "a853475341635480a15a49a9e8dc1c1dde743d17b64895079ff8836ced8f02c6",
+    "tests/test_scrum781_q0_native_host.py": "24f4bd0023d9c72f3808f6e6f2269fb6f89a55fddcebe2b0f1bc279b2317f27b"
+  },
+  "local_evidence_sha256": {
+    "red.xml": "b9eb699277fd6229c76b835bbf357bdf68b9fac28d3843db381146cd402c4c9d",
+    "green.xml": "aa0cd3dffe6a53f242b5ead28cdcdc5531174225f7815ceb8fd2bea3c877b550",
+    "wide.xml": "3378adb833bbd044571427f2de74b563d09b746ae39530672be432a59cc6bcf8"
+  },
+  "live_ce_polled_or_dispatched": false,
+  "boot_or_transition_script_executed": false,
+  "live_native_state_changed": false,
+  "new_issuer_or_lease_created": false,
+  "LOAD_PROOF_original_replay_L3_or_native_gate_receipts_claimed": false,
+  "six_foreign_files_preserved": true,
+  "remaining_boundary": "Controller-local G0/G1 execution is intentionally not performed by this CLI guard; no current-run gate transition or Q0 qualification proven. Twenty baseline failures remain.",
+  "next_owner": "DWA",
+  "next_action": "Continue same-run source/reload/replay provenance investigation under the current Q0 plan; never invoke fresh boot/transition producers on this continuing run or wire arbitrary truthy manifest evidence.",
+  "native_settlement": "PENDING_NORMAL_NATIVE_POST_TURN_NO_MANUAL_SETTLEMENT"
+}

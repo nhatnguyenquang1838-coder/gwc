@@ -113,8 +113,8 @@ class PlanRevision:
         """Emit the run-manifest-revision schema shape."""
         return {
             "record_id": _sha256_digest("manifest", self.run_id, self.revision),
-            "schema_id": "gwc.universal-run.run-manifest-revision",
-            "schema_version": 1,
+            "schema_id": "gwc.universal-run.run-manifest-revision.v2",
+            "schema_version": 2,
             "run_id": self.run_id,
             "created_at": "2026-01-01T00:00:00Z",
             "created_by": {"profile": "dwa-hermes"},

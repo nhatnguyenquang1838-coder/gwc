@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://gwc.dev/schemas/node-architect/universal-run/node-allocation.schema.json",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/node-allocation.schema.json",
   "title": "Universal Run NodeAllocation",
   "type": "object",
   "additionalProperties": false,
@@ -24,8 +24,8 @@
   ],
   "properties": {
     "record_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
-    "schema_id": {"const": "gwc.universal-run.node-allocation"},
-    "schema_version": {"const": 1},
+    "schema_id": {"const": "gwc.universal-run.node-allocation.v2"},
+    "schema_version": {"const": 2},
     "run_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
     "created_at": {"type": "string", "minLength": 1},
     "created_by": {"type": "object"},
@@ -34,8 +34,8 @@
       "required": ["id", "version"],
       "additionalProperties": false,
       "properties": {
-        "id": {"const": "gwc.universal-run"},
-        "version": {"const": 1}
+        "id": {"const": "gwc.universal-run.v2"},
+        "version": {"const": 2}
       }
     },
     "provenance": {

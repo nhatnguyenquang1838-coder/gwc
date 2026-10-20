@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://gwc.dev/schemas/node-architect/universal-run/record-envelope.schema.json",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/record-envelope.schema.json",
   "title": "Universal Run immutable logical record envelope",
   "type": "object",
   "required": ["record_id", "schema_id", "schema_version", "run_id", "created_at", "created_by", "provenance", "content_digest"],
@@ -16,8 +16,8 @@
       "required": ["id", "version"],
       "additionalProperties": false,
       "properties": {
-        "id": {"const": "gwc.universal-run"},
-        "version": {"const": 1}
+        "id": {"const": "gwc.universal-run.v2"},
+        "version": {"const": 2}
       }
     },
     "provenance": {

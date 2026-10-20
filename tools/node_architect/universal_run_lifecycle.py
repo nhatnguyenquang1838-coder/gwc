@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R2: Universal Run G0-G6 lifecycle state machine facade.
+"""R2: Universal Run UR.G0-UR.G6 lifecycle state machine facade.
 
 C1 (contract identity/version, fixed seven-position lifecycle, illegal-transition
 rejection): a deterministic edge matrix over every (gate, state) cell with typed
@@ -53,7 +53,7 @@ EDGE_MATRIX: dict[tuple[str, str], frozenset[str]] = {}
 for gate in GATES:
     for state in GATE_STATES:
         legal: set[str] = set(_ALWAYS_LEGAL)
-        if state == "PASSED" and gate != "G6":
+        if state == "PASSED" and gate != GATES[-1]:
             legal.add("ADVANCE")
         if state == "ACTIVE":
             legal.add("WAIT")
@@ -67,7 +67,7 @@ for gate in GATES:
             legal.add("RETRY")
             legal.add("RERUN")
             legal.add("REPAIR")
-        if gate != "G0":
+        if gate != GATES[0]:
             legal.add("REPLAN")
         EDGE_MATRIX[(gate, state)] = frozenset(legal)
 
@@ -89,11 +89,11 @@ def _build_noop_reason_map() -> None:
         legal = EDGE_MATRIX[(gate, state)]
         for action in ACTIONS:
             if action not in legal:
-                if action == "ADVANCE" and gate == "G6":
+                if action == "ADVANCE" and gate == GATES[-1]:
                     _NOOP_REASON_BY_CASE[(gate, state, action)] = "NOOP_NO_FORWARD_GATE"
                 elif action == "ADVANCE" and state == "NOT_STARTED":
                     _NOOP_REASON_BY_CASE[(gate, state, action)] = "NOOP_NOT_STARTED"
-                elif action == "COMPLETE" and gate == "G4" and state == "ACTIVE":
+                elif action == "COMPLETE" and gate == GATES[4] and state == "ACTIVE":
                     _NOOP_REASON_BY_CASE[(gate, state, action)] = "NOOP_G4_OUTCOME_REQUIRED"
                 else:
                     _NOOP_REASON_BY_CASE[(gate, state, action)] = "NOOP_EDGE_UNDECLARED"
@@ -226,7 +226,7 @@ def evaluate_transition(
     if action == "ADVANCE" and target_gate is None:
         idx = GATES.index(current_gate)
         if idx >= len(GATES) - 1:
-            raise LifecycleStateMachineError("LIFECYCLE_EDGE_UNDECLARED", "G6 has no forward gate")
+            raise LifecycleStateMachineError("LIFECYCLE_EDGE_UNDECLARED", f"{GATES[-1]} has no forward gate")
         target_gate = GATES[idx + 1]
 
     try:

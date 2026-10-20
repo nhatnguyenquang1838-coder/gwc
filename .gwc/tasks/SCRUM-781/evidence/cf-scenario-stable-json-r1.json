@@ -1,0 +1,46 @@
+{
+ "schema_id": "gwc.q0.cf.scenario/v1",
+ "id": "CF-SCENARIO-STABLE-JSON-READ",
+ "plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+ "defect": {
+  "class": "P1 host preflight read of a file inside its atomic rewrite window",
+  "symptom": "{\"outcome\":\"BLOCKED\",\"reason_code\":\"Expecting value: line 1 column 1 (char 0)\",\"native_state_modified\":false}",
+  "affected": "scripts/scrum781_engineering_loop.py (active_sessions.json, browser binding), tools/node_architect/engineering_m1_m7_workflow.py (route file)",
+  "observed_ticks": [
+   "175",
+   "176",
+   "177"
+  ],
+  "observed_artifacts": [
+   "~/.hermes/loop-checkpoints/scrum781-q0-fresh-20261010-r1/native175-cli-actual.json"
+  ]
+ },
+ "source_before": {
+  "commit": "1ee36eb0a5bbb67f2abc44dbb954b9ae3626d456",
+  "note": "treated with a local retry only in the CLI; the workflow route read was still a bare json.loads"
+ },
+ "source_after": {
+  "commit": "4a775eb1db21af6143dad7758608909f410cb651"
+ },
+ "red": {
+  "command": "env -u PYTHONPATH python -m pytest tests/test_stable_json.py -q",
+  "result": "4 failed, 1 passed (module absent \u2192 every read path aborts)",
+  "error_boundary": "json.JSONDecodeError raised by json.loads(path.read_text())",
+  "reproducible": "tools/node_architect/stable_json.py::read_json missing; naive read of an empty file raises"
+ },
+ "green": {
+  "command": "env -u PYTHONPATH python -m pytest tests/test_stable_json.py -q",
+  "result": "5 passed",
+  "suite": "env -u PYTHONPATH python -m pytest <Q0 suites> -q \u2192 78 passed"
+ },
+ "scope": {
+  "writes": [
+   "tools/node_architect/stable_json.py",
+   "tools/node_architect/engineering_m1_m7_workflow.py",
+   "scripts/scrum781_engineering_loop.py",
+   "tests/test_stable_json.py"
+  ],
+  "authority_granted": false,
+  "typed_ce_admitted": false
+ }
+}

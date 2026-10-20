@@ -1,0 +1,273 @@
+{
+  "format_id": "local-only.q0-qualification-coverage-audit/v1",
+  "format_version": 1,
+  "artifact_type": "q0-qualification-matrix-coverage-audit",
+  "notice": "Coverage audit only. This is NOT the campaign qualification matrix, a Q0 certification/verification receipt, LOAD_PROOF, or native GWC gate evidence; it grants no authority and advances no gate.",
+  "run_id": "scrum781-q0-fresh-20261010-r1",
+  "task_id": "SCRUM-781",
+  "current_gate": "UR.G2",
+  "gate_advanced": false,
+  "certification_claimed": false,
+  "authority_granted": false,
+  "source_binding": {
+    "repository": "nhatnguyenquang1838-coder/gwc",
+    "branch": "fix/SCRUM-781-q0-fresh-20261010-r1",
+    "branch_head_at_audit": "1a8d71d0544a4fc52e60d974e37c5bca4a5edbd0",
+    "tested_code_candidate": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+    "diff_candidate_to_audit_head": [
+      ".gwc/tasks/SCRUM-781/evidence/q0-langgraph-sqlite-resume-evidence-v1.json",
+      ".gwc/tasks/SCRUM-781/evidence/q0-dwo-source-provenance-scan-v1.json"
+    ],
+    "code_and_test_sources_unchanged_after_candidate": true,
+    "runtime_plan_path": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "runtime_plan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+    "qualification_profile_path": "core/node-architect/q0-live-qualification-profile.json",
+    "qualification_profile_file_sha256": "aaab03dc97119243e962c90c0f640031589b9024e0f468e35143ffbba972c1c3",
+    "qualification_profile_digest": "sha256:2a37d580c26305b74f742f45d25f4caeafae35da043a3b1307b2aedeac34932c",
+    "qualification_profile_schema_sha256": "14993c30846dccfc5a570c5fb14874e520d5bf3490806645801b4ecf4dc5ce6f",
+    "qualification_implementation_sha256": "101d508a3d4710e3544df1acb156dcd243f7204ef33dc912870fcd68d3eedea8",
+    "mandatory_entries_are_profile_bound": true
+  },
+  "test_evidence": [
+    {
+      "id": "q0-source-fixture-langgraph-exact-code-suite",
+      "branch_head_when_run": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "command": "python -m pytest -q tests/test_scrum781_q0_langgraph_checkpoint_resume.py tests/test_scrum781_q0_fixture_replay.py tests/test_scrum781_q0_source_reconcile.py",
+      "result": "22 passed in 66.48s",
+      "exit_code": 0,
+      "stdout_sha256": "4c8d5df0c32d5f9aced456d69885f8cbeeef98980a70ea9a632bc24b35e639e3",
+      "environment": "isolated Python 3.14.7 / pytest 9.1.1 / LangGraph 1.2.15 / langgraph-checkpoint-sqlite 3.1.2",
+      "evidence_artifact": ".gwc/tasks/SCRUM-781/evidence/q0-langgraph-sqlite-resume-evidence-v1.json",
+      "scope_limit": "Source-reconcile and replay tests use the explicitly RECONSTRUCTED C91/E52 fixture; the LangGraph SQLite test proves persisted checkpoint mechanics across fresh test processes only."
+    },
+    {
+      "id": "q0-execution-contract-and-qualification-unit-suite",
+      "branch_head_when_run": "d9ca6957ced604cd0fd3ef9ce79167cd78288004",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "command": "python -m pytest -q -p no:cacheprovider tests/test_scrum781_q0_execution_contract.py tests/test_q0_universal_qualification.py",
+      "result": "40 passed in 1.33s",
+      "exit_code": 0,
+      "stdout_sha256": "a486065f64c9ffe31323e4afca65103489cd2ecf4792d08cf29c5fe32e553ee6",
+      "environment": "isolated Python 3.14.7 / pytest 9.1.1 / jsonschema 4.26.0",
+      "environment_note": "jsonschema and its dependencies were installed only in the scratch Q0 environment after the first attempt exposed the missing test dependency; repository manifests and host/global Python were not changed.",
+      "scope_limit": "Qualification helpers use test-built receipts, synthetic references, and a test-built matrix whose entries are all set to PASS; those values are validator fixtures, not live Q0 evidence."
+    },
+    {
+      "id": "q0-live-fix-contract-tests",
+      "branch_head_when_run": "1a8d71d0544a4fc52e60d974e37c5bca4a5edbd0",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "command": "python -m pytest -q -p no:cacheprovider tests/test_q0_live_qualification_contract.py",
+      "result": "13 passed in 0.14s",
+      "exit_code": 0,
+      "stdout_sha256": "ace7b7a5b2947802fafef449277bed303506526554b03c80f2cb2f466cfb62f0",
+      "scope_limit": "Tests receipt/runbook contracts with synthetic data; no runtime was activated and no original incident was replayed."
+    },
+    {
+      "id": "universal-runtime-primitives-focused-suite",
+      "branch_head_when_run": "1a8d71d0544a4fc52e60d974e37c5bca4a5edbd0",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "files": [
+        "tests/test_universal_run_epoch_v2.py",
+        "tests/test_scrum781_q0_historical_replay.py",
+        "tests/test_universal_run_topology_v1.py",
+        "tests/test_universal_run_continuation_v2.py"
+      ],
+      "command": "python -m pytest -q -p no:cacheprovider tests/test_universal_run_epoch_v2.py tests/test_scrum781_q0_historical_replay.py tests/test_universal_run_topology_v1.py tests/test_universal_run_continuation_v2.py",
+      "result": "73 passed in 0.24s",
+      "exit_code": 0,
+      "stdout_sha256": "9254cd27b5faff14a44db0538c1011be74f1d20261a0c8cff52ecc03abfc3303",
+      "scope_limit": "Pure/unit topology, epoch, route, and continuation contracts; the historical C91/E52 scenario is reconstructed and is not DWO login evidence."
+    },
+    {
+      "id": "runtime-plan-structural-dag-harness",
+      "branch_head_when_run": "d9ca6957ced604cd0fd3ef9ce79167cd78288004",
+      "runtime_plan_sha256": "ac8e8b855d5564ec9e503f965cd73deb60b546caf70a7304c43140a315422500",
+      "result": "PASS_STRUCTURAL",
+      "metrics": {
+        "node_count": 13,
+        "atomic_leaf_count": 8,
+        "dependency_edge_count": 10,
+        "all_dependency_refs_resolved": true,
+        "dependency_dag_acyclic": true,
+        "work_packages": ["P1", "P2", "P3", "P4", "P5", "P6"]
+      },
+      "stdout_sha256": "ff0ec7b902983cc5173c5c49d2faa4b2828015f5e7507fd2103959cc6cbf158c",
+      "scope_limit": "Temporary source-bound structural verifier only; not a live G1 transition, approval, or qualification matrix result."
+    },
+    {
+      "id": "native-reconstructed-fixture-replay",
+      "candidate_sha": "22ef367d3fcf703e0fedf43a565de9928b4611d7",
+      "result": "RECONSTRUCTED_SUBCASE_PASS",
+      "fixture_id": "SCRUM-781-Q0-C91-E52-RECONSTRUCTED-V1",
+      "fixture_digest": "sha256:6cb31b328edc2a567eef6acf20b17eb0b217ae41372f3e69519884a83b02fe13",
+      "stdout_sha256": "4d09f05d4a0c020aa9dc7200bfaa2340502254d5ee5e38b24776c0d5f421126b",
+      "authentic_dwo_replay": false,
+      "scope_limit": "Reconstructed C91/E52 subcase only."
+    }
+  ],
+  "mandatory_entry_audit": [
+    {
+      "entry": "fresh_boot",
+      "code_level_status": "PASS_UNIT_ONLY",
+      "evidence": [
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_epoch_v2.py::test_fresh_boot_selects_universal_v2_development",
+        "universal-runtime-primitives-focused-suite: tests/test_scrum781_q0_historical_replay.py::test_scrum781_fresh_boot_is_universal_v2_not_legacy"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "No fresh clean Q0 runtime activation/boot was created or observed; unit resolver behavior does not establish live boot isolation."
+    },
+    {
+      "entry": "default_route",
+      "code_level_status": "PASS_UNIT_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_q0_mode_routes_without_legacy_g2_envelope_for_read_only_probe",
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_agent_host_compiles_q0_profile_node_without_legacy_registry_gate",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_epoch_v2.py::test_universal_epoch_allows_namespaced_universal_gate"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "No current-run runtime activation produced a live default-route readback."
+    },
+    {
+      "entry": "runtime_plan",
+      "code_level_status": "PASS_SOURCE_AND_STRUCTURE_ONLY",
+      "evidence": [
+        "q0-source-fixture-langgraph-exact-code-suite: tests/test_scrum781_q0_source_reconcile.py",
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_scrum781_q0_execution_contract.py::test_q0_execution_plan_stays_executable_and_scoped",
+        "runtime-plan-structural-dag-harness"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "RuntimePlan source hash/scope were checked, but no live runtime proved that it loaded this exact immutable plan digest."
+    },
+    {
+      "entry": "node_allocation",
+      "code_level_status": "PARTIAL_UNIT_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: Q0 execution-receipt validator binds expected node_id and requires a non-empty node_allocation_id",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_topology_v1.py::test_13_node_allocation_immutable_across_rerun",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_topology_v1.py::test_33_node_allocation_rejects_noncanonical_references",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_topology_v1.py::test_34_node_allocation_schema_rejects_noncanonical_references"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "No exact current-run NodeAllocation identity/membership was read back from a live allocation; unit tests use synthetic records."
+    },
+    {
+      "entry": "node_architect_seam",
+      "code_level_status": "PASS_UNIT_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_agent_host_compiles_q0_profile_node_without_legacy_registry_gate"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "Host registry binding compiles in a unit test; no current-run Universal Run was observed traversing the live Node Architect seam."
+    },
+    {
+      "entry": "effect_authority",
+      "code_level_status": "PASS_UNIT_FAIL_CLOSED_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_q0_branch_effect_requires_separate_exact_authority",
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_ur_g2_completion_requires_execution_receipt_with_bound_digest",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_epoch_v2.py::test_effect_hold_does_not_stop_control_loop"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "Negative/synthetic authority checks pass; no live effect-time decision was exercised, and no authority was granted."
+    },
+    {
+      "entry": "exact_readback",
+      "code_level_status": "PASS_UNIT_MATERIALIZER_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_ur_g3_verification_receipt_is_schema_sealed_and_exactly_bound",
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_q0_verification_receipt_materializer_is_exact_and_idempotent",
+        "q0-live-fix-contract-tests: tests/test_q0_live_qualification_contract.py::test_runtime_fixed_requires_broader_regression_and_final_readback"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "Exact temp-file receipt readback is a unit/materializer test; no current live runtime target readback was performed."
+    },
+    {
+      "entry": "typed_continuation",
+      "code_level_status": "PASS_UNIT_KERNEL_CONTRACT_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_continuation_uses_universal_kernel_lifecycle_not_counter_only_advance",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_continuation_v2.py::test_continuation_api_accepts_native_state_not_mailbox_cursor_inputs",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_continuation_v2.py::test_checkpoint_recovery_rejects_mailbox_only_projection"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "No current-run typed Universal NEXT/continuation was read back. TaskController C/E adapter/session-admission evidence is separate and was not synthesized or used as a substitute."
+    },
+    {
+      "entry": "restart_recovery",
+      "code_level_status": "PASS_PERSISTENCE_MECHANICS_ONLY",
+      "evidence": [
+        "q0-source-fixture-langgraph-exact-code-suite: tests/test_scrum781_q0_langgraph_checkpoint_resume.py::test_sqlite_resume_reinitializes_process_and_matches_native",
+        "universal-runtime-primitives-focused-suite: tests/test_universal_run_continuation_v2.py::test_checkpoint_recovery_rejects_mailbox_only_projection"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "SQLite checkpoint recovery crosses fresh test processes on reconstructed data; no live Q0 runtime process/session restart or current-run resume occurred."
+    },
+    {
+      "entry": "self_fix_replay",
+      "code_level_status": "PASS_CONTRACT_AND_RECONSTRUCTED_SUBCASE_ONLY",
+      "evidence": [
+        "q0-live-fix-contract-tests: tests/test_q0_live_qualification_contract.py::test_runtime_fixed_receipt_requires_exact_loaded_candidate_identity",
+        "q0-live-fix-contract-tests: tests/test_q0_live_qualification_contract.py::test_replay_verified_requires_advance_beyond_old_failure",
+        "q0-live-fix-contract-tests: tests/test_q0_live_qualification_contract.py::test_runtime_fixed_rejects_failed_original_incident_replay",
+        "native-reconstructed-fixture-replay"
+      ],
+      "live_matrix_status": "BLOCKED_AUTHENTIC_SOURCE_MISSING",
+      "blocker": "No independently verifiable original DWO-LOGIN-AUTH-R1 producer trace/fixture/digest was recovered in the bounded source sweep. Reconstructed C91/E52 PASS is not original incident replay."
+    },
+    {
+      "entry": "stale_state_fail_closed",
+      "code_level_status": "PASS_UNIT_NEGATIVE_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_q0_certification_fails_on_runtime_identity_drift",
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_q0_acceptance_invalid_after_certified_sha_drift",
+        "q0-live-fix-contract-tests: tests/test_q0_live_qualification_contract.py::test_runtime_loaded_rejects_stale_worktree_head",
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_q0_universal_qualification.py::test_ur_g3_verification_receipt_rejects_tampering_and_candidate_drift"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "Synthetic stale/candidate drift is rejected by unit tests; no live dependent-state invalidation/regeneration/readback was executed."
+    },
+    {
+      "entry": "deterministic_replay",
+      "code_level_status": "PASS_RECONSTRUCTED_MECHANICS_ONLY",
+      "evidence": [
+        "q0-source-fixture-langgraph-exact-code-suite: 22 passed; native/LangGraph parity and persisted checkpoint mechanics on reconstructed C91/E52 fixture",
+        "native-reconstructed-fixture-replay"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "Only reconstructed data and isolated test processes were replayed; no authentic DWO event stream or live runtime deterministic replay was run."
+    },
+    {
+      "entry": "recursive_plan_dag_complete",
+      "code_level_status": "PASS_STRUCTURAL_ONLY",
+      "evidence": [
+        "q0-execution-contract-and-qualification-unit-suite: tests/test_scrum781_q0_execution_contract.py::test_q0_recursive_g1_has_atomic_leaves",
+        "runtime-plan-structural-dag-harness: 13 nodes, 8 atomic leaves, 10 edges, all refs resolved, acyclic"
+      ],
+      "live_matrix_status": "NOT_RUN",
+      "live_gap": "Plan structure is source-bound and acyclic; no live G1 qualification/transition or campaign matrix completion was recorded."
+    }
+  ],
+  "actual_campaign_matrix": {
+    "materialized": false,
+    "entries": [],
+    "passed_live_entries": 0,
+    "not_run_entries": 12,
+    "blocked_entries": 1,
+    "complete": false
+  },
+  "qualification_boundaries": {
+    "load_proof_created": false,
+    "live_runtime_activation_observed": false,
+    "original_dwo_trace_found": false,
+    "authentic_dwo_replay": false,
+    "q0_verification_receipt_created": false,
+    "native_gate_receipt_created": false,
+    "q0_l3_qualified": false,
+    "q0_acceptance_or_handoff_created": false,
+    "protected_or_production_effects": [],
+    "no_global_absence_claim": true
+  },
+  "disposition": "P5 code-level coverage mapping is complete. Unit/structural evidence is separated from live-only qualification evidence. The real Q0 campaign matrix remains incomplete: 12 entries NOT_RUN and self_fix_replay BLOCKED on the missing authentic source. No certification or gate advancement is asserted.",
+  "next_same_run_action": "Continue only independently authorized non-live Q0 engineering or coverage gaps; do not manufacture campaign PASS entries. Re-open the authentic replay path only when an independently verifiable original DWO trace/fixture/digest lead appears. Before any live activation, revalidate the exact same-run authority and runtime binding."
+}
