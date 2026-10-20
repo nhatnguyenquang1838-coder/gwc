@@ -83,11 +83,57 @@ def reconcile_controller_response(request, exchange_state):
             'workflow_resume_allowed':False}
 
 
+def reconcile_exchange_request_context(request, old_context, new_context, outbox, *, reason):
+    """Rebind a reserved exchange request after a worktree-only context move.
+
+    The request payload, ``request_digest`` and ``marker`` stay immutable — only
+    a separate reconciliation row records that the same reservation now belongs
+    to the relocated context. Any delta other than ``repository.worktree`` (plus
+    an ancestor-only head advance) fails closed.
+    """
+    import copy
+    old=validate_task_context(old_context);new=validate_task_context(new_context)
+    require(isinstance(reason,str) and bool(reason.strip()),'EXCHANGE_CONTEXT_REBIND_REASON_REQUIRED')
+    require(request.get('task_context_digest')==digest(old),'EXCHANGE_CONTEXT_REBIND_PRIOR_MISMATCH')
+    old_wt=str(old['repository']['worktree']);new_wt=str(new['repository']['worktree'])
+    require(old_wt!=new_wt,'EXCHANGE_CONTEXT_REBIND_UNCHANGED_WORKTREE')
+    equivalent=copy.deepcopy(new)
+    equivalent['repository']['worktree']=old_wt
+    equivalent['repository']['head_sha']=old['repository']['head_sha']
+    require(equivalent==old,'EXCHANGE_CONTEXT_REBIND_DRIFT')
+    receipt={'request_digest':request['request_digest'],'marker':request['marker'],
+             'old_context_digest':digest(old),'new_context_digest':digest(new),
+             'reason':reason,'context_rebound':True,
+             'old_worktree':old_wt,'new_worktree':new_wt,
+             'single_writer':True,'authority_granted':False,'typed_ce_admitted':False}
+    require(outbox.read(request)['request']==request,'EXCHANGE_REQUEST_DRIFT')
+    with outbox._db() as db:
+        db.execute('BEGIN IMMEDIATE')
+        db.execute('CREATE TABLE IF NOT EXISTS exchange_context_reconciliations '
+                   '(key TEXT PRIMARY KEY, request_digest TEXT, old_context_digest TEXT, '
+                   'new_context_digest TEXT, receipt TEXT)')
+        db.execute('INSERT INTO exchange_context_reconciliations VALUES (?,?,?,?,?)',
+                   (digest(receipt),request['request_digest'],digest(old),digest(new),json.dumps(receipt,sort_keys=True)))
+        db.commit()
+    require(outbox.context_rebound(request,digest(new)),'EXCHANGE_CONTEXT_REBIND_READBACK_FAILED')
+    return receipt
+
+
 class ExchangeOutbox:
     def __init__(self, path):
         self.path = Path(path);self.path.parent.mkdir(parents=True,exist_ok=True)
         with self._db() as db:
             db.execute('CREATE TABLE IF NOT EXISTS exchange (key TEXT PRIMARY KEY, request TEXT NOT NULL, status TEXT NOT NULL, receipt TEXT)')
+
+    def context_rebound(self, request, new_context_digest):
+        """True only when a recorded reconciliation maps this request to the context."""
+        with self._db() as db:
+            db.execute('CREATE TABLE IF NOT EXISTS exchange_context_reconciliations '
+                       '(key TEXT PRIMARY KEY, request_digest TEXT, old_context_digest TEXT, '
+                       'new_context_digest TEXT, receipt TEXT)')
+            row=db.execute('SELECT 1 FROM exchange_context_reconciliations WHERE request_digest=? AND new_context_digest=?',
+                           (request['request_digest'],new_context_digest)).fetchone()
+        return row is not None
 
     def _db(self):
         return sqlite3.connect(str(self.path), timeout=10)

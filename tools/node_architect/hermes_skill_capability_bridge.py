@@ -17,7 +17,9 @@ class HermesSkillBridge:
         self.context=context;self.outbox=outbox;self.metadata=metadata
 
     def _bound(self,request):
-        require(request['task_context_digest']==digest(self.context),'EXCHANGE_CONTEXT_DRIFT')
+        current=digest(self.context)
+        require(request['task_context_digest']==current or
+                self.outbox.context_rebound(request,current),'EXCHANGE_CONTEXT_DRIFT')
         require(request['session_id']==self.context['executor']['session_id'],'HOST_SESSION_MISMATCH')
         require(request['conversation_url']==self.context['controller']['conversation_url'],'HOST_URL_MISMATCH')
         require(self.outbox.read(request)['request']==request,'EXCHANGE_RESERVATION_BINDING_MISMATCH')

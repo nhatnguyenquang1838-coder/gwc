@@ -83,6 +83,34 @@ def test_resume_host_exchange_recovers_stage_after_pre_invocation_tool_rejection
     assert phases==[('STAGE',),('TYPE_REPLAY',)]
 
 
+def test_exchange_request_context_rebinds_after_worktree_relocation(tmp_path):
+    """A reserved request survives a worktree-only context move via an explicit rebind."""
+    import copy
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox, make_exchange_request
+    from tools.node_architect.controller_exchange_adapter import reconcile_exchange_request_context
+    from tools.node_architect.task_context_binding import digest
+    from tools.node_architect.hermes_skill_capability_bridge import resolve_hermes_skills
+    c=context();req=make_exchange_request(c,'Exact reserved report',lane='HOST_COORDINATION')
+    box=ExchangeOutbox(tmp_path/'box.sqlite');assert box.reserve(req)
+    skill=tmp_path/'SKILL.md';skill.write_text('---\nname: dwa-gpt-exchange\n---\n')
+    moved=copy.deepcopy(c);moved['repository']['worktree']=str(tmp_path/'new-worktree')
+    registry=resolve_hermes_skills(moved,skill_path=skill,host_session_id='session',
+        preview={'url':moved['controller']['conversation_url']},outbox=box)
+    readback={'url':req['conversation_url'],'text':'You said:\n'+req['marker']+' report'}
+    with pytest.raises(ValueError,match='EXCHANGE_CONTEXT_DRIFT'):
+        registry['bridge'].accept_readback(req,readback)
+    # A non-worktree delta must still fail closed.
+    drifted=copy.deepcopy(moved);drifted['repository']['branch']='fix/other'
+    with pytest.raises(ValueError,match='EXCHANGE_CONTEXT_REBIND_DRIFT'):
+        reconcile_exchange_request_context(req,c,drifted,box,reason='fixture')
+    receipt=reconcile_exchange_request_context(req,c,moved,box,reason='canonical worktree relocation')
+    assert receipt['context_rebound'] is True
+    assert receipt['old_context_digest']==digest(c) and receipt['new_context_digest']==digest(moved)
+    assert box.read(req)['request']==req  # request payload and marker stay immutable
+    result=registry['bridge'].accept_readback(req,readback)
+    assert box.read(req)['status'] in {'MESSAGE_SENT_VERIFIED','CONTROLLER_ACTION_REQUIRED'}
+
+
 def test_resume_host_exchange_requires_matching_pre_invocation_failure_and_is_one_shot(tmp_path):
     from tools.node_architect.hermes_skill_capability_bridge import resolve_hermes_skills
     c=context();req=make_exchange_request(c,'Exact reserved report',lane='HOST_COORDINATION')
