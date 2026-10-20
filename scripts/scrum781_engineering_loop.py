@@ -20,7 +20,8 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.node_architect.q0_m1_m7_integration import build_q0_operation, PLAN_REF, resolve_active_plan
+from tools.node_architect.q0_m1_m7_integration import (build_q0_operation, PLAN_REF,
+                                                      resolve_active_plan, resolve_frontier_ref)
 from tools.node_architect.q0_engineering_loop import assess_engineering_resume, engineering_prompt
 
 
@@ -175,7 +176,7 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             host_capabilities['engineering.execution_ready']=lambda c,item:args.tick is not None and guard()
             from tools.node_architect.engineering_host_adapter import read_source_bound_frontier
             host_capabilities['engineering.work_frontier']=lambda c:read_source_bound_frontier(
-                c,profile_ref='core/node-architect/q0-engineering-frontier-r1.json',guard=guard)
+                c,profile_ref=resolve_frontier_ref(ROOT),guard=guard)
     elif mode=='PROTECTED_TYPED_CE':
         context['workflow']['mode']='PROTECTED_TYPED_CE'
         if host_capabilities is None:

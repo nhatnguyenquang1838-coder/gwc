@@ -67,6 +67,24 @@ def resolve_active_plan(root: Path | str) -> str:
     return ref
 
 
+FRONTIER_R2_REF = 'core/node-architect/q0-engineering-frontier-r1.json'
+FRONTIER_R3_REF = 'core/node-architect/q0-controlled-failure-frontier-r3.json'
+
+
+def resolve_frontier_ref(root: Path | str) -> str:
+    """Pick the frontier that matches the active plan (R3 campaign vs R2 lane)."""
+    root = Path(root).resolve()
+    plan = resolve_active_plan(root)
+    ref = FRONTIER_R3_REF if 'controlled-failure' in plan else FRONTIER_R2_REF
+    path = root / ref
+    if not path.exists():
+        raise ValueError('Q0_FRONTIER_SOURCE_MISSING')
+    policy = json.loads(path.read_text())
+    if policy.get('runtime_plan_ref') != plan:
+        raise ValueError('Q0_FRONTIER_PLAN_DRIFT')
+    return ref
+
+
 def build_q0_operation(root: Path | str, *, activity_id: str) -> tuple[dict, dict]:
     root = Path(root).resolve()
     if not activity_id or any(char not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for char in activity_id):

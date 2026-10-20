@@ -1,0 +1,162 @@
+{
+ "schema_id": "gwc.q0.engineering-frontier/v1",
+ "runtime_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+ "runtime_plan_digest": "sha256:08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06",
+ "authority_granted": false,
+ "items": [
+  {
+   "id": "CF-PRECHECK",
+   "plan_node_id": "CF-PRECHECK",
+   "objective": "Bind exact source/runtime identity and validate the recursive DAG.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_PRECHECK_VALIDATED",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 1,
+   "depends_on": [],
+   "write_paths": [],
+   "input_digest": "sha256:54dcac75ced5fda00daaa0723cfbda649933151857a4525d1597583290194841"
+  },
+  {
+   "id": "CF-RED",
+   "plan_node_id": "CF-RED",
+   "objective": "Demonstrate a genuine controlled failure (RED) with exact evidence.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_RED_OBSERVED",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 2,
+   "depends_on": [
+    "CF-PRECHECK"
+   ],
+   "write_paths": [],
+   "input_digest": "sha256:2f332e7b58c000c20b987fc7c5ad35514d571107f71372150955b7a86b9655de"
+  },
+  {
+   "id": "CF-FIX",
+   "plan_node_id": "CF-FIX",
+   "objective": "Repair the bounded runtime defect with RED->GREEN on the same branch.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_FIX_GREEN",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 3,
+   "depends_on": [
+    "CF-RED"
+   ],
+   "write_paths": [],
+   "input_digest": "sha256:23fa933baba8eb6c97502da45d0ecd60e242b83e79dd0aa66fa50086eb8788fc"
+  },
+  {
+   "id": "CF-LOAD",
+   "plan_node_id": "CF-LOAD",
+   "objective": "Reload the exact fixed source identity and prove loaded identities.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_LOAD_PROOF",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 4,
+   "depends_on": [
+    "CF-FIX"
+   ],
+   "write_paths": [],
+   "input_digest": "sha256:83377e8ed185b3b761da4843d0b8fbbbc808d11ff94cfcc72bc257b855aa1b31"
+  },
+  {
+   "id": "CF-REPLAY",
+   "plan_node_id": "CF-REPLAY",
+   "objective": "Replay the controlled failure and prove progress beyond the boundary.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_REPLAY_ADVANCED",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 5,
+   "depends_on": [
+    "CF-LOAD"
+   ],
+   "write_paths": [],
+   "input_digest": "sha256:098dd1a788d13d917f041d61955ace89096322197f6f6e0bda874fa229f0bce5"
+  },
+  {
+   "id": "CF-CERTIFY",
+   "plan_node_id": "CF-CERTIFY",
+   "objective": "Run the qualification matrix and prepare the draft certification.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_engineering_m1_m7_workflow.py",
+    "tests/test_engineering_work_frontier.py",
+    "tests/test_engineering_frontier_host.py",
+    "tests/test_controller_exchange_adapter.py",
+    "tests/test_exchange_outbox_transitions.py",
+    "-q"
+   ],
+   "expected_result": "CF_CERTIFIED",
+   "read_paths": [
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 6,
+   "depends_on": [
+    "CF-REPLAY"
+   ],
+   "write_paths": [],
+   "input_digest": "sha256:ef678dd47b7b59800db263fa50847598f11d08239b2a156f652173b18e87e62d"
+  }
+ ]
+}

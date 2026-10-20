@@ -31,6 +31,7 @@ class EngineeringState(TypedDict,total=False):
     terminal_exchange_request:dict
     terminal_exchange_status:str
     terminal_digest:str
+    work_rounds:int
     controller_response_observation:dict
 
 
