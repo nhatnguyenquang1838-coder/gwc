@@ -20,7 +20,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.node_architect.q0_m1_m7_integration import build_q0_operation, PLAN_REF
+from tools.node_architect.q0_m1_m7_integration import build_q0_operation, PLAN_REF, resolve_active_plan
 from tools.node_architect.q0_engineering_loop import assess_engineering_resume, engineering_prompt
 
 
@@ -44,7 +44,7 @@ def inspect(args: argparse.Namespace) -> dict:
         raise ValueError('SESSION_ENV_BINDING_MISMATCH')
     home = Path(os.environ.get('HERMES_HOME', str(Path.home()/'.hermes'))).resolve()
     operation, _ = build_q0_operation(ROOT, activity_id='engineering-resume-inspection')
-    plan = json.loads((ROOT / PLAN_REF).read_text())
+    plan = json.loads((ROOT / resolve_active_plan(ROOT)).read_text())
     required = {'modify_approved_files', 'run_sandboxed_validation', 'stage', 'create_commit', 'push_working_branch'}
     agents = subprocess.check_output(['git', '-C', str(ROOT), 'show', 'HEAD:AGENTS.md'], text=True)
     contract_current = (required <= set(plan['scope']['allowed_actions'])
@@ -154,7 +154,7 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
     home = Path(os.environ.get('HERMES_HOME', str(Path.home()/'.hermes'))).resolve()
     trigger = f'native-tick-{args.tick}' if args.tick is not None else 'explicit-user-request'
     path = select_workflow_checkpoint(home/'cache/scratch/q0-m1-m7-host'/args.session,preflight['run_id'])
-    context = bind_from_plan(ROOT, plan_ref=PLAN_REF, conversation_url=args.controller_url,
+    context = bind_from_plan(ROOT, plan_ref=resolve_active_plan(ROOT), conversation_url=args.controller_url,
                              session_id=args.session, checkpoint_ref=path, skill_ref='dwa-gpt-exchange')
     if context['repository']['head_sha'] != preflight['code_head']:
         raise ValueError('WORKFLOW_SOURCE_CHANGED_AFTER_PREFLIGHT')

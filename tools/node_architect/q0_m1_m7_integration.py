@@ -12,24 +12,7 @@ from typing import Any
 
 PLAN_REF = 'core/node-architect/scrum781-q0-fresh-execution-plan-r2.json'
 ROUTE_REF = 'core/node-architect/q0-engineering-coordination-route-r1.json'
-
-
-def resolve_active_plan(root: Path | str) -> str:
-    """Resolve the active RuntimePlan: an approved successor G1 wins over R2.
-
-    The coordination route may declare a human-approved successor plan (Option B
-    Controlled Failure Campaign). Only an approved successor whose file exists is
-    used; otherwise the lane stays on the R2 plan.
-    """
-    root = Path(root).resolve()
-    route_path = root / ROUTE_REF
-    if route_path.exists():
-        route = json.loads(route_path.read_text())
-        successor = route.get('approved_successor_g1') or {}
-        ref = successor.get('successor_plan_ref')
-        if ref and successor.get('human_approved') is True and (root / ref).exists():
-            return ref
-    return PLAN_REF
+ACTIVATION_RECEIPT_REF = '.gwc/tasks/SCRUM-781/activation/cf-plan-activation.json'
 
 
 def _git(root: Path, *args: str) -> str:
@@ -39,6 +22,49 @@ def _git(root: Path, *args: str) -> str:
 def _digest(value: Any) -> str:
     raw = json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()
     return 'sha256:' + hashlib.sha256(raw).hexdigest()
+
+
+def _sha256_file(path: Path) -> str:
+    return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def resolve_active_plan(root: Path | str) -> str:
+    """Resolve the active RuntimePlan with fail-closed activation semantics.
+
+    - No approved successor: the lane stays on R2.
+    - Approved successor still PENDING: raise Q0_PLAN_ACTIVATION_PENDING instead of
+      silently executing the old acceptance target.
+    - ACTIVATED: require the durable activation receipt, the plan file at the
+      working tree, and matching digests; otherwise Q0_PLAN_ACTIVATION_INVALID.
+    - The receipt binds the plan digest at activation time, not the current HEAD,
+      so later additive commits do not invalidate activation.
+    """
+    root = Path(root).resolve()
+    route_path = root / ROUTE_REF
+    if not route_path.exists():
+        return PLAN_REF
+    route = json.loads(route_path.read_text())
+    successor = route.get('approved_successor_g1') or {}
+    if not successor:
+        return PLAN_REF
+    status = successor.get('activation_status')
+    ref = successor.get('successor_plan_ref')
+    if status != 'ACTIVATED':
+        raise ValueError('Q0_PLAN_ACTIVATION_PENDING')
+    if not ref:
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    plan_path = root / ref
+    if not plan_path.exists():
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    receipt_path = root / ACTIVATION_RECEIPT_REF
+    if not receipt_path.exists():
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    receipt = json.loads(receipt_path.read_text())
+    if (receipt.get('plan_ref') != ref or
+            receipt.get('plan_digest') != _sha256_file(plan_path) or
+            not receipt.get('checkpoint_receipt_digest')):
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    return ref
 
 
 def build_q0_operation(root: Path | str, *, activity_id: str) -> tuple[dict, dict]:

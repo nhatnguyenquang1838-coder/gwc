@@ -627,6 +627,66 @@ def reconcile_engineering_route_metadata(old_context,new_context,*,repository_ro
     return receipt
 
 
+def reconcile_engineering_plan_transition(old_context,new_context,*,reason,repository_root,
+                                          activation_receipt_ref):
+    """Advance the SAME checkpoint from the predecessor plan to an ACTIVATED successor.
+
+    Allowed deltas: an ancestor head advance, ``run.runtime_plan_ref``/
+    ``runtime_plan_digest``, ``engineering.work_items`` and the route digest.
+    The successor must be proven ACTIVATED by its durable receipt before the
+    transition is recorded; nothing is erased or replanned.
+    """
+    import copy,subprocess
+    from .q0_m1_m7_integration import resolve_active_plan
+    old=validate_task_context(old_context);new=validate_task_context(new_context)
+    require(isinstance(reason,str) and bool(reason.strip()),'PLAN_TRANSITION_REASON_REQUIRED')
+    require(old['run']['id']==new['run']['id'],'PLAN_TRANSITION_RUN_MISMATCH')
+    root=Path(repository_root).resolve()
+    active=resolve_active_plan(root)
+    require(active==new['run']['runtime_plan_ref'],'PLAN_TRANSITION_NOT_ACTIVATED')
+    require((root/activation_receipt_ref).exists(),'PLAN_TRANSITION_RECEIPT_MISSING')
+    equivalent=copy.deepcopy(new)
+    equivalent['repository']['head_sha']=old['repository']['head_sha']
+    equivalent['run']['runtime_plan_ref']=old['run']['runtime_plan_ref']
+    equivalent['run']['runtime_plan_digest']=old['run']['runtime_plan_digest']
+    if old.get('engineering') is not None and new.get('engineering') is not None:
+        equivalent['engineering']['work_items']=old['engineering']['work_items']
+        equivalent['engineering']['route_policy_digest']=old['engineering']['route_policy_digest']
+    # The successor plan legitimately replaces the task/runtime_plan bodies.
+    equivalent['task']=old['task']
+    equivalent['runtime_plan']=old['runtime_plan']
+    require(equivalent==old,'PLAN_TRANSITION_CONTEXT_DRIFT')
+    import hashlib as _h
+    plan_path=root/new['run']['runtime_plan_ref']
+    require(plan_path.exists() and
+            new['run']['runtime_plan_digest']=='sha256:'+_h.sha256(plan_path.read_bytes()).hexdigest(),
+            'PLAN_TRANSITION_PLAN_DIGEST_MISMATCH')
+    def git(*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
+    require(git('rev-parse','HEAD')==new['repository']['head_sha'],'PLAN_TRANSITION_GIT_BINDING_REQUIRED')
+    if old['repository']['head_sha']!=new['repository']['head_sha']:
+        subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',
+                        old['repository']['head_sha'],new['repository']['head_sha']],check=True)
+    with _connect(old['workflow']['checkpoint_ref']) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+        if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+        receipt={'old_context_digest':digest(old),'new_context_digest':digest(new),
+                 'old_head':old['repository']['head_sha'],'new_head':new['repository']['head_sha'],
+                 'reason':reason,'plan_transition':True,
+                 'old_plan_ref':old['run']['runtime_plan_ref'],'new_plan_ref':new['run']['runtime_plan_ref'],
+                 'old_plan_digest':old['run']['runtime_plan_digest'],'new_plan_digest':new['run']['runtime_plan_digest'],
+                 'activation_receipt_ref':activation_receipt_ref}
+        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt),row[1]))
+        db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',
+                   (digest(new),old['run']['id'],digest(old)));db.commit()
+    with _connect(old['workflow']['checkpoint_ref']) as reader:
+        require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),
+                'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
+    return receipt
+
+
 def reconcile_engineering_worktree_relocation(old_context,new_context,*,reason):
     """Explicit relocation of the SAME run to another linked worktree.
 
