@@ -1,0 +1,130 @@
+schema_version: '1.0'
+artifact_type: node-instruction
+node_id: q0.qualification-campaign
+gate:
+  - UR.G0
+  - UR.G1
+  - UR.G2
+  - UR.G3
+  - UR.G4
+  - UR.G5
+  - UR.G6
+purpose: Execute the Q0 live runtime-qualification campaign as a profile of Universal Runtime and Node Architect; do not run the real Login workload until L3 certification and accepted handoff.
+entry_conditions:
+  - Universal Runtime epoch is UNIVERSAL_V2_DEVELOPMENT
+  - q0_live_qualification profile and exact run binding are loaded
+  - current Universal RunState and RuntimePlan are available
+inputs:
+  - run_id
+  - runtime_epoch
+  - q0_profile
+  - active_gate
+  - gate_evidence
+  - effect_class
+allowed_actions:
+  - q0_understand
+  - q0_plan_decompose
+  - q0_execute_probe
+  - q0_verify_evidence
+  - q0_integrate_candidate
+  - q0_validate_in_target
+  - q0_accept_and_handoff
+forbidden_actions:
+  - treat_q0_as_login_workload
+  - legacy_g2_execution_token_as_q0_lifecycle_authority
+  - legacy_g4_merge_as_ur_g4
+  - legacy_g6_production_data_as_ur_g6
+  - protected_main_mutation
+  - merge
+  - deploy
+  - production_data_access
+  - credential_or_secret_access
+outputs:
+  - q0_profile_bound_node_result
+  - evidence_gated_universal_transition
+  - q0_certification_or_acceptance_receipt_when_valid
+  - typed_next
+  - exact_readback
+evidence_required:
+  - node-start
+  - node-decision
+  - node-result
+  - node-readback
+  - checkpoint
+  - runtime-event
+  - next-route-decision
+logs_required:
+  - runtime-events.jsonl
+  - decision_digest
+  - state_digest
+  - event_digest
+next:
+  pass:
+    disposition: continue
+    reason: Continue only through the evidence-gated Universal lifecycle and Q0 profile.
+    next_node: null
+    next_action: q0_continue_universal_lifecycle
+    next_gate: null
+  blocked:
+    disposition: stop
+    reason: Fail closed at the exact Q0 evidence, profile, run, or effect-authority boundary.
+    next_node: null
+    next_action: q0_report_blocker
+    next_gate: null
+  pending:
+    disposition: wait
+    reason: Preserve current RunState until the exact typed evidence or Nhat decision arrives.
+    next_node: null
+    next_action: q0_wait_for_typed_evidence
+    next_gate: null
+  retry:
+    disposition: retry
+    reason: Retry only by the bounded idempotent Q0 recovery contract.
+    next_node: null
+    next_action: q0_retry_same_run
+    next_gate: null
+retry:
+  idempotency_key_fields:
+    - run_id
+    - candidate_sha
+    - active_gate
+    - q0_profile_digest
+  replay_check: Read the exact RunState, source identity, and evidence ledger before replay; same-key semantic drift fails closed.
+  max_attempts: 3
+  pending_reconciliation: Unknown runtime or effect outcome must be reconciled by exact readback; never repeat blindly.
+rollback:
+  reversible: true
+  strategy: Preserve immutable Q0 lineage and append a bounded corrective commit only under the lane's exact authority.
+  reconciliation: Reconcile candidate SHA, loaded source identity, replay evidence, and current RuntimePlan before retry.
+  human_required_when:
+    - protected main mutation
+    - merge or deployment
+    - production configuration or data
+    - credentials or secrets
+    - migration or destructive action
+    - unresolved business-risk acceptance
+authority_boundary:
+  statement: Q0 completion and Nhat's acceptance/handoff do not grant effect authority; every concrete effect is independently gated.
+  node_grants_gate_authority: false
+  g2_authority_granted: false
+  g3_authority_granted: false
+  merge_authority_granted: false
+  deployment_authority_granted: false
+  production_authority_granted: false
+mode_policy:
+  supported_modes:
+    - normal
+    - fastlane
+    - e2e
+    - hotfix
+    - rescue
+    - q0_live_qualification
+  runtime_required: true
+  boot_required: true
+  claim_required: true
+  gate_authority_required: false
+  route_required: true
+  instruction_required: true
+  evidence_required: true
+  logs_required: true
+  next_route_required: true

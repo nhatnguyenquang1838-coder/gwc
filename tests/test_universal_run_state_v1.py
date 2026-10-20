@@ -12,7 +12,7 @@ from jsonschema import Draft7Validator
 from tools.node_architect.universal_run_kernel import GATES, UniversalRunKernelError
 
 MODULE_NAME = "tools.node_architect.universal_run_state"
-PROFILE = {"id": "gwc.universal-run", "version": 1}
+PROFILE = {"id": "gwc.universal-run.v2", "version": 2}
 CREATED = {"kind": "agent", "id": "DWA"}
 TS = "2026-09-10T08:00:00+07:00"
 
@@ -31,7 +31,7 @@ def _api():
     return module
 
 
-def _gates(active: str = "G0") -> dict[str, str]:
+def _gates(active: str = "UR.G0") -> dict[str, str]:
     return {gate: ("ACTIVE" if gate == active else "NOT_STARTED") for gate in GATES}
 
 
@@ -46,7 +46,7 @@ def _valid(**overrides: Any) -> dict[str, Any]:
         "predecessor_state_ref": None,
         "predecessor_state_digest": None,
         "sequence": 0,
-        "active_gate": "G0",
+        "active_gate": "UR.G0",
         "gate_states": _gates(),
         "terminal_state": "OPEN",
         "execution_refs": {
@@ -76,7 +76,7 @@ def _successor(previous: dict[str, Any], **overrides: Any) -> dict[str, Any]:
     fn = getattr(api, "make_successor_state_record", None) or getattr(api, "make_successor_run_state_record", None)
     if fn is None:
         pytest.fail("R1 RED contract missing symbols: make_successor_state_record")
-    changes = {"active_gate": "G1", "gate_states": _gates("G1"), "sequence": 1, "state_revision": 2}
+    changes = {"active_gate": "UR.G1", "gate_states": _gates("UR.G1"), "sequence": 1, "state_revision": 2}
     changes.update(overrides)
     return fn(previous, record_id="RS-2", created_at=TS, created_by=CREATED, changes=changes)
 
@@ -88,7 +88,7 @@ def test_run_state_requires_universal_profile_v1():
 
 def test_run_state_requires_exact_seven_gate_positions():
     gates = _gates()
-    gates.pop("G6")
+    gates.pop("UR.G6")
     with pytest.raises(UniversalRunKernelError):
         _create(gate_states=gates)
 

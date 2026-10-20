@@ -13,6 +13,7 @@ import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
 SUPPORTED_MODES = ("normal", "fastlane", "e2e", "hotfix", "rescue")
+Q0_WORKFLOW_MODE = "q0_live_qualification"
 REQUIRED_EVIDENCE = {
     "node-start", "node-decision", "node-result", "node-readback",
     "checkpoint", "runtime-event", "next-route-decision",
@@ -112,7 +113,9 @@ def validate_instruction(
 
     card_gates = set(card.get("gate", []) if isinstance(card.get("gate"), list) else [])
     descriptor_gates = set(descriptor.get("gates", []) if isinstance(descriptor.get("gates"), list) else [])
-    if active_gate not in card_gates or active_gate not in descriptor_gates:
+    q0_gate_valid = mode != Q0_WORKFLOW_MODE or active_gate.startswith("UR.")
+    legacy_gate_valid = mode == Q0_WORKFLOW_MODE or not active_gate.startswith("UR.")
+    if not q0_gate_valid or not legacy_gate_valid or active_gate not in card_gates or active_gate not in descriptor_gates:
         codes.append("NODE_INSTRUCTION_INVALID")
 
     evidence = set(card.get("evidence_required", []) if isinstance(card.get("evidence_required"), list) else [])
@@ -155,12 +158,15 @@ def validate_instruction(
 
     policy = card.get("mode_policy", {}) if isinstance(card.get("mode_policy"), Mapping) else {}
     runtime_flags = [
-        "runtime_required", "boot_required", "claim_required", "gate_authority_required",
+        "runtime_required", "boot_required", "claim_required",
         "route_required", "instruction_required", "evidence_required", "logs_required",
         "next_route_required",
     ]
     supported = set(policy.get("supported_modes", []) if isinstance(policy.get("supported_modes"), list) else [])
-    mode_valid = mode in SUPPORTED_MODES and set(SUPPORTED_MODES).issubset(supported) and all(policy.get(flag) is True for flag in runtime_flags)
+    mode_allowed = mode in SUPPORTED_MODES or mode == Q0_WORKFLOW_MODE
+    q0_declared = mode != Q0_WORKFLOW_MODE or Q0_WORKFLOW_MODE in supported
+    authority_mode_valid = policy.get("gate_authority_required") is (mode != Q0_WORKFLOW_MODE)
+    mode_valid = mode_allowed and q0_declared and authority_mode_valid and set(SUPPORTED_MODES).issubset(supported) and all(policy.get(flag) is True for flag in runtime_flags)
     if not mode_valid:
         codes.append("MODE_BYPASSES_NODE_RUNTIME")
 
@@ -245,7 +251,7 @@ def main() -> int:
     parser.add_argument("--registry", type=Path, required=True)
     parser.add_argument("--route-profile", type=Path, required=True)
     parser.add_argument("--gate", required=True)
-    parser.add_argument("--mode", choices=SUPPORTED_MODES, default="normal")
+    parser.add_argument("--mode", choices=(*SUPPORTED_MODES, Q0_WORKFLOW_MODE), default="normal")
     parser.add_argument("--route-id")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()

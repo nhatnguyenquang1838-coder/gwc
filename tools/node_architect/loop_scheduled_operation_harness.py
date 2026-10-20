@@ -111,6 +111,8 @@ def emit_operation_envelope(
     """
     if not isinstance(run_id, str) or not run_id:
         raise HarnessContractError("OPERATION_ENVELOPE_RUN_ID_MISSING")
+    if run_id.startswith("scrum781-q0-"):
+        raise HarnessContractError("Q0_SOURCE_BOUND_ADAPTER_REQUIRED")
     if not isinstance(tick, int) or tick < 0:
         raise HarnessContractError("OPERATION_ENVELOPE_TICK_INVALID")
 
@@ -297,6 +299,17 @@ def invoke_or_resume(
             repo_root, operation_envelope, checkpoint_store_ref, checkpoint_expected_revision
         )
         if prior_projection is not None:
+            if prior_projection.get("operation_id") != operation_envelope["operation_id"]:
+                old_activity = str(prior_projection.get("activity_id", ""))
+                new_activity = str(operation_envelope["activity_id"])
+                safe_empty_hold = (
+                    prior_projection.get("current_activity") == "M1"
+                    and (prior_projection.get("activity_results") or {}).get("M1", {}).get("reason_code") == "OBSERVER_UNQUALIFIED"
+                    and not any(prior_projection.get(key) for key in ("idempotency_keys", "controller_exchange_idempotency_keys", "settlement_idempotency_keys"))
+                )
+                if not (safe_empty_hold and old_activity.startswith("tick-") and new_activity.startswith("tick-") and old_activity[5:].isdigit() and new_activity[5:].isdigit() and int(new_activity[5:]) > int(old_activity[5:])):
+                    raise HarnessContractError("CHECKPOINT_PRIOR_OPERATION_UNSETTLED")
+                prior_projection = {**prior_projection, **{key: operation_envelope[key] for key in OPERATION_ENVELOPE_FIELDS}, "current_activity": "M1", "activity_results": {}, "mailbox_classification": None}
             initial["checkpoint_projection"] = prior_projection
             initial["activity_results"] = dict(prior_projection.get("activity_results") or {})
             initial["mailbox_classification"] = prior_projection.get("mailbox_classification")
@@ -345,6 +358,16 @@ def invoke_or_resume(
         "controller_exchange_idempotency_keys": list(prior_checkpoint.get("controller_exchange_idempotency_keys") or []),
         "settlement_idempotency_keys": list(prior_checkpoint.get("settlement_idempotency_keys") or []),
     })
+
+    for state_key, projection_key in (
+        ("host_action_requests", "idempotency_keys"),
+        ("controller_exchange_requests", "controller_exchange_idempotency_keys"),
+        ("settlement_requests", "settlement_idempotency_keys"),
+    ):
+        projection[projection_key] = list(dict.fromkeys([
+            *projection[projection_key],
+            *[item["idempotency_key"] for item in raw.get(state_key, []) if isinstance(item, Mapping) and isinstance(item.get("idempotency_key"), str)],
+        ]))
 
     # persist with CAS (exactly-once checkpointing; replay of identical state is a no-op)
     from .checkpoint_store import CheckpointInput, digest_payload, load_store, persist_to_file, replay_checkpoint, validate_readback

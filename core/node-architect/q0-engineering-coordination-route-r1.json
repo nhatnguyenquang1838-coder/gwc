@@ -1,0 +1,60 @@
+{
+ "schema_id": "gwc.engineering-coordination-route/v1",
+ "workflow_mode": "Q0_ENGINEERING_COORDINATION",
+ "workflow_identity": "generic-engineering-m1-m7/v1",
+ "runtime_epoch": "UNIVERSAL_V2_DEVELOPMENT",
+ "communication_issue": 595,
+ "intent_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6259086931",
+ "intent_body_sha256": "edd90f078abb2fd6674f007e0ca96661383d278dc30cae4c60a83509ac2a0076",
+ "work_items": [
+  {
+   "id": "dwo-login-reconstructed-native-probe",
+   "priority": 1,
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "scripts.scrum781_q0_login_fixture",
+    "--engine",
+    "native"
+   ],
+   "expected_result": "RECONSTRUCTED_LOGIN_CONTRACT_PASS",
+   "provenance": "RECONSTRUCTED_REQUIREMENTS_BOUND_NOT_ORIGINAL_INCIDENT",
+   "read_paths": [
+    "scripts/scrum781_q0_login_fixture.py",
+    ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/manifest-v1.json",
+    ".gwc/tasks/SCRUM-781/fixtures/dwo-login-auth-r1/scenarios-v1.json",
+    "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+    "tools/node_architect/universal_run_epoch.py",
+    "tools/node_architect/resolve_gate_node_route.py"
+   ]
+  }
+ ],
+ "limits": {
+  "write_or_production_effects": "SEPARATE_AUTHORITY_PATH_REQUIRED",
+  "native_loop_lifecycle": "HERMES_NATIVE_OWNER_ONLY",
+  "typed_ce": "PROTECTED_MODE_SEPARATE",
+  "unchanged_input_reexecution": "FORBIDDEN_WITHOUT_EXPLICIT_RECONCILIATION",
+  "authentic_original_replay": false,
+  "q0_l3_qualified": false
+ },
+ "approved_successor_g1": {
+  "target_change": "OPTION_B_CONTROLLED_FAILURE_CAMPAIGN",
+  "human_approved": true,
+  "successor_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "predecessor_plan_ref": "core/node-architect/scrum781-q0-fresh-execution-plan-r2.json",
+  "activation_status": "ACTIVATED",
+  "first_atomic_work_id": "CF-PRECHECK",
+  "read_only_metadata_no_runtime_plan_override": true,
+  "do_not_use_old_trace_as_controlled_red": true
+ },
+ "active_frontier_ref": "core/node-architect/q0-cf-load-frontier-r1.json",
+ "child_activation": {
+  "run_id": "scrum781-q0-cf-load-r1",
+  "parent_run_ref": "scrum781-q0-fresh-20261010-r1",
+  "plan_ref": "core/node-architect/scrum781-q0-cf-load-execution-plan-r1.json",
+  "frontier_ref": "core/node-architect/q0-cf-load-frontier-r1.json",
+  "activation_receipt_ref": ".gwc/tasks/SCRUM-781/activation/cf-load-child-activation-r1.json",
+  "checkpoint_ref": "/Users/mac/.hermes/cache/scratch/q0-m1-m7-host/20261014_021304_0dc728/cf-load-r1/checkpoint.sqlite",
+  "activation_status": "ACTIVATED"
+ }
+}

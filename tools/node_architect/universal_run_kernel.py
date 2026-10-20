@@ -12,11 +12,11 @@ from typing import Any, Mapping
 
 from tools.node_architect.canonical_digest.reference_canonicalizer import canonical_json_bytes
 
-UNIVERSAL_PROFILE_ID = "gwc.universal-run"
-UNIVERSAL_PROFILE_VERSION = 1
+UNIVERSAL_PROFILE_ID = "gwc.universal-run.v2"
+UNIVERSAL_PROFILE_VERSION = 2
 UNIVERSAL_PROFILE = {"id": UNIVERSAL_PROFILE_ID, "version": UNIVERSAL_PROFILE_VERSION}
 
-GATES = ("G0", "G1", "G2", "G3", "G4", "G5", "G6")
+GATES = tuple(f"UR.G{index}" for index in range(7))
 GATE_STATES = {"NOT_STARTED", "ACTIVE", "WAITING", "BLOCKED", "PASSED", "FAILED"}
 TERMINAL_STATES = {"OPEN", "ACCEPTED", "FAILED", "CANCELLED", "SUPERSEDED"}
 G4_EXPLICIT_OUTCOMES = {"INTEGRATED", "IN_PLACE", "NO_TRANSFER_REQUIRED", "DOMAIN_DEFINED"}
@@ -173,7 +173,7 @@ def initial_run_state(lifecycle_profile: Mapping[str, Any] | str) -> dict[str, A
     profile = _normalize_profile(lifecycle_profile)
     return {
         "lifecycle_profile": profile,
-        "gate_states": {gate: ("ACTIVE" if gate == "G0" else "NOT_STARTED") for gate in GATES},
+        "gate_states": {gate: ("ACTIVE" if gate == GATES[0] else "NOT_STARTED") for gate in GATES},
         "terminal_state": "OPEN",
     }
 
@@ -204,7 +204,7 @@ def transition_lifecycle(
     if action == "ADVANCE":
         _require(current_state == "PASSED", "LIFECYCLE_EDGE_UNDECLARED", "advance requires PASSED")
         idx = GATES.index(current_gate)
-        _require(idx < len(GATES) - 1, "LIFECYCLE_EDGE_UNDECLARED", "G6 has no forward gate")
+        _require(idx < len(GATES) - 1, "LIFECYCLE_EDGE_UNDECLARED", f"{GATES[-1]} has no forward gate")
         expected = GATES[idx + 1]
         _require(target_gate == expected, "LIFECYCLE_EDGE_UNDECLARED", f"expected {expected}")
         next_gate, next_state, edge_kind = expected, "ACTIVE", "FORWARD"
@@ -219,11 +219,11 @@ def transition_lifecycle(
         next_state = "ACTIVE"
         edge_kind = "NON_FORWARD"
     elif action == "REPLAN":
-        _require(current_gate != "G0", "LIFECYCLE_EDGE_UNDECLARED", "cannot replan before G1")
-        next_gate, next_state, edge_kind = "G1", "ACTIVE", "NON_FORWARD"
+        _require(current_gate != GATES[0], "LIFECYCLE_EDGE_UNDECLARED", f"cannot replan before {GATES[1]}")
+        next_gate, next_state, edge_kind = GATES[1], "ACTIVE", "NON_FORWARD"
     elif action == "COMPLETE":
         _require(current_state == "ACTIVE", "LIFECYCLE_EDGE_UNDECLARED", "COMPLETE requires ACTIVE")
-        if current_gate == "G4":
+        if current_gate == GATES[4]:
             _require(explicit_outcome is not None, "G4_OUTCOME_REQUIRED")
             _require(explicit_outcome in G4_EXPLICIT_OUTCOMES, "G4_OUTCOME_INVALID", str(explicit_outcome))
         next_state = "PASSED"
@@ -238,7 +238,7 @@ def transition_lifecycle(
         _require(target_gate == next_gate, "LIFECYCLE_EDGE_UNDECLARED", "target gate mismatch")
 
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "artifact_type": "universal-lifecycle-transition",
         "lifecycle_profile": profile,
         "current_gate": current_gate,
@@ -268,6 +268,6 @@ def derive_terminal_state(
     _require(outcome in TERMINAL_STATES - {"OPEN"}, "RUN_TERMINAL_STATE_UNKNOWN", outcome)
 
     if outcome == "ACCEPTED":
-        _require(gate_states.get("G6") == "PASSED", "G6_NOT_PASSED")
+        _require(gate_states.get(GATES[-1]) == "PASSED", "G6_NOT_PASSED")
         _require(handoff_present, "HANDOFF_REQUIRED")
     return outcome

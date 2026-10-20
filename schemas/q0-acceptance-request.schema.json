@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-acceptance-request.schema.json",
+  "title": "Q0AcceptanceRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "run_id", "task_id", "certified_q0_sha", "q0_certification_receipt_ref", "qualification_matrix_digest", "target_handoff", "decision_authority", "captured_via", "issued_at", "expires_at", "effect_authority_granted", "request_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"}, "artifact_type": {"const": "q0-acceptance-request"},
+    "run_id": {"type": "string", "minLength": 1}, "task_id": {"const": "SCRUM-781"},
+    "certified_q0_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "q0_certification_receipt_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "qualification_matrix_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "target_handoff": {"const": "LOGIN_R00_PLUS"},
+    "decision_authority": {"type": "object", "const": {"type": "human", "id": "NHAT"}},
+    "captured_via": {"type": "object", "required": ["type", "id"], "properties": {"type": {"enum": ["direct_chat", "approver_bot", "other_adapter"]}, "id": {"type": "string", "minLength": 1}}, "additionalProperties": false},
+    "issued_at": {"type": "string", "format": "date-time"}, "expires_at": {"type": "string", "format": "date-time"},
+    "effect_authority_granted": {"const": false}, "request_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

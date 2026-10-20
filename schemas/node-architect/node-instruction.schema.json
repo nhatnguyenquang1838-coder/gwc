@@ -16,7 +16,7 @@
     "node_id": {"type": "string", "pattern": "^[a-z0-9_]+\\.[a-z0-9-]+$"},
     "gate": {
       "type": "array", "minItems": 1, "uniqueItems": true,
-      "items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA"]}
+      "items": {"enum": ["G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA", "UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]}
     },
     "purpose": {"type": "string", "minLength": 1},
     "entry_conditions": {"$ref": "#/$defs/nonEmptyStringArray"},
@@ -83,7 +83,7 @@
       "properties": {
         "supported_modes": {
           "type": "array", "uniqueItems": true, "minItems": 5,
-          "items": {"enum": ["normal", "fastlane", "e2e", "hotfix", "rescue"]},
+          "items": {"enum": ["normal", "fastlane", "e2e", "hotfix", "rescue", "q0_live_qualification"]},
           "allOf": [
             {"contains": {"const": "normal"}}, {"contains": {"const": "fastlane"}},
             {"contains": {"const": "e2e"}}, {"contains": {"const": "hotfix"}},
@@ -93,7 +93,7 @@
         "runtime_required": {"const": true},
         "boot_required": {"const": true},
         "claim_required": {"const": true},
-        "gate_authority_required": {"const": true},
+        "gate_authority_required": {"type": "boolean"},
         "route_required": {"const": true},
         "instruction_required": {"const": true},
         "evidence_required": {"const": true},

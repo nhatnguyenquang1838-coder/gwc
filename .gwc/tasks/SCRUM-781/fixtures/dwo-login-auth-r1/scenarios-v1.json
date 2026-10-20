@@ -1,0 +1,290 @@
+{
+  "schema_id": "gwc.q0.dwo-login-scenarios/v1",
+  "cases": [
+    {
+      "id": "LOGIN-01",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "ACCEPT",
+        "next": "/runs"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-02",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "REJECT",
+        "next": "/runs"
+      },
+      "expected": {
+        "decision": "AUTH_ERROR",
+        "location": "/login",
+        "session": "NONE",
+        "error": "INVALID_LOGIN_GENERIC"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-03",
+      "event": "sign_in",
+      "input": {
+        "email": "",
+        "password_present": true,
+        "credential_verdict": "ACCEPT"
+      },
+      "expected": {
+        "decision": "VALIDATION_ERROR",
+        "location": "/login",
+        "session": "NONE",
+        "error": "INPUT_REQUIRED"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-04",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": false,
+        "credential_verdict": "ACCEPT"
+      },
+      "expected": {
+        "decision": "VALIDATION_ERROR",
+        "location": "/login",
+        "session": "NONE",
+        "error": "INPUT_REQUIRED"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-05",
+      "event": "visit_runs",
+      "input": {
+        "path": "/runs/events",
+        "server_session": "ANONYMOUS"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/login?next=%2Fruns%2Fevents",
+        "session": "NONE",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-06",
+      "event": "visit_runs",
+      "input": {
+        "path": "/runs/events",
+        "server_session": "VERIFIED"
+      },
+      "expected": {
+        "decision": "ALLOW",
+        "location": "/runs/events",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-07",
+      "event": "visit_runs",
+      "input": {
+        "path": "/runs",
+        "server_session": "EXPIRED"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/login?next=%2Fruns",
+        "session": "NONE",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-08",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "ACCEPT",
+        "next": "https://evil.example/steal"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-09",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "ACCEPT",
+        "next": "//evil.example"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-10",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "ACCEPT",
+        "next": "/runs/jobs"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs/jobs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-11",
+      "event": "logout",
+      "input": {
+        "server_session": "VERIFIED"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/login",
+        "session": "REVOKED_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-12",
+      "event": "visit_login",
+      "input": {
+        "server_session": "VERIFIED"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-13",
+      "event": "visit_login",
+      "input": {
+        "server_session": "ANONYMOUS"
+      },
+      "expected": {
+        "decision": "ALLOW",
+        "location": "/login",
+        "session": "NONE",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-14",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "ACCEPT",
+        "next": "/runs/%2e%2e/admin"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-15",
+      "event": "visit_runs",
+      "input": {
+        "path": "/runs/events",
+        "server_session": "CLIENT_ONLY"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/login?next=%2Fruns%2Fevents",
+        "session": "NONE",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    },
+    {
+      "id": "LOGIN-16",
+      "event": "sign_in",
+      "input": {
+        "email": "operator@example.invalid",
+        "password_present": true,
+        "credential_verdict": "ACCEPT",
+        "next": "/admin"
+      },
+      "expected": {
+        "decision": "REDIRECT",
+        "location": "/runs",
+        "session": "SSR_EXPECTED",
+        "error": "NONE"
+      },
+      "oracle_class": "REQUIREMENTS_DERIVED",
+      "oracle_source": "DWO_NOTION_ARCH_20260913",
+      "observed_product_behavior": false
+    }
+  ]
+}

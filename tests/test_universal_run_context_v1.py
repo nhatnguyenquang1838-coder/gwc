@@ -9,7 +9,7 @@ import pytest
 from tools.node_architect.universal_run_kernel import UniversalRunKernelError
 
 MODULE_NAME = "tools.node_architect.universal_run_context"
-PROFILE = {"id": "gwc.universal-run", "version": 1}
+PROFILE = {"id": "gwc.universal-run.v2", "version": 2}
 
 
 def _api():

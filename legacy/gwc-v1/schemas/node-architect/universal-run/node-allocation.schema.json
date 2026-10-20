@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/node-allocation.schema.json",
+  "title": "Universal Run NodeAllocation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "schema_id",
+    "schema_version",
+    "run_id",
+    "created_at",
+    "created_by",
+    "lifecycle_profile",
+    "provenance",
+    "node_allocation_id",
+    "kind",
+    "requirement",
+    "condition_ref",
+    "control_justification",
+    "independent_boundary_reasons",
+    "child_instance_policy",
+    "content_digest"
+  ],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "schema_id": {"const": "gwc.universal-run.node-allocation"},
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "created_at": {"type": "string", "minLength": 1},
+    "created_by": {"type": "object"},
+    "lifecycle_profile": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"const": "gwc.universal-run"},
+        "version": {"const": 1}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["predecessor_refs", "source_refs"],
+      "additionalProperties": false,
+      "properties": {
+        "predecessor_refs": {"type": "array", "items": {"type": "string"}},
+        "source_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "node_allocation_id": {"type": "string", "minLength": 1, "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "kind": {"enum": ["WORK", "CONTROL"]},
+    "requirement": {"enum": ["REQUIRED", "OPTIONAL", "CONDITIONAL"]},
+    "condition_ref": {"type": ["string", "null"], "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "control_justification": {"type": ["string", "null"], "pattern": "^[^\\s\\r\\n](?:[^\\r\\n]*[^\\s\\r\\n])?$"},
+    "independent_boundary_reasons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "INDEPENDENT_CONSUMER",
+          "INDEPENDENT_ACCEPTANCE",
+          "INDEPENDENT_TARGET",
+          "INDEPENDENT_HANDOFF",
+          "INDEPENDENT_AUTHORITY",
+          "INDEPENDENT_EVIDENCE",
+          "GOVERNED_RETRY_BOUNDARY"
+        ]
+      }
+    },
+    "child_instance_policy": {"const": "SINGLE_ACTIVE"},
+    "content_digest": {
+      "type": "object",
+      "required": ["algorithm", "canonicalization", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {"const": "sha256"},
+        "canonicalization": {"const": "JCS"},
+        "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"kind": {"const": "CONTROL"}}, "required": ["kind"]},
+      "then": {
+        "properties": {
+          "control_justification": {"type": "string", "minLength": 1},
+          "independent_boundary_reasons": {"maxItems": 0}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"requirement": {"const": "CONDITIONAL"}}, "required": ["requirement"]},
+      "then": {"properties": {"condition_ref": {"type": "string", "minLength": 1}}}
+    }
+  ]
+}

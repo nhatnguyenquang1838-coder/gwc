@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.dev/schemas/node-architect/universal-run/v2/executor-action-receipt.schema.json",
+  "title": "Universal Runtime v2 executor action receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id", "schema_version", "artifact_type", "runtime_protocol",
+    "runtime_epoch", "runtime_profile_digest", "route_id", "run_id",
+    "sequence", "gate", "action", "actor", "node_id", "node_allocation_id",
+    "runtime_plan_digest", "assignment_digest", "event_id", "host_status",
+    "host_result_digest", "evidence_refs", "authority_granted",
+    "executed_effects", "receipt_digest"
+  ],
+  "properties": {
+    "schema_id": {"const": "gwc.universal-run.executor-action-receipt.v2"},
+    "schema_version": {"const": 2},
+    "artifact_type": {"const": "executor-action-receipt"},
+    "runtime_protocol": {"const": "gwc.universal.controller/v2"},
+    "runtime_epoch": {"const": "UNIVERSAL_V2_DEVELOPMENT"},
+    "runtime_profile_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "route_id": {"const": "UNIVERSAL_RUN_NEW_RUNTIME"},
+    "run_id": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "gate": {"enum": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]},
+    "action": {"type": "string", "minLength": 1},
+    "actor": {"const": "EXECUTOR"},
+    "node_id": {"type": "string", "minLength": 1},
+    "node_allocation_id": {"type": "string", "minLength": 1},
+    "runtime_plan_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "assignment_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "event_id": {"type": "string", "minLength": 1},
+    "host_status": {"enum": ["ACTION_COMPLETE", "ACTION_BLOCKED"]},
+    "host_result_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "evidence_refs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "authority_granted": {"const": false},
+    "executed_effects": {"const": []},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

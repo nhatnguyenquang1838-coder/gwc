@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/q0-certification-receipt.schema.json",
+  "title": "Q0CertificationReceipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "artifact_type", "run_id", "task_id", "runtime_epoch", "qualification_profile", "qualification_profile_digest", "qualification_matrix_digest", "candidate_sha", "loaded_runtime_identity", "load_proof_ref", "load_proof_evidence", "incident_replay_refs", "replay_result", "replay_exact_readback", "previous_failure_state", "first_state_beyond_failure", "forward_progress_refs", "broader_regression_refs", "broader_regression_result", "stale_dependent_state", "certified_q0_sha", "certification_level", "campaign_state", "created_at", "created_by", "receipt_digest"],
+  "properties": {
+    "schema_version": {"const": "1.0"}, "artifact_type": {"const": "q0-certification-receipt"},
+    "run_id": {"type": "string", "minLength": 1}, "task_id": {"const": "SCRUM-781"},
+    "runtime_epoch": {"const": "UNIVERSAL_V2_DEVELOPMENT"}, "qualification_profile": {"const": "q0_live_qualification"},
+    "qualification_profile_digest": {"$ref": "#/$defs/digest"},
+    "qualification_matrix_digest": {"$ref": "#/$defs/digest"},
+    "candidate_sha": {"$ref": "#/$defs/sha"}, "loaded_runtime_identity": {"$ref": "#/$defs/sha"},
+    "load_proof_ref": {"type": "string", "minLength": 1},
+    "load_proof_evidence": {"type": "object", "required": ["activation_id", "candidate_sha", "loaded_source_sha", "source_root", "runtime_session_id", "runtime_process_id", "loaded_profile_digest", "loaded_module_identities"], "properties": {"activation_id": {"type": "string", "minLength": 1}, "candidate_sha": {"$ref": "#/$defs/sha"}, "loaded_source_sha": {"$ref": "#/$defs/sha"}, "source_root": {"type": "string", "minLength": 1}, "runtime_session_id": {"type": "string", "minLength": 1}, "runtime_process_id": {"type": "string", "minLength": 1}, "loaded_profile_digest": {"$ref": "#/$defs/digest"}, "loaded_module_identities": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/digest"}}}, "additionalProperties": true},
+    "incident_replay_refs": {"$ref": "#/$defs/refs"}, "replay_result": {"const": "PASS"},
+    "replay_exact_readback": {"const": true}, "previous_failure_state": {"type": "string", "minLength": 1},
+    "first_state_beyond_failure": {"type": "string", "minLength": 1},
+    "forward_progress_refs": {"$ref": "#/$defs/refs"},
+    "broader_regression_refs": {"$ref": "#/$defs/refs"}, "broader_regression_result": {"const": "PASS"},
+    "stale_dependent_state": {"type": "array", "items": {"type": "string"}},
+    "certified_q0_sha": {"$ref": "#/$defs/sha"}, "certification_level": {"const": "L3"},
+    "campaign_state": {"const": "CAMPAIGN_READY_RUNTIME"}, "created_at": {"type": "string", "format": "date-time"},
+    "created_by": {"type": "object", "required": ["id"], "properties": {"type": {"type": "string"}, "id": {"type": "string", "minLength": 1}}, "additionalProperties": true},
+    "receipt_digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}

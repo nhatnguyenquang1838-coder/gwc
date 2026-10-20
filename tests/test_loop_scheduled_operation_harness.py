@@ -442,9 +442,14 @@ def test_settlement_reconciler_does_not_record_unverified_native_result(tmp_path
             settlement,
             lambda request: {"status": "FAILED", "settled": False},
         )
-    # nothing recorded: no ledger file (or an empty settlement map if one exists)
-    if ledger.exists():
-        assert json.loads(ledger.read_text(encoding="utf-8"))["settlements"] == {}
+    # An unverified callback is not settlement success, but its intent must be
+    # retained: lack of a verified receipt is not proof the effect never ran.
+    entry = json.loads(ledger.read_text(encoding="utf-8"))["settlements"][settlement["idempotency_key"]]
+    assert entry["settled"] is False
+    assert entry["state"] == "INTENT_RECORDED"
+    assert reconciler.is_settled(settlement) is False
+    with pytest.raises(ValueError, match="UNKNOWN_OUTCOME"):
+        reconciler.settle_exactly_once(settlement, lambda _request: pytest.fail("blind retry forbidden"))
 
 
 # --------------------------------------------------------------------------

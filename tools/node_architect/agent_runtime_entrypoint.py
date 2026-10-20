@@ -94,6 +94,53 @@ def _binding_for(registry: Mapping[str, Any], node_id: str) -> Mapping[str, Any]
     return matches[0] if len(matches) == 1 else None
 
 
+def _q0_profile_implementation_registry(
+    route: Mapping[str, Any], *, root: Path, node_registry_revision: str | None = None
+) -> dict[str, Any]:
+    """Bind the Q0 campaign profile into the Agent Host's normal dispatch path."""
+    from .q0_qualification import Q0_WORKFLOW_MODE
+    from .semantic_implementation_registry import _binding_payload, node_registry_revision as _node_registry_revision
+    from .validate_node_instruction import load_data, validate_instruction
+
+    descriptor_ref = "core/node-architect/q0/qualification-campaign.node.json"
+    instruction_ref = "core/node-architect/node-instructions/q0/qualification-campaign.node-instruction.yaml"
+    try:
+        descriptor = load_data(root / descriptor_ref)
+        card = load_data(root / instruction_ref)
+        schema = load_data(root / "schemas/node-architect/node-instruction.schema.json")
+        if node_registry_revision is None:
+            node_registry = load_data(root / "core/node-architect/node-registry.json")
+            node_registry_revision = _node_registry_revision(node_registry)
+        node_registry_revision = str(node_registry_revision or "")
+        if not node_registry_revision:
+            return {"status": "FAIL", "bindings": [], "errors": ["Q0_NODE_REGISTRY_REVISION_MISSING"]}
+        if route.get("node_instruction_ref") != instruction_ref:
+            return {"status": "FAIL", "bindings": [], "errors": ["Q0_INSTRUCTION_REF_MISMATCH"]}
+        node = {
+            "id": "q0.qualification-campaign", "version": "1.0.0", "family": "q0",
+            "effect_class": "read_only", "authority_class": "workflow",
+            "provenance": {"source_path": descriptor_ref},
+            "suspension": {"suspendable": True, "resume_metadata": ["run_id", "candidate_sha"]},
+        }
+        report = validate_instruction(
+            card=card, schema=schema, descriptor=descriptor, registry_node=node,
+            route=route, active_gate=str(route.get("gate", "")), mode=Q0_WORKFLOW_MODE,
+        )
+        if not report.valid:
+            return {"status": "FAIL", "bindings": [], "errors": list(report.reason_codes)}
+        implementation_ref = str((route.get("implementation") or {}).get("ref", ""))
+        binding = _binding_payload(
+            node=node, registry_revision=node_registry_revision,
+            card=card, implementation_kind="q0_profile_adapter",
+            implementation_ref=implementation_ref, semantic_source_kind="Q0_PROFILE_ADAPTER",
+            descriptor_ref=descriptor_ref,
+        )
+        return {"status": "PASS", "bindings": [binding], "errors": [],
+                "profile_digest": str(route.get("instruction_digest", ""))}
+    except Exception as exc:
+        return {"status": "FAIL", "bindings": [], "errors": [f"Q0_PROFILE_BINDING_INVALID:{type(exc).__name__}"]}
+
+
 def _route_context(
     *,
     canonical_state: Mapping[str, Any],
@@ -116,6 +163,11 @@ def _route_context(
         "expected_profile_revision": str(canonical_state.get("profile_revision") or ""),
         "expected_graph_revision": str(canonical_state.get("graph_revision") or ""),
     })
+    # Universal Runtime v2 development lane: the host carries the resolved
+    # runtime epoch into canonical route resolution so the gate-node router
+    # can reject legacy unqualified gate routes for UNIVERSAL_V2_DEVELOPMENT.
+    if canonical_state.get("runtime_epoch"):
+        context.setdefault("runtime_epoch", str(canonical_state["runtime_epoch"]))
     # Canonical route resolution owns required-context validation. The Agent Host
     # supplies the immutable task/gate context; provider/model output never does.
     context.setdefault("context", dict(input_payload))
@@ -589,6 +641,28 @@ def _provider_semantic_handler(
     return handler
 
 
+_LEGACY_GATE_ALIASES = {
+    "G0_CONTEXT": "UR.G0",
+    "G1_ALIGNMENT": "UR.G1",
+    "G2_EXECUTION": "UR.G2",
+    "G3_PR": "UR.G3",
+    "G4_MERGE": "UR.G4",
+    "G5_DEPLOY": "UR.G5",
+    "G6_PRODUCTION_DATA": "UR.G6",
+}
+
+
+def _canonical_gate(gate: str) -> str:
+    """Normalize a GWC-v1 gate name to its UR gate at the V2 boundary.
+
+    The V2 bridge accepts only ``UR.G0..UR.G6``. Callers that still carry the
+    legacy lifecycle names are mapped explicitly here instead of being allowed to
+    leak the GWC namespace into the canonical Universal Runtime state.
+    """
+    name = str(gate or "").strip()
+    return _LEGACY_GATE_ALIASES.get(name, name)
+
+
 def run_agent_runtime_event(
     *,
     canonical_state: Mapping[str, Any],
@@ -660,9 +734,16 @@ def run_agent_runtime_event(
     if not node_id:
         return _blocked("AGENT_ROUTE_NODE_MISSING")
 
-    registry = implementation_registry
-    if registry is None:
-        registry = compile_semantic_implementation_registry(node_registry, root=repo_root)
+    from .q0_qualification import Q0_RUNTIME_EPOCH, Q0_WORKFLOW_MODE
+    if workflow_mode == Q0_WORKFLOW_MODE:
+        registry = _q0_profile_implementation_registry(
+            route, root=repo_root,
+            node_registry_revision=str(canonical_state.get("node_registry_revision") or ""),
+        )
+    else:
+        registry = implementation_registry
+        if registry is None:
+            registry = compile_semantic_implementation_registry(node_registry, root=repo_root)
     if not isinstance(registry, Mapping) or registry.get("status") != "PASS":
         return _blocked("AGENT_SEMANTIC_IMPLEMENTATION_REGISTRY_INVALID")
     binding = _binding_for(registry, node_id)
@@ -688,15 +769,56 @@ def run_agent_runtime_event(
     except InstructionBundleError as exc:
         return _blocked(exc.reason_code, detail=exc.detail, node_id=node_id)
 
-    event = build_live_runtime_event(
-        canonical_state=canonical_state,
-        event_id=event_id,
-        run_id=run_id,
-        gate=gate,
-        requested_action=requested_action,
-        scenario=scenario,
-        input_payload=input_payload,
-    )
+    event_input_payload = dict(input_payload)
+    if workflow_mode == Q0_WORKFLOW_MODE:
+        runtime_epoch = str(canonical_state.get("runtime_epoch") or event_input_payload.get("runtime_epoch") or "")
+        supplied_mode = str(event_input_payload.get("workflow_mode") or "")
+        if runtime_epoch != Q0_RUNTIME_EPOCH:
+            return _blocked("AGENT_Q0_RUNTIME_EPOCH_MISMATCH", runtime_epoch=runtime_epoch)
+        if supplied_mode and supplied_mode != Q0_WORKFLOW_MODE:
+            return _blocked("AGENT_Q0_WORKFLOW_MODE_MISMATCH", workflow_mode=supplied_mode)
+        supplied_epoch = str(event_input_payload.get("runtime_epoch") or "")
+        if supplied_epoch and supplied_epoch != runtime_epoch:
+            return _blocked("AGENT_Q0_RUNTIME_EPOCH_MISMATCH", runtime_epoch=supplied_epoch)
+        event_input_payload["workflow_mode"] = Q0_WORKFLOW_MODE
+        event_input_payload["runtime_epoch"] = runtime_epoch
+
+    # Runtime-family dispatch: a Q0 claim goes through the Universal Runtime v2
+    # bridge (UR gates); a legacy semantic-runtime call keeps the preserved GWC-v1
+    # bridge and its gate namespace. Neither namespace is folded into the other.
+    if str(workflow_mode) == Q0_WORKFLOW_MODE:
+        dispatch = dispatch_live_runtime_event
+        legacy_family = False
+        event = build_live_runtime_event(
+            canonical_state=canonical_state,
+            event_id=event_id,
+            run_id=run_id,
+            gate=_canonical_gate(gate),
+            requested_action=requested_action,
+            scenario=scenario,
+            input_payload=event_input_payload,
+        )
+    else:
+        from .legacy_live_runtime_bridge import (
+            LiveRuntimeState as LegacyLiveRuntimeState,
+            build_live_runtime_event as legacy_build,
+            dispatch_live_runtime_event as legacy_dispatch,
+        )
+
+        # The legacy bridge carries its own execution state type.
+        if not isinstance(state, LegacyLiveRuntimeState):
+            state = LegacyLiveRuntimeState()
+        legacy_family = True
+        dispatch = legacy_dispatch
+        event = legacy_build(
+            canonical_state=canonical_state,
+            event_id=event_id,
+            run_id=run_id,
+            gate=gate,
+            requested_action=requested_action,
+            scenario=scenario,
+            input_payload=event_input_payload,
+        )
     provider_request = _provider_request(
         canonical_state=canonical_state,
         run_id=run_id,
@@ -772,9 +894,10 @@ def run_agent_runtime_event(
         workflow_root=repo_root,
     )
 
-    runtime_state = state if isinstance(state, LiveRuntimeState) else LiveRuntimeState()
+    state_type = LegacyLiveRuntimeState if legacy_family else LiveRuntimeState
+    runtime_state = state if isinstance(state, state_type) else state_type()
     effective_readback_handler = readback_handler if readback_handler is not None else verify_canonical_readback
-    result = dispatch_live_runtime_event(
+    result = dispatch(
         event=event,
         route_decision=route,
         implementation_registry=registry,

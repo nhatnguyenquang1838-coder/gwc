@@ -109,6 +109,8 @@ def _validate_operation_binding(state: WorkflowState, profile: Mapping[str, Any]
         "scope_hash": profile["scope_hash"],
         "runtime_plan_digest": profile["runtime_plan_digest"],
     }
+    if "run_id" in profile:
+        expected["run_id"] = profile["run_id"]
     if any(operation.get(key) != value for key, value in expected.items()):
         return {"status": "BLOCKED", "reason_code": "OPERATION_BINDING_MISMATCH", "current_activity": "M1", "authority_granted": False, "executed_effects": []}
     if operation.get("head_sha") != operation.get("base_sha"):
@@ -597,11 +599,24 @@ def build_m1_m7_graph(
     workflow_manifest: Mapping[str, Any],
     runtime_profile: Mapping[str, Any],
     activity_source_sha256: str,
+    execution_binding: Mapping[str, Any] | None = None,
 ):
-    """Compile the optional LangGraph backend after closed contract checks."""
+    """Compile the optional graph. Q0 rebinding is observation-only, never authority."""
     if not isinstance(workflow_manifest, Mapping) or not isinstance(runtime_profile, Mapping):
         raise WorkflowContractError("WORKFLOW_CONTRACT_INPUT_INVALID")
     _validate_contracts(workflow_manifest, runtime_profile, activity_source_sha256)
+    if execution_binding is not None:
+        _require(isinstance(execution_binding, Mapping), "EXECUTION_BINDING_INVALID")
+        _require(execution_binding.get("task_id") == "SCRUM-781", "EXECUTION_TASK_INVALID")
+        _require(str(execution_binding.get("run_id", "")).startswith("scrum781-q0-"), "EXECUTION_RUN_INVALID")
+        _require(str(execution_binding.get("working_branch", "")).startswith("fix/SCRUM-781-q0-"), "EXECUTION_BRANCH_INVALID")
+        _require(execution_binding.get("repository") == runtime_profile["repository"], "EXECUTION_REPOSITORY_INVALID")
+        _require(_valid_sha(execution_binding.get("base_sha")), "EXECUTION_BASE_INVALID")
+        for field in ("scope_hash", "runtime_plan_digest"):
+            value = execution_binding.get(field)
+            _require(isinstance(value, str) and value.startswith("sha256:") and len(value) == 71, "EXECUTION_DIGEST_INVALID")
+        _require(execution_binding.get("authorized_actions") == [] and execution_binding.get("authorized_paths") == [], "EXECUTION_BINDING_MUST_BE_OBSERVATION_ONLY")
+        runtime_profile = {**dict(runtime_profile), **{key: execution_binding[key] for key in ("task_id", "run_id", "repository", "base_sha", "working_branch", "scope_hash", "runtime_plan_digest", "authorized_actions", "authorized_paths")}}
     graph = StateGraph(WorkflowState)
     graph.add_node("validate_operation", lambda state: _validate_operation_binding(state, runtime_profile))
     graph.add_node("M1", _m1_observe)

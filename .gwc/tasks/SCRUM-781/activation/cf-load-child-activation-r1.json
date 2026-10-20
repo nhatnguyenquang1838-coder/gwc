@@ -1,0 +1,21 @@
+{
+ "activated_at": "2026-10-20T15:47:10.352323+00:00",
+ "activation_generation": 1,
+ "authority_granted": false,
+ "authority_ref": "https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6294303484",
+ "branch": "fix/SCRUM-781-q0-cf-load-r1",
+ "checkpoint_ref": "/Users/mac/.hermes/cache/scratch/q0-m1-m7-host/20261014_021304_0dc728/cf-load-r1/checkpoint.sqlite",
+ "claim_boundary": "child first-run plan activation only; no native LOAD_PROOF, L3, typed C/E admission or gate receipt",
+ "head_sha": "fa936cde678f0ade92c23408e65a1f74cb07fc87",
+ "native_runtime_activation": false,
+ "parent_run_ref": "scrum781-q0-fresh-20261010-r1",
+ "parent_terminal_digest": "sha256:001a0007aedea926666feed7511c6a7df6c5f39d6b0b25ac9aed7b436f945589",
+ "parent_terminal_ref": ".gwc/tasks/SCRUM-781/evidence/q0-e2e-closure-r1.json",
+ "plan_digest": "sha256:e198be367c6dbc8d384fdb6b1159e29e25fc699447d38bcabffe200a9d851c8e",
+ "plan_ref": "core/node-architect/scrum781-q0-cf-load-execution-plan-r1.json",
+ "reason": "Controller COMMAND #89 (B2): distinct child run first-run activation for CF_LOAD",
+ "receipt_digest": "sha256:e3d2b0bfdfae3d055221df9a586a9ad31363d35c63935884d9c37d1b47148fe1",
+ "run_id": "scrum781-q0-cf-load-r1",
+ "schema_id": "gwc.q0.first-run-activation/v1",
+ "typed_ce_admitted": false
+}

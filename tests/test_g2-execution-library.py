@@ -1,5 +1,12 @@
 # Test suite for G2 Execution Library Integrity
 
+"""Specification only.
+
+The cases below are not implemented yet; the file is kept verbatim as the
+source-bound contract for the G2 Execution Library. Wrapping it in a module
+docstring keeps it importable so it no longer aborts collection of the whole
+suite.
+
 ## Objective
 Validate that the `gwc-g2-execution-library` correctly binds, executes, and enforces transaction boundaries during the G2 phase.
 
@@ -16,3 +23,4 @@ Validate that the `gwc-g2-execution-library` correctly binds, executes, and enfo
 
 # Test execution command (Conceptual)
 python tests/test_g2-execution-library.py --suite gwc-g2
+"""
