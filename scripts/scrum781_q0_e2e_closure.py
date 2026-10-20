@@ -59,7 +59,7 @@ def git(*args: str) -> str:
 
 def p1_scope(plan: dict) -> dict:
     targets = list((plan.get("scope") or {}).get("writable_targets") or [])
-    changed = git("diff", "--name-only", "origin/main...HEAD").splitlines()
+    changed = [l for l in git("diff", "--name-only", "--diff-filter=ADM", "origin/main...HEAD").splitlines() if l]
     matched, unmatched = [], []
     for path in changed:
         if any(fnmatch.fnmatch(path, pattern) for pattern in targets):

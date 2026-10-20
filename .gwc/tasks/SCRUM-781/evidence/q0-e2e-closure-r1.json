@@ -2,7 +2,7 @@
  "P1_scope_reconciliation": {
   "changed_files": 183,
   "matched": {
-   "count": 135,
+   "count": 136,
    "paths": [
     ".gwc/tasks/SCRUM-781/activation/cf-plan-activation.json",
     ".gwc/tasks/SCRUM-781/engineering/correction43-engineering-workflow-r1.md",
@@ -51,6 +51,7 @@
     "scripts/scrum781_fresh_taskcontroller_preflight.py",
     "scripts/scrum781_fresh_ur_g0_boot.py",
     "scripts/scrum781_q0_controller_recover_20261010.py",
+    "scripts/scrum781_q0_e2e_closure.py",
     "scripts/scrum781_q0_execute_dispatch.py",
     "scripts/scrum781_q0_execute_worker.py",
     "scripts/scrum781_q0_fixture_replay.py",
@@ -142,7 +143,7 @@
    ]
   },
   "unmatched": {
-   "count": 48,
+   "count": 47,
    "paths": [
     ".github/workflows/scrum781-fresh-ur-g0.yml",
     ".github/workflows/scrum781-q0-controller-recovery.yml",
@@ -190,8 +191,7 @@
     "schemas/q0-closure-receipt.schema.json",
     "schemas/q0-handoff-receipt.schema.json",
     "schemas/q0-live-qualification-profile.schema.json",
-    "schemas/q0-verification-receipt.schema.json",
-    "scripts/q0_e2e_closure.py"
+    "schemas/q0-verification-receipt.schema.json"
    ],
    "top_level_groups": {
     ".github/workflows": 3,
@@ -205,8 +205,7 @@
     "schemas/q0-closure-receipt.schema.json": 1,
     "schemas/q0-handoff-receipt.schema.json": 1,
     "schemas/q0-live-qualification-profile.schema.json": 1,
-    "schemas/q0-verification-receipt.schema.json": 1,
-    "scripts/q0_e2e_closure.py": 1
+    "schemas/q0-verification-receipt.schema.json": 1
    }
   },
   "writable_targets": [
@@ -232,7 +231,7 @@
     "summary": "78 passed"
    }
   ],
-  "source_head": "a3d7b61e2ae45e0358446e73a618f8fd9d7ab336"
+  "source_head": "b0af94498222add3e556e674df4a1c4080acb340"
  },
  "P3_qualification_matrix": {
   "counts": {
@@ -344,5 +343,5 @@
  "claim_boundary": "local engineering evidence; no native LOAD_PROOF, no original DWO replay, no L3, no gate receipt",
  "run_id": "scrum781-q0-fresh-20261010-r1",
  "schema_id": "gwc.q0.e2e-closure/v1",
- "source_head": "a3d7b61e2ae45e0358446e73a618f8fd9d7ab336"
+ "source_head": "b0af94498222add3e556e674df4a1c4080acb340"
 }
