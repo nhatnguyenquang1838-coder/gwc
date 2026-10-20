@@ -163,10 +163,14 @@ def terminal_blocker_identity(*,run_id,runtime_plan_digest,activity,reason_code,
 
 
 def controller_dispatch_required(activity,reason_code):
-    """True for every halt: each real firing reports to the Controller.
+    """True only for material blockers that need a Controller decision.
 
-    Response to the Controller is mandatory on every turn, including a
-    no-material-change or host-action halt. The dispatch carries the exact
-    blocker so the Controller can decide; it grants no authority.
+    ACK #69: mandatory reporting is not mandatory approval. A routine firing is
+    telemetry; only a material blocker, plan conflict or E2E handoff creates a
+    Controller decision request.
     """
-    return True
+    return ((activity=='M2' and reason_code=='ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED') or
+            (activity=='M3' and reason_code=='ENGINEERING_FRONTIER_WAIT_INPUT') or
+            (activity=='M4' and reason_code=='ENGINEERING_EXTERNAL_DEPENDENCY') or
+            (activity=='M5' and reason_code in {'ENGINEERING_EFFECT_AUTHORITY_REQUIRED',
+                                                 'ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED'}))

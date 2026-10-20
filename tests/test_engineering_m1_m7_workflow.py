@@ -67,8 +67,8 @@ def test_missing_host_firing_admission_holds_before_work_claim(tmp_path):
     r=run_task_workflow(c,host_capabilities=caps,invocation_key='explicit-source-check')
     assert r['verdict']['reason_code']=='ENGINEERING_GENUINE_FIRING_REQUIRED'
     assert counts['execute']==0
-    # Every firing reports to the Controller, including a native-owner admission halt.
-    assert len(r['graph_requests'])==1
+    # Native-owner admission halt is telemetry: no Controller decision request.
+    assert r['graph_requests']==[]
 
 
 @pytest.mark.parametrize('admission',['missing','none','non_callable'])
@@ -332,8 +332,12 @@ def test_preflight_failure_is_recorded_as_no_effect_and_retryable_on_same_finger
     assert status=='PRE_EFFECT_VALIDATION_FAILED'
     assert detail['effect_started'] is False and detail['reason_code']=='ENGINEERING_INPUT_DIGEST_DRIFT'
     assert first['terminal']['pre_effect_failure']==detail
-    assert first['terminal']['controller_dispatch_required'] is True
-    assert len(first['graph_requests'])==1
+    assert first['terminal']['controller_dispatch_required'] is False
+    assert first['graph_requests']==[]
+    import sqlite3 as _s
+    with _s.connect(c['workflow']['checkpoint_ref']) as db:
+        row=db.execute('SELECT request_created FROM engineering_firing_telemetry WHERE run=?',(c['run']['id'],)).fetchone()
+    assert row==(0,)  # telemetry recorded, no Controller decision request
     retry=run_task_workflow(c,host_capabilities=caps,invocation_key='same-fingerprint-recovery')
     assert retry['activity_results']['M5']['status']=='PASS'
     assert retry['activity_results']['M6']['status']=='PASS'
@@ -497,7 +501,7 @@ def test_m8_correlates_response_as_observation_without_resuming_or_granting_auth
     assert counts['execute']==0
 
 
-def test_m8_reports_each_firing_while_prior_exchange_is_pending(tmp_path):
+def test_m8_records_telemetry_without_a_second_request_while_exchange_pending(tmp_path):
     import sqlite3
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
     c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)
@@ -506,14 +510,16 @@ def test_m8_reports_each_firing_while_prior_exchange_is_pending(tmp_path):
     assert original['lane']=='HOST_COORDINATION'
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='m3-after-m7')
     assert second['verdict']['current_activity']=='M8'
-    assert original['marker'] in second['terminal']['backlog_pending_exchange_markers']
-    assert len(second['graph_requests'])==1
-    assert second['graph_requests'][0]['marker']!=original['marker']
-    assert second['terminal_exchange_request']['marker']==second['graph_requests'][0]['marker']
+    # ACK #69: an unchanged/non-material firing records telemetry only.
+    assert second['graph_requests']==[]
+    assert second['terminal_exchange_request'] is None
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     assert box.read(original)['status']=='EXCHANGE_REQUESTED'
     with sqlite3.connect(box.path) as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        rows=db.execute('SELECT firing,request_created FROM engineering_firing_telemetry ORDER BY firing').fetchall()
+    assert ('m3-after-m7',0) in rows
 
 
 def test_m7_uses_shared_marker_response_reconciliation_before_next_request(tmp_path):

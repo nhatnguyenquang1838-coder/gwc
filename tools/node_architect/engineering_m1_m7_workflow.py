@@ -65,6 +65,24 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     def outcome(s,name,status,reason,**data):
         return {'current_activity':name,'status':status,'reason_code':reason,
                 'activity_results':{**s.get('activity_results',{}),name:{'status':status,'reason_code':reason}},**data}
+    def _telemetry(activity,reason,status,result_digest,request_created):
+        with _connect(path) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_firing_telemetry '
+                       '(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,'
+                       'source_head TEXT,result_digest TEXT,request_created INTEGER,PRIMARY KEY(run,firing))')
+            db.execute('INSERT OR REPLACE INTO engineering_firing_telemetry VALUES (?,?,?,?,?,?,?,?)',
+                       (run,invocation_key or 'explicit',activity,reason,status,
+                        c['repository']['head_sha'],result_digest,int(request_created)))
+    def _already_reported(result_digest):
+        with _connect(path) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_reported (run TEXT,digest TEXT,PRIMARY KEY(run,digest))')
+            return db.execute('SELECT 1 FROM engineering_reported WHERE run=? AND digest=?',
+                              (run,result_digest)).fetchone() is not None
+    def _mark_reported(result_digest):
+        with _connect(path) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_reported (run TEXT,digest TEXT,PRIMARY KEY(run,digest))')
+            db.execute('INSERT OR IGNORE INTO engineering_reported VALUES (?,?)',(run,result_digest))
+
     def m1(s):
         read=host_capabilities.get('engineering.communication_read_once')
         if not callable(read):return outcome(s,'M1','WAIT','ENGINEERING_COMMUNICATION_READER_REQUIRED')
@@ -285,6 +303,21 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             from .engineering_work_frontier import classify_controller_observation
             disposition=classify_controller_observation(prior_receipt['response_text'])
             response_observation={**response_observation,'disposition_observation':disposition}
+        result_digest=digest({'work':(s.get('work') or {}).get('id'),
+                              'result':(s.get('execution') or {}).get('result'),
+                              'head':c['repository']['head_sha']})
+        if _already_reported(result_digest):
+            # ACK #69: an unchanged result is telemetry, not a new decision request.
+            _telemetry('M7','ENGINEERING_TELEMETRY_RECORDED','WAIT',result_digest,False)
+            return outcome(s,'M7','WAIT','ENGINEERING_TELEMETRY_RECORDED',
+                           controller_exchange_requests=[],
+                           controller_response_observation=response_observation,
+                           backlog_pending_exchange_markers=backlog,
+                           terminal={'kind':'ENGINEERING_TELEMETRY','activity':'M7',
+                                     'reason_code':'ENGINEERING_TELEMETRY_RECORDED',
+                                     'result_digest':result_digest,
+                                     'work_id':(s.get('work') or {}).get('id')})
+        _mark_reported(result_digest)
         request=make_exchange_request(c,report,lane='HOST_COORDINATION')
         with _connect(path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS engineering_exchange_contexts (digest TEXT PRIMARY KEY, context TEXT)')
@@ -363,7 +396,9 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         # Terminal results owned by the Controller are routed independently of
         # protected M7. Deduplicate by blocker identity (not source HEAD): a new
         # additive commit cannot reopen the same unresolved external blocker.
-        if controller_required:
+        dispatch_request = controller_required
+        _telemetry(s['current_activity'],s['reason_code'],s['status'],terminal_digest,dispatch_request)
+        if dispatch_request:
             box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
             with _connect(path) as db:
                 db.execute('CREATE TABLE IF NOT EXISTS engineering_terminal_dispatches '
