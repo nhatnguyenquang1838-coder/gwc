@@ -104,6 +104,94 @@ def test_head_change_requires_explicit_same_checkpoint_reconciliation(tmp_path):
         assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
 
 
+def test_additive_route_metadata_requires_explicit_route_reconciliation(tmp_path):
+    """A human-approved successor plan may add read-only route metadata.
+
+    The HEAD-only helper must refuse the non-head drift, and an explicit,
+    checksum-bound route-metadata reconciliation must advance the same
+    checkpoint while preserving every invocation/work/outbox/UNKNOWN row.
+    """
+    import copy,json,subprocess,sqlite3
+    from tools.node_architect.task_context_binding import digest as ctx_digest
+    from tools.node_architect.engineering_m1_m7_workflow import (
+        reconcile_engineering_source_head, reconcile_engineering_route_metadata)
+    def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
+    git('init','-b','fix/test')
+    (tmp_path/'route.json').write_text(json.dumps({
+        'workflow_mode':'Q0_ENGINEERING_COORDINATION','runtime_epoch':'UNIVERSAL_V2_DEVELOPMENT',
+        'intent_ref':'intent-1','intent_body_sha256':'s',
+        'work_items':[{'id':'login-probe','priority':1,'action':'run_sandboxed_validation',
+                       'input_digest':'sha256:'+'b'*64,'provenance':'RECONSTRUCTED_REQUIREMENTS_BOUND'}]}))
+    git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    route_ref='route.json'
+    old_route=json.loads(git('show','HEAD:'+route_ref))
+    c=binding(tmp_path)
+    c['repository']['worktree']=str(tmp_path);c['repository']['branch']='fix/test'
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    c['engineering']['route_policy_ref']=route_ref
+    c['engineering']['route_policy_digest']=ctx_digest(old_route)
+    c['engineering']['work_items']=old_route['work_items']
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    run_task_workflow(c,host_capabilities=caps,invocation_key='route-one')
+    new_route=copy.deepcopy(old_route)
+    new_route['approved_successor_g1']={'target_change':'OPTION_B_CONTROLLED_FAILURE_CAMPAIGN',
+                                        'human_approved':True,'activation_status':'PENDING'}
+    (tmp_path/'route.json').write_text(json.dumps(new_route))
+    git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','additive route metadata')
+    newer=copy.deepcopy(c)
+    newer['repository']['head_sha']=git('rev-parse','HEAD')
+    newer['engineering']['route_policy_digest']=ctx_digest(new_route)
+    # HEAD-only reconciliation must refuse a route-content delta.
+    with pytest.raises(ValueError,match='ENGINEERING_RECONCILE_NON_HEAD_DRIFT'):
+        reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='fixture')
+    receipt=reconcile_engineering_route_metadata(c,newer,repository_root=tmp_path,
+        reason='fixture additive route metadata',route_ref=route_ref)
+    assert receipt['route_metadata_delta'] is True
+    assert receipt['old_route_policy_digest']==ctx_digest(old_route)
+    assert receipt['new_route_policy_digest']==ctx_digest(new_route)
+    r=run_task_workflow(newer,host_capabilities=caps,invocation_key='route-two')
+    assert r['verdict']['reason_code']=='NO_MATERIAL_CHANGE'
+    with sqlite3.connect(newer['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_invocations').fetchone()[0]==2
+        assert db.execute('SELECT count(*) FROM engineering_work').fetchone()[0]==1
+        assert db.execute('SELECT count(*) FROM engineering_source_reconciliations').fetchone()[0]>=1
+
+
+def test_route_metadata_reconciliation_rejects_non_additive_delta(tmp_path):
+    """A route delta that changes existing keys or work_items must fail closed."""
+    import copy,json,subprocess,sqlite3
+    from tools.node_architect.task_context_binding import digest as ctx_digest
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_route_metadata
+    def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
+    git('init','-b','fix/test')
+    (tmp_path/'route.json').write_text(json.dumps({
+        'workflow_mode':'Q0_ENGINEERING_COORDINATION','runtime_epoch':'UNIVERSAL_V2_DEVELOPMENT',
+        'intent_ref':'intent-1','intent_body_sha256':'s',
+        'work_items':[{'id':'login-probe','priority':1,'action':'run_sandboxed_validation',
+                       'input_digest':'sha256:'+'b'*64,'provenance':'RECONSTRUCTED_REQUIREMENTS_BOUND'}]}))
+    git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    route_ref='route.json';old_route=json.loads(git('show','HEAD:'+route_ref))
+    c=binding(tmp_path);c['repository']['worktree']=str(tmp_path);c['repository']['branch']='fix/test'
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    c['engineering']['route_policy_ref']=route_ref
+    c['engineering']['route_policy_digest']=ctx_digest(old_route)
+    c['engineering']['work_items']=old_route['work_items']
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    run_task_workflow(c,host_capabilities=caps,invocation_key='route-nona')
+    for delta in ({'workflow_mode':'PROTECTED_TYPED_CE'},
+                  {'work_items':[{'id':'other','priority':1,'action':'run_sandboxed_validation','input_digest':'sha256:'+'d'*64}]},
+                  {'intent_ref':'different-intent'}):
+        new_route=copy.deepcopy(old_route);new_route.update(delta)
+        (tmp_path/'route.json').write_text(json.dumps(new_route))
+        git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','non additive delta')
+        newer=copy.deepcopy(c)
+        newer['repository']['head_sha']=git('rev-parse','HEAD')
+        newer['engineering']['route_policy_digest']=ctx_digest(new_route)
+        with pytest.raises(ValueError,match='ROUTE_METADATA_(DELTA_NOT_ADDITIVE|POLICY_KEY_CHANGED|WORK_ITEMS_CHANGED)'):
+            reconcile_engineering_route_metadata(c,newer,repository_root=tmp_path,
+                reason='fixture non additive delta',route_ref=route_ref)
+
+
 def test_executor_crash_is_not_retried_on_another_invocation(tmp_path):
     import sqlite3
     c=binding(tmp_path);counts={'read':0,'execute':0};caps=capabilities(c,counts)

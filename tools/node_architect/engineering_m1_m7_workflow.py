@@ -514,3 +514,60 @@ def reconcile_engineering_source_head(old_context,new_context,*,repository_root,
     with _connect(old['workflow']['checkpoint_ref']) as reader:
         require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
     return receipt
+
+
+def reconcile_engineering_route_metadata(old_context,new_context,*,repository_root,reason,route_ref):
+    """Explicit additive route-metadata continuation (e.g. human-approved G1 successor).
+
+    A successor acceptance-target approval may add read-only metadata to the
+    coordination route while leaving the executable route policy unchanged.
+    This advances the SAME checkpoint across such a delta, but only when the
+    delta is provably additive: every pre-existing route key must keep its exact
+    value, and the executable policy keys (workflow_mode, runtime_epoch,
+    communication_issue, intent_ref, intent_body_sha256, work_items) must be
+    byte-identical. All invocations, work rows, outbox rows and UNKNOWN
+    statuses are preserved; nothing is erased, retried or replanned.
+    """
+    import copy,subprocess
+    old=validate_task_context(old_context);new=validate_task_context(new_context)
+    require(isinstance(reason,str) and bool(reason.strip()),'ROUTE_METADATA_REASON_REQUIRED')
+    require(old['repository']['head_sha']!=new['repository']['head_sha'],'ROUTE_METADATA_UNCHANGED_HEAD')
+    old_eng=old.get('engineering') or {};new_eng=new.get('engineering') or {}
+    equivalent=copy.deepcopy(new)
+    equivalent['repository']['head_sha']=old['repository']['head_sha']
+    equivalent['engineering']['route_policy_digest']=old_eng.get('route_policy_digest')
+    require(equivalent==old,'ROUTE_METADATA_CONTEXT_DRIFT')
+    root=Path(repository_root).resolve()
+    def git(*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
+    def route_at(sha):return json.loads(git('show',sha+':'+route_ref))
+    old_route=route_at(old['repository']['head_sha']);new_route=route_at(new['repository']['head_sha'])
+    require(old_route.get('work_items')==new_route.get('work_items'),'ROUTE_METADATA_WORK_ITEMS_CHANGED')
+    for key in ('workflow_mode','runtime_epoch','communication_issue','intent_ref','intent_body_sha256'):
+        require(old_route.get(key)==new_route.get(key),'ROUTE_METADATA_POLICY_KEY_CHANGED')
+    for key,value in old_route.items():
+        if key=='work_items':continue
+        require(key in new_route and new_route[key]==value,'ROUTE_METADATA_DELTA_NOT_ADDITIVE')
+    require(git('rev-parse','HEAD')==new['repository']['head_sha'] and
+            git('branch','--show-current')==new['repository']['branch'] and
+            root==Path(new['repository']['worktree']).resolve(),'ENGINEERING_RECONCILE_GIT_BINDING_REQUIRED')
+    subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',
+                    old['repository']['head_sha'],new['repository']['head_sha']],check=True)
+    with _connect(old['workflow']['checkpoint_ref']) as db:
+        db.execute('BEGIN IMMEDIATE')
+        row=db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+        if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+        receipt={'old_context_digest':digest(old),'new_context_digest':digest(new),
+                 'old_head':old['repository']['head_sha'],'new_head':new['repository']['head_sha'],
+                 'reason':reason,'route_metadata_delta':True,'route_ref':route_ref,
+                 'old_route_policy_digest':old_eng.get('route_policy_digest'),
+                 'new_route_policy_digest':new_eng.get('route_policy_digest'),
+                 'added_route_keys':sorted(set(new_route)-set(old_route))}
+        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt),row[1]))
+        db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',
+                   (digest(new),old['run']['id'],digest(old)));db.commit()
+    with _connect(old['workflow']['checkpoint_ref']) as reader:
+        require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),
+                'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
+    return receipt
