@@ -423,7 +423,35 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         # later tick still produces its own response instead of being silenced.
         dispatch_identity=digest({'blocker_identity':blocker_identity,
                                   'firing':invocation_key or 'explicit'})
+        # Deadlock guard. A stall is stable across ticks: same activity +
+        # reason_code + status + source_head and no selected work. Re-dispatching
+        # the same blocker every firing is the repeated identical WAIT the user
+        # flagged. One report per stall_key; the original request stays open and
+        # is not re-sent. The guard is invalidated only when the frontier actually
+        # moves (new selected work, source head change, or a Controller response
+        # that changes the blocker identity) — those produce a NEW stall_key.
+        from tools.node_architect.loop_stall_detector import detect_stall
+        _stall_rows=[]
+        with _connect(path) as db:
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_firing_telemetry '
+                       '(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,'
+                       'source_head TEXT,result_digest TEXT,request_created INTEGER,'
+                       'PRIMARY KEY(run,firing))')
+            cur=db.execute('SELECT activity,reason_code,status,source_head '
+                           'FROM engineering_firing_telemetry WHERE run=? '
+                           'ORDER BY rowid DESC LIMIT 12',(run,))
+            _stall_rows=[dict(zip(('activity','reason_code','status','source_head'),r)) for r in cur.fetchall()]
+        _stall=detect_stall(_stall_rows)
+        terminal['stall']={k:_stall.get(k) for k in ('stalled','streak','stage','stall_key','escalate')}
+        if _stall.get('stalled'):
+            terminal['stall_key']=_stall['stall_key']
         controller_required=controller_dispatch_required(s['current_activity'],s['reason_code'])
+        # A confirmed stall suppresses a fresh dispatch request for the same
+        # stable key; the original report stays open and is not re-sent.
+        if _stall.get('stalled') and controller_required:
+            controller_required=False
+            terminal['controller_dispatch_required']=False
+            terminal['stall_suppresses_dispatch']=True
         terminal['controller_dispatch_required']=controller_required
         decision_packet=None
         if s['current_activity']=='M3' and frontier.get('selected_work') is None:
