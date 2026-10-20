@@ -641,6 +641,28 @@ def _provider_semantic_handler(
     return handler
 
 
+_LEGACY_GATE_ALIASES = {
+    "G0_CONTEXT": "UR.G0",
+    "G1_ALIGNMENT": "UR.G1",
+    "G2_EXECUTION": "UR.G2",
+    "G3_PR": "UR.G3",
+    "G4_MERGE": "UR.G4",
+    "G5_DEPLOY": "UR.G5",
+    "G6_PRODUCTION_DATA": "UR.G6",
+}
+
+
+def _canonical_gate(gate: str) -> str:
+    """Normalize a GWC-v1 gate name to its UR gate at the V2 boundary.
+
+    The V2 bridge accepts only ``UR.G0..UR.G6``. Callers that still carry the
+    legacy lifecycle names are mapped explicitly here instead of being allowed to
+    leak the GWC namespace into the canonical Universal Runtime state.
+    """
+    name = str(gate or "").strip()
+    return _LEGACY_GATE_ALIASES.get(name, name)
+
+
 def run_agent_runtime_event(
     *,
     canonical_state: Mapping[str, Any],
@@ -761,15 +783,42 @@ def run_agent_runtime_event(
         event_input_payload["workflow_mode"] = Q0_WORKFLOW_MODE
         event_input_payload["runtime_epoch"] = runtime_epoch
 
-    event = build_live_runtime_event(
-        canonical_state=canonical_state,
-        event_id=event_id,
-        run_id=run_id,
-        gate=gate,
-        requested_action=requested_action,
-        scenario=scenario,
-        input_payload=event_input_payload,
-    )
+    # Runtime-family dispatch: a Q0 claim goes through the Universal Runtime v2
+    # bridge (UR gates); a legacy semantic-runtime call keeps the preserved GWC-v1
+    # bridge and its gate namespace. Neither namespace is folded into the other.
+    if str(workflow_mode) == Q0_WORKFLOW_MODE:
+        dispatch = dispatch_live_runtime_event
+        legacy_family = False
+        event = build_live_runtime_event(
+            canonical_state=canonical_state,
+            event_id=event_id,
+            run_id=run_id,
+            gate=_canonical_gate(gate),
+            requested_action=requested_action,
+            scenario=scenario,
+            input_payload=event_input_payload,
+        )
+    else:
+        from .legacy_live_runtime_bridge import (
+            LiveRuntimeState as LegacyLiveRuntimeState,
+            build_live_runtime_event as legacy_build,
+            dispatch_live_runtime_event as legacy_dispatch,
+        )
+
+        # The legacy bridge carries its own execution state type.
+        if not isinstance(state, LegacyLiveRuntimeState):
+            state = LegacyLiveRuntimeState()
+        legacy_family = True
+        dispatch = legacy_dispatch
+        event = legacy_build(
+            canonical_state=canonical_state,
+            event_id=event_id,
+            run_id=run_id,
+            gate=gate,
+            requested_action=requested_action,
+            scenario=scenario,
+            input_payload=event_input_payload,
+        )
     provider_request = _provider_request(
         canonical_state=canonical_state,
         run_id=run_id,
@@ -845,9 +894,10 @@ def run_agent_runtime_event(
         workflow_root=repo_root,
     )
 
-    runtime_state = state if isinstance(state, LiveRuntimeState) else LiveRuntimeState()
+    state_type = LegacyLiveRuntimeState if legacy_family else LiveRuntimeState
+    runtime_state = state if isinstance(state, state_type) else state_type()
     effective_readback_handler = readback_handler if readback_handler is not None else verify_canonical_readback
-    result = dispatch_live_runtime_event(
+    result = dispatch(
         event=event,
         route_decision=route,
         implementation_registry=registry,
