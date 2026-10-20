@@ -8,6 +8,7 @@ import json
 import sqlite3
 from pathlib import Path
 from typing import TypedDict,Any
+from .stable_json import read_json
 from .task_context_binding import validate_task_context,digest,require,ACTIVITIES
 from .controller_exchange_adapter import make_exchange_request,ExchangeOutbox,reconcile_controller_response
 
@@ -114,7 +115,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         try:
             from .q0_m1_m7_integration import ROUTE_REF, ACTIVATION_RECEIPT_REF, resolve_active_plan
             root=Path(c['repository']['worktree'])
-            route=json.loads((root/ROUTE_REF).read_text())
+            route=read_json(root/ROUTE_REF)
             succ=route.get('approved_successor_g1') or {}
             if succ.get('human_approved') is not True or not (root/ACTIVATION_RECEIPT_REF).exists():
                 return False

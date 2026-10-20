@@ -30,15 +30,10 @@ def digest(value: Any) -> str:
     return 'sha256:' + hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def _read_json(path, attempts=6, delay=0.15):
+def _read_json(path, **kwargs):
     """Read a JSON file that another process may be atomically rewriting."""
-    last=None
-    for _ in range(attempts):
-        try:
-            return json.loads(path.read_text())
-        except (json.JSONDecodeError, OSError) as exc:
-            last=exc; time.sleep(delay)
-    raise last
+    from tools.node_architect.stable_json import read_json
+    return read_json(path, **kwargs)
 
 
 def find_session_leases(value: Any, session_id: str) -> list[dict]:
