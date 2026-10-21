@@ -483,6 +483,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         if _stall.get('stalled'):
             terminal['stall_key']=_stall['stall_key']
         controller_required=controller_dispatch_required(s['current_activity'],s['reason_code'])
+        controller_notification_required=controller_required
         # A confirmed stall suppresses a fresh dispatch request for the same
         # stable key; the original report stays open and is not re-sent.
         if _stall.get('stalled') and controller_required:
@@ -500,6 +501,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         terminal_digest=digest(terminal)
         terminal_exchange_request=None
         terminal_exchange_status=None
+        terminal_exchange_state=None
         response_observation=None
         controller_exchange_requests=[]
         # Terminal results owned by the Controller are routed independently of
@@ -511,6 +513,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         if dispatch_request or _table_exists('engineering_terminal_dispatches'):
             box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
             candidate_request=None
+            request=None
             if dispatch_request:
                 report=(f"{c['task']['id']} Q0 terminal engineering result; run {run}; firing {invocation_key or 'explicit'}; "
                         f"session {c['executor']['session_id']}; source {c['repository']['head_sha']}; "
@@ -548,17 +551,23 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                 db.commit()
             if existing:
                 request=json.loads(existing[0])
-                terminal_exchange_status=box.read(request)['status']
+                try:
+                    terminal_exchange_state=box.read(request)
+                    terminal_exchange_status=terminal_exchange_state['status']
+                except Exception as exc:
+                    terminal['controller_notification_read_error']=type(exc).__name__
                 terminal['outbox_request_source_head']=existing[1]
                 telemetry_marker=request['marker']
                 try:
-                    response_observation=reconcile_controller_response(request,box.read(request))
+                    if terminal_exchange_state is None:
+                        raise ValueError('EXCHANGE_READ_FAILED')
+                    response_observation=reconcile_controller_response(request,terminal_exchange_state)
                 except ValueError:
                     terminal['blocked_by_pending_exchange_marker']=request['marker']
                     terminal['controller_dispatch_required']=False
                 else:
                     from .engineering_work_frontier import classify_controller_observation
-                    receipt=box.read(request)['receipt']
+                    receipt=terminal_exchange_state['receipt']
                     disposition=classify_controller_observation(receipt['response_text'])
                     response_observation={**response_observation,'disposition_observation':disposition}
                     with _connect(path) as db:
@@ -571,11 +580,30 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                 request=candidate_request
                 box.reserve(request)
                 terminal_exchange_request=request
-                terminal_exchange_status=box.read(request)['status']
+                try:
+                    terminal_exchange_state=box.read(request)
+                    terminal_exchange_status=terminal_exchange_state['status']
+                except Exception as exc:
+                    terminal['controller_notification_read_error']=type(exc).__name__
                 controller_exchange_requests=[request]
                 request_created=True
                 telemetry_marker=request['marker']
                 terminal['controller_dispatch_required']=True
+            if controller_notification_required:
+                receipt=(terminal_exchange_state or {}).get('receipt') or {}
+                delivery_statuses={
+                    'MESSAGE_SENT_VERIFIED','CONTROLLER_ACTION_REQUIRED',
+                    'CONTROLLER_RESPONSE_VERIFIED'}
+                delivered=((terminal_exchange_state or {}).get('status') in delivery_statuses and
+                    receipt.get('status') in delivery_statuses and
+                    request is not None and receipt.get('marker')==request.get('marker'))
+                terminal['controller_notification']={
+                    'required':True,
+                    'browser_ack_required':True,
+                    'delivery_state':'DELIVERED' if delivered else 'NOT_DELIVERED',
+                    'delivery_receipt_ref':request['marker'] if delivered else None,
+                    'delivery_evidence':'OUTBOX_RECEIPT' if delivered else 'NONE',
+                }
         _telemetry(s['current_activity'],s['reason_code'],s['status'],digest(terminal),request_created,telemetry_marker)
         if response_observation is not None:
             terminal['controller_response_observation']=response_observation

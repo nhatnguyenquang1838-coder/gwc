@@ -144,3 +144,11 @@ def test_only_material_blockers_request_a_controller_decision():
                             ('M6','ENGINEERING_EXECUTION_RESULT_NOT_VERIFIED'),
                             ('M6','NO_MATERIAL_CHANGE')):
         assert controller_dispatch_required(activity,reason) is False
+
+
+def test_controller_dispatch_required_covers_exhausted_and_authority():
+    from tools.node_architect.engineering_work_frontier import controller_dispatch_required
+    for reason in ('ENGINEERING_FRONTIER_WAIT_INPUT','ENGINEERING_FRONTIER_WAIT_AUTHORITY',
+                   'ENGINEERING_FRONTIER_EXHAUSTED'):
+        assert controller_dispatch_required('M3',reason) is True
+    assert controller_dispatch_required('M3','UNRELATED_REASON') is False

@@ -188,6 +188,48 @@ def test_external_evidence_frontier_still_wait_input(tmp_path):
     assert 'approval_request' not in result['terminal']
 
 
+def test_m8_marks_delivery_not_delivered_without_browser_receipt(tmp_path):
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0})
+    caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx)
+    result=run_task_workflow(c,host_capabilities=caps,invocation_key='notification-pending')
+    request=result['terminal_exchange_request']
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
+    assert box.read(request)['status']=='EXCHANGE_REQUESTED'
+    notification=result['terminal']['controller_notification']
+    assert notification['required'] is True
+    assert notification['browser_ack_required'] is True
+    assert notification['delivery_state']=='NOT_DELIVERED'
+    assert notification['delivery_receipt_ref'] is None
+    replay=run_task_workflow(c,host_capabilities=caps,invocation_key='notification-still-pending')
+    assert replay['terminal']['controller_notification']['required'] is True
+    assert replay['terminal']['controller_notification']['delivery_state']=='NOT_DELIVERED'
+
+
+def test_m8_marks_delivery_delivered_after_outbox_receipt(tmp_path):
+    from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0})
+    caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx)
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='notification-sent')
+    request=first['terminal_exchange_request']
+    box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
+    box.record(request,{'request_digest':request['request_digest'],
+        'conversation_url':request['conversation_url'],'marker':request['marker'],
+        'task_id':request['task_id'],'run_id':request['run_id'],
+        'user_turn_ref':'user:'+request['marker'],
+        'evidence_class':'BROWSER_EXCHANGE_VERIFIED',
+        'status':'MESSAGE_SENT_VERIFIED','typed_ce_admitted':False,
+        'authority_granted':False})
+    result=run_task_workflow(c,host_capabilities=caps,invocation_key='notification-receipt-readback')
+    notification=result['terminal']['controller_notification']
+    assert notification['required'] is True
+    assert notification['delivery_state']=='DELIVERED'
+    assert notification['delivery_evidence']=='OUTBOX_RECEIPT'
+    assert notification['delivery_receipt_ref']==request['marker']
+
+
 def test_approval_request_deduped_by_scope_hash(tmp_path):
     import sqlite3
     c=binding(tmp_path);c['engineering']['work_items']=[]

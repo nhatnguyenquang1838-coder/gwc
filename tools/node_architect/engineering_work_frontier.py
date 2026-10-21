@@ -188,7 +188,9 @@ def controller_dispatch_required(activity,reason_code):
     Controller decision request.
     """
     return ((activity=='M2' and reason_code=='ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED') or
-            (activity=='M3' and reason_code=='ENGINEERING_FRONTIER_WAIT_INPUT') or
+            (activity=='M3' and reason_code in {'ENGINEERING_FRONTIER_WAIT_INPUT',
+                                                'ENGINEERING_FRONTIER_WAIT_AUTHORITY',
+                                                'ENGINEERING_FRONTIER_EXHAUSTED'}) or
             (activity=='M4' and reason_code=='ENGINEERING_EXTERNAL_DEPENDENCY') or
             (activity=='M5' and reason_code in {'ENGINEERING_EFFECT_AUTHORITY_REQUIRED',
                                                  'ENGINEERING_NEW_INTENT_RECONCILIATION_REQUIRED'}))
