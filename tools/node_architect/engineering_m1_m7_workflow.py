@@ -67,14 +67,22 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     def outcome(s,name,status,reason,**data):
         return {'current_activity':name,'status':status,'reason_code':reason,
                 'activity_results':{**s.get('activity_results',{}),name:{'status':status,'reason_code':reason}},**data}
-    def _telemetry(activity,reason,status,result_digest,request_created):
+    def _telemetry(activity,reason,status,result_digest,request_created,exchange_marker=None):
         with _connect(path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS engineering_firing_telemetry '
                        '(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,'
                        'source_head TEXT,result_digest TEXT,request_created INTEGER,PRIMARY KEY(run,firing))')
-            db.execute('INSERT OR REPLACE INTO engineering_firing_telemetry VALUES (?,?,?,?,?,?,?,?)',
+            columns={row[1] for row in db.execute('PRAGMA table_info(engineering_firing_telemetry)')}
+            if 'exchange_marker' not in columns:
+                db.execute('ALTER TABLE engineering_firing_telemetry ADD COLUMN exchange_marker TEXT')
+            db.execute('INSERT OR REPLACE INTO engineering_firing_telemetry '
+                       '(run,firing,activity,reason_code,status,source_head,result_digest,request_created,exchange_marker) '
+                       'VALUES (?,?,?,?,?,?,?,?,?)',
                        (run,invocation_key or 'explicit',activity,reason,status,
-                        c['repository']['head_sha'],result_digest,int(request_created)))
+                        c['repository']['head_sha'],result_digest,int(request_created),exchange_marker))
+    def _table_exists(name):
+        with _connect(path) as db:
+            return db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",(name,)).fetchone() is not None
     def _already_reported(result_digest):
         with _connect(path) as db:
             db.execute('CREATE TABLE IF NOT EXISTS engineering_reported (run TEXT,digest TEXT,PRIMARY KEY(run,digest))')
@@ -86,8 +94,10 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             db.execute('INSERT OR IGNORE INTO engineering_reported VALUES (?,?)',(run,result_digest))
 
     def _fingerprint(item):
-        # The frontier reader pins a stable identity before injecting evidence
-        # hashes; fall back to the full item digest for host-supplied items.
+        # Source-bound work is an execution of these exact inputs at this exact
+        # head; do not let a stable plan identity suppress a fresh frontier item.
+        if item.get('_source_policy_ref'):
+            return digest(item)
         return item.get('_stable_fingerprint') or digest(item)
     def _is_verified(item):
         key=_fingerprint(item)
@@ -156,7 +166,12 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
                 key=_fingerprint(item)
                 if not _is_verified(item):
                     return outcome(s,'M3','PASS','PLAN_DRIVEN_FRONTIER_SELECTED',work={**item,'fingerprint':key},work_frontier=projection)
-            return outcome(s,'M3','WAIT','ENGINEERING_FRONTIER_WAIT_INPUT',work_frontier=projection)
+                projection={**projection,'items':[
+                    {**row,'status':'VERIFIED'} if row.get('id')==item.get('id') else row
+                    for row in projection.get('items',[])]}
+            from .engineering_work_frontier import classify_empty_frontier
+            classification=classify_empty_frontier(projection)
+            return outcome(s,'M3','WAIT',classification['reason_code'],work_frontier=projection)
         return outcome(s,'M3','WAIT','NO_MATERIAL_CHANGE')
     def m4(s):
         # Conflicts are scoped to the selected work, not a protected C/E global HOLD.
@@ -418,11 +433,33 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
             runtime_plan_digest=c['run']['runtime_plan_digest'],activity=s['current_activity'],
             reason_code=s['reason_code'],work=s.get('work'),frontier=frontier)
         terminal['blocker_identity']=blocker_identity
-        # Every real firing must report to the Controller. Dedupe by blocker
-        # identity *plus* the firing key so a repeat of the same blocker on a
-        # later tick still produces its own response instead of being silenced.
-        dispatch_identity=digest({'blocker_identity':blocker_identity,
-                                  'firing':invocation_key or 'explicit'})
+        if s['current_activity']=='M3' and s['reason_code']=='ENGINEERING_FRONTIER_WAIT_AUTHORITY':
+            authority_items=[row for row in frontier.get('items',[]) if row.get('status')=='BLOCKED_AUTHORITY']
+            work_packages=[]
+            for row in authority_items:
+                work=row.get('work') or {}
+                work_packages.append({'id':row.get('id'),'title':work.get('title',''),
+                    'paths':list(work.get('paths',work.get('write_paths',[]))),
+                    'acceptance_tests':list(work.get('acceptance_tests',[]))})
+            request_fields={'base_sha':c['repository']['head_sha'],
+                'authority_requested':'APPROVE_BLOCKED_AUTHORITY_WORK','work_packages':work_packages,
+                'decision_required':'APPROVE | REJECT'}
+            scope_hash=digest(request_fields)
+            request_id=f"approval-{run}-{scope_hash[7:23]}"
+            approval_request={'request_id':request_id,'scope_hash':scope_hash,**request_fields}
+            with _connect(path) as db:
+                db.execute('CREATE TABLE IF NOT EXISTS engineering_approval_requests '
+                           '(request_id TEXT PRIMARY KEY, scope_hash TEXT, request TEXT, first_firing TEXT)')
+                db.execute('BEGIN IMMEDIATE')
+                existing=db.execute('SELECT request FROM engineering_approval_requests '
+                                    'WHERE request_id=? AND scope_hash=?',(request_id,scope_hash)).fetchone()
+                if existing:
+                    terminal['blocked_by_pending_approval_scope']=scope_hash
+                else:
+                    db.execute('INSERT INTO engineering_approval_requests VALUES (?,?,?,?)',
+                        (request_id,scope_hash,json.dumps(approval_request,sort_keys=True),invocation_key or 'explicit'))
+                    terminal['approval_request']=approval_request
+                db.commit()
         # Deadlock guard. A stall is stable across ticks: same activity +
         # reason_code + status + source_head and no selected work. Re-dispatching
         # the same blocker every firing is the repeated identical WAIT the user
@@ -466,103 +503,83 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
         response_observation=None
         controller_exchange_requests=[]
         # Terminal results owned by the Controller are routed independently of
-        # protected M7. Deduplicate by blocker identity (not source HEAD): a new
-        # additive commit cannot reopen the same unresolved external blocker.
-        dispatch_request = controller_required
-        _telemetry(s['current_activity'],s['reason_code'],s['status'],terminal_digest,dispatch_request)
-        if dispatch_request:
+        # protected M7. The stable blocker identity owns one canonical request;
+        # firing identity is retained only in telemetry.
+        dispatch_request=controller_required
+        request_created=False
+        telemetry_marker=None
+        if dispatch_request or _table_exists('engineering_terminal_dispatches'):
             box=ExchangeOutbox(str(path)+'.engineering-exchange.sqlite')
+            candidate_request=None
+            if dispatch_request:
+                report=(f"{c['task']['id']} Q0 terminal engineering result; run {run}; firing {invocation_key or 'explicit'}; "
+                        f"session {c['executor']['session_id']}; source {c['repository']['head_sha']}; "
+                        f"terminal {terminal_digest}; blocker_identity ({blocker_identity}). "
+                        f"Result: {json.dumps(terminal,sort_keys=True,separators=(',',':'))}. "
+                        "No typed C/E admission, authority, plan mutation, original replay, LOAD_PROOF or L3 claim. "
+                        "Please review and return the smallest source-bound disposition; an acceptance-target change still requires an explicit human-approved immutable G1 revision.")
+                candidate_request=make_exchange_request(c,report,lane='HOST_COORDINATION')
             with _connect(path) as db:
                 db.execute('CREATE TABLE IF NOT EXISTS engineering_terminal_dispatches '
                            '(blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, '
                            'request_source_head TEXT NOT NULL, response_observation TEXT)')
-                row=db.execute('SELECT request,request_source_head FROM engineering_terminal_dispatches '
-                               'WHERE blocker_identity=?',(dispatch_identity,)).fetchone()
-            if row:
-                request=json.loads(row[0]);terminal_exchange_request=request
-                terminal['outbox_request_source_head']=row[1]
-                box.reserve(request)
-                prior_state=box.read(request);terminal_exchange_status=prior_state['status']
-                other_pending=None
-                for outstanding in old.get('pending_controller_exchange_requests',[]):
-                    if outstanding['request_digest']==request['request_digest']:
-                        continue
-                    outstanding_state=box.read(outstanding)
-                    try:reconcile_controller_response(outstanding,outstanding_state)
-                    except ValueError:
-                        other_pending=outstanding
-                        break
-                if other_pending:
-                    terminal['blocked_by_pending_exchange_marker']=other_pending['marker']
-                    controller_exchange_requests=[other_pending]
+                columns={row[1] for row in db.execute('PRAGMA table_info(engineering_terminal_dispatches)')}
+                if 'first_firing' not in columns:
+                    db.execute('ALTER TABLE engineering_terminal_dispatches ADD COLUMN first_firing TEXT')
+                if 'last_firing' not in columns:
+                    db.execute('ALTER TABLE engineering_terminal_dispatches ADD COLUMN last_firing TEXT')
+                db.execute('BEGIN IMMEDIATE')
+                existing=db.execute('SELECT request,request_source_head FROM engineering_terminal_dispatches '
+                                    'WHERE blocker_identity=?',(blocker_identity,)).fetchone()
+                if existing:
+                    db.execute('UPDATE engineering_terminal_dispatches SET last_firing=? '
+                               'WHERE blocker_identity=?',(invocation_key or 'explicit',blocker_identity))
+                elif dispatch_request:
+                    db.execute('CREATE TABLE IF NOT EXISTS engineering_exchange_contexts (digest TEXT PRIMARY KEY, context TEXT)')
+                    db.execute('INSERT OR IGNORE INTO engineering_exchange_contexts VALUES (?,?)',
+                               (candidate_request['task_context_digest'],json.dumps(c,sort_keys=True)))
+                    db.execute('INSERT INTO engineering_terminal_dispatches '
+                               '(blocker_identity,request,request_source_head,response_observation,first_firing,last_firing) '
+                               'VALUES (?,?,?,NULL,?,?)',
+                               (blocker_identity,json.dumps(candidate_request,sort_keys=True),c['repository']['head_sha'],
+                                invocation_key or 'explicit',invocation_key or 'explicit'))
                 else:
-                    try:
-                        response_observation=reconcile_controller_response(request,prior_state)
-                    except ValueError:
-                        controller_exchange_requests=[request]
-                    else:
-                        from .engineering_work_frontier import classify_controller_observation
-                        receipt=prior_state['receipt'];disposition=classify_controller_observation(receipt['response_text'])
-                        response_observation={**response_observation,'disposition_observation':disposition}
-                        with _connect(path) as db:
-                            db.execute('UPDATE engineering_terminal_dispatches SET response_observation=? '
-                                       'WHERE blocker_identity=?',(json.dumps(response_observation,sort_keys=True),dispatch_identity))
-                        if decision_packet is not None:
-                            decision_packet['controller_disposition_observation']=disposition
-                        terminal['controller_response_observation']=response_observation
-            else:
-                active_pending=None
-                # Response is mandatory per firing. An unresolved earlier request
-                # stays open as backlog for its own owner; it no longer suppresses
-                # this firing's report.
-                for outstanding in old.get('pending_controller_exchange_requests',[]):
-                    outstanding_state=box.read(outstanding)
-                    try:
-                        observed=reconcile_controller_response(outstanding,outstanding_state)
-                    except ValueError:
-                        terminal.setdefault('backlog_pending_exchange_markers',[]).append(outstanding['marker'])
-                    else:
-                        from .engineering_work_frontier import classify_controller_observation
-                        response_observation={**observed,
-                            'disposition_observation':classify_controller_observation(outstanding_state['receipt']['response_text'])}
-                if active_pending:
-                    # Do not create a second browser request while any exact
-                    # same-run Controller exchange is unresolved. Preserve and
-                    # surface the original request/marker for its owner.
-                    terminal['blocked_by_pending_exchange_marker']=active_pending['marker']
-                    controller_exchange_requests=[active_pending]
+                    existing=None
+                db.commit()
+            if existing:
+                request=json.loads(existing[0])
+                terminal_exchange_status=box.read(request)['status']
+                terminal['outbox_request_source_head']=existing[1]
+                telemetry_marker=request['marker']
+                try:
+                    response_observation=reconcile_controller_response(request,box.read(request))
+                except ValueError:
+                    terminal['blocked_by_pending_exchange_marker']=request['marker']
+                    terminal['controller_dispatch_required']=False
                 else:
-                    report=(f"{c['task']['id']} Q0 terminal engineering result; run {run}; firing {invocation_key or 'explicit'}; "
-                            f"session {c['executor']['session_id']}; source {c['repository']['head_sha']}; "
-                            f"terminal {terminal_digest}; blocker_identity {blocker_identity}. "
-                            f"Result: {json.dumps(terminal,sort_keys=True,separators=(',',':'))}. "
-                            "No typed C/E admission, authority, plan mutation, original replay, LOAD_PROOF or L3 claim. "
-                            "Please review and return the smallest source-bound disposition; an acceptance-target change still requires an explicit human-approved immutable G1 revision.")
-                    if response_observation is not None and decision_packet is not None:
-                        decision_packet['controller_disposition_observation']=response_observation.get('disposition_observation')
-                    request=make_exchange_request(c,report,lane='HOST_COORDINATION')
+                    from .engineering_work_frontier import classify_controller_observation
+                    receipt=box.read(request)['receipt']
+                    disposition=classify_controller_observation(receipt['response_text'])
+                    response_observation={**response_observation,'disposition_observation':disposition}
                     with _connect(path) as db:
-                        db.execute('BEGIN IMMEDIATE')
-                        db.execute('CREATE TABLE IF NOT EXISTS engineering_exchange_contexts (digest TEXT PRIMARY KEY, context TEXT)')
-                        db.execute('INSERT OR IGNORE INTO engineering_exchange_contexts VALUES (?,?)',
-                                   (request['task_context_digest'],json.dumps(c,sort_keys=True)))
-                        db.execute('CREATE TABLE IF NOT EXISTS engineering_terminal_dispatches '
-                                   '(blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, '
-                                   'request_source_head TEXT NOT NULL, response_observation TEXT)')
-                        existing=db.execute('SELECT request,request_source_head FROM engineering_terminal_dispatches '
-                                             'WHERE blocker_identity=?',(dispatch_identity,)).fetchone()
-                        if existing:
-                            request=json.loads(existing[0])
-                        else:
-                            db.execute('INSERT INTO engineering_terminal_dispatches '
-                                       '(blocker_identity,request,request_source_head,response_observation) VALUES (?,?,?,NULL)',
-                                       (dispatch_identity,json.dumps(request,sort_keys=True),c['repository']['head_sha']))
-                    box.reserve(request)
-                    terminal_exchange_request=request
-                    terminal_exchange_status=box.read(request)['status']
-                    controller_exchange_requests=[request]
+                        db.execute('UPDATE engineering_terminal_dispatches SET response_observation=? '
+                                   'WHERE blocker_identity=?',(json.dumps(response_observation,sort_keys=True),blocker_identity))
+                    if decision_packet is not None:
+                        decision_packet['controller_disposition_observation']=disposition
+                    terminal['controller_response_observation']=response_observation
+            elif dispatch_request:
+                request=candidate_request
+                box.reserve(request)
+                terminal_exchange_request=request
+                terminal_exchange_status=box.read(request)['status']
+                controller_exchange_requests=[request]
+                request_created=True
+                telemetry_marker=request['marker']
+                terminal['controller_dispatch_required']=True
+        _telemetry(s['current_activity'],s['reason_code'],s['status'],digest(terminal),request_created,telemetry_marker)
         if response_observation is not None:
             terminal['controller_response_observation']=response_observation
+        terminal_digest=digest(terminal)
         # M8 is a result-dispatch node, NOT a gate. It must preserve the
         # original WAIT status and reason_code so the Controller still sees
         # ENGINEERING_EFFECT_AUTHORITY_REQUIRED / ENGINEERING_GENUINE_FIRING_REQUIRED
@@ -639,6 +656,36 @@ def reconcile_engineering_source_head(old_context,new_context,*,repository_root,
     with _connect(old['workflow']['checkpoint_ref']) as reader:
         require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
     return receipt
+
+
+def reconcile_legacy_terminal_dispatches(checkpoint_ref,run):
+    """Audit legacy firing-keyed rows by their blocker identity; mutate nothing."""
+    import re
+    pattern=re.compile(r'blocker_identity\s*\(?\s*(sha256:[0-9a-f]{64})\s*\)?',re.I)
+    groups={};examined=0;unmatched=0
+    with sqlite3.connect(str(checkpoint_ref)) as db:
+        try:
+            rows=db.execute('SELECT blocker_identity,request,request_source_head,response_observation '
+                            'FROM engineering_terminal_dispatches').fetchall()
+        except sqlite3.OperationalError:
+            rows=[]
+        for stored_identity,raw_request,source_head,response_observation in rows:
+            try:request=json.loads(raw_request)
+            except (TypeError,ValueError):continue
+            if request.get('run_id')!=run:continue
+            examined+=1
+            report=str(request.get('report') or '')
+            match=pattern.search(report)
+            if not match:
+                unmatched+=1;continue
+            identity=match.group(1)
+            groups.setdefault(identity,[]).append({'stored_blocker_identity':stored_identity,
+                'marker':request.get('marker'),'request_digest':request.get('request_digest'),
+                'request_source_head':source_head,'has_response_observation':response_observation is not None})
+    return {'run_id':run,'rows_examined':examined,'unmatched_rows':unmatched,
+            'groups':{identity:sorted(rows,key=lambda row:(row.get('marker') or '',row.get('stored_blocker_identity') or ''))
+                      for identity,rows in sorted(groups.items())},
+            'authority_granted':False,'typed_ce_admitted':False,'mutated':False}
 
 
 def reconcile_engineering_conversation_binding(old_context,new_context,*,reason):

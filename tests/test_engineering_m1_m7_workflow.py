@@ -53,6 +53,184 @@ def test_duplicate_invocation_and_work_cannot_reexecute(tmp_path):
     assert counts=={'read':2,'execute':1}
 
 
+def _blocked_frontier(c,work_id='trace',status='BLOCKED_EXTERNAL_EVIDENCE'):
+    return {'source_head':c['repository']['head_sha'],
+            'runtime_plan_digest':c['run']['runtime_plan_digest'],'authority_granted':False,
+            'selected_work':None,'items':[{'id':work_id,'status':status,
+                'work':{'id':work_id,'title':'Recover source evidence','plan_node_id':'ROOT',
+                        'missing_inputs':['approval'] if status=='BLOCKED_AUTHORITY' else [],
+                        'missing_external_evidence':['original trace'] if status!='BLOCKED_AUTHORITY' else [],
+                        'paths':['tools/**'],'acceptance_tests':['test_recovery']}}]}
+
+
+def test_ten_firings_one_blocker_one_reservation(tmp_path):
+    import sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(c)
+    results=[run_task_workflow(c,host_capabilities=caps,
+                               invocation_key=f"{c['executor']['session_id']}:native:{n}") for n in range(10)]
+    assert sum(len(result['graph_requests']) for result in results)==1
+    with sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_firing_telemetry').fetchone()[0]==10
+        dispatch=db.execute('SELECT first_firing,last_firing FROM engineering_terminal_dispatches').fetchone()
+        assert dispatch==(f"{c['executor']['session_id']}:native:0",f"{c['executor']['session_id']}:native:9")
+        markers=db.execute('SELECT exchange_marker FROM engineering_firing_telemetry ORDER BY rowid').fetchall()
+        assert all(row[0]==results[0]['terminal_exchange_request']['marker'] for row in markers)
+
+
+def test_restart_replay_creates_no_new_reservation(tmp_path):
+    import sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(c)
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='restart-replay')
+    replay=run_task_workflow(c,host_capabilities=caps,invocation_key='restart-replay')
+    assert first['graph_requests']==replay['graph_requests']
+    assert replay['invocation_replayed'] is True
+    with sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+
+
+def test_head_only_advance_keeps_blocker_key(tmp_path):
+    import copy,subprocess,sqlite3
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
+    c=binding(tmp_path);c['engineering']['work_items']=[];c['repository']['worktree']=str(tmp_path)
+    (tmp_path/'source').write_text('base\n')
+    def git(*args):return subprocess.check_output(['git','-C',str(tmp_path),*args],text=True).strip()
+    git('init','-b',c['repository']['branch']);git('add','.');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','base')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx)
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='head-one')
+    identity=first['terminal']['blocker_identity']
+    git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-m','advance')
+    newer=copy.deepcopy(c);newer['repository']['head_sha']=git('rev-parse','HEAD')
+    reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='additive head advance')
+    second=run_task_workflow(newer,host_capabilities=caps,invocation_key='head-two')
+    assert second['terminal']['blocker_identity']==identity
+    assert second['graph_requests']==[]
+    with sqlite3.connect(newer['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
+
+
+def test_different_blocker_revision_creates_new_request(tmp_path):
+    import sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[];current={'id':'trace'}
+    caps=capabilities(c,{'read':0,'execute':0})
+    caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx,current['id'])
+    first=run_task_workflow(c,host_capabilities=caps,invocation_key='blocker-one')
+    current['id']='different-trace'
+    second=run_task_workflow(c,host_capabilities=caps,invocation_key='blocker-two')
+    assert first['terminal']['blocker_identity']!=second['terminal']['blocker_identity']
+    assert len(second['graph_requests'])==1
+    with sqlite3.connect(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite') as db:
+        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
+
+
+def test_existing_pending_backlog_preserved(tmp_path):
+    import json,sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    legacy={'schema_version':1,'request_type':'CONTROLLER_EXCHANGE_REQUEST','task_id':c['task']['id'],
+            'run_id':'another-run','session_id':'legacy','task_context_digest':'sha256:'+'f'*64,
+            'conversation_url':c['controller']['conversation_url'],'capability':{},'lane':'HOST_COORDINATION',
+            'report':'legacy unresolved request','authority_granted':False,'typed_ce_admitted':False,
+            'request_digest':'sha256:'+'e'*64,'marker':'DWA-REVIEW-LEGACY'}
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        db.execute('CREATE TABLE engineering_terminal_dispatches (blocker_identity TEXT PRIMARY KEY, request TEXT NOT NULL, request_source_head TEXT NOT NULL, response_observation TEXT)')
+        db.execute('INSERT INTO engineering_terminal_dispatches VALUES (?,?,?,NULL)',
+                   ('sha256:'+'d'*64,json.dumps(legacy,sort_keys=True),'a'*40))
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(c)
+    run_task_workflow(c,host_capabilities=caps,invocation_key='preserve-legacy')
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        row=db.execute('SELECT blocker_identity,request,request_source_head,response_observation FROM engineering_terminal_dispatches WHERE blocker_identity=?',
+                       ('sha256:'+'d'*64,)).fetchone()
+        assert row==('sha256:'+'d'*64,json.dumps(legacy,sort_keys=True),'a'*40,None)
+
+
+def test_legacy_dispatch_reconciliation_is_audit_only(tmp_path):
+    import json,sqlite3
+    from tools.node_architect.engineering_m1_m7_workflow import reconcile_legacy_terminal_dispatches
+    path=tmp_path/'checkpoint.sqlite';report='blocker_identity (sha256:'+'a'*64+')'
+    request={'run_id':'legacy-run','report':report,'marker':'DWA-REVIEW-LEGACY',
+             'request_digest':'sha256:'+'b'*64}
+    with sqlite3.connect(path) as db:
+        db.execute('CREATE TABLE engineering_terminal_dispatches '
+                   '(blocker_identity TEXT PRIMARY KEY,request TEXT,request_source_head TEXT,response_observation TEXT)')
+        db.execute('INSERT INTO engineering_terminal_dispatches VALUES (?,?,?,NULL)',
+                   ('sha256:'+'c'*64,json.dumps(request),'d'*40))
+    with sqlite3.connect(path) as db:before=db.execute('SELECT * FROM engineering_terminal_dispatches').fetchall()
+    result=reconcile_legacy_terminal_dispatches(path,'legacy-run')
+    with sqlite3.connect(path) as db:after=db.execute('SELECT * FROM engineering_terminal_dispatches').fetchall()
+    assert result['groups']['sha256:'+'a'*64][0]['stored_blocker_identity']=='sha256:'+'c'*64
+    assert result['mutated'] is False and result['authority_granted'] is False
+    assert before==after
+
+
+def test_authority_frontier_emits_approval_request(tmp_path):
+    import re
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx,status='BLOCKED_AUTHORITY')
+    result=run_task_workflow(c,host_capabilities=caps,invocation_key='authority-frontier')
+    assert result['verdict']['reason_code']=='ENGINEERING_FRONTIER_WAIT_AUTHORITY'
+    request=result['terminal']['approval_request']
+    assert re.fullmatch(r'sha256:[0-9a-f]{64}',request['scope_hash'])
+    assert result['authority_granted'] is False and result['typed_ce_admitted'] is False
+    assert set(request)=={'request_id','scope_hash','base_sha','authority_requested','work_packages','decision_required'}
+    from tools.node_architect.task_context_binding import digest
+    assert request['scope_hash']==digest({k:v for k,v in request.items() if k not in {'request_id','scope_hash'}})
+
+
+def test_external_evidence_frontier_still_wait_input(tmp_path):
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx)
+    result=run_task_workflow(c,host_capabilities=caps,invocation_key='external-frontier')
+    assert result['verdict']['reason_code']=='ENGINEERING_FRONTIER_WAIT_INPUT'
+    assert 'approval_request' not in result['terminal']
+
+
+def test_approval_request_deduped_by_scope_hash(tmp_path):
+    import sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=lambda ctx:_blocked_frontier(ctx,status='BLOCKED_AUTHORITY')
+    results=[run_task_workflow(c,host_capabilities=caps,invocation_key=f'authority-{n}') for n in range(5)]
+    assert 'approval_request' in results[0]['terminal']
+    assert all('approval_request' not in result['terminal'] and
+               result['terminal']['blocked_by_pending_approval_scope']==results[0]['terminal']['approval_request']['scope_hash']
+               for result in results[1:])
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        assert db.execute('SELECT count(*) FROM engineering_approval_requests').fetchone()[0]==1
+
+
+def test_stale_source_bound_verification_does_not_suppress_current_frontier_item(tmp_path):
+    import json,sqlite3
+    c=binding(tmp_path);c['engineering']['work_items']=[]
+    c['repository']['head_sha']='b'*40
+    stable='sha256:'+'a'*64
+    item={'id':'CF-PRECHECK','priority':1,'plan_node_id':'ROOT',
+          'action':'run_sandboxed_validation','input_digest':'sha256:'+'c'*64,
+          '_stable_fingerprint':stable,'_source_policy_ref':'frontier.json',
+          '_source_head':c['repository']['head_sha']}
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        db.execute('CREATE TABLE engineering_work (run TEXT,fingerprint TEXT,status TEXT,result TEXT)')
+        db.execute('INSERT INTO engineering_work VALUES (?,?,?,?)',
+                   (c['run']['id'],stable,'VERIFIED',json.dumps({'execution':{
+                       'result':'OLD_RESULT','source_head':'a'*40}})))
+    def frontier(ctx):
+        return {'source_head':ctx['repository']['head_sha'],
+                'runtime_plan_digest':ctx['run']['runtime_plan_digest'],
+                'authority_granted':False,'items':[{'id':item['id'],'status':'READY','work':item}],
+                'selected_work':item}
+    counts={'read':0,'execute':0};caps=capabilities(c,counts)
+    caps['engineering.work_frontier']=frontier
+    r=run_task_workflow(c,host_capabilities=caps,invocation_key='fresh-source-bound-work')
+    assert r['work']['id']=='CF-PRECHECK'
+    assert r['execution']['result']=='REAL_HOST_FIXTURE_RESULT'
+    assert r['execution']['source_head']==c['repository']['head_sha']
+    assert r['activity_results']['M5']['status']=='PASS'
+    assert r['activity_results']['M6']['status']=='PASS'
+    assert counts['execute']==1
+
+
 def test_prohibited_effect_does_not_reach_executor(tmp_path):
     c=binding(tmp_path);c['engineering']['work_items'][0]['action']='deploy_approved_release';c['runtime_plan']['scope']['allowed_actions'].append('deploy_approved_release');counts={'read':0,'execute':0}
     r=run_task_workflow(c,host_capabilities=capabilities(c,counts),invocation_key='forbidden')
@@ -440,7 +618,7 @@ def test_terminal_result_preserves_blocked_reason_code(tmp_path):
     assert r['terminal']['blocker']
 
 
-def test_m8_reserves_a_host_coordination_request_per_firing(tmp_path):
+def test_m8_reserves_a_host_coordination_request_per_blocker(tmp_path):
     import sqlite3, json
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
     c=binding(tmp_path);c['engineering']['work_items']=[]
@@ -471,10 +649,9 @@ def test_m8_reserves_a_host_coordination_request_per_firing(tmp_path):
     with sqlite3.connect(box.path) as outbox_db:
         assert outbox_db.execute('SELECT count(*) FROM exchange').fetchone()[0]==1
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-two')
-    # Same blocker, later firing: a fresh request is reserved for that firing
-    # (mandatory per-turn response) while the first stays open for its owner.
-    assert len(second['graph_requests'])==1
-    assert second['graph_requests'][0]['marker']!=req['marker']
+    # Same unresolved blocker, later firing: preserve the canonical request.
+    assert second['graph_requests']==[]
+    assert second['terminal']['blocked_by_pending_exchange_marker']==req['marker']
     assert second['terminal_exchange_status']=='EXCHANGE_REQUESTED'
     assert box.read(req)['status']=='EXCHANGE_REQUESTED'
     assert counts['read']==2 and counts['execute']==0
@@ -486,7 +663,10 @@ def test_m8_correlates_response_as_observation_without_resuming_or_granting_auth
     counts={'read':0,'execute':0};caps=capabilities(c,counts)
     frontier={'source_head':c['repository']['head_sha'],
               'runtime_plan_digest':c['run']['runtime_plan_digest'],
-              'authority_granted':False,'selected_work':None,'items':[]}
+              'authority_granted':False,'selected_work':None,'items':[
+                  {'id':'trace','status':'BLOCKED_EXTERNAL_EVIDENCE','work':{
+                      'id':'trace','plan_node_id':'F2-INCIDENT-RED',
+                      'missing_external_evidence':['authentic original trace']}}]}
     caps['engineering.work_frontier']=lambda ctx:frontier
     first=run_task_workflow(c,host_capabilities=caps,invocation_key='response-one')
     req=first['graph_requests'][0]
@@ -502,18 +682,19 @@ def test_m8_correlates_response_as_observation_without_resuming_or_granting_auth
                     'workflow_resume_allowed':False,'receipt_strength':'RENDERED_TEXT_CORRELATION_ONLY'})
     second=run_task_workflow(c,host_capabilities=caps,invocation_key='response-two')
     observation=second['terminal']['controller_response_observation']
+    assert second['controller_response_observation']==observation
     assert observation['classification']=='RENDERED_TEXT_CORRELATED_WEAK'
     assert observation['response_to_marker']==req['marker']
     assert observation['authority_granted'] is False and observation['typed_ce_admitted'] is False
     assert observation['workflow_resume_allowed'] is False
+    assert second['authority_granted'] is False and second['typed_ce_admitted'] is False
     assert observation['disposition_observation']['disposition']=='SEARCH_EXHAUSTED_WAIT_EXTERNAL_EVIDENCE'
     assert observation['disposition_observation']['planning_state']=='WAIT_EXTERNAL_INPUT'
     assert observation['disposition_observation']['acceptance_target_changed'] is False
     assert second['decision_packet']['controller_disposition_observation']==observation['disposition_observation']
-    # The correlated response is recorded AND this firing still reports its own result.
-    assert len(second['graph_requests'])==1
-    assert second['graph_requests'][0]['marker']!=req['marker']
-    assert [r['marker'] for r in second['pending_controller_exchange_requests']]==[second['graph_requests'][0]['marker']]
+    # The correlated response is recorded; replay does not mint another request.
+    assert second['graph_requests']==[]
+    assert second['pending_controller_exchange_requests']==[]
     assert second['verdict']['status']=='WAIT'
     assert counts['execute']==0
 
@@ -580,8 +761,8 @@ def test_m4_external_dependency_dispatches_terminal_result_to_controller(tmp_pat
     assert r['authority_granted'] is False and r['typed_ce_admitted'] is False
 
 
-def test_terminal_blocker_identity_is_stable_but_each_firing_reports(tmp_path):
-    import copy,subprocess,sqlite3
+def test_terminal_blocker_identity_dedupes_across_firings_and_head_only_advance(tmp_path):
+    import copy,json,subprocess,sqlite3
     from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
     from tools.node_architect.controller_exchange_adapter import ExchangeOutbox
     c=binding(tmp_path);c['repository']['worktree']=str(tmp_path);c['engineering']['work_items']=[]
@@ -598,16 +779,31 @@ def test_terminal_blocker_identity_is_stable_but_each_firing_reports(tmp_path):
     caps=capabilities(c,{'read':0,'execute':0});caps['engineering.work_frontier']=frontier
     first=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-head-one')
     original=first['terminal_exchange_request'];identity=first['terminal']['blocker_identity']
+    same_head=run_task_workflow(c,host_capabilities=caps,invocation_key='terminal-head-two')
+    assert same_head['terminal']['blocker_identity']==identity
+    assert same_head['terminal_exchange_request'] is None
+    assert same_head['terminal']['blocked_by_pending_exchange_marker']==original['marker']
+    assert same_head['terminal']['controller_dispatch_required'] is False
+    assert same_head['graph_requests']==[]
     git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','--allow-empty','-m','additive source change')
     newer=copy.deepcopy(c);newer['repository']['head_sha']=git('rev-parse','HEAD')
     reconcile_engineering_source_head(c,newer,repository_root=tmp_path,reason='fixture additive commit preserving same blocker')
-    second=run_task_workflow(newer,host_capabilities=caps,invocation_key='terminal-head-two')
+    second=run_task_workflow(newer,host_capabilities=caps,invocation_key='terminal-head-three')
     assert second['terminal']['blocker_identity']==identity
-    # Same blocker, new firing: the response obligation is per-turn, so the
-    # second firing reserves its own request while the blocker identity stays stable.
-    assert second['terminal_exchange_request']['marker']!=original['marker']
-    assert second['graph_requests']==[second['terminal_exchange_request']]
-    assert second['terminal_exchange_status']=='EXCHANGE_REQUESTED'
+    assert second['terminal_exchange_request'] is None
+    assert second['graph_requests']==[]
+    assert second['terminal']['blocked_by_pending_exchange_marker']==original['marker']
+    assert second['terminal']['controller_dispatch_required'] is False
     box=ExchangeOutbox(c['workflow']['checkpoint_ref']+'.engineering-exchange.sqlite')
     with sqlite3.connect(box.path) as db:
-        assert db.execute('SELECT count(*) FROM exchange').fetchone()[0]==2
+        rows=db.execute('SELECT request FROM exchange ORDER BY rowid').fetchall()
+        assert len(rows)==1 and json.loads(rows[0][0])==original
+    with sqlite3.connect(c['workflow']['checkpoint_ref']) as db:
+        rows=db.execute('SELECT request,last_firing FROM engineering_terminal_dispatches WHERE blocker_identity=?',
+                        (identity,)).fetchall()
+        assert len(rows)==1 and json.loads(rows[0][0])==original
+        assert rows[0][1]=='terminal-head-three'
+        telemetry=db.execute('SELECT firing,exchange_marker FROM engineering_firing_telemetry ORDER BY firing').fetchall()
+        assert telemetry==[('terminal-head-one',original['marker']),
+                           ('terminal-head-three',original['marker']),
+                           ('terminal-head-two',original['marker'])]

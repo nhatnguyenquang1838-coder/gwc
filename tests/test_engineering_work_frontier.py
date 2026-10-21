@@ -17,6 +17,22 @@ def setup_frontier(tmp_path):
     return c,items
 
 
+def test_classify_empty_frontier_authority_vs_input_vs_exhausted():
+    from tools.node_architect.engineering_work_frontier import classify_empty_frontier
+    authority={'id':'restricted','status':'BLOCKED_AUTHORITY','plan_node_id':'ROOT',
+               'work':{'id':'restricted','plan_node_id':'ROOT','missing_inputs':['approval']}}
+    external={'id':'trace','status':'BLOCKED_EXTERNAL_EVIDENCE','plan_node_id':'ROOT',
+              'work':{'id':'trace','plan_node_id':'ROOT','missing_external_evidence':['trace']}}
+    assert classify_empty_frontier({'items':[authority]})=={
+        'cause':'WAIT_AUTHORITY','reason_code':'ENGINEERING_FRONTIER_WAIT_AUTHORITY',
+        'authority_items':[{'id':'restricted','status':'BLOCKED_AUTHORITY','plan_node_id':'ROOT',
+                            'missing_inputs':['approval']} ]}
+    assert classify_empty_frontier({'items':[external]})=={
+        'cause':'WAIT_INPUT','reason_code':'ENGINEERING_FRONTIER_WAIT_INPUT'}
+    assert classify_empty_frontier({'items':[{'id':'done','status':'VERIFIED'}]})=={
+        'cause':'EXHAUSTED','reason_code':'ENGINEERING_FRONTIER_EXHAUSTED'}
+
+
 def test_verified_probe_advances_to_independent_agent_work(tmp_path):
     c,items=setup_frontier(tmp_path);counts={'read':0,'execute':0}
     caps=capabilities(c,counts)

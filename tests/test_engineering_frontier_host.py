@@ -95,6 +95,14 @@ def test_source_bound_host_frontier_loads_real_policy_and_trace_status(tmp_path)
     r=read_source_bound_frontier(c,profile_ref='profile.json',guard=lambda:True)
     assert r['selected_work']['id']=='repair'
     assert next(i for i in r['items'] if i['id']=='trace')['status']=='BLOCKED_EXTERNAL_EVIDENCE'
+    repair=next(i for i in r['items'] if i['id']=='repair')
+    assert repair['work']['_source_head']==c['repository']['head_sha']
+    prior_fingerprint=repair['fingerprint']
+    (tmp_path/'unrelated.txt').write_text('additive source revision\n')
+    git('add','unrelated.txt');git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','advance source head')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    refreshed=read_source_bound_frontier(c,profile_ref='profile.json',guard=lambda:True)
+    assert next(i for i in refreshed['items'] if i['id']=='repair')['fingerprint']!=prior_fingerprint
     (tmp_path/'code.py').write_text('# drift\n')
     with pytest.raises(ValueError,match='ENGINEERING_FRONTIER_SOURCE_DRIFT'):
         read_source_bound_frontier(c,profile_ref='profile.json',guard=lambda:True)

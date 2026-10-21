@@ -43,6 +43,24 @@ def project_frontier(context,items,*,verified_fingerprints):
             'items':rows,'selected_work':ready[0]['work'] if ready else None,'authority_granted':False}
 
 
+def classify_empty_frontier(frontier):
+    """Classify why the source-bound frontier has no selected work."""
+    rows=frontier.get('items',[]) if isinstance(frontier,dict) else []
+    non_verified=[row for row in rows if row.get('status')!='VERIFIED']
+    authority=[row for row in non_verified if row.get('status')=='BLOCKED_AUTHORITY']
+    if authority:
+        return {'cause':'WAIT_AUTHORITY','reason_code':'ENGINEERING_FRONTIER_WAIT_AUTHORITY',
+                'authority_items':[{'id':row.get('id'),'status':row.get('status'),
+                    'plan_node_id':(row.get('work') or {}).get('plan_node_id',row.get('plan_node_id')),
+                    'missing_inputs':list((row.get('work') or {}).get('missing_inputs',[]))}
+                    for row in authority]}
+    if not non_verified:
+        return {'cause':'EXHAUSTED','reason_code':'ENGINEERING_FRONTIER_EXHAUSTED'}
+    if all(row.get('status') in {'BLOCKED_EXTERNAL_EVIDENCE','WAIT_INPUT'} for row in non_verified):
+        return {'cause':'WAIT_INPUT','reason_code':'ENGINEERING_FRONTIER_WAIT_INPUT'}
+    require(False,'ENGINEERING_FRONTIER_EMPTY_CLASSIFICATION_INVALID')
+
+
 def build_recovery_decision_packet(*,run_id,goal,runtime_plan,frontier):
     """Describe exhausted-frontier options without mutating the frozen plan.
 
