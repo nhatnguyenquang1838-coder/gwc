@@ -43,7 +43,7 @@ acceptance_criteria_refs:
 - AC-10
 - AC-11
 - AC-12
-scope_hash: sha256:1ba309ab98d5b9413f6b13bdc611e8b10fcef65a2a34dd74917b4016f912ae8d
+scope_hash: sha256:0b1da099298ca2d8401cc21345e9964cfedb04e8287d002f013da0ad226525e2
 g1_gate_outcome: PASS
 authority_boundaries:
   grants: []

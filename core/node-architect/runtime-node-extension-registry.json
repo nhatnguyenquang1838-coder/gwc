@@ -77,7 +77,7 @@
     {
       "extension_slot": 83,
       "decision_task_id": "UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1",
-      "decision_scope_hash": "sha256:1ba309ab98d5b9413f6b13bdc611e8b10fcef65a2a34dd74917b4016f912ae8d",
+      "decision_scope_hash": "sha256:0b1da099298ca2d8401cc21345e9964cfedb04e8287d002f013da0ad226525e2",
       "decision_admission_id": "G1-UNIVERSAL-V2-POST81-GENERIC-ADAPTER-R1",
       "decision_record_ref": ".gwc/tasks/UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1/g1/decision/g1-decision-record.yaml",
       "node": {
