@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from pathlib import PurePosixPath, PureWindowsPath
 import subprocess
 from typing import Any, Mapping
 
@@ -264,13 +265,14 @@ def activate_successor_plan(*, grant, predecessor, runtime_plan, node_allocation
 
 
 _LIVE_ACTIVATION_JOURNAL = 'live-activation-journal.json'
+_R3_PREDECESSOR_PLAN_REF = 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json'
 
 
 def _live_activation_paths(root: Path) -> dict[str, Path]:
     activation_dir = root / ACTIVATION_RECEIPT_REF
     return {
         'route': root / ROUTE_REF,
-        'plan': root / 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json',
+        'plan': root / _R3_PREDECESSOR_PLAN_REF,
         'record': activation_dir,
         'database': activation_dir.parent / 'engineering-plan-activation.sqlite3',
         'selector': root / 'selector.json',
@@ -339,7 +341,8 @@ def reconcile_live_activation_journal(isolated_root: Path | str) -> dict[str, An
 
 
 def apply_live_activation_isolated(*, grant, predecessor, runtime_plan, node_allocation,
-                                   branch, head, isolated_root, mode='SIMULATE') -> dict[str, Any]:
+                                   branch, head, isolated_root, successor_plan_ref,
+                                   mode='SIMULATE') -> dict[str, Any]:
     """Materialize native selector artifacts in a disposable root; never enables live execution."""
     if mode != 'SIMULATE':
         raise ValueError('LIVE_ACTIVATION_LIVE_MODE_FORBIDDEN')
@@ -347,14 +350,23 @@ def apply_live_activation_isolated(*, grant, predecessor, runtime_plan, node_all
     _live_target_guard(root)
     if not isinstance(predecessor, Mapping) or not isinstance(runtime_plan, Mapping) or not isinstance(node_allocation, Mapping):
         raise ValueError('LIVE_ACTIVATION_BINDING_INVALID')
+    if (not isinstance(successor_plan_ref, str) or not successor_plan_ref.strip()
+            or Path(successor_plan_ref).is_absolute() or PurePosixPath(successor_plan_ref).is_absolute()
+            or PureWindowsPath(successor_plan_ref).is_absolute() or PureWindowsPath(successor_plan_ref).drive
+            or '..' in PurePosixPath(successor_plan_ref).parts
+            or '..' in PureWindowsPath(successor_plan_ref).parts):
+        raise ValueError('SUCCESSOR_PLAN_REF_INVALID')
+    if (successor_plan_ref == _R3_PREDECESSOR_PLAN_REF
+            or successor_plan_ref == predecessor.get('runtime_plan_ref')):
+        raise ValueError('SUCCESSOR_PLAN_MUST_DIFFER_FROM_PREDECESSOR')
+    plan_bytes = (json.dumps(dict(runtime_plan), sort_keys=True, indent=2, ensure_ascii=False) + chr(10)).encode()
+    plan_digest = 'sha256:' + hashlib.sha256(plan_bytes).hexdigest()
+    if plan_digest == predecessor.get('runtime_plan_digest'):
+        raise ValueError('SUCCESSOR_PLAN_MUST_DIFFER_FROM_PREDECESSOR')
     grant_digest = _validate_activation_grant(grant, predecessor, runtime_plan, node_allocation, branch, head)
     root.mkdir(parents=True, exist_ok=True)
     paths = _live_activation_paths(root)
-    ref = runtime_plan.get('plan_ref') or 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json'
-    if ref != 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json':
-        raise ValueError('LIVE_ACTIVATION_BINDING_INVALID')
-    plan_bytes = (json.dumps(dict(runtime_plan), sort_keys=True, indent=2, ensure_ascii=False) + '\n').encode()
-    plan_digest = 'sha256:' + hashlib.sha256(plan_bytes).hexdigest()
+    ref = successor_plan_ref
     allocation_id = node_allocation.get('node_allocation_id') or node_allocation.get('allocation_id')
     allocation_digest = node_allocation.get('content_digest') or node_allocation.get('digest')
     if isinstance(allocation_digest, Mapping):

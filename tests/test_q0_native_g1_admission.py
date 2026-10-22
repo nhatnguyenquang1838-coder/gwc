@@ -444,15 +444,18 @@ def test_live_bridge_rejects_real_worktree_and_hermes_home_and_live_mode(tmp_pat
     root = Path(__file__).resolve().parents[1]
     with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
         apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
-                                       branch="branch", head="head", isolated_root=root)
+                                       branch="branch", head="head", isolated_root=root,
+                                       successor_plan_ref="core/node-architect/q0-successor-test.json")
     hermes_home = tmp_path / "hermes-home"
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
     with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
         apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
-                                       branch="branch", head="head", isolated_root=hermes_home / "child")
+                                       branch="branch", head="head", isolated_root=hermes_home / "child",
+                                       successor_plan_ref="core/node-architect/q0-successor-test.json")
     with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_MODE_FORBIDDEN$"):
         apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
-                                       branch="branch", head="head", isolated_root=tmp_path, mode="LIVE")
+                                       branch="branch", head="head", isolated_root=tmp_path,
+                                       successor_plan_ref="core/node-architect/q0-successor-test.json", mode="LIVE")
 
 
 def test_live_bridge_requires_typed_grant_without_writes(tmp_path):
@@ -460,7 +463,8 @@ def test_live_bridge_requires_typed_grant_without_writes(tmp_path):
     root = tmp_path / "isolated"
     with pytest.raises(ValueError, match="^LIVE_ACTIVATION_AUTHORITY_REQUIRED$"):
         apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
-                                       branch="fix/test", head="b" * 40, isolated_root=root)
+                                       branch="fix/test", head="b" * 40, isolated_root=root,
+                                       successor_plan_ref="core/node-architect/q0-successor-test.json")
     assert not root.exists()
 
 
@@ -468,7 +472,8 @@ def test_live_bridge_rejects_expired_scope_and_binding_grants(tmp_path):
     from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated
     grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
     kwargs = dict(predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
-                  branch="fix/test", head="b" * 40, isolated_root=tmp_path / "target")
+                  branch="fix/test", head="b" * 40, isolated_root=tmp_path / "target",
+                  successor_plan_ref="core/node-architect/q0-successor-test.json")
     for changes, code in [({"expires_at":"2000-01-01T00:00:00Z"}, "GRANT_EXPIRED"),
                           ({"scope":[]}, "GRANT_SCOPE_INVALID"),
                           ({"bindings":{**grant["bindings"], "head":"wrong"}}, "GRANT_BINDING_MISMATCH")]:
@@ -495,10 +500,11 @@ def test_live_bridge_materializes_native_activation_idempotently_and_recovers_pr
     r3_path = repo_root / "core/node-architect/q0-controlled-failure-frontier-r3.json"
     r3_before = hashlib.sha256(r3_path.read_bytes()).hexdigest()
     kwargs = dict(grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
-                  branch="fix/test", head="b" * 40, isolated_root=root)
+                  branch="fix/test", head="b" * 40, isolated_root=root,
+                  successor_plan_ref="core/node-architect/q0-successor-runtime-plan-w1-w6.json")
     result = apply_live_activation_isolated(**kwargs)
     readback = verify_live_activation_isolated(root)
-    assert readback == {"resolved_plan_ref":"core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+    assert readback == {"resolved_plan_ref":"core/node-architect/q0-successor-runtime-plan-w1-w6.json",
                         "generation":1,"activation_status":"ACTIVATED"}
     assert result["resolve_readback"] == readback
     assert result["authority_granted"] is False and result["live_target_touched"] is False
@@ -523,6 +529,68 @@ def test_live_bridge_materializes_native_activation_idempotently_and_recovers_pr
     assert verify_live_activation_isolated(root)["generation"] == 1
     assert hashes() == real_before
     assert hashlib.sha256(r3_path.read_bytes()).hexdigest() == r3_before
+
+
+def test_successor_activation_resolves_successor_not_r3(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated, verify_live_activation_isolated
+    grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
+    successor_plan_ref = "core/node-architect/q0-successor-runtime-plan-w1-w6.json"
+    predecessor["runtime_plan_ref"] = "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+    predecessor["runtime_plan_digest"] = "sha256:" + "f" * 64
+    kwargs = dict(grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+                  branch="fix/test", head="b" * 40, isolated_root=tmp_path / "successor-root",
+                  successor_plan_ref=successor_plan_ref)
+    # Bind the grant to the complete predecessor identity used for this activation.
+    from tools.node_architect.q0_m1_m7_integration import _digest
+    grant["bindings"]["predecessor_context_digest"] = _digest(predecessor)
+    apply_live_activation_isolated(**kwargs)
+    assert verify_live_activation_isolated(kwargs["isolated_root"])["resolved_plan_ref"] == successor_plan_ref
+    assert successor_plan_ref != "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+
+
+def test_activation_rejects_r3_as_successor(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated, _digest
+    grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
+    predecessor["runtime_plan_ref"] = "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+    predecessor["runtime_plan_digest"] = "sha256:" + "f" * 64
+    grant["bindings"]["predecessor_context_digest"] = _digest(predecessor)
+    with pytest.raises(ValueError, match="^SUCCESSOR_PLAN_MUST_DIFFER_FROM_PREDECESSOR$"):
+        apply_live_activation_isolated(
+            grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+            branch="fix/test", head="b" * 40, isolated_root=tmp_path / "reject-r3",
+            successor_plan_ref="core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json")
+
+
+@pytest.mark.parametrize("bad_ref,code", [
+    ("/absolute/plan.json", "SUCCESSOR_PLAN_REF_INVALID"),
+    ("core/node-architect/../escape.json", "SUCCESSOR_PLAN_REF_INVALID"),
+    ("core/node-architect/predecessor.json", "SUCCESSOR_PLAN_MUST_DIFFER_FROM_PREDECESSOR"),
+])
+def test_activation_rejects_predecessor_ref_and_bad_refs(tmp_path, bad_ref, code):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated
+    grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
+    if bad_ref.endswith("predecessor.json"):
+        predecessor["runtime_plan_ref"] = bad_ref
+        from tools.node_architect.q0_m1_m7_integration import _digest
+        grant["bindings"]["predecessor_context_digest"] = _digest(predecessor)
+    with pytest.raises(ValueError, match=f"^{code}$"):
+        apply_live_activation_isolated(
+            grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+            branch="fix/test", head="b" * 40, isolated_root=tmp_path / "reject-bad-ref",
+            successor_plan_ref=bad_ref)
+
+
+def test_activation_rejects_successor_plan_digest_matching_predecessor(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated
+    grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
+    import hashlib
+    plan_bytes = (json.dumps(plan, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode()
+    predecessor["runtime_plan_digest"] = "sha256:" + hashlib.sha256(plan_bytes).hexdigest()
+    with pytest.raises(ValueError, match="^SUCCESSOR_PLAN_MUST_DIFFER_FROM_PREDECESSOR$"):
+        apply_live_activation_isolated(
+            grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+            branch="fix/test", head="b" * 40, isolated_root=tmp_path / "reject-matching-digest",
+            successor_plan_ref="core/node-architect/q0-successor-runtime-plan-w1-w6.json")
 
 
 def test_activation_adapter_exists_and_envelope_points_to_it():
@@ -580,6 +648,7 @@ def test_activation_dry_run_has_durable_prepare_and_sealed_readback(tmp_path):
 def _activation_fixture(tmp_path):
     from tools.node_architect.q0_m1_m7_integration import _digest
     predecessor = {"run_id": "prior-run", "context_digest": "sha256:" + "d" * 64,
+                   "runtime_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
                    "runtime_plan_digest": "sha256:" + "e" * 64}
     plan = {"run_id": "next-run", "digest": "sha256:" + "a" * 64}
     allocation = {"node_allocation_id": "alloc-1", "content_digest": {"value": "sha256:" + "c" * 64}}
