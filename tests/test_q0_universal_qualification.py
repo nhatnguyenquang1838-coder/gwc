@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from tools.node_architect.q0_native_g1_admission import build_native_g1_plan_receipt
+
 ROOT = Path(__file__).resolve().parents[1]
 MOD = "tools.node_architect.q0_qualification"
 
@@ -502,9 +504,35 @@ def test_q0_e2e_campaign_certify_accept_handoff_then_login_start():
     m = _m()
     profile = m.q0_qualification_profile()
     assert profile["workflow_mode"] == "q0_live_qualification"
+    run_id = "scrum781-q0-e2e-g1"
+    candidate = _sha("d")
+    allocation = {
+        "node_allocation_id": f"{run_id}:W6",
+        "content_digest": {"value": "sha256:" + "c" * 64},
+    }
+    runtime_plan = {
+        "digest": "sha256:" + "a" * 64,
+        "source_binding": {"pre_head_sha": candidate},
+        "node_allocations": [allocation["node_allocation_id"]],
+        "dag": {"nodes": [
+            {"id": f"W{i}", "predecessors": [] if i == 1 else [f"W{i-1}"]}
+            for i in range(1, 7)
+        ]},
+    }
+    receipt = build_native_g1_plan_receipt(
+        run_id=run_id, runtime_plan_digest=runtime_plan["digest"],
+        candidate_sha=candidate, node_allocation=allocation,
+        runtime_plan=runtime_plan, source_head=candidate,
+    )
+    assert m.complete_q0_gate(
+        gate="UR.G0", evidence={"UNDERSTANDING_RECEIPT":"g0"},
+    )["gate_state"] == "PASSED"
+    assert m.complete_q0_gate(
+        gate="UR.G1", evidence={"PLAN_RECEIPT": receipt}, run_id=run_id,
+        runtime_plan_digest=runtime_plan["digest"], candidate_sha=candidate,
+        node_allocation=allocation, runtime_plan=runtime_plan, source_head=candidate,
+    )["gate_state"] == "PASSED"
     for gate, evidence in (
-        ("UR.G0", {"UNDERSTANDING_RECEIPT":"g0"}),
-        ("UR.G1", {"PLAN_RECEIPT":"g1"}),
         ("UR.G2", {"EXECUTION_RECEIPT": _execution_receipt()}),
         ("UR.G3", {"VERIFICATION_RECEIPT": _valid_g3_verification_receipt()}),
         ("UR.G4", {"integration_outcome":"IN_PLACE"}),

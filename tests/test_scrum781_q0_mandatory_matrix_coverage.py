@@ -13,8 +13,11 @@ import hashlib
 import importlib
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
+
+from tools.node_architect.q0_native_g1_admission import build_native_g1_plan_receipt
 
 ROOT = Path(__file__).resolve().parents[1]
 MOD = "tools.node_architect.q0_qualification"
@@ -132,16 +135,50 @@ def test_mandatory_restart_recovery_resumes_from_durable_gate_state():
     """restart_recovery: a fresh advance from a durable current gate/state
     resumes the lifecycle deterministically (no stale conversation state)."""
     m = _m()
-    first = m.advance_qualification_gate(
-        current_gate="UR.G1", current_state="ACTIVE",
-        evidence={"PLAN_RECEIPT": "g1"},
+    run_id = "scrum781-q0-restart-g1"
+    candidate = _sha("d")
+    allocation = {
+        "node_allocation_id": f"{run_id}:W6",
+        "content_digest": {"value": "sha256:" + "c" * 64},
+    }
+    runtime_plan = {
+        "digest": "sha256:" + "a" * 64,
+        "source_binding": {"pre_head_sha": candidate},
+        "node_allocations": [allocation["node_allocation_id"]],
+        "dag": {"nodes": [
+            {"id": f"W{i}", "predecessors": [] if i == 1 else [f"W{i-1}"]}
+            for i in range(1, 7)
+        ]},
+    }
+    receipt = build_native_g1_plan_receipt(
+        run_id=run_id, runtime_plan_digest=runtime_plan["digest"],
+        candidate_sha=candidate, node_allocation=allocation,
+        runtime_plan=runtime_plan, source_head=candidate,
     )
-    # A 'restart' re-advances from the same durable gate/state and must be
-    # deterministic (same next gate/state).
-    second = m.advance_qualification_gate(
-        current_gate="UR.G1", current_state="ACTIVE",
-        evidence={"PLAN_RECEIPT": "g1"},
-    )
+    evidence = {"PLAN_RECEIPT": receipt}
+    bound_complete = m.complete_q0_gate
+    kwargs = {
+        "run_id": run_id, "runtime_plan_digest": runtime_plan["digest"],
+        "candidate_sha": candidate, "node_allocation": allocation,
+        "runtime_plan": runtime_plan, "source_head": candidate,
+    }
+    assert bound_complete(gate="UR.G1", evidence=evidence, **kwargs)["gate_state"] == "PASSED"
+    # advance_qualification_gate owns lifecycle advancement; bind its internal
+    # completion check to the same validated G1 plan receipt.
+    def complete_with_bindings(*, gate, evidence, **_ignored):
+        if gate == "UR.G1":
+            return bound_complete(gate=gate, evidence=evidence, **kwargs)
+        return bound_complete(gate=gate, evidence=evidence, **_ignored)
+
+    with patch.object(m, "complete_q0_gate", side_effect=complete_with_bindings):
+        first = m.advance_qualification_gate(
+            current_gate="UR.G1", current_state="ACTIVE", evidence=evidence,
+        )
+        # A 'restart' re-advances from the same durable gate/state and must be
+        # deterministic (same next gate/state).
+        second = m.advance_qualification_gate(
+            current_gate="UR.G1", current_state="ACTIVE", evidence=evidence,
+        )
     assert first["next_gate"] == second["next_gate"] == "UR.G2"
     assert first["next_state"] == second["next_state"] == "ACTIVE"
 

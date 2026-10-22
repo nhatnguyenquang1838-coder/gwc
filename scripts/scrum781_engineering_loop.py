@@ -208,7 +208,8 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             host_capabilities=local_engineering_capabilities(context,guard=guard,
                 artifact_directory=path.parent/'engineering-results',
                 allowed_commands=[['-m','scripts.scrum781_q0_login_fixture','--engine','native'],
-                                  ['-m','pytest','tests/test_engineering_m1_m7_workflow.py','tests/test_engineering_work_frontier.py','tests/test_engineering_frontier_host.py','tests/test_controller_exchange_adapter.py','tests/test_exchange_outbox_transitions.py','-q']])
+                                  ['-m','pytest','tests/test_engineering_m1_m7_workflow.py','tests/test_engineering_work_frontier.py','tests/test_engineering_frontier_host.py','tests/test_controller_exchange_adapter.py','tests/test_exchange_outbox_transitions.py','-q'],
+                                  ['-m','pytest','tests/test_q0_native_g1_admission.py','tests/test_q0_universal_qualification.py','tests/test_scrum781_q0_mandatory_matrix_coverage.py','tests/test_scrum781_q0_native_host.py','-q']])
             host_capabilities['engineering.execution_ready']=lambda c,item:args.tick is not None and guard()
             from tools.node_architect.engineering_host_adapter import read_source_bound_frontier
             host_capabilities['engineering.work_frontier']=lambda c:read_source_bound_frontier(

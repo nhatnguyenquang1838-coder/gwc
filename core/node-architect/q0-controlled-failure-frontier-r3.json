@@ -36,6 +36,38 @@
    ],
    "minimum_tests_passed": 1,
    "input_digest": "sha256:65cbae3caccc3ba7a41435f1268df8f701d8b6a028bd294512662ef49dd0cb90"
+  },
+  {
+   "id": "CF-G1-ADMISSION",
+   "plan_node_id": "F1-PLAN-IDENTITY",
+   "objective": "Validate COMMAND #163 native UR.G1 admission contract: strict digest-sealed PLAN_RECEIPT, real plan/allocation binding, fail-closed authority fields.",
+   "action": "run_sandboxed_validation",
+   "argv": [
+    "-m",
+    "pytest",
+    "tests/test_q0_native_g1_admission.py",
+    "tests/test_q0_universal_qualification.py",
+    "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+    "tests/test_scrum781_q0_native_host.py",
+    "-q"
+   ],
+   "expected_result": "CF_G1_ADMISSION_VALIDATED",
+   "read_paths": [
+    "tools/node_architect/q0_native_g1_admission.py",
+    "tests/test_q0_native_g1_admission.py",
+    "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+   ],
+   "priority": 2,
+   "depends_on": [],
+   "write_paths": [],
+   "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+   "required_test_files": [
+    "tests/test_q0_native_g1_admission.py",
+    "tests/test_q0_universal_qualification.py",
+    "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+    "tests/test_scrum781_q0_native_host.py"
+   ],
+   "minimum_tests_passed": 75
   }
  ],
  "blocked_next": {

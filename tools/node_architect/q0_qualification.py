@@ -198,11 +198,35 @@ def resolve_q0_qualification_node(context: Mapping[str, Any]) -> dict[str, Any]:
 def complete_q0_gate(
     *, gate: str, evidence: Mapping[str, Any], run_id: str | None = None,
     runtime_plan_digest: str | None = None, candidate_sha: str | None = None,
+    node_allocation: Mapping[str, Any] | None = None,
+    runtime_plan: Mapping[str, Any] | None = None, source_head: str | None = None,
 ) -> dict[str, Any]:
     """Validate the completion evidence for one namespaced Universal gate."""
     _require(gate in GATE_EVIDENCE, "Q0_GATE_UNKNOWN", str(gate))
     values = dict(evidence or {})
     required = GATE_EVIDENCE[gate]
+    if gate == "UR.G1":
+        from tools.node_architect.q0_native_g1_admission import (
+            Q0NativeG1AdmissionError, validate_native_g1_plan_receipt,
+        )
+        receipt = values.get("PLAN_RECEIPT")
+        _require(bool(receipt), "PLAN_RECEIPT_REQUIRED")
+        if not isinstance(receipt, Mapping):
+            raise Q0QualificationError("PLAN_RECEIPT_INVALID")
+        _require(isinstance(node_allocation, Mapping) and isinstance(runtime_plan, Mapping), "PLAN_RECEIPT_BINDING_REQUIRED")
+        bound_run_id = run_id if run_id is not None else receipt.get("run_id")
+        bound_plan_digest = runtime_plan_digest if runtime_plan_digest is not None else receipt.get("runtime_plan_digest")
+        bound_candidate_sha = candidate_sha if candidate_sha is not None else receipt.get("candidate_sha")
+        bound_source_head = source_head if source_head is not None else bound_candidate_sha
+        try:
+            validate_native_g1_plan_receipt(
+                receipt, run_id=bound_run_id, runtime_plan_digest=bound_plan_digest,
+                candidate_sha=bound_candidate_sha, node_allocation=node_allocation,
+                runtime_plan=runtime_plan, source_head=bound_source_head,
+            )
+        except Q0NativeG1AdmissionError as exc:
+            raise Q0QualificationError("PLAN_RECEIPT_INVALID", exc.code) from exc
+        return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "PLAN_RECEIPT"}
     if gate == "UR.G4":
         outcome = values.get("integration_outcome")
         receipt = values.get("INTEGRATION_RECEIPT")
