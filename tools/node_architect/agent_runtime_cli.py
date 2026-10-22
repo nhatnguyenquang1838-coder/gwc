@@ -104,7 +104,12 @@ def _load_manifest(path: Path) -> dict[str, Any]:
             raise AgentRuntimeCliError("RECURSIVE_RUN_MANIFEST_INVALID")
         if recursive_spec["root_manifest"].get("run_id") != event.get("run_id"):
             raise AgentRuntimeCliError("RECURSIVE_ROOT_RUN_ID_MISMATCH")
-        if set(recursive_spec["gate_actions"]) != {"G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_INTEGRATE", "G5_VALIDATE_TARGET", "G6_ACCEPT_HANDOFF"}:
+        expected_actions = {
+            "UR.G0": "UNDERSTAND", "UR.G1": "PLAN", "UR.G2": "EXECUTE",
+            "UR.G3": "VERIFY", "UR.G4": "INTEGRATE",
+            "UR.G5": "VALIDATE-IN-TARGET", "UR.G6": "ACCEPT/HANDOFF",
+        }
+        if recursive_spec["gate_actions"] != expected_actions:
             raise AgentRuntimeCliError("RECURSIVE_GATE_ACTIONS_INCOMPLETE")
         return {"provider_name": provider_name, "event": dict(event), "mode": "recursive_run", "recursive_run": dict(recursive_spec)}
     if isinstance(selection, Mapping):
@@ -193,13 +198,9 @@ def main(argv: list[str] | None = None) -> int:
             recursive_spec = manifest["recursive_run"]
             actions = dict(recursive_spec["gate_actions"])
 
-            gate_names = {
-                "G0": "G0_CONTEXT", "G1": "G1_ALIGNMENT", "G2": "G2_EXECUTION",
-                "G3": "G3_PR", "G4": "G4_INTEGRATE", "G5": "G5_VALIDATE_TARGET",
-                "G6": "G6_ACCEPT_HANDOFF",
-            }
             def canonical_host_event(**kwargs: Any) -> Mapping[str, Any]:
-                gate = gate_names.get(str(kwargs.get("gate") or ""), str(kwargs.get("gate") or ""))
+                raw_gate = str(kwargs.get("gate") or "")
+                gate = raw_gate if raw_gate.startswith("UR.") else f"UR.{raw_gate if raw_gate.startswith('G') else 'G' + raw_gate}"
                 action = actions.get(gate)
                 if not isinstance(action, str) or not action.strip():
                     return {"status": "SEMANTIC_NODE_BLOCKED", "reason_code": "RECURSIVE_GATE_ACTION_MISSING"}

@@ -45,6 +45,17 @@ class RuntimeRegistryValidationTests(unittest.TestCase):
         self.assertEqual(report["counts"]["materialized_scenarios"], 14)
         self.assertEqual(len(report["scenario_ids"]), 14)
 
+    def test_versioned_post81_extension_preserves_scrum284_and_admits_generic_slot83(self) -> None:
+        registry = json.loads(
+            (ROOT / "core/node-architect/runtime-node-extension-registry.json").read_text(encoding="utf-8")
+        )
+        extensions = registry["extensions"]
+        self.assertEqual([item["extension_slot"] for item in extensions], [82, 83])
+        self.assertEqual(extensions[0]["decision_task_id"], "SCRUM-284")
+        self.assertEqual(extensions[1]["decision_task_id"], "UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1")
+        self.assertEqual(extensions[1]["node"]["id"], "universal_run.gate-adapter")
+        self.assertEqual(registry["schema_version"], "2.0.0")
+
     def test_every_slot_has_maturity_and_provenance(self) -> None:
         registry = json.loads(
             (ROOT / "core/node-architect/node-registry.json").read_text(encoding="utf-8")

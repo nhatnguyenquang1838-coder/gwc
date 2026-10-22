@@ -218,6 +218,62 @@ def _binding_payload(
     payload["binding_digest"] = _digest(payload)
     return payload
 
+def compile_extension_semantic_binding(
+    *, node: Mapping[str, Any], instruction_ref: str, implementation_ref: str,
+    descriptor_ref: str, root: Path | str = Path("."),
+) -> dict[str, Any] | None:
+    """Compile the admitted slot-83 callable without altering canonical-81 bindings."""
+    repo_root = Path(root).resolve()
+    if (node.get("id") != "universal_run.gate-adapter"
+            or not instruction_ref.startswith("core/node-architect/node-instructions/")
+            or not instruction_ref.endswith(".node-instruction.yaml")
+            or not _safe_ref(instruction_ref) or not _safe_ref(descriptor_ref)
+            or not _callable_ref_valid(repo_root, implementation_ref)):
+        return None
+    try:
+        from .validate_runtime_registry import validate_registry
+        report = validate_registry(repo_root)
+        extension_registry = _load_json(repo_root / "core/node-architect/runtime-node-extension-registry.json") or {}
+        admitted = [entry for entry in extension_registry.get("extensions", [])
+                    if isinstance(entry, Mapping) and entry.get("extension_slot") == 83
+                    and entry.get("decision_task_id") == "UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1"
+                    and isinstance(entry.get("node"), Mapping)
+                    and entry["node"].get("id") == node.get("id")]
+        if report.get("valid") is not True or len(admitted) != 1:
+            return None
+        admitted_node = admitted[0]["node"]
+        if implementation_ref not in admitted_node.get("implementation_refs", []):
+            return None
+        descriptor = _load_json(repo_root / descriptor_ref)
+        card = _load_yaml(repo_root / instruction_ref)
+        if descriptor is None or card is None:
+            return None
+        if descriptor.get("node_id") != node.get("id") or card.get("node_id") != node.get("id"):
+            return None
+        if card.get("artifact_type") != "node-instruction" or not isinstance(card.get("inputs"), list) or not isinstance(card.get("allowed_actions"), list):
+            return None
+        if list(card.get("gate", [])) != ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"]:
+            return None
+        if any((card.get("authority_boundary") or {}).get(key) is not False for key in (
+            "node_grants_gate_authority", "g2_authority_granted", "g3_authority_granted",
+            "merge_authority_granted", "deployment_authority_granted", "production_authority_granted",
+        )):
+            return None
+        revision = str(extension_registry.get("revision") or "")
+        binding = _binding_payload(
+            node=admitted_node, registry_revision=revision, card=card,
+            implementation_kind="canonical_route_callable", implementation_ref=implementation_ref,
+            semantic_source_kind="CANONICAL_ROUTE_IMPLEMENTATION", descriptor_ref=descriptor_ref,
+        )
+        binding["instruction_ref"] = instruction_ref
+        binding["next_route_contract"]["pass"]["next_gate"] = "UR.G0"
+        binding["next_route_contract"]["blocked"]["next_gate"] = "UR.G0"
+        binding["binding_digest"] = _digest({key: value for key, value in binding.items() if key != "binding_digest"})
+        return binding
+    except Exception:
+        return None
+
+
 
 def compile_semantic_implementation_registry(
     node_registry: Mapping[str, Any],
@@ -355,6 +411,7 @@ def validate_semantic_implementation_registry(
 
 __all__ = [
     "INSTRUCTION_EVALUATOR",
+    "compile_extension_semantic_binding",
     "compile_semantic_implementation_registry",
     "node_registry_revision",
     "validate_semantic_implementation_registry",

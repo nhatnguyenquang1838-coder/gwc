@@ -498,9 +498,13 @@ class RecursiveRunDag:
         if isinstance(binding, Mapping):
             if any(binding.get(key) != value for key, value in expected_binding.items()):
                 raise NodeArchitectureError("DAG_PERSISTENCE_BINDING_MISMATCH")
+        route_context = event_context.get("route_context")
+        route_payload = route_context.get("context") if isinstance(route_context, Mapping) else None
+        input_target_contract = route_payload.get("target_contract") if isinstance(route_payload, Mapping) else None
         input_digest = durable.digest_payload({
             "root_manifest": root_manifest, "child_node_allocations": child_node_allocations,
             "authority": authority, "canonical_state": canonical_state,
+            "target_contract": input_target_contract,
         })
         lease = store.get("lease_binding")
         if isinstance(lease, Mapping):
@@ -623,6 +627,9 @@ class RecursiveRunDag:
         final = durable.load_store(path)
         item = last_item[0]
         if item is None:
+            if (result.get("status") == "BLOCKED"
+                    and str(result.get("failure_code", "")).startswith("TARGET_CONTRACT_")):
+                return result
             raise NodeArchitectureError("DAG_PERSISTENCE_CHECKPOINT_MISSING")
         reconciliation = durable.reconcile_unknown_outcome(final, item)
         if reconciliation.get("outcome") != "KNOWN_STATE":
@@ -685,14 +692,199 @@ class RecursiveRunDag:
                     raise NodeArchitectureError("CHILD_RUN_ID_DUPLICATE", run_id)
                 visited.add(run_id)
                 active.add(run_id)
+                gate_store = store.setdefault("gates", {}).setdefault(run_id, {})
+                contracts = store.setdefault("target_contracts", {})
+
+                def target_contract_digest(contract: Mapping[str, Any]) -> str:
+                    body = {key: value for key, value in contract.items() if key != "contract_digest"}
+                    try:
+                        return "sha256:" + hashlib.sha256(_canonical_json_bytes(body)).hexdigest()
+                    except (TypeError, ValueError):
+                        return ""
+
+                def valid_contract(contract: Any) -> bool:
+                    if not isinstance(contract, Mapping):
+                        return False
+                    children = contract.get("required_children")
+                    allocations = contract.get("required_child_allocations")
+                    run_id_value = contract.get("run_id")
+                    target_id_value = contract.get("target_id")
+                    return (contract.get("schema_version") == "1.0"
+                            and isinstance(run_id_value, str) and bool(run_id_value.strip())
+                            and isinstance(target_id_value, str) and bool(target_id_value.strip())
+                            and isinstance(children, list)
+                            and all(isinstance(item, str) and item for item in children)
+                            and isinstance(allocations, list)
+                            and all(isinstance(item, str) and item for item in allocations)
+                            and contract.get("contract_digest") == target_contract_digest(contract))
+
+                prepared_contracts: dict[str, dict[str, Any]] = {}
+
+                def prepare_child_contracts(parent_id: str, parent_contract: Mapping[str, Any],
+                                            child_specs: list[Mapping[str, Any]],
+                                            depth: int = 1,
+                                            ancestors: set[str] | None = None) -> None:
+                    if depth > self.max_depth:
+                        raise NodeArchitectureError("DAG_MAX_DEPTH_EXCEEDED", parent_id)
+                    if ancestors is None:
+                        ancestors = {parent_id}
+                    child_ids = [str(item.get("child_run_id", "")) for item in child_specs]
+                    if any(not child_id for child_id in child_ids):
+                        raise NodeArchitectureError("TARGET_CONTRACT_ALLOCATION_LINEAGE_INVALID", parent_id)
+                    if len(child_ids) != len(set(child_ids)):
+                        raise NodeArchitectureError("CHILD_RUN_ID_DUPLICATE", parent_id)
+                    for child_spec in child_specs:
+                        child_id = str(child_spec["child_run_id"])
+                        if child_id == parent_id:
+                            raise NodeArchitectureError("CHILD_PARENT_SELF_LOOP", child_id)
+                        if child_id in ancestors:
+                            raise NodeArchitectureError("DAG_CYCLE", child_id)
+                        allocation = child_spec.get("node_allocation")
+                        if (not isinstance(allocation, Mapping) or allocation.get("run_id") != parent_id
+                                or not isinstance(allocation.get("node_allocation_id"), str)
+                                or not allocation.get("node_allocation_id")
+                                or not isinstance(allocation.get("record_id"), str)
+                                or not allocation.get("record_id")):
+                            raise NodeArchitectureError("TARGET_CONTRACT_ALLOCATION_LINEAGE_INVALID", child_id)
+                        descendants: list[Mapping[str, Any]] = list(child_spec.get("children", ()))
+                        fields = {
+                            "schema_version": "1.0", "run_id": child_id,
+                            "target_id": parent_contract["target_id"],
+                            "required_children": [str(item.get("child_run_id", "")) for item in descendants],
+                            "required_child_allocations": [str((item.get("node_allocation") or {}).get("node_allocation_id", ""))
+                                                            for item in descendants],
+                            "parent_run_id": parent_id,
+                            "parent_contract_digest": parent_contract["contract_digest"],
+                            "invoking_node_allocation_ref": str(allocation["record_id"]),
+                            "node_allocation_id": str(allocation["node_allocation_id"]),
+                            "node_allocation_record_id": str(allocation["record_id"]),
+                        }
+                        fields["contract_digest"] = target_contract_digest(fields)
+                        supplied = child_spec.get("target_contract")
+                        if supplied is not None and (not valid_contract(supplied) or dict(supplied) != fields):
+                            raise NodeArchitectureError("TARGET_CONTRACT_BINDING_MISMATCH", child_id)
+                        old = contracts.get(child_id)
+                        if old is not None and old != fields:
+                            raise NodeArchitectureError("TARGET_CONTRACT_BINDING_MISMATCH", child_id)
+                        prepared_contracts[child_id] = fields
+                        prepare_child_contracts(child_id, fields, descendants, depth + 1,
+                                                ancestors | {child_id})
+
+                def save_contract(current_run_id: str, contract: Mapping[str, Any]) -> None:
+                    existing = contracts.get(current_run_id)
+                    if existing is not None and existing != contract:
+                        raise NodeArchitectureError("TARGET_CONTRACT_BINDING_MISMATCH", current_run_id)
+                    if existing is None:
+                        contracts[current_run_id] = copy.deepcopy(dict(contract))
+                        if _persist_hook is not None:
+                            _persist_hook(store, run_id=current_run_id,
+                                          node_id=f"target-contract:{current_run_id}")
+
+                if run_id == root_id:
+                    supplied_route = event_context.get("route_context")
+                    supplied_context = supplied_route.get("context") if isinstance(supplied_route, Mapping) else None
+                    supplied_contract = supplied_context.get("target_contract") if isinstance(supplied_context, Mapping) else None
+                    if supplied_contract is None:
+                        active.remove(run_id)
+                        return {"run_id": run_id, "status": "BLOCKED", "failure_code": "TARGET_CONTRACT_MISSING",
+                                "reason_code": "TARGET_CONTRACT_MISSING",
+                                "c1_status": "INTEGRATION_PENDING", "gate_evidence": {}, "gate_readbacks": {},
+                                "gate_outcomes": {}, "children": [], "g6_receipt": None,
+                                "authority_granted": False}
+                    expected_children = [str(item.get("child_run_id", "")) for item in specs]
+                    expected_allocations = [str((item.get("node_allocation") or {}).get("node_allocation_id", ""))
+                                            for item in specs]
+                    if not valid_contract(supplied_contract):
+                        active.remove(run_id)
+                        return {"run_id": run_id, "status": "BLOCKED",
+                                "failure_code": "TARGET_CONTRACT_DIGEST_INVALID", "reason_code": "TARGET_CONTRACT_DIGEST_INVALID",
+                                "c1_status": "INTEGRATION_PENDING", "gate_evidence": {}, "gate_readbacks": {},
+                                "gate_outcomes": {}, "children": [], "g6_receipt": None,
+                                "authority_granted": False}
+                    if (supplied_contract.get("run_id") != root_id
+                            or supplied_contract.get("required_children") != expected_children
+                            or supplied_contract.get("required_child_allocations") != expected_allocations
+                            or set(supplied_contract) != {"schema_version", "run_id", "target_id", "required_children",
+                                                          "required_child_allocations", "contract_digest"}):
+                        active.remove(run_id)
+                        return {"run_id": run_id, "status": "BLOCKED",
+                                "failure_code": "TARGET_CONTRACT_BINDING_MISMATCH",
+                                "reason_code": "TARGET_CONTRACT_BINDING_MISMATCH",
+                                "c1_status": "INTEGRATION_PENDING", "gate_evidence": {}, "gate_readbacks": {},
+                                "gate_outcomes": {}, "children": [], "g6_receipt": None,
+                                "authority_granted": False}
+                    try:
+                        prepare_child_contracts(root_id, supplied_contract, list(specs))
+                    except NodeArchitectureError as exc:
+                        active.remove(run_id)
+                        # Structural DAG invariants (cycle / duplicate / self-loop /
+                        # depth) are caller programming errors and must propagate;
+                        # only TargetContract admission failures become BLOCKED.
+                        if exc.code.startswith(("DAG_", "CHILD_")):
+                            raise
+                        code = exc.code if exc.code.startswith("TARGET_CONTRACT_") else "TARGET_CONTRACT_BINDING_MISMATCH"
+                        return {"run_id": run_id, "status": "BLOCKED", "failure_code": code,
+                                "reason_code": code, "c1_status": "INTEGRATION_PENDING",
+                                "gate_evidence": {}, "gate_readbacks": {}, "gate_outcomes": {},
+                                "children": [], "g6_receipt": None, "authority_granted": False}
+                    try:
+                        save_contract(run_id, supplied_contract)
+                    except NodeArchitectureError:
+                        active.remove(run_id)
+                        return {"run_id": run_id, "status": "BLOCKED",
+                                "failure_code": "TARGET_CONTRACT_BINDING_MISMATCH",
+                                "reason_code": "TARGET_CONTRACT_BINDING_MISMATCH",
+                                "c1_status": "INTEGRATION_PENDING", "gate_evidence": {},
+                                "gate_readbacks": {}, "gate_outcomes": {}, "children": [],
+                                "g6_receipt": None, "authority_granted": False}
+                else:
+                    stored_contract = contracts.get(run_id)
+                    manifest = store.get("child_manifests", {}).get(run_id)
+                    parent_id = manifest.get("parent_run_ref") if isinstance(manifest, Mapping) else None
+                    parent_contract = contracts.get(parent_id) if isinstance(parent_id, str) else None
+                    expected_children = [str(item.get("child_run_id", "")) for item in specs]
+                    expected_allocations = [str((item.get("node_allocation") or {}).get("node_allocation_id", ""))
+                                            for item in specs]
+                    if (not valid_contract(stored_contract) or stored_contract.get("run_id") != run_id
+                            or stored_contract.get("required_children") != expected_children
+                            or stored_contract.get("required_child_allocations") != expected_allocations
+                            or not isinstance(manifest, Mapping)
+                            or manifest.get("run_id") != run_id
+                            or stored_contract.get("parent_run_id") != parent_id
+                            or stored_contract.get("parent_contract_digest") != (parent_contract or {}).get("contract_digest")
+                            or stored_contract.get("invoking_node_allocation_ref") != manifest.get("invoking_node_allocation_ref")
+                            or stored_contract.get("target_id") != (parent_contract or {}).get("target_id")
+                            or set(stored_contract) != {"schema_version", "run_id", "target_id", "required_children",
+                                                        "required_child_allocations", "parent_run_id",
+                                                        "parent_contract_digest", "invoking_node_allocation_ref",
+                                                        "node_allocation_id", "node_allocation_record_id",
+                                                        "contract_digest"}):
+                        active.remove(run_id)
+                        return {"run_id": run_id, "status": "WAITING", "failure_code": "TARGET_CONTRACT_INVALID",
+                                "c1_status": "INTEGRATION_PENDING", "gate_evidence": {}, "gate_readbacks": {},
+                                "gate_outcomes": {}, "children": [], "g6_receipt": None,
+                                "authority_granted": False}
+
                 cached = run_receipts.get(run_id)
-                # Only accepted terminal receipts are replay-cached. FAILED/WAITING
-                # attempts are recoverable from their gate cursor and may be retried.
+                # Only accepted terminal receipts replay, and only after the bound
+                # contract has been revalidated from its persisted representation.
                 if isinstance(cached, Mapping) and cached.get("status") == "COMPLETED":
                     active.remove(run_id)
                     return copy.deepcopy(dict(cached))
 
-                gate_store = store.setdefault("gates", {}).setdefault(run_id, {})
+                def bind_universal_host(kwargs: dict[str, Any], current_run_id: str) -> None:
+                    route_context = dict(kwargs.get("route_context") or {})
+                    payload = dict(route_context.get("context") or {})
+                    run_manifest = store.get("child_manifests", {}).get(current_run_id, root_manifest)
+                    contract = contracts.get(current_run_id)
+                    if not valid_contract(contract) or contract.get("run_id") != current_run_id:
+                        raise NodeArchitectureError("TARGET_CONTRACT_INVALID", current_run_id)
+                    payload["universal_run_manifest"] = run_manifest
+                    payload["target_contract"] = copy.deepcopy(dict(contract))
+                    route_context["context"] = payload
+                    kwargs["route_context"] = route_context
+                    kwargs["internal_receipt_store"] = store
+                    kwargs["receipts_persisted"] = _persist_hook is not None
                 evidence: dict[str, Any] = {}
                 readbacks: dict[str, Any] = {}
                 outcomes: dict[str, Any] = {}
@@ -713,6 +905,7 @@ class RecursiveRunDag:
                     kwargs.update({"canonical_state": run_canonical_state, "run_id": run_id,
                                    "gate": self._host_gate(gate), "requested_action": "RUN", "authority": run_authority,
                                    "state": run_state, "event_id": f"{run_id}:{gate}"})
+                    bind_universal_host(kwargs, run_id)
                     response = self.runtime_event(**kwargs)
                     host_response: Mapping[str, Any] = response if isinstance(response, Mapping) else {}
                     semantic_host = host_response.get("status") in {
@@ -861,6 +1054,50 @@ class RecursiveRunDag:
                         store.setdefault("child_manifests", {})[child_id] = copy.deepcopy(child_manifest)
                         if not verify_record_digest(child_manifest):
                             raise NodeArchitectureError("CHILD_RUN_MANIFEST_INVALID", child_id)
+                        parent_contract = contracts.get(run_id)
+                        if not valid_contract(parent_contract):
+                            waiting = True
+                            failure = "TARGET_CONTRACT_INVALID"
+                            break
+                        if (allocation.get("run_id") != run_id
+                                or not isinstance(allocation.get("node_allocation_id"), str)
+                                or not allocation.get("node_allocation_id")
+                                or not isinstance(allocation.get("record_id"), str)
+                                or not allocation.get("record_id")):
+                            waiting = True
+                            failure = "TARGET_CONTRACT_ALLOCATION_LINEAGE_INVALID"
+                            break
+                        required_children = [str(item.get("child_run_id", "")) for item in spec.get("children", ())]
+                        required_allocations = [str((item.get("node_allocation") or {}).get("node_allocation_id", ""))
+                                                for item in spec.get("children", ())]
+                        child_contract = {
+                            "schema_version": "1.0", "run_id": child_id,
+                            "target_id": parent_contract["target_id"],
+                            "required_children": required_children,
+                            "required_child_allocations": required_allocations,
+                            "parent_run_id": run_id,
+                            "parent_contract_digest": parent_contract["contract_digest"],
+                            "invoking_node_allocation_ref": str(allocation["record_id"]),
+                            "node_allocation_id": str(allocation["node_allocation_id"]),
+                            "node_allocation_record_id": str(allocation["record_id"]),
+                        }
+                        child_contract["contract_digest"] = target_contract_digest(child_contract)
+                        supplied_child_contract = spec.get("target_contract")
+                        if supplied_child_contract is not None:
+                            if not valid_contract(supplied_child_contract):
+                                waiting = True
+                                failure = "TARGET_CONTRACT_DIGEST_INVALID"
+                                break
+                            if dict(supplied_child_contract) != child_contract:
+                                waiting = True
+                                failure = "TARGET_CONTRACT_BINDING_MISMATCH"
+                                break
+                        try:
+                            save_contract(child_id, child_contract)
+                        except NodeArchitectureError:
+                            waiting = True
+                            failure = "TARGET_CONTRACT_BINDING_MISMATCH"
+                            break
                         child_outcomes = spec.get("outcomes", {})
                         if not isinstance(child_outcomes, Mapping):
                             raise NodeArchitectureError("TRANSFER_OUTCOME_INVALID", child_id)
@@ -882,7 +1119,7 @@ class RecursiveRunDag:
                             "ACCEPTED" if child_accepted else "OPEN" if child_status == "WAITING" else "FAILED"
                         )
                         if not child_accepted and failure is None:
-                            failure = "CHILD_G6_NOT_ACCEPTED"
+                            failure = str(child.get("failure_code") or "CHILD_G6_NOT_ACCEPTED")
                         if child_status == "WAITING":
                             waiting = True
                         child["run_manifest"] = child_manifest
@@ -905,6 +1142,7 @@ class RecursiveRunDag:
                         kwargs.update({"canonical_state": run_canonical_state, "run_id": run_id,
                                        "gate": self._host_gate(gate), "requested_action": "RUN", "authority": run_authority,
                                        "state": run_state, "event_id": f"{run_id}:{gate}"})
+                        bind_universal_host(kwargs, run_id)
                         response = self.runtime_event(**kwargs)
                         host_response: Mapping[str, Any] = response if isinstance(response, Mapping) else {}
                         if host_response.get("status") == "SEMANTIC_NODE_BLOCKED":

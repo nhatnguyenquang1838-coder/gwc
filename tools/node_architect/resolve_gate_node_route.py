@@ -48,6 +48,51 @@ def _node_map(registry: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
     return {str(node.get("id")): node for node in registry.get("nodes", []) if node.get("id")}
 
 
+def _load_admitted_universal_node(root: Path, node_id: str) -> Mapping[str, Any] | None:
+    """Resolve the one generic node from the validated post-81 sidecar."""
+    if node_id != "universal_run.gate-adapter":
+        return None
+    try:
+        validator_path = root / "tools/node_architect/validate_runtime_registry.py"
+        spec = importlib.util.spec_from_file_location("gwc_validate_runtime_extension_registry", validator_path)
+        if spec is None or spec.loader is None:
+            return None
+        validator_module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = validator_module
+        spec.loader.exec_module(validator_module)
+        report = validator_module.validate_registry(root)
+        if report.get("valid") is not True:
+            return None
+        payload = _load(root / "core/node-architect/runtime-node-extension-registry.json")
+    except Exception:
+        return None
+    matches = [
+        item.get("node") for item in payload.get("extensions", [])
+        if isinstance(item, Mapping) and item.get("extension_slot") == 83
+        and item.get("decision_task_id") == "UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1"
+        and isinstance(item.get("node"), Mapping) and item["node"].get("id") == node_id
+    ]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _universal_instruction_report(*, root: Path, route: Mapping[str, Any],
+                                  descriptor: Mapping[str, Any], node: Mapping[str, Any],
+                                  gate: str, action: str, mode: str) -> Any | None:
+    """Validate the extension-specific card without aliasing legacy GWC gates."""
+    try:
+        card = _load(root / str(route["node_instruction_ref"]))
+        try:
+            from .validate_node_instruction import validate_universal_instruction
+        except ImportError:
+            from tools.node_architect.validate_node_instruction import validate_universal_instruction
+        return validate_universal_instruction(
+            card=card, descriptor=descriptor, registry_node=node, route=route,
+            active_gate=gate, action=action, mode=mode,
+        )
+    except Exception:
+        return None
+
+
 def _implementation_available(root: Path, implementation: Mapping[str, Any], context: Mapping[str, Any]) -> bool:
     """Check implementation presence without importing or executing implementation code."""
     kind = implementation.get("kind")
@@ -306,30 +351,49 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
     if not isinstance(context_payload, Mapping):
         context_payload = {}
     loaded_context = sorted(k for k in required_context if _is_loaded(context_payload.get(k)))
+    nodes = _node_map(node_registry)
+    node = nodes.get(node_id)
+    if node is None and gate in {"UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"}:
+        node = _load_admitted_universal_node(root, node_id)
     route_common = dict(**common, route_id=route_id, current_node=node_id,
                         implementation=implementation, required_context=required_context,
                         loaded_context=loaded_context, instruction_ref=instruction_ref)
     if len(loaded_context) != len(required_context):
         return _blocked(reasons=["NODE_CONTEXT_NOT_LOADED"], **route_common)
 
-    envelope = context_payload.get("g2_envelope", {})
-    approval = context_payload.get("approval_receipt", {})
-    claim = context_payload.get("task_claim", {})
-    envelope_invalid = not isinstance(envelope, Mapping) or any([
-        str(envelope.get("task_id", "")) != task_id,
-        str(envelope.get("authority_gate", "")) != gate,
-        str(envelope.get("repository", "")) != str(context.get("repository", "")),
-        str(envelope.get("base_sha", "")) != str(context.get("base_sha", "")),
-        str(envelope.get("working_branch", "")) != str(context.get("working_branch", "")),
-        str(envelope.get("scope_hash", "")) != str(context.get("scope_hash", "")),
-    ])
-    approval_invalid = not isinstance(approval, Mapping) or approval.get("status") not in {"VALID", "APPROVED", "PASS"}
-    claim_invalid = not isinstance(claim, Mapping) or not claim.get("agent")
-    if envelope_invalid or approval_invalid or claim_invalid:
-        return _blocked(reasons=["GATE_NODE_BINDING_MISMATCH"], **route_common)
+    universal_route = gate in {"UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"}
+    if universal_route:
+        manifest = context_payload.get("universal_run_manifest")
+        target_contract = context_payload.get("target_contract")
+        run_id = str(context.get("run_id") or "")
+        if (not isinstance(manifest, Mapping) or not run_id or manifest.get("run_id") != run_id
+                or manifest.get("run_kind") not in {"ROOT", "CHILD", "ATOMIC"}
+                or not isinstance(target_contract, Mapping)
+                or target_contract.get("run_id") != run_id
+                or (manifest.get("run_kind") == "ROOT" and manifest.get("parent_run_ref") is not None)
+                or (manifest.get("run_kind") == "CHILD" and not manifest.get("parent_run_ref"))):
+            return _blocked(reasons=["UNIVERSAL_RUN_IDENTITY_OR_TARGET_INVALID"], **route_common)
+    else:
+        envelope = context_payload.get("g2_envelope", {})
+        approval = context_payload.get("approval_receipt", {})
+        claim = context_payload.get("task_claim", {})
+        envelope_invalid = not isinstance(envelope, Mapping) or any([
+            str(envelope.get("task_id", "")) != task_id,
+            str(envelope.get("authority_gate", "")) != gate,
+            str(envelope.get("repository", "")) != str(context.get("repository", "")),
+            str(envelope.get("base_sha", "")) != str(context.get("base_sha", "")),
+            str(envelope.get("working_branch", "")) != str(context.get("working_branch", "")),
+            str(envelope.get("scope_hash", "")) != str(context.get("scope_hash", "")),
+        ])
+        approval_invalid = not isinstance(approval, Mapping) or approval.get("status") not in {"VALID", "APPROVED", "PASS"}
+        claim_invalid = not isinstance(claim, Mapping) or not claim.get("agent")
+        if envelope_invalid or approval_invalid or claim_invalid:
+            return _blocked(reasons=["GATE_NODE_BINDING_MISMATCH"], **route_common)
 
     nodes = _node_map(node_registry)
     node = nodes.get(node_id)
+    if node is None and universal_route:
+        node = _load_admitted_universal_node(root, node_id)
     if node is None:
         return _blocked(reasons=["NODE_CONTRACT_MISSING"], **route_common)
     descriptor_ref = str(route.get("node_descriptor_ref", ""))
@@ -367,18 +431,25 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
 
     if not instruction_ref or not (root / instruction_ref).is_file():
         return _blocked(reasons=["NODE_INSTRUCTION_MISSING"], **route_common)
-    validator = _instruction_validator(root)
-    if validator is None:
-        return _blocked(reasons=["NODE_INSTRUCTION_INVALID"], **route_common)
-    try:
-        card = validator.load_data(root / instruction_ref)
-        schema = validator.load_data(root / "schemas/node-architect/node-instruction.schema.json")
-        report = validator.validate_instruction(
-            card=card, schema=schema, descriptor=descriptor, registry_node=node,
-            route=route, active_gate=gate, mode=mode,
+    if universal_route:
+        report = _universal_instruction_report(
+            root=root, route=route, descriptor=descriptor, node=node, gate=gate, action=action, mode=mode,
         )
-    except Exception:
-        return _blocked(reasons=["NODE_INSTRUCTION_INVALID"], **route_common)
+        if report is None:
+            return _blocked(reasons=["NODE_INSTRUCTION_INVALID"], **route_common)
+    else:
+        validator = _instruction_validator(root)
+        if validator is None:
+            return _blocked(reasons=["NODE_INSTRUCTION_INVALID"], **route_common)
+        try:
+            card = validator.load_data(root / instruction_ref)
+            schema = validator.load_data(root / "schemas/node-architect/node-instruction.schema.json")
+            report = validator.validate_instruction(
+                card=card, schema=schema, descriptor=descriptor, registry_node=node,
+                route=route, active_gate=gate, mode=mode,
+            )
+        except Exception:
+            return _blocked(reasons=["NODE_INSTRUCTION_INVALID"], **route_common)
     if not report.valid:
         payload = _blocked(reasons=report.reason_codes, **route_common)
         payload.update({
@@ -405,6 +476,8 @@ def resolve_gate_node_route(*, profile: Mapping[str, Any], node_registry: Mappin
     if route.get("next_gate") is not None:
         reason_codes.append(str(next_gate_result["reason_code"]))
     payload = _base_payload(**route_common)
+    if node_id == "universal_run.gate-adapter":
+        payload.update({"node": dict(node), "node_descriptor_ref": str(route.get("node_descriptor_ref", ""))})
     payload.update({
         "outcome": "ROUTE_SELECTED", "instruction_digest": report.instruction_digest,
         "instruction_validated": True,

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+
 import pytest
 
-from tools.node_architect.universal_run_node import RecursiveRunDag, NodeArchitectureError
+from tools.node_architect.universal_run_node import RecursiveRunDag, NodeArchitectureError, _canonical_json_bytes
 from tools.node_architect.universal_run_topology import (
     create_node_allocation,
     create_run_manifest_revision,
@@ -11,6 +13,64 @@ from tools.node_architect.universal_run_topology import (
 TS = "2026-10-22T00:00:00Z"
 ACTOR = {"kind": "agent", "id": "c1-test"}
 GATES = ["G0", "G1", "G2", "G3", "G4", "G5", "G6"]
+
+
+def contract_for(run_id, child_ids, allocation_ids, *, parent_contract=None,
+                 parent_run_id=None, parent_contract_digest=None,
+                 invoking_allocation_ref=None, node_allocation_id=None,
+                 node_allocation_record_id=None, target_id="generic-target",
+                 strict=True):
+    """Build an exact, self-digested TargetContract for a run."""
+    body = {
+        "schema_version": "1.0",
+        "run_id": run_id,
+        "target_id": target_id,
+        "required_children": list(child_ids),
+        "required_child_allocations": list(allocation_ids),
+    }
+    if strict and len(body["required_children"]) != len(set(body["required_children"])):
+        raise ValueError("required_children must be unique in strict mode")
+    if parent_contract is not None:
+        body["parent_run_id"] = parent_run_id
+        body["parent_contract_digest"] = parent_contract["contract_digest"]
+        body["invoking_node_allocation_ref"] = invoking_allocation_ref
+        body["node_allocation_id"] = node_allocation_id
+        body["node_allocation_record_id"] = node_allocation_record_id
+    body["contract_digest"] = "sha256:" + hashlib.sha256(
+        _canonical_json_bytes(body)).hexdigest()
+    return body
+
+
+def route_context(contract):
+    return {"route_context": {"context": {"target_contract": contract}}}
+
+
+def root_contract(child_specs):
+    return contract_for("generic-root-191",
+                        [s["child_run_id"] for s in child_specs],
+                        [s["node_allocation"]["node_allocation_id"] for s in child_specs],
+                        strict=False)
+
+
+def child_contract_for(spec, parent_contract):
+    children = spec.get("children", [])
+    alloc = spec["node_allocation"]
+    return contract_for(
+        spec["child_run_id"],
+        [c["child_run_id"] for c in children],
+        [c["node_allocation"]["node_allocation_id"] for c in children],
+        parent_contract=parent_contract,
+        parent_run_id="generic-root-191",
+        parent_contract_digest=parent_contract["contract_digest"],
+        invoking_allocation_ref=alloc["record_id"],
+        node_allocation_id=alloc["node_allocation_id"],
+        node_allocation_record_id=alloc["record_id"])
+
+
+def with_contracts(specs, **extra):
+    """Attach the validated root TargetContract; children are derived by the DAG."""
+    return dict(root_manifest=root(), child_node_allocations=list(specs),
+                **route_context(root_contract(specs)), **extra)
 
 
 def root():
@@ -69,14 +129,11 @@ def test_recursive_children_run_all_gates_through_host_and_parent_waits_for_rece
         return event_result(kwargs["run_id"], kwargs["gate"])
 
     dag = RecursiveRunDag(runtime_event=host, max_depth=4, max_nodes=8)
-    result = dag.execute(
-        root_manifest=root(),
-        child_node_allocations=[spec("generic-root-191", "child-a", "node-a", children=[
+    result = dag.execute(**with_contracts([
+        spec("generic-root-191", "child-a", "node-a", children=[
             spec("child-a", "grandchild-a", "node-grandchild")
-        ])],
-        authority={"authority_ref": "existing-authority"},
-        canonical_state={"fixture": True},
-    )
+        ])
+    ], authority={"authority_ref": "existing-authority"}, canonical_state={"fixture": True}))
 
     assert [c["gate"] for c in calls if c["run_id"] == "generic-root-191"] == GATES
     assert [c["gate"] for c in calls if c["run_id"] == "child-a"] == GATES
@@ -100,14 +157,10 @@ def test_failed_child_receipt_fails_parent_aggregation_but_sibling_runs():
             response["g6_receipt"] = {"status": "REJECTED", "receipt_id": "g6:child-b"}
         return response
 
-    result = RecursiveRunDag(runtime_event=host).execute(
-        root_manifest=root(),
-        child_node_allocations=[
-            spec("generic-root-191", "child-b", "node-b"),
-            spec("generic-root-191", "child-c", "node-c"),
-        ],
-        authority={"authority_ref": "existing-authority"}, canonical_state={},
-    )
+    result = RecursiveRunDag(runtime_event=host).execute(**with_contracts([
+        spec("generic-root-191", "child-b", "node-b"),
+        spec("generic-root-191", "child-c", "node-c"),
+    ], authority={"authority_ref": "existing-authority"}, canonical_state={}))
     assert "child-c" in {call["run_id"] for call in calls}
     # A rejected required child blocks parent composition before G3/G4/G5/G6.
     assert not any(call["run_id"] == "generic-root-191" and call["gate"] in GATES[3:]
@@ -140,9 +193,9 @@ def test_child_cannot_inject_authority_or_cross_run_canonical_state():
     ]:
         calls.clear()
         with pytest.raises(NodeArchitectureError, match=code):
-            dag.execute(root_manifest=root(), child_node_allocations=[
+            dag.execute(**with_contracts([
                 spec("generic-root-191", "child-inject", "node-inject", **override)
-            ], authority={"authority_ref": "parent"}, canonical_state={"run_id": "generic-root-191"})
+            ], authority={"authority_ref": "parent"}, canonical_state={"run_id": "generic-root-191"}))
         assert not any(call["run_id"] == "child-inject" for call in calls)
         assert not any(call["run_id"] == "generic-root-191" and call["gate"] in GATES[3:]
                        for call in calls)
@@ -159,17 +212,20 @@ def test_waiting_child_is_recoverable_and_siblings_continue():
         return event_result(kwargs["run_id"], kwargs["gate"])
     dag = RecursiveRunDag(runtime_event=host)
     checkpoint = {}
-    kwargs = dict(root_manifest=root(), child_node_allocations=[
+    kwargs = dict(authority={}, canonical_state={}, checkpoint=checkpoint)
+    first = dag.execute(**with_contracts([
         spec("generic-root-191", "child-wait", "node-wait"),
         spec("generic-root-191", "child-sibling", "node-sibling"),
-    ], authority={}, canonical_state={}, checkpoint=checkpoint)
-    first = dag.execute(**kwargs)
+    ], **kwargs))
     assert first["status"] == "WAITING"
     assert any(run_id == "child-sibling" for run_id, _ in calls)
     assert not any(run_id == "generic-root-191" and gate in GATES[3:] for run_id, gate in calls)
     assert checkpoint["generations"]["generic-root-191:node-wait"][0]["terminal_state"] == "OPEN"
     released = True
-    second = dag.execute(**kwargs)
+    second = dag.execute(**with_contracts([
+        spec("generic-root-191", "child-wait", "node-wait"),
+        spec("generic-root-191", "child-sibling", "node-sibling"),
+    ], **kwargs))
     assert second["status"] == "COMPLETED"
     assert checkpoint["generations"]["generic-root-191:node-wait"][0]["terminal_state"] == "ACCEPTED"
 
@@ -178,26 +234,26 @@ def test_dag_rejects_cycles_duplicate_ids_self_parent_and_depth_budget():
     host = lambda **kw: event_result(kw["run_id"], kw["gate"])
     dag = RecursiveRunDag(runtime_event=host, max_depth=2)
     with pytest.raises(NodeArchitectureError, match="DAG_CYCLE"):
-        dag.execute(root_manifest=root(), child_node_allocations=[
+        dag.execute(**with_contracts([
             spec("generic-root-191", "child-x", "node-x", children=[
                 spec("child-x", "generic-root-191", "node-back")
             ])
-        ], authority={}, canonical_state={})
+        ], authority={}, canonical_state={}))
     with pytest.raises(NodeArchitectureError, match="CHILD_RUN_ID_DUPLICATE"):
-        dag.execute(root_manifest=root(), child_node_allocations=[
+        dag.execute(**with_contracts([
             spec("generic-root-191", "child-x", "node-x"),
             spec("generic-root-191", "child-x", "node-y"),
-        ], authority={}, canonical_state={})
+        ], authority={}, canonical_state={}))
     with pytest.raises(NodeArchitectureError, match="CHILD_PARENT_SELF_LOOP"):
-        dag.execute(root_manifest=root(), child_node_allocations=[
+        dag.execute(**with_contracts([
             spec("generic-root-191", "generic-root-191", "node-self")
-        ], authority={}, canonical_state={})
+        ], authority={}, canonical_state={}))
     with pytest.raises(NodeArchitectureError, match="DAG_MAX_DEPTH_EXCEEDED"):
-        dag.execute(root_manifest=root(), child_node_allocations=[
+        dag.execute(**with_contracts([
             spec("generic-root-191", "child-x", "node-x", children=[
                 spec("child-x", "grandchild-x", "node-g")
             ])
-        ], authority={}, canonical_state={})
+        ], authority={}, canonical_state={}))
 
 
 def test_typed_noop_is_explicit_and_checkpoint_replay_is_idempotent():
@@ -209,21 +265,30 @@ def test_typed_noop_is_explicit_and_checkpoint_replay_is_idempotent():
 
     checkpoint = {}
     dag = RecursiveRunDag(runtime_event=host)
-    kwargs = dict(root_manifest=root(), child_node_allocations=[
+    kwargs = dict(authority={}, canonical_state={}, checkpoint=checkpoint,
+                  lease_owner="worker-a")
+    first = dag.execute(**with_contracts([
         spec("generic-root-191", "child-resume", "node-resume", outcomes={
             "G2": {"kind": "NO_TRANSFER_REQUIRED", "reason": "read-only atomic run"}
         })
-    ], authority={}, canonical_state={}, checkpoint=checkpoint, lease_owner="worker-a")
-    first = dag.execute(**kwargs)
+    ], **kwargs))
     call_count = len(calls)
-    replay = dag.execute(**kwargs)
+    replay = dag.execute(**with_contracts([
+        spec("generic-root-191", "child-resume", "node-resume", outcomes={
+            "G2": {"kind": "NO_TRANSFER_REQUIRED", "reason": "read-only atomic run"}
+        })
+    ], **kwargs))
     assert len(calls) == call_count
     assert first == replay
     assert first["children"][0]["gate_outcomes"]["G2"]["kind"] == "NO_TRANSFER_REQUIRED"
     assert first["children"][0]["g6_receipt"]["status"] == "ACCEPTED"
     checkpoint["leases"] = {"generic-root-191": "worker-a"}
     with pytest.raises(NodeArchitectureError, match="DAG_LEASE_HELD"):
-        dag.execute(**{**kwargs, "lease_owner": "worker-b"})
+        dag.execute(**with_contracts([
+            spec("generic-root-191", "child-resume", "node-resume", outcomes={
+                "G2": {"kind": "NO_TRANSFER_REQUIRED", "reason": "read-only atomic run"}
+            })
+        ], **{**kwargs, "lease_owner": "worker-b"}))
 
 
 def test_interrupted_child_resumes_from_last_gate_without_replaying_prefix():
@@ -240,15 +305,17 @@ def test_interrupted_child_resumes_from_last_gate_without_replaying_prefix():
 
     checkpoint = {}
     dag = RecursiveRunDag(runtime_event=host)
-    kwargs = dict(root_manifest=root(), child_node_allocations=[
-        spec("generic-root-191", "child-restart", "node-restart")
-    ], authority={}, canonical_state={}, checkpoint=checkpoint)
+    kwargs = dict(authority={}, canonical_state={}, checkpoint=checkpoint)
     with pytest.raises(RuntimeError, match="interruption"):
-        dag.execute(**kwargs)
+        dag.execute(**with_contracts([
+            spec("generic-root-191", "child-restart", "node-restart")
+        ], **kwargs))
     child_prefix_calls = [gate for run_id, gate in calls if run_id == "child-restart"]
     assert child_prefix_calls == GATES[:5]
 
-    result = dag.execute(**kwargs)
+    result = dag.execute(**with_contracts([
+        spec("generic-root-191", "child-restart", "node-restart")
+    ], **kwargs))
     resumed_child_calls = [gate for run_id, gate in calls if run_id == "child-restart"]
     assert resumed_child_calls == GATES[:5] + GATES[4:]
     assert result["status"] == "COMPLETED"
@@ -262,10 +329,9 @@ def test_every_child_receipt_requires_gate_evidence_readback_and_g6_acceptance()
             response.pop("evidence")
         return response
 
-    result = RecursiveRunDag(runtime_event=incomplete).execute(
-        root_manifest=root(), child_node_allocations=[spec("generic-root-191", "child-bad", "node-bad")],
-        authority={}, canonical_state={},
-    )
+    result = RecursiveRunDag(runtime_event=incomplete).execute(**with_contracts([
+        spec("generic-root-191", "child-bad", "node-bad")
+    ], authority={}, canonical_state={}))
     assert result["status"] == "FAILED"
     assert result["children"][0]["failure_code"] == "CHILD_GATE_EVIDENCE_MISSING"
     assert "LOAD_PROOF" not in repr(result)

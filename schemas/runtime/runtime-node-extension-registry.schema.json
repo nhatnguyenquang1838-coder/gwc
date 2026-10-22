@@ -17,7 +17,7 @@
     "provenance"
   ],
   "properties": {
-    "schema_version": {"const": "1.0.0"},
+    "schema_version": {"enum": ["1.0.0", "2.0.0"]},
     "artifact_type": {"const": "runtime-node-extension-registry"},
     "registry_id": {"type": "string", "minLength": 1},
     "revision": {"type": "string", "minLength": 1},
@@ -36,6 +36,8 @@
           "extension_slot": {"type": "integer", "minimum": 82},
           "decision_task_id": {"type": "string", "minLength": 1},
           "decision_scope_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "decision_admission_id": {"type": "string", "minLength": 1},
+          "decision_record_ref": {"type": "string", "minLength": 1},
           "node": {"$ref": "node-contract.schema.json"},
           "route": {
             "type": "object",
@@ -65,8 +67,8 @@
                   }
                 }
               },
-              "terminal_gate": {"const": "G4_MERGE"},
-              "outcome": {"const": "HUMAN_REQUIRED"}
+              "terminal_gate": {"enum": ["G4_MERGE", "G6_ACCEPT_HANDOFF"]},
+              "outcome": {"enum": ["HUMAN_REQUIRED", "TARGET_CONTRACT_REQUIRED"]}
             }
           }
         }

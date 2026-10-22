@@ -30,6 +30,19 @@ def _allocation():
     )
 
 
+def _target_contract(run_id, target_id, children, allocations, parent_digest=None,
+                    lineage=None):
+    contract = {"schema_version": "1.0", "run_id": run_id, "target_id": target_id,
+                "required_children": list(children), "required_child_allocations": list(allocations)}
+    if parent_digest is not None:
+        contract.update(lineage or {})
+        contract["parent_contract_digest"] = parent_digest
+    digest_body = json.dumps(contract, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    import hashlib
+    contract["contract_digest"] = "sha256:" + hashlib.sha256(digest_body).hexdigest()
+    return contract
+
+
 def _semantic_complete(run_id, gate):
     return {
         "status": "SEMANTIC_NODE_COMPLETE",
@@ -53,11 +66,14 @@ def _case_semantic_host_responses_produce_gate_evidence_then_wait_for_real_g6_ac
         calls.append(kwargs)
         return _semantic_complete(kwargs["run_id"], kwargs["gate"])
 
+    allocation = _allocation()
     result = RecursiveRunDag(runtime_event=host).execute(
         root_manifest=_root(),
-        child_node_allocations=[{"child_run_id": "recursive-child-adapter", "node_allocation": _allocation()}],
+        child_node_allocations=[{"child_run_id": "recursive-child-adapter", "node_allocation": allocation}],
         authority=None,
         canonical_state={"task_id": "SCRUM-TEST"},
+        route_context={"context": {"target_contract": _target_contract(
+            "recursive-root-adapter", "test-target", ["recursive-child-adapter"], [allocation["node_allocation_id"]])}},
     )
 
     assert [call["gate"] for call in calls if call["run_id"] == "recursive-child-adapter"] == [
@@ -84,6 +100,8 @@ def _case_provider_cannot_select_next_gate_or_route_in_recursive_host_result():
     result = RecursiveRunDag(runtime_event=host).execute(
         root_manifest=_root(), child_node_allocations=[], authority=None,
         canonical_state={"task_id": "SCRUM-TEST"},
+        route_context={"context": {"target_contract": _target_contract(
+            "recursive-root-adapter", "test-target", [], [])}},
     )
 
     assert result["status"] == "WAITING"
@@ -99,6 +117,8 @@ def _case_semantic_blocked_maps_to_waiting_without_gate_evidence():
     result = RecursiveRunDag(runtime_event=host).execute(
         root_manifest=_root(), child_node_allocations=[], authority=None,
         canonical_state={"task_id": "SCRUM-TEST"},
+        route_context={"context": {"target_contract": _target_contract(
+            "recursive-root-adapter", "test-target", [], [])}},
     )
     assert result["status"] == "WAITING"
     assert result["failure_code"] == "HOST_READBACK_REJECTED"
@@ -106,7 +126,7 @@ def _case_semantic_blocked_maps_to_waiting_without_gate_evidence():
     assert result["g6_receipt"] is None
 
 
-def _case_cli_recursive_mode_calls_canonical_host_and_fails_closed_on_missing_route():
+def _case_cli_recursive_mode_dispatches_slot83_and_holds_c2_g2():
     repository_root = Path(__file__).resolve().parents[1]
     with TemporaryDirectory() as temp:
         tmp = Path(temp)
@@ -130,20 +150,20 @@ def _case_cli_recursive_mode_calls_canonical_host_and_fails_closed_on_missing_ro
             created_at=TS, created_by=ACTOR,
         )
         read = lambda name: json.loads((repository_root / "core/node-architect" / name).read_text(encoding="utf-8"))
-        gate_names = ("G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR", "G4_INTEGRATE", "G5_VALIDATE_TARGET", "G6_ACCEPT_HANDOFF")
+        gate_names = ("UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6")
         payload = {
             "mode": "recursive_run",
             "provider_name": "recursive-configured-provider",
             "recursive_run": {
                 "root_manifest": root_manifest,
                 "child_node_allocations": [],
-                "gate_actions": {gate: "resolve_execution_node" for gate in gate_names},
+                "gate_actions": dict(zip(gate_names, ("UNDERSTAND", "PLAN", "EXECUTE", "VERIFY", "INTEGRATE", "VALIDATE-IN-TARGET", "ACCEPT/HANDOFF"))),
             },
             "event": {
                 "canonical_state": {
                     "task_id": "SCRUM-TEST", "repository": "example/gwc", "branch": "test-branch",
                     "base_sha": "a" * 40, "head_sha": "b" * 40, "scope_hash": "sha256:" + "c" * 64,
-                    "profile_revision": "workflow-contract-gate-applicability-20260810-r1",
+                    "profile_revision": read("gate-node-route-profile.json")["revision"],
                     "graph_revision": "scrum-104-20260726",
                     "node_registry_revision": "scrum-288-entry-schema-validation-20260809-r1",
                     "policy_revision": "policy-r1", "source_kind": "canonical_agent_gate_state",
@@ -155,7 +175,8 @@ def _case_cli_recursive_mode_calls_canonical_host_and_fails_closed_on_missing_ro
                 "readback_handler": None, "evidence_root": str(tmp / "evidence"), "state": None,
                 "root": str(repository_root), "route_profile": read("gate-node-route-profile.json"),
                 "node_registry": read("node-registry.json"), "graph_registry": read("runtime-graph-registry.json"),
-                "route_context": {"context": {}},
+                "route_context": {"context": {"universal_run_manifest": root_manifest,
+                               "target_contract": _target_contract(run_id, "test-target", [], [])}},
             },
         }
         manifest = tmp / "manifest.json"
@@ -170,14 +191,71 @@ def _case_cli_recursive_mode_calls_canonical_host_and_fails_closed_on_missing_ro
         assert marker.read_text(encoding="utf-8") == "created"
         assert code == 1
         assert result["status"] == "WAITING"
-        assert result["failure_code"] == "NODE_ROUTE_MISSING"
+        assert result["failure_code"] == "AUTHORITY_TRUST_ANCHOR_UNAVAILABLE"
         assert result["c1_status"] == "INTEGRATION_PENDING"
         assert result["g6_receipt"] is None
+        assert set(result["gate_evidence"]) == {"G0", "G1"}
+        for gate in ("G0", "G1"):
+            assert result["gate_evidence"][gate]["semantic_status"] == "SEMANTIC_NODE_COMPLETE"
+            result_path = Path(result["gate_evidence"][gate]["evidence_summary"]["paths"][2])
+            node_result = json.loads(result_path.read_text(encoding="utf-8"))
+            assert node_result["payload"]["semantic_result"]["provider_result"]["status"] == "ROUTE_SELECTED"
+        assert "G2" not in result["gate_evidence"]
 
 
 class RecursiveSemanticAdapterTests(unittest.TestCase):
-    def test_cli_recursive_mode_calls_canonical_host_and_fails_closed_on_missing_route(self):
-        _case_cli_recursive_mode_calls_canonical_host_and_fails_closed_on_missing_route()
+    def test_core_universal_instruction_validates_and_builds_pack_from_exact_route(self):
+        from tools.node_architect.agent_instruction_bundle import resolve_agent_instruction_bundle
+        from tools.node_architect.build_node_instruction_pack import build_node_instruction_pack
+        from tools.node_architect.validate_node_instruction import validate_universal_instruction
+        root = Path(__file__).resolve().parents[1]
+        profile = json.loads((root / "core/node-architect/gate-node-route-profile.json").read_text())
+        route = next(item for item in profile["routes"] if item["gate"] == "UR.G4")
+        card = json.loads((root / route["node_instruction_ref"]).read_text())
+        descriptor = json.loads((root / route["node_descriptor_ref"]).read_text())
+        node = json.loads((root / "core/node-architect/runtime-node-extension-registry.json").read_text())["extensions"][1]["node"]
+        report = validate_universal_instruction(card=card, descriptor=descriptor, registry_node=node,
+                                                route=route, active_gate="UR.G4", action="INTEGRATE", mode="normal")
+        self.assertTrue(report.valid, report.reason_codes)
+        bundle = resolve_agent_instruction_bundle(
+            root=root, instruction_refs=(), role_overlay_refs=(), required_skill_names=(),
+            node_instruction_ref=route["node_instruction_ref"],
+        )
+        pack = build_node_instruction_pack(
+            {"run_id": "run-1", "task_id": "task-1", "repository": "org/repo",
+             "preprod_base_sha": "a" * 40, "working_branch": "feature/test",
+             "scope_hash": "sha256:" + "b" * 64, "graph_revision": "graph-r1",
+             "policy_revision": "policy-r1", "idempotency_key": "run-1:UR.G4",
+             "allowed_paths": [], "prohibited_paths": [], "authorized_actions": [],
+             "validation_commands": []},
+            gate="UR.G4", requested_action="INTEGRATE", node_id=node["id"],
+            node_version=node["version"], implementation_ref=route["implementation"]["ref"],
+            instruction_bundle=bundle,
+        )
+        self.assertEqual(pack.node_instruction_ref, route["node_instruction_ref"])
+        self.assertTrue(pack.content_digest.startswith("sha256:"))
+
+    def test_route_context_keeps_task_and_run_identity_separate(self):
+        from tools.node_architect.agent_runtime_entrypoint import _route_context
+        context = _route_context(
+            canonical_state={"task_id": "TASK-1"}, run_id="child-run-1", gate="UR.G4",
+            requested_action="INTEGRATE", workflow_mode="normal", input_payload={}, supplied=None,
+        )
+        self.assertEqual(context["task_id"], "TASK-1")
+        self.assertEqual(context["run_id"], "child-run-1")
+
+    def test_live_bridge_accepts_universal_gates_without_legacy_aliasing(self):
+        from tools.node_architect.live_runtime_bridge import build_live_runtime_event
+        event = build_live_runtime_event(
+            canonical_state={"task_id": "TASK-1", "source_kind": "canonical_agent_gate_state"},
+            event_id="evt-1", run_id="child-run-1", gate="UR.G4", requested_action="INTEGRATE",
+            scenario="generic", input_payload={},
+        )
+        self.assertEqual(event["gate"], "UR.G4")
+        self.assertEqual(event["run_id"], "child-run-1")
+
+    def test_cli_recursive_mode_dispatches_slot83_and_holds_c2_g2(self):
+        _case_cli_recursive_mode_dispatches_slot83_and_holds_c2_g2()
 
     def test_semantic_host_responses_produce_gate_evidence_then_wait_for_real_g6_acceptance(self):
         _case_semantic_host_responses_produce_gate_evidence_then_wait_for_real_g6_acceptance()

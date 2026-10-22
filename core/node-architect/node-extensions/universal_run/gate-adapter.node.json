@@ -1,0 +1,17 @@
+{
+  "node_id": "universal_run.gate-adapter",
+  "node_type": "workflow",
+  "title": "Universal Run Gate Adapter",
+  "canonical": "canonical",
+  "authority_boundary": "g2_required",
+  "gates": [
+    "UR.G0",
+    "UR.G1",
+    "UR.G2",
+    "UR.G3",
+    "UR.G4",
+    "UR.G5",
+    "UR.G6"
+  ],
+  "description": "Maps the target-neutral recursive Universal Run lifecycle to typed, source-backed routing. It never creates authority or performs protected effects. G2 remains held unless a separately trusted authority source validates; G6 is accepted only by the parent consumer against its TargetContract and child readbacks."
+}

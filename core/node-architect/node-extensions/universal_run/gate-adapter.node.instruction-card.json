@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "artifact_type": "node-instruction",
+  "node_id": "universal_run.gate-adapter",
+  "gate": ["UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"],
+  "purpose": "Resolve and execute one target-neutral Universal Run lifecycle step, preserving typed identity, target and evidence bindings while keeping effect authority external and fail-closed.",
+  "entry_conditions": ["The effective extension registry admits exactly one slot-83 node under an independent G1 decision and canonical scope hash.", "The caller binds run_id, run_kind, parent_run_ref when applicable, gate, action, and TargetContract."],
+  "inputs": ["run_id", "run_kind", "parent_run_ref", "gate", "action", "target_contract", "evidence", "readbacks"],
+  "allowed_actions": ["UNDERSTAND", "PLAN", "EXECUTE", "VERIFY", "INTEGRATE", "VALIDATE-IN-TARGET", "ACCEPT/HANDOFF"],
+  "forbidden_actions": ["grant_gate_authority", "grant_g2_authority", "grant_g3_authority", "merge", "deploy", "production_data", "secret_change", "migration", "fabricate_parent_receipt"],
+  "outputs": ["typed_route_decision", "typed_child_handoff", "target_contract_validation", "authority_hold_when_untrusted"],
+  "evidence_required": ["node-start", "node-decision", "node-result", "node-readback", "checkpoint", "runtime-event", "next-route-decision"],
+  "logs_required": ["runtime-events.jsonl", "decision_digest", "state_digest", "event_digest"],
+  "next": {
+    "pass": {"disposition": "stop", "reason": "Return the typed target-neutral lifecycle decision to the canonical host.", "next_node": null, "next_action": null, "next_gate": null},
+    "blocked": {"disposition": "stop", "reason": "Fail closed on invalid route, identity, target, evidence, or trust binding.", "next_node": null, "next_action": null, "next_gate": null},
+    "pending": {"disposition": "wait", "reason": "Wait for required independent evidence or a trusted authority readback.", "next_node": null, "next_action": null, "next_gate": null},
+    "retry": {"disposition": "retry", "reason": "Retry only after idempotency and canonical readback permit it.", "next_node": null, "next_action": "RECONCILE", "next_gate": null}
+  },
+  "retry": {"idempotency_key_fields": ["run_id", "event_id", "gate", "action"], "replay_check": "Compare the complete canonical event and readback digests before replay; conflicting replay blocks.", "max_attempts": 1, "pending_reconciliation": "Require independent target readback before retrying a pending or unknown outcome."},
+  "rollback": {"reversible": true, "strategy": "No protected effects are performed by this adapter; reconcile or discard only local semantic decisions.", "reconciliation": "Verify exact run, target, evidence and readback digests before resuming.", "human_required_when": ["The target policy requires Human review.", "A privileged effect or untrusted authority is encountered."]},
+  "authority_boundary": {"statement": "The node is a semantic router only. It grants no gate or effect authority. G2 returns AUTHORITY_TRUST_ANCHOR_UNAVAILABLE unless an independent verifier authenticates the parent source. Parent G6 requires exact TargetContract and authentic G3/G4/G5 evidence/readbacks.", "node_grants_gate_authority": false, "g2_authority_granted": false, "g3_authority_granted": false, "merge_authority_granted": false, "deployment_authority_granted": false, "production_authority_granted": false},
+  "mode_policy": {"supported_modes": ["normal", "fastlane", "e2e", "hotfix", "rescue"], "runtime_required": true, "boot_required": true, "claim_required": true, "gate_authority_required": true, "route_required": true, "instruction_required": true, "evidence_required": true, "logs_required": true, "next_route_required": true}
+}

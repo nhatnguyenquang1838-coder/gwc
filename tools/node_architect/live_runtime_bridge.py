@@ -14,7 +14,10 @@ from .semantic_agent_runtime import RuntimeExecutionState, execute_semantic_node
 GATES = (
     "G0_CONTEXT", "G1_ALIGNMENT", "G2_EXECUTION", "G3_PR",
     "G4_MERGE", "G5_DEPLOY", "G6_PRODUCTION_DATA",
+    "UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6",
 )
+LEGACY_GATES = GATES[:7]
+UNIVERSAL_RUN_GATES = GATES[7:]
 CANONICAL_SOURCE_KIND = "canonical_agent_gate_state"
 
 
@@ -225,4 +228,4 @@ def resume_live_runtime_event(
     )
 
 
-__all__ = ["GATES", "LiveRuntimeState", "build_live_runtime_event", "dispatch_live_runtime_event", "resume_live_runtime_event"]
+__all__ = ["GATES", "LEGACY_GATES", "UNIVERSAL_RUN_GATES", "LiveRuntimeState", "build_live_runtime_event", "dispatch_live_runtime_event", "resume_live_runtime_event"]

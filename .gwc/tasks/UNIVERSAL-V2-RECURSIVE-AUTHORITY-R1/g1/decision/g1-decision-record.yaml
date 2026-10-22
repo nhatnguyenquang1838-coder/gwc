@@ -1,0 +1,87 @@
+schema_version: '1.0'
+artifact_type: g1-decision-record
+generated_at: '2026-10-22T18:25:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options_ref: ../brainstorming/g1-options.yaml
+preflight_ref: ../preflight/g1-preflight-report.yaml
+status: ACCEPTED
+selected_option_id: OPT-1
+user_decision:
+  actor: User
+  decided_at: '2026-10-22T15:35:10Z'
+  source: 'Controller #189 seq 189 records the explicit user instruction “ok, áp dụng yêu cầu này, phát controller để hermes
+    làm”; Controller #197 selects OPT-1 as G1 design admission.'
+  explicit: true
+rationale: 'Accept OPT-1 only as a G1 design admission: one source-backed universal_run.gate-adapter in the versioned post-81
+  extension sidecar at candidate slot 83, with seven target-neutral UR.G0-G6 routes and a Parent Consumer G6 TargetContract.
+  Preserve baseline 81 and SCRUM-284 slot 82 exactly. The scope identity was computed by the canonical producer for the exact
+  candidate paths/actions and bindings below. This does not authorize source edits, issue a Human grant, establish a trusted
+  issuer, prove host integration, or close Parent G6. If later source evidence invalidates any binding or path, stop and rederive
+  the identity.'
+rejected_option_ids:
+- OPT-2
+- OPT-3
+- OPT-4
+- OPT-5
+- OPT-6
+acceptance_criteria_refs:
+- AC-0
+- AC-1
+- AC-2
+- AC-3
+- AC-4
+- AC-5
+- AC-6
+- AC-7
+- AC-8
+- AC-9
+- AC-10
+- AC-11
+- AC-12
+scope_hash: sha256:39c914fde08e64af342dd36a72e745db4904c65fb7e631e4e6ec733c30196cc0
+g1_gate_outcome: PASS
+authority_boundaries:
+  grants: []
+  excluded:
+  - G4_MERGE
+  - G5_DEPLOY
+  - G6_PRODUCTION
+subagent_distribution_plan:
+  task_decomposition:
+  - sub_task_id: SUB-TASK-1
+    description: Versioned post-81 decision-backed extension admission with exact SCRUM-284 v1 compatibility and slot/baseline/provenance
+      negatives.
+  - sub_task_id: SUB-TASK-2
+    description: Effective registry, generic route/profile, instruction, and canonical CLI/entrypoint integration for one
+      executable adapter node.
+  - sub_task_id: SUB-TASK-3
+    description: Parent Consumer G6 TargetContract, typed receipt validation, and independent-source trust behavior; keep
+      authority unavailable fail-closed if no valid source exists.
+  - sub_task_id: SUB-TASK-4
+    description: Clean-checkout host E2E and regression evidence for baseline 81, SCRUM-284 slot 82, generic slot 83, cross-target
+      routes, and adversarial cases.
+  agent_allocation:
+  - sub_task_id: SUB-TASK-1
+    skill_id: gwc-runtime-registry
+    agent_type: primary
+  - sub_task_id: SUB-TASK-2
+    skill_id: universal-runtime-integration
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-3
+    skill_id: authority-trust-review
+    agent_type: specialist
+  - sub_task_id: SUB-TASK-4
+    skill_id: independent-verification
+    agent_type: reviewer
+  execution_order:
+  - SUB-TASK-1
+  - SUB-TASK-2
+  - SUB-TASK-3
+  - SUB-TASK-4
+  summary: Future G2 implementation remains bounded to the canonical candidate scope; this task itself only writes G0/G1 governance
+    artifacts.
