@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import sqlite3
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -723,4 +724,151 @@ def test_activation_rejects_invalid_grant_and_mode_and_holds_lease(tmp_path):
     lease.write_text(json.dumps({"owner_id": "other", "expires_at": 4102444800}))
     with pytest.raises(ValueError, match="^LEASE_HELD_BY_OTHER$"):
         activate_successor_plan(**kwargs, mode="SANDBOX_COMMIT")
+
+
+def _real_r2_activation_fixture(tmp_path):
+    from tools.node_architect.universal_run_plan import _sha256_digest
+    repo_root = Path(__file__).resolve().parents[1]
+    proposal = json.loads((repo_root / "core/node-architect/q0-native-successor-runtime-plan-r2.json").read_text())
+    plan = proposal["native_runtime_plan"]
+    plan_digest = plan["digest"]
+    allocation = proposal["node_allocation"]
+    predecessor = _predecessor(tmp_path, run_id="scrum781-q0-predecessor")
+    predecessor["runtime_plan_ref"] = "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+    predecessor["runtime_plan_digest"] = "sha256:" + "f" * 64
+    branch = "fix/SCRUM-781-q0-fresh-20261010-r1"
+    head = subprocess.check_output(["git", "-C", str(repo_root), "rev-parse", "HEAD"], text=True).strip()
+    authority = {
+        "authority_kind": "HUMAN_OPERATOR_EFFECT_AUTHORITY", "actor": "human-operator:test",
+        "authority_ref": "authority:test:177", "scope": ["q0.live_activation.execute"],
+        "issued_at": "2020-01-01T00:00:00Z", "expires_at": "2999-01-01T00:00:00Z",
+        "bindings": {"predecessor_context_digest": predecessor["context_digest"],
+                     "successor_plan_digest": plan_digest,
+                     "node_allocation_digest": allocation["content_digest"]["value"],
+                     "branch": branch, "head": head},
+    }
+    return repo_root, proposal, plan, allocation, predecessor, authority, branch, head
+
+
+def test_r2_plan_is_canonical_and_live_executor_cold_starts_real_successor(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        execute_live_activation, read_live_activation_receipt,
+    )
+    from tools.node_architect.universal_run_plan import _sha256_digest
+    repo_root, proposal, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    candidate = json.loads((repo_root / "core/node-architect/q0-native-successor-runtime-plan-candidate-r1.json").read_text())["native_runtime_plan"]
+    body = {key: value for key, value in plan.items() if key != "digest"}
+    candidate_body = {key: value for key, value in candidate.items() if key != "digest"}
+    assert plan["revision"] == candidate["revision"] + 1
+    assert plan["previous_digest"] == candidate["digest"]
+    assert plan["source_binding"]["pre_head_sha"] == head
+    assert plan["digest"] == _sha256_digest(body)
+    work = [item for item in proposal["candidate_work_dag"]["children"] if item["id"].startswith("W")]
+    assert [item["id"] for item in work] == [f"W{i}" for i in range(1, 7)]
+    assert [item["depends_on"] for item in work] == [["NATIVE-PLAN-ACTIVATION"], ["W1"], ["W2"], ["W3"], ["W4"], ["W5"]]
+    assert candidate["digest"] == _sha256_digest(candidate_body)
+    root = tmp_path / "isolated-live-root"
+    root.mkdir()
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head, live_root=root)
+    preflight = execute_live_activation(**kwargs)
+    assert preflight["accepted"] is True and preflight["executed"] is False
+    result = execute_live_activation(**kwargs, mode="COMMIT")
+    assert result["executed"] is True
+    assert result["applied_effects"] == ["selector_write", "checkpoint_write", "cursor_advance"]
+    assert result["resolve_readback"]["resolved_plan_ref"] == kwargs["successor_plan_ref"]
+    assert result["resolve_readback"]["resolved_plan_ref"] != predecessor["runtime_plan_ref"]
+    assert result["resolve_readback"]["generation"] == 1
+    receipt = read_live_activation_receipt(root)
+    assert receipt is not None and receipt["receipt_digest"]
+    duplicate = execute_live_activation(**kwargs, mode="COMMIT")
+    assert duplicate["already_applied"] is True
+    assert duplicate["applied_effects"] == []
+    assert duplicate["resolve_readback"]["generation"] == 1
+
+
+@pytest.mark.parametrize("authority_change,code", [
+    (None, "LIVE_ACTIVATION_AUTHORITY_REQUIRED"),
+    ({"authority_kind": "OTHER"}, "EFFECT_AUTHORITY_KIND_INVALID"),
+    ({"actor": ""}, "EFFECT_AUTHORITY_IDENTITY_REQUIRED"),
+    ({"expires_at": "2000-01-01T00:00:00Z"}, "EFFECT_AUTHORITY_EXPIRED"),
+    ({"scope": []}, "EFFECT_AUTHORITY_SCOPE_INVALID"),
+    ({"bindings": {"head": "drift"}}, "EFFECT_AUTHORITY_BINDING_MISMATCH"),
+])
+def test_live_executor_fails_closed_on_authority_contract(tmp_path, authority_change, code):
+    from tools.node_architect.q0_m1_m7_integration import execute_live_activation
+    _, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    target = tmp_path / "isolated"
+    target.mkdir()
+    if authority_change is None:
+        authority = None
+    else:
+        authority = {**authority, **authority_change}
+    with pytest.raises(ValueError, match=f"^{code}$"):
+        execute_live_activation(authority=authority, predecessor=predecessor, successor_plan=plan,
+                                successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                                node_allocation=allocation, branch=branch, head=head, live_root=target)
+    assert not list(target.iterdir())
+
+
+def test_live_executor_rejects_head_drift_and_live_targets(tmp_path, monkeypatch):
+    from tools.node_architect.q0_m1_m7_integration import execute_live_activation
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head="0" * 40,
+                  live_root=tmp_path / "isolated")
+    with pytest.raises(ValueError, match="^SOURCE_HEAD_DRIFT$"):
+        execute_live_activation(**kwargs)
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
+        execute_live_activation(**{**kwargs, "head": head, "live_root": repo_root})
+    hermes_home = tmp_path / "hermes-home"
+    monkeypatch.setenv("HERMES_HOME", str(hermes_home))
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
+        execute_live_activation(**{**kwargs, "head": head, "live_root": hermes_home / "child"})
+
+
+def test_live_executor_recovers_crash_and_rollback_restores_snapshot(tmp_path, monkeypatch):
+    from tools.node_architect import q0_m1_m7_integration as integration
+    _, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    root = tmp_path / "recovery-root"
+    root.mkdir()
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head, live_root=root)
+    before = {p.name: p.read_bytes() for p in root.iterdir() if p.is_file()}
+    original_write = integration._executor_write
+    def crash_after_selector(path, value):
+        original_write(path, value)
+        if path.name == "selector.json":
+            raise RuntimeError("injected crash after selector")
+    monkeypatch.setattr(integration, "_executor_write", crash_after_selector)
+    with pytest.raises(RuntimeError, match="injected crash"):
+        integration.execute_live_activation(**kwargs, mode="COMMIT")
+    monkeypatch.setattr(integration, "_executor_write", original_write)
+    assert integration.reconcile_live_activation_journal(root)["status"] == "COMPLETED"
+    assert integration.reconcile_live_activation_journal(root)["status"] == "NO_PENDING_PREPARE"
+    assert integration.resolve_active_plan(root) == kwargs["successor_plan_ref"]
+    assert integration.rollback_live_activation(root)["status"] == "ROLLED_BACK"
+    assert {p.name: p.read_bytes() for p in root.iterdir() if p.is_file() and p.name not in {"live-activation-journal.json", "live-activation-executor-journal.json"}} == before
+
+
+def test_live_executor_leaves_real_live_state_and_frozen_r3_frontier_unchanged(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import execute_live_activation
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    watched = [repo_root / ".gwc", repo_root / "selector.json", repo_root / "checkpoint.json", repo_root / "cursor.json",
+               repo_root / "core/node-architect/q0-controlled-failure-frontier-r3.json"]
+    before = {str(path.relative_to(repo_root)): hashlib.sha256(path.read_bytes()).hexdigest()
+              for base in watched for path in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
+              if path.is_file()}
+    root = tmp_path / "proof-root"
+    root.mkdir()
+    execute_live_activation(authority=authority, predecessor=predecessor, successor_plan=plan,
+                            successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                            node_allocation=allocation, branch=branch, head=head, live_root=root, mode="COMMIT")
+    after = {str(path.relative_to(repo_root)): hashlib.sha256(path.read_bytes()).hexdigest()
+             for base in watched for path in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
+             if path.is_file()}
+    assert after == before
 

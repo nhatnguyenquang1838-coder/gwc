@@ -264,6 +264,266 @@ def activate_successor_plan(*, grant, predecessor, runtime_plan, node_allocation
         _lease_release(root, owner)
 
 
+_LIVE_EXECUTOR_JOURNAL = 'live-activation-executor-journal.json'
+_LIVE_EXECUTOR_LEASE = '.live-activation-executor-lease.json'
+
+
+def read_live_activation_receipt(live_root: Path | str) -> dict[str, Any] | None:
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    path = root / ACTIVATION_RECEIPT_REF
+    if not path.is_file():
+        return None
+    receipt = json.loads(path.read_text('utf-8'))
+    body = {key: value for key, value in receipt.items() if key != 'receipt_digest'}
+    if receipt.get('receipt_digest') != _digest(body):
+        raise ValueError('LIVE_ACTIVATION_RECEIPT_INVALID')
+    return receipt
+
+
+def _executor_validate(authority, predecessor, successor_plan, successor_plan_ref,
+                       node_allocation, branch, head):
+    import sqlite3, time
+    from .universal_run_plan import _sha256_digest
+    if authority is None:
+        raise ValueError('LIVE_ACTIVATION_AUTHORITY_REQUIRED')
+    if not isinstance(authority, Mapping) or authority.get('authority_kind') != 'HUMAN_OPERATOR_EFFECT_AUTHORITY':
+        raise ValueError('EFFECT_AUTHORITY_KIND_INVALID')
+    if any(not isinstance(authority.get(k), str) or not authority[k].strip()
+           for k in ('actor', 'authority_ref', 'issued_at', 'expires_at')):
+        raise ValueError('EFFECT_AUTHORITY_IDENTITY_REQUIRED')
+    try:
+        issued, expires = _iso_utc(authority['issued_at']), _iso_utc(authority['expires_at'])
+    except ValueError as exc:
+        raise ValueError('EFFECT_AUTHORITY_EXPIRED') from exc
+    if issued > time.time() or expires <= time.time() or expires <= issued:
+        raise ValueError('EFFECT_AUTHORITY_EXPIRED')
+    if not isinstance(authority.get('scope'), (list, tuple, set)) or 'q0.live_activation.execute' not in authority['scope']:
+        raise ValueError('EFFECT_AUTHORITY_SCOPE_INVALID')
+    if not all(isinstance(v, Mapping) for v in (predecessor, successor_plan, node_allocation)):
+        raise ValueError('LIVE_ACTIVATION_BINDING_INVALID')
+    ref = successor_plan_ref
+    if (not isinstance(ref, str) or not ref.strip() or Path(ref).is_absolute()
+        or PurePosixPath(ref).is_absolute() or PureWindowsPath(ref).is_absolute()
+        or PureWindowsPath(ref).drive or '..' in PurePosixPath(ref).parts
+        or '..' in PureWindowsPath(ref).parts):
+        raise ValueError('SUCCESSOR_PLAN_REF_INVALID')
+    if ref == _R3_PREDECESSOR_PLAN_REF or ref == predecessor.get('runtime_plan_ref'):
+        raise ValueError('SUCCESSOR_PLAN_MUST_DIFFER_FROM_PREDECESSOR')
+    body = {k: v for k, v in successor_plan.items() if k != 'digest'}
+    plan_digest = _sha256_digest(body)
+    if successor_plan.get('digest') != plan_digest:
+        raise ValueError('SUCCESSOR_PLAN_DIGEST_MISMATCH')
+    repo = Path(__file__).resolve().parents[2]
+    if _git(repo, 'rev-parse', 'HEAD') != head:
+        raise ValueError('SOURCE_HEAD_DRIFT')
+    checkpoint = predecessor.get('checkpoint_ref')
+    if not isinstance(checkpoint, str) or not Path(checkpoint).is_file():
+        raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND')
+    run_id, context = predecessor.get('run_id'), predecessor.get('context_digest')
+    if not isinstance(run_id, str) or not isinstance(context, str):
+        raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND')
+    try:
+        with sqlite3.connect(Path(checkpoint).resolve().as_uri() + '?mode=ro', uri=True) as db:
+            row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?', (run_id,)).fetchone()
+    except (sqlite3.Error, OSError) as exc:
+        raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND') from exc
+    if row is None or row[0] != context:
+        raise ValueError('PREDECESSOR_CONTEXT_MISMATCH')
+    alloc_digest = node_allocation.get('content_digest')
+    if isinstance(alloc_digest, Mapping):
+        alloc_digest = alloc_digest.get('value')
+    if not alloc_digest:
+        alloc_digest = node_allocation.get('digest')
+    expected = {'predecessor_context_digest': context, 'successor_plan_digest': plan_digest,
+                'node_allocation_digest': alloc_digest, 'branch': branch, 'head': head}
+    bindings = authority.get('bindings')
+    if not isinstance(bindings, Mapping) or any(bindings.get(k) != v for k, v in expected.items()):
+        raise ValueError('EFFECT_AUTHORITY_BINDING_MISMATCH')
+    return _digest(dict(authority)), plan_digest, _digest(dict(predecessor))
+
+
+def _executor_bytes(path: Path):
+    return path.read_bytes() if path.is_file() else None
+
+
+def _executor_write(path: Path, content):
+    if content is None:
+        if path.is_file():
+            path.unlink()
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_name(path.name + '.activation-tmp')
+    temp.write_bytes(content)
+    temp.replace(path)
+
+
+def _executor_rows(root: Path):
+    path = root / _LIVE_EXECUTOR_JOURNAL
+    if not path.exists():
+        return []
+    rows = json.loads(path.read_text('utf-8'))
+    if not isinstance(rows, list):
+        raise ValueError('LIVE_ACTIVATION_JOURNAL_INVALID')
+    return rows
+
+
+def _executor_apply(root: Path, prepare: Mapping[str, Any], *, rollback: bool):
+    states = prepare['files']
+    for rel, state in states.items():
+        current = _executor_bytes(root / rel)
+        current_hex = None if current is None else current.hex()
+        if current_hex not in (state['before'], state['after']):
+            raise ValueError('CAS_CONFLICT')
+    effects = reversed(_ACTIVATION_EFFECTS) if rollback else _ACTIVATION_EFFECTS
+    for effect in effects:
+        for rel in prepare['effects'][effect]:
+            content = states[rel]['before' if rollback else 'after']
+            _executor_write(root / rel, None if content is None else bytes.fromhex(content))
+            if _executor_bytes(root / rel) != (None if content is None else bytes.fromhex(content)):
+                raise ValueError('CAS_CONFLICT')
+
+
+def _reconcile_executor_live_activation_journal(live_root: Path | str) -> dict[str, Any]:
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    rows = _executor_rows(root)
+    done = {r.get('key') for r in rows if r.get('phase') in ('COMMIT', 'ROLLBACK_APPLIED')}
+    pending = next((r for r in reversed(rows) if r.get('phase') == 'PREPARE' and r.get('key') not in done), None)
+    if pending is None:
+        return {'reconciled': False, 'status': 'NO_PENDING_PREPARE'}
+    try:
+        _executor_apply(root, pending, rollback=False)
+    except ValueError as exc:
+        if str(exc) != 'CAS_CONFLICT':
+            raise
+        _executor_apply(root, pending, rollback=True)
+        rows.append({'phase': 'ROLLBACK_APPLIED', 'key': pending['key'], 'reason': 'CAS_CONFLICT'})
+        _write_json_atomic(root / _LIVE_EXECUTOR_JOURNAL, rows)
+        return {'reconciled': True, 'status': 'ROLLED_BACK'}
+    rows.append({'phase': 'COMMIT', 'key': pending['key'], 'recovered': True})
+    _write_json_atomic(root / _LIVE_EXECUTOR_JOURNAL, rows)
+    resolve_active_plan(root)
+    return {'reconciled': True, 'status': 'COMPLETED'}
+
+
+def rollback_live_activation(live_root: Path | str) -> dict[str, Any]:
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    rows = _executor_rows(root)
+    rolled = {r.get('key') for r in rows if r.get('phase') == 'ROLLBACK_APPLIED'}
+    commit = next((r for r in reversed(rows) if r.get('phase') == 'COMMIT' and r.get('key') not in rolled), None)
+    if commit is None:
+        return {'rolled_back': False, 'status': 'NO_ACTIVATION'}
+    prepare = next(r for r in reversed(rows) if r.get('phase') == 'PREPARE' and r.get('key') == commit['key'])
+    _executor_apply(root, prepare, rollback=True)
+    rows.append({'phase': 'ROLLBACK_APPLIED', 'key': commit['key'], 'reason': 'EXPLICIT_ROLLBACK'})
+    _write_json_atomic(root / _LIVE_EXECUTOR_JOURNAL, rows)
+    return {'rolled_back': True, 'status': 'ROLLED_BACK'}
+
+
+def execute_live_activation(*, authority, predecessor, successor_plan, successor_plan_ref,
+                            node_allocation, branch, head, live_root, mode='PREFLIGHT') -> dict[str, Any]:
+    """Execute authority-bound effects only inside an isolated live_root; SIMULATE is untouched."""
+    if mode not in ('PREFLIGHT', 'COMMIT'):
+        raise ValueError('LIVE_ACTIVATION_MODE_INVALID')
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    auth_digest, plan_digest, predecessor_digest = _executor_validate(
+        authority, predecessor, successor_plan, successor_plan_ref, node_allocation, branch, head)
+    paths = _live_activation_paths(root)
+    paths['plan'] = root / successor_plan_ref
+    for path in paths.values():
+        if path.is_symlink() or not path.resolve().is_relative_to(root):
+            raise ValueError('LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN')
+    root.mkdir(parents=True, exist_ok=True)
+    key = _digest({'authority_digest': auth_digest, 'predecessor_digest': predecessor_digest,
+                   'plan_digest': plan_digest, 'plan_ref': successor_plan_ref,
+                   'allocation': dict(node_allocation), 'branch': branch, 'head': head})
+    if mode == 'PREFLIGHT':
+        return {'accepted': True, 'executed': False, 'mode': mode, 'applied_effects': [],
+                'already_applied': False, 'activation_receipt_ref': str(paths['record']),
+                'resolve_readback': None, 'authority_granted': False, 'typed_ce_admitted': False,
+                'live_target': str(root)}
+    owner = _lease_acquire(root)
+    try:
+        rows = _executor_rows(root)
+        if any(r.get('phase') == 'COMMIT' and r.get('key') == key for r in rows):
+            return {'accepted': True, 'executed': False, 'mode': mode, 'applied_effects': [],
+                    'already_applied': True, 'activation_receipt_ref': str(paths['record']),
+                    'resolve_readback': verify_live_activation_isolated(root),
+                    'authority_granted': False, 'typed_ce_admitted': False, 'live_target': str(root)}
+        recovery = reconcile_live_activation_journal(root)
+        if recovery['status'] not in ('NO_PENDING_PREPARE', 'COMPLETED', 'ROLLED_BACK'):
+            raise ValueError('LIVE_ACTIVATION_RECOVERY_REQUIRED')
+        import sqlite3, tempfile
+        generation = _live_db_generation(paths['database'], successor_plan_ref) + 1
+        raw_plan = (json.dumps(dict(successor_plan), sort_keys=True, indent=2, ensure_ascii=False) + '\n').encode()
+        file_digest = 'sha256:' + hashlib.sha256(raw_plan).hexdigest()
+        route = json.loads(paths['route'].read_text()) if paths['route'].exists() else {'schema_id': 'gwc.engineering-coordination-route/v1'}
+        route['approved_successor_g1'] = {'successor_plan_ref': successor_plan_ref, 'activation_status': 'ACTIVATED'}
+        stamp = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()
+        checkpoint_digest = _digest({'key': key, 'generation': generation, 'plan_digest': file_digest})
+        receipt_body = {'schema_id': 'gwc.q0.live-activation-executor-receipt.v1', 'plan_ref': successor_plan_ref,
+                        'plan_digest': file_digest, 'checkpoint_receipt_digest': checkpoint_digest,
+                        'checkpoint_ref': str(paths['database']),
+                        'generation': generation, 'predecessor_run_id': predecessor['run_id'],
+                        'predecessor_context_digest': predecessor['context_digest'],
+                        'successor_run_id': successor_plan.get('run_id'), 'node_allocation': dict(node_allocation),
+                        'branch': branch, 'head': head, 'authority_ref': authority['authority_ref'],
+                        'authority_digest': auth_digest, 'activated_at': stamp}
+        receipt = {**receipt_body, 'receipt_digest': _digest(receipt_body)}
+        selector = {'active_plan_ref': successor_plan_ref, 'activation_status': 'ACTIVATED', 'generation': generation}
+        checkpoint = {'plan_ref': successor_plan_ref, 'plan_digest': file_digest,
+                      'generation': generation, 'checkpoint_receipt_digest': checkpoint_digest}
+        cursor = {'plan_ref': successor_plan_ref, 'generation': generation}
+        with tempfile.TemporaryDirectory(prefix='q0-live-activation-') as tmp:
+            db_tmp = Path(tmp) / 'activation.sqlite3'
+            with sqlite3.connect(db_tmp) as db:
+                db.execute('CREATE TABLE engineering_plan_activation (plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, generation INTEGER, activated_at TEXT)')
+                db.execute('INSERT INTO engineering_plan_activation VALUES (?,?,?,?,?)',
+                           (successor_plan_ref, file_digest, checkpoint_digest, generation, stamp))
+            after = {
+                'selector_write': {paths['selector']: json.dumps(selector, sort_keys=True, indent=2).encode() + b'\n'},
+                'checkpoint_write': {paths['checkpoint']: json.dumps(checkpoint, sort_keys=True, indent=2).encode() + b'\n',
+                                     paths['route']: json.dumps(route, sort_keys=True, indent=2).encode() + b'\n',
+                                     paths['plan']: raw_plan,
+                                     paths['record']: json.dumps(receipt, sort_keys=True, indent=2).encode() + b'\n',
+                                     paths['database']: db_tmp.read_bytes()},
+                'cursor_advance': {paths['cursor']: json.dumps(cursor, sort_keys=True, indent=2).encode() + b'\n'},
+            }
+        files, effects = {}, {effect: [] for effect in _ACTIVATION_EFFECTS}
+        for effect, group in after.items():
+            for path, content in group.items():
+                rel = path.relative_to(root).as_posix()
+                old = _executor_bytes(path)
+                files[rel] = {'before': None if old is None else old.hex(), 'after': content.hex()}
+                effects[effect].append(rel)
+        prepare = {'phase': 'PREPARE', 'key': key, 'files': files, 'effects': effects}
+        rows.append(prepare)
+        _write_json_atomic(root / _LIVE_EXECUTOR_JOURNAL, rows)
+        for rel, state in files.items():
+            now = _executor_bytes(root / rel)
+            if (None if now is None else now.hex()) != state['before']:
+                raise ValueError('CAS_CONFLICT')
+        for effect in _ACTIVATION_EFFECTS:
+            for rel in effects[effect]:
+                _executor_write(root / rel, bytes.fromhex(files[rel]['after']))
+                actual = _executor_bytes(root / rel)
+                if actual is None or hashlib.sha256(actual).hexdigest() != hashlib.sha256(bytes.fromhex(files[rel]['after'])).hexdigest():
+                    raise ValueError('CAS_CONFLICT')
+        rows.append({'phase': 'COMMIT', 'key': key})
+        _write_json_atomic(root / _LIVE_EXECUTOR_JOURNAL, rows)
+        read_live_activation_receipt(root)
+        readback = verify_live_activation_isolated(root)
+        return {'accepted': True, 'executed': True, 'mode': mode, 'applied_effects': list(_ACTIVATION_EFFECTS),
+                'already_applied': False, 'activation_receipt_ref': str(paths['record']),
+                'resolve_readback': readback, 'authority_granted': False, 'typed_ce_admitted': False,
+                'live_target': str(root)}
+    finally:
+        _lease_release(root, owner)
+
+
 _LIVE_ACTIVATION_JOURNAL = 'live-activation-journal.json'
 _R3_PREDECESSOR_PLAN_REF = 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json'
 
@@ -307,7 +567,7 @@ def _live_db_generation(db_path: Path, plan_ref: str) -> int:
     return int(row[0]) if row else 0
 
 
-def reconcile_live_activation_journal(isolated_root: Path | str) -> dict[str, Any]:
+def _reconcile_legacy_live_activation_journal(isolated_root: Path | str) -> dict[str, Any]:
     """Finish a durable live-bridge PREPARE using only its isolated target."""
     root = Path(isolated_root).expanduser().resolve()
     _live_target_guard(root)
@@ -338,6 +598,14 @@ def reconcile_live_activation_journal(isolated_root: Path | str) -> dict[str, An
     rows.append({'phase': 'COMMIT', 'key': pending['key'], 'generation': pending['generation']})
     _write_json_atomic(journal_path, rows)
     return {'reconciled': True, 'status': 'COMPLETED'}
+
+
+def reconcile_live_activation_journal(live_root: Path | str) -> dict[str, Any]:
+    """Dispatch journal reconciliation without changing the legacy SIMULATE contract."""
+    root = Path(live_root).expanduser().resolve()
+    if (root / _LIVE_EXECUTOR_JOURNAL).exists():
+        return _reconcile_executor_live_activation_journal(root)
+    return _reconcile_legacy_live_activation_journal(root)
 
 
 def apply_live_activation_isolated(*, grant, predecessor, runtime_plan, node_allocation,
