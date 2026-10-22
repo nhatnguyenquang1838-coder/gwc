@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 from tools.node_architect.universal_run_kernel import UNIVERSAL_PROFILE, UniversalRunKernelError
+from tools.node_architect.universal_run_lifecycle import TRANSFER_OUTCOME_KINDS, TransferOutcome
+from tools.node_architect.universal_run_topology import create_run_manifest_revision, materialize_child_run
 
 PROFILE = UNIVERSAL_PROFILE
 NODE_KINDS = ("WORK", "CONTROL")
@@ -396,6 +398,275 @@ def verify_parent_composition(
     }
 
 
+class RecursiveRunDag:
+    """Execute recursive ChildRuns through the canonical Agent Host event seam.
+
+    Specs contain a sealed ``node_allocation``, a distinct ``child_run_id``,
+    optional ``depends_on`` IDs and nested ``children``. ``checkpoint`` is a
+    caller-owned durable mapping of gate receipts, generations and run receipts.
+    """
+
+    def __init__(self, *, runtime_event: Any | None = None, max_depth: int = 16, max_nodes: int = 256):
+        if not isinstance(max_depth, int) or max_depth < 1 or not isinstance(max_nodes, int) or max_nodes < 1:
+            raise NodeArchitectureError("DAG_BUDGET_INVALID")
+        self._uses_host_defaults = runtime_event is None
+        if runtime_event is None:
+            from tools.node_architect.agent_runtime_entrypoint import LiveRuntimeState, run_agent_runtime_event
+            runtime_event = run_agent_runtime_event
+            self._state_factory = LiveRuntimeState
+        else:
+            self._state_factory = None
+        if not callable(runtime_event):
+            raise NodeArchitectureError("RUNTIME_EVENT_REQUIRED")
+        self.runtime_event = runtime_event
+        self.max_depth = max_depth
+        self.max_nodes = max_nodes
+
+    def _host_gate(self, gate: str) -> str:
+        if not self._uses_host_defaults:
+            return gate
+        return {
+            "G0": "G0_CONTEXT", "G1": "G1_ALIGNMENT", "G2": "G2_EXECUTION",
+            "G3": "G3_PR", "G4": "G4_MERGE", "G5": "G5_DEPLOY",
+            "G6": "G6_PRODUCTION_DATA",
+        }[gate]
+
+    @staticmethod
+    def _ordered(specs: list[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+        by_id = {str(item.get("child_run_id", "")): item for item in specs}
+        if len(by_id) != len(specs):
+            raise NodeArchitectureError("CHILD_RUN_ID_DUPLICATE")
+        ordered: list[Mapping[str, Any]] = []
+        pending = dict(by_id)
+        while pending:
+            done = {str(item["child_run_id"]) for item in ordered}
+            ready = sorted(key for key, item in pending.items()
+                           if set(map(str, item.get("depends_on", ()))) <= done)
+            if not ready:
+                raise NodeArchitectureError("DAG_CYCLE_OR_DEPENDENCY_UNKNOWN")
+            for key in ready:
+                ordered.append(pending.pop(key))
+        return ordered
+
+    def execute(self, *, root_manifest: Mapping[str, Any],
+                child_node_allocations: list[Mapping[str, Any]],
+                authority: Mapping[str, Any] | None, canonical_state: Mapping[str, Any],
+                checkpoint: dict[str, Any] | None = None,
+                lease_owner: str = "recursive-run-dag", **event_context: Any) -> dict[str, Any]:
+        from tools.node_architect.universal_run_kernel import GATES, verify_record_digest
+
+        if (not isinstance(root_manifest, Mapping) or root_manifest.get("run_kind") != "ROOT"
+                or root_manifest.get("parent_run_ref") is not None
+                or root_manifest.get("invoking_node_allocation_ref") is not None
+                or not verify_record_digest(root_manifest)):
+            raise NodeArchitectureError("ROOT_RUN_MANIFEST_INVALID")
+        if not isinstance(lease_owner, str) or not lease_owner.strip():
+            raise NodeArchitectureError("DAG_LEASE_OWNER_INVALID")
+        store = checkpoint if checkpoint is not None else {}
+        leases = store.setdefault("leases", {})
+        root_id = str(root_manifest["run_id"])
+        if leases.get(root_id) not in (None, lease_owner):
+            raise NodeArchitectureError("DAG_LEASE_HELD", root_id)
+        leases[root_id] = lease_owner
+        run_receipts = store.setdefault("run_receipts", {})
+        try:
+            visited: set[str] = set()
+            active: set[str] = set()
+            node_count = 1
+
+            def run_one(run_id: str, specs: list[Mapping[str, Any]], depth: int,
+                        run_outcomes: Mapping[str, Any] | None = None,
+                        run_authority: Mapping[str, Any] | None = None,
+                        run_state: Any = None,
+                        run_canonical_state: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                nonlocal node_count
+                if run_canonical_state is None:
+                    run_canonical_state = canonical_state
+                if run_authority is None:
+                    run_authority = authority
+                if run_state is None:
+                    run_state = event_context.get("state")
+                if run_state is None and self._state_factory is not None:
+                    run_state = store.setdefault("runtime_states", {}).setdefault(run_id, self._state_factory())
+                if run_id in active:
+                    raise NodeArchitectureError("DAG_CYCLE", run_id)
+                if depth > self.max_depth:
+                    raise NodeArchitectureError("DAG_MAX_DEPTH_EXCEEDED", run_id)
+                if run_id in visited:
+                    raise NodeArchitectureError("CHILD_RUN_ID_DUPLICATE", run_id)
+                visited.add(run_id)
+                active.add(run_id)
+                cached = run_receipts.get(run_id)
+                if isinstance(cached, Mapping) and cached.get("status") in {"COMPLETED", "FAILED"}:
+                    active.remove(run_id)
+                    return copy.deepcopy(dict(cached))
+
+                gate_store = store.setdefault("gates", {}).setdefault(run_id, {})
+                evidence: dict[str, Any] = {}
+                readbacks: dict[str, Any] = {}
+                outcomes: dict[str, Any] = {}
+                g6 = None
+                failure = None
+                gate_sequence = GATES[:4] if specs else GATES
+                for gate in gate_sequence:
+                    saved = gate_store.get(gate)
+                    if isinstance(saved, Mapping):
+                        evidence[gate] = copy.deepcopy(saved.get("evidence"))
+                        readbacks[gate] = copy.deepcopy(saved.get("target_readback"))
+                        outcomes[gate] = copy.deepcopy(saved.get("outcome"))
+                        if gate == "G6":
+                            g6 = copy.deepcopy(saved.get("g6_receipt"))
+                        continue
+                    kwargs = dict(event_context)
+                    kwargs.update({"canonical_state": run_canonical_state, "run_id": run_id,
+                                   "gate": self._host_gate(gate), "requested_action": "RUN", "authority": run_authority,
+                                   "state": run_state, "event_id": f"{run_id}:{gate}"})
+                    response = self.runtime_event(**kwargs)
+                    if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED"}:
+                        failure = str(response.get("reason_code", "CHILD_EVENT_NOT_COMPLETED")) if isinstance(response, Mapping) else "CHILD_EVENT_INVALID"
+                        break
+                    if gate == "G3" and not isinstance(response.get("evidence"), Mapping):
+                        failure = "CHILD_GATE_EVIDENCE_MISSING"
+                        break
+                    if gate in {"G4", "G5"} and (not isinstance(response.get("target_readback"), Mapping)
+                                                   or response["target_readback"].get("status") != "VERIFIED"):
+                        failure = "CHILD_TARGET_READBACK_MISSING"
+                        break
+                    raw_outcome = (run_outcomes or {}).get(gate)
+                    outcome = None
+                    if raw_outcome is not None:
+                        if (not isinstance(raw_outcome, Mapping)
+                                or raw_outcome.get("kind") not in TRANSFER_OUTCOME_KINDS
+                                or not str(raw_outcome.get("reason", "")).strip()):
+                            failure = "TRANSFER_OUTCOME_INVALID"
+                            break
+                        outcome = TransferOutcome(str(raw_outcome["kind"]), str(raw_outcome["reason"])).to_dict()
+                    if gate == "G6":
+                        candidate = response.get("g6_receipt")
+                        if not isinstance(candidate, Mapping) or candidate.get("status") != "ACCEPTED" or not candidate.get("receipt_id"):
+                            failure = "CHILD_G6_NOT_ACCEPTED"
+                            break
+                        g6 = copy.deepcopy(dict(candidate))
+                    evidence[gate] = copy.deepcopy(response.get("evidence"))
+                    readbacks[gate] = copy.deepcopy(response.get("target_readback"))
+                    outcomes[gate] = outcome
+                    gate_store[gate] = {"evidence": evidence[gate], "target_readback": readbacks[gate],
+                                        "outcome": outcome, "g6_receipt": g6}
+
+                children: list[dict[str, Any]] = []
+                if not failure:
+                    ordered = self._ordered(list(specs))
+                    node_count += len(ordered)
+                    if node_count > self.max_nodes:
+                        raise NodeArchitectureError("DAG_BUDGET_EXCEEDED", str(node_count))
+                    for spec in ordered:
+                        child_id = str(spec.get("child_run_id", ""))
+                        allocation = spec.get("node_allocation")
+                        if not child_id or child_id == run_id:
+                            raise NodeArchitectureError("CHILD_PARENT_SELF_LOOP", child_id)
+                        if not isinstance(allocation, Mapping):
+                            raise NodeArchitectureError("NODE_ALLOCATION_REQUIRED", child_id)
+                        generation_key = f"{run_id}:{allocation.get('node_allocation_id')}"
+                        generations = store.setdefault("generations", {}).setdefault(generation_key, [])
+                        existing_open = next((state for state in generations
+                                              if state.get("child_run_ref") == child_id
+                                              and state.get("terminal_state") == "OPEN"), None)
+                        materialization_key = f"{run_id}:{child_id}"
+                        if existing_open is not None:
+                            materialization = store.setdefault("materializations", {}).get(materialization_key)
+                            if not isinstance(materialization, Mapping):
+                                raise NodeArchitectureError("CHILD_CHECKPOINT_INVALID", child_id)
+                        else:
+                            materialization = materialize_child_run(
+                                record_id=f"materialization:{run_id}:{child_id}", parent_run_id=run_id,
+                                child_run_id=child_id, node_allocation=allocation,
+                                created_at=str(spec.get("created_at", "1970-01-01T00:00:00Z")),
+                                created_by=spec.get("created_by", {"kind": "agent", "id": "recursive-run-dag"}),
+                                generation_states=generations,
+                            )
+                            generations.append({"child_run_ref": child_id, "generation": materialization["generation"], "terminal_state": "OPEN"})
+                            store.setdefault("materializations", {})[materialization_key] = copy.deepcopy(materialization)
+                        child_manifest = create_run_manifest_revision(
+                            record_id=f"manifest:{child_id}", run_id=child_id, revision=1,
+                            run_kind="CHILD", created_at=str(spec.get("created_at", "1970-01-01T00:00:00Z")),
+                            created_by=spec.get("created_by", {"kind": "agent", "id": "recursive-run-dag"}),
+                            parent_run_ref=run_id,
+                            invoking_node_allocation_ref=str(allocation.get("record_id", "")),
+                        )
+                        store.setdefault("child_manifests", {})[child_id] = copy.deepcopy(child_manifest)
+                        if not verify_record_digest(child_manifest):
+                            raise NodeArchitectureError("CHILD_RUN_MANIFEST_INVALID", child_id)
+                        child_outcomes = spec.get("outcomes", {})
+                        if not isinstance(child_outcomes, Mapping):
+                            raise NodeArchitectureError("TRANSFER_OUTCOME_INVALID", child_id)
+                        child = run_one(child_id, list(spec.get("children", ())), depth + 1, child_outcomes,
+                                        spec.get("authority", run_authority), spec.get("state"),
+                                        spec.get("canonical_state", run_canonical_state))
+                        generations[-1]["terminal_state"] = "ACCEPTED" if (child.get("g6_receipt") or {}).get("status") == "ACCEPTED" else "FAILED"
+                        child["run_manifest"] = child_manifest
+                        child["materialization_receipt"] = materialization
+                        children.append(child)
+
+                if specs and not failure:
+                    for gate in GATES[4:]:
+                        saved = gate_store.get(gate)
+                        if isinstance(saved, Mapping):
+                            evidence[gate] = copy.deepcopy(saved.get("evidence"))
+                            readbacks[gate] = copy.deepcopy(saved.get("target_readback"))
+                            outcomes[gate] = copy.deepcopy(saved.get("outcome"))
+                            if gate == "G6":
+                                g6 = copy.deepcopy(saved.get("g6_receipt"))
+                            continue
+                        kwargs = dict(event_context)
+                        kwargs.update({"canonical_state": run_canonical_state, "run_id": run_id,
+                                       "gate": self._host_gate(gate), "requested_action": "RUN", "authority": run_authority,
+                                       "state": run_state, "event_id": f"{run_id}:{gate}"})
+                        response = self.runtime_event(**kwargs)
+                        if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED"}:
+                            failure = str(response.get("reason_code", "CHILD_EVENT_NOT_COMPLETED")) if isinstance(response, Mapping) else "CHILD_EVENT_INVALID"
+                            break
+                        if gate in {"G4", "G5"} and (not isinstance(response.get("target_readback"), Mapping)
+                                                       or response["target_readback"].get("status") != "VERIFIED"):
+                            failure = "CHILD_TARGET_READBACK_MISSING"
+                            break
+                        if gate == "G6":
+                            candidate = response.get("g6_receipt")
+                            if not isinstance(candidate, Mapping) or candidate.get("status") != "ACCEPTED" or not candidate.get("receipt_id"):
+                                failure = "CHILD_G6_NOT_ACCEPTED"
+                                break
+                            g6 = copy.deepcopy(dict(candidate))
+                        evidence[gate] = copy.deepcopy(response.get("evidence"))
+                        readbacks[gate] = copy.deepcopy(response.get("target_readback"))
+                        outcomes[gate] = None
+                        gate_store[gate] = {"evidence": evidence[gate], "target_readback": readbacks[gate],
+                                            "outcome": None, "g6_receipt": g6}
+
+                if not failure:
+                    if not isinstance(g6, Mapping) or g6.get("status") != "ACCEPTED" or not g6.get("receipt_id"):
+                        failure = "CHILD_G6_NOT_ACCEPTED"
+                accepted_children = all((c.get("g6_receipt") or {}).get("status") == "ACCEPTED" for c in children)
+                failed = bool(failure) or not accepted_children
+                result = {
+                    "run_id": run_id, "status": "FAILED" if failed else "COMPLETED",
+                    "failure_code": failure or ("CHILD_G6_NOT_ACCEPTED" if not accepted_children else None),
+                    "gate_evidence": evidence, "gate_readbacks": readbacks, "gate_outcomes": outcomes,
+                    "children": children,
+                    "g6_receipt": copy.deepcopy(dict(g6)) if isinstance(g6, Mapping) and g6.get("status") == "ACCEPTED" else None,
+                    "parent_aggregation": {"g3": "EVIDENCE_BOUND" if "G3" in evidence else "FAILED",
+                                           "g4": "INTEGRATED" if accepted_children and not failed else "FAILED",
+                                           "g5": "VERIFIED" if accepted_children and not failed else "FAILED",
+                                           "g6": "ACCEPTED" if not failed and g6 else "FAILED"},
+                }
+                run_receipts[run_id] = copy.deepcopy(result)
+                active.remove(run_id)
+                return result
+
+            return run_one(root_id, list(child_node_allocations), 1)
+        finally:
+            if leases.get(root_id) == lease_owner:
+                leases.pop(root_id, None)
+
+
 __all__ = [
     "CHILD_INSTANCE_POLICY",
     "CompositionVerificationError",
@@ -404,6 +675,7 @@ __all__ = [
     "NodeAllocation",
     "NodeArchitectureError",
     "NodeDefinition",
+    "RecursiveRunDag",
     "REQUIREMENT_KINDS",
     "SingleActiveError",
     "allocate_node",
