@@ -750,14 +750,44 @@ class RealTargetActivationAdapter:
             path = self.source_root / rel
             if path.is_file():
                 artifacts[rel] = _sha256_file(path)
-        if _R3_PREDECESSOR_PLAN_REF not in artifacts or ACTIVATION_RECEIPT_REF not in artifacts:
+        if _R3_PREDECESSOR_PLAN_REF not in artifacts:
             raise ValueError('REAL_TARGET_SOURCE_ARTIFACT_MISSING')
+        first_activation = ACTIVATION_RECEIPT_REF not in artifacts
+        if first_activation:
+            # A prior selector/checkpoint/cursor proves this is not a cold start;
+            # continuity must be backed by its durable activation receipt.
+            prior_state = any((self.source_root / name).is_file()
+                              for name in ('selector.json', 'checkpoint.json', 'cursor.json'))
+            if prior_state:
+                raise ValueError('REAL_TARGET_RECEIPT_MISSING')
         checkpoint_ref = predecessor.get('checkpoint_ref') if isinstance(predecessor, Mapping) else None
         if not isinstance(checkpoint_ref, str) or not Path(checkpoint_ref).is_file():
             raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND')
         artifacts['predecessor_checkpoint'] = _sha256_file(Path(checkpoint_ref))
         return {'source_root': str(self.source_root), 'artifacts': artifacts,
-                'view_digest': _digest(artifacts)}
+                'view_digest': _digest(artifacts), 'first_activation': first_activation}
+
+    def _verify_trusted_authority_source(self, authority: Mapping[str, Any]) -> str:
+        trusted_source = authority.get('trusted_source')
+        if not isinstance(trusted_source, Mapping):
+            raise ValueError('EFFECT_AUTHORITY_TRUSTED_SOURCE_REQUIRED')
+        registry_ref = trusted_source.get('registry_ref')
+        entry_id = trusted_source.get('entry_id')
+        if (not isinstance(registry_ref, str) or not registry_ref.strip()
+                or not isinstance(entry_id, str) or not entry_id.strip()):
+            raise ValueError('EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID')
+        registry_path = Path(registry_ref).expanduser().resolve()
+        try:
+            registry = json.loads(registry_path.read_text('utf-8'))
+        except (OSError, ValueError) as exc:
+            raise ValueError('EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID') from exc
+        entries = registry.get('trusted_authorities') if isinstance(registry, Mapping) else None
+        entry = entries.get(entry_id) if isinstance(entries, Mapping) else None
+        expected = {key: authority.get(key) for key in
+                    ('authority_ref', 'actor', 'authority_kind', 'scope', 'bindings')}
+        if not isinstance(entry, Mapping) or dict(entry) != expected:
+            raise ValueError('EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID')
+        return _sha256_file(registry_path)
 
     def validate_authority(self, *, authority, predecessor, successor_plan, successor_plan_ref,
                            node_allocation, branch, head) -> dict[str, Any]:
@@ -769,6 +799,7 @@ class RealTargetActivationAdapter:
         if (not isinstance(scopes, (list, tuple))
                 or len(scopes) != 1 or scopes[0] != _REAL_TARGET_AUTHORITY_SCOPE):
             raise ValueError('REAL_TARGET_AUTHORITY_SCOPE_INVALID')
+        trusted_registry_digest = self._verify_trusted_authority_source(authority)
         authority_digest, plan_digest, predecessor_digest = _executor_validate(
             authority, predecessor, successor_plan, successor_plan_ref,
             node_allocation, branch, head)
@@ -776,6 +807,7 @@ class RealTargetActivationAdapter:
                 'scope': _REAL_TARGET_AUTHORITY_SCOPE, 'authority_digest': authority_digest,
                 'successor_plan_digest': plan_digest,
                 'predecessor_digest': predecessor_digest,
+                'trusted_registry_digest': trusted_registry_digest,
                 'checkpoint_context_digest': predecessor['context_digest'],
                 'branch': branch, 'head': head}
 
@@ -792,6 +824,7 @@ class RealTargetActivationAdapter:
             branch=branch, head=head, live_root=self.live_root, mode=mode)
         result['authority_verification'] = authority_check
         result['real_target_view'] = view
+        result['first_activation'] = view['first_activation']
         if mode == 'COMMIT' and result.get('executed'):
             receipt = read_live_activation_receipt(self.live_root)
             if receipt is None:

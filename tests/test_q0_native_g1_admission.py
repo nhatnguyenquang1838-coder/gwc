@@ -747,6 +747,13 @@ def _real_r2_activation_fixture(tmp_path):
                      "node_allocation_digest": allocation["content_digest"]["value"],
                      "branch": branch, "head": head},
     }
+    registry_path = tmp_path / "trusted-authorities.json"
+    registry_path.write_text(json.dumps({"trusted_authorities": {
+        authority["authority_ref"]: {key: authority[key] for key in
+                                    ("authority_ref", "actor", "authority_kind", "scope", "bindings")}
+    }}))
+    authority["trusted_source"] = {"registry_ref": str(registry_path),
+                                   "entry_id": authority["authority_ref"]}
     return repo_root, proposal, plan, allocation, predecessor, authority, branch, head
 
 
@@ -927,6 +934,61 @@ def test_real_target_adapter_preflights_commits_verifies_and_deduplicates_in_iso
     assert after == real_before
 
 
+def test_real_target_authority_requires_trusted_registry_source(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
+    kwargs = dict(predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUSTED_SOURCE_REQUIRED$"):
+        adapter.validate_authority(authority={k: v for k, v in authority.items() if k != "trusted_source"}, **kwargs)
+    bad = {**authority, "trusted_source": {"registry_ref": str(tmp_path / "missing.json"),
+                                           "entry_id": authority["authority_ref"]}}
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID$"):
+        adapter.validate_authority(authority=bad, **kwargs)
+
+
+def test_real_target_first_activation_allows_missing_receipt_and_flags_cold_start(tmp_path):
+    import shutil
+    from tools.node_architect.q0_m1_m7_integration import (
+        ACTIVATION_RECEIPT_REF, _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF,
+        RealTargetActivationAdapter,
+    )
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    source = tmp_path / "cold-source"
+    (source / Path(_REAL_TARGET_PLAN_REF).parent).mkdir(parents=True)
+    (source / Path(_R3_PREDECESSOR_PLAN_REF).parent).mkdir(parents=True, exist_ok=True)
+    shutil.copy2(repo_root / _REAL_TARGET_PLAN_REF, source / _REAL_TARGET_PLAN_REF)
+    shutil.copy2(repo_root / _R3_PREDECESSOR_PLAN_REF, source / _R3_PREDECESSOR_PLAN_REF)
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "cold-target")
+    view = adapter._real_target_view(_REAL_TARGET_PLAN_REF, plan, predecessor)
+    assert ACTIVATION_RECEIPT_REF not in view["artifacts"]
+    assert view["first_activation"] is True
+    result = adapter.preflight(authority=authority, predecessor=predecessor, successor_plan=plan,
+                               successor_plan_ref=_REAL_TARGET_PLAN_REF, node_allocation=allocation,
+                               branch=branch, head=head)
+    assert result["accepted"] is True and result["executed"] is False
+    assert result["first_activation"] is True
+
+
+def test_real_target_subsequent_activation_without_receipt_is_rejected(tmp_path):
+    import shutil
+    from tools.node_architect.q0_m1_m7_integration import (
+        _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,
+    )
+    repo_root, _, plan, _, predecessor, _, _, _ = _real_r2_activation_fixture(tmp_path)
+    source = tmp_path / "warm-source"
+    for ref in (_REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF):
+        (source / Path(ref).parent).mkdir(parents=True, exist_ok=True)
+        shutil.copy2(repo_root / ref, source / ref)
+    (source / "selector.json").write_text("{}")
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "warm-target")
+    with pytest.raises(ValueError, match="^REAL_TARGET_RECEIPT_MISSING$"):
+        adapter._real_target_view(_REAL_TARGET_PLAN_REF, plan, predecessor)
+
+
+
 def test_real_target_adapter_rejects_unallowlisted_authority_scope(tmp_path):
     from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
     repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
@@ -949,7 +1011,7 @@ def test_real_target_adapter_rejects_expired_and_mismatched_authority_bindings(t
     for change, code in [
         ({"authority_kind": "UNKNOWN"}, "EFFECT_AUTHORITY_KIND_INVALID"),
         ({"expires_at": "2000-01-01T00:00:00Z"}, "EFFECT_AUTHORITY_EXPIRED"),
-        ({"bindings": {**authority["bindings"], "branch": "wrong"}}, "EFFECT_AUTHORITY_BINDING_MISMATCH"),
+        ({"bindings": {**authority["bindings"], "branch": "wrong"}}, "EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID"),
     ]:
         with pytest.raises(ValueError, match=f"^{code}$"):
             adapter.preflight(authority={**authority, **change}, **kwargs)
