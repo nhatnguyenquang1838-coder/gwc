@@ -78,6 +78,7 @@ class AuthorityDecisionReceipt:
     issued_at: str = "2026-01-01T00:00:00Z"
     expires_at: str = "2030-01-01T00:00:00Z"
     receipt_digest: str = field(default_factory=str)
+    claims: Mapping[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -90,6 +91,7 @@ class AuthorityDecisionReceipt:
             "issued_at": self.issued_at,
             "expires_at": self.expires_at,
             "receipt_digest": self.receipt_digest,
+            "claims": copy.deepcopy(dict(self.claims)),
         }
 
     @classmethod
@@ -103,6 +105,7 @@ class AuthorityDecisionReceipt:
             issued_at=str(data.get("issued_at", "2026-01-01T00:00:00Z")),
             expires_at=str(data.get("expires_at", "2030-01-01T00:00:00Z")),
             receipt_digest=str(data.get("receipt_digest", "")),
+            claims=copy.deepcopy(data.get("claims", {})) if isinstance(data.get("claims", {}), Mapping) else {},
         )
 
 
@@ -111,7 +114,7 @@ def _compute_receipt_digest(receipt_fields: Mapping[str, Any]) -> str:
         receipt_fields.get("task_id"), receipt_fields.get("authority_id"),
         receipt_fields.get("grantee"), receipt_fields.get("action"),
         receipt_fields.get("issued_by"), receipt_fields.get("issued_at"),
-        receipt_fields.get("expires_at"),
+        receipt_fields.get("expires_at"), receipt_fields.get("claims", {}),
     )
 
 
@@ -124,6 +127,7 @@ def issue_authority(
     issued_by: str,
     issued_at: str = "2026-01-01T00:00:00Z",
     expires_at: str = "2030-01-01T00:00:00Z",
+    claims: Mapping[str, Any] | None = None,
 ) -> AuthorityDecisionReceipt:
     """Issue an orthogonal authority decision receipt (C6).
 
@@ -140,11 +144,13 @@ def issue_authority(
         "task_id": task_id, "authority_id": authority_id, "grantee": grantee,
         "action": action, "issued_by": issued_by, "issued_at": issued_at,
         "expires_at": expires_at,
+        "claims": dict(claims or {}),
     })
     return AuthorityDecisionReceipt(
         task_id=task_id, authority_id=authority_id, grantee=grantee,
         action=action, issued_by=issued_by, issued_at=issued_at,
         expires_at=expires_at, receipt_digest=digest,
+        claims=copy.deepcopy(dict(claims or {})),
     )
 
 
@@ -161,6 +167,8 @@ def validate_authority(
         "grantee": receipt.grantee, "action": receipt.action,
         "issued_by": receipt.issued_by, "issued_at": receipt.issued_at,
         "expires_at": receipt.expires_at,
+        "claims": dict(receipt.claims),
+        "claims": dict(receipt.claims),
     })
     if receipt.receipt_digest != expected:
         raise AuthorityError("AUTHORITY_DIGEST_MISMATCH")
@@ -181,7 +189,19 @@ def resolve_authority(
     """Resolve whether an effect is authorized (C6): every effect requires a
     valid decision receipt for its exact task + action; else fail-closed DENIED.
     """
+    derived_matches = []
     for receipt in receipts or []:
+        if isinstance(receipt, Mapping) and receipt.get("schema") == "derived-child-authority/v1":
+            if receipt.get("task_id") != task_id or action not in receipt.get("authorized_actions", ()):
+                continue
+            if receipt.get("g4_g5_g6_authority_granted") is not False:
+                continue
+            if now >= str(receipt.get("expires_at", "")):
+                continue
+            expected = _sha256_digest({k: v for k, v in receipt.items() if k != "receipt_digest"})
+            if receipt.get("receipt_digest") == expected:
+                derived_matches.append(receipt)
+            continue
         if not isinstance(receipt, AuthorityDecisionReceipt):
             continue
         if receipt.task_id != task_id or receipt.action != action:
@@ -195,7 +215,76 @@ def resolve_authority(
             "decision": "GRANTED",
             "decision_receipt": receipt.to_dict(),
         }
+    if derived_matches:
+        if len({r.get("receipt_digest") for r in derived_matches}) != 1:
+            return {"granted": False, "decision": "DENIED", "decision_receipt": None}
+        return {"granted": True, "decision": "GRANTED", "decision_receipt": copy.deepcopy(dict(derived_matches[0]))}
     return {"granted": False, "decision": "DENIED", "decision_receipt": None}
+
+
+def derive_child_authority(
+    parent_grant: AuthorityDecisionReceipt,
+    child_subject: Mapping[str, Any],
+    *,
+    root: Any,
+    now: str,
+) -> dict[str, Any]:
+    """Deterministically derive a strict child receipt from a validated parent grant.
+
+    This is a pure evaluator: replaying identical inputs returns the identical
+    receipt; callers remain responsible for durable single-consumption tracking.
+    """
+    from tools.node_architect.derive_task_authority import evaluate_parent_child_authority
+
+    validate_authority(parent_grant, now=now)
+    if not isinstance(child_subject, Mapping):
+        raise AuthorityError("AUTHORITY_CHILD_SUBJECT_INVALID")
+    claims = dict(parent_grant.claims)
+    if not claims:
+        raise AuthorityError("AUTHORITY_PARENT_GRANT_INVALID")
+    if claims.get("revoked") is not False:
+        raise AuthorityError("AUTHORITY_REVOKED")
+    if claims.get("expires_at") != parent_grant.expires_at:
+        raise AuthorityError("AUTHORITY_PARENT_GRANT_INVALID")
+    if claims.get("issuer") == child_subject.get("child_run_id") or claims.get("issued_by") == child_subject.get("child_run_id"):
+        raise SelfGrantError("issuer is the child grantee")
+    if claims.get("issuer", claims.get("issued_by")) != parent_grant.issued_by:
+        raise AuthorityError("AUTHORITY_PROVENANCE_INVALID")
+    if claims.get("actor") != parent_grant.grantee:
+        raise AuthorityError("AUTHORITY_ACTOR_MISMATCH")
+    evaluation = evaluate_parent_child_authority(claims, child_subject)
+    if evaluation["decision"] != "ALLOW":
+        code = evaluation["reason_code"]
+        if code == "AUTHORITY_SELF_GRANT_FORBIDDEN":
+            raise SelfGrantError(code)
+        if code == "AUTHORITY_STALE":
+            raise StaleAuthorityError(code)
+        raise AuthorityError(code)
+    fields = {
+        "schema": "derived-child-authority/v1",
+        "task_id": parent_grant.task_id,
+        "authority_id": f"derived:{parent_grant.authority_id}:{child_subject['child_run_id']}",
+        "parent_grant_digest": parent_grant.receipt_digest,
+        "parent_run_id": claims["run_id"],
+        "child_run_id": child_subject["child_run_id"],
+        "grantee": parent_grant.grantee,
+        "actor": child_subject["actor"],
+        "repository": child_subject["repository"],
+        "branch": child_subject["branch"],
+        "head_sha": child_subject["head_sha"],
+        "target": child_subject["target"],
+        "scope": sorted(child_subject["scope"]),
+        "scope_hash": _sha256_digest(sorted(child_subject["scope"])),
+        "risk_ceiling": child_subject["risk_ceiling"],
+        "authorized_actions": [child_subject["action"]],
+        "expires_at": parent_grant.expires_at,
+        "audit_trail": [{"event": "derived", "parent_grant_digest": parent_grant.receipt_digest}],
+        "g4_g5_g6_authority_granted": False,
+        "decision": "ALLOW",
+    }
+    fields["decision_digest"] = _sha256_digest(fields)
+    fields["receipt_digest"] = _sha256_digest(fields)
+    return fields
 
 
 def build_modules_manifest(
@@ -232,6 +321,7 @@ __all__ = [
     "SelfGrantError",
     "StaleAuthorityError",
     "build_modules_manifest",
+    "derive_child_authority",
     "issue_authority",
     "resolve_authority",
     "validate_authority",
