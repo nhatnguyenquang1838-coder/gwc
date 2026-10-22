@@ -42,13 +42,14 @@ def route(**changes):
     return route_g2_effect(**args)
 
 
-def test_verified_derived_r2_routes_autonomously_hotl():
+def test_derived_r2_without_independent_parent_anchor_holds_exact_effect():
     result = route()
-    assert result["routing_decision"] == "AUTONOMOUS_HOTL"
-    assert result["effect_decision"] == "GRANTED"
-    assert result["mode"] == "HOTL"
-    assert result["interruptible"] is True
-    assert result["audit_receipt"]["receipt_digest"] == derived_receipt()["receipt_digest"]
+    assert result["routing_decision"] == "HITL_REQUIRED"
+    assert result["effect_decision"] == "EFFECT_HOLD"
+    assert "mode" not in result
+    assert result["approval_envelope"]["action"] == "G2_EXECUTION"
+    assert result["affected_effects"] == ["tools/node_architect/a.py"]
+    assert result["control_loop"] == "CONTINUE_INDEPENDENT_EFFECTS"
 
 
 def test_r2_without_valid_derived_authority_holds_exact_effect():

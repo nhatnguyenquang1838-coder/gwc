@@ -189,7 +189,7 @@ def resolve_authority(
     """Resolve whether an effect is authorized (C6): every effect requires a
     valid decision receipt for its exact task + action; else fail-closed DENIED.
     """
-    derived_matches = []
+    derived_anchor_unavailable = False
     for receipt in receipts or []:
         if isinstance(receipt, Mapping) and receipt.get("schema") == "derived-child-authority/v1":
             if receipt.get("task_id") != task_id or action not in receipt.get("authorized_actions", ()):
@@ -198,9 +198,11 @@ def resolve_authority(
                 continue
             if now >= str(receipt.get("expires_at", "")):
                 continue
-            expected = _sha256_digest({k: v for k, v in receipt.items() if k != "receipt_digest"})
-            if receipt.get("receipt_digest") == expected:
-                derived_matches.append(receipt)
+            # Derived receipt hashes are content-integrity checks, not proof of
+            # parent provenance. This resolver has no independently verified
+            # parent authority source/verifier, so the derived claim must never
+            # grant by matching a caller-computable self-hash.
+            derived_anchor_unavailable = True
             continue
         if not isinstance(receipt, AuthorityDecisionReceipt):
             continue
@@ -215,10 +217,13 @@ def resolve_authority(
             "decision": "GRANTED",
             "decision_receipt": receipt.to_dict(),
         }
-    if derived_matches:
-        if len({r.get("receipt_digest") for r in derived_matches}) != 1:
-            return {"granted": False, "decision": "DENIED", "decision_receipt": None}
-        return {"granted": True, "decision": "GRANTED", "decision_receipt": copy.deepcopy(dict(derived_matches[0]))}
+    if derived_anchor_unavailable:
+        return {
+            "granted": False,
+            "decision": "DENIED",
+            "reason_code": "AUTHORITY_TRUST_ANCHOR_UNAVAILABLE",
+            "decision_receipt": None,
+        }
     return {"granted": False, "decision": "DENIED", "decision_receipt": None}
 
 

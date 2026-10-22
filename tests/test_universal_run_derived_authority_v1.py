@@ -63,7 +63,32 @@ def test_valid_parent_grant_derives_strict_subset_and_is_deterministic():
     assert first["parent_grant_digest"] == parent.receipt_digest
     assert first["scope"] == CHILD["scope"]
     assert first["g4_g5_g6_authority_granted"] is False
-    assert resolve_authority(task_id="task-1", action="G2_EXECUTION", receipts=[first], now=NOW)["granted"]
+    result = resolve_authority(task_id="task-1", action="G2_EXECUTION", receipts=[first], now=NOW)
+    assert result["decision"] == "DENIED"
+    assert result["reason_code"] == "AUTHORITY_TRUST_ANCHOR_UNAVAILABLE"
+
+
+def test_forged_self_hashed_derived_receipt_cannot_grant_without_parent_anchor():
+    import hashlib
+    import json
+
+    forged = {
+        "schema": "derived-child-authority/v1",
+        "task_id": "task-1",
+        "authority_id": "forged",
+        "parent_grant_digest": "sha256:" + "0" * 64,
+        "child_run_id": "child-1",
+        "authorized_actions": ["G2_EXECUTION"],
+        "expires_at": "2030-01-01T00:00:00Z",
+        "g4_g5_g6_authority_granted": False,
+    }
+    forged["receipt_digest"] = "sha256:" + hashlib.sha256(
+        json.dumps(forged, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    ).hexdigest()
+    result = resolve_authority(task_id="task-1", action="G2_EXECUTION", receipts=[forged], now=NOW)
+    assert result["granted"] is False
+    assert result["decision"] == "DENIED"
+    assert result["reason_code"] == "AUTHORITY_TRUST_ANCHOR_UNAVAILABLE"
 
 
 @pytest.mark.parametrize("override,child,code", [
