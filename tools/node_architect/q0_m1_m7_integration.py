@@ -17,8 +17,255 @@ ROUTE_REF = 'core/node-architect/q0-engineering-coordination-route-r1.json'
 ACTIVATION_RECEIPT_REF = '.gwc/tasks/SCRUM-781/activation/cf-plan-activation.json'
 
 
+_ACTIVATION_EFFECTS = ('selector_write', 'checkpoint_write', 'cursor_advance')
+_ACTIVATION_RECEIPT = 'activation-receipt.json'
+_ACTIVATION_JOURNAL = 'activation-journal.json'
+_ACTIVATION_LEASE = '.activation-lease.json'
+
+
+def _activation_state_paths(root: Path) -> dict[str, Path]:
+    return {name: root / filename for name, filename in {
+        'selector_write': 'selector.json', 'checkpoint_write': 'checkpoint.json',
+        'cursor_advance': 'cursor.json', 'outbox': 'outbox.json',
+    }.items()}
+
+
+def _state_read(path: Path) -> Any:
+    # A missing sandbox copy is the defined empty state: JSON null.
+    return json.loads(path.read_text('utf-8')) if path.is_file() else None
+
+
+def _state_hash(value: Any) -> str:
+    return _digest({'state': value})
+
+
+def read_activation_receipt(sandbox_root: Path | str) -> dict[str, Any] | None:
+    """Read and verify the durable sandbox activation receipt after restart."""
+    path = Path(sandbox_root).resolve() / _ACTIVATION_RECEIPT
+    if not path.is_file():
+        return None
+    receipt = json.loads(path.read_text('utf-8'))
+    digest = receipt.get('receipt_digest')
+    body = {k: v for k, v in receipt.items() if k != 'receipt_digest'}
+    if receipt.get('schema_id') != 'gwc.q0.successor-activation-receipt.v1' or digest != _digest(body):
+        raise ValueError('ACTIVATION_RECEIPT_INVALID')
+    return receipt
+
+
+def _write_json_atomic(path: Path, value: Any) -> None:
+    raw = json.dumps(value, sort_keys=True, indent=2, ensure_ascii=False) + '\n'
+    temp = path.with_name(path.name + '.tmp')
+    temp.write_text(raw, encoding='utf-8')
+    temp.replace(path)
+
+
+def _iso_utc(value: Any) -> float:
+    from datetime import datetime, timezone
+    if not isinstance(value, str):
+        raise ValueError('GRANT_EXPIRED')
+    try:
+        parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+    except ValueError as exc:
+        raise ValueError('GRANT_EXPIRED') from exc
+    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(parsed):
+        raise ValueError('GRANT_EXPIRED')
+    return parsed.timestamp()
+
+
+def _validate_activation_grant(grant: Any, predecessor: Mapping[str, Any],
+                               runtime_plan: Mapping[str, Any], node_allocation: Mapping[str, Any],
+                               branch: str, head: str) -> str:
+    import time
+    if grant is None:
+        raise ValueError('LIVE_ACTIVATION_AUTHORITY_REQUIRED')
+    if not isinstance(grant, Mapping):
+        raise ValueError('GRANT_IDENTITY_REQUIRED')
+    if grant.get('authority_kind') != 'SEPARATE_HUMAN_OR_CONTROLLER_GRANT':
+        raise ValueError('GRANT_AUTHORITY_KIND_INVALID')
+    if (not isinstance(grant.get('grant_ref'), str) or not grant['grant_ref'].strip()
+            or not isinstance(grant.get('actor'), str) or not grant['actor'].strip()):
+        raise ValueError('GRANT_IDENTITY_REQUIRED')
+    now = time.time()
+    issued, expires = _iso_utc(grant.get('issued_at')), _iso_utc(grant.get('expires_at'))
+    if issued > now or expires <= now or expires <= issued:
+        raise ValueError('GRANT_EXPIRED')
+    if not isinstance(grant.get('scope'), list) or 'q0.live_activation.sandbox' not in grant['scope']:
+        raise ValueError('GRANT_SCOPE_INVALID')
+    allocation_digest = node_allocation.get('content_digest')
+    if isinstance(allocation_digest, Mapping):
+        allocation_digest = allocation_digest.get('value')
+    if not allocation_digest:
+        allocation_digest = node_allocation.get('digest')
+    expected = {'predecessor_context_digest': _digest(predecessor),
+                'runtime_plan_digest': runtime_plan.get('digest') or _digest(runtime_plan),
+                'node_allocation_digest': allocation_digest,
+                'branch': branch, 'head': head}
+    bindings = grant.get('bindings')
+    if not isinstance(bindings, Mapping) or any(bindings.get(k) != v for k, v in expected.items()):
+        raise ValueError('GRANT_BINDING_MISMATCH')
+    return _digest(dict(grant))
+
+
+def _lease_acquire(root: Path, *, ttl: int = 60) -> str:
+    import os, time, uuid
+    path = root / _ACTIVATION_LEASE
+    owner = uuid.uuid4().hex
+    payload = {'owner_id': owner, 'expires_at': time.time() + ttl}
+    for _ in range(2):
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            with os.fdopen(fd, 'w') as handle:
+                json.dump(payload, handle)
+            return owner
+        except FileExistsError:
+            try:
+                current = json.loads(path.read_text('utf-8'))
+                if float(current.get('expires_at', 0)) <= time.time():
+                    path.unlink()
+                    continue
+            except (OSError, ValueError, TypeError):
+                pass
+            raise ValueError('LEASE_HELD_BY_OTHER')
+    raise ValueError('LEASE_HELD_BY_OTHER')
+
+
+def _lease_release(root: Path, owner: str) -> None:
+    path = root / _ACTIVATION_LEASE
+    try:
+        if json.loads(path.read_text('utf-8')).get('owner_id') == owner:
+            path.unlink()
+    except (OSError, ValueError):
+        pass
+
+
+def _journal_read(root: Path) -> list[dict[str, Any]]:
+    path = root / _ACTIVATION_JOURNAL
+    if not path.exists():
+        return []
+    value = json.loads(path.read_text('utf-8'))
+    if not isinstance(value, list):
+        raise ValueError('ACTIVATION_JOURNAL_INVALID')
+    return value
+
+
+def _journal_append(root: Path, record: dict[str, Any]) -> None:
+    journal = _journal_read(root)
+    journal.append(record)
+    _write_json_atomic(root / _ACTIVATION_JOURNAL, journal)
+
+
+def reconcile_activation_journal(sandbox_root: Path | str) -> dict[str, Any]:
+    """Complete or roll back the most recent incomplete sandbox PREPARE safely."""
+    root = Path(sandbox_root).resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    owner = _lease_acquire(root)
+    try:
+        journal = _journal_read(root)
+        committed = {row.get('idempotency_key') for row in journal if row.get('phase') == 'COMMIT'}
+        pending = next((row for row in reversed(journal)
+                        if row.get('phase') == 'PREPARE' and row.get('idempotency_key') not in committed), None)
+        if pending is None:
+            return {'reconciled': False, 'status': 'NO_PENDING_PREPARE'}
+        paths = _activation_state_paths(root)
+        actual = {key: _state_read(paths[key]) for key in _ACTIVATION_EFFECTS}
+        expected_before = pending['before_state']
+        expected_after = pending['after_state']
+        if all(_state_hash(actual[k]) in {_state_hash(expected_before[k]), _state_hash(expected_after[k])}
+               for k in _ACTIVATION_EFFECTS):
+            for effect in _ACTIVATION_EFFECTS:
+                if _state_hash(actual[effect]) != _state_hash(expected_after[effect]):
+                    _write_json_atomic(paths[effect], expected_after[effect])
+            post = {k: _state_hash(_state_read(paths[k])) for k in _ACTIVATION_EFFECTS}
+            _journal_append(root, {'phase': 'COMMIT', 'idempotency_key': pending['idempotency_key'],
+                                   'post_hashes': post, 'reconciled': True})
+            _write_json_atomic(root / _ACTIVATION_RECEIPT, pending['receipt'])
+            return {'reconciled': True, 'status': 'COMPLETED'}
+        for effect in reversed(_ACTIVATION_EFFECTS):
+            _write_json_atomic(paths[effect], expected_before[effect])
+        _journal_append(root, {'phase': 'ROLLBACK_APPLIED', 'idempotency_key': pending['idempotency_key'],
+                               'reason': 'CAS_CONFLICT'})
+        return {'reconciled': True, 'status': 'ROLLED_BACK'}
+    finally:
+        _lease_release(root, owner)
+
+
+def activate_successor_plan(*, grant, predecessor, runtime_plan, node_allocation,
+                            branch, head, sandbox_root, mode='DRY_RUN') -> dict[str, Any]:
+    """Validate and activate a successor plan only against disposable sandbox copies."""
+    if mode not in ('DRY_RUN', 'SANDBOX_COMMIT'):
+        raise ValueError('LIVE_ACTIVATION_MODE_INVALID')
+    import os
+    root = Path(sandbox_root).expanduser().resolve()
+    hermes_home = Path(os.environ.get('HERMES_HOME', str(Path.home() / '.hermes'))).expanduser().resolve()
+    if (not root.is_dir() or (root / '.gwc').exists()
+            or root == hermes_home or hermes_home in root.parents):
+        raise ValueError('LIVE_ACTIVATION_LIVE_PATH_FORBIDDEN')
+    if not isinstance(predecessor, Mapping) or not isinstance(runtime_plan, Mapping) or not isinstance(node_allocation, Mapping):
+        raise ValueError('LIVE_ACTIVATION_BINDING_INVALID')
+    grant_digest = _validate_activation_grant(grant, predecessor, runtime_plan, node_allocation, branch, head)
+    if any((root / name).resolve().parent != root for name in ('selector.json','checkpoint.json','cursor.json','outbox.json')):
+        raise ValueError('LIVE_ACTIVATION_LIVE_PATH_FORBIDDEN')
+    root.mkdir(parents=True, exist_ok=True)
+    owner = _lease_acquire(root)
+    try:
+        predecessor_id = predecessor.get('run_id') or predecessor.get('identity')
+        successor_id = runtime_plan.get('run_id')
+        plan_digest = runtime_plan.get('digest') or _digest(runtime_plan)
+        key = _digest({'grant_ref': grant['grant_ref'], 'predecessor_run': predecessor_id,
+                       'successor_run': successor_id, 'plan_digest': plan_digest})
+        journal = _journal_read(root)
+        if any(r.get('phase') == 'COMMIT' and r.get('idempotency_key') == key for r in journal):
+            return {'accepted': True, 'executed': False, 'mode': mode, 'effects': list(_ACTIVATION_EFFECTS),
+                    'applied_effects': [], 'already_applied': True,
+                    'activation_receipt': read_activation_receipt(root), 'journal_ref': str(root / _ACTIVATION_JOURNAL),
+                    'readback': {k: _state_hash(_state_read(v)) for k, v in _activation_state_paths(root).items()},
+                    'authority_granted': False, 'typed_ce_admitted': False, 'protected_effect': 'SANDBOX_ONLY'}
+        paths = _activation_state_paths(root)
+        before = {effect: _state_read(paths[effect]) for effect in _ACTIVATION_EFFECTS}
+        snapshot = {k: _state_hash(_state_read(v)) for k, v in paths.items()}
+        successor = {'run_id': successor_id, 'runtime_plan': dict(runtime_plan),
+                     'node_allocation': dict(node_allocation), 'source_head': head, 'branch': branch}
+        after = {'selector_write': successor,
+                 'checkpoint_write': {'predecessor_run_id': predecessor_id, 'successor_run_id': successor_id,
+                                      'context_digest': _digest(successor)},
+                 'cursor_advance': {'run_id': successor_id, 'branch': branch, 'head': head}}
+        receipt_body = {'schema_id': 'gwc.q0.successor-activation-receipt.v1',
+                        'predecessor_identity': predecessor_id, 'r3_plan_digest': predecessor.get('runtime_plan_digest'),
+                        'predecessor_context_digest': _digest(predecessor), 'successor_run_id': successor_id,
+                        'successor_runtime_plan_digest': plan_digest, 'node_allocation': dict(node_allocation),
+                        'source_head': head, 'branch': branch, 'grant_ref': grant['grant_ref'],
+                        'grant_digest': grant_digest, 'effects': [
+                            {'effect': effect, 'pre_hash': _state_hash(before[effect]),
+                             'post_hash': _state_hash(after[effect])} for effect in _ACTIVATION_EFFECTS]}
+        receipt = {**receipt_body, 'receipt_digest': _digest(receipt_body)}
+        prepare = {'phase': 'PREPARE', 'idempotency_key': key, 'snapshot_hashes': snapshot,
+                   'before_state': before, 'after_state': after, 'receipt': receipt,
+                   'effects': list(_ACTIVATION_EFFECTS), 'mode': mode}
+        _journal_append(root, prepare)
+        applied = []
+        if mode == 'SANDBOX_COMMIT':
+            for effect in _ACTIVATION_EFFECTS:
+                current = _state_read(paths[effect])
+                if _state_hash(current) != _state_hash(before[effect]):
+                    raise ValueError('CAS_CONFLICT')
+                _write_json_atomic(paths[effect], after[effect])
+                applied.append(effect)
+            _journal_append(root, {'phase': 'COMMIT', 'idempotency_key': key,
+                                   'post_hashes': {k: _state_hash(_state_read(paths[k])) for k in _ACTIVATION_EFFECTS}})
+            _write_json_atomic(root / _ACTIVATION_RECEIPT, receipt)
+        return {'accepted': True, 'executed': mode == 'SANDBOX_COMMIT', 'mode': mode,
+                'effects': list(_ACTIVATION_EFFECTS), 'applied_effects': applied, 'already_applied': False,
+                'activation_receipt': receipt if mode == 'SANDBOX_COMMIT' else None,
+                'journal_ref': str(root / _ACTIVATION_JOURNAL),
+                'readback': {k: _state_hash(_state_read(v)) for k, v in paths.items()},
+                'authority_granted': False, 'typed_ce_admitted': False, 'protected_effect': 'SANDBOX_ONLY'}
+    finally:
+        _lease_release(root, owner)
+
+
 def prepare_successor_activation(envelope: Mapping[str, Any], *, authority: Mapping[str, Any] | None) -> dict[str, Any]:
     """Validate a live-activation envelope and return a non-executing preflight."""
+
     effects = envelope.get('effects') if isinstance(envelope, Mapping) else None
     if (not isinstance(envelope, Mapping)
             or envelope.get('kind') != 'LIVE_ACTIVATION_EFFECT_ENVELOPE'

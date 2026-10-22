@@ -76,17 +76,29 @@ def _validate_predecessor(predecessor: Any, successor_run_id: str, successor_dig
 def build_live_activation_effect_envelope(*, idempotency_key: str) -> dict[str, Any]:
     """Describe, but never execute, separately-authorized live activation effects."""
     _fail(isinstance(idempotency_key, str) and bool(idempotency_key.strip()), "IDEMPOTENCY_KEY_REQUIRED")
-    return {"schema_id": "gwc.q0.live-activation-effect-envelope.v1",
+    return {"schema_id": "gwc.q0.live-activation-effect-envelope.v2",
             "kind": "LIVE_ACTIVATION_EFFECT_ENVELOPE",
-            "api_entrypoint": "tools.node_architect.q0_m1_m7_integration.prepare_successor_activation",
+            "api_entrypoint": "tools.node_architect.q0_m1_m7_integration.activate_successor_plan",
+            "signature": "activate_successor_plan(*, grant, predecessor, runtime_plan, node_allocation, branch, head, sandbox_root, mode=\\\"DRY_RUN\\\") -> dict",
+            "preconditions": ["sandbox_root is an existing disposable directory outside live state and .gwc",
+                              "grant is independently issued, unexpired, scoped, and bound to all current inputs",
+                              "single-writer lease acquired; CAS snapshots match before effects"],
+            "grant_shape": {"grant_ref": "string", "authority_kind": "SEPARATE_HUMAN_OR_CONTROLLER_GRANT",
+                            "actor": "string", "scope": ["q0.live_activation.sandbox"], "issued_at": "ISO-8601 UTC",
+                            "expires_at": "ISO-8601 UTC", "bindings": {"predecessor_context_digest": "sha256:...",
+                            "runtime_plan_digest": "sha256:...", "node_allocation_digest": "sha256:...",
+                            "branch": "string", "head": "string"}},
             "effects": [
-                {"effect": "selector_write", "precondition": "separate_grant_and_successor_plan_valid"},
-                {"effect": "checkpoint_write", "precondition": "selector_binding_and_checkpoint_cas_valid"},
-                {"effect": "cursor_advance", "precondition": "checkpoint_readback_verified"}],
+                {"effect": "selector_write", "precondition": "grant and successor plan validated; selector CAS holds"},
+                {"effect": "checkpoint_write", "precondition": "selector_write readback and checkpoint CAS hold"},
+                {"effect": "cursor_advance", "precondition": "checkpoint_write readback and cursor CAS hold"}],
             "authority_required": "SEPARATE_HUMAN_OR_CONTROLLER_GRANT",
             "authority_granted": False, "executed": False,
+            "mode_available": ["DRY_RUN", "SANDBOX_COMMIT"], "live_mode": False,
             "idempotency_key": idempotency_key,
-            "refusal_codes": ["LIVE_ACTIVATION_AUTHORITY_REQUIRED"]}
+            "refusal_codes": ["LIVE_ACTIVATION_AUTHORITY_REQUIRED", "LIVE_ACTIVATION_LIVE_PATH_FORBIDDEN",
+                              "GRANT_BINDING_MISMATCH", "LEASE_HELD_BY_OTHER", "CAS_CONFLICT"]}
+
 
 
 def _dag_order(runtime_plan: Mapping[str, Any]) -> tuple[str, ...]:

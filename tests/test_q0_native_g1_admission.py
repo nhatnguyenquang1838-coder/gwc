@@ -437,3 +437,135 @@ def test_historical_evidence_is_unchanged(tmp_path):
         predecessor=_predecessor(tmp_path),
     )
     assert hashlib.sha256(historical.read_bytes()).hexdigest() == before
+
+
+def test_activation_adapter_exists_and_envelope_points_to_it():
+    from tools.node_architect import q0_m1_m7_integration as integration
+    assert callable(getattr(integration, "activate_successor_plan", None))
+    envelope = build_live_activation_effect_envelope(idempotency_key="adapter-v2")
+    assert envelope["schema_id"] == "gwc.q0.live-activation-effect-envelope.v2"
+    assert envelope["api_entrypoint"] == "tools.node_architect.q0_m1_m7_integration.activate_successor_plan"
+    assert envelope["live_mode"] is False
+
+
+def test_activation_adapter_rejects_absent_independent_grant_without_writes(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import activate_successor_plan
+    sandbox = tmp_path / "sandbox"
+    sandbox.mkdir()
+    before = {p.relative_to(sandbox).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sandbox.rglob("*") if p.is_file()}
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_AUTHORITY_REQUIRED$"):
+        activate_successor_plan(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
+                                branch="branch", head="head", sandbox_root=sandbox)
+    after = {p.relative_to(sandbox).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+             for p in sandbox.rglob("*") if p.is_file()}
+    assert after == before
+
+
+def test_activation_dry_run_has_durable_prepare_and_sealed_readback(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        activate_successor_plan, read_activation_receipt,
+    )
+    sandbox = tmp_path / "sandbox"
+    sandbox.mkdir()
+    predecessor = {"run_id": "prior-run", "context_digest": "sha256:" + "d" * 64}
+    plan = {"run_id": "next-run", "digest": "sha256:" + "a" * 64}
+    allocation = {"node_allocation_id": "alloc-1", "content_digest": {"value": "sha256:" + "c" * 64}}
+    from tools.node_architect.q0_m1_m7_integration import _digest
+    grant = {"grant_ref": "grant:1", "authority_kind": "SEPARATE_HUMAN_OR_CONTROLLER_GRANT",
+             "actor": "controller-1", "scope": ["q0.live_activation.sandbox"],
+             "issued_at": "2020-01-01T00:00:00Z", "expires_at": "2999-01-01T00:00:00Z",
+             "bindings": {"predecessor_context_digest": _digest(predecessor),
+                          "runtime_plan_digest": plan["digest"],
+                          "node_allocation_digest": allocation["content_digest"]["value"],
+                          "branch": "fix/test", "head": "b" * 40}}
+    result = activate_successor_plan(grant=grant, predecessor=predecessor, runtime_plan=plan,
+                                     node_allocation=allocation, branch="fix/test", head="b" * 40,
+                                     sandbox_root=sandbox, mode="DRY_RUN")
+    assert result["accepted"] is True and result["executed"] is False
+    assert result["authority_granted"] is False
+    assert result["typed_ce_admitted"] is False
+    assert result["protected_effect"] == "SANDBOX_ONLY"
+    assert read_activation_receipt(sandbox) is None
+    journal = json.loads((sandbox / "activation-journal.json").read_text())
+    assert journal[-1]["phase"] == "PREPARE"
+
+
+def _activation_fixture(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import _digest
+    predecessor = {"run_id": "prior-run", "context_digest": "sha256:" + "d" * 64,
+                   "runtime_plan_digest": "sha256:" + "e" * 64}
+    plan = {"run_id": "next-run", "digest": "sha256:" + "a" * 64}
+    allocation = {"node_allocation_id": "alloc-1", "content_digest": {"value": "sha256:" + "c" * 64}}
+    grant = {"grant_ref": "grant:1", "authority_kind": "SEPARATE_HUMAN_OR_CONTROLLER_GRANT",
+             "actor": "controller-1", "scope": ["q0.live_activation.sandbox"],
+             "issued_at": "2020-01-01T00:00:00Z", "expires_at": "2999-01-01T00:00:00Z",
+             "bindings": {"predecessor_context_digest": _digest(predecessor),
+                          "runtime_plan_digest": plan["digest"],
+                          "node_allocation_digest": allocation["content_digest"]["value"],
+                          "branch": "fix/test", "head": "b" * 40}}
+    sandbox = tmp_path / "sandbox-activation"
+    sandbox.mkdir()
+    return grant, predecessor, plan, allocation, sandbox
+
+
+def test_activation_sandbox_commit_orders_effects_seals_receipt_and_deduplicates(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import activate_successor_plan, read_activation_receipt
+    grant, predecessor, plan, allocation, sandbox = _activation_fixture(tmp_path)
+    kwargs = dict(grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+                  branch="fix/test", head="b" * 40, sandbox_root=sandbox, mode="SANDBOX_COMMIT")
+    result = activate_successor_plan(**kwargs)
+    assert result["executed"] is True
+    assert result["applied_effects"] == ["selector_write", "checkpoint_write", "cursor_advance"]
+    assert read_activation_receipt(sandbox)["receipt_digest"] == result["activation_receipt"]["receipt_digest"]
+    journal_path = sandbox / "activation-journal.json"
+    before = json.loads(journal_path.read_text())
+    duplicate = activate_successor_plan(**kwargs)
+    after = json.loads(journal_path.read_text())
+    assert duplicate["already_applied"] is True
+    assert after == before
+
+
+def test_activation_reconciles_prepare_and_is_repeatable(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        activate_successor_plan, read_activation_receipt, reconcile_activation_journal,
+    )
+    grant, predecessor, plan, allocation, sandbox = _activation_fixture(tmp_path)
+    activate_successor_plan(grant=grant, predecessor=predecessor, runtime_plan=plan,
+                            node_allocation=allocation, branch="fix/test", head="b" * 40,
+                            sandbox_root=sandbox, mode="DRY_RUN")
+    assert reconcile_activation_journal(sandbox)["status"] == "COMPLETED"
+    receipt = read_activation_receipt(sandbox)
+    assert receipt is not None
+    assert reconcile_activation_journal(sandbox)["status"] == "NO_PENDING_PREPARE"
+    assert read_activation_receipt(sandbox) == receipt
+
+
+def test_activation_rejects_invalid_grant_and_mode_and_holds_lease(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import activate_successor_plan
+    grant, predecessor, plan, allocation, sandbox = _activation_fixture(tmp_path)
+    kwargs = dict(grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+                  branch="fix/test", head="b" * 40, sandbox_root=sandbox)
+    for change, code in [
+        ({"authority_kind": "UNTRUSTED"}, "GRANT_AUTHORITY_KIND_INVALID"),
+        ({"grant_ref": " "}, "GRANT_IDENTITY_REQUIRED"),
+        ({"actor": " "}, "GRANT_IDENTITY_REQUIRED"),
+        ({"scope": []}, "GRANT_SCOPE_INVALID"),
+        ({"expires_at": "2000-01-01T00:00:00Z"}, "GRANT_EXPIRED"),
+        ({"issued_at": "2998-01-01T00:00:00Z"}, "GRANT_EXPIRED"),
+    ]:
+        bad = {**grant, **change}
+        with pytest.raises(ValueError, match=f"^{code}$"):
+            activate_successor_plan(**{**kwargs, "grant": bad})
+    for key, wrong in [("predecessor_context_digest", "wrong"), ("runtime_plan_digest", "wrong"),
+                       ("node_allocation_digest", "wrong"), ("branch", "wrong"), ("head", "wrong")]:
+        bad = {**grant, "bindings": {**grant["bindings"], key: wrong}}
+        with pytest.raises(ValueError, match="^GRANT_BINDING_MISMATCH$"):
+            activate_successor_plan(**{**kwargs, "grant": bad})
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_MODE_INVALID$"):
+        activate_successor_plan(**kwargs, mode="LIVE")
+    lease = sandbox / ".activation-lease.json"
+    lease.write_text(json.dumps({"owner_id": "other", "expires_at": 4102444800}))
+    with pytest.raises(ValueError, match="^LEASE_HELD_BY_OTHER$"):
+        activate_successor_plan(**kwargs, mode="SANDBOX_COMMIT")
+
