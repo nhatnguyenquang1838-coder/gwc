@@ -162,7 +162,16 @@ Own execution/continuous self-remediation of in-scope atomic child Runs with ret
   contract; only `UR.G2` consults derived authority/effect routing. G0/G1/G3/G4/G5/G6 remain
   non-protected semantic/handoff/readback routes. A route must be backed by real node descriptor,
   registry binding, instruction and callable implementation; fail closed on missing binding.
-- C2 trust correction: `resolve_authority()` must not grant solely because a derived receipt's
+- Minimize new surface to one canonical `universal_run.gate-adapter` node whose descriptor
+  explicitly declares `UR.G0`…`UR.G6`; seven route records bind each UR gate/action to that
+  node and the canonical `universal_run_gate_adapter.handle_gate` callable. Register it in
+  node_registry and update the authoritative slot/count validators (do not leave the node as
+  a proposed/unexecutable slot). The handler delegates lifecycle to `universal_run_lifecycle`,
+  topology/lineage to `universal_run_topology`/`universal_run_node`, G2 effect decisions to
+  `route_g2_effect`, and G6 consumer validation to the TargetContract validator. Keep legacy
+  GWC gate route behavior unchanged; universal-route resolution bypasses legacy G2 approval
+  packet requirements only for non-effect UR gates, and for `UR.G2` requires the C3 exact-effect
+  decision (currently C2 trust anchor unavailable → HOLD). `resolve_authority()` must not grant solely because a derived receipt's
   self-computed digest matches. The child receipt must be checked against an independently
   verified parent authority receipt/source, exact parent scope + provenance + expiry/revocation;
   caller-authored JSON/policy/mailbox/test fixture is not a trust anchor. If the canonical
