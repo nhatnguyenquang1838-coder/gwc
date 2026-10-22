@@ -17,7 +17,7 @@
         "tests/test_scrum781_q0_native_host.py",
         "-q"
       ],
-      "expected_result": "Q0_TRANSITION_BRIDGE_READY",
+      "expected_result": "Q0_LIVE_ACTIVATION_BRIDGE_CODE_READY",
       "read_paths": [
         "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
       ],

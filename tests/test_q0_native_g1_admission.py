@@ -439,6 +439,92 @@ def test_historical_evidence_is_unchanged(tmp_path):
     assert hashlib.sha256(historical.read_bytes()).hexdigest() == before
 
 
+def test_live_bridge_rejects_real_worktree_and_hermes_home_and_live_mode(tmp_path, monkeypatch):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated
+    root = Path(__file__).resolve().parents[1]
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
+        apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
+                                       branch="branch", head="head", isolated_root=root)
+    hermes_home = tmp_path / "hermes-home"
+    monkeypatch.setenv("HERMES_HOME", str(hermes_home))
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
+        apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
+                                       branch="branch", head="head", isolated_root=hermes_home / "child")
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_MODE_FORBIDDEN$"):
+        apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
+                                       branch="branch", head="head", isolated_root=tmp_path, mode="LIVE")
+
+
+def test_live_bridge_requires_typed_grant_without_writes(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated
+    root = tmp_path / "isolated"
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_AUTHORITY_REQUIRED$"):
+        apply_live_activation_isolated(grant=None, predecessor={}, runtime_plan={}, node_allocation={},
+                                       branch="fix/test", head="b" * 40, isolated_root=root)
+    assert not root.exists()
+
+
+def test_live_bridge_rejects_expired_scope_and_binding_grants(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import apply_live_activation_isolated
+    grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
+    kwargs = dict(predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+                  branch="fix/test", head="b" * 40, isolated_root=tmp_path / "target")
+    for changes, code in [({"expires_at":"2000-01-01T00:00:00Z"}, "GRANT_EXPIRED"),
+                          ({"scope":[]}, "GRANT_SCOPE_INVALID"),
+                          ({"bindings":{**grant["bindings"], "head":"wrong"}}, "GRANT_BINDING_MISMATCH")]:
+        with pytest.raises(ValueError, match=f"^{code}$"):
+            apply_live_activation_isolated(grant={**grant, **changes}, **kwargs)
+    assert not kwargs["isolated_root"].exists()
+
+
+def test_live_bridge_materializes_native_activation_idempotently_and_recovers_prepare(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        _live_activation_paths, apply_live_activation_isolated, reconcile_live_activation_journal,
+        verify_live_activation_isolated,
+    )
+    grant, predecessor, plan, allocation, _ = _activation_fixture(tmp_path)
+    root = tmp_path / "isolated-native"
+    repo_root = Path(__file__).resolve().parents[1]
+    watched = [repo_root / ".gwc", repo_root / "selector.json", repo_root / "checkpoint.json", repo_root / "cursor.json"]
+    def hashes():
+        return {str(path.relative_to(repo_root)) if path.is_relative_to(repo_root) else path.name:
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                for base in watched for path in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
+                if path.is_file()}
+    real_before = hashes()
+    r3_path = repo_root / "core/node-architect/q0-controlled-failure-frontier-r3.json"
+    r3_before = hashlib.sha256(r3_path.read_bytes()).hexdigest()
+    kwargs = dict(grant=grant, predecessor=predecessor, runtime_plan=plan, node_allocation=allocation,
+                  branch="fix/test", head="b" * 40, isolated_root=root)
+    result = apply_live_activation_isolated(**kwargs)
+    readback = verify_live_activation_isolated(root)
+    assert readback == {"resolved_plan_ref":"core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+                        "generation":1,"activation_status":"ACTIVATED"}
+    assert result["resolve_readback"] == readback
+    assert result["authority_granted"] is False and result["live_target_touched"] is False
+    import sqlite3
+    db_path = _live_activation_paths(root)["database"]
+    with sqlite3.connect(db_path) as db:
+        assert db.execute("SELECT COUNT(*) FROM engineering_plan_activation").fetchone()[0] == 1
+    before = (root / "live-activation-journal.json").read_bytes()
+    second = apply_live_activation_isolated(**kwargs)
+    assert second["already_applied"] is True
+    assert (root / "live-activation-journal.json").read_bytes() == before
+    record = _live_activation_paths(root)["record"]
+    assert record.is_relative_to(root) and record.is_file()
+
+    # A durable PREPARE can be replayed and the following reconciliation is a no-op.
+    rows = json.loads(before)
+    rows = [row for row in rows if row["phase"] == "PREPARE"]
+    (root / "live-activation-journal.json").write_text(json.dumps(rows))
+    (root / "core/node-architect/q0-engineering-coordination-route-r1.json").unlink()
+    assert reconcile_live_activation_journal(root)["status"] == "COMPLETED"
+    assert reconcile_live_activation_journal(root)["status"] == "NO_PENDING_PREPARE"
+    assert verify_live_activation_isolated(root)["generation"] == 1
+    assert hashes() == real_before
+    assert hashlib.sha256(r3_path.read_bytes()).hexdigest() == r3_before
+
+
 def test_activation_adapter_exists_and_envelope_points_to_it():
     from tools.node_architect import q0_m1_m7_integration as integration
     assert callable(getattr(integration, "activate_successor_plan", None))

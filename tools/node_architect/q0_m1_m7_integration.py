@@ -263,6 +263,171 @@ def activate_successor_plan(*, grant, predecessor, runtime_plan, node_allocation
         _lease_release(root, owner)
 
 
+_LIVE_ACTIVATION_JOURNAL = 'live-activation-journal.json'
+
+
+def _live_activation_paths(root: Path) -> dict[str, Path]:
+    activation_dir = root / ACTIVATION_RECEIPT_REF
+    return {
+        'route': root / ROUTE_REF,
+        'plan': root / 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json',
+        'record': activation_dir,
+        'database': activation_dir.parent / 'engineering-plan-activation.sqlite3',
+        'selector': root / 'selector.json',
+        'checkpoint': root / 'checkpoint.json',
+        'cursor': root / 'cursor.json',
+        'journal': root / _LIVE_ACTIVATION_JOURNAL,
+    }
+
+
+def _live_target_guard(root: Path) -> None:
+    import os
+    target = root.expanduser().resolve()
+    repo = Path(__file__).resolve().parents[2]
+    hermes_home = Path(os.environ.get('HERMES_HOME', str(Path.home() / '.hermes'))).expanduser().resolve()
+    if target == repo or repo in target.parents or target == hermes_home or hermes_home in target.parents:
+        raise ValueError('LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN')
+    gwc = target / '.gwc'
+    if gwc.is_symlink() and gwc.resolve().is_relative_to(repo / '.gwc'):
+        raise ValueError('LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN')
+
+
+def _live_db_generation(db_path: Path, plan_ref: str) -> int:
+    import sqlite3
+    if not db_path.exists():
+        return 0
+    with sqlite3.connect(f'file:{db_path}?mode=ro', uri=True) as db:
+        try:
+            row = db.execute('SELECT generation FROM engineering_plan_activation WHERE plan_ref=?',
+                             (plan_ref,)).fetchone()
+        except sqlite3.OperationalError:
+            return 0
+    return int(row[0]) if row else 0
+
+
+def reconcile_live_activation_journal(isolated_root: Path | str) -> dict[str, Any]:
+    """Finish a durable live-bridge PREPARE using only its isolated target."""
+    root = Path(isolated_root).expanduser().resolve()
+    _live_target_guard(root)
+    journal_path = root / _LIVE_ACTIVATION_JOURNAL
+    if not journal_path.exists():
+        return {'reconciled': False, 'status': 'NO_PENDING_PREPARE'}
+    rows = json.loads(journal_path.read_text('utf-8'))
+    committed = {r.get('key') for r in rows if r.get('phase') == 'COMMIT'}
+    pending = next((r for r in reversed(rows) if r.get('phase') == 'PREPARE' and r.get('key') not in committed), None)
+    if pending is None:
+        return {'reconciled': False, 'status': 'NO_PENDING_PREPARE'}
+    paths = _live_activation_paths(root)
+    for rel, content in pending['files'].items():
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp = path.with_name(path.name + '.prepare')
+        temp.write_bytes(bytes.fromhex(content))
+        temp.replace(path)
+    import sqlite3
+    db_path = paths['database']
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    with sqlite3.connect(db_path) as db:
+        db.execute('CREATE TABLE IF NOT EXISTS engineering_plan_activation '
+                   '(plan_ref TEXT PRIMARY KEY, plan_digest TEXT, context_digest TEXT, generation INTEGER, activated_at TEXT)')
+        db.execute('INSERT OR IGNORE INTO engineering_plan_activation VALUES (?,?,?,?,?)',
+                   (pending['plan_ref'], pending['plan_digest'], pending['receipt']['checkpoint_receipt_digest'],
+                    pending['generation'], pending['activated_at']))
+    rows.append({'phase': 'COMMIT', 'key': pending['key'], 'generation': pending['generation']})
+    _write_json_atomic(journal_path, rows)
+    return {'reconciled': True, 'status': 'COMPLETED'}
+
+
+def apply_live_activation_isolated(*, grant, predecessor, runtime_plan, node_allocation,
+                                   branch, head, isolated_root, mode='SIMULATE') -> dict[str, Any]:
+    """Materialize native selector artifacts in a disposable root; never enables live execution."""
+    if mode != 'SIMULATE':
+        raise ValueError('LIVE_ACTIVATION_LIVE_MODE_FORBIDDEN')
+    root = Path(isolated_root).expanduser().resolve()
+    _live_target_guard(root)
+    if not isinstance(predecessor, Mapping) or not isinstance(runtime_plan, Mapping) or not isinstance(node_allocation, Mapping):
+        raise ValueError('LIVE_ACTIVATION_BINDING_INVALID')
+    grant_digest = _validate_activation_grant(grant, predecessor, runtime_plan, node_allocation, branch, head)
+    root.mkdir(parents=True, exist_ok=True)
+    paths = _live_activation_paths(root)
+    ref = runtime_plan.get('plan_ref') or 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json'
+    if ref != 'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json':
+        raise ValueError('LIVE_ACTIVATION_BINDING_INVALID')
+    plan_bytes = (json.dumps(dict(runtime_plan), sort_keys=True, indent=2, ensure_ascii=False) + '\n').encode()
+    plan_digest = 'sha256:' + hashlib.sha256(plan_bytes).hexdigest()
+    allocation_id = node_allocation.get('node_allocation_id') or node_allocation.get('allocation_id')
+    allocation_digest = node_allocation.get('content_digest') or node_allocation.get('digest')
+    if isinstance(allocation_digest, Mapping):
+        allocation_digest = allocation_digest.get('value')
+    db_path = paths['database']
+    generation = _live_db_generation(db_path, ref) + 1
+    key = _digest({'grant_digest': grant_digest, 'predecessor': _digest(predecessor),
+                   'plan_digest': plan_digest, 'allocation_id': allocation_id,
+                   'allocation_digest': allocation_digest, 'branch': branch, 'head': head})
+    journal_path = paths['journal']
+    journal = json.loads(journal_path.read_text()) if journal_path.exists() else []
+    if any(row.get('phase') == 'COMMIT' and row.get('key') == key for row in journal):
+        return {'accepted': True, 'executed': False, 'mode': mode, 'applied_effects': [],
+                'already_applied': True, 'receipt_ref': str(paths['record']),
+                'selector_readback': _state_read(paths['selector']),
+                'resolve_readback': verify_live_activation_isolated(root),
+                'authority_granted': False, 'typed_ce_admitted': False,
+                'live_target_touched': False, 'mode_available': ['SIMULATE']}
+    source_repo = Path(__file__).resolve().parents[2]
+    route_path = source_repo / ROUTE_REF
+    route = json.loads(route_path.read_text()) if route_path.exists() else {'schema_id':'gwc.engineering-coordination-route/v1'}
+    route['approved_successor_g1'] = {**route.get('approved_successor_g1', {}),
+                                      'successor_plan_ref': ref, 'activation_status': 'ACTIVATED'}
+    stamp = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()
+    checkpoint_receipt = _digest({'key': key, 'generation': generation, 'plan_digest': plan_digest})
+    receipt = {'schema_id':'gwc.q0.plan-activation/v1', 'plan_ref':ref, 'plan_digest':plan_digest,
+               'node_allocation_id':allocation_id, 'node_allocation_digest':allocation_digest,
+               'generation':generation, 'activation_status':'ACTIVATED',
+               'predecessor_identity':predecessor.get('run_id') or predecessor.get('identity'),
+               'predecessor_plan_digest':predecessor.get('runtime_plan_digest'),
+               'predecessor_context_digest':_digest(predecessor), 'grant_digest':grant_digest,
+               'checkpoint_receipt_digest':checkpoint_receipt,
+               'checkpoint_ref':str(db_path), 'activated_at':stamp,
+               'branch':branch, 'head':head}
+    receipt['receipt_digest'] = _digest(receipt)
+    selector = {'active_plan_ref':ref, 'activation_status':'ACTIVATED', 'generation':generation}
+    checkpoint = {'plan_ref':ref, 'plan_digest':plan_digest, 'generation':generation,
+                  'checkpoint_receipt_digest':checkpoint_receipt}
+    cursor = {'plan_ref':ref, 'generation':generation}
+    files = {ROUTE_REF: (json.dumps(route, sort_keys=True, indent=2, ensure_ascii=False)+'\n').encode().hex(),
+             ref: plan_bytes.hex(), ACTIVATION_RECEIPT_REF:(json.dumps(receipt,sort_keys=True,indent=2,ensure_ascii=False)+'\n').encode().hex(),
+             'selector.json':(json.dumps(selector,sort_keys=True,indent=2)+'\n').encode().hex(),
+             'checkpoint.json':(json.dumps(checkpoint,sort_keys=True,indent=2)+'\n').encode().hex(),
+             'cursor.json':(json.dumps(cursor,sort_keys=True,indent=2)+'\n').encode().hex()}
+    journal.append({'phase':'PREPARE','key':key,'files':files,'plan_ref':ref,'plan_digest':plan_digest,
+                    'generation':generation,'receipt':receipt,'activated_at':stamp})
+    _write_json_atomic(journal_path, journal)
+    reconcile_live_activation_journal(root)
+    return {'accepted':True, 'executed':False, 'mode':mode,
+            'applied_effects':['route_write','activation_record_write','activation_row_insert','selector_copy','checkpoint_copy','cursor_copy'],
+            'already_applied':False,'receipt_ref':str(paths['record']),
+            'selector_readback':_state_read(paths['selector']),
+            'resolve_readback':verify_live_activation_isolated(root),
+            'authority_granted':False,'typed_ce_admitted':False,
+            'live_target_touched':False,'mode_available':['SIMULATE']}
+
+
+def verify_live_activation_isolated(isolated_root: Path | str) -> dict[str, Any]:
+    """Resolve native activation from disk using a fresh SQLite connection."""
+    root = Path(isolated_root).expanduser().resolve()
+    resolved = resolve_active_plan(root)
+    receipt = json.loads((root / ACTIVATION_RECEIPT_REF).read_text('utf-8'))
+    import sqlite3
+    db_path = Path(receipt['checkpoint_ref'])
+    with sqlite3.connect(f'file:{db_path}?mode=ro', uri=True) as db:
+        row = db.execute('SELECT generation FROM engineering_plan_activation WHERE plan_ref=?',
+                         (resolved,)).fetchone()
+    if row is None:
+        raise ValueError('Q0_PLAN_ACTIVATION_INVALID')
+    return {'resolved_plan_ref':resolved,'generation':int(row[0]),
+            'activation_status':receipt.get('activation_status')}
+
+
 def prepare_successor_activation(envelope: Mapping[str, Any], *, authority: Mapping[str, Any] | None) -> dict[str, Any]:
     """Validate a live-activation envelope and return a non-executing preflight."""
 
