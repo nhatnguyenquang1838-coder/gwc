@@ -152,6 +152,16 @@ Own execution/continuous self-remediation of in-scope atomic child Runs with ret
   generic G0/G1/G3/G4/G5/G6 routes exist. New routes must be canonical Node Architect records
   with real descriptors, registry bindings, instructions/implementation, schema validation and
   executable CLI coverage—not gate-name-only profile rows.
+- **Namespace separation (required):** expose generic lifecycle as `UR.G0`…`UR.G6` in the
+  Node Architect host route, distinct from legacy/effect `GWC-G*` values (`G0_CONTEXT`,
+  `G2_EXECUTION`, `G3_PR`, `G4_MERGE`, `G5_DEPLOY`, `G6_PRODUCTION_DATA`). Do not map an UR gate
+  to an effect gate. Extend the existing route resolver with an explicit `authority_model:
+  UNIVERSAL_RUN` route contract, reusing universal_run_kernel/lifecycle/topology/node and
+  `route_g2_effect`; leave existing legacy GWC route resolution and its G2 envelope/approval
+  validators unchanged. The universal route binds exact generic Root/Child manifest + target
+  contract; only `UR.G2` consults derived authority/effect routing. G0/G1/G3/G4/G5/G6 remain
+  non-protected semantic/handoff/readback routes. A route must be backed by real node descriptor,
+  registry binding, instruction and callable implementation; fail closed on missing binding.
 - C2 trust correction: `resolve_authority()` must not grant solely because a derived receipt's
   self-computed digest matches. The child receipt must be checked against an independently
   verified parent authority receipt/source, exact parent scope + provenance + expiry/revocation;
