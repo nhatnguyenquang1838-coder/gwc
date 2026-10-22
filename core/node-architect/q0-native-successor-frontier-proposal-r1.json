@@ -1,0 +1,404 @@
+{
+  "artifact_type": "Q0_NATIVE_SUCCESSOR_FRONTIER_PROPOSAL",
+  "authority_granted": false,
+  "blocked_next": {
+    "decision_owner": "GPT Controller",
+    "id": "NATIVE-PLAN-ACTIVATION",
+    "reason": "R3 max_children=0 and #159 excludes selector/checkpoint activation; a separately authorized native plan transition is absent.",
+    "release_trigger": "source-bound native G1 admission/activation decision bound to the exact candidate plan/frontier digests",
+    "status": "BLOCKED_AUTHORITY"
+  },
+  "candidate_scope_digest": "sha256:7e01e69503dd519014d2b026f2e122d91b00240caf44d5eaea5324d5465e20c0",
+  "candidate_scope_source": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "executed_effects": [],
+  "frontier_digest": "sha256:12baa72366ccb2697366d109f86356284aad4f8fd47400bed7c84cb9a4c5eff6",
+  "items": [
+    {
+      "action": "activate_native_successor_plan",
+      "depends_on": [],
+      "id": "NATIVE-PLAN-ACTIVATION",
+      "input_digest": "sha256:b039e007bb3109e611c4065c1d6420c33f53d990adf4226d781d15001a546364",
+      "missing_external_evidence": [
+        "separate exact activation authority"
+      ],
+      "missing_inputs": [],
+      "objective": "Controller-authorized native plan selector/checkpoint admission; prohibited by current R3 scope and #159 boundary.",
+      "plan_node_id": "NATIVE-PLAN-ACTIVATION",
+      "priority": 0,
+      "read_paths": [
+        "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+        "core/node-architect/q0-controlled-failure-frontier-r3.json"
+      ],
+      "write_paths": [
+        "core/node-architect/q0-engineering-coordination-route-r1.json",
+        "native-checkpoint"
+      ]
+    },
+    {
+      "action": "run_sandboxed_validation",
+      "depends_on": [
+        "NATIVE-PLAN-ACTIVATION"
+      ],
+      "id": "W1",
+      "input_digest": "sha256:f12411a3215d551e5bae1d1f1a8ea75a45ea3b0483a7cd320f62832f18558a96",
+      "missing_external_evidence": [],
+      "missing_inputs": [
+        "native activation receipt",
+        "parent native RunState binding"
+      ],
+      "objective": "Parent Q0 live Controller-to-Executor run against this activated native successor plan.",
+      "plan_node_id": "W1",
+      "priority": 1,
+      "read_paths": [
+        "tools/node_architect/agent_runtime_cli.py",
+        "tools/node_architect/universal_run_controller.py",
+        "tools/node_architect/universal_run_execution.py"
+      ],
+      "write_paths": []
+    },
+    {
+      "action": "run_sandboxed_validation",
+      "depends_on": [
+        "W1"
+      ],
+      "id": "W2",
+      "input_digest": "sha256:56985f9a8d2bdd2e91d89e420212a84bc5e5f3e4dbf0923fd4e6c017393b12c9",
+      "missing_external_evidence": [],
+      "missing_inputs": [],
+      "objective": "Node Architect allocation, route and executor receipt for the admitted parent run.",
+      "plan_node_id": "W2",
+      "priority": 2,
+      "read_paths": [
+        "tools/node_architect/resolve_gate_node_route.py",
+        "tools/node_architect/universal_run_topology.py",
+        "tools/node_architect/universal_run_controller.py"
+      ],
+      "write_paths": []
+    },
+    {
+      "action": "run_sandboxed_validation",
+      "depends_on": [
+        "W2"
+      ],
+      "id": "W3",
+      "input_digest": "sha256:ebaaaa3d537f9927c60a6eeda4def3b7316f712f0a0f0172211ba974a4111406",
+      "missing_external_evidence": [],
+      "missing_inputs": [],
+      "objective": "Separate-process LangGraph checkpoint, interrupt, resume and idempotency on scratch state.",
+      "plan_node_id": "W3",
+      "priority": 3,
+      "read_paths": [
+        "tests/test_scrum781_q0_langgraph_checkpoint_resume.py",
+        "tests/q0_langgraph_checkpoint_resume_worker.py"
+      ],
+      "write_paths": []
+    },
+    {
+      "action": "run_sandboxed_validation",
+      "depends_on": [
+        "W3"
+      ],
+      "id": "W4",
+      "input_digest": "sha256:4b0d107a696931e97b6d09a3d52849b93ff834c72579cd2a8883cc92be388b76",
+      "missing_external_evidence": [
+        "naturally observed genuine GWC runtime defect with frozen prestate/error"
+      ],
+      "missing_inputs": [],
+      "objective": "Genuine defect recovery only if a runtime defect is naturally observed.",
+      "plan_node_id": "W4",
+      "priority": 4,
+      "read_paths": [
+        "tools/node_architect/q0_qualification.py"
+      ],
+      "write_paths": []
+    },
+    {
+      "action": "run_sandboxed_validation",
+      "depends_on": [
+        "W4"
+      ],
+      "id": "W5",
+      "input_digest": "sha256:d952ab84d05797ea7d029217455d147de1a6819bee7252c8d449707c0eaa1159",
+      "missing_external_evidence": [],
+      "missing_inputs": [
+        "qualifying W4 replay",
+        "real activation LOAD_PROOF",
+        "13/13 exact matrix"
+      ],
+      "objective": "Clean 13/13 qualification and exact source-bound LOAD_PROOF, only after W4 qualifies.",
+      "plan_node_id": "W5",
+      "priority": 5,
+      "read_paths": [
+        "core/node-architect/q0-live-qualification-profile.json",
+        "tools/node_architect/q0_qualification.py"
+      ],
+      "write_paths": []
+    },
+    {
+      "action": "human_ur_g6_acceptance",
+      "depends_on": [
+        "W5"
+      ],
+      "id": "W6",
+      "input_digest": "sha256:ccdd3d647c040ce06b366e1022cacacb9b6d8cfdd242e7673ebf0d26666cdf6d",
+      "missing_external_evidence": [],
+      "missing_inputs": [
+        "authentic Q0 L3 receipt",
+        "separate Human UR.G6 decision"
+      ],
+      "objective": "Human final Q0 acceptance and LOGIN_R00_PLUS handoff after actual L3.",
+      "plan_node_id": "W6",
+      "priority": 6,
+      "read_paths": [
+        "tools/node_architect/q0_qualification.py"
+      ],
+      "write_paths": []
+    }
+  ],
+  "native_runtime_plan_digest": "sha256:dbbd7a4abb1607c9f4346696d68b1fa18a6844dceb340ca35aa58e21e3f6232e",
+  "native_runtime_plan_ref": "core/node-architect/q0-native-successor-runtime-plan-candidate-r1.json",
+  "parent_context_digest": "sha256:9369deda8c64e9a5ad414aea95c6faced44beab29efe092cc7d487d8aee2e5a5",
+  "parent_run_id": "scrum781-q0-fresh-20261010-r1",
+  "projection": {
+    "authority_granted": false,
+    "items": [
+      {
+        "fingerprint": "sha256:0595c1d9b7beb9c3dc4b50d63c650e05ef704601a8aa3fddef83b457983c05d7",
+        "id": "NATIVE-PLAN-ACTIVATION",
+        "status": "BLOCKED_AUTHORITY",
+        "work": {
+          "action": "activate_native_successor_plan",
+          "depends_on": [],
+          "id": "NATIVE-PLAN-ACTIVATION",
+          "input_digest": "sha256:b039e007bb3109e611c4065c1d6420c33f53d990adf4226d781d15001a546364",
+          "missing_external_evidence": [
+            "separate exact activation authority"
+          ],
+          "missing_inputs": [],
+          "objective": "Controller-authorized native plan selector/checkpoint admission; prohibited by current R3 scope and #159 boundary.",
+          "plan_node_id": "NATIVE-PLAN-ACTIVATION",
+          "priority": 0,
+          "read_paths": [
+            "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+            "core/node-architect/q0-controlled-failure-frontier-r3.json"
+          ],
+          "write_paths": [
+            "core/node-architect/q0-engineering-coordination-route-r1.json",
+            "native-checkpoint"
+          ]
+        }
+      },
+      {
+        "fingerprint": "sha256:9ced5d05cc93f0fc27d130cc1750e9fe866a151fe4e5bb93dcc7d8f184d984a4",
+        "id": "W1",
+        "status": "WAIT_INPUT",
+        "work": {
+          "action": "run_sandboxed_validation",
+          "depends_on": [
+            "NATIVE-PLAN-ACTIVATION"
+          ],
+          "id": "W1",
+          "input_digest": "sha256:f12411a3215d551e5bae1d1f1a8ea75a45ea3b0483a7cd320f62832f18558a96",
+          "missing_external_evidence": [],
+          "missing_inputs": [
+            "native activation receipt",
+            "parent native RunState binding"
+          ],
+          "objective": "Parent Q0 live Controller-to-Executor run against this activated native successor plan.",
+          "plan_node_id": "W1",
+          "priority": 1,
+          "read_paths": [
+            "tools/node_architect/agent_runtime_cli.py",
+            "tools/node_architect/universal_run_controller.py",
+            "tools/node_architect/universal_run_execution.py"
+          ],
+          "write_paths": []
+        }
+      },
+      {
+        "fingerprint": "sha256:17334f5469880b6f2b37b4d2db84e4bc854260d23463f8dc79b669ed9f23e156",
+        "id": "W2",
+        "status": "WAIT_INPUT",
+        "work": {
+          "action": "run_sandboxed_validation",
+          "depends_on": [
+            "W1"
+          ],
+          "id": "W2",
+          "input_digest": "sha256:56985f9a8d2bdd2e91d89e420212a84bc5e5f3e4dbf0923fd4e6c017393b12c9",
+          "missing_external_evidence": [],
+          "missing_inputs": [],
+          "objective": "Node Architect allocation, route and executor receipt for the admitted parent run.",
+          "plan_node_id": "W2",
+          "priority": 2,
+          "read_paths": [
+            "tools/node_architect/resolve_gate_node_route.py",
+            "tools/node_architect/universal_run_topology.py",
+            "tools/node_architect/universal_run_controller.py"
+          ],
+          "write_paths": []
+        }
+      },
+      {
+        "fingerprint": "sha256:f286d728dee62e1af652dc6a7f5e5a72f118f33be2bd5d39a97d2b35a5910c7e",
+        "id": "W3",
+        "status": "WAIT_INPUT",
+        "work": {
+          "action": "run_sandboxed_validation",
+          "depends_on": [
+            "W2"
+          ],
+          "id": "W3",
+          "input_digest": "sha256:ebaaaa3d537f9927c60a6eeda4def3b7316f712f0a0f0172211ba974a4111406",
+          "missing_external_evidence": [],
+          "missing_inputs": [],
+          "objective": "Separate-process LangGraph checkpoint, interrupt, resume and idempotency on scratch state.",
+          "plan_node_id": "W3",
+          "priority": 3,
+          "read_paths": [
+            "tests/test_scrum781_q0_langgraph_checkpoint_resume.py",
+            "tests/q0_langgraph_checkpoint_resume_worker.py"
+          ],
+          "write_paths": []
+        }
+      },
+      {
+        "fingerprint": "sha256:2a35a1ea12a312aba5abdda0d1d38ba50032e6c5db8ac49a50aef5fc2526ebf9",
+        "id": "W4",
+        "status": "BLOCKED_EXTERNAL_EVIDENCE",
+        "work": {
+          "action": "run_sandboxed_validation",
+          "depends_on": [
+            "W3"
+          ],
+          "id": "W4",
+          "input_digest": "sha256:4b0d107a696931e97b6d09a3d52849b93ff834c72579cd2a8883cc92be388b76",
+          "missing_external_evidence": [
+            "naturally observed genuine GWC runtime defect with frozen prestate/error"
+          ],
+          "missing_inputs": [],
+          "objective": "Genuine defect recovery only if a runtime defect is naturally observed.",
+          "plan_node_id": "W4",
+          "priority": 4,
+          "read_paths": [
+            "tools/node_architect/q0_qualification.py"
+          ],
+          "write_paths": []
+        }
+      },
+      {
+        "fingerprint": "sha256:e47695d28fd62ff34ac71edc34c306a7b5f0210a018e793a7f36360389f829d1",
+        "id": "W5",
+        "status": "WAIT_INPUT",
+        "work": {
+          "action": "run_sandboxed_validation",
+          "depends_on": [
+            "W4"
+          ],
+          "id": "W5",
+          "input_digest": "sha256:d952ab84d05797ea7d029217455d147de1a6819bee7252c8d449707c0eaa1159",
+          "missing_external_evidence": [],
+          "missing_inputs": [
+            "qualifying W4 replay",
+            "real activation LOAD_PROOF",
+            "13/13 exact matrix"
+          ],
+          "objective": "Clean 13/13 qualification and exact source-bound LOAD_PROOF, only after W4 qualifies.",
+          "plan_node_id": "W5",
+          "priority": 5,
+          "read_paths": [
+            "core/node-architect/q0-live-qualification-profile.json",
+            "tools/node_architect/q0_qualification.py"
+          ],
+          "write_paths": []
+        }
+      },
+      {
+        "fingerprint": "sha256:890bfb41154f283cd4b3b30c8c297fc425729c8197de8c1568106500a91c7dfc",
+        "id": "W6",
+        "status": "BLOCKED_AUTHORITY",
+        "work": {
+          "action": "human_ur_g6_acceptance",
+          "depends_on": [
+            "W5"
+          ],
+          "id": "W6",
+          "input_digest": "sha256:ccdd3d647c040ce06b366e1022cacacb9b6d8cfdd242e7673ebf0d26666cdf6d",
+          "missing_external_evidence": [],
+          "missing_inputs": [
+            "authentic Q0 L3 receipt",
+            "separate Human UR.G6 decision"
+          ],
+          "objective": "Human final Q0 acceptance and LOGIN_R00_PLUS handoff after actual L3.",
+          "plan_node_id": "W6",
+          "priority": 6,
+          "read_paths": [
+            "tools/node_architect/q0_qualification.py"
+          ],
+          "write_paths": []
+        }
+      }
+    ],
+    "runtime_plan_digest": "sha256:dbbd7a4abb1607c9f4346696d68b1fa18a6844dceb340ca35aa58e21e3f6232e",
+    "selected_work": null,
+    "source_head": "3ae4646abd519b9d30476c194047e8b2a3f809fc"
+  },
+  "proposal_only": true,
+  "recursive_plan": {
+    "atomic": false,
+    "children": [
+      {
+        "atomic": true,
+        "depends_on": [],
+        "id": "NATIVE-PLAN-ACTIVATION"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "NATIVE-PLAN-ACTIVATION"
+        ],
+        "id": "W1"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W1"
+        ],
+        "id": "W2"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W2"
+        ],
+        "id": "W3"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W3"
+        ],
+        "id": "W4"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W4"
+        ],
+        "id": "W5"
+      },
+      {
+        "atomic": true,
+        "depends_on": [
+          "W5"
+        ],
+        "id": "W6"
+      }
+    ],
+    "id": "Q0-NATIVE-SUCCESSOR-G1"
+  },
+  "schema_id": "gwc.q0.native-successor-frontier-proposal/v1",
+  "schema_version": 1,
+  "source_head": "3ae4646abd519b9d30476c194047e8b2a3f809fc",
+  "status": "PROPOSED_NOT_ACTIVATED"
+}
