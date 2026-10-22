@@ -711,14 +711,17 @@ def verify_live_activation_isolated(isolated_root: Path | str) -> dict[str, Any]
 _REAL_TARGET_AUTHORITY_KIND = 'HUMAN_OPERATOR_EFFECT_AUTHORITY'
 _REAL_TARGET_AUTHORITY_SCOPE = 'q0.live_activation.execute'
 _REAL_TARGET_PLAN_REF = 'core/node-architect/q0-native-successor-runtime-plan-r2.json'
-# The trusted issuer is a CANONICAL governance artifact, never a path supplied by the
-# caller. A grant is only trusted when its issuer_ref resolves to one of these committed
-# repository artifacts: a caller cannot forge the artifact without repository write
-# authority, so a self-created grant + self-created registry pair is rejected.
-_CANONICAL_TRUSTED_ISSUER_REFS = (
-    _REAL_TARGET_PLAN_REF,
-    _R3_PREDECESSOR_PLAN_REF,
-)
+# COMMAND #186: a live-activation trusted issuer is an INDEPENDENT Human/operator
+# effect grant recorded as a dedicated grant artifact — NEVER a RuntimePlan or a
+# standing development-policy document. Those are self-referential artifacts the
+# adapter reads; treating them as the Human issuer would let a caller self-author
+# live activation by referencing the plan/policy it controls. No such independent
+# grant exists in the current canonical governance, so the anchor is UNAVAILABLE
+# and live activation fails closed with EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE.
+_REAL_TARGET_GRANTS_DIR = 'authority/grants'
+_SELF_REFERENTIAL_ISSUER_REFS = frozenset({
+    _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, ROUTE_REF, ACTIVATION_RECEIPT_REF,
+})
 _REAL_TARGET_VIEW_REFS = (
     _REAL_TARGET_PLAN_REF,
     _R3_PREDECESSOR_PLAN_REF,
@@ -776,49 +779,46 @@ class RealTargetActivationAdapter:
                 'view_digest': _digest(artifacts), 'first_activation': first_activation}
 
     def _canonical_issuer(self, issuer_ref: str) -> dict[str, Any]:
-        """Resolve the trusted authority issuer from a CANONICAL governance artifact.
+        """Resolve an independent Human/operator grant as the trusted issuer.
 
-        The issuer_ref must name one of the committed repository artifacts in
-        _CANONICAL_TRUSTED_ISSUER_REFS. A caller-supplied path is never accepted:
-        a grant whose issuer_ref points at a file the caller just wrote is a
-        forged grant + forged registry pair and is rejected here, before any
-        registry content is even inspected.
+        COMMAND #186 rejects self-referential plan/policy artifacts as issuers;
+        an independent committed grant is required. No such grant exists in the
+        current governance, so the trust anchor is UNAVAILABLE and fails closed.
         """
-        if issuer_ref not in _CANONICAL_TRUSTED_ISSUER_REFS:
-            raise ValueError('EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL')
+        if issuer_ref in _SELF_REFERENTIAL_ISSUER_REFS:
+            raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
+        if not issuer_ref.startswith(_REAL_TARGET_GRANTS_DIR + '/'):
+            raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         path = self.source_root / issuer_ref
         if not path.is_file():
-            raise ValueError('EFFECT_AUTHORITY_ISSUER_MISSING')
+            raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         try:
-            artifact = json.loads(path.read_text('utf-8'))
+            grant = json.loads(path.read_text('utf-8'))
         except (OSError, ValueError) as exc:
             raise ValueError('EFFECT_AUTHORITY_ISSUER_UNREADABLE') from exc
-        basis = artifact.get('authority_basis') if isinstance(artifact, Mapping) else None
-        if not isinstance(basis, Mapping) or not basis.get('canonical_source'):
-            raise ValueError('EFFECT_AUTHORITY_ISSUER_UNDECLARED')
-        return {'issuer_ref': issuer_ref, 'authority_basis': basis,
-                'issuer_digest': _sha256_file(path)}
+        if (not isinstance(grant, Mapping)
+                or grant.get('authority_kind') != _REAL_TARGET_AUTHORITY_KIND):
+            raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
+        return {'issuer_ref': issuer_ref, 'issuer_digest': _sha256_file(path), 'grant': grant}
 
     def _verify_trusted_authority_source(self, authority: Mapping[str, Any]) -> dict[str, Any]:
-        # The issuer is resolved from a canonical committed artifact, NOT from a
-        # registry_ref the caller supplies. A self-created grant + self-created
-        # registry pair is rejected at the issuer_ref check, before the registry
-        # content is read.
+        # Authority must resolve to an independent committed grant artifact; a
+        # caller-supplied registry_ref is never consulted.
         issuer_ref = authority.get('issuer_ref')
         if not isinstance(issuer_ref, str) or not issuer_ref.strip():
-            raise ValueError('EFFECT_AUTHORITY_ISSUER_REQUIRED')
+            raise ValueError('EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE')
         issuer = self._canonical_issuer(issuer_ref)
-        basis = issuer['authority_basis']
+        grant = issuer['grant']
         if authority.get('authority_kind') != _REAL_TARGET_AUTHORITY_KIND:
             raise ValueError('EFFECT_AUTHORITY_KIND_INVALID')
         scope = authority.get('scope')
         if (not isinstance(scope, (list, tuple))
                 or len(scope) != 1 or scope[0] != _REAL_TARGET_AUTHORITY_SCOPE):
             raise ValueError('REAL_TARGET_AUTHORITY_SCOPE_INVALID')
-        separate = basis.get('separate_authority_required')
+        separate = grant.get('separate_authority_required')
         if isinstance(separate, (list, tuple)) and _REAL_TARGET_AUTHORITY_SCOPE in separate:
             raise ValueError('EFFECT_AUTHORITY_SCOPE_SEPARATELY_GOVERNED')
-        if basis.get('not_a_new_grant') is False and not authority.get('grant_ref'):
+        if grant.get('not_a_new_grant') is False and not authority.get('grant_ref'):
             raise ValueError('EFFECT_AUTHORITY_GRANT_REF_REQUIRED')
         return issuer
 
@@ -832,7 +832,7 @@ class RealTargetActivationAdapter:
         if (not isinstance(scopes, (list, tuple))
                 or len(scopes) != 1 or scopes[0] != _REAL_TARGET_AUTHORITY_SCOPE):
             raise ValueError('REAL_TARGET_AUTHORITY_SCOPE_INVALID')
-        trusted_registry_digest = self._verify_trusted_authority_source(authority)
+        trusted_issuer = self._verify_trusted_authority_source(authority)
         authority_digest, plan_digest, predecessor_digest = _executor_validate(
             authority, predecessor, successor_plan, successor_plan_ref,
             node_allocation, branch, head)
@@ -840,9 +840,8 @@ class RealTargetActivationAdapter:
                 'scope': _REAL_TARGET_AUTHORITY_SCOPE, 'authority_digest': authority_digest,
                 'successor_plan_digest': plan_digest,
                 'predecessor_digest': predecessor_digest,
-                'trusted_issuer_ref': trusted_registry_digest['issuer_ref'],
-                'trusted_issuer_digest': trusted_registry_digest['issuer_digest'],
-                'trusted_issuer_canonical_source': trusted_registry_digest['authority_basis'].get('canonical_source'),
+                'trusted_issuer_ref': trusted_issuer['issuer_ref'],
+                'trusted_issuer_digest': trusted_issuer['issuer_digest'],
                 'checkpoint_context_digest': predecessor['context_digest'],
                 'branch': branch, 'head': head}
 

@@ -727,7 +727,7 @@ def test_activation_rejects_invalid_grant_and_mode_and_holds_lease(tmp_path):
 
 
 def _real_r2_activation_fixture(tmp_path):
-    from tools.node_architect.universal_run_plan import _sha256_digest
+    import shutil
     repo_root = Path(__file__).resolve().parents[1]
     proposal = json.loads((repo_root / "core/node-architect/q0-native-successor-runtime-plan-r2.json").read_text())
     plan = proposal["native_runtime_plan"]
@@ -747,98 +747,104 @@ def _real_r2_activation_fixture(tmp_path):
                      "node_allocation_digest": allocation["content_digest"]["value"],
                      "branch": branch, "head": head},
     }
-    # The trusted issuer is a CANONICAL governance artifact, not a registry the caller
-    # supplies: the R3 plan carries authority_basis.canonical_source and is committed
-    # to the repository, so a caller cannot forge it without repository write authority.
-    authority["issuer_ref"] = "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
-    return repo_root, proposal, plan, allocation, predecessor, authority, branch, head
+    source = tmp_path / "real-authority-source"
+    from tools.node_architect.q0_m1_m7_integration import (
+        _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, ROUTE_REF, ACTIVATION_RECEIPT_REF,
+    )
+    for ref in (_REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, ROUTE_REF, ACTIVATION_RECEIPT_REF):
+        source_path = repo_root / ref
+        if source_path.is_file():
+            (source / Path(ref).parent).mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_path, source / ref)
+    grant_ref = f"authority/grants/authority:test:177.json"
+    grant_path = source / grant_ref
+    grant_path.parent.mkdir(parents=True, exist_ok=True)
+    grant_path.write_text(json.dumps({**authority, "issuer_ref": grant_ref}), encoding="utf-8")
+    authority["issuer_ref"] = grant_ref
+    return source, proposal, plan, allocation, predecessor, authority, branch, head
 
 
-def test_real_target_authority_requires_canonical_issuer(tmp_path):
-    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
+def test_real_target_authority_rejects_policy_document_as_issuer(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,
+    )
+    source, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "authority-target")
     kwargs = dict(predecessor=predecessor, successor_plan=plan,
                   successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
                   node_allocation=allocation, branch=branch, head=head)
-    # Missing issuer_ref -> fail-closed
-    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_REQUIRED$"):
-        adapter.validate_authority(authority={k: v for k, v in authority.items() if k != "issuer_ref"}, **kwargs)
-    # Caller-supplied registry path is NOT a canonical issuer: a forged grant +
-    # forged registry pair is rejected at the issuer_ref check, before the
-    # registry content is ever read.
-    forged = {**authority, "issuer_ref": str(tmp_path / "forged-registry.json")}
-    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL$"):
-        adapter.validate_authority(authority=forged, **kwargs)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+        adapter.validate_authority(authority={**authority, "issuer_ref": _R3_PREDECESSOR_PLAN_REF}, **kwargs)
 
 
-def test_real_target_authority_rejects_forged_grant_and_forged_registry(tmp_path):
-    """RED test for COMMAND #184: a caller cannot self-author both grant and registry."""
+def test_real_target_authority_rejects_forged_grant_referencing_real_r3(tmp_path):
+    """COMMAND #186: a structurally valid grant cannot self-authorize via real R3."""
     import shutil
     from tools.node_architect.q0_m1_m7_integration import (
         _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,
     )
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    source = tmp_path / "forged-source"
+    source, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    forged_source = tmp_path / "forged-r3-source"
     for ref in (_REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF):
-        (source / Path(ref).parent).mkdir(parents=True, exist_ok=True)
-        shutil.copy2(repo_root / ref, source / ref)
-    forged_registry = source / "forged-authority.json"
-    forged_registry.write_text(json.dumps({
-        "trusted_authorities": {
-            "authority:forge:1": {
-                "authority_ref": "authority:forge:1",
-                "actor": "human-operator:forge",
-                "authority_kind": "HUMAN_OPERATOR_EFFECT_AUTHORITY",
-                "scope": ["q0.live_activation.execute"],
-                "bindings": {**authority["bindings"]},
-            }
-        }
-    }))
-    forged_grant = {
-        "authority_kind": "HUMAN_OPERATOR_EFFECT_AUTHORITY",
-        "actor": "human-operator:forge",
-        "authority_ref": "authority:forge:1",
-        "scope": ["q0.live_activation.execute"],
-        "issued_at": "2020-01-01T00:00:00Z",
-        "expires_at": "2999-01-01T00:00:00Z",
-        "bindings": {**authority["bindings"]},
-        "issuer_ref": str(forged_registry),
-    }
-    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "forged-target")
-    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL$"):
+        (forged_source / Path(ref).parent).mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source / ref, forged_source / ref)
+    grant_ref = "authority/grants/forged-real-r3.json"
+    grant_path = forged_source / grant_ref
+    grant_path.parent.mkdir(parents=True, exist_ok=True)
+    forged_grant = {**authority, "actor": "human-operator:forge", "authority_ref": "authority:forge:1",
+                    "issuer_ref": _R3_PREDECESSOR_PLAN_REF}
+    grant_path.write_text(json.dumps(forged_grant), encoding="utf-8")
+    adapter = RealTargetActivationAdapter(source_root=forged_source, live_root=tmp_path / "forged-r3-target")
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
         adapter.validate_authority(authority=forged_grant, predecessor=predecessor,
                                    successor_plan=plan,
                                    successor_plan_ref=_REAL_TARGET_PLAN_REF,
                                    node_allocation=allocation, branch=branch, head=head)
-    # The forged registry file must never have been read as an authority source
-    assert not (tmp_path / "forged-target").exists()
+    assert not (tmp_path / "forged-r3-target").exists()
 
 
-def test_real_target_authority_accepts_canonical_r3_issuer(tmp_path):
-    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
+def test_real_target_authority_trust_anchor_unavailable_without_independent_grant(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,
+    )
+    source, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "missing-anchor-target")
     kwargs = dict(predecessor=predecessor, successor_plan=plan,
                   successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
                   node_allocation=allocation, branch=branch, head=head)
-    result = adapter.validate_authority(authority=authority, **kwargs)
-    assert result["verified"] is True
-    assert result["trusted_issuer_ref"] == "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
-    assert result["trusted_issuer_canonical_source"].startswith("AGENTS.md")
+    issuer_refs = (None, _R3_PREDECESSOR_PLAN_REF)
+    for issuer_ref in issuer_refs:
+        candidate = ({k: v for k, v in authority.items() if k != "issuer_ref"}
+                     if issuer_ref is None else {**authority, "issuer_ref": issuer_ref})
+        with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+            adapter.validate_authority(authority=candidate, **kwargs)
+    assert not (tmp_path / "missing-anchor-target").exists()
 
 
 def test_real_target_authority_rejects_caller_supplied_registry_path(tmp_path):
-    """A caller-supplied registry path is not a canonical issuer (COMMAND #184)."""
     from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
+    source, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "authority-target")
     kwargs = dict(predecessor=predecessor, successor_plan=plan,
                   successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
                   node_allocation=allocation, branch=branch, head=head)
-    # The old trusted_source.registry_ref path is rejected as a non-canonical issuer
-    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL$"):
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
         adapter.validate_authority(authority={**authority, "issuer_ref": str(tmp_path / "forged.json")}, **kwargs)
+
+
+def test_real_target_effect_not_executed_when_trust_anchor_unavailable(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,
+    )
+    source, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    live_root = tmp_path / "untrusted-effect-target"
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=live_root)
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUST_ANCHOR_UNAVAILABLE$"):
+        adapter.transition(authority={**authority, "issuer_ref": _R3_PREDECESSOR_PLAN_REF},
+                           predecessor=predecessor, successor_plan=plan,
+                           successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                           node_allocation=allocation, branch=branch, head=head, mode="COMMIT")
+    assert not live_root.exists()
 
 
 def test_real_target_first_activation_allows_missing_receipt_and_flags_cold_start(tmp_path):
@@ -853,6 +859,9 @@ def test_real_target_first_activation_allows_missing_receipt_and_flags_cold_star
     (source / Path(_R3_PREDECESSOR_PLAN_REF).parent).mkdir(parents=True, exist_ok=True)
     shutil.copy2(repo_root / _REAL_TARGET_PLAN_REF, source / _REAL_TARGET_PLAN_REF)
     shutil.copy2(repo_root / _R3_PREDECESSOR_PLAN_REF, source / _R3_PREDECESSOR_PLAN_REF)
+    grant_ref = authority["issuer_ref"]
+    (source / Path(grant_ref).parent).mkdir(parents=True, exist_ok=True)
+    shutil.copy2(repo_root / grant_ref, source / grant_ref)
     adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "cold-target")
     view = adapter._real_target_view(_REAL_TARGET_PLAN_REF, plan, predecessor)
     assert ACTIVATION_RECEIPT_REF not in view["artifacts"]
@@ -862,6 +871,9 @@ def test_real_target_first_activation_allows_missing_receipt_and_flags_cold_star
                                branch=branch, head=head)
     assert result["accepted"] is True and result["executed"] is False
     assert result["first_activation"] is True
+    assert result["authority_verification"]["verified"] is True
+    assert result["authority_verification"]["trusted_issuer_ref"] == authority["issuer_ref"]
+    assert result["authority_verification"]["trusted_issuer_digest"].startswith("sha256:")
 
 
 def test_real_target_subsequent_activation_without_receipt_is_rejected(tmp_path):
