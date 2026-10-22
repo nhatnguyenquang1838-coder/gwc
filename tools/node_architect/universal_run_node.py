@@ -714,8 +714,62 @@ class RecursiveRunDag:
                                    "gate": self._host_gate(gate), "requested_action": "RUN", "authority": run_authority,
                                    "state": run_state, "event_id": f"{run_id}:{gate}"})
                     response = self.runtime_event(**kwargs)
-                    if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED"}:
-                        response_status = str(response.get("status", "" )).upper() if isinstance(response, Mapping) else ""
+                    host_response: Mapping[str, Any] = response if isinstance(response, Mapping) else {}
+                    semantic_host = host_response.get("status") in {
+                        "SEMANTIC_NODE_COMPLETE", "SEMANTIC_NODE_BLOCKED", "SEMANTIC_NODE_NOT_APPLICABLE"
+                    }
+                    if semantic_host:
+                        host_status = str(host_response.get("status"))
+                        if host_status == "SEMANTIC_NODE_BLOCKED":
+                            waiting = True
+                            failure = str(host_response.get("reason_code") or "SEMANTIC_NODE_BLOCKED")
+                            break
+                        if host_status == "SEMANTIC_NODE_NOT_APPLICABLE":
+                            applicability = host_response.get("applicability")
+                            raw_outcome = host_response.get("transfer_outcome")
+                            if (isinstance(applicability, Mapping)
+                                    and applicability.get("decision") == "NOT_APPLICABLE"
+                                    and isinstance(raw_outcome, Mapping)
+                                    and raw_outcome.get("kind") in TRANSFER_OUTCOME_KINDS
+                                    and isinstance(raw_outcome.get("reason"), str)
+                                    and raw_outcome["reason"].strip()):
+                                outcome = TransferOutcome(str(raw_outcome["kind"]), raw_outcome["reason"]).to_dict()
+                                outcomes[gate] = outcome
+                                gate_store[gate] = {"outcome": outcome}
+                                continue
+                            waiting = True
+                            failure = "CANONICAL_NOT_APPLICABLE_OUTCOME_MISSING"
+                            break
+                        next_route = host_response.get("next_route")
+                        readback = host_response.get("readback")
+                        if (not isinstance(next_route, Mapping)
+                                or next_route.get("disposition") != "stop"
+                                or next_route.get("next_node") is not None
+                                or next_route.get("next_action") is not None
+                                or not next_route.get("next_gate")):
+                            waiting = True
+                            failure = "CANONICAL_NEXT_ROUTE_INVALID"
+                            break
+                        evidence_summary = host_response.get("evidence_summary")
+                        if (not isinstance(readback, Mapping)
+                                or readback.get("status") != "VERIFIED"
+                                or host_response.get("canonical_readback_verified") is not True
+                                or not isinstance(evidence_summary, Mapping)):
+                            waiting = True
+                            failure = "CANONICAL_GATE_READBACK_OR_EVIDENCE_MISSING"
+                            break
+                        response = {**dict(host_response), "evidence": {
+                            "semantic_status": "SEMANTIC_NODE_COMPLETE",
+                            "evidence_summary": dict(evidence_summary),
+                            "readback": dict(readback),
+                            "next_route": dict(next_route),
+                        }, "target_readback": dict(readback)}
+                    if isinstance(response, Mapping) and response.get("status") == "AGENT_RUNTIME_BLOCKED":
+                        waiting = True
+                        failure = str(response.get("reason_code") or "AGENT_RUNTIME_BLOCKED")
+                        break
+                    if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED", "SEMANTIC_NODE_COMPLETE"}:
+                        response_status = str(response.get("status", "")).upper() if isinstance(response, Mapping) else ""
                         waiting = response_status in {"WAITING", "HOLD", "BLOCKED"}
                         failure = str(response.get("reason_code", "CHILD_EVENT_NOT_COMPLETED")) if isinstance(response, Mapping) else "CHILD_EVENT_INVALID"
                         break
@@ -738,7 +792,10 @@ class RecursiveRunDag:
                     if gate == "G6":
                         candidate = response.get("g6_receipt")
                         if not isinstance(candidate, Mapping) or candidate.get("status") != "ACCEPTED" or not candidate.get("receipt_id"):
-                            failure = "CHILD_G6_NOT_ACCEPTED"
+                            failure = ("G6_ACCEPTANCE_EVIDENCE_MISSING"
+                                       if response.get("status") == "SEMANTIC_NODE_COMPLETE"
+                                       else "CHILD_G6_NOT_ACCEPTED")
+                            waiting = response.get("status") == "SEMANTIC_NODE_COMPLETE"
                             break
                         g6 = copy.deepcopy(dict(candidate))
                     evidence[gate] = copy.deepcopy(response.get("evidence"))
@@ -849,8 +906,58 @@ class RecursiveRunDag:
                                        "gate": self._host_gate(gate), "requested_action": "RUN", "authority": run_authority,
                                        "state": run_state, "event_id": f"{run_id}:{gate}"})
                         response = self.runtime_event(**kwargs)
-                        if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED"}:
+                        host_response: Mapping[str, Any] = response if isinstance(response, Mapping) else {}
+                        if host_response.get("status") == "SEMANTIC_NODE_BLOCKED":
+                            waiting = True
+                            failure = str(host_response.get("reason_code") or "SEMANTIC_NODE_BLOCKED")
+                            break
+                        if host_response.get("status") == "SEMANTIC_NODE_NOT_APPLICABLE":
+                            applicability = host_response.get("applicability")
+                            raw_outcome = host_response.get("transfer_outcome")
+                            if (isinstance(applicability, Mapping)
+                                    and applicability.get("decision") == "NOT_APPLICABLE"
+                                    and isinstance(raw_outcome, Mapping)
+                                    and raw_outcome.get("kind") in TRANSFER_OUTCOME_KINDS
+                                    and isinstance(raw_outcome.get("reason"), str)
+                                    and raw_outcome["reason"].strip()):
+                                outcome = TransferOutcome(str(raw_outcome["kind"]), raw_outcome["reason"]).to_dict()
+                                outcomes[gate] = outcome
+                                gate_store[gate] = {"outcome": outcome}
+                                continue
+                            waiting = True
+                            failure = "CANONICAL_NOT_APPLICABLE_OUTCOME_MISSING"
+                            break
+                        if host_response.get("status") == "SEMANTIC_NODE_COMPLETE":
+                            next_route = host_response.get("next_route")
+                            readback = host_response.get("readback")
+                            evidence_summary = host_response.get("evidence_summary")
+                            if (not isinstance(next_route, Mapping)
+                                    or next_route.get("disposition") != "stop"
+                                    or next_route.get("next_node") is not None
+                                    or next_route.get("next_action") is not None
+                                    or not next_route.get("next_gate")):
+                                waiting = True
+                                failure = "CANONICAL_NEXT_ROUTE_INVALID"
+                                break
+                            if (not isinstance(readback, Mapping) or readback.get("status") != "VERIFIED"
+                                    or host_response.get("canonical_readback_verified") is not True
+                                    or not isinstance(evidence_summary, Mapping)):
+                                waiting = True
+                                failure = "CANONICAL_GATE_READBACK_OR_EVIDENCE_MISSING"
+                                break
+                            response = {**dict(host_response), "evidence": {
+                                "semantic_status": "SEMANTIC_NODE_COMPLETE",
+                                "evidence_summary": dict(evidence_summary),
+                                "readback": dict(readback),
+                                "next_route": dict(next_route),
+                            }, "target_readback": dict(readback)}
+                        if isinstance(response, Mapping) and response.get("status") == "AGENT_RUNTIME_BLOCKED":
+                            waiting = True
+                            failure = str(response.get("reason_code") or "AGENT_RUNTIME_BLOCKED")
+                            break
+                        if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED", "SEMANTIC_NODE_COMPLETE"}:
                             failure = str(response.get("reason_code", "CHILD_EVENT_NOT_COMPLETED")) if isinstance(response, Mapping) else "CHILD_EVENT_INVALID"
+                            waiting = isinstance(response, Mapping) and response.get("status") in {"WAITING", "HOLD", "BLOCKED"}
                             break
                         if gate in {"G4", "G5"} and (not isinstance(response.get("target_readback"), Mapping)
                                                        or response["target_readback"].get("status") != "VERIFIED"):
@@ -859,7 +966,10 @@ class RecursiveRunDag:
                         if gate == "G6":
                             candidate = response.get("g6_receipt")
                             if not isinstance(candidate, Mapping) or candidate.get("status") != "ACCEPTED" or not candidate.get("receipt_id"):
-                                failure = "CHILD_G6_NOT_ACCEPTED"
+                                failure = ("G6_ACCEPTANCE_EVIDENCE_MISSING"
+                                           if response.get("status") == "SEMANTIC_NODE_COMPLETE"
+                                           else "CHILD_G6_NOT_ACCEPTED")
+                                waiting = response.get("status") == "SEMANTIC_NODE_COMPLETE"
                                 break
                             g6 = copy.deepcopy(dict(candidate))
                         evidence[gate] = copy.deepcopy(response.get("evidence"))
@@ -876,6 +986,7 @@ class RecursiveRunDag:
                 result = {
                     "run_id": run_id, "status": "WAITING" if waiting else "FAILED" if failed else "COMPLETED",
                     "failure_code": failure or ("CHILD_G6_NOT_ACCEPTED" if not accepted_children else None),
+                    "c1_status": "INTEGRATION_PENDING",
                     "gate_evidence": evidence, "gate_readbacks": readbacks, "gate_outcomes": outcomes,
                     "children": children,
                     "g6_receipt": copy.deepcopy(dict(g6)) if isinstance(g6, Mapping) and g6.get("status") == "ACCEPTED" else None,
