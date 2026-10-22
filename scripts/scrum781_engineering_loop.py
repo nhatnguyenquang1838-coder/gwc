@@ -12,15 +12,20 @@ import argparse
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import sqlite3
 import subprocess
-import sys
 import time
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+try:
+    from tools.node_architect.q0_python_env import sanitize_python_path
+    sanitize_python_path()
+except Exception:
+    pass
 from tools.node_architect.q0_m1_m7_integration import (build_q0_operation, PLAN_REF,
                                                       resolve_active_plan, resolve_frontier_ref)
 from tools.node_architect.q0_engineering_loop import assess_engineering_resume, engineering_prompt

@@ -178,3 +178,74 @@ class Q0BrowserBindingTests(unittest.TestCase):
                                    run_id=RUN, session_id=SID,
                                    controller_url=self.current()['conversation_url'])
         self.assertEqual(raised.exception.code, 'BINDING_NOT_DELIVERED')
+
+
+class Q0PythonEnvTests(unittest.TestCase):
+    def test_foreign_site_packages_entries_detected(self):
+        from tools.node_architect.q0_python_env import foreign_pythonpath_entries
+        self.assertEqual(foreign_pythonpath_entries({'PYTHONPATH': '/opt/lib/python3.14/site-packages'}),
+                         ['/opt/lib/python3.14/site-packages'])
+
+    def test_same_version_site_packages_entry_kept(self):
+        import sys
+        from tools.node_architect.q0_python_env import foreign_pythonpath_entries
+        major, minor = sys.version_info[:2]
+        entry = f'/opt/lib/python{major}.{minor}/site-packages'
+        self.assertEqual(foreign_pythonpath_entries({'PYTHONPATH': entry}), [])
+
+    def test_sanitize_removes_foreign_entry_from_syspath_and_environ(self):
+        import os
+        import sys
+        from tools.node_architect.q0_python_env import sanitize_python_path
+        foreign = '/opt/lib/python3.14/site-packages'
+        old_env = os.environ.get('PYTHONPATH')
+        old_path = list(sys.path)
+        try:
+            os.environ['PYTHONPATH'] = os.pathsep.join([foreign, '/keep/me'])
+            sys.path.insert(0, foreign)
+            self.assertEqual(sanitize_python_path(), [foreign])
+            self.assertNotIn(foreign, sys.path)
+            self.assertEqual(os.environ['PYTHONPATH'], '/keep/me')
+        finally:
+            sys.path[:] = old_path
+            if old_env is None:
+                os.environ.pop('PYTHONPATH', None)
+            else:
+                os.environ['PYTHONPATH'] = old_env
+
+    def test_clean_env_sets_path_and_drops_foreign_pythonpath(self):
+        from tools.node_architect.q0_python_env import clean_env
+        result = clean_env({'PATH': '/usr/bin:/bin', 'PYTHONPATH': '/opt/lib/python3.14/site-packages:/keep'})
+        self.assertNotIn('/opt/lib/python3.14/site-packages', result.get('PYTHONPATH', ''))
+        self.assertEqual(result['PATH'].split(':')[0], str(__import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python().parent))
+        self.assertEqual(result['PATH'].count(str(__import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python().parent)), 1)
+
+    def test_canonical_python_prefers_env_var_then_venv_then_sys_executable(self):
+        import os
+        from pathlib import Path
+        from unittest.mock import patch
+        from tools.node_architect import q0_python_env as envmod
+        with patch.dict(os.environ, {'Q0_PYTHON': '/custom/python'}):
+            with patch.object(Path, 'is_file', autospec=True, side_effect=lambda self: str(self) == '/custom/python'), patch('os.access', side_effect=lambda path, mode: str(path) == '/custom/python'):
+                self.assertEqual(envmod.canonical_python(), Path('/custom/python'))
+        with patch.dict(os.environ, {}, clear=True):
+            with patch.object(Path, 'exists', autospec=True, side_effect=lambda self: str(self) == str(envmod.CANONICAL_VENV / 'bin/python')):
+                with patch.object(Path, 'is_file', return_value=True), patch('os.access', return_value=True):
+                    self.assertEqual(envmod.canonical_python(), envmod.CANONICAL_VENV / 'bin/python')
+            with patch.object(Path, 'exists', return_value=False):
+                self.assertEqual(envmod.canonical_python(), Path(__import__('sys').executable))
+
+    def test_cli_help_survives_foreign_pythonpath(self):
+        import os
+        import subprocess
+        import sys
+        import tempfile
+        with tempfile.TemporaryDirectory() as directory:
+            foreign = Path(directory) / 'lib/python3.14/site-packages'
+            foreign.mkdir(parents=True)
+            env = os.environ.copy()
+            env['PYTHONPATH'] = str(foreign)
+            script = Path(__file__).resolve().parents[1] / 'scripts/scrum781_engineering_loop.py'
+            result = subprocess.run([sys.executable, str(script), '--help'], env=env,
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
