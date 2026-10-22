@@ -454,11 +454,194 @@ class RecursiveRunDag:
                 ordered.append(pending.pop(key))
         return ordered
 
+    def execute_persistent(self, *, store_path: Any, task_id: str, repository: str,
+                           branch: str, base_sha: str, head_sha: str, scope_hash: str,
+                           lease_id: str, fencing_token: int, lease_expires_at: str,
+                           root_manifest: Mapping[str, Any],
+                           child_node_allocations: list[Mapping[str, Any]],
+                           authority: Mapping[str, Any] | None,
+                           canonical_state: Mapping[str, Any],
+                           lease_owner: str = "recursive-run-dag", **event_context: Any) -> dict[str, Any]:
+        """Execute against the canonical file-backed checkpoint store.
+
+        The caller supplies exact repository/run and fencing authority. A new DAG
+        instance can reload the sealed gate cursor from ``store_path`` after a
+        process restart. This is the durable path; ``execute(checkpoint=dict)``
+        remains an in-memory test prototype.
+        """
+        import copy
+        from datetime import datetime, timezone
+        from pathlib import Path
+        from tools.node_architect import checkpoint_store as durable
+
+        path = Path(store_path)
+        root_id = str(root_manifest.get("run_id", "")) if isinstance(root_manifest, Mapping) else ""
+        if (not all(isinstance(value, str) and value.strip() for value in
+                    (task_id, repository, branch, base_sha, head_sha, scope_hash, lease_id, lease_owner))
+                or not scope_hash.startswith("sha256:")
+                or not isinstance(fencing_token, int) or isinstance(fencing_token, bool) or fencing_token < 0):
+            raise NodeArchitectureError("DAG_PERSISTENCE_BINDING_INVALID")
+        try:
+            expiry = datetime.fromisoformat(lease_expires_at.replace("Z", "+00:00"))
+        except (AttributeError, ValueError):
+            raise NodeArchitectureError("DAG_LEASE_INVALID") from None
+        now = datetime.now(timezone.utc)
+        if expiry.tzinfo is None or expiry <= now:
+            raise NodeArchitectureError("DAG_LEASE_EXPIRED")
+        if not root_id:
+            raise NodeArchitectureError("ROOT_RUN_MANIFEST_INVALID")
+
+        store = durable.load_store(path)
+        expected_binding = {"task_id": task_id, "repository": repository, "branch": branch,
+                            "base_sha": base_sha, "head_sha": head_sha, "scope_hash": scope_hash}
+        binding = store.get("binding")
+        if isinstance(binding, Mapping):
+            if any(binding.get(key) != value for key, value in expected_binding.items()):
+                raise NodeArchitectureError("DAG_PERSISTENCE_BINDING_MISMATCH")
+        input_digest = durable.digest_payload({
+            "root_manifest": root_manifest, "child_node_allocations": child_node_allocations,
+            "authority": authority, "canonical_state": canonical_state,
+        })
+        lease = store.get("lease_binding")
+        if isinstance(lease, Mapping):
+            if (lease.get("lease_owner") != lease_owner or lease.get("lease_token") != lease_id
+                    or lease.get("fencing_token") != fencing_token):
+                raise NodeArchitectureError("DAG_LEASE_FENCING_MISMATCH")
+            try:
+                stored_expiry = datetime.fromisoformat(str(lease.get("lease_expires_at", "")).replace("Z", "+00:00"))
+            except ValueError:
+                raise NodeArchitectureError("DAG_LEASE_INVALID") from None
+            if stored_expiry.tzinfo is None or stored_expiry <= now:
+                raise NodeArchitectureError("DAG_LEASE_EXPIRED")
+            if lease.get("lease_expires_at") != lease_expires_at:
+                raise NodeArchitectureError("DAG_LEASE_BINDING_MISMATCH")
+        if int(store.get("revision", 0)) > 0:
+            digest = store.get("store_digest")
+            expected_digest = durable.digest_payload({
+                "revision": store.get("revision", 0), "binding": store.get("binding"),
+                "lease_binding": store.get("lease_binding"), "events": store.get("events", []),
+                "checkpoints": store.get("checkpoints", {}), "effects": store.get("effects", {}),
+            })
+            if digest != expected_digest:
+                raise NodeArchitectureError("DAG_PERSISTENCE_STORE_TAMPERED")
+
+        last_item: list[Any] = [None]
+        def persist_progress(current: dict[str, Any], *, run_id: str, node_id: str) -> None:
+            safe_state = copy.deepcopy({key: value for key, value in current.items()
+                                        if key not in {"runtime_states", "leases", "schema_version", "artifact_type",
+                                                       "revision", "events", "checkpoints", "effects", "binding",
+                                                       "lease_binding", "store_digest"}})
+            revision = int(current.get("revision", 0))
+            item = durable.CheckpointInput(
+                task_id=task_id, run_id=root_id, node_id=f"recursive-dag:{revision + 1}:{run_id}:{node_id}",
+                repository=repository, branch=branch, base_sha=base_sha, head_sha=head_sha,
+                scope_hash=scope_hash, state=safe_state, expected_revision=revision,
+                graph_revision="recursive-run-dag-v1", lease_id=lease_id,
+                fencing_token=fencing_token,
+                cas_context={"lease_owner": lease_owner, "lease_expires_at": lease_expires_at},
+            )
+            last_item[0] = item
+            try:
+                saved = durable.persist_to_file(path, item)
+            except Exception as exc:
+                observed = durable.load_store(path)
+                decision = durable.reconcile_unknown_outcome(observed, item)
+                raise NodeArchitectureError("DAG_PERSISTENCE_OUTCOME_UNKNOWN", str(decision)) from exc
+            saved.setdefault("binding", {}).update(expected_binding)
+            saved["store_digest"] = durable.digest_payload({
+                "revision": saved["revision"], "binding": saved.get("binding"),
+                "lease_binding": saved.get("lease_binding"), "events": saved["events"],
+                "checkpoints": saved["checkpoints"], "effects": saved.get("effects", {}),
+            })
+            audit_event = {
+                "schema_version": "1.0", "artifact_type": "runtime-event",
+                "event_type": "recursive_run.audit", "run_id": run_id,
+                "node_id": node_id, "decision": "CHECKPOINT_SEALED",
+                "checkpoint_revision": saved["revision"],
+                "lease_owner": lease_owner, "fencing_token": fencing_token,
+                "gate_receipt_digests": {
+                    gate: durable.digest_payload({"evidence": receipt.get("evidence"),
+                                                 "g6_receipt": receipt.get("g6_receipt")})
+                    for gates in safe_state.get("gates", {}).values()
+                    if isinstance(gates, Mapping)
+                    for gate, receipt in gates.items() if isinstance(receipt, Mapping)
+                },
+                "gate_readback_digests": {
+                    gate: durable.digest_payload(receipt.get("target_readback"))
+                    for gates in safe_state.get("gates", {}).values()
+                    if isinstance(gates, Mapping)
+                    for gate, receipt in gates.items() if isinstance(receipt, Mapping)
+                },
+                "occurred_at": durable._now(),
+            }
+            audit_event["event_digest"] = durable.digest_payload(audit_event)
+            saved["events"].append(audit_event)
+            saved["store_digest"] = durable.digest_payload({
+                "revision": saved["revision"], "binding": saved.get("binding"),
+                "lease_binding": saved.get("lease_binding"), "events": saved["events"],
+                "checkpoints": saved["checkpoints"], "effects": saved.get("effects", {}),
+            })
+            durable.write_store(path, saved)
+            for key in ("schema_version", "artifact_type", "revision", "events", "checkpoints",
+                        "effects", "binding", "lease_binding", "store_digest"):
+                if key in saved:
+                    current[key] = saved[key]
+
+        # Recover only the DAG's sealed state from the latest canonical record.
+        if int(store.get("revision", 0)):
+            records = [record for record in store.get("checkpoints", {}).values()
+                       if isinstance(record, Mapping) and record.get("run_id") == root_id
+                       and str(record.get("node_id", "")).startswith("recursive-dag:")]
+            if not records:
+                raise NodeArchitectureError("DAG_PERSISTENCE_CHECKPOINT_MISSING")
+            record = max(records, key=lambda value: int(value.get("revision", 0)))
+            state = record.get("state")
+            if not isinstance(state, Mapping):
+                raise NodeArchitectureError("DAG_PERSISTENCE_STATE_INVALID")
+            if durable.digest_payload(state) != record.get("state_digest"):
+                raise NodeArchitectureError("DAG_PERSISTENCE_STATE_TAMPERED")
+            store.update({key: copy.deepcopy(value) for key, value in state.items()
+                          if key not in {"schema_version", "artifact_type", "revision", "events", "checkpoints",
+                                         "effects", "binding", "lease_binding", "store_digest"}})
+            prior_input_digest = store.get("dag_input_digest")
+            if prior_input_digest is not None and prior_input_digest != input_digest:
+                raise NodeArchitectureError("DAG_PERSISTENCE_INPUT_MISMATCH")
+            last_item[0] = durable.CheckpointInput(
+                task_id=task_id, run_id=root_id, node_id=str(record.get("node_id")),
+                repository=repository, branch=branch, base_sha=base_sha, head_sha=head_sha,
+                scope_hash=scope_hash, state=copy.deepcopy(dict(state)),
+                expected_revision=int(record.get("previous_revision", 0)),
+                graph_revision="recursive-run-dag-v1", lease_id=lease_id, fencing_token=fencing_token,
+                cas_context={"lease_owner": lease_owner, "lease_expires_at": lease_expires_at},
+            )
+        store["dag_input_digest"] = input_digest
+        result = self.execute(root_manifest=root_manifest,
+                              child_node_allocations=child_node_allocations,
+                              authority=authority, canonical_state=canonical_state,
+                              checkpoint=store, lease_owner=lease_owner,
+                              _persist_hook=persist_progress, **event_context)
+        final = durable.load_store(path)
+        item = last_item[0]
+        if item is None:
+            raise NodeArchitectureError("DAG_PERSISTENCE_CHECKPOINT_MISSING")
+        reconciliation = durable.reconcile_unknown_outcome(final, item)
+        if reconciliation.get("outcome") != "KNOWN_STATE":
+            raise NodeArchitectureError("DAG_PERSISTENCE_OUTCOME_UNKNOWN", str(reconciliation))
+        readback = durable.validate_readback(final, item)
+        if readback.get("outcome") != "PASS":
+            raise NodeArchitectureError("DAG_PERSISTENCE_READBACK_FAILED")
+        result["persistence"] = {"revision": readback["revision"],
+                                  "state_digest": readback["state_digest"],
+                                  "store_digest": final.get("store_digest"),
+                                  "readback": "PASS"}
+        return result
+
     def execute(self, *, root_manifest: Mapping[str, Any],
                 child_node_allocations: list[Mapping[str, Any]],
                 authority: Mapping[str, Any] | None, canonical_state: Mapping[str, Any],
                 checkpoint: dict[str, Any] | None = None,
-                lease_owner: str = "recursive-run-dag", **event_context: Any) -> dict[str, Any]:
+                lease_owner: str = "recursive-run-dag", _persist_hook: Any = None,
+                **event_context: Any) -> dict[str, Any]:
         from tools.node_architect.universal_run_kernel import GATES, verify_record_digest
 
         if (not isinstance(root_manifest, Mapping) or root_manifest.get("run_kind") != "ROOT"
@@ -563,6 +746,8 @@ class RecursiveRunDag:
                     outcomes[gate] = outcome
                     gate_store[gate] = {"evidence": evidence[gate], "target_readback": readbacks[gate],
                                         "outcome": outcome, "g6_receipt": g6}
+                    if _persist_hook is not None:
+                        _persist_hook(store, run_id=run_id, node_id=f"{run_id}:{gate}")
 
                 children: list[dict[str, Any]] = []
                 if not failure:
@@ -607,6 +792,8 @@ class RecursiveRunDag:
                             )
                             generations.append({"child_run_ref": child_id, "generation": materialization["generation"], "terminal_state": "OPEN"})
                             store.setdefault("materializations", {})[materialization_key] = copy.deepcopy(materialization)
+                            if _persist_hook is not None:
+                                _persist_hook(store, run_id=run_id, node_id=f"materialization:{child_id}")
                         child_manifest = create_run_manifest_revision(
                             record_id=f"manifest:{child_id}", run_id=child_id, revision=1,
                             run_kind="CHILD", created_at=str(spec.get("created_at", "1970-01-01T00:00:00Z")),
@@ -704,6 +891,8 @@ class RecursiveRunDag:
                     # gate_store remains the resumable cursor for the next attempt.
                     run_receipts.pop(run_id, None)
                 active.remove(run_id)
+                if _persist_hook is not None:
+                    _persist_hook(store, run_id=run_id, node_id=f"receipt:{run_id}")
                 return result
 
             return run_one(root_id, list(child_node_allocations), 1)
