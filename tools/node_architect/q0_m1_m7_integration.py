@@ -1,5 +1,7 @@
 """Source-bound, observation-only Q0 integration of the frozen M1-M7 library.
 
+Successor activation preparation is a preflight contract, not an executor.
+
 No scheduler, mailbox, browser, lease or authority writes. Execution Binding is
 identity, NOT an approval. Native qualification remains a separate admission.
 """
@@ -8,11 +10,38 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-from typing import Any
+from typing import Any, Mapping
 
 PLAN_REF = 'core/node-architect/scrum781-q0-fresh-execution-plan-r2.json'
 ROUTE_REF = 'core/node-architect/q0-engineering-coordination-route-r1.json'
 ACTIVATION_RECEIPT_REF = '.gwc/tasks/SCRUM-781/activation/cf-plan-activation.json'
+
+
+def prepare_successor_activation(envelope: Mapping[str, Any], *, authority: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Validate a live-activation envelope and return a non-executing preflight."""
+    effects = envelope.get('effects') if isinstance(envelope, Mapping) else None
+    if (not isinstance(envelope, Mapping)
+            or envelope.get('kind') != 'LIVE_ACTIVATION_EFFECT_ENVELOPE'
+            or not envelope.get('schema_id')
+            or envelope.get('executed') is not False
+            or envelope.get('authority_granted') is not False
+            or not isinstance(effects, list) or not effects
+            or any(not isinstance(item, Mapping)
+                   or not isinstance(item.get('effect'), str)
+                   or not item.get('effect').strip() for item in effects)):
+        raise ValueError('LIVE_ACTIVATION_ENVELOPE_INVALID')
+    if (not isinstance(authority, Mapping)
+            or authority.get('granted') is not True
+            or authority.get('authority_kind') != 'SEPARATE_HUMAN_OR_CONTROLLER_GRANT'
+            or not authority.get('grant_ref')):
+        raise ValueError('LIVE_ACTIVATION_AUTHORITY_REQUIRED')
+    return {
+        'accepted': True,
+        'executed': False,
+        'effects': [item['effect'] for item in effects],
+        'authority_ref': authority['grant_ref'],
+        'next_step': 'LIVE_ACTIVATION_EXECUTION_NOT_IMPLEMENTED',
+    }
 
 
 def _git(root: Path, *args: str) -> str:

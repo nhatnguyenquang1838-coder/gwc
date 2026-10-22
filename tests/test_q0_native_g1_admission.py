@@ -9,6 +9,8 @@ from pathlib import Path
 import pytest
 
 from tools.node_architect import q0_qualification
+from tools.node_architect.q0_m1_m7_integration import prepare_successor_activation
+from tools.node_architect.q0_native_g1_admission import build_live_activation_effect_envelope
 from tools.node_architect.q0_native_g1_admission import (
     Q0NativeG1AdmissionError,
     build_native_g1_plan_receipt,
@@ -323,6 +325,55 @@ def test_genesis_materialization_is_digest_idempotent_and_sandbox_only(tmp_path)
     assert transition["predecessor"]["digest"] == _predecessor(tmp_path)["runtime_plan_digest"]
     assert transition["successor"]["node_allocation_id"] == "alloc-1"
     assert transition["transition_digest"] == first["transition_receipt_digest"]
+
+
+def test_genesis_materialization_leaves_predecessor_checkpoint_byte_identical(tmp_path):
+    bindings = _bindings()
+    predecessor = _predecessor(tmp_path)
+    checkpoint_path = Path(predecessor["checkpoint_ref"])
+    before = hashlib.sha256(checkpoint_path.read_bytes()).digest()
+
+    materialize_native_g1_genesis(
+        _valid(), worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+        runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        predecessor=predecessor,
+    )
+
+    after = hashlib.sha256(checkpoint_path.read_bytes()).digest()
+    assert after == before
+
+
+def test_activation_prepare_requires_separate_authority(tmp_path):
+    envelope = build_live_activation_effect_envelope(idempotency_key="prepare-test")
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_AUTHORITY_REQUIRED$"):
+        prepare_successor_activation(envelope, authority=None)
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_AUTHORITY_REQUIRED$"):
+        prepare_successor_activation(envelope, authority={"granted": True})
+
+
+def test_activation_prepare_is_dry_run_even_with_valid_authority(tmp_path):
+    envelope = build_live_activation_effect_envelope(idempotency_key="prepare-test")
+    predecessor = _predecessor(tmp_path)
+    checkpoint_path = Path(predecessor["checkpoint_ref"])
+    checkpoint_before = hashlib.sha256(checkpoint_path.read_bytes()).digest()
+    sandbox = tmp_path / "sandbox"
+    sandbox.mkdir()
+
+    result = prepare_successor_activation(
+        envelope,
+        authority={"granted": True, "authority_kind": "SEPARATE_HUMAN_OR_CONTROLLER_GRANT",
+                   "grant_ref": "grant:human-1"},
+    )
+
+    assert result == {
+        "accepted": True, "executed": False,
+        "effects": ["selector_write", "checkpoint_write", "cursor_advance"],
+        "authority_ref": "grant:human-1",
+        "next_step": "LIVE_ACTIVATION_EXECUTION_NOT_IMPLEMENTED",
+    }
+    assert hashlib.sha256(checkpoint_path.read_bytes()).digest() == checkpoint_before
+    assert not list(sandbox.rglob("*selector*"))
+    assert not list(sandbox.rglob("*cursor*"))
 
 
 def test_genesis_refuses_path_outside_sandbox(tmp_path):

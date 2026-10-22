@@ -78,7 +78,7 @@ def build_live_activation_effect_envelope(*, idempotency_key: str) -> dict[str, 
     _fail(isinstance(idempotency_key, str) and bool(idempotency_key.strip()), "IDEMPOTENCY_KEY_REQUIRED")
     return {"schema_id": "gwc.q0.live-activation-effect-envelope.v1",
             "kind": "LIVE_ACTIVATION_EFFECT_ENVELOPE",
-            "api_entrypoint": "tools.node_architect.q0_m1_m7_integration.activate_successor_plan",
+            "api_entrypoint": "tools.node_architect.q0_m1_m7_integration.prepare_successor_activation",
             "effects": [
                 {"effect": "selector_write", "precondition": "separate_grant_and_successor_plan_valid"},
                 {"effect": "checkpoint_write", "precondition": "selector_binding_and_checkpoint_cas_valid"},
