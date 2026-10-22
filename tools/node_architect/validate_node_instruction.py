@@ -84,6 +84,57 @@ def _schema_valid(card: Any, schema: Mapping[str, Any]) -> bool:
         return False
 
 
+def validate_universal_instruction(
+    *, card: Mapping[str, Any], descriptor: Mapping[str, Any], registry_node: Mapping[str, Any],
+    route: Mapping[str, Any], active_gate: str, action: str, mode: str,
+) -> InstructionValidationReport:
+    """Validate the extension-only UR instruction dialect without changing the legacy schema."""
+    codes: list[str] = []
+    node_id = str(card.get("node_id", ""))
+    gates = {"UR.G0", "UR.G1", "UR.G2", "UR.G3", "UR.G4", "UR.G5", "UR.G6"}
+    identities = {bridge_node_identity(node_id), bridge_node_identity(descriptor.get("node_id", "")),
+                  bridge_node_identity(registry_node.get("id", "")), bridge_node_identity(route.get("current_node", ""))}
+    if len(identities) != 1 or "" in identities or card.get("artifact_type") != "node-instruction":
+        codes.append("NODE_INSTRUCTION_INVALID")
+    if active_gate not in gates or active_gate not in set(card.get("gate", []) or []) or active_gate not in set(descriptor.get("gates", []) or []):
+        codes.append("NODE_INSTRUCTION_INVALID")
+    if action not in set(card.get("allowed_actions", []) or []):
+        codes.append("NODE_INSTRUCTION_INVALID")
+    evidence_valid = REQUIRED_EVIDENCE.issubset(set(card.get("evidence_required", []) or []))
+    log_valid = REQUIRED_LOGS.issubset(set(card.get("logs_required", []) or []))
+    if not evidence_valid:
+        codes.append("NODE_EVIDENCE_CONTRACT_MISSING")
+    if not log_valid:
+        codes.append("NODE_LOG_CONTRACT_MISSING")
+    next_map = card.get("next", {}) if isinstance(card.get("next"), Mapping) else {}
+    next_valid = all(isinstance(next_map.get(outcome), Mapping)
+                     and next_map[outcome].get("disposition") in {"stop", "wait", "retry"}
+                     and next_map[outcome].get("next_node") is None
+                     and next_map[outcome].get("next_gate") is None
+                     and next_map[outcome].get("next_action") in ({None, "RECONCILE"} if outcome == "retry" else {None})
+                     for outcome in ("pass", "blocked", "pending", "retry"))
+    if not next_valid:
+        codes.append("NODE_NEXT_ROUTE_MISSING")
+    boundary = card.get("authority_boundary") if isinstance(card.get("authority_boundary"), Mapping) else {}
+    flags = ("node_grants_gate_authority", "g2_authority_granted", "g3_authority_granted",
+             "merge_authority_granted", "deployment_authority_granted", "production_authority_granted")
+    authority_valid = bool(boundary) and all(boundary.get(flag) is False for flag in flags)
+    if not authority_valid:
+        codes.append("NODE_AUTHORITY_ESCALATION_ATTEMPT")
+    runtime = card.get("mode_policy") if isinstance(card.get("mode_policy"), Mapping) else {}
+    mode_valid = mode in set(runtime.get("supported_modes", []) or []) and runtime.get("runtime_required") is True
+    if not mode_valid:
+        codes.append("NODE_MODE_BYPASS")
+    codes = _dedupe(codes)
+    return InstructionValidationReport(
+        valid=not codes, node_id=node_id, mode=mode,
+        instruction_digest=digest_payload(card),
+        reason_code=codes[0] if codes else "NODE_INSTRUCTION_VALID", reason_codes=codes,
+        evidence_contract_valid=evidence_valid, log_contract_valid=log_valid,
+        next_route_contract_valid=next_valid, mode_runtime_required=mode_valid,
+        authority_boundary_valid=authority_valid,
+    )
+
 def validate_instruction(
     *,
     card: Mapping[str, Any],

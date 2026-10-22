@@ -1,0 +1,83 @@
+schema_version: '1.0'
+artifact_type: g1-options
+generated_at: '2026-10-22T18:25:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+options:
+- id: OPT-1
+  title: Admit one generic gate-adapter through the versioned sidecar at slot 83
+  description: Implement the selected post-81 runtime extension as one source-backed universal_run.gate-adapter node with
+    seven domain-neutral UR.G0-G6 route contracts and a Parent Consumer G6 TargetContract, preserving baseline 81 and SCRUM-284
+    slot 82.
+  benefits:
+  - Follows the active post-81 extension mechanism
+  - Preserves historical baseline and slot-82 compatibility
+  - Creates one executable, source-backed generic node rather than orphan route strings
+  tradeoffs:
+  - Requires versioned validator/sidecar compatibility work
+  - Requires independently validated receipts and trusted-source fail-closed behavior
+  risks:
+  - Incorrect version branching could weaken historical SCRUM-284 constraints
+  - C2 remains blocked if no authentic independent authority source exists
+  constraint_fit: FIT
+- id: OPT-2
+  title: Repurpose or modify one of the 81 baseline nodes
+  description: Use an existing frozen baseline identity for the new generic capability.
+  benefits:
+  - Avoids introducing a new slot
+  tradeoffs:
+  - Violates baseline immutability and conflates historical semantics
+  risks:
+  - Breaks baseline identity/count and historical consumers
+  constraint_fit: NOT_FIT
+- id: OPT-3
+  title: Overwrite SCRUM-284 slot 82 or its scope
+  description: Replace the existing slot-82 extension with the generic adapter.
+  benefits:
+  - Reuses an extension slot
+  tradeoffs:
+  - Destroys a separately accepted SCRUM-284 decision and compatibility contract
+  risks:
+  - Breaks historical route and scope binding
+  constraint_fit: NOT_FIT
+- id: OPT-4
+  title: Add orphan route strings or a dummy node
+  description: Register generic route names without a real node contract, instruction, implementation, and validated evidence.
+  benefits:
+  - Small apparent change
+  tradeoffs:
+  - Does not provide executable runtime behavior or source-backed provenance
+  risks:
+  - Creates phantom routes and false acceptance evidence
+  constraint_fit: NOT_FIT
+- id: OPT-5
+  title: Map generic G4/G5/G6 to legacy protected domain actions
+  description: Alias generic target integration, validation, or handoff to G4_MERGE, G5_DEPLOY, or G6_PRODUCTION_DATA.
+  benefits:
+  - May reuse old route vocabulary
+  tradeoffs:
+  - Erases target-generic semantics and crosses protected domain boundaries
+  risks:
+  - Could trigger unauthorized merge, deploy, or production effects
+  constraint_fit: NOT_FIT
+- id: OPT-6
+  title: Create an independent Human trust anchor or infer a grant from serialized data
+  description: Treat self-hashed JSON, mailbox text, plans, fixtures, or a newly invented key as an authenticated Human approval
+    source.
+  benefits:
+  - Could appear to unblock HOTL/HITL flow
+  tradeoffs:
+  - No canonical issuer or independent readback is established
+  risks:
+  - Forged authority and privileged-effect bypass
+  constraint_fit: NOT_FIT
+recommended_option_id: OPT-1
+recommendation_rationale: 'This is the single design explicitly selected by Controller #197: one versioned sidecar extension
+  at candidate slot 83, conditional on current uniqueness, with a generic adapter and no mutation of the frozen baseline or
+  slot 82.'
+decision_required: true
+status: READY

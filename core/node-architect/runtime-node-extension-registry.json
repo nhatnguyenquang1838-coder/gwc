@@ -1,12 +1,12 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "2.0.0",
   "artifact_type": "runtime-node-extension-registry",
   "registry_id": "gwc-runtime-node-extension-registry",
-  "revision": "scrum-284-20260808-r2",
+  "revision": "universal-v2-recursive-authority-r1-r1",
   "baseline_registry_ref": "gwc-runtime-node-registry",
   "baseline_declared_slot_count": 81,
   "baseline_node_ids_digest": "sha256:21afecdd0d7742445d8a6a94d8734e50f5f24e78f407293d1b0ef54368d8ac9c",
-  "admitted_extension_count": 1,
+  "admitted_extension_count": 2,
   "extensions": [
     {
       "extension_slot": 82,
@@ -72,6 +72,71 @@
         ],
         "terminal_gate": "G4_MERGE",
         "outcome": "HUMAN_REQUIRED"
+      }
+    },
+    {
+      "extension_slot": 83,
+      "decision_task_id": "UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1",
+      "decision_scope_hash": "sha256:0b1da099298ca2d8401cc21345e9964cfedb04e8287d002f013da0ad226525e2",
+      "decision_admission_id": "G1-UNIVERSAL-V2-POST81-GENERIC-ADAPTER-R1",
+      "decision_record_ref": ".gwc/tasks/UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1/g1/decision/g1-decision-record.yaml",
+      "node": {
+        "schema_version": "1.0.0",
+        "artifact_type": "runtime-node",
+        "id": "universal_run.gate-adapter",
+        "version": "1.0.0",
+        "family": "gate_authority",
+        "maturity": "candidate",
+        "source_status": "canonical_explicit",
+        "effect_class": "read_only",
+        "authority_class": "delegated",
+        "reversibility": "reversible",
+        "idempotency": "readback_required",
+        "suspension": {
+          "suspendable": true,
+          "resume_metadata": [
+            "run_id",
+            "event_id",
+            "target_contract_digest",
+            "evidence_digest",
+            "readback_digest"
+          ]
+        },
+        "determinism": "external_state_dependent",
+        "evidence_contract": "universal-run-target-contract-and-child-readbacks",
+        "implementation_refs": [
+          "tools/node_architect/universal_run_gate_adapter.py:handle_gate",
+          "tools/node_architect/universal_run_gate_adapter.py:accept_parent_g6",
+          "tools/node_architect/agent_runtime_cli.py:main",
+          "tools/node_architect/agent_runtime_entrypoint.py:run_agent_runtime_event"
+        ],
+        "provenance": {
+          "source_path": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+          "source_sha": "93abe2c041bd8dd2daefa9122ab4a02cb783150bc1ca0bf983490ddbe644a4fa",
+          "discovery_basis": "G1-UNIVERSAL-V2-POST81-GENERIC-ADAPTER-R1; Controller #197 post-81 admission"
+        },
+        "slot_review": {
+          "decision": "keep",
+          "rationale": "One target-neutral generic lifecycle adapter; preserve the immutable 81-node baseline and SCRUM-284 slot 82."
+        }
+      },
+      "route": {
+        "route_id": "universal-run-g0-g6-target-neutral",
+        "nodes": [
+          "universal_run.gate-adapter",
+          "runtime_checkpoint.checkpoint-persist"
+        ],
+        "edges": [
+          {
+            "source": "universal_run.gate-adapter",
+            "target": "runtime_checkpoint.checkpoint-persist",
+            "edge_type": "dependency",
+            "runtime_executable": true,
+            "provenance": "G1-UNIVERSAL-V2-POST81-GENERIC-ADAPTER-R1:typed-run-checkpoint"
+          }
+        ],
+        "terminal_gate": "G6_ACCEPT_HANDOFF",
+        "outcome": "TARGET_CONTRACT_REQUIRED"
       }
     }
   ],

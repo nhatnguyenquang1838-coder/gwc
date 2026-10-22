@@ -97,6 +97,7 @@ def _binding_for(registry: Mapping[str, Any], node_id: str) -> Mapping[str, Any]
 def _route_context(
     *,
     canonical_state: Mapping[str, Any],
+    run_id: str,
     gate: str,
     requested_action: str,
     workflow_mode: str,
@@ -106,6 +107,7 @@ def _route_context(
     context = dict(supplied or {})
     context.update({
         "task_id": str(canonical_state.get("task_id") or context.get("task_id") or ""),
+        "run_id": run_id,
         "gate": gate,
         "requested_action": requested_action,
         "workflow_mode": workflow_mode,
@@ -620,6 +622,8 @@ def run_agent_runtime_event(
     applicability_decision: Mapping[str, Any] | None = None,
     validation_runner: Any | None = None,
     validation_root: Path | str | None = None,
+    internal_receipt_store: Mapping[str, Any] | None = None,
+    receipts_persisted: bool = False,
     m1_m7_workflow_selection: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run one canonical Agent task event end-to-end through Node Architect."""
@@ -632,6 +636,7 @@ def run_agent_runtime_event(
         input_payload = {**dict(input_payload), "_scrum841_workflow_selection": dict(m1_m7_workflow_selection)}
     context = _route_context(
         canonical_state=canonical_state,
+        run_id=run_id,
         gate=gate,
         requested_action=requested_action,
         workflow_mode=workflow_mode,
@@ -666,8 +671,55 @@ def run_agent_runtime_event(
     if not isinstance(registry, Mapping) or registry.get("status") != "PASS":
         return _blocked("AGENT_SEMANTIC_IMPLEMENTATION_REGISTRY_INVALID")
     binding = _binding_for(registry, node_id)
+    if binding is None and node_id == "universal_run.gate-adapter":
+        # Compile only the independently admitted slot-83 sidecar binding. The
+        # canonical compiler remains exactly the immutable 81-node baseline.
+        node = route.get("node") if isinstance(route.get("node"), Mapping) else None
+        implementation = route.get("implementation") if isinstance(route.get("implementation"), Mapping) else {}
+        implementation_ref = str(implementation.get("ref") or "")
+        try:
+            from . import semantic_implementation_registry as semantic_registry
+            if node is not None:
+                binding = semantic_registry.compile_extension_semantic_binding(
+                    node=node,
+                    implementation_ref=implementation_ref,
+                    descriptor_ref=str(route.get("node_descriptor_ref") or ""),
+                    instruction_ref=str(route.get("node_instruction_ref") or ""),
+                    root=repo_root,
+                )
+        except Exception:
+            binding = None
+        if binding is None:
+            return _blocked("AGENT_EXTENSION_BINDING_NOT_ADMITTED", node_id=node_id)
+        registry = {**dict(registry), "bindings": [*registry.get("bindings", []), binding]}
     if binding is None:
         return _blocked("AGENT_SEMANTIC_BINDING_MISSING_OR_AMBIGUOUS", node_id=node_id)
+
+    extension_binding = node_id == "universal_run.gate-adapter"
+    if extension_binding:
+        binding = dict(binding)
+        binding["node_registry_revision"] = str(canonical_state.get("node_registry_revision") or "")
+        binding["next_route_contract"] = {key: dict(value) for key, value in binding["next_route_contract"].items()}
+        binding["next_route_contract"]["pass"]["next_gate"] = gate
+        binding["next_route_contract"]["blocked"]["next_gate"] = gate
+        from .semantic_implementation_registry import _digest as _semantic_digest
+        registry = {**dict(registry), "bindings": [
+            binding if item.get("node_id") == node_id else item
+            for item in registry.get("bindings", []) if isinstance(item, Mapping)
+        ]}
+        binding["binding_digest"] = _semantic_digest({key: value for key, value in binding.items() if key != "binding_digest"})
+        route_payload = context.get("context") if isinstance(context.get("context"), Mapping) else {}
+        manifest = route_payload.get("universal_run_manifest")
+        target_contract = route_payload.get("target_contract")
+        input_payload = {
+            **dict(input_payload), "run_id": run_id,
+            "run_kind": manifest.get("run_kind") if isinstance(manifest, Mapping) else None,
+            "parent_run_ref": manifest.get("parent_run_ref") if isinstance(manifest, Mapping) else None,
+            "gate": gate, "action": requested_action,
+            "target_contract": target_contract, "manifest": manifest,
+            "evidence": route_payload.get("evidence", {}),
+            "readbacks": route_payload.get("readbacks", {}),
+        }
 
     route_instruction_ref = str(route.get("node_instruction_ref") or route.get("instruction_ref") or "")
     binding_instruction_ref = str(binding.get("instruction_ref") or "")
@@ -710,6 +762,23 @@ def run_agent_runtime_event(
     implementation_ref = str(binding.get("implementation_ref") or "")
     if not implementation_ref:
         return _blocked("AGENT_SEMANTIC_IMPLEMENTATION_REF_MISSING", node_id=node_id)
+
+    extension_pack = None
+    if extension_binding:
+        try:
+            extension_pack = build_node_instruction_pack(
+                provider_request, head_sha=str(canonical_state.get("head_sha") or ""),
+                gate=gate, requested_action=requested_action,
+                node_id=str(binding.get("node_id") or ""), node_version=str(binding.get("node_version") or ""),
+                implementation_ref=implementation_ref,
+                profile_revision=str(canonical_state.get("profile_revision") or ""),
+                node_registry_revision=str(canonical_state.get("node_registry_revision") or ""),
+                provider_contract_revision=str(getattr(provider, "contract_revision", "agent-reasoning-v1")),
+                instruction_bundle=bundle,
+            )
+        except Exception as exc:
+            return _blocked("AGENT_NODE_INSTRUCTION_PACK_INVALID", node_id=node_id,
+                            error=f"{type(exc).__name__}: {exc}")
 
     # Apply the provider live-closure gate (review finding #2): the Agent Host
     # must not silently run a provider that is not live-closure eligible. When a
@@ -771,15 +840,59 @@ def run_agent_runtime_event(
         provider_binding=provider_binding,
         workflow_root=repo_root,
     )
+    semantic_handlers = {implementation_ref: llm_handler}
+    extension_decision: dict[str, Any] = {}
+    if extension_binding:
+        from .universal_run_gate_adapter import handle_gate
+
+        def extension_handler(current_binding: Mapping[str, Any], event_payload: Mapping[str, Any]) -> Mapping[str, Any]:
+            payload = event_payload.get("input_payload") if isinstance(event_payload.get("input_payload"), Mapping) else {}
+            decision = handle_gate(
+                gate=str(payload.get("gate") or gate), action=str(payload.get("action") or requested_action),
+                run_id=str(payload.get("run_id") or run_id),
+                manifest=payload.get("manifest") if isinstance(payload.get("manifest"), Mapping) else {},
+                target_contract=payload.get("target_contract") if isinstance(payload.get("target_contract"), Mapping) else {},
+                authority=authority, internal_store=internal_receipt_store,
+                receipts_persisted=receipts_persisted,
+            )
+            extension_decision.clear()
+            extension_decision.update(decision)
+            accepted = decision.get("status") in {"ROUTE_SELECTED", "ACCEPTED"}
+            return {
+                "outcome": "PASS" if accepted else "BLOCKED",
+                "reason_code": str(decision.get("reason_code") or "UNIVERSAL_RUN_ROUTE_SELECTED"),
+                "provider_result": dict(decision), "requested_effects": [], "proposed_effects": [],
+                "executed_effects": [],
+                "next_contract": current_binding["next_route_contract"]["pass" if accepted else "blocked"],
+                "authority_granted": False, "implementation_invoked": True, "semantic_execution": True,
+                "invocation_digest": _digest({"decision": decision, "binding": current_binding.get("binding_digest"),
+                                              "instruction_pack": extension_pack.content_digest if extension_pack else None}),
+            }
+
+        semantic_handlers = {implementation_ref: extension_handler}
 
     runtime_state = state if isinstance(state, LiveRuntimeState) else LiveRuntimeState()
     effective_readback_handler = readback_handler if readback_handler is not None else verify_canonical_readback
+    if extension_binding and readback_handler is None:
+        def effective_readback_handler(current_binding: Mapping[str, Any], semantic: Mapping[str, Any],
+                                       executed_effects: list[Mapping[str, Any]], event_payload: Mapping[str, Any]) -> Mapping[str, Any]:
+            decision = semantic.get("provider_result") if isinstance(semantic.get("provider_result"), Mapping) else {}
+            event_input = event_payload.get("input_payload") if isinstance(event_payload.get("input_payload"), Mapping) else {}
+            contract = event_input.get("target_contract") if isinstance(event_input.get("target_contract"), Mapping) else {}
+            if (decision.get("status") in {"ROUTE_SELECTED", "ACCEPTED"}
+                    and contract.get("run_id") == event_payload.get("run_id")
+                    and not executed_effects):
+                return {"status": "VERIFIED", "digest": _digest({
+                    "binding_digest": current_binding.get("binding_digest"), "run_id": event_payload.get("run_id"),
+                    "gate": event_payload.get("gate"), "target_contract": contract,
+                })}
+            return {"status": "BLOCKED", "reason_code": str(decision.get("reason_code") or "UNIVERSAL_RUN_READBACK_INVALID")}
     result = dispatch_live_runtime_event(
         event=event,
         route_decision=route,
         implementation_registry=registry,
         mode=mode,
-        semantic_handlers={implementation_ref: llm_handler},
+        semantic_handlers=semantic_handlers,
         capability_handlers=capability_handlers,
         readback_handler=effective_readback_handler,
         evidence_root=evidence_root,
@@ -799,6 +912,7 @@ def run_agent_runtime_event(
         "provider": str(getattr(provider, "name", type(provider).__name__)),
         "provider_evidence_class": provider_evidence_class,
         "live_closure_eligible": live_closure_eligible,
+        **({"g6_receipt": extension_decision.get("g6_receipt")} if extension_binding and gate == "UR.G6" else {}),
     }
 
 

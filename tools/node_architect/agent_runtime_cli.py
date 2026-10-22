@@ -92,6 +92,27 @@ def _load_manifest(path: Path) -> dict[str, Any]:
             raise AgentRuntimeCliError("WORKFLOW_SELECTION_INVALID")
         if not isinstance(selection.get("operation_envelope"), Mapping) or not isinstance(selection.get("inputs"), Mapping):
             raise AgentRuntimeCliError("WORKFLOW_SELECTION_INVALID")
+    recursive = manifest.get("mode") == "recursive_run"
+    if manifest.get("mode") not in (None, "recursive_run"):
+        raise AgentRuntimeCliError("AGENT_RUNTIME_MODE_INVALID")
+    if recursive:
+        recursive_spec = manifest.get("recursive_run")
+        if (not isinstance(recursive_spec, Mapping)
+                or not isinstance(recursive_spec.get("root_manifest"), Mapping)
+                or not isinstance(recursive_spec.get("child_node_allocations"), list)
+                or not isinstance(recursive_spec.get("gate_actions"), Mapping)):
+            raise AgentRuntimeCliError("RECURSIVE_RUN_MANIFEST_INVALID")
+        if recursive_spec["root_manifest"].get("run_id") != event.get("run_id"):
+            raise AgentRuntimeCliError("RECURSIVE_ROOT_RUN_ID_MISMATCH")
+        expected_actions = {
+            "UR.G0": "UNDERSTAND", "UR.G1": "PLAN", "UR.G2": "EXECUTE",
+            "UR.G3": "VERIFY", "UR.G4": "INTEGRATE",
+            "UR.G5": "VALIDATE-IN-TARGET", "UR.G6": "ACCEPT/HANDOFF",
+        }
+        if recursive_spec["gate_actions"] != expected_actions:
+            raise AgentRuntimeCliError("RECURSIVE_GATE_ACTIONS_INCOMPLETE")
+        return {"provider_name": provider_name, "event": dict(event), "mode": "recursive_run", "recursive_run": dict(recursive_spec)}
+    if isinstance(selection, Mapping):
         return {"provider_name": provider_name, "event": dict(event), "workflow_selection": dict(selection)}
     return {"provider_name": provider_name, "event": dict(event)}
 
@@ -169,10 +190,36 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        result = run_agent_runtime_loop(
-            _prepare_event(manifest, provider),
-            max_iterations=args.max_iterations,
-        )
+        event_kwargs = _prepare_event(manifest, provider)
+        if manifest.get("mode") == "recursive_run":
+            from .agent_runtime_entrypoint import run_agent_runtime_event
+            from .universal_run_node import RecursiveRunDag
+
+            recursive_spec = manifest["recursive_run"]
+            actions = dict(recursive_spec["gate_actions"])
+
+            def canonical_host_event(**kwargs: Any) -> Mapping[str, Any]:
+                raw_gate = str(kwargs.get("gate") or "")
+                gate = raw_gate if raw_gate.startswith("UR.") else f"UR.{raw_gate if raw_gate.startswith('G') else 'G' + raw_gate}"
+                action = actions.get(gate)
+                if not isinstance(action, str) or not action.strip():
+                    return {"status": "SEMANTIC_NODE_BLOCKED", "reason_code": "RECURSIVE_GATE_ACTION_MISSING"}
+                kwargs["gate"] = gate
+                kwargs["requested_action"] = action
+                return run_agent_runtime_event(**kwargs)
+
+            dag = RecursiveRunDag(runtime_event=canonical_host_event)
+            result = dag.execute(
+                root_manifest=recursive_spec["root_manifest"],
+                child_node_allocations=recursive_spec["child_node_allocations"],
+                **event_kwargs,
+            )
+            result["c1_status"] = "INTEGRATION_PENDING"
+        else:
+            result = run_agent_runtime_loop(
+                event_kwargs,
+                max_iterations=args.max_iterations,
+            )
     except Exception as exc:  # noqa: BLE001
         result = _blocked("AGENT_RUNTIME_CALLER_ERROR", f"{type(exc).__name__}: {exc}")
 

@@ -1,0 +1,160 @@
+schema_version: '1.0'
+artifact_type: g0-context-snapshot
+generated_at: '2026-10-22T18:25:53Z'
+project:
+  id: gwc
+  name: GWC
+  profile_path: projects/gwc/project-profile.yaml
+repository:
+  full_name: nhatnguyenquang1838-coder/gwc
+  base_ref: main
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  protected_branches:
+  - main
+  connector: GitHub
+  write_enabled: true
+constraints:
+- This task materializes only the five standard G0/G1 artifacts; no source, registry, schema, or validator edits.
+- No commit or push; preserve the pre-existing untracked adapter source and test unchanged.
+- 'Controller #197 is G1 design admission only, not G2 source-edit authority or a Human grant.'
+- 'Do not modify node-registry.json, the historical 81-node expansion plan, SCRUM-284 slot 82, or PR #609.'
+- Exclude protected-main changes, merge/deploy/production/secrets/migration/destructive effects, Q0 selector/checkpoint/cursor/scheduler
+  (APPROVE B), fabricated Human grants/signing keys, C1 host-integration claims, and Parent G6 claims.
+applicable_policies:
+- id: GWC-AGENTS
+  path: AGENTS.md
+  ref: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  source_sha: d4408dd358728c9736cb5f3058d83a10ead153a285c74b4f9cb7216fbd05c593
+- id: POST81-EXTENSION-RULE
+  path: core/node-architect/POST_81_RUNTIME_NODE_EXTENSION_RULE_v0.1.md
+  ref: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  source_sha: f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92
+- id: GATE-NODE-RUNTIME-BINDING
+  path: core/node-architect/GATE_NODE_RUNTIME_BINDING_CONTRACT_v1.0.md
+  ref: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  source_sha: 713f6322414811c787c142238e552edc9c16d67e3443676695c71454d45b4915
+- id: CANONICAL-G1-VALIDATOR
+  path: tools/validate_g01.py
+  ref: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  source_sha: 31bdc701b8290e8e3b4c3c43652805950a430df3d6e21526d415c94fef9793cb
+- id: CANONICAL-SCOPE-HASH-PRODUCER
+  path: tools/node_architect/scope_hash_calculation.py
+  ref: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  source_sha: 653a12fa574424176bbbcc4e1a3383850c39953aba57cb0b71a5bdbff8e0b38b
+sources:
+- path: projects/gwc/project-profile.yaml
+  required: true
+  status: AVAILABLE
+  source_sha: fbf386bb9c32ba1f9823ced7fc5dfc7200b9282c8d28683f84a81688ec114ad5
+- path: core/node-architect/POST_81_RUNTIME_NODE_EXTENSION_RULE_v0.1.md
+  required: true
+  status: AVAILABLE
+  source_sha: f558fde653f0abf3cedd8696b728f6280ccc7fd5a17fc49a03f10ac121383f92
+- path: core/node-architect/runtime-node-extension-registry.json
+  required: true
+  status: AVAILABLE
+  source_sha: 16910d3d4ff9bb30ab87bb9ac5d4597b4d0e9c2c36a0c71542345be225930f45
+- path: core/node-architect/gate-node-route-profile.json
+  required: true
+  status: AVAILABLE
+  source_sha: 6a32799562d581e346ac4b20f6b5b4f68e291c76ed578304d90a78ed2494be12
+- path: schemas/runtime/runtime-node-extension-registry.schema.json
+  required: true
+  status: AVAILABLE
+  source_sha: 944197ec44e46b2e881a6de34a8e506a26180420440d6b7e90e79c7322fc937c
+- path: tools/node_architect/scope_hash_calculation.py
+  required: true
+  status: AVAILABLE
+  source_sha: 653a12fa574424176bbbcc4e1a3383850c39953aba57cb0b71a5bdbff8e0b38b
+- path: tools/node_architect/validate_runtime_registry.py
+  required: true
+  status: AVAILABLE
+  source_sha: a45249886051a5a36489dc555fcc90df0b74dfb636b4adfc9367761bf26c511a
+- path: tools/node_architect/resolve_gate_node_route.py
+  required: true
+  status: AVAILABLE
+  source_sha: b6379a6f8be25e712f41698bf3e34d6a5c6a3837a48ecdac7943ead08beab6a9
+- path: tools/node_architect/agent_runtime_cli.py
+  required: true
+  status: AVAILABLE
+  source_sha: 98e22e5f4d59b3726e7bb6d899cfed54819114abc3e0224bcb94b2ba0f9fd63a
+- path: tools/node_architect/agent_runtime_entrypoint.py
+  required: true
+  status: AVAILABLE
+  source_sha: 441cfde38cc0590f0857c9be7de42dc9d27351b92cb9a7d49ddeef26e68c8247
+- path: tools/node_architect/build_node_instruction_pack.py
+  required: true
+  status: AVAILABLE
+  source_sha: 4542ba2920c7f4d9af69ffe84d6944e62cd5ee898d715ca8a6db72b3be3f45a7
+- path: tools/node_architect/validate_node_instruction.py
+  required: true
+  status: AVAILABLE
+  source_sha: 9e88f56b7ae6a277c4e56cc3c90a3fa4ae464d2b827ff149998e510ae9cddafe
+- path: tools/node_architect/universal_run_authority.py
+  required: true
+  status: AVAILABLE
+  source_sha: 23dab74e4657a42a1ff7f9cf9d2ed556e0a75ed120d5566a7a36b68e9acda6b2
+- path: tools/node_architect/universal_run_node.py
+  required: true
+  status: AVAILABLE
+  source_sha: b17c93c58a84864e91bcce3392a6cad3b871c62aba1210a75f458c613664c8c9
+- path: tools/node_architect/universal_run_gate_adapter.py
+  required: true
+  status: AVAILABLE
+  source_sha: 73fe3bd9c5397852c61a7ac391f571386bc65d7bdb8053c6746b34133029bdbd
+- path: tests/test_runtime_registry_validation.py
+  required: true
+  status: AVAILABLE
+  source_sha: df2d7088cb96ae7d38382bd0b4a149116426faa623c27e2549e1682185198a4c
+- path: tests/test_gate_node_route_resolution.py
+  required: true
+  status: AVAILABLE
+  source_sha: 4a2867f3b0a4315c5ebf8039a89d53be7d3b1ad51197f77b10d8742f4bf35688
+- path: tests/test_instruction_source_registry.py
+  required: true
+  status: AVAILABLE
+  source_sha: 7da307ba6151a6aa6ff3502a75e5d02b85169d09250167f4cf92f48c1d6a42b2
+- path: tests/test_node_instruction_contract.py
+  required: true
+  status: AVAILABLE
+  source_sha: cd9c244141fb888e3d0091f107aba8665ed95c83e4467ae43637bdc2d64b95f1
+- path: tests/test_universal_run_gate_adapter.py
+  required: true
+  status: AVAILABLE
+  source_sha: 2a0fd7c1443d4a11334938c428857e21b87b843fa917c8d6966c130c7b76e6f2
+- path: core/node-architect/node-extensions/universal_run/gate-adapter.node.json
+  required: false
+  status: MISSING
+  source_sha: null
+- path: core/node-architect/node-extensions/universal_run/gate-adapter.node.instruction-card.json
+  required: false
+  status: MISSING
+  source_sha: null
+status: READY
+blockers: []
+contextual_discovery:
+  historical_context:
+  - id: COMMAND-189
+    description: User product direction for generic recursive G0-G6, inherited authority, risk-based HITL/HOTL; explicitly
+      not a signed approval or effect grant.
+    link: https://github.com/nhatnguyenquang1838-coder/gwc/issues/595
+  - id: CONTROLLER-197
+    description: Selects one post-81 versioned-sidecar extension at candidate slot 83 and universal_run.gate-adapter; G1 design
+      admission only.
+    link: https://github.com/nhatnguyenquang1838-coder/gwc/issues/595#issuecomment-6347931655
+  - id: SCRUM-781-CONSUMER
+    description: Consumer edge only; not the Root task identity or parent.
+    link: https://github.com/nhatnguyenquang1838-coder/gwc/pull/609
+  downstream_impact:
+  - target: 'PR #613 generic runtime branch'
+    impact_type: NON_BREAKING
+    description: Future source plan is additive via extension sidecar and runtime route integration; source effects require
+      their applicable G2 scope.
+  - target: 'SCRUM-781 / PR #609'
+    impact_type: NON_BREAKING
+    description: Consumer edge only; no files or Q0 live state are in this G1 materialization.
+  stakeholder_reach:
+  - persona: Generic GWC runtime consumers
+    impact: Must receive target-neutral G0-G6 behavior and typed receipts.
+  - persona: SCRUM-781 consumer
+    impact: Consumes the generic runtime; remains distinct from the Root run.

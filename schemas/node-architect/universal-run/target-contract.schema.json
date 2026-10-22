@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gwc.local/schemas/node-architect/universal-run/target-contract.schema.json",
+  "title": "Universal Run TargetContract",
+  "description": "Digest-bound target identity and child allocation binding. Root contracts are caller supplied; child contracts derive from a validated parent and exact allocation lineage.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "run_id": { "type": "string", "minLength": 1 },
+        "target_id": { "type": "string", "minLength": 1 },
+        "required_children": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "required_child_allocations": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "contract_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "required": ["schema_version", "run_id", "target_id", "required_children", "required_child_allocations", "contract_digest"],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "run_id": { "type": "string", "minLength": 1 },
+        "target_id": { "type": "string", "minLength": 1 },
+        "required_children": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "required_child_allocations": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "contract_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "parent_run_id": { "type": "string", "minLength": 1 },
+        "parent_contract_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "invoking_node_allocation_ref": { "type": "string", "minLength": 1 },
+        "node_allocation_id": { "type": "string", "minLength": 1 },
+        "node_allocation_record_id": { "type": "string", "minLength": 1 }
+      },
+      "required": ["schema_version", "run_id", "target_id", "required_children", "required_child_allocations", "contract_digest", "parent_run_id", "parent_contract_digest", "invoking_node_allocation_ref", "node_allocation_id", "node_allocation_record_id"],
+      "additionalProperties": false
+    }
+  ]
+}

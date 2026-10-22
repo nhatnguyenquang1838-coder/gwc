@@ -2,7 +2,7 @@
   "schema_version": "1.2",
   "artifact_type": "gate-node-route-profile",
   "profile_id": "gwc-gate-node-runtime-binding",
-  "revision": "workflow-contract-gate-applicability-20260810-r1",
+  "revision": "universal-v2-recursive-authority-r1-r1",
   "bound_graph_revision": "scrum-104-20260726",
   "bound_node_registry_revision": "scrum-288-entry-schema-validation-20260809-r1",
   "workflow_profile_ref": "full-flow-v3",
@@ -289,6 +289,153 @@
       },
       "next_node": null,
       "next_action": "complete_delivery_evidence",
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g0",
+      "gate": "UR.G0",
+      "requested_action": "UNDERSTAND",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g1",
+      "gate": "UR.G1",
+      "requested_action": "PLAN",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g2",
+      "gate": "UR.G2",
+      "requested_action": "EXECUTE",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g3",
+      "gate": "UR.G3",
+      "requested_action": "VERIFY",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g4",
+      "gate": "UR.G4",
+      "requested_action": "INTEGRATE",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g5",
+      "gate": "UR.G5",
+      "requested_action": "VALIDATE-IN-TARGET",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
+      "next_gate": null
+    },
+    {
+      "route_id": "universal-run-ur-g6",
+      "gate": "UR.G6",
+      "requested_action": "ACCEPT/HANDOFF",
+      "current_node": "universal_run.gate-adapter",
+      "node_descriptor_ref": "core/node-architect/node-extensions/universal_run/gate-adapter.node.json",
+      "node_instruction_ref": "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml",
+      "required_context": [
+        "universal_run_manifest",
+        "target_contract"
+      ],
+      "minimum_maturity": "experimental",
+      "allow_proposed_with_implementation": true,
+      "implementation": {
+        "kind": "python",
+        "ref": "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+      },
+      "next_node": null,
+      "next_action": null,
       "next_gate": null
     }
   ]

@@ -80,6 +80,23 @@ NOOP_REASON_CODES = (
     "NOOP_NOT_STARTED",
 )
 
+# Explicit gate outcomes for semantically empty transfer stages. These do not
+# skip a lifecycle position; every atomic run still visits all seven gates.
+TRANSFER_OUTCOME_KINDS = frozenset({"IN_PLACE", "NO_TRANSFER_REQUIRED"})
+
+
+@dataclass(frozen=True)
+class TransferOutcome:
+    """Typed declaration that a gate has no transfer effect to perform."""
+
+    kind: str
+    reason: str
+
+    def to_dict(self) -> dict[str, str]:
+        if self.kind not in TRANSFER_OUTCOME_KINDS or not self.reason.strip():
+            raise LifecycleStateMachineError("TRANSFER_OUTCOME_INVALID", self.kind)
+        return {"kind": self.kind, "reason": self.reason}
+
 _NOOP_REASON_BY_CASE: dict[tuple[str, str, str], str] = {}
 
 
@@ -360,6 +377,8 @@ __all__ = [
     "LifecycleStateMachineError",
     "NoOpOutcome",
     "TransitionResult",
+    "TRANSFER_OUTCOME_KINDS",
+    "TransferOutcome",
     "classify_noop",
     "edge_is_legal",
     "evaluate_transition",

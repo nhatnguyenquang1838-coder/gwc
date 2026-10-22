@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import yaml
 from jsonschema import Draft202012Validator, RefResolver
 
 FAMILIES = {
@@ -109,12 +110,61 @@ def _validate_extension_registry(
         issues.append("extension slots must be unique integers starting at 82")
 
     extension_edge_count = 0
+    version = extensions_payload.get("schema_version")
+    if version not in {"1.0.0", "2.0.0"}:
+        issues.append("extension registry schema_version is unsupported")
+    if version == "1.0.0" and len(extensions) != 1:
+        issues.append("v1 extension registry must preserve the single SCRUM-284 admission")
+
     for item, node in zip(extensions, extension_nodes):
         node_id = node.get("id")
-        if item.get("decision_task_id") != "SCRUM-284":
-            issues.append(f"extension {node_id} is not admitted by SCRUM-284")
-        if item.get("decision_scope_hash") != SCRUM_284_SCOPE_HASH:
-            issues.append(f"extension {node_id} decision scope hash drift")
+        slot = item.get("extension_slot")
+        legacy_284 = slot == 82
+        if legacy_284:
+            if item.get("decision_task_id") != "SCRUM-284":
+                issues.append(f"extension {node_id} is not admitted by SCRUM-284")
+            if item.get("decision_scope_hash") != SCRUM_284_SCOPE_HASH:
+                issues.append(f"extension {node_id} decision scope hash drift")
+            if version == "2.0.0" and (item.get("decision_admission_id") or item.get("decision_record_ref")):
+                issues.append("v2 registry must not rewrite SCRUM-284 slot-82 admission fields")
+        elif version == "1.0.0":
+            issues.append(f"v1 extension registry cannot admit post-v1 slot {slot}")
+        else:
+            task_id = item.get("decision_task_id")
+            decision_ref = item.get("decision_record_ref")
+            decision_path = (root / str(decision_ref or "")).resolve()
+            try:
+                decision_path.relative_to(root.resolve())
+                decision_path_safe = True
+            except ValueError:
+                decision_path_safe = False
+            if (not isinstance(task_id, str) or not task_id
+                    or not isinstance(item.get("decision_admission_id"), str)
+                    or not item.get("decision_admission_id")
+                    or not decision_ref or not decision_path_safe or not decision_path.is_file()):
+                issues.append(f"extension {node_id} requires an in-root versioned G1 decision admission")
+            else:
+                try:
+                    decision = yaml.safe_load(decision_path.read_text(encoding="utf-8"))
+                except (OSError, UnicodeError, yaml.YAMLError):
+                    decision = None
+                if not isinstance(decision, dict) or any((
+                    not isinstance(decision.get("trace"), dict),
+                    decision.get("trace", {}).get("task_id") != task_id,
+                    decision.get("trace", {}).get("repository") != "nhatnguyenquang1838-coder/gwc",
+                    decision.get("scope_hash") != item.get("decision_scope_hash"),
+                    decision.get("status") != "ACCEPTED",
+                    decision.get("g1_gate_outcome") != "PASS",
+                    not isinstance(decision.get("user_decision"), dict),
+                    decision.get("user_decision", {}).get("explicit") is not True,
+                    not isinstance(decision.get("authority_boundaries"), dict),
+                    decision.get("authority_boundaries", {}).get("grants") != [],
+                )):
+                    issues.append(f"extension {node_id} G1 decision binding is invalid")
+                elif not isinstance(item.get("decision_admission_id"), str) or not item.get("decision_admission_id"):
+                    issues.append(f"extension {node_id} G1 admission identity is missing")
+            if item.get("decision_scope_hash") == SCRUM_284_SCOPE_HASH:
+                issues.append(f"extension {node_id} must use its own decision scope hash")
         if node.get("family") not in FAMILIES:
             issues.append(f"extension node {node_id} has unknown family {node.get('family')}")
         if node.get("source_status") != "canonical_explicit":
@@ -141,8 +191,12 @@ def _validate_extension_registry(
             issues.append(f"extension node {node_id} route must start at the extension node")
         if not route_node_set <= effective_node_set:
             issues.append(f"extension node {node_id} route references unknown node")
-        if route.get("terminal_gate") != "G4_MERGE" or route.get("outcome") != "HUMAN_REQUIRED":
-            issues.append(f"extension node {node_id} must terminate at Human G4 authority")
+        if legacy_284:
+            if route.get("terminal_gate") != "G4_MERGE" or route.get("outcome") != "HUMAN_REQUIRED":
+                issues.append(f"extension node {node_id} must terminate at Human G4 authority")
+        elif (route.get("terminal_gate") != "G6_ACCEPT_HANDOFF"
+              or route.get("outcome") != "TARGET_CONTRACT_REQUIRED"):
+            issues.append(f"extension node {node_id} must require Parent Consumer G6 TargetContract")
 
         edges = route.get("edges", [])
         if not isinstance(edges, list) or not edges:
@@ -362,6 +416,33 @@ def validate_registry(root: Path) -> dict[str, Any]:
                 issues.append(
                     f"profile {profile.get('id')} route {route.get('route_id')} has unresolved node"
                 )
+
+    route_profile_path = registry_root / "gate-node-route-profile.json"
+    route_profile = load(route_profile_path)
+    route_profile_schema = root / "schemas" / "node-architect" / "gate-node-route-profile.schema.json"
+    issues.extend(
+        f"gate-route-profile: {error}"
+        for error in validate_schema(route_profile, route_profile_schema, root / "schemas" / "node-architect")
+    )
+    universal_routes = [
+        route for route in route_profile.get("routes", [])
+        if isinstance(route, dict) and str(route.get("gate", "")).startswith("UR.G")
+    ]
+    expected_universal_routes = {
+        ("UR.G0", "UNDERSTAND"), ("UR.G1", "PLAN"), ("UR.G2", "EXECUTE"),
+        ("UR.G3", "VERIFY"), ("UR.G4", "INTEGRATE"),
+        ("UR.G5", "VALIDATE-IN-TARGET"), ("UR.G6", "ACCEPT/HANDOFF"),
+    }
+    actual_universal_routes = {(item.get("gate"), item.get("requested_action")) for item in universal_routes}
+    if actual_universal_routes != expected_universal_routes or len(universal_routes) != len(expected_universal_routes):
+        issues.append("Universal Run route profile must bind exactly the seven generic UR.G0-G6 routes")
+    for route in universal_routes:
+        if (route.get("current_node") != "universal_run.gate-adapter"
+                or route.get("node_descriptor_ref") != "core/node-architect/node-extensions/universal_run/gate-adapter.node.json"
+                or route.get("node_instruction_ref") != "core/node-architect/node-instructions/universal_run/gate-adapter.node-instruction.yaml"
+                or route.get("implementation", {}).get("ref") != "tools/node_architect/universal_run_gate_adapter.py:handle_gate"
+                or route.get("next_gate") is not None):
+            issues.append(f"Universal Run route {route.get('route_id')} is not bound to the admitted adapter")
 
     return {
         "outcome": "PASS" if not issues else "FAIL",

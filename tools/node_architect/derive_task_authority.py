@@ -30,6 +30,59 @@ def _decision_digest(value: Mapping[str, Any]) -> str:
     return canonical_digest(value, omit=("decision_digest",))
 
 
+def evaluate_parent_child_authority(parent: Mapping[str, Any], child: Mapping[str, Any]) -> dict[str, Any]:
+    """Evaluate deterministic parent-to-child inheritance without issuing approval."""
+    def deny(code: str) -> dict[str, Any]:
+        result = {"decision": "DENY", "reason_code": code}
+        result["decision_digest"] = canonical_digest(result)
+        return result
+
+    if not isinstance(parent, Mapping) or not isinstance(child, Mapping):
+        return deny("AUTHORITY_PARENT_GRANT_INVALID")
+    if parent.get("source") != "human_approval" or parent.get("revoked") is not False:
+        return deny("AUTHORITY_PROVENANCE_INVALID")
+    child_id, parent_id = child.get("child_run_id"), parent.get("run_id")
+    if not isinstance(child_id, str) or not child_id or child_id == parent_id:
+        return deny("AUTHORITY_SELF_GRANT_FORBIDDEN")
+    if child.get("parent_run_id") != parent_id:
+        return deny("AUTHORITY_LINEAGE_INVALID")
+    ancestors = parent.get("ancestor_run_ids", [])
+    if not isinstance(ancestors, list) or child_id in ancestors or parent_id in ancestors:
+        return deny("AUTHORITY_LINEAGE_INVALID")
+    if parent.get("issuer", parent.get("issued_by")) in {child_id, *ancestors}:
+        return deny("AUTHORITY_SELF_GRANT_FORBIDDEN")
+    if child.get("actor") != parent.get("actor"):
+        return deny("AUTHORITY_ACTOR_MISMATCH")
+    for field in ("repository", "branch", "head_sha", "target"):
+        if child.get(field) != parent.get(field):
+            return deny("AUTHORITY_SCOPE_DRIFT")
+    pscope, cscope = parent.get("scope"), child.get("scope")
+    if (not isinstance(pscope, list) or not pscope or not isinstance(cscope, list) or not cscope
+            or any(not isinstance(p, str) or not p or p.startswith("/") or ".." in p.split("/") for p in pscope + cscope)
+            or len(set(pscope)) != len(pscope) or len(set(cscope)) != len(cscope)
+            or not set(cscope).issubset(pscope)):
+        return deny("AUTHORITY_SCOPE_DRIFT")
+    levels = {"LOW": 0, "MEDIUM": 1, "HIGH": 2, "CRITICAL": 3, "R0": 0, "R1": 1, "R2": 2, "R3": 3}
+    if parent.get("risk_ceiling") not in levels or child.get("risk_ceiling") not in levels:
+        return deny("AUTHORITY_RISK_INVALID")
+    if levels[child["risk_ceiling"]] > levels[parent["risk_ceiling"]]:
+        return deny("AUTHORITY_RISK_ESCALATION")
+    action = child.get("action")
+    actions = parent.get("actions")
+    if not isinstance(actions, list) or action not in actions:
+        return deny("AUTHORITY_ACTION_FORBIDDEN")
+    closure = {"G2_EXECUTION": {"G2_EXECUTION"}, "G3_REVIEW": {"G3_REVIEW"},
+               "G3_PR": {"G3_PR"}}
+    if action not in closure or not closure[action].issubset(set(actions)):
+        return deny("AUTHORITY_ACTION_FORBIDDEN")
+    result = {"decision": "ALLOW", "reason_code": "AUTHORITY_CHILD_DERIVED",
+              "parent_run_id": parent_id, "child_run_id": child_id,
+              "scope_hash": canonical_digest({"scope": sorted(cscope)}),
+              "action_effect_closure": sorted(closure[action])}
+    result["decision_digest"] = canonical_digest(result)
+    return result
+
+
 def _deny(gate: str, code: str, *, run_id: str | None = None, task_id: str | None = None) -> dict[str, Any]:
     value: dict[str, Any] = {
         "schema_version": "1.0",

@@ -129,6 +129,36 @@ class TestGateNodeRouteResolution(unittest.TestCase):
         self.assertEqual(result["next_gate"], "G3_PR")
         self.assertFalse(result["pr_authority_granted"])
 
+    def test_universal_run_route_resolves_from_validated_slot83_sidecar(self):
+        context = {
+            "task_id": "generic-child-1", "run_id": "generic-child-1", "gate": "UR.G4", "requested_action": "INTEGRATE",
+            "workflow_mode": "normal", "expected_profile_revision": self.profile["revision"],
+            "expected_graph_revision": self.mod._graph_revision(self.graph),
+            "context": {
+                "universal_run_manifest": {"run_id": "generic-child-1", "run_kind": "CHILD",
+                                           "parent_run_ref": "generic-root"},
+                "target_contract": {"run_id": "generic-child-1", "target_id": "test-target"},
+            },
+        }
+        result = self.resolve(context)
+        self.assertEqual(result["outcome"], "ROUTE_SELECTED", result)
+        self.assertEqual(result["current_node"], "universal_run.gate-adapter")
+        self.assertEqual(result["route_id"], "universal-run-ur-g4")
+        self.assertFalse(result["authority_granted"])
+
+    def test_universal_run_route_rejects_cross_run_target_contract(self):
+        ctx = {
+            "task_id": "generic-child-1", "run_id": "generic-child-1", "gate": "UR.G4", "requested_action": "INTEGRATE",
+            "workflow_mode": "normal", "expected_profile_revision": self.profile["revision"],
+            "expected_graph_revision": self.mod._graph_revision(self.graph),
+            "context": {
+                "universal_run_manifest": {"run_id": "generic-child-1", "run_kind": "CHILD",
+                                           "parent_run_ref": "generic-root"},
+                "target_contract": {"run_id": "other-child", "target_id": "test-target"},
+            },
+        }
+        self.assertEqual(self.resolve(ctx)["reason_code"], "UNIVERSAL_RUN_IDENTITY_OR_TARGET_INVALID")
+
     def test_missing_context_fails_closed(self):
         ctx = context()
         del ctx["context"]["approval_receipt"]

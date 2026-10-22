@@ -1,0 +1,138 @@
+schema_version: '1.0'
+artifact_type: g1-intake-brief
+generated_at: '2026-10-22T18:25:53Z'
+trace:
+  project_id: gwc
+  repository: nhatnguyenquang1838-coder/gwc
+  task_id: UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1
+  base_sha: f560db71705d89d0ded2a5efbcaeb4c7c4dafab8
+  g0_snapshot: ../../g0/context-snapshot.yaml
+problem:
+  statement: The generic recursive G0-G6 runtime requires one explicit, source-backed post-81 gate-adapter node admission
+    without altering the frozen 81-node baseline or the SCRUM-284 slot-82 extension.
+  why_now: 'Controller #197 explicitly selected this design admission and required a validated, source-bound G1 package before
+    any registry/validator source edits.'
+desired_outcome: Record a validated G1 design admission for one versioned sidecar extension, universal_run.gate-adapter at
+  unique candidate slot 83, with seven domain-neutral UR.G0-G6 routes and Parent Consumer G6 TargetContract; preserve 81 and
+  SCRUM-284 slot 82.
+stakeholders:
+  requester: User / GWC Controller
+  affected:
+  - Generic GWC runtime consumers
+  - SCRUM-781 consumer run
+  - GWC governance maintainers
+scope:
+  in_scope:
+  - 'G1-only decision package for generic Root run universal-v2-recursive-authority-r1; consumer edge SCRUM-781 run scrum781-q0-fresh-20261010-r1
+    / PR #609.'
+  - 'Selected option: one universal_run.gate-adapter node admitted through the separately versioned runtime extension sidecar
+    at unused slot 83, conditional on current uniqueness validation.'
+  - 'Seven domain-neutral routes: G0_CONTEXT/UNDERSTAND; G1_ALIGNMENT/PLAN; G2_EXECUTION/EXECUTE; G3_REVIEW/VERIFY; G4_INTEGRATE/target-defined;
+    G5_VALIDATE_TARGET/readback; G6_ACCEPT_HANDOFF/consumer receipt.'
+  - Generic G4/G5/G6 remain distinct from legacy G4_MERGE/G5_DEPLOY/G6_PRODUCTION_DATA; include Parent Consumer G6 TargetContract
+    and C2 trust fail-closed corrections.
+  - 'Future candidate code scope, bound by the canonical scope hash: core/node-architect/gate-node-route-profile.json, core/node-architect/node-extensions/universal_run/gate-adapter.node.instruction-card.json,
+    core/node-architect/node-extensions/universal_run/gate-adapter.node.json, core/node-architect/runtime-node-extension-registry.json,
+    schemas/runtime/runtime-node-extension-registry.schema.json, tests/test_gate_node_route_resolution.py, tests/test_gate_node_routes.py,
+    tests/test_instruction_source_registry.py, tests/test_node_instruction_contract.py, tests/test_runtime_registry_validation.py,
+    tests/test_universal_run_derived_authority_v1.py, tests/test_universal_run_gate_adapter.py, tests/test_universal_run_risk_routing_v1.py,
+    tests/test_universal_v2_recursive_e2e_v1.py, tools/node_architect/agent_runtime_cli.py, tools/node_architect/agent_runtime_entrypoint.py,
+    tools/node_architect/build_node_instruction_pack.py, tools/node_architect/resolve_gate_node_route.py, tools/node_architect/universal_run_authority.py,
+    tools/node_architect/universal_run_gate_adapter.py, tools/node_architect/universal_run_node.py, tools/node_architect/validate_node_instruction.py,
+    tools/node_architect/validate_runtime_registry.py'
+  - 'Future candidate actions represented in scope identity: modify_approved_files and run_sandboxed_validation only; branch/commit/push/PR
+    promotion/merge/deploy/production/secrets/migration excluded.'
+  non_goals:
+  - Any G2 source edit/effect authority, registry/schema/validator mutation during this task, or approval request.
+  - Modification of core/node-architect/node-registry.json, historical 81-node expansion plan, or SCRUM-284 slot 82 / decision
+    scope hash / legacy route.
+  - Protected main, merge, deploy, production, secrets, migration, destructive operations, Q0 live selector/checkpoint/cursor/scheduler
+    (APPROVE B), fabricated Human authority or signing keys.
+  - Claiming C1 host integration, verified trust anchor, successful host E2E, authenticated Human grant, Parent G6, or external
+    acceptance from schema-only G1 PASS.
+  - Changing the pre-existing untracked tools/node_architect/universal_run_gate_adapter.py or tests/test_universal_run_gate_adapter.py
+    in this artifact-only task.
+constraints:
+- Use exact existing G0/G1 schemas and tools/validate_g01.py.
+- Use tools/node_architect/scope_hash_calculation.py; accept only outcome READY with a non-null scope_hash.
+- 'Bind repository, base, branch, head, and PR #613; do not reuse SCRUM-284 hash or write a fabricated digest.'
+- Keep G1 authority_boundaries.grants empty; this decision is design admission, not source-edit authority.
+- Preserve all files outside .gwc/tasks/UNIVERSAL-V2-RECURSIVE-AUTHORITY-R1/g0/** and g1/**.
+assumptions:
+- Current source readback shows slot 82 is occupied by SCRUM-284 and slot 83 is unused; revalidate before source changes.
+- The task worktree HEAD is c6a50e1d8d805c65348f0d4c3db2eb751bc74664 and protected base is f560db71705d89d0ded2a5efbcaeb4c7c4dafab8.
+- The untracked gate-adapter implementation/test existed before this artifact materialization and are not used as committed-source
+  proof.
+risks:
+- id: RISK-001
+  description: A versioned sidecar admission can accidentally weaken SCRUM-284 v1 constraints or baseline immutability.
+  impact: high
+  mitigation: Preserve v1 behavior behind explicit versioned policy, assert 81/82 unchanged, and test generic slot 83 separately.
+- id: RISK-002
+  description: Generic G4/G5/G6 could be mapped to legacy merge/deploy/production actions or bypass TargetContract receipt
+    checks.
+  impact: high
+  mitigation: Use explicit generic route vocabulary, target-defined outcomes, typed receipts, and negative alias tests.
+- id: RISK-003
+  description: Derived-child or parent approval trust could be self-authorized by serialized data without an independent issuer/readback.
+  impact: high
+  mitigation: Keep C2 fail-closed with AUTHORITY_TRUST_ANCHOR_UNAVAILABLE until an independently authenticated source is proven;
+    never synthesize grants.
+- id: RISK-004
+  description: A canonical scope digest could be mistaken for authority or could omit planned source paths.
+  impact: high
+  mitigation: Record exact canonical inputs, require READY, keep grants empty, and rederive if any path/action/base/head changes.
+acceptance_criteria:
+- id: AC-0
+  statement: 'Apply #191 source-routing correction: bind the generic Root identity separately from SCRUM-781, trace the real
+    CLI/entrypoint/route seam, and do not rely on a synthetic controller shim.'
+  verifiable: true
+- id: AC-1
+  statement: Implement the generic recursively composable UR.G0 UNDERSTAND through UR.G6 ACCEPT/HANDOFF lifecycle for Root,
+    Child, and atomic Runs, with typed ChildRun receipts and provenance.
+  verifiable: true
+- id: AC-2
+  statement: Keep valid in-scope low/medium-risk child execution observable and interruptible under HUMAN-ON-THE-LOOP without
+    duplicate approval tokens; preserve per-Run G2 entry.
+  verifiable: true
+- id: AC-3
+  statement: Require HUMAN-IN-THE-LOOP at the actual G2 boundary for high-risk or privileged effects unless current, independently
+    validated, reusable Human authority is explicitly permitted by canonical policy.
+  verifiable: true
+- id: AC-4
+  statement: Hold only an out-of-scope, stale, cross-target, untrusted, or escalated effect and continue independently authorized
+    nonblocked work.
+  verifiable: true
+- id: AC-5
+  statement: 'Reject self-grants and forged authority: a parent approval is not wildcard authority, and plans, comments, registries,
+    fixtures, or self-hashed JSON are not Human trust anchors.'
+  verifiable: true
+- id: AC-6
+  statement: Keep Q0 live selector/checkpoint/cursor activation (APPROVE B), protected-main merge, deploy, production, secrets,
+    and migration outside this package.
+  verifiable: true
+- id: AC-7
+  statement: Provide durable continuation/recovery, lease and audit evidence where required; test restart and one-use behavior
+    rather than infer recovery from in-memory replay.
+  verifiable: true
+- id: AC-8
+  statement: Require authentic G3/G4/G5 evidence and accepted Child G6 handoff before Parent integration/validation/acceptance;
+    use typed receipts, not phantom PASS.
+  verifiable: true
+- id: AC-9
+  statement: Preserve backward-compatible standalone R2 behavior and existing 81-node baseline plus SCRUM-284 slot 82 behavior.
+  verifiable: true
+- id: AC-10
+  statement: Verify cross-target generic execution through the actual configured host/CLI path from a clean checkout, distinguishing
+    injected simulations from host integration.
+  verifiable: true
+- id: AC-11
+  statement: Admit exactly one source-backed universal_run.gate-adapter at unused post-81 slot 83 through the versioned sidecar;
+    preserve baseline 81 and slot 82, and validate decision, scope, provenance, uniqueness, and effective-registry resolution.
+  verifiable: true
+- id: AC-12
+  statement: Keep generic G4/G5/G6 target semantics and Parent Consumer G6 TargetContract distinct from G4_MERGE/G5_DEPLOY/G6_PRODUCTION_DATA;
+    keep C2 trust-anchor evaluation fail-closed unless a real independent issuer is verified.
+  verifiable: true
+unresolved_questions: []
+status: READY
