@@ -48,6 +48,19 @@ def event_result(run_id, gate):
     }
 
 
+def test_generic_root_manifest_has_distinct_identity_and_q0_consumer_edge():
+    from pathlib import Path
+    from tools.node_architect.universal_run_kernel import verify_record_digest
+    path = Path(__file__).resolve().parents[1] / "core/node-architect/universal-v2-recursive-authority-root-r1.json"
+    manifest = __import__("json").loads(path.read_text(encoding="utf-8"))
+    assert verify_record_digest(manifest)
+    assert manifest["run_kind"] == "ROOT"
+    assert manifest["run_id"] == "universal-v2-recursive-authority-r1"
+    assert manifest["parent_run_ref"] is None
+    assert manifest["invoking_node_allocation_ref"] is None
+    assert "run:scrum781-q0-fresh-20261010-r1" in manifest["provenance"]["source_refs"]
+
+
 def test_recursive_children_run_all_gates_through_host_and_parent_waits_for_receipts():
     calls = []
 
@@ -96,9 +109,69 @@ def test_failed_child_receipt_fails_parent_aggregation_but_sibling_runs():
         authority={"authority_ref": "existing-authority"}, canonical_state={},
     )
     assert "child-c" in {call["run_id"] for call in calls}
+    # A rejected required child blocks parent composition before G3/G4/G5/G6.
+    assert not any(call["run_id"] == "generic-root-191" and call["gate"] in GATES[3:]
+                   for call in calls)
     assert result["status"] == "FAILED"
+    assert result["parent_aggregation"]["g3"] == "FAILED"
     assert result["parent_aggregation"]["g4"] == "FAILED"
     assert result["parent_aggregation"]["g5"] == "FAILED"
+
+
+def test_generic_gates_never_default_to_protected_domain_effects():
+    dag = RecursiveRunDag()
+    assert dag._host_gate("G4") == "G4_INTEGRATE"
+    assert dag._host_gate("G5") == "G5_VALIDATE_TARGET"
+    assert dag._host_gate("G6") == "G6_ACCEPT_HANDOFF"
+    assert "G4_MERGE" not in {dag._host_gate(g) for g in ("G4", "G5", "G6")}
+    assert "G5_DEPLOY" not in {dag._host_gate(g) for g in ("G4", "G5", "G6")}
+    assert "G6_PRODUCTION_DATA" not in {dag._host_gate(g) for g in ("G4", "G5", "G6")}
+
+
+def test_child_cannot_inject_authority_or_cross_run_canonical_state():
+    calls = []
+    def host(**kwargs):
+        calls.append(kwargs)
+        return event_result(kwargs["run_id"], kwargs["gate"])
+    dag = RecursiveRunDag(runtime_event=host)
+    for override, code in [
+        ({"authority": {"authority_ref": "forged"}}, "CHILD_AUTHORITY_OVERRIDE_FORBIDDEN"),
+        ({"canonical_state": {"run_id": "other-run"}}, "CHILD_CANONICAL_STATE_OVERRIDE_FORBIDDEN"),
+    ]:
+        calls.clear()
+        with pytest.raises(NodeArchitectureError, match=code):
+            dag.execute(root_manifest=root(), child_node_allocations=[
+                spec("generic-root-191", "child-inject", "node-inject", **override)
+            ], authority={"authority_ref": "parent"}, canonical_state={"run_id": "generic-root-191"})
+        assert not any(call["run_id"] == "child-inject" for call in calls)
+        assert not any(call["run_id"] == "generic-root-191" and call["gate"] in GATES[3:]
+                       for call in calls)
+
+
+def test_waiting_child_is_recoverable_and_siblings_continue():
+    calls = []
+    released = False
+    def host(**kwargs):
+        nonlocal released
+        calls.append((kwargs["run_id"], kwargs["gate"]))
+        if kwargs["run_id"] == "child-wait" and kwargs["gate"] == "G2" and not released:
+            return {"status": "WAITING", "reason_code": "EFFECT_HOLD"}
+        return event_result(kwargs["run_id"], kwargs["gate"])
+    dag = RecursiveRunDag(runtime_event=host)
+    checkpoint = {}
+    kwargs = dict(root_manifest=root(), child_node_allocations=[
+        spec("generic-root-191", "child-wait", "node-wait"),
+        spec("generic-root-191", "child-sibling", "node-sibling"),
+    ], authority={}, canonical_state={}, checkpoint=checkpoint)
+    first = dag.execute(**kwargs)
+    assert first["status"] == "WAITING"
+    assert any(run_id == "child-sibling" for run_id, _ in calls)
+    assert not any(run_id == "generic-root-191" and gate in GATES[3:] for run_id, gate in calls)
+    assert checkpoint["generations"]["generic-root-191:node-wait"][0]["terminal_state"] == "OPEN"
+    released = True
+    second = dag.execute(**kwargs)
+    assert second["status"] == "COMPLETED"
+    assert checkpoint["generations"]["generic-root-191:node-wait"][0]["terminal_state"] == "ACCEPTED"
 
 
 def test_dag_rejects_cycles_duplicate_ids_self_parent_and_depth_budget():

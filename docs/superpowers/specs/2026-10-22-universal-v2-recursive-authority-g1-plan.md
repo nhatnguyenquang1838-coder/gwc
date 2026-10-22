@@ -67,9 +67,9 @@ CORRECTION (F4): dependencies are TRUE data dependencies, not an artificial seri
   driver that runs through the REAL host seam (`run_agent_runtime_event` →
   `resolve_gate_node_route` → node dispatch), NOT a parallel controller. Parent/child
   IDs distinct, immutable lineage, separate gate states, dependency ordering, DAG
-  budget/max-depth/cycle/SINGLE_ACTIVE protections, durable cursor/checkpoint resume,
-  child G6 acceptance + failure propagation. Atomic Run runs full G0–G6 (typed
-  IN_PLACE/NO_TRANSFER_REQUIRED where applicable; no silent skip).
+  typed IN_PLACE/NO_TRANSFER_REQUIRED where applicable; no silent skip. The current
+  checkpoint mapping is an in-memory replay prototype only; disk/process-crash durability,
+  sealed receipts, CAS and persistent leases belong to C4 and are not claimed by C1.
   AC: AC1, AC7(partial), AC8. Owner files: `universal_run_topology.py`,
   `universal_run_lifecycle.py`, `universal_run_node.py`; tests `tests/test_universal_run_dag_v1.py` (new).
   DEPENDS ON: nothing (foundational topology/kernel/lifecycle/state/plan are pure and already

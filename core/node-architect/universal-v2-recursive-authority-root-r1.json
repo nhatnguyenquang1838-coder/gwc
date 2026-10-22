@@ -1,0 +1,32 @@
+{
+  "record_id": "run-manifest:universal-v2-recursive-authority-r1",
+  "schema_id": "gwc.universal-run.run-manifest-revision",
+  "schema_version": 1,
+  "run_id": "universal-v2-recursive-authority-r1",
+  "created_at": "2026-10-22T00:00:00Z",
+  "created_by": {
+    "kind": "agent",
+    "id": "dwa"
+  },
+  "lifecycle_profile": {
+    "id": "gwc.universal-run",
+    "version": 1
+  },
+  "provenance": {
+    "predecessor_refs": [],
+    "source_refs": [
+      "github://nhatnguyenquang1838-coder/gwc/commit/f560db71705d89d0ded2a5efbcaeb4c7c4dafab8",
+      "github://nhatnguyenquang1838-coder/gwc/pull/609#consumer",
+      "run:scrum781-q0-fresh-20261010-r1"
+    ]
+  },
+  "revision": 1,
+  "run_kind": "ROOT",
+  "parent_run_ref": null,
+  "invoking_node_allocation_ref": null,
+  "content_digest": {
+    "algorithm": "sha256",
+    "canonicalization": "JCS",
+    "value": "079fb041542a16db1dc1f074d91bbd969d728445e823fe3b0bf876fc1588590b"
+  }
+}

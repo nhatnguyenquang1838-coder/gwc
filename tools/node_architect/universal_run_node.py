@@ -403,7 +403,9 @@ class RecursiveRunDag:
 
     Specs contain a sealed ``node_allocation``, a distinct ``child_run_id``,
     optional ``depends_on`` IDs and nested ``children``. ``checkpoint`` is a
-    caller-owned durable mapping of gate receipts, generations and run receipts.
+    caller-owned in-memory checkpoint mapping prototype for gate receipts,
+    generations and run receipts; it is NOT disk/process-crash durable. C4 owns
+    persistence, sealed receipts, replay preconditions and CAS.
     """
 
     def __init__(self, *, runtime_event: Any | None = None, max_depth: int = 16, max_nodes: int = 256):
@@ -423,12 +425,16 @@ class RecursiveRunDag:
         self.max_nodes = max_nodes
 
     def _host_gate(self, gate: str) -> str:
+        # COMMAND #193 F2: universal G4/G5/G6 are INTEGRATE / VALIDATE-IN-TARGET /
+        # ACCEPT-HANDOFF. They must NEVER default to a protected domain effect
+        # (G4_MERGE / G5_DEPLOY / G6_PRODUCTION_DATA) — that requires a separately
+        # resolved canonical route, scope and exact authenticated authority.
         if not self._uses_host_defaults:
             return gate
         return {
             "G0": "G0_CONTEXT", "G1": "G1_ALIGNMENT", "G2": "G2_EXECUTION",
-            "G3": "G3_PR", "G4": "G4_MERGE", "G5": "G5_DEPLOY",
-            "G6": "G6_PRODUCTION_DATA",
+            "G3": "G3_REVIEW", "G4": "G4_INTEGRATE", "G5": "G5_VALIDATE_TARGET",
+            "G6": "G6_ACCEPT_HANDOFF",
         }[gate]
 
     @staticmethod
@@ -497,7 +503,9 @@ class RecursiveRunDag:
                 visited.add(run_id)
                 active.add(run_id)
                 cached = run_receipts.get(run_id)
-                if isinstance(cached, Mapping) and cached.get("status") in {"COMPLETED", "FAILED"}:
+                # Only accepted terminal receipts are replay-cached. FAILED/WAITING
+                # attempts are recoverable from their gate cursor and may be retried.
+                if isinstance(cached, Mapping) and cached.get("status") == "COMPLETED":
                     active.remove(run_id)
                     return copy.deepcopy(dict(cached))
 
@@ -507,7 +515,8 @@ class RecursiveRunDag:
                 outcomes: dict[str, Any] = {}
                 g6 = None
                 failure = None
-                gate_sequence = GATES[:4] if specs else GATES
+                waiting = False
+                gate_sequence = GATES[:3] if specs else GATES
                 for gate in gate_sequence:
                     saved = gate_store.get(gate)
                     if isinstance(saved, Mapping):
@@ -523,6 +532,8 @@ class RecursiveRunDag:
                                    "state": run_state, "event_id": f"{run_id}:{gate}"})
                     response = self.runtime_event(**kwargs)
                     if not isinstance(response, Mapping) or response.get("status") not in {"COMPLETED", "PASSED"}:
+                        response_status = str(response.get("status", "" )).upper() if isinstance(response, Mapping) else ""
+                        waiting = response_status in {"WAITING", "HOLD", "BLOCKED"}
                         failure = str(response.get("reason_code", "CHILD_EVENT_NOT_COMPLETED")) if isinstance(response, Mapping) else "CHILD_EVENT_INVALID"
                         break
                     if gate == "G3" and not isinstance(response.get("evidence"), Mapping):
@@ -568,14 +579,23 @@ class RecursiveRunDag:
                             raise NodeArchitectureError("NODE_ALLOCATION_REQUIRED", child_id)
                         generation_key = f"{run_id}:{allocation.get('node_allocation_id')}"
                         generations = store.setdefault("generations", {}).setdefault(generation_key, [])
-                        existing_open = next((state for state in generations
-                                              if state.get("child_run_ref") == child_id
-                                              and state.get("terminal_state") == "OPEN"), None)
+                        existing_state = next((state for state in generations
+                                               if state.get("child_run_ref") == child_id), None)
+                        existing_open = existing_state is not None and existing_state.get("terminal_state") == "OPEN"
                         materialization_key = f"{run_id}:{child_id}"
-                        if existing_open is not None:
+                        if existing_open:
                             materialization = store.setdefault("materializations", {}).get(materialization_key)
                             if not isinstance(materialization, Mapping):
                                 raise NodeArchitectureError("CHILD_CHECKPOINT_INVALID", child_id)
+                        elif existing_state is not None and existing_state.get("terminal_state") == "ACCEPTED":
+                            # Accepted sibling generations are immutable and idempotently
+                            # reused when a different sibling resumes from WAITING.
+                            materialization = store.setdefault("materializations", {}).get(materialization_key)
+                            cached_child = run_receipts.get(child_id)
+                            if not isinstance(materialization, Mapping) or not isinstance(cached_child, Mapping):
+                                raise NodeArchitectureError("CHILD_CHECKPOINT_INVALID", child_id)
+                            children.append(copy.deepcopy(dict(cached_child)))
+                            continue
                         else:
                             materialization = materialize_child_run(
                                 record_id=f"materialization:{run_id}:{child_id}", parent_run_id=run_id,
@@ -583,6 +603,7 @@ class RecursiveRunDag:
                                 created_at=str(spec.get("created_at", "1970-01-01T00:00:00Z")),
                                 created_by=spec.get("created_by", {"kind": "agent", "id": "recursive-run-dag"}),
                                 generation_states=generations,
+                                reason="RERUN_SUBTREE" if existing_state is not None else "INITIAL",
                             )
                             generations.append({"child_run_ref": child_id, "generation": materialization["generation"], "terminal_state": "OPEN"})
                             store.setdefault("materializations", {})[materialization_key] = copy.deepcopy(materialization)
@@ -599,16 +620,35 @@ class RecursiveRunDag:
                         child_outcomes = spec.get("outcomes", {})
                         if not isinstance(child_outcomes, Mapping):
                             raise NodeArchitectureError("TRANSFER_OUTCOME_INVALID", child_id)
+                        # COMMAND #193 F4: reject child-supplied authority or canonical
+                        # context BEFORE dispatch. C2 may later supply a verified derived
+                        # receipt through a separate typed path; arbitrary spec overrides
+                        # are never authority.
+                        if spec.get("authority") is not None:
+                            raise NodeArchitectureError("CHILD_AUTHORITY_OVERRIDE_FORBIDDEN", child_id)
+                        if spec.get("canonical_state") is not None:
+                            raise NodeArchitectureError("CHILD_CANONICAL_STATE_OVERRIDE_FORBIDDEN", child_id)
                         child = run_one(child_id, list(spec.get("children", ())), depth + 1, child_outcomes,
-                                        spec.get("authority", run_authority), spec.get("state"),
-                                        spec.get("canonical_state", run_canonical_state))
-                        generations[-1]["terminal_state"] = "ACCEPTED" if (child.get("g6_receipt") or {}).get("status") == "ACCEPTED" else "FAILED"
+                                        run_authority, run_state, run_canonical_state)
+                        # COMMAND #193 F1: a failed/held child blocks parent G4/G5/G6,
+                        # but does NOT stop independent siblings from making progress.
+                        child_status = child.get("status")
+                        child_accepted = (child.get("g6_receipt") or {}).get("status") == "ACCEPTED"
+                        generations[-1]["terminal_state"] = (
+                            "ACCEPTED" if child_accepted else "OPEN" if child_status == "WAITING" else "FAILED"
+                        )
+                        if not child_accepted and failure is None:
+                            failure = "CHILD_G6_NOT_ACCEPTED"
+                        if child_status == "WAITING":
+                            waiting = True
                         child["run_manifest"] = child_manifest
                         child["materialization_receipt"] = materialization
                         children.append(child)
 
                 if specs and not failure:
-                    for gate in GATES[4:]:
+                    # Parent G3 (composition review) and G4-G6 run only after every
+                    # required child has an ACCEPTED G6 receipt.
+                    for gate in GATES[3:]:
                         saved = gate_store.get(gate)
                         if isinstance(saved, Mapping):
                             evidence[gate] = copy.deepcopy(saved.get("evidence"))
@@ -647,7 +687,7 @@ class RecursiveRunDag:
                 accepted_children = all((c.get("g6_receipt") or {}).get("status") == "ACCEPTED" for c in children)
                 failed = bool(failure) or not accepted_children
                 result = {
-                    "run_id": run_id, "status": "FAILED" if failed else "COMPLETED",
+                    "run_id": run_id, "status": "WAITING" if waiting else "FAILED" if failed else "COMPLETED",
                     "failure_code": failure or ("CHILD_G6_NOT_ACCEPTED" if not accepted_children else None),
                     "gate_evidence": evidence, "gate_readbacks": readbacks, "gate_outcomes": outcomes,
                     "children": children,
@@ -657,7 +697,12 @@ class RecursiveRunDag:
                                            "g5": "VERIFIED" if accepted_children and not failed else "FAILED",
                                            "g6": "ACCEPTED" if not failed and g6 else "FAILED"},
                 }
-                run_receipts[run_id] = copy.deepcopy(result)
+                if result["status"] == "COMPLETED":
+                    run_receipts[run_id] = copy.deepcopy(result)
+                else:
+                    # Keep recoverable WAITING/FAILED state out of terminal cache;
+                    # gate_store remains the resumable cursor for the next attempt.
+                    run_receipts.pop(run_id, None)
                 active.remove(run_id)
                 return result
 
