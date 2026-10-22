@@ -124,6 +124,12 @@ def _verification_receipt():
 
 def _cert_inputs(**overrides):
     m = _m()
+    replay_provenance = {
+        "subject": "ORIGINAL_DWO", "scenario_id": "original-incident-1",
+        "observed_prestate_ref": "evidence:prestate-1", "observed_error_ref": "evidence:error-1",
+        "defect_class": "GENUINE_GWC_RUNTIME_DEFECT", "original_incident_replayed": True,
+    }
+    replay_provenance["provenance_digest"] = _digest(replay_provenance)
     matrix_body = {
         "mandatory_entries": list(m.MANDATORY_QUALIFICATION_ENTRIES),
         "results": {k: "PASS" for k in m.MANDATORY_QUALIFICATION_ENTRIES},
@@ -151,6 +157,7 @@ def _cert_inputs(**overrides):
         "incident_replay_refs": ["replay:1"],
         "replay_result": "PASS",
         "replay_exact_readback": True,
+        "replay_provenance": replay_provenance,
         "previous_failure_state": "CONTROLLER_WAIT",
         "first_state_beyond_failure": "UR.G2_EXECUTION_STARTED",
         "forward_progress_refs": ["progress:1"],

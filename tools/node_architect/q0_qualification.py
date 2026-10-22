@@ -26,6 +26,8 @@ Q0_INTEGRATION_GATE = "UR.G4"
 LOGIN_TARGET = "LOGIN_R00_PLUS"
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
+SUPPORTED_Q0_CERTIFICATION_SCHEMA_VERSIONS = ("1.0", "1.1")
+CURRENT_Q0_CERTIFICATION_SCHEMA_VERSION = "1.1"
 
 MANDATORY_QUALIFICATION_ENTRIES = (
     "fresh_boot", "default_route", "runtime_plan", "node_allocation",
@@ -550,12 +552,16 @@ def advance_qualification_gate(
     }
 
 
-def _validate_matrix(matrix: Mapping[str, Any]) -> None:
+def _validate_matrix_digest(matrix: Mapping[str, Any]) -> None:
     _require(isinstance(matrix, Mapping), "QUALIFICATION_MATRIX_REQUIRED")
     digest = matrix.get("digest")
     _require(_valid_digest(digest), "QUALIFICATION_MATRIX_DIGEST_INVALID")
     matrix_body = {k: copy.deepcopy(v) for k, v in matrix.items() if k != "digest"}
     _require(digest == _digest(matrix_body), "QUALIFICATION_MATRIX_DIGEST_MISMATCH")
+
+
+def _validate_matrix(matrix: Mapping[str, Any]) -> None:
+    _validate_matrix_digest(matrix)
     declared_mandatory = matrix.get("mandatory_entries")
     _require(isinstance(declared_mandatory, list) and tuple(declared_mandatory) == MANDATORY_QUALIFICATION_ENTRIES, "QUALIFICATION_MATRIX_PROFILE_MISMATCH")
     results = matrix.get("results")
@@ -565,11 +571,39 @@ def _validate_matrix(matrix: Mapping[str, Any]) -> None:
     _require(not list(matrix.get("active_unresolved_defects") or []), "ACTIVE_Q0_DEFECTS")
 
 
+def _validate_replay_provenance(replay_provenance: Any) -> dict[str, Any]:
+    _require(isinstance(replay_provenance, Mapping), "REPLAY_PROVENANCE_INVALID")
+    provenance = dict(replay_provenance)
+    allowed_fields = {
+        "subject", "scenario_id", "observed_prestate_ref", "observed_error_ref",
+        "defect_class", "original_incident_replayed", "authorization_ref", "provenance_digest",
+    }
+    _require(set(provenance).issubset(allowed_fields), "REPLAY_PROVENANCE_FIELDS_INVALID")
+    required_text = ("subject", "scenario_id", "observed_prestate_ref", "observed_error_ref", "defect_class")
+    _require(all(isinstance(provenance.get(key), str) and bool(provenance[key].strip()) for key in required_text), "REPLAY_PROVENANCE_REQUIRED")
+    subject = provenance["subject"]
+    _require(subject in {"ORIGINAL_DWO", "APPROVED_DISTINCT_CONTROLLED"}, "REPLAY_PROVENANCE_SUBJECT_INVALID")
+    _require(provenance["defect_class"] in {"GENUINE_GWC_RUNTIME_DEFECT", "INJECTED_FAULT_RESILIENCE"}, "REPLAY_PROVENANCE_DEFECT_CLASS_INVALID")
+    original_replayed = provenance.get("original_incident_replayed")
+    _require(type(original_replayed) is bool, "REPLAY_PROVENANCE_ORIGINAL_FLAG_REQUIRED")
+    if subject == "APPROVED_DISTINCT_CONTROLLED":
+        _require(isinstance(provenance.get("authorization_ref"), str) and bool(provenance["authorization_ref"].strip()), "REPLAY_PROVENANCE_AUTHORIZATION_REQUIRED")
+        _require(original_replayed is False, "REPLAY_PROVENANCE_SUBJECT_MISMATCH")
+    else:
+        _require(original_replayed is True, "REPLAY_PROVENANCE_SUBJECT_MISMATCH")
+    provenance_digest = provenance.get("provenance_digest")
+    _require(_valid_digest(provenance_digest), "REPLAY_PROVENANCE_DIGEST_INVALID")
+    provenance_body = {key: copy.deepcopy(value) for key, value in provenance.items() if key != "provenance_digest"}
+    _require(provenance_digest == _digest(provenance_body), "REPLAY_PROVENANCE_DIGEST_MISMATCH")
+    return copy.deepcopy(provenance)
+
+
 def certify_q0_runtime(
     *, run_id: str, task_id: str, runtime_epoch: str, qualification_profile: str,
     qualification_profile_digest: str, qualification_matrix: Mapping[str, Any], candidate_sha: str,
     loaded_runtime_identity: str, load_proof_ref: str, load_proof_evidence: Mapping[str, Any],
     incident_replay_refs: list[str], replay_result: str, replay_exact_readback: bool,
+    replay_provenance: Mapping[str, Any],
     previous_failure_state: str, first_state_beyond_failure: str,
     forward_progress_refs: list[str], broader_regression_refs: list[str], broader_regression_result: str,
     stale_dependent_state: list[str], created_at: str, created_by: Mapping[str, Any],
@@ -592,9 +626,17 @@ def certify_q0_runtime(
         raise Q0QualificationError("LOAD_PROOF_MODULE_IDENTITIES_REQUIRED")
     _require(all(isinstance(path, str) and path and _valid_digest(digest) for path, digest in module_identities.items()), "LOAD_PROOF_MODULE_IDENTITIES_INVALID")
     _require(load_proof_evidence.get("candidate_sha") == candidate_sha and load_proof_evidence.get("loaded_source_sha") == candidate_sha, "LOAD_PROOF_IDENTITY_MISMATCH")
-    _validate_matrix(qualification_matrix)
+    _validate_matrix_digest(qualification_matrix)
     _require(bool(incident_replay_refs), "ORIGINAL_INCIDENT_REPLAY_REQUIRED")
+    validated_replay_provenance = _validate_replay_provenance(replay_provenance)
     _require(replay_result == "PASS" and replay_exact_readback is True, "ORIGINAL_INCIDENT_REPLAY_FAILED")
+    matrix_results = qualification_matrix.get("results")
+    _require(isinstance(matrix_results, Mapping), "QUALIFICATION_MATRIX_INCOMPLETE")
+    self_fix_result = matrix_results.get("self_fix_replay")
+    if validated_replay_provenance["defect_class"] == "INJECTED_FAULT_RESILIENCE":
+        _require(self_fix_result != "PASS", "SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT")
+        _require(False, "INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY")
+    _validate_matrix(qualification_matrix)
     _require(bool(previous_failure_state) and bool(first_state_beyond_failure) and first_state_beyond_failure != previous_failure_state, "FORWARD_PROGRESS_REQUIRED")
     _require(bool(forward_progress_refs), "FORWARD_PROGRESS_REQUIRED")
     _require(bool(broader_regression_refs) and broader_regression_result == "PASS", "BROADER_REGRESSION_REQUIRED")
@@ -602,7 +644,7 @@ def certify_q0_runtime(
     _require(isinstance(created_by, Mapping) and bool(created_by.get("id")), "Q0_CREATOR_REQUIRED")
     _require(_parse_utc(created_at) is not None, "Q0_CERTIFICATION_TIMESTAMP_INVALID")
     body = {
-        "schema_version": "1.0", "artifact_type": "q0-certification-receipt",
+        "schema_version": CURRENT_Q0_CERTIFICATION_SCHEMA_VERSION, "artifact_type": "q0-certification-receipt",
         "run_id": run_id, "task_id": task_id, "runtime_epoch": runtime_epoch,
         "qualification_profile": qualification_profile,
         "qualification_profile_digest": qualification_profile_digest,
@@ -612,6 +654,7 @@ def certify_q0_runtime(
         "load_proof_evidence": copy.deepcopy(dict(load_proof_evidence)),
         "incident_replay_refs": list(incident_replay_refs),
         "replay_result": replay_result, "replay_exact_readback": replay_exact_readback,
+        "replay_provenance": validated_replay_provenance,
         "previous_failure_state": previous_failure_state,
         "first_state_beyond_failure": first_state_beyond_failure,
         "forward_progress_refs": list(forward_progress_refs),
@@ -627,12 +670,34 @@ def certify_q0_runtime(
 
 def verify_q0_certification(receipt: Mapping[str, Any]) -> bool:
     try:
-        return (
+        if not isinstance(receipt, Mapping):
+            return False
+        version = receipt.get("schema_version")
+        if version not in SUPPORTED_Q0_CERTIFICATION_SCHEMA_VERSIONS:
+            return False
+        if version == "1.1":
+            _validate_replay_provenance(receipt.get("replay_provenance"))
+        elif "replay_provenance" in receipt:
+            return False
+        valid = (
             receipt.get("artifact_type") == "q0-certification-receipt"
             and receipt.get("certification_level") == "L3"
             and receipt.get("campaign_state") == "CAMPAIGN_READY_RUNTIME"
             and receipt.get("candidate_sha") == receipt.get("certified_q0_sha") == receipt.get("loaded_runtime_identity")
             and _verify_seal(receipt, "receipt_digest")
+        )
+        if not valid or version == "1.0":
+            return valid
+        load_proof = receipt.get("load_proof_evidence")
+        return (
+            receipt.get("runtime_epoch") == Q0_RUNTIME_EPOCH
+            and receipt.get("qualification_profile") == Q0_WORKFLOW_MODE
+            and _valid_digest(receipt.get("qualification_matrix_digest"))
+            and receipt.get("qualification_profile_digest") == q0_qualification_profile().get("profile_digest")
+            and isinstance(load_proof, Mapping)
+            and load_proof.get("candidate_sha") == receipt.get("candidate_sha")
+            and load_proof.get("loaded_source_sha") == receipt.get("candidate_sha")
+            and load_proof.get("loaded_profile_digest") == receipt.get("qualification_profile_digest")
         )
     except Exception:
         return False

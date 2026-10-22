@@ -137,6 +137,37 @@ It MUST preserve the semantic preconditions and original failure boundary while 
 2. exact readback matches the contract;
 3. execution reaches at least one legal state beyond the previous failure point.
 
+### Sealed replay provenance and subject distinction
+
+New Q0 certification receipts use schema version `1.1` and require a
+digest-sealed `replay_provenance` object. Its `subject` distinguishes
+`ORIGINAL_DWO` from `APPROVED_DISTINCT_CONTROLLED`; every provenance record
+also identifies a non-empty scenario, observed prestate, observed error, and
+defect class. The digest is the canonical module digest over the complete
+provenance object with `provenance_digest` omitted. The provenance digest and
+`qualification_matrix_digest` are independent evidence boundaries: provenance
+is not included in the matrix digest, and neither digest substitutes for the
+other.
+
+`ORIGINAL_DWO` requires `original_incident_replayed: true`. A deliberately
+controlled distinct scenario requires `authorization_ref` and
+`original_incident_replayed: false`; it cannot be presented as the original
+DWO incident. `incident_replay_refs` remains required and an empty list still
+fails with `ORIGINAL_INCIDENT_REPLAY_REQUIRED`.
+
+The mandatory matrix entry `self_fix_replay` may be `PASS` only for
+`GENUINE_GWC_RUNTIME_DEFECT`. A scenario classified
+`INJECTED_FAULT_RESILIENCE` cannot satisfy that matrix entry: claiming `PASS`
+fails with `SELF_FIX_REPLAY_REQUIRES_GENUINE_DEFECT`, and a non-`PASS` result
+fails closed with `INJECTED_FAULT_CANNOT_SATISFY_SELF_FIX_REPLAY` because the
+complete mandatory matrix requires every entry to pass. Controlled injected
+fault tests therefore cannot certify as Q0 self-fix proof.
+
+The verifier supports sealed schema versions `1.0` and `1.1`. Historical `1.0`
+receipts remain verifiable without provenance; a `1.1` receipt must include
+valid provenance. Unknown schema versions, stale qualification-profile
+digests, runtime identity drift, and load-proof identity mismatch are rejected.
+
 If the old failure persists for the same root cause, continue the same defect branch. If a new independent defect appears after successful advance, accept the current fix first and open a new defect branch from the accepted SHA.
 
 ## Final clean certification

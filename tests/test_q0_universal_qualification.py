@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import hashlib
 import json
 from pathlib import Path
 
@@ -16,6 +17,11 @@ def _m():
 
 def _sha(ch):
     return ch * 40
+
+
+def _digest(value):
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return "sha256:" + hashlib.sha256(raw).hexdigest()
 
 
 def _execution_receipt(*, authority_granted: bool = False, node_id: str | None = None):
@@ -62,6 +68,12 @@ def _matrix():
 
 
 def _cert_inputs(**overrides):
+    replay_provenance = {
+        "subject": "ORIGINAL_DWO", "scenario_id": "original-incident-1",
+        "observed_prestate_ref": "evidence:prestate-1", "observed_error_ref": "evidence:error-1",
+        "defect_class": "GENUINE_GWC_RUNTIME_DEFECT", "original_incident_replayed": True,
+    }
+    replay_provenance["provenance_digest"] = _digest(replay_provenance)
     d = {
         "run_id": "scrum781-q0-20260920T074727Z",
         "task_id": "SCRUM-781",
@@ -76,6 +88,7 @@ def _cert_inputs(**overrides):
         "incident_replay_refs": ["replay:1"],
         "replay_result": "PASS",
         "replay_exact_readback": True,
+        "replay_provenance": replay_provenance,
         "previous_failure_state": "CONTROLLER_WAIT",
         "first_state_beyond_failure": "UR.G2_EXECUTION_STARTED",
         "forward_progress_refs": ["progress:1"],
