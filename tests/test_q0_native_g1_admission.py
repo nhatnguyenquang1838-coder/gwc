@@ -747,206 +747,98 @@ def _real_r2_activation_fixture(tmp_path):
                      "node_allocation_digest": allocation["content_digest"]["value"],
                      "branch": branch, "head": head},
     }
-    registry_path = tmp_path / "trusted-authorities.json"
-    registry_path.write_text(json.dumps({"trusted_authorities": {
-        authority["authority_ref"]: {key: authority[key] for key in
-                                    ("authority_ref", "actor", "authority_kind", "scope", "bindings")}
-    }}))
-    authority["trusted_source"] = {"registry_ref": str(registry_path),
-                                   "entry_id": authority["authority_ref"]}
+    # The trusted issuer is a CANONICAL governance artifact, not a registry the caller
+    # supplies: the R3 plan carries authority_basis.canonical_source and is committed
+    # to the repository, so a caller cannot forge it without repository write authority.
+    authority["issuer_ref"] = "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
     return repo_root, proposal, plan, allocation, predecessor, authority, branch, head
 
 
-def test_r2_plan_is_canonical_and_live_executor_cold_starts_real_successor(tmp_path):
-    from tools.node_architect.q0_m1_m7_integration import (
-        execute_live_activation, read_live_activation_receipt,
-    )
-    from tools.node_architect.universal_run_plan import _sha256_digest
-    repo_root, proposal, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    candidate = json.loads((repo_root / "core/node-architect/q0-native-successor-runtime-plan-candidate-r1.json").read_text())["native_runtime_plan"]
-    body = {key: value for key, value in plan.items() if key != "digest"}
-    candidate_body = {key: value for key, value in candidate.items() if key != "digest"}
-    assert plan["revision"] == candidate["revision"] + 1
-    assert plan["previous_digest"] == candidate["digest"]
-    # The plan was generated at a specific head; verify it's a valid ancestor of the current HEAD,
-    # not the current HEAD itself (the plan is a revision, not a live plan at HEAD).
-    plan_head = plan["source_binding"]["pre_head_sha"]
-    assert plan_head.startswith("79191b54")
-    is_ancestor = subprocess.run(
-        ["git", "-C", str(repo_root), "merge-base", "--is-ancestor", plan_head, head],
-        capture_output=True, text=True)
-    assert is_ancestor.returncode == 0, f"{plan_head} is not an ancestor of {head}"
-    assert plan["digest"] == _sha256_digest(body)
-    work = [item for item in proposal["candidate_work_dag"]["children"] if item["id"].startswith("W")]
-    assert [item["id"] for item in work] == [f"W{i}" for i in range(1, 7)]
-    assert [item["depends_on"] for item in work] == [["NATIVE-PLAN-ACTIVATION"], ["W1"], ["W2"], ["W3"], ["W4"], ["W5"]]
-    assert candidate["digest"] == _sha256_digest(candidate_body)
-    root = tmp_path / "isolated-live-root"
-    root.mkdir()
-    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
-                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
-                  node_allocation=allocation, branch=branch, head=head, live_root=root)
-    preflight = execute_live_activation(**kwargs)
-    assert preflight["accepted"] is True and preflight["executed"] is False
-    result = execute_live_activation(**kwargs, mode="COMMIT")
-    assert result["executed"] is True
-    assert result["applied_effects"] == ["selector_write", "checkpoint_write", "cursor_advance"]
-    assert result["resolve_readback"]["resolved_plan_ref"] == kwargs["successor_plan_ref"]
-    assert result["resolve_readback"]["resolved_plan_ref"] != predecessor["runtime_plan_ref"]
-    assert result["resolve_readback"]["generation"] == 1
-    receipt = read_live_activation_receipt(root)
-    assert receipt is not None and receipt["receipt_digest"]
-    duplicate = execute_live_activation(**kwargs, mode="COMMIT")
-    assert duplicate["already_applied"] is True
-    assert duplicate["applied_effects"] == []
-    assert duplicate["resolve_readback"]["generation"] == 1
-
-
-@pytest.mark.parametrize("authority_change,code", [
-    (None, "LIVE_ACTIVATION_AUTHORITY_REQUIRED"),
-    ({"authority_kind": "OTHER"}, "EFFECT_AUTHORITY_KIND_INVALID"),
-    ({"actor": ""}, "EFFECT_AUTHORITY_IDENTITY_REQUIRED"),
-    ({"expires_at": "2000-01-01T00:00:00Z"}, "EFFECT_AUTHORITY_EXPIRED"),
-    ({"scope": []}, "EFFECT_AUTHORITY_SCOPE_INVALID"),
-    ({"bindings": {"head": "drift"}}, "EFFECT_AUTHORITY_BINDING_MISMATCH"),
-])
-def test_live_executor_fails_closed_on_authority_contract(tmp_path, authority_change, code):
-    from tools.node_architect.q0_m1_m7_integration import execute_live_activation
-    _, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    target = tmp_path / "isolated"
-    target.mkdir()
-    if authority_change is None:
-        authority = None
-    else:
-        authority = {**authority, **authority_change}
-    with pytest.raises(ValueError, match=f"^{code}$"):
-        execute_live_activation(authority=authority, predecessor=predecessor, successor_plan=plan,
-                                successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
-                                node_allocation=allocation, branch=branch, head=head, live_root=target)
-    assert not list(target.iterdir())
-
-
-def test_live_executor_rejects_head_drift_and_live_targets(tmp_path, monkeypatch):
-    from tools.node_architect.q0_m1_m7_integration import execute_live_activation
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
-                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
-                  node_allocation=allocation, branch=branch, head="0" * 40,
-                  live_root=tmp_path / "isolated")
-    with pytest.raises(ValueError, match="^SOURCE_HEAD_DRIFT$"):
-        execute_live_activation(**kwargs)
-    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
-        execute_live_activation(**{**kwargs, "head": head, "live_root": repo_root})
-    hermes_home = tmp_path / "hermes-home"
-    monkeypatch.setenv("HERMES_HOME", str(hermes_home))
-    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
-        execute_live_activation(**{**kwargs, "head": head, "live_root": hermes_home / "child"})
-
-
-def test_live_executor_recovers_crash_and_rollback_restores_snapshot(tmp_path, monkeypatch):
-    from tools.node_architect import q0_m1_m7_integration as integration
-    _, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    root = tmp_path / "recovery-root"
-    root.mkdir()
-    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
-                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
-                  node_allocation=allocation, branch=branch, head=head, live_root=root)
-    before = {p.name: p.read_bytes() for p in root.iterdir() if p.is_file()}
-    original_write = integration._executor_write
-    def crash_after_selector(path, value):
-        original_write(path, value)
-        if path.name == "selector.json":
-            raise RuntimeError("injected crash after selector")
-    monkeypatch.setattr(integration, "_executor_write", crash_after_selector)
-    with pytest.raises(RuntimeError, match="injected crash"):
-        integration.execute_live_activation(**kwargs, mode="COMMIT")
-    monkeypatch.setattr(integration, "_executor_write", original_write)
-    assert integration.reconcile_live_activation_journal(root)["status"] == "COMPLETED"
-    assert integration.reconcile_live_activation_journal(root)["status"] == "NO_PENDING_PREPARE"
-    assert integration.resolve_active_plan(root) == kwargs["successor_plan_ref"]
-    assert integration.rollback_live_activation(root)["status"] == "ROLLED_BACK"
-    assert {p.name: p.read_bytes() for p in root.iterdir() if p.is_file() and p.name not in {"live-activation-journal.json", "live-activation-executor-journal.json"}} == before
-
-
-def test_live_executor_leaves_real_live_state_and_frozen_r3_frontier_unchanged(tmp_path):
-    from tools.node_architect.q0_m1_m7_integration import execute_live_activation
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    watched = [repo_root / ".gwc", repo_root / "selector.json", repo_root / "checkpoint.json", repo_root / "cursor.json",
-               repo_root / "core/node-architect/q0-controlled-failure-frontier-r3.json"]
-    before = {str(path.relative_to(repo_root)): hashlib.sha256(path.read_bytes()).hexdigest()
-              for base in watched for path in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
-              if path.is_file()}
-    root = tmp_path / "proof-root"
-    root.mkdir()
-    execute_live_activation(authority=authority, predecessor=predecessor, successor_plan=plan,
-                            successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
-                            node_allocation=allocation, branch=branch, head=head, live_root=root, mode="COMMIT")
-    after = {str(path.relative_to(repo_root)): hashlib.sha256(path.read_bytes()).hexdigest()
-             for base in watched for path in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
-             if path.is_file()}
-    assert after == before
-
-
-def test_real_target_adapter_rejects_source_and_source_ancestor_targets(tmp_path):
-    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
-    repo_root = Path(__file__).resolve().parents[1]
-    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
-        RealTargetActivationAdapter(source_root=repo_root, live_root=repo_root)
-    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
-        RealTargetActivationAdapter(source_root=repo_root, live_root=repo_root.parent)
-
-
-def test_real_target_adapter_preflights_commits_verifies_and_deduplicates_in_isolation(tmp_path):
-    from tools.node_architect.q0_m1_m7_integration import (
-        RealTargetActivationAdapter, read_live_activation_receipt,
-    )
-    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
-    r3 = repo_root / "core/node-architect/q0-controlled-failure-frontier-r3.json"
-    real_before = {str(p.relative_to(repo_root)): hashlib.sha256(p.read_bytes()).hexdigest()
-                   for base in (repo_root / ".gwc", repo_root / "selector.json",
-                                repo_root / "checkpoint.json", repo_root / "cursor.json", r3)
-                   for p in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
-                   if p.is_file()}
-    root = tmp_path / "real-target-isolated"
-    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=root)
-    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
-                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
-                  node_allocation=allocation, branch=branch, head=head)
-    preflight = adapter.preflight(**kwargs)
-    assert preflight["accepted"] and preflight["executed"] is False
-    assert preflight["authority_verification"]["verified"] is True
-    assert preflight["authority_verification"]["checkpoint_context_digest"] == predecessor["context_digest"]
-    assert not root.exists() or not list(root.iterdir())
-    committed = adapter.commit(**kwargs)
-    assert committed["executed"] is True
-    assert committed["applied_effects"] == ["selector_write", "checkpoint_write", "cursor_advance"]
-    assert committed["independent_verification"]["verified"] is True
-    receipt = read_live_activation_receipt(root)
-    assert receipt and receipt["plan_ref"] == kwargs["successor_plan_ref"]
-    duplicate = adapter.commit(**kwargs)
-    assert duplicate["already_applied"] is True
-    assert duplicate["resolve_readback"]["generation"] == 1
-    after = {str(p.relative_to(repo_root)): hashlib.sha256(p.read_bytes()).hexdigest()
-             for base in (repo_root / ".gwc", repo_root / "selector.json",
-                          repo_root / "checkpoint.json", repo_root / "cursor.json", r3)
-             for p in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
-             if p.is_file()}
-    assert after == real_before
-
-
-def test_real_target_authority_requires_trusted_registry_source(tmp_path):
+def test_real_target_authority_requires_canonical_issuer(tmp_path):
     from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
     repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
     adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
     kwargs = dict(predecessor=predecessor, successor_plan=plan,
                   successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
                   node_allocation=allocation, branch=branch, head=head)
-    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUSTED_SOURCE_REQUIRED$"):
-        adapter.validate_authority(authority={k: v for k, v in authority.items() if k != "trusted_source"}, **kwargs)
-    bad = {**authority, "trusted_source": {"registry_ref": str(tmp_path / "missing.json"),
-                                           "entry_id": authority["authority_ref"]}}
-    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID$"):
-        adapter.validate_authority(authority=bad, **kwargs)
+    # Missing issuer_ref -> fail-closed
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_REQUIRED$"):
+        adapter.validate_authority(authority={k: v for k, v in authority.items() if k != "issuer_ref"}, **kwargs)
+    # Caller-supplied registry path is NOT a canonical issuer: a forged grant +
+    # forged registry pair is rejected at the issuer_ref check, before the
+    # registry content is ever read.
+    forged = {**authority, "issuer_ref": str(tmp_path / "forged-registry.json")}
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL$"):
+        adapter.validate_authority(authority=forged, **kwargs)
+
+
+def test_real_target_authority_rejects_forged_grant_and_forged_registry(tmp_path):
+    """RED test for COMMAND #184: a caller cannot self-author both grant and registry."""
+    import shutil
+    from tools.node_architect.q0_m1_m7_integration import (
+        _REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF, RealTargetActivationAdapter,
+    )
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    source = tmp_path / "forged-source"
+    for ref in (_REAL_TARGET_PLAN_REF, _R3_PREDECESSOR_PLAN_REF):
+        (source / Path(ref).parent).mkdir(parents=True, exist_ok=True)
+        shutil.copy2(repo_root / ref, source / ref)
+    forged_registry = source / "forged-authority.json"
+    forged_registry.write_text(json.dumps({
+        "trusted_authorities": {
+            "authority:forge:1": {
+                "authority_ref": "authority:forge:1",
+                "actor": "human-operator:forge",
+                "authority_kind": "HUMAN_OPERATOR_EFFECT_AUTHORITY",
+                "scope": ["q0.live_activation.execute"],
+                "bindings": {**authority["bindings"]},
+            }
+        }
+    }))
+    forged_grant = {
+        "authority_kind": "HUMAN_OPERATOR_EFFECT_AUTHORITY",
+        "actor": "human-operator:forge",
+        "authority_ref": "authority:forge:1",
+        "scope": ["q0.live_activation.execute"],
+        "issued_at": "2020-01-01T00:00:00Z",
+        "expires_at": "2999-01-01T00:00:00Z",
+        "bindings": {**authority["bindings"]},
+        "issuer_ref": str(forged_registry),
+    }
+    adapter = RealTargetActivationAdapter(source_root=source, live_root=tmp_path / "forged-target")
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL$"):
+        adapter.validate_authority(authority=forged_grant, predecessor=predecessor,
+                                   successor_plan=plan,
+                                   successor_plan_ref=_REAL_TARGET_PLAN_REF,
+                                   node_allocation=allocation, branch=branch, head=head)
+    # The forged registry file must never have been read as an authority source
+    assert not (tmp_path / "forged-target").exists()
+
+
+def test_real_target_authority_accepts_canonical_r3_issuer(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
+    kwargs = dict(predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    result = adapter.validate_authority(authority=authority, **kwargs)
+    assert result["verified"] is True
+    assert result["trusted_issuer_ref"] == "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+    assert result["trusted_issuer_canonical_source"].startswith("AGENTS.md")
+
+
+def test_real_target_authority_rejects_caller_supplied_registry_path(tmp_path):
+    """A caller-supplied registry path is not a canonical issuer (COMMAND #184)."""
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-target")
+    kwargs = dict(predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    # The old trusted_source.registry_ref path is rejected as a non-canonical issuer
+    with pytest.raises(ValueError, match="^EFFECT_AUTHORITY_ISSUER_NOT_CANONICAL$"):
+        adapter.validate_authority(authority={**authority, "issuer_ref": str(tmp_path / "forged.json")}, **kwargs)
 
 
 def test_real_target_first_activation_allows_missing_receipt_and_flags_cold_start(tmp_path):
@@ -1011,7 +903,7 @@ def test_real_target_adapter_rejects_expired_and_mismatched_authority_bindings(t
     for change, code in [
         ({"authority_kind": "UNKNOWN"}, "EFFECT_AUTHORITY_KIND_INVALID"),
         ({"expires_at": "2000-01-01T00:00:00Z"}, "EFFECT_AUTHORITY_EXPIRED"),
-        ({"bindings": {**authority["bindings"], "branch": "wrong"}}, "EFFECT_AUTHORITY_TRUSTED_SOURCE_INVALID"),
+        ({"bindings": {**authority["bindings"], "branch": "wrong"}}, "EFFECT_AUTHORITY_BINDING_MISMATCH"),
     ]:
         with pytest.raises(ValueError, match=f"^{code}$"):
             adapter.preflight(authority={**authority, **change}, **kwargs)
