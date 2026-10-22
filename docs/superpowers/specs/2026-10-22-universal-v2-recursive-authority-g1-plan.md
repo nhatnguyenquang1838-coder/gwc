@@ -143,5 +143,25 @@ AC1→C1 · AC2→C2/C3 · AC3→C3 · AC4→C2/C3 · AC5→C2 · AC6→C2/C5 ·
 ## 6. Execution policy (per Controller)
 Own execution/continuous self-remediation of in-scope atomic child Runs with retries + checkpoint; do NOT request Controller approval after each RED/GREEN; avoid repetitive precheck-only loops; do not stop the whole Parent on one HITL effect (isolate the held effect). Controller validates reports independently against remote code + consumer evidence.
 
-## 7. This-firing deliverable
-G1 plan materialized on the new parent branch; C1 implementation is the next child run.
+## 8. COMMAND #195 correction — canonical generic host routes, Consumer G6, trusted parent
+- Generic UR gate semantics are explicitly: G0 UNDERSTAND; G1 PLAN/DECOMPOSE; G2 EXECUTE;
+  G3 VERIFY; G4 INTEGRATE; G5 VALIDATE-IN-TARGET; G6 ACCEPT/HANDOFF. Generic G4/G5/G6
+  must NEVER map to protected `G4_MERGE` / `G5_DEPLOY` / `G6_PRODUCTION_DATA`.
+- The actual `core/node-architect/gate-node-route-profile.json` has 11 routes at the reviewed
+  base, all 10 `G2_EXECUTION` actions plus one `G3_PR` (`ci_evidence_capture`). No configured
+  generic G0/G1/G3/G4/G5/G6 routes exist. New routes must be canonical Node Architect records
+  with real descriptors, registry bindings, instructions/implementation, schema validation and
+  executable CLI coverage—not gate-name-only profile rows.
+- C2 trust correction: `resolve_authority()` must not grant solely because a derived receipt's
+  self-computed digest matches. The child receipt must be checked against an independently
+  verified parent authority receipt/source, exact parent scope + provenance + expiry/revocation;
+  caller-authored JSON/policy/mailbox/test fixture is not a trust anchor. If the canonical
+  independent parent verifier/source is unavailable, return fail-closed/unavailable; do not
+  mint a Human grant or claim HOTL authority.
+- Child G6 is accepted by its Parent Consumer only against a canonical `TargetContract` and
+  validated child evidence/readback; Human approval is not the default, and is required only
+  where canonical policy says so. Never synthesize a G6 receipt from provider prose or a test
+  helper; bind the receipt to the target contract, child run, evidence digests and parent.
+- Test requirements: actual CLI -> `run_agent_runtime_event` -> canonical route -> executable
+  generic node; second non-SCRUM domain; Q0 consumer remains isolated. Report C1 integration
+  pending until the actual route and parent-consumer G6 path are evidenced.
