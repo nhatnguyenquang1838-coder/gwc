@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sqlite3
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -34,6 +35,58 @@ def _allocation_digest(allocation: Mapping[str, Any]) -> str | None:
     if isinstance(content_digest, Mapping):
         return content_digest.get("value")
     return allocation.get("digest")
+
+
+def _validate_predecessor(predecessor: Any, successor_run_id: str, successor_digest: str) -> dict[str, Any]:
+    _fail(predecessor is not None, "PREDECESSOR_BINDING_REQUIRED")
+    keys = {"kind", "run_id", "runtime_plan_ref", "runtime_plan_digest", "checkpoint_ref",
+            "context_digest", "owner_session_id", "source_head"}
+    _fail(isinstance(predecessor, Mapping) and set(predecessor) == keys, "PREDECESSOR_BINDING_INVALID")
+    value = dict(predecessor)
+    _fail(all(isinstance(value[k], str) and bool(value[k].strip()) for k in keys), "PREDECESSOR_BINDING_INVALID")
+    _fail(value["run_id"] != successor_run_id, "PREDECESSOR_SELF_REFERENCE")
+    _fail(re.fullmatch(r"sha256:[0-9a-f]{64}", value["runtime_plan_digest"]) is not None,
+          "PREDECESSOR_BINDING_INVALID")
+    _fail(value["runtime_plan_digest"] != successor_digest, "PLAN_DIGEST_MISMATCH")
+    try:
+        plan_bytes = Path(value["runtime_plan_ref"]).read_bytes()
+    except OSError as exc:
+        raise Q0NativeG1AdmissionError("PREDECESSOR_PLAN_UNREADABLE") from exc
+    _fail("sha256:" + hashlib.sha256(plan_bytes).hexdigest() == value["runtime_plan_digest"], "PLAN_DIGEST_MISMATCH")
+    checkpoint = Path(value["checkpoint_ref"])
+    _fail(checkpoint.is_file(), "PREDECESSOR_CHECKPOINT_UNBOUND")
+    try:
+        uri = checkpoint.resolve().as_uri() + "?mode=ro"
+        with sqlite3.connect(uri, uri=True) as db:
+            row = db.execute("SELECT context_digest,state FROM engineering_workflow WHERE run=?",
+                             (value["run_id"],)).fetchone()
+    except (OSError, sqlite3.Error) as exc:
+        raise Q0NativeG1AdmissionError("PREDECESSOR_CHECKPOINT_UNBOUND") from exc
+    _fail(row is not None and row[0] == value["context_digest"], "PREDECESSOR_CONTEXT_MISMATCH")
+    try:
+        state = json.loads(row[1])
+    except (TypeError, ValueError):
+        state = {}
+    recorded_session = state.get("executor", {}).get("session_id") if isinstance(state, Mapping) else None
+    if recorded_session is not None:
+        _fail(recorded_session == value["owner_session_id"], "PREDECESSOR_OWNER_MISMATCH")
+    return value
+
+
+def build_live_activation_effect_envelope(*, idempotency_key: str) -> dict[str, Any]:
+    """Describe, but never execute, separately-authorized live activation effects."""
+    _fail(isinstance(idempotency_key, str) and bool(idempotency_key.strip()), "IDEMPOTENCY_KEY_REQUIRED")
+    return {"schema_id": "gwc.q0.live-activation-effect-envelope.v1",
+            "kind": "LIVE_ACTIVATION_EFFECT_ENVELOPE",
+            "api_entrypoint": "tools.node_architect.q0_m1_m7_integration.activate_successor_plan",
+            "effects": [
+                {"effect": "selector_write", "precondition": "separate_grant_and_successor_plan_valid"},
+                {"effect": "checkpoint_write", "precondition": "selector_binding_and_checkpoint_cas_valid"},
+                {"effect": "cursor_advance", "precondition": "checkpoint_readback_verified"}],
+            "authority_required": "SEPARATE_HUMAN_OR_CONTROLLER_GRANT",
+            "authority_granted": False, "executed": False,
+            "idempotency_key": idempotency_key,
+            "refusal_codes": ["LIVE_ACTIVATION_AUTHORITY_REQUIRED"]}
 
 
 def _dag_order(runtime_plan: Mapping[str, Any]) -> tuple[str, ...]:
@@ -165,6 +218,7 @@ def materialize_native_g1_genesis(
     receipt: Any, *, worktree_root: str | Path, sandbox_dir: str | Path,
     runtime_plan: Mapping[str, Any] | None = None,
     node_allocation: Mapping[str, Any] | None = None,
+    predecessor: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Create and durably read back a canonical Universal v2 genesis RunState."""
     _fail(isinstance(runtime_plan, Mapping) and isinstance(node_allocation, Mapping), "PLAN_BINDING_REQUIRED")
@@ -186,10 +240,13 @@ def materialize_native_g1_genesis(
         candidate_sha=candidate_sha, node_allocation=node_allocation,
         runtime_plan=runtime_plan, source_head=candidate_sha,
     )
+    predecessor_value = _validate_predecessor(predecessor, receipt["run_id"], plan_digest)
     sandbox.mkdir(parents=True, exist_ok=True)
     db_path = (sandbox / "native-g1-genesis.sqlite3").resolve()
     transition_path = (sandbox / "native-g1-transition-receipt.json").resolve()
-    _fail(db_path.parent == sandbox and transition_path.parent == sandbox, "SANDBOX_PATH_INVALID")
+    effect_envelope_path = (sandbox / "live-activation-effect-envelope.json").resolve()
+    _fail(db_path.parent == sandbox and transition_path.parent == sandbox and
+          effect_envelope_path.parent == sandbox, "SANDBOX_PATH_INVALID")
     receipt_digest = receipt["receipt_digest"]
     run_id = receipt["run_id"]
     node_id = "native-g1-genesis"
@@ -239,11 +296,24 @@ def materialize_native_g1_genesis(
                     "source_refs": [receipt_digest, f"node-allocation:{allocation_id}"]},
     )
     _fail(verify_run_state_record(state), "GENESIS_RUN_STATE_INVALID")
+    envelope = build_live_activation_effect_envelope(
+        idempotency_key=f"live-activation:{predecessor_value['run_id']}:{run_id}:{plan_digest}")
     transition_body = {
         "schema_id": "gwc.q0.native-g1-genesis-transition.v1", "schema_version": 1,
-        "predecessor": {"identity": plan_run_id, "digest": plan_digest},
-        "successor": {"run_id": run_id, "state_digest": state["content_digest"]["value"]},
+        "predecessor": {"identity": predecessor_value["run_id"],
+                        "digest": predecessor_value["runtime_plan_digest"],
+                        "checkpoint_ref": predecessor_value["checkpoint_ref"],
+                        "context_digest": predecessor_value["context_digest"],
+                        "owner_session_id": predecessor_value["owner_session_id"],
+                        "source_head": predecessor_value["source_head"]},
+        "successor": {"run_id": run_id, "runtime_plan_digest": plan_digest,
+                      "node_allocation_id": allocation_id,
+                      "node_allocation_digest": _allocation_digest(node_allocation),
+                      "source_head": candidate_sha},
+        "effect_envelope_ref": str(effect_envelope_path),
+        "effect_envelope": envelope,
         "receipt_digest": receipt_digest, "authority_granted": False,
+        "effect_authority_granted": False,
     }
     transition = {**transition_body, "transition_digest": _seal(transition_body)}
     transition_raw = (json.dumps(transition, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
@@ -251,6 +321,11 @@ def materialize_native_g1_genesis(
         _fail(transition_path.read_bytes() == transition_raw, "GENESIS_CONTENT_MISMATCH")
     else:
         transition_path.write_bytes(transition_raw)
+    envelope_raw = (json.dumps(envelope, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    if effect_envelope_path.exists():
+        _fail(effect_envelope_path.read_bytes() == envelope_raw, "GENESIS_CONTENT_MISMATCH")
+    else:
+        effect_envelope_path.write_bytes(envelope_raw)
     write_checkpoint(
         db_path, task_id="SCRUM-781", run_id=run_id, node_id=node_id,
         idempotency_key=f"native-g1-genesis:{run_id}",
@@ -283,11 +358,17 @@ def read_back_genesis(db_ref: str | Path) -> dict[str, str]:
     digest = state["content_digest"]["value"]
     _fail(isinstance(transition, Mapping), "GENESIS_TRANSITION_RECEIPT_INVALID")
     _fail(transition.get("transition_digest") == _seal({k: v for k, v in transition.items() if k != "transition_digest"}), "GENESIS_TRANSITION_RECEIPT_INVALID")
-    _fail(transition.get("successor") == {"run_id": state["run_id"], "state_digest": digest}, "GENESIS_TRANSITION_RECEIPT_INVALID")
-    _fail(transition.get("predecessor", {}).get("identity") == state["run_manifest_ref"].removeprefix("runtime-plan:"), "GENESIS_TRANSITION_RECEIPT_INVALID")
+    successor = transition.get("successor", {})
+    _fail(successor.get("run_id") == state["run_id"] and
+          successor.get("runtime_plan_digest", "").removeprefix("sha256:") == state["run_manifest_digest"], "GENESIS_TRANSITION_RECEIPT_INVALID")
+    _fail(isinstance(transition.get("predecessor", {}).get("identity"), str) and
+          transition["predecessor"]["identity"] != successor.get("run_id"), "GENESIS_TRANSITION_RECEIPT_INVALID")
+    _fail(transition.get("effect_authority_granted") is False and
+          transition.get("effect_envelope", {}).get("executed") is False, "GENESIS_TRANSITION_RECEIPT_INVALID")
     _fail(stored.get("state_digest") == digest and stored.get("record_digest") in state.get("provenance", {}).get("source_refs", []), "GENESIS_READBACK_MISMATCH")
     return {"run_id": state["run_id"], "state_digest": digest}
 
 
 __all__ = ["Q0NativeG1AdmissionError", "build_native_g1_plan_receipt",
-           "materialize_native_g1_genesis", "read_back_genesis", "validate_native_g1_plan_receipt"]
+           "materialize_native_g1_genesis", "read_back_genesis", "validate_native_g1_plan_receipt",
+           "build_live_activation_effect_envelope"]

@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -36,6 +37,22 @@ def _bindings():
 
 def _valid():
     return build_native_g1_plan_receipt(**_bindings())
+
+
+def _predecessor(tmp_path, *, run_id="cmd162-predecessor", context_digest="sha256:" + "d" * 64,
+                 owner_session_id="session-predecessor", plan_content=b"predecessor plan"):
+    plan_path = tmp_path / "predecessor-plan.json"
+    plan_path.write_bytes(plan_content)
+    checkpoint_path = tmp_path / "predecessor.sqlite3"
+    with sqlite3.connect(checkpoint_path) as db:
+        db.execute("CREATE TABLE IF NOT EXISTS engineering_workflow (run TEXT PRIMARY KEY, context_digest TEXT, state TEXT)")
+        db.execute("INSERT OR REPLACE INTO engineering_workflow VALUES (?, ?, ?)",
+                   (run_id, context_digest, json.dumps({"executor": {"session_id": owner_session_id}})))
+    return {"kind": "R3_CHECKPOINT", "run_id": run_id,
+            "runtime_plan_ref": str(plan_path),
+            "runtime_plan_digest": "sha256:" + hashlib.sha256(plan_content).hexdigest(),
+            "checkpoint_ref": str(checkpoint_path), "context_digest": context_digest,
+            "owner_session_id": owner_session_id, "source_head": "c" * 40}
 
 
 def _reseal(receipt):
@@ -214,6 +231,7 @@ def test_self_sealed_receipt_cannot_bind_itself_to_real_plan_or_allocation(tmp_p
         materialize_native_g1_genesis(
             forged, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
             runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+            predecessor=_predecessor(tmp_path),
         )
     assert exc.value.code in {"PLAN_DIGEST_MISMATCH", "NODE_ALLOCATION_MISMATCH"}
 
@@ -226,16 +244,60 @@ def test_genesis_materializer_requires_explicit_plan_binding(tmp_path):
     assert exc.value.code == "PLAN_BINDING_REQUIRED"
 
 
+def test_transition_requires_explicit_predecessor_binding(tmp_path):
+    bindings = _bindings()
+    with pytest.raises(Q0NativeG1AdmissionError) as exc:
+        materialize_native_g1_genesis(
+            _valid(), worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+            runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        )
+    assert exc.value.code == "PREDECESSOR_BINDING_REQUIRED"
+
+
+@pytest.mark.parametrize("mutation,code", [
+    ("self", "PREDECESSOR_SELF_REFERENCE"),
+    ("stale_digest", "PLAN_DIGEST_MISMATCH"),
+    ("missing_plan", "PREDECESSOR_PLAN_UNREADABLE"),
+    ("missing_checkpoint", "PREDECESSOR_CHECKPOINT_UNBOUND"),
+    ("context", "PREDECESSOR_CONTEXT_MISMATCH"),
+    ("owner", "PREDECESSOR_OWNER_MISMATCH"),
+])
+def test_transition_rejects_unbound_or_invalid_predecessor(tmp_path, mutation, code):
+    bindings = _bindings()
+    predecessor = _predecessor(tmp_path)
+    if mutation == "self":
+        predecessor["run_id"] = bindings["run_id"]
+    elif mutation == "stale_digest":
+        predecessor["runtime_plan_digest"] = "sha256:" + "e" * 64
+    elif mutation == "missing_plan":
+        predecessor["runtime_plan_ref"] = str(tmp_path / "absent-plan.json")
+    elif mutation == "missing_checkpoint":
+        predecessor["checkpoint_ref"] = str(tmp_path / "absent.sqlite3")
+    elif mutation == "context":
+        predecessor["context_digest"] = "sha256:" + "f" * 64
+    elif mutation == "owner":
+        predecessor["owner_session_id"] = "wrong-session"
+    with pytest.raises(Q0NativeG1AdmissionError) as exc:
+        materialize_native_g1_genesis(
+            _valid(), worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+            runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+            predecessor=predecessor,
+        )
+    assert exc.value.code == code
+
+
 def test_genesis_materialization_is_digest_idempotent_and_sandbox_only(tmp_path):
     receipt = _valid()
     bindings = _bindings()
     first = materialize_native_g1_genesis(
         receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
         runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        predecessor=_predecessor(tmp_path),
     )
     second = materialize_native_g1_genesis(
         receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
         runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        predecessor=_predecessor(tmp_path),
     )
     assert first["run_id"] == second["run_id"]
     assert first["state_digest"] == second["state_digest"]
@@ -256,10 +318,10 @@ def test_genesis_materialization_is_digest_idempotent_and_sandbox_only(tmp_path)
     assert payload["run_state"]["run_id"] == first["run_id"]
     transition_path = Path(first["transition_receipt_ref"])
     transition = json.loads(transition_path.read_text())
-    assert transition["predecessor"]["identity"] == _bindings()["runtime_plan"]["run_id"]
+    assert transition["predecessor"]["identity"] == "cmd162-predecessor"
     assert transition["successor"]["run_id"] == first["run_id"]
-    assert transition["predecessor"]["digest"] == _bindings()["runtime_plan"]["digest"]
-    assert transition["successor"]["state_digest"] == first["state_digest"]
+    assert transition["predecessor"]["digest"] == _predecessor(tmp_path)["runtime_plan_digest"]
+    assert transition["successor"]["node_allocation_id"] == "alloc-1"
     assert transition["transition_digest"] == first["transition_receipt_digest"]
 
 
@@ -281,12 +343,14 @@ def test_genesis_materializer_rejects_conflicting_existing_content(tmp_path):
     first = materialize_native_g1_genesis(
         receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
         runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        predecessor=_predecessor(tmp_path),
     )
     Path(first["transition_receipt_ref"]).write_text("conflicting artifact")
     with pytest.raises(Q0NativeG1AdmissionError) as exc:
         materialize_native_g1_genesis(
             receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
             runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+            predecessor=_predecessor(tmp_path),
         )
     assert exc.value.code == "GENESIS_CONTENT_MISMATCH"
 
@@ -297,6 +361,7 @@ def test_genesis_rejects_conflicting_input_for_existing_sandbox_database(tmp_pat
     materialize_native_g1_genesis(
         first, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
         runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        predecessor=_predecessor(tmp_path),
     )
     conflict = build_native_g1_plan_receipt(
         **{**bindings, "provenance_ref": "evidence:changed"}
@@ -305,6 +370,7 @@ def test_genesis_rejects_conflicting_input_for_existing_sandbox_database(tmp_pat
         materialize_native_g1_genesis(
             conflict, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
             runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+            predecessor=_predecessor(tmp_path),
         )
     assert exc.value.code == "GENESIS_CONTENT_MISMATCH"
 
@@ -317,5 +383,6 @@ def test_historical_evidence_is_unchanged(tmp_path):
     materialize_native_g1_genesis(
         _valid(), worktree_root=root, sandbox_dir=tmp_path / "sandbox",
         runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        predecessor=_predecessor(tmp_path),
     )
     assert hashlib.sha256(historical.read_bytes()).hexdigest() == before
