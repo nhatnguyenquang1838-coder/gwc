@@ -9,6 +9,13 @@ RUN = 'scrum781-q0-fresh-20261010-r1'
 HEAD = '0' * 40
 
 
+def _foreign_site_packages(prefix='/opt/lib'):
+    import sys
+    major, minor = sys.version_info[:2]
+    other_minor = minor + 1 if minor < 20 else minor - 1
+    return f'{prefix}/python{major}.{other_minor}/site-packages'
+
+
 class EngineeringResumeTests(unittest.TestCase):
     def context(self, **changes):
         out = dict(expected={'session_id': SID, 'run_id': RUN, 'head_sha': HEAD},
@@ -183,8 +190,8 @@ class Q0BrowserBindingTests(unittest.TestCase):
 class Q0PythonEnvTests(unittest.TestCase):
     def test_foreign_site_packages_entries_detected(self):
         from tools.node_architect.q0_python_env import foreign_pythonpath_entries
-        self.assertEqual(foreign_pythonpath_entries({'PYTHONPATH': '/opt/lib/python3.14/site-packages'}),
-                         ['/opt/lib/python3.14/site-packages'])
+        foreign = _foreign_site_packages()
+        self.assertEqual(foreign_pythonpath_entries({'PYTHONPATH': foreign}), [foreign])
 
     def test_same_version_site_packages_entry_kept(self):
         import sys
@@ -197,7 +204,7 @@ class Q0PythonEnvTests(unittest.TestCase):
         import os
         import sys
         from tools.node_architect.q0_python_env import sanitize_python_path
-        foreign = '/opt/lib/python3.14/site-packages'
+        foreign = _foreign_site_packages()
         old_env = os.environ.get('PYTHONPATH')
         old_path = list(sys.path)
         try:
@@ -215,8 +222,9 @@ class Q0PythonEnvTests(unittest.TestCase):
 
     def test_clean_env_sets_path_and_drops_foreign_pythonpath(self):
         from tools.node_architect.q0_python_env import clean_env
-        result = clean_env({'PATH': '/usr/bin:/bin', 'PYTHONPATH': '/opt/lib/python3.14/site-packages:/keep'})
-        self.assertNotIn('/opt/lib/python3.14/site-packages', result.get('PYTHONPATH', ''))
+        foreign = _foreign_site_packages()
+        result = clean_env({'PATH': '/usr/bin:/bin', 'PYTHONPATH': f'{foreign}:/keep'})
+        self.assertNotIn(foreign, result.get('PYTHONPATH', ''))
         self.assertEqual(result['PATH'].split(':')[0], str(__import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python().parent))
         self.assertEqual(result['PATH'].count(str(__import__('tools.node_architect.q0_python_env', fromlist=['canonical_python']).canonical_python().parent)), 1)
 
@@ -241,7 +249,7 @@ class Q0PythonEnvTests(unittest.TestCase):
         import sys
         import tempfile
         with tempfile.TemporaryDirectory() as directory:
-            foreign = Path(directory) / 'lib/python3.14/site-packages'
+            foreign = Path(_foreign_site_packages(prefix=f'{directory}/lib'))
             foreign.mkdir(parents=True)
             env = os.environ.copy()
             env['PYTHONPATH'] = str(foreign)
