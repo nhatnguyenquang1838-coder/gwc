@@ -56,6 +56,28 @@
         "tests/test_scrum781_q0_native_host.py"
       ],
       "minimum_tests_passed": 75
+    },
+    {
+      "id": "CF-REAL-TARGET-ADAPTER",
+      "priority": 3,
+      "plan_node_id": "F1-PLAN-IDENTITY",
+      "action": "run_sandboxed_validation",
+      "worktree_required": true,
+      "argv": [
+        "-m",
+        "pytest",
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "-q"
+      ],
+      "required_test_files": [
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py"
+      ],
+      "minimum_tests_passed": 101,
+      "expected_result": "Q0_REAL_TARGET_ADAPTER_A_CODE_READY",
+      "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+      "write_paths": []
     }
   ]
 }

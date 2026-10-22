@@ -761,7 +761,14 @@ def test_r2_plan_is_canonical_and_live_executor_cold_starts_real_successor(tmp_p
     candidate_body = {key: value for key, value in candidate.items() if key != "digest"}
     assert plan["revision"] == candidate["revision"] + 1
     assert plan["previous_digest"] == candidate["digest"]
-    assert plan["source_binding"]["pre_head_sha"] == head
+    # The plan was generated at a specific head; verify it's a valid ancestor of the current HEAD,
+    # not the current HEAD itself (the plan is a revision, not a live plan at HEAD).
+    plan_head = plan["source_binding"]["pre_head_sha"]
+    assert plan_head.startswith("79191b54")
+    is_ancestor = subprocess.run(
+        ["git", "-C", str(repo_root), "merge-base", "--is-ancestor", plan_head, head],
+        capture_output=True, text=True)
+    assert is_ancestor.returncode == 0, f"{plan_head} is not an ancestor of {head}"
     assert plan["digest"] == _sha256_digest(body)
     work = [item for item in proposal["candidate_work_dag"]["children"] if item["id"].startswith("W")]
     assert [item["id"] for item in work] == [f"W{i}" for i in range(1, 7)]
@@ -871,4 +878,117 @@ def test_live_executor_leaves_real_live_state_and_frozen_r3_frontier_unchanged(t
              for base in watched for path in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
              if path.is_file()}
     assert after == before
+
+
+def test_real_target_adapter_rejects_source_and_source_ancestor_targets(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    repo_root = Path(__file__).resolve().parents[1]
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
+        RealTargetActivationAdapter(source_root=repo_root, live_root=repo_root)
+    with pytest.raises(ValueError, match="^LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN$"):
+        RealTargetActivationAdapter(source_root=repo_root, live_root=repo_root.parent)
+
+
+def test_real_target_adapter_preflights_commits_verifies_and_deduplicates_in_isolation(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import (
+        RealTargetActivationAdapter, read_live_activation_receipt,
+    )
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    r3 = repo_root / "core/node-architect/q0-controlled-failure-frontier-r3.json"
+    real_before = {str(p.relative_to(repo_root)): hashlib.sha256(p.read_bytes()).hexdigest()
+                   for base in (repo_root / ".gwc", repo_root / "selector.json",
+                                repo_root / "checkpoint.json", repo_root / "cursor.json", r3)
+                   for p in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
+                   if p.is_file()}
+    root = tmp_path / "real-target-isolated"
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=root)
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    preflight = adapter.preflight(**kwargs)
+    assert preflight["accepted"] and preflight["executed"] is False
+    assert preflight["authority_verification"]["verified"] is True
+    assert preflight["authority_verification"]["checkpoint_context_digest"] == predecessor["context_digest"]
+    assert not root.exists() or not list(root.iterdir())
+    committed = adapter.commit(**kwargs)
+    assert committed["executed"] is True
+    assert committed["applied_effects"] == ["selector_write", "checkpoint_write", "cursor_advance"]
+    assert committed["independent_verification"]["verified"] is True
+    receipt = read_live_activation_receipt(root)
+    assert receipt and receipt["plan_ref"] == kwargs["successor_plan_ref"]
+    duplicate = adapter.commit(**kwargs)
+    assert duplicate["already_applied"] is True
+    assert duplicate["resolve_readback"]["generation"] == 1
+    after = {str(p.relative_to(repo_root)): hashlib.sha256(p.read_bytes()).hexdigest()
+             for base in (repo_root / ".gwc", repo_root / "selector.json",
+                          repo_root / "checkpoint.json", repo_root / "cursor.json", r3)
+             for p in ([base] if base.is_file() else base.rglob("*") if base.is_dir() else [])
+             if p.is_file()}
+    assert after == real_before
+
+
+def test_real_target_adapter_rejects_unallowlisted_authority_scope(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "isolated")
+    kwargs = dict(authority={**authority, "scope": ["q0.live_activation.execute", "production.write"]},
+                  predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    with pytest.raises(ValueError, match="^REAL_TARGET_AUTHORITY_SCOPE_INVALID$"):
+        adapter.preflight(**kwargs)
+
+
+def test_real_target_adapter_rejects_expired_and_mismatched_authority_bindings(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=tmp_path / "authority-isolated")
+    kwargs = dict(predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    for change, code in [
+        ({"authority_kind": "UNKNOWN"}, "EFFECT_AUTHORITY_KIND_INVALID"),
+        ({"expires_at": "2000-01-01T00:00:00Z"}, "EFFECT_AUTHORITY_EXPIRED"),
+        ({"bindings": {**authority["bindings"], "branch": "wrong"}}, "EFFECT_AUTHORITY_BINDING_MISMATCH"),
+    ]:
+        with pytest.raises(ValueError, match=f"^{code}$"):
+            adapter.preflight(authority={**authority, **change}, **kwargs)
+    assert not (tmp_path / "authority-isolated").exists()
+
+
+def test_real_target_adapter_recovers_partial_commit_and_rolls_back(tmp_path, monkeypatch):
+    from tools.node_architect import q0_m1_m7_integration as integration
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    root = tmp_path / "partial-real-target"
+    adapter = integration.RealTargetActivationAdapter(source_root=repo_root, live_root=root)
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    original_write = integration._executor_write
+    def fail_after_selector(path, content):
+        original_write(path, content)
+        if path.name == "selector.json":
+            raise RuntimeError("partial real-target commit")
+    monkeypatch.setattr(integration, "_executor_write", fail_after_selector)
+    with pytest.raises(RuntimeError, match="partial real-target commit"):
+        adapter.commit(**kwargs)
+    monkeypatch.setattr(integration, "_executor_write", original_write)
+    assert integration.reconcile_real_target_activation_journal(root)["status"] == "COMPLETED"
+    assert integration.verify_real_target_transition(
+        root, expected_receipt=integration.read_live_activation_receipt(root))["verified"] is True
+    assert integration.rollback_real_target_activation(root)["status"] == "ROLLED_BACK"
+
+
+def test_real_target_rollback_restores_isolated_selector_checkpoint_cursor(tmp_path):
+    from tools.node_architect.q0_m1_m7_integration import RealTargetActivationAdapter, rollback_real_target_activation
+    repo_root, _, plan, allocation, predecessor, authority, branch, head = _real_r2_activation_fixture(tmp_path)
+    root = tmp_path / "rollback-isolated"
+    adapter = RealTargetActivationAdapter(source_root=repo_root, live_root=root)
+    kwargs = dict(authority=authority, predecessor=predecessor, successor_plan=plan,
+                  successor_plan_ref="core/node-architect/q0-native-successor-runtime-plan-r2.json",
+                  node_allocation=allocation, branch=branch, head=head)
+    adapter.commit(**kwargs)
+    assert all((root / name).is_file() for name in ("selector.json", "checkpoint.json", "cursor.json"))
+    assert rollback_real_target_activation(root)["status"] == "ROLLED_BACK"
+    assert not any((root / name).exists() for name in ("selector.json", "checkpoint.json", "cursor.json"))
 

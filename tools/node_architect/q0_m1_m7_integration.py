@@ -708,6 +708,143 @@ def verify_live_activation_isolated(isolated_root: Path | str) -> dict[str, Any]
             'activation_status':receipt.get('activation_status')}
 
 
+_REAL_TARGET_AUTHORITY_KIND = 'HUMAN_OPERATOR_EFFECT_AUTHORITY'
+_REAL_TARGET_AUTHORITY_SCOPE = 'q0.live_activation.execute'
+_REAL_TARGET_PLAN_REF = 'core/node-architect/q0-native-successor-runtime-plan-r2.json'
+_REAL_TARGET_VIEW_REFS = (
+    _REAL_TARGET_PLAN_REF,
+    _R3_PREDECESSOR_PLAN_REF,
+    ROUTE_REF,
+    ACTIVATION_RECEIPT_REF,
+)
+
+
+class RealTargetActivationAdapter:
+    """Authority-audited adapter whose target is an isolated real-target snapshot.
+
+    The source tree is read only. Selector/checkpoint/cursor writes, the PREPARE /
+    COMMIT journal, rollback and verification are confined to ``live_root``.
+    """
+
+    def __init__(self, *, source_root: Path | str, live_root: Path | str):
+        self.source_root = Path(source_root).expanduser().resolve()
+        self.live_root = Path(live_root).expanduser().resolve()
+        _live_target_guard(self.live_root)
+        if (self.live_root == self.source_root
+                or self.source_root in self.live_root.parents
+                or self.live_root in self.source_root.parents):
+            raise ValueError('LIVE_ACTIVATION_LIVE_TARGET_FORBIDDEN')
+
+    def _real_target_view(self, successor_plan_ref: str, successor_plan: Mapping[str, Any],
+                          predecessor: Mapping[str, Any]) -> dict[str, Any]:
+        if successor_plan_ref != _REAL_TARGET_PLAN_REF:
+            raise ValueError('SUCCESSOR_PLAN_REF_INVALID')
+        proposal_path = self.source_root / _REAL_TARGET_PLAN_REF
+        if not proposal_path.is_file():
+            raise ValueError('REAL_TARGET_SOURCE_ARTIFACT_MISSING')
+        proposal = json.loads(proposal_path.read_text('utf-8'))
+        if proposal.get('native_runtime_plan') != dict(successor_plan):
+            raise ValueError('REAL_TARGET_SUCCESSOR_MISMATCH')
+        artifacts = {}
+        for rel in _REAL_TARGET_VIEW_REFS:
+            path = self.source_root / rel
+            if path.is_file():
+                artifacts[rel] = _sha256_file(path)
+        if _R3_PREDECESSOR_PLAN_REF not in artifacts or ACTIVATION_RECEIPT_REF not in artifacts:
+            raise ValueError('REAL_TARGET_SOURCE_ARTIFACT_MISSING')
+        checkpoint_ref = predecessor.get('checkpoint_ref') if isinstance(predecessor, Mapping) else None
+        if not isinstance(checkpoint_ref, str) or not Path(checkpoint_ref).is_file():
+            raise ValueError('PREDECESSOR_CHECKPOINT_UNBOUND')
+        artifacts['predecessor_checkpoint'] = _sha256_file(Path(checkpoint_ref))
+        return {'source_root': str(self.source_root), 'artifacts': artifacts,
+                'view_digest': _digest(artifacts)}
+
+    def validate_authority(self, *, authority, predecessor, successor_plan, successor_plan_ref,
+                           node_allocation, branch, head) -> dict[str, Any]:
+        if not isinstance(authority, Mapping):
+            raise ValueError('LIVE_ACTIVATION_AUTHORITY_REQUIRED')
+        if authority.get('authority_kind') != _REAL_TARGET_AUTHORITY_KIND:
+            raise ValueError('EFFECT_AUTHORITY_KIND_INVALID')
+        scopes = authority.get('scope')
+        if (not isinstance(scopes, (list, tuple))
+                or len(scopes) != 1 or scopes[0] != _REAL_TARGET_AUTHORITY_SCOPE):
+            raise ValueError('REAL_TARGET_AUTHORITY_SCOPE_INVALID')
+        authority_digest, plan_digest, predecessor_digest = _executor_validate(
+            authority, predecessor, successor_plan, successor_plan_ref,
+            node_allocation, branch, head)
+        return {'verified': True, 'authority_kind': _REAL_TARGET_AUTHORITY_KIND,
+                'scope': _REAL_TARGET_AUTHORITY_SCOPE, 'authority_digest': authority_digest,
+                'successor_plan_digest': plan_digest,
+                'predecessor_digest': predecessor_digest,
+                'checkpoint_context_digest': predecessor['context_digest'],
+                'branch': branch, 'head': head}
+
+    def transition(self, *, authority, predecessor, successor_plan, successor_plan_ref,
+                   node_allocation, branch, head, mode='PREFLIGHT') -> dict[str, Any]:
+        authority_check = self.validate_authority(
+            authority=authority, predecessor=predecessor, successor_plan=successor_plan,
+            successor_plan_ref=successor_plan_ref, node_allocation=node_allocation,
+            branch=branch, head=head)
+        view = self._real_target_view(successor_plan_ref, successor_plan, predecessor)
+        result = execute_live_activation(
+            authority=authority, predecessor=predecessor, successor_plan=successor_plan,
+            successor_plan_ref=successor_plan_ref, node_allocation=node_allocation,
+            branch=branch, head=head, live_root=self.live_root, mode=mode)
+        result['authority_verification'] = authority_check
+        result['real_target_view'] = view
+        if mode == 'COMMIT' and result.get('executed'):
+            receipt = read_live_activation_receipt(self.live_root)
+            if receipt is None:
+                raise ValueError('REAL_TARGET_RECEIPT_MISSING')
+            result['independent_verification'] = verify_real_target_transition(
+                self.live_root, expected_receipt=receipt)
+        return result
+
+    def preflight(self, **kwargs) -> dict[str, Any]:
+        return self.transition(**kwargs, mode='PREFLIGHT')
+
+    def commit(self, **kwargs) -> dict[str, Any]:
+        return self.transition(**kwargs, mode='COMMIT')
+
+
+def verify_real_target_transition(live_root: Path | str, *, expected_receipt: Mapping[str, Any]) -> dict[str, Any]:
+    """Independently verify isolated selector/checkpoint/cursor and generation."""
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    if not isinstance(expected_receipt, Mapping):
+        raise ValueError('REAL_TARGET_EXPECTED_RECEIPT_REQUIRED')
+    actual = read_live_activation_receipt(root)
+    if actual is None or actual.get('receipt_digest') != expected_receipt.get('receipt_digest'):
+        raise ValueError('REAL_TARGET_RECEIPT_MISMATCH')
+    readback = verify_live_activation_isolated(root)
+    ref, generation = actual.get('plan_ref'), actual.get('generation')
+    selector = _state_read(root / 'selector.json')
+    checkpoint = _state_read(root / 'checkpoint.json')
+    cursor = _state_read(root / 'cursor.json')
+    for artifact in (selector, checkpoint, cursor):
+        if not isinstance(artifact, Mapping) or artifact.get('plan_ref', artifact.get('active_plan_ref')) != ref:
+            raise ValueError('REAL_TARGET_ARTIFACT_MISMATCH')
+        if artifact.get('generation') != generation:
+            raise ValueError('REAL_TARGET_GENERATION_MISMATCH')
+    if readback.get('resolved_plan_ref') != ref or readback.get('generation') != generation:
+        raise ValueError('REAL_TARGET_READBACK_MISMATCH')
+    return {'verified': True, 'plan_ref': ref, 'generation': generation,
+            'artifact_digests': {name: _sha256_file(root / f'{name}.json')
+                                 for name in ('selector', 'checkpoint', 'cursor')}}
+
+
+def rollback_real_target_activation(live_root: Path | str) -> dict[str, Any]:
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    return rollback_live_activation(root)
+
+
+def reconcile_real_target_activation_journal(live_root: Path | str) -> dict[str, Any]:
+    root = Path(live_root).expanduser().resolve()
+    _live_target_guard(root)
+    return reconcile_live_activation_journal(root)
+
+
 def prepare_successor_activation(envelope: Mapping[str, Any], *, authority: Mapping[str, Any] | None) -> dict[str, Any]:
     """Validate a live-activation envelope and return a non-executing preflight."""
 
