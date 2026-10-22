@@ -681,4 +681,119 @@ def check_authority_boundary(
     return _finish(output, reasons)
 
 
-__all__ = ["ACTION_TO_MINIMUM_GATE", "check_authority_boundary"]
+def route_g2_effect(
+    *,
+    task_id: str,
+    run_id: str,
+    action: str,
+    effect_closure: Sequence[str],
+    risk_class: str,
+    repository: str,
+    branch: str,
+    head_sha: str,
+    target: str,
+    receipts: Sequence[Any],
+    now: str,
+    protected_effect: bool,
+) -> dict[str, Any]:
+    """Route one G2 effect after resolving its derived authority receipt.
+
+    This is a per-effect routing decision, not a gate transition. In particular,
+    EFFECT_HOLD applies only to the supplied effect closure; callers may evaluate
+    independent siblings separately.
+    """
+    from tools.node_architect.universal_run_authority import resolve_authority
+
+    def decision(routing: str, effect: str, reason: str, **extra: Any) -> dict[str, Any]:
+        result: dict[str, Any] = {
+            "schema": "universal-run-g2-effect-routing/v1",
+            "task_id": task_id,
+            "run_id": run_id,
+            "action": action,
+            "affected_effects": list(effect_closure) if isinstance(effect_closure, (list, tuple)) else [],
+            "routing_decision": routing,
+            "effect_decision": effect,
+            "reason": reason,
+            "control_loop": "CONTINUE_INDEPENDENT_EFFECTS",
+        }
+        result.update(extra)
+        result["decision_digest"] = _digest(result)
+        return result
+
+    normalized_action = action.lower() if isinstance(action, str) else ""
+    protected_action = normalized_action in {
+        "merge_approved_pr", "deploy_approved_release", "reload_approved_runtime",
+        "production_data_read", "production_data_write", "production_config_change",
+        "credential_rotation", "migration", "activate_live_runtime",
+        "write_active_selector", "write_live_checkpoint", "write_live_cursor",
+    }
+    protected_words = ("production", "credential", "secret", "migration", "deploy",
+                       "merge", "selector", "live_checkpoint", "live_cursor", "protected_main")
+    protected_by_effect = any(
+        any(word in effect.lower() for word in protected_words)
+        for effect in effect_closure if isinstance(effect, str)
+    ) if isinstance(effect_closure, (list, tuple)) else False
+    protected_effect = protected_effect or protected_action or protected_by_effect
+    if (
+        not isinstance(task_id, str) or not task_id
+        or not isinstance(run_id, str) or not run_id
+        or not isinstance(action, str) or not action
+        or not isinstance(effect_closure, (list, tuple)) or not effect_closure
+        or any(not isinstance(item, str) or not item for item in effect_closure)
+        or len(set(effect_closure)) != len(effect_closure)
+        or not isinstance(risk_class, str) or risk_class not in VALID_RISK_CLASSES
+        or not all(isinstance(value, str) and value for value in (repository, branch, head_sha, target, now))
+        or not isinstance(protected_effect, bool)
+    ):
+        return decision("DENIED", "DENIED", "RISK_OR_EFFECT_INPUT_INVALID")
+
+    # Protected effects remain outside derived G2 code authority regardless of
+    # risk label or receipt contents. Existing canonical gate checks are untouched.
+    if protected_effect:
+        return decision("DENIED", "DENIED", "PROTECTED_EFFECT_FORBIDDEN")
+
+    resolution = resolve_authority(task_id=task_id, action=action, receipts=list(receipts or ()), now=now)
+    receipt = resolution.get("decision_receipt") if resolution.get("granted") else None
+    exact_binding = (
+        isinstance(receipt, Mapping)
+        and receipt.get("schema") == "derived-child-authority/v1"
+        and receipt.get("child_run_id") == run_id
+        and receipt.get("repository") == repository
+        and receipt.get("branch") == branch
+        and receipt.get("head_sha") == head_sha
+        and receipt.get("target") == target
+        and receipt.get("authorized_actions") == [action]
+        and all(effect in receipt.get("scope", ()) for effect in effect_closure)
+        and receipt.get("g4_g5_g6_authority_granted") is False
+    )
+    if not exact_binding:
+        envelope = {
+            "task_id": task_id, "run_id": run_id, "action": action,
+            "effect_closure": list(effect_closure), "risk_class": risk_class,
+            "repository": repository, "branch": branch, "head_sha": head_sha,
+            "target": target, "protected_effect": protected_effect,
+        }
+        envelope["envelope_digest"] = _digest(envelope)
+        return decision(
+            "HITL_REQUIRED", "EFFECT_HOLD", "DERIVED_AUTHORITY_NOT_VERIFIED_IN_SCOPE",
+            approval_envelope=envelope, interruptible=True,
+        )
+    if risk_class == "R3":
+        envelope = {
+            "task_id": task_id, "run_id": run_id, "action": action,
+            "effect_closure": list(effect_closure), "risk_class": risk_class,
+            "repository": repository, "branch": branch, "head_sha": head_sha,
+            "target": target, "protected_effect": protected_effect,
+        }
+        envelope["envelope_digest"] = _digest(envelope)
+        return decision(
+            "HITL_REQUIRED", "EFFECT_HOLD", "R3_REQUIRES_HUMAN_APPROVAL",
+            approval_envelope=envelope, interruptible=True,
+        )
+    return decision(
+        "AUTONOMOUS_HOTL", "GRANTED", "VERIFIED_DERIVED_AUTHORITY",
+        mode="HOTL", interruptible=True, audit_receipt=receipt,
+    )
+
+
+__all__ = ["ACTION_TO_MINIMUM_GATE", "check_authority_boundary", "route_g2_effect"]
