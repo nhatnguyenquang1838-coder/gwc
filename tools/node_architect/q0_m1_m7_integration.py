@@ -83,12 +83,19 @@ def resolve_active_plan(root: Path | str) -> str:
 
 FRONTIER_R2_REF = 'core/node-architect/q0-engineering-frontier-r1.json'
 FRONTIER_R3_REF = 'core/node-architect/q0-controlled-failure-frontier-r3.json'
+FRONTIER_NATIVE_SUCCESSOR_REF = 'core/node-architect/q0-native-successor-frontier-r1.json'
 
 
 def resolve_frontier_ref(root: Path | str) -> str:
-    """Pick the frontier that matches the active plan (R3 campaign vs R2 lane)."""
+    """Prefer a successor-specific frontier only when bound to the active plan."""
     root = Path(root).resolve()
     plan = resolve_active_plan(root)
+    successor_path = root / FRONTIER_NATIVE_SUCCESSOR_REF
+    if successor_path.exists():
+        policy = json.loads(successor_path.read_text())
+        if policy.get('runtime_plan_ref') != plan:
+            raise ValueError('Q0_FRONTIER_PLAN_DRIFT')
+        return FRONTIER_NATIVE_SUCCESSOR_REF
     ref = FRONTIER_R3_REF if 'controlled-failure' in plan else FRONTIER_R2_REF
     path = root / ref
     if not path.exists():

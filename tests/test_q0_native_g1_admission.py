@@ -22,6 +22,7 @@ def _bindings():
     candidate_sha = "b" * 40
     allocation = {"node_allocation_id": "alloc-1", "content_digest": {"value": "sha256:" + "c" * 64}}
     plan = {
+        "run_id": run_id,
         "digest": runtime_plan_digest,
         "source_binding": {"pre_head_sha": candidate_sha},
         "dag": {"nodes": [{"id": f"W{i}", "predecessors": [] if i == 1 else [f"W{i-1}"]} for i in range(1, 7)]},
@@ -68,6 +69,10 @@ def test_ur_g1_requires_real_plan_and_allocation_bindings():
 def test_canonical_receipt_is_sealed_and_non_authorizing():
     receipt = _valid()
     verdict = validate_native_g1_plan_receipt(receipt, **_bindings())
+    assert receipt["plan_coverage"] == {
+        name: "PLANNED" for name in q0_qualification.MANDATORY_QUALIFICATION_ENTRIES
+    }
+    assert receipt["qualification_results"] == {}
     assert verdict["valid"] is True
     assert verdict["authority_granted"] is False
     assert verdict["effect_authority_granted"] is False
@@ -158,8 +163,31 @@ def test_missing_provenance_or_decision_reference_fails_closed():
 
 def test_missing_mandatory_qualification_entry_fails_closed():
     receipt = _valid()
-    receipt["qualification_entries"].pop(next(iter(receipt["qualification_entries"])))
-    _assert_code("QUALIFICATION_ENTRIES_INCOMPLETE", _reseal(receipt))
+    receipt["plan_coverage"].pop(next(iter(receipt["plan_coverage"])))
+    _assert_code("PLAN_COVERAGE_INVALID", _reseal(receipt))
+
+
+def test_qualification_coverage_is_planned_not_a_pass_claim():
+    receipt = _valid()
+    receipt["plan_coverage"][q0_qualification.MANDATORY_QUALIFICATION_ENTRIES[0]] = "PASS"
+    _assert_code("PLAN_COVERAGE_INVALID", _reseal(receipt))
+
+
+def test_qualification_result_pass_requires_evidence_reference():
+    receipt = _valid()
+    receipt["qualification_results"] = {
+        q0_qualification.MANDATORY_QUALIFICATION_ENTRIES[0]: {"status": "PASS"}
+    }
+    _assert_code("QUALIFICATION_RESULT_INVALID", _reseal(receipt))
+
+
+def test_ur_g1_does_not_report_qualification_pass_from_plan_coverage():
+    result = q0_qualification.complete_q0_gate(
+        gate="UR.G1", evidence={"PLAN_RECEIPT": _valid()}, **_bindings()
+    )
+    assert result["gate_state"] == "PASSED"
+    assert result["qualification_status"] == "NOT_QUALIFIED"
+    assert result["qualification_results"] == {}
 
 
 def test_digest_mismatch_fails_closed():
@@ -209,11 +237,30 @@ def test_genesis_materialization_is_digest_idempotent_and_sandbox_only(tmp_path)
         receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
         runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
     )
-    assert first == second
-    artifact = Path(first["ref"])
+    assert first["run_id"] == second["run_id"]
+    assert first["state_digest"] == second["state_digest"]
+    assert first["transition_receipt_digest"] == second["transition_receipt_digest"]
+    assert first["db_ref"] == second["db_ref"]
+    assert first["readback"] == second["readback"]
+    artifact = Path(first["db_ref"])
     assert artifact.is_relative_to(tmp_path / "sandbox")
-    assert hashlib.sha256(artifact.read_bytes()).hexdigest() == first["digest"].removeprefix("sha256:")
-    assert artifact.read_text().count("native-g1-genesis") == 1
+    assert artifact.is_file()
+    assert first["readback"] == {"run_id": first["run_id"], "state_digest": first["state_digest"]}
+    from tools.node_architect.q0_native_g1_admission import read_back_genesis
+    assert read_back_genesis(first["db_ref"]) == first["readback"]
+    import sqlite3
+    with sqlite3.connect(first["db_ref"]) as db:
+        assert db.execute("SELECT COUNT(*) FROM checkpoint_events").fetchone()[0] == 1
+        payload = json.loads(db.execute("SELECT payload_json FROM checkpoint_events").fetchone()[0])
+    assert payload["run_state"]["schema_id"] == "gwc.universal-run.run-state-record.v2"
+    assert payload["run_state"]["run_id"] == first["run_id"]
+    transition_path = Path(first["transition_receipt_ref"])
+    transition = json.loads(transition_path.read_text())
+    assert transition["predecessor"]["identity"] == _bindings()["runtime_plan"]["run_id"]
+    assert transition["successor"]["run_id"] == first["run_id"]
+    assert transition["predecessor"]["digest"] == _bindings()["runtime_plan"]["digest"]
+    assert transition["successor"]["state_digest"] == first["state_digest"]
+    assert transition["transition_digest"] == first["transition_receipt_digest"]
 
 
 def test_genesis_refuses_path_outside_sandbox(tmp_path):
@@ -230,16 +277,34 @@ def test_genesis_refuses_path_outside_sandbox(tmp_path):
 
 def test_genesis_materializer_rejects_conflicting_existing_content(tmp_path):
     receipt = _valid()
-    sandbox = tmp_path / "sandbox"
-    sandbox.mkdir()
-    ref = sandbox / f"native-g1-genesis-{receipt['receipt_digest'].split(':', 1)[1]}.json"
-    ref.write_text("conflicting artifact")
+    bindings = _bindings()
+    first = materialize_native_g1_genesis(
+        receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+        runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+    )
+    Path(first["transition_receipt_ref"]).write_text("conflicting artifact")
     with pytest.raises(Q0NativeG1AdmissionError) as exc:
         materialize_native_g1_genesis(
-            receipt, worktree_root=tmp_path, sandbox_dir=sandbox, **{
-                "runtime_plan": _bindings()["runtime_plan"],
-                "node_allocation": _bindings()["node_allocation"],
-            },
+            receipt, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+            runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+        )
+    assert exc.value.code == "GENESIS_CONTENT_MISMATCH"
+
+
+def test_genesis_rejects_conflicting_input_for_existing_sandbox_database(tmp_path):
+    bindings = _bindings()
+    first = _valid()
+    materialize_native_g1_genesis(
+        first, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+        runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
+    )
+    conflict = build_native_g1_plan_receipt(
+        **{**bindings, "provenance_ref": "evidence:changed"}
+    )
+    with pytest.raises(Q0NativeG1AdmissionError) as exc:
+        materialize_native_g1_genesis(
+            conflict, worktree_root=tmp_path, sandbox_dir=tmp_path / "sandbox",
+            runtime_plan=bindings["runtime_plan"], node_allocation=bindings["node_allocation"],
         )
     assert exc.value.code == "GENESIS_CONTENT_MISMATCH"
 

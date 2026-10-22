@@ -226,7 +226,9 @@ def complete_q0_gate(
             )
         except Q0NativeG1AdmissionError as exc:
             raise Q0QualificationError("PLAN_RECEIPT_INVALID", exc.code) from exc
-        return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "PLAN_RECEIPT"}
+        return {"gate": gate, "gate_state": "PASSED", "evidence_kind": "PLAN_RECEIPT",
+                "qualification_status": "NOT_QUALIFIED",
+                "qualification_results": dict(receipt.get("qualification_results", {}))}
     if gate == "UR.G4":
         outcome = values.get("integration_outcome")
         receipt = values.get("INTEGRATION_RECEIPT")

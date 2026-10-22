@@ -511,6 +511,7 @@ def test_q0_e2e_campaign_certify_accept_handoff_then_login_start():
         "content_digest": {"value": "sha256:" + "c" * 64},
     }
     runtime_plan = {
+        "run_id": run_id,
         "digest": "sha256:" + "a" * 64,
         "source_binding": {"pre_head_sha": candidate},
         "node_allocations": [allocation["node_allocation_id"]],

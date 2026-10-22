@@ -1,0 +1,37 @@
+{
+  "schema_id": "gwc.q0.engineering-frontier/v1",
+  "runtime_plan_ref": "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json",
+  "authority_granted": false,
+  "items": [
+    {
+      "id": "CF-G1-ADMISSION",
+      "plan_node_id": "F1-PLAN-IDENTITY",
+      "objective": "Validate native G1 admission, qualification evidence separation, and durable Universal RunState genesis.",
+      "action": "run_sandboxed_validation",
+      "argv": [
+        "-m",
+        "pytest",
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+        "tests/test_scrum781_q0_native_host.py",
+        "-q"
+      ],
+      "expected_result": "Q0_NATIVE_G1_ADMISSION_CORRECTED",
+      "read_paths": [
+        "core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json"
+      ],
+      "priority": 1,
+      "depends_on": [],
+      "write_paths": [],
+      "verification_profile": "Q0_TERMINAL_RESULT_SUITE",
+      "required_test_files": [
+        "tests/test_q0_native_g1_admission.py",
+        "tests/test_q0_universal_qualification.py",
+        "tests/test_scrum781_q0_mandatory_matrix_coverage.py",
+        "tests/test_scrum781_q0_native_host.py"
+      ],
+      "minimum_tests_passed": 75
+    }
+  ]
+}
