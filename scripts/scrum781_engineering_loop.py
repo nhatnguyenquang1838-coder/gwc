@@ -24,6 +24,7 @@ sys.path.insert(0, str(ROOT))
 from tools.node_architect.q0_m1_m7_integration import (build_q0_operation, PLAN_REF,
                                                       resolve_active_plan, resolve_frontier_ref)
 from tools.node_architect.q0_engineering_loop import assess_engineering_resume, engineering_prompt
+from tools.node_architect.q0_browser_binding import BrowserBindingError, resolve_binding
 
 
 def digest(value: Any) -> str:
@@ -81,12 +82,11 @@ def inspect(args: argparse.Namespace) -> dict:
     loop = states['loop']
     if args.tick is not None and (args.command != 'inspect' or args.tick != loop['ticks_fired'] or not loop['awaiting_response']):
         raise ValueError('TICK_BINDING_MISMATCH')
-    browser_binding = _read_json(home/'loop-checkpoints'/operation['run_id']/'browser-report39-039e1f6-delivery.json')
-    if (browser_binding.get('session_id') != args.session
-            or browser_binding.get('run_id') != operation['run_id']
-            or browser_binding.get('conversation_url') != args.controller_url
-            or browser_binding.get('send_outcome') != 'SENT_VERIFIED'):
-        raise ValueError('CONTROLLER_BROWSER_BINDING_MISMATCH')
+    try:
+        resolve_binding(home, run_id=operation['run_id'], session_id=args.session,
+                        controller_url=args.controller_url)
+    except BrowserBindingError:
+        raise ValueError('CONTROLLER_BROWSER_BINDING_MISMATCH') from None
     expected = {'session_id': args.session, 'run_id': operation['run_id'], 'head_sha': operation['head_sha']}
     # This is preparation under the current native Q0 engineering plan and
     # direct user request, not a reading of unknown typed TaskController RunState.

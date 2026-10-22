@@ -87,3 +87,94 @@ class EngineeringResumeTests(unittest.TestCase):
         self.assertIn('Do not change M1 HOLD to PASS', prompt)
         self.assertIn('Do not auto-resume', prompt)
         self.assertIn('one bounded', prompt)
+
+
+class Q0BrowserBindingTests(unittest.TestCase):
+    def setUp(self):
+        import hashlib
+        import json
+        import tempfile
+        from tools.node_architect.q0_browser_binding import current_binding_path
+        self._temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._temp.cleanup)
+        self.home = Path(self._temp.name)
+        self.run_dir = self.home / 'loop-checkpoints' / RUN
+        self.run_dir.mkdir(parents=True)
+        self.historical = {
+            'run_id': RUN, 'session_id': SID, 'send_outcome': 'SENT_VERIFIED',
+            'conversation_url': 'https://chatgpt.com/g/g-p-project-dw/c/old-chat',
+            'marker': 'DWA781-R39-039e1f6',
+        }
+        self.historical_bytes = json.dumps(self.historical, sort_keys=True).encode()
+        self.receipt_path = self.run_dir / 'browser-report39-039e1f6-delivery.json'
+        self.receipt_path.write_bytes(self.historical_bytes)
+        self.parent_digest = hashlib.sha256(self.historical_bytes).hexdigest()
+        self.binding_path = current_binding_path(self.home, RUN)
+
+    def current(self, **changes):
+        binding = {
+            'run_id': RUN, 'session_id': SID,
+            'conversation_url': 'https://chatgpt.com/g/g-p-project-dw/c/new-chat',
+            'marker': 'DWA781-Q0-CURRENT-001', 'report_ref': 'report-001',
+            'in_app_delivered': True, 'user_turn_observed': True,
+            'previous_receipt_path': str(self.receipt_path),
+            'previous_receipt_sha256': self.parent_digest,
+        }
+        binding.update(changes)
+        return binding
+
+    def test_legacy_receipt_still_accepted(self):
+        from tools.node_architect.q0_browser_binding import resolve_binding
+        self.historical['conversation_url'] = 'https://chatgpt.com/g/g-p-project-dw/c/old-chat'
+        self.receipt_path.write_text(__import__('json').dumps(self.historical))
+        result = resolve_binding(self.home, run_id=RUN, session_id=SID,
+                                 controller_url=self.historical['conversation_url'])
+        self.assertEqual(result['mode'], 'LEGACY')
+
+    def test_new_url_without_current_binding_fails_closed(self):
+        from tools.node_architect.q0_browser_binding import BrowserBindingError, resolve_binding
+        with self.assertRaises(BrowserBindingError) as raised:
+            resolve_binding(self.home, run_id=RUN, session_id=SID,
+                            controller_url=self.current()['conversation_url'])
+        self.assertEqual(raised.exception.code, 'CURRENT_BINDING_MISSING')
+
+    def test_chained_binding_accepted(self):
+        from tools.node_architect.q0_browser_binding import resolve_binding
+        self.binding_path.parent.mkdir(parents=True)
+        self.binding_path.write_text(__import__('json').dumps(self.current()))
+        result = resolve_binding(self.home, run_id=RUN, session_id=SID,
+                                 controller_url=self.current()['conversation_url'])
+        self.assertEqual(result, {'mode': 'CHAINED', 'marker': 'DWA781-Q0-CURRENT-001',
+                                  'conversation_url': self.current()['conversation_url']})
+
+    def test_chained_binding_rejects_parent_digest_mismatch(self):
+        from tools.node_architect.q0_browser_binding import BrowserBindingError, validate_binding_chain
+        with self.assertRaises(BrowserBindingError) as raised:
+            validate_binding_chain(self.historical, self.current(previous_receipt_sha256='wrong'),
+                                   run_id=RUN, session_id=SID,
+                                   controller_url=self.current()['conversation_url'])
+        self.assertEqual(raised.exception.code, 'BINDING_PARENT_DIGEST_MISMATCH')
+
+    def test_chained_binding_rejects_marker_reuse(self):
+        from tools.node_architect.q0_browser_binding import BrowserBindingError, validate_binding_chain
+        with self.assertRaises(BrowserBindingError) as raised:
+            validate_binding_chain(self.historical, self.current(marker=self.historical['marker']),
+                                   run_id=RUN, session_id=SID,
+                                   controller_url=self.current()['conversation_url'])
+        self.assertEqual(raised.exception.code, 'BINDING_MARKER_REUSED')
+
+    def test_chained_binding_rejects_other_project(self):
+        from tools.node_architect.q0_browser_binding import BrowserBindingError, validate_binding_chain
+        other = self.current(conversation_url='https://chatgpt.com/g/g-p-other-dw/c/new-chat')
+        with self.assertRaises(BrowserBindingError) as raised:
+            validate_binding_chain(self.historical, other, run_id=RUN, session_id=SID,
+                                   controller_url=other['conversation_url'])
+        self.assertEqual(raised.exception.code, 'BINDING_PROJECT_MISMATCH')
+
+    def test_chained_binding_requires_in_app_delivery_evidence(self):
+        from tools.node_architect.q0_browser_binding import BrowserBindingError, validate_binding_chain
+        with self.assertRaises(BrowserBindingError) as raised:
+            validate_binding_chain(self.historical, self.current(in_app_delivered=False),
+                                   run_id=RUN, session_id=SID,
+                                   controller_url=self.current()['conversation_url'])
+        self.assertEqual(raised.exception.code, 'BINDING_NOT_DELIVERED')
