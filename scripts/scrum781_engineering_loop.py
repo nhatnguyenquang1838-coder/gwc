@@ -220,12 +220,12 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             from tools.node_architect.hermes_skill_capability_bridge import resolve_installed_hermes_skills
             host_capabilities=resolve_installed_hermes_skills(context,home=home,host_session_id=args.session)
     else:raise ValueError('TASK_WORKFLOW_MODE_INVALID')
-    if mode=='Q0_ENGINEERING_COORDINATION':
-        from tools.node_architect.task_context_binding import build_context_manifest,seal_context_manifest
-        seal_context_manifest(path,build_context_manifest(context))
     try:
         result = run_task_workflow(context, host_capabilities=host_capabilities,
                                    invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
+        if mode=='Q0_ENGINEERING_COORDINATION':
+            from tools.node_architect.task_context_binding import build_context_manifest,seal_context_manifest
+            seal_context_manifest(path,build_context_manifest(context),authorized=True)
     except ValueError as exc:
         if str(exc) != 'ENGINEERING_CHECKPOINT_CONTEXT_DRIFT':
             raise
@@ -280,9 +280,9 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             reason=f'additive host-tooling commit {context["repository"]["head_sha"][:12]}; no campaign work/evidence changed')
         manifest=build_context_manifest(context)
         manifest['previous_context_digest']=context_digest(old)
-        seal_context_manifest(path,manifest)
         result = run_task_workflow(context, host_capabilities=host_capabilities,
                                    invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
+        seal_context_manifest(path,manifest,authorized=True)
     return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),
             'capability_binding':host_capabilities.get('capability_binding',{'status':'HOST_INJECTED'}),
             'trigger': 'NATIVE_OWNER_FIRING' if args.tick is not None else 'EXPLICIT_USER_REQUEST_NOT_NATIVE_TICK'}

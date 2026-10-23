@@ -103,7 +103,9 @@ def build_context_manifest(context) -> dict:
     }
 
 
-def seal_context_manifest(checkpoint_ref, manifest) -> str:
+def seal_context_manifest(checkpoint_ref, manifest, *, authorized: bool = False) -> str:
+    """Persist a manifest only after the caller has validated its context."""
+    require(authorized is True, 'MANIFEST_SEAL_NOT_AUTHORIZED')
     manifest_digest = digest(manifest)
     Path(checkpoint_ref).parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(str(checkpoint_ref), timeout=30) as db:

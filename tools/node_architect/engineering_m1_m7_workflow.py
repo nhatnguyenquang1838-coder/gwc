@@ -5,15 +5,73 @@ communication, engineering execution and protected typed authority are distinct.
 """
 from __future__ import annotations
 import json
+import os
 import sqlite3
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import TypedDict,Any
+from typing import TypedDict,Any,Callable,Literal
 from .stable_json import read_json
 from .task_context_binding import validate_task_context,digest,require,ACTIVITIES
 from .controller_exchange_adapter import make_exchange_request,ExchangeOutbox,reconcile_controller_response
 
 MODE='Q0_ENGINEERING_COORDINATION'
 IDENTITY='generic-engineering-m1-m7/v1'
+
+
+class EffectFenceResult(TypedDict):
+    """A refusal-only effect-fence readback; this result grants no authority."""
+    ok: Literal[True]
+    approval_id: str
+    scope_hash: str
+    latest_command_seq: int
+    last_acked_seq: int
+
+
+def _parse_utc(value: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise ValueError('FENCE_TIMESTAMP_INVALID') from exc
+    require(parsed.tzinfo is not None, 'FENCE_TIMESTAMP_INVALID')
+    return parsed.astimezone(timezone.utc)
+
+
+def assert_effect_fence(*, read_latest_command: Callable[[], dict], last_acked_seq: int,
+                        approval_id: str | None, scope_hash: str,
+                        approved_scope_prefix: str, expires_at: str | None,
+                        now: str) -> EffectFenceResult:
+    """Refuse stale/unbound effects; this check never grants execution authority."""
+    require(bool(approval_id), 'FENCE_APPROVAL_ID_REQUIRED')
+    require(bool(scope_hash) and bool(approved_scope_prefix) and
+            scope_hash.startswith(approved_scope_prefix), 'FENCE_SCOPE_PREFIX_MISMATCH')
+    if expires_at is not None:
+        require(_parse_utc(expires_at) >= _parse_utc(now), 'FENCE_APPROVAL_EXPIRED')
+    latest = read_latest_command()
+    require(isinstance(latest, dict) and isinstance(latest.get('seq'), int),
+            'FENCE_LATEST_COMMAND_INVALID')
+    require(isinstance(last_acked_seq, int), 'FENCE_ACK_SEQUENCE_INVALID')
+    latest_seq = latest['seq']
+    require(latest_seq <= last_acked_seq, 'FENCE_UNCONSUMED_CONTROLLER_COMMAND')
+    return {'ok': True, 'approval_id': approval_id, 'scope_hash': scope_hash,
+            'latest_command_seq': latest_seq, 'last_acked_seq': last_acked_seq}
+
+
+def assert_isolated_copy(live_path, copy_path) -> None:
+    """Reject aliases, symlinks, and hardlinks before opening a dry-run target."""
+    live = Path(live_path)
+    copied = Path(copy_path)
+    if copied.is_symlink():
+        raise ValueError('DRY_RUN_TARGET_SYMLINK')
+    try:
+        live_stat = live.stat()
+        copy_stat = copied.stat()
+    except OSError as exc:
+        raise ValueError('DRY_RUN_TARGET_COPY_REQUIRED') from exc
+    same_inode = (live_stat.st_dev, live_stat.st_ino) == (copy_stat.st_dev, copy_stat.st_ino)
+    if same_inode and copy_stat.st_nlink > 1:
+        raise ValueError('DRY_RUN_TARGET_HARDLINK')
+    if os.path.realpath(live_path) == os.path.realpath(copy_path) or same_inode:
+        raise ValueError('DRY_RUN_TARGET_IS_LIVE')
 
 
 class HISTORICAL_CONTEXT_NOT_PROVABLE(ValueError):
@@ -112,6 +170,18 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     require(isinstance(invocation_key,str) and invocation_key,'ENGINEERING_INVOCATION_ID_REQUIRED')
     path=Path(c['workflow']['checkpoint_ref']);path.parent.mkdir(parents=True,exist_ok=True)
     run=c['run']['id'];binding=digest(c)
+    # Reject a stale binding before _connect can create any schema on the live
+    # checkpoint. This read-only preflight makes context drift a zero-write exit.
+    if path.is_file():
+        checkpoint_uri=path.resolve().as_uri()+'?mode=ro'
+        with sqlite3.connect(checkpoint_uri,uri=True,timeout=30) as reader:
+            reader.execute('PRAGMA query_only=ON')
+            has_workflow=reader.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+            prior_binding=(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
+                                          (run,)).fetchone() if has_workflow else None)
+        require(prior_binding is None or prior_binding[0]==binding,
+                'ENGINEERING_CHECKPOINT_CONTEXT_DRIFT')
     with _connect(path) as db:
         db.execute('BEGIN IMMEDIATE')
         cached=db.execute('SELECT binding,result FROM engineering_invocations WHERE run=? AND key=?',(run,invocation_key)).fetchone()
@@ -725,15 +795,66 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     return result
 
 
-def reconcile_engineering_source_head(old_context,new_context,*,repository_root,reason,dry_run:bool=False):
-    """Explicit HEAD-only continuation; retains old invocations and effect claims."""
+def reconcile_engineering_source_head(old_context,new_context,*,repository_root,reason,dry_run:bool=False,
+                                      target_copy: str | None = None,
+                                      read_latest_command=None,last_acked_seq=None,
+                                      approval_id=None,scope_hash=None,
+                                      approved_scope_prefix=None,expires_at=None,now=None):
+    """Explicit HEAD-only continuation; retains old invocations and effect claims.
+
+    Omitting every effect-fence keyword preserves legacy behavior for existing
+    callers and tests. Supplying any fence value activates the complete fence.
+    Dry runs require a caller-created isolated database copy and never open the
+    live checkpoint with a writable connection.
+    """
     import copy,subprocess
+    if not dry_run and any(value is not None for value in
+            (read_latest_command,last_acked_seq,approval_id,scope_hash,
+             approved_scope_prefix,expires_at,now)):
+        assert_effect_fence(read_latest_command=read_latest_command,
+            last_acked_seq=last_acked_seq,approval_id=approval_id,
+            scope_hash=scope_hash,approved_scope_prefix=approved_scope_prefix,
+            expires_at=expires_at,now=now)
+    if dry_run and target_copy is None:
+        raise ValueError('DRY_RUN_REQUIRES_ISOLATED_COPY')
     old=validate_task_context(old_context);new=validate_task_context(new_context);equivalent=copy.deepcopy(new)
     equivalent['repository']['head_sha']=old['repository']['head_sha'];require(equivalent==old and reason,'ENGINEERING_RECONCILE_NON_HEAD_DRIFT')
     root=Path(repository_root).resolve()
     def git(*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
     require(root==Path(new['repository']['worktree']).resolve() and git('rev-parse','HEAD')==new['repository']['head_sha'] and git('branch','--show-current')==new['repository']['branch'],'ENGINEERING_RECONCILE_GIT_BINDING_REQUIRED')
     subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',old['repository']['head_sha'],new['repository']['head_sha']],check=True)
+    receipt={'old_context_digest':digest(old),'new_context_digest':digest(new),
+             'old_head':old['repository']['head_sha'],'new_head':new['repository']['head_sha'],'reason':reason}
+    if dry_run:
+        live_path=old['workflow']['checkpoint_ref']
+        assert_isolated_copy(live_path,target_copy)
+        live_uri=Path(live_path).resolve().as_uri()+'?mode=ro'
+        with sqlite3.connect(live_uri,uri=True,timeout=30) as reader:
+            reader.execute('PRAGMA query_only=ON')
+            live_table=reader.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+            live_row=(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
+                                     (old['run']['id'],)).fetchone() if live_table else None)
+            require(live_row is not None and live_row[0]==digest(old),
+                    'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        with sqlite3.connect(str(target_copy),timeout=30) as db:
+            db.execute('BEGIN IMMEDIATE')
+            table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+            row=(db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',
+                            (old['run']['id'],)).fetchone() if table else None)
+            require(row is not None and row[0]==digest(old),
+                    'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+            db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations '
+                       '(key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
+            db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',
+                       (digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
+            updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',
+                               (digest(new),old['run']['id'],digest(old)))
+            require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+            db.commit()
+        would_apply={'run':old['run']['id'],'old_context_digest':digest(old),
+                     'new_context_digest':digest(new),'receipt_digest':digest(receipt)}
+        return {'dry_run':True,'would_apply':would_apply,'receipt':receipt}
+
     with sqlite3.connect(str(old['workflow']['checkpoint_ref']),timeout=30) as db:
         db.execute('BEGIN IMMEDIATE')
         table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
@@ -742,15 +863,9 @@ def reconcile_engineering_source_head(old_context,new_context,*,repository_root,
         if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
         require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
         db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
-        receipt={'old_context_digest':digest(old),'new_context_digest':digest(new),'old_head':old['repository']['head_sha'],'new_head':new['repository']['head_sha'],'reason':reason}
         db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
         updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',(digest(new),old['run']['id'],digest(old)))
         require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
-        would_apply={'run':old['run']['id'],'old_context_digest':digest(old),
-                     'new_context_digest':digest(new),'receipt_digest':digest(receipt)}
-        if dry_run:
-            db.rollback()
-            return {'dry_run':True,'would_apply':would_apply,'receipt':receipt}
         db.commit()
     with _connect(old['workflow']['checkpoint_ref']) as reader:
         require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
