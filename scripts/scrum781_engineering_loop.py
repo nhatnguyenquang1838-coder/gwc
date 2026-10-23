@@ -220,29 +220,67 @@ def workflow(args: argparse.Namespace, *, host_capabilities=None) -> dict:
             from tools.node_architect.hermes_skill_capability_bridge import resolve_installed_hermes_skills
             host_capabilities=resolve_installed_hermes_skills(context,home=home,host_session_id=args.session)
     else:raise ValueError('TASK_WORKFLOW_MODE_INVALID')
+    if mode=='Q0_ENGINEERING_COORDINATION':
+        from tools.node_architect.task_context_binding import build_context_manifest,seal_context_manifest
+        seal_context_manifest(path,build_context_manifest(context))
     try:
         result = run_task_workflow(context, host_capabilities=host_capabilities,
                                    invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
     except ValueError as exc:
         if str(exc) != 'ENGINEERING_CHECKPOINT_CONTEXT_DRIFT':
             raise
-        # An additive host-tooling commit advanced HEAD. Reconcile the SAME run
-        # explicitly (head-only + ancestor + exact git binding), then retry once.
-        from tools.node_architect.engineering_m1_m7_workflow import reconcile_engineering_source_head
-        old = json.loads(json.dumps(context))
+        # Recover the exact historical binding from a sealed manifest before
+        # considering the legacy telemetry-based head-swap reconstruction.
+        from tools.node_architect.task_context_binding import (
+            classify_context_delta, digest as context_digest, load_context_manifests,
+        )
+        from tools.node_architect.engineering_m1_m7_workflow import (
+            HISTORICAL_CONTEXT_NOT_PROVABLE, _historical_context_recovery,
+            reconcile_engineering_source_head, resolve_prior_context,
+        )
         with sqlite3.connect(str(path)) as db:
-            db.execute('CREATE TABLE IF NOT EXISTS engineering_firing_telemetry '
-                       '(run TEXT,firing TEXT,activity TEXT,reason_code TEXT,status TEXT,'
-                       'source_head TEXT,result_digest TEXT,request_created INTEGER,'
-                       'PRIMARY KEY(run,firing))')
-            row = db.execute('SELECT source_head FROM engineering_firing_telemetry '
-                             'WHERE run=? ORDER BY rowid DESC LIMIT 1',(preflight['run_id'],)).fetchone()
-        previous_head = row[0] if row else None
-        if not previous_head:
-            raise
-        old['repository']['head_sha'] = previous_head
+            row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',
+                             (preflight['run_id'],)).fetchone()
+            stored_digest = row[0] if row else None
+        manifests = load_context_manifests(path,preflight['run_id'])
+        old = None
+        for sealed in manifests:
+            if sealed['context_digest'] != stored_digest:
+                continue
+            try:
+                manifest=json.loads(sealed['manifest'])
+                if context_digest(manifest) != sealed['manifest_digest']:
+                    continue
+                candidate=manifest.get('context')
+                if candidate is not None and context_digest(candidate)==stored_digest:
+                    old=candidate
+                    break
+            except (TypeError,ValueError,json.JSONDecodeError):
+                continue
+        if old is None:
+            with sqlite3.connect(str(path)) as db:
+                telemetry = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                                       "AND name='engineering_firing_telemetry'").fetchone()
+                row = (db.execute('SELECT source_head FROM engineering_firing_telemetry '
+                                  'WHERE run=? ORDER BY rowid DESC LIMIT 1',
+                                  (preflight['run_id'],)).fetchone() if telemetry else None)
+            previous_head = row[0] if row else None
+            if previous_head:
+                old = json.loads(json.dumps(context))
+                old['repository']['head_sha'] = previous_head
+        if old is None:
+            raise HISTORICAL_CONTEXT_NOT_PROVABLE(_historical_context_recovery(
+                path,preflight['run_id'],current_head=context['repository']['head_sha']))
+        resolve_prior_context(path,preflight['run_id'],candidate_old=old,candidate_new=context)
+        delta=classify_context_delta(old,context,repository_root=ROOT)
+        if delta['classification']!='HEAD_ONLY_SAFE':
+            raise HISTORICAL_CONTEXT_NOT_PROVABLE(_historical_context_recovery(
+                path,preflight['run_id'],current_head=context['repository']['head_sha']))
         reconcile_engineering_source_head(old, context, repository_root=ROOT,
             reason=f'additive host-tooling commit {context["repository"]["head_sha"][:12]}; no campaign work/evidence changed')
+        manifest=build_context_manifest(context)
+        manifest['previous_context_digest']=context_digest(old)
+        seal_context_manifest(path,manifest)
         result = run_task_workflow(context, host_capabilities=host_capabilities,
                                    invocation_key=f'{args.session}:native:{args.tick}' if args.tick is not None else None)
     return {**preflight, 'workflow': result, 'workflow_checkpoint': str(path),

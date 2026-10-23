@@ -16,6 +16,66 @@ MODE='Q0_ENGINEERING_COORDINATION'
 IDENTITY='generic-engineering-m1-m7/v1'
 
 
+class HISTORICAL_CONTEXT_NOT_PROVABLE(ValueError):
+    error_code = 'HISTORICAL_CONTEXT_NOT_PROVABLE'
+
+    def __init__(self, recovery_package):
+        super().__init__(self.error_code)
+        self.recovery_package = recovery_package
+
+
+def _historical_context_recovery(checkpoint_ref, run, *, current_head=None):
+    from .task_context_binding import load_context_manifests
+    package = {'stored_context_digest': None, 'telemetry_previous_head': None,
+               'current_head': current_head, 'sealed_manifest_digests': [],
+               'attempted_bindings': [],
+               'suggested_actions': [
+                   'Preserve the checkpoint and inspect its sealed context manifests.',
+                   'Recover the exact historical task context from immutable source evidence.',
+                   'Resume only after exact digest equality and repository ancestry are proven.',
+               ]}
+    with sqlite3.connect(str(checkpoint_ref), timeout=30) as db:
+        exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+        if exists:
+            row = db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?', (run,)).fetchone()
+            if row:
+                package['stored_context_digest'] = row[0]
+        exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_firing_telemetry'").fetchone()
+        if exists:
+            columns = {row[1] for row in db.execute('PRAGMA table_info(engineering_firing_telemetry)')}
+            if 'source_head' in columns and 'run' in columns:
+                row = db.execute('SELECT source_head FROM engineering_firing_telemetry '
+                                 'WHERE run=? ORDER BY rowid DESC LIMIT 1', (run,)).fetchone()
+                if row:
+                    package['telemetry_previous_head'] = row[0]
+        stored = package['stored_context_digest']
+        exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_invocations'").fetchone()
+        if exists and stored:
+            rows = db.execute('SELECT key,result FROM engineering_invocations '
+                              'WHERE run=? AND binding=? ORDER BY rowid', (run, stored)).fetchall()
+            package['attempted_bindings'] = [{'key': row[0], 'result': row[1]} for row in rows]
+    package['sealed_manifest_digests'] = [row['manifest_digest'] for row in
+                                           load_context_manifests(checkpoint_ref, run)]
+    return package
+
+
+def resolve_prior_context(checkpoint_ref, run, *, candidate_old, candidate_new):
+    """Prove a supplied historical context against the checkpoint's exact digest."""
+    from .task_context_binding import validate_task_context
+    old = validate_task_context(candidate_old)
+    new = validate_task_context(candidate_new)
+    with sqlite3.connect(str(checkpoint_ref), timeout=30) as db:
+        exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+        row = (db.execute('SELECT context_digest FROM engineering_workflow WHERE run=?', (run,)).fetchone()
+               if exists else None)
+    stored = row[0] if row else None
+    if stored != digest(old):
+        package = _historical_context_recovery(
+            checkpoint_ref, run, current_head=new['repository']['head_sha'])
+        raise HISTORICAL_CONTEXT_NOT_PROVABLE(package)
+    return old
+
+
 class EngineeringState(TypedDict,total=False):
     current_activity:str
     status:str
@@ -665,7 +725,7 @@ def run_engineering_workflow(context:dict,*,host_capabilities:dict[str,Any],invo
     return result
 
 
-def reconcile_engineering_source_head(old_context,new_context,*,repository_root,reason):
+def reconcile_engineering_source_head(old_context,new_context,*,repository_root,reason,dry_run:bool=False):
     """Explicit HEAD-only continuation; retains old invocations and effect claims."""
     import copy,subprocess
     old=validate_task_context(old_context);new=validate_task_context(new_context);equivalent=copy.deepcopy(new)
@@ -674,13 +734,24 @@ def reconcile_engineering_source_head(old_context,new_context,*,repository_root,
     def git(*args):return subprocess.check_output(['git','-C',str(root),*args],text=True).strip()
     require(root==Path(new['repository']['worktree']).resolve() and git('rev-parse','HEAD')==new['repository']['head_sha'] and git('branch','--show-current')==new['repository']['branch'],'ENGINEERING_RECONCILE_GIT_BINDING_REQUIRED')
     subprocess.run(['git','-C',str(root),'merge-base','--is-ancestor',old['repository']['head_sha'],new['repository']['head_sha']],check=True)
-    with _connect(old['workflow']['checkpoint_ref']) as db:
-        db.execute('BEGIN IMMEDIATE');row=db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+    with sqlite3.connect(str(old['workflow']['checkpoint_ref']),timeout=30) as db:
+        db.execute('BEGIN IMMEDIATE')
+        table=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='engineering_workflow'").fetchone()
+        row=(db.execute('SELECT context_digest,state FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()
+             if table else None)
         if row is None:raise ValueError('ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
         require(row[0]==digest(old),'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
         db.execute('CREATE TABLE IF NOT EXISTS engineering_source_reconciliations (key TEXT PRIMARY KEY, receipt TEXT, prior_state TEXT)')
         receipt={'old_context_digest':digest(old),'new_context_digest':digest(new),'old_head':old['repository']['head_sha'],'new_head':new['repository']['head_sha'],'reason':reason}
-        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt),row[1]));db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',(digest(new),old['run']['id'],digest(old)));db.commit()
+        db.execute('INSERT INTO engineering_source_reconciliations VALUES (?,?,?)',(digest(receipt),json.dumps(receipt,sort_keys=True),row[1]))
+        updated=db.execute('UPDATE engineering_workflow SET context_digest=? WHERE run=? AND context_digest=?',(digest(new),old['run']['id'],digest(old)))
+        require(updated.rowcount==1,'ENGINEERING_RECONCILE_PRIOR_CONTEXT_MISMATCH')
+        would_apply={'run':old['run']['id'],'old_context_digest':digest(old),
+                     'new_context_digest':digest(new),'receipt_digest':digest(receipt)}
+        if dry_run:
+            db.rollback()
+            return {'dry_run':True,'would_apply':would_apply,'receipt':receipt}
+        db.commit()
     with _connect(old['workflow']['checkpoint_ref']) as reader:
         require(reader.execute('SELECT context_digest FROM engineering_workflow WHERE run=?',(old['run']['id'],)).fetchone()[0]==digest(new),'ENGINEERING_RECONCILE_DURABLE_READBACK_FAILED')
     return receipt
