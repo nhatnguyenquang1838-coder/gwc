@@ -19,6 +19,7 @@
     "source_revision": "4087ee15eb1a3603ebd5c2f577ead44406b56eaa",
     "scan_scope": "AST call expressions sqlite3.connect and bare _connect in all Python files under tools/node_architect",
     "connection_sites": 80,
+    "source_bound_site_list": ".gwc/tasks/SCRUM-781/evidence/c245-checkpoint-connection-sites-r1.json",
     "modules": 9,
     "limits": "Static call-site census, not exhaustive authority/reachability proof. Aliases, external stores and host effects are not covered by this scanner. Counts bind pre-fix source, not post-fix site totals."
   },
