@@ -103,6 +103,7 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
             require(item['action'] in c['runtime_plan']['scope']['allowed_actions'] and item['action']=='run_sandboxed_validation','ENGINEERING_EFFECT_AUTHORITY_REQUIRED')
             require(validate(c),'ENGINEERING_EFFECT_REVALIDATION_FAILED')
             return {'argv':list(argv),'source_head':c['repository']['head_sha'],'input_hashes':hashes,
+                    'task_context_digest':digest(c),
                     'input_policy_ref':policy_ref,'input_policy_sha256':policy_sha256,
                     'input_digest':item['input_digest']}
         except EngineeringPreEffectValidationError:
@@ -118,11 +119,13 @@ def local_engineering_capabilities(context,*,guard,artifact_directory,allowed_co
         argv=tuple(prepared['argv']);hashes=prepared['input_hashes']
         policy_ref=prepared['input_policy_ref'];policy_sha256=prepared['input_policy_sha256']
         result=subprocess.run([sys.executable,*argv],cwd=root,capture_output=True,text=True,timeout=90)
+        if preflight(c,item)!=prepared:
+            raise EngineeringPreEffectValidationError('ENGINEERING_POSTEXEC_BINDING_CHANGED')
         artifacts.mkdir(parents=True,exist_ok=True)
         payload={'argv':list(argv),'source_head':c['repository']['head_sha'],'exit_code':result.returncode,
                  'stdout':result.stdout,'stderr':result.stderr,'input_hashes':hashes,
                  'input_policy_ref':policy_ref,'input_policy_sha256':policy_sha256 if policy_ref else None,
-                 'input_digest':item['input_digest']}
+                 'input_digest':item['input_digest'],'task_context_digest':prepared['task_context_digest']}
         path=artifacts/(item['fingerprint'].split(':')[-1]+'.json');encoded=json.dumps(payload,sort_keys=True)
         require(path.resolve().is_relative_to(artifacts),'ENGINEERING_ARTIFACT_PATH_ESCAPE')
         path.write_text(encoded)

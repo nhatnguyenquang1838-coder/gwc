@@ -159,7 +159,7 @@ def test_host_verifier_cannot_skip_preflight_or_artifact_binding(tmp_path, gap):
     stdout = '1 passed in 0.01s\n'  # Adversarial input, NOT observed execution.
     payload = {'argv':argv,'source_head':c['repository']['head_sha'],'exit_code':0,
                'stdout':stdout,'stderr':'','input_hashes':hashes,'input_digest':item['input_digest'],
-               'input_policy_ref':None,'input_policy_sha256':None}
+               'input_policy_ref':None,'input_policy_sha256':None,'task_context_digest':digest(c)}
     if gap == 'input_hashes':payload['input_hashes'] = {ref:'0'*64}
     if gap == 'policy_digest':payload['input_policy_sha256'] = 'unbound-policy'
     artifact.write_text(json.dumps(payload))
@@ -171,6 +171,76 @@ def test_host_verifier_cannot_skip_preflight_or_artifact_binding(tmp_path, gap):
                                          artifact_directory=artifacts, allowed_commands=[allowed])
     assert caps['engineering.verify_result'](c,item,result) is False
     assert artifact.read_bytes() == before
+
+
+def _terminal_unit_host(tmp_path):
+    import hashlib
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    from tools.node_architect.task_context_binding import digest
+    c,_,git=agent_fixture(tmp_path)
+    ref='tests/test_unit_bound.py';source=tmp_path/ref;source.parent.mkdir(parents=True)
+    source.write_text('def test_unit_only():\n    assert True\n')
+    git('add',ref);git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','unit input')
+    c['repository']['head_sha']=git('rev-parse','HEAD')
+    argv=['-m','pytest',ref,'-q']
+    item={'id':'unit-bound','action':'run_sandboxed_validation','argv':argv,'read_paths':[ref],
+          'input_digest':digest({ref:hashlib.sha256(source.read_bytes()).hexdigest()}),
+          'verification_profile':'Q0_TERMINAL_RESULT_SUITE','required_test_files':[ref],
+          'minimum_tests_passed':1,'expected_result':'UNIT_ONLY_PASS'}
+    item['fingerprint']=digest(item)
+    directory=tmp_path/'validation-results'
+    caps=local_engineering_capabilities(c,guard=lambda:True,artifact_directory=directory,allowed_commands=[argv])
+    return c,item,caps,source,directory,argv
+
+
+@pytest.mark.parametrize('identity', ['run','task'])
+def test_stale_result_cannot_cross_task_context(tmp_path, identity):
+    from copy import deepcopy
+    from tools.node_architect.engineering_host_adapter import local_engineering_capabilities
+    c,item,caps,_,directory,argv=_terminal_unit_host(tmp_path)
+    result=caps['engineering.execute'](c,item)
+    assert caps['engineering.verify_result'](c,item,result) is True
+    other=deepcopy(c);other[identity]['id']+='-other-unit-context'
+    successor=local_engineering_capabilities(other,guard=lambda:True,artifact_directory=directory,allowed_commands=[argv])
+    assert successor['engineering.verify_result'](other,item,result) is False
+
+
+@pytest.mark.parametrize('gap', ['input','symlink'])
+def test_post_preflight_drift_refused_before_task_subprocess(tmp_path, monkeypatch, gap):
+    import sys
+    import tools.node_architect.engineering_host_adapter as host
+    c,item,caps,source,directory,_=_terminal_unit_host(tmp_path)
+    prepared=caps['engineering.preflight'](c,item)
+    sentinel=tmp_path/'outside-sentinel';sentinel.write_bytes(b'PRESERVE')
+    if gap=='input':source.write_text('changed after preflight\n')
+    else:
+        directory.mkdir();(directory/(item['fingerprint'].split(':')[-1]+'.json')).symlink_to(sentinel)
+    run=host.subprocess.run;calls=[]
+    def observed(argv,*args,**kwargs):
+        if argv[0]==sys.executable:calls.append(argv)
+        return run(argv,*args,**kwargs)
+    monkeypatch.setattr(host.subprocess,'run',observed)
+    with pytest.raises(ValueError,match='ENGINEERING_INPUT_SOURCE_DRIFT|ENGINEERING_ARTIFACT_PATH_ESCAPE'):
+        caps['engineering.execute'](c,item,prepared)
+    assert calls==[]
+    assert sentinel.read_bytes()==b'PRESERVE'
+
+
+def test_post_command_input_drift_cannot_publish_completion(tmp_path, monkeypatch):
+    import sys
+    import tools.node_architect.engineering_host_adapter as host
+    c,item,caps,source,directory,_=_terminal_unit_host(tmp_path)
+    run=host.subprocess.run;calls=[]
+    def changed(argv,*args,**kwargs):
+        result=run(argv,*args,**kwargs)
+        if argv[0]==sys.executable:
+            calls.append(argv);source.write_text('changed while task ran\n')
+        return result
+    monkeypatch.setattr(host.subprocess,'run',changed)
+    with pytest.raises(ValueError,match='ENGINEERING_INPUT_SOURCE_DRIFT'):
+        caps['engineering.execute'](c,item)
+    assert len(calls)==1  # The initially admitted unit subprocess really ran.
+    assert not directory.exists()  # No completed artifact published after drift.
 
 
 def test_host_executes_exact_terminal_bridge_suite_and_verifies_artifact(tmp_path):

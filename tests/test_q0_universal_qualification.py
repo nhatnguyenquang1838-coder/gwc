@@ -104,6 +104,42 @@ def _cert_inputs(**overrides):
     return d
 
 
+@pytest.mark.parametrize('field,value,code', [
+    ('scenario_id','', 'REPLAY_PROVENANCE_REQUIRED'),
+    ('subject','APPROVED_DISTINCT_CONTROLLED','REPLAY_PROVENANCE_AUTHORIZATION_REQUIRED'),
+    ('original_incident_replayed',0,'REPLAY_PROVENANCE_ORIGINAL_FLAG_REQUIRED'),
+    ('original_incident_replayed',False,'REPLAY_PROVENANCE_SUBJECT_MISMATCH'),
+    ('provenance_digest','sha256:'+'0'*64,'REPLAY_PROVENANCE_DIGEST_MISMATCH'),
+])
+def test_r3_replay_provenance_negative_shape_only(field,value,code):
+    # Existing UNIT fixtures only; never emit an approval or certification receipt.
+    provenance=_cert_inputs()['replay_provenance']
+    provenance[field]=value
+    with pytest.raises(_m().Q0QualificationError,match=code):
+        _m()._validate_replay_provenance(provenance)
+
+
+@pytest.mark.parametrize('field,value,code', [
+    ('activation_id',None,'LOAD_PROOF_REQUIRED'),
+    ('runtime_session_id',None,'LOAD_PROOF_PROCESS_IDENTITY_REQUIRED'),
+    ('loaded_module_identities',{},'LOAD_PROOF_MODULE_IDENTITIES_REQUIRED'),
+    ('loaded_source_sha','0'*40,'LOAD_PROOF_IDENTITY_MISMATCH'),
+])
+def test_r3_host_load_negative_shape_only(field,value,code):
+    inputs=_cert_inputs()  # Unit shape, NOT a real activation/load/authority source.
+    inputs['load_proof_evidence'][field]=value
+    with pytest.raises(_m().Q0QualificationError,match=code):
+        _m().certify_q0_runtime(**inputs)
+
+
+def test_published_sandbox_is_not_native_r3_provenance():
+    plan=ROOT/'core/node-architect/scrum781-q0-controlled-failure-execution-plan-r3.json'
+    assert hashlib.sha256(plan.read_bytes()).hexdigest()=='08028c21107c7abbd8e0ab3525f5d5a32b66e5f314d949f45a385541de6c3f06'
+    evidence=json.loads((ROOT/'.gwc/tasks/SCRUM-781/evidence/c247-mutation-entrypoint-scenario-r1.json').read_text())
+    with pytest.raises(_m().Q0QualificationError,match='REPLAY_PROVENANCE_FIELDS_INVALID'):
+        _m()._validate_replay_provenance(evidence)
+
+
 def _cert():
     return _m().certify_q0_runtime(**_cert_inputs())
 
